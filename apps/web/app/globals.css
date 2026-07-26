@@ -1,0 +1,408 @@
+/**
+ * PM Academy — Global Styles & Design System
+ *
+ * Implements every Sprint 1 design token.
+ * In Tailwind v4, all theme configuration lives here via @theme.
+ * Raw hex values live ONLY in this file — never in component classes.
+ *
+ * Dark mode tokens are defined but NOT activated in Sprint 4.
+ * The .dark {} block is ready for a future sprint.
+ */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+/*---break---
+ */
+@custom-variant dark (&:is(.dark *));
+
+/* ─── Fonts ──────────────────────────────────────────────────────────────────
+   Loaded via next/font in app/layout.tsx and injected as CSS variables.
+   Fallbacks ensure no FOUT before the font loads.
+---------------------------------------------------------------------------- */
+
+/* ─── Light Mode Tokens (Sprint 1 §4) ───────────────────────────────────────
+   These are the single source of truth for all color values.
+   Components reference these variables — never raw hex.
+---------------------------------------------------------------------------- */
+
+:root {
+  /* Core Palette */
+  --color-background:        #FBFAF6;
+  --color-foreground:        #171A17;
+  --color-surface:           #FFFFFF;
+  --color-surface-muted:     #F2EFE7;
+  --color-border:            #DED8CB;
+  --color-border-strong:     #BDB4A2;
+  --color-primary:           #1F6B4E;
+  --color-primary-foreground:#FFFFFF;
+  --color-accent:            #D98B24;
+  --color-accent-foreground: #211204;
+  --color-focus:             #2F80ED;
+
+  /* Semantic Palette */
+  --color-success:           #15803D;
+  --color-success-bg:        #EAF7EE;
+  --color-warning:           #B45309;
+  --color-warning-bg:        #FFF4D6;
+  --color-danger:            #C2410C;
+  --color-danger-bg:         #FFF0E8;
+  --color-info:              #2563EB;
+  --color-info-bg:           #EBF2FF;
+  --color-locked:            #8A8174;
+  --color-ai:                #7C3AED;
+
+  /* Competency Colors (Sprint 1 §4.3) */
+  --color-skill-discovery:   #0F766E;
+  --color-skill-strategy:    #1D4ED8;
+  --color-skill-design:      #DB2777;
+  --color-skill-execution:   #7C3AED;
+  --color-skill-growth:      #16A34A;
+  --color-skill-leadership:  #D97706;
+  --color-skill-technical:   #475569;
+
+  /* Shadows (Sprint 1 §9) */
+  --shadow-xs:               0 1px 2px rgba(23,26,23,.06);
+  --shadow-sm:               0 4px 12px rgba(23,26,23,.08);
+  --shadow-md:               0 12px 32px rgba(23,26,23,.12);
+  --shadow-glow-primary:     0 0 0 4px rgba(31,107,78,.14);
+  --shadow-glow-accent:      0 0 24px rgba(217,139,36,.22);
+
+  /* Motion (Sprint 1 §12) */
+  --duration-fast:           120ms;
+  --duration-standard:       180ms;
+  --duration-complex:        240ms;
+  --ease-out:                cubic-bezier(0, 0, 0.2, 1);
+
+  /* Z-Index */
+  --z-nav:     50;
+  --z-popover: 60;
+  --z-dialog:  70;
+  --z-toast:   80;
+  --background:        oklch(1 0 0);
+  --foreground:        oklch(0.145 0 0);
+  --card:        oklch(1 0 0);
+  --card-foreground:        oklch(0.145 0 0);
+  --popover:        oklch(1 0 0);
+  --popover-foreground:        oklch(0.145 0 0);
+  --primary:        oklch(0.205 0 0);
+  --primary-foreground:        oklch(0.985 0 0);
+  --secondary:        oklch(0.97 0 0);
+  --secondary-foreground:        oklch(0.205 0 0);
+  --muted:        oklch(0.97 0 0);
+  --muted-foreground:        oklch(0.556 0 0);
+  --accent:        oklch(0.97 0 0);
+  --accent-foreground:        oklch(0.205 0 0);
+  --destructive:        oklch(0.577 0.245 27.325);
+  --border:        oklch(0.922 0 0);
+  --input:        oklch(0.922 0 0);
+  --ring:        oklch(0.708 0 0);
+  --chart-1:        oklch(0.87 0 0);
+  --chart-2:        oklch(0.556 0 0);
+  --chart-3:        oklch(0.439 0 0);
+  --chart-4:        oklch(0.371 0 0);
+  --chart-5:        oklch(0.269 0 0);
+  --radius:        0.625rem;
+  --sidebar:        oklch(0.985 0 0);
+  --sidebar-foreground:        oklch(0.145 0 0);
+  --sidebar-primary:        oklch(0.205 0 0);
+  --sidebar-primary-foreground:        oklch(0.985 0 0);
+  --sidebar-accent:        oklch(0.97 0 0);
+  --sidebar-accent-foreground:        oklch(0.205 0 0);
+  --sidebar-border:        oklch(0.922 0 0);
+  --sidebar-ring:        oklch(0.708 0 0);
+}
+
+/* ─── Dark Mode Tokens (Sprint 1 §14) ───────────────────────────────────────
+   DEFINED but NOT ACTIVATED in Sprint 4.
+   Activate by adding `next-themes` ThemeProvider and wiring .dark class.
+   Do not delete — these are ready for the dark mode sprint.
+---------------------------------------------------------------------------- */
+
+.dark {
+  /* Core Palette — Dark */
+  --color-background:        #0E1110;
+  --color-foreground:        #F4F1E8;
+  --color-surface:           #161A18;
+  --color-surface-muted:     #202520;
+  --color-border:            #343A34;
+  --color-border-strong:     #4A5249;
+  --color-primary:           #66D6A3;
+  --color-primary-foreground:#07110C;
+  --color-accent:            #FFB454;
+  --color-accent-foreground: #1C1003;
+  --color-focus:             #7AB2FF;
+
+  /* Semantic — Dark */
+  --color-success:           #4ADE80;
+  --color-success-bg:        #13261A;
+  --color-warning:           #FACC15;
+  --color-warning-bg:        #30250B;
+  --color-danger:            #FB7185;
+  --color-danger-bg:         #321A16;
+  --color-info:              #93C5FD;
+  --color-info-bg:           #13213A;
+  --color-locked:            #8A9289;
+  --color-ai:                #C4B5FD;
+
+  /* Competency — Dark (increased lightness for contrast) */
+  --color-skill-discovery:   #2DD4BF;
+  --color-skill-strategy:    #60A5FA;
+  --color-skill-design:      #F472B6;
+  --color-skill-execution:   #A78BFA;
+  --color-skill-growth:      #4ADE80;
+  --color-skill-leadership:  #FBD038;
+  --color-skill-technical:   #94A3B8;
+  --background:        oklch(0.145 0 0);
+  --foreground:        oklch(0.985 0 0);
+  --card:        oklch(0.205 0 0);
+  --card-foreground:        oklch(0.985 0 0);
+  --popover:        oklch(0.205 0 0);
+  --popover-foreground:        oklch(0.985 0 0);
+  --primary:        oklch(0.922 0 0);
+  --primary-foreground:        oklch(0.205 0 0);
+  --secondary:        oklch(0.269 0 0);
+  --secondary-foreground:        oklch(0.985 0 0);
+  --muted:        oklch(0.269 0 0);
+  --muted-foreground:        oklch(0.708 0 0);
+  --accent:        oklch(0.269 0 0);
+  --accent-foreground:        oklch(0.985 0 0);
+  --destructive:        oklch(0.704 0.191 22.216);
+  --border:        oklch(1 0 0 / 10%);
+  --input:        oklch(1 0 0 / 15%);
+  --ring:        oklch(0.556 0 0);
+  --chart-1:        oklch(0.87 0 0);
+  --chart-2:        oklch(0.556 0 0);
+  --chart-3:        oklch(0.439 0 0);
+  --chart-4:        oklch(0.371 0 0);
+  --chart-5:        oklch(0.269 0 0);
+  --sidebar:        oklch(0.205 0 0);
+  --sidebar-foreground:        oklch(0.985 0 0);
+  --sidebar-primary:        oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground:        oklch(0.985 0 0);
+  --sidebar-accent:        oklch(0.269 0 0);
+  --sidebar-accent-foreground:        oklch(0.985 0 0);
+  --sidebar-border:        oklch(1 0 0 / 10%);
+  --sidebar-ring:        oklch(0.556 0 0);
+}
+
+/* ─── Tailwind v4 Theme ──────────────────────────────────────────────────────
+   Maps every CSS variable to a Tailwind utility class.
+   Usage: bg-background, text-primary, border-border-strong, etc.
+---------------------------------------------------------------------------- */
+
+@theme inline {
+  /* Fonts */
+  --font-sans:        var(--font-sans);
+  --font-display: var(--font-fraunces);
+
+  /* Colors — Core */
+  --color-background:        var(--color-background);
+  --color-foreground:        var(--color-foreground);
+  --color-surface:           var(--color-surface);
+  --color-surface-muted:     var(--color-surface-muted);
+  --color-border:            var(--color-border);
+  --color-border-strong:     var(--color-border-strong);
+  --color-primary:           var(--color-primary);
+  --color-primary-foreground:var(--color-primary-foreground);
+  --color-accent:            var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-focus:             var(--color-focus);
+
+  /* Colors — Semantic */
+  --color-success:           var(--color-success);
+  --color-success-bg:        var(--color-success-bg);
+  --color-warning:           var(--color-warning);
+  --color-warning-bg:        var(--color-warning-bg);
+  --color-danger:            var(--color-danger);
+  --color-danger-bg:         var(--color-danger-bg);
+  --color-info:              var(--color-info);
+  --color-info-bg:           var(--color-info-bg);
+  --color-locked:            var(--color-locked);
+  --color-ai:                var(--color-ai);
+
+  /* Colors — Competency */
+  --color-skill-discovery:   var(--color-skill-discovery);
+  --color-skill-strategy:    var(--color-skill-strategy);
+  --color-skill-design:      var(--color-skill-design);
+  --color-skill-execution:   var(--color-skill-execution);
+  --color-skill-growth:      var(--color-skill-growth);
+  --color-skill-leadership:  var(--color-skill-leadership);
+  --color-skill-technical:   var(--color-skill-technical);
+
+  /* Border Radius (Sprint 1 §8) */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs:           var(--shadow-xs);
+  --shadow-sm:           var(--shadow-sm);
+  --shadow-md:           var(--shadow-md);
+  --shadow-glow-primary: var(--shadow-glow-primary);
+  --shadow-glow-accent:  var(--shadow-glow-accent);
+
+  /* Typography Scale (Sprint 1 §5) */
+  --text-display-xl: 3.5rem;    /* 56px */
+  --text-display-lg: 2.75rem;   /* 44px */
+  --text-h1:         2.25rem;   /* 36px */
+  --text-h2:         1.75rem;   /* 28px */
+  --text-h3:         1.375rem;  /* 22px */
+  --text-h4:         1.125rem;  /* 18px */
+  --text-body-lg:    1.125rem;  /* 18px */
+  --text-body:       1rem;      /* 16px */
+  --text-body-sm:    0.875rem;  /* 14px */
+  --text-caption:    0.75rem;   /* 12px */
+  --text-micro:      0.6875rem; /* 11px */
+
+  /* Spacing (Sprint 1 §6) */
+  --spacing-1:  0.25rem;   /* 4px */
+  --spacing-2:  0.5rem;    /* 8px */
+  --spacing-3:  0.75rem;   /* 12px */
+  --spacing-4:  1rem;      /* 16px */
+  --spacing-5:  1.25rem;   /* 20px */
+  --spacing-6:  1.5rem;    /* 24px */
+  --spacing-8:  2rem;      /* 32px */
+  --spacing-10: 2.5rem;    /* 40px */
+  --spacing-12: 3rem;      /* 48px */
+  --spacing-16: 4rem;      /* 64px */
+  --spacing-24: 6rem;      /* 96px */
+
+  /* Transition Durations */
+  --duration-fast:     120ms;
+  --duration-standard: 180ms;
+  --duration-complex:  240ms;
+  --font-heading:        var(--font-sans);
+  --color-sidebar-ring:        var(--sidebar-ring);
+  --color-sidebar-border:        var(--sidebar-border);
+  --color-sidebar-accent-foreground:        var(--sidebar-accent-foreground);
+  --color-sidebar-accent:        var(--sidebar-accent);
+  --color-sidebar-primary-foreground:        var(--sidebar-primary-foreground);
+  --color-sidebar-primary:        var(--sidebar-primary);
+  --color-sidebar-foreground:        var(--sidebar-foreground);
+  --color-sidebar:        var(--sidebar);
+  --color-chart-5:        var(--chart-5);
+  --color-chart-4:        var(--chart-4);
+  --color-chart-3:        var(--chart-3);
+  --color-chart-2:        var(--chart-2);
+  --color-chart-1:        var(--chart-1);
+  --color-ring:        var(--ring);
+  --color-input:        var(--input);
+  --color-destructive:        var(--destructive);
+  --color-muted-foreground:        var(--muted-foreground);
+  --color-muted:        var(--muted);
+  --color-secondary-foreground:        var(--secondary-foreground);
+  --color-secondary:        var(--secondary);
+  --color-popover-foreground:        var(--popover-foreground);
+  --color-popover:        var(--popover);
+  --color-card-foreground:        var(--card-foreground);
+  --color-card:        var(--card);
+  --radius-2xl:        calc(var(--radius) * 1.8);
+  --radius-3xl:        calc(var(--radius) * 2.2);
+  --radius-4xl:        calc(var(--radius) * 2.6);
+}
+
+/* ─── Base Styles ────────────────────────────────────────────────────────────
+   Applied globally. Components inherit from these.
+---------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Focus Styles ───────────────────────────────────────────────────────────
+   Visible focus rings using the Sprint 1 focus token.
+   Applied via focus-visible (keyboard only — not on mouse click).
+---------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ─── Selection ──────────────────────────────────────────────────────────────*/
+
+::selection {
+  background-color: rgba(31, 107, 78, 0.15);
+  color: var(--color-foreground);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────*/
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface-muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+/* ─── Utility: Screen-reader only ────────────────────────────────────────────
+   Elements marked .sr-only are visually hidden but readable by screen readers.
+---------------------------------------------------------------------------- */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only:focus,
+.sr-only:focus-within {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+/*---break---
+ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
