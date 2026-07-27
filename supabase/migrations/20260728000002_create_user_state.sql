@@ -37,7 +37,7 @@ create index if not exists user_lesson_progress_user_idx on user_lesson_progress
 
 -- ─── 3. Quiz Attempts ────────────────────────────────────────────────────────
 create table if not exists quiz_attempts (
-  id              uuid primary key default gen_random_uuid(),
+  id              uuid primary key default extensions.gen_random_uuid(),
   user_id         uuid references users(id) on delete cascade,
   lesson_slug     text not null,
   question_id     text not null,                -- stable ID from static JSON
@@ -63,7 +63,7 @@ create index if not exists user_flashcard_srs_user_review_idx on user_flashcard_
 
 -- ─── 5. XP Events Ledger (Source of Truth) ───────────────────────────────────
 create table if not exists xp_events (
-  id          uuid primary key default gen_random_uuid(),
+  id          uuid primary key default extensions.gen_random_uuid(),
   user_id     uuid references users(id) on delete cascade,
   source_type text not null,                   -- 'theory_read' | 'quiz_correct' | 'quiz_bonus' | 'flashcard' | 'reflection' | 'capstone' | 'streak'
   source_id   text,                            -- nullable ref to lesson slug or content ID
@@ -129,7 +129,7 @@ execute function sync_user_xp_and_level_on_update();
 
 -- ─── 6. Reflections ──────────────────────────────────────────────────────────
 create table if not exists reflections (
-  id          uuid primary key default gen_random_uuid(),
+  id          uuid primary key default extensions.gen_random_uuid(),
   user_id     uuid references users(id) on delete cascade,
   lesson_slug text not null,
   content     text not null,
@@ -141,7 +141,7 @@ create index if not exists reflections_user_lesson_idx on reflections (user_id, 
 
 -- ─── 7. Bookmarks ─────────────────────────────────────────────────────────────
 create table if not exists bookmarks (
-  id          uuid primary key default gen_random_uuid(),
+  id          uuid primary key default extensions.gen_random_uuid(),
   user_id     uuid references users(id) on delete cascade,
   lesson_slug text not null,
   created_at  timestamptz not null default now(),
@@ -150,7 +150,7 @@ create table if not exists bookmarks (
 
 -- ─── 8. Capstone Submissions ─────────────────────────────────────────────────
 create table if not exists capstone_submissions (
-  id           uuid primary key default gen_random_uuid(),
+  id           uuid primary key default extensions.gen_random_uuid(),
   user_id      uuid references users(id) on delete cascade,
   module_slug  text not null,
   content      text not null,
@@ -163,7 +163,7 @@ create index if not exists capstone_submissions_user_idx on capstone_submissions
 
 -- ─── 9. Badges & User Badges ──────────────────────────────────────────────────
 create table if not exists badges (
-  id          uuid primary key default gen_random_uuid(),
+  id          uuid primary key default extensions.gen_random_uuid(),
   key         text unique not null,
   name        text not null,
   description text not null,
@@ -193,7 +193,7 @@ on conflict (key) do nothing;
 
 -- ─── 10. Cohorts & Leaderboard ────────────────────────────────────────────────
 create table if not exists cohorts (
-  id         uuid primary key default gen_random_uuid(),
+  id         uuid primary key default extensions.gen_random_uuid(),
   name       text not null,
   created_at timestamptz not null default now()
 );

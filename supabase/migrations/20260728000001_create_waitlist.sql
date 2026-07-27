@@ -1,13 +1,15 @@
 -- PM Academy — Waitlist Table Migration
 -- Migration: 20260728000001_create_waitlist.sql
 
+create extension if not exists pgcrypto schema extensions;
+
 -- ─── 1. Table Setup ──────────────────────────────────────────────────────────
 create table if not exists waitlist (
-  id           uuid        primary key default gen_random_uuid(),
-  name         text        not null,
-  email        text        unique not null,
-  current_role text        not null,
-  source       text        not null default 'direct',
+  id           uuid primary key default extensions.gen_random_uuid(),
+  name         text not null,
+  email        text unique not null,
+  current_role text not null,
+  source       text not null default 'direct',
   utm_source   text,
   utm_medium   text,
   utm_campaign text,
