@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import type { ApiSuccess, ApiError } from '@/types'
 import { ROLE_OPTIONS } from '@/types'
+import { sendWaitlistConfirmationEmail } from '@/lib/email'
 
 // ─── Validation Schema ────────────────────────────────────────────────────────
 
@@ -105,6 +106,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
     }
 
     // Insert new waitlist entry
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: insertError } = await (supabase.from('waitlist') as any).insert({
       name,
       email,
@@ -131,6 +133,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
         { status: 500 }
       )
     }
+
+    // Send waitlist confirmation email (asynchronous, non-blocking)
+    sendWaitlistConfirmationEmail({ name, email }).catch((err) => {
+      console.error('[waitlist] Error sending confirmation email:', err)
+    })
 
     return NextResponse.json(
       { message: 'You are on the waitlist.' },
