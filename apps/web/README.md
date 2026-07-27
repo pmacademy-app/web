@@ -1,18 +1,19 @@
-# PM Academy — Marketing Website
+# PM Academy — Web Application
 
-A production-quality standalone Next.js marketing site implementing every design and content specification faithfully. Built to serve as the front door for PM Academy, with a fully integrated, lightweight waitlist system powered by Supabase.
+A production-quality Next.js application implementing the full PM Academy curriculum, learning loops, dashboard, and marketing landing pages. Built with a static-first architecture for the curriculum content, integrated with a lightweight user state database and waitlist system powered by Supabase.
 
 ---
 
 ## Technical Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
+- **Framework**: Next.js 16 (App Router) & React 19
+- **Language**: TypeScript (Strict Mode)
 - **Styling**: TailwindCSS v4
-- **UI Components**: Radix Primitives via shadcn/ui
+- **UI Components**: @base-ui/react primitives via shadcn/ui
 - **Animation**: Framer Motion
 - **Database**: Supabase
 - **Analytics**: Google Analytics 4 (GA4) with Google Tag Manager support
+
 
 ---
 

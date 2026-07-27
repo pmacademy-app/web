@@ -22,7 +22,7 @@ const COMPARISON_CARDS = [
   {
     icon: 'BookOpen',
     title: 'PM Academy',
-    description: 'Structured curriculum, skill analytics, AI-assisted feedback, and portfolio artifacts. Completely free.',
+    description: 'Structured curriculum, skill analytics, interactive quizzes, and portfolio artifacts. Completely free.',
     variant: 'comparison-highlighted' as const,
   },
 ]

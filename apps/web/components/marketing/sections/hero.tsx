@@ -82,7 +82,7 @@ export function HeroSection() {
               variants={prefersReducedMotion ? undefined : FADE_UP}
               className="text-body-lg text-locked leading-relaxed max-w-[500px]"
             >
-              A structured PM curriculum with 90 lessons, skill analytics, AI-assisted feedback, and portfolio artifacts. Built for people who want more than a certificate.
+              A structured PM curriculum with 90 lessons, skill analytics, interactive quizzes, and portfolio artifacts. Built for people who want more than a certificate.
             </motion.p>
 
             {/* CTAs */}

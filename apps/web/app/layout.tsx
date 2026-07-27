@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    'A complete, free Product Management curriculum with 90 structured lessons, quizzes, AI-assisted feedback, skill analytics, and portfolio projects. Built for career switchers and ambitious builders.',
+    'A complete, free Product Management curriculum with 90 structured lessons, interactive quizzes, skill analytics, and portfolio projects. Built for career switchers and ambitious builders.',
 
   keywords: [
     'Product Management course',
