@@ -134,3 +134,70 @@ export interface FooterLinkGroup {
   heading: string
   links: { label: string; href: string }[]
 }
+
+// ─── Parsed Lesson Content Types (from parse-content) ──────────────────────────
+
+export interface QuizQuestion {
+  id: string
+  questionNumber: number
+  questionText: string
+  options: string[]
+  correctOptionIndex: number // 0-indexed
+  correctOptionLetter: string // 'A' | 'B' | 'C' | 'D'
+  explanation: string
+  learningObjective?: string
+  difficulty?: string
+}
+
+export interface FlashcardItem {
+  id: string
+  front: string
+  back: string
+  difficulty: string
+  tags: string[]
+  lessonNumber: number
+}
+
+export interface LessonMeta {
+  slug: string
+  number: number
+  title: string
+  moduleNumber: number
+  moduleName: string
+  difficulty: number
+  estMinutesReading: number
+  estMinutesReflection: number
+  prerequisites: string
+  nextLessonSlug: string
+  futureTopicsUnlocked: string
+}
+
+export interface ParsedLesson {
+  meta: LessonMeta
+  learningObjectives: string[]
+  theory: string
+  mistakes: string
+  mentalModel: {
+    title: string
+    content: string
+    diagramMermaid?: string
+  }
+  caseStudy: {
+    title: string
+    content: string
+  }
+  framework: {
+    title: string
+    content: string
+  }
+  realWorldPerspective: {
+    title: string
+    content: string
+  }
+  quiz: QuizQuestion[]
+  flashcards: FlashcardItem[]
+  reflectionPrompt: string
+  connections: string
+  rawMarkdownPath: string
+}
+

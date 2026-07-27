@@ -9,7 +9,7 @@ import { SuccessState } from '@/components/feedback/success-state'
 import { ErrorState } from '@/components/feedback/error-state'
 import { trackWaitlistSignup } from '@/lib/analytics'
 import { ROLE_OPTIONS } from '@/types'
-import type { WaitlistFormValues, RoleOption } from '@/types'
+import type { WaitlistFormValues } from '@/types'
 import { cn } from '@/lib/utils'
 
 // ─── Validation schema ─────────────────────────────────────────────────────────
@@ -95,7 +95,6 @@ export function WaitlistForm({ className }: { className?: string }) {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),

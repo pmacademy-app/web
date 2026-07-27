@@ -4,10 +4,9 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { EXPERIENCE_FEATURES } from '@/config/content'
-import { AIChatPreview } from '@/components/marketing/product-mockup/ai-chat-preview'
 import { ModuleCardPreview } from '@/components/marketing/product-mockup/module-card-preview'
 import * as LucideIcons from 'lucide-react'
-import type { LucideProps } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TABS = [
@@ -61,7 +60,15 @@ function MockupPanel({ type }: { type: string }) {
       </div>
     ),
     casestudy: (
-      <AIChatPreview />
+      <div className="bg-surface border border-border rounded-lg p-5 w-full max-w-[320px] space-y-3">
+        <span className="text-caption text-locked font-medium uppercase tracking-wide">Case Study · Module 02</span>
+        <h4 className="text-h4 font-semibold text-foreground">Netflix: The Qwikster Split</h4>
+        <p className="text-body-sm text-locked">How Reed Hastings navigated splitting DVD-by-mail and streaming, and what it teaches about product positioning.</p>
+        <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-primary font-semibold">
+          <span>Read analysis →</span>
+          <span className="text-locked font-normal">8 min read</span>
+        </div>
+      </div>
     ),
   }
 
@@ -109,7 +116,7 @@ export function ExperienceSection() {
 
             <div className="space-y-4">
               {EXPERIENCE_FEATURES.map((feature, index) => {
-                const IconComponent = (LucideIcons as any)[feature.icon] as React.ComponentType<any> | undefined
+                const IconComponent = (LucideIcons as unknown as Record<string, LucideIcon | undefined>)[feature.icon]
                 return (
                   <motion.div
                     key={feature.title}

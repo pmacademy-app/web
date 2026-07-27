@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { PORTFOLIO_ARTIFACTS } from '@/config/content'
 import * as LucideIcons from 'lucide-react'
-import type { LucideProps } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { User, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -59,7 +59,7 @@ export function PortfolioSection() {
               </p>
               <div className="space-y-2">
                 {PORTFOLIO_ARTIFACTS.map((artifact, index) => {
-                  const IconComponent = (LucideIcons as any)[artifact.icon] as React.ComponentType<any> | undefined
+                  const IconComponent = (LucideIcons as unknown as Record<string, LucideIcon | undefined>)[artifact.icon]
                   return (
                     <motion.div
                       key={artifact.title}

@@ -31,10 +31,10 @@ export default function AboutPage() {
             <strong>Depth over gimmick:</strong> Gamification serves retention of real learning — it never replaces it.
           </li>
           <li>
-            <strong>Free means free — no dark patterns:</strong> No fake "free trial," no paywalling lesson 11 onward, ever.
+            <strong>Free means free — no dark patterns:</strong> No fake &quot;free trial,&quot; no paywalling lesson 11 onward, ever.
           </li>
           <li>
-            <strong>Respect the learner's time:</strong> Every lesson states an honest estimated time. No artificial waiting periods.
+            <strong>Respect the learner&apos;s time:</strong> Every lesson states an honest estimated time. No artificial waiting periods.
           </li>
           <li>
             <strong>Portfolio, not just certificate:</strong> Every module ends with an applied capstone you can share on LinkedIn.

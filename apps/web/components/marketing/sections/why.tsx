@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { FeatureCard } from '@/components/marketing/feature-card'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
-import { FADE_UP, STAGGER_CONTAINER } from '@/lib/animation'
+import { STAGGER_CONTAINER } from '@/lib/animation'
 
 const COMPARISON_CARDS = [
   {

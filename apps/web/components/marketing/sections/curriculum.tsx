@@ -41,7 +41,7 @@ export function CurriculumSection() {
             id="curriculum-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
           >
-            Everything you need. Nothing you don't.
+            Everything you need. Nothing you don&apos;t.
           </h2>
           <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
             Nine modules, ninety lessons, one coherent path from product thinking to portfolio-ready work.

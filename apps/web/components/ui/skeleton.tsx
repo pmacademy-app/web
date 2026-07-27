@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 
-interface SkeletonProps extends React.ComponentProps<"div"> {}
+type SkeletonProps = React.ComponentProps<"div">
 
 /**
  * Shimmering skeleton for loading states.

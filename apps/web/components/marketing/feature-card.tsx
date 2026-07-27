@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import * as LucideIcons from 'lucide-react'
-import type { LucideProps } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 
 interface FeatureCardProps {
@@ -25,7 +25,7 @@ export function FeatureCard({
   className,
 }: FeatureCardProps) {
   // Dynamically resolve Lucide icon by name
-  const IconComponent = (LucideIcons as any)[icon] as React.ComponentType<any> | undefined
+  const IconComponent = (LucideIcons as unknown as Record<string, LucideIcon | undefined>)[icon]
 
   const cardClasses = cn(
     'relative flex flex-col gap-4 p-5 rounded-lg border',

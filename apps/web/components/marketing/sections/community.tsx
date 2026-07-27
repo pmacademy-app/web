@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { COMMUNITY_FEATURES } from '@/config/content'
 import * as LucideIcons from 'lucide-react'
-import type { LucideProps } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 /**
  * Community section — Sprint 2 §16 + Sprint 3 community copy.
@@ -41,7 +41,7 @@ export function CommunitySection() {
         {/* Feature Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {COMMUNITY_FEATURES.map((feature, index) => {
-            const IconComponent = (LucideIcons as any)[feature.icon] as React.ComponentType<any> | undefined
+            const IconComponent = (LucideIcons as unknown as Record<string, LucideIcon | undefined>)[feature.icon]
             return (
               <motion.div
                 key={feature.title}

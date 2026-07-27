@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MODULES } from '@/config/content'
-import { SKILL_CLUSTERS } from '@/lib/skillRadar'
 
 export const metadata: Metadata = {
   title: 'Full Curriculum — 9 Modules, 90 Lessons | PM Academy',

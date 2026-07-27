@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerSupabaseClient } from '@/lib/supabase'
-import type { ApiSuccess, ApiError, RoleOption } from '@/types'
+import type { ApiSuccess, ApiError } from '@/types'
 import { ROLE_OPTIONS } from '@/types'
 
 // ─── Validation Schema ────────────────────────────────────────────────────────
@@ -17,20 +17,7 @@ const waitlistSchema = z.object({
     .email('Enter a valid email address.')
     .toLowerCase()
     .trim(),
-  current_role: z.enum([
-    'Student',
-    'Aspiring Product Manager',
-    'Product Manager',
-    'Software Engineer',
-    'Designer',
-    'Founder',
-    'Marketing',
-    'Sales',
-    'Business Analyst',
-    'Data Analyst',
-    'Consultant',
-    'Other',
-  ] as const, {
+  current_role: z.enum(ROLE_OPTIONS, {
     message: 'Please select a role from the list.',
   }),
   // Optional UTM attribution — captured client-side from URL
@@ -118,7 +105,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
     }
 
     // Insert new waitlist entry
-    const { error: insertError } = await supabase.from('waitlist').insert({
+    const { error: insertError } = await (supabase.from('waitlist') as any).insert({
       name,
       email,
       current_role,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+
 import { useScrollDepth } from '@/hooks/use-analytics'
 import { HeroSection } from '@/components/marketing/sections/hero'
 import { WhySection } from '@/components/marketing/sections/why'

@@ -54,7 +54,7 @@ export default function WaitlistPage() {
         {status === 'success' ? (
           <div className="text-center py-6 space-y-4">
             <div className="text-4xl">🎉</div>
-            <h2 className="text-xl font-bold text-foreground">You're on the list!</h2>
+            <h2 className="text-xl font-bold text-foreground">You&apos;re on the list!</h2>
             <p className="text-sm text-muted-foreground">{message}</p>
           </div>
         ) : (

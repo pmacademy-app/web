@@ -3,7 +3,7 @@ import path from 'path'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import type { ParsedLesson } from '../../../../../scripts/parse-content'
+import type { ParsedLesson } from '@/types'
 
 interface PageProps {
   params: Promise<{ slug: string }>
