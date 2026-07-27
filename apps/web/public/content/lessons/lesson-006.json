@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-006",
+    "number": 6,
+    "title": "Jobs To Be Done",
+    "moduleNumber": 1,
+    "moduleName": "Foundations",
+    "difficulty": 3,
+    "estMinutesReading": 30,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 1 (What is Product Management?), Lesson 5 (Users vs. Customers)",
+    "nextLessonSlug": "lesson-007",
+    "futureTopicsUnlocked": "Lesson 7 (Value Proposition — articulating value in job terms), Lesson 12 (Customer Interviews — the primary method for uncovering jobs), Lesson 17 (Problem Statements — formalizing a job into a workable statement), Lesson 21 (MVP — scoping a first solution to a validated job)"
+  },
+  "learningObjectives": [
+    "Define a \"job to be done\" and distinguish it from a feature request, a solution, and a demographic persona.",
+    "Apply the \"Five Whys\"–style laddering technique to decompose a stated request into its underlying functional, social, and emotional dimensions.",
+    "Distinguish functional, social, and emotional jobs, and explain why solutions that address only the functional dimension often underperform.",
+    "Identify the \"competing against non-consumption\" trap and explain why a product's true competitors are often not the obvious rival products.",
+    "Apply JTBD thinking to a stakeholder request from either a user or a customer (per the Stakeholder Ledger, Lesson 5), and propose at least one alternative solution to the same underlying job."
+  ],
+  "theory": "### The Core Definition\n\nA **job to be done** is the progress a person is trying to make in a particular circumstance — the underlying task, goal, or change they are trying to achieve — independent of any specific product or feature. The person \"hires\" a product, service, or even an informal workaround to get that job done, and will \"fire\" it (switch away, stop using it, or never adopt it in the first place) if something else does the job better, cheaper, or more conveniently.\n\nThe classic formulation, drawn from Clayton Christensen's writing and popularized further by consultants such as Bob Moesta and Tony Ulwick, uses a specific structure:\n\n> When [situation/circumstance], I want to [motivation], so I can [expected outcome].\n\nNotice what this structure deliberately omits: it says nothing about a product, a feature, or a company. It describes a person's situation and their desired outcome only. This is intentional — a job statement written correctly should be just as true before your product existed as after, and should remain true even if a competitor's product, or no product at all, ends up being hired to do it.\n\n### Why \"The Customer Wants X\" Is Usually the Wrong Level of Analysis\n\nRecall from Lesson 1's Common Beginner Mistake 4 and this lesson's opening example: stakeholders overwhelmingly express their needs as proposed solutions, not as jobs. This isn't a character flaw in stakeholders — it's a natural consequence of the fact that solving problems for a living is a specialized skill, and most people, most of the time, reach for the first plausible solution they can imagine rather than doing the harder work of naming the underlying problem precisely.\n\nThe risk is that a PM who takes stated solutions at face value inherits whatever blind spots the requester had. A sales VP who hears \"we need offline mode\" from prospects has correctly identified that *something* is blocking a sale, but has no particular expertise in solution design — that is the PM's job, and it is exactly the value a PM adds that a simple order-taker does not.\n\n### The Three Dimensions of a Job: Functional, Social, Emotional\n\nA job to be done is rarely purely practical. JTBD theory distinguishes three overlapping dimensions:\n\n- **Functional dimension** — the practical task itself. (\"I need to get my team's quarterly numbers reviewed before the board meeting.\")\n- **Emotional dimension** — how the person wants to feel, or wants to avoid feeling, while getting the job done. (\"I don't want to feel embarrassed presenting incomplete data.\")\n- **Social dimension** — how the person wants to be perceived by others while getting the job done. (\"I want my peers to see me as someone who runs a data-driven team.\")\n\nA product that satisfies only the functional dimension while ignoring the emotional and social dimensions frequently underperforms a functionally weaker competitor that better addresses all three. This is one of the most common reasons \"objectively better\" products lose to seemingly inferior ones: the losing product solved the practical task but ignored how the person wanted to feel, or be seen, while doing it.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Job to Be Done] --> B[Functional the Practical Task]\n    A --> C[Emotional How They Want to Feel]\n    A --> D[Social How They Want to Be Perceived]\n    B --> E[Complete Solution Addresses All Three]\n    C --> E\n    D --> E\n```\n\n### Laddering: Getting From a Stated Request to the Real Job\n\nThe core technique for uncovering a job is **laddering** — repeatedly asking \"why\" or \"what would that let you do\" in response to a stated request, until you reach a level of explanation that would remain true regardless of which specific solution is chosen.\n\nA worked example, continuing this lesson's opening scenario:\n\n> Stakeholder request: \"We need offline mode.\"\n> **Why?** \"Because our enterprise prospects work in facilities with unreliable Wi-Fi — warehouses, factory floors, field sites.\"\n> **Why does unreliable connectivity block a sale?** \"Because if the app doesn't work, their staff can't log safety inspections in real time, and inspections are a regulatory requirement.\"\n> **What would solve that, fundamentally?** \"A way to guarantee that a safety inspection gets recorded and eventually synced, regardless of connectivity at the moment it happens.\"\n\nNotice what happened during this ladder: the request moved from a specific technical implementation (\"offline mode,\" which could mean full local data caching, conflict resolution, background sync, and a meaningful engineering investment) to a more precise underlying job (\"guarantee an inspection gets recorded and eventually synced regardless of momentary connectivity\"). The second framing opens up a wider solution space — a much lighter-weight \"save now, sync automatically when reconnected\" queuing mechanism might satisfy the actual job at a fraction of the engineering cost of a full offline mode, and might even be delivered faster, which also helps the sales timeline that motivated the original request.\n\nThis is the payoff of laddering: **it is not merely an academic exercise — it routinely reveals solutions that are cheaper, faster to ship, or more broadly useful than the one originally proposed**, without sacrificing the underlying need the stakeholder actually cares about.\n\n### Jobs, Not Personas, Segment Real Markets\n\nA common early instinct is to segment users by demographic persona — age, job title, industry. JTBD theory argues this is often the wrong segmentation axis, because two people with identical demographics can be trying to accomplish completely different jobs in a given moment, while two people with wildly different demographics can be trying to accomplish the exact same job.\n\nThe canonical illustration from Christensen's own research: a fast-food chain wanted to improve milkshake sales and initially segmented by traditional demographics (age, income) with little success. When researchers instead asked what job people were \"hiring\" a milkshake to do, they discovered a large, unexpected segment: commuters buying milkshakes alone, in the early morning, to make a long, boring commute more bearable and to stave off hunger until lunch — a job with almost nothing to do with dessert, indulgence, or the demographic profile the company had assumed. This job (a long, one-handed, slow-to-consume companion for a boring commute) suggested completely different product improvements — a thicker shake that lasts longer, a more convenient dispensing process for commuters in a hurry — than a demographic-based analysis ever would have.\n\n### Competing Against Non-Consumption\n\nOne of JTBD's most useful and counterintuitive ideas is that **a product's real competition is often not the obvious rival product, but non-consumption** — the alternative of not solving the job at all, or solving it with an improvised, non-product workaround.\n\nA project management tool doesn't only compete with other project management tools; it competes with a shared spreadsheet, a whiteboard, a series of Slack messages, or simply the team's memory. A meal-kit delivery service doesn't only compete with other meal-kit companies; it competes with takeout, with skipping the meal, and with a jar of pasta sauce and whatever's already in the fridge. Understanding the true \"job competitor\" — frequently an informal workaround rather than a branded rival — reframes what \"winning\" actually requires: not necessarily being better than the nearest named competitor, but being clearly better than doing nothing, or doing it the old, unglamorous way.\n\nThis reframing matters directly for prioritization: a feature that only makes sense in a world where you're racing a specific named competitor may be far less valuable than a feature that converts non-consumers — people currently solving the job badly, informally, or not at all — into users.\n\n---",
+  "mistakes": "**Mistake 1: Treating the first stated request as the job itself.**\n\"We need offline mode\" is a solution, not a job. Stopping the analysis at the first sentence a stakeholder says is the single most common JTBD failure, and it is precisely the failure this lesson's laddering technique exists to prevent.\n\n**Mistake 2: Confusing a persona with a job.**\n\"Our user is a 35-year-old marketing manager\" describes a demographic, not a job. The same marketing manager may be hiring your product for entirely different jobs on a Monday morning (planning a campaign calendar) versus a Friday afternoon (quickly checking whether a report is ready before a client call) — and a single persona description flattens this into one undifferentiated profile.\n\n**Mistake 3: Assuming the job is purely functional.**\nIgnoring the emotional and social dimensions of a job (how the person wants to feel or be perceived) frequently produces a functionally competent but commercially underperforming solution, especially in categories where status, confidence, or belonging matter alongside the practical task.\n\n**Mistake 4: Benchmarking only against named competitors.**\nFocusing exclusively on feature parity with a known rival product, while ignoring the much larger population of people solving the job through an informal workaround or not solving it at all, causes teams to miss the biggest available growth opportunity — converting non-consumption.\n\n**Mistake 5: Laddering endlessly until the \"why\" becomes meaningless.**\nIt is possible to ladder too far — asking \"why\" so many times that you arrive at something so abstract (\"I want to be happy\") that it no longer usefully constrains solution design. The correct stopping point is the most specific level of explanation that would remain stable across multiple possible solutions, not the most abstract level imaginable.\n\n---",
+  "mentalModel": {
+    "title": "The Job Ladder",
+    "content": "This lesson's mental model is the **Job Ladder** — a simple visual for the laddering technique described above, used as a standing habit whenever a stakeholder hands you a solution instead of a problem.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph BT\n    A[Stated Request E.g. Build Offline Mode] --> B[First Why Unreliable<br/>Connectivity Blocks a Required Task]\n    B --> C[Underlying Functional Job Task<br/>Completes Despite Connectivity]\n    C --> D[Emotional / Social Staff Don't Want<br/>Incompetence to a Regulator]\n    D --> E[Multiple Possible Solutions, Not Just<br/>the One Originally Proposed]\n```\n\nUse the Job Ladder as a checkpoint, not a one-time exercise: every time a stakeholder request lands on your desk pre-packaged as a solution, climb the ladder at least two rungs before allowing yourself to evaluate feasibility or scope it for engineering. Skipping straight to scoping the originally proposed solution — even a solution that turns out to be correct — means you never actually checked whether it was correct; you got lucky, or you didn't, and you have no way of knowing which.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph BT\n    A[Stated Request E.g. Build Offline Mode] --> B[First Why Unreliable<br/>Connectivity Blocks a Required Task]\n    B --> C[Underlying Functional Job Task<br/>Completes Despite Connectivity]\n    C --> D[Emotional / Social Staff Don't Want<br/>Incompetence to a Regulator]\n    D --> E[Multiple Possible Solutions, Not Just<br/>the One Originally Proposed]"
+  },
+  "caseStudy": {
+    "title": "The Software That Solved the Wrong Job",
+    "content": "Consider a simplified, illustrative scenario common across B2B productivity software.\n\nA team-collaboration software company notices, through customer interviews, that several enterprise customers are frustrated with how difficult it is to find \"the latest version\" of a shared document across email threads and chat messages. The stated request, repeated across multiple customers, is consistent: \"We need built-in version history and a document viewer inside your app.\"\n\nThe team builds a robust, well-reviewed version-history feature. Adoption is disappointing: usage analytics show only a small fraction of customers use it regularly, and the original complaint about \"finding the latest version\" persists in subsequent customer conversations almost unchanged.\n\n**What went wrong?**\n\nA closer laddering exercise, conducted after the disappointing launch, reveals the actual job was different from — and slightly upstream of — the stated request:\n\n1. **Stated request:** \"We need version history and a document viewer.\"\n2. **First why:** \"Because we can never tell which version of a document is the current one when it's shared across email and chat.\"\n3. **Underlying functional job:** \"I need to instantly know, without asking anyone, whether the file I'm looking at right now is the one my team is currently working from.\"\n4. **Emotional layer:** \"I don't want to look careless in front of my team by working from an outdated file and having to be corrected.\"\n\nThe company had built a *viewer* for comparing past versions — a genuinely useful capability, but one aimed at investigating history *after* confusion had already occurred. The actual job was almost entirely about *preventing* the moment of confusion in the first place — a single, unambiguous, always-visible indicator of \"this is the current version\" at the moment someone opens a file, requiring no investigation at all. The version-history viewer solved a real but adjacent problem; it did not solve the job customers were actually describing, which is why usage stayed low and the original complaint kept recurring almost verbatim.\n\nA team applying the Job Ladder from the beginning would likely have shipped a much smaller, cheaper feature first — a persistent \"latest version\" indicator — and might have discovered that the deeper version-history viewer, while still valuable to a smaller subset of power users, was not the thing driving the loudest and most common complaint at all.\n\nThis case will be revisited in **Lesson 17 (Problem Statements)**, where we formalize the output of a Job Ladder exercise into a structured, testable problem statement, and again in **Lesson 21 (MVP)**, where we discuss scoping the smallest solution that addresses a validated job.\n\n---"
+  },
+  "framework": {
+    "title": "The Forces of Progress",
+    "content": "A companion framework to the Job Ladder, widely used alongside JTBD, is the **Forces of Progress** model (associated with Bob Moesta's applied JTBD work), which explains *why* someone switches — or fails to switch — to a new solution. Four forces are in tension whenever someone considers a change:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Push Current Situation Dissatisfaction] --> E{Net Force}\n    B[Pull New Solution Attraction] --> E\n    C[Anxiety New Solution Uncertainty] --> E\n    D[Habit / Inertia Current Approach Comfort] --> E\n    E --> F[Switch or Stay]\n```\n\n- **Push**: dissatisfaction with the current approach (\"our spreadsheet keeps breaking\").\n- **Pull**: the attraction of a new solution (\"this new tool looks like it would fix that\").\n- **Anxiety**: uncertainty or fear about the new solution itself (\"what if migrating loses our historical data, or the team refuses to learn a new tool\").\n- **Habit/Inertia**: comfort with, and sunk investment in, the current approach, independent of whether it's actually good (\"we've used this spreadsheet for six years and everyone already knows it\").\n\nA switch only happens when Push plus Pull together exceed Anxiety plus Habit. This model directly explains a pattern many PMs find puzzling: a product can be functionally superior to an alternative and still fail to gain adoption, because the anxiety and habit forces holding people to their current (worse) solution were never addressed — onboarding friction, migration risk, or the social cost of admitting the old approach wasn't working can all outweigh a purely functional improvement. This is why JTBD-driven product work often includes deliberate anxiety-reduction and habit-breaking design (easy data import, low-commitment trials, social proof) alongside the core functional solution itself.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "JTBD at Different Company Stages",
+    "content": "**At a startup:**\nJTBD is often used at its most foundational level — determining whether a job is real, painful, and currently poorly served enough to justify building a product around it at all. Early-stage teams frequently conduct direct \"switch interviews\" (detailed conversations about the moment someone adopted, or considered adopting, a new solution) to understand the forces that pushed them away from their old approach and pulled them toward a new one. At this stage, JTBD is a discovery tool for validating that a market exists before committing meaningful engineering time.\n\n**At a mid-size company:**\nJTBD is more often used to resolve specific prioritization disputes — deciding between two or more already-validated feature ideas by asking which better serves the core job, or to explain a puzzling metric (why a seemingly successful feature isn't driving the expected downstream behavior, because it addressed the functional job but ignored an emotional or social dimension that mattered more than expected).\n\n**At Big Tech:**\nJTBD often operates at the level of entire product-line strategy — determining whether a job is currently being served by an internal competing product line, an external competitor, or non-consumption, and using that analysis to decide where a large organization should invest scarce, high-leverage engineering resources across many possible initiatives, rather than at the level of a single feature decision.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-006-1",
+      "questionNumber": 1,
+      "questionText": "Which of the following best defines a \"job to be done\"?",
+      "options": [
+        "A specific feature a customer has requested",
+        "The underlying progress a person is trying to make, independent of any specific product",
+        "A demographic description of a target user",
+        "A company's internal engineering roadmap"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A job to be done describes the underlying task or goal a person is trying to accomplish, not a specific feature or demographic profile.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-006-2",
+      "questionNumber": 2,
+      "questionText": "What is the primary purpose of the \"laddering\" technique?",
+      "options": [
+        "To estimate engineering effort for a feature",
+        "To decompose a stated request into its underlying job by repeatedly asking \"why\" or \"what would that let you do\"",
+        "To rank features by revenue impact",
+        "To assign a request to a specific engineering team"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Laddering is the technique of repeatedly probing a stated request to reveal the underlying job it is meant to serve.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-006-3",
+      "questionNumber": 3,
+      "questionText": "Which of the following is NOT one of the three dimensions of a job to be done described in this lesson?",
+      "options": [
+        "Functional",
+        "Emotional",
+        "Social",
+        "Financial"
+      ],
+      "correctOptionIndex": 3,
+      "correctOptionLetter": "D",
+      "explanation": "The three dimensions described are functional (the practical task), emotional (how the person wants to feel), and social (how the person wants to be perceived). \"Financial\" is not one of the three named dimensions.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-006-4",
+      "questionNumber": 4,
+      "questionText": "In the milkshake example referenced in this lesson, what did researchers discover by asking about the underlying job rather than demographics?",
+      "options": [
+        "Younger customers bought more milkshakes than older customers",
+        "A significant segment of buyers were commuters hiring the milkshake as a long-lasting, one-handed companion for a boring commute, unrelated to typical dessert framing",
+        "Milkshakes were primarily purchased as gifts",
+        "Demographic segmentation was ultimately the most useful method after all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The job-based analysis revealed a commuter segment hiring milkshakes for a purpose entirely disconnected from age or income demographics — a job traditional segmentation had missed.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-006-5",
+      "questionNumber": 5,
+      "questionText": "According to this lesson, why is a product's real competitor often \"non-consumption\" rather than a named rival product?",
+      "options": [
+        "Because named rivals never actually compete for the same customers",
+        "Because a large number of potential customers may currently be solving the job through an informal workaround, or not solving it at all, representing a larger opportunity than rivalry with a named competitor",
+        "Because non-consumption is always impossible to overcome",
+        "Because JTBD theory does not consider competition relevant"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Many people solving a job through a workaround or not at all represent an underused opportunity, and this population is often larger and more significant to address than rivalry with the closest named competitor.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-006-6",
+      "questionNumber": 6,
+      "questionText": "A team ships a functionally superior tool, but adoption remains low because users are afraid of losing years of data during migration. Using the Forces of Progress model, which force is most directly responsible for this outcome?",
+      "options": [
+        "Push",
+        "Pull",
+        "Anxiety",
+        "Habit"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "Fear or uncertainty about the new solution itself (e.g., migration risk) is the Anxiety force, which can outweigh even a strong functional Pull.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-006-7",
+      "questionNumber": 7,
+      "questionText": "In the Detailed Case Study, what was the actual underlying job customers were describing, as opposed to the feature the company initially built?",
+      "options": [
+        "A way to permanently delete old file versions",
+        "A way to instantly know, without investigation, whether the file currently being viewed is the team's current working version",
+        "A way to compare two documents side by side",
+        "A way to restrict document editing to certain team members"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The deeper job was about preventing confusion at the moment of opening a file, not investigating history after confusion had already occurred — which is what the built version-history viewer addressed instead.",
+      "learningObjective": "#2",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-006-8",
+      "questionNumber": 8,
+      "questionText": "Why did the version-history viewer in the Detailed Case Study see low adoption despite being well-built?",
+      "options": [
+        "It was too expensive for customers to access",
+        "It solved an adjacent but different job (investigating history after confusion) rather than the actual job customers described (preventing confusion at the moment of opening a file)",
+        "Customers did not know the feature existed",
+        "The feature had significant bugs"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study attributes low adoption to a mismatch between the built solution and the actual underlying job, not to awareness or quality issues.",
+      "learningObjective": "#2, #4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-006-9",
+      "questionNumber": 9,
+      "questionText": "Which of the following job statements is written correctly, according to the structure introduced in this lesson?",
+      "options": [
+        "\"I want your app to have a dark mode setting.\"",
+        "\"When I'm reviewing documents late at night, I want to reduce eye strain, so I can keep working without discomfort.\"",
+        "\"Your competitor has dark mode, so we need it too.\"",
+        "\"Dark mode is a commonly requested feature.\""
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Option B follows the \"When [situation], I want to [motivation], so I can [outcome]\" structure and names no specific product or feature, unlike the others, which describe a solution or a competitive comparison rather than an underlying job.",
+      "learningObjective": "#1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-006-10",
+      "questionNumber": 10,
+      "questionText": "What is the risk of \"laddering too far,\" as described in this lesson's Common Beginner Mistakes?",
+      "options": [
+        "The stakeholder becomes annoyed by too many questions",
+        "The explanation becomes so abstract (e.g., \"I want to be happy\") that it no longer usefully constrains solution design",
+        "Engineering will refuse to build anything after too many \"why\" questions",
+        "There is no such thing as laddering too far"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The correct stopping point is the most specific, stable explanation across possible solutions — laddering past that point produces an explanation too abstract to guide design.",
+      "learningObjective": "#2",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-006-11",
+      "questionNumber": 11,
+      "questionText": "(Scenario) A customer requests \"an export-to-Excel button.\" Using this lesson's framework, what should a PM do first?",
+      "options": [
+        "Immediately scope the export button for engineering, since it is a simple, well-understood feature",
+        "Ladder the request to understand what the customer actually intends to do with the exported data, since a different, perhaps simpler, in-app solution might satisfy the same underlying need",
+        "Reject the request, since JTBD theory argues all stated requests should be ignored",
+        "Ask other customers if they also want an export button, and build it only if a majority agree"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson's core habit is to ladder a stated solution request to its underlying job before evaluating or scoping it, since the export button may be one of several possible solutions to a deeper need (e.g., needing to share a specific view with someone outside the tool).",
+      "learningObjective": "#1, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-006-12",
+      "questionNumber": 12,
+      "questionText": "(Product Thinking) Two users with very different job titles and ages are both observed using a note-taking app in the exact same way: capturing a fleeting thought during a meeting so it isn't forgotten. According to JTBD theory, what does this suggest about how the product should be segmented?",
+      "options": [
+        "By age, since age is always the most reliable segmentation variable",
+        "By job title, since professional context always determines product needs",
+        "By the shared job (\"capture a fleeting thought before it's lost\"), since both users are hiring the product for the same underlying job despite different demographics",
+        "The product cannot be segmented at all in this scenario"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "JTBD theory argues that shared jobs, not shared demographics, are the more meaningful segmentation axis — two demographically different users hiring a product for the same job should often be treated as the same segment for that use case.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-006-13",
+      "questionNumber": 13,
+      "questionText": "(Interview Reasoning) An interviewer asks, \"Who is your product's biggest competitor?\" A candidate names only the closest, most well-known rival product. What might this signal, according to this lesson's Interview Perspective section?",
+      "options": [
+        "Strong competitive awareness and nothing more is needed",
+        "A possibly incomplete picture, since the candidate did not consider non-consumption (workarounds, doing nothing) as frequently the larger and more significant competitive force",
+        "That the candidate has misunderstood the question entirely",
+        "That naming a specific rival is always the wrong answer"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson notes that a stronger answer names both the obvious rival and the often-larger non-consumption alternative, and that defaulting only to the named rival can indicate an incomplete strategic picture.",
+      "learningObjective": "#4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-006-14",
+      "questionNumber": 14,
+      "questionText": "(Product Thinking, Higher Difficulty) A team ships a feature that is measurably superior on every functional benchmark compared to a competitor's equivalent feature, yet adoption remains flat. Using the frameworks in this lesson, what are two plausible, non-mutually-exclusive explanations?",
+      "options": [
+        "The feature failed to satisfy the emotional or social dimension of the job, and/or the Anxiety or Habit forces anchoring users to their current approach were never addressed",
+        "Functional superiority always guarantees adoption, so this scenario is not possible",
+        "The feature must have had a bug, since functional superiority is the only relevant factor",
+        "The competitor's product must be functionally superior in reality, despite the benchmarks"
+      ],
+      "correctOptionIndex": 0,
+      "correctOptionLetter": "A",
+      "explanation": "This lesson explicitly argues that functional superiority alone does not guarantee adoption — unaddressed emotional/social dimensions or unresolved Anxiety/Habit forces can each independently suppress adoption even when functional benchmarks favor the new solution.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-006-15",
+      "questionNumber": 15,
+      "questionText": "(Highest Difficulty) A VP insists a specific technical solution (\"full offline mode\") is the only acceptable fix for a sales-blocking connectivity complaint. After laddering the request, a PM identifies a lighter-weight \"queue and auto-sync\" solution that appears to satisfy the same underlying job at a fraction of the engineering cost. What is the most defensible next step, according to this lesson's overall approach?",
+      "options": [
+        "Silently build the lighter-weight solution without informing the VP, since the PM's technical judgment should not be questioned",
+        "Build the VP's originally specified solution exactly as requested, since ignoring a senior stakeholder's explicit instruction is never appropriate",
+        "Present the underlying job, the evidence behind it, and the lighter-weight alternative to the VP directly, making the trade-off (cost, speed, risk) explicit, while remaining open to the VP's business context possibly ruling it out",
+        "Escalate the disagreement to engineering leadership for a unilateral technical ruling"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "This mirrors the lesson's consistent guidance (and Lesson 1's Common Beginner Mistake 4): the goal of laddering is not to unilaterally override a stakeholder, but to surface a broader solution space with clear reasoning and let the actual decision be made with that fuller picture — respecting that the VP may still have context (e.g., a specific contractual commitment) that the PM does not.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "You are the PM for a personal finance app. Several users have requested, through app store reviews and support tickets, \"a way to set a monthly spending limit per category, with a hard block once we hit it.\"\n\nWork through the following, in writing, before reading further:\n\n1. Write a first-pass job statement for this request using the structure: \"When [situation], I want to [motivation], so I can [outcome].\"\n2. Ladder the request at least two levels deeper. What functional job is likely underneath \"hard block once we hit it\"? Is there an emotional or social dimension layered on top (consider feelings like guilt, self-control, or accountability to a partner)?\n3. Using the \"competing against non-consumption\" idea, name at least one non-product way people currently try to solve this same job (a workaround, a habit, a manual method), and consider what it tells you about what a good solution needs to beat.\n4. Propose two different solutions to the underlying job you identified — the originally requested \"hard block,\" and at least one alternative that might satisfy the same job differently (for example, a softer warning-based approach, or a social-accountability feature).\n5. Using the Forces of Progress model, name one Anxiety or Habit force that might cause a user to resist adopting either solution, even if it perfectly addressed the underlying job.\n\nThere is no single correct answer. The purpose of this exercise is to practice the full Job Ladder — from a specific stated request, through functional and emotional/social layers, to a genuinely reconsidered solution space — under a request that, unlike the lesson's worked examples, you have not seen laddered before.\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 5 — Users vs. Customers | Resolves this lesson's cliffhanger — how to evaluate any stakeholder's request, whether from a user or a customer, using the Job Ladder rather than taking it at face value |\n| **Current Lesson** | Lesson 6 — Jobs To Be Done | Laddering; functional/emotional/social dimensions; non-consumption; Forces of Progress |\n| **Next Lesson** | Lesson 7 — Value Proposition | Builds directly on a validated job to construct a value proposition — what a product uniquely offers to help someone get that job done better than alternatives |\n| **Future Concepts Unlocked** | Lesson 12 (Customer Interviews) | Provides the interview-based method (including \"switch interviews\") for uncovering jobs directly from real conversations, rather than inferring them from stated requests alone |\n| | Lesson 17 (Problem Statements) | Formalizes the output of a completed Job Ladder into a structured, testable problem statement |\n| | Lesson 21 (MVP) | Uses a validated job as the basis for scoping the smallest solution worth building first |\n| | Lesson 29 (Prioritization Fundamentals) | Uses job validation strength as one input into scoring competing initiatives |\n\nThis curriculum is designed to be read as one continuous argument. From this lesson forward, any stated stakeholder request — from a user or a customer — is assumed to require laddering before it is treated as a decision; this will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-006.md"
+}

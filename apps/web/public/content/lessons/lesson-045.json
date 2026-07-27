@@ -1,0 +1,288 @@
+{
+  "meta": {
+    "slug": "lesson-045",
+    "number": 45,
+    "title": "A/B Testing & Experimentation",
+    "moduleNumber": 5,
+    "moduleName": "Metrics, Experimentation & Growth",
+    "difficulty": 6,
+    "estMinutesReading": 40,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 41 (Product Metrics Fundamentals — correlation vs. causation, guardrail metrics), Lesson 43 (Funnel Analysis), Lesson 44 (Cohort & Retention Analysis)",
+    "nextLessonSlug": "lesson-046",
+    "futureTopicsUnlocked": "Lesson 46 (Growth Loops & Virality), Lesson 50 (Product-Led Growth), Lesson 57 (Ethics in Product Management, which revisits experimentation's ethical boundaries) — all build on the experimental validity discipline introduced here"
+  },
+  "learningObjectives": [
+    "Explain why random assignment is the specific mechanism that allows a controlled experiment to establish causation, resolving the correlation-versus-causation gap from Lesson 41.",
+    "Define statistical significance and explain, in plain language, what a p-value does and does not tell you.",
+    "Explain sample size and statistical power, and why an underpowered experiment risks missing a genuine effect entirely.",
+    "Diagnose \"peeking\" — stopping an experiment early based on an interim result — and explain why it inflates false-positive rates.",
+    "Apply a pre-registration discipline (defining hypothesis, primary metric, guardrails, and sample size before launching) to design a trustworthy experiment."
+  ],
+  "theory": "### Why Random Assignment Establishes Causation\n\nRecall Lesson 41's caution: two metrics moving together doesn't establish that one causes the other, because a confounding variable might independently drive both. A controlled experiment solves this specific problem through **random assignment**: users are randomly split into a control group (seeing the existing experience) and one or more treatment groups (seeing the proposed change), with randomization ensuring that, on average, the two groups are statistically identical in every other respect — same mix of acquisition channels, same mix of device types, same mix of user tenure, same mix of literally everything else that might otherwise confound the comparison. Because random assignment neutralizes every other systematic difference between the groups, any statistically reliable difference in outcomes between them can be attributed to the one thing that was deliberately varied: the change being tested.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Eligible users] --> B[Random assignment]\n    B --> C[\"Control Group (existing Experience)\"]\n    B --> D[\"Treatment Group (proposed Change)\"]\n    C --> E[Measure outcome]\n    D --> E\n    E --> F{Statistically Reliable<br/>Difference Between Groups?}\n    F -->|Yes| G[Change Likely Caused<br/>the Observed Difference]\n    F -->|No| H[No Reliable Evidence<br/>the Change Had an Effect]\n```\n\n### Statistical Significance and P-Values, in Plain Language\n\nA **p-value** answers a specific, narrow question: if the change genuinely had *no real effect at all*, how likely would it be to observe a difference this large (or larger) between groups purely by random chance? A small p-value (conventionally, below 0.05, though the right threshold depends on context) suggests the observed difference would be unlikely to arise from chance alone if there were truly no effect, giving some confidence that a real effect exists. Critically, a p-value does *not* tell you the probability that the change actually works, nor does it tell you how large or practically meaningful the effect is — a large sample size can produce a statistically significant result for an effect too small to matter practically, and a small sample size can fail to reach significance even for an effect that's genuinely large and meaningful, simply because there wasn't enough data to detect it reliably.\n\n### Sample Size and Statistical Power\n\n**Statistical power** is the probability that an experiment will correctly detect a real effect, if one genuinely exists, at a given sample size. An **underpowered** experiment — one run with too few users relative to the size of the effect being tested for — risks concluding \"no significant difference found\" not because the change had no effect, but simply because the experiment never had enough data to reliably detect an effect of that size, even if a real one existed. Before running an experiment, a PM should estimate the **minimum detectable effect** (the smallest change worth caring about, business-wise) and ensure the planned sample size is large enough to reliably detect an effect of that size — running an experiment without this calculation risks either wasting resources on a hopelessly underpowered test, or running it far longer than necessary for an effect large enough to be obvious much sooner.\n\n### The Peeking Problem\n\nA specific and extremely common mistake deserves detailed treatment: **peeking** — checking an experiment's results before it reaches its planned sample size or duration, and stopping it early the moment the result happens to look statistically significant. This inflates the true false-positive rate far beyond the nominal significance threshold, because random noise naturally causes an experiment's measured difference to fluctuate above and below the true effect throughout its run — checking repeatedly and stopping at the first moment the fluctuation happens to cross a significance threshold is systematically biased toward catching noise, not signal, since a sufficiently long-running experiment on a null effect will, by chance, cross a nominal 0.05 significance threshold at some point during its run far more than 5% of the time if checked and potentially stopped repeatedly.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Experiment starts] --> B[Day 1: Check Result<br/>— Not Significant Yet]\n    B --> C[Day 2: Check Result<br/>— Not Significant Yet]\n    C --> D[Day 3: Check Result<br/>— Appears Significant!]\n    D --> E[Stop and Ship Based on Day 3 Result]\n    E -.->|Risk: This May Be a Random<br/>Fluctuation, Not a Real Effect| F[False positive]\n```\n\nThe correct discipline is to determine the required sample size and duration *before* launching the experiment (per the previous section), and either wait until that pre-determined point to analyze results, or use a statistical method specifically designed to allow valid early stopping (sequential testing methods), rather than informally checking and stopping at the first appealing-looking result.\n\n### Pre-Registration: Deciding Before You Look\n\nThe most reliable defense against both peeking and other, subtler forms of unintentional bias (sometimes called p-hacking when done more deliberately) is **pre-registration**: writing down, before the experiment launches, the specific hypothesis being tested, the single primary metric that will determine success, the guardrail metrics (Lesson 41) being monitored to catch unintended harm, the planned sample size and duration, and the specific threshold that will count as a meaningful result. Committing to these decisions in advance prevents the natural, often unconscious temptation to retroactively decide \"well, this secondary metric moved significantly, so let's call that our success metric instead\" after seeing results that didn't confirm the original hypothesis — a pattern that, applied loosely enough across many possible metrics, will eventually find *something* that looks significant purely by chance, without that finding representing a genuine effect.\n\n---",
+  "mistakes": "**Mistake 1: Treating a statistically significant result as proof the change definitely works and is worth shipping.**\nAs covered in Theory, statistical significance indicates the observed difference is unlikely to be pure chance — it says nothing about whether the effect size is practically meaningful, and a significant-but-tiny effect may not be worth the cost of shipping and maintaining the change.\n\n**Mistake 2: Running an experiment without first calculating the required sample size.**\nAs covered in Theory, this risks either wasting effort on a severely underpowered test that will very likely fail to detect a real effect, or leaving an experiment running far longer than necessary once a large, obvious effect could have been detected sooner.\n\n**Mistake 3: Peeking at results and stopping the experiment early upon seeing an appealing result.**\nAs covered in Theory, this specific behavior systematically inflates false positives, and is one of the single most common ways a well-intentioned experimentation program produces unreliable, non-reproducible results.\n\n**Mistake 4: Checking many secondary metrics after the fact and treating whichever one moved significantly as the \"real\" result.**\nThis is a subtler cousin of peeking — testing enough metrics, by chance alone, some will appear significant even with no genuine underlying effect, which is precisely why pre-registering a single primary metric in advance is essential.\n\n**Mistake 5: Ignoring guardrail metrics because the primary metric improved.**\nAn experiment that improves its primary metric while quietly damaging a guardrail metric (echoing Lesson 41's Goodhart's Law caution, and Lesson 45's own version of the same principle applied to a single experiment rather than an ongoing target) should not be shipped without understanding and addressing that trade-off explicitly.\n\n---",
+  "mentalModel": {
+    "title": "The Peeking Trap",
+    "content": "This lesson's core takeaway tool visualizes why informal, repeated checking of an in-progress experiment is fundamentally different from — and far riskier than — a single, planned analysis at a pre-determined endpoint:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Pre-registered Plan: Fixed<br/>Sample Size, One Analysis at the End] --> B[Analyze Once, at the Planned Point]\n    B --> C[Trustworthy Result: False-positive Rate<br/>Matches the Stated Significance Level]\n    D[No Pre-registration:<br/>Informal Repeated Checking] --> E[Stop the Moment a Result Looks Appealing]\n    E --> F[Untrustworthy Result: True<br/>False-positive Rate Is Much Higher Than<br/>Stated]\n```\n\nUse the Peeking Trap as a standing discipline whenever tempted to check an in-progress experiment's results before its planned endpoint: remind yourself that an appealing-looking interim result is not evidence of a real effect — it's exactly the kind of noise a properly powered, pre-registered experiment is specifically designed to filter out, and giving in to the temptation to stop early defeats that purpose entirely.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Pre-registered Plan: Fixed<br/>Sample Size, One Analysis at the End] --> B[Analyze Once, at the Planned Point]\n    B --> C[Trustworthy Result: False-positive Rate<br/>Matches the Stated Significance Level]\n    D[No Pre-registration:<br/>Informal Repeated Checking] --> E[Stop the Moment a Result Looks Appealing]\n    E --> F[Untrustworthy Result: True<br/>False-positive Rate Is Much Higher Than<br/>Stated]"
+  },
+  "caseStudy": {
+    "title": "The Fix That Looked Like It Worked",
+    "content": "Consider a simplified, illustrative scenario that directly continues Lesson 43's funnel Case Study — the company that diagnosed a paid-channel expectation mismatch causing drop-off at a project setup step.\n\nArmed with a specific, evidence-based hypothesis (adjusting the paid channel's marketing messaging to set accurate expectations would improve conversion at the setup step), the team launches a controlled experiment: half of new paid-channel users see the adjusted messaging, half see the original. Eager to see results, the PM checks the experiment dashboard daily. On day four, the treatment group's conversion rate is meaningfully higher than the control group's, with a p-value just under 0.05. Excited, the PM stops the experiment immediately and ships the new messaging to all paid-channel users.\n\nOver the following month, however, overall paid-channel conversion at the setup step doesn't show the improvement the four-day experiment suggested — it settles back to roughly where it was before the change, with no meaningful, lasting difference detectable.\n\n**What went wrong?**\n\nThis is a direct, worked illustration of the Peeking Trap: the experiment was never pre-registered with a planned sample size or duration, and the PM's daily checking, stopping at the first appealing-looking result, is precisely the behavior this lesson's Theory identifies as systematically inflating false positives. The day-four result was very likely a random fluctuation — noise that happened, by chance, to cross the nominal significance threshold at that particular moment — rather than genuine evidence of a real, lasting effect, and the subsequent month's data (effectively serving as an unplanned larger sample) revealed the true, much smaller or nonexistent effect.\n\nThe corrective process for any future experiment requires exactly what this lesson's Theory prescribes: calculating the required sample size before launch, based on a realistic minimum detectable effect estimate, and committing to a single analysis at that pre-determined point rather than informal daily checking. Notably, the underlying hypothesis from Lesson 43's Case Study (a messaging-expectation mismatch) may still have been correct — this Case Study's failure is not necessarily evidence the hypothesis was wrong, but a demonstration that the specific experiment run to test it was not conducted rigorously enough to actually confirm or deny it. A properly powered, pre-registered re-run of the same experiment would be the appropriate next step, rather than either abandoning the hypothesis or reflexively re-shipping the original change based on the flawed initial result.\n\n---"
+  },
+  "framework": {
+    "title": "The Experiment Pre-Registration Checklist",
+    "content": "A second, more tactical tool: complete this checklist before launching any experiment, and resist the temptation to revise any of these fields after seeing interim results.\n\n| Field | What to Specify Before Launch |\n|---|---|\n| Hypothesis | The specific, falsifiable claim being tested (e.g., \"adjusted messaging will increase setup-step conversion for paid-channel users\") |\n| Primary metric | The single metric that will determine success — chosen and locked in advance, not selected retroactively from whichever moved |\n| Guardrail metrics | Secondary metrics monitored to catch unintended harm, per Lesson 41's Goodhart's Law caution |\n| Minimum detectable effect | The smallest effect size that would be practically meaningful enough to justify shipping the change |\n| Required sample size / duration | Calculated in advance based on the minimum detectable effect and current traffic levels |\n| Analysis plan | A commitment to analyze results once, at the pre-determined endpoint, rather than through informal repeated checking |\n\nAn experiment launched without completing this checklist in advance is at meaningful risk of producing exactly the kind of unreliable, non-reproducible result illustrated in this lesson's Case Study — regardless of how sound the underlying hypothesis might genuinely be.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Startup vs. Mid-Size vs. Big Tech",
+    "content": "**At a startup:**\nFormal A/B testing is often impractical, since a startup's total user base may be too small to reach adequate statistical power within a reasonable timeframe for anything but the largest, most obvious effects. Reliance on qualitative research (Lesson 8, Lesson 38) and directional signal from smaller-scale tests is often more appropriate at this stage than expecting rigorous statistical significance on every decision.\n\n**At a mid-size company:**\nThis is typically the stage where formal A/B testing infrastructure and discipline become genuinely valuable, since sufficient traffic exists to reach meaningful sample sizes within reasonable timeframes, and enough decisions are being made that a systematic, less opinion-driven process for validating changes becomes worth the investment.\n\n**At Big Tech:**\nExperimentation is often deeply institutionalized, with dedicated platforms supporting many simultaneous experiments, automated guardrail monitoring, and statistical rigor enforced through required pre-registration and standardized power calculations — precisely the culture illustrated by the Google shades-of-blue example. The PM's job shifts toward correctly designing experiments within this infrastructure, interpreting results rigorously (resisting both Mistake 1's overconfidence and Mistake 3's peeking temptation), and understanding how multiple simultaneous experiments interact without contaminating each other's results.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-045-1",
+      "questionNumber": 1,
+      "questionText": "What specific mechanism allows a controlled experiment to establish causation rather than mere correlation?",
+      "options": [
+        "A large enough overall sample size",
+        "Random assignment, which ensures treatment and control groups are statistically identical except for the tested change",
+        "Running the experiment for at least 30 days",
+        "Using a p-value threshold below 0.01 instead of 0.05"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains that random assignment specifically neutralizes other systematic differences between groups, isolating the tested change as the cause of any reliable difference.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-045-2",
+      "questionNumber": 2,
+      "questionText": "What does a p-value of 0.03 actually indicate?",
+      "options": [
+        "There is a 97% probability the tested change works",
+        "If the change genuinely had no real effect, there would be roughly a 3% chance of observing a difference this large or larger by pure chance",
+        "The effect size is definitely large enough to be practically meaningful",
+        "The experiment was run for exactly 3% of the required duration"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains that a p-value indicates the likelihood of the observed result under pure chance assuming no real effect — not the probability the change works.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-045-3",
+      "questionNumber": 3,
+      "questionText": "Why might an underpowered experiment fail to detect a real, genuinely existing effect?",
+      "options": [
+        "Because underpowered experiments always produce false positives",
+        "Because insufficient sample size relative to the effect size being tested for can prevent reliable detection, even when a real effect exists",
+        "Because underpowered experiments cannot use random assignment",
+        "Because power only matters for guardrail metrics, not primary metrics"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains that an underpowered experiment risks concluding \"no significant difference\" not because there's no effect, but because there wasn't enough data to reliably detect it.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-045-4",
+      "questionNumber": 4,
+      "questionText": "What is \"peeking,\" and why does it inflate false positives?",
+      "options": [
+        "Peeking is reviewing an experiment's design before launch; it has no effect on false positives",
+        "Peeking is checking results before the planned endpoint and stopping early on an appealing result, which systematically increases the true false-positive rate beyond the nominal significance threshold",
+        "Peeking is a required step in every valid experiment design",
+        "Peeking only affects guardrail metrics, not primary metrics"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains this exact mechanism — repeated checking and early stopping on noise inflates the true false-positive rate.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-045-5",
+      "questionNumber": 5,
+      "questionText": "What does pre-registration require a team to define before an experiment launches?",
+      "options": [
+        "Only the experiment's start date",
+        "Hypothesis, primary metric, guardrail metrics, minimum detectable effect, sample size/duration, and analysis plan",
+        "Only the color scheme of the treatment variant",
+        "The final decision on whether to ship the change, decided before any data is collected"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Framework Explanation section's Experiment Pre-Registration Checklist lists exactly these fields.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-045-6",
+      "questionNumber": 6,
+      "questionText": "In the Detailed Case Study, why did the PM's day-four decision to stop the experiment turn out to be unreliable?",
+      "options": [
+        "The experiment's hypothesis was fundamentally wrong",
+        "The experiment was never pre-registered with a planned sample size, and the day-four result was very likely a random fluctuation rather than a genuine, lasting effect",
+        "The control group was not randomly assigned",
+        "The guardrail metrics showed clear harm that was ignored"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly attributes the unreliable result to peeking without pre-registration, not to a flaw in the underlying hypothesis or randomization.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-045-7",
+      "questionNumber": 7,
+      "questionText": "Why does the Case Study conclude that the underlying hypothesis (a messaging-expectation mismatch) might still be correct, despite the failed experiment?",
+      "options": [
+        "Because failed experiments always confirm the original hypothesis",
+        "Because the experiment's failure to hold up was attributed to a lack of rigor (peeking, no pre-registration), not necessarily to the hypothesis itself being wrong",
+        "Because the guardrail metrics proved the hypothesis directly",
+        "Because the treatment group was larger than the control group"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly distinguishes a flawed experimental process from a necessarily false hypothesis, recommending a properly powered re-run rather than abandoning the hypothesis.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-045-8",
+      "questionNumber": 8,
+      "questionText": "Why is checking many secondary metrics after an experiment and treating whichever one moved significantly as \"the real result\" considered a mistake?",
+      "options": [
+        "Because secondary metrics should never be measured at all",
+        "Because testing enough metrics will, by chance alone, produce some significant-looking results even with no genuine underlying effect — a subtler cousin of peeking",
+        "Because secondary metrics are always less accurate than primary metrics",
+        "Because this approach is required by most experimentation platforms"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #4 explains this exact risk — retroactive metric selection can produce false positives purely by chance across many tested metrics.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-045-9",
+      "questionNumber": 9,
+      "questionText": "Why shouldn't a statistically significant result automatically be treated as proof a change is worth shipping?",
+      "options": [
+        "Because statistical significance is always fabricated",
+        "Because significance indicates the difference is unlikely to be pure chance, but says nothing about whether the effect is practically meaningful or whether guardrail metrics were harmed",
+        "Because only guardrail metrics matter, never primary metrics",
+        "Because shipping decisions should never depend on any data at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #1 and #5 both explain that practical significance and guardrail metric impact must be considered alongside statistical significance before shipping.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-045-10",
+      "questionNumber": 10,
+      "questionText": "(Scenario) An experiment reaches its pre-registered sample size, and the primary metric shows a statistically significant 0.1 percentage point improvement — far below the pre-specified minimum detectable effect of 2 percentage points. What is the most appropriate conclusion?",
+      "options": [
+        "Ship the change immediately, since any statistically significant result should always be deployed",
+        "The result, while statistically significant, falls short of the effect size the team predetermined as practically meaningful, so shipping may not be justified despite technical significance",
+        "The experiment must have been run incorrectly, since a significant result was found at all",
+        "Statistical significance and minimum detectable effect are the same concept and cannot diverge"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly applies the lesson's distinction between statistical and practical significance — a technically significant but tiny effect, below the pre-specified minimum detectable effect, may not justify shipping.",
+      "learningObjective": "#2, #3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-045-11",
+      "questionNumber": 11,
+      "questionText": "(Interview Reasoning) A candidate is asked to design an A/B test and answers: \"I'd launch it and check the dashboard every day until I see a clear winner.\" Based on this lesson's Interview Perspective section, what is the weakness in this answer?",
+      "options": [
+        "There is no weakness; frequent checking is the recommended best practice",
+        "It describes exactly the peeking behavior this lesson identifies as inflating false positives, rather than a pre-registered plan with a single analysis at a predetermined endpoint",
+        "It correctly demonstrates thorough monitoring of the experiment",
+        "It shows strong statistical rigor"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section states that a strong answer includes pre-registration elements defined before launch, not informal daily checking and early stopping.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-045-12",
+      "questionNumber": 12,
+      "questionText": "Why does this lesson recommend calculating minimum detectable effect and required sample size before launching an experiment, rather than simply running it until a decision \"feels\" clear?",
+      "options": [
+        "Because sample size calculations are a formality with no real impact on results",
+        "Because without this calculation, a team risks either wasting resources on a severely underpowered test unable to detect a real effect, or running the experiment far longer than necessary for an obvious effect",
+        "Because minimum detectable effect only applies to guardrail metrics",
+        "Because sample size calculations eliminate the need for random assignment"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains both risks of skipping this calculation — underpowering and unnecessary over-running — directly motivating the pre-launch calculation.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-045-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A team runs an experiment and finds the primary metric improved significantly, but a guardrail metric tracking customer complaints also increased significantly. Using this lesson's frameworks, what is the most defensible next step?",
+      "options": [
+        "Ship the change immediately, since the primary metric result is all that matters",
+        "Investigate and understand the guardrail metric's regression before deciding whether to ship, since an improvement in the primary metric achieved at the cost of a guardrail metric may not represent a net-positive change, echoing Lesson 41's Goodhart's Law caution",
+        "Ignore the guardrail metric entirely, since it wasn't the primary focus of the experiment",
+        "Assume the guardrail metric regression is unrelated and irrelevant without further investigation"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #5 explicitly warns against ignoring guardrail metrics when the primary metric improves, recommending investigation of the trade-off before shipping.",
+      "learningObjective": "#5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-045-14",
+      "questionNumber": 14,
+      "questionText": "Which of the following best reflects the Peeking Trap mental model's core distinction?",
+      "options": [
+        "There is no meaningful difference between checking results once at a planned endpoint versus checking repeatedly and stopping early",
+        "A single, planned analysis at a pre-determined endpoint produces a trustworthy false-positive rate matching the stated significance level; repeated informal checking with early stopping produces a much higher true false-positive rate than stated",
+        "Checking results more frequently always produces more accurate conclusions",
+        "The Peeking Trap only applies to experiments with guardrail metrics"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Mental Model section explicitly draws this exact contrast between pre-registered single analysis and informal repeated checking.",
+      "learningObjective": "#4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-045-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A PM wants to test a change but calculates that reaching adequate statistical power would take four months given current traffic levels — far longer than the team's planning horizon allows. Using this lesson's frameworks, what is the most defensible approach?",
+      "options": [
+        "Run the experiment for two weeks anyway and treat whatever result appears as final, regardless of power calculations",
+        "Recognize the experiment is likely to be underpowered within the available timeframe, and consider alternatives: testing a larger, more dramatic version of the change to increase the expected effect size, accepting a larger minimum detectable effect threshold, pooling traffic across a longer eligible population, or supplementing with qualitative research (Lesson 8) rather than relying on an underpowered quantitative result",
+        "Abandon all experimentation permanently for this product due to insufficient traffic",
+        "Reduce the required sample size arbitrarily without recalculating power, just to fit the planning horizon",
+        "or giving up on evidence entirely (option C), the defensible path involves adjusting the experiment's design or complementing it with other rigorous methods to work within real constraints.*"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects a sophisticated application of the lesson's power and sample-size discipline — rather than either ignoring power requirements (option A/D) or giving up on evidence entirely (option C), the defensible path involves adjusting the experiment's design or complementing it with other rigorous methods to work within real constraints.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "Consider the following novel scenario: Your team wants to test whether adding a progress bar to a multi-step signup flow improves completion rates. Based on rough traffic estimates, you calculate that reaching adequate statistical power for a minimum detectable effect of 2 percentage points will take approximately five weeks.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying this lesson's pre-registration and power discipline, not to reach one \"right\" answer.\n\n1. Using the Experiment Pre-Registration Checklist, what would you specify for each field before launching this experiment?\n2. Three days into the experiment, a teammate excitedly reports the treatment group is already showing a large, seemingly significant improvement. How would you respond, using the Peeking Trap mental model?\n3. If, after the full five weeks, the result is statistically significant but the effect size is only 0.3 percentage points (below your minimum detectable effect threshold), what would you conclude, and why does this differ from simply asking \"was the p-value below 0.05\"?\n4. What guardrail metric might be worth monitoring alongside completion rate, in case the progress bar has an unintended negative effect elsewhere in the experience?\n5. If the five-week experiment shows no statistically significant difference at all, what would you want to check before concluding the progress bar definitely has no effect?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 44 — Cohort & Retention Analysis | Resolves both Lesson 43's and Lesson 44's open threads about rigorously validating a proposed fix rather than assuming a plausible hypothesis is correct |\n| **Current Lesson** | Lesson 45 — A/B Testing & Experimentation | Random assignment; p-values; statistical power; the Peeking Trap; pre-registration |\n| **Next Lesson** | Lesson 46 — Growth Loops & Virality | Applies experimental rigor to validating growth mechanisms and loop interventions |\n| **Future Concepts Unlocked** | Lesson 50 (Product-Led Growth) | Depends on rigorous experimentation to validate self-serve growth mechanics |\n| | Lesson 57 (Ethics in Product Management) | Revisits experimentation's ethical boundaries, including informed consent and manipulation concerns |\n\nThis curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry random assignment, statistical power, and the Peeking Trap with you — they will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-045.md"
+}

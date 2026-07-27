@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-012",
+    "number": 12,
+    "title": "Customer Interviews",
+    "moduleNumber": 2,
+    "moduleName": "Users & Research",
+    "difficulty": 4,
+    "estMinutesReading": 30,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 6 (Jobs To Be Done), Lesson 11 (User Research)",
+    "nextLessonSlug": "lesson-013",
+    "futureTopicsUnlocked": "Lesson 13 (Surveys — the quantitative complement to interviews), Lesson 14 (Personas — built from interview synthesis), Lesson 16 (Pain Points), Lesson 17 (Problem Statements)"
+  },
+  "learningObjectives": [
+    "Distinguish a \"past-behavior\" interview question from a hypothetical or opinion-based question, and explain why the former produces more reliable evidence.",
+    "Apply the \"switch interview\" structure to uncover the specific moment and forces that led someone to adopt, or seriously consider adopting, a new solution.",
+    "Identify and avoid the most common interviewer mistakes: leading questions, pitching instead of listening, accepting vague answers, and interviewing only easy-to-reach participants.",
+    "Distinguish a customer interview conducted for discovery purposes from one conducted for usability testing, and explain why conflating the two produces weaker results for both.",
+    "Apply the \"Five Whys\" and silence techniques to move a conversation from a surface-level answer to a genuinely underlying one."
+  ],
+  "theory": "### Past-Behavior Questions vs. Hypothetical and Opinion Questions\n\nThe single most important technical skill in customer interviewing is the discipline of asking about **specific past behavior** rather than **hypothetical future behavior** or **general opinion**. Consider three ways of asking about the same underlying topic:\n\n- **Hypothetical (weak)**: \"Would you use a feature that let you set spending limits per category?\"\n- **Opinion (weak)**: \"What do you think about budgeting apps in general?\"\n- **Past behavior (strong)**: \"Tell me about the last time you tried to stick to a budget. Walk me through exactly what happened.\"\n\nThe past-behavior question is dramatically more reliable, for reasons directly tied to Lesson 11's stated-versus-revealed-preference distinction: a hypothetical question asks someone to predict their own future behavior, which people are demonstrably bad at, and costs nothing to answer generously; an opinion question invites abstract, socially acceptable answers disconnected from lived experience; a past-behavior question asks for a specific, real memory, which is far harder to answer with a comfortable, generic platitude, and which tends to surface concrete detail — including friction, workarounds, and abandoned attempts — that a hypothetical question would never reveal.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Interview Question Type] --> B[Hypothetical Would You Use X?]\n    A --> C[Opinion What Do You Think About X?]\n    A --> D[Past Behavior Tell Me<br/>About the Last Time You Did X]\n    B --> E[Weak: Costs Nothing to Answer Generously]\n    C --> F[Weak: Invites Abstract,<br/>Socially Acceptable Answers]\n    D --> G[Strong: Specific, Real Memory, Harder to<br/>Fake, Surfaces Concrete Detail and<br/>Friction]\n```\n\n### The Switch Interview Structure\n\nA particularly powerful, structured application of past-behavior questioning is the **switch interview** (closely associated with Bob Moesta's applied Jobs to Be Done work, previewed in Lesson 6's Forces of Progress model), which focuses specifically on the moment someone adopted, or seriously considered adopting, a new solution. The structure moves through a specific sequence:\n\n1. **First thought**: \"When did you first start thinking you might need something like this?\" — establishing the earliest moment of dissatisfaction (the Push force from Lesson 6).\n2. **Passive looking**: \"What did you do next? Did you look into any options at that point, even casually?\"\n3. **Active looking**: \"What made you go from casually considering this to actually seriously looking for a solution?\" — often revealing a specific triggering event, not a gradual, generic realization.\n4. **Deciding**: \"Walk me through how you actually chose [this solution] over the alternatives you were considering.\" — surfacing the Pull force and the specific comparison being made.\n5. **Anxiety and habit at the moment of commitment**: \"What almost stopped you from going through with it?\" — directly surfacing the Anxiety and Habit forces from Lesson 6's Forces of Progress model.\n\nThis structure is powerful precisely because it anchors the entire conversation in a real, specific, already-completed event, rather than a general opinion or a hypothetical scenario — every question asks about something that actually happened, in a particular order, which the respondent can recall concretely rather than construct on the spot.\n\n### Common Interviewer Mistakes\n\n**Leading questions** (introduced in Lesson 11) remain the most pervasive interviewing mistake, but several additional, interview-specific mistakes deserve direct attention:\n\n- **Pitching instead of listening.** An interviewer excited about their own product idea often unconsciously turns an interview into a sales pitch — describing the proposed solution and gauging reaction, rather than first fully understanding the respondent's existing behavior and pain independent of any proposed solution. Once a solution has been described, the respondent's subsequent answers are contaminated by anchoring toward that specific solution, making it much harder to learn what they would have said, or wanted, absent that framing.\n- **Accepting vague answers.** A respondent saying \"it was frustrating\" or \"I just wanted it to be easier\" is common, and an inexperienced interviewer often moves on, treating this as sufficient detail. A skilled interviewer follows up specifically: \"What does 'frustrating' mean, concretely — what happened, step by step, that felt frustrating?\" Vague language is a signal to dig deeper, not a finished answer.\n- **Interviewing only easy-to-reach participants.** Directly echoing Lesson 11's representativeness concern, interviews conducted only with the most available, most enthusiastic, or most vocal customers systematically miss the perspectives — often including churned users, skeptical prospects, or quietly dissatisfied customers — that would most challenge the team's existing assumptions.\n- **Filling silence too quickly.** When a respondent pauses after a question, an uncomfortable-feeling silence often tempts the interviewer to jump in with a clarifying suggestion or a multiple-choice-style prompt. This frequently short-circuits the respondent's own, more genuine train of thought — deliberately tolerating a few seconds of silence often produces a more considered, more useful answer than immediately rescuing the respondent from having to think.\n\n### Discovery Interviews vs. Usability Interviews\n\nA conceptually important distinction, often blurred in practice: a **discovery interview** aims to understand a person's existing behavior, context, and needs — usually before a specific solution exists, or independent of one — while a **usability interview** (more precisely, a usability test conducted with an interview component) aims to observe how a person interacts with a specific, already-built prototype or product, to identify points of confusion or friction.\n\nConflating these two produces a specific, recognizable failure: a session framed as \"discovery\" that spends most of its time reacting to a shown prototype has, without anyone quite deciding to make this trade, actually become a usability session — collecting reactions to a specific proposed solution rather than the more foundational, solution-independent understanding discovery is meant to produce. Neither type of session is superior; they simply answer different questions, and a PM should be deliberate about which one they are running in a given conversation, rather than drifting between the two without noticing.\n\n### Digging Deeper: The Five Whys and the Power of Silence\n\nTwo specific, complementary techniques help move a conversation from a surface-level answer to a genuinely underlying one, directly extending Lesson 6's laddering technique into live interview practice:\n\n- **The Five Whys**: repeatedly asking \"why\" (or a softer equivalent, like \"what made that important to you?\") in response to a stated reason, until reaching an explanation that feels genuinely foundational rather than another intermediate justification. As in Lesson 6, this has a natural stopping point — the most specific, stable explanation, not the most abstract one imaginable.\n- **Tolerating silence**: as described above, resisting the urge to fill a pause immediately after asking a question, giving the respondent genuine space to think past their first, most readily available answer.\n\nUsed together, these techniques counteract a natural tendency in conversation — both interviewer and respondent are inclined to treat the first plausible-sounding answer as sufficient and move on — that, left unchecked, produces exactly the kind of surface-level, insufficiently specific finding this lesson (and Lesson 11) warns against.\n\n---",
+  "mistakes": "**Mistake 1: Asking \"would you use this?\" partway through an interview, then treating the answer as reliable evidence.**\nAs covered in Lesson 11, this remains one of the single most reliable ways to generate falsely confident, stated-preference-only validation — an interview format doesn't inoculate against this trap; it requires the same discipline of avoiding hypothetical framing.\n\n**Mistake 2: Describing the proposed solution before fully understanding the respondent's existing behavior.**\nOnce a solution is on the table, every subsequent answer is anchored to it, making it far harder to learn what the respondent's actual, solution-independent experience and need really are.\n\n**Mistake 3: Treating a vague answer as a complete answer.**\n\"It's frustrating\" or \"I wish it were easier\" are starting points, not findings — a skilled interviewer follows up for concrete, specific detail rather than recording the vague version as the finding itself.\n\n**Mistake 4: Recruiting only friendly, easy-to-reach participants.**\nThis produces exactly the unrepresentative sample problem from Lesson 11 — a systematic bias toward the perspectives of people already inclined to be positive and engaged, at the expense of skeptics, churned users, or people who never adopted the product at all.\n\n**Mistake 5: Rushing past silence.**\nJumping in to rescue a respondent from a pause, or offering a multiple-choice-style prompt (\"was it more about cost, or more about time?\") before they've had a chance to answer in their own words, often produces a shallower, more interviewer-shaped answer than genuine patience would have.\n\n---",
+  "mentalModel": {
+    "title": "The Interview Depth Staircase",
+    "content": "This lesson's mental model is the **Interview Depth Staircase** — a way of visualizing how a single topic should be progressively deepened across a conversation, rather than left at its first, surface-level answer.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph BT\n    A[Step 1: Surface Answer<br/>E.g. It Was Frustrating] --> B[Step 2: Concrete Detail What<br/>Specifically Happened? Walk Me Through<br/>It]\n    B --> C[Step 3: the Why What Made<br/>Particular Part Frustrating to You?]\n    C --> D[Step 4: Underlying Job What Were You<br/>Trying to Accomplish at Moment?]\n    D --> E[Step 5: Forces of Progress What Almost<br/>Stopped You, or What Finally Pushed You<br/>to Act?]\n```\n\nUse this staircase as a discipline for noticing when a conversation has stalled on a lower step: if you find yourself recording \"it was frustrating\" as if it were a complete insight, you have stopped on Step 1, and the techniques covered in this lesson — concrete follow-up questions, the Five Whys, and tolerating silence — are specifically what climb the remaining steps.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph BT\n    A[Step 1: Surface Answer<br/>E.g. It Was Frustrating] --> B[Step 2: Concrete Detail What<br/>Specifically Happened? Walk Me Through<br/>It]\n    B --> C[Step 3: the Why What Made<br/>Particular Part Frustrating to You?]\n    C --> D[Step 4: Underlying Job What Were You<br/>Trying to Accomplish at Moment?]\n    D --> E[Step 5: Forces of Progress What Almost<br/>Stopped You, or What Finally Pushed You<br/>to Act?]"
+  },
+  "caseStudy": {
+    "title": "The Interview That Became a Pitch",
+    "content": "Consider a simplified, illustrative scenario common across early-stage productivity software.\n\nA team building a project management tool for small creative agencies conducts a round of ten customer interviews to validate their product concept. In each interview, following an initial round of warm-up questions, the interviewer shows a working prototype and walks the respondent through its key features, asking after each one, \"Does this seem useful to you?\" and \"Would this solve your project-tracking problems?\" All ten respondents respond positively, several enthusiastically. The team proceeds confidently into a significant engineering investment.\n\nSix months after launch, adoption among the target segment is markedly lower than the interview round's enthusiasm predicted. A second round of interviews, conducted with a different, more disciplined structure — past-behavior questions asked before any prototype was shown, with the prototype withheld until the final few minutes of each conversation — reveals a different picture: most respondents' actual current project-tracking behavior was a lightweight combination of a shared spreadsheet and informal team chat messages, and several specifically mentioned that they had tried more full-featured project management tools in the past and abandoned them within weeks because the overhead of maintaining detailed task structures didn't match their agency's fast-moving, informal working style.\n\n**What went wrong?**\n\nApplying this lesson's frameworks:\n\n1. **The original interviews pitched the solution early**, anchoring every subsequent answer to a reaction about the shown prototype rather than an independent account of the respondents' actual existing behavior and pain.\n2. **\"Does this seem useful?\" and \"Would this solve your problem?\" are hypothetical, stated-preference questions**, precisely the kind Lesson 11 and this lesson both warn produce falsely confident, low-cost-to-answer-generously validation.\n3. **No past-behavior questions were asked about respondents' actual current tracking methods and any prior tool-adoption attempts**, meaning the team never surfaced the specific, highly relevant fact — a documented history of trying and abandoning similar tools — that would have directly challenged their confidence before a costly engineering investment was made.\n\nA team applying this lesson's discipline from the outset would have started every interview with past-behavior questions about current project-tracking methods and any prior tool adoption or abandonment, withheld any prototype until well into or after that discussion, and specifically probed prior abandoned-tool experiences using the switch-interview structure — likely surfacing the agency-specific mismatch (heavyweight tool overhead versus a fast-moving, informal working style) well before committing significant engineering resources to build it.\n\nThis case connects directly back to **Lesson 8's discovery theater** concept: the original interview round had the visible form of validation (ten interviews were conducted) but was structured in a way that made a negative, disconfirming result nearly impossible to surface, precisely because the questions asked were hypothetical and solution-anchored rather than past-behavior-based.\n\n---"
+  },
+  "framework": {
+    "title": "The Interview Guide Structure",
+    "content": "A practical, reusable structure for sequencing a discovery interview, synthesizing this lesson's techniques into a repeatable order:\n\n| Segment | Purpose | Example Question Style |\n|---|---|---|\n| **Warm-up** | Build rapport, establish context, low-stakes | \"Tell me a bit about your role and how your day typically goes.\" |\n| **Past-behavior deep dive** | Surface actual existing behavior and pain, with no solution mentioned yet | \"Tell me about the last time you [did the relevant task]. Walk me through it step by step.\" |\n| **Switch interview (if applicable)** | Uncover the specific moment and forces behind adopting, or considering, a prior solution | \"What made you first start looking for something like this? What almost stopped you from switching?\" |\n| **Digging deeper** | Move past vague, surface-level answers | \"What specifically made that frustrating?\" / \"Why did that matter to you?\" (Five Whys) |\n| **Solution reaction (only if needed, and only near the end)** | Gauge reaction to a specific concept, clearly separated from the discovery portion | \"Here's something we're considering. What's your honest reaction?\" |\n\nThe critical discipline this structure enforces: **the solution reaction segment comes last, is clearly separated from the discovery portion, and is treated as a distinct type of evidence** (weaker, stated-preference-adjacent evidence, per the Evidence Trustworthiness Ladder) rather than blended together with the earlier, more reliable past-behavior findings as if they were the same kind of data.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Customer Interviews at Different Company Stages",
+    "content": "**At a startup:**\nCustomer interviews are often the primary, sometimes only, research method available, given limited resources, and founders frequently conduct these interviews personally in the earliest stages. The central risk at this stage is the \"pitching instead of listening\" mistake — a founder deeply attached to their own idea can find it especially difficult to resist describing the solution early and anchoring the conversation toward validating it, rather than first understanding the respondent's independent experience.\n\n**At a mid-size company:**\nInterviews are often conducted by dedicated researchers or research-trained PMs, using more standardized interview guides and recruitment processes designed specifically to counteract the representativeness problem — deliberately including skeptics, churned users, and less-engaged customers rather than relying on convenient, self-selected volunteers.\n\n**At Big Tech:**\nInterviews at this scale are often used specifically to generate and refine hypotheses that will subsequently be tested quantitatively at scale (directly echoing Lesson 11's complementary-methods framework), and are frequently combined with more extensive documentation, coding, and synthesis practices (formal thematic analysis across dozens or hundreds of interview transcripts) to extract patterns systematically rather than relying on an individual interviewer's impressionistic recollection of a handful of conversations.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-012-1",
+      "questionNumber": 1,
+      "questionText": "Which of the following interview questions best exemplifies the \"past-behavior\" question type described in this lesson?",
+      "options": [
+        "\"Would you use a feature that automates employee scheduling?\"",
+        "\"What do you think about scheduling software in general?\"",
+        "\"Tell me about the last time you had to create a weekly schedule for your team. Walk me through exactly what happened.\"",
+        "\"Do you think scheduling is a common problem for small businesses?\""
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "This question asks for a specific, real past event rather than a hypothetical prediction or a general opinion, making it a past-behavior question in the sense described by this lesson.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-012-2",
+      "questionNumber": 2,
+      "questionText": "Why are past-behavior questions considered more reliable than hypothetical questions, according to this lesson?",
+      "options": [
+        "Because hypothetical questions are always dishonestly answered",
+        "Because specific, real memories are harder to answer with a comfortable, generic response, and cost the respondent something (accuracy to their own memory) to fabricate, unlike a low-stakes prediction about the future",
+        "Because past-behavior questions are always shorter to ask",
+        "Because hypothetical questions can only be asked in written surveys, not interviews"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explains that predicting future behavior is unreliable and low-cost to answer generously, while recalling a specific past event is harder to fabricate convincingly and tends to surface concrete, revealing detail.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-012-3",
+      "questionNumber": 3,
+      "questionText": "What is the purpose of the \"passive looking\" step in a switch interview?",
+      "options": [
+        "To ask the respondent whether they would recommend the eventual solution to a friend",
+        "To understand what the respondent did just after their first thought of dissatisfaction, even before actively searching for a solution",
+        "To show the respondent a prototype and gauge their reaction",
+        "To ask the respondent to rate their overall satisfaction on a numeric scale"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "\"Passive looking\" specifically asks what happened between the first moment of dissatisfaction and the point where the respondent began actively searching, per the switch interview structure described in this lesson.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-012-4",
+      "questionNumber": 4,
+      "questionText": "Which of the following is the clearest example of the \"pitching instead of listening\" mistake?",
+      "options": [
+        "Asking a respondent to describe their current workflow before mentioning any proposed feature",
+        "Describing a prototype's key features early in the conversation and asking after each one whether it \"seems useful\"",
+        "Tolerating a long pause after asking a question",
+        "Asking a follow-up question when a respondent gives a vague answer"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Describing the solution's features early and immediately asking for reactions anchors subsequent answers to the shown solution, exactly the \"pitching instead of listening\" pattern this lesson warns against.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-012-5",
+      "questionNumber": 5,
+      "questionText": "According to this lesson, what should an interviewer do when a respondent answers, \"It was just annoying\"?",
+      "options": [
+        "Record the answer as a complete finding and move to the next question",
+        "Follow up with specific, concrete questions (e.g., \"What specifically happened that felt annoying?\") to dig past the vague surface-level answer",
+        "Assume the respondent does not have a real opinion and skip the topic",
+        "Rephrase the original question as a multiple-choice option to make it easier to answer"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly frames vague answers as a signal to dig deeper using concrete follow-up questions or the Five Whys, not as a finished finding.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-012-6",
+      "questionNumber": 6,
+      "questionText": "What is the key difference between a discovery interview and a usability interview, as described in this lesson?",
+      "options": [
+        "Discovery interviews are always longer than usability interviews",
+        "A discovery interview understands existing behavior and needs, often independent of a specific solution; a usability interview observes interaction with an already-built prototype or product",
+        "Usability interviews can only be conducted in person, never remotely",
+        "There is no meaningful difference between the two"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is the lesson's explicit distinction — discovery interviews focus on solution-independent behavior and needs, while usability interviews focus on interaction with a specific built solution.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-012-7",
+      "questionNumber": 7,
+      "questionText": "In the Detailed Case Study, what was the key structural flaw in the original round of ten interviews?",
+      "options": [
+        "Too few interviews were conducted",
+        "The prototype was shown early, and respondents were asked hypothetical, solution-anchored questions (\"Does this seem useful?\") rather than past-behavior questions about their existing tracking methods",
+        "The interviews were conducted in the wrong language",
+        "The respondents were not real customers at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study explicitly attributes the flawed validation to showing the prototype early and asking hypothetical, solution-anchored questions, rather than first understanding actual existing behavior through past-behavior questions.",
+      "learningObjective": "#3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-012-8",
+      "questionNumber": 8,
+      "questionText": "What specific, highly relevant fact did the original (flawed) interview round fail to surface, which the second, more disciplined round did surface?",
+      "options": [
+        "That respondents preferred a different color scheme for the interface",
+        "That respondents had previously tried and abandoned similar, more full-featured project management tools due to a mismatch with their informal working style",
+        "That respondents were unwilling to pay for any project management tool",
+        "That respondents preferred to use a competitor's product exclusively"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The second round's past-behavior questions revealed a documented prior pattern of tool adoption and abandonment tied to a specific mismatch in working style — exactly the kind of finding hypothetical, solution-anchored questions had missed.",
+      "learningObjective": "#3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-012-9",
+      "questionNumber": 9,
+      "questionText": "(Scenario) An interviewer asks a respondent a question and the respondent pauses for several seconds before answering. According to this lesson, what is the most appropriate interviewer response?",
+      "options": [
+        "Immediately offer a multiple-choice-style prompt to help the respondent answer faster",
+        "Tolerate the silence, giving the respondent space to think past their first, most readily available answer",
+        "Repeat the question louder, assuming the respondent didn't hear it",
+        "Move on to the next question immediately, since the pause indicates the respondent has nothing to say"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly recommends tolerating silence rather than rescuing the respondent with a prompt, since doing so often short-circuits a more considered, genuine answer.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-012-10",
+      "questionNumber": 10,
+      "questionText": "(Product Thinking) A team wants to run a session to observe how users interact with a nearly finished prototype and identify points of confusion. According to this lesson, what kind of session is this, and what should the team be careful about?",
+      "options": [
+        "This is a discovery interview, and the team should avoid showing the prototype at all",
+        "This is a usability interview, and the team should be careful not to conflate it with discovery-style past-behavior questioning, since the two answer different questions",
+        "This is not a legitimate research method at all",
+        "This session type does not require any interview structure"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Observing interaction with an already-built prototype to identify confusion is a usability interview, and the lesson warns against blending this with discovery-style questioning without deliberate awareness of the different purposes.",
+      "learningObjective": "#4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-012-11",
+      "questionNumber": 11,
+      "questionText": "(Interview Reasoning) A candidate describes every past customer interview they've conducted as ultimately confirming their team's original product idea, with no example of a surprising or disconfirming finding. What might this signal, based on this lesson's Interview Perspective section?",
+      "options": [
+        "Exceptionally accurate initial product instincts requiring no further scrutiny",
+        "A possible sign of a pitching-not-listening pattern, or another bias, preventing genuinely disconfirming findings from surfacing",
+        "That customer interviews are inherently unable to produce disconfirming findings",
+        "Nothing meaningful, since consistent confirmation is the expected, normal outcome of interviews"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Echoing Lesson 11's related concern, an inability to describe a real disconfirming finding may signal a research process (in this case, an interviewing practice) contaminated by bias, such as pitching before listening or interviewer confirmation bias.",
+      "learningObjective": "#3",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-012-12",
+      "questionNumber": 12,
+      "questionText": "(Product Thinking, Higher Difficulty) A respondent in a switch interview describes actively searching for a new tool but ultimately says, \"I almost didn't switch because I was worried about losing all my existing data.\" Which Force of Progress (Lesson 6) does this statement most directly surface?",
+      "options": [
+        "Push",
+        "Pull",
+        "Anxiety",
+        "Habit"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "Worry about a specific negative consequence of switching (losing data) is a direct example of the Anxiety force from Lesson 6's Forces of Progress model, distinct from Habit (comfort with the old approach) or Push/Pull (dissatisfaction and attraction).",
+      "learningObjective": "#2",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-012-13",
+      "questionNumber": 13,
+      "questionText": "(Interview Reasoning, Higher Difficulty) An interviewer is asked to critique a colleague's interview guide, which begins with a five-minute demo of the proposed solution before any questions about the respondent's current behavior. What is the strongest critique, based on this lesson?",
+      "options": [
+        "The guide is well-structured, since showing the solution early builds respondent enthusiasm",
+        "The guide risks anchoring every subsequent answer to the shown solution, and should instead place past-behavior, solution-independent questions first, with any solution reaction moved to a clearly separated, later segment",
+        "The guide should be lengthened by adding even more demo time at the start",
+        "The guide has no meaningful flaws, since demos are always appropriate at any point in an interview"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly reflects the lesson's core structural guidance — solution description should come last and be clearly separated from the past-behavior discovery segment, precisely to avoid the anchoring problem shown in the Detailed Case Study.",
+      "learningObjective": "#3, #4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-012-14",
+      "questionNumber": 14,
+      "questionText": "(Product Thinking, Higher Difficulty) A team has completed several interviews and is unsure whether a recurring vague theme (\"it's just complicated\") represents a genuine, specific finding or an unexplored surface-level answer. Using the Interview Depth Staircase, what should the team conclude?",
+      "options": [
+        "The theme is a complete, actionable finding as stated, and no further investigation is needed",
+        "The theme likely represents Step 1 (a surface answer) on the staircase, and further digging (concrete follow-up questions, the Five Whys) is needed before treating it as an actionable insight",
+        "The theme should be discarded entirely, since vague findings are never useful",
+        "The team should immediately build a solution addressing \"complexity\" without further clarification"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A recurring vague theme sitting at Step 1 of the staircase is exactly the signal this lesson describes as requiring further digging before being treated as a specific, actionable insight — neither accepting it at face value nor discarding it outright is appropriate.",
+      "learningObjective": "#5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-012-15",
+      "questionNumber": 15,
+      "questionText": "(Highest Difficulty) A team conducts twenty interviews, all recruited through an in-app pop-up shown only to daily active users, and all following a past-behavior-first structure with solution reaction deferred to the end. According to this lesson and Lesson 11 combined, what specific limitation remains, despite the strong interview structure?",
+      "options": [
+        "There is no remaining limitation, since the interview structure itself was well-designed",
+        "The sample is still likely unrepresentative, since it excludes non-users, churned users, and less-engaged customers — a strong interview technique does not, by itself, correct for a biased recruitment strategy",
+        "Twenty interviews is an insufficient sample size for any purpose, regardless of structure",
+        "The interviews should have been conducted as usability tests instead"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This tests the integration of Lesson 11 and Lesson 12 — even an excellent interview structure does not correct for an unrepresentative recruitment strategy (here, only daily active users), which remains a distinct, unresolved limitation per Lesson 11's representativeness criterion.",
+      "learningObjective": "#3, #4",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "You are preparing to interview small business owners about how they currently handle employee scheduling, ahead of building a new scheduling tool.\n\nWork through the following, in writing, before reading further:\n\n1. Write three past-behavior questions you would ask early in the interview, before mentioning any proposed solution.\n2. Write a switch-interview-style question sequence (first thought through anxiety/habit) you would use if a respondent mentions they previously tried and abandoned a different scheduling tool.\n3. A respondent answers, \"Scheduling is just always a headache.\" Write two specific follow-up questions using the Five Whys or concrete-detail technique to dig past this vague answer.\n4. Identify one type of participant you might be tempted to skip recruiting (for example, someone who currently uses only a paper schedule, or someone who tried and quickly abandoned a competitor's app) and explain why including them matters, referencing Lesson 11's representativeness concern.\n5. Describe exactly when and how you would introduce your own proposed solution concept in this interview, and how you would keep that segment evidentially separate from the earlier past-behavior findings.\n\nThere is no single correct answer. The purpose of this exercise is to practice structuring a full interview guide using this lesson's techniques, for a scenario without a pre-worked example to lean on.\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 11 — User Research | Provides the theoretical foundation (stated vs. revealed preference, research biases) that this lesson translates into concrete interviewing technique |\n| **Current Lesson** | Lesson 12 — Customer Interviews | Past-behavior questions; the switch interview structure; the Interview Depth Staircase; discovery vs. usability interviews |\n| **Next Lesson** | Lesson 13 — Surveys | Extends this module's research methods into the quantitative domain, addressing how to design surveys that avoid the same leading-question and stated-preference traps at scale |\n| **Future Concepts Unlocked** | Lesson 14 (Personas) | Uses synthesized interview findings, rather than assumption, as the required input for building accurate personas |\n| | Lesson 16 (Pain Points) | Builds directly on the concrete, specific detail surfaced through past-behavior questioning and the Interview Depth Staircase |\n| | Lesson 17 (Problem Statements) | Formalizes interview findings, combined with Lesson 6's laddering, into a structured, testable problem statement |\n\nThis curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to \"what customers told us\" assumes the past-behavior discipline and the discovery-versus-usability distinction covered here — this will not be re-explained, only re-applied.",
+  "rawMarkdownPath": "content/lessons/lesson-012.md"
+}

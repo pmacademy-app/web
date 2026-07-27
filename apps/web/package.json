@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "content:parse": "npx tsx ../../scripts/parse-content.ts",
+    "content:validate": "npx tsx ../../scripts/validate-content.ts",
+    "content:search": "npx tsx ../../scripts/generate-search-index.ts",
+    "content:build": "npm run content:parse && npm run content:validate && npm run content:search",
+    "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -34,6 +38,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

@@ -29,7 +29,6 @@ export const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
       { label: 'Learning Experience', href: '/#experience' },
       { label: 'Skill Radar',         href: '/#skill-radar' },
       { label: 'Portfolio',           href: '/#portfolio' },
-      { label: 'AI Mentor',           href: '/#ai-mentor' },
     ],
   },
   {

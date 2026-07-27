@@ -1,0 +1,348 @@
+{
+  "meta": {
+    "slug": "lesson-089",
+    "number": 89,
+    "title": "The Future of Product Management",
+    "moduleNumber": 9,
+    "moduleName": "Specialized Domains and Synthesis",
+    "difficulty": 6,
+    "estMinutesReading": 40,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 65 (Ownership Zones Model), Lesson 84 (Capability-Reliability Matrix), Lesson 1 (responsibility without authority)",
+    "nextLessonSlug": "lesson-090",
+    "futureTopicsUnlocked": "Lesson 90 (Capstone) — draws on the PM Judgment Reserve as established canon for the curriculum's closing synthesis"
+  },
+  "learningObjectives": [
+    "Explain why AI tool capability at drafting and synthesis tasks doesn't eliminate the need for human PM judgment.",
+    "Apply the PM Judgment Reserve model to distinguish delegable execution work from irreducibly human judgment work.",
+    "Identify the specific risk of treating AI-generated outputs as substitutes for judgment rather than inputs to it.",
+    "Explain why trust-building and ethical tradeoff reasoning remain durably human PM responsibilities.",
+    "Evaluate a PM's own working practices for whether AI tool use is augmenting judgment or quietly replacing it."
+  ],
+  "theory": "### Why AI Capability at Drafting Doesn't Eliminate Judgment\n\nAn AI tool can draft a competent first-version spec, summarize a pile of user research, or generate several roadmap options quickly. What it cannot do is take accountability for whether the spec addresses the actual business context, whether the research summary captured the nuance that matters for this specific decision, or which roadmap option best fits constraints the tool wasn't given full visibility into. This is the same capability-versus-reliability distinction from Lesson 84, applied to text generation rather than a customer-facing decision: a draft can be impressively fluent and still miss exactly the judgment call that made the task worth doing in the first place.\n\n### The PM Judgment Reserve\n\nThis lesson introduces the **PM Judgment Reserve**, distinguishing four categories of PM work:\n\n```mermaid\ngraph TD\n    A[\"Execution, High Automatability<br/>(first-draft specs, research synthesis)<br/>→ Delegate to AI, review outputs\"]\n    B[\"Execution, Low Automatability<br/>(specific stakeholder coordination)<br/>→ Still largely manual\"]\n    C[\"Judgment, AI-Augmentable<br/>(option generation for a strategic decision)<br/>→ AI assists, human decides\"]\n    D[\"Judgment, Irreducibly Human<br/>(trust-building, ethical tradeoffs, ambiguous prioritization)<br/>→ The Judgment Reserve itself\"]\n```\n\nQuadrant D — trust-building with stakeholders, navigating genuine ethical tradeoffs, making a prioritization call under irreducible ambiguity where reasonable people would disagree — is what this lesson calls the **Judgment Reserve**: the part of PM work that doesn't shrink as AI tools improve, because it depends on accountability, relationship, and context no tool can hold. A PM whose time increasingly shifts toward quadrant A tasks, treating AI drafts as final outputs rather than inputs requiring quadrant D judgment, is not becoming more efficient — they are quietly abdicating the part of the job that was always the actual point.\n\n### The Risk of Treating Outputs as Substitutes for Judgment\n\nThe specific failure mode this lesson warns against is accepting an AI-generated artifact — a spec, a synthesis, a roadmap — without applying the same judgment a PM would have applied to their own draft, on the reasoning that the tool's output already looks polished and complete. Polish is not the same as correctness, and a fluent, well-organized draft can still contain a judgment error invisible to a reviewer who has stopped actively exercising judgment because the artifact already looks finished.\n\n### Why the Erosion Is Gradual and Easy to Miss\n\nNobody wakes up one day and decides to stop exercising judgment. The shift this lesson describes happens gradually, one individually reasonable time-saving choice at a time: skipping a second read-through on a draft that looked clean the first time, accepting a synthesis's framing because re-deriving it independently would take longer than the meeting allows, deferring to a tool's suggested prioritization because it's plausible and the PM is behind on other work. Each individual choice is defensible in isolation, which is exactly what makes the pattern hard to notice from the inside — there is rarely a single moment that feels like abdication, only an accumulation of small deferrals that, over months, can leave a PM meaningfully less engaged with the judgment calls their role actually exists to make. This mirrors the same gradual-accumulation dynamic described in Lesson 88's discussion of coherence overextension: both failure modes develop through a series of individually reasonable steps, and both require a deliberate, periodic check — rather than a single moment of obvious crisis — to catch before the accumulated drift becomes hard to reverse.\n\n---",
+  "mistakes": "1. **Treating AI-generated drafts as finished outputs rather than inputs requiring human judgment.**\n2. **Shifting time toward automatable execution tasks while under-investing in irreducibly human judgment work.**\n3. **Assuming a fluent, polished AI output is automatically correct, mistaking polish for accuracy.**\n4. **Using AI tools to avoid, rather than inform, a genuinely difficult stakeholder conversation or ethical tradeoff.**\n5. **Failing to recognize that accountability for an outcome doesn't diminish just because a tool assisted in producing the artifact behind it.**\n6. **Treating a polished AI output's coherence as evidence that independent re-derivation would be redundant, when the tool never had visibility into the specific context that judgment required.**\n\n---",
+  "mentalModel": {
+    "title": "The PM Judgment Reserve",
+    "content": "Ask: (1) Which quadrant does this task actually occupy — automatable execution, or irreducibly human judgment? (2) If AI-assisted, is the output being treated as a reviewable input requiring judgment, or as a finished substitute for it? (3) Is time increasingly shifting away from quadrant D work, and if so, is that erosion deliberate or accidental?\n\n---"
+  },
+  "caseStudy": {
+    "title": "The Unreviewed Roadmap",
+    "content": "A PM, under significant time pressure, used an AI tool to generate a full quarterly roadmap draft based on a summary of recent customer feedback and internal priorities, and presented it to leadership with only minor edits, reasoning that the tool's synthesis was thorough and well-organized. The roadmap, while polished, had weighted several customer feedback themes according to raw frequency rather than strategic importance, missing a specific, lower-volume but high-stakes concern from the company's largest enterprise account — a nuance the PM would ordinarily have caught through their own direct judgment about that account's strategic significance, per the Stakeholder Compass concept from Lesson 73.\n\n**What went wrong?** The PM treated a quadrant A output (AI-drafted synthesis) as though it had already incorporated quadrant D judgment (strategic weighting specific to account importance), when the tool had no visibility into which customer concerns carried outsized strategic weight. The roadmap's polish masked the absence of the judgment step that should have reviewed and reweighted its priorities before presentation. In the post-mortem conversation, the PM described a specific, recognizable internal reasoning: the synthesis had organized the feedback themes clearly, cited specific customer quotes accurately, and looked, on its face, like exactly the kind of thorough document they would have produced themselves given enough time — which made it feel redundant to re-derive the same prioritization independently rather than simply confirming the output looked reasonable.\n\nThat felt-redundancy is precisely the trap this lesson's Theory section describes: the tool's synthesis was accurate as a summary of what customers said, but the strategic weighting of which concerns mattered most was never something the tool could have performed, since it required knowledge of the enterprise account's specific commercial importance that existed only in the PM's head and in conversations the tool was never part of. Recovery involved the PM reviewing and substantially reweighting the roadmap before finalizing it, and adopting a personal practice of explicitly annotating which parts of any AI-assisted artifact still required deliberate judgment review before use — a lightweight habit that took only a few extra minutes per artifact but reliably forced the specific reasoning step that had gone missing.\n\n1. What made the AI-generated synthesis feel redundant to independently re-derive, and why was that feeling misleading in this specific case?\n2. If you adopted the annotation habit described in the recovery, what would you specifically flag as \"still requires judgment\" the next time you use an AI tool to draft something for your own work?\n\n---"
+  },
+  "framework": {
+    "title": "The Future-Ready PM Skills Checklist",
+    "content": "| Skill | Why It Remains Durably Human | Risk if Neglected |\n|---|---|---|\n| Judgment Under Ambiguity | Reasonable people can disagree; no tool resolves genuine ambiguity | Decisions default to whatever an AI tool weights most heavily, missing strategic nuance |\n| Stakeholder Trust-Building | Trust is relational and accountability-based, not generatable by a tool | Stakeholder relationships erode even as artifacts look polished |\n| Ethical Tradeoff Reasoning | Ethical stakes require accountability a tool cannot hold | Harmful tradeoffs go unexamined behind fluent-sounding justifications |\n| Systems-Level Thinking | Connecting many frameworks (as in Lessons 70 and 80) requires judgment across models | Isolated, single-lens diagnosis of multi-dimensional problems |\n| AI-Tool Fluency | Knowing what to delegate and what to review keeps quadrant D time protected | Either under-using helpful tools or over-delegating judgment work |\n\nNotice that this checklist is not an argument against using AI tools — the risk column throughout is about misapplied delegation, not tool use itself. A PM who never uses AI assistance for drafting or synthesis isn't automatically better positioned on this checklist; they may simply be spending scarce time on quadrant A work that could have been safely delegated, leaving less time for the quadrant D work the checklist actually protects. The discipline this lesson asks for is precise allocation, not blanket avoidance.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Real World Perspective",
+    "content": ""
+  },
+  "quiz": [
+    {
+      "id": "q-089-1",
+      "questionNumber": 1,
+      "questionText": "Why doesn't AI capability at drafting eliminate the need for PM judgment?",
+      "options": [
+        "AI tools are never actually capable of producing useful drafts",
+        "A fluent draft can still miss the accountability and context-dependent judgment that made the task worth doing",
+        "PM judgment is no longer relevant in any context",
+        "AI tools always incorporate full business context automatically"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A fluent draft can still miss the accountability and context-dependent judgment that made the task worth doing, so AI capability at drafting doesn't eliminate the need for PM judgment.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-089-2",
+      "questionNumber": 2,
+      "questionText": "What are the four quadrants of the PM Judgment Reserve model?",
+      "options": [
+        "Concept, Prototype, Pilot, Scale",
+        "Execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, judgment/irreducibly human",
+        "Data, Process, Outcome, Liability",
+        "Land, Expand, Retain, Grow"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The four quadrants are execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, and judgment/irreducibly human.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-089-3",
+      "questionNumber": 3,
+      "questionText": "What defines the \"Judgment Reserve\" quadrant specifically?",
+      "options": [
+        "Tasks that are easily automated by AI tools",
+        "Trust-building, ethical tradeoffs, and ambiguous prioritization that don't shrink as tools improve",
+        "Tasks that require no human involvement at all",
+        "Only tasks related to spec-writing"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Trust-building, ethical tradeoffs, and ambiguous prioritization don't shrink as tools improve — these are the irreducibly human responsibilities.",
+      "learningObjective": "#2, #4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-089-4",
+      "questionNumber": 4,
+      "questionText": "Why is polish not the same as correctness?",
+      "options": [
+        "Polished outputs are always correct by definition",
+        "A fluent, well-organized output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment",
+        "Polish and correctness are identical concepts",
+        "Correctness never actually matters for PM artifacts"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A fluent, well-organized output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-089-5",
+      "questionNumber": 5,
+      "questionText": "What was the root cause of the Unreviewed Roadmap case study's failure?",
+      "options": [
+        "The AI tool refused to generate any roadmap at all",
+        "The PM treated an AI-drafted synthesis as though it had already incorporated strategic judgment about account importance, which the tool had no visibility into",
+        "The PM never used any AI tool at all",
+        "The roadmap was rejected immediately by leadership"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The PM treated an AI-drafted synthesis as though it had already incorporated strategic judgment about account importance, which the tool had no visibility into.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-089-6",
+      "questionNumber": 6,
+      "questionText": "What specific nuance did the AI-generated roadmap miss in the case study?",
+      "options": [
+        "A high-volume, low-importance customer concern",
+        "A low-volume but high-stakes concern from the company's largest enterprise account",
+        "All customer feedback entirely",
+        "A purely cosmetic formatting issue"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A low-volume but high-stakes concern from the company's largest enterprise account was missed because the tool lacked visibility into strategic account importance.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-089-7",
+      "questionNumber": 7,
+      "questionText": "Why does trust-building remain a durably human PM responsibility, per the Future-Ready PM Skills Checklist?",
+      "options": [
+        "Trust is generatable by any sufficiently advanced AI tool",
+        "Trust is relational and accountability-based, not something a tool can hold",
+        "Trust-building is irrelevant to product management",
+        "AI tools have already fully replaced trust-building in most organizations"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Trust is relational and accountability-based, not something a tool can hold, making it a durably human PM responsibility.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-089-8",
+      "questionNumber": 8,
+      "questionText": "According to the checklist, what risk does neglecting \"Judgment Under Ambiguity\" create?",
+      "options": [
+        "No risk; ambiguous decisions are always resolved automatically",
+        "Decisions default to whatever an AI tool weights most heavily, missing strategic nuance",
+        "This skill is irrelevant to modern product management",
+        "Ambiguity never actually occurs in real product decisions"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Decisions default to whatever an AI tool weights most heavily, missing strategic nuance when judgment under ambiguity is neglected.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-089-9",
+      "questionNumber": 9,
+      "questionText": "Why might early-stage, solo PMs face especially acute pressure to over-delegate to AI tools, per the Real World Perspective section?",
+      "options": [
+        "Early-stage PMs never use AI tools at all",
+        "Limited time as the only PM at the company creates pressure to delegate execution tasks, making deliberate Judgment Reserve protection especially important",
+        "Early-stage companies are legally prohibited from using AI tools",
+        "This pressure only exists at large, mature organizations"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Limited time as the only PM at the company creates pressure to delegate execution tasks, making deliberate Judgment Reserve protection especially important.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-089-10",
+      "questionNumber": 10,
+      "questionText": "What are large organizations increasingly formalizing, per the Real World Perspective section?",
+      "options": [
+        "A complete ban on all AI tool usage",
+        "Guidance on where AI tools should assist versus where human judgment must remain primary",
+        "A policy requiring full AI automation of all PM tasks",
+        "No guidance of any kind regarding AI tool use"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Large organizations are increasingly formalizing guidance on where AI tools should assist versus where human judgment must remain primary.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-089-11",
+      "questionNumber": 11,
+      "questionText": "How does the PM Judgment Reserve connect to the Ownership Zones Model from Lesson 65?",
+      "options": [
+        "There is no meaningful connection between the two",
+        "It applies the same Zone 4 discipline — that a model's output shouldn't substitute for human judgment — to the PM's own artifacts",
+        "The Ownership Zones Model only applies to customer-facing decisions, never PM work",
+        "The PM Judgment Reserve replaces the need for the Ownership Zones Model entirely"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "It applies the same Zone 4 discipline — that a model's output shouldn't substitute for human judgment — to the PM's own artifacts.",
+      "learningObjective": "#1, #4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-089-12",
+      "questionNumber": 12,
+      "questionText": "(Scenario) A PM presents an AI-generated roadmap to leadership with only minor edits, treating it as essentially finished. What risk does this represent?",
+      "options": [
+        "No risk; AI-generated content is always ready for immediate presentation",
+        "The risk that quadrant D judgment (strategic weighting) was never actually applied, despite the artifact's polished appearance",
+        "A risk only relevant to hardware roadmaps",
+        "No risk, since leadership will catch any errors themselves"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The risk is that quadrant D judgment (strategic weighting) was never actually applied, despite the artifact's polished appearance.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-089-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A PM wants to use AI tools to draft all future specs with minimal review, citing time savings. What is the strongest response?",
+      "options": [
+        "Agree entirely, since time savings are always the top priority",
+        "Explain that drafts should be treated as inputs requiring judgment review, not finished substitutes, particularly regarding context the tool couldn't have known",
+        "Prohibit any AI tool use entirely",
+        "Agree, but only for specs under a certain word count"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Drafts should be treated as inputs requiring judgment review, not finished substitutes, particularly regarding context the tool couldn't have known.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-089-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) A candidate, asked how AI tools affect their PM work, describes using them to fully automate stakeholder prioritization decisions with no further review. What does this signal?",
+      "options": [
+        "A strong and complete understanding of future-ready PM practice",
+        "A gap in recognizing that ambiguous, stakeholder-sensitive prioritization belongs in the irreducibly human Judgment Reserve",
+        "Readiness for a senior PM role immediately",
+        "Nothing meaningful; full automation of prioritization is always appropriate"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A gap in recognizing that ambiguous, stakeholder-sensitive prioritization belongs in the irreducibly human Judgment Reserve.",
+      "learningObjective": "#2, #4, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-089-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A PM organization is adopting AI tools widely, and some PMs have begun presenting AI-drafted artifacts with minimal review, citing efficiency gains. Using only this lesson's frameworks, what is the most defensible organizational response?",
+      "options": [
+        "Encourage full delegation to AI tools across all PM tasks to maximize efficiency",
+        "Establish clear guidance distinguishing automatable execution work from the Judgment Reserve, requiring deliberate human review of AI-assisted artifacts before use in judgment-sensitive contexts",
+        "Ban all AI tool usage across the organization entirely",
+        "Take no action, since efficiency gains are the only relevant consideration"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Establish clear guidance distinguishing automatable execution work from the Judgment Reserve, requiring deliberate human review of AI-assisted artifacts before use in judgment-sensitive contexts.",
+      "learningObjective": "#1, #2, #3, #4, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "fc-089-1",
+      "front": "Why doesn't AI capability at drafting eliminate the need for PM judgment?",
+      "back": "A tool can produce a fluent, polished draft while missing exactly the accountability and context-dependent judgment call that made the task worth doing.",
+      "difficulty": "Easy",
+      "tags": [
+        "#future-of-pm"
+      ],
+      "lessonNumber": 89
+    },
+    {
+      "id": "fc-089-2",
+      "front": "What are the four quadrants of the PM Judgment Reserve model?",
+      "back": "Execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, judgment/irreducibly human.",
+      "difficulty": "Medium",
+      "tags": [
+        "#judgment-reserve"
+      ],
+      "lessonNumber": 89
+    },
+    {
+      "id": "fc-089-3",
+      "front": "Why is polish not the same as correctness?",
+      "back": "A fluent, well-organized AI output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment because it already looks finished.",
+      "difficulty": "Medium",
+      "tags": [
+        "#polish-vs-correctness"
+      ],
+      "lessonNumber": 89
+    },
+    {
+      "id": "fc-089-4",
+      "front": "What went wrong in the Unreviewed Roadmap case study?",
+      "back": "An AI-generated roadmap weighted feedback by raw frequency, missing a low-volume but high-stakes enterprise concern the PM would ordinarily have caught through direct judgment.",
+      "difficulty": "Hard",
+      "tags": [
+        "#case-study"
+      ],
+      "lessonNumber": 89
+    },
+    {
+      "id": "fc-089-5",
+      "front": "Why is judgment-reserve erosion gradual and hard to notice from the inside?",
+      "back": "It happens through a series of individually reasonable, small time-saving deferrals rather than one obvious moment of abdication — the same gradual-accumulation dynamic as Lesson 88's coherence overextension.",
+      "difficulty": "Hard",
+      "tags": [
+        "#judgment-erosion"
+      ],
+      "lessonNumber": 89
+    },
+    {
+      "id": "fc-089-6",
+      "front": "What is the \"felt-redundancy trap\" described in the Unreviewed Roadmap case study?",
+      "back": "The mistaken sense that re-deriving a judgment independently is unnecessary because a tool's output already looks thorough — misleading because the tool never had visibility into the specific strategic context that judgment required.",
+      "difficulty": "Hard",
+      "tags": [
+        "#case-study",
+        "#judgment-reserve"
+      ],
+      "lessonNumber": 89
+    }
+  ],
+  "reflectionPrompt": "You increasingly use AI tools to draft specs and synthesize user research.\n\n1. Which of your current PM tasks fall into each of the four Judgment Reserve quadrants?\n2. What signal would tell you that you've started treating an AI draft as a finished output rather than an input?\n3. How would you protect time for irreducibly human judgment work as automatable tasks grow?\n4. What stakeholder relationship or ethical tradeoff in your current work most clearly requires your own direct judgment?\n5. How would you explain the Judgment Reserve concept to a colleague who believes AI tools will eventually replace most PM judgment entirely?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 88 — Building and Scaling a Product Organization | Shifts from organizational structure to the PM discipline's own evolving practice |\n| **Current Lesson** | Lesson 89 — The Future of Product Management | PM Judgment Reserve; delegable execution vs. irreducibly human judgment |\n| **Next Lesson** | Lesson 90 — Capstone: Advanced Product Philosophy at Scale | Closes the curriculum with a final synthesis across all ninety lessons |\n| **Future Concepts Unlocked** | Lesson 90 (Capstone) | Treats the PM Judgment Reserve as established canon for the curriculum's closing synthesis |\n\nThis curriculum continues to build as one continuous argument. From this lesson forward, any reference to AI tool use in PM practice assumes you can locate it on the PM Judgment Reserve without re-explanation.",
+  "rawMarkdownPath": "content/lessons/lesson-089.md"
+}

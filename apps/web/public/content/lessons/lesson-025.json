@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-025",
+    "number": 25,
+    "title": "Wireframing",
+    "moduleNumber": 3,
+    "moduleName": "Product Design",
+    "difficulty": 3,
+    "estMinutesReading": 25,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 15 (User Journey Mapping), Lesson 24 (Acceptance Criteria)",
+    "nextLessonSlug": "lesson-026",
+    "futureTopicsUnlocked": "Lesson 26 (Prototyping — adding interactivity to structural layout), Lesson 27 (UX Principles for Product Managers), Lesson 28 (Information Architecture)"
+  },
+  "learningObjectives": [
+    "Define a wireframe and distinguish it precisely from a mockup, a prototype, and a finished visual design.",
+    "Explain why deliberately low fidelity is the core value of wireframing, not a limitation, using the concept of \"premature visual commitment.\"",
+    "Apply wireframing to visualize a specific journey map touchpoint or acceptance criterion, translating text specification into structural layout.",
+    "Identify the \"wireframe as final design\" and \"wireframing skipped entirely\" failure patterns and explain the risks of each.",
+    "Distinguish appropriate wireframe fidelity for different review audiences and purposes (internal structural review versus early user testing)."
+  ],
+  "theory": "### The Core Definition and Precise Distinctions\n\nA wireframe is a low-fidelity visual representation showing an interface's structural layout — the placement, hierarchy, and relationships of elements on a screen — without visual design detail like color, typography, imagery, or polished styling. It's useful to place this precisely relative to closely related, frequently conflated artifacts:\n\n- **Wireframe**: structural layout only, typically grayscale or minimally styled, focused on \"what goes where\" and \"in what order.\"\n- **Mockup**: a higher-fidelity, static visual representation with actual colors, typography, and styling applied, but typically still non-interactive.\n- **Prototype** (Lesson 26): an interactive representation, which may range from low to high fidelity, that a user can actually click through and experience some degree of real interaction with.\n- **Finished visual design**: the fully polished, production-ready design, informed by validated wireframes and prototypes, and ready for engineering implementation.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Wireframe Structure<br/>Only, No Visual Polish] --> B[Mockup Visual Styling<br/>Applied, Typically Static]\n    B --> C[Prototype Interactive,<br/>Varying Fidelity Lesson 26]\n    C --> D[Finished Visual Design<br/>Fully Polished, Production-ready]\n```\n\nConfusing these stages — treating a wireframe review as if it were a final design review, or skipping wireframing and jumping straight to polished mockups — undermines the specific value each stage provides at its appropriate point in the process, a concern this lesson returns to directly in its failure patterns section.\n\n### Why Deliberate Low Fidelity Is the Point, Not a Limitation\n\nThe central argument of this lesson is that a wireframe's low fidelity is not an unfortunate, temporary limitation to be resolved as quickly as possible — it is the specific mechanism that makes structural iteration cheap and fast. This connects directly to a phenomenon worth naming explicitly: **premature visual commitment**, in which polished visual design, introduced too early, causes reviewers (and even the design team itself) to focus feedback on surface-level details (color choices, font selection, spacing aesthetics) rather than the more fundamental, structural questions a wireframe is actually meant to resolve — is the information organized in the right order, does the layout support the user's actual task flow (echoing Lesson 15's journey map work), is anything critical missing or misplaced.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Premature Visual Polish] --> B[Reviewers Focus on Surface-level<br/>Details: Colors, Fonts, Spacing]\n    A --> C[Structural Questions Get Less Scrutiny,<br/>Since Attention Is Captured by Polish]\n    D[Deliberately Low-Fidelity Wireframe] --> E[Reviewers Focus on Structural Questions:<br/>Information Order, Task Flow,<br/>Completeness]\n```\n\nThis is a specific, well-documented cognitive effect: polished visuals implicitly signal \"this is close to finished,\" inviting a correspondingly more surface-level, cosmetic style of feedback, even when the actual, more consequential questions (does this layout structurally support the user's task) remain unresolved. Wireframing's rough, unpolished appearance deliberately signals \"this is still open to significant structural change,\" inviting exactly the kind of feedback most valuable at this stage.\n\n### Translating Text Specification into Structural Layout\n\nA wireframe's practical function is translating the text-based artifacts covered earlier in this module — a journey map touchpoint (Lesson 15), an acceptance criterion (Lesson 24) — into an initial visual structure. For example, an acceptance criterion like \"Given an expired discount code, when the customer attempts to apply it, then a clear error message should be displayed\" specifies a required behavior, but doesn't specify where on the screen that error message should appear, how prominently, or in what relationship to the discount code input field — questions a wireframe begins to answer, still without committing to final visual styling.\n\nThis translation step matters because text specifications, however precise (per Lesson 24's Given/When/Then discipline), inevitably leave visual and structural questions unaddressed — not because the text was poorly written, but because text and visual layout are simply different dimensions of a solution, and both require deliberate attention rather than assuming one automatically implies the other.\n\n### Appropriate Fidelity for Different Purposes\n\nWireframe fidelity should be matched to its specific purpose and audience, directly echoing this module's recurring \"appropriate precision\" theme (Lesson 22's Precision Dial, now applied to visual rather than textual specification):\n\n- **Internal structural review** (with the immediate product/design/engineering team): often benefits from the roughest, fastest wireframes possible — hand-drawn sketches or simple boxes-and-labels diagrams are frequently sufficient, since the goal is rapid structural iteration among people who already share significant context.\n- **Early user testing** (showing a wireframe to real users, echoing Lesson 12's interview techniques): typically requires slightly higher fidelity than a purely internal sketch, since real users, lacking the team's internal context, need enough visual clarity to meaningfully interpret and respond to the layout — but should still stop well short of full visual polish, to avoid the premature-commitment effect described above.\n\nThe discipline here parallels Lesson 22's Precision Dial directly: too little fidelity for a given audience (an internal team member's rough sketch shown to a real user who can't interpret it) produces confusion rather than useful feedback; too much fidelity for a given purpose (a fully polished mockup shown in an internal structural-review meeting) triggers premature visual commitment and surface-level feedback. The right fidelity level is a genuine judgment call, calibrated to audience and purpose, not a fixed universal standard.\n\n---",
+  "mistakes": "**Mistake 1: Adding visual polish to a wireframe \"just to make it look nicer\" before structural feedback has been gathered.**\nEven well-intentioned polish introduced too early triggers premature visual commitment, shifting reviewer attention away from the structural questions a wireframe is meant to surface.\n\n**Mistake 2: Skipping wireframing entirely and moving directly from a text specification to a fully polished mockup or prototype.**\nThis skips an entire, cheap, fast round of structural iteration, and any structural problems discovered later (during prototype testing or, worse, during implementation) become significantly more expensive to fix, since polished visual investment has already been made.\n\n**Mistake 3: Treating a wireframe review meeting as if it were a final design approval, inviting cosmetic rather than structural feedback.**\nThis confuses the purpose of the wireframe stage specifically, and often results from either excessive fidelity or from framing the review incorrectly, regardless of the wireframe's actual visual polish level.\n\n**Mistake 4: Showing a purely internal, rough sketch-level wireframe to real users without adjusting fidelity for that audience.**\nReal users, lacking the team's internal context, may struggle to meaningfully interpret an extremely rough sketch, producing confused or unreliable feedback rather than genuine structural insight.\n\n**Mistake 5: Treating wireframing as purely a design-team responsibility disconnected from the PM's specification work.**\nSince a wireframe's core function is translating specific acceptance criteria and journey map touchpoints into structure, a PM's active involvement — checking that the wireframe actually reflects the specified behavior and required scenarios — remains important, not something to fully delegate away.\n\n---",
+  "mentalModel": {
+    "title": "The Fidelity Ladder",
+    "content": "This lesson's mental model is the **Fidelity Ladder** — the sequence of increasing visual and interactive fidelity introduced in Theory, used as a discipline for matching the right level of polish to the right stage of feedback-gathering.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph BT\n    A[Rough Sketch Fastest,<br/>Roughest, Internal Structural Review] --> B[Wireframe Clean<br/>Structural Layout, No Visual Styling]\n    B --> C[Mockup Visual Styling Applied, Static]\n    C --> D[Prototype Interactive, Lesson 26]\n    D --> E[Finished Visual Design Production-ready]\n```\n\nUse this ladder as a discipline for deliberately choosing where to enter and how quickly to climb, based on the specific question currently being resolved: a genuinely open structural question warrants staying at the rough-sketch or wireframe rung longer, gathering iterative feedback cheaply, before investing in the fidelity increase that mockups and prototypes represent.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph BT\n    A[Rough Sketch Fastest,<br/>Roughest, Internal Structural Review] --> B[Wireframe Clean<br/>Structural Layout, No Visual Styling]\n    B --> C[Mockup Visual Styling Applied, Static]\n    C --> D[Prototype Interactive, Lesson 26]\n    D --> E[Finished Visual Design Production-ready]"
+  },
+  "caseStudy": {
+    "title": "The Wireframe That Was Actually a Mockup",
+    "content": "Consider a simplified, illustrative scenario common across B2B software design processes.\n\nA team is designing a new dashboard feature, following a validated opportunity and a set of acceptance criteria specifying required information and interactions. The designer, eager to make a strong first impression in an upcoming stakeholder review, skips a genuinely low-fidelity wireframing stage and instead produces a fully polished, on-brand mockup — complete with the company's color palette, finished typography, and refined iconography — for the very first round of internal review.\n\nDuring the review meeting, the majority of feedback concerns the specific shade of blue used for a call-to-action button, whether the font size for secondary text is appropriately readable, and a suggestion to adjust icon spacing slightly. No one in the meeting raises a significant structural concern about the fact that the dashboard's information hierarchy actually buries the single most important metric (identified through the original journey map and pain point research, per Lessons 15–16) below several less critical pieces of information — a genuine structural problem that goes entirely unaddressed, because the polished presentation implicitly signaled the design was largely finished and invited cosmetic rather than structural scrutiny.\n\nThe issue is only caught weeks later, during early user testing (with a still-polished, by-then further-refined design), when several test participants struggle to locate the key metric quickly, exactly the difficulty the buried information hierarchy would predict.\n\n**What went wrong?**\n\nApplying this lesson's frameworks:\n\n1. **The team skipped the wireframe stage of the Fidelity Ladder entirely**, moving directly from acceptance criteria to a polished mockup, losing the specific, cheap opportunity to catch structural problems before visual investment was made.\n2. **Premature visual commitment shaped the nature of the feedback received.** The polish itself, not any explicit decision by the reviewers, shifted attention toward cosmetic details (button color, font size, icon spacing) and away from the more fundamental information-hierarchy problem that a rough, unstyled wireframe would have made more visible and more natural to scrutinize.\n3. **The structural problem was eventually caught, but at a significantly higher cost** — after a polished design had already been produced and further refined, rather than during an early, cheap round of unstyled structural iteration.\n\nA team applying this lesson's discipline would have first produced a genuinely low-fidelity wireframe — grayscale boxes and labels, no branding or polish — for the same initial internal review, very likely surfacing structural feedback about the buried key metric at that early stage, when the fix would have cost a quick layout rearrangement rather than a mockup and testing cycle's worth of already-invested effort.\n\nThis case connects directly back to **Lesson 22's Precision Dial** and **Lesson 21's MVP discipline**: in both cases, the core argument is the same — resolving the most fundamental, structural questions first, before investing in polish or completeness that isn't yet necessary, and that can actively distract attention from the more important open questions still unresolved.\n\n---"
+  },
+  "framework": {
+    "title": "The Wireframe Review Framing Checklist",
+    "content": "A practical checklist for ensuring a wireframe review actually surfaces structural feedback, rather than drifting toward premature cosmetic commentary:\n\n| Practice | Purpose |\n|---|---|\n| Present the wireframe in genuinely low fidelity (grayscale, unstyled), appropriate to the Fidelity Ladder stage | Avoids triggering premature visual commitment |\n| Explicitly frame the review's purpose at the start: \"We're evaluating structure and information hierarchy, not visual polish\" | Directs reviewer attention toward the intended kind of feedback |\n| Reference the specific acceptance criteria and journey map touchpoints the wireframe is meant to satisfy | Keeps the review anchored to validated requirements, not personal aesthetic preference |\n| Explicitly ask whether the most important information (per prior pain point/severity research, Lesson 16) is appropriately prominent | Directly checks for the kind of hierarchy problem shown in the Detailed Case Study |\n| Defer visual design discussion to a later, appropriately staged review | Preserves the Fidelity Ladder's intended sequencing |\n\nThe recurring discipline this checklist reinforces: **fidelity and framing together determine what kind of feedback a review actually produces — low fidelity alone is not sufficient if the review's stated purpose isn't also made explicit.**\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Wireframing at Different Company Stages",
+    "content": "**At a startup:**\nWireframing is often extremely lightweight and rapid, sometimes literally hand-drawn on paper or a whiteboard, given the premium on speed and the small, tightly collaborating team that doesn't need extensive fidelity to interpret a rough sketch correctly — the core discipline (resolving structural questions before visual investment) matters just as much, even if the specific tooling is minimal.\n\n**At a mid-size company:**\nWireframing typically becomes a more standardized step within a broader design process, often using dedicated wireframing tools that produce clean, consistent, if still deliberately unstyled, layouts suitable for both internal review and early user testing, given a larger team that benefits from more standardized artifacts than an ad hoc sketch might provide.\n\n**At Big Tech:**\nWireframing at scale often needs to account for established design systems and platform conventions even at low fidelity, since structural decisions interact with existing, complex interface patterns across a large product — wireframes at this scale may reference established component structures even while remaining visually unstyled, reflecting the reality that \"structure\" itself is more constrained and interconnected within a mature, large-scale product than in an early-stage one.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-025-1",
+      "questionNumber": 1,
+      "questionText": "What is the defining characteristic of a wireframe, according to this lesson?",
+      "options": [
+        "It is fully interactive and can be clicked through like a real product",
+        "It is a deliberately low-fidelity representation of structural layout, without visual design detail",
+        "It uses the company's final brand colors and typography",
+        "It is identical to a finished visual design, just produced earlier in the process"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson's core definition emphasizes deliberate low fidelity and structural focus, distinct from interactivity (a prototype's defining feature) or full visual polish (a mockup or finished design's defining feature).",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-025-2",
+      "questionNumber": 2,
+      "questionText": "What is \"premature visual commitment,\" as described in this lesson?",
+      "options": [
+        "A technique for speeding up the design process",
+        "The effect where polished visuals shift reviewer attention toward surface-level, cosmetic feedback and away from structural questions",
+        "A requirement that all wireframes must be completed within a fixed time limit",
+        "The practice of finalizing a design before any stakeholder review occurs"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is the lesson's explicit definition of the phenomenon that makes wireframing's low fidelity valuable rather than a limitation.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-025-3",
+      "questionNumber": 3,
+      "questionText": "Which of the following best distinguishes a wireframe from a prototype?",
+      "options": [
+        "A wireframe is always more expensive to produce than a prototype",
+        "A wireframe shows structural layout without interactivity; a prototype is interactive, allowing a user to click through and experience some real interaction",
+        "A wireframe and a prototype are identical concepts with different names",
+        "A wireframe always includes final visual styling, while a prototype does not"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is the lesson's explicit distinction — interactivity is the defining feature separating a prototype from a wireframe, not visual styling (which neither typically includes at full polish) or cost.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-025-4",
+      "questionNumber": 4,
+      "questionText": "Why does this lesson argue that wireframing's low fidelity is \"the point, not a limitation\"?",
+      "options": [
+        "Because low-fidelity work is always cheaper to produce, regardless of any other consideration",
+        "Because deliberately low fidelity avoids premature visual commitment, keeping reviewer attention on structural questions rather than surface-level cosmetic details",
+        "Because clients and stakeholders always prefer rough, unpolished work",
+        "Because wireframes are legally required to be low fidelity in most design processes"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson's core argument connects low fidelity directly to avoiding the premature-commitment effect, not to cost alone or any external requirement.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-025-5",
+      "questionNumber": 5,
+      "questionText": "According to this lesson, how should fidelity be adjusted for showing a wireframe to real users during early testing, compared to an internal structural review?",
+      "options": [
+        "Fidelity should be identical in both cases, regardless of audience",
+        "Real users typically need slightly higher fidelity than a purely internal rough sketch, since they lack the team's internal context, but should still stop short of full visual polish",
+        "Real users should always see the fully finished, polished design, never a wireframe",
+        "Internal team members should always require higher fidelity than real users"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the lesson's audience-matching discipline — real users need enough clarity to interpret the layout meaningfully, but excessive polish still risks the premature-commitment problem even with this audience.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-025-6",
+      "questionNumber": 6,
+      "questionText": "In the Detailed Case Study, what specific structural problem went unaddressed because the team skipped the wireframe stage?",
+      "options": [
+        "The dashboard loaded too slowly for users with slow internet connections",
+        "The dashboard's information hierarchy buried the single most important metric below several less critical pieces of information",
+        "The dashboard used the wrong color palette for the company's brand guidelines",
+        "The dashboard was not compatible with mobile devices"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study explicitly identifies this information-hierarchy problem as the structural issue that went unaddressed due to premature visual commitment.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-025-7",
+      "questionNumber": 7,
+      "questionText": "Why did the internal review in the Detailed Case Study focus primarily on button color, font size, and icon spacing rather than the dashboard's information hierarchy?",
+      "options": [
+        "The reviewers did not care about the product's success",
+        "The polished mockup's visual completeness implicitly signaled the design was largely finished, inviting cosmetic rather than structural scrutiny — precisely the premature visual commitment effect",
+        "The reviewers were only qualified to comment on visual design, not structure",
+        "The information hierarchy was not actually a real problem with the design"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study explicitly attributes the nature of the feedback received to the premature visual commitment effect triggered by the polished presentation.",
+      "learningObjective": "#2, #4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-025-8",
+      "questionNumber": 8,
+      "questionText": "According to the Wireframe Review Framing Checklist, what should be done at the start of a wireframe review, in addition to using low fidelity?",
+      "options": [
+        "Nothing further is necessary once low fidelity has been achieved",
+        "The review's purpose should be explicitly stated (e.g., \"we're evaluating structure, not polish\") to direct reviewer attention appropriately",
+        "The wireframe should be immediately converted to a fully polished mockup before the meeting begins",
+        "All acceptance criteria should be removed from consideration during this specific review"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Checklist explicitly notes that fidelity and framing together determine the kind of feedback a review produces — low fidelity alone is not sufficient without also stating the review's intended focus.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-025-9",
+      "questionNumber": 9,
+      "questionText": "(Scenario) A designer produces a rough, hand-drawn sketch of a new feature and shows it directly to real users for feedback, without any adjustment in fidelity. What risk does this practice raise, according to this lesson?",
+      "options": [
+        "No risk; rough sketches are always the ideal fidelity level regardless of audience",
+        "Real users, lacking the team's internal context, may struggle to meaningfully interpret an extremely rough sketch, producing confused or unreliable feedback rather than genuine structural insight",
+        "This practice guarantees premature visual commitment will occur",
+        "This practice is only a problem if the sketch includes color"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects Common Mistake 4 — matching fidelity to audience matters in both directions; too little fidelity for an audience lacking internal context risks producing unreliable feedback, not just too much fidelity risking premature commitment.",
+      "learningObjective": "#5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-025-10",
+      "questionNumber": 10,
+      "questionText": "(Product Thinking) A team wants to resolve a genuinely open structural question — whether a specific piece of information should appear above or below another on a screen — before investing in any visual design work. According to the Fidelity Ladder, what is the most appropriate next step?",
+      "options": [
+        "Skip directly to a fully polished mockup, since visual design will make the comparison clearer",
+        "Use a rough sketch or wireframe to test both structural arrangements quickly and cheaply, before any visual styling investment is made",
+        "Build a fully interactive, high-fidelity prototype to resolve this specific structural question",
+        "Make the decision based purely on personal preference without any visual exploration at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A purely structural question (ordering of information) is exactly the kind of question the Fidelity Ladder's early, low-fidelity stages are designed to resolve cheaply, before investing in higher-fidelity stages not yet warranted.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-025-11",
+      "questionNumber": 11,
+      "questionText": "(Interview Reasoning) A candidate describes routinely producing fully polished, on-brand mockups for the very first round of internal design review, explaining that \"it saves time since we'll need the polish eventually anyway.\" What might this signal, based on this lesson's Interview Perspective section?",
+      "options": [
+        "An efficient, best-practice approach to design review",
+        "A likely instance of skipping the wireframe stage of the Fidelity Ladder, risking premature visual commitment and the loss of cheap, early structural iteration",
+        "That the candidate has strong visual design skills that should be considered a core PM competency",
+        "Nothing meaningful, since polish is always beneficial regardless of the review stage"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the lesson's explicit warning against skipping wireframing, even when framed as a time-saving measure — the actual risk is losing cheap early structural iteration and inviting the wrong kind of feedback.",
+      "learningObjective": "#4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-025-12",
+      "questionNumber": 12,
+      "questionText": "(Product Thinking, Higher Difficulty) A team correctly produces a low-fidelity wireframe and explicitly frames the review as structural, but reviewers still spend most of the meeting discussing minor spacing preferences. What additional factor, beyond fidelity and framing, might explain this outcome?",
+      "options": [
+        "The wireframe fidelity was too low, and should have included full visual polish instead",
+        "Reviewers may need more explicit guidance connecting the review specifically back to acceptance criteria and journey map touchpoints (per the Framing Checklist), or may simply need a habit-forming reminder, since old review habits can persist even when fidelity and stated framing are both correct",
+        "This outcome proves that wireframing is fundamentally ineffective as a technique",
+        "The review should have been skipped entirely, since reviewers are incapable of giving structural feedback under any circumstances"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects a more nuanced point — even with correct fidelity and stated framing, team habits and review culture can still drift toward familiar, comfortable feedback patterns, suggesting the Framing Checklist's practices (explicitly referencing criteria and journey touchpoints) may need reinforcement, not that the underlying technique has failed.",
+      "learningObjective": "#4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-025-13",
+      "questionNumber": 13,
+      "questionText": "(Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where a team's wireframes are appropriately low fidelity, but the PM has no involvement in reviewing them against the original acceptance criteria, delegating this entirely to the design team. What is the strongest critique of this practice, based on this lesson?",
+      "options": [
+        "No critique is warranted; wireframe review should always be handled entirely by the design team",
+        "The PM's active involvement in checking that wireframes genuinely reflect specified behavior and required scenarios (per Common Mistake 5) remains valuable and shouldn't be fully delegated away, since the PM holds the connection to the underlying validated requirements",
+        "PMs should never be involved in any aspect of visual design, including wireframe review",
+        "This practice is ideal, since designers are always better positioned to catch requirement mismatches than PMs"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly reflects Common Mistake 5 — the PM's continued involvement in checking wireframes against specified acceptance criteria and journey map touchpoints is explicitly recommended, not something to be fully delegated away.",
+      "learningObjective": "#3",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-025-14",
+      "questionNumber": 14,
+      "questionText": "(Product Thinking, Higher Difficulty) A team is deciding between two options: spending an extra day iterating on multiple rough wireframe variations before committing to one, or moving directly to a single polished mockup to save time. Using this lesson's arguments, which option is generally preferable, and why?",
+      "options": [
+        "Moving directly to a single polished mockup, since more time spent on any stage is inherently wasteful",
+        "Spending the extra day iterating on rough wireframe variations, since structural changes are dramatically cheaper to make at low fidelity than after visual polish has been invested, potentially saving significantly more time later if a structural issue would otherwise be discovered post-polish",
+        "Both options are equally time-efficient regardless of when structural issues are discovered",
+        "Neither option matters, since visual design has no bearing on structural quality"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the lesson's core economic argument for wireframing — the cost of structural change increases significantly at higher fidelity stages, making early, low-fidelity iteration a net time-saver even though it adds an explicit step, as shown by the costly outcome in the Detailed Case Study.",
+      "learningObjective": "#2",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-025-15",
+      "questionNumber": 15,
+      "questionText": "(Highest Difficulty) A team produces a genuinely low-fidelity wireframe, explicitly frames the review as structural, and receives excellent structural feedback that leads to several layout changes. The team then moves to a polished mockup stage — but upon final user testing, discovers that the same information-hierarchy problem from this lesson's Detailed Case Study has somehow reappeared. What does this scenario suggest, and what should the team check?",
+      "options": [
+        "Wireframing is fundamentally ineffective, since the same problem reappeared despite following the correct process",
+        "The team should check whether the structural changes agreed upon during the wireframe review were actually and faithfully carried through into the subsequent mockup and prototype stages, since a correct wireframing process does not automatically guarantee that its conclusions survive translation into later, higher-fidelity stages",
+        "The mockup stage should be eliminated entirely from the process going forward",
+        "This outcome is unrelated to the wireframing process and should be attributed entirely to user testing methodology"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This tests a subtler point — even a well-executed wireframing stage doesn't automatically guarantee that its structural conclusions are faithfully preserved through subsequent fidelity increases; the team should specifically verify that the mockup stage carried forward the wireframe's validated structural decisions, rather than assuming success at one stage guarantees success at all subsequent stages.",
+      "learningObjective": "#1, #3",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "You are the PM for a personal finance app, working with a designer to translate the acceptance criteria from Lesson 24's discount-code exercise (adapted here: a spending-alert feature) into a wireframe: \"Given a user has exceeded their monthly budget in a specific category, when they open the app, then a clear alert should be visible on the home screen without requiring additional navigation.\"\n\nWork through the following, in writing, before reading further:\n\n1. Describe, in words (since you're not creating an actual visual), the key structural questions a wireframe for this alert would need to resolve — where it appears, how it relates to other home-screen content, and what happens when a user interacts with it.\n2. Explain why producing a polished, fully branded mockup of this alert for the very first internal review might risk the premature-visual-commitment problem this lesson describes.\n3. Identify one specific structural question (drawing on this app's presumed journey map and pain point research, per Lessons 15-16) that a genuinely low-fidelity wireframe review should explicitly surface, if handled correctly.\n4. Propose an appropriate fidelity level for showing this concept to five real users for early feedback, and justify why that level is more appropriate than either a rough internal sketch or a fully polished mockup.\n5. Using the Wireframe Review Framing Checklist, write the specific framing statement you would use to open an internal review of this wireframe, to keep feedback focused on structure rather than cosmetics.\n\nThere is no single correct answer. The purpose of this exercise is to practice reasoning about fidelity, framing, and structural translation, rather than skipping straight to polished visual details.\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 24 — Acceptance Criteria | Provides the specific, testable behavior that a wireframe translates into initial visual and structural form |\n| **Current Lesson** | Lesson 25 — Wireframing | The Fidelity Ladder; premature visual commitment; wireframe-as-final-design and skipped-wireframing failure patterns |\n| **Next Lesson** | Lesson 26 — Prototyping | Adds interactivity to structural layout, extending the Fidelity Ladder into a testable, clickable representation |\n| **Future Concepts Unlocked** | Lesson 27 (UX Principles for Product Managers) | Provides deeper design principles informing how wireframe structure should be organized |\n| | Lesson 28 (Information Architecture) | Formalizes the information-hierarchy concerns this lesson's Detailed Case Study raised into a dedicated discipline |\n\nThis curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to \"the design\" assumes the Fidelity Ladder discipline covered here — this will not be re-explained, only re-applied.",
+  "rawMarkdownPath": "content/lessons/lesson-025.md"
+}

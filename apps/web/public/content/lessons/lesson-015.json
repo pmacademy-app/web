@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-015",
+    "number": 15,
+    "title": "User Journey Mapping",
+    "moduleNumber": 2,
+    "moduleName": "Users & Research",
+    "difficulty": 4,
+    "estMinutesReading": 25,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 12 (Customer Interviews), Lesson 14 (Personas)",
+    "nextLessonSlug": "lesson-016",
+    "futureTopicsUnlocked": "Lesson 16 (Pain Points — a deeper dive into the friction surfaced on a journey map), Lesson 17 (Problem Statements), Lesson 25 (Wireframing)"
+  },
+  "learningObjectives": [
+    "Define a user journey map and identify its core components: stages, actions, thoughts/emotions, touchpoints, and pain points.",
+    "Distinguish a journey map built from real research (interviews, behavioral data) from one built from a team's assumed or idealized version of a process.",
+    "Identify the \"happy path only\" failure pattern and explain why it produces an incomplete, misleading map.",
+    "Apply journey mapping to identify specific moments of friction, drop-off, or emotional low points that warrant further investigation or design attention.",
+    "Distinguish a journey map's scope (a specific persona, a specific process) from an attempt to map \"the entire user experience\" at once, and explain why the latter produces an unusably broad artifact."
+  ],
+  "theory": "### The Core Definition and Components\n\nA user journey map visually represents the sequence of steps a specific persona takes while pursuing a specific goal, alongside their actions, thoughts, and emotions at each step, and the touchpoints (specific product screens, communications, or interactions) involved. The standard components are:\n\n- **Stages**: the major phases of the journey (e.g., awareness, consideration, onboarding, active use, renewal or churn).\n- **Actions**: what the persona actually does at each stage, ideally drawn from observed or reported behavior rather than assumption.\n- **Thoughts and emotions**: what the persona is thinking and feeling at each step — confusion, confidence, frustration, relief — which often reveals more about where design attention is needed than the actions alone.\n- **Touchpoints**: the specific product screens, emails, support interactions, or other concrete points of contact involved at each stage.\n- **Pain points and opportunities**: specific moments of friction, confusion, or drop-off, and any corresponding opportunity for improvement.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Stage 1: Awareness] --> B[Stage 2: Consideration]\n    B --> C[Stage 3: Onboarding]\n    C --> D[Stage 4: Active Use]\n    D --> E[Stage 5: Renewal or Churn]\n    A -.->|Actions, Thoughts,<br/>Touchpoints, Pain Points| A\n    B -.->|Actions, Thoughts,<br/>Touchpoints, Pain Points| B\n    C -.->|Actions, Thoughts,<br/>Touchpoints, Pain Points| C\n    D -.->|Actions, Thoughts,<br/>Touchpoints, Pain Points| D\n    E -.->|Actions, Thoughts,<br/>Touchpoints, Pain Points| E\n```\n\n### Journey Maps Built from Research vs. Assumption\n\nPrecisely as Lesson 14 warned about assumption-based personas, a journey map built from a team's idealized or assumed version of \"how the process works\" — rather than from actual research — carries exactly the same risk: it tends to reflect how the team designed the process to work, rather than how real users actually experience it, and it is especially prone to omitting friction points that are uncomfortable for the team to acknowledge (a confusing step the team itself designed, a drop-off point tied to a decision a stakeholder championed).\n\nA genuinely research-grounded journey map draws on:\n\n- **Past-behavior interview findings (Lesson 12)**: specific, concrete accounts of what actually happened at each stage, rather than a general description of the intended flow.\n- **Behavioral/analytics data (revealed preference, per Lesson 11)**: actual drop-off rates, time-on-step, and navigation patterns, which can reveal friction points a team's mental model of the process entirely misses.\n- **Direct observation, where possible**: watching a real user move through the actual process, rather than relying solely on their retrospective account of it (which can be subject to the same recall limitations and social desirability effects covered in Lesson 11).\n\n### The \"Happy Path Only\" Failure Pattern\n\nA specific, common failure in journey mapping is building a map that only represents the **happy path** — the smoothest, most successful version of the journey, in which the user encounters no significant friction and proceeds cleanly from one stage to the next. This produces a map that looks clean and presentable, but that fails to represent the actual, often messier reality experienced by a meaningful share of real users — including detours, abandoned attempts, workarounds, and points where users backtrack or seek external help.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Journey Map Built] --> B{Happy Path Only, or Does It<br/>Include Friction and Detours?}\n    B -->|Happy path only| C[Misses Drop-off Points, Workarounds, and<br/>the Experience of Users Who Don't<br/>Succeed Smoothly]\n    B -->|Includes Friction and Detours| D[Represents the Actual, Full<br/>Range of Real User Experience]\n```\n\nThis directly echoes Lesson 8's discovery theater concern and Lesson 13's sampling bias concern: a journey map is a research synthesis artifact, and if the underlying research (or the map's construction) systematically excludes the messier, less successful parts of the real experience, the resulting map — however polished — will mislead a team into believing the process is smoother than it actually is for a meaningful portion of real users.\n\n### Distinguishing Actions from Thoughts and Emotions\n\nA common, more subtle mistake is building a journey map that documents only actions (what the user clicked, what screen they were on) without capturing thoughts and emotions at each step. This is a significant loss, because two users can take the identical sequence of actions while having very different internal experiences — one confident and satisfied, another confused and anxious but proceeding anyway out of necessity — and a map that records only the action sequence cannot distinguish between these two very different underlying experiences, even though they likely call for very different design responses.\n\nThoughts and emotions are also frequently where the most actionable insight lives: an action-only map might show \"user clicks 'connect bank account'\" without revealing that, per interview findings, several users hesitated at this step specifically because they weren't sure why a bank connection was necessary before they'd seen any concrete product value — an emotional and cognitive detail (uncertainty, a request for justification) that directly suggests a design fix (explaining the \"why\" before requesting the connection) that the action alone would never surface.\n\n### Scoping a Journey Map: One Persona, One Process\n\nA final, important discipline is scope: a useful journey map is built for **one specific persona** moving through **one specific, well-defined process** (e.g., \"first-time onboarding,\" \"monthly billing and renewal,\" \"canceling a subscription\") — not an attempt to map \"the entire user experience\" of a complex product in a single artifact. Attempting the latter produces a map so broad and abstracted that it loses the specific, concrete detail that makes journey mapping useful in the first place, echoing Lesson 7's \"for everyone\" value proposition failure and Lesson 14's \"too many personas\" failure at a process-mapping level: an artifact that tries to represent everything ends up representing nothing with useful specificity.\n\n---",
+  "mistakes": "**Mistake 1: Building a journey map from the team's idealized version of the process, rather than from research.**\nThis inherits the same risk as an assumption-based persona (Lesson 14) — the map reflects how the team designed the process to work, not how users actually experience it, and tends to omit uncomfortable friction points.\n\n**Mistake 2: Mapping only the \"happy path.\"**\nA map excluding detours, abandoned attempts, and workarounds misrepresents the actual range of real user experience and can lead a team to underestimate how much friction genuinely exists.\n\n**Mistake 3: Recording only actions, without thoughts and emotions.**\nAn action-only map cannot distinguish between a confident, satisfied user and a confused, anxious one taking the identical sequence of steps, losing exactly the detail most likely to point toward an actionable design fix.\n\n**Mistake 4: Attempting to map \"the entire user experience\" in a single journey map.**\nThis produces an artifact too broad and abstracted to retain the specific, concrete detail that makes journey mapping useful — scope should be narrowed to one persona and one specific process.\n\n**Mistake 5: Treating a journey map as a one-time artifact that never needs revisiting.**\nAs the underlying product, market, or user behavior changes (echoing Lesson 14's persona-updating guidance), a journey map built from research conducted long ago may no longer accurately reflect the current, real experience.\n\n---",
+  "mentalModel": {
+    "title": "The Journey Map Truth Test",
+    "content": "This lesson's mental model is the **Journey Map Truth Test** — a quick diagnostic for evaluating whether a completed journey map reflects genuine research or an idealized team assumption.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Completed Journey Map] --> B{Does It Include at Least One Moment of<br/>Friction, Hesitation, or Drop-off the<br/>Team Finds Uncomfortable to Acknowledge?}\n    B -->|No — Entirely Smooth,<br/>No Uncomfortable Friction| C[Likely a Happy-path, Idealized Map —<br/>Revisit with Real Research]\n    B -->|Yes — Includes Genuine, Even<br/>Uncomfortable Friction| D[Likely Grounded in Real<br/>Research and Honest Synthesis]\n```\n\nApply this test whenever reviewing a journey map presented to you: a map with no uncomfortable, team-implicating friction points at all is a specific and reliable warning sign, precisely because real user experiences of any nontrivial process virtually always include at least some genuine friction — its complete absence usually indicates the map was built from an idealized assumption rather than honest research.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Completed Journey Map] --> B{Does It Include at Least One Moment of<br/>Friction, Hesitation, or Drop-off the<br/>Team Finds Uncomfortable to Acknowledge?}\n    B -->|No — Entirely Smooth,<br/>No Uncomfortable Friction| C[Likely a Happy-path, Idealized Map —<br/>Revisit with Real Research]\n    B -->|Yes — Includes Genuine, Even<br/>Uncomfortable Friction| D[Likely Grounded in Real<br/>Research and Honest Synthesis]"
+  },
+  "caseStudy": {
+    "title": "The Onboarding Map That Skipped the Detour",
+    "content": "Consider a simplified, illustrative scenario common across B2C subscription products.\n\nA meal-kit subscription company builds a journey map of its new-customer onboarding process, based primarily on the team's own understanding of the intended flow: sign up, select a meal plan, complete the first order, receive the first delivery, cook the first meal. The map is clean, linear, and entirely happy-path, with no significant friction points identified at any stage.\n\nA subsequent round of customer interviews (Lesson 12), conducted using past-behavior questions specifically about the first two weeks of the subscription, reveals a substantially messier reality for a meaningful share of customers: several respondents describe pausing their subscription immediately after the first delivery because the volume of food felt overwhelming relative to their actual weekly cooking capacity, several describe confusion about how to skip a week when traveling (a feature that existed but was difficult to locate), and one respondent specifically describes contacting customer support in frustration after failing to find the skip-week option, ultimately canceling the subscription entirely rather than continuing to search for it.\n\n**What went wrong?**\n\nApplying this lesson's frameworks:\n\n1. **The original map was built from the team's assumed, idealized version of the process, not from research.** It reflected how the onboarding flow was designed to work, not how real customers actually experienced it.\n2. **The map was entirely happy-path**, with no included friction, hesitation, or drop-off points — precisely the warning sign the Journey Map Truth Test is designed to catch.\n3. **The map recorded only intended actions, not the actual thoughts and emotions (feeling overwhelmed, confused, frustrated) that interviews later revealed** — the specific detail (a confusing, hard-to-locate skip-week feature, and the emotional escalation from confusion to frustration to cancellation) that most directly pointed toward an actionable design fix.\n\nA team applying this lesson's discipline from the outset would have built the original map from real interview findings and behavioral data (Lesson 11), and would very likely have identified the skip-week confusion and portion-size overwhelm as genuine, research-grounded pain points requiring design attention, well before losing customers to a friction point the happy-path map had entirely missed.\n\nThis case will be revisited in **Lesson 16 (Pain Points)**, where we cover techniques for prioritizing among the multiple pain points a well-constructed journey map is likely to surface.\n\n---"
+  },
+  "framework": {
+    "title": "The Journey Map Construction Checklist",
+    "content": "A practical checklist for building a genuinely useful, research-grounded journey map:\n\n| Step | Question to Answer |\n|---|---|\n| **Scope** | Is this map built for one specific, validated persona (Lesson 14) and one specific, well-defined process — not an attempt to map everything at once? |\n| **Source** | Is each stage, action, thought, and pain point drawn from actual research (interviews, behavioral data) rather than the team's assumed or idealized version of the process? |\n| **Completeness** | Does the map include genuine friction, hesitation, and drop-off points — not only the happy path? |\n| **Depth** | Does the map capture thoughts and emotions at each stage, not just observable actions? |\n| **Currency** | Was the underlying research conducted recently enough to still reflect the current product and market, or does the map need to be revisited? |\n\nA journey map that fails several of these checks is not necessarily worthless as a first draft or hypothesis, but should not be treated as a finished, trustworthy artifact — much like Lesson 11's general research trustworthiness checklist, this list distinguishes a genuinely useful synthesis from one that merely looks complete.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Journey Mapping at Different Company Stages",
+    "content": "**At a startup:**\nJourney maps are often built quickly and informally, based on a small number of early user observations or interviews, and are typically focused narrowly on the single most critical process for the business at that stage — frequently first-time onboarding, since early-stage products are especially vulnerable to losing new users during their very first experience with the product.\n\n**At a mid-size company:**\nJourney mapping often becomes a more structured, cross-functional exercise, combining interview findings with actual behavioral analytics (drop-off rates, time-on-step data) to validate that the mapped friction points reflect real, quantifiable patterns rather than a small number of anecdotal accounts — directly echoing Lesson 11's complementary-methods framework applied specifically to journey construction.\n\n**At Big Tech:**\nJourney mapping at scale often involves extensive quantitative instrumentation, allowing teams to observe drop-off and friction at a granular, statistically robust level across an enormous user base, but this can create a specific risk of over-relying on quantitative drop-off data alone without pairing it with qualitative research (interviews, direct observation) to understand the emotional and cognitive *why* behind a given friction point — echoing Lesson 11's warning against over-relying on quantitative methods without qualitative depth.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-015-1",
+      "questionNumber": 1,
+      "questionText": "Which of the following is NOT one of the five core components of a user journey map described in this lesson?",
+      "options": [
+        "Stages",
+        "Actions",
+        "Competitor pricing",
+        "Touchpoints"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The five core components are stages, actions, thoughts/emotions, touchpoints, and pain points. Competitor pricing is not one of the named components.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-015-2",
+      "questionNumber": 2,
+      "questionText": "Why is a journey map built from a team's idealized, assumed version of a process considered risky, according to this lesson?",
+      "options": [
+        "Because idealized processes are always technically infeasible",
+        "Because it tends to reflect how the team designed the process to work rather than how users actually experience it, often omitting uncomfortable friction points",
+        "Because assumption-based maps take longer to build than research-based ones",
+        "Because idealized maps cannot be presented visually"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly parallels Lesson 14's warning about assumption-based personas — an idealized map reflects intended design, not lived reality, and tends to miss uncomfortable friction.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-015-3",
+      "questionNumber": 3,
+      "questionText": "What is the \"happy path only\" failure pattern?",
+      "options": [
+        "Building a journey map that only includes touchpoints, without stages or actions",
+        "Building a journey map that represents only the smoothest, most successful version of a process, omitting real friction, detours, and abandoned attempts",
+        "Building a journey map for more than one persona at once",
+        "Building a journey map without any visual diagram"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is the lesson's explicit definition — a map that captures only the cleanest possible version of a journey, missing the messier reality many real users actually experience.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-015-4",
+      "questionNumber": 4,
+      "questionText": "Why is it important for a journey map to capture thoughts and emotions in addition to actions?",
+      "options": [
+        "Because actions alone are always inaccurate",
+        "Because two users can take an identical sequence of actions while having very different internal experiences, and the emotional/cognitive detail often points most directly to an actionable fix",
+        "Because emotions are easier to measure than actions",
+        "Because thoughts and emotions are the only component required in a journey map"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explains that action-only maps cannot distinguish between a confident and a confused user taking the same steps, losing exactly the detail most useful for design decisions.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-015-5",
+      "questionNumber": 5,
+      "questionText": "According to the Journey Map Truth Test, what should a reviewer suspect about a journey map that shows zero friction anywhere in the process?",
+      "options": [
+        "That the process is genuinely flawless and requires no further investigation",
+        "That the map is likely idealized and assumption-based, since real user experiences of any nontrivial process virtually always include at least some genuine friction",
+        "That the map was built using only quantitative behavioral data",
+        "That the map is too detailed and should be simplified"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Journey Map Truth Test treats the complete absence of uncomfortable friction as a reliable warning sign of an idealized, assumption-based map rather than a genuinely research-grounded one.",
+      "learningObjective": "#2, #3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-015-6",
+      "questionNumber": 6,
+      "questionText": "What is the recommended scope for a single journey map, according to this lesson?",
+      "options": [
+        "The entire user experience of the product, across all personas and all processes",
+        "One specific, validated persona moving through one specific, well-defined process",
+        "Every persona the company has identified, mapped through a single generic process",
+        "A journey map should never be scoped narrowly, since broader maps are always more useful"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly recommends narrow scoping — one persona, one process — warning that broader attempts lose the specific, actionable detail that makes journey mapping useful.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-015-7",
+      "questionNumber": 7,
+      "questionText": "In the Detailed Case Study, what specific research method revealed the friction the original happy-path map had missed?",
+      "options": [
+        "A large-scale quantitative survey",
+        "Customer interviews using past-behavior questions about the first two weeks of the subscription",
+        "A focus group conducted with the product team itself",
+        "An analysis of competitor products"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study explicitly describes past-behavior interviews (per Lesson 12's technique) as the method that revealed the portion-size overwhelm and skip-week confusion the original map had missed.",
+      "learningObjective": "#2, #3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-015-8",
+      "questionNumber": 8,
+      "questionText": "What specific consequence resulted from the hard-to-locate \"skip a week\" feature in the Detailed Case Study?",
+      "options": [
+        "The customer successfully found the feature after a brief search",
+        "At least one customer contacted support in frustration and ultimately canceled the subscription rather than continuing to search for the feature",
+        "The feature was immediately removed from the product",
+        "The customer recommended the product to a friend despite the difficulty"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study explicitly describes this specific escalation from confusion to frustration to cancellation as the consequence of the hard-to-locate feature.",
+      "learningObjective": "#3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-015-9",
+      "questionNumber": 9,
+      "questionText": "(Scenario) A team is deciding whether to build one comprehensive journey map covering \"the entire customer lifecycle\" or several narrower maps for specific processes (onboarding, renewal, cancellation). According to this lesson, which approach is recommended, and why?",
+      "options": [
+        "One comprehensive map, since covering everything at once is always more efficient",
+        "Several narrower maps, since a map scoped to one persona and one specific process retains the concrete detail needed to be genuinely useful, while an overly broad map loses that specificity",
+        "Neither approach is valid; journey maps should never be built for more than a single touchpoint",
+        "The choice does not matter, since journey map scope has no effect on usefulness"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the lesson's explicit scoping guidance — narrower, process-specific maps retain useful, actionable detail, while an attempt to cover an entire lifecycle in one map tends to lose specificity.",
+      "learningObjective": "#5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-015-10",
+      "questionNumber": 10,
+      "questionText": "(Product Thinking) A journey map shows a smooth, linear happy path with high emotional confidence at every single stage, based entirely on the design team's understanding of the intended onboarding flow. What should a PM do before trusting this map?",
+      "options": [
+        "Accept the map immediately, since a clean, confident journey reflects a well-designed process",
+        "Apply the Journey Map Truth Test and seek out actual research (interviews, behavioral data) to check whether real users experience the process as smoothly as the map suggests",
+        "Add more visual polish to the map to make it more presentable",
+        "Assume the map is accurate simply because it was created by the design team"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A frictionless, entirely design-team-derived map is precisely the pattern the Journey Map Truth Test warns about, and should prompt validation against real research before being trusted.",
+      "learningObjective": "#2, #3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-015-11",
+      "questionNumber": 11,
+      "questionText": "(Interview Reasoning) An interviewer asks a candidate to describe a journey map they've built, and the candidate's description includes no mention of any friction, hesitation, or drop-off points anywhere in the process. What might this signal, based on this lesson's Interview Perspective section?",
+      "options": [
+        "An exceptionally well-designed process requiring no further scrutiny",
+        "A possible sign that the map was built from assumption rather than genuine research, since real processes of any complexity typically include at least some friction",
+        "That the candidate is unqualified for any product research role",
+        "Nothing meaningful, since frictionless journey maps are the expected, normal outcome of good design"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly applies the Journey Map Truth Test in an interview context — the complete absence of friction in a described journey map is treated as a weak signal, not a strong one.",
+      "learningObjective": "#2, #3",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-015-12",
+      "questionNumber": 12,
+      "questionText": "(Product Thinking, Higher Difficulty) A team has behavioral analytics showing a sharp drop-off at a specific onboarding step, but no qualitative research explaining why users are dropping off at that point. According to this lesson and Lesson 11's complementary-methods framework, what should the team do next?",
+      "options": [
+        "Conclude the drop-off is unimportant, since only quantitative data is available",
+        "Conduct qualitative research (interviews) specifically targeting users who dropped off at that step, to understand the underlying thoughts and emotions driving the behavior the analytics data has only quantified, not explained",
+        "Immediately redesign the step without further investigation, based purely on the drop-off percentage",
+        "Ignore the analytics data entirely and rely solely on the team's assumption about the cause"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the complementary-methods principle from Lesson 11 — quantitative data reveals the drop-off's existence and scale, while qualitative research is needed to understand the underlying why, which the journey map's thoughts/emotions component is specifically meant to capture.",
+      "learningObjective": "#2, #4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-015-13",
+      "questionNumber": 13,
+      "questionText": "(Interview Reasoning, Higher Difficulty) A candidate is asked how they would scope a journey map for a complex, multi-featured product with several distinct user segments. A weak answer would most likely propose which of the following?",
+      "options": [
+        "Building several narrower maps, each scoped to a specific validated persona and a specific process",
+        "Attempting to build a single, comprehensive map covering the entire user experience across all segments and processes simultaneously",
+        "Prioritizing which processes are most strategically important (echoing Lesson 10) before deciding which maps to build first",
+        "Grounding each map in actual research specific to the relevant persona and process"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Attempting to cover the entire user experience in a single map is explicitly identified in this lesson as producing an artifact too broad to retain useful, actionable specificity — the weak-answer pattern here.",
+      "learningObjective": "#5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-015-14",
+      "questionNumber": 14,
+      "questionText": "(Product Thinking, Higher Difficulty) A journey map accurately identifies several genuine, research-grounded pain points, but the team has not yet decided which one to address first. What lesson does this scenario most directly set up?",
+      "options": [
+        "Lesson 9 (Product Vision)",
+        "Lesson 16 (Pain Points), which addresses prioritizing among multiple identified pain points",
+        "Lesson 7 (Value Proposition)",
+        "Lesson 5 (Users vs. Customers)"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Connections section explicitly identifies Lesson 16 as the next lesson addressing exactly this gap — how to prioritize among multiple pain points a well-constructed journey map is likely to surface.",
+      "learningObjective": "#4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-015-15",
+      "questionNumber": 15,
+      "questionText": "(Highest Difficulty) A team builds a journey map using both past-behavior interviews and behavioral analytics, correctly scoped to one persona and one process, and including genuine friction points with associated thoughts and emotions — but the underlying research was conducted four years ago, before a significant product redesign. According to this lesson, what is the most appropriate response?",
+      "options": [
+        "Continue using the map indefinitely, since it was built correctly at the time using rigorous methods",
+        "Recognize that, like a persona (Lesson 14) or a vision (Lesson 9), a journey map can become outdated as the product and market evolve, and conduct fresh research to validate whether the mapped stages, friction points, and emotions still reflect the current, redesigned experience",
+        "Discard the map entirely and build a new one based purely on team assumption, since re-running research would take too much time",
+        "Assume the map remains accurate simply because it was built using rigorous methods originally"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This tests the integration of this lesson's currency principle with Lesson 14's persona-updating guidance — even a rigorously built map can become outdated after a significant product change, and the appropriate response is fresh validation, not indefinite reliance or wholesale assumption-based replacement.",
+      "learningObjective": "#2",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "You are the PM for a personal budgeting app, mapping the journey of a new user connecting their first bank account.\n\nWork through the following, in writing, before reading further:\n\n1. List the stages you would expect this specific journey to include, from first considering connecting an account through successfully seeing their transaction data.\n2. For one stage, write both an action (\"clicks 'connect account'\") and a plausible corresponding thought/emotion (e.g., hesitation about security) that a real user might experience at that step.\n3. Describe one plausible \"detour\" or non-happy-path moment a real user might experience during this journey (e.g., their specific bank isn't supported, or a security concern causes them to abandon partway through).\n4. Apply the Journey Map Truth Test to a hypothetical map your team drafted that shows zero friction anywhere in this process. What would you do in response?\n5. Referencing Lesson 12's interview techniques, write one past-behavior question you would ask a real user to validate whether your draft journey map accurately reflects their actual experience.\n\nThere is no single correct answer. The purpose of this exercise is to practice building a journey map that captures genuine friction and emotional detail, rather than defaulting to a clean, happy-path assumption.\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 14 — Personas | Provides the validated persona a journey map should be built around, and extends the Persona Substance Test's research-grounding discipline into a chronological, process-specific artifact |\n| **Current Lesson** | Lesson 15 — User Journey Mapping | Stages/actions/thoughts/touchpoints/pain points; the \"happy path only\" failure; the Journey Map Truth Test; narrow scoping discipline |\n| **Next Lesson** | Lesson 16 — Pain Points | Directly addresses how to prioritize among the multiple pain points a well-constructed journey map typically surfaces |\n| **Future Concepts Unlocked** | Lesson 17 (Problem Statements) | Formalizes a prioritized pain point, surfaced through journey mapping, into a structured, testable problem statement |\n| | Lesson 25 (Wireframing) | Uses journey map touchpoints and friction points as direct input for early-stage interface design |\n\nThis curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to a \"user journey\" or \"onboarding flow\" assumes the research-grounding and scoping discipline covered here — this will not be re-explained, only re-applied.",
+  "rawMarkdownPath": "content/lessons/lesson-015.md"
+}

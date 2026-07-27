@@ -1,0 +1,349 @@
+{
+  "meta": {
+    "slug": "lesson-084",
+    "number": 84,
+    "title": "PM in AI-Native Companies: New Skills, New Risks",
+    "moduleNumber": 9,
+    "moduleName": "Specialized Domains and Synthesis",
+    "difficulty": 7,
+    "estMinutesReading": 40,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 65 (Ownership Zones Model), Lesson 66 (Discovery Frontier), Lesson 81 (Regulatory Surface Map, human-in-the-loop)",
+    "nextLessonSlug": "lesson-085",
+    "futureTopicsUnlocked": "Lesson 85 (Responsible AI Product Management), Lesson 90 (Capstone) — depend on the Capability-Reliability Matrix introduced here"
+  },
+  "learningObjectives": [
+    "Explain why a generative model's quality cannot be reduced to a single \"is it good enough\" judgment.",
+    "Apply the Capability-Reliability Matrix to determine the appropriate product response for a given AI-powered feature.",
+    "Identify why evaluation (\"evals\") must be an ongoing practice rather than a one-time pre-launch gate for AI-native products.",
+    "Explain why per-inference cost economics differ from traditional software's near-zero marginal cost assumption.",
+    "Evaluate a proposed AI-powered feature for whether its automation level matches its actual position on the Capability-Reliability Matrix."
+  ],
+  "theory": "### Capability Is Not a Single Number\n\nA generative model can be highly *capable* at a task — able, in its best outputs, to perform at a genuinely impressive level — while being unreliable at that same task, meaning its performance varies significantly across similar-seeming inputs, sometimes producing an excellent result and sometimes producing a confidently-stated but wrong one (a \"hallucination\"). Capability and reliability are distinct properties, and a product decision informed only by capability (\"look how good this can be\") without accounting for reliability risks shipping a feature that performs impressively in a demo and unpredictably in production.\n\n### The Capability-Reliability Matrix\n\nThis lesson introduces the **Capability-Reliability Matrix**:\n\n```mermaid\ngraph TD\n    A[\"High Capability + High Reliability<br/>→ Full automation reasonable\"]\n    B[\"High Capability + Low Reliability<br/>→ Human-in-the-loop assist mode\"]\n    C[\"Low Capability + High Reliability<br/>→ Narrow, well-scoped use only\"]\n    D[\"Low Capability + Low Reliability<br/>→ Do not ship this use case yet\"]\n```\n\nA task landing in quadrant A can reasonably be fully automated. A task in quadrant B — the most common position for many current generative use cases — calls for keeping a human explicitly in the loop, per the Ownership Zones Model's Zone 4 discipline and, in regulated contexts, per Lesson 81's legal human-in-the-loop requirements. Quadrant D should not ship at all for that specific use case, regardless of how compelling a demo made it look.\n\n### Evals as an Ongoing Practice\n\n**Evals** — structured evaluation suites measuring a model's performance on representative tasks — must be run continuously, not once before launch, because model behavior shifts with every underlying model version update and every prompt or system change, directly echoing the Metric Provenance Chain's insistence (Lesson 64) that a metric must be continuously validated, not validated once and trusted forever.\n\n### Per-Inference Cost Economics\n\nUnlike most software, where serving one more user costs almost nothing, generative AI features carry a genuine, often significant per-inference cost that scales directly with usage — a cost structure a PM must model explicitly, since a feature can be capable, reliable, and popular, and still be a poor product decision if its unit economics don't work at scale.\n\n### Why AI Products Break Traditional QA Assumptions\n\nTraditional software QA rests on a quiet assumption that most PMs never have to state explicitly: a given input, run through a given version of the code, produces the same output every time. This determinism is what makes a fixed test suite meaningful — if a test passes today, it will pass tomorrow unless the code changes. Generative models violate this assumption at the root. The same prompt, run twice against the same model version, can produce two different outputs, and a test suite that passed cleanly last week can begin failing this week with no code change at all, purely because the underlying model provider shipped a silent update, or because the specific inputs users send have drifted from the inputs the team originally tested against. This means a PM cannot treat \"we have a test suite and it's green\" as evidence of ongoing quality the way they could for deterministic software — the test suite itself must be re-run continuously against production-representative inputs, and its results must be watched for drift, not just checked once at a release gate. This is the deeper reason evals function differently from unit tests, and why an AI-native PM's mental model of \"quality assurance\" has to be rebuilt rather than simply carried over from prior software experience.\n\n---",
+  "mistakes": "1. **Treating \"the model is impressive in a demo\" as sufficient evidence to ship at full automation.** Demos showcase capability, not reliability across the full range of real inputs.\n2. **Running evals once before launch and treating the model as permanently validated.** Model updates and prompt changes require continuous re-evaluation.\n3. **Ignoring per-inference cost until scale reveals it as a problem.** Unit economics should be modeled before launch, not discovered after.\n4. **Defaulting to full automation for any quadrant B (high capability, low reliability) task under launch-speed pressure.** This is precisely the Ownership Zones Model's Zone 4 mistake, now in an AI-specific context.\n5. **Confusing a model's stated confidence with actual reliability.** A hallucinated answer is frequently delivered with the same fluent confidence as a correct one.\n6. **Treating a feature's Capability-Reliability Matrix quadrant as permanent.** A quadrant A classification at launch can silently drift toward quadrant B as usage diversifies or the underlying model changes, which is why the classification needs periodic re-verification, not a single pre-launch determination.\n\n---",
+  "mentalModel": {
+    "title": "The Capability-Reliability Matrix",
+    "content": "Apply it by asking: (1) How capable is the model at this specific task? (2) How reliably does it perform at that level across representative real inputs, not just demo inputs? (3) Does the current automation level match the quadrant, or does launch pressure push toward more automation than reliability supports?\n\n---"
+  },
+  "caseStudy": {
+    "title": "The Automated Refund Assistant",
+    "content": "A company shipped a fully-automated AI customer support agent authorized to approve refunds up to a moderate dollar threshold with no human review, based on strong demo performance. In production, the model occasionally hallucinated policy terms that didn't exist, approving refunds it should have denied and, in rarer cases, confidently citing a non-existent policy to deny a legitimate refund. The task was clearly quadrant B — high capability, meaningfully imperfect reliability — but was shipped as if it were quadrant A.\n\n**What went wrong?** Capability was mistaken for reliability, and full automation was applied to a task that, per the Ownership Zones Model and Lesson 81's human-in-the-loop discipline, required a human review step given the financial stakes involved. The team's pre-launch evaluation process had genuinely tested the model against a representative set of common refund scenarios, and the model had performed well — but \"performed well on a representative test set\" and \"will perform reliably across the full, open-ended range of real customer messages, including ones that reference policies that don't exist\" turned out to be two different claims. The team had implicitly treated a passing eval run as equivalent to a passing traditional software test — a one-time gate rather than an ongoing signal — which meant the specific hallucination pattern that eventually caused customer harm was never caught before it reached production, because it simply hadn't appeared in the original test set.\n\nThe recovery involved adding human review for any refund above a small threshold, and instituting continuous evals specifically tracking hallucination rate on refund-policy questions, sampled from real production traffic rather than the original curated test set. Notably, the company also discovered that a meaningful share of the hallucinated policy citations followed a specific pattern — the model would fabricate exception clauses when a customer's message combined two unrelated complaints in a single request — which only became visible once the team began analyzing real failure cases rather than relying on aggregate pass rates alone.\n\n1. What specific assumption caused the team to treat their pre-launch eval results as sufficient evidence for full automation?\n2. If you were rebuilding this feature's launch plan from scratch, at what refund dollar threshold would you require human review, and what evidence would you want before raising that threshold over time?\n\n---"
+  },
+  "framework": {
+    "title": "The AI Product Readiness Checklist",
+    "content": "| Checklist Item | Question | Risk if Skipped |\n|---|---|---|\n| Capability vs. Reliability Assessed Separately | Has reliability been measured across representative inputs, not just demo cases? | Quadrant B mistaken for quadrant A |\n| Continuous Evals in Place | Does evaluation run on every model/prompt change, not just pre-launch? | Silent quality drift goes undetected |\n| Human-in-the-Loop Matched to Stakes | Does automation level match the Ownership Zones and Regulatory Surface requirements for this task? | Costly errors in high-stakes automated decisions |\n| Per-Inference Cost Modeled | Is unit economics understood before scale? | Popular feature with unsustainable cost structure |\n| Failure Mode Cataloged | Are known hallucination or failure patterns documented and monitored? | Repeat failures go unaddressed |\n\nThe checklist is most useful as a pre-launch gate that gets *re-run*, not a document that gets filled out once and archived. A team that revisits it before every meaningful model version bump, prompt change, or significant shift in how the feature is used will catch quadrant drift — a feature that was genuinely quadrant A at launch sliding toward quadrant B as usage patterns diversify beyond what the original evals covered — long before a customer-facing incident forces the same discovery the hard way, as happened in the Automated Refund Assistant case above.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Real World Perspective",
+    "content": ""
+  },
+  "quiz": [
+    {
+      "id": "q-084-1",
+      "questionNumber": 1,
+      "questionText": "Why can't a generative model's quality be reduced to a single \"good enough\" judgment?",
+      "options": [
+        "Models never actually vary in performance",
+        "Capability and reliability are distinct properties that can diverge sharply",
+        "All models perform identically regardless of task",
+        "Quality is irrelevant to AI product decisions"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Capability (how good the model can be) and reliability (how consistently it performs) are separate properties that can diverge, so a single rating misses the reliability dimension entirely.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-084-2",
+      "questionNumber": 2,
+      "questionText": "What does the Capability-Reliability Matrix recommend for high capability, low reliability tasks?",
+      "options": [
+        "Full automation",
+        "Human-in-the-loop assist mode",
+        "Immediate cancellation of the feature",
+        "No monitoring is needed"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The matrix prescribes human-in-the-loop assist mode for quadrant B (high capability, low reliability), keeping a human explicitly in the loop rather than automating fully.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-084-3",
+      "questionNumber": 3,
+      "questionText": "Why must evals run continuously rather than once?",
+      "options": [
+        "Models never change after launch",
+        "Model and prompt updates shift behavior, requiring ongoing re-evaluation",
+        "Continuous evals are legally required in all jurisdictions",
+        "One-time evals are always sufficient"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Model and prompt changes shift behavior over time, so a one-time pre-launch evaluation cannot guarantee ongoing quality — continuous re-evaluation is required.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-084-4",
+      "questionNumber": 4,
+      "questionText": "Why does per-inference cost matter for AI-native products?",
+      "options": [
+        "It never actually affects business viability",
+        "Generative AI features carry real, scaling marginal costs unlike most traditional software",
+        "Per-inference cost is identical across all AI providers",
+        "Cost only matters for hardware products"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Unlike traditional software with near-zero marginal cost, each generative AI inference carries a real cost that scales directly with usage, which can make a popular feature economically unsustainable.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-084-5",
+      "questionNumber": 5,
+      "questionText": "What was the root cause of the Automated Refund Assistant case study's failure?",
+      "options": [
+        "The model had no capability at the task at all",
+        "A quadrant-B task was shipped at full automation without human review",
+        "The company never tested the model at all",
+        "The refund threshold was set too low"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The refund assistant was a quadrant B task (high capability, imperfect reliability) but was shipped at full automation without human review, leading to hallucination-driven errors.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-084-6",
+      "questionNumber": 6,
+      "questionText": "Why is a model's confident tone not evidence of correctness?",
+      "options": [
+        "Models never sound confident",
+        "Hallucinated outputs are frequently delivered with the same fluency as correct ones",
+        "Confidence is always a reliable indicator of accuracy",
+        "This is not actually a concern in practice"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Hallucinated outputs are delivered with the same fluent confidence as correct ones, so a model's tone provides no signal about whether the output is actually accurate.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-084-7",
+      "questionNumber": 7,
+      "questionText": "What connects quadrant-B automation decisions to Lesson 65?",
+      "options": [
+        "No connection exists",
+        "The Ownership Zones Model's Zone 4 discipline requires human review of model outputs before action, which quadrant B tasks specifically need",
+        "Lesson 65 only applies to recommender systems",
+        "Ownership Zones only applies to hardware products"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Ownership Zones Model's Zone 4 requires human review of model outputs before action, which is exactly what quadrant B (high capability, low reliability) tasks demand.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-084-8",
+      "questionNumber": 8,
+      "questionText": "What should happen for a task in the low-capability quadrant regardless of reliability?",
+      "options": [
+        "Full automation should proceed anyway",
+        "The use case should not ship yet",
+        "Human review is unnecessary",
+        "Cost modeling is irrelevant"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "If capability itself is insufficient (low capability), the use case should not ship regardless of how reliable the model is at that low level of performance.",
+      "learningObjective": "#2",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-084-9",
+      "questionNumber": 9,
+      "questionText": "Why is demo performance an unreliable indicator of production reliability?",
+      "options": [
+        "Demos are always representative of all real-world inputs",
+        "Demos showcase capability under curated conditions, not reliability across the full range of real inputs",
+        "Demos never actually use the real model",
+        "There is no meaningful difference between demos and production use"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Demos showcase capability under curated, favorable conditions, but production use involves a much broader range of inputs where reliability may be significantly lower.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-084-10",
+      "questionNumber": 10,
+      "questionText": "What is a recommended recovery step from the Automated Refund Assistant case study?",
+      "options": [
+        "Removing all human oversight entirely",
+        "Adding human review above a threshold and instituting continuous evals for hallucination rate",
+        "Shutting down the support feature entirely",
+        "Increasing the refund threshold without any other changes"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Adding human review above a threshold and instituting continuous evals tracking hallucination rate directly addresses the quadrant B mismatch and enables ongoing quality monitoring.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-084-11",
+      "questionNumber": 11,
+      "questionText": "(Scenario) A model performs excellently in curated demo tests but shows inconsistent quality on a broader eval set. What does this indicate?",
+      "options": [
+        "The feature is definitely quadrant A and ready for full automation",
+        "A likely quadrant-B position — high capability, lower reliability — requiring human-in-the-loop consideration",
+        "The eval set is flawed and should be ignored",
+        "No further action is needed"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Excellent demo performance but inconsistent quality on a broader eval set indicates high capability with lower reliability — a quadrant B position requiring human-in-the-loop consideration.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-084-12",
+      "questionNumber": 12,
+      "questionText": "(Product Thinking) A team wants to skip ongoing evals after a successful launch. What is the strongest response?",
+      "options": [
+        "Agree, since pre-launch evals are always sufficient",
+        "Explain that model and prompt changes require continuous re-evaluation to catch silent quality drift",
+        "Cancel the feature entirely",
+        "Increase automation instead of adding evals"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Model and prompt changes shift behavior over time, so stopping evals after launch risks silent quality drift going undetected in production.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-084-13",
+      "questionNumber": 13,
+      "questionText": "(Interview Reasoning) A candidate says a model is \"good enough to ship\" based solely on demo results. What does this signal?",
+      "options": [
+        "Strong understanding of AI product management",
+        "A gap in distinguishing capability from reliability",
+        "Readiness for a senior AI PM role immediately",
+        "Nothing meaningful"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Judging a model as \"good enough\" based solely on demo results conflates capability with reliability, revealing a gap in understanding that these are distinct properties requiring separate assessment.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-084-14",
+      "questionNumber": 14,
+      "questionText": "(Product Thinking) A high-stakes automated decision has never had its per-inference cost modeled. What risk does this create?",
+      "options": [
+        "No risk; cost is irrelevant to product decisions",
+        "A popular feature could prove economically unsustainable at scale",
+        "This only matters for low-stakes features",
+        "Cost modeling is only relevant post-shutdown"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Without modeling per-inference cost before launch, a feature can become popular and widespread while its unit economics prove unsustainable at scale.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-084-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A financial AI assistant shows high capability but inconsistent reliability on edge cases, and leadership wants full automation to compete on speed. What is the most defensible response?",
+      "options": [
+        "Proceed with full automation to match competitor speed",
+        "Classify the task's quadrant honestly, implement human-in-the-loop review matched to actual reliability evidence, and continue eval-driven improvement before considering further automation",
+        "Cancel the feature entirely",
+        "Automate only the easiest cases with no broader evaluation"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The defensible response is honest quadrant classification, human-in-the-loop review matched to actual reliability evidence, and continued eval-driven improvement — resisting launch pressure to over-automate.",
+      "learningObjective": "#2, #3, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "fc-084-1",
+      "front": "Why can't model quality be reduced to a single number?",
+      "back": "Capability and reliability are distinct and can diverge sharply, requiring different product responses.",
+      "difficulty": "Easy",
+      "tags": [
+        "#ai-native"
+      ],
+      "lessonNumber": 84
+    },
+    {
+      "id": "fc-084-2",
+      "front": "What does the high-capability/low-reliability quadrant call for?",
+      "back": "Human-in-the-loop assist mode, not full automation.",
+      "difficulty": "Medium",
+      "tags": [
+        "#capability-reliability-matrix"
+      ],
+      "lessonNumber": 84
+    },
+    {
+      "id": "fc-084-3",
+      "front": "Why must evals run continuously?",
+      "back": "Model and prompt changes shift behavior, so pre-launch evaluation alone doesn't guarantee ongoing quality.",
+      "difficulty": "Medium",
+      "tags": [
+        "#evals"
+      ],
+      "lessonNumber": 84
+    },
+    {
+      "id": "fc-084-4",
+      "front": "What went wrong in the Automated Refund Assistant case study?",
+      "back": "A quadrant-B task (high capability, imperfect reliability) was shipped at full automation with no human review, leading to hallucination-driven refund errors.",
+      "difficulty": "Hard",
+      "tags": [
+        "#case-study"
+      ],
+      "lessonNumber": 84
+    },
+    {
+      "id": "fc-084-5",
+      "front": "Why do traditional QA assumptions break down for generative AI products?",
+      "back": "Traditional QA assumes deterministic behavior — same input, same output, forever, unless the code changes. Generative models can produce different outputs for the same input, and behavior can shift with silent provider-side updates, so a passing test suite doesn't guarantee ongoing quality the way it does for deterministic software.",
+      "difficulty": "Hard",
+      "tags": [
+        "#qa",
+        "#evals"
+      ],
+      "lessonNumber": 84
+    },
+    {
+      "id": "fc-084-6",
+      "front": "What is \"quadrant drift\" and why does it matter?",
+      "back": "A feature's real capability/reliability position shifting over time — even without any deliberate product change — as usage patterns diversify or the underlying model updates. It matters because a feature correctly classified as quadrant A at launch can silently become quadrant B, which is why the AI Product Readiness Checklist should be re-run periodically, not filled out once.",
+      "difficulty": "Hard",
+      "tags": [
+        "#capability-reliability-matrix",
+        "#evals"
+      ],
+      "lessonNumber": 84
+    }
+  ],
+  "reflectionPrompt": "You are the PM for an AI-powered legal document summarization tool being considered for full automation with no attorney review.\n\n1. Using the Capability-Reliability Matrix, what quadrant would you want evidence for before considering full automation?\n2. What would a continuous eval process look like for this specific task?\n3. What human-in-the-loop requirement might apply, drawing on Lesson 81?\n4. How would you model per-inference cost at scale?\n5. What failure modes would you specifically want cataloged?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 83 — Hardware and Physical Products | Shifts from physical irreversibility to AI-specific reliability constraints |\n| **Current Lesson** | Lesson 84 — PM in AI-Native Companies | Capability-Reliability Matrix; continuous evals; per-inference economics |\n| **Next Lesson** | Lesson 85 — Responsible AI Product Management | Extends reliability and human-in-the-loop discipline into fairness and harm considerations |\n| **Future Concepts Unlocked** | Lesson 90 (Capstone) | Treats the Capability-Reliability Matrix as established canon |\n\nThis curriculum continues to build as one continuous argument. This lesson resolves the open thread from Lessons 65, 66, and 81 regarding model-driven decision risk, now applied specifically to generative AI.",
+  "rawMarkdownPath": "content/lessons/lesson-084.md"
+}

@@ -1,0 +1,360 @@
+{
+  "meta": {
+    "slug": "lesson-075",
+    "number": 75,
+    "title": "Competitive Strategy and Moats",
+    "moduleNumber": 8,
+    "moduleName": "Advanced Strategy, Innovation & Enterprise/B2B Product Management",
+    "difficulty": 7,
+    "estMinutesReading": 40,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 63 (cross-side network effects, marketplace liquidity), Lesson 71 (Strategy Cascade, falsifiable bets)",
+    "nextLessonSlug": "lesson-076",
+    "futureTopicsUnlocked": "Lesson 76 (M&A and Product Integration), Lesson 78 (Build, Buy, or Partner), Lesson 80 (Module Synthesis) — all depend on the Moat Durability Matrix introduced here"
+  },
+  "learningObjectives": [
+    "Explain why a current market advantage is not automatically a durable competitive moat.",
+    "Apply the Moat Durability Matrix to categorize a competitive advantage by replication difficulty and erosion risk.",
+    "Identify the five common categories of competitive moat: network effects, switching costs, economies of scale, brand and trust, and proprietary assets.",
+    "Distinguish genuine structural moats from advantages that merely look durable in the short term.",
+    "Evaluate a company's stated competitive advantage for whether it would survive sustained, well-resourced competitive pressure."
+  ],
+  "theory": "### Why a Current Advantage Is Not Automatically a Moat\n\nA **moat**, in the strategic sense this lesson uses, is a structural characteristic of a business that makes it difficult for competitors to replicate its position, even when those competitors have comparable resources, talent, and motivation to do so. This is a meaningfully stronger claim than simply being ahead right now. A company can be the current market leader in usage, revenue, or brand recognition while possessing no genuine moat at all, if that leadership position rests entirely on factors — first-mover timing, temporary underinvestment by competitors, a fashionable brand moment — that a well-resourced competitor could, in principle, replicate or overcome given sufficient time and investment. Genuine moats specifically resist this kind of replication, not merely because competitors haven't tried yet, but because of some structural feature of the business that makes replication difficult even when competitors do try.\n\n### The Moat Durability Matrix\n\nThis lesson introduces the **Moat Durability Matrix**, plotting a competitive advantage along two dimensions: how difficult it would be for a well-resourced competitor to replicate, and how quickly the advantage naturally erodes without active defense.\n\n```mermaid\ngraph TD\n    A[\"High Replication Difficulty +<br/>Low Erosion Risk<br/>(genuine, durable moat)\"] \n    B[\"High Replication Difficulty +<br/>High Erosion Risk<br/>(requires active, ongoing defense)\"]\n    C[\"Low Replication Difficulty +<br/>Low Erosion Risk<br/>(comfortable but vulnerable to a well-resourced entrant)\"]\n    D[\"Low Replication Difficulty +<br/>High Erosion Risk<br/>(not a real moat at all)\"]\n```\n\nThe Matrix's discipline is placing a claimed competitive advantage honestly into one of these four positions, rather than assuming any current advantage automatically belongs in the top-left, most favorable position. An advantage in quadrant D — easy to replicate and naturally eroding — should not be described internally as a \"moat\" at all, however comfortable the company's current position feels, since that language creates a dangerous false sense of security about the durability of the underlying advantage.\n\n### The Five Common Categories of Moat\n\n**Network effects**, directly connected to Lesson 63's cross-side network effect discussion, create a moat when a product's value to each user increases with the number of other users, making it structurally difficult for a competitor to match the value proposition without first achieving comparable scale — though, as this lesson's Case Study will show, network effects are more fragile than commonly assumed when users can easily use multiple competing platforms simultaneously. **Switching costs** create a moat when a customer's investment in learning, integrating, or customizing a product makes moving to a competitor genuinely costly, independent of whether the competitor's product is otherwise comparable or even superior. **Economies of scale** create a moat when a company's larger size allows it to operate at a lower per-unit cost than smaller competitors can match, allowing sustained price or margin advantages. **Brand and trust** create a moat when customers' confidence in a company, built over time through consistent delivery, creates a genuine preference that a functionally comparable but unfamiliar competitor cannot easily overcome, particularly in categories where trust carries significant weight, such as financial services or healthcare. **Proprietary assets** — patents, exclusive data, unique regulatory approvals, or exclusive access to a critical resource — create a moat when competitors are legally, technically, or practically prevented from replicating a specific capability regardless of their resources.\n\n### Why Network Effects Are More Fragile Than Commonly Assumed\n\nNetwork effects are frequently treated as the strongest, most unassailable category of moat, but this reputation deserves scrutiny. **Multi-homing** — a user's ability to use multiple competing platforms simultaneously without significant cost — substantially weakens a network effect's defensive power, since a user who can easily maintain a presence on both an incumbent and a new entrant doesn't need the incumbent's network to remain their exclusive choice, undermining the \"must join the biggest network\" logic network effects are supposed to provide. A network effect moat is strongest specifically in contexts where multi-homing is costly or impractical, and considerably weaker in contexts where users can and do participate in multiple competing networks with minimal friction.\n\n---",
+  "mistakes": "1. **Describing any current market leadership position as a \"moat\" without examining its structural durability.** Being ahead currently is not evidence of a genuine moat, and the two claims should not be conflated.\n2. **Treating network effects as automatically the strongest, most durable moat category.** Network effects are significantly weakened by multi-homing, and their strength depends heavily on the specific competitive context, not the mere presence of a network.\n3. **Assuming a moat, once established, requires no ongoing investment to maintain.** Quadrant B of the Moat Durability Matrix — high replication difficulty but high erosion risk — describes real moats that still require active, ongoing defense rather than passive assumption of permanence.\n4. **Overestimating switching costs from the vendor's own perspective rather than the customer's.** A switching cost that feels significant to the vendor (extensive integration work, customized configuration) may feel much smaller to a customer facing genuine dissatisfaction, particularly if a competitor offers migration assistance.\n5. **Conflating brand recognition with brand trust as a moat.** Widespread awareness of a brand is not the same as customer trust deep enough to resist a comparable competitor's offer, and the two should be evaluated separately.\n\n---",
+  "mentalModel": {
+    "title": "The Moat Durability Matrix",
+    "content": "The Moat Durability Matrix introduced above is this lesson's core takeaway tool. When evaluating any claimed competitive advantage, ask:\n\n1. **How difficult would this advantage genuinely be for a well-resourced competitor to replicate**, not merely how difficult it has been for competitors who haven't yet tried seriously?\n2. **How quickly would this advantage erode without active, ongoing defense**, rather than assuming a currently favorable position is self-sustaining?\n3. **Which quadrant does this advantage honestly occupy**, and does the company's actual strategic behavior match the quadrant's real requirements — active defense for quadrant B, appropriate humility about vulnerability for quadrant C, and no false confidence at all for quadrant D?\n\nA company that runs its claimed competitive advantages through this Matrix honestly is far less likely to be caught by surprise when a well-resourced competitor successfully challenges a position that was never as structurally protected as internal narrative assumed.\n\n---"
+  },
+  "caseStudy": {
+    "title": "The Multi-Homed Marketplace",
+    "content": "A B2B software marketplace connecting freelance specialists with client businesses believed it had built a durable network-effect moat: a large, established base of both freelancers and clients, with internal leadership frequently describing the marketplace's scale as an unassailable advantage that would be prohibitively difficult for any new entrant to replicate. Growth had been strong for several years, and the company's strategic planning assumed this network-effect moat would continue to protect its market position indefinitely with minimal additional defensive investment.\n\nA new, well-funded competitor entered the market focusing specifically on a narrower, higher-quality segment of specialized freelancers, offering a superior vetting and matching experience. Rather than attempting to build a comparably large network from scratch — which would indeed have been difficult — the new entrant recognized that both freelancers and client businesses could easily **multi-home**: a freelancer could maintain a profile on both platforms simultaneously with minimal cost, and a client business could post a project on both platforms and simply choose whichever produced a better match. Within roughly a year, a meaningful fraction of the incumbent's most active, highest-quality freelancers had begun multi-homing onto the new platform, and client businesses following that quality signal began shifting a portion of their business to the new entrant as well, without ever fully abandoning the original platform.\n\n**What went wrong?** Using the Moat Durability Matrix, the failure is precise: the incumbent had assumed its network effect sat firmly in the most favorable quadrant — high replication difficulty, low erosion risk — without examining the specific competitive dynamics of its own market, where multi-homing was genuinely low-cost for both sides of the marketplace. The advantage was real and did make replicating the incumbent's *total scale* difficult, but it did not prevent a competitor from successfully capturing a meaningful, valuable slice of the same participants through multi-homing, which is precisely the erosion mechanism network-effect moats are most vulnerable to whenever switching or dual-participation costs are low.\n\nThe company's recovery involved investing directly in reducing the appeal of multi-homing — introducing exclusivity incentives for top-tier freelancers, improving matching quality specifically to compete on the dimension the new entrant had targeted, and more honestly recalibrating internal strategic planning to recognize the network effect as sitting in quadrant B (requiring active, ongoing defense) rather than quadrant A (assumed permanent and requiring no defense) — a recalibration that connects directly to the build-versus-buy-versus-partner decisions formalized in Lesson 78.\n\n---"
+  },
+  "framework": {
+    "title": "The Competitive Moat Audit Checklist",
+    "content": "Before describing any advantage internally as a genuine \"moat,\" a PM or strategy team can use the following checklist:\n\n| Moat Category | Diagnostic Question | Red Flag |\n|---|---|---|\n| Network Effects | Is multi-homing genuinely costly or impractical for participants on either side? | Participants can easily use a competing platform simultaneously with minimal friction |\n| Switching Costs | Would a genuinely dissatisfied customer still find switching prohibitively costly, from their own perspective? | Switching costs are assumed to be high based on the vendor's internal view, not tested from the customer's perspective |\n| Economies of Scale | Does the company's scale actually translate into a meaningful, sustained per-unit cost advantage over credible competitors? | Scale exists but has not been shown to produce a genuine cost or margin advantage |\n| Brand and Trust | Does the brand advantage reflect deep customer trust, not merely broad awareness or recognition? | Brand strength is measured only by awareness metrics, not by resistance to a comparable competitor's offer |\n| Proprietary Assets | Is the asset (data, patent, exclusive access) genuinely difficult for a well-resourced competitor to replicate or work around? | The \"proprietary\" asset could plausibly be replicated or substituted with sufficient investment |\n\nA moat claim that fails its category's specific diagnostic question should be treated with significant skepticism, regardless of how confidently it is asserted in internal strategic planning documents.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Real World Perspective",
+    "content": ""
+  },
+  "quiz": [
+    {
+      "id": "q-075-1",
+      "questionNumber": 1,
+      "questionText": "Why is a current market advantage not automatically evidence of a durable competitive moat?",
+      "options": [
+        "Market advantages are always temporary regardless of any structural factors",
+        "A genuine moat requires structural difficulty of replication, even for well-resourced competitors, not merely an unchallenged lead",
+        "Competitive moats do not actually exist in real markets",
+        "Market leadership always indicates the presence of a genuine moat"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson's central distinction is between a temporary, unchallenged lead and a structurally defensible position.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-075-2",
+      "questionNumber": 2,
+      "questionText": "What are the two dimensions of the Moat Durability Matrix?",
+      "options": [
+        "Revenue and market share",
+        "Replication difficulty and natural erosion risk",
+        "Brand awareness and customer satisfaction",
+        "Company size and founding date"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "These are the two dimensions explicitly introduced in the Theory section for evaluating a claimed moat's genuine durability.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-075-3",
+      "questionNumber": 3,
+      "questionText": "What describes an advantage in the least favorable quadrant of the Moat Durability Matrix?",
+      "options": [
+        "High replication difficulty and low erosion risk",
+        "Low replication difficulty and high erosion risk",
+        "High replication difficulty and high erosion risk",
+        "An advantage that cannot be plotted on the Matrix at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This quadrant, combining ease of replication with high erosion risk, represents an advantage that should not be described as a genuine moat.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-075-4",
+      "questionNumber": 4,
+      "questionText": "Name the five common categories of competitive moat.",
+      "options": [
+        "Marketing, sales, product, engineering, support",
+        "Network effects, switching costs, economies of scale, brand and trust, proprietary assets",
+        "Revenue, growth rate, market share, valuation, headcount",
+        "Speed, quality, price, service, innovation"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "These five categories are explicitly introduced in the Theory section as the common moat types this lesson examines.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-075-5",
+      "questionNumber": 5,
+      "questionText": "Why are network effects more fragile than their common reputation suggests?",
+      "options": [
+        "Network effects never provide any real competitive advantage",
+        "Multi-homing allows participants to use a competing platform with minimal cost, undermining the incumbent's exclusive advantage",
+        "Network effects only apply to consumer products, never B2B products",
+        "Network effects always strengthen over time with no possible vulnerability"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly identifies multi-homing as the mechanism that weakens network-effect moats in contexts where switching or dual participation is low-cost.",
+      "learningObjective": "#3, #4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-075-6",
+      "questionNumber": 6,
+      "questionText": "Why should switching costs be evaluated from the customer's perspective rather than the vendor's?",
+      "options": [
+        "The vendor's perspective is always more accurate than the customer's",
+        "A switching cost that feels significant internally to the vendor may feel much smaller to a genuinely dissatisfied customer",
+        "Switching costs are never relevant to competitive strategy",
+        "Customers never actually consider switching costs when evaluating competitors"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Common Beginner Mistakes section explicitly warns against this perspective mismatch as a source of overestimated moat strength.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-075-7",
+      "questionNumber": 7,
+      "questionText": "In the Multi-Homed Marketplace case study, what specifically allowed the new entrant to succeed despite not matching the incumbent's total scale?",
+      "options": [
+        "The new entrant offered significantly lower prices than the incumbent",
+        "Low-cost multi-homing allowed freelancers and clients to use both platforms simultaneously, letting the entrant capture valuable participants without needing to displace the incumbent entirely",
+        "The incumbent's platform experienced a major technical outage",
+        "The new entrant acquired the incumbent's user data through a data breach"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study's core mechanism was low-cost multi-homing, not pricing, technical failure, or data acquisition.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-075-8",
+      "questionNumber": 8,
+      "questionText": "What was the incumbent's core strategic error in the Multi-Homed Marketplace case study?",
+      "options": [
+        "Failing to build any network effect at all",
+        "Assuming its network effect sat in the most favorable quadrant (high difficulty, low erosion) without examining its specific vulnerability to multi-homing",
+        "Investing too heavily in defensive strategies against a threat that never materialized",
+        "Failing to raise sufficient funding to compete"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The failure was a mismatch between assumed and actual moat durability, specifically regarding the market's multi-homing dynamics.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-075-9",
+      "questionNumber": 9,
+      "questionText": "According to the Competitive Moat Audit Checklist, what is a red flag for a claimed \"brand and trust\" moat?",
+      "options": [
+        "Deep customer resistance to switching even when offered a comparable competitor",
+        "Brand strength measured only by awareness metrics, not by resistance to a comparable competitor's offer",
+        "A brand that has existed for many decades",
+        "A brand associated with a specific product category"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The checklist explicitly distinguishes broad awareness from genuine trust-based resistance to switching as the meaningful diagnostic.",
+      "learningObjective": "#3, #4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-075-10",
+      "questionNumber": 10,
+      "questionText": "Why might early-stage startups be cautioned against claiming they already have a genuine moat, per the Real World Perspective section?",
+      "options": [
+        "Startups are legally prohibited from having competitive advantages",
+        "Claiming a moat prematurely can create dangerous overconfidence, when the honest priority is usually building toward a genuine moat rather than assuming one exists",
+        "Moats are only relevant to companies with over ten thousand employees",
+        "Early-stage companies never face any competitive pressure"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section explicitly warns against premature moat claims at the early stage, given the lack of genuine structural advantage typically present.",
+      "learningObjective": "#1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-075-11",
+      "questionNumber": 11,
+      "questionText": "What typically becomes empirically testable for mid-size companies regarding their claimed moat, per the Real World Perspective section?",
+      "options": [
+        "Whether the company should raise additional funding",
+        "Whether the previously assumed advantage is genuinely structural or merely a temporary lead, as competitors with real resources begin challenging the position directly",
+        "Whether the company's brand logo needs to be redesigned",
+        "Whether the company should relocate its headquarters"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section describes this stage as the point where a moat claim first faces genuine competitive testing.",
+      "learningObjective": "#1, #4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-075-12",
+      "questionNumber": 12,
+      "questionText": "(Scenario) A company describes its large existing customer base as an \"unassailable\" network-effect moat, but has never examined whether customers could easily use a competing product simultaneously. What should this company investigate first, per this lesson's frameworks?",
+      "options": [
+        "Whether its marketing budget is sufficiently large",
+        "Whether multi-homing is genuinely costly or impractical for its specific customer base, using the Competitive Moat Audit Checklist's network effects diagnostic",
+        "Whether its logo and branding need updating",
+        "Whether its pricing is competitive with alternatives"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly applies the lesson's core diagnostic for network-effect moats: examining multi-homing cost and practicality before assuming durability.",
+      "learningObjective": "#2, #3, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-075-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A PM is asked to justify why a company's current market leadership should be trusted to persist. Using this lesson's frameworks, what is the strongest response?",
+      "options": [
+        "Cite the company's current revenue and user count as sufficient evidence of a durable moat",
+        "Conduct an honest Moat Durability Matrix assessment, examining specific replication difficulty and erosion risk for the company's actual competitive advantages, rather than assuming current leadership is self-sustaining",
+        "Assume all five moat categories automatically apply equally to the company's situation",
+        "Decline to examine the question, since current leadership is sufficient justification on its own"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The correct response applies the Matrix honestly rather than treating current market position itself as sufficient evidence of durability.",
+      "learningObjective": "#2, #4, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-075-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) A candidate, asked whether network effects are always a strong moat, answers simply \"yes\" with no further elaboration. What does this most likely signal, per the Interview Perspective section?",
+      "options": [
+        "A strong and complete understanding of competitive strategy",
+        "A gap in recognizing the multi-homing vulnerability that significantly weakens network-effect moats in many contexts",
+        "That the candidate is ready for a senior competitive strategy role immediately",
+        "Nothing meaningful; network effects are in fact always an unconditionally strong moat"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section specifically listens for recognition of multi-homing as a key qualifying factor, which this answer omits.",
+      "learningObjective": "#3, #4, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-075-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A company has long described its large user base as an unassailable moat, but a new competitor is successfully capturing valuable participants who now use both platforms simultaneously. Using only the frameworks in this lesson, what is the most defensible response?",
+      "options": [
+        "Continue describing the position as unassailable and take no action, trusting the network effect will self-correct",
+        "Honestly recalibrate the internal assessment to recognize the advantage as real but requiring active defense (quadrant B), and invest in reducing the appeal of multi-homing while improving competitiveness on the specific dimension the entrant is winning",
+        "Abandon the existing platform entirely and attempt to rebuild from scratch with a different business model",
+        "Dismiss the competitor's traction as temporary and insignificant without further investigation"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the Case Study and Reflection Exercise: the correct response neither assumes automatic permanence nor overreacts with abandonment, but honestly recalibrates the moat assessment and invests in targeted, active defense.",
+      "learningObjective": "#2, #3, #4, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "fc-075-1",
+      "front": "Why is a current market advantage not automatically a competitive moat?",
+      "back": "A moat requires structural difficulty of replication, even for well-resourced competitors, not merely an unchallenged lead that hasn't yet been seriously tested.",
+      "difficulty": "Easy",
+      "tags": [
+        "#moats",
+        "#core-concept"
+      ],
+      "lessonNumber": 75
+    },
+    {
+      "id": "fc-075-2",
+      "front": "What are the two dimensions of the Moat Durability Matrix?",
+      "back": "Replication difficulty and natural erosion risk.",
+      "difficulty": "Easy",
+      "tags": [
+        "#moat-durability-matrix"
+      ],
+      "lessonNumber": 75
+    },
+    {
+      "id": "fc-075-3",
+      "front": "Name the five common moat categories.",
+      "back": "Network effects, switching costs, economies of scale, brand and trust, proprietary assets.",
+      "difficulty": "Medium",
+      "tags": [
+        "#moat-categories"
+      ],
+      "lessonNumber": 75
+    },
+    {
+      "id": "fc-075-4",
+      "front": "Why are network effects more fragile than commonly assumed?",
+      "back": "Multi-homing allows participants to use a competing platform with minimal cost, undermining the \"must join the biggest network\" logic network effects rely on.",
+      "difficulty": "Hard",
+      "tags": [
+        "#multi-homing",
+        "#network-effects"
+      ],
+      "lessonNumber": 75
+    },
+    {
+      "id": "fc-075-5",
+      "front": "What went wrong in the Multi-Homed Marketplace case study?",
+      "back": "The incumbent assumed its network effect was a permanent, high-difficulty moat, but low-cost multi-homing allowed a competitor to capture valuable participants without fully displacing the incumbent.",
+      "difficulty": "Hard",
+      "tags": [
+        "#case-study",
+        "#multi-homing"
+      ],
+      "lessonNumber": 75
+    },
+    {
+      "id": "fc-075-6",
+      "front": "Why should switching costs be evaluated from the customer's perspective rather than the vendor's?",
+      "back": "A switching cost that feels significant to the vendor may feel much smaller to a genuinely dissatisfied customer, especially if a competitor offers migration assistance.",
+      "difficulty": "Medium",
+      "tags": [
+        "#switching-costs"
+      ],
+      "lessonNumber": 75
+    },
+    {
+      "id": "fc-075-7",
+      "front": "Why is brand recognition distinct from brand trust as a moat?",
+      "back": "Awareness of a brand does not guarantee the deep customer confidence needed to resist a comparable competitor's offer; only genuine trust functions as a real moat.",
+      "difficulty": "Medium",
+      "tags": [
+        "#brand-trust"
+      ],
+      "lessonNumber": 75
+    }
+  ],
+  "reflectionPrompt": "You are the PM for an established project management software company that has long described its large, integrated user base and years of accumulated customer workflow data as an \"unassailable moat.\" A new, well-funded competitor has recently launched, targeting a specific, underserved segment (small creative agencies) with a more specialized, higher-quality product.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying the Moat Durability Matrix and the Competitive Moat Audit Checklist to honestly assess a previously unexamined moat claim.\n\n1. Using the Moat Durability Matrix, which quadrant would you honestly place your company's claimed \"large user base\" advantage in, and why?\n2. What role might multi-homing play in this specific competitive situation, given that customers could plausibly use both products for different purposes?\n3. Using the Competitive Moat Audit Checklist, which specific diagnostic questions would you want answered before continuing to describe your position as an \"unassailable moat\" internally?\n4. If your company's actual advantage turns out to sit in quadrant B (real but requiring active defense) rather than quadrant A, what kind of active defensive investment might be appropriate?\n5. How would you communicate a more honest, less confident assessment of your competitive position to leadership, given the existing internal narrative of \"unassailable\" advantage?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 74 — Land-and-Expand: Packaging for Enterprise Growth | Shifts from internal packaging design to external competitive positioning and durability assessment |\n| **Current Lesson** | Lesson 75 — Competitive Strategy and Moats | Moat Durability Matrix; the five moat categories; multi-homing vulnerability; Competitive Moat Audit Checklist |\n| **Next Lesson** | Lesson 76 — M&A and Product Integration | Extends competitive strategy considerations into acquisition as a specific mechanism for acquiring or defending a moat |\n| **Future Concepts Unlocked** | Lesson 78 (Build, Buy, or Partner) | Uses moat assessment as a key input into whether to build, acquire, or partner for a given capability |\n| | Lesson 80 (Module Synthesis) | Treats the Moat Durability Matrix as established canon alongside Module 8's other strategic frameworks |\n\nThis curriculum continues to build as one continuous argument. From this lesson forward, any reference to a company's competitive position assumes you can evaluate it through the Moat Durability Matrix without re-explanation.",
+  "rawMarkdownPath": "content/lessons/lesson-075.md"
+}

@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-038",
+    "number": 38,
+    "title": "Working with Design Teams",
+    "moduleNumber": 4,
+    "moduleName": "Execution & Agile Delivery",
+    "difficulty": 4,
+    "estMinutesReading": 35,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 8 (Product Discovery), Lesson 37 (Working with Engineering Teams — trust and context-handoff principles)",
+    "nextLessonSlug": "lesson-039",
+    "futureTopicsUnlocked": "Lesson 39 (Technical Debt & PM Trade-offs), Lesson 45 (A/B Testing & Experimentation, which depends on testable design variants), Lesson 52 (Storytelling and Narrative for PMs) — all build on the fidelity discipline and early-involvement principles introduced here"
+  },
+  "learningObjectives": [
+    "Explain why involving design early, during problem definition rather than after a solution is chosen, tends to produce better outcomes than involving design only at the visual-polish stage.",
+    "Apply the fidelity ladder (low, mid, high fidelity) to match a design artifact's polish to the actual certainty behind the underlying decision.",
+    "Describe the Double Diamond framework and use it to identify which phase of design work a given moment in a project actually calls for.",
+    "Diagnose \"premature high-fidelity\" — a specific, common failure where polished mockups create false attachment to an unvalidated idea — and explain why it's costly.",
+    "Apply the same \"give context, not commands\" principle from Lesson 37 to the PM-design relationship specifically, distinguishing user needs and constraints (PM's domain) from visual and interaction solutions (design's domain)."
+  ],
+  "theory": "### Design as Exploration, Not Decoration\n\nThe most consequential mental shift a PM can make about design is recognizing it as a method for exploring and pressure-testing a solution space, not a finishing step applied after the \"real\" decisions have already been made elsewhere. A PM who arrives at a design conversation having already decided the interface's layout, flow, and interaction pattern — asking design only to \"make it look good\" — has skipped past the phase where design's distinct expertise (understanding how users actually perceive, navigate, and form mental models of an interface) could have meaningfully shaped the underlying decision, not just its surface appearance.\n\n### The Double Diamond\n\nA widely used framework, originally developed by the UK Design Council, describes the design process as two consecutive diamonds — each expanding into divergent exploration before converging on a decision:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Discover Diverge: Explore the Problem] --> B[Define Converge:<br/>Commit to a Specific Problem]\n    B --> C[Develop Diverge: Explore Solutions]\n    C --> D[Deliver Converge:<br/>Commit to a Specific Solution]\n```\n\nThe critical insight, easy to miss at a glance, is that there are *two* distinct divergent phases — one exploring the problem itself (Discover), and a separate one exploring possible solutions (Develop) — each followed by a deliberate narrowing (Define, Deliver). A PM who invites design in only at the \"Deliver\" stage has skipped both divergent phases entirely, asking design to visually finish a solution whose problem framing and solution exploration were never actually opened up for genuine design input. This directly parallels Lesson 8's discovery discipline: design has its own discovery process, and skipping it produces the same risk — building the wrong thing, confidently — that skipping user discovery does elsewhere in the product process.\n\n### The Fidelity Ladder\n\nA second, closely related concept concerns *how polished* a design artifact should be at a given stage of certainty:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[\"Low Fidelity (sketches, Wireframes)\"] --> B[\"Mid Fidelity (clickable<br/>Prototypes, Grayscale Flows)\"]\n    B --> C[\"High Fidelity (polished,<br/>Pixel-accurate Visual Design)\"]\n```\n\nLow-fidelity artifacts are cheap to produce and cheap to discard, making them appropriate for early exploration when the underlying idea itself is still uncertain — a hand-drawn sketch invites genuine feedback and revision in a way a polished mockup does not, because it visibly signals \"this is still an open question.\" High-fidelity artifacts are expensive to produce and, critically, tend to create a psychological sense of finality and ownership disproportionate to how validated the underlying idea actually is — a mistake this lesson calls **premature high-fidelity**, covered in detail in the Case Study below. The general rule: fidelity should track actual certainty, mirroring Lesson 35's Confidence Gradient principle applied here to design artifacts rather than roadmap items.\n\n### Applying \"Give Context, Not Commands\" to Design\n\nLesson 37 established that a PM's job is to convey the problem, user need, and constraints precisely, while trusting the domain expert to own the solution space. Applied to design, this means a PM should be highly specific about the *user problem* being solved, the *constraints* that matter (technical limitations, brand guidelines, accessibility requirements, existing design system components), and the *outcome* being targeted — while resisting the urge to dictate specific layouts, visual treatments, or interaction patterns, which is squarely design's domain, just as technical architecture is squarely engineering's.\n\n| PM's Domain (context to convey precisely) | Design's Domain (solution space to own) |\n|---|---|\n| The user problem and evidence behind it | Specific layout, visual hierarchy, interaction pattern |\n| Business and technical constraints | How to communicate information visually |\n| Success criteria / what \"solved\" looks like | Which existing design system components to use or extend |\n| Priority and timeline | Exact copy, iconography, and micro-interaction choices (within brand guidelines) |\n\n---",
+  "mistakes": "**Mistake 1: Bringing design in only at the \"make it pretty\" stage.**\nAs covered in Theory, this skips both of the Double Diamond's divergent phases, wasting design's ability to meaningfully shape problem framing and solution exploration, and reduces the relationship to a visual-polish service rather than a genuine partnership.\n\n**Mistake 2: Commissioning high-fidelity mockups before the underlying idea has been validated.**\nThis is \"premature high-fidelity\" — producing a level of visual polish that creates false attachment and a false sense of finality around an idea that hasn't actually earned that level of certainty yet, covered in full in this lesson's Case Study.\n\n**Mistake 3: Dictating specific layouts or visual treatments instead of describing the user problem and constraints.**\nThis is the design-specific version of Lesson 37's Mistake 1 — substituting the PM's own visual preference for design's domain expertise, often producing a worse outcome than trusting design with full context.\n\n**Mistake 4: Treating design feedback sessions as approval checkpoints rather than genuine collaboration.**\nA PM who shows design a nearly-finished mockup expecting only a rubber-stamp \"looks good\" has effectively excluded design from the actual decision-making process, even if the meeting nominally included them.\n\n**Mistake 5: Skipping user testing on a design because \"the team already likes it.\"**\nInternal team enthusiasm for a design is not evidence that real users will understand or successfully use it — conflating internal consensus with user validation is a distinct and common failure, especially once a polished mockup has generated internal excitement (see Mistake 2).\n\n---",
+  "mentalModel": {
+    "title": "The Fidelity Ladder",
+    "content": "*(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[\"Low Fidelity Cheap,<br/>Discardable, Invites Open Feedback\"] --> B[\"Mid Fidelity Testable<br/>Flow, Moderate Investment\"]\n    B --> C[\"High Fidelity Polished, Expensive,<br/>Signals Near-final Decision\"]\n```\n\nUse the Fidelity Ladder as a standing discipline whenever a design artifact is being produced: ask explicitly, \"how validated is the underlying idea this artifact represents, and does its polish level honestly reflect that?\" An idea still being explored should be represented with correspondingly low fidelity, regardless of how tempting it might be to show something impressive-looking to stakeholders early — because a polished artifact, once seen, is very hard to walk back psychologically, even when the underlying idea turns out to be wrong.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[\"Low Fidelity Cheap,<br/>Discardable, Invites Open Feedback\"] --> B[\"Mid Fidelity Testable<br/>Flow, Moderate Investment\"]\n    B --> C[\"High Fidelity Polished, Expensive,<br/>Signals Near-final Decision\"]"
+  },
+  "caseStudy": {
+    "title": "The Mockup Everyone Fell in Love With",
+    "content": "Consider a simplified, illustrative scenario common at teams new to structured design collaboration.\n\nA PM, excited about a new onboarding flow idea, asks a designer to produce a polished, high-fidelity set of screens quickly, \"just to see how it could look,\" before any user testing has occurred and before the underlying flow concept has been validated with real users. The designer produces a genuinely beautiful set of mockups. The PM shares them enthusiastically in a company-wide meeting, and the mockups generate real internal excitement — several stakeholders reference \"the new onboarding flow\" in subsequent planning conversations as though it were already a settled direction.\n\nThree weeks later, informal user testing on a simplified prototype (built only after the internal excitement prompted someone to ask \"have we actually tested this with users yet?\") reveals that the core flow concept confuses first-time users in a specific, structural way that no amount of visual polish can fix — the underlying information architecture, not the visual design, is the problem. Reworking the flow at this point requires largely discarding the beautiful mockups and starting over, and several stakeholders express visible disappointment and mild resistance to abandoning \"the design we already loved.\"\n\n**What went wrong?**\n\nUsing the Fidelity Ladder: this idea was still squarely in the Double Diamond's early \"Develop\" phase — a solution concept that hadn't yet been pressure-tested with real users — but was represented with \"Deliver\"-stage polish, creating a mismatch between the artifact's apparent finality and its actual, unvalidated status. The resulting internal enthusiasm was not really evidence the idea was good; it was evidence that polished visuals are persuasive regardless of underlying validation, a distinct and separate thing. The stakeholders' resistance to abandoning \"the design we already loved\" is precisely the psychological cost of premature high-fidelity: the team had become emotionally attached to a specific, expensive artifact before the underlying concept had earned that level of commitment, making a necessary pivot feel like a loss rather than a normal part of a healthy discovery process.\n\nThe fix is not to avoid high-fidelity work altogether, but to sequence it correctly: low-fidelity sketches and a testable mid-fidelity prototype should validate the underlying flow concept with real users *before* any high-fidelity visual polish is invested in it. This sequencing discipline — matching artifact investment to validation status — is directly related to the technical-debt trade-off reasoning covered next in **Lesson 39 (Technical Debt & PM Trade-offs)**, where a similar principle applies to engineering investment: build the cheapest version that answers the real question first, before investing in a polished, expensive version of an idea that hasn't yet earned that investment.\n\n---"
+  },
+  "framework": {
+    "title": "The Design Involvement Timing Table",
+    "content": "A second, more tactical tool: use this table to check whether design is being brought into a project at the right phase, relative to the Double Diamond.\n\n| Project Phase | Design's Appropriate Role | Warning Sign of Late Involvement |\n|---|---|---|\n| Problem exploration (Discover) | Participating in user research, synthesizing problem patterns alongside the PM | Design first hears about the project once a specific solution is already assumed |\n| Problem definition (Define) | Helping frame the specific problem statement, informed by user/interaction perspective | The problem statement is fully written before design is consulted at all |\n| Solution exploration (Develop) | Producing low/mid-fidelity concepts, testing multiple directions | Design is asked to visually execute a single, PM-specified layout with no real alternatives considered |\n| Solution delivery (Deliver) | Producing high-fidelity, validated final design, working with engineering on implementation detail | High-fidelity work is commissioned before user validation has occurred (see Case Study) |\n\nA project where design's actual involvement clusters entirely in the \"Deliver\" column, with little or no presence in \"Discover\" or \"Develop,\" is very likely under-using design relative to what this lesson's Theory recommends — even if design is nominally \"involved\" throughout, in a purely reactive capacity.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Startup vs. Mid-Size vs. Big Tech",
+    "content": "**At a startup:**\nA PM may work directly with a single designer, or wear the design hat personally in the absence of a dedicated designer at all. The risk here is Mistake 3 — without a dedicated design partner to push back, a PM's own visual instincts can go unchallenged, even when they lack the training to recognize interaction or usability problems a trained designer would catch immediately.\n\n**At a mid-size company:**\nA PM typically works with one or a small number of dedicated designers, often participating in a shared team ritual (a design critique, a weekly review) that formalizes the Double Diamond's divergent-then-convergent rhythm. This is the stage where Mistake 1 (bringing design in late) most commonly causes friction, since designers with real capacity for deeper involvement are being under-utilized relative to what the team's process nominally allows for.\n\n**At Big Tech:**\nDesign often operates as its own strong, semi-independent discipline with dedicated design leadership, formal design systems, and rigorous user research support, and PM-design collaboration is frequently structured through formal design review processes analogous to engineering's architecture reviews. The PM's job shifts toward ensuring the underlying user problem and constraints are represented clearly and early in these processes, and toward correctly interpreting design system constraints (which interaction patterns are already established and shouldn't be casually reinvented) when scoping new work.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-038-1",
+      "questionNumber": 1,
+      "questionText": "According to this lesson, what is the biggest risk of treating design as something applied only after a solution has already been decided?",
+      "options": [
+        "It makes the interface look worse",
+        "It skips design's ability to meaningfully shape problem framing and solution exploration, reducing the relationship to visual-polish execution",
+        "It takes longer than involving design early",
+        "It violates the Definition of Done"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains that treating design as decoration wastes its ability to explore and pressure-test the solution space during the Double Diamond's divergent phases.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-038-2",
+      "questionNumber": 2,
+      "questionText": "What are the two divergent phases in the Double Diamond framework?",
+      "options": [
+        "Discover and Deliver",
+        "Discover and Develop",
+        "Define and Deliver",
+        "There is only one divergent phase"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section identifies Discover (diverging on the problem) and Develop (diverging on solutions) as the framework's two divergent phases, each followed by a convergent phase (Define, Deliver).",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-038-3",
+      "questionNumber": 3,
+      "questionText": "What should a design artifact's fidelity level track, according to the Fidelity Ladder?",
+      "options": [
+        "How much time is available before the deadline",
+        "The actual validation status of the underlying idea — low fidelity for unvalidated ideas, high fidelity only after real user validation",
+        "The seniority of the designer assigned to the project",
+        "The size of the engineering team involved"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains that fidelity should track actual certainty/validation status, mirroring Lesson 35's Confidence Gradient principle.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-038-4",
+      "questionNumber": 4,
+      "questionText": "What is \"premature high-fidelity\"?",
+      "options": [
+        "Producing polished visual design before an idea has been validated with real users, creating false confidence and attachment",
+        "Producing sketches too early in a project",
+        "A term describing engineering technical debt",
+        "A design system component that hasn't been finalized"
+      ],
+      "correctOptionIndex": 0,
+      "correctOptionLetter": "A",
+      "explanation": "The Theory and Case Study sections define this term exactly as described in option A.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-038-5",
+      "questionNumber": 5,
+      "questionText": "In the Detailed Case Study, why was it so difficult for stakeholders to abandon the original onboarding mockup once user testing revealed a problem?",
+      "options": [
+        "The mockup had been legally approved and could not be changed",
+        "The team had become emotionally attached to a specific, polished artifact before the underlying concept had earned that level of commitment, making the pivot feel like a loss",
+        "The designer refused to make any changes",
+        "There was no actual problem with the original design"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study's \"What went wrong?\" analysis explicitly identifies premature emotional attachment to a polished, unvalidated artifact as the reason the pivot felt costly.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-038-6",
+      "questionNumber": 6,
+      "questionText": "What was the actual root cause of the onboarding flow's failure in the Case Study?",
+      "options": [
+        "The visual design was ugly",
+        "A structural information-architecture problem in the underlying flow concept, which no amount of visual polish could fix",
+        "The mockup used the wrong color scheme",
+        "The designer did not follow the brand guidelines"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly states the problem was structural (information architecture), not visual, meaning visual polish could never have fixed it regardless of fidelity level.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-038-7",
+      "questionNumber": 7,
+      "questionText": "Applying Lesson 37's \"context, not commands\" principle to design, which of the following is squarely the PM's domain to specify precisely?",
+      "options": [
+        "The exact pixel layout of a screen",
+        "The user problem, constraints, and success criteria",
+        "Which icon style to use",
+        "The specific interaction animation for a button"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section's table places user problem, constraints, and success criteria in the PM's domain, while layout, visual hierarchy, and interaction pattern belong to design.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-038-8",
+      "questionNumber": 8,
+      "questionText": "Why is internal team enthusiasm for a mockup not, by itself, evidence that the design is good?",
+      "options": [
+        "Because teams are never enthusiastic about good designs",
+        "Because polished visuals are persuasive regardless of underlying validation, and enthusiasm reflects the artifact's polish rather than confirmation that real users will succeed with it",
+        "Because only external customers are allowed to evaluate design quality",
+        "Because enthusiasm is always a sign of groupthink"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #5 and the Case Study both make this exact point — internal enthusiasm and user validation are separate things that are easily, and dangerously, conflated.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-038-9",
+      "questionNumber": 9,
+      "questionText": "Using the Design Involvement Timing Table, what is a warning sign that design is being involved too late in a project?",
+      "options": [
+        "Design participates in user research during the Discover phase",
+        "Design first hears about the project once a specific solution is already assumed, with no real alternatives considered",
+        "Design helps frame the problem statement during Define",
+        "Design produces low-fidelity concepts during Develop"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Design Involvement Timing Table explicitly lists this as a warning sign of late involvement, corresponding to design being excluded from both divergent phases.",
+      "learningObjective": "#3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-038-10",
+      "questionNumber": 10,
+      "questionText": "(Scenario) A PM asks a designer to produce a fully polished, pixel-perfect mockup of a brand-new feature concept before any user testing has occurred, \"just to see how it could look.\" Using the Fidelity Ladder, what is the most likely risk?",
+      "options": [
+        "There is no risk; polished mockups are always beneficial regardless of timing",
+        "The team may become falsely confident in and attached to the concept before it has been validated, making a needed pivot later feel like a loss — premature high-fidelity",
+        "The designer will refuse the request outright",
+        "The mockup will automatically be tested with users as part of the request"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is a direct instance of premature high-fidelity as defined in this lesson, mirroring the Detailed Case Study's exact scenario.",
+      "learningObjective": "#2, #4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-038-11",
+      "questionNumber": 11,
+      "questionText": "(Interview Reasoning) A candidate is asked \"how do you give feedback on a design without micromanaging the designer?\" and answers: \"I usually just tell them exactly what layout and colors I want.\" Based on this lesson's Interview Perspective section, what does this answer reveal?",
+      "options": [
+        "Strong design fluency and clear communication",
+        "A failure to apply \"context, not commands\" to design — dictating specific visual choices instead of framing feedback around user problems and constraints",
+        "An appropriate level of PM involvement in design decisions",
+        "That the candidate should be a designer instead of a PM"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section states that a strong answer frames feedback around user problems and constraints, not specific visual dictates — this answer does the opposite.",
+      "learningObjective": "#5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-038-12",
+      "questionNumber": 12,
+      "questionText": "Why does this lesson recommend low-fidelity or mid-fidelity prototypes specifically for testing an unvalidated flow concept with users, rather than high-fidelity mockups?",
+      "options": [
+        "Because users cannot understand high-fidelity mockups at all",
+        "Because low/mid-fidelity artifacts are cheap to produce and discard, inviting genuine feedback and revision without the false sense of finality high-fidelity work creates",
+        "Because high-fidelity mockups are illegal to test with users",
+        "Because designers refuse to create low-fidelity work"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains that low-fidelity artifacts are cheap and discardable, appropriate for genuine exploration, in contrast to high-fidelity work's costly finality.",
+      "learningObjective": "#2",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-038-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A PM wants to build leadership excitement for an early-stage idea without risking premature high-fidelity attachment. Using this lesson's frameworks, what is the most defensible approach?",
+      "options": [
+        "Commission a fully polished, final-looking mockup to maximize excitement regardless of validation status",
+        "Share a low- or mid-fidelity concept, explicitly framed as an early, unvalidated exploration, and pair it with a plan for how it will be tested with real users before further investment",
+        "Avoid discussing the idea with leadership at all until it is fully built",
+        "Ask engineering to build a complete working version before showing anyone"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly applies the Fidelity Ladder and premature high-fidelity caution — building excitement is possible without dishonest, misleadingly polished artifacts, by being explicit about the idea's actual validation status.",
+      "learningObjective": "#2, #4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-038-14",
+      "questionNumber": 14,
+      "questionText": "Which of the following best reflects genuine design involvement during the \"Develop\" phase, according to the Design Involvement Timing Table?",
+      "options": [
+        "Design executes a single, PM-specified layout with no real alternatives considered",
+        "Design produces low/mid-fidelity concepts and tests multiple directions",
+        "Design is not consulted at all during this phase",
+        "Design only reviews the final, already-shipped product"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Design Involvement Timing Table explicitly describes genuine \"Develop\" phase involvement as producing and testing multiple low/mid-fidelity concepts, not executing a single predetermined layout.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-038-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A PM has a strong personal preference for a specific visual layout for a new feature, based on products they've personally enjoyed using elsewhere. Using this lesson's and Lesson 37's frameworks together, what is the most defensible way to raise this preference with the design team?",
+      "options": [
+        "Direct the designer to implement the exact layout as a firm requirement, since the PM has already decided it's the right approach",
+        "Share the underlying user need or interaction quality the preferred layout seems to address, as context and inspiration, while explicitly leaving the specific solution open for design to explore and potentially improve upon",
+        "Say nothing at all, to avoid any appearance of influencing the design process",
+        "Insist the designer copy the other product's layout exactly, citing the PM's positive personal experience with it"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This applies \"context, not commands\" correctly — sharing the underlying need or quality as useful context and inspiration, while preserving design's ownership of the actual solution space, rather than converting a personal preference into a directive.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "Consider the following novel scenario: You're a PM who has just had an idea for a new feature after a single conversation with one enthusiastic customer. You're excited, and you're tempted to ask your designer to put together a polished set of screens to show at next week's leadership meeting, to build momentum for the idea.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying the Fidelity Ladder and Double Diamond, not to reach one \"right\" answer.\n\n1. Using the Double Diamond, which phase is this idea actually in right now, and what does that suggest about the appropriate fidelity level for any design artifact at this stage?\n2. What would you ask your designer to produce instead of a polished mockup, if your goal is to genuinely test the idea rather than just generate excitement?\n3. If you do want to build leadership momentum for the idea, how could you do that honestly without resorting to premature high-fidelity?\n4. What would you want to learn from a low-fidelity test before investing in any further design or engineering work?\n5. If leadership loves a low-fidelity version and pushes for immediate high-fidelity design and engineering commitment, how would you respond, using this lesson's frameworks?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 37 — Working with Engineering Teams | This lesson mirrors the \"context, not commands\" and trust-building principles from Lesson 37, applied specifically to the PM-design relationship |\n| **Current Lesson** | Lesson 38 — Working with Design Teams | Double Diamond; Fidelity Ladder; premature high-fidelity; Design Involvement Timing Table |\n| **Next Lesson** | Lesson 39 — Technical Debt & PM Trade-offs | Extends this lesson's \"build cheap before investing\" sequencing principle to engineering investment decisions |\n| **Future Concepts Unlocked** | Lesson 45 (A/B Testing & Experimentation) | Depends on well-sequenced, testable design variants produced through appropriate fidelity discipline |\n| | Lesson 52 (Storytelling and Narrative for PMs) | Builds on this lesson's distinction between generating genuine excitement and manufacturing false confidence through polish |\n\nThis curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Double Diamond and the Fidelity Ladder with you — they will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-038.md"
+}

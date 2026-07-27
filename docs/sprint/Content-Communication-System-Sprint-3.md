@@ -3,7 +3,9 @@
 **Status:** Authoritative content and communication system.
 **Depends on:** `Design-System-Sprint-1.md` and `Marketing-Website-Sprint-2.md`.
 **Do not redesign:** This document defines language, not new UI or visual direction.
-**Intent:** Give PM Academy one consistent voice across the marketing website, learning platform, onboarding, waitlist, emails, notifications, AI Mentor, SEO, and future surfaces.
+**Intent:** Give PM Academy one consistent voice across the marketing website, learning platform, onboarding, waitlist, emails, notifications, SEO, and future surfaces.
+
+**⚠ Document-wide flag (see `PRD.md` §11's Open Decision):** this document contains ~25+ references to an "AI Mentor" feature (in copy, SEO meta descriptions, social previews, FAQ, personality guide §15, and developer notes) that is **not in v1 scope** — it isn't in `PRD.md`'s feature list, `Architecture.md`'s stack, or `Phases.md`'s roadmap, and it contradicts `PRD.md` §6's explicit non-goal against AI-generated content. The most launch-critical instances (SEO meta descriptions, homepage subheadline, FAQ) are corrected directly in this revision. The remaining instances are marked for removal in the accompanying Documentation Review — search this file for "AI Mentor," "AI-assisted," and "AI support" and strip or defer every remaining instance before this copy ships, using the same reasoning applied to the corrected instances below as your template. Section 15 (AI Mentor Personality Guide) is preserved as future-reference material only, same treatment as `Marketing-Website-Sprint-2.md` §15.
 
 ---
 
@@ -113,14 +115,14 @@ The Duolingo of Product Management, with the rigor of a world-class university e
 
 ### Value Proposition
 
-Learn Product Management through structured lessons, practical projects, AI-assisted feedback, skill analytics, and portfolio-building capstones. Completely free.
+Learn Product Management through structured lessons, practical projects, skill analytics, and portfolio-building capstones. Completely free.
 
 ### Unique Differentiators
 
 - 90 lessons across 9 modules.
 - Practical PM artifacts, not passive video completion.
 - Skill radar across 7 PM competencies.
-- AI Mentor for questions, feedback, and practice.
+- Portfolio-ready capstones you can share with employers.
 - Quizzes, flashcards, case studies, and reflection prompts.
 - Portfolio-ready capstones.
 - Free core curriculum with no paywalled lessons.
@@ -160,15 +162,13 @@ PM Academy is a completely free, structured Product Management academy where lea
 
 ### 30-Second Pitch
 
-PM Academy teaches Product Management from beginner to advanced through 90 structured lessons, quizzes, flashcards, case studies, capstones, and AI-assisted feedback. Instead of only tracking course completion, it shows growth across core PM competencies with a skill radar and helps learners build portfolio artifacts like PRDs, roadmaps, strategy docs, and case studies. The full core curriculum is free.
+PM Academy teaches Product Management from beginner to advanced through 90 structured lessons, quizzes, flashcards, case studies, and capstones. Instead of only tracking course completion, it shows growth across core PM competencies with a skill radar and helps learners build portfolio artifacts like PRDs, roadmaps, strategy docs, and case studies. The full core curriculum is free.
 
 ### 2-Minute Product Explanation
 
 Product Management is hard to learn because the best free content is scattered and most structured programs are expensive. PM Academy gives learners a complete path: 9 modules, 90 lessons, practical assignments, quizzes, flashcards, case studies, and capstones that turn learning into portfolio-ready work.
 
 The product is built around product judgment. Learners move through foundations, discovery, execution, strategy, metrics, technical fluency, leadership, and career readiness. As they complete lessons and projects, their skill radar updates across 7 competencies so they can see where they are growing and where to focus next.
-
-PM Academy also includes an AI Mentor for thoughtful support: asking questions, reviewing PRDs, generating practice prompts, preparing for interviews, and recommending what to study next. It is not a shortcut around the curriculum. It is a mentor that helps learners think more clearly.
 
 The core promise is simple: serious PM education, practical output, and no paywalled lessons. Learners should leave with more than a certificate. They should leave with stronger judgment and work they can show.
 
@@ -337,9 +337,6 @@ The full curriculum includes 90 lessons across 9 modules. Your pace can vary, bu
 
 **What will I build?**
 You will create practical artifacts like PRDs, roadmaps, research notes, wireframe critiques, metrics trees, strategy memos, and capstone case studies.
-
-**How does the AI Mentor work?**
-The AI Mentor helps answer questions, review drafts, generate practice prompts, and recommend next steps. It supports your learning inside the structured curriculum.
 
 **Will I get a certificate?**
 The product may include a certificate, but the real value is your portfolio: the work you build and can explain.
@@ -810,9 +807,11 @@ CTA: Back to Profile
 
 ### Form
 
-**Label:** Email address
+**⚠ Corrected in this revision:** matches the canonical 3-field spec in `PRD.md` §8 / `Architecture.md` §2 — name, email, and current career position, not email alone.
 
-**Placeholder:** you@example.com
+**Field 1 — Label:** Name
+**Field 2 — Label:** Email address, **Placeholder:** you@example.com
+**Field 3 — Label:** Current career position, **Placeholder:** e.g. Software Engineer, Consultant, Student
 
 **Helper:** We will only send PM Academy updates and launch access.
 
@@ -820,9 +819,9 @@ CTA: Back to Profile
 
 ### Validation
 
-**Empty:** Enter your email address to join the waitlist.
+**Empty (any required field):** Enter your name, email, and current career position to join the waitlist.
 
-**Invalid:** Enter a valid email address.
+**Invalid email:** Enter a valid email address.
 
 **Already joined:** You are already on the waitlist. We will be in touch.
 
@@ -1176,19 +1175,19 @@ Body: `{announcement_summary}`
 
 **Title:** PM Academy - Learn Product Management for Free
 
-**Description:** PM Academy is a free Product Management learning platform with structured lessons, quizzes, AI-assisted feedback, skill analytics, and portfolio projects.
+**Description:** PM Academy is a free Product Management learning platform with structured lessons, quizzes, skill analytics, and portfolio projects.
 
 **Open Graph title:** Learn Product Management. Build real products. Completely free.
 
-**Open Graph description:** A complete PM academy with 90 lessons, 9 modules, practical capstones, AI Mentor support, and a skill radar for tracking product judgment.
+**Open Graph description:** A complete PM academy with 90 lessons, 9 modules, practical capstones, and a skill radar for tracking product judgment.
 
 **Twitter/X title:** PM Academy - Free Product Management Education
 
-**Twitter/X description:** Learn PM through structured lessons, practice, AI-assisted feedback, and portfolio-ready projects.
+**Twitter/X description:** Learn PM through structured lessons, practice, and portfolio-ready projects.
 
 ### Structured Data Descriptions
 
-**Organization description:** PM Academy is a free Product Management learning platform focused on structured lessons, practical projects, AI-assisted learning, and portfolio development.
+**Organization description:** PM Academy is a free Product Management learning platform focused on structured lessons, practical projects, and portfolio development.
 
 **Course description:** A structured Product Management curriculum covering discovery, strategy, UX, execution, metrics, technical fluency, leadership, and portfolio-building capstones.
 
@@ -1301,7 +1300,7 @@ Start here: `{url}`
 
 ---
 
-## 15. AI Mentor Personality Guide
+## 15. AI Mentor Personality Guide — ⚠ DEFERRED, NOT v1 (see document-wide flag at top of file and `Marketing-Website-Sprint-2.md` §15)
 
 ### Tone
 
@@ -1661,4 +1660,5 @@ Before shipping any PM Academy copy, ask:
 
 ## Changelog
 
+- v1.1 — Documentation review pass: corrected waitlist form copy to the canonical 3-field spec (name, email, career position). Fixed the highest-stakes "AI Mentor" references — SEO meta descriptions/OG tags/Twitter cards (these ship directly to Google and social previews), homepage value proposition, 30-second pitch, 2-minute explanation, and FAQ. ~15 lower-stakes instances remain flagged at the top of this document for the same treatment before this copy ships (§15 preserved as deferred future-reference only).
 - v1.0 - Created Sprint 3 content and communication system covering voice, messaging, website copy, UX writing, empty/loading/error/success states, waitlist, email, notifications, onboarding, SEO, social, AI Mentor, style, glossary, and developer copy rules.

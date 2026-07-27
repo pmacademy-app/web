@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-058",
+    "number": 58,
+    "title": "AI in Product Management",
+    "moduleNumber": 6,
+    "moduleName": "Leadership, Communication & Career",
+    "difficulty": 6,
+    "estMinutesReading": 35,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 45 (A/B Testing & Experimentation), Lesson 57 (Ethics in Product Management — Harm Radius, ethical debt)",
+    "nextLessonSlug": "lesson-059",
+    "futureTopicsUnlocked": "Lesson 59 (International & Localization Considerations), Lesson 60 (Capstone: Building Your Own Product Philosophy) — both draw on the evaluation and trust-calibration principles introduced here"
+  },
+  "learningObjectives": [
+    "Explain why AI features' probabilistic, non-deterministic behavior requires evaluation methods beyond standard A/B testing alone.",
+    "Describe an evaluation set (eval set) and explain its role in systematically measuring AI feature quality before and after changes.",
+    "Apply the Trust Calibration model to design AI features that help users form accurate confidence in the system's outputs, rather than over-trusting or under-trusting them.",
+    "Distinguish appropriate AI use cases from \"AI for AI's sake,\" extending this curriculum's Lesson 1 output-versus-outcome discipline to AI feature decisions.",
+    "Extend Lesson 57's ethical debt framework to AI-specific harms, particularly hallucination and bias, and design human-in-the-loop safeguards to mitigate them."
+  ],
+  "theory": "### Why AI Breaks the Deterministic Assumption\n\nTraditional software, given the same input, reliably produces the same output — a bug, once fixed, stays fixed; a feature, once verified working, generally continues working the same way. Many AI systems, particularly large language models, are fundamentally **probabilistic**: the same prompt can produce meaningfully different outputs across different invocations, and a system's overall quality is better described as a distribution of possible outputs than a single, fixed behavior. This has a direct, practical consequence for product evaluation: testing an AI feature with a handful of manual examples, the way a PM might sanity-check a traditional feature before launch, provides far weaker assurance of genuine quality than the same practice would for deterministic software, since a handful of good outputs doesn't rule out a meaningfully high rate of poor ones elsewhere in the distribution.\n\n```mermaid\ngraph LR\n    A[\"Traditional software:<br/>same input → same output<br/>(deterministic)\"] --> B[Manual spot-check<br/>provides strong assurance]\n    C[\"AI feature:<br/>same input → distribution<br/>of possible outputs\"] --> D[Manual spot-check provides<br/>weak assurance —<br/>systematic evaluation needed]\n```\n\n### Evaluation Sets (Evals)\n\nThe primary tool for addressing this gap is an **evaluation set (eval set)**: a curated, representative collection of test inputs, ideally covering both common cases and known difficult edge cases, run systematically against the AI system with outputs scored against defined quality criteria — sometimes by human reviewers, sometimes by automated scoring, often by a combination of both. An eval set functions similarly to a regression test suite in traditional software, but accounts for AI's probabilistic nature by running enough test cases, and often enough repeated trials per case, to characterize the actual output distribution's quality rather than relying on a small number of anecdotal spot-checks. Building and maintaining a good eval set is one of the most concretely useful things a PM working on AI features can contribute, since it requires exactly the product judgment (what does \"good\" actually look like for this specific use case, and what are the realistic edge cases users will encounter) that a PM, rather than a model-focused engineer alone, is often best positioned to define.\n\n### Trust Calibration\n\nA specific new design challenge AI features introduce: helping users form **calibrated trust** — confidence in the system's outputs that accurately reflects the system's actual reliability, neither more nor less. **Over-trust** occurs when users treat AI outputs as more reliable than they actually are, acting on incorrect information without verification, a specific risk given that AI-generated text is often fluent and confident-sounding regardless of its actual accuracy. **Under-trust** occurs when users, burned by an early bad experience or general skepticism, discount genuinely useful and accurate AI outputs, failing to realize the value the feature could provide.\n\n```mermaid\ngraph TD\n    A[AI feature output] --> B{Does the user's trust<br/>match the output's<br/>actual reliability?}\n    B -->|Over-trust| C[User acts on incorrect<br/>output without verification —<br/>risk of real harm]\n    B -->|Under-trust| D[User discounts genuinely<br/>useful output —<br/>value is lost]\n    B -->|Calibrated trust| E[User appropriately verifies<br/>uncertain outputs, trusts<br/>reliable ones — healthy usage]\n```\n\nDesigning for calibrated trust involves specific product decisions: surfacing confidence signals where genuinely available, making it easy for users to verify or correct an AI output rather than only accept or reject it wholesale, and being honest in product communication about the system's actual failure modes and limitations rather than presenting it as more capable or reliable than it genuinely is.\n\n### AI for AI's Sake vs. Genuine Value\n\nExtending Lesson 1's output-versus-outcome discipline directly: adding an AI-powered feature is itself an output, not an outcome, and the presence of AI capability in a product is not, by itself, evidence of genuine user value delivered. A specific, common failure pattern involves adding AI features primarily to signal technological currency or competitive parity, without a clear, evidenced user problem the AI capability specifically and uniquely solves better than a simpler, deterministic alternative would. The discipline this lesson recommends: before building an AI-powered feature, ask explicitly whether the underlying problem genuinely requires AI's specific capabilities (handling ambiguous, open-ended input; generating novel content; recognizing patterns too complex for rule-based logic) or whether a simpler, more predictable, more easily verified deterministic solution would serve the same user need at lower risk and complexity.\n\n---",
+  "mistakes": "**Mistake 1: Relying on a small number of manual spot-checks to evaluate AI feature quality, as though it were traditional deterministic software.**\nAs covered in Theory, this provides far weaker assurance for a probabilistic system than for deterministic software, since a handful of good examples doesn't rule out a meaningfully high failure rate elsewhere in the output distribution.\n\n**Mistake 2: Presenting AI-generated output with unwarranted confidence, contributing to user over-trust.**\nAn AI feature presented without any indication of its actual reliability or known limitations invites users to trust it more than its true accuracy warrants, risking real harm when incorrect outputs are acted upon without verification.\n\n**Mistake 3: Adding AI capability primarily for competitive or marketing signaling, without a clear underlying user problem it specifically and uniquely solves.**\nThis is the AI-specific version of Lesson 1's output-versus-outcome trap — an AI feature that exists because AI is currently prominent, rather than because it solves a genuine problem better than the available alternatives, risks investing real effort in something that doesn't move genuine value.\n\n**Mistake 4: Failing to design a clear, low-friction correction mechanism for when an AI output is wrong.**\nWithout an easy way for users to correct or flag an incorrect AI output, errors compound (both in terms of immediate user harm and in terms of lost signal that could otherwise improve the system), and users are pushed toward the binary choice of fully trusting or fully abandoning the feature rather than productively engaging with its actual, imperfect reliability.\n\n**Mistake 5: Treating AI hallucination and bias as purely a technical/model problem outside product responsibility.**\nExtending Lesson 57's ethical framework directly: a PM shipping an AI feature bears real product responsibility for the human-in-the-loop safeguards, transparency, and appropriate use-case scoping that mitigate these known risks — deferring this responsibility entirely to the model or engineering team, treating it as outside the PM's scope, misses the product judgment (per Lesson 37's context-not-commands principle) that a PM is specifically positioned to contribute.\n\n---",
+  "mentalModel": {
+    "title": "The Trust Calibration Curve",
+    "content": "This lesson's core takeaway tool visualizes the relationship a well-designed AI feature should maintain between a system's actual reliability and the trust users place in it:\n\n```mermaid\ngraph LR\n    A[\"Low actual reliability<br/>(e.g., novel, ambiguous requests)\"] --> B[\"Low user trust:<br/>heavy verification,<br/>clear low-confidence signaling\"]\n    C[\"High actual reliability<br/>(e.g., well-tested, common cases)\"] --> D[\"Higher user trust:<br/>lighter-touch verification,<br/>appropriate confidence\"]\n    B -.->|calibration line:<br/>trust should track<br/>actual reliability| D\n```\n\nUse the Trust Calibration Curve as a standing diagnostic whenever designing or evaluating an AI feature: ask explicitly whether the feature's presentation (confidence signals, framing, correction affordances) actually tracks its real, eval-set-measured reliability across different types of input, rather than presenting uniform confidence regardless of the underlying, often highly variable, actual accuracy for different request types.\n\n---",
+    "diagramMermaid": "graph LR\n    A[\"Low actual reliability<br/>(e.g., novel, ambiguous requests)\"] --> B[\"Low user trust:<br/>heavy verification,<br/>clear low-confidence signaling\"]\n    C[\"High actual reliability<br/>(e.g., well-tested, common cases)\"] --> D[\"Higher user trust:<br/>lighter-touch verification,<br/>appropriate confidence\"]\n    B -.->|calibration line:<br/>trust should track<br/>actual reliability| D"
+  },
+  "caseStudy": {
+    "title": "The Assistant That Sounded Right",
+    "content": "Consider a simplified, illustrative scenario common at teams shipping their first significant AI-powered feature.\n\nA team launches an AI-powered customer support assistant, designed to answer common product questions automatically before escalating to a human agent when needed. Pre-launch testing consists of the product team trying roughly twenty representative questions themselves, all of which produce accurate, helpful-sounding answers, generating confidence that the feature is ready for broad release. The team ships the assistant without a formal escalation trigger for low-confidence responses, reasoning that the assistant's answers had consistently \"sounded right\" during testing.\n\nWithin weeks of launch, customer support escalations related to the assistant rise sharply — not because the assistant was refusing to help, but because it was confidently generating plausible-sounding but factually incorrect answers to a meaningful share of less-common questions outside the roughly twenty scenarios the team had manually tested, and users, trusting the assistant's fluent, confident tone, frequently acted on the incorrect information before eventually discovering the error and escalating, sometimes after real inconvenience or cost.\n\n**What went wrong?**\n\nUsing this lesson's core distinction: the team's pre-launch evaluation — twenty manually-tested, hand-picked questions — provided the weak, anecdotal assurance this lesson's Theory warns against, rather than the systematic, distribution-characterizing assurance a genuine eval set would have provided. Twenty good examples said very little about the assistant's actual failure rate across the full range of real user questions it would eventually encounter, particularly the less-common, harder cases the team's own quick testing was unlikely to have covered. This is also a direct instance of the Trust Calibration failure this lesson describes: the assistant's uniformly confident, fluent tone gave users no signal to distinguish its reliable answers from its unreliable ones, inviting exactly the kind of over-trust this lesson's Theory identifies as a specific AI product risk.\n\nThe corrective response required building a genuine eval set — covering common cases, known difficult edge cases, and a representative sample of actual historical support questions — scored systematically rather than anecdotally, alongside a design change introducing explicit confidence signaling and a low-confidence escalation trigger that routed uncertain responses to human review before they reached the user with unwarranted apparent authority. This combination — systematic evaluation plus trust-calibrated design — directly addresses both halves of this lesson's core framework, and echoes Lesson 57's ethical debt concept: the shortcut of shipping on twenty anecdotal examples deferred real evaluation cost, which then compounded into actual user harm and support burden once the feature reached real-world scale and variety.\n\n---"
+  },
+  "framework": {
+    "title": "The AI Feature Readiness Checklist",
+    "content": "A second, more tactical tool: use this checklist before launching or significantly changing an AI-powered feature.\n\n| Check | Question |\n|---|---|\n| Eval set exists | Has the feature been tested against a systematic, representative eval set — not just a handful of manually-tried examples? |\n| Known failure modes identified | Has the team deliberately tried to find where the system fails (adversarial/edge-case testing), not just confirmed where it succeeds? |\n| Confidence signaling | Does the feature communicate appropriately when its output is less certain, rather than presenting uniform confidence regardless of actual reliability? |\n| Correction mechanism | Can a user easily correct or flag an incorrect output, rather than being forced into a binary trust-or-abandon choice? |\n| Human-in-the-loop fallback | Is there a clear path to human review or escalation for low-confidence or high-stakes cases? |\n| Harm Radius assessed | Has the feature been evaluated (per Lesson 57) for who could be harmed by an incorrect output, and how severely? |\n\nA feature failing several of these checks, as in this lesson's Case Study, carries meaningful risk of exactly the over-trust and compounding harm dynamic this lesson describes, regardless of how impressive its outputs appeared during limited pre-launch testing.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Startup vs. Mid-Size vs. Big Tech",
+    "content": "**At a startup:**\nAI feature evaluation is often informal, relying on a founding team's direct, hands-on testing rather than a systematic eval set, given limited resources. The risk here is Mistake 1's exposure at meaningful scale — a startup shipping an AI feature based on encouraging but limited manual testing may not discover a significant failure mode until it affects real users at volume.\n\n**At a mid-size company:**\nBuilding genuine eval sets and systematic AI evaluation practices typically becomes worthwhile, since sufficient usage volume and product maturity exist to justify the investment, and the cost of an undetected failure mode grows correspondingly larger as the user base scales.\n\n**At Big Tech:**\nAI evaluation is often deeply sophisticated, with dedicated red-teaming (adversarial testing specifically designed to surface failure modes and harmful outputs), extensive eval infrastructure, and formal review processes for AI feature launches that parallel and extend the launch tiering system from Lesson 36. The PM's job shifts toward correctly scoping eval coverage for a specific feature's actual risk profile, and toward advocating for appropriate trust-calibration design even under competitive pressure to ship AI capabilities quickly.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-058-1",
+      "questionNumber": 1,
+      "questionText": "Why do AI features often require evaluation methods beyond standard manual spot-checks?",
+      "options": [
+        "Because AI features are always bug-free by design",
+        "Because many AI systems are probabilistic — the same input can produce different outputs across invocations — so a small number of manually-tested examples provides weak assurance about the system's true output distribution",
+        "Because manual testing is illegal for AI products",
+        "Because AI features never need to be tested at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains this exact reasoning about probabilistic systems and the weakness of anecdotal spot-checks.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-058-2",
+      "questionNumber": 2,
+      "questionText": "What is an evaluation set (eval set)?",
+      "options": [
+        "A list of every user who has ever used an AI feature",
+        "A curated, representative collection of test inputs, covering common and known difficult edge cases, scored systematically against defined quality criteria",
+        "A synonym for an A/B test control group",
+        "A legal document required before launching any AI feature"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section defines an eval set exactly this way.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-058-3",
+      "questionNumber": 3,
+      "questionText": "What is \"over-trust,\" in the context of AI feature design?",
+      "options": [
+        "A user having no opinion about an AI feature's reliability",
+        "A user treating AI outputs as more reliable than they actually are, potentially acting on incorrect information without verification",
+        "A synonym for a well-calibrated trust relationship",
+        "A term that only applies to traditional deterministic software"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section defines over-trust exactly this way, as one of Trust Calibration's two failure modes.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-058-4",
+      "questionNumber": 4,
+      "questionText": "What is \"under-trust,\" and why is it also a problem, not just over-trust?",
+      "options": [
+        "Under-trust is not a real phenomenon and has no product implications",
+        "Under-trust occurs when users discount genuinely useful and accurate AI outputs due to skepticism or a prior bad experience, causing real value to be lost",
+        "Under-trust only affects traditional software, never AI features",
+        "Under-trust is always preferable to over-trust in every context"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains under-trust as a distinct, genuine problem — lost value from discounting useful outputs — alongside over-trust.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-058-5",
+      "questionNumber": 5,
+      "questionText": "How does this lesson extend Lesson 1's output-versus-outcome discipline to AI features?",
+      "options": [
+        "It argues AI features should never be evaluated using output/outcome thinking",
+        "It frames adding AI capability as itself an output, not an outcome, recommending PMs ask whether a problem genuinely requires AI's specific capabilities rather than building AI for competitive signaling alone",
+        "It claims AI features are always outcomes, never outputs",
+        "It has no connection to Lesson 1's framework at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly extends this distinction to AI feature decisions.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-058-6",
+      "questionNumber": 6,
+      "questionText": "In the Detailed Case Study, why did the customer support assistant generate a sharp rise in escalations after launch?",
+      "options": [
+        "The assistant refused to answer any questions at all",
+        "The assistant confidently generated plausible-sounding but factually incorrect answers to less-common questions outside the twenty scenarios manually tested pre-launch, and users trusted its fluent tone and acted on incorrect information",
+        "The assistant was too slow to respond to user questions",
+        "The assistant was shut down immediately after launch"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly describes this exact failure pattern — confident but incorrect answers on less-common questions, combined with unwarranted user trust.",
+      "learningObjective": "#1, #3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-058-7",
+      "questionNumber": 7,
+      "questionText": "What specific design gap contributed to the Case Study's Trust Calibration failure?",
+      "options": [
+        "The assistant had too many confidence signals, confusing users",
+        "The assistant's uniformly confident, fluent tone gave users no signal to distinguish reliable answers from unreliable ones",
+        "The assistant refused to provide any answers without human review",
+        "The assistant only worked for a small subset of users"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly identifies uniform confidence presentation, with no reliability signaling, as the specific design gap.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-058-8",
+      "questionNumber": 8,
+      "questionText": "What corrective design change did the team implement in the Detailed Case Study?",
+      "options": [
+        "Removing the assistant entirely with no replacement",
+        "Building a genuine eval set and introducing explicit confidence signaling with a low-confidence escalation trigger routing uncertain responses to human review",
+        "Increasing the assistant's confidence level uniformly across all responses",
+        "Removing all human review from the process entirely"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly describes this two-part corrective response — systematic evaluation plus trust-calibrated design with human-in-the-loop escalation.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-058-9",
+      "questionNumber": 9,
+      "questionText": "How does this lesson connect the Case Study's original shortcut (twenty anecdotal tests) to Lesson 57's ethical debt concept?",
+      "options": [
+        "There is no connection between the two concepts",
+        "The shortcut of shipping on limited anecdotal testing deferred real evaluation cost, which then compounded into actual user harm and support burden once the feature reached real-world scale — mirroring ethical debt's principal-and-interest structure",
+        "Ethical debt only applies to non-AI features",
+        "The Case Study explicitly denies any relationship to ethical debt"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly draws this parallel to Lesson 57's ethical debt framework in its concluding analysis.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-058-10",
+      "questionNumber": 10,
+      "questionText": "Why does this lesson argue that hallucination and bias are genuine product responsibilities, not purely technical concerns?",
+      "options": [
+        "Because PMs are legally required to personally fix all AI model errors",
+        "Because a PM shipping an AI feature bears responsibility for the human-in-the-loop safeguards, transparency, and appropriate use-case scoping that mitigate these known risks — product judgment a PM is specifically positioned to contribute, echoing Lesson 37's context-not-commands principle",
+        "Because engineers are incapable of addressing hallucination or bias at all",
+        "Because this is purely a marketing concern, unrelated to product design"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #5 explains this exact reasoning about product-level responsibility for AI-specific risk mitigation.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-058-11",
+      "questionNumber": 11,
+      "questionText": "(Interview Reasoning) A candidate is asked how they'd evaluate an AI feature before launch, and answers: \"I'd try it myself a few times and see if the outputs look good.\" Based on this lesson's Interview Perspective section, what is the weakness in this answer?",
+      "options": [
+        "There is no weakness; personal spot-checking is always sufficient for AI features",
+        "It describes exactly the weak, anecdotal assurance this lesson warns against, rather than systematic eval set construction covering common and edge cases",
+        "It correctly demonstrates strong hands-on product involvement",
+        "It shows an appropriate level of caution before launch"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section states that a strong answer reaches for systematic eval set construction, not a small number of manual spot-checks.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-058-12",
+      "questionNumber": 12,
+      "questionText": "Using the AI Feature Readiness Checklist, what does \"correction mechanism\" refer to?",
+      "options": [
+        "A legal document users must sign before using an AI feature",
+        "A design allowing users to easily flag or correct an incorrect AI output, rather than being forced into a binary trust-or-abandon choice",
+        "A technical process for retraining the underlying model",
+        "A feature only relevant to non-AI software"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Framework Explanation section's checklist defines this exact concept.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-058-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A team wants to add an AI chatbot to answer simple, well-defined questions with a small, fixed set of correct answers (e.g., \"what are your business hours?\"). Using the \"AI for AI's sake\" discipline, what should the team consider?",
+      "options": [
+        "Immediately build the AI-powered chatbot, since AI is always the best solution for any user-facing question",
+        "Consider whether a simpler, deterministic solution (like a rules-based FAQ lookup) would serve this narrow, well-defined need with less complexity and risk than a probabilistic AI system, reserving AI for cases genuinely requiring its specific capabilities (ambiguous input, novel content generation)",
+        "Avoid answering the question at all, since no solution is appropriate",
+        "Build both an AI and a non-AI solution simultaneously with no further analysis"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly applies the lesson's core discipline — a well-defined, narrow question with fixed correct answers is a strong candidate for a simpler deterministic solution rather than an AI system, consistent with Lesson 1's output-vs-outcome reasoning extended here.",
+      "learningObjective": "#4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-058-14",
+      "questionNumber": 14,
+      "questionText": "Which of the following best reflects a well-calibrated Trust Calibration design, per this lesson?",
+      "options": [
+        "Presenting all AI outputs with identical, high confidence regardless of the underlying request's actual difficulty or the system's measured reliability for that type of request",
+        "Signaling lower confidence and encouraging verification for request types where the eval set shows lower actual reliability, while presenting higher confidence for well-tested, reliably-handled request types",
+        "Never providing any confidence signaling under any circumstances, to keep the interface simple",
+        "Always defaulting to the lowest possible confidence signal regardless of actual reliability"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the Trust Calibration Curve's core principle — confidence signaling should track actual, measured reliability, not be uniform or arbitrary.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-058-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A PM is under pressure to ship an AI-powered feature quickly to match a competitor's recent announcement, with limited time for full eval set construction. Using this lesson's frameworks, what is the most defensible approach?",
+      "options": [
+        "Ship immediately with no evaluation at all, relying entirely on competitive pressure as justification",
+        "Build a reduced but still representative eval set prioritizing the highest-risk and highest-volume use cases first (informed by Lesson 57's Harm Radius), implement conservative trust-calibration design (clear low-confidence signaling, human-in-the-loop fallback for uncertain cases) as a safeguard given the necessarily limited pre-launch testing, and communicate the trade-off honestly to stakeholders (echoing Lesson 54's no-surprises principle) rather than presenting a rushed feature as fully validated",
+        "Delay the launch indefinitely until a completely exhaustive eval set covering every conceivable case has been built",
+        "Ship the feature exactly as originally planned, but rename it to avoid appearing to compete directly with the competitor's announcement"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects a sophisticated, risk-prioritized application of the lesson's frameworks under real time pressure — rather than either skipping evaluation entirely or demanding impossible perfection, focusing limited evaluation effort on the highest-risk cases while compensating with conservative trust-calibration design and honest stakeholder communication is the most defensible middle path.",
+      "learningObjective": "#2, #3, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "Consider the following novel scenario: Your team is considering adding an AI-powered feature that automatically summarizes long customer feedback threads for internal stakeholders, to save reading time.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying this lesson's frameworks, not to reach one \"right\" answer.\n\n1. Using the \"AI for AI's sake\" discipline, what genuine user problem would this feature need to solve to justify AI's specific capabilities, versus a simpler alternative (like basic keyword highlighting)?\n2. What would a representative eval set look like for this specific feature — what kinds of feedback threads (common and difficult edge cases) would you want to include?\n3. Using the Trust Calibration Curve, how would you design the summary presentation to help stakeholders appropriately calibrate their trust, rather than assuming the summary is always complete and accurate?\n4. What correction mechanism would you design, so a stakeholder who notices a summary missed something important can easily flag or fix it?\n5. Using Lesson 57's Harm Radius, who could be harmed if this summarization feature omitted or misrepresented important feedback, and how severe might that harm be?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 57 — Ethics in Product Management | Extends the Harm Radius and ethical debt framework specifically to AI-generated harm (hallucination, bias) |\n| **Current Lesson** | Lesson 58 — AI in Product Management | Eval sets; Trust Calibration; AI for AI's sake; AI Feature Readiness Checklist |\n| **Next Lesson** | Lesson 59 — International & Localization Considerations | Extends evaluation and trust-calibration discipline to culturally and linguistically varied international contexts, particularly relevant for AI features |\n| **Future Concepts Unlocked** | Lesson 60 (Capstone: Building Your Own Product Philosophy) | Builds on this lesson's evaluation rigor when synthesizing a durable personal product philosophy |\n\nThis curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry eval sets and the Trust Calibration Curve with you — they will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-058.md"
+}

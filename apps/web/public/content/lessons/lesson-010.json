@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-010",
+    "number": 10,
+    "title": "Product Strategy Basics",
+    "moduleNumber": 1,
+    "moduleName": "Foundations",
+    "difficulty": 4,
+    "estMinutesReading": 30,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 7 (Value Proposition), Lesson 9 (Product Vision)",
+    "nextLessonSlug": "lesson-011",
+    "futureTopicsUnlocked": "Module 2 (User & Research — the methods used to gather the diagnosis a strategy is built on), Lesson 19 (Opportunity Identification), Lesson 29 (Prioritization Fundamentals — strategy as an input into scoring)"
+  },
+  "learningObjectives": [
+    "Define product strategy using the diagnosis–guiding policy–coordinated action structure, and distinguish it from a goal, a vision, and a roadmap.",
+    "Identify \"bad strategy\" patterns: fluff, failure to face the challenge, mistaking goals for strategy, and a grab-bag of disconnected objectives.",
+    "Explain why a real strategy necessarily excludes options, and why an unwillingness to exclude anything is itself a sign that no real strategy exists.",
+    "Apply a basic method for connecting a stated vision (Lesson 9) to a concrete near-term strategy through sequenced, evidence-based choices.",
+    "Distinguish a strategic choice from a tactical or operational one, and explain why conflating the two produces the \"vision without strategy\" failure from Lesson 9."
+  ],
+  "theory": "### The Core Definition: Diagnosis, Guiding Policy, Coordinated Action\n\nA useful, precise definition of strategy, adapted from Richard Rumelt's influential formulation, breaks it into three necessary components:\n\n- **Diagnosis**: a clear-eyed, evidence-based account of the actual situation — what's really happening, what's really constraining progress, and why. Not a wish list of what you'd like to be true, but an honest assessment of the current reality.\n- **Guiding policy**: a general approach for dealing with the situation identified in the diagnosis — the overall logic that will govern subsequent decisions, without yet specifying every individual action.\n- **Coordinated actions**: the specific, mutually reinforcing set of near-term steps that follow from, and are consistent with, the guiding policy.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Diagnosis What Is Happening, and Why?] --> B[Guiding Policy Our General<br/>Approach to This Situation]\n    B --> C[Coordinated Actions the Specific,<br/>Mutually Reinforcing Near-term Steps<br/>Follow from the Policy]\n    C --> D[Roadmap Concrete,<br/>Time-bound Execution of Those Actions]\n```\n\nNotice how this differs from simply stating an ambitious goal. \"We will become the market leader in project management software\" is a goal, not a strategy — it contains no diagnosis of why the company isn't currently the market leader, no guiding policy for how that gap will be closed, and no specific coordinated actions. A real strategy for the same ambition might read: \"Our diagnosis is that enterprise buyers currently choose incumbents primarily on compliance and integration depth, not features, and our current product is feature-competitive but integration-weak (diagnosis). Our guiding policy is to win through a narrow, best-in-class integration ecosystem rather than competing broadly on feature count (guiding policy). Our coordinated actions this year are: build our top three requested integrations, deprioritize a planned but unvalidated new module, and reallocate that engineering capacity to an integrations team (coordinated actions).\"\n\n### Bad Strategy: The Patterns to Recognize\n\nRumelt's work identifies several recurring patterns of \"bad strategy\" that are worth naming explicitly, because they are common, superficially plausible, and easy to produce without realizing a real strategy was never actually developed:\n\n- **Fluff**: language that sounds sophisticated or strategic but, on close inspection, states nothing concrete or falsifiable — restating a goal in more abstract vocabulary rather than actually diagnosing anything.\n- **Failure to face the challenge**: a strategy document that never actually names the core obstacle standing in the way, often because naming it honestly would be uncomfortable (it might implicate a prior decision, a beloved product area, or a powerful stakeholder's pet project).\n- **Mistaking goals for strategy**: stating an ambitious outcome (\"increase market share by 20%\") as if the statement itself constituted a plan for achieving it, with no diagnosis or guiding policy attached.\n- **A grab-bag of disconnected objectives**: a list of priorities that may each be individually reasonable, but that don't reinforce or build on each other, and that could just as easily be reordered or partially abandoned without the overall plan changing in any coherent way — because there was never really a unifying logic connecting them in the first place.\n\nA useful diagnostic test for any strategy document: **does it name a specific, honestly identified obstacle, and does it explain a specific logic for overcoming that particular obstacle** — or could the same document, with only the company's name changed, be handed to a direct competitor with an entirely different situation and still sound equally plausible? A real strategy should not be interchangeable across companies in fundamentally different situations; a fake one usually is.\n\n### Why Real Strategy Necessarily Excludes Things\n\nThe single most reliable signal that a strategy is real, rather than decorative, is that **it says no to some genuinely plausible, individually reasonable options** — not because those options are bad in the abstract, but because pursuing them would dilute focus, resources, or coherence relative to the chosen guiding policy. This directly echoes Lesson 7's argument that a value proposition trying to serve \"everyone\" has made no real choice at all — strategy operates on the same underlying logic, at a broader scope.\n\nA strategy that endorses every plausible initiative simultaneously — more features, more markets, more integrations, more platforms, all pursued at once, all described as \"priorities\" — has not actually made the hard trade-offs that define real strategic work. This is uncomfortable precisely because every individual excluded option usually has a genuine, articulable case in its favor; the discipline of strategy is choosing anyway, based on the diagnosis, rather than trying to avoid the discomfort of exclusion by pursuing everything at a diluted level of investment.\n\n### Connecting Vision to Strategy: The Missing Middle Layer\n\nRecall Lesson 9's Detailed Case Study: a company had a specific, well-written vision (a future of asynchronous work) and a roadmap that quietly worked against it, because no strategy connected the two. The practical method for closing this gap involves working backward from the vision through a specific sequence:\n\n1. **Name the current gap.** What is the honest, evidence-based distance between where the product is today and the described future state? (This is the diagnosis.)\n2. **Identify the two or three highest-leverage obstacles** actually standing in the way of closing that gap — not every possible obstacle, but the ones that, if resolved, would most unlock progress toward the vision.\n3. **Choose a guiding policy** for addressing those specific obstacles — a general logic, not yet a full task list.\n4. **Derive coordinated near-term actions** from that guiding policy, explicitly checking each one against the Vision Filter from Lesson 9 (does this action move toward the vision, sit neutral, or conflict with it?).\n5. **Explicitly name what will NOT be pursued**, even if individually reasonable, because it doesn't follow from the chosen guiding policy.\n\nApplied to the asynchronous-work case: the diagnosis might reveal that the biggest obstacle to the vision isn't a lack of async-specific features, but the fact that the product's core interaction model still assumes synchronous presence by default (the live \"who's online now\" indicator being a symptom, not a cause). The guiding policy might then be: \"redesign core workflows to default to async-first patterns, rather than adding async features on top of a fundamentally synchronous core.\" Coordinated actions might include redesigning the update/notification model around structured async check-ins, and — critically — explicitly deprioritizing further investment in real-time presence and live-notification speed, even though these were individually popular with some customers, because they run counter to the chosen guiding policy.\n\n---",
+  "mistakes": "**Mistake 1: Presenting a goal as if it were a strategy.**\n\"Our strategy is to double revenue this year\" states an ambition with no diagnosis of the current obstacle and no guiding policy for overcoming it — it is a target, not a strategy, and stating it more forcefully or more often does not make it one.\n\n**Mistake 2: Writing a strategy document full of fluff that could apply to any company.**\nSophisticated-sounding language (\"we will leverage synergies to drive customer-centric innovation\") that states nothing falsifiable or specific to the actual situation is the clearest sign that real diagnostic work was skipped.\n\n**Mistake 3: Refusing to exclude anything.**\nA \"strategy\" that endorses every plausible initiative as a simultaneous priority has not made a real choice, and functions more as a wish list than a plan — echoing Lesson 7's \"for everyone\" value proposition failure at a broader scope.\n\n**Mistake 4: Confusing strategic choices with tactical or operational ones.**\nDeciding which specific bug to fix first this sprint is an operational decision; deciding which integration ecosystem to build a competitive moat around is strategic. Treating every decision as equally \"strategic\" dilutes the term and makes it harder to recognize when a genuinely consequential choice is actually being made.\n\n**Mistake 5: Skipping the diagnosis and jumping straight to guiding policy.**\nA guiding policy chosen without an honest diagnosis of the actual obstacle tends to reflect whatever approach the team already prefers or is most comfortable with, rather than the approach that genuinely fits the situation — strategy built backward from a preferred solution, rather than forward from an honest read of reality.\n\n---",
+  "mentalModel": {
+    "title": "The Strategy Kernel",
+    "content": "This lesson's mental model is the **Strategy Kernel** — the three-part diagnosis / guiding policy / coordinated action structure, used as a standing test for any document or statement that claims to be a \"strategy.\"\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Claimed Strategy] --> B{Does It Contain an<br/>Honest, Specific Diagnosis?}\n    B -->|No| F[Not a Real Strategy —<br/>Likely Fluff or a Goal]\n    B -->|Yes| C{Does It Name a Guiding Policy<br/>Responding to Specific Diagnosis?}\n    C -->|No| F\n    C -->|Yes| D{Do Coordinated Actions Follow from the<br/>Policy, and Does It Exclude Plausible<br/>Alternatives?}\n    D -->|No exclusions made| F\n    D -->|Yes, with real exclusions| E[Passes the Strategy Kernel test]\n```\n\nUse the Strategy Kernel as a filter whenever a \"strategy\" is presented to you, including your own drafts: can you point to the specific diagnosis, the specific guiding policy responding to it, and at least one thing being explicitly excluded as a result? If any of these three pieces is missing, what you have is very likely a goal, a vision restated, or a list of priorities — not yet a strategy.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Claimed Strategy] --> B{Does It Contain an<br/>Honest, Specific Diagnosis?}\n    B -->|No| F[Not a Real Strategy —<br/>Likely Fluff or a Goal]\n    B -->|Yes| C{Does It Name a Guiding Policy<br/>Responding to Specific Diagnosis?}\n    C -->|No| F\n    C -->|Yes| D{Do Coordinated Actions Follow from the<br/>Policy, and Does It Exclude Plausible<br/>Alternatives?}\n    D -->|No exclusions made| F\n    D -->|Yes, with real exclusions| E[Passes the Strategy Kernel test]"
+  },
+  "caseStudy": {
+    "title": "The Strategy That Never Said No",
+    "content": "Consider a simplified, illustrative scenario common across growth-stage consumer technology companies.\n\nA photo-sharing app's leadership, facing slowing user growth, commissions a strategy process to reverse the trend. After several weeks of workshops, the resulting strategy document lists five equally weighted \"strategic priorities\" for the year: expand into short-form video, launch a creator monetization program, improve core photo-editing tools, build a messaging feature to compete with a rival's recent launch, and pursue international expansion into two new markets.\n\nEach priority, examined individually, has a reasonable justification — video is growing across the industry, creators are requesting monetization, editing tools are a known differentiator, the rival's messaging launch is a competitive threat, and international markets represent untapped growth. Engineering, however, has capacity for perhaps two of these five initiatives to be executed well within the year. Leadership, unwilling to explicitly deprioritize any of the five (each has a vocal internal advocate), instructs teams to make \"the best progress possible\" on all five simultaneously.\n\nA year later, all five initiatives show only partial, underwhelming progress: the short-form video feature launched but with limited differentiation from established competitors: the creator monetization program signed up a small pilot group but was never scaled; editing tools received minor incremental updates; the messaging feature shipped roughly a year after the rival's, by which point the competitive threat had partially resolved on its own; and international expansion reached one of the two targeted markets, with limited localization investment.\n\n**What went wrong?**\n\nApplying the Strategy Kernel in hindsight:\n\n1. **There was no real diagnosis.** The document never identified a specific, honest account of *why* growth was actually slowing — was it a saturated core market, a specific competitive gap, a churn problem, or a stalled acquisition funnel? Without this diagnosis, there was no way to determine which of the five initiatives, if any, actually addressed the real underlying obstacle.\n2. **There was no guiding policy.** Five equally weighted priorities is a list, not a policy — nothing in the document explained a unifying logic for why these five, together, represented the best response to the (unstated) diagnosis, or how they reinforced each other.\n3. **Nothing was excluded.** The unwillingness to say no to any of the five vocal internal advocates meant engineering capacity was spread thin across all five, guaranteeing that none would receive the sustained, coordinated investment needed to genuinely succeed — precisely the failure mode this lesson identifies as the clearest sign of a fake strategy.\n\nA team applying the Strategy Kernel from the outset would have first done the uncomfortable diagnostic work of identifying the actual primary obstacle to growth, then chosen a guiding policy addressing that specific obstacle, and then — critically — explicitly told at least three of the five initiatives' advocates that their proposals, while individually reasonable, would not be pursued this year, because they did not follow from the chosen guiding policy. This would have concentrated capacity enough to genuinely execute two initiatives well, rather than five initiatives poorly.\n\nThis case connects directly back to **Lesson 9's Vision Filter**: an explicit vision, applied rigorously, would likely have flagged that several of these five priorities (video expansion, international expansion) had little clear connection to whatever the company's stated long-term vision actually was — but without a strategy layer translating vision into a specific diagnosis and guiding policy, the Vision Filter alone had no mechanism to force the necessary exclusions.\n\n---"
+  },
+  "framework": {
+    "title": "The \"Say No\" Test",
+    "content": "A simple, practical test for evaluating whether a strategy document is real: **ask what it explicitly excludes.**\n\n| Question | Real Strategy | Bad Strategy (Fluff / Goal / Grab-Bag) |\n|---|---|---|\n| Does it name a specific, honest diagnosis of the actual obstacle? | Yes, often uncomfortably specific | Vague, generic, or absent entirely |\n| Could the same document apply equally well to a competitor in a different situation? | No — it's specific to this diagnosis | Yes — the language is interchangeable |\n| Does it explicitly name at least one plausible, individually reasonable option that will NOT be pursued? | Yes | No — everything is a \"priority\" |\n| Do the coordinated actions reinforce each other, or could any be removed without affecting the others? | They reinforce each other; removing one weakens the whole | Each item stands alone; the list could be reordered or trimmed with no real consequence |\n\nIf a strategy document cannot name anything it is excluding, this is not evidence of unusual ambition or resourcefulness — per this lesson's core argument, it is the clearest available signal that no real strategic choice has actually been made.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Strategy at Different Company Stages",
+    "content": "**At a startup:**\nStrategy is often concentrated almost entirely on a single, existential diagnosis: which specific segment and job (Lessons 5 and 6) represents the startup's best available path to a defensible position, given extremely limited resources — and, just as importantly, which adjacent, individually plausible markets or features the team will explicitly avoid pursuing in order to protect focus. The guiding policy at this stage is often close to \"go deep and narrow before going broad,\" precisely because a startup rarely has the resources to pursue a grab-bag of disconnected objectives even if it wanted to.\n\n**At a mid-size company:**\nStrategy typically becomes more explicit and more frequently documented, since the organization has grown large enough that implicit, founder-held strategic logic no longer automatically propagates to every team. This is often where formal strategy documents (following something like the Strategy Kernel structure) are first introduced, precisely to prevent the drift described in Lesson 9's case study — different teams independently pursuing individually reasonable but strategically disconnected initiatives.\n\n**At Big Tech:**\nStrategy often needs to be coordinated across multiple product lines or business units simultaneously, and a significant part of senior strategic work involves ensuring that one unit's guiding policy doesn't quietly undermine another's — for example, one team's strategy of aggressive platform openness working against another team's strategy of tightly controlled ecosystem lock-in. At this scale, the exclusions a strategy requires often have organizational, not just product, consequences (specific teams being deliberately not funded, or explicitly wound down).\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-010-1",
+      "questionNumber": 1,
+      "questionText": "Which of the following best completes the definition of product strategy used in this lesson?",
+      "options": [
+        "An ambitious goal stated with conviction",
+        "A three-part structure: an honest diagnosis, a guiding policy responding to it, and coordinated actions that follow from the policy",
+        "A list of every initiative a team would like to pursue",
+        "A restated version of the company's mission statement"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This lesson's core definition, adapted from Rumelt's framework, requires all three components — diagnosis, guiding policy, and coordinated action — to constitute a real strategy.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-010-2",
+      "questionNumber": 2,
+      "questionText": "Which of the following is the clearest example of \"fluff,\" as described in this lesson's bad strategy patterns?",
+      "options": [
+        "\"Our diagnosis is that enterprise buyers choose incumbents on integration depth, not features.\"",
+        "\"We will leverage synergies to drive customer-centric innovation across all touchpoints.\"",
+        "\"We will not pursue the international expansion opportunity this year.\"",
+        "\"Our guiding policy is to win through a narrow, best-in-class integration ecosystem.\""
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This statement sounds sophisticated but states nothing concrete, falsifiable, or specific to any particular situation — the hallmark of fluff, as distinguished from the specific diagnosis, exclusion, and policy statements in the other options.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-010-3",
+      "questionNumber": 3,
+      "questionText": "What is the single most reliable signal, according to this lesson, that a strategy is real rather than decorative?",
+      "options": [
+        "It is written in formal, professional language",
+        "It explicitly excludes at least one genuinely plausible, individually reasonable option",
+        "It has been approved by senior leadership",
+        "It contains at least five distinct priorities"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson repeatedly emphasizes that genuine exclusion — saying no to something plausible — is the clearest available signal of real strategic work, since a document endorsing everything has not made an actual choice.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-010-4",
+      "questionNumber": 4,
+      "questionText": "Why is \"we will become the market leader in project management software\" described in this lesson as a goal rather than a strategy?",
+      "options": [
+        "Because market leadership is an unrealistic goal for any company",
+        "Because it contains no diagnosis of the current obstacle and no guiding policy for closing the gap — it states an ambition without a plan",
+        "Because goals are always shorter than strategies",
+        "Because it does not mention a specific product category"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This lesson explicitly distinguishes a stated ambition (a goal) from an actual plan containing a diagnosis and guiding policy for achieving it (a strategy).",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-010-5",
+      "questionNumber": 5,
+      "questionText": "In the Detailed Case Study, what was the primary reason all five initiatives showed only partial, underwhelming progress?",
+      "options": [
+        "All five ideas were fundamentally bad ideas",
+        "Engineering capacity was spread thin across all five, with no diagnosis or guiding policy concentrating investment, guaranteeing diluted results",
+        "The company lacked sufficient funding to pursue any of the five",
+        "Customers did not want any of the five initiatives"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study explicitly attributes the underwhelming results to spreading limited capacity across all five initiatives without any diagnosis-driven concentration of effort, not to the ideas themselves being flawed.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-010-6",
+      "questionNumber": 6,
+      "questionText": "According to this lesson, what must come first when connecting a stated vision to a concrete strategy?",
+      "options": [
+        "Choosing a guiding policy based on what the team is most comfortable executing",
+        "An honest, evidence-based diagnosis of the actual gap and obstacle between the current state and the vision",
+        "Assigning engineering resources to as many plausible initiatives as possible",
+        "Rewriting the vision statement to match the current roadmap"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson's sequence explicitly places honest diagnosis first, since a guiding policy chosen before diagnosis tends to reflect existing preferences rather than the actual situation.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-010-7",
+      "questionNumber": 7,
+      "questionText": "What does the \"Say No\" Test check for in a strategy document?",
+      "options": [
+        "Whether the document is grammatically correct",
+        "Whether the document names at least one plausible option that will explicitly NOT be pursued",
+        "Whether the document has been reviewed by at least three stakeholders",
+        "Whether the document uses the word \"strategy\" at least once"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The \"Say No\" Test specifically evaluates whether a strategy makes a real exclusionary choice, which the lesson identifies as the clearest marker of genuine strategic work.",
+      "learningObjective": "#3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-010-8",
+      "questionNumber": 8,
+      "questionText": "(Scenario) A strategy document states a diagnosis and a guiding policy, but its \"coordinated actions\" section lists five unrelated initiatives that could each be removed without affecting the others. According to this lesson, what does this suggest?",
+      "options": [
+        "The strategy is complete and well-formed, since a diagnosis and guiding policy are present",
+        "The coordinated actions likely don't actually follow from, or reinforce, the stated guiding policy — a real set of coordinated actions should be mutually reinforcing, not independently removable",
+        "This is an example of excellent, flexible strategic planning",
+        "The document should add even more unrelated initiatives to increase its scope"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson specifies that real coordinated actions reinforce each other and derive specifically from the guiding policy; a list of independently removable items suggests the \"actions\" section was not actually derived from the stated policy.",
+      "learningObjective": "#1, #2",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-010-9",
+      "questionNumber": 9,
+      "questionText": "(Product Thinking) A company's leadership names an honest diagnosis (a specific competitive weakness) but refuses to deprioritize any existing initiative to address it, insisting all current work continues \"in parallel\" with new efforts targeting the diagnosis. What does this most likely indicate, according to this lesson?",
+      "options": [
+        "This is a strong strategy, since it addresses the diagnosis without disrupting existing work",
+        "Despite having a real diagnosis, the refusal to exclude anything suggests the resulting plan may still function as bad strategy in practice, since resources will likely be diluted across old and new priorities alike",
+        "This approach guarantees success on both the diagnosis-driven initiative and all existing work",
+        "Diagnosis alone is sufficient for a strategy to be considered complete and real"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Even with an honest diagnosis, the lesson's core argument is that failing to exclude anything undermines a strategy's coherence — diagnosis alone is necessary but not sufficient without a policy and genuine, resource-concentrating exclusion.",
+      "learningObjective": "#2, #3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-010-10",
+      "questionNumber": 10,
+      "questionText": "(Interview Reasoning) A candidate is asked to describe a strategy they developed, and their answer consists entirely of an ambitious target with no mention of an underlying obstacle or approach for overcoming it. What does this most likely signal, based on this lesson's Interview Perspective section?",
+      "options": [
+        "Strong strategic thinking, since ambitious targets demonstrate leadership",
+        "A likely conflation of a goal with an actual strategy, missing the diagnosis and guiding policy this lesson identifies as necessary",
+        "That the candidate is unqualified for any senior product role",
+        "Nothing meaningful, since strategy questions are rarely asked in interviews"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This lesson's Interview Perspective explicitly frames a stated-goal-only answer as a weak signal, since it lacks the diagnosis and guiding policy that distinguish a real strategy from an ambition.",
+      "learningObjective": "#1",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-010-11",
+      "questionNumber": 11,
+      "questionText": "(Product Thinking, Higher Difficulty) A team's guiding policy is \"win through best-in-class integration depth rather than competing on feature count,\" and a stakeholder proposes a new, unrelated feature module that would require significant engineering investment. Using this lesson's framework, what is the most appropriate response?",
+      "options": [
+        "Automatically approve the feature, since all stakeholder requests should be treated equally regardless of strategic fit",
+        "Evaluate the proposal against the guiding policy — since it does not follow from an integration-focused approach, treat this as a candidate for explicit exclusion, or require a deliberate discussion about revising the guiding policy if there's compelling new evidence",
+        "Approve the feature without discussion, since guiding policies are not meant to influence real decisions",
+        "Reject the guiding policy entirely in favor of pursuing every stakeholder's individual proposal"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the lesson's core discipline — using the guiding policy as an actual filter for evaluating proposals, and treating a mismatch as grounds for explicit exclusion or a deliberate, evidence-based reconsideration of the policy itself, rather than either blind approval or blind rejection of the policy.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-010-12",
+      "questionNumber": 12,
+      "questionText": "Which of the following best distinguishes a strategic choice from a tactical or operational one, according to this lesson?",
+      "options": [
+        "Strategic choices are always more expensive than tactical ones",
+        "Strategic choices involve the fundamental diagnosis, guiding policy, and resource-allocation logic of the business; tactical/operational choices are near-term execution details that should follow from that logic",
+        "There is no meaningful distinction between strategic and tactical choices",
+        "Strategic choices are only made by senior executives, while tactical choices are made by anyone else"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly warns against treating every decision as equally \"strategic,\" distinguishing the higher-altitude diagnosis/policy/resource-allocation decisions from the more granular execution decisions that should derive from them.",
+      "learningObjective": "#5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-010-13",
+      "questionNumber": 13,
+      "questionText": "(Interview Reasoning, Higher Difficulty) An interviewer asks a candidate to critique a real strategy document that lists ten equally weighted \"strategic pillars\" with no stated diagnosis. What is the strongest possible critique, based on this lesson?",
+      "options": [
+        "The document should have more pillars to increase strategic coverage",
+        "The document likely represents a grab-bag of disconnected objectives rather than a real strategy, since it lacks a diagnosis, a unifying guiding policy, and any explicit exclusion among the ten pillars",
+        "The document is excellent, since ten pillars demonstrates thorough strategic thinking",
+        "The document's only flaw is that it should be reordered alphabetically"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is a direct instance of the \"grab-bag of disconnected objectives\" bad-strategy pattern this lesson names explicitly — a long list without diagnosis, guiding policy, or exclusion.",
+      "learningObjective": "#2",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-010-14",
+      "questionNumber": 14,
+      "questionText": "(Product Thinking, Higher Difficulty) A company diagnoses that its core obstacle to growth is a weak onboarding funnel causing early churn, and adopts a guiding policy of \"invest exclusively in onboarding and early retention this year, deferring new-market expansion.\" A stakeholder objects that deferring international expansion \"leaves money on the table.\" Using this lesson's framework, how should this objection be evaluated?",
+      "options": [
+        "The objection is automatically correct, since any foregone opportunity represents a real cost, and the strategy should be abandoned",
+        "The objection may be valid in the abstract, but the guiding policy was chosen specifically because the diagnosis identified onboarding, not new-market opportunity, as the primary constraint — the objection would need new diagnostic evidence to justify revising the policy, not just the existence of a plausible alternative",
+        "The objection should be ignored entirely without any consideration",
+        "The strategy should immediately add international expansion as an eleventh equally weighted priority"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the lesson's repeated theme — a real strategy will always have plausible foregone alternatives, and the correct response is to weigh new evidence against the existing diagnosis, not to treat every plausible objection as automatic grounds for abandoning the exclusion that makes the strategy real in the first place.",
+      "learningObjective": "#3, #4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-010-15",
+      "questionNumber": 15,
+      "questionText": "(Highest Difficulty) A product team has a specific, well-written vision (Lesson 9) and a specific, well-formed strategy (this lesson's Strategy Kernel), but its actual roadmap for the next two quarters bears little visible relationship to either. What does this most likely indicate, and what is the appropriate next step?",
+      "options": [
+        "The vision and strategy are irrelevant documents and should be discarded in favor of the existing roadmap",
+        "There is likely a breakdown in the final translation step — coordinated actions and roadmap items should be explicitly checked against both the guiding policy and the Vision Filter, and the roadmap should be revised to reflect that connection, or the mismatch should prompt honest reconsideration of whether the strategy itself needs updating",
+        "This is normal and requires no further action, since roadmaps and strategies operate independently of each other",
+        "The team should abandon strategic planning altogether, since apparently even a well-formed strategy cannot influence a roadmap"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the exact failure diagnosed in Lesson 9's case study and this lesson's core argument — a well-formed vision and strategy still require an active, checked translation into roadmap decisions; a disconnect here calls for closing that gap, not discarding the higher-altitude work or assuming the disconnect is unavoidable.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "You are the PM for a niche online learning platform whose vision (echoing Lesson 9) is: \"We believe expert-led, small-group learning should be accessible to anyone, anywhere, regardless of their local geography.\" User growth has plateaued over the past two quarters.\n\nWork through the following, in writing, before reading further:\n\n1. Propose three plausible, genuinely different diagnoses for why growth might have plateaued (consider: market saturation in current geographies, a weak acquisition funnel, insufficient instructor supply, or a retention/churn problem) — and briefly describe what evidence you would need to distinguish between them.\n2. Choose one of your three diagnoses and write a guiding policy that follows specifically from it (not a generic \"grow faster\" statement, but a specific logic tied to your chosen diagnosis).\n3. Derive two or three coordinated actions from your guiding policy, and check each against the Vision Filter from Lesson 9 (does it move toward the accessibility-focused vision, sit neutral, or conflict with it?).\n4. Explicitly name at least one plausible, individually reasonable initiative that you would choose NOT to pursue this year as a direct consequence of your guiding policy, and explain why.\n5. Apply the \"Say No\" Test to your own answer: could your guiding policy and actions be handed, largely unchanged, to a different company facing a different growth problem? If so, revise until they are specific to your diagnosis.\n\nThere is no single correct answer. The purpose of this exercise is to practice the full Strategy Kernel — diagnosis, guiding policy, coordinated action, and explicit exclusion — under a scenario without a pre-worked example to lean on, and to notice how much harder genuine exclusion feels than simply endorsing every plausible idea.\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 9 — Product Vision | Directly resolves the missing middle layer identified in Lesson 9's Detailed Case Study — the sequenced diagnosis, policy, and action connecting a stated vision to today's roadmap |\n| **Current Lesson** | Lesson 10 — Product Strategy Basics | The Strategy Kernel (diagnosis, guiding policy, coordinated action); bad strategy patterns; the \"Say No\" Test |\n| **Next Lesson** | Lesson 11 — User Research | Provides the methods for gathering the evidence a genuine strategic diagnosis depends on, opening Module 2 |\n| **Future Concepts Unlocked** | Lesson 19 (Opportunity Identification) | Uses strategic diagnosis as an input into identifying which specific opportunities are worth pursuing |\n| | Lesson 29 (Prioritization Fundamentals) | Incorporates strategic fit (does this follow from our guiding policy?) as a scoring input alongside the Value Proposition Filter and Vision Filter |\n\nThis curriculum is designed to be read as one continuous argument. Module 1 — Foundations concludes here: Lessons 5 through 10 have built, in sequence, from naming the right audience (Users vs. Customers), to understanding their real need (Jobs to Be Done), to articulating why your product serves that need best (Value Proposition), to validating that claim before committing resources (Product Discovery), to describing where this all leads (Product Vision), to the disciplined, exclusionary path of actually getting there (Product Strategy). Module 2 — Users & Research begins next, providing the concrete methods for gathering the evidence every framework in Module 1 has assumed you already have.",
+  "rawMarkdownPath": "content/lessons/lesson-010.md"
+}

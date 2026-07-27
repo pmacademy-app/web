@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-005",
+    "number": 5,
+    "title": "Users vs. Customers",
+    "moduleNumber": 1,
+    "moduleName": "Foundations",
+    "difficulty": 2,
+    "estMinutesReading": 25,
+    "estMinutesReflection": 10,
+    "prerequisites": "Lesson 1 (What is Product Management?)",
+    "nextLessonSlug": "lesson-006",
+    "futureTopicsUnlocked": "Lesson 6 (Jobs to Be Done — the underlying-need framework for both users and customers), Lesson 7 (Value Proposition — separate value props per audience), Lesson 18 (Customer Segmentation), Lesson 29 (Prioritization Basics — weighting competing user vs. customer demands)"
+  },
+  "learningObjectives": [
+    "Define \"user\" and \"customer\" precisely, and identify which one (or both) a given stakeholder request actually concerns.",
+    "Classify a product along the User-Customer Alignment Spectrum, from fully aligned (user = customer) to fully divergent (user and customer have opposing interests).",
+    "Explain why conflating users and customers leads to systematically biased prioritization decisions, using at least one real-world mechanism (e.g., attention economy, procurement dynamics).",
+    "Apply a structured method for deciding whose need takes priority when user and customer needs genuinely conflict.",
+    "Identify the specific interview and case-study failure pattern that results from treating \"the user\" as a single, homogeneous stakeholder."
+  ],
+  "theory": "### The Core Definitions\n\nA **user** is the person who directly interacts with the product — clicks the buttons, reads the screen, receives the notification, experiences the friction or delight of the interface.\n\nA **customer** is the person or entity that makes the purchasing decision and pays for the product, directly or indirectly.\n\nIn consumer products with a direct-purchase model (a single person buys and uses a paid mobile game, for instance), these two roles usually collapse into one person, and the distinction barely matters day to day. But as soon as a product is bought by someone other than the person who uses it, the distinction becomes load-bearing.\n\nConsider a few common patterns:\n\n- **Enterprise software**: An IT director or procurement team (the customer) purchases a tool that individual employees (the users) will operate daily. The customer cares about total cost of ownership, security compliance, and vendor reliability. The user cares about whether the tool makes their actual job easier or harder.\n- **Ad-supported consumer apps**: The end user does not pay anything directly. The customer is the advertiser, who pays for attention and engagement. The user's experience matters to the business only insofar as it sustains the attention the customer is paying for.\n- **Marketplaces**: A two-sided marketplace like a food delivery app has at least three populations to track — the diner (a user), the restaurant (a user and, in a real sense, a customer, since they often pay commission), and in some models an advertiser paying for placement (a customer).\n- **Products built for dependents**: A parental-control app, a pet-tracking device, or many categories of children's educational software have a user (the dependent) with essentially no purchasing power or product feedback channel at all — the customer (a parent or guardian) makes every meaningful product decision on the user's behalf.\n\nNone of these patterns are unusual or edge cases. They are, in aggregate, more common than the simple case where user and customer are identical.\n\n### The User-Customer Alignment Spectrum\n\nIt is useful to think of every product as sitting somewhere on a spectrum, rather than treating \"user vs. customer\" as a binary:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Fully Aligned User = Customer] --> B[Mostly Aligned Customer Is a User<br/>Employer, Interests Mostly Overlap]\n    B --> C[Partially Divergent Customer Cares About<br/>Different Things Than the User]\n    C --> D[Fully Divergent Customer Interest<br/>Actively Opposes User Interest]\n```\n\n- **Fully aligned** (e.g., a single-player mobile game bought and played by the same person): user research and customer research are effectively the same activity.\n- **Mostly aligned** (e.g., a project management tool where the buyer is a team lead who also uses the product daily): the buyer and the daily user overlap substantially, though budget-holder concerns (cost, admin controls) can still diverge from daily-user concerns (speed, ease of use).\n- **Partially divergent** (e.g., enterprise software bought by an IT department for employees who never chose it): the customer's criteria (security, compliance, price) and the user's criteria (usability, speed) can both be legitimate but are not the same list, and can trade off against each other.\n- **Fully divergent** (e.g., an ad-supported free app where more user attention directly benefits the advertiser-customer, sometimes at the cost of user wellbeing): the customer's commercial interest can be in direct tension with what is actually good for the user.\n\nA PM's first job in this lesson is diagnostic: **place your own product honestly on this spectrum before doing anything else.** Most of the prioritization mistakes described below come from PMs who assume, by default, that they are further left on this spectrum (more aligned) than they actually are.\n\n### Why This Distinction Breaks Naive \"Desirability\"\n\nRecall from Lesson 1 that desirability is one leg of the Accountability Triangle — do people want this? The user-customer distinction reveals that this question is underspecified. The more precise version is: **desirability to whom?**\n\nA feature can be simultaneously:\n\n- Highly desirable to the customer (a compliance dashboard that procurement loves) and low-desirability to the user (who finds it adds friction to their daily workflow), or\n- Highly desirable to the user (a feature that reduces the ads they see) and low-desirability to the customer (an advertiser who is, after all, paying specifically for that attention).\n\nA PM who reports \"high desirability\" without specifying *whose* desirability has quietly picked a side — usually the side that is easier to measure, or the side with more organizational power, rather than the side that is actually correct for the product's health.\n\n### Why This Matters More at Certain Company Stages and Business Models\n\nThe user-customer gap is not a fixed property of a company; it is a property of a **business model**. This means the same company can have wildly different user-customer alignment across different products or even different pricing tiers of the same product. A subscription-based tier of a product (where the paying user is also the daily user) sits much further left on the spectrum than a free, ad-supported tier of the exact same product (where the daily user is not the paying customer at all — the advertiser is). PMs who move between pricing tiers, or who are asked to evaluate \"the same feature\" across a free and paid tier, must re-diagnose alignment each time rather than assuming it transfers.\n\n### The Political Dimension\n\nThere's a version of this problem that is not just analytical but organizational: **customers usually have more organizational leverage than users.** A customer complaint often arrives through an account manager, a sales leader, or a contract renewal conversation — channels with direct revenue consequences and executive visibility. A user complaint often arrives through a support ticket, an app store review, or a research session — channels that are easier for an organization to deprioritize, even when the underlying signal is just as important.\n\nThis creates a systematic bias: absent deliberate correction, product roadmaps tend to over-index on customer requests relative to user needs, simply because customer requests are louder and better connected to revenue conversations, not because they are objectively more important. Recognizing this bias explicitly — and building processes that give user signal equal structural weight (dedicated user research, usage analytics, in-product feedback loops) — is part of the PM's job of guarding against a distortion the org chart naturally produces.\n\n---",
+  "mistakes": "**Mistake 1: \"The customer wants X, so users want X.\"**\nThis assumes alignment without checking it. A request from a paying customer (particularly in enterprise software) reflects that customer's priorities — which may be procurement-driven, cost-driven, or politically driven within their own organization — and is not automatically a proxy for what the people who will actually use the feature every day want or need.\n\n**Mistake 2: \"User research is optional if we already talk to customers.\"**\nSales and account management conversations are a real and valuable signal, but they are customer signal, not user signal, whenever the two differ. A PM relying exclusively on customer-facing conversations for product direction, in a product where users and customers diverge, is building on half the picture — often the half that is easier to access, not the half that is most important.\n\n**Mistake 3: Treating \"the user\" as a single homogeneous person.**\nEven within \"users,\" there are often multiple distinct roles with different needs — an admin user versus an end-user of the same enterprise tool, for instance. Lumping all of these into one undifferentiated \"the user\" hides exactly the kind of conflict this lesson is about to teach you to look for.\n\n**Mistake 4: Assuming misalignment means the customer is \"wrong.\"**\nThe correct response to discovering user-customer divergence is not automatically to side with the user. A customer's business concerns (security compliance, cost control, contractual obligations) are often entirely legitimate and can be things the user themselves would care about if they had visibility into them. The goal is not \"users always win\" — it is to make the trade-off explicit and deliberate, rather than accidental.\n\n**Mistake 5: Assuming this distinction is unique to B2B or enterprise products.**\nAd-supported consumer products, freemium products, and products built for dependents (children, pets, elderly relatives under someone else's account) all have the exact same structural issue, often in a more extreme form, because the user in these cases frequently has no direct commercial relationship with the company at all.\n\n---",
+  "mentalModel": {
+    "title": "The Stakeholder Ledger",
+    "content": "This lesson's mental model is the **Stakeholder Ledger** — a simple habit of explicitly naming, for any given feature request or complaint, exactly whose interest it represents before evaluating it.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Incoming Request or Signal] --> B{Who is the source?}\n    B --> C[User Direct Product Interaction]\n    B --> D[Customer / Buyer<br/>Pays, but May Not Use Daily]\n    B --> E[Both Aligned Roles]\n    C --> F[Weigh Against<br/>Usability, Daily Workflow Impact]\n    D --> G[Weigh Against Cost,<br/>Compliance, Retention Risk]\n    E --> H[Weigh as Single,<br/>Higher-confidence Signal]\n    F --> I[PM Synthesizes Across Ledger and<br/>Makes an Explicit Trade-off Call]\n    G --> I\n    H --> I\n```\n\nUse this as a discipline, not just a diagram: every time a request lands on your desk, name the row of the ledger it belongs to *before* deciding how much weight to give it. A surprising number of misprioritized roadmaps trace back to a PM who evaluated every incoming request as if it came from the same, undifferentiated \"the user,\" when in fact requests were arriving from at least two structurally different sources with different — sometimes opposing — incentives.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Incoming Request or Signal] --> B{Who is the source?}\n    B --> C[User Direct Product Interaction]\n    B --> D[Customer / Buyer<br/>Pays, but May Not Use Daily]\n    B --> E[Both Aligned Roles]\n    C --> F[Weigh Against<br/>Usability, Daily Workflow Impact]\n    D --> G[Weigh Against Cost,<br/>Compliance, Retention Risk]\n    E --> H[Weigh as Single,<br/>Higher-confidence Signal]\n    F --> I[PM Synthesizes Across Ledger and<br/>Makes an Explicit Trade-off Call]\n    G --> I\n    H --> I"
+  },
+  "caseStudy": {
+    "title": "The Compliance Dashboard No One Used",
+    "content": "Consider a simplified, illustrative scenario common across enterprise B2B software.\n\nA workplace analytics company sells a product to HR departments (the customer) that is used daily by individual managers (the users) to track team performance metrics. During a renewal cycle, several large customers' procurement and legal teams request a new \"compliance audit dashboard\" — a detailed log of every action taken in the tool, exportable for regulatory review.\n\nLeadership, eager to close renewals and unlock several six-figure contracts, tells the product team: \"This is now our top priority. Build it this quarter.\"\n\nThe team builds the compliance dashboard. It ships on time. The affected contracts renew. Six months later, usage data shows the compliance dashboard has been opened by exactly the number of legal/compliance staff expected — and by almost no one else. Meanwhile, a long-standing complaint from the actual daily users (managers) about the product's slow, confusing team-comparison view has gone unaddressed for over a year, and churn among smaller customers — where the manager and the buyer are frequently the same person — has quietly worsened over the same period.\n\n**What went wrong?**\n\nNothing about building the compliance dashboard was a mistake in itself — it was a legitimate customer need, tied to real revenue, and probably worth building. The mistake was treating it as *the* top priority for the entire roadmap, rather than *a* priority alongside user-facing work, without ever explicitly reasoning through the Stakeholder Ledger:\n\n1. The compliance dashboard request came entirely from the **customer** side of the ledger (procurement/legal), at large accounts where the customer and the user are different people.\n2. The unaddressed team-comparison complaint came entirely from the **user** side of the ledger, and disproportionately affected smaller accounts where the user and the customer are the *same* person — meaning user dissatisfaction there translates directly and quickly into customer churn, with no intermediary to buffer it.\n3. By fully deprioritizing user-side work for a quarter, the team correctly protected large-account renewals in the short term, while quietly increasing churn risk in a segment where user pain converts directly into lost revenue, with no separate procurement relationship to catch it.\n\nA PM applying the Stakeholder Ledger would not necessarily have made a different final call — closing large renewals may genuinely have been the right trade-off — but they would have made the *trade-off explicit*, quantified the churn risk in the user-equals-customer segment, and likely negotiated at least partial resourcing for the team-comparison fix in the same quarter, rather than treating one ledger row as if it were the only row that existed.\n\nThis case will be revisited in **Lesson 18 (Customer Segmentation)**, where we introduce a structured method for tracking exactly which segments have aligned versus divergent user-customer roles, and in **Lesson 29 (Prioritization Fundamentals)**, where the Stakeholder Ledger becomes one input into a formal scoring model.\n\n---"
+  },
+  "framework": {
+    "title": "The Alignment Spectrum as a Decision Tool",
+    "content": "Beyond the diagram already shown, the User-Customer Alignment Spectrum is directly actionable in a specific way: **it tells you which research methods and which metrics to trust for a given decision.**\n\n| Spectrum Position | Trust This Signal Most | Be Cautious Of |\n|---|---|---|\n| Fully aligned | Direct user research, usage analytics, satisfaction surveys | Overweighting a single vocal customer as representative |\n| Mostly aligned | A blend of admin/buyer interviews and end-user usage data | Assuming budget-holder priorities always reflect daily-user priorities |\n| Partially divergent | Two separate discovery tracks: buyer criteria and user criteria, tracked independently | Letting sales-reported \"customer requests\" substitute for actual user research |\n| Fully divergent | Independent, deliberately protected user-wellbeing signals (not just engagement metrics, which reward the customer's interest by default) | Treating engagement or time-in-app as a proxy for user satisfaction, when it may really be a proxy for advertiser value |\n\nThe practical takeaway: as a product moves rightward on the spectrum, a PM must *increase*, not decrease, the deliberate investment in independent user signal — because the natural organizational forces (sales relationships, renewal conversations, executive attention) will already over-supply customer signal without any extra effort. Nobody has to go out of their way to make sure a paying enterprise customer's voice is heard. Someone does have to go out of their way to make sure the user's voice is heard, precisely in the products where the two diverge most.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Where This Gap Shows Up Most Sharply",
+    "content": "**In B2B/enterprise SaaS:**\nThe user-customer gap is often at its widest here. A procurement team may select a vendor based on a security questionnaire, a contract negotiation, and an RFP process that the actual daily users of the software never see or influence. PMs in this environment often maintain two parallel discovery tracks: one for buyer/admin personas (focused on cost, control, compliance) and one for end-user personas (focused on daily workflow), and treat convergence between the two — a feature that helps both — as a particularly high-value target.\n\n**In ad-supported consumer products:**\nThe gap here is structural and cannot be fully \"solved,\" only managed responsibly. The advertiser-customer's interest (more attention, more engagement, more time in-app) is not automatically the same as the user's interest (a healthy, non-manipulative relationship with the product). Mature product organizations in this category typically build explicit user-wellbeing guardrails — usage transparency features, screen-time tools, engagement caps — precisely because the business model alone would not naturally produce them. Recognizing that the underlying incentive structure creates this tension is the first step to managing it responsibly, rather than assuming it away.\n\n**In products for dependents (children, pets, elderly relatives):**\nHere the user has essentially no direct commercial voice, and the customer (a parent, adult child, or guardian) makes nearly all product decisions. PMs in this space have a particular ethical obligation to build genuine proxies for the user's actual experience and wellbeing — usability testing with the dependent population itself, developmental or safety expertise — precisely because the market mechanism that normally forces companies to listen to users (the user could simply stop paying) does not operate the same way when the user isn't the one paying at all.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-005-1",
+      "questionNumber": 1,
+      "questionText": "Which of the following best defines a \"user,\" as distinct from a \"customer\"?",
+      "options": [
+        "The person who pays for the product",
+        "The person who directly interacts with the product",
+        "The person who approves the marketing budget",
+        "The company's largest shareholder"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "A user is defined by direct interaction with the product; a customer is defined by the purchasing decision, and these are frequently different people.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-005-2",
+      "questionNumber": 2,
+      "questionText": "In a two-sided food delivery marketplace, which of the following is the most accurate statement about user/customer roles?",
+      "options": [
+        "There is only ever one user and one customer",
+        "Diners and restaurants can each be considered users, and restaurants (paying commission) can simultaneously be considered customers",
+        "Only diners are users; restaurants have no meaningful role",
+        "The delivery courier is always the primary customer"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Multi-sided marketplaces often have overlapping roles — a participant can be both a user and a customer simultaneously, depending on the specific relationship being examined.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-005-3",
+      "questionNumber": 3,
+      "questionText": "A product where a single person both buys and uses a paid mobile game would sit where on the User-Customer Alignment Spectrum?",
+      "options": [
+        "Fully divergent",
+        "Partially divergent",
+        "Fully aligned",
+        "Undefined — the spectrum does not apply"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "When the same person is both the buyer and the daily user, the product sits at the fully aligned end of the spectrum, and user research and customer research are effectively the same activity.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-005-4",
+      "questionNumber": 4,
+      "questionText": "Why is \"desirability\" from the Accountability Triangle described as underspecified in this lesson?",
+      "options": [
+        "Because desirability does not apply to enterprise software",
+        "Because it does not distinguish whose desire is being measured — the user's or the customer's — which can differ",
+        "Because desirability should be replaced entirely by feasibility",
+        "Because desirability only matters for consumer apps"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson argues that \"desirable\" must always be paired with \"to whom\" once user and customer roles diverge, since the same feature can be desirable to one and undesirable to the other.",
+      "learningObjective": "#1, #3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-005-5",
+      "questionNumber": 5,
+      "questionText": "According to this lesson, why do product roadmaps tend to systematically over-index on customer requests relative to user needs, absent deliberate correction?",
+      "options": [
+        "Because customers are always right",
+        "Because customer signal typically arrives through louder, more revenue-connected organizational channels than user signal",
+        "Because users never provide useful feedback",
+        "Because engineering prefers building customer-requested features"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Customer complaints often arrive through sales, account management, or renewal conversations with direct executive visibility, while user signal arrives through weaker channels like support tickets or app reviews — a structural bias, not a reflection of relative importance.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-005-6",
+      "questionNumber": 6,
+      "questionText": "A parental-control app's core end-user is a child, while the paying customer is a parent. According to this lesson, what special obligation does this create for the PM?",
+      "options": [
+        "None — children's preferences are irrelevant to product decisions",
+        "A heightened obligation to build genuine proxies for the child user's actual experience, since the market mechanism of \"users can stop paying\" does not apply",
+        "An obligation to let the child make all final product decisions",
+        "An obligation to ignore the parent's requests entirely"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Products for dependents represent the most extreme form of user-customer divergence, and the lesson argues for a heightened obligation to genuinely represent the user's experience, since normal market feedback loops don't operate the same way.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-005-7",
+      "questionNumber": 7,
+      "questionText": "In the Detailed Case Study, what was the underlying structural reason that user-side neglect disproportionately increased churn risk among smaller accounts?",
+      "options": [
+        "Smaller accounts had lower usage overall",
+        "In smaller accounts, the user and the customer were frequently the same person, so user dissatisfaction converted directly into customer churn with no intermediary",
+        "Smaller accounts did not use the compliance dashboard",
+        "Smaller accounts had signed longer contracts"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Where the user and customer are the same person, there is no procurement or account-management layer to buffer user dissatisfaction — it converts directly and quickly into churn risk.",
+      "learningObjective": "#3, #4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-005-8",
+      "questionNumber": 8,
+      "questionText": "Using the Stakeholder Ledger described in this lesson, what should a PM do first upon receiving a new feature request?",
+      "options": [
+        "Immediately estimate engineering cost",
+        "Explicitly identify whose interest the request represents — user, customer, or both — before evaluating its priority",
+        "Reject any request that comes from a customer rather than a user",
+        "Assume all requests represent the same, undifferentiated interest"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Stakeholder Ledger's core habit is naming the source of a request on the user-customer axis before deciding how much weight to give it.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-005-9",
+      "questionNumber": 9,
+      "questionText": "Which of the following is the most accurate description of how a PM should respond upon discovering user-customer divergence?",
+      "options": [
+        "Always prioritize the user's interest over the customer's",
+        "Always prioritize the customer's interest over the user's",
+        "Make the trade-off explicit and deliberate, since both interests can be legitimate",
+        "Avoid making a decision until the divergence resolves itself"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The lesson explicitly warns against assuming either side automatically wins; the goal is an explicit, deliberate trade-off rather than an accidental one driven by organizational default.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-005-10",
+      "questionNumber": 10,
+      "questionText": "(Scenario) An ad-supported app sees engagement rise sharply after a new feature launch, and the advertising team is pleased. What should a PM do, according to this lesson, before treating this as unambiguous product success?",
+      "options": [
+        "Nothing — rising engagement is always good news",
+        "Check whether the engagement increase reflects genuine user value or primarily reflects value to the advertiser-customer, since the two are not automatically the same in a fully divergent product",
+        "Immediately roll back the feature",
+        "Ask the advertisers whether they are satisfied, and stop there"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "In products near the \"fully divergent\" end of the spectrum, engagement metrics can reward the customer's (advertiser's) interest without reliably indicating user wellbeing — the lesson explicitly warns against treating engagement as a proxy for user satisfaction in this context.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-005-11",
+      "questionNumber": 11,
+      "questionText": "(Product Thinking) A B2B software company's IT-department customers all request a new security feature that end-users have told researchers they find confusing and disruptive. What is the most mature PM response, based on this lesson and its connection to Lesson 6 (Jobs to Be Done)?",
+      "options": [
+        "Refuse to build the security feature, since users dislike it",
+        "Build exactly what the IT departments specified, since they are the paying customer",
+        "Investigate the underlying security need behind the request and look for an implementation that satisfies it without the specific user-disruptive design",
+        "Escalate the disagreement to legal for a final ruling"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "This mirrors the lesson's guidance to separate the underlying business need (a legitimate customer concern) from a specific proposed implementation, and to seek solutions that satisfy the real need without unnecessary user cost — previewing the Jobs to Be Done approach in Lesson 6.",
+      "learningObjective": "#4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-005-12",
+      "questionNumber": 12,
+      "questionText": "Why does the lesson caution against treating \"the user\" as a single, homogeneous person even within a single product?",
+      "options": [
+        "Because there is only ever one type of user in any product",
+        "Because different user roles (e.g., an admin user vs. an end-user) can have different, sometimes conflicting needs, hiding exactly the kind of divergence this lesson addresses",
+        "Because user research is unreliable",
+        "Because customers are always more important than users"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Beginner Mistake 3 explicitly warns that lumping all users together can hide internal conflicts of need — for example, between an admin user and an end-user of the same tool.",
+      "learningObjective": "#5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-005-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking, Higher Difficulty) A company's free tier and paid tier are structurally identical in features, but the free tier is ad-supported and the paid tier removes ads for a subscription fee. According to this lesson, how should a PM's approach to prioritization differ between the two tiers?",
+      "options": [
+        "It should not differ at all, since the product is the same",
+        "The PM should recognize the free tier sits further right on the Alignment Spectrum (user ≠ paying customer, i.e., the advertiser) while the paid tier sits further left (user = paying customer), and weigh signals accordingly for each",
+        "The PM should ignore the free tier entirely, since it generates no direct revenue",
+        "The PM should always prioritize the paid tier's feature requests over the free tier's"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly notes that alignment is a property of a business model, not a fixed company trait — the same underlying product can sit at different points on the spectrum depending on its monetization model, requiring re-diagnosis for each.",
+      "learningObjective": "#2",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-005-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) An interviewer asks a candidate to describe a time they balanced conflicting user and customer needs. The candidate responds that \"our users and customers were always the same, so this never came up.\" What does this likely signal to an experienced interviewer, according to this lesson's Interview Perspective section?",
+      "options": [
+        "Strong product instincts, since alignment is the ideal state",
+        "A possible sign the candidate has not looked closely enough to notice the many roles at play in most products, or has not worked on a product where the distinction mattered",
+        "That the candidate is uniquely qualified for enterprise software roles",
+        "Nothing meaningful — this is a fully acceptable and complete answer"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson notes that claiming user and customer were \"always aligned\" is often a weak signal, since most real products have at least some role divergence worth examining, and a strong candidate can usually surface a genuine example.",
+      "learningObjective": "#5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-005-15",
+      "questionNumber": 15,
+      "questionText": "(Highest Difficulty) A workplace analytics company deprioritizes a long-standing user complaint for an entire quarter in favor of a customer-requested compliance dashboard, and large-account renewals close successfully as a result. According to the Detailed Case Study, was this necessarily the wrong decision, and what did the PM's process lack regardless of the final call?",
+      "options": [
+        "It was necessarily wrong, since users should always be prioritized over customers",
+        "It was necessarily right, since it directly protected revenue",
+        "The decision itself may have been reasonable, but the process lacked an explicit accounting of the churn risk in the segment where users and customers were the same person, and likely under-resourced user-side work that could have been partially addressed in parallel",
+        "The case study shows that compliance dashboards should never be built"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The case study explicitly argues that the final trade-off may have been defensible, but the failure was in not making the trade-off — and its risk to user-equals-customer segments — explicit, and not seeking even partial parallel investment in user-side work.",
+      "learningObjective": "#3, #4",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "You are the PM for a free, ad-supported habit-tracking app. Your data team reports that a new notification pattern increases daily active usage by 22%, which your advertising partners (your paying customers) are thrilled about, since it means more ad impressions. Separately, a small but consistent stream of app store reviews and support tickets describes the same notification pattern as \"anxiety-inducing\" and \"hard to turn off.\"\n\nWork through the following, in writing, before reading further:\n\n1. Using the Alignment Spectrum, where does this product sit, and why?\n2. Name, specifically, whose interest the 22% usage increase actually represents. Is it automatically evidence that users are better off?\n3. Construct two different ways you could address the advertiser's legitimate interest in engagement without relying on a notification pattern that some users experience as harmful.\n4. Using the Stakeholder Ledger, how would you weigh the small volume of negative reviews against the large, clearly measured usage increase? What additional evidence would change your answer?\n5. Write the one-sentence framing you would use to explain this trade-off to a leadership team focused primarily on the advertiser relationship and the revenue it represents.\n\nThere is no single correct answer. The purpose of this exercise is to practice noticing when a metric that looks like unambiguous success is actually success for one stakeholder on the ledger, potentially at a cost to another — and to practice making that trade-off explicit rather than letting the loudest, most measurable signal decide by default.\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 4 — Product Lifecycle | Assumes familiarity with how a product's stage affects its priorities; this lesson adds the user/customer lens to that same evolving context |\n| **Current Lesson** | Lesson 5 — Users vs. Customers | User-Customer Alignment Spectrum; refining \"desirability\"; the Stakeholder Ledger |\n| **Next Lesson** | Lesson 6 — Jobs To Be Done | Provides the structured method for uncovering the underlying need behind *any* stakeholder's request — user or customer — extending this lesson's case study resolution |\n| **Future Concepts Unlocked** | Lesson 7 (Value Proposition) | Requires articulating distinct value propositions for user and customer audiences when they diverge |\n| | Lesson 18 (Customer Segmentation) | Formalizes tracking which segments have aligned vs. divergent user-customer roles, directly extending the Case Study |\n| | Lesson 29 (Prioritization Fundamentals) | Incorporates the Stakeholder Ledger as a scoring input alongside the Accountability Triangle |\n| | Lesson 47 (Stakeholder Management) | Extends the structural-bias insight (customer signal being louder) into a full toolkit for balancing organizational voice fairly |\n\nThis curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to \"desirability\" assumes you will ask \"to whom\" — this will not be re-explained, only re-applied.",
+  "rawMarkdownPath": "content/lessons/lesson-005.md"
+}

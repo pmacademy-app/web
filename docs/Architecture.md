@@ -185,6 +185,9 @@ pm-academy/
 │       ├── app/                    # App Router
 │       │   ├── (marketing)/        # Public routes: landing, sample lessons, waitlist
 │       │   ├── (auth)/             # Sign up / log in / password reset
+│       │   ├── (portfolio)/        # Public, unauthenticated routes: /p/[username] portfolio export (PRD.md §4.11)
+│       │   │                       #   — must render for logged-out viewers (e.g. a recruiter clicking a LinkedIn link),
+│       │   │                       #   reading only rows explicitly marked is_public = true (Architecture.md §2, §9)
 │       │   ├── (app)/              # Authenticated product routes
 │       │   │   ├── dashboard/
 │       │   │   ├── curriculum/
@@ -217,6 +220,7 @@ pm-academy/
 
 **Key structural decisions:**
 - The marketing site is folded into the main Next.js app as the `(marketing)` route group — one deploy, one domain, shared design system.
+- The portfolio/certificate export feature (`PRD.md` §4.11) needs its own unauthenticated `(portfolio)` route group, separate from `(app)` — this was missing from earlier versions of this doc. A logged-out recruiter clicking a shared link must be able to render the page without hitting an auth wall; the query layer enforces `is_public = true` (§2, §9), not route-level auth.
 - Source Markdown lives at the repo root in `/content`, separate from the Next.js app. Build scripts process it into static JSON placed in `public/content/` for CDN delivery.
 - There is no `supabase/seed.sql` — content is never seeded into the database. The database contains only migration files for user-state tables.
 
@@ -359,5 +363,6 @@ This stack is chosen specifically so that scaling is a **later, success-driven d
 
 ## Changelog
 
+- v2.1 — Documentation review pass: added missing `(portfolio)` public route group for the unauthenticated portfolio/certificate export feature (`PRD.md` §4.11), which had no route in the folder structure despite being a required v1 feature.
 - v2.0 — Architecture rewritten for static-first, Markdown-to-JSON build pipeline. Removed database-backed content tables (modules, lessons, quiz_questions, flashcards) — content is now pre-generated static JSON. User-state tables reference content by slug. Added search architecture (client-side, build-time index). Added deployment pipeline (GitHub Actions). Replaced PostHog with Google Analytics. Replaced LinkedIn OAuth with Email + Password and Google Login. Removed Cloudflare Pages. Added Resend SMTP integration. Added waitlist and bookmarks tables. Target: ~5,000-user MVP.
 - v1.0 — Initial architecture authored from the "PM Academy — 0→1 Roadmap & Project Plan" source document, with the data model, folder structure, and content-pipeline detail expanded for direct implementation use.

@@ -152,9 +152,9 @@ export const EXPERIENCE_FEATURES: FeatureItem[] = [
     description: 'Structured lessons that build on each other, with reading, reflection, and immediate application.',
   },
   {
-    icon: 'WandSparkles',
-    title: 'AI Mentor',
-    description: 'Ask questions, review drafts, and get practice prompts without leaving the curriculum.',
+    icon: 'BookOpen',
+    title: 'Interactive Lessons',
+    description: 'Structured lessons that build on each other, with reading, reflection, and immediate application.',
   },
   {
     icon: 'Layers',
@@ -200,36 +200,6 @@ export const COMMUNITY_FEATURES: FeatureItem[] = [
     icon: 'BarChart3',
     title: 'Consistency Leaderboards',
     description: 'Opt-in, cohort-based rankings focused on study consistency, not raw completion.',
-  },
-]
-
-// ─── AI Mentor Capabilities (Sprint 2 §15) ────────────────────────────────────
-
-export const AI_MENTOR_CAPABILITIES: FeatureItem[] = [
-  {
-    icon: 'HelpCircle',
-    title: 'Ask questions',
-    description: 'Get clear, practical answers to PM concepts and frameworks.',
-  },
-  {
-    icon: 'FileText',
-    title: 'Review PRDs',
-    description: 'Receive specific feedback on your drafts, not generic suggestions.',
-  },
-  {
-    icon: 'Shuffle',
-    title: 'Generate practice prompts',
-    description: 'Custom quiz questions and case study scenarios to test your thinking.',
-  },
-  {
-    icon: 'MessageSquare',
-    title: 'Interview practice',
-    description: 'Practice product sense, estimation, and behavioural questions.',
-  },
-  {
-    icon: 'Compass',
-    title: 'Learning recommendations',
-    description: 'Guidance on what to study next based on your skill radar.',
   },
 ]
 
@@ -279,10 +249,6 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'What will I build?',
     answer: 'You will create practical artifacts like PRDs, roadmaps, research notes, wireframe critiques, metrics trees, strategy memos, and capstone case studies.',
-  },
-  {
-    question: 'How does the AI Mentor work?',
-    answer: 'The AI Mentor helps answer questions, review drafts, generate practice prompts, and recommend next steps. It supports your learning inside the structured curriculum.',
   },
   {
     question: 'Will I get a certificate?',

@@ -1,0 +1,360 @@
+{
+  "meta": {
+    "slug": "lesson-061",
+    "number": 61,
+    "title": "Platform Thinking: Products, Platforms, and Ecosystems",
+    "moduleNumber": 7,
+    "moduleName": "Platform, Technical & Data-Intensive Product Management",
+    "difficulty": 5,
+    "estMinutesReading": 40,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 1 (Accountability Triangle, Output vs. Outcome), Lesson 46 (Growth Loops and K-factor), Lesson 60 (Product Philosophy synthesis)",
+    "nextLessonSlug": "lesson-062",
+    "futureTopicsUnlocked": "Lesson 62 (APIs as Products), Lesson 63 (Two-Sided Marketplaces), Lesson 67 (Platform Governance), Lesson 78 (Build, Buy, or Partner) — all depend on the feature-product/platform distinction and the Leverage Stack introduced here"
+  },
+  "learningObjectives": [
+    "Distinguish a feature product from a platform product using the \"who creates the value\" test.",
+    "Explain the Leverage Stack and identify which layer a given product decision operates on.",
+    "Identify the distinct success metrics required for platform products versus feature products.",
+    "Describe at least two structural risks unique to platform businesses that do not exist for feature products.",
+    "Evaluate a real product decision for whether it strengthens or weakens third-party incentive to build on the platform."
+  ],
+  "theory": "### The Feature Product / Platform Distinction\n\nA useful diagnostic, sometimes called the **\"who creates the value\" test**: when a user has a good experience with your product, who built the thing that made that experience good?\n\n- If the answer is almost always \"our own team,\" you are managing a **feature product**.\n- If the answer is increasingly \"a third party we don't employ, using tools we built,\" you are managing a **platform**.\n\nMost successful products migrate from the first category toward the second over time, not because platforms are inherently superior, but because a platform's value can scale without the core team's headcount scaling in proportion. A feature team of thirty engineers can ship a great note-taking app. It cannot, by itself, build ten thousand integrations connecting that note-taking app to every calendar, CRM, and messaging tool on earth. A platform can — by making those ten thousand integrations worthwhile for people who don't work for the company to build.\n\n### The Leverage Stack\n\nThis lesson introduces the **Leverage Stack**, a four-layer model for reasoning about where a platform decision actually operates:\n\n```mermaid\ngraph TD\n    A[Layer 4: Ecosystem<br/>Independent businesses built on top of you] --> B[Layer 3: Marketplace<br/>Discovery, distribution, monetization for builders]\n    B --> C[Layer 2: Developer Surface<br/>APIs, SDKs, extensions, webhooks]\n    C --> D[Layer 1: Core Product<br/>The thing your own team ships directly]\n```\n\nEach layer depends on the one below it, and a weakness at a lower layer caps everything above it. If your Developer Surface (Layer 2) is unreliable — APIs that change without notice, documentation that lags behind reality — no amount of investment in Marketplace discovery (Layer 3) will produce a thriving Ecosystem (Layer 4), because builders will not invest their own time and reputation on a foundation they don't trust.\n\nThe Leverage Stack is useful precisely because it forces you to locate a proposed initiative. \"Should we build a plugin marketplace?\" is a Layer 3 question that presupposes a healthy Layer 2. Teams frequently skip straight to Layer 3 or 4 investments — public marketplaces, developer conferences, partner co-marketing — while Layer 2 is still brittle, and then wonder why adoption stalls. We will return to this exact failure pattern in the Case Study below.\n\n### Direct, Indirect, and Platform Network Effects\n\nLesson 46 introduced growth loops and the K-factor for user-to-user virality. Platforms introduce a related but distinct phenomenon: **network effects across two different populations** — builders and end users — where growth in one population increases the value of the platform for the other.\n\n```mermaid\ngraph LR\n    U[More End Users] -->|makes platform worth building for| B[More Builders]\n    B -->|more integrations, apps, content| U\n```\n\nThis loop, sometimes called a **cross-side network effect**, is the structural engine behind platforms like app stores, marketplaces, and developer ecosystems: more shoppers attract more sellers, and more sellers (with more selection) attract more shoppers. Note that this loop can also run in reverse and collapse just as powerfully — a platform that loses end users gives builders a reason to leave, which then gives remaining users a reason to leave too. Platform PMs must monitor both sides of this loop, not just the side closest to their own team's traditional metrics.\n\n### Platform Value Capture: The Take-Rate Question\n\nA platform must eventually answer how it captures value from the ecosystem it enables — typically through a **take rate** (a percentage of transactions, as with app store commissions or marketplace fees), a **subscription or usage fee** for developer access (as with many API-first companies), or an **indirect capture** strategy where the platform is monetized elsewhere and the developer surface is offered as a retention or distribution mechanism rather than a direct revenue line. Choosing the wrong capture mechanism, or setting a take rate that developers perceive as extractive relative to the value they receive, is one of the most common causes of ecosystem stagnation, and is a topic this curriculum returns to in Lesson 79 (Pricing Strategy at Scale).\n\n---",
+  "mistakes": "1. **Building Layer 3 or 4 features before Layer 2 is trustworthy.** Investing in a public app directory or partner marketing before your API has stable versioning and reliable uptime guarantees builders will be burned, and burned builders do not return.\n2. **Treating developers as a segment of \"users\" rather than a distinct accountable population.** Developer needs (stability, predictability, clear deprecation policies) are frequently in tension with end-user needs (frequent visible changes, rapid iteration), and conflating the two leads to decisions that satisfy neither well.\n3. **Measuring platform health using only end-user metrics.** A platform can show healthy end-user engagement metrics for a long time after its Developer Surface has started to rot, because the existing integrations built years ago continue to function even as new integration is quietly grinding to a halt.\n4. **Underestimating the cost of a breaking API change.** A change that costs the internal team one sprint to make can cost the entire external developer ecosystem months of collective work to adapt to, multiplied across every integration — a cost that does not appear on the internal team's own roadmap.\n5. **Assuming platform success is a scaled-up version of feature success.** The skills that make someone excellent at shipping features that delight end users directly (fast iteration, frequent visible change, tight internal feedback loops) are not the same skills that make a platform trustworthy to build upon (stability, advance notice, backward compatibility) — and a team can be excellent at one while actively undermining the other.\n\n---",
+  "mentalModel": {
+    "title": "The Leverage Stack",
+    "content": "The Leverage Stack introduced in the Theory section above is this lesson's core takeaway tool. Use it any time you evaluate a platform initiative, by asking three questions in order:\n\n1. **Which layer does this initiative actually target** — Core Product, Developer Surface, Marketplace, or Ecosystem?\n2. **Is the layer immediately below it healthy enough to support it?** An initiative targeting Layer 3 or 4 with a shaky Layer 2 underneath is premature, regardless of how compelling it looks in isolation.\n3. **What does this initiative do to the cross-side network effect?** Does it make the platform more attractive to builders (which should, in turn, make it more attractive to end users), or does it only address end users directly, leaving the builder side untouched?\n\nA team that can answer all three questions before greenlighting a platform initiative avoids the single most common platform failure mode: investing in visible, ecosystem-facing work while the foundation underneath is still too unreliable to support it.\n\n---"
+  },
+  "caseStudy": {
+    "title": "The Premature Marketplace",
+    "content": "A mid-size project-management SaaS company, having grown to several thousand business customers, noticed that its largest customers kept requesting custom integrations with their internal tools. Leadership, eager to reduce this one-off integration burden and to signal ambition to investors, greenlit a public \"App Marketplace\" initiative — a Layer 3 investment, complete with a public directory, revenue-sharing terms for third-party developers, and a splashy launch event.\n\nThe problem: the company's underlying API (Layer 2) had been built organically over several years, without a formal versioning policy, and was already changing in breaking ways roughly every quarter as the core product evolved. The handful of internal engineers who understood the API's undocumented quirks had, until then, been the only people building against it, and they simply adapted their own code whenever something broke.\n\nWithin two quarters of the Marketplace launch, several of the earliest third-party developers who had built apps for the new directory found their integrations breaking without warning, with no changelog or deprecation notice to explain why. Two vocal early partners published public complaints about the experience. New developer sign-ups for the Marketplace slowed sharply, and — most damaging — the cross-side network effect began running in reverse: fewer working apps in the directory made the Marketplace less useful to end customers, which reduced the incentive for any *new* developer to invest the time to build there.\n\n**What went wrong?** Using the Leverage Stack, the failure is precise: leadership invested directly in Layer 3 (the public Marketplace) while Layer 2 (the Developer Surface) was still unstable and undocumented. No amount of Marketplace polish — the directory design, the revenue-sharing terms, the launch event — could compensate for an API that broke trust every quarter. The company had, in effect, built a storefront on top of a foundation it hadn't finished pouring.\n\nThe company's eventual recovery involved freezing the public Marketplace, investing six months in Layer 2 fundamentals (a formal versioning scheme, a published deprecation policy, and a stable API gateway), and only then relaunching Marketplace recruitment — a sequencing lesson directly foreshadowing the API-design discipline covered in Lesson 62.\n\n---"
+  },
+  "framework": {
+    "title": "The Platform Readiness Checklist",
+    "content": "Before investing meaningfully in Layer 3 or Layer 4, a platform PM can use the following checklist to assess whether Layer 2 is genuinely ready to support them:\n\n| Readiness Criterion | Question to Ask | Red Flag If... |\n|---|---|---|\n| Versioning | Does the API have an explicit version number and support policy? | Breaking changes ship without a version bump |\n| Deprecation Notice | Is there a published minimum notice period before an endpoint is retired? | Endpoints disappear with no advance warning |\n| Documentation Currency | Is the documentation verified against the live API on a regular cadence? | Developers report the docs don't match production behavior |\n| Reliability SLA | Is there a defined and monitored uptime commitment for the developer surface? | No one internally can state the current uptime number |\n| Support Channel | Is there a dedicated channel for developers to report and track API issues? | Developers resort to public social channels to get answers |\n\nA \"no\" on more than one or two of these criteria is a strong signal that Layer 3 or 4 investment should be paused in favor of Layer 2 remediation, regardless of business pressure to launch something visible.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Real World Perspective",
+    "content": ""
+  },
+  "quiz": [
+    {
+      "id": "q-061-1",
+      "questionNumber": 1,
+      "questionText": "What is the \"who creates the value\" test used to determine?",
+      "options": [
+        "Whether a product is profitable",
+        "Whether a product is a feature product or a platform",
+        "Whether a product should be open source",
+        "Whether a product needs a mobile app"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The test asks who built the thing responsible for a good user experience — your own team, or a third party — to classify the product.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-061-2",
+      "questionNumber": 2,
+      "questionText": "In the Leverage Stack, which layer sits directly above the Core Product?",
+      "options": [
+        "Ecosystem",
+        "Marketplace",
+        "Developer Surface",
+        "End Users"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The Leverage Stack order is Core Product, then Developer Surface, then Marketplace, then Ecosystem.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-061-3",
+      "questionNumber": 3,
+      "questionText": "Why can a platform's end-user engagement metrics remain healthy even after its Developer Surface has begun to decay?",
+      "options": [
+        "End users do not care about third-party integrations",
+        "Existing integrations continue functioning while new developer investment quietly stalls",
+        "Engagement metrics automatically adjust for developer issues",
+        "Developer Surface decay always shows up immediately in end-user metrics"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Old integrations keep working for a time even as new building on the platform grinds to a halt, so the decay is initially invisible to end-user dashboards.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-061-4",
+      "questionNumber": 4,
+      "questionText": "What is a cross-side network effect?",
+      "options": [
+        "A loop where a single user's engagement affects only their own experience",
+        "A loop where growth in the builder population and the end-user population reinforce each other",
+        "A pricing model unique to marketplaces",
+        "A technical architecture pattern for APIs"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Cross-side network effects describe how growth in one population (builders or end users) increases the platform's value to the other population.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-061-5",
+      "questionNumber": 5,
+      "questionText": "Which of the following is a structural risk unique to platform businesses, not feature products?",
+      "options": [
+        "The risk of shipping a feature no one wants",
+        "The risk that a cross-side network effect can collapse in reverse across two populations at once",
+        "The risk of missing a project deadline",
+        "The risk of a poorly worded error message"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Feature products don't have a second population (builders) whose departure can trigger a reinforcing collapse with the end-user population; this risk is specific to platforms.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-061-6",
+      "questionNumber": 6,
+      "questionText": "According to this lesson, what is typically in tension between developers and end users?",
+      "options": [
+        "Developers want frequent change; end users want stability",
+        "Developers want stability and advance notice; end users often want frequent, visible change",
+        "There is no meaningful tension between the two groups",
+        "Developers and end users always want identical things"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Developers need predictability to build reliably; end users often expect and reward visible iteration, creating a structural tension platform PMs must manage.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-061-7",
+      "questionNumber": 7,
+      "questionText": "In the Case Study, what was the root cause of the Marketplace's failure?",
+      "options": [
+        "The revenue-sharing terms were too generous to developers",
+        "A Layer 3 investment (public Marketplace) was made while Layer 2 (the API) was unstable and undocumented",
+        "The launch event was poorly attended",
+        "The company chose the wrong third-party developers to recruit first"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Leverage Stack diagnosis is precise: Layer 3 investment cannot succeed if Layer 2 beneath it is untrustworthy.",
+      "learningObjective": "#2, #4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-061-8",
+      "questionNumber": 8,
+      "questionText": "What does the Platform Readiness Checklist help a PM assess?",
+      "options": [
+        "Whether the core product has product-market fit",
+        "Whether the Developer Surface is stable enough to support Marketplace or Ecosystem investment",
+        "Whether a company should IPO",
+        "Whether an end-user feature should be prioritized"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The checklist evaluates versioning, deprecation notice, documentation currency, reliability SLA, and support channels — all Layer 2 concerns.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-061-9",
+      "questionNumber": 9,
+      "questionText": "Why is premature platform investment a common mistake at early-stage startups specifically?",
+      "options": [
+        "Startups lack the legal resources to run a marketplace",
+        "It substitutes \"let's make it extensible\" for the harder work of proving the core feature product works first",
+        "Startups are legally prohibited from having APIs",
+        "Investors always discourage platform thinking at any stage"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section identifies this as a platform-specific variant of the Build Trap, where extensibility work displaces the harder task of nailing product-market fit.",
+      "learningObjective": "#1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-061-10",
+      "questionNumber": 10,
+      "questionText": "At a mid-size company, what typically triggers the transition from feature product to platform?",
+      "options": [
+        "A mandate from the board with no customer input",
+        "A handful of large customers or partners requesting integrations the core team can't build individually",
+        "A decision to reduce headcount",
+        "A change in company logo or branding"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section describes this as the typical mid-size-company trigger for platform investment.",
+      "learningObjective": "#1, #3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-061-11",
+      "questionNumber": 11,
+      "questionText": "What is a \"take rate\" in the context of platform value capture?",
+      "options": [
+        "The speed at which a platform ships new features",
+        "The percentage of transaction value a platform captures from ecosystem activity",
+        "The rate at which developers abandon a platform",
+        "The interest rate charged on platform loans"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Take rate refers to the platform's mechanism for capturing a share of the value generated by ecosystem transactions, such as app store commissions.",
+      "learningObjective": "#3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-061-12",
+      "questionNumber": 12,
+      "questionText": "(Scenario) A platform team wants to launch a public developer conference and co-marketing campaign (Layer 4) while its API still changes unpredictably every release (Layer 2 issue). Using the Leverage Stack, what should the PM recommend?",
+      "options": [
+        "Proceed with the conference as planned, since marketing and engineering are unrelated concerns",
+        "Pause the Layer 4 investment and prioritize Layer 2 stability first, since higher layers depend on the layer beneath them",
+        "Cancel the API entirely and rebuild the product from scratch",
+        "Proceed with the conference, but ask developers to sign a waiver"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Leverage Stack's core insight is that higher-layer investment cannot succeed without a stable layer beneath it; the PM should sequence Layer 2 stability first.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-061-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A Big Tech platform PM is evaluated primarily on third-party integration counts and API reliability SLAs rather than end-user engagement metrics. What does this reflect about platform accountability?",
+      "options": [
+        "Platform PMs are never accountable for end users",
+        "Platform PMs have an accountability structure that includes a second population — developers — whose success is measured differently than end-user success",
+        "Big Tech companies do not track end-user metrics",
+        "API reliability SLAs are irrelevant to platform success"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section notes platform PMs are accountable to developers as a distinct population, measured through different metrics than the ones dominating Module 5.",
+      "learningObjective": "#3, #4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-061-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) A candidate, asked how they'd decide whether to invest in a public API, immediately describes an ambitious ecosystem vision without mentioning current API stability. What does this most likely signal, per this lesson's Interview Perspective section?",
+      "options": [
+        "Strong strategic vision with no weaknesses",
+        "A failure to apply the Leverage Stack's sequencing logic — jumping to Layer 3/4 enthusiasm without assessing Layer 2 readiness first",
+        "That the candidate should be hired immediately",
+        "Nothing meaningful; ecosystem vision is the only relevant factor"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section identifies this exact gap — enthusiasm about ecosystem potential without Layer 2 readiness assessment — as a weak signal.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-061-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A VP has committed to three external partners that they will receive API access within one quarter, but engineering reports the internal API has no versioning and changes almost every release. Using only the frameworks in this lesson, what is the PM's best course of action?",
+      "options": [
+        "Proceed as promised, since a VP commitment overrides internal readiness concerns",
+        "Refuse outright and cancel the partnership without offering any alternative",
+        "Assess the Developer Surface against the Platform Readiness Checklist, communicate the specific gaps and risks to the VP, and propose a lower-risk interim commitment while Layer 2 stability work proceeds",
+        "Immediately launch a public Marketplace to satisfy the partners' urgency"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "This mirrors the Reflection Exercise and the Case Study: the PM's job is neither blind compliance nor outright refusal, but to diagnose the actual Layer 2 gap using the Readiness Checklist, communicate it clearly, and propose a workable interim path.",
+      "learningObjective": "#1, #2, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "fc-061-1",
+      "front": "What is the \"who creates the value\" test?",
+      "back": "Ask who built the thing that made a user's experience good — your own team (feature product) or a third party using your tools (platform).",
+      "difficulty": "Easy",
+      "tags": [
+        "#platform-thinking",
+        "#diagnostic"
+      ],
+      "lessonNumber": 61
+    },
+    {
+      "id": "fc-061-2",
+      "front": "Name the four layers of the Leverage Stack in order.",
+      "back": "Core Product → Developer Surface → Marketplace → Ecosystem.",
+      "difficulty": "Easy",
+      "tags": [
+        "#leverage-stack"
+      ],
+      "lessonNumber": 61
+    },
+    {
+      "id": "fc-061-3",
+      "front": "Why can a healthy end-user engagement metric mask a decaying platform?",
+      "back": "Existing integrations keep working even as new developer investment quietly stalls, so end-user dashboards lag the real signal.",
+      "difficulty": "Medium",
+      "tags": [
+        "#metrics",
+        "#platform-risk"
+      ],
+      "lessonNumber": 61
+    },
+    {
+      "id": "fc-061-4",
+      "front": "What is a cross-side network effect?",
+      "back": "A loop where growth in one population (builders or end users) increases the platform's value for the other population, and vice versa.",
+      "difficulty": "Medium",
+      "tags": [
+        "#network-effects"
+      ],
+      "lessonNumber": 61
+    },
+    {
+      "id": "fc-061-5",
+      "front": "What does the Platform Readiness Checklist assess?",
+      "back": "Whether a Developer Surface (Layer 2) is stable and trustworthy enough to support Marketplace or Ecosystem investment (Layers 3–4).",
+      "difficulty": "Medium",
+      "tags": [
+        "#platform-readiness"
+      ],
+      "lessonNumber": 61
+    },
+    {
+      "id": "fc-061-6",
+      "front": "Why did the SaaS company's Marketplace fail in the Case Study?",
+      "back": "It invested in a public Layer 3 marketplace while its Layer 2 API was still unversioned and prone to undocumented breaking changes.",
+      "difficulty": "Hard",
+      "tags": [
+        "#case-study",
+        "#sequencing"
+      ],
+      "lessonNumber": 61
+    },
+    {
+      "id": "fc-061-7",
+      "front": "Name two things that are typically in tension between developers and end users.",
+      "back": "Developers want stability and advance notice; end users often want frequent, visible change and rapid iteration.",
+      "difficulty": "Hard",
+      "tags": [
+        "#tradeoffs"
+      ],
+      "lessonNumber": 61
+    }
+  ],
+  "reflectionPrompt": "You are the PM for a well-established consumer photo-editing app with a loyal user base. Your VP of Business Development has just signed a partnership with three well-known third-party developers who want to build plugins on top of your product, and has promised them API access within one quarter. Your engineering team tells you the current internal API was never designed for external use, has no versioning, and changes almost every release cycle to support the core product's own roadmap.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying the Leverage Stack and the Platform Readiness Checklist under real business pressure.\n\n1. Using the Leverage Stack, identify exactly which layer the VP's commitment targets, and which layer(s) beneath it need to be assessed first.\n2. Run the situation through the Platform Readiness Checklist. Which criteria are most likely to fail, given what engineering has told you?\n3. What would you say to the VP if you believed the one-quarter timeline was not achievable without serious risk to the partnership?\n4. Is there a smaller, lower-risk commitment you could offer the three partners in the short term while Layer 2 work proceeds? Describe it.\n5. How would you explain, to a non-technical stakeholder, why \"we already have an API\" does not mean \"we are ready for outside developers to build on it\"?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 60 — Capstone: Building Your Own Product Philosophy | Extends your personal PM accountability model to include a second population: external builders |\n| **Current Lesson** | Lesson 61 — Platform Thinking: Products, Platforms, and Ecosystems | Feature product vs. platform; the Leverage Stack; cross-side network effects; Platform Readiness Checklist |\n| **Next Lesson** | Lesson 62 — APIs as Products: Designing for Developers | Deep-dives into Layer 2 of the Leverage Stack, formalizing what \"API stability\" concretely requires |\n| **Future Concepts Unlocked** | Lesson 63 (Two-Sided Marketplaces) | Extends cross-side network effects into a full marketplace-design framework |\n| | Lesson 67 (Platform Governance) | Addresses what happens when Ecosystem-layer activity (Layer 4) requires trust and safety enforcement |\n| | Lesson 78 (Build, Buy, or Partner) | Revisits the Leverage Stack when deciding whether to build platform capability internally or rely on external partners |\n| | Lesson 79 (Pricing Strategy at Scale) | Extends the take-rate value-capture question introduced here into full enterprise pricing mechanics |\n\nThis curriculum continues to build as one continuous argument. From this lesson forward, any reference to a \"platform\" decision assumes you can locate it within the Leverage Stack without re-explanation.",
+  "rawMarkdownPath": "content/lessons/lesson-061.md"
+}

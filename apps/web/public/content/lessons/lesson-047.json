@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-047",
+    "number": 47,
+    "title": "Stakeholder Management",
+    "moduleNumber": 5,
+    "moduleName": "Metrics, Experimentation & Growth",
+    "difficulty": 5,
+    "estMinutesReading": 35,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 5 (structural bias toward customer-channel signal), Lesson 35 (Roadmapping — hedged commitments), Lesson 37 (Working with Engineering Teams — Trust Ladder)",
+    "nextLessonSlug": "lesson-048",
+    "futureTopicsUnlocked": "Lesson 49 (Go-To-Market Strategy), Lesson 51 (Communicating with Executives), Lesson 53 (Negotiation & Influence Without Authority), Lesson 54 (Managing Up and Across) — all build directly on the stakeholder mapping and communication discipline introduced here"
+  },
+  "learningObjectives": [
+    "Map an organization's stakeholders using a power/interest grid and tailor communication approach to each quadrant.",
+    "Explain structural bias toward customer-channel signal, extending Lesson 5's original framing, and describe concrete practices that counteract it.",
+    "Apply Lesson 35's hedged-commitment principles specifically to upward stakeholder communication under deadline or pressure situations.",
+    "Deliver difficult news (a delay, a deprioritization, a \"no\") to a stakeholder in a way that preserves trust rather than eroding it.",
+    "Distinguish stakeholder management done well (informing and aligning) from stakeholder management done poorly (simply telling people what they want to hear)."
+  ],
+  "theory": "### Mapping Stakeholders: The Power/Interest Grid\n\nNot every stakeholder needs the same relationship or communication cadence. A widely used tool, the **power/interest grid**, classifies stakeholders along two dimensions — how much influence or authority they hold over the product's success, and how actively interested they are in its day-to-day details:\n\n```mermaid\ngraph TD\n    subgraph High Power\n    A[\"High Power, High Interest:<br/>Manage Closely<br/>(e.g., your direct exec sponsor)\"]\n    B[\"High Power, Low Interest:<br/>Keep Satisfied<br/>(e.g., a VP in an adjacent org)\"]\n    end\n    subgraph Low Power\n    C[\"Low Power, High Interest:<br/>Keep Informed<br/>(e.g., an engaged frontline support lead)\"]\n    D[\"Low Power, Low Interest:<br/>Monitor<br/>(e.g., a peripheral team affected occasionally)\"]\n    end\n```\n\nA stakeholder in the \"Manage Closely\" quadrant warrants frequent, detailed, two-way communication and early involvement in decisions. A stakeholder in \"Keep Satisfied\" needs periodic, high-level updates focused on outcomes rather than process detail, since their interest is low but their influence is high enough that surprising them is risky. A stakeholder in \"Keep Informed\" benefits from regular updates even though they can't independently affect outcomes, since their engagement can be valuable and their goodwill matters. A stakeholder in \"Monitor\" needs the least active management — occasional awareness is sufficient. Misjudging a stakeholder's quadrant — most commonly, treating a \"Keep Satisfied\" stakeholder as \"Monitor,\" and blindsiding a high-power person who was quietly paying less attention than assumed — is one of the most common and costly stakeholder management errors.\n\n### Structural Bias Toward Customer-Channel Signal, Revisited\n\nRecall Lesson 5's original framing: customer feedback that reaches a PM through internal channels — a sales team relaying a prospect's specific request, a support team escalating a vocal customer's complaint, a single large account's account manager pushing for a feature — is not a representative sample of the broader user base. It is filtered by who has the loudest voice, the most organizational access, or the most squeaky-wheel persistence, not by who represents the most common or most valuable underlying need.\n\n```mermaid\ngraph LR\n    A[Broad user base] --> B{Which users' voices<br/>actually reach the PM?}\n    B --> C[\"Loud, well-connected,<br/>high-access customers<br/>(via sales/support channels)\"]\n    B --> D[\"Quiet majority<br/>(rarely escalated,<br/>rarely directly heard)\"]\n    C --> E[Structural bias:<br/>roadmap over-indexes on C,<br/>under-represents D]\n```\n\nThis structural bias is not a matter of any individual stakeholder acting in bad faith — a salesperson relaying a prospect's blocking requirement, or a support lead escalating a frustrated customer, is doing their job correctly. The bias emerges structurally, from the simple fact that certain channels amplify certain voices more than others, and a PM who treats whatever reaches them through these channels as a representative signal of the whole user base — rather than actively supplementing it with broader, more representative research (echoing Lesson 8's discovery discipline) — will systematically over-invest in the needs of the loudest, most connected segment at the expense of the quieter majority. Managing this bias is itself a form of stakeholder management: it requires actively seeking out and weighing signal from stakeholders and channels that don't naturally advocate for themselves as forcefully.\n\n### Hedged Commitments Under Pressure\n\nLesson 35 introduced the Now-Next-Later format and the Confidence Gradient as tools for giving stakeholders honest, useful forward visibility without manufacturing false certainty. Applying this specifically to live stakeholder conversations, particularly under pressure: when a stakeholder pushes for a specific date or commitment on something genuinely uncertain, the goal is not to choose between capitulating to false precision and unhelpfully refusing to engage — it's to offer the most specific, useful answer that's still honest about its own confidence level, explicitly naming what would need to be true for the estimate to hold and what could change it.\n\n### Delivering Difficult News\n\nA recurring, high-stakes stakeholder management situation deserves specific treatment: telling a stakeholder something they don't want to hear — a delay, a deprioritization, a declined request. The pattern that best preserves trust (echoing Lesson 37's Trust Ladder and Lesson 34's mid-sprint change protocol) has several consistent elements: deliver the news directly and promptly rather than delaying or burying it, explain the reasoning transparently (what changed, what evidence drove the decision), acknowledge the impact on the stakeholder specifically rather than only defending the decision abstractly, and where possible, offer a concrete alternative or next step rather than leaving the stakeholder with only a closed door. A PM who delays delivering bad news, hoping circumstances will improve before the conversation becomes necessary, typically only makes the eventual conversation more damaging, since the stakeholder now has less time to adjust and may reasonably wonder how long the PM already knew.\n\n---",
+  "mistakes": "**Mistake 1: Treating every stakeholder identically, regardless of their actual power and interest.**\nAs covered in Theory, an executive sponsor and a peripheral, low-interest observer warrant genuinely different communication approaches — a uniform approach either overwhelms low-interest stakeholders or under-serves high-power ones.\n\n**Mistake 2: Treating whatever customer feedback reaches you through sales or support as representative of the whole user base.**\nThis is the exact structural bias Lesson 5 and this lesson both address — feedback that reaches a PM through internal channels is filtered by access and volume, not representativeness, and must be actively supplemented with broader research rather than trusted at face value.\n\n**Mistake 3: Telling stakeholders what they want to hear rather than what's actually true.**\nThis produces short-term comfort at the cost of long-term trust — a stakeholder who discovers, eventually, that they were told a comforting but inaccurate story will trust future communications far less, echoing Lesson 37's Trust Ladder principle that honest communication builds durable trust while its absence erodes it quickly.\n\n**Mistake 4: Delaying difficult news in hopes the situation will resolve itself before a conversation becomes necessary.**\nAs covered in Theory, this typically only compounds the damage, since the stakeholder loses valuable time to adjust and may reasonably question how long the information was known before being shared.\n\n**Mistake 5: Defending a decision abstractly without acknowledging its specific impact on the stakeholder receiving the news.**\nA stakeholder who feels their specific situation wasn't genuinely considered, even if the underlying decision was sound, is far more likely to feel dismissed and less likely to trust future communications, regardless of how well-reasoned the decision actually was.\n\n---",
+  "mentalModel": {
+    "title": "The Signal Amplification Map",
+    "content": "This lesson's core takeaway tool visualizes structural bias toward customer-channel signal as a filtering process, making the invisible amplification explicit so a PM can consciously counteract it:\n\n```mermaid\ngraph TD\n    A[All users/customers] --> B[Amplification filter:<br/>sales access, support escalation,<br/>account size, persistence]\n    B --> C[Signal that naturally<br/>reaches the PM]\n    A -.->|requires active effort<br/>to reach| D[Broader, representative<br/>research: surveys, usage data,<br/>random-sample interviews]\n    D --> E[Genuinely representative<br/>signal]\n    C --> F{Roadmap decisions}\n    E --> F\n```\n\nUse the Signal Amplification Map as a standing discipline whenever a specific, vivid customer request arrives through a sales or support channel: ask explicitly, \"is this request reaching me because it's genuinely representative of a widespread need, or because this specific customer happens to have unusually strong access to me?\" Both can be true simultaneously, but only active, structured effort — the dotted-line path in the diagram — reliably surfaces the second, quieter kind of signal that the amplification filter would otherwise systematically suppress.\n\n---",
+    "diagramMermaid": "graph TD\n    A[All users/customers] --> B[Amplification filter:<br/>sales access, support escalation,<br/>account size, persistence]\n    B --> C[Signal that naturally<br/>reaches the PM]\n    A -.->|requires active effort<br/>to reach| D[Broader, representative<br/>research: surveys, usage data,<br/>random-sample interviews]\n    D --> E[Genuinely representative<br/>signal]\n    C --> F{Roadmap decisions}\n    E --> F"
+  },
+  "caseStudy": {
+    "title": "The Roadmap Built on the Loudest Voice",
+    "content": "Consider a simplified, illustrative scenario that directly resolves Lesson 5's original structural-bias framing and echoes Lesson 35's roadmap Case Study from a different angle.\n\nA PM at a B2B software company receives a specific, detailed feature request repeatedly, relayed through the sales team, from a small number of large enterprise prospects currently in active sales conversations. The request is compelling, well-articulated (since sales has refined the pitch through repeated conversations), and carries visible urgency (each relay comes with a note about a deal that might close faster if the feature existed). The PM prioritizes it near the top of the roadmap, reasoning that it must reflect broad market demand, given how consistently and urgently it keeps surfacing.\n\nAfter shipping the feature, adoption among the broader existing customer base is minimal — fewer than 3% of customers use it in the following quarter — and none of the specific enterprise deals that had originally driven the urgency actually close any faster than deals that didn't reference the feature at all. A subsequent, deliberately broader survey of the existing customer base reveals the actual most commonly requested improvement was something entirely different — a much less dramatic, less \"sales-pitch-worthy\" workflow improvement that had never once been escalated through sales, because no single customer considered it urgent enough to push hard for individually, even though a large share of customers, independently and quietly, wanted it.\n\n**What went wrong?**\n\nThis is a direct, worked instance of the structural bias Lesson 5 first raised and this lesson formalizes: the feature request that reached the PM most forcefully did so not because it represented the broadest underlying need, but because it happened to pass through a channel (active sales conversations with a small number of vocal, well-connected prospects) that amplifies exactly this kind of request, regardless of how representative it actually is. The quieter, more broadly-held need never generated the same organizational volume, precisely because it wasn't urgent or dramatic enough for any single customer to escalate — but its quietness said nothing about its actual underlying prevalence or value across the customer base as a whole.\n\nThe corrective practice, going forward, mirrors this lesson's Real Company Example: supplementing channel-amplified signal with deliberate, structured research — a broad survey, systematic usage-pattern analysis, or a structured sampling of customer interviews not filtered through sales urgency — specifically to surface the quieter, more representative signal the amplification filter had been suppressing. This does not mean sales-channel feedback should be ignored; it remains valuable, specific, and often genuinely urgent information. It means such feedback should never be treated as a substitute for broader validation, precisely the discipline this lesson's Signal Amplification Map recommends.\n\n---"
+  },
+  "framework": {
+    "title": "The Stakeholder Communication Cadence Table",
+    "content": "A second, more tactical tool: use this table to determine an appropriate communication cadence and format for a stakeholder, once mapped onto the power/interest grid.\n\n| Quadrant | Recommended Cadence | Recommended Format |\n|---|---|---|\n| Manage Closely (high power, high interest) | Frequent, often weekly or biweekly | Detailed, two-way conversation; early involvement in decisions |\n| Keep Satisfied (high power, low interest) | Periodic, milestone-based | High-level, outcome-focused summary; proactive heads-up before anything surprising |\n| Keep Informed (low power, high interest) | Regular, often via a standing update | Detailed but one-way is often sufficient (newsletter, shared doc) |\n| Monitor (low power, low interest) | Minimal, as-needed | Brief, only when directly relevant |\n\nMisapplying this table in either direction carries real cost: over-communicating with a \"Monitor\" stakeholder wastes effort and can create noise; under-communicating with a \"Keep Satisfied\" stakeholder risks a damaging surprise precisely because their low day-to-day interest doesn't reduce their high underlying influence.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Startup vs. Mid-Size vs. Big Tech",
+    "content": "**At a startup:**\nStakeholder management is often informal, with a small number of stakeholders (perhaps a handful of co-founders and early customers) who interact directly and frequently. Structural bias toward customer-channel signal is still a real risk even here — early customers who are unusually vocal or well-connected to the founding team can disproportionately shape early product direction, even in a small, seemingly close-knit environment.\n\n**At a mid-size company:**\nThe stakeholder map typically grows significantly — multiple executives, sales and support organizations, and a broader base of customers whose feedback increasingly arrives through structured channels rather than direct founder relationships. This is the stage where formal stakeholder mapping (the power/interest grid) and deliberate structural-bias countermeasures (like Intuit's customer immersion practices) become genuinely necessary rather than optional refinements.\n\n**At Big Tech:**\nStakeholder ecosystems are often large and complex, spanning multiple business units, regulatory and legal stakeholders, and vast, highly segmented customer bases where structural bias risk is especially acute, since sales and enterprise account relationships can carry enormous organizational weight even when representing a small fraction of the overall user base. The PM's job shifts toward navigating a genuinely complex stakeholder map with much higher stakes for misjudging a quadrant, and toward advocating for and using rigorous, representative research (surveys, usage analytics, structured sampling) as a deliberate counterweight to the loudest available channel signal.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-047-1",
+      "questionNumber": 1,
+      "questionText": "What are the four quadrants of the power/interest grid?",
+      "options": [
+        "Now, Next, Later, Never",
+        "Manage Closely, Keep Satisfied, Keep Informed, Monitor",
+        "Input, Action, Output, Reinvestment",
+        "Discover, Define, Develop, Deliver"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly names these four quadrants.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-047-2",
+      "questionNumber": 2,
+      "questionText": "According to the power/interest grid, what communication approach fits a high-power, low-interest stakeholder?",
+      "options": [
+        "No communication at all, since their interest is low",
+        "Periodic, milestone-based, high-level updates focused on outcomes, with proactive heads-up before anything surprising",
+        "Frequent, detailed, two-way conversation identical to a high-interest stakeholder",
+        "Communication only when the stakeholder directly requests it"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Framework Explanation section's cadence table specifies this approach for the \"Keep Satisfied\" quadrant.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-047-3",
+      "questionNumber": 3,
+      "questionText": "What is structural bias toward customer-channel signal, as extended from Lesson 5?",
+      "options": [
+        "A bias toward using too many communication channels simultaneously",
+        "The tendency for feedback reaching a PM through sales or support channels to over-represent loud, well-connected customers rather than the broader user base",
+        "A statistical bias that only affects A/B testing results",
+        "A preference for written communication over verbal communication"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section defines this concept exactly this way, extending Lesson 5's original framing.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-047-4",
+      "questionNumber": 4,
+      "questionText": "Why does this lesson caution against discarding sales- or support-relayed customer feedback entirely, even while warning about structural bias?",
+      "options": [
+        "Because such feedback should always be treated as the single most important signal available",
+        "Because it remains valuable, specific, and often genuinely urgent information — the caution is against treating it as a *substitute* for broader validation, not against using it at all",
+        "Because sales and support teams are never trustworthy sources of information",
+        "Because structural bias only applies to support channels, not sales channels"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section and Case Study both clarify that channel feedback remains valuable and should be supplemented, not discarded.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-047-5",
+      "questionNumber": 5,
+      "questionText": "What practice does this lesson's Real Company Example (Intuit) illustrate as a countermeasure to structural bias?",
+      "options": [
+        "Ignoring all sales-relayed feedback permanently",
+        "Direct, structured customer immersion research (such as \"follow-me-home\" style observation), gathering broader understanding than channel-amplified feedback alone provides",
+        "Relying exclusively on the loudest customer voices to guide the roadmap",
+        "Eliminating the sales team's ability to relay any customer feedback"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real Company Example describes exactly this kind of deliberate, structured research as a countermeasure to channel-amplified bias.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-047-6",
+      "questionNumber": 6,
+      "questionText": "In the Detailed Case Study, what did the PM discover after shipping the urgently-requested enterprise feature?",
+      "options": [
+        "Adoption was widespread and all enterprise deals closed faster as predicted",
+        "Adoption among the broader customer base was minimal (under 3%), and none of the originally cited enterprise deals closed any faster because of the feature",
+        "The feature was never actually built due to engineering constraints",
+        "Sales stopped relaying any further feedback after this incident"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly states this outcome — minimal broad adoption and no measurable impact on the deals that had driven the original urgency.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-047-7",
+      "questionNumber": 7,
+      "questionText": "What did a subsequent, broader survey reveal in the Detailed Case Study?",
+      "options": [
+        "No customers wanted any new features at all",
+        "The most commonly requested improvement was a different, less dramatic workflow change that had never been escalated through sales, because no single customer considered it individually urgent enough to push for",
+        "The original enterprise feature request was actually the top priority after all",
+        "The survey results were inconclusive and provided no useful information"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly describes this finding — a quieter, more broadly-held need that never generated the same channel-amplified volume.",
+      "learningObjective": "#2",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-047-8",
+      "questionNumber": 8,
+      "questionText": "What four elements characterize delivering difficult news well, according to this lesson?",
+      "options": [
+        "Delay, minimize detail, avoid specifics, offer no alternatives",
+        "Deliver directly and promptly, explain the reasoning transparently, acknowledge specific impact, offer a concrete alternative or next step where possible",
+        "Deliver only through written communication, never verbally",
+        "Deliver only to the highest-power stakeholder, regardless of who else is affected"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly lists these four elements as the pattern that best preserves trust.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-047-9",
+      "questionNumber": 9,
+      "questionText": "Why does delaying difficult news typically compound rather than avoid damage, according to this lesson?",
+      "options": [
+        "Because delayed news is always factually different from prompt news",
+        "Because the stakeholder loses valuable time to adjust and may reasonably question how long the PM already knew before sharing it",
+        "Because delaying news is illegal in most organizations",
+        "Because delayed news never needs to be delivered at all eventually"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #4 explains this exact reasoning — delay reduces the stakeholder's adjustment time and raises legitimate trust concerns.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-047-10",
+      "questionNumber": 10,
+      "questionText": "(Scenario) A PM receives a single, highly detailed, urgently-framed feature request from a support team representing one frustrated customer, and immediately elevates it to the top of the roadmap without further validation. Using the Signal Amplification Map, what is the most likely risk?",
+      "options": [
+        "There is no risk; support-relayed requests are always representative of broad customer need",
+        "The PM may be over-indexing on a request that reached them through channel amplification, without verifying whether it represents a broadly shared need across the wider customer base",
+        "The request should be ignored entirely simply because it came through support",
+        "This scenario has no relevance to structural bias, since it involves only one customer"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is a direct instance of the structural bias this lesson warns against — treating a single, channel-amplified voice as sufficient evidence without broader validation.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-047-11",
+      "questionNumber": 11,
+      "questionText": "(Interview Reasoning) A candidate is asked how they'd handle a specific, urgent customer request relayed repeatedly by sales, and answers: \"I'd prioritize it immediately, since sales clearly believes it's important.\" Based on this lesson's Interview Perspective section, what is the weakness in this answer?",
+      "options": [
+        "There is no weakness; sales requests should always be prioritized immediately",
+        "It fails to recognize structural bias toward customer-channel signal, and skips validating the request against broader, more representative research before committing significant roadmap priority to it",
+        "It correctly demonstrates strong responsiveness to sales needs",
+        "It shows an appropriate level of trust in the sales team's judgment"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section states that a strong answer recognizes structural bias and validates channel-amplified requests against broader research before prioritizing them.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-047-12",
+      "questionNumber": 12,
+      "questionText": "Why does misjudging a stakeholder's power/interest quadrant carry real cost in both directions, according to this lesson?",
+      "options": [
+        "It doesn't; there is no cost to misjudging a stakeholder's quadrant",
+        "Over-communicating with a low-power, low-interest stakeholder wastes effort and creates noise, while under-communicating with a high-power, low-interest stakeholder risks a damaging surprise",
+        "Only under-communication carries any cost; over-communication is always harmless",
+        "Only over-communication carries any cost; under-communication is always harmless"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Framework Explanation section explicitly describes costs in both directions of misapplying the cadence table.",
+      "learningObjective": "#1",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-047-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A PM wants to validate whether a channel-amplified feature request represents broad demand before committing significant engineering resources to it. Using this lesson's and earlier lessons' frameworks together, what is the most defensible approach?",
+      "options": [
+        "Trust the channel-amplified request entirely, since it arrived with clear urgency",
+        "Conduct broader, structured research (a survey or representative sampling, echoing Lesson 8's discovery discipline and this lesson's Intuit example) to assess actual prevalence of the need, before committing significant roadmap priority based on the single amplified signal alone",
+        "Ignore the request entirely without any further investigation",
+        "Ask the same sales team to relay the request one more time to confirm it"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This combines the Signal Amplification Map's core recommendation with earlier discovery discipline (Lesson 8) — validating with broader research rather than either blind trust or dismissal.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-047-14",
+      "questionNumber": 14,
+      "questionText": "Which of the following best reflects a well-executed instance of delivering difficult news, per this lesson's frameworks?",
+      "options": [
+        "Waiting several weeks to inform a stakeholder of a delay, hoping the timeline will recover on its own first",
+        "Informing the stakeholder promptly, explaining specifically what changed and why, acknowledging how the delay affects their specific plans, and proposing a concrete next step or alternative",
+        "Sending a brief, vague message with no explanation of the reasoning behind the decision",
+        "Informing only the highest-power stakeholder and leaving other affected stakeholders to find out indirectly"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects all four elements of well-delivered difficult news described in the Theory section: promptness, transparent reasoning, acknowledged impact, and a concrete next step.",
+      "learningObjective": "#4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-047-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A PM has validated, through broad research, that a channel-amplified request from a major enterprise account does NOT represent a widely shared need. The account's sales lead is upset and insists the deal will be lost without it. Using this lesson's frameworks, what is the most defensible way forward?",
+      "options": [
+        "Reverse the decision immediately based solely on the sales lead's insistence, to avoid conflict",
+        "Communicate the research findings transparently to the sales lead (positioned appropriately on the power/interest grid), acknowledge the specific business impact they're concerned about, and explore whether a smaller, less resource-intensive accommodation could address the account's need without committing the broader roadmap to a low-demand feature",
+        "Refuse to discuss the decision further with sales under any circumstances",
+        "Ignore the sales lead's concerns entirely and make no further effort to communicate the reasoning"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This combines the lesson's structural-bias validation, power/interest-grid-appropriate communication, and difficult-news delivery principles — transparent reasoning, acknowledged impact, and exploring an alternative, rather than either capitulating or dismissing the stakeholder's legitimate business concern.",
+      "learningObjective": "#3, #4, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "Consider the following novel scenario: You're a PM who has just received, for the third time this month, an urgent feature request relayed by your sales team on behalf of a single large prospective customer currently in final contract negotiations. Your engineering team has capacity for one more mid-size initiative this quarter, and this request would consume most of it.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying the Signal Amplification Map and stakeholder communication principles, not to reach one \"right\" answer.\n\n1. Using the Signal Amplification Map, what questions would you ask before concluding this request reflects broad underlying demand rather than one prospect's specific, urgent need?\n2. Where would you place the sales team itself on the power/interest grid for this specific situation, and how would that shape how you communicate your decision-making process to them?\n3. If your research reveals this request is genuinely a one-off need rather than a broadly shared one, how would you communicate that decision to sales in a way that doesn't dismiss the urgency they've been relaying in good faith?\n4. What structured research (survey, usage data, broader interviews) could you run quickly enough to inform this quarter's decision, given the time pressure?\n5. If you ultimately decide not to prioritize this request, and the deal doesn't close as a result, how would you evaluate whether your decision was still the right one, using this lesson's frameworks?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 46 — Growth Loops & Virality | Shifts from quantitative growth mechanics to the interpersonal discipline of managing the people who make product decisions possible |\n| **Current Lesson** | Lesson 47 — Stakeholder Management | Power/interest grid; structural bias toward customer-channel signal (extending Lesson 5); hedged commitments; delivering difficult news |\n| **Next Lesson** | Lesson 48 — Pricing & Monetization Strategy | Applies stakeholder communication discipline to a specifically high-stakes, cross-functional decision area |\n| **Future Concepts Unlocked** | Lesson 49 (Go-To-Market Strategy) | Builds on stakeholder coordination when planning a cross-functional launch |\n| | Lesson 51 (Communicating with Executives) | Extends the power/interest grid's \"Manage Closely\" and \"Keep Satisfied\" quadrants specifically to executive audiences |\n| | Lesson 53 (Negotiation & Influence Without Authority) | Builds directly on this lesson's difficult-news and trust-preservation principles |\n| | Lesson 54 (Managing Up and Across) | Extends this lesson's stakeholder cadence discipline to ongoing manager and peer relationships |\n\nThis curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the power/interest grid and the structural bias caution with you — they will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-047.md"
+}

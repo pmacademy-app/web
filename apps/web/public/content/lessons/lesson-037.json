@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-037",
+    "number": 37,
+    "title": "Working with Engineering Teams",
+    "moduleNumber": 4,
+    "moduleName": "Execution & Agile Delivery",
+    "difficulty": 5,
+    "estMinutesReading": 35,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 1 (Responsibility without authority), Lesson 32 (Scrum Framework — Product Owner vs. Developers roles), Lesson 34 (Sprint Planning & Backlog Grooming — INVEST's \"Negotiable\" criterion)",
+    "nextLessonSlug": "lesson-038",
+    "futureTopicsUnlocked": "Lesson 38 (Working with Design Teams, a parallel relationship-building lesson), Lesson 39 (Technical Debt & PM Trade-offs), Lesson 53 (Negotiation & Influence Without Authority), Lesson 54 (Managing Up and Across) — all build on the trust and context-handoff principles introduced here"
+  },
+  "learningObjectives": [
+    "Explain why \"giving context, not commands\" produces better technical outcomes than specifying a solution directly, and connect this to INVEST's \"Negotiable\" criterion from Lesson 34.",
+    "Describe the specific behaviors that build or erode engineering trust in a PM over time, distinguishing durable trust from one-off goodwill.",
+    "Apply a technical-disagreement resolution approach that respects engineering's authority over \"how\" while preserving the PM's accountability for \"why\" and \"what.\"",
+    "Distinguish problems a team can resolve internally from problems that require PM/PO escalation outward, extending the distinction raised in Lesson 32's Case Study.",
+    "Explain the Iron Triangle (scope, time, quality) and use it to reason about trade-off conversations with engineering under real constraints."
+  ],
+  "theory": "### Give Context, Not Commands\n\nThe single most consequential shift a new PM can make in how they work with engineers is moving from specifying solutions to specifying problems, context, and constraints — then trusting engineering to own the solution space. This is not a matter of etiquette; it reflects a genuine asymmetry in expertise. A PM typically has the clearest view of the user problem, the business context, and the constraints that matter (deadline pressure, dependencies, strategic priority); engineers typically have the clearest view of the technical trade-off space (what's actually hard, what's actually cheap, what technical debt a given approach would create). A PM who hands over a fully-specified technical solution is, in effect, making decisions in a domain where engineering has more information — and is very often specifying a worse solution than engineering would have proposed with the same context.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[PM Provides:<br/>Problem, Context, Constraints] --> B[Engineering Owns:<br/>Technical Solution Space]\n    B --> C[Proposed Approach]\n    C --> D{Does It Solve the Actual<br/>Problem Within Constraints?}\n    D -->|Yes| E[Proceed]\n    D -->|Unclear| F[PM Clarifies Context, Not the Solution]\n```\n\nThis does not mean a PM should have no opinion on technical approach, or should never ask a clarifying or challenging question about a proposed solution. It means the PM's questions should test whether a proposed approach actually serves the stated problem and constraints, rather than substituting the PM's own preferred implementation for engineering's.\n\n### What Builds (and Erodes) Engineering Trust\n\nTrust between a PM and an engineering team is built cumulatively, through specific, repeated behaviors, and eroded quickly by their absence:\n\n| Builds Trust | Erodes Trust |\n|---|---|\n| Explaining the \"why\" behind a request, not just the \"what\" | Handing over tickets with no context, expecting silent execution |\n| Protecting the team's focus by pushing back on low-value mid-Sprint interruptions | Constantly introducing new \"urgent\" requests without prioritization discipline |\n| Accepting engineering's estimate and technical judgment by default | Second-guessing every estimate or technical call without domain expertise to back it up |\n| Escalating blockers the team can't solve on its own (Lesson 32's Case Study) | Leaving structural blockers unaddressed and blaming the team for resulting delays |\n| Being honest about uncertainty and changing plans transparently (Lesson 31, Lesson 34) | Presenting an uncertain plan as a firm commitment, then quietly walking it back later |\n\nTrust, once established, gives a PM significant benefit of the doubt during a genuinely difficult trade-off conversation; trust, once eroded, makes even a reasonable request from the PM subject to skepticism and resistance.\n\n### Resolving Technical Disagreements\n\nA specific, recurring situation deserves its own framework: what happens when a PM and engineering disagree about the right approach to a problem. The healthiest pattern separates the conversation into two distinct questions, asked in order:\n\n1. **Do we agree on the problem, the user need, and the constraints?** If not, the disagreement is actually about \"what\" and \"why\" — squarely the PM's domain — and should be resolved there first, before any technical discussion proceeds.\n2. **Given agreement on problem and constraints, which technical approach best satisfies them?** This is squarely engineering's domain. A PM can and should ask clarifying questions here (\"does this approach still meet the timeline we discussed,\" \"does this handle the edge case we identified\"), but should generally defer to engineering's judgment on the actual technical trade-offs once the problem and constraints are aligned.\n\nMost unproductive PM-engineering disagreements occur because the two questions get conflated — a PM pushing back on a technical approach is often, without realizing it, actually revealing an unresolved disagreement about the underlying problem or constraints, which is better surfaced and resolved directly rather than fought out indirectly through a debate about implementation details neither side fully owns from the other's side.\n\n### Escalating What the Team Can't Solve Internally\n\nRecall Lesson 32's Case Study: a cross-team design-resource blocker recurred across eight consecutive retrospectives, unsolved, because it required PO escalation outward rather than an internal process fix. This lesson generalizes that distinction: some problems (unclear requirements, internal process friction, estimation disagreements) are genuinely within a team's power to resolve through its own Scrum or Kanban practices; others (a shared resource bottleneck, an organizational dependency, a conflicting priority set by another team's leadership) are structural, and no amount of internal team process will fix them. A PM's job includes correctly identifying which category a given blocker falls into, and taking ownership of escalating the structural ones — since failing to do so leaves the team blocked indefinitely while quietly absorbing blame for a problem that was never theirs to solve alone.\n\n### The Iron Triangle\n\nA classical framing, useful in trade-off conversations with engineering: any piece of work can be described along three dimensions — **scope** (how much is being built), **time** (how quickly it must ship), and **quality/resources** (how much rigor, testing, and polish goes into it). The core claim of the Iron Triangle is that these three dimensions are interdependent: fixing any two effectively determines the third, and demanding all three be fixed simultaneously (more scope, faster, with no quality trade-off) is not a request for hard work — it's a request that violates the triangle's basic arithmetic.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Scope] --- B[Time]\n    B --- C[Quality / Resources]\n    C --- A\n```\n\nThis framing gives a PM a clean, respectful way to have a trade-off conversation under deadline pressure: rather than simply demanding \"more, faster,\" name explicitly which side of the triangle is flexible — is scope negotiable (can something be cut), is time negotiable (can the deadline move), or is quality genuinely the dimension being knowingly traded down (with the resulting risk made explicit and accepted).\n\n---",
+  "mistakes": "**Mistake 1: Handing engineering a fully-specified technical solution instead of a problem and constraints.**\nAs covered in Theory, this substitutes the PM's judgment for engineering's in a domain where engineering typically has more relevant information, often producing a worse outcome than trusting the team with the actual problem.\n\n**Mistake 2: Second-guessing engineering estimates without new information to justify it.**\nPushing back on an estimate simply because it's inconvenient, without offering new context that might genuinely change the estimate (a simplified scope, a different approach, new information about urgency), erodes trust and rarely produces a more accurate number — it usually just produces a falsely optimistic one.\n\n**Mistake 3: Treating every blocker as the team's to solve internally.**\nAs covered in Theory, some blockers are structural and require PM escalation; a PM who reflexively tells a blocked team to \"just figure it out\" when the blocker is genuinely outside the team's control leaves the team stuck and erodes trust in the PM's willingness to advocate for them.\n\n**Mistake 4: Demanding fixed scope, fixed time, and fixed quality simultaneously under deadline pressure.**\nThis is the Iron Triangle violation described above — a request that isn't really a request for harder work, but an implicit demand that one of the three dimensions quietly gives way (usually quality, and usually invisibly, in the form of accumulating technical debt or reduced testing) without ever being named or agreed to explicitly.\n\n**Mistake 5: Conflating disagreement about the problem with disagreement about the technical solution.**\nAs covered in Theory, unresolved disagreements about the underlying problem or constraints often surface, confusingly, as arguments about implementation details — resolving the wrong layer of disagreement (arguing about code architecture when the real disagreement is about which user need matters most) wastes time and rarely produces genuine alignment.\n\n---",
+  "mentalModel": {
+    "title": "The Trust Ladder",
+    "content": "This lesson's core takeaway tool visualizes engineering trust as a ladder that a PM climbs through repeated, consistent behavior, and can fall down quickly through a small number of trust-eroding actions:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[\"Rung 1: Basic Reliability (shows Up<br/>Prepared, Follows Through)\"] --> B[\"Rung 2: Honest Communication<br/>(transparent About Uncertainty,<br/>Changes)\"]\n    B --> C[\"Rung 3: Respects Expertise Boundaries<br/>(gives Context, Not Commands)\"]\n    C --> D[\"Rung 4: Advocates Outward<br/>(escalates Structural Blockers)\"]\n    D --> E[\"High Trust: Benefit of the Doubt in<br/>Hard Trade-off Conversations\"]\n    E -.->|Single Major Violation<br/>Can Drop Several Rungs| A\n```\n\nUse the Trust Ladder as a diagnostic whenever a working relationship with engineering feels strained: which rung is actually in question? A team that doesn't trust a PM's basic reliability (Rung 1) needs a different remedy than a team that trusts the PM personally but has seen structural blockers go unaddressed (Rung 4) — treating every trust problem as if it's the same problem, at the same rung, tends to apply the wrong fix.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[\"Rung 1: Basic Reliability (shows Up<br/>Prepared, Follows Through)\"] --> B[\"Rung 2: Honest Communication<br/>(transparent About Uncertainty,<br/>Changes)\"]\n    B --> C[\"Rung 3: Respects Expertise Boundaries<br/>(gives Context, Not Commands)\"]\n    C --> D[\"Rung 4: Advocates Outward<br/>(escalates Structural Blockers)\"]\n    D --> E[\"High Trust: Benefit of the Doubt in<br/>Hard Trade-off Conversations\"]\n    E -.->|Single Major Violation<br/>Can Drop Several Rungs| A"
+  },
+  "caseStudy": {
+    "title": "The PRD That Specified the Database Schema",
+    "content": "Consider a simplified, illustrative scenario common among new PMs eager to demonstrate technical credibility.\n\nA first-time PM, wanting to be seen as technically capable by an engineering team they've just started working with, writes a product requirements document for a new feature that includes not just the user problem and business context, but a specific proposed database schema, API endpoint structure, and caching strategy — details the PM researched independently but has no direct engineering experience implementing. The engineering team, seeing a fully pre-specified technical design handed to them, quietly builds it as specified rather than raising concerns, despite two engineers privately believing a different, simpler approach would have handled an important edge case (concurrent updates from multiple users) that the PM's proposed schema does not handle well.\n\nThree weeks after launch, the unhandled edge case causes a data-consistency bug affecting a small number of users. In the resulting retrospective, the two engineers explain they'd noticed the issue during initial design review but assumed the PM's detailed schema reflected a deliberate, informed technical decision, and didn't want to seem like they were overriding the PM's stated plan.\n\n**What went wrong?**\n\nThe PM's instinct — to demonstrate technical seriousness by being maximally specific — inverted the actual value they could have provided. By specifying a full technical solution rather than the underlying problem and constraints (in this case, the requirement to handle concurrent multi-user updates correctly, which the PM likely wasn't even aware needed explicit design attention), the PM removed the space for the engineers' better technical judgment to surface, and inadvertently signaled through the level of detail that the schema was a firm, considered decision rather than an open starting point. The engineers' silence, while understandable given the artifact they were handed, compounded the underlying mistake — but the root cause was the PM operating outside the boundary this lesson describes, treating engineering's domain as something to specify rather than something to trust with full context.\n\nThe fix is not for the PM to avoid all technical detail out of caution, but to clearly separate two kinds of information in any written specification: context and constraints that must be conveyed precisely (including, critically, non-obvious requirements like \"must handle concurrent updates from multiple users correctly\"), versus a proposed technical approach explicitly labeled as a starting suggestion open to revision, not a final decision. This distinction — what must be stated as a hard requirement versus what should be offered only as an open, negotiable suggestion — is a specific instance of INVEST's \"Negotiable\" criterion from **Lesson 34**, applied here to a full specification document rather than a single backlog item, and will be extended further in **Lesson 39 (Technical Debt & PM Trade-offs)**, where we discuss how upfront technical decisions interact with longer-term system health.\n\n---"
+  },
+  "framework": {
+    "title": "The Escalation Decision Table",
+    "content": "A second, more tactical tool: use this table when a team reports being blocked, to decide quickly whether the blocker is genuinely team-solvable or requires PM escalation.\n\n| Signal | Likely Team-Solvable | Likely Requires PM Escalation |\n|---|---|---|\n| Source of the blocker | Internal to the team's own process or communication | Involves another team, external vendor, or organizational resourcing decision |\n| Recurrence | First time this specific issue has come up | Has recurred across multiple Sprints or retrospectives unresolved (as in Lesson 32's Case Study) |\n| Authority required to fix it | Within the team's existing decision-making authority | Requires a decision or resource commitment from outside the team's leadership |\n| What's already been tried | The team hasn't yet attempted an internal process fix | The team has already tried reasonable internal fixes without success |\n\nA blocker landing mostly in the right-hand column is a signal that the PM's job is to advocate outward — not to encourage the team to keep trying to solve something structurally outside their control, which both wastes effort and, per the Trust Ladder, quietly erodes trust if it continues without visible PM action.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Startup vs. Mid-Size vs. Big Tech",
+    "content": "**At a startup:**\nThe PM-engineering relationship is often informal and built through constant, close daily contact — trust can form (or erode) quickly, since there's little organizational distance between the PM and the people building the product. The risk here is that informality can mask Mistake 1 (handing over solutions instead of problems) as simply \"collaborative brainstorming,\" when in practice the PM is still substituting their own technical preference without realizing it.\n\n**At a mid-size company:**\nThe relationship typically becomes more structured — a PM works with a defined set of engineers and an Engineering Manager or Tech Lead, often across recurring, scheduled touchpoints (grooming, planning, 1:1s). This is the stage where the Trust Ladder's higher rungs (advocating outward, escalating structural blockers) become especially visible and valuable, since the PM increasingly sits at the interface between the immediate team and the broader organization.\n\n**At Big Tech:**\nA PM may work with multiple engineering teams or a large team led by a dedicated Engineering Manager, and technical design review processes are often formalized (design docs, architecture review committees). The PM's job shifts toward being an effective participant and advocate within these more formal technical review processes, ensuring the problem and constraints are represented clearly, rather than trying to personally adjudicate technical trade-offs outside their expertise.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-037-1",
+      "questionNumber": 1,
+      "questionText": "What does \"give context, not commands\" mean, according to this lesson?",
+      "options": [
+        "PMs should never communicate any technical details to engineering",
+        "PMs should convey the problem, user need, and real constraints precisely, while trusting engineering to own the technical solution space",
+        "PMs should always specify the exact technical solution to be built",
+        "Engineers should never ask PMs any clarifying questions"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section defines this principle exactly as conveying problem and constraints while leaving the solution space to engineering.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-037-2",
+      "questionNumber": 2,
+      "questionText": "Why does specifying a fully-detailed technical solution often produce a worse outcome than specifying the problem and constraints?",
+      "options": [
+        "Because engineers dislike detailed documents on principle",
+        "Because engineering typically has more relevant information about the technical trade-off space, and a PM substituting their own solution overrides that expertise advantage",
+        "Because detailed documents take longer to write",
+        "Because Scrum forbids PMs from writing technical specifications"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains this as an asymmetry-of-expertise argument — engineering typically knows the technical trade-off space better than the PM does.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-037-3",
+      "questionNumber": 3,
+      "questionText": "According to the Trust Ladder, which of these behaviors builds trust rather than eroding it?",
+      "options": [
+        "Handing over tickets with no context, expecting silent execution",
+        "Escalating blockers the team can't solve on its own",
+        "Second-guessing every estimate without new information",
+        "Presenting an uncertain plan as a firm commitment, then quietly walking it back"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section's builds/erodes trust table lists escalating unsolvable blockers as a trust-building behavior; the other three options are explicitly listed as trust-eroding.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-037-4",
+      "questionNumber": 4,
+      "questionText": "What is the correct order of questions when resolving a technical disagreement, according to this lesson?",
+      "options": [
+        "Debate the technical approach first, then discuss the problem if needed",
+        "First confirm alignment on the problem, user need, and constraints; then discuss which technical approach best satisfies them",
+        "Always defer to whichever party has more seniority",
+        "Skip discussing the problem entirely and vote on the technical approach"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly presents this as a two-step, ordered framework — problem/constraints alignment first, technical approach second.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-037-5",
+      "questionNumber": 5,
+      "questionText": "Why does this lesson claim that many unproductive PM-engineering disagreements are \"conflated\"?",
+      "options": [
+        "Because PMs and engineers never actually disagree about anything real",
+        "Because an unresolved disagreement about the underlying problem or constraints often surfaces indirectly as an argument about implementation details, which resolves the wrong layer",
+        "Because engineers always agree with PMs once given enough data",
+        "Because technical disagreements are always about code style only"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explains that disagreements about problem/constraints frequently get mistaken for, and fought out as, disagreements about technical implementation.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-037-6",
+      "questionNumber": 6,
+      "questionText": "Using the Escalation Decision Table, which signal suggests a blocker likely requires PM escalation rather than being team-solvable?",
+      "options": [
+        "It's the first time this specific issue has come up",
+        "It involves another team, external vendor, or organizational resourcing decision outside the team's authority",
+        "The team hasn't yet attempted an internal process fix",
+        "It is within the team's existing decision-making authority"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Escalation Decision Table explicitly lists involvement of another team, external party, or organizational resourcing as a signal pointing toward PM escalation.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-037-7",
+      "questionNumber": 7,
+      "questionText": "What are the three dimensions of the Iron Triangle?",
+      "options": [
+        "Backlog, Sprint, Increment",
+        "Scope, Time, Quality/Resources",
+        "Transparency, Inspection, Adaptation",
+        "Now, Next, Later"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly defines the Iron Triangle as scope, time, and quality/resources.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-037-8",
+      "questionNumber": 8,
+      "questionText": "What does the Iron Triangle imply about demanding more scope, faster delivery, and unchanged quality simultaneously?",
+      "options": [
+        "This is always achievable with enough motivation",
+        "This violates the triangle's basic interdependence — fixing two of the three dimensions effectively determines the third, so demanding all three fixed forces one to give way, often invisibly",
+        "This is only a problem for Kanban teams",
+        "This has no relationship to the Iron Triangle at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly frames this demand as a violation of the triangle's interdependence, typically resulting in quality or technical debt quietly absorbing the difference.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-037-9",
+      "questionNumber": 9,
+      "questionText": "In the Detailed Case Study, why did the two engineers stay silent about the unhandled concurrent-update edge case?",
+      "options": [
+        "They did not notice the issue at all",
+        "They assumed the PM's detailed, specific schema reflected a deliberate, informed technical decision, and didn't want to seem like they were overriding the PM's stated plan",
+        "They agreed the edge case did not matter",
+        "They were not part of the design review process"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly states the engineers noticed the issue during review but assumed the specificity of the PM's schema signaled a deliberate, final decision.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-037-10",
+      "questionNumber": 10,
+      "questionText": "What is the recommended fix from the Detailed Case Study, for how a PM should write a specification document?",
+      "options": [
+        "Include no technical detail whatsoever, under any circumstances",
+        "Clearly separate hard, precisely-stated requirements (like handling concurrent updates correctly) from proposed technical approaches explicitly labeled as open, negotiable suggestions",
+        "Always let engineering write the entire specification independently",
+        "Always specify the exact database schema to avoid ambiguity"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study's resolution explicitly recommends this distinction between hard requirements and open, negotiable suggested approaches.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-037-11",
+      "questionNumber": 11,
+      "questionText": "(Scenario) A team has been blocked for three consecutive Sprints by the same dependency on another team's unavailable resource, and retrospective action items about it have gone unresolved each time. Using the Escalation Decision Table, what should the PM most likely do?",
+      "options": [
+        "Continue asking the team to solve it internally through better planning",
+        "Recognize this as a structural, escalation-worthy blocker (recurrence, cross-team source, authority required) and take ownership of escalating it outward",
+        "Remove the blocked item from the backlog permanently without further discussion",
+        "Wait for the issue to resolve itself naturally over time"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This matches the Escalation Decision Table's clearest signals for PM escalation: cross-team source and unresolved recurrence across multiple Sprints, directly echoing Lesson 32's Case Study.",
+      "learningObjective": "#4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-037-12",
+      "questionNumber": 12,
+      "questionText": "(Interview Reasoning) A candidate is asked how they handle a technical disagreement with an engineer, and answers: \"I usually just trust my gut and go with what I think is right, since I'm the PM.\" Based on this lesson's Interview Perspective section, what is the weakness in this answer?",
+      "options": [
+        "There is no weakness; PM authority should always prevail in a disagreement",
+        "It fails to describe a structured approach (confirming problem/constraint alignment first, then deferring to engineering's technical judgment) and instead asserts positional authority in a domain where the PM often has less relevant expertise",
+        "It correctly demonstrates strong decision-making under uncertainty",
+        "It shows appropriate confidence and should be viewed positively"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section explicitly states that a weak answer asserts preference without structured reasoning, echoing the lesson's broader point that a PM's authority is not positional (Lesson 1) and technical trade-offs are typically better judged by engineering.",
+      "learningObjective": "#1, #3",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-037-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A PM notices that engineers on their team have started silently implementing exactly what's written in specs, even when they privately have concerns, rather than raising objections. Using the Trust Ladder and the Detailed Case Study, what is the most likely underlying cause?",
+      "options": [
+        "The engineers are simply not skilled enough to raise concerns",
+        "The PM's specifications may be signaling technical decisions as final and fully-specified rather than open, inviting engineers to defer rather than push back — echoing the Case Study's core failure",
+        "This is a sign of a perfectly healthy, high-trust relationship",
+        "The team should be given even more detailed specifications to prevent further silence"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly mirrors the Detailed Case Study's dynamic — overly specific, final-seeming specifications can suppress engineers' willingness to raise legitimate concerns, exactly the failure mode this lesson warns against.",
+      "learningObjective": "#1, #2, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-037-14",
+      "questionNumber": 14,
+      "questionText": "Why does the lesson recommend asking clarifying questions about a technical approach (\"does this handle the edge case we identified\") rather than avoiding all technical engagement entirely?",
+      "options": [
+        "Because PMs should have no involvement in technical conversations at all",
+        "Because these questions test whether a proposed approach serves the stated problem and constraints, without substituting the PM's own preferred implementation for engineering's judgment",
+        "Because asking questions is only appropriate once a decision has already shipped",
+        "Because engineers expect PMs to propose alternative technical solutions directly"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly distinguishes appropriate PM engagement (testing whether an approach serves the problem/constraints) from inappropriate engagement (substituting a preferred implementation).",
+      "learningObjective": "#1, #3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-037-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A PM is under significant pressure from leadership to ship more scope in less time than the engineering team believes is realistic, without any discussion of reduced quality or additional resources. Using the Iron Triangle and the Trust Ladder together, what is the most defensible response?",
+      "options": [
+        "Silently pass the pressure on to engineering and demand they simply work harder to hit both targets",
+        "Use the Iron Triangle to make the trade-off explicit with leadership — naming that scope, time, and quality are interdependent — while using the Trust Ladder's principles (honest communication, advocating outward) to represent engineering's realistic assessment rather than absorbing the pressure silently and passing it downward",
+        "Tell engineering to quietly cut corners on testing without informing leadership of the change",
+        "Refuse to discuss the request with leadership at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This combines both frameworks as intended: the Iron Triangle names the actual trade-off explicitly to leadership, while the Trust Ladder's \"advocates outward\" principle means the PM represents engineering's honest assessment upward rather than passing unreasonable pressure downward or letting quality erode invisibly.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "Consider the following novel scenario: You're a new PM working with an engineering team for the first time. During Sprint Planning, an engineer proposes an estimate for a feature that seems, to you, surprisingly high — nearly double what you expected based on similar past features. You don't have deep technical expertise in the specific area involved.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying this lesson's trust and disagreement frameworks, not to reach one \"right\" answer.\n\n1. Using this lesson's technical disagreement framework, what should you check first before questioning the estimate itself?\n2. What specific, respectful questions could you ask that test the estimate without second-guessing engineering's technical judgment outright?\n3. If the engineer's answer reveals a piece of context you were missing (a hidden dependency, a testing requirement), how should that change your next move?\n4. If, after this conversation, you still believe the estimate seems high, and you lack the technical expertise to independently evaluate it, what does the Trust Ladder suggest about how you should proceed?\n5. How would you distinguish, going forward, whether this specific interaction built or eroded trust with this engineer, using the builds/erodes trust table from this lesson?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 36 — Release Planning & Launch Management | This lesson addresses how the safeguards from Lesson 36 (staged rollout, feature flags, rollback plans) actually get built into a team's default process through effective PM-engineering collaboration |\n| **Current Lesson** | Lesson 37 — Working with Engineering Teams | Give context, not commands; Trust Ladder; technical disagreement resolution; Escalation Decision Table; Iron Triangle |\n| **Next Lesson** | Lesson 38 — Working with Design Teams | A parallel relationship-building lesson, applying similar trust and context-handoff principles to the PM-design partnership |\n| **Future Concepts Unlocked** | Lesson 39 (Technical Debt & PM Trade-offs) | Extends the Iron Triangle and the hard-requirement/open-suggestion distinction from this lesson's Case Study |\n| | Lesson 53 (Negotiation & Influence Without Authority) | Builds directly on this lesson's Trust Ladder and Lesson 1's \"responsibility without authority\" framing |\n| | Lesson 54 (Managing Up and Across) | Extends this lesson's \"advocates outward\" principle to managing pressure from leadership specifically |\n\nThis curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Trust Ladder, the Iron Triangle, and the \"context not commands\" principle with you — they will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-037.md"
+}

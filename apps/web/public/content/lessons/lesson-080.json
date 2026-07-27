@@ -1,0 +1,358 @@
+{
+  "meta": {
+    "slug": "lesson-080",
+    "number": 80,
+    "title": "Module Synthesis: Advanced Strategic Judgment",
+    "moduleNumber": 8,
+    "moduleName": "Advanced Strategy, Innovation & Enterprise/B2B Product Management",
+    "difficulty": 7,
+    "estMinutesReading": 45,
+    "estMinutesReflection": 20,
+    "prerequisites": "Lessons 71–79 (all Module 8 mental models), Lesson 70 (Platform Health Radar, as a model of connected synthesis)",
+    "nextLessonSlug": "lesson-081",
+    "futureTopicsUnlocked": "Lesson 84 (PM in AI-Native Companies), Lesson 88 (Building and Scaling a Product Organization), Lesson 90 (Capstone) — all draw on this integrated Module 8 toolkit as established canon"
+  },
+  "learningObjectives": [
+    "Recall and correctly name all nine mental models introduced across Module 8, and the specific strategic question each answers.",
+    "Apply the Strategic Judgment Radar to assess a company's strategic position holistically across all nine dimensions simultaneously.",
+    "Use the Cross-Lesson Strategic Diagnostic Protocol to determine which combination of models applies to an ambiguous, multi-faceted strategic problem.",
+    "Explain how the nine models interconnect, rather than treating them as a disconnected checklist.",
+    "Evaluate a complex strategic scenario by correctly identifying which model or models are the primary diagnostic lens, and which are secondary."
+  ],
+  "theory": "### Why Integration, Not Addition, Is the Point\n\nAs with Module 7's Platform Health Radar, a strategist who has memorized nine separate models but always applies exactly one to any given problem has developed nine narrow reflexes rather than genuine strategic judgment. Advanced strategic judgment means recognizing that most real business problems are multi-dimensional, and that the first diagnostic task is determining which combination of models is actually relevant, not simply picking whichever model's name sounds closest to the symptom being observed.\n\n### The Strategic Judgment Radar\n\nThis lesson introduces the **Strategic Judgment Radar**, assessing a strategic situation across all nine Module 8 dimensions at once, rather than one at a time:\n\n```mermaid\ngraph TD\n    R[Strategic Judgment Radar] --> A[Strategy Cascade:<br/>Is the underlying bet actually falsifiable?]\n    R --> B[Enterprise Adoption Ladder:<br/>Which rung, and what capability blocks the next one?]\n    R --> C[Stakeholder Compass:<br/>Which stakeholder role is unaddressed?]\n    R --> D[Expansion Wedge:<br/>Does packaging create or block natural growth?]\n    R --> E[Moat Durability Matrix:<br/>Is the claimed advantage genuinely durable?]\n    R --> F[Integration Continuum:<br/>Does any M&A integration match its rationale?]\n    R --> G[Portfolio Health Grid:<br/>Is this bet judged by stage-appropriate evidence?]\n    R --> H[Capability Sourcing Matrix:<br/>Should this capability be built, bought, or partnered for?]\n    R --> I[Concession Exchange Map:<br/>Are negotiation trades efficient, or precedent-setting?]\n```\n\nThe Radar's discipline is running through all nine questions whenever a significant strategic problem surfaces, rather than stopping at the first model that seems to fit, since real strategic incidents — as this lesson's Case Study will show — are frequently the product of failures across more than one axis simultaneously.\n\n### The Cross-Lesson Strategic Diagnostic Protocol\n\nWhen a strategic symptom is observed — a stalled deal, a declining account, an underperforming acquisition, an eroding competitive position — this lesson recommends a **Cross-Lesson Strategic Diagnostic Protocol** with a deliberate order of investigation:\n\n1. **Check the bet** (Strategy Cascade, Lesson 71): is the underlying strategic bet actually falsifiable, with pre-defined success criteria, or is this a vague aspiration that was never set up to be judged?\n2. **Check the rung** (Enterprise Adoption Ladder, Lesson 72): if this is an account-level problem, which rung is it stalled at, and what specific capability does the next rung require?\n3. **Check the stakeholders** (Stakeholder Compass, Lesson 73): has every relevant buying-committee role actually been engaged, or is progress being inferred from only one enthusiastic contact?\n4. **Check the packaging** (Expansion Wedge, Lesson 74): does the account's packaging create a natural path to expansion, or has it removed the incentive to grow?\n5. **Check the moat** (Moat Durability Matrix, Lesson 75): is a claimed competitive advantage genuinely structural, or merely a temporary, untested lead?\n6. **Check any integration** (Integration Continuum, Lesson 76): if an acquisition is involved, does its integration approach actually match its original strategic rationale?\n7. **Check the evidence** (Portfolio Health Grid, Lesson 77): is this initiative being judged against evidence appropriate to its actual maturity stage?\n8. **Check the sourcing** (Capability Sourcing Matrix, Lesson 78): is a relevant capability being built, bought, or partnered for in a way that matches its genuine differentiation and market maturity?\n9. **Check the concessions** (Concession Exchange Map, Lesson 79): have any pricing or contract concessions been traded efficiently, or have they set a costly precedent?\n\nAs with Module 7's protocol, this ordered checklist does not mean every investigation touches all nine steps equally — a well-trained strategist learns to move quickly past steps that clearly don't apply — but the discipline of checking each axis, rather than assuming only one applies, is what distinguishes genuine strategic diagnostic skill from pattern-matching a symptom to the first familiar-sounding model.\n\n### How the Models Interconnect\n\nThe nine models connect directly. The Strategy Cascade (Lesson 71) provides the foundational discipline — falsifiability — that the Portfolio Health Grid (Lesson 77) later applies specifically to bets at different maturity stages. The Enterprise Adoption Ladder (Lesson 72) and Stakeholder Compass (Lesson 73) both describe the same underlying B2B adoption process from complementary angles — rungs of organizational progress and the people who gate that progress, respectively. The Expansion Wedge (Lesson 74) depends directly on the Enterprise Adoption Ladder, since its Enterprise Tier must be built around Rung 3 and 4 capability needs. The Moat Durability Matrix (Lesson 75) feeds directly into the Capability Sourcing Matrix (Lesson 78), since genuine differentiation is one of the Sourcing Matrix's two core axes. The Integration Continuum (Lesson 76) is, in effect, a specialized application of rationale-matching thinking to the specific context of post-acquisition integration. The Concession Exchange Map (Lesson 79) closes the loop by addressing what happens once a deal, having successfully navigated the Adoption Ladder and Stakeholder Compass, reaches the negotiation table.\n\n---",
+  "mistakes": "1. **Applying only the first model that seems to fit, without checking whether others are also relevant.** Most significant strategic problems involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.\n2. **Treating the nine models as an unordered checklist rather than a connected structure.** Understanding how the models depend on each other produces faster, more accurate diagnosis than treating each model as unrelated to the others.\n3. **Skipping the Strategy Cascade's falsifiability check when diagnosing any other problem.** A bet that was never made falsifiable in the first place cannot be genuinely evaluated using any of the other eight models, since there is no clear success criterion to measure progress against.\n4. **Forgetting that the Concession Exchange Map applies to internal negotiations too, not just external customer contracts.** The same precedent-cost logic applies whenever any concession is granted that other parties might reasonably expect to be extended again.\n5. **Assuming strategic judgment is complete once all nine models are individually memorized.** Genuine strategic judgment is the ability to recognize which combination applies to a novel, real situation — a skill built through practice, not memorization alone.\n\n---",
+  "mentalModel": {
+    "title": "The Strategic Judgment Radar",
+    "content": "The Strategic Judgment Radar introduced above is this lesson's core takeaway tool, synthesizing all of Module 8 into a single integrated diagnostic. When facing any significant strategic problem, however it initially presents, run through the Radar's nine axes using the Cross-Lesson Strategic Diagnostic Protocol:\n\n1. **Is the underlying bet** falsifiable?\n2. **Which rung** is an account stalled at?\n3. **Which stakeholder** is unaddressed?\n4. **Does packaging** create or block expansion?\n5. **Is the moat** genuinely durable?\n6. **Does integration** match its rationale?\n7. **Is the evidence** stage-appropriate?\n8. **Is sourcing** correctly matched?\n9. **Are concessions** efficient or precedent-setting?\n\nA strategist who runs this full Radar, rather than stopping at the first familiar-sounding symptom, is far better equipped to diagnose the genuinely multi-dimensional problems that characterize real strategic work.\n\n---"
+  },
+  "caseStudy": {
+    "title": "The Multi-Front Strategic Stall",
+    "content": "A mid-size enterprise software company noticed, over two consecutive quarters, a troubling combination of symptoms: a recently acquired competitor's technology had still not been meaningfully integrated into the core product a year after the deal closed; several large enterprise accounts that had shown strong departmental adoption had stalled before reaching organization-wide rollout; and a promising new product line, launched eighteen months earlier as an explicit exploratory bet, was facing internal pressure to be shut down for failing to show revenue comparable to the company's mature core business.\n\nA thorough investigation using the Cross-Lesson Strategic Diagnostic Protocol revealed that these three symptoms, while superficially unrelated, shared a common underlying pattern. The stalled acquisition integration, examined through the Integration Continuum, revealed that the deal's original rationale — acquiring a specific proprietary technology — had never been matched to an appropriate Selective Integration plan, with the acquired team instead left in an ambiguous, under-communicated limbo that had caused several key engineers to depart, taking much of the technology's practical value with them. The stalled enterprise accounts, examined through the Enterprise Adoption Ladder and Stakeholder Compass together, revealed that sales and success teams had been engaging only enthusiastic departmental Champions, never directly reaching the Technical Evaluators whose security sign-off Rung 3 required. The pressured new product line, examined through the Portfolio Health Grid, revealed the same premature-cancellation pattern from Lesson 77's case study: a Horizon 3 bet being judged against Horizon 1 revenue metrics it was structurally too early to satisfy.\n\n**What went wrong?** Using the Strategic Judgment Radar across multiple axes at once, the true picture was a company-wide pattern of premature judgment and unmatched rigor: an acquisition integration approach that never matched its rationale, an enterprise sales motion that never engaged the full Stakeholder Compass, and a portfolio evaluation process that never accounted for genuine maturity stages. No single Module 8 lesson, applied in isolation, would have revealed this shared underlying pattern across three seemingly unrelated business problems.\n\nThe company's recovery required addressing the pattern at its root rather than symptom by symptom: instituting a formal Integration Continuum rationale-check for all future acquisitions, a mandatory Technical Evaluator engagement step for any account approaching Rung 3, and a company-wide Portfolio Health Grid review requiring stage-appropriate metrics for every active bet — illustrating precisely why this lesson's synthesis, rather than any single model in isolation, was necessary to correctly diagnose and resolve the underlying pattern.\n\n---"
+  },
+  "framework": {
+    "title": "The Cross-Lesson Strategic Diagnostic Protocol (Reference Table)",
+    "content": "The following table summarizes the nine-step protocol introduced in the Theory section, for quick reference when facing a real strategic problem:\n\n| Step | Model | Core Diagnostic Question |\n|---|---|---|\n| 1 | Strategy Cascade (Lesson 71) | Is the underlying bet genuinely falsifiable? |\n| 2 | Enterprise Adoption Ladder (Lesson 72) | Which rung is an account stalled at, and what capability does the next rung need? |\n| 3 | Stakeholder Compass (Lesson 73) | Has every relevant buying-committee role been directly engaged? |\n| 4 | Expansion Wedge (Lesson 74) | Does packaging create or eliminate a natural path to expansion? |\n| 5 | Moat Durability Matrix (Lesson 75) | Is a claimed competitive advantage genuinely structural? |\n| 6 | Integration Continuum (Lesson 76) | Does an M&A integration approach match its original rationale? |\n| 7 | Portfolio Health Grid (Lesson 77) | Is a bet being judged against evidence appropriate to its actual maturity stage? |\n| 8 | Capability Sourcing Matrix (Lesson 78) | Is a capability's sourcing decision matched to genuine differentiation and market maturity? |\n| 9 | Concession Exchange Map (Lesson 79) | Have negotiation concessions been traded efficiently, or have they set a costly precedent? |\n\nA thorough strategic investigation moves through this table deliberately, ruling axes in or out with evidence, rather than stopping at the first plausible-sounding explanation.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Real World Perspective",
+    "content": ""
+  },
+  "quiz": [
+    {
+      "id": "q-080-1",
+      "questionNumber": 1,
+      "questionText": "What is the primary purpose of the Strategic Judgment Radar?",
+      "options": [
+        "To replace all nine prior Module 8 models with a single new model",
+        "To assess a strategic situation across all nine Module 8 dimensions simultaneously, rather than applying one model in isolation",
+        "To measure only a company's revenue performance",
+        "To eliminate the need for the Cross-Lesson Strategic Diagnostic Protocol"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Strategic Judgment Radar is explicitly an integrating tool, not a replacement for the individual models it draws together.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-080-2",
+      "questionNumber": 2,
+      "questionText": "According to this lesson, why do real strategic problems often resist single-model diagnosis?",
+      "options": [
+        "Real strategic problems are always simpler than they initially appear",
+        "Real problems are frequently multi-dimensional, involving compounding failures across more than one diagnostic axis",
+        "Single-model diagnosis is always sufficient for any real-world strategic issue",
+        "Multi-dimensional strategic problems do not actually occur in practice"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson's central argument is that strategic incidents are often the product of failures across multiple axes at once.",
+      "learningObjective": "#1, #3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-080-3",
+      "questionNumber": 3,
+      "questionText": "How does the Enterprise Adoption Ladder (Lesson 72) relate to the Stakeholder Compass (Lesson 73)?",
+      "options": [
+        "The two models are entirely unrelated",
+        "They describe the same B2B adoption process from complementary angles — organizational progress rungs and the stakeholders who gate that progress",
+        "The Stakeholder Compass replaces the Enterprise Adoption Ladder entirely",
+        "The Enterprise Adoption Ladder only applies to consumer products, unlike the Stakeholder Compass"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly connects these two models as complementary views of the same underlying process.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-080-4",
+      "questionNumber": 4,
+      "questionText": "How does the Moat Durability Matrix (Lesson 75) relate to the Capability Sourcing Matrix (Lesson 78)?",
+      "options": [
+        "They are unrelated models covering entirely separate topics",
+        "Genuine competitive differentiation, assessed by the Moat Durability Matrix, is one of the two core axes the Capability Sourcing Matrix uses",
+        "The Capability Sourcing Matrix replaces the need for the Moat Durability Matrix entirely",
+        "The Moat Durability Matrix only applies to marketplace problems, unlike the Capability Sourcing Matrix"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly frames the Moat Durability Matrix's differentiation assessment as feeding directly into the Sourcing Matrix's evaluation.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-080-5",
+      "questionNumber": 5,
+      "questionText": "In the Cross-Lesson Strategic Diagnostic Protocol, what should be checked using the Portfolio Health Grid?",
+      "options": [
+        "Whether a negotiation concession was efficient or precedent-setting",
+        "Whether a bet is being judged against evidence appropriate to its actual maturity stage",
+        "Whether a marketplace has a binding supply-side or demand-side constraint",
+        "Whether an acquisition's integration matches its original rationale"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Portfolio Health Grid step checks stage-appropriate evaluation, a foundational concern distinct from the other axes.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-080-6",
+      "questionNumber": 6,
+      "questionText": "In the Multi-Front Strategic Stall case study, what did the stalled acquisition integration have in common with the stalled enterprise accounts and the pressured product line?",
+      "options": [
+        "Nothing; the three symptoms were entirely unrelated",
+        "A shared underlying pattern of unmatched rigor: mismatched integration rationale, incomplete stakeholder engagement, and premature evaluation against inappropriate metrics",
+        "All three problems were caused by a single technical bug",
+        "All three symptoms were resolved by the same single fix with no further investigation needed"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study's core lesson is that a shared underlying pattern connected three seemingly unrelated symptoms, discoverable only through multi-axis investigation.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-080-7",
+      "questionNumber": 7,
+      "questionText": "Why might treating each of the three symptoms in the case study as entirely separate problems have failed to resolve the underlying issue?",
+      "options": [
+        "Separate treatment would have been equally effective as connected diagnosis",
+        "A shared underlying pattern connected all three symptoms, meaning symptom-by-symptom fixes would likely have left the root cause unaddressed",
+        "The three symptoms had no actual connection to each other",
+        "Separate treatment is always superior to connected diagnosis in any strategic situation"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study demonstrates that addressing symptoms individually, without recognizing the shared pattern, would have missed the actual root cause.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-080-8",
+      "questionNumber": 8,
+      "questionText": "What does the Concession Exchange Map check within the Cross-Lesson Strategic Diagnostic Protocol specifically investigate?",
+      "options": [
+        "Whether an acquisition's integration matches its rationale",
+        "Whether negotiation concessions have been traded efficiently or have set a costly precedent",
+        "Whether a marketplace's supply side is under-resourced",
+        "Whether a recommender system has fallen into a filter bubble"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Concession Exchange Map's role in the protocol is specifically to check pricing and negotiation efficiency, distinct from the other axes.",
+      "learningObjective": "#3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-080-9",
+      "questionNumber": 9,
+      "questionText": "According to the Real World Perspective section, why might a Big Tech-scale organization's strategic synthesis role look different from that of a mid-size company's?",
+      "options": [
+        "Big Tech organizations never need to understand any of the nine models personally",
+        "Dedicated specialist teams typically handle different axes, so the strategist's synthesis role shifts toward coordinating those specialists around a shared, integrated understanding",
+        "Mid-size companies are the only ones who ever need to apply these models",
+        "There is no meaningful difference between the two contexts"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section describes this shift from personal application to cross-team coordination as scale increases, mirroring Module 7's synthesis lesson.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-080-10",
+      "questionNumber": 10,
+      "questionText": "What is \"advanced strategic judgment,\" as defined in this lesson's Key Takeaways?",
+      "options": [
+        "The ability to memorize all nine models' names and definitions",
+        "The applied skill of recognizing which combination of models fits a real, ambiguous strategic situation",
+        "A formal certification awarded after completing Module 8",
+        "The ability to build a company strategy without any need for diagnostic frameworks"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly distinguishes memorization from the applied, situational skill of correctly combining models.",
+      "learningObjective": "#1, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-080-11",
+      "questionNumber": 11,
+      "questionText": "Why is checking the Strategy Cascade's falsifiability considered foundational to any other diagnostic step, per the Common Beginner Mistakes section?",
+      "options": [
+        "It is the most complex of the nine models and therefore the most important",
+        "A bet that was never made falsifiable in the first place cannot be genuinely evaluated using any of the other eight models, since there is no clear success criterion",
+        "The other eight models cannot function without first applying the Strategy Cascade",
+        "The Strategy Cascade is only relevant to enterprise sales problems specifically"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Common Beginner Mistakes section explicitly warns that skipping this check undermines the ability to evaluate progress through any other model.",
+      "learningObjective": "#3",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-080-12",
+      "questionNumber": 12,
+      "questionText": "(Scenario) A strategist observes a stalled acquisition, several stalled enterprise accounts, and pressure to cancel a promising product line, and immediately proposes three separate, unrelated fixes for each. What does this lesson suggest as the appropriate first response?",
+      "options": [
+        "Approve all three separate fixes immediately, since each symptom clearly requires its own distinct solution",
+        "Run the situation through the Cross-Lesson Strategic Diagnostic Protocol to check for a shared underlying pattern before committing to three separate, uncoordinated fixes",
+        "Reject all three proposed fixes outright without any further investigation",
+        "Assume the three symptoms are purely coincidental and require no action"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the Case Study's core lesson: symptoms that appear unrelated may share a common root cause, discoverable only through the full diagnostic protocol.",
+      "learningObjective": "#2, #3, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-080-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A strategist notices three seemingly unrelated symptoms across acquisition integration, enterprise sales, and portfolio evaluation. Using this lesson's frameworks, what is the most defensible first step?",
+      "options": [
+        "Treat each symptom as an entirely separate problem requiring three unrelated investigations",
+        "Investigate whether these symptoms share a common root cause using the Cross-Lesson Strategic Diagnostic Protocol, checking relevant axes for each symptom in parallel",
+        "Address only the acquisition integration issue, since M&A problems are always the most urgent",
+        "Wait for additional symptoms to appear before taking any action"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the Reflection Exercise: multiple seemingly separate symptoms may share a common underlying cause, and the protocol supports investigating them together rather than in isolation.",
+      "learningObjective": "#3, #4, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-080-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) A candidate, asked to diagnose a complex strategic problem, applies a single model thoroughly and concludes their investigation once that model produces a plausible explanation. What does this most likely signal, per the Interview Perspective section?",
+      "options": [
+        "A complete and sufficient diagnostic approach",
+        "A potential gap in checking for compounding causes across other axes, which the interviewer is specifically listening for",
+        "That the candidate is ready for a senior strategy leadership role immediately",
+        "Nothing meaningful; a single plausible explanation is always sufficient"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section specifically listens for evidence of considering multiple contributing causes, not stopping at the first plausible single-model explanation.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-080-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A company faces a stalled acquisition integration, several stalled enterprise accounts just short of company-wide rollout, and pressure to cancel a maturing exploratory product line. Using only the frameworks in this lesson, what is the most defensible response?",
+      "options": [
+        "Address only the single symptom that seems most urgent, and assume the others will resolve themselves once that one is fixed",
+        "Investigate all three symptoms for a shared underlying pattern using the Cross-Lesson Strategic Diagnostic Protocol, and address any common root cause alongside symptom-specific fixes",
+        "Launch a broad reorganization to address all symptoms simultaneously without further diagnosis",
+        "Conclude that the situation is too complex to address and take no action"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the Multi-Front Strategic Stall case study directly: a compounding, multi-axis pattern requires a coordinated, root-cause-informed response, not a single-symptom fix, an undiagnosed broad reorganization, or inaction.",
+      "learningObjective": "#2, #3, #4, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "fc-080-1",
+      "front": "Name all nine Module 8 mental models in the order they were introduced.",
+      "back": "Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, Concession Exchange Map.",
+      "difficulty": "Medium",
+      "tags": [
+        "#module-synthesis"
+      ],
+      "lessonNumber": 80
+    },
+    {
+      "id": "fc-080-2",
+      "front": "What is the Strategic Judgment Radar?",
+      "back": "An integrated diagnostic tool assessing a strategic situation across all nine Module 8 dimensions simultaneously, rather than applying one model in isolation.",
+      "difficulty": "Easy",
+      "tags": [
+        "#strategic-judgment-radar"
+      ],
+      "lessonNumber": 80
+    },
+    {
+      "id": "fc-080-3",
+      "front": "How does the Enterprise Adoption Ladder relate to the Stakeholder Compass?",
+      "back": "They describe the same B2B adoption process from complementary angles — rungs of organizational progress, and the specific people who gate that progress at each rung.",
+      "difficulty": "Medium",
+      "tags": [
+        "#model-interconnection"
+      ],
+      "lessonNumber": 80
+    },
+    {
+      "id": "fc-080-4",
+      "front": "How does the Moat Durability Matrix relate to the Capability Sourcing Matrix?",
+      "back": "Genuine competitive differentiation, assessed by the Moat Durability Matrix, is one of the two core axes the Capability Sourcing Matrix uses to recommend Build, Buy, or Partner.",
+      "difficulty": "Hard",
+      "tags": [
+        "#model-interconnection"
+      ],
+      "lessonNumber": 80
+    },
+    {
+      "id": "fc-080-5",
+      "front": "Why did the Multi-Front Strategic Stall case study require more than one model to diagnose correctly?",
+      "back": "The true cause was a shared pattern across an unmatched acquisition integration, incomplete stakeholder engagement in stalled accounts, and premature evaluation of a maturing bet — three seemingly unrelated symptoms with one underlying root cause.",
+      "difficulty": "Hard",
+      "tags": [
+        "#case-study",
+        "#multi-front-stall"
+      ],
+      "lessonNumber": 80
+    },
+    {
+      "id": "fc-080-6",
+      "front": "What is the risk of applying only the first model that seems to fit a strategic symptom?",
+      "back": "Most significant strategic problems involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.",
+      "difficulty": "Medium",
+      "tags": [
+        "#diagnostic-discipline"
+      ],
+      "lessonNumber": 80
+    },
+    {
+      "id": "fc-080-7",
+      "front": "What does genuine \"advanced strategic judgment\" mean, per this synthesis lesson?",
+      "back": "The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.",
+      "difficulty": "Medium",
+      "tags": [
+        "#strategic-judgment"
+      ],
+      "lessonNumber": 80
+    }
+  ],
+  "reflectionPrompt": "You are the head of product strategy at a mid-size B2B software company. Over the past two quarters, you've observed: a technology acquisition from eighteen months ago still operating in organizational limbo with no clear integration plan; three large enterprise accounts stalled just short of company-wide rollout; and mounting internal pressure to cancel a year-old exploratory product line for its still-modest revenue.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying the Strategic Judgment Radar and Cross-Lesson Strategic Diagnostic Protocol to a genuinely multi-symptom scenario.\n\n1. Using the Cross-Lesson Strategic Diagnostic Protocol's nine steps, which steps would you investigate first given these three symptoms, and why?\n2. Could the stalled acquisition and the stalled enterprise accounts share any common underlying cause? What model would you use to check this?\n3. How does the pressure to cancel the exploratory product line relate to, or potentially compound, the other two symptoms you're observing?\n4. Propose a plan for investigating all three symptoms in parallel, rather than addressing them as three unrelated problems.\n5. Once you've diagnosed the root cause(s), how would you decide which fixes to prioritize first if resources don't allow addressing everything simultaneously?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 79 — Pricing Strategy at Scale: Enterprise Contracts and Negotiation | Integrates the Concession Exchange Map as the ninth axis of the Strategic Judgment Radar |\n| **Current Lesson** | Lesson 80 — Module Synthesis: Advanced Strategic Judgment | Strategic Judgment Radar; Cross-Lesson Strategic Diagnostic Protocol; model interconnection; advanced strategic judgment |\n| **Next Lesson** | Lesson 81 — Regulated Industries: PM in Healthcare, Finance, and Government | Opens Module 9 by applying the accumulated toolkit from Modules 7 and 8 to the specific constraints of regulated domains |\n| **Future Concepts Unlocked** | Lesson 84 (PM in AI-Native Companies) | Draws on the full Module 8 toolkit, especially the Moat Durability Matrix and Capability Sourcing Matrix, when evaluating AI-native strategic positioning |\n| | Lesson 88 (Building and Scaling a Product Organization) | Extends the Strategic Judgment Radar into organizational design and scaling decisions |\n| | Lesson 90 (Capstone) | Treats the full, integrated Module 8 toolkit as established canon for the curriculum's final synthesis |\n\nThis curriculum continues to build as one continuous argument. From this lesson forward, any reference to a strategic problem assumes you can run the Cross-Lesson Strategic Diagnostic Protocol across the full Module 8 toolkit without re-explanation.",
+  "rawMarkdownPath": "content/lessons/lesson-080.md"
+}

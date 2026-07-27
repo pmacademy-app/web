@@ -9,7 +9,6 @@ import { CurriculumSection } from '@/components/marketing/sections/curriculum'
 import { ExperienceSection } from '@/components/marketing/sections/experience'
 import { SkillRadarSection } from '@/components/marketing/sections/skill-radar-section'
 import { PortfolioSection } from '@/components/marketing/sections/portfolio'
-import { AIMentorSection } from '@/components/marketing/sections/ai-mentor'
 import { CommunitySection } from '@/components/marketing/sections/community'
 import { TestimonialsSection } from '@/components/marketing/sections/testimonials'
 import { FAQSection } from '@/components/marketing/sections/faq'
@@ -17,7 +16,7 @@ import { FinalCTASection } from '@/components/marketing/sections/final-cta'
 
 /**
  * Main marketing landing page.
- * Assembles all 12 sections in order.
+ * Assembles core marketing sections.
  * Triggers scroll analytics hook on mount.
  */
 export default function MarketingPage() {
@@ -33,7 +32,6 @@ export default function MarketingPage() {
       <ExperienceSection />
       <SkillRadarSection />
       <PortfolioSection />
-      <AIMentorSection />
       <CommunitySection />
       <TestimonialsSection />
       <FAQSection />

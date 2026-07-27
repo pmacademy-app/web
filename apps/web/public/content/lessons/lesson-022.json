@@ -1,0 +1,288 @@
+{
+  "meta": {
+    "slug": "lesson-022",
+    "number": 22,
+    "title": "Product Requirements Document (PRD)",
+    "moduleNumber": 3,
+    "moduleName": "Product Design",
+    "difficulty": 4,
+    "estMinutesReading": 25,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 17 (Problem Statements), Lesson 21 (MVP)",
+    "nextLessonSlug": "lesson-023",
+    "futureTopicsUnlocked": "Lesson 23 (User Stories — breaking a PRD into implementable units), Lesson 24 (Acceptance Criteria), Lesson 37 (Working with Engineering Teams)"
+  },
+  "learningObjectives": [
+    "Define a PRD and identify its core sections, distinguishing required content from optional or team-specific additions.",
+    "Apply the \"problem before solution\" ordering discipline within a PRD, directly extending Lesson 17's problem statement practice.",
+    "Distinguish appropriate specification precision from over-specification, and explain the risks of each extreme.",
+    "Identify the \"PRD as one-way document\" failure pattern and explain why a PRD should function as a living, collaboratively refined artifact rather than a final, unquestionable decree.",
+    "Apply a structured method for scoping what belongs inside a PRD versus what belongs in adjacent artifacts (user stories, acceptance criteria, design specs)."
+  ],
+  "theory": "### The Core Definition and Structure\n\nA PRD is a written specification communicating what is being built, for whom, why, and to what specification, structured to give engineering, design, and QA a shared, unambiguous reference point throughout a project. While specific templates vary by organization, a PRD typically includes:\n\n- **Problem statement** (Lesson 17): the validated problem being addressed, stated without a solution.\n- **Goals and success metrics**: what outcome this solution is meant to produce, and how success will be measured — directly connecting to the desired outcome at the root of the Opportunity Solution Tree (Lesson 19).\n- **Scope** (in and out): what the MVP (Lesson 21) does and, just as importantly, does not include, given the riskiest-assumption scoping discipline from the previous lesson.\n- **User flows or scenarios**: how a user actually moves through the solution, often connecting to persona and journey map work (Lessons 14–15).\n- **Functional requirements**: specific behaviors the solution must exhibit.\n- **Non-functional requirements**: performance, security, accessibility, and other cross-cutting constraints.\n- **Open questions and risks**: explicitly unresolved issues, rather than papering over uncertainty with false specificity.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[PRD] --> B[Problem Statement<br/>Lesson 17, Solution-free]\n    A --> C[Goals & Success Metrics]\n    A --> D[Scope: in and Out Per<br/>MVP Discipline, Lesson 21]\n    A --> E[User Flows / Scenarios]\n    A --> F[Functional Requirements]\n    A --> G[Non-Functional Requirements]\n    A --> H[Open Questions & Risks]\n```\n\n### Problem Before Solution: Ordering Discipline Within a PRD\n\nA specific, important discipline — directly extending Lesson 17's solution-free problem statement practice — is the ordering of a PRD's content: the problem statement and goals must be established and agreed upon *before* functional requirements are specified, not written concurrently with, or after, the solution details. This ordering matters for the same reason Lesson 17 emphasized excluding solutions from problem statements in the first place: a PRD that opens directly with a list of functional requirements, without first anchoring the reader in the validated problem, invites reviewers to evaluate the requirements against their own private, unstated assumptions about the problem, rather than against a shared, explicit understanding — precisely the anchoring risk Lesson 12 warned about at the interview level and Lesson 17 warned about at the problem-framing level, now recurring at the level of an entire specification document's structure.\n\nA PRD that begins with a clearly stated, evidence-cited problem (directly reusing Lesson 17's template) gives every subsequent requirement a test: does this requirement plausibly serve the stated problem, or has scope drifted toward something else? This is the same discipline as the Value Proposition Filter (Lesson 7) and Vision Filter (Lesson 9), now applied at the level of an individual document's internal consistency.\n\n### Appropriate Precision vs. Over-Specification\n\nA genuinely difficult judgment call in PRD writing is choosing the right level of precision — specific enough that engineering and design can build confidently without constant clarification, but not so exhaustively detailed that the document becomes a rigid, premature commitment to implementation choices that are better made by the specialists actually doing that work.\n\n- **Under-specification** leaves genuine ambiguity that different team members will resolve differently, discovering the mismatch only during implementation or QA — for example, a requirement stating \"the system should handle errors gracefully\" without specifying what \"gracefully\" means in any testable sense.\n- **Over-specification** dictates implementation details that are properly the domain of engineering or design expertise — for example, a PRD specifying the exact database schema or the precise pixel spacing of a UI element, decisions better made by the engineers and designers with the relevant technical and craft expertise, and decisions that, if specified prematurely by a PM without that expertise, risk being both wrong and unnecessarily constraining.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Specification Precision] --> B[Under-Specified Vague, Ambiguous;<br/>Invites Inconsistent Interpretation]\n    A --> C[Appropriately Specified Clear on<br/>Behavior and Outcome; Leaves<br/>Implementation Choices to Relevant<br/>Experts]\n    A --> D[Over-Specified Dictates Implementation<br/>Details Outside the PM Expertise or Role]\n```\n\nThe practical discipline for finding this middle ground: specify the **what and why** (the required behavior, the reason it matters, the success criteria) with real precision, while deliberately leaving the **how** (the specific technical implementation, the exact visual execution) to the engineers and designers whose expertise that decision belongs to — consulting them, and inviting their judgment, rather than pre-deciding it unilaterally in the document.\n\n### The \"PRD as One-Way Document\" Failure Pattern\n\nA specific, common organizational failure treats a PRD as a final, unquestionable decree — written by a PM, handed to engineering and design as a finished, non-negotiable specification, with any subsequent questions treated as deviations from an already-settled plan rather than legitimate, expected refinements. This directly echoes Lesson 20's discovery-delivery handoff warning, now applied specifically to the PRD document itself: treating a PRD as something \"delivered\" rather than something collaboratively developed risks losing exactly the kind of implementation-stage insight (technical constraints discovered mid-build, design considerations that only become apparent once real interface work begins) that a genuinely open, living document would incorporate.\n\nA healthier practice treats a PRD as a starting point for structured collaboration: engineering and design review it early, before commitments are finalized, explicitly raising questions, proposing alternative approaches to functional requirements, and flagging any premature over-specification the PM may have unintentionally included. The document itself should be updated as this collaboration surfaces new information, rather than treated as immutable once initially written — directly paralleling Lesson 17's guidance that a finalized problem statement should function as an ongoing reference point checked against reality, not a one-time artifact.\n\n---",
+  "mistakes": "**Mistake 1: Opening a PRD with functional requirements before establishing the problem statement and goals.**\nThis invites readers to evaluate requirements against their own private assumptions about the problem, rather than a shared, explicit understanding, echoing the anchoring risks covered in earlier lessons.\n\n**Mistake 2: Under-specifying requirements, leaving genuine ambiguity that different team members resolve inconsistently.**\nVague language (\"handle errors gracefully,\" \"make it fast\") invites exactly the kind of divergent interpretation a PRD exists to prevent.\n\n**Mistake 3: Over-specifying implementation details that belong to engineering or design expertise.**\nDictating a specific database schema or exact pixel measurements, without inviting the relevant experts' judgment, both risks being technically wrong and unnecessarily constrains solutions that specialists might implement better.\n\n**Mistake 4: Treating a PRD as a final, unquestionable decree rather than a living, collaboratively refined document.**\nThis risks losing valuable implementation-stage insight and echoes Lesson 20's discovery-delivery handoff failure at the level of an individual specification document.\n\n**Mistake 5: Including content that belongs in a different, more granular artifact (user stories, acceptance criteria) rather than the PRD itself.**\nA PRD that attempts to specify every individual implementable unit of work in exhaustive detail duplicates, and often conflicts with, the more granular work covered in Lessons 23 and 24.\n\n---",
+  "mentalModel": {
+    "title": "The PRD Precision Dial",
+    "content": "This lesson's mental model is the **PRD Precision Dial** — a way of visualizing the trade-off between under- and over-specification, and consciously choosing where a given requirement should sit.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Under-Specified Vague<br/>Behavior, Ambiguous Outcome] --> B[Appropriately Specified Clear Behavior<br/>and Success Criteria; Implementation<br/>Choices Left to Relevant Experts]\n    B --> C[Over-Specified Dictates Implementation<br/>Details Outside PM Expertise or Role]\n```\n\nUse this dial explicitly when drafting or reviewing a requirement: is this specific enough that a reasonable engineer or designer, reading it independently, would build essentially the same thing another reasonable engineer or designer would build from the same text? If two people could reasonably interpret it very differently, it's under-specified. If it dictates a technical or visual implementation choice the PM isn't positioned to make well, it's over-specified.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Under-Specified Vague<br/>Behavior, Ambiguous Outcome] --> B[Appropriately Specified Clear Behavior<br/>and Success Criteria; Implementation<br/>Choices Left to Relevant Experts]\n    B --> C[Over-Specified Dictates Implementation<br/>Details Outside PM Expertise or Role]"
+  },
+  "caseStudy": {
+    "title": "The PRD That Specified the Wrong Things",
+    "content": "Consider a simplified, illustrative scenario common across B2B software teams.\n\nA PM writes a PRD for a new notification system, based on a well-validated opportunity and a correctly scoped MVP (Lesson 21). The document opens directly with a detailed list of functional requirements — including a highly specific database table structure for storing notification preferences, and an exact specification of button placement and color within the settings interface — without ever explicitly restating the underlying problem statement or success metrics the notification system was meant to address.\n\nEngineering, working from the PRD, builds exactly what was specified: the given database structure and the given interface layout. During implementation, an engineer notices that the specified database structure would make a common, expected future feature (notification digests, batching multiple notifications together) significantly harder to build later, and would have proposed a different structure — but, treating the PRD as a finalized, non-negotiable specification (rather than raising the concern, given the document's one-way framing), the engineer builds as specified rather than raising the issue.\n\nSeparately, the design team, upon finally reviewing the PRD's specified button placement and color, disagrees with the choice on established design-system grounds, but similarly treats the specification as already decided rather than open for discussion, given how the document was originally framed and circulated.\n\nThree months after launch, both concerns prove valid: a subsequent notification-digest feature does require a costly database migration exactly because of the original schema choice, and user testing reveals the specified button color has poor contrast for a portion of users, an accessibility issue the design team could have easily caught and flagged, had they felt the document invited that kind of pushback.\n\n**What went wrong?**\n\nApplying this lesson's frameworks:\n\n1. **The PRD opened with functional requirements rather than the problem statement and goals**, denying reviewers the shared context needed to evaluate whether the specific requirements (including the ones that later proved problematic) actually served the underlying need well.\n2. **The document was significantly over-specified in areas outside the PM's expertise** — the database schema and exact interface styling are properly engineering and design decisions, and specifying them unilaterally both risked being technically or aesthetically suboptimal and pre-empted the relevant experts' better judgment.\n3. **The PRD functioned as a one-way document rather than a living, collaboratively refined one.** Both the engineer and the designer had legitimate, valuable concerns, but the document's framing (and likely the surrounding team culture) discouraged raising them as an expected, welcomed part of the process.\n\nA team applying this lesson's discipline would have opened the PRD with the problem statement and goals, specified the required notification behavior and success criteria (the what and why) while explicitly inviting engineering to propose the database structure and design to propose the specific interface treatment (the how), and circulated the document for genuine review and pushback before finalizing — very likely catching both the schema limitation and the contrast issue well before either became a costly, post-launch problem.\n\nThis case connects directly back to **Lesson 20's discovery-delivery handoff pattern** and **Lesson 17's problem-before-solution discipline**: in both cases, the underlying failure is the same — treating a specification or research artifact as a finished, one-way deliverable rather than a living tool for ongoing, genuine collaboration.\n\n---"
+  },
+  "framework": {
+    "title": "The PRD Review Checklist",
+    "content": "A practical checklist for reviewing a draft PRD before circulating it as a final specification:\n\n| Question | Purpose |\n|---|---|\n| Does the document open with the problem statement (Lesson 17) and goals, before any functional requirements? | Prevents readers from evaluating requirements against private, unstated assumptions |\n| Is each functional requirement specific enough to prevent divergent interpretation, without dictating implementation details outside the PM's expertise? | Balances the Precision Dial correctly |\n| Are open questions and risks explicitly listed, rather than papered over with false specificity? | Prevents the document from projecting more certainty than actually exists |\n| Has the document been circulated for genuine review, with real opportunity for engineering and design pushback, before being treated as final? | Prevents the \"one-way document\" failure pattern |\n| Does the document avoid duplicating content that belongs in more granular artifacts (user stories, acceptance criteria)? | Keeps the PRD focused on its appropriate level of specification |\n\nA PRD that fails several of these checks risks the exact kind of costly, post-launch discovery shown in this lesson's Detailed Case Study — issues that could have been caught and resolved during specification and review, at a small fraction of the cost of catching them after implementation or launch.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "PRDs at Different Company Stages",
+    "content": "**At a startup:**\nPRDs are often lightweight and informal, sometimes replaced by a brief written brief or even a well-structured verbal alignment session, given small team size and close daily collaboration that reduces the risk of the divergent-mental-model problem a formal PRD exists to prevent. As teams grow beyond a size where informal alignment reliably works, the discipline of writing things down explicitly becomes increasingly valuable.\n\n**At a mid-size company:**\nPRDs typically become a more standard, expected artifact for any initiative involving more than a small handful of people, and organizations at this stage often develop templates codifying the sections this lesson describes — the main ongoing risk is the \"PRD as one-way document\" failure pattern, as team size grows enough that informal, continuous conversation with the PM becomes less automatic than it was at a smaller scale.\n\n**At Big Tech:**\nPRDs and equivalent specification documents at scale often go through formal, multi-stage review processes involving multiple cross-functional stakeholders and sometimes explicit sign-off requirements, and a significant part of senior product leadership's role involves ensuring these formal review processes remain genuinely collaborative (inviting real pushback and iteration) rather than becoming a bureaucratic, one-way approval ritual that technically satisfies a process requirement without functioning as genuine cross-functional alignment.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-022-1",
+      "questionNumber": 1,
+      "questionText": "Which of the following best describes the core purpose of a PRD, according to this lesson?",
+      "options": [
+        "To make a PM appear thorough to senior leadership",
+        "To give engineering, design, and QA a shared, unambiguous reference point for what is being built, why, and to what specification",
+        "To replace the need for any further cross-functional communication during a project",
+        "To specify every possible implementation detail exhaustively, leaving no decisions to engineering or design"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is the lesson's explicit core purpose — solving the specific failure of different team members building from different mental models, not appearing thorough or eliminating further communication.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-022-2",
+      "questionNumber": 2,
+      "questionText": "Why must a PRD's problem statement and goals be established before functional requirements are specified?",
+      "options": [
+        "Because functional requirements are always less important than goals",
+        "Because opening with requirements invites readers to evaluate them against their own private, unstated assumptions about the problem, rather than a shared, explicit understanding",
+        "Because problem statements must always be longer than functional requirements sections",
+        "Because engineering teams refuse to read documents that don't open with a problem statement"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly reflects the lesson's ordering discipline, extending Lesson 17's anchoring-avoidance principle to the structure of an entire specification document.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-022-3",
+      "questionNumber": 3,
+      "questionText": "Which of the following is the clearest example of over-specification in a PRD, according to this lesson?",
+      "options": [
+        "\"The system must send a notification within 5 seconds of the triggering event.\"",
+        "\"The database should use this exact table schema with these specific column names and types.\"",
+        "\"Users should be able to dismiss the notification.\"",
+        "\"The feature must be accessible to users relying on screen readers.\""
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Specifying an exact database schema dictates an implementation detail properly belonging to engineering expertise, unlike the other options, which specify required behavior without pre-empting technical implementation choices.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-022-4",
+      "questionNumber": 4,
+      "questionText": "What is the risk of under-specification in a PRD?",
+      "options": [
+        "It pre-empts engineering or design expertise",
+        "It leaves genuine ambiguity that different team members may resolve inconsistently, discovering the mismatch during implementation or QA",
+        "It always makes a document too long",
+        "It eliminates the need for any further collaboration"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Under-specification is defined by the lesson as leaving requirements vague enough that reasonable people could interpret them very differently, exactly the failure a PRD exists to prevent.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-022-5",
+      "questionNumber": 5,
+      "questionText": "What is the \"PRD as one-way document\" failure pattern?",
+      "options": [
+        "A PRD that is too short to be useful",
+        "Treating a PRD as a final, unquestionable decree handed to engineering and design, rather than a living, collaboratively refined artifact",
+        "A PRD that includes too many open questions",
+        "A PRD written collaboratively by multiple stakeholders from the outset"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is the lesson's explicit definition of the failure pattern, distinct from document length or the inclusion of open questions (which the lesson actually encourages).",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-022-6",
+      "questionNumber": 6,
+      "questionText": "In the Detailed Case Study, what specific consequence resulted from over-specifying the database schema?",
+      "options": [
+        "The system launched significantly ahead of schedule",
+        "A subsequent notification-digest feature required a costly database migration, directly because of the original schema choice",
+        "The engineering team refused to build the specified schema at all",
+        "No meaningful consequence resulted from this specific decision"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study explicitly attributes the costly later migration to the prematurely specified schema, which an engineer had concerns about but didn't feel invited to raise given the document's framing.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-022-7",
+      "questionNumber": 7,
+      "questionText": "Why did the engineer and designer in the Detailed Case Study not raise their concerns about the specified requirements before implementation?",
+      "options": [
+        "They had no concerns about the specifications at all",
+        "They treated the PRD as a finalized, non-negotiable specification, given how the document was framed and circulated, rather than an invitation to genuine collaborative review",
+        "They were not informed that a PRD existed for this project",
+        "They agreed completely with every specified detail"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study explicitly attributes their silence to the document's one-way framing, not agreement or lack of awareness — both had legitimate concerns they didn't feel invited to raise.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-022-8",
+      "questionNumber": 8,
+      "questionText": "According to the PRD Review Checklist, what should happen with open questions and risks in a PRD?",
+      "options": [
+        "They should be omitted to project confidence and certainty",
+        "They should be explicitly listed, rather than papered over with false specificity",
+        "They should be resolved unilaterally by the PM before the document is shared with anyone",
+        "They are not a necessary component of a PRD"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Review Checklist explicitly calls for open questions and risks to be listed transparently, rather than hidden behind false confidence or specificity.",
+      "learningObjective": "#1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-022-9",
+      "questionNumber": 9,
+      "questionText": "(Scenario) A PM drafts a PRD specifying that \"the checkout process must feel fast and modern.\" According to the Precision Dial, what is the issue with this requirement, and how should it be improved?",
+      "options": [
+        "This requirement is appropriately specified and needs no revision",
+        "This requirement is under-specified — \"feel fast and modern\" is vague and open to inconsistent interpretation; it should be replaced with a specific, testable behavior or performance target while still leaving exact visual execution to design",
+        "This requirement is over-specified and should be removed entirely",
+        "This requirement should specify the exact CSS styling to use, to eliminate any ambiguity"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "\"Feel fast and modern\" is vague and untestable, an example of under-specification; the fix is a specific, testable requirement (e.g., a load-time target) while still leaving exact visual execution — the \"how\" — to design's expertise.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-022-10",
+      "questionNumber": 10,
+      "questionText": "(Product Thinking) A PM circulates a draft PRD and explicitly writes, \"I'd like genuine pushback on the approach in section 3 — please propose alternatives if you see a better way to meet this goal.\" What discipline does this practice reflect?",
+      "options": [
+        "The \"PRD as one-way document\" failure pattern",
+        "A deliberate effort to avoid the one-way document failure pattern, inviting genuine collaborative review rather than passive acceptance",
+        "Over-specification, since the PM is dictating exactly what feedback to provide",
+        "Under-specification, since the PM has not yet finalized the requirements"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This explicit invitation for pushback and alternatives is precisely the corrective practice this lesson recommends against the one-way document failure pattern.",
+      "learningObjective": "#4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-022-11",
+      "questionNumber": 11,
+      "questionText": "(Interview Reasoning) A candidate describes writing a PRD that specifies the exact pixel spacing and color hex codes for every UI element, without input from the design team. What might this signal, based on this lesson's Interview Perspective section?",
+      "options": [
+        "An exceptionally thorough and well-regarded PRD practice",
+        "A likely instance of over-specification, dictating implementation details outside the PM's design expertise without inviting the relevant experts' judgment",
+        "That the candidate has strong visual design skills that should be considered a core PM competency",
+        "Nothing meaningful, since specifying visual details is always appropriate for a PM to do unilaterally"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly matches the lesson's definition of over-specification — dictating detailed implementation choices (here, exact visual styling) that belong to design expertise, without inviting collaborative input.",
+      "learningObjective": "#3",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-022-12",
+      "questionNumber": 12,
+      "questionText": "(Product Thinking, Higher Difficulty) A PRD includes a section attempting to break down every individual user story and specific acceptance criterion in exhaustive detail, duplicating content that the team also maintains separately in a project management tool. According to this lesson, what is the issue with this practice?",
+      "options": [
+        "This is ideal practice, since more detail in a single document is always better",
+        "This risks duplicating, and potentially conflicting with, more granular artifacts (user stories, acceptance criteria) that are better maintained separately, per Lessons 23 and 24",
+        "User stories and acceptance criteria should never exist as separate artifacts from the PRD under any circumstances",
+        "This practice has no meaningful downside as long as the PRD is kept up to date"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly warns against a PRD duplicating content that belongs in more granular, separately maintained artifacts, since this risks inconsistency and blurs the PRD's appropriate scope.",
+      "learningObjective": "#5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-022-13",
+      "questionNumber": 13,
+      "questionText": "(Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where an engineer, during implementation, discovers a significant technical constraint that would require deviating from a PRD's specified approach, but proceeds with the flawed original specification anyway rather than raising the concern. What is the strongest diagnostic question for a candidate to ask about the team's process, based on this lesson?",
+      "options": [
+        "\"Was the PRD written in a format the engineering team could technically access?\"",
+        "\"Was the PRD treated as a living, collaboratively refined document that genuinely welcomed this kind of mid-implementation pushback, or was it framed and circulated as a final, unquestionable decree?\"",
+        "\"Did the PRD include enough Mermaid diagrams to be visually engaging?\"",
+        "\"Was the PRD approved by a sufficiently senior stakeholder before implementation began?\""
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This diagnostic question directly targets the lesson's core failure pattern — whether the document's framing and team culture invited genuine, ongoing collaboration or discouraged raising legitimate concerns once implementation had begun.",
+      "learningObjective": "#4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-022-14",
+      "questionNumber": 14,
+      "questionText": "(Product Thinking, Higher Difficulty) A team's PRD process requires formal, multi-stakeholder sign-off before any implementation can begin, and stakeholders routinely approve documents without substantive comment, viewing the sign-off as a procedural formality. According to this lesson, does this satisfy the goal of collaborative, living specification?",
+      "options": [
+        "Yes, since a formal sign-off process is sufficient regardless of the substance of the review",
+        "No — a formal sign-off process that has become a procedural formality without substantive engagement still risks functioning as a \"one-way document\" in practice, despite its formal appearance of collaboration",
+        "Yes, as long as the PRD includes all the required sections listed in this lesson's template",
+        "This scenario is not addressed by this lesson's framework at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This reflects the lesson's distinction between the appearance of collaboration (a formal sign-off step) and its substance (genuine, engaged review and pushback) — a procedural formality without real engagement still falls into the one-way document failure pattern in practice.",
+      "learningObjective": "#4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-022-15",
+      "questionNumber": 15,
+      "questionText": "(Highest Difficulty) A team writes a PRD that correctly opens with a problem statement and goals, specifies functional requirements at an appropriate level of precision, explicitly lists open questions, and circulates the document for genuine review — but the underlying problem statement itself, inherited from an earlier stage, is later discovered to be based on an un-laddered, surface-level pain point (per Lesson 16) rather than its actual root cause. What does this scenario illustrate?",
+      "options": [
+        "That PRD-writing discipline alone is sufficient regardless of the quality of the underlying problem statement it's built on",
+        "That a well-constructed PRD, following every discipline in this lesson, can still lead a team astray if the problem statement it opens with was never properly validated and laddered in the first place — PRD quality does not substitute for the upstream research and problem-formalization work in Lessons 6, 16, and 17",
+        "That problem statements are unnecessary once a PRD's functional requirements are appropriately specified",
+        "That this scenario is impossible if a PRD follows the structure described in this lesson",
+        "| Core PRD sections; problem-before-solution ordering; the Precision Dial; the one-way-document failure pattern | | **Next Lesson** | Lesson 23 — User Stories | Breaks a PRD's functional requirements down into specific, implementable units of work | | **Future Concepts Unlocked** | Lesson 24 (Acceptance Criteria) | Formalizes testable conditions for each user story, extending a PRD's requirements to a more granular, verifiable level | | | Lesson 37 (Working with Engineering Teams) | Extends this lesson's collaborative-review discipline into a broader treatment of PM-engineering partnership |"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This connects PRD-writing discipline back to the upstream chain the entire curriculum has built — a PRD's internal quality (structure, precision, collaborative review) cannot substitute for a genuinely validated, laddered problem statement underneath it; both layers of discipline are necessary, and excellence at one layer does not compensate for a failure at another.",
+      "learningObjective": "#2",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "You are the PM for a ride-sharing app, drafting a PRD for a new in-app tipping feature, following a correctly scoped MVP (Lesson 21) testing whether users will adopt an in-app tip option at all.\n\nWork through the following, in writing, before reading further:\n\n1. Draft a one-paragraph problem statement (per Lesson 17's template) to open this PRD, and briefly note the goals/success metric it should be evaluated against.\n2. Write one functional requirement for this feature at an \"appropriately specified\" level (per the Precision Dial), and then rewrite it once as under-specified and once as over-specified, explaining what's wrong with each version.\n3. Identify one implementation decision (e.g., a specific payment-processing integration detail, or an exact visual treatment) that you would deliberately leave open for engineering or design to decide, rather than specifying yourself.\n4. Describe how you would circulate this draft PRD for review, and what specific invitation or framing you would use to encourage genuine pushback rather than passive acceptance.\n5. List two \"open questions\" you would explicitly include in the document, rather than resolving them with false confidence.\n\nThere is no single correct answer. The purpose of this exercise is to practice applying the Precision Dial and the problem-before-solution ordering discipline to a concrete specification, rather than defaulting to either vague generality or premature over-specification.\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 21 — Minimum Viable Product (MVP) | Provides the scoped MVP that a PRD formally specifies for a cross-functional team |\n| **Current Lesson** | Lesson 22 — Product Requirements Document (PRD) | Core PRD sections; problem-before-solution ordering; the Precision Dial; the one-way-document failure pattern |\n| **Next Lesson** | Lesson 23 — User Stories | Breaks a PRD's functional requirements down into specific, implementable units of work |\n| **Future Concepts Unlocked** | Lesson 24 (Acceptance Criteria) | Formalizes testable conditions for each user story, extending a PRD's requirements to a more granular, verifiable level |\n| | Lesson 37 (Working with Engineering Teams) | Extends this lesson's collaborative-review discipline into a broader treatment of PM-engineering partnership |\n\nThis curriculum is designed to be read as one continuous argument. From this lesson forward, any reference to \"the spec\" or \"the requirements doc\" assumes the problem-before-solution ordering and the Precision Dial covered here — this will not be re-explained, only re-applied.",
+  "rawMarkdownPath": "content/lessons/lesson-022.md"
+}

@@ -1,0 +1,359 @@
+{
+  "meta": {
+    "slug": "lesson-072",
+    "number": 72,
+    "title": "Enterprise & B2B Product Management Fundamentals",
+    "moduleNumber": 8,
+    "moduleName": "Advanced Strategy, Innovation & Enterprise/B2B Product Management",
+    "difficulty": 6,
+    "estMinutesReading": 40,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 71 (Strategy Cascade, falsifiable bets), Lesson 1 (responsibility without authority)",
+    "nextLessonSlug": "lesson-073",
+    "futureTopicsUnlocked": "Lesson 73 (Buyer vs. User), Lesson 74 (Land-and-Expand Packaging), Lesson 79 (Pricing Strategy at Scale) — all depend on the Enterprise Adoption Ladder introduced here"
+  },
+  "learningObjectives": [
+    "Explain why enterprise and B2B products require a different set of capabilities than consumer products, beyond simply \"more features.\"",
+    "Apply the Enterprise Adoption Ladder to identify what capability gap is blocking a product's progression to the next stage of organizational adoption.",
+    "Identify the core categories of enterprise readiness: security and compliance, administrative control, reliability commitments, and integration capability.",
+    "Distinguish a genuine organizational rollout from an isolated pocket of individual enthusiasm within a larger company.",
+    "Evaluate a B2B product's current state against the Enterprise Adoption Ladder to diagnose why it may be stalled at a given stage."
+  ],
+  "theory": "### Why Enterprise Products Need More Than \"More Features\"\n\nA common misconception is that enterprise readiness simply means adding more features — more settings, more customization options, more configuration screens. In fact, enterprise readiness is primarily about a different *category* of capability, one that has little to do with the core functionality an individual user experiences and everything to do with how a large organization can trust, control, and depend on a system operating across many of its people simultaneously. A product can be extremely good at the task an individual user hired it to do, and still be entirely unusable at the organizational level, because organizations, unlike individuals, need to know who has access to what, whether the vendor meets specific security and compliance standards, what happens if the system goes down, and how the product will integrate with the dozens of other systems the organization already runs.\n\n### The Enterprise Adoption Ladder\n\nThis lesson introduces the **Enterprise Adoption Ladder**, a four-rung model describing the stages a B2B product typically passes through as it moves from an individual's initial interest to genuine organizational entrenchment:\n\n```mermaid\ngraph TD\n    A[\"Rung 1: Pilot<br/>(an individual or small team tries the product)\"] --> B[\"Rung 2: Departmental Adoption<br/>(a team or department adopts it as a standard tool)\"]\n    B --> C[\"Rung 3: Organization-Wide Rollout<br/>(the product spans multiple departments, requiring central IT/security sign-off)\"]\n    C --> D[\"Rung 4: Mission-Critical Entrenchment<br/>(the organization's operations meaningfully depend on the product)\"]\n```\n\nEach rung requires a different, additional category of capability beyond what the previous rung needed. A **Pilot** requires only that the core product deliver genuine value to the individual using it. **Departmental Adoption** typically requires basic team-level administrative controls (who on the team has access, basic usage visibility for a team lead) that an individual pilot never needed. **Organization-Wide Rollout** requires a substantially different tier of capability — enterprise-grade security certifications, single sign-on integration, granular role-based access control, audit logging — because at this stage, central IT and security functions, who were never involved in the original pilot, become gatekeepers whose sign-off is required before broader deployment can proceed. **Mission-Critical Entrenchment** requires reliability commitments (defined uptime guarantees, disaster recovery plans, formal support SLAs) appropriate to a system the organization can no longer easily operate without.\n\nThe Enterprise Adoption Ladder's core diagnostic use is identifying, when a product's growth within an account stalls, exactly which rung's required capability is missing — since a product genuinely excellent at Rung 1's core value proposition can still stall indefinitely at the Rung 2-to-3 transition if it lacks the security and administrative capabilities Rung 3 specifically requires, regardless of how enthusiastic individual users remain.\n\n### The Four Categories of Enterprise Readiness\n\nEnterprise readiness capabilities, particularly the ones required starting at Rung 3, generally fall into four categories: **security and compliance** (certifications like SOC 2 or ISO 27001, data residency guarantees, vulnerability management practices), **administrative control** (role-based access control, centralized user provisioning and deprovisioning, audit logs of user activity), **reliability and support commitments** (defined uptime SLAs, disaster recovery and business continuity plans, formal support response-time tiers), and **integration capability** (single sign-on, compatibility with the organization's existing identity and data systems, often connecting directly back to the API-as-product discipline from Lesson 62). A product missing capability in any one of these four categories can find its organizational rollout blocked entirely, regardless of how strong the other three categories are, because enterprise procurement and security review processes typically treat each category as a distinct, non-negotiable gate rather than allowing strength in one area to compensate for weakness in another.\n\n### Isolated Enthusiasm vs. Genuine Organizational Rollout\n\nA specific and common trap is mistaking a strong pocket of individual enthusiasm — several engaged users within one team, genuinely delighted with the product — for evidence of a broader organizational rollout in progress. These are structurally different phenomena. Individual enthusiasm reflects Rung 1 or 2 success and says relatively little about whether the Rung 3 gatekeepers (security, IT, procurement) have even been engaged yet, let alone satisfied. A B2B product team celebrating strong pilot-user satisfaction scores while having no active conversation with the account's central IT function may be celebrating a metric that, however genuinely positive, has limited bearing on whether the deal or rollout will actually progress.\n\n---",
+  "mistakes": "1. **Treating enterprise readiness as simply \"more features\" rather than a distinct category of organizational trust and control capability.** Security certifications, admin controls, and reliability commitments serve a fundamentally different purpose than the core features an individual user experiences.\n2. **Mistaking strong individual or departmental enthusiasm for evidence of organization-wide rollout progress.** These are different rungs of the Adoption Ladder, and success at one does not guarantee progress at the next.\n3. **Assuming a single enterprise readiness gap can be compensated for by strength elsewhere.** Procurement and security review processes typically treat security, admin control, reliability, and integration as separate, non-negotiable gates.\n4. **Underestimating how much of enterprise adoption depends on stakeholders who never used the product directly.** Central IT and security teams, who may have no firsthand experience with the product's core value proposition, frequently hold effective veto power over Rung 3 progression.\n5. **Building enterprise readiness capabilities reactively, only after a specific deal is blocked by their absence.** Since these capabilities (certifications in particular) often require significant lead time to obtain, waiting until a specific deal demands them can cause avoidable delays or lost opportunities.\n\n---",
+  "mentalModel": {
+    "title": "The Enterprise Adoption Ladder",
+    "content": "The Enterprise Adoption Ladder introduced above is this lesson's core takeaway tool. When a B2B product's growth within an account or market segment stalls, ask:\n\n1. **Which rung is the product currently at**, and what specific capability does the *next* rung require that the current rung didn't?\n2. **Is the stall caused by a missing capability** in security and compliance, administrative control, reliability commitments, or integration, or is it caused by something else (such as insufficient core value at the current rung)?\n3. **Is apparent progress actually representative of the relevant rung's gatekeepers**, or does it reflect only isolated enthusiasm from users who aren't the actual decision-makers for the next stage?\n\nA B2B PM who runs every stalled account or stalled market segment through this diagnostic is far better positioned to correctly identify whether the blocker is a product capability gap, a stakeholder engagement gap, or something else entirely — rather than assuming more of the same core feature work will eventually break through a blocker that core features were never going to solve.\n\n---"
+  },
+  "caseStudy": {
+    "title": "The Stalled Departmental Rollout",
+    "content": "A B2B project management software startup achieved strong early traction: dozens of individual teams across several large enterprise accounts had adopted the product organically, often via free trials initiated by individual managers with no involvement from central IT. Usage metrics and qualitative feedback from these teams were consistently excellent, and the company's internal narrative, reinforced in board meetings, was that the product was clearly \"winning\" within these large accounts.\n\nWhen the sales team attempted to convert this grassroots traction into formal, organization-wide enterprise contracts, however, deal after deal stalled at the same point: security review. The product had no formal SOC 2 certification, no granular role-based access control beyond basic team-level permissions, and no centralized audit logging that a security team could review. Central IT and security stakeholders at each account, who had never been part of the original grassroots adoption and had no firsthand experience with the product's core value, were unmoved by reports of high user satisfaction among individual teams, since satisfaction was not among the criteria their review process was designed to evaluate.\n\n**What went wrong?** Using the Enterprise Adoption Ladder, the failure is precise: the company had genuine, real success at Rungs 1 and 2, but had never invested in the security and administrative control capabilities specifically required at Rung 3, and had mistaken Rung 1/2 success metrics for evidence that Rung 3 progression was already underway. The stall was not a core product problem — the product's value proposition remained strong — but a specific, locatable capability gap in exactly the category (security and compliance) that Rung 3's gatekeepers were evaluating.\n\nThe company's recovery involved a deliberate, multi-quarter investment in obtaining SOC 2 certification, building out formal role-based access control and audit logging, and establishing a dedicated enterprise sales engineering function specifically responsible for engaging security and IT stakeholders early in future sales processes rather than only after a deal had already stalled — a discipline that foreshadows the buyer-versus-user dynamics formalized directly in Lesson 73.\n\n---"
+  },
+  "framework": {
+    "title": "The Enterprise Readiness Checklist",
+    "content": "Before attempting to convert departmental traction into organization-wide rollout, a PM can use the following checklist across the four enterprise readiness categories:\n\n| Category | Capability to Verify | Risk if Missing |\n|---|---|---|\n| Security & Compliance | Relevant certifications (e.g., SOC 2, ISO 27001), data residency guarantees | Security review blocks the deal regardless of product quality or user satisfaction |\n| Administrative Control | Role-based access control, centralized user provisioning/deprovisioning, audit logs | IT cannot manage or oversee deployment at scale, blocking Rung 3 progression |\n| Reliability & Support | Defined uptime SLA, disaster recovery plan, formal support response tiers | Organization cannot justify mission-critical dependence without these commitments |\n| Integration Capability | Single sign-on support, compatibility with existing identity and data systems | IT must manage yet another disconnected system, increasing operational burden and resistance |\n\nA \"no\" on Security & Compliance in particular should be treated as an especially significant blocker for Rung 3 progression, given how consistently security review functions as a hard gate in enterprise procurement processes, largely independent of core product quality.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Real World Perspective",
+    "content": ""
+  },
+  "quiz": [
+    {
+      "id": "q-072-1",
+      "questionNumber": 1,
+      "questionText": "Why is enterprise readiness described as a distinct category from \"more features\"?",
+      "options": [
+        "Enterprise readiness features are simply a larger quantity of the same type of feature",
+        "It establishes organizational trust and control — security, administrative oversight, reliability, integration — rather than serving individual user tasks directly",
+        "Enterprise readiness has no meaningful distinction from consumer product features",
+        "Enterprise readiness only applies to products with no individual users at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly distinguishes enterprise readiness as a different category of capability serving organizational trust rather than individual task completion.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-072-2",
+      "questionNumber": 2,
+      "questionText": "What is the correct order of the Enterprise Adoption Ladder?",
+      "options": [
+        "Mission-Critical Entrenchment, Organization-Wide Rollout, Departmental Adoption, Pilot",
+        "Pilot, Departmental Adoption, Organization-Wide Rollout, Mission-Critical Entrenchment",
+        "Departmental Adoption, Pilot, Mission-Critical Entrenchment, Organization-Wide Rollout",
+        "Organization-Wide Rollout, Mission-Critical Entrenchment, Pilot, Departmental Adoption"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This is the sequential order introduced in the Theory section, from individual pilot to organizational entrenchment.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-072-3",
+      "questionNumber": 3,
+      "questionText": "What typically becomes necessary for the first time at Rung 3, Organization-Wide Rollout?",
+      "options": [
+        "Basic core product functionality",
+        "Enterprise-grade security certifications, single sign-on, and granular role-based access control, requiring central IT and security sign-off",
+        "An individual user's initial enthusiasm for the product",
+        "A marketing campaign targeting new individual users"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section specifically identifies this tier of capability as necessary starting at Rung 3, engaging gatekeepers not involved at earlier rungs.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-072-4",
+      "questionNumber": 4,
+      "questionText": "Name the four categories of enterprise readiness capability.",
+      "options": [
+        "Marketing, sales, engineering, and design",
+        "Security and compliance, administrative control, reliability and support commitments, integration capability",
+        "User interface, pricing, onboarding, and documentation",
+        "Revenue, growth, retention, and referrals"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "These four categories are explicitly named in the Theory section as the core dimensions of enterprise readiness.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-072-5",
+      "questionNumber": 5,
+      "questionText": "Why can a single missing enterprise readiness category block an entire deal, regardless of strength elsewhere?",
+      "options": [
+        "Enterprise buyers always prioritize price above all other factors",
+        "Procurement and security review processes typically treat each category as a separate, non-negotiable gate",
+        "Enterprise deals are never actually blocked by any single capability gap",
+        "Strength in one category always fully compensates for weakness in another"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly describes these categories as distinct, non-negotiable gates rather than compensating dimensions.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-072-6",
+      "questionNumber": 6,
+      "questionText": "What distinguishes isolated enthusiasm from genuine organizational rollout progress?",
+      "options": [
+        "There is no meaningful distinction between the two",
+        "Isolated enthusiasm reflects individual or departmental success, while organizational rollout requires engagement from gatekeepers like central IT and security who evaluate different criteria",
+        "Isolated enthusiasm is always a stronger signal of rollout progress than gatekeeper engagement",
+        "Organizational rollout never requires any additional stakeholder engagement beyond initial pilot users"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This distinction is central to the Enterprise Adoption Ladder's diagnostic value, as illustrated in the Case Study.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-072-7",
+      "questionNumber": 7,
+      "questionText": "In the Case Study, why didn't strong user satisfaction metrics unblock the stalled enterprise deals?",
+      "options": [
+        "The metrics were inaccurate and did not reflect true user sentiment",
+        "Security review criteria were entirely separate from user satisfaction, and the relevant gatekeepers had never been part of the original grassroots adoption",
+        "The sales team failed to present the metrics to the customer at all",
+        "Enterprise customers never consider user satisfaction relevant to any purchasing decision"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study specifically shows that security review evaluates different criteria than user satisfaction, and the security stakeholders were disconnected from the original adoption.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-072-8",
+      "questionNumber": 8,
+      "questionText": "What was the actual root cause of the stalled deals in the Case Study, using the Enterprise Adoption Ladder?",
+      "options": [
+        "The core product lacked genuine value for individual users",
+        "The company had never invested in the security and administrative control capabilities specifically required at Rung 3",
+        "The sales team had not adequately marketed the product to individual users",
+        "The company had too many features rather than too few"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The failure was a specific, locatable capability gap at exactly the rung the deals were stalled at, not a core product deficiency.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-072-9",
+      "questionNumber": 9,
+      "questionText": "According to the Enterprise Readiness Checklist, what risk does a missing Security & Compliance capability carry?",
+      "options": [
+        "A minor inconvenience easily overcome by strong core product value",
+        "Security review blocking the deal regardless of product quality or user satisfaction",
+        "No practical risk, since security certifications are optional in enterprise sales",
+        "A risk only relevant to consumer products, not B2B products"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson treats missing security and compliance capability as an especially significant blocker, largely independent of other product strengths.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-072-10",
+      "questionNumber": 10,
+      "questionText": "Why might early-stage B2B startups reasonably deprioritize Rung 3 and 4 capabilities, per the Real World Perspective section?",
+      "options": [
+        "Rung 3 and 4 capabilities are never relevant to any B2B company",
+        "Building these capabilities before there is evidence of genuine demand for organization-wide deployment can represent a premature and costly investment",
+        "Early-stage startups are legally prohibited from pursuing security certifications",
+        "Rung 1 and 2 capabilities are always sufficient for the entire lifecycle of a B2B product"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section frames this as a reasonable prioritization trade-off given limited early-stage resources.",
+      "learningObjective": "#1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-072-11",
+      "questionNumber": 11,
+      "questionText": "What typically shifts as the strategic priority for mid-size B2B companies, per the Real World Perspective section?",
+      "options": [
+        "Abandoning departmental adoption entirely in favor of enterprise-only sales",
+        "Converting accumulated departmental adoption traction into larger, IT-sanctioned enterprise deals by investing in Rung 3 capabilities",
+        "Focusing exclusively on individual user acquisition with no organizational considerations",
+        "Eliminating the need for any security or compliance investment"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section identifies this Rung 2-to-3 transition as the characteristic mid-size company strategic priority.",
+      "learningObjective": "#1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-072-12",
+      "questionNumber": 12,
+      "questionText": "(Scenario) A B2B product has excellent departmental adoption across many teams within an account, but has never engaged the account's central IT function. Using the Enterprise Adoption Ladder, what is the most likely next step required for progression?",
+      "options": [
+        "Focus exclusively on acquiring more individual users within existing teams",
+        "Proactively engage central IT and security stakeholders and assess enterprise readiness gaps before assuming rollout will happen automatically",
+        "Assume rollout will proceed automatically given strong departmental traction",
+        "Reduce investment in the product entirely, since departmental adoption has already succeeded"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Rung 3 progression specifically requires engaging gatekeepers who were not part of departmental adoption, and this should be done proactively rather than assumed.",
+      "learningObjective": "#2, #4, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-072-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A company's internal narrative describes an account as \"clearly winning\" based on strong departmental usage metrics, while formal enterprise contract negotiations have stalled with no clear explanation. Using this lesson's frameworks, what should a PM investigate first?",
+      "options": [
+        "Whether the departmental usage metrics are being calculated correctly",
+        "Whether central IT or security stakeholders have been engaged, and whether a specific enterprise readiness capability gap exists",
+        "Whether the sales team is using the correct marketing materials",
+        "Whether individual users would benefit from additional core features"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly applies the lesson's core diagnostic: isolated enthusiasm doesn't indicate rollout progress, so gatekeeper engagement and readiness gaps should be investigated first.",
+      "learningObjective": "#2, #4, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-072-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) A candidate, asked how they'd expand a product within a large account, describes only plans for additional core feature development. What does this most likely signal, per the Interview Perspective section?",
+      "options": [
+        "A strong and complete understanding of enterprise expansion strategy",
+        "A gap in recognizing that Rung 3 progression typically requires security, administrative, and reliability capabilities beyond core feature development",
+        "That the candidate is ready for a senior enterprise PM role immediately",
+        "Nothing meaningful; core feature development is always sufficient for enterprise expansion"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section specifically listens for recognition of the distinct capability categories required at later rungs, which this answer omits.",
+      "learningObjective": "#2, #3, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-072-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A product has strong departmental traction across a large account, but formal enterprise-wide rollout has stalled with the customer providing no clear explanation. Using only the frameworks in this lesson, what is the most defensible diagnostic approach?",
+      "options": [
+        "Assume the core product needs additional features and prioritize further feature development",
+        "Investigate whether central IT and security stakeholders have been engaged, assess the account against the Enterprise Readiness Checklist's four categories, and identify the specific capability gap most likely blocking progression",
+        "Conclude the deal is simply taking longer than expected and take no further action",
+        "Discount the account's potential value and redirect resources elsewhere without further investigation"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the Reflection Exercise and Case Study: the correct response systematically investigates gatekeeper engagement and readiness gaps rather than assuming a core product issue, dismissing the stall as normal, or abandoning the account without diagnosis.",
+      "learningObjective": "#2, #3, #4, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "fc-072-1",
+      "front": "Why is enterprise readiness a distinct category from \"more features\"?",
+      "back": "It establishes organizational trust and control — security, administrative oversight, reliability, integration — rather than serving an individual user's core task directly.",
+      "difficulty": "Easy",
+      "tags": [
+        "#enterprise-readiness",
+        "#core-concept"
+      ],
+      "lessonNumber": 72
+    },
+    {
+      "id": "fc-072-2",
+      "front": "Name the four rungs of the Enterprise Adoption Ladder.",
+      "back": "Pilot, Departmental Adoption, Organization-Wide Rollout, Mission-Critical Entrenchment.",
+      "difficulty": "Easy",
+      "tags": [
+        "#adoption-ladder"
+      ],
+      "lessonNumber": 72
+    },
+    {
+      "id": "fc-072-3",
+      "front": "Name the four categories of enterprise readiness capability.",
+      "back": "Security and compliance, administrative control, reliability and support commitments, integration capability.",
+      "difficulty": "Medium",
+      "tags": [
+        "#enterprise-readiness"
+      ],
+      "lessonNumber": 72
+    },
+    {
+      "id": "fc-072-4",
+      "front": "Why couldn't strong user satisfaction metrics unblock the security review stall in the Case Study?",
+      "back": "Security review criteria (certifications, access control, audit logs) are entirely separate from user satisfaction, and central IT/security stakeholders were never part of the original grassroots adoption.",
+      "difficulty": "Hard",
+      "tags": [
+        "#case-study",
+        "#adoption-ladder"
+      ],
+      "lessonNumber": 72
+    },
+    {
+      "id": "fc-072-5",
+      "front": "Why can a single missing enterprise readiness category block a deal regardless of strength elsewhere?",
+      "back": "Procurement and security review processes typically treat each category as a separate, non-negotiable gate rather than allowing compensation across categories.",
+      "difficulty": "Medium",
+      "tags": [
+        "#enterprise-readiness"
+      ],
+      "lessonNumber": 72
+    },
+    {
+      "id": "fc-072-6",
+      "front": "Why should enterprise readiness capabilities often be built proactively rather than reactively?",
+      "back": "Certifications and related capabilities often require significant lead time to obtain, and waiting until a specific deal demands them can cause avoidable delays.",
+      "difficulty": "Medium",
+      "tags": [
+        "#enterprise-readiness-timing"
+      ],
+      "lessonNumber": 72
+    },
+    {
+      "id": "fc-072-7",
+      "front": "What distinguishes isolated enthusiasm from genuine organizational rollout progress?",
+      "back": "Isolated enthusiasm reflects Rung 1/2 success among individual users, while organizational rollout requires engagement and approval from Rung 3 gatekeepers like central IT and security, who evaluate entirely different criteria.",
+      "difficulty": "Hard",
+      "tags": [
+        "#isolated-enthusiasm"
+      ],
+      "lessonNumber": 72
+    }
+  ],
+  "reflectionPrompt": "You are the PM for a B2B analytics tool that has organically spread across several teams within a large enterprise customer, with strong usage metrics and highly positive qualitative feedback. Your sales team has just reported that a formal enterprise-wide contract, which would significantly expand the account, has stalled with no clear explanation from the customer's side.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying the Enterprise Adoption Ladder and the Enterprise Readiness Checklist to diagnose an ambiguous stall.\n\n1. Using the Enterprise Adoption Ladder, what rung do you believe the account is currently at, and what capability might be required for the next rung?\n2. What questions would you ask your sales team to determine whether central IT or security stakeholders have been directly engaged in this account?\n3. Using the Enterprise Readiness Checklist, which of the four categories would you investigate first, and why?\n4. If a specific readiness gap is identified, how would you weigh the cost and timeline of addressing it against the potential value of this specific deal and similar future deals?\n5. How would you communicate this diagnosis to your sales team and leadership, given that the existing narrative may have been \"we're clearly winning this account\"?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 71 — Product Strategy Frameworks: From Vision to Bets | Applies the falsifiable-bet discipline to enterprise go-to-market strategy specifically |\n| **Current Lesson** | Lesson 72 — Enterprise & B2B Product Management Fundamentals | Enterprise Adoption Ladder; four categories of enterprise readiness; isolated enthusiasm vs. genuine rollout |\n| **Next Lesson** | Lesson 73 — Selling to Committees: Buyer vs. User in B2B | Extends the Rung 3 gatekeeper concept into a full framework for navigating multiple stakeholders in an enterprise buying process |\n| **Future Concepts Unlocked** | Lesson 74 (Land-and-Expand Packaging) | Uses the Enterprise Adoption Ladder as the structural basis for designing packaging that supports rung-by-rung expansion |\n| | Lesson 79 (Pricing Strategy at Scale) | Extends enterprise readiness investment costs into pricing and contract negotiation considerations |\n\nThis curriculum continues to build as one continuous argument. From this lesson forward, any reference to enterprise account growth assumes you can locate it on the Enterprise Adoption Ladder without re-explanation.",
+  "rawMarkdownPath": "content/lessons/lesson-072.md"
+}

@@ -1,0 +1,359 @@
+{
+  "meta": {
+    "slug": "lesson-073",
+    "number": 73,
+    "title": "Selling to Committees: Buyer vs. User in B2B",
+    "moduleNumber": 8,
+    "moduleName": "Advanced Strategy, Innovation & Enterprise/B2B Product Management",
+    "difficulty": 6,
+    "estMinutesReading": 40,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 72 (Enterprise Adoption Ladder, Rung 3 gatekeepers)",
+    "nextLessonSlug": "lesson-074",
+    "futureTopicsUnlocked": "Lesson 74 (Land-and-Expand Packaging), Lesson 79 (Pricing Strategy at Scale), Lesson 88 (Building and Scaling a Product Organization) — all depend on the Stakeholder Compass introduced here"
+  },
+  "learningObjectives": [
+    "Explain why B2B purchasing decisions typically involve multiple distinct stakeholder roles rather than a single \"customer.\"",
+    "Apply the Stakeholder Compass to identify the champion, economic buyer, technical evaluator, and end user in a given B2B deal.",
+    "Distinguish each stakeholder role's distinct definition of success and primary concern.",
+    "Identify the risk of over-relying on a single stakeholder, particularly a champion with no budget authority, to carry a deal forward.",
+    "Evaluate a stalled B2B deal for which stakeholder role may be inadequately engaged or unsatisfied."
+  ],
+  "theory": "### Why B2B Purchases Involve Multiple Distinct Roles\n\nIn a consumer purchase, one person typically experiences the product, decides whether it's worth the money, and completes the transaction, all in a single, largely private decision. In a B2B purchase of meaningful size, these functions are routinely distributed across different people within the buying organization, each of whom has their own incentives, success criteria, and constraints, and none of whom can unilaterally complete the purchase alone. A product that delights the person who will use it daily can still fail to be purchased if the person controlling the budget doesn't see a clear return, or if a technical reviewer identifies a security concern the daily user has no visibility into or authority over.\n\n### The Stakeholder Compass\n\nThis lesson introduces the **Stakeholder Compass**, mapping the four most common distinct roles in a B2B buying process:\n\n```mermaid\ngraph TD\n    C[\"Champion<br/>(personally invested advocate inside the org)\"] --- E[\"Economic Buyer<br/>(controls budget, cares about ROI)\"]\n    E --- T[\"Technical Evaluator<br/>(IT/security gatekeeper, cares about risk and compliance)\"]\n    T --- U[\"End User<br/>(daily user, cares about task fit and usability)\"]\n    U --- C\n```\n\nThe **Champion** is someone inside the buying organization, often but not always an end user themselves, who is personally invested in seeing the purchase succeed — sometimes because it solves a problem they're accountable for, sometimes because their own reputation is tied to advocating for the change. The **Economic Buyer** controls the budget and evaluates the purchase primarily in terms of cost, return on investment, and opportunity cost relative to other uses of the same budget — and critically, may have limited or no firsthand exposure to the product itself. The **Technical Evaluator**, directly connected to the Rung 3 gatekeeper concept from Lesson 72, assesses security, compliance, integration, and technical risk, and typically has veto power regardless of how compelling the product is to everyone else on the committee. The **End User** is the person who will actually interact with the product daily, and whose primary concern is whether it genuinely fits and improves their actual workflow.\n\nThe Stakeholder Compass's core discipline is recognizing that a deal requires, at minimum, adequate engagement across all four roles — not necessarily unanimous enthusiasm, but at least no unaddressed veto-level objection from any one of them — and that strong performance with one role does not substitute for engagement with the others.\n\n### The Champion-Without-Authority Trap\n\nA specific and extremely common B2B failure mode is over-relying on a single, genuinely enthusiastic Champion, particularly one who is also an End User, to carry a deal forward without ever directly engaging the Economic Buyer or Technical Evaluator. A Champion's enthusiasm is a genuinely valuable asset — often the reason a deal exists at all — but a Champion without formal budget authority or technical sign-off authority cannot, by themselves, complete a purchase, and treating their strong internal advocacy as equivalent to deal progress risks the sales-and-product team investing significant effort in an account that stalls the moment it needs sign-off from stakeholders who were never engaged directly.\n\n### Distinct Success Criteria by Role\n\nEach stakeholder role's definition of \"this product is good\" differs meaningfully, and a product or sales narrative optimized for one role's success criteria may fail to resonate with, or even actively concern, another. The End User evaluates task fit and day-to-day usability. The Economic Buyer evaluates return on investment and total cost relative to alternatives, often with limited patience for feature-level detail that doesn't connect to a business outcome. The Technical Evaluator evaluates risk exposure, compliance, and integration burden, largely independent of how well the product performs its core function. The Champion, depending on their own role, may care about all of the above simultaneously, but their success is also frequently tied to their own internal credibility — meaning a Champion needs not just a good product, but a good, defensible story they can personally tell to the other stakeholders on their own behalf.\n\n---",
+  "mistakes": "1. **Treating a single enthusiastic stakeholder's feedback as representative of the whole buying committee.** Strong Champion or End User enthusiasm says little about whether the Economic Buyer or Technical Evaluator have been engaged or satisfied.\n2. **Assuming a Champion has more internal authority than they actually do.** A Champion without budget or technical sign-off authority cannot unilaterally close a deal, however strong their advocacy.\n3. **Pitching every stakeholder with the same narrative and the same level of detail.** A pitch optimized for an End User's task-fit concerns may fail to address an Economic Buyer's ROI concerns or a Technical Evaluator's risk concerns at all.\n4. **Engaging the Technical Evaluator only late in the process, after significant momentum has already built with other stakeholders.** Given the veto-level authority Technical Evaluators typically hold, per Lesson 72's Rung 3 discussion, late engagement risks a costly, momentum-killing stall at exactly the point a deal seemed closest to completion.\n5. **Assuming all four roles are always occupied by different individuals.** In smaller organizations, a single person may occupy multiple roles simultaneously (for example, a founder who is both Economic Buyer and Technical Evaluator), and failing to recognize this can lead to either redundant or entirely missed stakeholder engagement.\n\n---",
+  "mentalModel": {
+    "title": "The Stakeholder Compass",
+    "content": "The Stakeholder Compass introduced above is this lesson's core takeaway tool. For any B2B deal or account, ask:\n\n1. **Who occupies each of the four roles** — Champion, Economic Buyer, Technical Evaluator, End User — in this specific account, recognizing that one person may occupy more than one role?\n2. **Has each role actually been engaged directly**, or has engagement been assumed based on strong performance with only one or two of the roles?\n3. **Does the narrative or evidence presented to each stakeholder match their actual success criteria** — ROI for the Economic Buyer, risk and compliance for the Technical Evaluator, task fit for the End User — rather than a single generic pitch applied uniformly?\n4. **Is the deal currently relying too heavily on a single stakeholder**, particularly a Champion, to carry momentum without direct engagement from the roles that hold actual authority to approve or veto the purchase?\n\nA B2B PM or sales team that runs every account through this diagnostic is far less likely to be surprised by a deal stalling after apparently strong progress, since the stall is usually explainable by an unaddressed role on the Compass rather than a mysterious, unexplained loss of momentum.\n\n---"
+  },
+  "caseStudy": {
+    "title": "The Champion Who Couldn't Deliver",
+    "content": "A B2B data analytics startup had, over several months, cultivated an extremely enthusiastic internal champion at a mid-size retail company — a data analyst who had personally piloted the product, presented it favorably at an internal team meeting, and repeatedly assured the startup's sales team that \"everyone loves this\" and that a formal purchase was imminent. The startup's sales team, encouraged by this consistent enthusiasm, invested significant effort in supporting the champion with additional demos, technical documentation, and customized reports, all directed at reinforcing the champion's own internal advocacy.\n\nAfter several months of what felt like steady progress, the deal abruptly stalled and ultimately did not close. A later post-mortem conversation revealed that the champion, while genuinely enthusiastic and influential among her immediate peers, had no actual budget authority and had never successfully gotten the purchase on the agenda of the department's actual economic buyer, a VP who controlled the relevant budget and had, in fact, never been directly engaged by the startup's sales team at any point in the process. Separately, the company's IT security team, also never engaged, had a standing policy requiring a formal security review for any new data tool, a requirement the champion had not raised because she did not know engaging IT was necessary or was not confident in how to initiate that process herself.\n\n**What went wrong?** Using the Stakeholder Compass, the failure is precise: the startup had invested heavily and exclusively in the Champion role, mistaking her genuine internal enthusiasm for evidence of overall deal progress, while never directly engaging either the Economic Buyer or the Technical Evaluator — the two roles whose actual authority was required to complete the purchase. The Champion's own account of progress, however sincere, reflected her limited visibility into the departmental budget process and her own uncertainty about navigating IT security review, not an accurate picture of the deal's true status across the full Compass.\n\nThe company's recovery involved instituting a formal account-mapping practice requiring explicit identification and direct engagement confirmation for all four Stakeholder Compass roles before a deal could be marked as \"advancing\" internally, and developing differentiated materials — an ROI-focused business case for economic buyers, a security and compliance overview for technical evaluators — rather than relying on a single champion-facing narrative across the entire process, a discipline that connects directly to the packaging strategies formalized in Lesson 74.\n\n---"
+  },
+  "framework": {
+    "title": "The Stakeholder Engagement Checklist",
+    "content": "Before considering a B2B deal genuinely \"on track,\" a PM or sales team can use the following checklist:\n\n| Role | Primary Success Criteria | Engagement Confirmation Needed |\n|---|---|---|\n| Champion | Personal credibility and internal advocacy success | Direct, ongoing relationship confirmed, but not treated as sufficient alone |\n| Economic Buyer | Return on investment relative to cost and alternatives | Direct conversation or presentation confirmed, not assumed via the champion's secondhand account |\n| Technical Evaluator | Risk, security, compliance, and integration burden | Direct engagement with IT/security confirmed, ideally initiated early rather than late |\n| End User | Task fit and day-to-day usability | Direct feedback confirmed, distinct from champion enthusiasm alone |\n\nA \"no\" on direct engagement with either the Economic Buyer or the Technical Evaluator should be treated as a significant risk to deal progress, regardless of how strong Champion or End User enthusiasm appears, given how consistently these two roles hold effective veto authority in B2B purchasing decisions.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Real World Perspective",
+    "content": ""
+  },
+  "quiz": [
+    {
+      "id": "q-073-1",
+      "questionNumber": 1,
+      "questionText": "Why do B2B purchasing decisions typically involve multiple distinct stakeholder roles?",
+      "options": [
+        "B2B products always require more features than consumer products",
+        "The functions of using, deciding, and paying for a product are frequently distributed across different people with different incentives",
+        "B2B companies are legally required to have multiple decision-makers for every purchase",
+        "There is no meaningful difference between B2B and consumer purchasing decisions"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This distribution of functions across different people is the central distinguishing feature of B2B purchasing versus consumer purchasing.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-073-2",
+      "questionNumber": 2,
+      "questionText": "What are the four roles in the Stakeholder Compass?",
+      "options": [
+        "Marketing, Sales, Engineering, Design",
+        "Champion, Economic Buyer, Technical Evaluator, End User",
+        "CEO, CFO, CTO, CMO",
+        "Founder, Investor, Board Member, Advisor"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "These are the four roles explicitly mapped by the Stakeholder Compass introduced in this lesson.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-073-3",
+      "questionNumber": 3,
+      "questionText": "What does the Technical Evaluator primarily assess?",
+      "options": [
+        "Return on investment relative to cost",
+        "Security, compliance, integration, and technical risk",
+        "Personal internal advocacy credibility",
+        "Day-to-day task fit and usability"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Technical Evaluator's role, connected directly to Lesson 72's Rung 3 gatekeepers, focuses on risk and compliance assessment.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-073-4",
+      "questionNumber": 4,
+      "questionText": "What is the Champion-Without-Authority Trap?",
+      "options": [
+        "A Champion who has too much budget authority relative to their role",
+        "Over-relying on an enthusiastic Champion's account of deal progress without directly engaging the Economic Buyer or Technical Evaluator",
+        "A situation where no Champion exists at all in a given account",
+        "A technical vulnerability in enterprise software systems"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This trap specifically describes mistaking Champion enthusiasm for overall deal progress without engaging the roles with actual approval authority.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-073-5",
+      "questionNumber": 5,
+      "questionText": "What does the Economic Buyer primarily care about?",
+      "options": [
+        "Day-to-day usability of the product",
+        "Return on investment and total cost relative to alternatives",
+        "Security certifications and compliance requirements",
+        "Personal credibility among their internal peers"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Economic Buyer's defining concern, as described in the Theory section, is ROI and cost relative to alternative uses of the same budget.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-073-6",
+      "questionNumber": 6,
+      "questionText": "Why might a pitch optimized for an End User's concerns fail to resonate with an Economic Buyer?",
+      "options": [
+        "End Users and Economic Buyers always have identical concerns",
+        "The Economic Buyer evaluates the purchase primarily in terms of ROI and cost, which task-fit-focused messaging may not address",
+        "Economic Buyers never have any interest in product functionality",
+        "End Users always have more purchasing authority than Economic Buyers"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Each role's distinct success criteria means a narrative tailored to one role may not address another's actual concerns.",
+      "learningObjective": "#3, #5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-073-7",
+      "questionNumber": 7,
+      "questionText": "In the Case Study, what was the actual root cause of the stalled deal?",
+      "options": [
+        "The Champion was not genuinely enthusiastic about the product",
+        "The startup had invested exclusively in the Champion role, never directly engaging the Economic Buyer or Technical Evaluator, both of whom held actual approval authority",
+        "The product itself was technically deficient",
+        "The sales team never spoke with the Champion at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The failure was a specific engagement gap with the two roles holding real authority, not a flaw in the Champion's genuine enthusiasm or the product itself.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-073-8",
+      "questionNumber": 8,
+      "questionText": "Why didn't the Champion in the Case Study raise the need for IT security review earlier?",
+      "options": [
+        "She was not genuinely invested in the purchase succeeding",
+        "She did not know engaging IT was necessary or was not confident in how to initiate that process herself",
+        "IT security review was not actually required at her company",
+        "The startup explicitly told her not to contact IT"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The case study describes the Champion's limited visibility into and confidence navigating the security review process as part of why this gap went unaddressed.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-073-9",
+      "questionNumber": 9,
+      "questionText": "According to the Stakeholder Engagement Checklist, what should a \"no\" on direct Economic Buyer engagement signal?",
+      "options": [
+        "A minor and inconsequential gap",
+        "A significant risk to deal progress, given how consistently this role holds effective veto authority",
+        "That the Champion's advocacy is sufficient to proceed without further concern",
+        "That the deal should be immediately abandoned"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly treats missing direct engagement with the Economic Buyer as a significant risk warranting further action, not abandonment or dismissal.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-073-10",
+      "questionNumber": 10,
+      "questionText": "Why might a single person occupy multiple Stakeholder Compass roles simultaneously in smaller organizations?",
+      "options": [
+        "Smaller organizations are legally prohibited from having distinct stakeholder roles",
+        "A small business owner, for example, may serve as Economic Buyer, Technical Evaluator, and End User all at once",
+        "The Stakeholder Compass framework does not apply to any organization with fewer than four employees",
+        "Smaller organizations never make B2B purchasing decisions"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section explicitly describes this consolidation of roles as common and reasonable at small organizational scale.",
+      "learningObjective": "#2",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-073-11",
+      "questionNumber": 11,
+      "questionText": "What do large enterprise sales organizations typically maintain, per the Real World Perspective section?",
+      "options": [
+        "No formal process for identifying stakeholder roles",
+        "Formal account-mapping processes explicitly identifying and tracking engagement status for each Stakeholder Compass role",
+        "A policy of engaging only the End User throughout the entire sales process",
+        "A prohibition on engaging Economic Buyers directly"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real World Perspective section describes formal, structured account mapping as characteristic of large-scale enterprise sales organizations.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-073-12",
+      "questionNumber": 12,
+      "questionText": "(Scenario) A sales team has strong End User feedback and Champion enthusiasm for a deal, but has never spoken directly with the account's IT security team. Using the Stakeholder Compass, what should the team do next?",
+      "options": [
+        "Proceed to close the deal, since End User and Champion enthusiasm indicate strong overall progress",
+        "Proactively engage the Technical Evaluator directly, given their typical veto authority, rather than assuming their approval will follow automatically",
+        "Wait for the Champion to independently handle all remaining stakeholder engagement",
+        "Conclude that Technical Evaluator engagement is unnecessary if End User feedback is strong enough"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This directly applies the lesson's core diagnostic: strong performance with two roles does not substitute for direct engagement with the Technical Evaluator, who holds separate veto authority.",
+      "learningObjective": "#2, #4, #5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-073-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A PM is told a deal is \"clearly on track\" based on a Champion's repeated assurances, despite no direct contact with the Economic Buyer in over two months. What is the most defensible response, using this lesson's frameworks?",
+      "options": [
+        "Accept the Champion's assurances at face value and continue current momentum",
+        "Treat the deal's status with appropriate skepticism and work to establish direct engagement with the Economic Buyer before considering it genuinely on track",
+        "Escalate the deal for immediate closing based on Champion enthusiasm alone",
+        "Assume the Economic Buyer's approval is a formality that doesn't require direct engagement"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the Case Study's core lesson: secondhand assurances from a Champion are not a substitute for confirmed direct engagement with roles holding actual approval authority.",
+      "learningObjective": "#4, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-073-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) A candidate, asked how they'd manage a complex B2B sales process, describes focusing entirely on maximizing End User satisfaction throughout. What does this most likely signal, per the Interview Perspective section?",
+      "options": [
+        "A strong and complete understanding of B2B sales dynamics",
+        "A gap in recognizing that Economic Buyer and Technical Evaluator engagement, with their distinct success criteria, are equally necessary for deal progress",
+        "That the candidate is ready for a senior enterprise sales leadership role immediately",
+        "Nothing meaningful; End User satisfaction is the only relevant factor in B2B deals"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section specifically listens for recognition of all four Compass roles, not exclusive focus on the End User.",
+      "learningObjective": "#2, #3, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-073-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A B2B deal has strong Champion and End User enthusiasm but has stalled in \"review\" for two months with no clear explanation, and neither the Economic Buyer nor Technical Evaluator has been directly engaged. Using only the frameworks in this lesson, what is the most defensible next step?",
+      "options": [
+        "Continue relying on the Champion's updates and wait for the review process to resolve on its own",
+        "Proactively work to establish direct engagement with both the Economic Buyer and Technical Evaluator, preparing differentiated materials matched to each role's distinct success criteria, without undermining the Champion's internal credibility",
+        "Escalate pressure on the Champion to personally resolve the review process faster",
+        "Conclude the deal is unlikely to close and deprioritize the account entirely without further investigation"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the Reflection Exercise and Case Study: the correct response neither passively waits nor abandons the account, but proactively establishes engagement with the roles holding actual authority, using appropriately differentiated materials.",
+      "learningObjective": "#2, #3, #4, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "fc-073-1",
+      "front": "Why do B2B purchasing decisions typically involve multiple stakeholder roles, unlike consumer purchases?",
+      "back": "In B2B, the functions of using, deciding, and paying for a product are frequently distributed across different people with different incentives, unlike a consumer purchase where one person fulfills all roles.",
+      "difficulty": "Easy",
+      "tags": [
+        "#stakeholder-compass",
+        "#core-concept"
+      ],
+      "lessonNumber": 73
+    },
+    {
+      "id": "fc-073-2",
+      "front": "Name the four roles of the Stakeholder Compass.",
+      "back": "Champion, Economic Buyer, Technical Evaluator, End User.",
+      "difficulty": "Easy",
+      "tags": [
+        "#stakeholder-compass"
+      ],
+      "lessonNumber": 73
+    },
+    {
+      "id": "fc-073-3",
+      "front": "What is the Champion-Without-Authority Trap?",
+      "back": "Over-relying on a genuinely enthusiastic Champion's account of deal progress without directly engaging the Economic Buyer or Technical Evaluator, who hold actual approval authority.",
+      "difficulty": "Medium",
+      "tags": [
+        "#champion-trap"
+      ],
+      "lessonNumber": 73
+    },
+    {
+      "id": "fc-073-4",
+      "front": "What does the Economic Buyer primarily evaluate a purchase on?",
+      "back": "Return on investment and total cost relative to alternatives, often with limited firsthand exposure to the product itself.",
+      "difficulty": "Medium",
+      "tags": [
+        "#economic-buyer"
+      ],
+      "lessonNumber": 73
+    },
+    {
+      "id": "fc-073-5",
+      "front": "Why did the Champion Who Couldn't Deliver case study's deal ultimately stall?",
+      "back": "The startup invested exclusively in the enthusiastic Champion, never directly engaging the Economic Buyer (who controlled budget) or the Technical Evaluator (who required security review), both of whom held actual approval authority.",
+      "difficulty": "Hard",
+      "tags": [
+        "#case-study",
+        "#champion-trap"
+      ],
+      "lessonNumber": 73
+    },
+    {
+      "id": "fc-073-6",
+      "front": "Why should the Technical Evaluator be engaged early rather than late in a B2B sales process?",
+      "back": "Given their veto-level authority, late engagement risks a costly, momentum-killing stall at exactly the point a deal seemed closest to completion.",
+      "difficulty": "Medium",
+      "tags": [
+        "#technical-evaluator"
+      ],
+      "lessonNumber": 73
+    },
+    {
+      "id": "fc-073-7",
+      "front": "Why might a single person occupy multiple Stakeholder Compass roles simultaneously?",
+      "back": "In smaller organizations, one person (e.g., a small business owner) may be Economic Buyer, Technical Evaluator, and End User all at once.",
+      "difficulty": "Medium",
+      "tags": [
+        "#stakeholder-compass-scale"
+      ],
+      "lessonNumber": 73
+    }
+  ],
+  "reflectionPrompt": "You are the PM for a B2B HR software company. Your sales team reports strong enthusiasm from an HR manager at a target account who has been actively using a free trial and advocating internally, but the formal contract has been \"in review\" for two months with no clear update.\n\nThere is no single correct answer to the prompts below — the goal is to practice applying the Stakeholder Compass and the Stakeholder Engagement Checklist to a deal that may be caught in the Champion-Without-Authority Trap.\n\n1. Using the Stakeholder Compass, which role does the enthusiastic HR manager most likely occupy, and what does this tell you about the deal's true status?\n2. What specific questions would you want your sales team to ask the HR manager to determine whether the Economic Buyer and Technical Evaluator have actually been engaged?\n3. If neither the Economic Buyer nor the Technical Evaluator has been directly engaged, what steps would you recommend to establish that engagement without undermining the Champion's own credibility internally?\n4. How might you differentiate the materials or narrative you'd prepare for the Economic Buyer versus the Technical Evaluator, given their differing success criteria?\n5. How would you communicate the deal's true status to your own leadership, given that the existing narrative may have overstated progress based on Champion enthusiasm alone?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 72 — Enterprise & B2B Product Management Fundamentals | Names and elaborates the Rung 3 gatekeeper concept into a full four-role Stakeholder Compass |\n| **Current Lesson** | Lesson 73 — Selling to Committees: Buyer vs. User in B2B | Stakeholder Compass; Champion-Without-Authority Trap; role-differentiated engagement; Stakeholder Engagement Checklist |\n| **Next Lesson** | Lesson 74 — Land-and-Expand: Packaging for Enterprise Growth | Uses the Stakeholder Compass to inform how packaging and pricing tiers should be designed around different stakeholder roles |\n| **Future Concepts Unlocked** | Lesson 79 (Pricing Strategy at Scale) | Extends role-differentiated messaging into pricing negotiation strategy specifically |\n| | Lesson 88 (Building and Scaling a Product Organization) | Extends stakeholder-mapping discipline into internal organizational stakeholder management |\n\nThis curriculum continues to build as one continuous argument. From this lesson forward, any reference to a B2B deal or account assumes you can map it onto the Stakeholder Compass without re-explanation.",
+  "rawMarkdownPath": "content/lessons/lesson-073.md"
+}

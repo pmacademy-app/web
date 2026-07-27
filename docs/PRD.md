@@ -70,7 +70,7 @@ PM Academy
 
 ## 3. Content Model
 
-- 9 modules, 10 lessons each = **90 lessons total**. (If the content audit changes this count, update this section and the content schema in `Architecture.md` §4 together — they must never drift out of sync.)
+- 9 modules, 10 lessons each = **90 lessons total**. (Resolved per §11's Open Decisions Log — every other document already assumes this. If this ever changes, update this section and the content schema in `Architecture.md` §4 together in the same session — they must never drift out of sync.)
 - **Markdown is the single source of truth.** Each lesson is authored as a Markdown file with a fixed section structure (see `Architecture.md` §4 for the exact schema). At build time, Markdown is parsed, validated, and converted to static JSON. The browser consumes pre-generated JSON — there is no runtime markdown parsing. **Lesson content is never stored in the database** — the database stores only user state (see `Architecture.md` §2).
 - Every lesson carries an **honest estimated time** shown before the learner starts it.
 - Every lesson is tagged with 1–2 of 7 **competency clusters**: Discovery & Research, Strategy, Design & UX, Execution & Delivery, Metrics & Growth, Leadership & Communication, Platform/Technical/Specialized.
@@ -260,14 +260,16 @@ Track unresolved product decisions here so context is never lost between session
 
 | Decision | Status | Notes |
 |---|---|---|
-| 9 vs. 10 modules | **Open — blocks data model.** | Resolve before building the content parser (`Architecture.md` §4). Default assumption in this doc is 9 modules × 10 lessons = 90, per the roadmap; update every reference across all five docs if changed. |
+| 9 vs. 10 modules | **Resolved: 9 modules.** | Locked in. Every downstream document (`Architecture.md` §2/§4, `Design.md`, `Phases.md`, and both marketing/content sprint docs) already builds on 9 modules × 10 lessons = 90 — this was de facto decided by implementation drift even while this table still said "Open." Formally closing it here so no future contributor reopens it. |
+| **AI Mentor — is it in scope for v1?** | **Open — CRITICAL, blocks marketing site copy and hero design.** | `Marketing-Website-Sprint-2.md` §15 and `Content-Communication-System-Sprint-3.md` build an entire homepage section, FAQ answer, footer link, error state ("The AI Mentor is unavailable right now"), and hero copy ("A structured, AI-assisted PM academy...") around a chat-based AI mentor (reviews PRDs, generates quizzes, gives interview practice) that **does not exist anywhere in this PRD's feature list (§4), in `Architecture.md`'s tech stack or data model, or in `Phases.md`'s roadmap** — and directly contradicts this PRD's own non-goal (§6: "AI-generated personalized lesson content... curriculum is fixed and human-authored"). An LLM-backed chat feature also breaks the $0-infra-cost architecture principle (`Architecture.md` §1, `Rules.md` §2.3) — API-metered LLM calls have no meaningful free tier at real usage volume. **This must be resolved before the marketing site ships**, because right now the marketing site is making a product promise engineering has no plan or budget to build. Two real options: (a) cut AI Mentor from all launch copy entirely and revisit as a genuine, costed, post-launch feature (Phase 7+, alongside monetization, since it would need to be paid-tier-funded to avoid breaking the free-forever cost model), or (b) if you actually want this at launch, it needs to be added to `PRD.md` §4, `Architecture.md` §1/§6, and `Phases.md` as a real, budgeted feature — not left as marketing-only vaporware. Recommendation: (a). See the accompanying Doc Review for full reasoning. |
 | Skill radar scoring formula (discrete Beginner/Intermediate/Advanced vs. continuous 0–100) | Open | Lock in during Phase 1 design (see `Phases.md`), then document the final formula in this PRD §4.8. |
 | Exact XP thresholds per level/title | Open | Tune during closed beta (Phase 4); §4.6 sequence is fixed, numeric thresholds are not. |
-| Expert-reviewed-AI capstone feedback (§10.1) — build in-house or use an LLM API directly | Deferred | Not a v1 decision; revisit only once free core is proven per §10's ordering. |
+| Expert-reviewed-AI capstone feedback (§10.1) — build in-house or use an LLM API directly | Deferred | Not a v1 decision; revisit only once free core is proven per §10's ordering. Note: if AI Mentor (above) is greenlit, evaluate both together — they'd likely share the same LLM-API cost/vendor decision rather than being solved twice. |
 
 ---
 
 ## Changelog
 
+- v2.1 — Documentation review pass: closed the 9-vs-10 modules decision (resolved: 9, per downstream doc consistency). Added critical Open Decision on the "AI Mentor" feature found unscoped in the marketing/content sprint docs — contradicts §6's non-goal and is absent from Architecture/Phases; flagged as launch-blocking until resolved.
 - v2.0 — Updated for static-first architecture: responsive web app (not native), Markdown→JSON build pipeline, Supabase for user state only, Google Analytics (replaced PostHog), Email+Password and Google Login (removed LinkedIn OAuth), Resend SMTP, Vercel-only hosting (removed Cloudflare), client-side search, waitlist collects name/email/career position.
 - v1.0 — Initial PRD authored from the "PM Academy — 0→1 Roadmap & Project Plan" source document. All decisions in that roadmap are considered ratified unless marked "Open" in §11.

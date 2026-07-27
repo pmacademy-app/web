@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-033",
+    "number": 33,
+    "title": "Kanban Framework",
+    "moduleNumber": 4,
+    "moduleName": "Execution & Agile Delivery",
+    "difficulty": 4,
+    "estMinutesReading": 35,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 31 (Agile Fundamentals — Iteration Loop, Agile Fit Checklist), Lesson 32 (Scrum Framework — roles, events, artifacts)",
+    "nextLessonSlug": "lesson-034",
+    "futureTopicsUnlocked": "Lesson 34 (Sprint Planning & Backlog Grooming), Lesson 39 (Technical Debt & PM Trade-offs, where flow-based prioritization becomes relevant), Lesson 43 (Funnel Analysis, which reuses this lesson's flow-bottleneck logic), Lesson 47 (Stakeholder Management) — all build on WIP limits and flow metrics introduced here"
+  },
+  "learningObjectives": [
+    "State Kanban's six core practices and explain the problem each one is designed to solve.",
+    "Explain what a Work-in-Progress (WIP) limit is, and why constraining the amount of work in progress can increase, rather than decrease, overall throughput.",
+    "Distinguish cycle time from lead time, and explain what each metric reveals that the other does not.",
+    "Apply the Agile Fit Checklist (Lesson 31) to compare Scrum and Kanban, and identify the specific conditions under which each framework is the better fit.",
+    "Diagnose a flow bottleneck using a cumulative flow diagram and a WIP-limit violation, and propose an appropriate response."
+  ],
+  "theory": "### The Origin: Flow, Not Batches\n\nKanban's modern software adaptation traces back to lean manufacturing principles, most famously the Toyota Production System, later adapted for knowledge work by David J. Anderson in the mid-2000s. Where Scrum's unit of commitment is the Sprint (a fixed time-box), Kanban's unit of attention is the **item of work moving through a value stream** — and its central bet is that limiting how much work is in progress at once, rather than how much time is allotted, is the more reliable lever for improving delivery speed and predictability.\n\n### The Six Core Practices\n\n| Practice | What It Solves |\n|---|---|\n| **1. Visualize the workflow** | Makes invisible knowledge work visible, typically as a board with columns representing stages (e.g., Backlog → In Progress → Review → Done) |\n| **2. Limit Work in Progress (WIP)** | Prevents a team from starting more than it can finish, which is the single most common cause of slow, unpredictable delivery |\n| **3. Manage flow** | Shifts attention from \"are people busy\" to \"is work actually moving through the system smoothly\" |\n| **4. Make process policies explicit** | Ensures everyone shares the same definition of what it means for an item to move from one column to the next |\n| **5. Implement feedback loops** | Establishes regular checkpoints (analogous to, but less rigidly scheduled than, Scrum's events) for reviewing flow and outcomes |\n| **6. Improve collaboratively, evolve experimentally** | Treats the process itself as something to be iterated on using evidence, mirroring the Iteration Loop from Lesson 31 applied to the process rather than the product |\n\n### Why Limiting WIP Increases Throughput\n\nThis is the single most counterintuitive idea in this lesson, and worth deriving carefully rather than simply asserting. Consider a team with five engineers and no WIP limit. Under pressure from many stakeholders, the team starts eight things simultaneously — every engineer context-switches between roughly 1.5 items on average. Context-switching carries a real, well-documented cost: every switch requires re-loading mental context, and that overhead is pure waste, contributing to none of the eight items' completion.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[No WIP Limit] --> B[Many Items Started Simultaneously]\n    B --> C[Constant context-switching]\n    C --> D[Everything Slows Down Together]\n    D --> E[Nothing Finishes for a Long Time]\n```\n\nNow compare a team that limits WIP to, say, three items at a time. A fourth request must wait in a queue until one of the three in progress is finished. This feels, superficially, like it should be slower — after all, work is being deliberately delayed. But because the three in-progress items receive full, uninterrupted attention, they finish faster individually, and the team's overall completion rate (throughput) tends to rise, not fall, because the hidden cost of constant context-switching has been removed. This is Kanban's central, often initially resisted, claim: **starting less work finishes more work**.\n\n### Flow Metrics: Cycle Time and Lead Time\n\nTwo related but distinct metrics are essential to Kanban's \"manage flow\" practice, and new PMs frequently conflate them:\n\n- **Lead time**: the total time from when a request is *made* (entering the backlog) to when it's *delivered*. This is the metric a customer or stakeholder experiences directly — \"how long did it take from when I asked to when I got it?\"\n- **Cycle time**: the time from when work *actually begins* on an item to when it's *delivered*. This is the metric that measures the team's execution efficiency specifically, stripped of however long the item sat waiting in the backlog before anyone started it.\n\nA team can have a short cycle time (fast once started) but a long lead time (items sit in the backlog for weeks before anyone picks them up) — this is an extremely common pattern, and one that a team focused only on cycle time will completely miss, because it's invisible to anyone only watching work once it's \"in progress.\" Diagnosing which of the two is the actual problem determines whether the fix is \"work faster once started\" (rarely the real issue) or \"start things sooner\" (frequently the real issue, and much more within a PM's direct influence, since it's often driven by prioritization decisions rather than engineering execution speed).\n\n### The Cumulative Flow Diagram\n\nA cumulative flow diagram (CFD) plots the number of items in each workflow stage over time, as stacked bands. A healthy CFD shows roughly parallel, steadily widening bands. A widening band for one specific stage — say, \"Code Review\" growing wider and wider while \"In Progress\" and \"Done\" stay flat — is a visual signature of a bottleneck: work is piling up at that stage faster than it's being cleared, exactly the kind of structural problem a WIP limit at that stage is designed to surface and force the team to confront directly, rather than allowing it to silently accumulate.\n\n---",
+  "mistakes": "**Mistake 1: Treating Kanban as \"Scrum without the meetings.\"**\nKanban is not merely an unstructured, ceremony-free version of Scrum — it has its own explicit practices (the six above), its own discipline (WIP limits, explicit policies), and its own feedback mechanisms. A team that drops Scrum's events without adopting Kanban's actual practices in their place has adopted neither framework's discipline, only the appearance of informality.\n\n**Mistake 2: Setting WIP limits too high to avoid the discomfort of a full queue.**\nA WIP limit only works if it's occasionally binding — if it never actually blocks anyone from starting new work, it isn't constraining behavior, it's decorative. New teams frequently set WIP limits generously enough that they're never hit, which defeats the entire mechanism described above.\n\n**Mistake 3: Measuring \"team busyness\" instead of \"flow.\"**\nA team where every engineer is constantly occupied can still have terrible flow, if what they're occupied with is a large number of half-finished items rather than a small number of completed ones. Kanban's \"manage flow\" practice exists specifically to redirect attention away from individual utilization and toward whether work is actually completing and moving downstream.\n\n**Mistake 4: Confusing cycle time improvements with lead time improvements.**\nAs covered above, optimizing execution speed once work has started does nothing for items still waiting, unstarted, in a long backlog queue. A PM who reports \"we improved cycle time by 20%\" as evidence the team is now faster to deliver, without checking lead time, may be reporting a genuine but incomplete improvement — or masking a worsening backlog problem entirely.\n\n**Mistake 5: Skipping explicit process policies.**\nWithout an explicit, shared definition of what it means for an item to be ready to move from one column to the next (e.g., what \"Ready for Review\" actually requires), teams experience constant, low-grade disputes about whether something is really done with a stage — the Kanban equivalent of the Definition of Done ambiguity covered in Lesson 32.\n\n---",
+  "mentalModel": {
+    "title": "The Flow Valve",
+    "content": "This lesson's core takeaway tool visualizes the WIP-limit mechanism as a valve controlling pressure through a pipe:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Backlog Unlimited Queue] --> B{WIP Limit Valve}\n    B -->|Only N Items Allowed Through| C[In Progress Limited, Focused Work]\n    C --> D[Done]\n    D -.->|Capacity Freed, Valve Opens| B\n```\n\nUse the Flow Valve as a diagnostic whenever a team reports feeling \"busy but nothing's shipping.\" Ask: is the valve (WIP limit) actually constraining anything, or has it been set so loosely that everything passes through unimpeded, recreating the context-switching problem the valve exists to prevent? A team with no binding WIP limit is, functionally, a team with no valve at all — pressure (requests) flows straight through into an overloaded pipe (in-progress work), regardless of what the board visually implies.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Backlog Unlimited Queue] --> B{WIP Limit Valve}\n    B -->|Only N Items Allowed Through| C[In Progress Limited, Focused Work]\n    C --> D[Done]\n    D -.->|Capacity Freed, Valve Opens| B"
+  },
+  "caseStudy": {
+    "title": "The Board That Looked Fine",
+    "content": "Consider a simplified, illustrative scenario common on platform and infrastructure teams several months into adopting Kanban.\n\nA six-person platform team adopts a Kanban board with columns: Backlog, In Progress, Code Review, QA, Done. They set a WIP limit of 4 for \"In Progress\" but never set one for \"Code Review,\" reasoning that review \"shouldn't take long anyway.\" Over several weeks, the team notices that items seem to sit for days after being marked \"ready for review,\" even though engineers report being busy the entire time. The team's dashboard shows steady throughput of new items entering \"In Progress,\" creating an impression of healthy activity.\n\n**What went wrong?**\n\nA cumulative flow diagram would have shown the actual problem immediately: the \"Code Review\" band was widening steadily while \"In Progress\" and \"QA\" stayed flat — a textbook bottleneck signature. Without a WIP limit on Code Review, engineers kept starting new work in \"In Progress\" (since nothing formally prevented them) rather than picking up items waiting in the review queue, because starting new work often feels more productive, in the moment, than reviewing someone else's. The result: a growing pile of nearly-finished work sitting invisible behind a healthy-looking \"In Progress\" column, exactly the \"busy but nothing's shipping\" pattern this lesson's Mental Model warns about.\n\nThe fix was not more engineers, more meetings, or faster reviewers — it was placing an explicit WIP limit on Code Review itself, which forced a genuine trade-off into the open: when Code Review is full, engineers must either help clear it or explicitly decide to leave capacity idle, rather than silently starting new work while a bottleneck grows unaddressed. This exact bottleneck-diagnosis logic — noticing where work piles up rather than where people look busy — reappears directly in **Lesson 43 (Funnel Analysis)**, applied to user behavior rather than engineering workflow, and in **Lesson 39 (Technical Debt & PM Trade-offs)**, where an under-resourced review or QA stage is a common source of accumulating technical debt.\n\n---"
+  },
+  "framework": {
+    "title": "Scrum vs. Kanban Fit Assessment",
+    "content": "A second, more tactical tool: use this table, built directly on the Agile Fit Checklist from Lesson 31, to reason about which framework better suits a specific team's actual working conditions.\n\n| Condition | Favors Scrum | Favors Kanban |\n|---|---|---|\n| Predictability of incoming work | Work can be reasonably planned two-plus weeks ahead | Work arrives continuously and unpredictably (incidents, support requests) |\n| Need for a fixed planning cadence | Stakeholders benefit from regular, scheduled commitments | Work is better served by continuous prioritization than fixed-interval planning |\n| Team's tolerance for context-switching | Team can focus on a stable batch for the Sprint's duration | Team must remain responsive to shifting urgency within days or hours |\n| Nature of \"done\" | Discrete features/increments with a clear finish line each cycle | Ongoing operational or maintenance work without a natural batch boundary |\n| Primary flow metric of interest | Sprint velocity / burndown | Cycle time, lead time, WIP limit adherence |\n\nNeither framework is inherently superior; the fit assessment above exists precisely to prevent the common mistake of choosing a framework based on familiarity or company-wide default rather than the actual shape of the team's work — a mistake this lesson's Interview Perspective section below addresses directly.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Startup vs. Mid-Size vs. Big Tech",
+    "content": "**At a startup:**\nKanban is often adopted implicitly, even without the name — a simple \"To Do / Doing / Done\" board with a rough, informal sense that people shouldn't start too many things at once. Formal WIP limits and cumulative flow diagrams are less common at this stage; the team is small enough that flow problems are often visible through direct conversation rather than requiring a chart to surface them.\n\n**At a mid-size company:**\nKanban is more frequently adopted formally for teams whose work doesn't fit neatly into sprints — support-adjacent engineering, platform teams, or teams serving many internal stakeholders with unpredictable requests. This is also where explicit WIP limits and cycle-time tracking tend to appear, because the team has grown past the point where flow problems are obvious from casual observation alone.\n\n**At Big Tech:**\nKanban frequently coexists with Scrum across different teams within the same organization, chosen based on the nature of each team's work rather than a company-wide mandate. PMs at this scale are often expected to make — and defend — the specific choice of framework for their own team, using reasoning like the Agile Fit Checklist below, rather than defaulting to whichever framework is most common company-wide.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-033-1",
+      "questionNumber": 1,
+      "questionText": "What is Kanban's central, counterintuitive claim about work in progress?",
+      "options": [
+        "More work in progress always means faster delivery",
+        "Limiting work in progress tends to increase overall throughput by reducing context-switching costs",
+        "WIP limits should always be set as high as possible",
+        "Work in progress has no effect on delivery speed"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly derives this claim: limiting WIP removes the hidden cost of context-switching, allowing in-progress items to finish faster and raising overall throughput.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-033-2",
+      "questionNumber": 2,
+      "questionText": "Which of the following is NOT one of Kanban's six core practices?",
+      "options": [
+        "Visualize the workflow",
+        "Limit Work in Progress",
+        "Hold a fixed two-week Sprint",
+        "Make process policies explicit"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "A fixed two-week Sprint is a Scrum concept (Lesson 32), not one of Kanban's six core practices listed in this lesson's Theory section.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-033-3",
+      "questionNumber": 3,
+      "questionText": "What does cycle time measure, as distinct from lead time?",
+      "options": [
+        "The total time from request to delivery, including time waiting unstarted",
+        "The time from when work actually begins on an item to when it's delivered",
+        "The number of items completed per week",
+        "The number of engineers assigned to a project"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section defines cycle time specifically as the time from when work begins to delivery, distinct from lead time's inclusion of unstarted wait time.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-033-4",
+      "questionNumber": 4,
+      "questionText": "A team has a short cycle time but stakeholders report long waits before their requests are even started. What does this pattern indicate?",
+      "options": [
+        "The team's execution speed is the problem",
+        "The team likely has a lead time problem driven by how long items sit in the backlog before being picked up, not an execution speed problem",
+        "This pattern is impossible under Kanban",
+        "The WIP limit is set too low"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly describes this exact pattern — short cycle time but long lead time — as common and driven by backlog wait time rather than execution speed, often requiring a prioritization rather than an execution fix.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-033-5",
+      "questionNumber": 5,
+      "questionText": "What does a widening band for one specific stage in a cumulative flow diagram indicate?",
+      "options": [
+        "That stage is operating efficiently",
+        "A bottleneck — work is accumulating in that stage faster than it's being cleared",
+        "The team needs more Sprints",
+        "The WIP limit is set correctly"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly defines a widening band relative to other stages as the visual signature of a bottleneck.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-033-6",
+      "questionNumber": 6,
+      "questionText": "Why is a WIP limit that never actually blocks anyone considered a problem?",
+      "options": [
+        "It isn't a problem; a WIP limit's purpose is purely cosmetic",
+        "A limit set high enough to never bind isn't actually constraining behavior — it's decorative rather than disciplinary",
+        "It means the team is working too slowly",
+        "It means the team should switch to Scrum"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #2 explicitly states that a WIP limit only works if it's occasionally binding; one that's never hit defeats the entire mechanism.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-033-7",
+      "questionNumber": 7,
+      "questionText": "According to the Scrum vs. Kanban Fit Assessment, which condition favors Kanban over Scrum?",
+      "options": [
+        "Work can be reasonably planned two-plus weeks ahead",
+        "Stakeholders benefit from regular, scheduled commitments",
+        "Work arrives continuously and unpredictably, such as incidents or support requests",
+        "The team wants a fixed planning cadence"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The Fit Assessment table explicitly lists unpredictable, continuously arriving work as a condition favoring Kanban.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-033-8",
+      "questionNumber": 8,
+      "questionText": "In the Detailed Case Study, what was the specific missing element that allowed the Code Review bottleneck to go unnoticed?",
+      "options": [
+        "A missing Daily Scrum",
+        "A missing WIP limit specifically on the Code Review stage, allowing engineers to keep starting new work instead of clearing the review queue",
+        "A missing Sprint Goal",
+        "Too few engineers on the team"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study's \"What went wrong?\" section identifies the absence of a WIP limit on Code Review specifically as what allowed the bottleneck to accumulate invisibly.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-033-9",
+      "questionNumber": 9,
+      "questionText": "Why does the lesson caution against measuring \"team busyness\" as a proxy for healthy flow?",
+      "options": [
+        "Because busyness and flow are always identical",
+        "Because a team can be fully occupied working on many half-finished items while completion (flow) is actually poor, as shown in the Case Study",
+        "Because busy teams are always underperforming",
+        "Because Kanban discourages teams from working hard"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #3 and the Case Study both illustrate that apparent busyness (many active cards) can mask poor actual flow (a bottleneck accumulating behind the scenes).",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-033-10",
+      "questionNumber": 10,
+      "questionText": "(Scenario) A PM reports \"cycle time improved 20% this quarter\" as evidence the team is now faster to deliver to stakeholders. What critical check is this claim missing, according to this lesson?",
+      "options": [
+        "Whether the team held enough retrospectives",
+        "Whether lead time also improved, since a cycle time improvement alone doesn't address how long items wait unstarted in the backlog",
+        "Whether the WIP limit was removed entirely",
+        "Whether the team switched from Kanban to Scrum"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #4 explicitly warns that reporting cycle time improvements without checking lead time may be incomplete or may mask a worsening backlog wait problem.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-033-11",
+      "questionNumber": 11,
+      "questionText": "Which real-world type of team does this lesson suggest is naturally better suited to Kanban's flow-based model?",
+      "options": [
+        "A team building a single large planned feature release over one quarter",
+        "A team handling continuous, unpredictable incident response and support work",
+        "A team that only ships once per year",
+        "A team with no stakeholders at all"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Real Company Example and Fit Assessment both point to operations/infrastructure-style teams handling continuous, unpredictable work as the natural fit for Kanban.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-033-12",
+      "questionNumber": 12,
+      "questionText": "What is the relationship between Kanban's six practices and Lesson 31's Iteration Loop?",
+      "options": [
+        "They are unrelated concepts from different disciplines",
+        "Kanban's practices (especially \"implement feedback loops\" and \"improve collaboratively\") are a specific, flow-based implementation of the same feedback-driven logic behind the Iteration Loop",
+        "Kanban replaces the need for any feedback loop entirely",
+        "The Iteration Loop only applies to Scrum, not Kanban"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson frames Kanban throughout as philosophically consistent with Lesson 31's Iteration Loop, just implemented through continuous flow rather than fixed Sprints.",
+      "learningObjective": "#1, #4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-033-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A team's cumulative flow diagram shows all bands widening in roughly parallel, steady bands over time. What does this indicate?",
+      "options": [
+        "A severe, hidden bottleneck",
+        "Healthy flow, with no single stage accumulating work disproportionately faster than others",
+        "That the team should immediately add more WIP limits",
+        "That the team is not using Kanban correctly"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly describes roughly parallel, steadily widening bands as the visual signature of healthy flow, in contrast to one disproportionately widening band, which signals a bottleneck.",
+      "learningObjective": "#5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-033-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) An interviewer asks a candidate when they'd recommend Kanban over Scrum, and the candidate answers: \"I always prefer Kanban, it's less bureaucratic.\" Based on this lesson's Interview Perspective section, what does this answer signal?",
+      "options": [
+        "Strong, well-reasoned framework judgment",
+        "A preference-based rather than conditions-based answer, since it doesn't reference the actual predictability or batch-ability of the team's work",
+        "That the candidate should have said Scrum instead",
+        "Nothing meaningful, since framework choice is arbitrary"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section states that a weak answer expresses a blanket preference, while a strong answer references specific conditions like predictability and batch-ability, which this answer fails to do.",
+      "learningObjective": "#4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-033-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A platform team has adopted Kanban, but stakeholders complain about unpredictable delivery timing, and the team's cumulative flow diagram shows a steadily widening \"QA\" band while other stages stay flat. Using only this lesson's frameworks, what is the most defensible next step, and why?",
+      "options": [
+        "Switch the entire team back to Scrum immediately, since Kanban has clearly failed",
+        "Introduce or tighten a WIP limit specifically on the QA stage, since the widening band identifies QA as the accumulating bottleneck — and investigate why work isn't being pulled through QA fast enough, rather than assuming more incoming request throttling elsewhere would help",
+        "Ignore the diagram, since stakeholder complaints about timing are a lead time issue unrelated to workflow stages",
+        "Add more WIP limit slots to \"In Progress\" so more work can start simultaneously"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the Detailed Case Study's exact reasoning: a widening band at one specific stage identifies precisely where the bottleneck lives, and the appropriate response is to constrain and address that stage directly (via a WIP limit and investigation into why QA is under-clearing work), not to loosen limits elsewhere or abandon the framework entirely.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "Consider the following novel scenario: You're the PM for a data infrastructure team that recently switched from Scrum to Kanban because their work — pipeline failures, ad hoc data requests from other teams, and planned improvements — didn't fit neatly into two-week Sprints. Three months in, cycle time for individual tickets has improved significantly. However, several internal stakeholders who submit data requests say they still \"wait forever\" to even hear back about when their request will be looked at.\n\nThere is no single correct answer to the prompts below — the goal is to practice distinguishing flow metrics and applying this lesson's frameworks, not to reach one \"right\" fix.\n\n1. Based on the stakeholders' complaints, is this more likely a cycle time problem or a lead time problem? What evidence in the scenario points to your answer?\n2. What would a cumulative flow diagram need to show for you to confirm where in the workflow requests are actually piling up before being started?\n3. Is it possible for cycle time to genuinely improve while lead time gets worse at the same time? Explain how, using this lesson's definitions.\n4. What role might an absent or overly generous WIP limit on the \"Backlog\" or \"Not Yet Started\" stage play in this pattern?\n5. If your investigation confirms a lead time problem specifically, what kind of intervention (using this lesson's frameworks) would you propose, and why would improving cycle time further not solve it?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 32 — Scrum Framework | Contrasts Kanban's flow-based model directly against Scrum's fixed-Sprint model, using the same underlying Agile values from Lesson 31 |\n| **Current Lesson** | Lesson 33 — Kanban Framework | Six core practices; WIP limits and the throughput claim; cycle time vs. lead time; cumulative flow diagrams; Scrum vs. Kanban Fit Assessment |\n| **Next Lesson** | Lesson 34 — Sprint Planning & Backlog Grooming | Returns to Scrum-specific mechanics, now informed by this lesson's flow-metric vocabulary (cycle time, lead time) for estimating and grooming backlog items |\n| **Future Concepts Unlocked** | Lesson 39 (Technical Debt & PM Trade-offs) | Applies this lesson's bottleneck-diagnosis logic to under-resourced review/QA stages as a source of accumulating technical debt |\n| | Lesson 43 (Funnel Analysis) | Reuses the bottleneck-identification logic from the cumulative flow diagram, applied to user behavior funnels instead of engineering workflow |\n| | Lesson 47 (Stakeholder Management) | Extends this lesson's lead-time framing into managing stakeholder expectations about delivery timing |\n\nThis curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the WIP-limit throughput claim and the cycle time/lead time distinction with you — they will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-033.md"
+}

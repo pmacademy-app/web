@@ -210,7 +210,7 @@ Use a 4px base with semantic spacing aliases.
 - Dashboard main grid: 12 columns desktop, 6 tablet, 4 mobile.
 
 **Layout rules**
-- Mobile first.
+- **⚠ Corrected in this revision:** this previously said "Mobile first," which contradicts `Design.md` §2's explicit "desktop as the primary design target." PM Academy's core work — reading dense lesson theory, taking 15-question quizzes, writing PRD-style capstones — is knowledge work closer to Notion or Coursera than a mobile game, and the target user (career switchers actively job-hunting) does this work overwhelmingly on a laptop. **Design desktop-first**: build the full desktop layout and interaction model first, then adapt down to a genuinely complete (not stripped-down) mobile experience for on-the-go review — flashcards, streak check-ins, quick quiz retakes — rather than mobile driving the base layout decisions.
 - Avoid horizontal scrolling except intentional carousels, tables with affordance, or code blocks.
 - Sidebar collapses below `lg`.
 - Right rails collapse below `xl`.
@@ -379,10 +379,13 @@ Dark mode is a first-class learning environment, especially for evening study.
 
 ## 16. Responsive Design Rules
 
-- Design mobile as a complete product, not a collapsed desktop.
-- Mobile navigation uses bottom nav for core areas: Home, Curriculum, Review, Progress, Profile.
+**⚠ Corrected in this revision:** the mobile-first framing below is replaced with a desktop-primary, mobile-complete framing consistent with `Design.md` §2 and the layout-rules correction in §7 above. The bottom-nav pattern is kept — it's a legitimate, widely-used responsive-web convention (not exclusive to native apps; Notion, Linear, and X's web apps all use it at narrow viewports), but it must never expand beyond a thin tab strip into anything resembling a native app shell (no swipe-to-navigate between tabs, no pull-to-refresh, no native-style modals) — `Design.md` §2's "no native app patterns" rule governs *interaction model*, not this one navigational affordance.
+
+- Build the full desktop experience first; adapt it down to mobile rather than starting from a mobile layout and stretching it up.
+- On mobile, prioritize the tasks a learner actually does on a phone — flashcard review, checking streak/skill radar, retaking a missed quiz question — over trying to replicate the full desktop lesson-writing/capstone-authoring experience, which realistically happens on desktop.
+- Mobile navigation uses a bottom nav bar for core areas: Home, Curriculum, Review, Progress, Profile. Keep it a simple tab strip — no native-app gesture patterns layered on top.
 - Desktop uses sidebar for authenticated app routes.
-- Reading view prioritizes text; secondary progress and AI panels collapse into sheets/drawers.
+- Reading view prioritizes text; secondary progress panels collapse into sheets/drawers.
 - Tables become cards or horizontally scrollable regions with visible affordance.
 - Dialogs become bottom sheets on small screens when task-oriented.
 - Keep CTAs reachable without covering content.
@@ -1053,4 +1056,5 @@ lib/
 
 ## Changelog
 
+- v1.1 — Documentation review pass: fixed "Mobile first" layout rule (§7) and "Design mobile as a complete product" framing (§16), both of which contradicted `Design.md`'s explicit desktop-first, no-native-app-patterns principle. Reframed as desktop-primary, mobile-complete. Removed stray "AI panels" reference from §16 (orphaned — no such feature exists in `PRD.md`).
 - v1.0 — Created Sprint 1 design foundation, token system, component specifications, and frontend architecture guidance for PM Academy.

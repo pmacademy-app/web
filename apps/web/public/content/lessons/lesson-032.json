@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-032",
+    "number": 32,
+    "title": "Scrum Framework",
+    "moduleNumber": 4,
+    "moduleName": "Execution & Agile Delivery",
+    "difficulty": 4,
+    "estMinutesReading": 35,
+    "estMinutesReflection": 15,
+    "prerequisites": "Lesson 31 (Agile Fundamentals — Iteration Loop, Agile Fit Checklist, Doing vs. Being Agile)",
+    "nextLessonSlug": "lesson-033",
+    "futureTopicsUnlocked": "Lesson 33 (Kanban Framework, contrasting flow-based model), Lesson 34 (Sprint Planning & Backlog Grooming, goes deep on one Scrum event), Lesson 40 (Product Operations), Lesson 55 (Building and Leading Product Teams) — all build on the Scrum roles, events, and artifacts introduced here"
+  },
+  "learningObjectives": [
+    "Name and explain Scrum's three pillars of empiricism (transparency, inspection, adaptation) and connect each to a specific Scrum event or artifact.",
+    "List Scrum's three roles, three artifacts (plus their associated commitments), and five events, and state the purpose of each in one sentence.",
+    "Explain the difference between a Sprint Goal and a sprint backlog, and why conflating the two undermines a sprint's coherence.",
+    "Diagnose \"Zombie Scrum\" — a team running all Scrum events without empirical value — using the Agile Fit Checklist from Lesson 31.",
+    "Explain the specific responsibilities of the Product Owner role, and distinguish them from the responsibilities of the Scrum Master and the Developers."
+  ],
+  "theory": "### Origins and the Empirical Foundation\n\nScrum was formalized in the early 1990s by Ken Schwaber and Jeff Sutherland and later codified in the **Scrum Guide**, which both authors have continued to maintain and periodically revise. Scrum describes itself not as a full methodology but as a lightweight **framework** — a minimal set of roles, events, and artifacts within which teams solve complex problems, with the actual work of planning and execution left to the team itself.\n\nScrum rests on three pillars, collectively called **empiricism**:\n\n1. **Transparency** — the state of the work and the process must be visible and understood by everyone involved, using a shared, honest vocabulary. A \"90% done\" status that hides an unresolved technical risk violates transparency.\n2. **Inspection** — progress toward a goal must be examined frequently enough to detect problems before they compound. Scrum's events exist largely to create scheduled, structured moments of inspection.\n3. **Adaptation** — when inspection reveals that an aspect of the work is unacceptable, or that the resulting product will be unacceptable, adjustments must be made promptly.\n\nNotice the direct lineage from Lesson 31: transparency and inspection generate the \"Feedback\" step of the Iteration Loop, and adaptation is precisely the \"informs next batch\" step. Scrum is, in this sense, a specific, named implementation of Lesson 31's generic Iteration Loop — with a fixed cadence (the Sprint) and a specific set of scheduled moments where inspection and adaptation are supposed to happen.\n\n### The Three Roles\n\n| Role | Primary Accountability |\n|---|---|\n| **Product Owner** | Maximizing the value of the product resulting from the team's work; owns and orders the Product Backlog |\n| **Scrum Master** | Establishing Scrum as defined in the Scrum Guide; coaching the team and organization; removing impediments to the team's progress |\n| **Developers** | The people doing the work of creating the Increment each Sprint (engineers, designers, QA — anyone building the product) |\n\nNotice that \"Product Owner\" is a Scrum-specific title for a responsibility this curriculum has been describing since Lesson 1 under the broader term \"Product Manager.\" In many organizations the titles are used interchangeably; in some larger organizations, a single PM may oversee multiple Product Owners embedded in different Scrum teams, or the PM and PO responsibilities may be split across two people. Either way, the accountability described here — owning and ordering the backlog toward maximum value — is precisely the \"problem-solution-value fit\" accountability from Lesson 1, expressed inside Scrum's specific vocabulary.\n\n### The Three Artifacts and Their Commitments\n\n| Artifact | What It Represents | Associated Commitment |\n|---|---|---|\n| **Product Backlog** | The complete, ordered list of everything known to be needed in the product | **Product Goal** — the longer-term objective the Product Backlog is working toward |\n| **Sprint Backlog** | The Product Backlog items selected for the current Sprint, plus a plan for delivering them | **Sprint Goal** — the single objective the current Sprint exists to achieve |\n| **Increment** | A concrete, working step toward the Product Goal, meeting the Definition of Done | **Definition of Done** — a shared, explicit standard of quality every Increment must meet |\n\nThe commitments matter as much as the artifacts themselves, and are frequently the part new PMs skip. Without a Sprint Goal, a Sprint Backlog degrades into an arbitrary list of tickets with no coherent story connecting them — which makes mid-sprint trade-off decisions (should we drop item C if item A takes longer than expected?) essentially unanswerable, because there's no shared objective to weigh them against.\n\n### The Five Events\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Sprint Planning] --> B((Sprint))\n    B --> C[Daily Scrum Repeats Daily]\n    C -.-> B\n    B --> D[Sprint Review]\n    D --> E[Sprint Retrospective]\n    E --> A\n```\n\n- **The Sprint** — a fixed-length container (commonly one to four weeks) for all other events; a new Sprint starts immediately after the previous one ends, with no gap.\n- **Sprint Planning** — the team selects Sprint Backlog items and forms a Sprint Goal, answering \"why is this Sprint valuable?\" and \"what can be done this Sprint?\"\n- **Daily Scrum** — a short, daily inspection of progress toward the Sprint Goal, used to adapt the plan for the next 24 hours — not a status report to the PM, a distinction covered further below.\n- **Sprint Review** — the team and stakeholders inspect the Increment together and adapt the Product Backlog based on what was learned; this is the event most directly tied to Lesson 31's Iteration Loop feedback step.\n- **Sprint Retrospective** — the team inspects its own process and interpersonal effectiveness, and plans adaptations to how it works, closing the loop before the next Sprint Planning begins.\n\n### The Daily Scrum Is Not a Status Meeting for the PM\n\nA specific, frequent PM mistake deserves its own subsection because it recurs so often: treating the Daily Scrum as an opportunity to receive individual status updates (\"what did you do yesterday, what will you do today, any blockers\"), directed at and primarily for the PM's benefit. The Scrum Guide frames the Daily Scrum as belonging to the Developers, for the Developers' own re-planning of the next day's work toward the Sprint Goal. A PM who dominates this event, or attends expecting a personal briefing, subtly converts a peer-coordination ritual into a supervisory one — which tends to make the meeting slower, more guarded, and less genuinely useful for the people actually doing the work.\n\n---",
+  "mistakes": "**Mistake 1: Treating the Product Owner role as a project-manager-style status tracker.**\nThe Product Owner's job is maximizing product value through backlog ordering — a strategic, prioritization-heavy accountability, not a scheduling or status-reporting one. A PO who spends most of their time updating a burndown chart, rather than refining and reordering the backlog based on evidence, has drifted into exactly the role confusion Lesson 1 and Lesson 31 both warned against.\n\n**Mistake 2: Confusing a Sprint Backlog with a Sprint Goal.**\nA list of ten tickets is not a Sprint Goal. A Sprint Goal is a single coherent objective — \"reduce onboarding drop-off for new mobile users\" — that the ten tickets exist to serve. Teams that skip forming a real Sprint Goal lose their ability to make sound mid-sprint trade-offs, because there's no shared \"why\" to weigh a dropped or added item against.\n\n**Mistake 3: Running all five events without empirical value — \"Zombie Scrum.\"**\nThis is Scrum's version of Lesson 31's \"doing Agile without being Agile.\" A team can hold Sprint Planning, Daily Scrums, a Sprint Review, and a Retrospective every single Sprint, on schedule, while transparency is thin (status is fudged), inspection is shallow (no one asks hard questions), and adaptation never actually happens (the same retrospective action items recur unaddressed). The calendar shows a functioning Scrum team; the outcomes show otherwise.\n\n**Mistake 4: Treating the Sprint Review as a one-way demo rather than a two-way inspection.**\nThe Sprint Review exists to inspect the Increment *with stakeholders* and adapt the Product Backlog based on what's learned — it is a feedback-gathering event, not a presentation. A team that treats it purely as \"showing off what we built,\" without genuinely updating backlog priorities based on stakeholder reaction, has converted an inspection event into a status broadcast.\n\n**Mistake 5: Skipping or trivializing the Definition of Done.**\nWithout an explicit, shared Definition of Done, \"done\" silently means different things to different people — an engineer may consider a ticket done once code is merged, while a PM may consider it done once it's live for all users. This ambiguity routinely surfaces as a painful surprise during the Sprint Review, when stakeholders discover that \"done\" items aren't actually usable yet.\n\n---",
+  "mentalModel": {
+    "title": "The Empirical Loop of a Sprint",
+    "content": "This lesson's core takeaway tool builds directly on the five-events diagram above, but reframes it around Scrum's three pillars rather than its calendar structure — useful because it's the pillars, not the event names, that determine whether Scrum is working:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Transparency Honest, Visible State] --> B[Inspection Daily Scrum, Sprint Review]\n    B --> C{Is Something Unacceptable?}\n    C -->|Yes| D[Adaptation Re-plan, Reorder Backlog]\n    C -->|No| E[Continue Toward Sprint Goal]\n    D --> A\n    E --> A\n```\n\nUse this as your standing diagnostic whenever a Scrum team feels \"off.\" Ask, in order: Is the current state of the work actually transparent, or is someone (often unconsciously) protecting appearances? Is inspection happening with real scrutiny, or is it perfunctory? When inspection reveals a problem, does adaptation actually follow — a re-planned Sprint Backlog, a reordered Product Backlog, a changed process — or does the problem get named and then quietly repeated next Sprint? A team failing any one of these three questions is running Scrum's calendar without Scrum's substance — the exact \"Zombie Scrum\" pattern from Mistake 3 above.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Transparency Honest, Visible State] --> B[Inspection Daily Scrum, Sprint Review]\n    B --> C{Is Something Unacceptable?}\n    C -->|Yes| D[Adaptation Re-plan, Reorder Backlog]\n    C -->|No| E[Continue Toward Sprint Goal]\n    D --> A\n    E --> A"
+  },
+  "caseStudy": {
+    "title": "The Retrospective That Never Changed Anything",
+    "content": "Consider a simplified, illustrative scenario common at mid-size product organizations several quarters into Scrum adoption.\n\nA nine-person Scrum team has run two-week Sprints for over a year. Every Sprint includes all five events, performed diligently and on schedule. At every Sprint Retrospective, the same two issues surface: (1) the team is frequently blocked waiting on a shared design resource who splits time across three teams, and (2) the Definition of Done is inconsistently applied — some Increments demoed at Sprint Review turn out to need additional QA work the following Sprint. Both issues have appeared in roughly eight consecutive retrospectives. Each time, the team writes an action item (\"follow up with design lead about capacity,\" \"clarify Definition of Done\"), and each time, the next retrospective reveals the same two problems, unresolved.\n\n**What went wrong?**\n\nBy the letter of the Scrum Guide, this team is doing everything correctly — five events, on schedule, with retrospective action items dutifully recorded. But applying this lesson's Mental Model, the failure is visible immediately: **inspection** is functioning (the same two problems keep surfacing, meaning the team is honestly noticing them), but **adaptation** is not (nothing about the design-resource constraint or the Definition of Done actually changes between retrospectives). Recording an action item is not the same as executing an adaptation — and a team that mistakes the former for the latter will experience Scrum as an elaborate mechanism for documenting the same unsolved problems indefinitely.\n\nThe design-resource issue, notably, is not solvable by the team's Scrum Master alone, because it's a cross-team resourcing constraint — it requires the Product Owner to escalate it as a structural blocker to the broader organization, rather than treating it as an internal process problem the team can fix through willpower. The Definition of Done issue, by contrast, is entirely within the team's control and should have been resolved after its first appearance. This distinction — which problems a team can adapt to on its own versus which require the PM/PO to escalate outward — will be addressed directly in **Lesson 37 (Working with Engineering Teams)**, and the specific mechanics of writing a Definition of Done that actually prevents this kind of QA surprise will be covered in **Lesson 34 (Sprint Planning & Backlog Grooming)**.\n\n---"
+  },
+  "framework": {
+    "title": "The Scrum Health Diagnostic",
+    "content": "A second, more tactical tool: use this table to audit whether a specific Scrum team is operating on genuine empiricism or Zombie Scrum, checking each pillar against a concrete, observable signal.\n\n| Pillar | Healthy Signal | Warning Sign |\n|---|---|---|\n| Transparency | Blockers and risks are raised as soon as they're known, even when uncomfortable | Status is reported as \"on track\" until it suddenly isn't |\n| Inspection (Daily Scrum) | Developers actively re-plan the next day based on new information | The meeting is a recitation of yesterday's tasks with no real re-planning |\n| Inspection (Sprint Review) | Stakeholders' reactions visibly change the Product Backlog's order afterward | The Review is a one-way demo with no backlog changes following it |\n| Adaptation (Retrospective) | Action items from the previous retrospective are visibly resolved before new ones are added | The same 2–3 issues recur across multiple consecutive retrospectives |\n| Sprint Goal coherence | Every item in the Sprint Backlog can be explained in terms of the Sprint Goal | The Sprint Backlog is a list of tickets with no shared \"why\" connecting them |\n\nThis diagnostic pairs directly with the Agile Fit Checklist from Lesson 31 — that checklist audits Agile values generically; this one applies the same audit specifically to Scrum's named pillars and events.\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Startup vs. Mid-Size vs. Big Tech",
+    "content": "**At a startup:**\nScrum, if used at all, is often adopted in a lightweight, partial form — a Sprint Goal and a rough weekly check-in, without necessarily running all five named events formally. This is often appropriate: with five people in one room, transparency and inspection can happen constantly and informally, without needing a scheduled Daily Scrum to manufacture them. The risk here is different from Zombie Scrum — it's under-formalization to the point that adaptation happens on gut feel rather than any structured backlog reordering, which can work at small scale but breaks down as headcount grows.\n\n**At a mid-size company:**\nScrum is typically formalized with all five events running on a fixed cadence, often across multiple teams that need to stay loosely coordinated. This is precisely the stage where Zombie Scrum risk peaks — enough process exists to create the appearance of rigor, but the organization hasn't yet built the muscle (or psychological safety) for genuinely honest transparency and hard-hitting inspection.\n\n**At Big Tech:**\nScrum is frequently one of several coexisting frameworks (some teams may run Scrum, others Kanban — covered in Lesson 33 — depending on the nature of their work), often supported by dedicated Agile coaches and standardized tooling. The PM's job shifts toward ensuring their team's Sprint Goals visibly ladder up to broader organizational objectives across many parallel teams, and toward protecting genuine inspection and adaptation at a scale where it's easy for ceremonies to become perfunctory simply because so many teams are running them simultaneously.\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-032-1",
+      "questionNumber": 1,
+      "questionText": "What are Scrum's three pillars of empiricism?",
+      "options": [
+        "Planning, Estimation, Reporting",
+        "Transparency, Inspection, Adaptation",
+        "Speed, Quality, Cost",
+        "Backlog, Sprint, Increment"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section explicitly names transparency, inspection, and adaptation as Scrum's three pillars of empiricism.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-032-2",
+      "questionNumber": 2,
+      "questionText": "Which Scrum event is most directly responsible for generating the \"feedback\" step of Lesson 31's Iteration Loop?",
+      "options": [
+        "Daily Scrum",
+        "Sprint Review",
+        "Sprint Planning",
+        "None of the events relate to the Iteration Loop"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly ties the Sprint Review to Lesson 31's Iteration Loop feedback step, since it's where the team and stakeholders inspect the Increment together and adapt the Product Backlog.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-032-3",
+      "questionNumber": 3,
+      "questionText": "Which artifact is paired with the Definition of Done?",
+      "options": [
+        "Product Backlog",
+        "Sprint Backlog",
+        "Increment",
+        "Sprint Goal"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The Theory section's artifacts table pairs the Increment with the Definition of Done as its associated commitment.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-032-4",
+      "questionNumber": 4,
+      "questionText": "Why does the lesson caution against conflating a Sprint Backlog with a Sprint Goal?",
+      "options": [
+        "Because a Sprint Backlog is always shorter than a Sprint Goal",
+        "Because without a coherent Sprint Goal, a Sprint Backlog is just a list of tickets with no shared objective, making mid-sprint trade-offs unanswerable",
+        "Because Sprint Goals are optional in the Scrum Guide",
+        "Because only the Scrum Master is allowed to set a Sprint Goal"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #2 explains that without a real Sprint Goal, there is no shared \"why\" to weigh a dropped or added item against, making trade-offs unanswerable.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-032-5",
+      "questionNumber": 5,
+      "questionText": "A team runs all five Scrum events every Sprint, but retrospective action items are never actually resolved, and Sprint Reviews never change the Product Backlog's order. What does this lesson call this pattern?",
+      "options": [
+        "Healthy Scrum",
+        "Zombie Scrum",
+        "Kanban",
+        "Waterfall in disguise"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson defines Zombie Scrum as exactly this pattern — events running on schedule without genuine transparency, inspection, or adaptation.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-032-6",
+      "questionNumber": 6,
+      "questionText": "Who does the Daily Scrum primarily belong to, according to this lesson?",
+      "options": [
+        "The Product Owner, for status collection",
+        "The Developers, for their own re-planning toward the Sprint Goal",
+        "The Scrum Master, as a personal check-in tool",
+        "Stakeholders outside the team"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly states the Daily Scrum belongs to the Developers for their own re-planning of the next 24 hours, not as a status briefing for the PM.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-032-7",
+      "questionNumber": 7,
+      "questionText": "What is the Product Owner's primary accountability, according to this lesson?",
+      "options": [
+        "Facilitating all Scrum events and removing impediments",
+        "Maximizing the value of the product resulting from the team's work by owning and ordering the Product Backlog",
+        "Writing all the code for the Increment",
+        "Tracking the team's velocity chart"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section's roles table defines the Product Owner's accountability as maximizing product value through Product Backlog ownership and ordering.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-032-8",
+      "questionNumber": 8,
+      "questionText": "Which role is accountable for establishing Scrum as defined in the Scrum Guide and removing impediments to the team's progress?",
+      "options": [
+        "Product Owner",
+        "Developers",
+        "Scrum Master",
+        "Executive sponsor"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The roles table assigns this accountability specifically to the Scrum Master.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-032-9",
+      "questionNumber": 9,
+      "questionText": "In the Detailed Case Study, why couldn't the team resolve the design-resource blocker on its own, unlike the Definition of Done issue?",
+      "options": [
+        "Because the Scrum Master refused to help",
+        "Because it was a cross-team resourcing constraint requiring the Product Owner to escalate it outward, rather than an internal process problem the team could fix through willpower",
+        "Because the team didn't hold enough retrospectives",
+        "Because the issue was not actually real"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study's \"What went wrong?\" analysis explicitly distinguishes the cross-team resourcing issue, which required PO escalation, from the Definition of Done issue, which was entirely within the team's control.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-032-10",
+      "questionNumber": 10,
+      "questionText": "(Scenario) A Sprint Review is well-attended, but afterward the Product Backlog's order never changes based on what stakeholders said. Using the Scrum Health Diagnostic, which signal is this team most clearly failing?",
+      "options": [
+        "Transparency",
+        "Daily Scrum inspection",
+        "Sprint Review inspection",
+        "Sprint Goal coherence"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The Scrum Health Diagnostic table defines the healthy signal for Sprint Review inspection as stakeholder reactions visibly changing the Product Backlog's order — the warning sign is exactly a one-way demo with no resulting backlog changes.",
+      "learningObjective": "#4",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-032-11",
+      "questionNumber": 11,
+      "questionText": "Why does the lesson describe recording a retrospective action item as insufficient on its own?",
+      "options": [
+        "Because action items should never be written down",
+        "Because recording an action item is not the same as executing an adaptation — the same issue can recur if the action item is never actually acted on",
+        "Because only the Scrum Master is allowed to write action items",
+        "Because retrospectives should not identify any problems"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Case Study explicitly makes this distinction: the team recorded action items every retrospective, but the same two problems persisted because adaptation, not just recording, never actually followed.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-032-12",
+      "questionNumber": 12,
+      "questionText": "A new PM insists on running the Daily Scrum as a personal status briefing, asking each Developer to report to them individually. According to this lesson, what is the likely effect?",
+      "options": [
+        "It has no effect, since the meeting format doesn't matter",
+        "It subtly converts a peer-coordination ritual into a supervisory one, tending to make the meeting slower, more guarded, and less useful for the people doing the work",
+        "It correctly follows the Scrum Guide's intended purpose for the Daily Scrum",
+        "It improves transparency by centralizing all information with the PM"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Theory section's \"Daily Scrum Is Not a Status Meeting for the PM\" subsection describes exactly this effect.",
+      "learningObjective": "#5",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-032-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A Product Owner spends most of their time each Sprint updating a burndown chart and tracking ticket status, with the Product Backlog left unrefined and unreordered for weeks. Using this lesson's frameworks, what is the most likely underlying problem?",
+      "options": [
+        "The PO is performing their role correctly, since tracking progress is central to the job",
+        "The PO has drifted into project-coordination work, neglecting the backlog ownership and value-maximization accountability that actually defines the role",
+        "The team needs a Scrum Master instead of a PO",
+        "This indicates the team should switch to Kanban"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Common Beginner Mistake #1 and the roles table both establish that the PO's defining accountability is backlog ownership and value maximization, not status tracking — spending most effort on the latter while neglecting the former is the specific role-confusion this lesson warns against.",
+      "learningObjective": "#2, #5",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-032-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) A candidate is asked to describe a dysfunctional Scrum team they've worked with, and answers: \"We just didn't have enough meetings — if we'd had more standups, it would have gone better.\" Based on this lesson's Interview Perspective section, what does this answer signal?",
+      "options": [
+        "A sophisticated diagnosis of the team's process",
+        "A superficial diagnosis that doesn't identify which of the three pillars (transparency, inspection, adaptation) was actually breaking down",
+        "Correct reasoning, since more meetings always improve Scrum teams",
+        "That the candidate should have suggested Kanban instead"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Interview Perspective section states that a strong answer names which specific pillar was breaking down and why; \"not enough meetings\" fails to diagnose at the level of transparency, inspection, or adaptation at all.",
+      "learningObjective": "#4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-032-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A Scrum team's Sprint Reviews consistently surface strong stakeholder interest in a specific unplanned feature, and the team's retrospectives consistently surface the same recurring blocker involving a shared resource from another team. Using this lesson's frameworks, how should the Product Owner most appropriately respond to these two different signals?",
+      "options": [
+        "Treat both signals identically, since both come from Scrum events",
+        "Ignore both, since Sprint commitments should never change based on new information",
+        "Use the Sprint Review feedback to reorder and adapt the Product Backlog (since this is squarely within the PO's authority), while escalating the recurring cross-team resource blocker outward as a structural issue requiring intervention beyond the team's own retrospective process",
+        "Ask the Scrum Master to handle both issues, since process issues and backlog issues are identical in Scrum"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "This mirrors the lesson's Detailed Case Study distinction directly: Sprint Review feedback about product direction falls within the PO's backlog-ownership authority and should drive adaptation there, while a cross-team structural blocker recurring across retrospectives requires PO escalation outward, since it cannot be solved by the team's internal process alone.",
+      "learningObjective": "#1, #4, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "Consider the following novel scenario: You've become the Product Owner for a seven-person Scrum team midway through a project. The team's Sprint Reviews are well-attended by stakeholders, who ask sharp questions and give detailed feedback on the demoed Increment. However, you notice that the Product Backlog's top ten items have not changed in order for the last five Sprints, regardless of what stakeholders said in each Review.\n\nThere is no single correct answer to the prompts below — the goal is to practice diagnosing Scrum health using this lesson's Mental Model and Framework Explanation, not to reach one \"right\" fix.\n\n1. Using the Empirical Loop mental model, which specific pillar appears to be functioning, and which appears to be breaking down?\n2. Is this pattern more likely a transparency problem, an inspection problem, or an adaptation problem? Justify your answer using evidence from the scenario.\n3. What questions would you ask the team (or yourself, as PO) to understand why stakeholder feedback isn't reaching the backlog's actual ordering?\n4. Could this be a sign that the Sprint Review has become a one-way demo rather than a two-way inspection, as described in Common Beginner Mistake #4? What evidence would confirm or rule that out?\n5. As the incoming Product Owner, what is the first concrete change you would make, and how would you know within one or two Sprints whether it worked?\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | Lesson 31 — Agile Fundamentals | Takes the generic Iteration Loop and Agile Fit Checklist and formalizes them into Scrum's specific roles, artifacts, and events |\n| **Current Lesson** | Lesson 32 — Scrum Framework | Three pillars of empiricism; three roles; three artifacts and commitments; five events; Zombie Scrum diagnosis; Scrum Health Diagnostic |\n| **Next Lesson** | Lesson 33 — Kanban Framework | Introduces a contrasting, flow-based Agile implementation, to be compared against Scrum using the same underlying empiricism lens |\n| **Future Concepts Unlocked** | Lesson 34 (Sprint Planning & Backlog Grooming) | Goes deep on Sprint Planning and resolves the Definition of Done ambiguity raised in this lesson's Case Study |\n| | Lesson 37 (Working with Engineering Teams) | Extends this lesson's distinction between team-solvable problems and problems requiring PO/PM escalation outward |\n| | Lesson 40 (Product Operations) | Addresses how Scrum practices are standardized and supported at scale across many teams simultaneously |\n| | Lesson 55 (Building and Leading Product Teams) | Builds on the Product Owner/PM role clarity established here when discussing how to structure and lead multiple product teams |\n\nThis curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry Scrum's three pillars, its roles/artifacts/events, and the Zombie Scrum diagnosis with you — they will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-032.md"
+}

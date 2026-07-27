@@ -1,0 +1,287 @@
+{
+  "meta": {
+    "slug": "lesson-001",
+    "number": 1,
+    "title": "What is Product Management?",
+    "moduleNumber": 1,
+    "moduleName": "Foundations",
+    "difficulty": 1,
+    "estMinutesReading": 25,
+    "estMinutesReflection": 10,
+    "prerequisites": "None",
+    "nextLessonSlug": "lesson-002",
+    "futureTopicsUnlocked": "Lesson 6 (Jobs to Be Done), Lesson 8 (Product Discovery), Lesson 29 (Prioritization Basics), Lesson 33 (Retention) — all directly build on the Accountability Triangle and Output vs. Outcome concepts introduced here"
+  },
+  "learningObjectives": [
+    "Define Product Management and distinguish it from adjacent disciplines (engineering, design, marketing, project management).",
+    "Explain the three core questions every Product Manager must answer.",
+    "Describe the Accountability Triangle (desirability, feasibility, viability) and explain why it is a more precise model than the popular \"PM Venn diagram.\"",
+    "Distinguish output-focused work from outcome-focused work, and identify which one a given metric or activity represents.",
+    "Explain why PMs typically operate through influence rather than formal authority, and identify what this implies for how a PM should behave in a disagreement."
+  ],
+  "theory": "### The Core Definition\n\nA **Product Manager (PM)** is the person accountable for guiding a product toward success by identifying what problem is worth solving, for whom, and why — and then working with engineering, design, and business stakeholders to bring a solution to that problem to life.\n\nNotice what this definition omits. It does not say the PM writes the code. It does not say the PM designs the interface. It does not say the PM manages people as direct reports. This omission is deliberate, and it is the first thing every new PM must internalize: **the PM manages the product, not the people, and manages it primarily through decisions, prioritization, and communication — not through direct execution.**\n\nThis is disorienting for people arriving from execution-heavy backgrounds (engineering, consulting, operations), where value is usually measured by what you personally produced. In Product Management, the PM's personal output is often invisible: a prioritization decision, a well-framed problem statement, a \"no\" said at the right moment. The *team's* output is visible. This asymmetry — invisible personal contribution, visible team contribution — is a permanent feature of the role, not a temporary condition to escape.\n\n### The Three Core Questions\n\nNearly every activity a PM performs can be traced back to answering three questions, in order:\n\n1. **What problem are we solving, and for whom?** (the \"why\")\n2. **What should we build to solve it?** (the \"what\")\n3. **How do we know if it worked?** (the \"so what\")\n\nA person who cannot answer all three of these questions for their product, at any given time, is not yet doing product management — they are doing project coordination, which is a narrower and different job (see the comparison table below, and Lesson 2 for a full treatment).\n\nIt's worth noting the *order* matters. A surprising number of failed products can be traced to teams that answered question 2 before question 1 — they became attached to a solution before rigorously establishing the problem. We will return to this failure mode explicitly in the Case Study below, and again in Lesson 8 (Product Discovery).\n\n### PM vs. Adjacent Roles\n\nIt helps to define Product Management by contrast with the roles it most often gets confused with:\n\n| Role | Primary Question | Primary Output | Primary Accountability |\n|---|---|---|---|\n| **Product Manager** | What should we build, and why? | Decisions, priorities, roadmaps | Problem-solution-value fit |\n| **Engineer** | How do we build it? | Working software | Technical correctness and feasibility |\n| **Designer** | How should it look and feel to use? | Interfaces, interaction flows | Usability and desirability |\n| **Project Manager** | Are we on schedule and on budget? | Timelines, status reports | Delivery predictability |\n| **Marketer** | How do we communicate this to the market? | Positioning, campaigns | Awareness and demand |\n\nA common early-career mistake is treating Product Management as \"a bit of all of these\" — a generalist who knows enough about engineering, design, and business to talk to everyone. This self-description is popular, usually illustrated with three overlapping circles (the \"PM Venn diagram\"), and it is not *false*. But it is dangerously incomplete, for a reason worth sitting with.\n\n### Why the Venn Diagram Model Falls Short\n\nThe Venn diagram model describes **proximity** — which departments a PM sits near, which languages they can speak. It does not describe **accountability** — what result the PM is actually on the hook for, that no one else is on the hook for.\n\nA more precise framing:\n\n> A PM is accountable for outcomes that no single other function can be accountable for alone.\n\nAn engineer is accountable for whether the code works. A designer is accountable for whether the interface is usable. But *no one else on the team* is accountable for whether the product solves the right problem, for the right people, in a way that creates real business value. That accountability — for what this lesson calls **problem-solution-value fit** — is the actual center of the job. Knowing \"a little about everything\" is a *side effect* of holding that accountability, not the accountability itself.\n\nThis distinction is not academic. A PM who thinks of the job as \"being a bridge between teams\" will spend their time in meetings, relaying information. A PM who thinks of the job as \"being accountable for problem-solution-value fit\" will spend their time gathering evidence, making calls, and defending those calls — even in the same meetings. Same room, different job.\n\n### Output vs. Outcome\n\nThe single most important distinction introduced in this lesson — one you will apply in nearly every subsequent lesson — is the difference between **output** and **outcome**.\n\n- **Output** is what a team ships: a feature, a redesign, a new setting, a new integration.\n- **Outcome** is the change in user or business behavior that results from that output: higher retention, faster task completion, increased revenue, reduced support tickets.\n\nA team can ship a large volume of output and produce zero meaningful outcome, if what was shipped didn't address a real problem for real users. This is such a common failure pattern in the industry that Melissa Perri named an entire book after it: *Escaping the Build Trap* — the trap of measuring yourself, and being measured, by how much you shipped rather than what changed because of it.\n\nJunior PMs are often informally evaluated on output (\"we shipped 12 features this quarter\"). Senior PMs, and PMs at companies with mature product cultures, are evaluated on outcome (\"retention improved 4 points because we fixed the onboarding drop-off\"). This curriculum will consistently push you toward outcome-based thinking, starting here.\n\nA practical test you can apply immediately: **if you can't state the outcome a piece of work is meant to produce before it ships, you are not yet ready to build it.** This single sentence will save you more wasted engineering time than any framework in this curriculum.\n\n### Authority Without Control\n\nNew PMs are frequently surprised to learn that they typically cannot:\n\n- Order an engineer to prioritize their request over another team's request.\n- Unilaterally overrule a designer's judgment on interaction design.\n- Force a launch date without engineering's agreement on scope.\n- Compel a stakeholder in another department to adopt their roadmap.\n\nInstead, a PM operates primarily through **influence**: clear reasoning, well-communicated priorities, credible evidence, and trust accumulated over time. This is sometimes summarized as \"responsibility without authority\" — you are held accountable for the outcome, but you cannot simply command your way to it.\n\nThis is not a flaw in how companies are organized; it is a deliberate design choice. Engineers and designers report to their own functional leadership, who are accountable for the health and growth of those disciplines. If PMs had direct authority over engineers, the incentive to build genuinely excellent engineering organizations — as opposed to organizations optimized purely for whatever the PM wants this quarter — would erode. Understanding *why* the structure exists makes it far easier to work within it without resentment.\n\n---",
+  "mistakes": "**Mistake 1: \"PMs manage engineers.\"**\nThis is the single most common misconception, usually inherited from the word \"manager\" in the title. PMs do not sit in engineers' reporting lines, do not conduct their performance reviews, and cannot assign work by fiat. What a PM does is set *priority and direction* — the engineering manager and the engineers themselves retain authority over *how* the work gets done. Confusing these two leads new PMs to behave in ways that damage trust with engineering partners almost immediately.\n\n**Mistake 2: \"Shipping more features means the product is succeeding.\"**\nThis is the output/outcome confusion described above, and it is worth restating directly because it is so persistent: a shipped feature is an *attempt* at an outcome, not the outcome itself. A PM who reports \"we shipped X\" as if it were an achievement, without reference to what changed for users or the business, has not yet separated their evaluation criteria from an engineer's.\n\n**Mistake 3: \"As the PM, I have final authority.\"**\nSome new PMs, especially those coming from more hierarchical prior roles, assume the title implies command authority similar to a general manager. It does not, in the vast majority of modern tech organizations. The PM's power comes from the quality of their reasoning and the trust they've built, not their position on an org chart.\n\n**Mistake 4: \"My job is to solve the solution the stakeholder asked for.\"**\nA stakeholder (often a sales leader, an executive, or a customer) will frequently arrive with a specific solution already in mind: \"We need a dark mode.\" \"We need an export-to-Excel button.\" A common beginner mistake is to take this request at face value and route it directly to engineering. A more mature response is to ask *what problem the requested solution is meant to solve*, because the requester's proposed solution is frequently not the best — or even a correct — answer to their actual underlying problem. This single habit, more than any other, separates order-takers from Product Managers. We will build a dedicated framework for this in Lesson 6 (Jobs to Be Done).\n\n**Mistake 5: \"The PM Venn diagram is the whole job.\"**\nAs covered in the Theory section: describing the PM as \"a generalist who knows business, tech, and design\" describes proximity to disciplines, not the accountability that actually defines the role. Beginners who over-index on this model tend to spend their energy trying to sound credible in every domain, rather than developing the judgment to make hard trade-off calls between desirability, feasibility, and viability.\n\n---",
+  "mentalModel": {
+    "title": "The Decision Chain",
+    "content": "Every lesson in this curriculum will introduce one memorable mental model — a compressed way of carrying the lesson's core idea in your head permanently, long after the details fade. For this lesson, the mental model is the **Decision Chain**:\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Problem] --> B[Understanding]\n    B --> C[Decision]\n    C --> D[Execution]\n    D --> E[Outcome]\n    E -.->|feedback loop| A\n```\n\nRead it as follows:\n\n- You start with a **Problem** — something is wrong or missing for a specific group of users.\n- You build **Understanding** — evidence about who has this problem, how severe it is, and why it exists (this is the domain of Module 2, User Research).\n- You make a **Decision** — what, specifically, will be built, and what will deliberately *not* be built (this is where prioritization and trade-offs, covered later in Module 3, live).\n- Engineering and design perform **Execution** — turning the decision into a working product.\n- You measure the **Outcome** — did user or business behavior actually change (Module 4, Product Analytics).\n- Critically, the outcome **feeds back** into a refined understanding of the problem — the chain is a loop, not a straight line.\n\nUse this model as a diagnostic tool. When a product initiative fails, ask which link in the chain broke: Was the problem misidentified? Was understanding thin (built on assumption, not evidence)? Was the decision poorly reasoned? Was execution weak? Or was the outcome never actually measured, so no one can even say whether it worked? Nearly every product failure can be traced to exactly one of these five links, and identifying which one is often more useful than any post-mortem template.\n\n---",
+    "diagramMermaid": "%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Problem] --> B[Understanding]\n    B --> C[Decision]\n    C --> D[Execution]\n    D --> E[Outcome]\n    E -.->|feedback loop| A"
+  },
+  "caseStudy": {
+    "title": "The Problem With \"More Features\"",
+    "content": "Consider a simplified, illustrative scenario based on a pattern extremely common across both early-stage and mature products.\n\nA photo-sharing app has stagnant user growth. Leadership, concerned, tells the product team: \"Our competitors have more features than us. We need to catch up.\" Over the following two quarters, the team ships:\n\n- A new filter library\n- A \"stories\" feature\n- A redesigned profile page\n- An in-app messaging system\n\nAt the end of this period, engagement metrics have not moved. Some users report the app now feels \"cluttered.\"\n\n**What went wrong?**\n\nThe team optimized for *output* (four new features) without ever answering the three core questions from this lesson:\n\n1. **What problem are we solving, and for whom?** — Never clearly defined. \"Catch up to competitors\" is a reaction to competitors' *output*, not a diagnosis of a *user need*. It answers \"what are they doing\" rather than \"what is broken for our users.\"\n2. **What should we build to solve it?** — Without a defined problem, feature selection was driven by competitive anxiety rather than evidence. Each feature was plausible in isolation, which is precisely what makes this failure mode dangerous — nothing on the list was obviously a bad idea.\n3. **How do we know if it worked?** — No success metric was defined *before* building, so the team had no operational definition of \"working,\" even in principle, until after the fact — by which point it was too late to course-correct cheaply.\n\nA PM applying the Decision Chain mental model would have paused at the very first link. Before committing engineering time, they would have investigated: Is growth stagnating because of onboarding drop-off? Because of a specific friction point among existing users? Because the core value proposition is no longer differentiated from a specific competitor? Each of these implies a *completely different* solution — and possibly no new feature at all. This is the difference between reactive feature production and product management: not effort, not intelligence, but the discipline to build understanding before committing to a decision.\n\nThis case will be revisited directly in **Lesson 6 (Jobs to Be Done)**, where we introduce a structured method for uncovering the real problem before this mistake happens, and again in **Lesson 33 (Retention)**, where we introduce the metrics that would have surfaced the actual friction point.\n\n---"
+  },
+  "framework": {
+    "title": "The Accountability Triangle",
+    "content": "This lesson introduces the first reusable framework of the curriculum: the **Accountability Triangle**.\n\nThree conditions must all be true simultaneously for a product decision to be sound:\n\n1. **Desirability** — Do users actually want this?\n2. **Feasibility** — Can we actually build this, given our technology and resources?\n3. **Viability** — Does this make sense for the business — commercially, strategically, operationally?\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph TD\n    A[Product Decision] --> B[Desirability User Want?]\n    A --> C[Feasibility Can Build?]\n    A --> D[Viability Business Sense?]\n    B --> E{PM Synthesizes and Decides}\n    C --> E\n    D --> E\n    E --> F[Sound Decision]\n```\n\nIn practice, Design tends to hold the strongest signal on desirability (usability research, qualitative feedback). Engineering tends to hold the strongest signal on feasibility (technical constraints, architecture, timeline realism). Business and leadership tend to hold the strongest signal on viability (unit economics, strategic fit, regulatory exposure). The PM's distinctive job is to sit at the center of these three signals and make the call when they conflict — for example, when a feature is desirable and feasible but not viable (too expensive to support at scale), or desirable and viable but not feasible within a reasonable timeframe (would require a full architecture rebuild).\n\nThis is a considerably more precise version of the \"PM Venn diagram\" than the popular one, because it names *what specific tension is being resolved* (desirability vs. feasibility vs. viability) rather than merely *which departments happen to sit nearby*.\n\nWe will apply the Accountability Triangle directly in **Lesson 8 (Product Discovery)** and **Lesson 29 (Prioritization Basics)** — in both cases, as a lens for evaluating competing ideas, not just a theoretical diagram.\n\n```mermaid\n%%{init: {\n  \"theme\": \"dark\",\n  \"themeVariables\": {\n    \"background\": \"#0b0b0c\",\n    \"primaryColor\": \"#1f1f23\",\n    \"primaryTextColor\": \"#ffffff\",\n    \"primaryBorderColor\": \"#8b5cf6\",\n    \"lineColor\": \"#d1d5db\",\n    \"secondaryColor\": \"#18181b\",\n    \"tertiaryColor\": \"#111111\",\n    \"mainBkg\": \"#1f1f23\",\n    \"nodeBorder\": \"#8b5cf6\",\n    \"clusterBkg\": \"#000000\",\n    \"clusterBorder\": \"#27272a\",\n    \"titleColor\": \"#ffffff\",\n    \"edgeLabelBackground\": \"#0b0b0c\",\n    \"nodeTextColor\": \"#ffffff\",\n    \"edgeLabelColor\": \"#ffffff\",\n    \"actorBorder\": \"#8b5cf6\",\n    \"actorBkg\": \"#1f1f23\",\n    \"actorTextColor\": \"#ffffff\",\n    \"sequenceNumberColor\": \"#ffffff\",\n    \"signalColor\": \"#8b5cf6\",\n    \"signalTextColor\": \"#ffffff\",\n    \"textColor\": \"#ffffff\",\n    \"classText\": \"#ffffff\",\n    \"classBorder\": \"#8b5cf6\",\n    \"classBkg\": \"#1f1f23\"\n  }\n}}%%\ngraph LR\n    A[Output What We Ship] -->|may or may not produce| B[Outcome Behavior Change]\n    B --> C[Impact Business Result]\n```\n\n---"
+  },
+  "realWorldPerspective": {
+    "title": "Startup vs. Mid-Size vs. Big Tech",
+    "content": "The *definition* of Product Management in this lesson holds everywhere. The *day-to-day texture* of the job differs substantially by company stage, and new PMs are frequently caught off guard by this.\n\n**At a startup (roughly pre-seed to Series B):**\nThe PM often wears multiple hats simultaneously — sometimes doing customer support, sometimes writing marketing copy, sometimes doing basic QA. There is usually no dedicated user researcher or data analyst, so the PM personally conducts interviews and pulls raw data. The Accountability Triangle is often heavily skewed toward *viability*, because runway is finite and every decision has immediate survival implications. Speed frequently matters more than rigor; a \"good enough\" decision made this week often beats a perfect decision made in a month.\n\n**At a mid-size company (roughly Series C to pre-IPO, or an established profitable company):**\nSpecialization begins. There are usually dedicated designers, a data team, and sometimes a user research function. The PM's job shifts from \"do everything\" to \"coordinate specialists and make the call between their inputs.\" Process starts to matter — quarterly planning, roadmap reviews, cross-team dependencies — because the number of people affected by a decision has grown past what informal conversation can manage.\n\n**At Big Tech (Google, Microsoft, Amazon, Meta, and similar):**\nPMs typically operate within a highly specialized ecosystem: dedicated UX researchers, data scientists, program managers (who absorb much of the scheduling/coordination burden a startup PM would otherwise handle personally), and often a formal experimentation platform for A/B testing (covered in Lesson 40). The core job — problem-solution-value fit — does not change, but the PM spends comparatively more time on stakeholder alignment across large orgs, and comparatively less time on hands-on research or QA, because dedicated specialists exist for those functions. Influence, rather than raw output, becomes an even more pronounced lever, because a single PM's product often touches millions of users and dozens of adjacent teams.\n\nThe common thread: as company size grows, the PM's job shifts from *doing* toward *deciding and aligning*. This is worth remembering as you plan your own career path — the skills that make you excel at a 10-person startup (versatility, speed, hands-on execution) are not identical to the skills that make you excel inside a 10,000-person organization (stakeholder navigation, structured decision-making, working through specialists rather than around them).\n\n---"
+  },
+  "quiz": [
+    {
+      "id": "q-001-1",
+      "questionNumber": 1,
+      "questionText": "What is the primary distinguishing accountability of a Product Manager, compared to an engineer or designer?",
+      "options": [
+        "Writing the highest-quality code",
+        "Accountability for the fit between problem, solution, and business value",
+        "Managing the largest team",
+        "Creating the final visual design"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Engineers are accountable for whether the code works and designers for usability; the PM is uniquely accountable for whether the product solves the right problem in a way that creates value.",
+      "learningObjective": "#1",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-001-2",
+      "questionNumber": 2,
+      "questionText": "Which of the following is NOT one of the three core questions a PM must answer?",
+      "options": [
+        "What problem are we solving, and for whom?",
+        "What should we build to solve it?",
+        "How much will each team member be paid?",
+        "How do we know if it worked?"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "Compensation is an HR/management function, not one of the three defining questions of product management.",
+      "learningObjective": "#2",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-001-3",
+      "questionNumber": 3,
+      "questionText": "A team ships five new features in a quarter, but user retention does not improve. This is best described as:",
+      "options": [
+        "High outcome, low output",
+        "High output, low outcome",
+        "High viability, low feasibility",
+        "A failure of engineering execution"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Shipping features is output. Since retention (a behavior change) did not improve, outcome was low, despite high output.",
+      "learningObjective": "#4",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-001-4",
+      "questionNumber": 4,
+      "questionText": "Why is the \"PM Venn diagram\" (intersection of business, technology, design) described as incomplete in this lesson?",
+      "options": [
+        "Because PMs do not work with designers",
+        "Because it describes proximity to disciplines, not actual accountability",
+        "Because it does not include marketing",
+        "Because it applies only to Spotify"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Venn diagram shows which departments a PM sits near, not what the PM is actually responsible for delivering — problem-solution-value fit.",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-001-5",
+      "questionNumber": 5,
+      "questionText": "In the Accountability Triangle, \"Viability\" refers to:",
+      "options": [
+        "Whether users want the solution",
+        "Whether the solution can technically be built",
+        "Whether the solution makes sense for the business",
+        "Whether the solution has been tested with real users"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "Viability concerns business sense — cost, revenue, strategic fit — distinct from desirability (user want) and feasibility (technical possibility).",
+      "learningObjective": "#3",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-001-6",
+      "questionNumber": 6,
+      "questionText": "A PM wants to change the design direction of a feature, but the designer disagrees based on usability research. According to this lesson, what should the PM most likely do?",
+      "options": [
+        "Override the designer, since the PM has final authority",
+        "Escalate immediately to leadership",
+        "Use influence, evidence, and discussion to resolve the disagreement, since PMs typically lack direct authority over design decisions",
+        "Cancel the feature entirely"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The lesson establishes that PMs typically operate through influence rather than command authority, especially in domains like design where another role holds the strongest expertise.",
+      "learningObjective": "#5",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "q-001-7",
+      "questionNumber": 7,
+      "questionText": "In the Detailed Case Study, what was the primary mistake made by the product team?",
+      "options": [
+        "They hired too few engineers",
+        "They shipped output (new features) without first defining the underlying problem or success metric",
+        "They did not use Mermaid diagrams",
+        "They ignored competitor products entirely"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The team reacted to competitive pressure by shipping features without answering the three core questions — problem, solution, and success measurement — first.",
+      "learningObjective": "#1, #4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-001-8",
+      "questionNumber": 8,
+      "questionText": "At Spotify, as referenced in this lesson, how is the PM's relationship to their team best described?",
+      "options": [
+        "The PM has direct command authority over all squad decisions, including implementation details",
+        "The PM sets direction and priorities for the squad; the squad retains autonomy over execution",
+        "The PM is not part of the squad and works separately from engineers and designers",
+        "The PM's role is purely administrative"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Spotify model illustrates \"responsibility without authority\" — the PM defines mission and priorities, while the squad decides how to execute.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-001-9",
+      "questionNumber": 9,
+      "questionText": "Which statement correctly distinguishes a Project Manager from a Product Manager, based on this lesson?",
+      "options": [
+        "They are the same role with different titles",
+        "A Project Manager focuses on schedule and budget; a Product Manager focuses on what should be built and why",
+        "A Project Manager has more authority than a Product Manager",
+        "A Product Manager only works on internal tools"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The comparison table shows Project Managers are primarily concerned with schedule/budget adherence, while PMs are concerned with defining the right thing to build.",
+      "learningObjective": "#1",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-001-10",
+      "questionNumber": 10,
+      "questionText": "In the Decision Chain mental model, what does the feedback loop from \"Outcome\" back to \"Problem\" represent?",
+      "options": [
+        "A sign that the initiative has failed",
+        "The idea that measuring outcomes refines your understanding of the original problem, informing the next cycle",
+        "A requirement to repeat the exact same execution",
+        "An optional step that most teams skip"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The Decision Chain is a loop, not a straight line — outcome measurement feeds back into a sharper understanding of the problem for the next cycle of work.",
+      "learningObjective": "#4",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-001-11",
+      "questionNumber": 11,
+      "questionText": "Why does this lesson argue that \"authority\" is the wrong lens for understanding PM effectiveness?",
+      "options": [
+        "Because PMs technically outrank engineers in most organizations",
+        "Because most PMs cannot mandate outcomes through direct command, and must instead rely on influence and evidence",
+        "Because authority is only relevant in large companies",
+        "Because engineers have more authority than PMs in all cases"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "The lesson explicitly frames PM effectiveness around influence — through reasoning, communication, and trust — rather than formal command authority.",
+      "learningObjective": "#5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "q-001-12",
+      "questionNumber": 12,
+      "questionText": "A feature is desirable (users want it) and viable (good business case) but would require a complete rebuild of the product's backend architecture within an unrealistic timeframe. Which element of the Accountability Triangle is in question?",
+      "options": [
+        "Desirability",
+        "Feasibility",
+        "Viability",
+        "Authority"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "Feasibility concerns whether something can actually be built with available technology and resources — a backend rebuild constraint is a feasibility issue.",
+      "learningObjective": "#3",
+      "difficulty": "Medium-Hard"
+    },
+    {
+      "id": "q-001-13",
+      "questionNumber": 13,
+      "questionText": "(Product Thinking) A PM at a 15-person startup and a PM at a 10,000-person company both apply the Decision Chain. According to the Real World Perspective section, which part of the job is most likely to look different between them, even though the underlying accountability is identical?",
+      "options": [
+        "Whether they need to understand the problem before building",
+        "Whether outcome, not output, is the right measure of success",
+        "How much of the \"Understanding\" and \"Execution\" work they do personally versus through specialists",
+        "Whether the Accountability Triangle applies to their decisions"
+      ],
+      "correctOptionIndex": 2,
+      "correctOptionLetter": "C",
+      "explanation": "The core accountability (problem-solution-value fit, output vs. outcome, the Triangle) is invariant across company stages. What changes is how much of the day-to-day work — research, coordination, QA — the PM does hands-on versus delegates to specialists, per the Real World Perspective section.",
+      "learningObjective": "#1, #3",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-001-14",
+      "questionNumber": 14,
+      "questionText": "(Interview Reasoning) An interviewer asks, \"Tell me about a product you think is badly designed, and how you'd fix it.\" A candidate immediately describes three new features they would add. What does this response most likely signal to the interviewer, based on this lesson's Interview Perspective section?",
+      "options": [
+        "Strong product instincts, because the candidate proposed concrete solutions quickly",
+        "A solution-first instinct, since the candidate never established what problem the current design fails to solve, or for whom",
+        "That the candidate has strong design skills",
+        "Nothing meaningful — interviewers only care about the final list of features proposed"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "As described in the Interview Perspective section, jumping straight to proposed fixes without first diagnosing the underlying problem and affected user segment mirrors the exact failure mode described in this lesson's Case Study, and is read as a weak signal by experienced interviewers.",
+      "learningObjective": "#1, #4",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "q-001-15",
+      "questionNumber": 15,
+      "questionText": "(Product Thinking, Highest Difficulty) A VP tells a PM: \"Our top three enterprise prospects all said they won't sign unless we build offline mode. Build it.\" Using only the frameworks in this lesson, what is the single best justification for the PM to pause before committing engineering time — even though the request comes from a powerful stakeholder with real urgency?",
+      "options": [
+        "The PM has final authority and can simply decline the request outright",
+        "\"Offline mode\" is a proposed solution, not a validated problem statement — the underlying need (e.g., unreliable venue connectivity, data security concerns, or something else entirely) is not yet known, and different underlying problems could imply different, possibly cheaper or more valuable, solutions",
+        "Engineering will refuse to build it regardless of justification",
+        "The request should be declined because it did not come through the design team first"
+      ],
+      "correctOptionIndex": 1,
+      "correctOptionLetter": "B",
+      "explanation": "This mirrors the lesson's core lesson about solution-first requests (Common Beginner Mistake #4) and the ordering of the three core questions: understanding the problem must precede committing to a specific solution, even under real stakeholder pressure. The PM's job is not to refuse the request, nor to accept it uncritically, but to establish the actual problem first — which may or may not confirm offline mode as the right answer.",
+      "learningObjective": "#1, #2, #5",
+      "difficulty": "Hard"
+    }
+  ],
+  "flashcards": [],
+  "reflectionPrompt": "You are the PM for a note-taking app. Your VP of Sales tells you, in a hallway conversation: \"Three of our biggest enterprise prospects this quarter said they won't sign unless we add offline mode. We need to build this immediately.\"\n\nWork through the following, in writing, before reading further:\n\n1. Using the Decision Chain, identify which link you currently have the *least* understanding of. Is it the problem itself, or something else?\n2. What specific evidence would you want, beyond the VP's summary, before treating \"build offline mode\" as a decision rather than a proposed solution?\n3. Construct two different underlying problems that could each explain \"enterprise prospects want offline mode\" — problems that would imply two *different* solutions, only one of which might be offline mode.\n4. Apply the Accountability Triangle to the VP's proposed solution (offline mode) using only the information given. Where is your greatest uncertainty — desirability, feasibility, or viability?\n5. Write the single sentence you would say back to the VP in the hallway, right now, without being dismissive of urgent revenue pressure.\n\nThere is no single correct answer. The purpose of this exercise is to practice resisting a solution handed to you by a stakeholder — including one with real organizational power and real urgency — until you have done the work this lesson describes. This is a harder skill in practice, under social and political pressure, than it appears on paper.\n\n---",
+  "connections": "| | Lesson | Core Idea Carried Forward |\n|---|---|---|\n| **Previous Lesson** | None (this is Lesson 1) | — |\n| **Current Lesson** | Lesson 1 — What is Product Management? | PM accountability = problem-solution-value fit; Accountability Triangle; Output vs. Outcome; Decision Chain |\n| **Next Lesson** | Lesson 2 — Product vs. Project | Builds directly on the PM/Project Manager comparison table above, and introduces why products require ongoing lifecycle thinking that a single project cannot capture |\n| **Future Concepts Unlocked** | Lesson 6 (Jobs to Be Done) | Provides the structured method for uncovering real problems — directly resolves Common Beginner Mistake #4 and the Case Study's core failure |\n| | Lesson 8 (Product Discovery) | Formalizes the \"Understanding\" link of the Decision Chain into a repeatable process |\n| | Lesson 29 (Prioritization Basics) | Applies the Accountability Triangle as a scoring lens across competing ideas |\n| | Lesson 33 (Retention) | Introduces the metrics that would have diagnosed the Case Study's stagnant growth *before* four quarters of wasted output |\n| | Lesson 47 (Stakeholder Management) | Directly extends \"Responsibility Without Authority\" into a full toolkit for managing upward and sideways influence |\n\nThis curriculum is designed to be read as one continuous argument, not fifty independent articles. Every lesson from here forward will assume you carry the Accountability Triangle, the Output/Outcome distinction, and the Decision Chain with you — they will not be re-explained, only re-applied in new contexts.",
+  "rawMarkdownPath": "content/lessons/lesson-001.md"
+}

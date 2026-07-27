@@ -19,13 +19,13 @@ PM Academy exists because serious PM education is either expensive, fragmented, 
 
 **Primary message:** Learn Product Management. Build real products. Completely free.
 
-**Secondary message:** A structured, AI-assisted PM curriculum with lessons, quizzes, projects, skill analytics, and portfolio artifacts.
+**Secondary message:** A structured PM curriculum with lessons, quizzes, projects, skill analytics, and portfolio artifacts. *(Corrected: "AI-assisted" removed — not a v1 feature, see §15's scope flag.)*
 
 **Emotional progression**
 - Curiosity: the hero shows a beautiful product that appears deeper than a normal free course.
 - Understanding: the problem section explains why PM education is broken.
 - Trust: curriculum, competency model, and portfolio outputs prove substance.
-- Excitement: learning experience, AI mentor, and community show daily momentum.
+- Excitement: learning experience and community show daily momentum. *(Removed "AI mentor" from this list — not a v1 feature.)*
 - Desire: final CTA makes joining feel like stepping into a serious free academy.
 
 ---
@@ -82,8 +82,8 @@ The homepage is not a pile of SaaS sections. It is a guided proof sequence.
 | 6 | Learning Experience | What does studying feel like? | Excitement |
 | 7 | Skill Radar | How will I know I am getting better? | Differentiation |
 | 8 | Portfolio | What will I have to show for it? | Aspiration |
-| 9 | AI Mentor | Will I get help when stuck? | Support |
-| 10 | Community | Will I learn alone? | Belonging |
+| ~~9~~ | ~~AI Mentor~~ *(cut from v1 — see §15)* | ~~Will I get help when stuck?~~ | ~~Support~~ |
+| 9 | Community | Will I learn alone? | Belonging |
 | 11 | Testimonials | Can I believe this? | Credibility |
 | 12 | FAQ | What are the catches? | Objection handling |
 | 13 | Final CTA | What should I do next? | Conversion |
@@ -241,7 +241,7 @@ Badge: 90 lessons. Free forever.            ProductMockupCluster
 H1: Learn Product Management.                - Skill radar preview
     Build real products.                     - Module progress card
     Completely free.                         - Lesson completion card
-Copy                                         - AI hint chip
+Copy                                         - Streak/XP chip
 [Join Waitlist] [Explore curriculum]         
 Trust line: No paywalls. No fluff.           
 ```
@@ -252,7 +252,7 @@ Trust line: No paywalls. No fluff.
   - Learn Product Management.
   - Build real products.
   - Completely free.
-- Supporting copy: "A structured, AI-assisted PM academy with interactive lessons, quizzes, capstones, skill analytics, and portfolio projects - built for career switchers and ambitious builders."
+- Supporting copy: "A structured PM academy with interactive lessons, quizzes, capstones, skill analytics, and portfolio projects — built for career switchers and ambitious builders." *(Corrected: removed "AI-assisted" — see `PRD.md` §11's Open Decision on AI Mentor. Do not reintroduce AI-related claims into hero copy until that decision is resolved and, if approved, is actually built and budgeted.)*
 - Primary CTA: `Join Waitlist`.
 - Secondary CTA: `Explore Curriculum`.
 - Product mockup cluster shows three overlapping but non-nested surfaces:
@@ -314,7 +314,7 @@ Scattered, no feedback       Costly, theoretical        Structured, practical, f
 - Follow with three horizontal comparison panels:
   - Fragmented free content: no sequence, no accountability, no portfolio.
   - Traditional courses: expensive, often passive, certificate-heavy.
-  - PM Academy: structured roadmap, AI-assisted practice, portfolio artifacts, free core.
+  - PM Academy: structured roadmap, real practice, portfolio artifacts, free core.
 - PM Academy panel uses primary border and a small `Badge`: "Free forever".
 
 ### UX Rationale
@@ -489,7 +489,6 @@ Show what studying inside PM Academy feels like: active, structured, beautiful, 
 
 ### Content Pillars
 - Interactive lessons.
-- AI Mentor.
 - Flashcards.
 - Quizzes.
 - Assignments.
@@ -660,9 +659,11 @@ This section turns free learning into career value. It supports the "portfolio, 
 
 ---
 
-## 15. AI Mentor
+## 15. AI Mentor — ⚠ NOT IN v1 SCOPE, DO NOT BUILD OR SHIP AT LAUNCH
 
-### Purpose
+**This entire section is deferred.** It is preserved here as a well-thought-out future concept, not a Phase 0–5 deliverable. As written, it contradicts `PRD.md` §6's explicit non-goal ("AI-generated personalized lesson content") and describes a feature absent from `Architecture.md`'s stack, cost model, and `Phases.md`'s roadmap entirely. Do not include this section, its wireframe, its chat mockup, or any "AI Mentor"/"AI-assisted" copy anywhere in the launch site (hero, FAQ, footer, testimonials, error states, meta descriptions) until this is resolved as a real, budgeted feature per `PRD.md` §11's Open Decision. If/when it is greenlit, treat it the same way `PRD.md` §10 treats monetization — build it only once the free core is proven, and give it a real cost model (LLM API calls are not free-tier-friendly the way the rest of this stack is).
+
+### Purpose (preserved for future reference)
 Present AI as a thoughtful mentor that helps learners think, practice, and improve. Do not oversell it as magic.
 
 ### Demonstrated Uses
@@ -815,11 +816,10 @@ Remove friction and address skepticism, especially around "free".
 3. Do I need prior product experience?
 4. How long does the curriculum take?
 5. What will I build?
-6. How does the AI Mentor work?
-7. Will I get a certificate?
-8. Is there a community?
-9. When will PM Academy launch?
-10. Will lessons ever be paywalled?
+6. Will I get a certificate?
+7. Is there a community?
+8. When will PM Academy launch?
+9. Will lessons ever be paywalled?
 
 ### High-Fidelity Description
 - Use `Accordion`.
@@ -911,7 +911,7 @@ Provide closure, trust, and useful routes.
 ```txt
 Brand + free promise
 Resources: Curriculum, Sample Lessons, Glossary
-Product: Learning Experience, Skill Radar, Portfolio, AI Mentor
+Product: Learning Experience, Skill Radar, Portfolio
 Company: About, Contact, Updates
 Legal: Privacy, Terms
 Social: LinkedIn, X, GitHub/Product Hunt future
@@ -974,10 +974,6 @@ Portfolio
   Artifact preview
   Public profile preview
 
-AI Mentor
-  Chat/product panel
-  Capability list
-
 Community
   Feature grid
   Cohort preview
@@ -1020,7 +1016,6 @@ Footer
 - Learning experience: horizontally scrollable tabs with one mockup at a time.
 - Skill radar: chart then text summary.
 - Portfolio: artifact cards first, then profile preview.
-- AI Mentor: transcript-like chat panel.
 - FAQ: full-width accordion.
 - Final CTA: full-width input and button.
 - Avoid sticky bottom CTA if it covers content or creates fatigue; use only after visitor scrolls past hero.
@@ -1039,7 +1034,6 @@ Footer
 | Experience | Fade split | Feature highlight | Tab transition | None | Panel skeleton | Instant tabs |
 | Skill Radar | Chart draw | Axis highlight | Count-up | None | Chart skeleton | Static |
 | Portfolio | Slide document | Artifact badge | Share success | Subtle layer movement | Document skeleton | Static |
-| AI Mentor | Chat sequence | Row highlight | Typing dots prototype | None | Panel skeleton | Static transcript |
 | Community | Fade grid | Row highlight | Consistency reveal | None | List skeleton | Static |
 | Testimonials | Fade up | Border | None | None | Card skeletons | Static |
 | FAQ | Fade | Row bg | Accordion | None | None | Instant |
@@ -1050,9 +1044,12 @@ Footer
 
 ## 25. Waitlist Form States
 
+**⚠ Corrected in this revision:** this section previously specified an email-only form. The canonical spec in `PRD.md` §8, `Architecture.md` §2 (`waitlist` table, all three columns `not null`), and `Design.md` §6.2 requires **name, email, and current career position** — nothing else, nothing less. The form below is corrected to match. If this ever changes, update all four documents in the same session (`Rules.md` §7).
+
 **Default**
-- Label: `Email address`
-- Placeholder: `you@example.com`
+- Field 1 — Label: `Name`, Placeholder: `Jane Doe`
+- Field 2 — Label: `Email address`, Placeholder: `you@example.com`
+- Field 3 — Label: `Current career position`, Placeholder: `e.g. Software Engineer, Consultant, Student` (free text, not a dropdown — keep friction low and avoid forcing users into a category that doesn't fit)
 - Button: `Join Waitlist`
 
 **Loading**
@@ -1180,4 +1177,5 @@ Before approving the Figma design, challenge every section:
 
 ## Changelog
 
+- v1.1 — Documentation review pass: (1) corrected waitlist form from email-only to the canonical 3-field spec (name, email, career position) per `PRD.md` §8 / `Architecture.md`'s `waitlist` table schema. (2) Flagged and stripped "AI Mentor"/"AI-assisted" copy from hero, IA table, content pillars, FAQ, footer, wireframes, and motion tables — this feature is absent from `PRD.md`, `Architecture.md`, and `Phases.md`, and contradicts `PRD.md` §6's non-goal. §15 preserved as deferred future-reference material only; see `PRD.md` §11's Open Decision before reintroducing.
 - v1.0 - Created Figma-ready Sprint 2 marketing website specification for the complete PM Academy public website.
