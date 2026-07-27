@@ -79,6 +79,21 @@ If a database change is pushed to production and needs to be undone:
 2. Add the undo commands (e.g., `DROP TABLE my_new_table;`).
 3. Commit and push this change to `main` so the deployment pipeline runs it.
 
+### 4.3 Production Baselining & Repair Operations
+When migrating an existing database that already contains active tables (e.g. from Phase 0 pre-launch waitlist setup), running `npx supabase db push` for the first time will fail because the CLI will attempt to recreate pre-existing tables, indexes, or policies.
+
+To resolve this without data loss, mark the initial migrations as already applied in your remote database's migration history:
+1. Link your project locally:
+   ```bash
+   npx supabase link --project-ref <project-id>
+   ```
+2. Record the base migrations as already applied in the remote history table:
+   ```bash
+   npx supabase migration repair --status applied 20260728000001
+   npx supabase migration repair --status applied 20260728000002
+   ```
+3. Future runs of the deployment pipeline will now skip these two files and apply only newly created migrations.
+
 ---
 
 ## 5. CI/CD Integration & GitHub Secrets
