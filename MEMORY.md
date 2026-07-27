@@ -62,8 +62,11 @@ pm-academy/
 ├── content/
 │   ├── lessons/                # 90 human-authored Markdown lesson source files
 │   └── master_flashcards.json  # Pre-compiled flashcard collection
+├── supabase/                   # Supabase database config & migrations (CLI version-controlled)
+│   ├── config.toml             # Local Supabase engine configurations
+│   └── migrations/             # Timestamped SQL database migration files (1-indexed base migrations)
 ├── scripts/                    # Build-time TypeScript content parsing and validation scripts
-├── docs/                       # Project specifications (PRD, Architecture, Rules, Design, Phases)
+├── docs/                       # Project specifications & manuals (PRD, Architecture, Rules, Guides)
 └── .agents/                    # Antigravity AI Customizations (AGENTS.md, skill guides)
 ```
 

@@ -1,10 +1,10 @@
 -- PM Academy — User State Schema Migration
--- Migration: 002_user_state_schema.sql
--- Implements complete user-state data model per Architecture.md §2
+-- Migration: 20260728000002_create_user_state.sql
+-- Implements complete user-state data model per Architecture.md §2 with security enhancements
 
 -- ─── 1. Users Table ──────────────────────────────────────────────────────────
 create table if not exists users (
-  id                       uuid primary key default gen_random_uuid(),
+  id                       uuid primary key references auth.users(id) on delete cascade,
   email                    text unique not null,
   name                     text,
   auth_provider            text not null default 'email', -- 'email' | 'google'
@@ -84,7 +84,7 @@ begin
   from xp_events
   where user_id = NEW.user_id;
 
-  -- Level title logic: 1000 XP per level cap (tunable)
+  -- Level title logic: 500 XP per level increments (capped at level 9)
   calculated_level := least(9, greatest(1, floor(new_total / 500) + 1));
 
   update users
@@ -100,6 +100,32 @@ create or replace trigger trigger_update_user_xp
 after insert on xp_events
 for each row
 execute function update_user_xp_and_level();
+
+-- Anti-tampering Trigger: Recalculate and enforce authentic total_xp and level on user updates
+create or replace function sync_user_xp_and_level_on_update()
+returns trigger as $$
+declare
+  actual_xp int;
+  calculated_level int;
+begin
+  -- Recalculate from the ledger to prevent direct table updates by the client
+  select coalesce(sum(xp_amount), 0) into actual_xp
+  from xp_events
+  where user_id = NEW.id;
+
+  calculated_level := least(9, greatest(1, floor(actual_xp / 500) + 1));
+
+  NEW.total_xp := actual_xp;
+  NEW.level := calculated_level;
+
+  return NEW;
+end;
+$$ language plpgsql;
+
+create or replace trigger trigger_sync_user_xp_on_update
+before update on users
+for each row
+execute function sync_user_xp_and_level_on_update();
 
 -- ─── 6. Reflections ──────────────────────────────────────────────────────────
 create table if not exists reflections (
@@ -180,7 +206,6 @@ create table if not exists cohort_members (
 );
 
 -- ─── 11. Row Level Security (RLS) Policies ───────────────────────────────────
-
 alter table users enable row level security;
 alter table user_lesson_progress enable row level security;
 alter table quiz_attempts enable row level security;
@@ -194,33 +219,34 @@ alter table cohort_members enable row level security;
 
 -- Users RLS
 create policy "Users can view own profile" on users for select using (auth.uid() = id);
+create policy "Users can insert own profile" on users for insert with check (auth.uid() = id);
 create policy "Users can update own profile" on users for update using (auth.uid() = id);
 
--- User Lesson Progress RLS
-create policy "Users manage own progress" on user_lesson_progress for all using (auth.uid() = user_id);
+-- User Lesson Progress RLS (SELECT only for client - mutations verified server-side)
+create policy "Users view own progress" on user_lesson_progress for select using (auth.uid() = user_id);
 
--- Quiz Attempts RLS
-create policy "Users manage own quiz attempts" on quiz_attempts for all using (auth.uid() = user_id);
+-- Quiz Attempts RLS (SELECT only for client - mutations verified server-side)
+create policy "Users view own quiz attempts" on quiz_attempts for select using (auth.uid() = user_id);
 
--- Flashcard SRS RLS
+-- Flashcard SRS RLS (Full access since SRS calculations run on client via SM-2)
 create policy "Users manage own flashcard srs" on user_flashcard_srs for all using (auth.uid() = user_id);
 
--- XP Events RLS
-create policy "Users manage own xp events" on xp_events for all using (auth.uid() = user_id);
+-- XP Events RLS (SELECT only for client - XP events ledger populated server-side only)
+create policy "Users view own xp events" on xp_events for select using (auth.uid() = user_id);
 
 -- Reflections RLS (Allow public read if is_public = true for portfolio export)
 create policy "Users manage own reflections" on reflections for all using (auth.uid() = user_id);
 create policy "Public can view public reflections" on reflections for select using (is_public = true);
 
--- Bookmarks RLS
+-- Bookmarks RLS (Full client access for bookmark management)
 create policy "Users manage own bookmarks" on bookmarks for all using (auth.uid() = user_id);
 
 -- Capstone Submissions RLS (Allow public read if is_public = true for portfolio export)
 create policy "Users manage own capstones" on capstone_submissions for all using (auth.uid() = user_id);
 create policy "Public can view public capstones" on capstone_submissions for select using (is_public = true);
 
--- User Badges RLS
+-- User Badges RLS (SELECT only for client - badges awarded server-side only)
 create policy "Users view own badges" on user_badges for select using (auth.uid() = user_id);
 
--- Cohort Members RLS
+-- Cohort Members RLS (SELECT only for client - group membership managed server-side)
 create policy "Cohort members view cohort" on cohort_members for select using (auth.uid() = user_id);
