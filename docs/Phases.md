@@ -14,23 +14,31 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 
 ## Phase 0 — Foundation (Weeks 1–3)
 
-**Goal:** Resolve blocking content/design decisions and stand up the technical skeleton, so Phase 1 engineering isn't blocked on anything.
+**Goal:** Resolve blocking content/design decisions, stand up the static-first content pipeline, and wire the deployment infrastructure, so Phase 1 engineering isn't blocked on anything.
 
 **Scope:**
-- Resolve the 9 vs. 10 modules decision (`PRD.md` §11) — this blocks the data model in `Architecture.md` §2 and must be resolved first.
+- Resolve the 9 vs. 10 modules decision (`PRD.md` §11) — this blocks the content schema in `Architecture.md` §4 and must be resolved first.
 - Approve the content backlog/bug-fix list from the content audit; kick off any Module 9 expansion work in parallel with engineering (content work should never block engineering, and vice versa).
-- Build the Figma design system: typography, color, component library (buttons, cards, progress rings, quiz UI) — see `Design.md` §1–§2 for the locked-in direction to execute against.
-- Technical scaffolding: repo created per `Architecture.md` §3's folder structure, Next.js + Supabase set up, auth wired (email + Google first, LinkedIn can follow), CI/CD on Vercel per `Rules.md` §3.5.
-- Build the content parser (`Architecture.md` §4) and run it against all lessons currently ready → seed the dev database. **Do this as the first real engineering task** — it de-risks the entire content pipeline before any UI exists.
-- Stand up the marketing-site waitlist landing page (see `Design.md` §6) — this is independent of every other Phase 0 item and should go live as early in Week 1 as possible.
+- Build the Figma design system: typography, color, component library (buttons, cards, progress rings, quiz UI, search input, auth forms, waitlist form) — see `Design.md` §1–§2 for the locked-in direction to execute against.
+- Technical scaffolding: repo created per `Architecture.md` §3's folder structure, Next.js + Supabase set up, CI/CD on Vercel per `Rules.md` §3.5.
+- **Content parser and JSON generator** (`Architecture.md` §4) — build this as the **first real engineering task**. Parse all source Markdown files into validated, structured JSON. No runtime markdown parsing — the browser consumes pre-generated JSON.
+- **Search index generation** — build `scripts/generate-search-index.ts` to produce `search-index.json` from the generated lesson JSON (see `Architecture.md` §5).
+- **Authentication** — wire Supabase Auth with Email + Password and Google Login (`PRD.md` §4.1).
+- **Waitlist page** — stand up the marketing-site waitlist landing page (see `Design.md` §6) collecting name, email, and current career position. This is independent of every other Phase 0 item and should go live as early in Week 1 as possible. Waitlist data stored in Supabase `waitlist` table (`Architecture.md` §2).
+- **Google Analytics** — integrate for page views and basic user flow tracking.
+- **Resend SMTP** — connect Resend to Supabase via SMTP for email verification, password reset, waitlist confirmation, and welcome emails.
+- **Deployment pipeline** — set up GitHub Actions workflow: Markdown validation → JSON generation → search index generation → Next.js build → Vercel deployment (`Architecture.md` §8).
 
-**Explicit exclusions:** no gamification logic, no quiz UI polish, no dashboard — this phase is scaffolding and decisions only.
+**Explicit exclusions:** no gamification logic, no quiz UI polish, no dashboard — this phase is scaffolding, content pipeline, and deployment infrastructure only.
 
 **Definition of Done:**
-- Module/lesson count decision is finalized and reflected in `PRD.md` §3, `Architecture.md` §2/§4.
-- A developer (or AI assistant) can clone the repo, run it locally, and see at least one real seeded lesson rendered from the content pipeline.
-- The waitlist landing page is live and capturing emails.
-- Figma design system covers at minimum: typography scale, color tokens, button/card/progress-ring components (see `Design.md` §2 for the full first-screens list this system must support).
+- Module/lesson count decision is finalized and reflected in `PRD.md` §3, `Architecture.md` §4.
+- A developer (or AI assistant) can clone the repo, run the build, and see at least one real lesson rendered from the static JSON content pipeline.
+- The deployment pipeline is fully automated: push to GitHub → GitHub Actions validates content and generates JSON → Vercel deploys.
+- The waitlist landing page is live and capturing name, email, and career position.
+- Google Analytics is tracking page views.
+- Resend SMTP is sending transactional emails (verification, waitlist confirmation).
+- Figma design system covers at minimum: typography scale, color tokens, button/card/progress-ring/search/auth/waitlist components (see `Design.md` §2 for the full first-screens list this system must support).
 
 ---
 
@@ -39,10 +47,11 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 **Goal:** A real user can sign up, read Lesson 1, take its quiz, and see Lesson 2 unlock. This is the first genuinely testable version of the product.
 
 **Scope:**
-- Lesson reading view: full MDX rendering of all fixed sections (`PRD.md` §4.2, `Architecture.md` §4), styled per `Design.md`.
-- Quiz flow: 15 questions, immediate feedback, explanations (`PRD.md` §4.3).
-- Basic progress tracking: lesson complete/incomplete, module unlock logic based on the prerequisite graph (`PRD.md` §2).
+- Lesson reading view: renders pre-generated static JSON content for all fixed sections (`PRD.md` §4.2, `Architecture.md` §4), styled per `Design.md`.
+- Quiz flow: 15 questions, immediate feedback, explanations (`PRD.md` §4.3). Quiz data loaded from static JSON.
+- Basic progress tracking: lesson complete/incomplete, module unlock logic based on the prerequisite graph (`PRD.md` §2). Progress stored in Supabase.
 - Auth + user accounts, onboarding flow (placement quiz + goal-setting, `PRD.md` §4.1).
+- Client-side search using the pre-built `search-index.json` (`Architecture.md` §5).
 
 **Explicit exclusions:** no XP/levels, no streaks, no skill radar, no badges, no leaderboard, no flashcard SRS, no capstones. These are all Phase 2–3. Resist the temptation to add "just a little gamification" here — the point of this phase is to validate the *learning* loop in isolation.
 
@@ -59,8 +68,8 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 
 **Scope:**
 - XP system + levels/titles (`PRD.md` §4.6) — implement the anti-gaming rule (`Rules.md` §5.2) from the start, not as a later patch.
-- Streaks with the earned-freeze mechanic (`PRD.md` §4.7, `Rules.md` §5.3) — timezone-correct day-boundary logic per `Architecture.md` §5.
-- Skill radar: competency tagging (already in the content pipeline) + visualization (`PRD.md` §4.8) — lock in the scoring formula (open decision, `PRD.md` §11) during this phase and document it back into `PRD.md` §4.8 once decided.
+- Streaks with the earned-freeze mechanic (`PRD.md` §4.7, `Rules.md` §5.3) — timezone-correct day-boundary logic per `Architecture.md` §6.
+- Skill radar: competency tagging (already in the static JSON content) + visualization (`PRD.md` §4.8) — lock in the scoring formula (open decision, `PRD.md` §11) during this phase and document it back into `PRD.md` §4.8 once decided.
 - Dashboard: progress ring + skill radar + "continue learning" CTA (`Design.md` §2, screen #3).
 - Flashcard spaced-repetition review hub (`PRD.md` §4.4, SM-2 per `Architecture.md` §5).
 
@@ -101,7 +110,7 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 - Full content-audit fixes applied (ideally this ran in parallel since Week 1 — confirm completion here as a gate, don't start it now if it wasn't already in motion).
 - SSR/SEO pass on lesson pages: public-facing lesson previews indexed by Google (`PRD.md` §5 non-functional requirement, `Design.md` §6 SEO strategy) — this is a major free acquisition channel for "what is product management"-style queries.
 - Accessibility pass: WCAG AA (`PRD.md` §5) — contrast, keyboard nav, screen-reader labels.
-- Closed beta with 100–200 real users, instrumented with PostHog (`Architecture.md` §1). Fix drop-off points in the funnel — **onboarding → Lesson 1 completion is the single most important metric to fix here.**
+- Closed beta with 100–200 real users, instrumented with Google Analytics. Fix drop-off points in the funnel — **onboarding → Lesson 1 completion is the single most important metric to fix here.**
 
 **Explicit exclusions:** no new features in this phase — this is a hardening and instrumentation phase only. If a beta user requests a new feature, log it for a post-launch phase; don't let it slip into Phase 4 scope.
 
@@ -109,7 +118,7 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 - Lighthouse performance score ≥ 90 on lesson pages (`PRD.md` §5).
 - WCAG AA basics verified (automated + at least one manual pass with a screen reader).
 - Closed beta cohort's Day-1 activation and Day-7 retention numbers are known and any major funnel drop-off has been addressed (see `PRD.md` §9 for target ranges to compare against).
-- PostHog is capturing the funnel end-to-end: signup → onboarding → Lesson 1 theory → quiz → dashboard return.
+- Google Analytics is capturing the funnel end-to-end: signup → onboarding → Lesson 1 theory → quiz → dashboard return.
 
 ---
 
@@ -140,19 +149,20 @@ These predict long-term success far better than signup counts (`PRD.md` §9).
 
 ## Post-Launch Phases (directional — flesh out once Phase 5 data exists)
 
-- **Phase 6 — Retention iteration:** use closed-beta and launch-week PostHog data to fix the biggest funnel drop-off, iterate on gamification balance (XP thresholds, streak-freeze cadence) using real behavioral data rather than guesses.
+- **Phase 6 — Retention iteration:** use closed-beta and launch-week Google Analytics data to fix the biggest funnel drop-off, iterate on gamification balance (XP thresholds, streak-freeze cadence) using real behavioral data rather than guesses.
 - **Phase 7 — Monetization exploration (only once free-core success is proven per `PRD.md` §10):** optional paid capstone review, job-search-adjacent premium features, or B2B/cohort licensing — in that order of fit, never before the core metrics in `PRD.md` §9 show real traction.
-- **Phase 8+ — Scale infrastructure decisions:** revisit `Architecture.md` §8's scaling path only when free-tier ceilings are actually approached — not preemptively.
+- **Phase 8+ — Scale infrastructure decisions:** revisit `Architecture.md` §10's scaling path only when free-tier ceilings are actually approached — not preemptively.
 
 ---
 
 ## Immediate Next Steps (do these first, this week, regardless of which phase is "current")
 
-1. Decide 9 vs. 10 modules (`PRD.md` §11) — blocks the data model.
+1. Decide 9 vs. 10 modules (`PRD.md` §11) — blocks the content schema.
 2. Approve the fixed-count content backlog and kick off metadata-bug fixes + any module expansion in parallel with Phase 0 engineering.
 3. Commission or draft the Figma design system (`Design.md` §1–§2) so engineering isn't blocked waiting on visual direction.
-4. Stand up the waitlist landing page (`PRD.md` §8, `Design.md` §6) — this can go live literally this week, independent of everything else, and starts compounding immediately.
-5. Write the content parser (`Architecture.md` §4) as the first real engineering task — it de-risks the entire content pipeline before any UI is built.
+4. Stand up the waitlist landing page (`PRD.md` §8, `Design.md` §6) collecting name, email, and career position — this can go live literally this week, independent of everything else, and starts compounding immediately.
+5. Build the content parser and JSON generator (`Architecture.md` §4) as the first real engineering task — it de-risks the entire content pipeline before any UI is built.
+6. Set up the deployment pipeline (`Architecture.md` §8): GitHub Actions → Markdown validation → JSON generation → Vercel deployment.
 
 ---
 
@@ -162,8 +172,12 @@ These predict long-term success far better than signup counts (`PRD.md` §9).
 - [ ] Waitlist landing page live
 - [ ] Figma design system v1 complete
 - [ ] Repo scaffolded per `Architecture.md` §3
-- [ ] Content parser built and run against all available lessons
-- [ ] Auth working (email + Google, LinkedIn optional at this stage)
+- [ ] Content parser and JSON generator built and run against all available lessons
+- [ ] Search index (`search-index.json`) generated
+- [ ] Deployment pipeline automated (GitHub Actions → Vercel)
+- [ ] Auth working (Email + Password, Google Login)
+- [ ] Google Analytics tracking page views
+- [ ] Resend SMTP sending transactional emails
 - [ ] Lesson reading view + quiz flow functional (Phase 1 core loop)
 - [ ] 10–20 real users complete the core loop
 - [ ] XP, streaks, skill radar live (Phase 2)
@@ -175,4 +189,5 @@ These predict long-term success far better than signup counts (`PRD.md` §9).
 
 ## Changelog
 
+- v2.0 — Updated for static-first architecture: Phase 0 expanded to include content parser, JSON generator, search index, deployment pipeline (GitHub Actions), Google Analytics, Resend SMTP, waitlist (name/email/career position). Replaced PostHog with Google Analytics throughout. Removed LinkedIn OAuth. Updated content pipeline references from DB seeding to static JSON generation.
 - v1.0 — Initial phased roadmap authored from the "PM Academy — 0→1 Roadmap & Project Plan" source document, with explicit scope/exclusion/definition-of-done added per phase for unambiguous execution.

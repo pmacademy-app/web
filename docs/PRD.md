@@ -2,6 +2,7 @@
 
 **Status:** Living document — single source of truth for product decisions.
 **Owner:** Solo founder (you).
+**Platform:** Responsive web application (desktop + mobile responsive). Not a native mobile app.
 **Companion docs:** `Architecture.md`, `Rules.md`, `Phases.md`, `Design.md`. Read all five before building or changing anything.
 **How to use this doc (for any future AI assistant or developer):** This PRD defines *what* to build and *why*. It does not define *how* the code is structured (see `Architecture.md`), *how* to work day-to-day (see `Rules.md`), *when* things ship (see `Phases.md`), or *what it looks like* (see `Design.md`). If a requirement here conflicts with something in another doc, this PRD wins for product behavior; `Architecture.md` wins for technical implementation details.
 
@@ -69,11 +70,11 @@ PM Academy
 
 ## 3. Content Model
 
-- 9 modules, 10 lessons each = **90 lessons total**. (If the content audit changes this count, update this section and the data model in `Architecture.md` §2 together — they must never drift out of sync.)
-- Each lesson is authored as a single source-of-truth Markdown file (`lesson-NNN.md`) with a fixed section structure (see `Architecture.md` §4 for the exact schema). The app never hand-edits content in the database — MD files are canonical, the DB is a rebuildable cache of parsed content.
+- 9 modules, 10 lessons each = **90 lessons total**. (If the content audit changes this count, update this section and the content schema in `Architecture.md` §4 together — they must never drift out of sync.)
+- **Markdown is the single source of truth.** Each lesson is authored as a Markdown file with a fixed section structure (see `Architecture.md` §4 for the exact schema). At build time, Markdown is parsed, validated, and converted to static JSON. The browser consumes pre-generated JSON — there is no runtime markdown parsing. **Lesson content is never stored in the database** — the database stores only user state (see `Architecture.md` §2).
 - Every lesson carries an **honest estimated time** shown before the learner starts it.
 - Every lesson is tagged with 1–2 of 7 **competency clusters**: Discovery & Research, Strategy, Design & UX, Execution & Delivery, Metrics & Growth, Leadership & Communication, Platform/Technical/Specialized.
-- Every lesson has: Theory (MDX prose + mental model + case study + framework table), a 15-question Quiz, a Flashcard set, and a Reflection Exercise prompt.
+- Every lesson has: Theory (prose + mental model + case study + framework table), a 15-question Quiz, a Flashcard set, and a Reflection Exercise prompt.
 - Every module ends in one **Capstone / Applied Assignment** — a larger, portfolio-worthy deliverable (e.g., write a PRD, run a mock case study), gradeable by self-review, peer-review, or (future, monetized) expert review.
 
 ---
@@ -83,13 +84,13 @@ PM Academy
 Each feature below states **what it must do**, **what "done" looks like**, and **explicit non-goals** to prevent scope creep by a future contributor.
 
 ### 4.1 Authentication & Onboarding
-- **Requirement:** Email/password + Google OAuth + LinkedIn OAuth (LinkedIn is on-brand for a career-focused product — prioritize it after email+Google in build order, not before).
+- **Requirement:** Email + Password and Google Login, via Supabase Auth.
 - **Onboarding flow:** short placement-style intro quiz (5–8 questions) to set an initial skill-radar baseline, followed by a goal-setting question ("Why are you here?" — options: job search, filling gaps, exploring) that tailors notification cadence and dashboard copy.
 - **Done when:** a new user can sign up, complete onboarding in under 2 minutes, and land on a dashboard with a pre-seeded (if rough) skill radar and a "Start Lesson 1" CTA.
-- **Non-goal at MVP:** social sign-up beyond Google/LinkedIn; multi-factor auth (rely on Supabase Auth defaults).
+- **Non-goal at MVP:** additional social sign-up providers; multi-factor auth (rely on Supabase Auth defaults).
 
 ### 4.2 Lesson Reading View
-- **Requirement:** renders the lesson's MDX body (theory, mental model diagram, case study, framework table) with clean, distraction-free typography. Tracks scroll-depth + active time-on-page (used for XP anti-gaming, §4.6).
+- **Requirement:** renders the lesson content from pre-generated static JSON (theory, mental model diagram, case study, framework table) with clean, distraction-free typography. No runtime markdown parsing — content is built from Markdown into JSON at deploy time (see `Architecture.md` §4). Tracks scroll-depth + active time-on-page (used for XP anti-gaming, §4.6).
 - **Done when:** a learner can read a full lesson, see estimated time honored, and the "Continue to Quiz" CTA becomes available only after the dwell-time/scroll threshold is met.
 - **Non-goal:** video content, audio narration (future consideration, not MVP).
 
@@ -167,12 +168,14 @@ Each feature below states **what it must do**, **what "done" looks like**, and *
 
 | Category | Requirement |
 |---|---|
-| **Cost** | ₹0 infrastructure cost at launch — every service used must have a genuinely free tier sufficient for launch-scale traffic. See `Architecture.md` §1 for the locked-in free-tier stack and what triggers a paid upgrade decision. |
-| **Performance** | Lesson pages must be server-rendered (SSR) for SEO and fast first paint. Target Lighthouse performance score ≥ 90 on lesson pages. |
+| **Cost** | Low infrastructure cost at launch — every service used must have a genuinely free tier sufficient for launch-scale traffic (~5,000 users). See `Architecture.md` §1 for the locked-in free-tier stack and what triggers a paid upgrade decision. |
+| **Architecture** | Static-first: lesson content served as pre-generated JSON via Vercel Edge Network CDN. Database used only for user state. No runtime markdown parsing. See `Architecture.md` §4 for the full content pipeline. |
+| **Performance** | Lesson pages must be server-rendered (SSR) for SEO and fast first paint. Target Lighthouse performance score ≥ 90 on lesson pages. Static JSON content delivery ensures consistently fast load times. |
 | **SEO** | Public lesson preview pages must be indexable, with proper meta tags, structured data (Article/Course schema), and semantic HTML. This is a primary organic acquisition channel — treat SEO as a functional requirement, not an afterthought (see `Design.md` §6 for the marketing site + SEO strategy in full). |
 | **Accessibility** | WCAG AA minimum: color contrast, keyboard navigation, screen-reader labels on all interactive elements. Build this in from day one — retrofitting is expensive (per original roadmap §5.3). |
 | **i18n readiness** | Externalize all UI strings from day one (even if launching English-only) — a large share of the target audience is outside the US/India-and-APAC-heavy given the positioning. Do not hardcode strings inline in components. |
-| **Data integrity** | Content MD files are the single source of truth for lesson content. The database is a rebuildable cache populated by a re-runnable migration/parser script (see `Architecture.md` §4). Never hand-edit lesson content directly in the DB. |
+| **Data integrity** | Markdown files are the single source of truth for lesson content. Content is converted to static JSON at build time — never stored in the database. The database stores only user state (progress, reflections, XP events, bookmarks). Never hand-edit lesson content outside of Markdown source files. |
+| **Analytics** | Google Analytics for page views, user flow, and conversion tracking. No server-side analytics infrastructure. |
 | **Security** | Row-level security (RLS) enforced at the database layer for all user-owned data (progress, reflections, XP events) — do not rely solely on application-layer checks. |
 | **Solo-founder maintainability** | Every architectural choice must optimize for one person (possibly aided by AI tools) being able to understand, extend, and debug the system without a team. Prefer boring, well-documented technology over novel or clever solutions. See `Rules.md` for the full simplicity-first engineering philosophy. |
 
@@ -182,12 +185,13 @@ Each feature below states **what it must do**, **what "done" looks like**, and *
 
 To prevent scope creep, the following are **not** in scope for the initial public launch, even though they may be discussed or requested:
 
-- Native mobile apps (responsive web only at launch).
+- Native mobile apps — this is a responsive web application only. No Android app, no iOS app, no app store listings.
 - Community/social features beyond the opt-in friends leaderboard (no forums, comments, DMs).
 - AI-generated personalized lesson content (curriculum is fixed and human-authored).
 - Multi-language content (i18n-*ready* infrastructure only, not translated content).
 - Any paid tier or paywalled lesson content (see Product Principle #2 — this is permanent, not just a v1 scope cut).
 - Cohort/instructor mode for institutions (this is a Section 10 monetization idea for *after* the free core is proven — do not build early).
+- Server-side search (search is client-side via a build-time generated index — see `Architecture.md` §5).
 
 ---
 
@@ -204,12 +208,14 @@ To prevent scope creep, the following are **not** in scope for the initial publi
 
 ## 8. Marketing Website — Product Requirements
 
-A separate, lightweight marketing/information site precedes and accompanies the app. Full content structure, page-by-page copy guidance, and SEO strategy live in `Design.md` §6. This section defines the *functional* requirements only:
+The marketing pages are integrated into the main Next.js application as the `(marketing)` route group — one deploy, one domain, shared design system. Full content structure, page-by-page copy guidance, and SEO strategy live in `Design.md` §6. This section defines the *functional* requirements only:
 
 - **Purpose:** official information page for PM Academy — explains the product, shows sample lesson content, and converts visitors into either (a) waitlist signups pre-launch or (b) app signups post-launch.
-- **Must include:** a working email-capture waitlist form (pre-launch), 3–5 fully public sample lesson pages (SEO head start + credibility proof), a clear explanation of the free-forever model (reinforces Product Principle #2 to skeptical visitors), and a Product Hunt/launch-ready landing page for launch week.
-- **Must be live independently of the main app build** — per the original roadmap's Immediate Next Steps, the waitlist page can and should go live in Week 1, decoupled from all other engineering work.
-- **Cost constraint:** same ₹0 infra rule applies — see `Architecture.md` §1 for the specific free hosting choice for the marketing site (kept separate from the main app's hosting for simplicity and so it can ship before the app's stack is even decided).
+- **Waitlist form:** collects **name, email address, and current career position** — nothing else. Stored in a `waitlist` table in Supabase (see `Architecture.md` §2).
+- **Must include:** a working waitlist form (pre-launch), 3–5 fully public sample lesson pages (SEO head start + credibility proof), a clear explanation of the free-forever model (reinforces Product Principle #2 to skeptical visitors), and a Product Hunt/launch-ready landing page for launch week.
+- **Must be live independently of the authenticated app features** — the waitlist page can and should go live in Week 1, decoupled from all other engineering work.
+- **Transactional email:** waitlist confirmation, email verification, password reset, and welcome emails sent via **Resend** connected to Supabase through SMTP (see `Architecture.md` §1).
+- **Hosting:** Vercel, same deployment as the main application.
 
 ---
 
@@ -263,4 +269,5 @@ Track unresolved product decisions here so context is never lost between session
 
 ## Changelog
 
+- v2.0 — Updated for static-first architecture: responsive web app (not native), Markdown→JSON build pipeline, Supabase for user state only, Google Analytics (replaced PostHog), Email+Password and Google Login (removed LinkedIn OAuth), Resend SMTP, Vercel-only hosting (removed Cloudflare), client-side search, waitlist collects name/email/career position.
 - v1.0 — Initial PRD authored from the "PM Academy — 0→1 Roadmap & Project Plan" source document. All decisions in that roadmap are considered ratified unless marked "Open" in §11.

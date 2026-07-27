@@ -24,9 +24,14 @@ Before writing a single line of code or making a single product decision:
 1. **Simplicity over cleverness.** If two approaches solve the problem, pick the one a solo founder (or a fresh AI assistant with no memory of past sessions) can understand in five minutes, not the one that's more "elegant."
 2. **Boring technology wins.** Prefer well-documented, widely-used libraries and patterns over novel or bleeding-edge ones. The stack in `Architecture.md` §1 was chosen for exactly this reason — do not introduce a new framework, database, or paradigm without a very strong, explicitly documented reason.
 3. **Free-tier discipline.** Before adding any new dependency, service, or infrastructure component, confirm it has a free tier sufficient for pre-launch and early-launch scale (see `Architecture.md` §1's table format for how to document this). If it isn't free, it doesn't go in until Section 10 monetization (`PRD.md`) makes it viable.
-4. **Content is data, code is not content.** The 90 lesson Markdown files are canonical. Never hardcode lesson content into components or the database as a first-class edit surface — always go through the content pipeline (`Architecture.md` §4).
-5. **Ship the smallest complete loop first.** Phase 1 (`Phases.md`) exists specifically to get a real, testable core learning loop in front of 10–20 users before any gamification is built. Do not let gamification-layer work bleed into Phase 1 scope, however tempting.
-6. **No dark patterns, ever.** This is not just a product principle (`PRD.md` §1) — it's an engineering rule. Do not implement any feature that gates free content, makes cancellation/removal harder than signup, or manufactures urgency/scarcity that isn't real. If a request (from a user, a stakeholder, or a future you) asks for this, flag it against `PRD.md` §1's Product Principle #2 before building it.
+4. **Markdown is the single source of truth.** The lesson Markdown files are canonical. Never store lesson content in the database. Content is parsed, validated, and converted to static JSON at build time (see `Architecture.md` §4). The database stores only user state.
+5. **Static-first architecture.** Generate JSON from Markdown during build — no runtime markdown parsing. The browser consumes pre-generated JSON served via CDN. Keep the architecture static-first whenever possible to minimize server load and operational cost.
+6. **Supabase is for user state only.** Use Supabase for authentication, user profiles, progress tracking, bookmarks, quiz attempts, XP events, streaks, reflections, and other user-specific data. Never for lesson content, quiz questions, or flashcard data.
+7. **Ship the smallest complete loop first.** Phase 1 (`Phases.md`) exists specifically to get a real, testable core learning loop in front of 10–20 users before any gamification is built. Do not let gamification-layer work bleed into Phase 1 scope, however tempting.
+8. **No dark patterns, ever.** This is not just a product principle (`PRD.md` §1) — it's an engineering rule. Do not implement any feature that gates free content, makes cancellation/removal harder than signup, or manufactures urgency/scarcity that isn't real. If a request (from a user, a stakeholder, or a future you) asks for this, flag it against `PRD.md` §1's Product Principle #2 before building it.
+9. **Deploy through Vercel.** All deployments go through the GitHub → GitHub Actions → Vercel pipeline (see `Architecture.md` §8). No manual deployments.
+10. **Use Google Analytics for product analytics.** No server-side analytics infrastructure. Keep analytics simple and free.
+11. **Use Resend SMTP for transactional email.** Connected to Supabase through SMTP for email verification, password reset, welcome emails, and waitlist confirmation.
 
 ---
 
@@ -57,17 +62,18 @@ Before writing a single line of code or making a single product decision:
 - **Trunk-based, simple branching:** `main` is always deployable. Feature branches (`feature/xp-system`, `fix/streak-timezone-bug`) merge via PR, even solo — PRs create a reviewable diff trail for future-you or a future AI assistant to read back.
 - **Commit messages:** short imperative summary line (`Add SM-2 scheduling to flashcard review`), body explains *why* if not obvious.
 - **CI must pass before merge:** lint, type-check, unit tests, build. Vercel preview deployments on every PR give a free, zero-config staging environment — use it.
-- **Never commit secrets.** Use environment variables (`.env.local`, never committed) for all API keys (Supabase, Resend, PostHog). Document required env vars in a checked-in `.env.example`.
+- **Never commit secrets.** Use environment variables (`.env.local`, never committed) for all API keys (Supabase, Resend, Google Analytics). Document required env vars in a checked-in `.env.example`.
 
 ---
 
 ## 4. Content Authoring Rules
 
 - Every lesson Markdown file must conform exactly to the fixed section schema in `Architecture.md` §4. Do not add ad hoc sections without updating that schema and the parser together.
+- When editing existing lesson content, edit the source `.md` file and let the build pipeline regenerate the JSON (`Architecture.md` §4) — never hand-edit the generated JSON or attempt to store content in the database.
+- Content changes trigger the full build pipeline: Markdown → validation → JSON generation → search index update → deploy. This is automated via GitHub Actions (`Architecture.md` §8).
 - Every lesson must state an **honest** estimated time — do not inflate or deflate this to game engagement metrics (`PRD.md` §1, Product Principle #3).
 - Every lesson must be tagged with 1–2 of the 7 competency clusters (`PRD.md` §3) — never 0, never 3+, to keep the skill radar meaningful.
 - Quiz questions must map to a stated learning objective (used for the missed-question review queue) — no orphan questions.
-- When editing existing lesson content, edit the source `.md` file and re-run the content parser (`Architecture.md` §4) — never edit the database directly.
 
 ---
 
@@ -122,4 +128,5 @@ Since this project explicitly expects to be built or continued with AI coding as
 
 ## Changelog
 
+- v2.0 — Updated for static-first architecture: added rules for Markdown as source of truth, no content in database, build-time JSON generation, Supabase for user state only, Google Analytics (replaced PostHog), Resend SMTP, Vercel deployment pipeline. Expanded content authoring rules for the automated build pipeline.
 - v1.0 — Initial rules authored to formalize engineering philosophy, coding standards, and change-management process for a solo-founder, AI-assisted build of PM Academy.

@@ -57,7 +57,7 @@ PM Academy
 └── Profile & Settings
 ```
 
-**Key IA decision:** lessons are the atomic unit, modules are the pacing unit, and a **competency skill radar** (not modules) is the thing shown most prominently on the dashboard — because "I'm 40% through Module 6" means less to a learner than "My Discovery skill is Advanced, my Strategy skill is Beginner." This reframes progress around competence, not completion, which is the actual promise of the app.
+**Key IA decision:** lessons are the atomic unit, modules are the pacing unit, and a **competency skill radar** (not modules) is the thing shown most prominently on the dashboard — because "I'm 40% through Module 6" means less to a learner than "My Discovery skill is Advanced, my Strategy skill is Beginner." This reframes progress around competence, not completion, which is the actual promise of the product.
 
 ---
 
@@ -123,41 +123,66 @@ Since this targets a broad, cost-sensitive, global audience (a big share of PM a
 ## 6. Technical Architecture
 
 ### 6.1 Recommended stack
-Optimized for: solo/small-team buildable, free-tier-friendly (this is a free product, keep infra cost near-zero at launch), and content-as-data (your 90 MD files are structured — treat them as a real content pipeline, not hardcoded pages).
+Optimized for: solo/small-team buildable, free-tier-friendly (this is a free product, keep infra cost near-zero at launch, targeting ~5,000 users), static-first architecture (Markdown as the source of truth, JSON generated at build time, no runtime markdown parsing).
 
 | Layer | Choice | Why |
 |---|---|---|
-| Frontend | Next.js (React) + TypeScript | SSR for SEO on lesson pages (huge for organic discovery — "what is product management" should rank), App Router, huge ecosystem |
+| Frontend | Next.js (App Router) + TypeScript | SSR for SEO on lesson pages (huge for organic discovery — "what is product management" should rank), huge ecosystem |
 | Styling | Tailwind CSS + shadcn/ui | Fast, consistent design system, matches your existing design-system constraints |
-| Content pipeline | MDX (Markdown + JSX) compiled at build/deploy time from your 90 source files | Your lessons are already near-MDX-ready; parse the Learning Path table, Quiz, Flashcards, Glossary into structured frontmatter/JSON, keep prose as MDX body |
-| Backend/API | Next.js API routes or a separate Node/Express (or tRPC) service | Keep it simple at 0→1; don't over-engineer microservices for a 90-lesson MVP |
-| Database | PostgreSQL (via Supabase or Neon) | Relational fits perfectly: users, progress, XP events, quiz attempts, flashcard SRS state all relational; Supabase also gives you auth + row-level security out of the box, which matters for a solo/small team |
-| Auth | Supabase Auth or Clerk | Don't build auth yourself; email + Google/LinkedIn OAuth (LinkedIn OAuth is *very* on-brand for a career-focused product) |
-| Hosting | Vercel (frontend) + Supabase (DB/auth) | Both have generous free tiers, scale automatically, near-zero DevOps overhead for a free product |
-| Spaced repetition | Implement SM-2 algorithm (open, well-documented, same core algorithm Anki uses) as a scheduled job, not a 3rd-party dependency | Keeps you independent, it's a genuinely simple algorithm (~100 lines) |
-| Analytics | PostHog (self-hostable or free tier) | Product analytics + session replay + feature flags in one tool, important for iterating on gamification mechanics post-launch |
-| Email | Resend or Postmark | Streak reminders, weekly recap, re-engagement — transactional email done right |
+| Content pipeline | Markdown → JSON at build time | Markdown files are the single source of truth. A build-time parser validates, converts to structured JSON, and generates a search index. The browser consumes pre-generated static JSON. No runtime markdown parsing. No content in the database |
+| Backend/API | Next.js API routes (for user-state mutations only) | Keep it simple at 0→1; don't over-engineer microservices for a 90-lesson MVP. API routes handle progress updates, XP events, and other user-state writes only |
+| Database | PostgreSQL via Supabase | Stores **user state only**: auth, profiles, progress, XP events, quiz attempts, bookmarks, streaks, reflections, SRS state. **Never stores lesson content.** Supabase bundles auth + row-level security |
+| Auth | Supabase Auth | Email + Password and Google Login. Don't build auth yourself |
+| Hosting | Vercel (frontend + API routes + static JSON) | Generous free tier, automatic scaling, zero DevOps overhead, native Next.js integration. Vercel Edge Network provides built-in CDN for static asset delivery |
+| Search | Client-side via build-time `search-index.json` | No server-side search. Fast, free, zero operational cost |
+| Spaced repetition | Implement SM-2 algorithm (open, well-documented, same core algorithm Anki uses) in-house | Keeps you independent, it's a genuinely simple algorithm (~100 lines) |
+| Analytics | Google Analytics | Page views, user flow, conversion tracking — sufficient for MVP-scale product analytics |
+| Email | Resend, connected to Supabase via SMTP | Email verification, password reset, welcome emails, waitlist confirmation, streak reminders, weekly recaps |
+| CI/CD | GitHub + GitHub Actions → Vercel | Automated pipeline: Markdown validation → JSON generation → search index → Next.js build → Vercel deployment |
 
 ### 6.2 Data model (core tables, not exhaustive)
+The database stores **user state only** — authentication, profiles, progress, and gamification. Lesson content, quiz questions, and flashcards are never stored in the database; they are served as pre-generated static JSON.
+
 ```
 users(id, email, name, auth_provider, created_at, current_streak, longest_streak, total_xp, level)
-lessons(id, module_id, order_in_module, slug, title, difficulty, est_minutes, content_mdx_ref, skill_clusters[])
-modules(id, order, title, theme)
-user_lesson_progress(user_id, lesson_id, status[not_started|in_progress|completed], theory_read_at, quiz_score, quiz_attempts, xp_earned, completed_at)
-quiz_questions(id, lesson_id, question_text, options[], correct_option, explanation, learning_objective, difficulty)
-quiz_attempts(id, user_id, quiz_question_id, selected_option, is_correct, attempted_at)
-flashcards(id, lesson_id, front, back, difficulty, tags[])
+user_lesson_progress(user_id, lesson_slug, status[not_started|in_progress|completed], theory_read_at, quiz_score, quiz_attempts, xp_earned, completed_at)
+quiz_attempts(id, user_id, lesson_slug, question_id, selected_option, is_correct, attempted_at)
 user_flashcard_srs(user_id, flashcard_id, ease_factor, interval_days, next_review_at, review_count)
 xp_events(id, user_id, source_type, source_id, xp_amount, created_at)
-capstone_submissions(id, user_id, module_id, content, status, submitted_at)
+reflections(id, user_id, lesson_slug, content, is_public, created_at)
+bookmarks(id, user_id, lesson_slug, created_at)
+capstone_submissions(id, user_id, module_slug, content, status, submitted_at)
 badges(id, key, name, description, icon)
 user_badges(user_id, badge_id, earned_at)
+waitlist(id, name, email, career_position, created_at)
 ```
 
-### 6.3 Content pipeline (turn your 90 MD files into app data — practical, not theoretical)
-1. Write a parser (Python or Node) that walks each `lesson-NNN.md`, extracts the fixed sections via the header structure already confirmed consistent in the content audit, and outputs structured JSON: `{ meta, theory_mdx, mistakes, mental_model, case_study, framework, interview_perspective, summary, key_takeaways, cheat_sheet, glossary[], resources[], flashcards[], reflection, quiz[], connections[] }`.
-2. This JSON becomes your seed data for `lessons`, `quiz_questions`, `flashcards` tables — a one-time migration script, re-runnable whenever you edit source content (keep the MD files as the source of truth, never hand-edit the DB).
-3. This is exactly why the content audit's structural consistency finding (§2.1, §3 in the audit doc) matters most: because the structure is this disciplined, this entire pipeline can be automated instead of 90 lessons of manual data entry.
+User-state tables reference content by **slug** (a stable string identifier from the static JSON), not by foreign-key UUID. This decouples user state from content.
+
+### 6.3 Content pipeline (Markdown → static JSON — build-time only)
+
+**Content flow:**
+```
+Markdown files (/content)
+       ↓
+  Parser (scripts/parse-content.ts)
+       ↓
+  Validation (scripts/validate-content.ts)
+       ↓
+  JSON Generation
+       ↓
+  Search Index Generation (search-index.json)
+       ↓
+  Static Assets (public/content/)
+       ↓
+  Vercel Deployment (served via CDN)
+```
+
+1. A parser script walks each Markdown lesson file, extracts the fixed sections via the header structure confirmed consistent in the content audit, and outputs structured JSON: `{ meta, theory, mistakes, mental_model, case_study, framework, interview_perspective, summary, key_takeaways, cheat_sheet, glossary[], resources[], flashcards[], reflection, quiz[], connections[] }`.
+2. This JSON becomes static assets served to the browser — **not** seed data for database tables. The browser consumes pre-generated JSON directly. No runtime markdown parsing.
+3. A search index generator produces `search-index.json` for client-side search. No server-side search infrastructure.
+4. The pipeline is automated via GitHub Actions: push to GitHub → validate Markdown → generate JSON → generate search index → build Next.js → deploy to Vercel.
+5. Build this pipeline as the **first real engineering task** — it de-risks the entire content pipeline before any UI is built.
 
 ### 6.4 Why not a no-code tool / off-the-shelf LMS
 Considered and rejected: Kajabi/Teachable/Thinkific are built for *paid* cohort courses, not free gamified self-serve learning, and none give you real control over a custom XP/streak/skill-radar system, which is your core differentiator. An open-source LMS (Moodle) is the opposite problem — heavy, dated UX, wrong aesthetic entirely for a "Duolingo of PM" positioning. Custom-built on the stack above is the right call given the gamification mechanics *are* the product.
@@ -170,15 +195,22 @@ Assume a small team (1 PM/founder — you — + 1–2 engineers + 1 designer, or
 
 ### Phase 0 — Foundation (Weeks 1–3)
 - Finalize content decisions from the audit doc (9 vs. 10 modules, bug fixes, Module 9 expansion kicked off in parallel).
-- Design system in Figma: typography, color, component library (buttons, cards, progress rings, quiz UI).
-- Technical scaffolding: repo, Next.js + Supabase setup, auth, CI/CD on Vercel.
-- Content parser built and run against all 90 lessons → seeded into dev DB.
+- Design system in Figma: typography, color, component library (buttons, cards, progress rings, quiz UI, search input, auth forms, waitlist form).
+- Technical scaffolding: repo, Next.js + Supabase setup, CI/CD on Vercel.
+- **Content parser and JSON generator** built and run against all lessons → static JSON output.
+- **Search index generation** (`search-index.json`) for client-side search.
+- **Authentication**: Email + Password and Google Login via Supabase Auth.
+- **Waitlist page** live, collecting name, email, and current career position.
+- **Google Analytics** integrated for page views and user flow.
+- **Resend SMTP** connected to Supabase for transactional emails.
+- **Deployment pipeline**: GitHub Actions → Markdown validation → JSON generation → Next.js build → Vercel deployment.
 
 ### Phase 1 — Core Learning Loop MVP (Weeks 4–8)
-- Lesson reading view (MDX rendering with all sections styled).
-- Quiz flow with instant feedback + explanations.
-- Basic progress tracking (lesson complete/incomplete, module unlock logic).
+- Lesson reading view (renders pre-generated static JSON content with all sections styled).
+- Quiz flow with instant feedback + explanations (quiz data from static JSON).
+- Basic progress tracking (lesson complete/incomplete, module unlock logic). Progress stored in Supabase.
 - Auth + user accounts.
+- Client-side search using the pre-built `search-index.json`.
 - **Goal at end of Phase 1: a real user can sign up, read Lesson 1, take the quiz, and see Lesson 2 unlock.** This is your first genuinely testable version — get 10–20 real career-switcher users on it before building anything else.
 
 ### Phase 2 — Gamification Layer (Weeks 9–13)
@@ -199,7 +231,7 @@ Assume a small team (1 PM/founder — you — + 1–2 engineers + 1 designer, or
 - Full content audit fixes applied (see companion doc) — run this in parallel starting Week 1, target completion by here.
 - SSR/SEO pass on lesson pages (public-facing lesson previews indexed by Google — huge free acquisition channel for a "what is product management" style query).
 - Accessibility pass (WCAG AA).
-- Closed beta with 100–200 real users, instrument everything with PostHog, fix drop-off points in the funnel (onboarding → Lesson 1 completion is the metric that matters most).
+- Closed beta with 100–200 real users, instrumented with Google Analytics, fix drop-off points in the funnel (onboarding → Lesson 1 completion is the metric that matters most).
 
 ### Phase 5 — Public Launch (Week 23+)
 - See §8 below for launch strategy specifics.
@@ -211,7 +243,7 @@ Assume a small team (1 PM/founder — you — + 1–2 engineers + 1 designer, or
 ## 8. Launch Strategy
 
 ### 8.1 Pre-launch (weeks before public launch)
-- Build an email waitlist landing page immediately (Week 1, independent of the build) — "90 lessons. Free forever. Get notified." Costs nothing, starts compounding immediately.
+- Build a waitlist landing page immediately (Week 1, independent of the build) — collects **name, email, and current career position** only. "90 lessons. Free forever. Get notified." Costs nothing, starts compounding immediately. Confirmation email via Resend SMTP.
 - Publish 3–5 individual lessons as free public blog-style pages *before* full launch (SEO head start + credibility proof — "here's actual sample content" beats any landing page copy).
 - Recruit the closed beta cohort (Phase 4) specifically from career-switcher communities (r/ProductManagement, Product School alumni Slack/Discord communities, PM-focused LinkedIn groups) — these are people who will give sharp, honest feedback and become your first advocates if the product delivers.
 
@@ -252,8 +284,9 @@ Avoid: ads (undermines the "b-school caliber" positioning), gating any of the 90
 
 ## 11. Immediate Next Steps (this week)
 
-1. Decide 9 vs. 10 modules (audit doc §3.3) — blocks the data model.
+1. Decide 9 vs. 10 modules (audit doc §3.3) — blocks the content schema.
 2. Approve the fixed-count content backlog (audit doc §6) and kick off the metadata-bug fixes + Module 9 expansion in parallel with build Phase 0.
 3. Commission or draft the Figma design system (§5) so engineering isn't blocked waiting on visual direction.
-4. Stand up the waitlist landing page (§8.1) — this can go live literally this week, independent of everything else, and starts compounding immediately.
-5. Write the content parser (§6.3) as the first real engineering task — it de-risks the entire content pipeline before any UI is built.
+4. Stand up the waitlist landing page (§8.1) collecting name, email, and career position — this can go live literally this week, independent of everything else, and starts compounding immediately.
+5. Build the content parser and JSON generator (§6.3) as the first real engineering task — it de-risks the entire content pipeline before any UI is built.
+6. Set up the deployment pipeline: GitHub Actions → Markdown validation → JSON generation → Vercel deployment.

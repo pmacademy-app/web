@@ -1,6 +1,7 @@
 # PM Academy — Design
 
 **Status:** Living document — single source of truth for visual design, UX patterns, and the marketing website's content/SEO strategy.
+**Platform:** Responsive web application — desktop-first experience with mobile responsiveness. Browser-based navigation (no native app patterns).
 **Companion docs:** `PRD.md` (what/why), `Architecture.md` (technical implementation), `Rules.md` (working standards), `Phases.md` (when).
 **Design system:** `Design-System-Sprint-1.md` is the Phase 0/Sprint 1 foundation for brand, tokens, responsive rules, component specifications, and frontend component architecture. Any UI implementation must follow that document before inventing new patterns.
 **Marketing website:** `Marketing-Website-Sprint-2.md` is the Figma-ready public website specification for sitemap, IA, sections, responsive layouts, motion, component mapping, and developer handoff.
@@ -25,14 +26,17 @@
 
 ## 2. Core Screens — Build/Design Order
 
-Design (and build) in this order — each screen unlocks meaningful user testing before the next:
+Design (and build) in this order — each screen unlocks meaningful user testing before the next. All screens must be fully responsive (desktop + mobile) with desktop as the primary design target:
 
-1. **Lesson reading view** — the single most-used screen in the product. Get this right before anything else. Must render all fixed MDX sections (`Architecture.md` §4) cleanly: theory prose, mental model diagram, case study, framework table.
+1. **Lesson reading view** — the single most-used screen in the product. Get this right before anything else. Content is rendered from pre-generated static JSON (see `Architecture.md` §4) — no runtime markdown parsing. Must render all content sections cleanly: theory prose, mental model diagram, case study, framework table.
 2. **Quiz flow** — question → immediate feedback → explanation → next. Feedback states (correct/incorrect) are part of the semantic color system (§1).
 3. **Dashboard** — progress ring, skill radar, streak, "continue where you left off." The skill radar must be the single most prominent element (per `PRD.md` §2's key IA decision) — do not let streak or XP visually dominate over it.
 4. **Module/curriculum map** — visual, not a bare list. A game-world-map metaphor works well for 9 modules (locked/unlocked states, prerequisite paths visible).
 5. **Flashcard review session** — card-flip interaction, SM-2-driven due-card queue.
 6. **Onboarding** — placement-style intro quiz (sets initial skill-radar baseline) + goal-setting ("why are you here") that tailors notification cadence and dashboard copy per `PRD.md` §4.1.
+7. **Authentication pages** — sign up, log in, password reset. Supports Email + Password and Google Login via Supabase Auth. Clean, minimal forms that reinforce the brand.
+8. **Waitlist page** — pre-launch landing page collecting name, email, and current career position. Must go live in Week 1 independent of all other work (see `PRD.md` §8).
+9. **Search experience** — client-side search powered by a build-time generated `search-index.json` (see `Architecture.md` §5). Fast, instant results as the user types. Should feel integrated into the curriculum navigation, not a separate "search page."
 
 ---
 
@@ -92,6 +96,9 @@ Build these as the first design-system components (Phase 0, `Phases.md`), matchi
 - Radar/spider chart component (for skill radar)
 - Streak flame indicator
 - Skill-cluster icon set (7 icons, one per competency cluster)
+- Search input with instant results dropdown
+- Authentication form components (email/password inputs, social login buttons)
+- Waitlist form component (name, email, career position fields)
 
 ---
 
@@ -126,7 +133,7 @@ pmacademy.com (marketing site — see Architecture.md §3 for hosting/deployment
 - **Curriculum page:** Publish the full module/lesson outline publicly, even pre-launch. This is both a credibility signal ("here's actual depth, not vague promises") and a strong SEO asset, since module/lesson titles map closely to real search queries.
 - **Sample lesson pages:** Publish 3–5 full lessons before full launch (per `PRD.md` §8's pre-launch requirement) — this gives an SEO head start and is more credible than landing-page copy alone ("here's actual sample content").
 - **About page:** Founder-voice narrative about the free-vs-paid gap — this directly feeds the LinkedIn launch channel (`PRD.md` §8.2), where founder-voice posts about *why* the product was built are a primary distribution lever.
-- **Waitlist page:** Minimal friction — email only, clear "90 lessons. Free forever." headline. This must be able to go live independent of all other engineering work (`Phases.md` Phase 0).
+- **Waitlist page:** Minimal friction — collects **name, email, and current career position** only. Clear "90 lessons. Free forever." headline. This must be able to go live independent of all other engineering work (`Phases.md` Phase 0). Stored in Supabase `waitlist` table, confirmation email sent via Resend SMTP.
 
 ### 6.3 SEO Strategy
 
@@ -137,8 +144,9 @@ pmacademy.com (marketing site — see Architecture.md §3 for hosting/deployment
 
 ### 6.4 Marketing Site — Technical & Cost Notes
 
-- Same ₹0 infra rule as the main app (`Architecture.md` §1) — host on Vercel's free tier (or Cloudflare Pages), independent of or folded into the main app's deployment per the decision documented in `Architecture.md` §3.
-- The waitlist form should post to a lightweight, free backend (a Supabase table is sufficient — no need for a separate email-marketing SaaS at launch scale; this can be reconsidered later without infra cost until volume genuinely demands a dedicated tool).
+- The marketing pages are part of the main Next.js application, deployed on Vercel (`Architecture.md` §1). One domain, one deploy, shared design system.
+- The waitlist form posts to a `waitlist` table in Supabase (see `Architecture.md` §2) — no separate email-marketing SaaS at launch scale; this can be reconsidered later without infra cost until volume genuinely demands a dedicated tool.
+- Transactional emails (waitlist confirmation, email verification, password reset, welcome) sent via Resend connected to Supabase through SMTP.
 
 ---
 
@@ -155,6 +163,7 @@ pmacademy.com (marketing site — see Architecture.md §3 for hosting/deployment
 
 ## Changelog
 
+- v2.0 — Updated for responsive web app (desktop-first + mobile). Added authentication pages, waitlist page, and search experience to core screens. Updated waitlist to collect name/email/career position. Added search, auth, and waitlist components to design system. Removed Cloudflare Pages references. Updated marketing site to Vercel-only hosting with Resend SMTP for transactional email.
 - v1.3 - Added `Content-Communication-System-Sprint-3.md` as the Sprint 3 content and communication system.
 - v1.2 - Added `Marketing-Website-Sprint-2.md` as the Sprint 2 public website design specification.
 - v1.1 — Added `Design-System-Sprint-1.md` as the authoritative Sprint 1 design foundation and component-system specification.

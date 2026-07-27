@@ -2,7 +2,7 @@
 
 **Status:** Living document — single source of truth for technical decisions.
 **Companion docs:** `PRD.md` (what/why), `Rules.md` (how we work), `Phases.md` (when), `Design.md` (what it looks like).
-**Read this before writing any code.** Every choice below is optimized for one constraint set: **solo-founder buildable, ₹0 infrastructure cost at launch, and capable of scaling later without a rewrite.**
+**Read this before writing any code.** Every choice below is optimized for one constraint set: **solo-founder buildable, low infrastructure cost, static-first architecture targeting ~5,000 users, and capable of scaling later without a rewrite.**
 
 ---
 
@@ -10,18 +10,19 @@
 
 | Layer | Choice | Why | Free-tier ceiling (what triggers a paid upgrade decision) |
 |---|---|---|---|
-| Frontend framework | **Next.js (React) + TypeScript**, App Router | SSR for SEO on lesson pages, huge ecosystem, one deploy target | N/A — framework itself is free forever |
+| Frontend framework | **Next.js (App Router) + TypeScript** | SSR for SEO on lesson pages, huge ecosystem, one deploy target | N/A — framework itself is free forever |
 | Styling | **Tailwind CSS + shadcn/ui** | Fast, consistent, no design-system build-from-scratch cost | N/A — open source |
-| Content authoring | **Markdown/MDX** — 90 source `lesson-NNN.md` files | Content is already structured; treat as a real pipeline, not hardcoded pages | N/A — files live in the repo |
-| Backend/API | **Next.js API routes** (or tRPC if type-safety across client/server becomes painful) | Don't over-engineer microservices for a 90-lesson MVP; one deployable unit | N/A — same hosting as frontend |
-| Database | **PostgreSQL via Supabase** | Relational fits perfectly (users, progress, XP events, quiz attempts, SRS state); Supabase bundles auth + row-level security | Supabase free tier: 500MB DB, 50k monthly active users on auth, 2 free projects, 1GB file storage. Upgrade trigger: DB size or MAU approaching these ceilings — monitor via Supabase dashboard, plan the paid-tier decision (~$25/mo Pro) as a *product-success problem*, not a launch blocker. |
-| Auth | **Supabase Auth** | Don't build auth yourself. Email + Google OAuth + LinkedIn OAuth | Same free tier as DB above |
-| Hosting (app) | **Vercel** (frontend + API routes) | Generous free tier (Hobby plan), automatic scaling, zero DevOps overhead, native Next.js integration | Vercel Hobby: 100GB bandwidth/month, serverless function execution limits. Upgrade trigger: bandwidth or function-invocation ceilings — again, a success problem, revisit at Phase 5+ traffic levels. |
-| Hosting (marketing site) | **Vercel** (separate project) or **Cloudflare Pages** | Kept as a *separate deployable* from the main app so it can ship in Week 1 independent of app architecture decisions | Free tier, same as above |
+| Content authoring | **Markdown** — 90 source lesson files, organized by topic | Content is the single source of truth; parsed and validated at build time into static JSON | N/A — files live in the repo |
+| Content delivery | **Pre-generated JSON** — built from Markdown at deploy time | No runtime markdown parsing; browser consumes static JSON assets served via Vercel Edge Network | N/A — static files served via CDN |
+| Backend/API | **Next.js API routes** (or tRPC if type-safety across client/server becomes painful) | Don't over-engineer microservices for a 90-lesson MVP; one deployable unit. API routes handle user-state mutations only | N/A — same hosting as frontend |
+| Database | **PostgreSQL via Supabase** | Stores **user state only**: auth, profiles, progress, XP events, quiz attempts, bookmarks, streaks, reflections, SRS state. **Never stores lesson content** — content lives in static JSON | Supabase free tier: 500MB DB, 50k monthly active users on auth, 2 free projects, 1GB file storage. Upgrade trigger: DB size or MAU approaching these ceilings — monitor via Supabase dashboard, plan the paid-tier decision (~$25/mo Pro) as a *product-success problem*, not a launch blocker. |
+| Auth | **Supabase Auth** | Don't build auth yourself. Supported: **Email + Password** and **Google Login** | Same free tier as DB above |
+| Hosting | **Vercel** (frontend + API routes + static JSON content) | Generous free tier (Hobby plan), automatic scaling, zero DevOps overhead, native Next.js integration. **Vercel Edge Network** provides built-in CDN for static asset delivery | Vercel Hobby: 100GB bandwidth/month, serverless function execution limits. Upgrade trigger: bandwidth or function-invocation ceilings — a success problem, revisit at Phase 5+ traffic levels. |
+| Search | **Client-side search** via build-time `search-index.json` | No server-side search infrastructure needed; fast, free, zero operational cost | N/A — static file + client-side library |
 | Spaced repetition | **SM-2 algorithm, implemented in-house** (~100 lines, well-documented, same core algorithm Anki uses) | No 3rd-party dependency, no cost, full control | N/A — it's your own code |
-| Analytics | **PostHog** (cloud free tier) | Product analytics + session replay + feature flags in one tool | PostHog free tier: 1M events/month. Upgrade trigger: event volume approaching this — a scale problem, not a launch concern. |
-| Email (transactional) | **Resend** | Streak reminders, weekly recap, re-engagement | Resend free tier: 3,000 emails/month, 100/day. Upgrade trigger: user base large enough to exceed daily send volume. |
-| Version control / CI-CD | **GitHub + GitHub Actions**, deploy via Vercel's native Git integration | Free for public or reasonably-sized private repos; CI/CD without extra infra | Free tier limits are generous for a solo project; unlikely to be a constraint pre-launch |
+| Analytics | **Google Analytics** | Page views, user flow, conversion tracking — sufficient for MVP-scale product analytics | Free for standard usage |
+| Email (transactional) | **Resend**, connected to Supabase via SMTP | Email verification, password reset, magic links, welcome emails, waitlist confirmation, streak reminders, weekly recaps | Resend free tier: 3,000 emails/month, 100/day. Upgrade trigger: user base large enough to exceed daily send volume. |
+| Version control / CI-CD | **GitHub + GitHub Actions**, deploy via Vercel's native Git integration | Free for public or reasonably-sized private repos; CI/CD handles markdown validation, JSON generation, and deployment | Free tier limits are generous for a solo project; unlikely to be a constraint pre-launch |
 | Design | **Figma** (free tier) | Component library, typography, color system | Free tier supports one active project sufficiently for a solo founder |
 
 **Rule for any future addition to this stack:** before adding any new service, confirm (a) it has a free tier sufficient for pre-launch and early-launch scale, (b) it doesn't duplicate a capability already covered above, and (c) removing it later (if it stops being free or the product outgrows it) wouldn't require a rewrite of core logic. Document the addition here immediately, including its free-tier ceiling and upgrade trigger, using the same table format.
@@ -32,6 +33,8 @@
 
 ## 2. Data Model
 
+The database stores **user state only** — authentication, profiles, progress, gamification, and social features. **Lesson content, quiz questions, and flashcards are never stored in the database** — they are served as pre-generated static JSON (see §4).
+
 Core tables (PostgreSQL via Supabase). This is not exhaustive — extend as features in `PRD.md` §4 require, but never restructure a table listed here without checking every feature in `PRD.md` that depends on it.
 
 ```sql
@@ -40,7 +43,7 @@ users (
   id                uuid primary key default gen_random_uuid(),
   email             text unique not null,
   name              text,
-  auth_provider     text not null,             -- 'email' | 'google' | 'linkedin'
+  auth_provider     text not null,             -- 'email' | 'google'
   timezone          text not null default 'UTC', -- captured at signup, used for streak day-boundary calc
   goal              text,                        -- 'job_search' | 'fill_gaps' | 'exploring' (from onboarding)
   current_streak    int not null default 0,
@@ -51,74 +54,34 @@ users (
   created_at        timestamptz not null default now()
 );
 
--- Curriculum structure
-modules (
-  id        uuid primary key default gen_random_uuid(),
-  order_index int not null unique,
-  title     text not null,
-  theme     text
-);
-
-lessons (
-  id                uuid primary key default gen_random_uuid(),
-  module_id         uuid not null references modules(id),
-  order_in_module   int not null,
-  slug              text unique not null,        -- used for public lesson-preview URLs
-  title             text not null,
-  difficulty        text,                        -- 'beginner' | 'intermediate' | 'advanced'
-  est_minutes       int not null,
-  content_mdx_ref   text not null,                -- path/ref to the parsed MDX body (see §4)
-  skill_clusters    text[] not null,              -- 1-2 of the 7 competency clusters, see PRD §3
-  is_public_preview boolean not null default false -- true for the 3-5 SEO/marketing sample lessons
-);
-
--- Progress
+-- Progress (references lessons by slug, not foreign key — content is static JSON)
 user_lesson_progress (
   user_id           uuid references users(id),
-  lesson_id         uuid references lessons(id),
+  lesson_slug       text not null,               -- matches the slug in the static JSON content
   status            text not null default 'not_started', -- 'not_started' | 'in_progress' | 'completed'
   theory_read_at    timestamptz,
   quiz_score        int,
   quiz_attempts     int not null default 0,
   xp_earned         int not null default 0,
   completed_at      timestamptz,
-  primary key (user_id, lesson_id)
+  primary key (user_id, lesson_slug)
 );
 
--- Quiz
-quiz_questions (
-  id                  uuid primary key default gen_random_uuid(),
-  lesson_id           uuid references lessons(id),
-  question_text       text not null,
-  options             jsonb not null,             -- array of option strings
-  correct_option      int not null,               -- index into options
-  explanation         text not null,
-  learning_objective  text,
-  difficulty          text
-);
-
+-- Quiz attempts (references questions by a stable content ID from static JSON)
 quiz_attempts (
   id                uuid primary key default gen_random_uuid(),
   user_id           uuid references users(id),
-  quiz_question_id  uuid references quiz_questions(id),
+  lesson_slug       text not null,
+  question_id       text not null,               -- stable ID from the static JSON quiz data
   selected_option   int not null,
   is_correct        boolean not null,
   attempted_at      timestamptz not null default now()
 );
 
--- Flashcards / spaced repetition
-flashcards (
-  id          uuid primary key default gen_random_uuid(),
-  lesson_id   uuid references lessons(id),
-  front       text not null,
-  back        text not null,
-  difficulty  text,
-  tags        text[]
-);
-
+-- Flashcard spaced repetition state (references flashcards by stable content ID)
 user_flashcard_srs (
   user_id       uuid references users(id),
-  flashcard_id  uuid references flashcards(id),
+  flashcard_id  text not null,                   -- stable ID from the static JSON flashcard data
   ease_factor   numeric not null default 2.5,   -- SM-2 state
   interval_days int not null default 0,
   repetitions   int not null default 0,
@@ -131,7 +94,7 @@ xp_events (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid references users(id),
   source_type text not null,      -- 'theory_read' | 'quiz_correct' | 'quiz_bonus' | 'flashcard' | 'reflection' | 'capstone' | 'streak'
-  source_id   uuid,                -- nullable ref to the lesson/quiz/capstone that triggered it
+  source_id   text,                -- nullable ref to the lesson slug or content ID that triggered it
   xp_amount   int not null,
   created_at  timestamptz not null default now()
 );
@@ -140,17 +103,26 @@ xp_events (
 reflections (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid references users(id),
-  lesson_id   uuid references lessons(id),
+  lesson_slug text not null,
   content     text not null,
   is_public   boolean not null default false,
   created_at  timestamptz not null default now()
+);
+
+-- Bookmarks
+bookmarks (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid references users(id),
+  lesson_slug text not null,
+  created_at  timestamptz not null default now(),
+  unique (user_id, lesson_slug)
 );
 
 -- Capstones
 capstone_submissions (
   id            uuid primary key default gen_random_uuid(),
   user_id       uuid references users(id),
-  module_id     uuid references modules(id),
+  module_slug   text not null,                   -- matches module slug in static JSON
   content       text not null,
   status        text not null default 'submitted', -- 'submitted' | 'reviewed' (future: expert review)
   is_public     boolean not null default false,      -- for portfolio export
@@ -185,12 +157,22 @@ cohort_members (
   joined_at   timestamptz not null default now(),
   primary key (cohort_id, user_id)
 );
+
+-- Waitlist (pre-launch)
+waitlist (
+  id                uuid primary key default gen_random_uuid(),
+  name              text not null,
+  email             text unique not null,
+  career_position   text not null,               -- current career position
+  created_at        timestamptz not null default now()
+);
 ```
 
 **Design notes:**
 - `xp_events` is the append-only source of truth for XP; `users.total_xp` and `users.level` are denormalized caches recomputed by a trigger or application-layer function whenever a new event is inserted. Never let application code increment `total_xp` directly without writing the corresponding `xp_events` row first — this preserves auditability and makes the anti-gaming rule (`PRD.md` §4.6) verifiable after the fact.
-- Row-Level Security (RLS) must be enabled on every user-owned table (`user_lesson_progress`, `quiz_attempts`, `user_flashcard_srs`, `xp_events`, `reflections`, `capstone_submissions`, `user_badges`, `cohort_members`). Policy: a user can only read/write rows where `user_id = auth.uid()`, except for explicitly `is_public` rows (reflections, capstones) which are readable by anyone for the portfolio-export feature.
-- `lessons.is_public_preview` flags the 3–5 lessons published pre-launch for SEO/credibility (`PRD.md` §8). These render via a public route with no auth required.
+- Row-Level Security (RLS) must be enabled on every user-owned table (`user_lesson_progress`, `quiz_attempts`, `user_flashcard_srs`, `xp_events`, `reflections`, `bookmarks`, `capstone_submissions`, `user_badges`, `cohort_members`). Policy: a user can only read/write rows where `user_id = auth.uid()`, except for explicitly `is_public` rows (reflections, capstones) which are readable by anyone for the portfolio-export feature.
+- User-state tables reference content by **slug** (a stable string identifier from the static JSON), not by foreign-key UUID. This decouples user state from content — content can be rebuilt from Markdown without affecting user progress data.
+- The `waitlist` table collects name, email, and current career position during the pre-launch phase.
 
 ---
 
@@ -199,48 +181,75 @@ cohort_members (
 ```
 pm-academy/
 ├── apps/
-│   ├── web/                        # Main Next.js app (the product)
-│   │   ├── app/                    # App Router
-│   │   │   ├── (marketing)/        # Public routes: landing, sample lessons, waitlist
-│   │   │   ├── (auth)/             # Sign up / log in / onboarding
-│   │   │   ├── (app)/              # Authenticated product routes
-│   │   │   │   ├── dashboard/
-│   │   │   │   ├── curriculum/
-│   │   │   │   │   └── [moduleSlug]/[lessonSlug]/
-│   │   │   │   ├── review/
-│   │   │   │   ├── progress/
-│   │   │   │   ├── leaderboard/
-│   │   │   │   └── settings/
-│   │   │   └── api/                # API routes (server-side logic)
-│   │   ├── components/             # Shared React components (ui/, lesson/, quiz/, dashboard/, etc.)
-│   │   ├── lib/                    # Business logic: xp.ts, srs.ts (SM-2), streaks.ts, skillRadar.ts
-│   │   ├── content/                # 90 source lesson-NNN.md files (canonical content, see §4)
-│   │   ├── scripts/                # Content parser, migration/seed scripts (see §4)
-│   │   ├── styles/                 # Tailwind config, design tokens
-│   │   └── public/                 # Static assets
-│   └── marketing-site/             # OPTIONAL separate deployable if kept fully independent of the app
-│       └── ... (only if you decide not to fold marketing into apps/web's (marketing) group — see Design.md §6 for the decision)
+│   └── web/                        # Main Next.js app (the product + marketing pages)
+│       ├── app/                    # App Router
+│       │   ├── (marketing)/        # Public routes: landing, sample lessons, waitlist
+│       │   ├── (auth)/             # Sign up / log in / password reset
+│       │   ├── (app)/              # Authenticated product routes
+│       │   │   ├── dashboard/
+│       │   │   ├── curriculum/
+│       │   │   │   └── [moduleSlug]/[lessonSlug]/
+│       │   │   ├── review/
+│       │   │   ├── progress/
+│       │   │   ├── leaderboard/
+│       │   │   └── settings/
+│       │   └── api/                # API routes (user-state mutations only)
+│       ├── components/             # Shared React components (ui/, lesson/, quiz/, dashboard/, etc.)
+│       ├── lib/                    # Business logic: xp.ts, srs.ts (SM-2), streaks.ts, skillRadar.ts
+│       ├── styles/                 # Tailwind config, design tokens
+│       └── public/                 # Static assets + generated JSON content
+│           └── content/            # Build-generated JSON files (lessons, quizzes, flashcards)
+│               └── search-index.json
+├── content/                        # Source Markdown files (single source of truth)
+│   ├── roadmap/
+│   ├── interview/
+│   ├── resume/
+│   └── .../                        # Additional topic directories
+├── scripts/                        # Build-time scripts
+│   ├── parse-content.ts            # Markdown parser → structured JSON
+│   ├── validate-content.ts         # Content validation (schema, cross-refs)
+│   └── generate-search-index.ts    # Generates search-index.json
 ├── supabase/
-│   ├── migrations/                 # SQL migration files (schema in §2 lives here, versioned)
-│   └── seed.sql                    # Generated from the content parser output, re-runnable
+│   └── migrations/                 # SQL migration files (user-state schema in §2)
 ├── docs/                           # This document set: PRD.md, Architecture.md, Rules.md, Phases.md, Design.md
-└── .github/workflows/              # CI/CD (lint, type-check, test, deploy)
+└── .github/workflows/              # CI/CD: lint, type-check, test, markdown validation, JSON generation, deploy
 ```
 
-**Decision:** default to keeping the marketing site as the `(marketing)` route group inside `apps/web` for simplicity (one deploy, one domain, shared design system) **unless** the waitlist page needs to ship in Week 1 before the main app's Next.js scaffolding exists — in that case, stand up `apps/marketing-site` as a minimal standalone Next.js (or even static HTML) deploy first, and fold its routes into `apps/web` once the main app is scaffolded. Document whichever path is taken in `Phases.md` Phase 0.
+**Key structural decisions:**
+- The marketing site is folded into the main Next.js app as the `(marketing)` route group — one deploy, one domain, shared design system.
+- Source Markdown lives at the repo root in `/content`, separate from the Next.js app. Build scripts process it into static JSON placed in `public/content/` for CDN delivery.
+- There is no `supabase/seed.sql` — content is never seeded into the database. The database contains only migration files for user-state tables.
 
 ---
 
-## 4. Content Pipeline (source Markdown → structured app data)
+## 4. Content Pipeline (Markdown → static JSON, build-time only)
 
-The 90 lesson Markdown files are the **canonical source of truth**. The database is a **rebuildable cache**. Never hand-edit lesson content in the database.
+The Markdown files in `/content` are the **single source of truth**. Content is parsed, validated, and converted to static JSON at build time. **There is no runtime markdown parsing.** The browser consumes pre-generated JSON.
 
-**Fixed section schema per `lesson-NNN.md`** (confirmed consistent across all 90 files by the content audit):
+**Content flow:**
+
+```
+Markdown files (/content)
+       ↓
+  Parser (scripts/parse-content.ts)
+       ↓
+  Validation (scripts/validate-content.ts)
+       ↓
+  JSON Generation (structured lesson/quiz/flashcard JSON)
+       ↓
+  Search Index Generation (scripts/generate-search-index.ts → search-index.json)
+       ↓
+  Static Assets (placed in public/content/)
+       ↓
+  Vercel Deployment (served via Vercel Edge Network CDN)
+```
+
+**Fixed section schema per lesson Markdown file** (confirmed consistent across all lessons by the content audit):
 
 ```
 {
-  meta,                    // title, module, order, difficulty, est_minutes, skill_clusters[]
-  theory_mdx,              // main prose body, MDX-compatible
+  meta,                    // slug, title, module, order, difficulty, est_minutes, skill_clusters[]
+  theory,                  // main prose body
   mistakes,                // common-mistakes section
   mental_model,            // diagram/framework description
   case_study,
@@ -251,22 +260,32 @@ The 90 lesson Markdown files are the **canonical source of truth**. The database
   cheat_sheet,
   glossary[],
   resources[],
-  flashcards[],            // { front, back, difficulty, tags[] }
+  flashcards[],            // { id, front, back, difficulty, tags[] }
   reflection,              // prompt text
-  quiz[],                  // { question_text, options[], correct_option, explanation, learning_objective, difficulty }
+  quiz[],                  // { id, question_text, options[], correct_option, explanation, learning_objective, difficulty }
   connections[]            // cross-references to other lessons
 }
 ```
 
-**Pipeline steps:**
-1. A parser script (`scripts/parse-content.ts` or `.py`) walks every `content/lesson-NNN.md`, extracts each fixed section via the header structure above, and outputs structured JSON per lesson.
-2. This JSON is the seed data for `lessons`, `quiz_questions`, `flashcards` (and their fields) — a migration/seed script (`supabase/seed.sql`, generated from the JSON) populates the database.
-3. **This script must be re-runnable and idempotent** — re-running it after editing a source MD file should update the corresponding DB rows without duplicating them (use `slug` or a stable lesson ID as the upsert key), so content edits never require manual DB surgery.
-4. Because the content structure is this disciplined, this entire pipeline is automatable instead of requiring manual data entry for 90 lessons — build this parser as the **first real engineering task**, before any UI, to de-risk the content pipeline early (see `Phases.md` Phase 0).
+**Pipeline rules:**
+1. Every content item (quiz question, flashcard) must have a **stable `id`** field generated deterministically from its content or position — this is the key that user-state tables reference (see §2).
+2. The parser script must be **re-runnable and idempotent** — re-running after editing a source Markdown file regenerates the corresponding JSON without breaking user-state references (stable IDs preserve the link).
+3. The validation script enforces the schema above — a missing required field (e.g., a quiz question without an explanation) fails the build. This is the quality gate for content.
+4. Build this pipeline as the **first real engineering task**, before any UI, to de-risk the content pipeline early (see `Phases.md` Phase 0).
 
 ---
 
-## 5. Key Business Logic Modules
+## 5. Search Architecture
+
+Search is implemented entirely at build time and runs client-side. No server-side search infrastructure.
+
+- **Build time:** `scripts/generate-search-index.ts` processes all lesson JSON and produces a `search-index.json` file containing searchable fields (title, summary, key takeaways, glossary terms, module name).
+- **Client side:** A lightweight client-side search library (e.g., Fuse.js or Lunr.js) loads the search index and provides instant, offline-capable search results.
+- **No Algolia, Elasticsearch, or server-side search** — these add operational complexity and cost with no benefit at ~5,000-user scale.
+
+---
+
+## 6. Key Business Logic Modules
 
 Implement these as isolated, well-tested modules in `lib/` — each should be independently unit-testable without spinning up the full app.
 
@@ -277,38 +296,68 @@ Implement these as isolated, well-tested modules in `lib/` — each should be in
 | `lib/streaks.ts` | Daily streak increment/reset, freeze application | Compute "day" boundaries using the user's stored `timezone`, not server UTC midnight, or streaks will feel broken to users outside the server's timezone |
 | `lib/skillRadar.ts` | Aggregates lesson/quiz/capstone performance into the 7-cluster radar score | Lock in the exact scoring formula here once decided (see `PRD.md` §11 open decision) and treat this file as the single implementation of that formula — never duplicate the calculation elsewhere |
 | `lib/badges.ts` | Evaluates badge-earning conditions after relevant events | Keep the badge list and its trigger conditions in one place, matching `PRD.md` §4.9 exactly |
+| `lib/search.ts` | Client-side search against the pre-built search index | Load `search-index.json` once, provide instant results — no network round-trips for search queries |
 
 ---
 
-## 6. API Design Principles
+## 7. API Design Principles
 
-- Use Next.js API routes (or route handlers under `app/api/`) for all server-side mutations (progress updates, XP events, flashcard reviews, capstone submissions).
+- **Content reads are static** — lessons, quizzes, flashcards, and the search index are served as pre-generated JSON from the CDN. No API route is needed to fetch content.
+- Use Next.js API routes (or route handlers under `app/api/`) for all **user-state mutations** (progress updates, XP events, flashcard reviews, capstone submissions, bookmarks).
 - Every mutation endpoint must re-derive authorization from the authenticated session (via Supabase Auth) — never trust a `user_id` passed in the request body.
-- Prefer server components + direct Supabase queries (with RLS enforced) for reads where possible, reserving API routes for writes and for logic that needs server-only secrets (e.g., email-sending via Resend).
+- Prefer server components + direct Supabase queries (with RLS enforced) for user-state reads where possible, reserving API routes for writes and for logic that needs server-only secrets (e.g., email-sending via Resend SMTP).
 - Keep endpoints resource-oriented and small; avoid a single monolithic "app logic" endpoint. This keeps the codebase navigable for a solo founder or any future contributor picking it up cold.
 
 ---
 
-## 7. Security & Privacy
+## 8. Deployment Pipeline
+
+All deployments flow through a single automated pipeline:
+
+```
+GitHub (push to main or PR)
+       ↓
+GitHub Actions
+       ↓
+  ┌─ Markdown Validation (schema check, cross-ref check)
+  ├─ JSON Generation (parse-content.ts)
+  ├─ Search Index Generation (generate-search-index.ts)
+  ├─ Lint + Type Check + Unit Tests
+  └─ Next.js Build
+       ↓
+Vercel Deployment (automatic via Git integration)
+```
+
+**Key rules:**
+- If markdown validation fails, the build fails — broken content never reaches production.
+- JSON generation runs before `next build` so that static JSON is available for Next.js to include in the build output.
+- Vercel preview deployments on every PR provide a free, zero-config staging environment.
+- Never commit secrets. Use environment variables (`.env.local`, never committed) for all API keys (Supabase, Resend, Google Analytics). Document required env vars in a checked-in `.env.example`.
+
+---
+
+## 9. Security & Privacy
 
 - Supabase Row-Level Security enabled on every user-owned table (§2).
 - Auth via Supabase Auth — never implement custom password hashing/session logic.
 - Public/portfolio-export routes must only ever expose rows explicitly marked `is_public = true` — double-check this at the query layer, not just the UI layer.
-- No third-party analytics or email tooling should receive PII beyond what's operationally necessary (e.g., email address for Resend sends, anonymized/aliased IDs for PostHog where feasible).
+- Google Analytics should be configured to anonymize IP addresses and comply with privacy regulations. No PII beyond what's operationally necessary should be sent to third-party services.
+- Resend SMTP receives only the email address required for transactional sends — no additional user data.
 
 ---
 
-## 8. Scaling Path (post-launch, only when traffic actually demands it)
+## 10. Scaling Path (post-launch, only when traffic actually demands it)
 
-This stack is chosen specifically so that scaling is a **later, success-driven decision**, not a launch blocker:
+This stack is chosen specifically so that scaling is a **later, success-driven decision**, not a launch blocker. The static-first architecture means most traffic is served from CDN edge nodes with zero server load.
 
 - **Supabase free → Pro ($25/mo):** triggered by DB size or MAU approaching free-tier ceilings (§1). No migration needed — same Postgres instance, just a plan upgrade.
 - **Vercel Hobby → Pro:** triggered by bandwidth/function-invocation ceilings. Same deployment model, no re-architecture.
-- **Read replicas / caching (e.g., edge caching of public lesson pages):** only consider once organic SEO traffic (a stated goal, `PRD.md` §9) is large enough to matter — Next.js's built-in static/ISR rendering for public lesson pages should absorb significant scale before this is needed.
+- **Static content at the edge:** since all lesson content is pre-generated JSON served via Vercel Edge Network, content delivery scales essentially for free. The ~5,000-user MVP target is well within free-tier CDN limits.
 - **Splitting the monolith (API routes → dedicated service):** explicitly deferred. Do not preemptively introduce microservices for a 90-lesson product — this is a documented rejection (see §1's "why not a no-code tool" reasoning extends to "why not microservices" for the same solo-maintainability reason).
 
 ---
 
 ## Changelog
 
+- v2.0 — Architecture rewritten for static-first, Markdown-to-JSON build pipeline. Removed database-backed content tables (modules, lessons, quiz_questions, flashcards) — content is now pre-generated static JSON. User-state tables reference content by slug. Added search architecture (client-side, build-time index). Added deployment pipeline (GitHub Actions). Replaced PostHog with Google Analytics. Replaced LinkedIn OAuth with Email + Password and Google Login. Removed Cloudflare Pages. Added Resend SMTP integration. Added waitlist and bookmarks tables. Target: ~5,000-user MVP.
 - v1.0 — Initial architecture authored from the "PM Academy — 0→1 Roadmap & Project Plan" source document, with the data model, folder structure, and content-pipeline detail expanded for direct implementation use.
