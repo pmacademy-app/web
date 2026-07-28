@@ -1,7 +1,7 @@
 # PM Academy — Project Memory (MEMORY.md)
 
 **Last Updated:** 2026-07-28  
-**Project Stage:** Sprint 2 Complete / Entering Sprint 3  
+**Project Stage:** Sprint 3 Complete / Entering Sprint 4  
 **OS Version:** Windows  
 **Framework:** Next.js 16 (App Router) + TypeScript 5 (Strict) + Tailwind CSS v4 + Supabase
 
@@ -42,7 +42,17 @@ Audit scored **88/100** with 7 issues (2 high, 3 medium, 2 low). All high and me
 
 ---
 
-## 4. Directory Layout
+## 4. Sprint 3 Completion & Refactoring Alignment Pass (2026-07-28)
+
+Completed Sprint 3 features and executed a clean architecture alignment and isolation pass:
+- **Canonical XP Service**: Consolidated all XP awards into `apps/web/lib/xp-service.ts` to log events in the append-only `xp_events` ledger.
+- **Lesson Completion Service**: Consolidated lesson completion state updates, score caching, and sequential unlock checks into `apps/web/lib/lessons-completion-service.ts`. Restricted the progress PATCH API to allow `'in_progress'` updates only.
+- **Flashcard SRS Service**: Extracted SM-2 calculation orchestration, due-card querying, and review logs persistence into `apps/web/lib/flashcards-service.ts`.
+- **Quality Gates**: All production builds compile cleanly, and ESLint/TypeScript checks pass with zero warnings or errors.
+
+---
+
+## 5. Directory Layout
 
 The workspace is organized as follows:
 ```
@@ -68,8 +78,15 @@ pm-academy/
 │   │   ├── animation.ts        # Centralised Framer Motion timings and transition variants
 │   │   ├── auth.ts             # Profile synchronization and session helpers
 │   │   ├── email.ts            # Resend transaction templates and sending functions
+│   │   ├── flashcards-service.ts # Decoupled flashcard SRS database transaction coordinator
+│   │   ├── lessons-completion-service.ts # Lesson unlock and completion verification service
+│   │   ├── lessons-db.ts       # Lesson database operations (theory reads, quiz grading, reflections)
 │   │   ├── skillRadar.ts       # Skill radar scoring logic and cluster definitions
+│   │   ├── srs.ts              # Pure SM-2 spaced repetition calculation math
+│   │   ├── streaks-db.ts       # Timezone-aware streak updates and daily XP awards
+│   │   ├── streaks.ts          # Pure timezone-aware streak calculator engine
 │   │   ├── supabase.ts         # Server/Browser Supabase client factories
+│   │   ├── xp-service.ts       # Canonical service for appending to the xp_events ledger
 │   │   ├── xp.ts               # XP constants, level titles, getLevelTitle()
 │   │   ├── utils.ts            # Tailwind CSS class merging helper (cn)
 │   │   └── design/
@@ -88,7 +105,7 @@ pm-academy/
 
 ---
 
-## 5. Technical Invariants & Rules
+## 6. Technical Invariants & Rules
 
 Every developer (or AI agent) working on this repository must adhere to the following laws:
 
@@ -104,7 +121,7 @@ Every developer (or AI agent) working on this repository must adhere to the foll
 
 ---
 
-## 6. DB Schema & User State Quick Reference
+## 7. DB Schema & User State Quick Reference
 
 - **`users`:** Core account, streak tracking, cached `total_xp`, and `level`.
 - **`user_lesson_progress`:** Tracks lesson completion status, quiz score, attempts, and XP earned per lesson slug.
@@ -116,7 +133,7 @@ Every developer (or AI agent) working on this repository must adhere to the foll
 
 ---
 
-## 7. Antigravity AI Skill System
+## 8. Antigravity AI Skill System
 
 Workspace rules and specialized assistant guides are housed in `.agents/`. Under normal workflow, the appropriate skills should be consulted:
 - `00-pm-academy-core` — Loads full architecture, stack rules, and invariants. **Load in every session.**
@@ -128,7 +145,7 @@ Workspace rules and specialized assistant guides are housed in `.agents/`. Under
 
 ---
 
-## 8. Next.js 16 Warnings
+## 9. Next.js 16 Warnings
 
 The project runs on Next.js 16 (currently `16.2.12`) and React 19.
 - App Router layout configurations use standard patterns but double-check API signatures against `node_modules/next/dist/docs/` when working on route optimization or runtime rendering context.

@@ -47,7 +47,7 @@ Before writing a single line of code or making a single product decision:
 - **Database:** `snake_case` for all table and column names (already reflected in `Architecture.md` §2 — keep any new tables/columns consistent with this).
 - **TypeScript types/interfaces:** `PascalCase` (`UserProgress`, `QuizAttempt`). Prefer `type` over `interface` unless declaration merging is specifically needed.
 - **API routes:** REST-ish, resource-oriented paths (`/api/lessons/[slug]/progress`, not `/api/updateLessonProgress`).
-- **Business logic modules:** match the responsibilities defined in `Architecture.md` §5 exactly (`lib/xp.ts`, `lib/srs.ts`, `lib/streaks.ts`, `lib/skillRadar.ts`, `lib/badges.ts`) — do not scatter this logic across components.
+- **Business logic modules:** match the responsibilities defined in `Architecture.md` §6 exactly (`lib/srs.ts`, `lib/streaks.ts`, `lib/skillRadar.ts`, `lib/xp.ts`, and isolated services: `lessons-db.ts`, `streaks-db.ts`, `xp-service.ts`, `lessons-completion-service.ts`, `flashcards-service.ts`) — do not scatter this logic across components.
 
 ### 3.3 Component Structure
 - Prefer **server components by default**; use client components (`"use client"`) only where interactivity genuinely requires it (quiz answer selection, flashcard flip, streak animations).
@@ -128,6 +128,7 @@ Since this project explicitly expects to be built or continued with AI coding as
 
 ## Changelog
 
+- v2.2 — Updated §3.2 naming conventions to register the newly isolated domain service layers (xp-service.ts, lessons-completion-service.ts, flashcards-service.ts) and database helper files.
 - v2.1 — Lean-documentation pass: amended §6.4 to explicitly balance "don't reopen settled decisions casually" with "these decisions aren't permanent — revisit with a real reason," per the project's "current decision unless justified" philosophy (`PRD.md` intro). No change to companion doc count — this doc already correctly scoped to the 5 canonical docs, unaffected by archiving the 3 sprint docs and original roadmap.
 - v2.0 — Updated for static-first architecture: added rules for Markdown as source of truth, no content in database, build-time JSON generation, Supabase for user state only, Google Analytics (replaced PostHog), Resend SMTP, Vercel deployment pipeline. Expanded content authoring rules for the automated build pipeline.
 - v1.0 — Initial rules authored to formalize engineering philosophy, coding standards, and change-management process for a solo-founder, AI-assisted build of PM Academy.

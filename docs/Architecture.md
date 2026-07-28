@@ -198,7 +198,7 @@ pm-academy/
 │       │   │   └── settings/
 │       │   └── api/                # API routes (user-state mutations only)
 │       ├── components/             # Shared React components (ui/, lesson/, quiz/, dashboard/, etc.)
-│       ├── lib/                    # Business logic: xp.ts, srs.ts (SM-2), streaks.ts, skillRadar.ts
+│       ├── lib/                    # Business logic: srs.ts (SM-2), streaks.ts, skillRadar.ts, xp.ts, and isolated services (lessons-db.ts, streaks-db.ts, xp-service.ts, lessons-completion-service.ts, flashcards-service.ts)
 │       ├── styles/                 # Tailwind config, design tokens
 │       └── public/                 # Static assets + generated JSON content
 │           └── content/            # Build-generated JSON files (lessons, quizzes, flashcards)
@@ -296,7 +296,12 @@ Implement these as isolated, well-tested modules in `lib/` — each should be in
 
 | Module | Responsibility | Key rule to preserve |
 |---|---|---|
-| `lib/xp.ts` | Computes and records XP events, updates denormalized `total_xp`/`level` | Never award Theory-read XP without verifying scroll-depth + minimum active-time server-side (client-reported dwell time alone is spoofable — verify with periodic heartbeat pings or scroll-position events sent to the API, not a single client-side timer) |
+| `lib/xp.ts` | Engagement check verification and XP constants | Verifies reading dwell time and scroll depth thresholds; defines all gamification XP values |
+| `lib/xp-service.ts` | Canonical XP Service | Serves as the single system responsible for appending rows to `xp_events` ledger |
+| `lib/lessons-completion-service.ts` | Lesson Completion Service | Coordinates lesson completion state transitions, score caching, and sequential unlock checks |
+| `lib/flashcards-service.ts` | Flashcard SRS Service | Coordinates spaced repetition card reviews, SM-2 updates, and database updates |
+| `lib/lessons-db.ts` | Lesson database operations | Handles data transitions for theory reads, quiz attempts, and reflections |
+| `lib/streaks-db.ts` | Streaks database updates | Computes and updates streaks timezone-correctly in the database |
 | `lib/srs.ts` | SM-2 spaced-repetition scheduling | Keep the algorithm self-contained and unit-tested against known SM-2 reference outputs; do not couple it to UI code |
 | `lib/streaks.ts` | Daily streak increment/reset, freeze application | Compute "day" boundaries using the user's stored `timezone`, not server UTC midnight, or streaks will feel broken to users outside the server's timezone |
 | `lib/skillRadar.ts` | Aggregates lesson/quiz/capstone performance into the 7-cluster radar score | Lock in the exact scoring formula here once decided (see `PRD.md` §11 open decision) and treat this file as the single implementation of that formula — never duplicate the calculation elsewhere |
@@ -376,6 +381,7 @@ This stack is chosen specifically so that scaling is a **later, success-driven d
 
 ## Changelog
 
+- v2.4 — Updated §3 and §6 to register the newly isolated domain service layers (xp-service.ts, lessons-completion-service.ts, flashcards-service.ts) and clean feature database helpers (lessons-db.ts, streaks-db.ts).
 - v2.3 — Reconciled §8 with the real, separately-built database migration workflow: split the "single pipeline" into an app pipeline and a database pipeline, cross-referenced the new `Supabase-Migration-Guide.md`, and corrected search-index generation to only run from Phase 4 onward (was incorrectly shown as universal, contradicting the Phase 1→4 move already made in `Phases.md`).
 - v2.2 — Lean-documentation pass: added explicit scalability trigger for client-side search (revisit past ~300 lessons or ~2MB gzipped index) so the tradeoff has a concrete decision point rather than being implicit.
 - v2.1 — Documentation review pass: added missing `(portfolio)` public route group for the unauthenticated portfolio/certificate export feature (`PRD.md` §4.11), which had no route in the folder structure despite being a required v1 feature.
