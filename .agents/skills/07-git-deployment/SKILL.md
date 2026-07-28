@@ -28,7 +28,7 @@ main                    # production branch — always deployable
 **Rules:**
 - `main` is protected — no direct pushes. All changes via PR.
 - Feature branches are short-lived — merge within days, not weeks.
-- Rebase onto `main` before merging (not merge commits into feature branches).
+- Rebase onto `main` before merging (no merge commits into feature branches).
 - Delete branches after merging.
 
 ---
@@ -78,15 +78,15 @@ test: add unit tests for streak freeze application logic
 ## 3. PR Workflow
 
 1. Create branch from `main`: `git checkout -b feature/xp-system main`
-2. Build the feature with small, focused commits
-3. Push and create a PR against `main`
-4. **Vercel preview deployment** is automatic — use it to verify the feature visually before merge
-5. CI must pass: lint → type-check → content validation → build
-6. Self-review the diff before merging — treat the PR as a document for future-you
-7. Squash-merge or rebase-merge into `main` (no merge commits)
-8. Delete the feature branch
+2. Build the feature with small, focused commits.
+3. Push and create a PR against `main`.
+4. **Vercel preview deployment** is automatic — use it to verify the feature visually before merge.
+5. CI must pass: lint → type-check → content validation → build.
+6. Self-review the diff before merging — treat the PR as a document for future-you.
+7. Squash-merge or rebase-merge into `main` (no merge commits).
+8. Delete the feature branch.
 
-### PR description template
+### PR Description Template
 ```markdown
 ## What changed
 [1-2 sentence summary of what this PR does]
@@ -117,48 +117,36 @@ Current pipeline: `.github/workflows/ci.yml`
 # 1. Install dependencies (npm ci)
 # 2. npm run content:build (parse + validate + search index)
 # 3. npm run lint (ESLint)
-# 4. npm run build (next build — includes content:build via package.json)
+# 4. npx tsc --noEmit (strict typecheck)
+# 5. npm test (unit tests)
+# 6. npm run build (next build — includes content:build via package.json)
 ```
 
-### CI must-pass rules
+### CI Must-Pass Rules
 - Content validation failing = build fails. Broken content never reaches production.
 - ESLint errors = build fails. No exceptions.
-- TypeScript errors = build fails (Next.js build catches these).
-
-### Recommended CI additions (when ready)
-```yaml
-# Add after lint step:
-- name: Type check (strict)
-  run: npx tsc --noEmit
-
-# Add after type check:
-- name: Unit tests
-  run: npm test
-
-# Add for accessibility auditing (Phase 4):
-- name: Accessibility check
-  run: npx @axe-core/cli http://localhost:3000/lessons/lesson-001
-```
+- TypeScript errors = build fails (strict type checking is mandatory).
+- Any unit test failure = build fails.
 
 ---
 
 ## 5. Vercel Deployment
 
 **Configuration:**
-- Hosting: Vercel Hobby plan
-- Auto-deploy: on merge to `main`
-- Preview deployments: on every PR (free, zero config)
-- Build command: `npm run build` (set in Vercel dashboard or `vercel.json`)
-- Install command: `npm ci`
-- Root directory: `apps/web`
+- Hosting: Vercel Hobby plan (upgrade to Pro when bandwidth/invocation ceiling hit).
+- Auto-deploy: on merge to `main`.
+- Preview deployments: on every PR (free, zero config).
+- Build command: `npm run build` (set in Vercel dashboard or `vercel.json`).
+- Install command: `npm ci`.
+- Root directory: `apps/web`.
 
 **Never** deploy manually by running `vercel --prod` — all deployments go through the GitHub → Vercel integration.
 
-### Vercel environment variables
+### Vercel Environment Variables
 Set in Vercel dashboard under Settings → Environment Variables:
 - `NEXT_PUBLIC_SUPABASE_URL` — all environments
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — all environments
-- `SUPABASE_SERVICE_ROLE_KEY` — production + preview only (not development)
+- `SUPABASE_SERVICE_ROLE_KEY` — production + preview only (server-only, NEVER expose to browser)
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID` — production only
 - `RESEND_API_KEY` — production + preview only
 
@@ -166,7 +154,7 @@ Set in Vercel dashboard under Settings → Environment Variables:
 
 ## 6. Environment Variable Management
 
-### Local development
+### Local Development
 ```bash
 # apps/web/.env.local (NOT committed — in .gitignore)
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -176,7 +164,7 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 RESEND_API_KEY=re_xxxxxxxx                   # NEVER expose to browser
 ```
 
-### Documented template (committed)
+### Documented Template (committed)
 ```bash
 # apps/web/.env.example (committed — safe to share)
 NEXT_PUBLIC_SUPABASE_URL=
@@ -187,85 +175,89 @@ RESEND_API_KEY=              # Server-only. NEVER expose to browser.
 ```
 
 ### Rules
-- `.env.local` is in `.gitignore` — NEVER commit it
-- `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` start with NO `NEXT_PUBLIC_` prefix — they are server-only
-- If you accidentally commit a secret: rotate it IMMEDIATELY in Supabase/Resend dashboards, then remove from git history
+- `.env.local` is in `.gitignore` — NEVER commit it.
+- `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` start with NO `NEXT_PUBLIC_` prefix — they are server-only.
+- If you accidentally commit a secret: rotate it IMMEDIATELY in Supabase/Resend dashboards, then remove from git history.
 
 ---
 
-## 7. Supabase Migrations in CI
+## 7. Supabase Migrations in CI & Local Workflow
 
-Database migrations are NOT run by CI automatically — they're applied manually via the Supabase dashboard or CLI:
+Database migrations are the source of truth for the database schema.
 
-```bash
-# Apply a migration manually (when needed)
-# supabase db push  (if using Supabase CLI — not currently set up)
-# OR: copy SQL from migrations/ and run in Supabase SQL editor
-```
+### Naming Convention
+Every migration MUST use a timestamped format.
+- Format: `YYYYMMDDHHMMSS_description.sql` (e.g., `20260728160000_create_users_table.sql`)
+- Location: `apps/web/supabase/migrations/` (or repository root `supabase/migrations/` as per repository scaffolding)
+- Never use sequential numbering (`001_`, `002_`) as it leads to merge conflicts in branches.
 
-Migration files are version-controlled in `apps/web/supabase/migrations/` as documentation and audit trail, even if applied manually.
+### Database Change Workflow
+1. Write database schema SQL in a timestamped migration file.
+2. Run migration locally using the Supabase CLI (if configured) or apply the SQL to your local/development database via the SQL Editor.
+3. Commit the migration file.
+4. **Never modify an already applied migration.** If changes are needed, write a new timestamped migration file.
 
 ---
 
-## 8. Release Readiness Checklist
+## 8. Hotfix Procedure
+
+If a critical bug reaches production:
+
+### Code/Content Hotfix
+1. Create a hotfix branch from `main`: `git checkout -b fix/critical-bug main`
+2. Make the minimal fix (do not add features in a hotfix).
+3. Test locally (`npm run dev` and `npm test`).
+4. Push and create a PR.
+5. CI must pass.
+6. Merge immediately — Vercel auto-deploys.
+7. Verify the fix on production within minutes of deploy.
+
+### Database Hotfix (Critical Policy/Schema Bug)
+**NEVER run ad-hoc modifications in the production SQL editor without a migration file.**
+1. Create a timestamped migration file locally (e.g., `20260728163000_hotfix_rls_policies.sql`).
+2. Write the corrective SQL.
+3. Run the SQL in the production database (Supabase dashboard SQL Editor) to immediately resolve the issue.
+4. Commit the migration file to git. This ensures the git history and production database schema remain in sync.
+
+---
+
+## 9. Release Readiness Checklist
 
 Before any "release" (new phase launch, feature launch, or public launch):
 
 ### Phase 0 → 1 Gate
-- [ ] Content pipeline runs without errors (all 90 lessons parse + validate)
-- [ ] One real lesson renders correctly in the browser from JSON (not from Supabase)
-- [ ] Deployment pipeline fully automated: push → GitHub Actions → Vercel
-- [ ] Waitlist page live and capturing signups
-- [ ] Google Analytics tracking page views
+- [ ] Content pipeline runs without errors (all 90 lessons parse + validate).
+- [ ] One real lesson renders correctly in the browser from JSON (not from Supabase).
+- [ ] Deployment pipeline fully automated: push → GitHub Actions → Vercel.
+- [ ] Waitlist page live and capturing signups.
+- [ ] Google Analytics tracking page views.
 
 ### Phase 1 → 2 Gate
-- [ ] Core loop works end-to-end: signup → onboarding → lesson → quiz → next lesson unlocks
-- [ ] 10-20 real users have completed the loop
-- [ ] No P0 bugs in reading → quiz → unlock
-- [ ] Scroll-depth + dwell-time XP verification working
+- [ ] Core loop works end-to-end: signup → onboarding → lesson → quiz → next lesson unlocks.
+- [ ] 10-20 real users have completed the loop.
+- [ ] No P0 bugs in reading → quiz → unlock.
+- [ ] Scroll-depth + dwell-time XP verification working.
 
 ### Phase 4 → 5 (Public Launch) Gate
-- [ ] Lighthouse ≥ 90 on lesson pages
-- [ ] WCAG AA verified (automated + manual screen reader)
-- [ ] All 3-5 public sample lesson pages live with SSR + structured data
-- [ ] sitemap.xml submitted to Google Search Console
-- [ ] Closed beta data collected: Day-1 activation, Day-7 retention, quiz completion
-- [ ] Email flows verified: verification, password reset, waitlist confirmation, welcome, weekly recap
-- [ ] Portfolio export works for logged-out viewers
-- [ ] No P0/P1 bugs open
-- [ ] Security: RLS verified on all user-owned tables
-
----
-
-## 9. Hotfix Procedure
-
-If a critical bug reaches production:
-
-```bash
-# 1. Create hotfix branch from main
-git checkout -b fix/critical-xp-bug main
-
-# 2. Make the minimal fix (don't add features in a hotfix)
-# 3. Test locally (npm run dev)
-# 4. Push and create PR
-# 5. CI must pass
-# 6. Merge immediately — Vercel auto-deploys
-# 7. Verify fix on production within minutes of deploy
-```
-
-For database-level hotfixes (e.g., RLS policy bug):
-- Fix in Supabase SQL editor immediately (for urgency)
-- Then write a migration file to document the change
-- Commit the migration file to the repo
+- [ ] Lighthouse ≥ 90 on lesson pages.
+- [ ] WCAG AA verified (automated + manual screen reader).
+- [ ] All 3-5 public sample lesson pages live with SSG + structured data.
+- [ ] `sitemap.xml` submitted to Google Search Console.
+- [ ] Closed beta data collected: Day-1 activation, Day-7 retention, quiz completion.
+- [ ] Email flows verified: verification, password reset, waitlist confirmation, welcome, weekly recap.
+- [ ] Portfolio export works for logged-out viewers.
+- [ ] No P0/P1 bugs open.
+- [ ] Security: RLS verified on all user-owned tables.
 
 ---
 
 ## 10. What Never to Do
 
-1. Direct push to `main` (bypasses CI and review)
-2. `vercel --prod` manual deploy (bypasses GitHub Actions pipeline)
-3. Committing `.env.local` or any file containing API keys
-4. Merging a PR with failing CI
-5. Running `npm run build` in production to bypass the content pipeline
-6. Hand-editing files in `public/content/` and committing without running `npm run content:build`
-7. Keeping feature branches alive for more than a week without merging
+1. Direct push to `main` (bypasses CI and review).
+2. `vercel --prod` manual deploy (bypasses GitHub Actions pipeline).
+3. Committing `.env.local` or any file containing API keys.
+4. Merging a PR with failing CI.
+5. Running `npm run build` in production to bypass the content pipeline.
+6. Hand-editing files in `public/content/` and committing without running `npm run content:build`.
+7. Keeping feature branches alive for more than a week without merging.
+8. Applying database modifications to production without committing a matching timestamped migration file.

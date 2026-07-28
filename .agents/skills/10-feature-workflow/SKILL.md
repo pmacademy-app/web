@@ -1,299 +1,163 @@
 ---
 name: pm-academy-feature-workflow
 description: >
-  PM Academy feature implementation workflow. The complete Plan → Build → Review →
-  Test → Refactor → Document cycle for building features in this project. Triggers on:
-  "implement X feature", "build X", "add X", or any task involving building a
+  PM Academy feature implementation workflow. The complete 17-step Plan → Build →
+  Review → Test → Refactor → Document pipeline for building features in this project.
+  Triggers on: "implement X feature", "build X", "add X", or any task involving building a
   substantial new feature end-to-end.
 ---
 
 # PM Academy — Feature Implementation Workflow
 
-Load `00-pm-academy-core` alongside this skill. Load relevant specialist skills (frontend, backend, etc.) for the feature type.
+Load `00-pm-academy-core` alongside this skill. Load relevant specialist skills (frontend, backend, design, etc.) as needed.
 
 ---
 
-## The Workflow: Plan → Build → Review → Test → Refactor → Document
+## 1. The Core Engineering Principles
+
+Every feature implementation must adhere to these foundational principles:
+- **Server Components First:** Push page state and fetching to async Server Components. Use `"use client"` only for client interactivity (e.g., event handlers, hooks, Framer Motion).
+- **Static-First Architecture:** Serve content as pre-generated JSON via CDN. Use `generateStaticParams` for lessons. Keep dynamic routes to user state mutations or user progress overlays.
+- **Least Database Privilege:** Never bypass RLS in the client. Always enable RLS on new tables. Use `SECURITY INVOKER` by default for Postgres functions.
+- **Zero-Trust API Routing:** Always re-derive user ID via `auth.getUser()`. Never use `body.user_id` or `getSession()`. Always validate payloads using Zod.
+- **Keyboard & Screen Reader Accessible:** Keyboard navigation (focus rings, tab indexes) and ARIA attributes are required for all interactive elements. Wrapping motion in `useReducedMotion` is mandatory.
 
 ---
 
-## Phase 1: PLAN
+## 2. The 17-Step Mandatory Pipeline
 
-### 1.1 — Read the docs first
-Before writing any code, read:
-- PRD.md §4 — Does this feature have a specified requirement? What's the "Done When" condition?
-- Architecture.md — Does this feature touch the data model, content pipeline, or API design?
-- Rules.md §3 — What coding standards apply?
-- Design.md — Is there a visual spec for this feature?
-- Phases.md — Is this feature in scope for the current phase?
+Every feature implementation must proceed sequentially through these 17 steps. **Never stop after step 4 (writing code). A feature is only complete when all 17 steps are verified.**
 
-### 1.2 — Check for open decisions
-Consult `docs/PRD.md §11`. Does any unresolved open decision affect this feature?
-If yes: **resolve the open decision first** (update the relevant doc), then build.
-
-### 1.3 — Scope the feature
-Answer these before coding:
-1. What is the minimum implementation that satisfies the PRD's "Done When" condition?
-2. What is explicitly out of scope (per PRD.md §6 non-goals or the current phase exclusions)?
-3. What data does this feature read/write? (User state → Supabase. Content → static JSON.)
-4. What existing `lib/` modules does this feature use? (Don't reimplement — call existing modules.)
-5. What new API routes are needed (if any)? Follow the naming convention in backend skill.
-
-### 1.4 — Implementation checklist (create this, then execute)
 ```
-- [ ] API route(s): /api/[...]
-- [ ] Supabase migration (if schema change): migrations/00N_[name].sql
-- [ ] Business logic in lib/: [which module?]
-- [ ] Server component(s): [page/layout file]
-- [ ] Client component(s): [component file]
-- [ ] Unit tests for lib/ changes: tests/[module].test.ts
-- [ ] UI matches Design.md direction
-- [ ] Accessibility: aria labels, keyboard nav
-- [ ] Responsive: mobile viewport
-```
-
----
-
-## Phase 2: BUILD
-
-### 2.1 — Build in this order (avoid wasted work)
-1. **Data layer first** — schema migration (if needed) + RLS policies
-2. **Business logic** — `lib/` module implementation + unit tests
-3. **API route** — wraps the lib logic with auth guard
-4. **Server component** — fetches data, passes to presentational component
-5. **Client component** — interactivity, animations
-6. **UI polish** — matches Design.md
-
-### 2.2 — Small, reviewable commits
-Commit at each meaningful step:
-```bash
-git commit -m "feat: add user_flashcard_srs RLS policy"
-git commit -m "feat: implement SM-2 scheduling in lib/srs.ts"
-git commit -m "test: add SM-2 unit tests against reference outputs"
-git commit -m "feat: add POST /api/flashcards/[id]/review route"
-git commit -m "feat: build FlashcardCard component with flip animation"
-```
-
-### 2.3 — Verify the anti-rules as you build
-At each step, confirm:
-- Content not going into Supabase
-- XP being written via xp_events first
-- User ID from session, not request body
-- No dark patterns in UI copy
-- `"use client"` only where genuinely needed
-
----
-
-## Phase 3: REVIEW
-
-### Self-review checklist (before pushing)
-```
-[ ] Core functionality: works in the happy path
-[ ] Error states: network failure, auth failure, invalid input handled
-[ ] Security: auth guard, RLS, no user_id from body
-[ ] Performance: no unnecessary client-side JS, images use next/image
-[ ] Accessibility: keyboard navigable, aria labels, color contrast
-[ ] Responsive: tested at mobile viewport (375px)
-[ ] Business rules: matches PRD.md §4 exactly (XP values, streak rules, etc.)
-[ ] Anti-gaming: verified if this touches XP or theory-read
-[ ] No new services introduced without Architecture.md update
-[ ] No secrets hardcoded
-[ ] CI would pass: lint, types, build
-```
-
-### Design review checklist
-```
-[ ] Typography: correct font family for headings vs. body
-[ ] Colors: semantic tokens used (--color-primary, --color-correct, etc.)
-[ ] Motion: only approved animations (see Design.md §3.6 celebration list)
-[ ] useReducedMotion: wrapped around all Framer Motion
-[ ] Skill radar: still the most prominent dashboard element (if touching dashboard)
-[ ] Gamification copy: no dark-pattern urgency language
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│  1. Requirements Review   │ ───> │        2. Planning        │ ───> │ 3. Architecture Validation│
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+                                                                                    │
+                                                                                    v
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│      6. Refactoring       │ <─── │      5. Self Review       │ <─── │     4. Implementation     │
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+              │
+              v
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│   7. Performance Review   │ ───> │    8. Security Review     │ ───> │  9. Accessibility Review  │
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+                                                                                    │
+                                                                                    v
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│     12. Lint check        │ <─── │      11. Build check      │ <─── │10. Doc Compliance Review  │
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+              │
+              v
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│    13. Type Check (tsc)   │ ───> │        14. Testing        │ ───> │ 15. Dead Code Removal     │
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+                                                                                    │
+                                                                                    v
+                                   ┌───────────────────────────┐      ┌───────────────────────────┐
+                                   │   17. Completion Report   │ <─── │16. Production Verification│
+                                   └───────────────────────────┘      └───────────────────────────┘
 ```
 
 ---
 
-## Phase 4: TEST
+### Step 1: Requirements Review
+Read the 5 source-of-truth documents to understand the context:
+- PRD.md §4: Confirm the exact product spec and XP/streak boundaries.
+- Design.md: Confirm the layout, visual positioning, and motion rules.
+- Phases.md: Verify this feature is in scope for the active phase.
 
-### 4.1 — Unit tests (for lib/ changes)
-If you modified any file in `lib/`:
-- Write or update tests in `tests/[module-name].test.ts`
-- Ensure SM-2, XP anti-gaming, streak timezone tests pass (see testing-qa skill)
-- Run `npm test` — all tests must pass
+### Step 2: Planning
+Create an implementation plan (`implementation_plan.md` artifact):
+- Outline database changes, new API endpoints, logic modules, and UI components.
+- Highlight any open decisions or dependencies.
+- Submit the plan for user review and approval before proceeding.
 
-### 4.2 — Manual QA
-Execute the relevant QA flow from the testing-qa skill:
-- Core Learning Loop (if touching lesson/quiz/progress)
-- Gamification Loop (if touching XP/streaks/badges)
-- Anti-gaming Verification (if touching theory-read or XP)
-- Portfolio Export (if touching public routes)
-- Security Checks (if touching auth or API routes)
+### Step 3: Architecture Validation
+Verify that the proposed plan doesn't violate core stack invariants:
+- No content stored in Supabase.
+- No new libraries added without verifying free-tier ceilings.
+- Seams between static content and user state remain clean (referenced by text slug, not FK).
 
-### 4.3 — CI verification
-```bash
-# From apps/web/
-npm run content:build  # content pipeline still works
-npm run lint           # no ESLint errors
-npm run build          # production build succeeds
-```
+### Step 4: Implementation
+Implement changes in a clean, logical order to prevent rework:
+1. **Database Schema:** migrations + RLS policies + triggers.
+2. **Business Logic:** implement in `lib/` modules (never inside components or APIs).
+3. **API Routing:** write endpoints, add `getUser()` auth guards, and write input Zod validation.
+4. **Server Components:** fetch data, evaluate permissions, pass data to children.
+5. **Client Components:** add layout state, event handlers, animations.
+6. **UI Polish:** apply Tailwind v4 semantic classes, responsive styles, accessibility helpers.
 
----
+### Step 5: Self Review
+Assess the initial implementation:
+- Test edge cases (first user visit, slow connection, database offline).
+- Verify error handling: users shouldn't see blank screens or DB tracebacks.
 
-## Phase 5: REFACTOR
+### Step 6: Refactoring
+Improve code structure without altering behavior:
+- Deduplicate logic: extract shared queries or calculations to `lib/` helpers.
+- Clean up file paths, naming, and type definitions (prefer `type` over `interface`).
 
-### Refactoring triggers (do these proactively, not at the end)
-- Business logic crept into a component → extract to `lib/`
-- Same logic duplicated in two places → extract to shared utility
-- Component doing too many things → split into data-fetching + presentational
-- Magic numbers hardcoded → extract to named constants
-- `any` type used → replace with proper types
+### Step 7: Performance Review
+Verify performance compliance:
+- Target Lighthouse ≥ 90.
+- Verify lesson pages are statically generated (`generateStaticParams`).
+- Verify images use `next/image` and custom fonts use `next/font`.
+- Ensure Framer Motion and Lucide packages are imported individually.
 
-### Refactoring constraints
-- **Do not refactor and add features in the same commit** — makes diffs unreadable
-- **Run tests after every refactoring step** — regression check
-- Maintain the same behavior — refactoring = same behavior, better structure
+### Step 8: Security Review
+Audit the implementation's security bounds:
+- Verify API routes use `supabase.auth.getUser()`.
+- Ensure all public/portfolio database queries explicitly select `is_public = true`.
+- Verify database triggers and functions are marked `SECURITY INVOKER`. If `SECURITY DEFINER` is used, confirm `SET search_path = public` is declared.
+- Verify RLS policies are enabled on all new tables.
 
----
+### Step 9: Accessibility Review
+Audit the component list against WCAG AA standards:
+- Verify keyboard navigation works (Tab, Space, Enter, Arrow keys).
+- Check contrast ratios (body text ≥ 4.5:1, large text ≥ 3:1).
+- Confirm all motion animations check `useReducedMotion()`.
+- Add screen-reader friendly table options for radar charts and graphics.
 
-## Phase 6: DOCUMENT
+### Step 10: Documentation Compliance Review
+Ensure project records are accurate:
+- Update Architecture.md schema drawings if new columns or tables were added.
+- Update PRD.md features logs or Open Decisions tables.
+- Append a change summary to document Changelogs with version updates.
 
-### 6.1 — Update source-of-truth docs if the feature changed any decisions
-- New service added → Architecture.md §1 table
-- New table or column → Architecture.md §2 schema
-- New API route → document in backend skill references
-- Open decision resolved → PRD.md §11 changelog
+### Step 11: Build Check
+Verify that the project successfully builds for production:
+- Run `npm run build` from `apps/web/`.
+- Ensure the Markdown content parse/validate commands execute successfully.
 
-### 6.2 — Code documentation
-- Document the "why" in comments, not the "what" (the code already says what)
-- Every `lib/` module: top-of-file JSDoc comment explaining the module's responsibility
-- Complex business rules: inline comment referencing PRD.md section (e.g., `// PRD.md §4.6 — anti-gaming rule`)
+### Step 12: Lint Check
+Check for formatting and style compliance:
+- Run `npm run lint` from `apps/web/`.
+- Fix all warnings and errors. Zero exceptions.
 
-### 6.3 — Commit and PR
-```bash
-git add .
-git commit -m "feat: implement flashcard spaced repetition review (SM-2)"
-git push origin feature/flashcard-srs
-# Create PR → CI runs → Vercel preview → verify → merge
-```
+### Step 13: Type Check
+Ensure strict type compliance:
+- Run `npx tsc --noEmit` from `apps/web/`.
+- Eliminate any occurrence of `any` types. Ensure types are correctly declared.
 
----
+### Step 14: Testing
+Ensure logic stability:
+- Write unit tests using Vitest in the `tests/` directory for any modifications to business logic (`lib/xp.ts`, `lib/srs.ts`, `lib/streaks.ts`, `lib/skillRadar.ts`, `lib/badges.ts`).
+- Run `npm test` and verify that all test suites pass.
 
-## Common Feature Templates
+### Step 15: Dead Code Removal
+Clean up the filesystem and codebase:
+- Remove unused variables, imports, and CSS classes.
+- Delete debugging comments, `console.log` statements, and old backup files.
+- Resolve any unresolved `TODO` comments.
 
-### New `lib/` Module
+### Step 16: Production Readiness Verification
+Confirm launch alignment:
+- Ensure all environment variables are documented in `.env.example`.
+- Verify that API URLs and redirect URIs are not hardcoded to `localhost`.
 
-```typescript
-/**
- * [Module Name] — [one-line responsibility]
- *
- * [Architecture.md §N] defines the rules this module enforces.
- * [PRD.md §4.N] defines the product behavior this module implements.
- *
- * This is the SINGLE implementation of [formula/logic] — never duplicate
- * this logic in components, API routes, or other lib files.
- */
-
-// Constants (match PRD.md exactly)
-export const [MODULE]_CONSTANTS = {
-  // ...
-} as const
-
-// Types
-export type [ModuleType] = {
-  // ...
-}
-
-// Core logic
-export function [mainFunction]([params]: [Types]): [ReturnType] {
-  // ...
-}
-```
-
-### New API Route
-
-```typescript
-// app/api/[resource]/[action]/route.ts
-import { createServerSupabaseClient } from '@/lib/supabase'
-import { NextRequest } from 'next/server'
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { [key]: string } }
-) {
-  const supabase = createServerSupabaseClient()
-  
-  // 1. Auth guard — always first
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  
-  // 2. Validate input
-  const body = await request.json()
-  // Zod validation here
-  
-  // 3. Business logic (call lib/ functions, not inline)
-  
-  // 4. DB mutation
-  
-  // 5. Return
-  return Response.json({ data: result })
-}
-```
-
-### New Page (Server Component)
-
-```typescript
-// app/(app)/[feature]/page.tsx
-import { createServerSupabaseClient } from '@/lib/supabase'
-import { redirect } from 'next/navigation'
-import { Metadata } from 'next'
-import { FeatureComponent } from '@/components/[feature]/FeatureComponent'
-
-export const metadata: Metadata = {
-  title: '[Page Title] | PM Academy',
-  description: '[Page description]',
-}
-
-export default async function FeaturePage() {
-  const supabase = createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) redirect('/login')
-  
-  // Fetch user state from Supabase (not content — that comes from JSON files)
-  const { data } = await supabase.from('[table]').select().eq('user_id', user.id)
-  
-  return <FeatureComponent data={data} />
-}
-```
-
-### New Client Component
-
-```typescript
-// components/[category]/ComponentName.tsx
-'use client'
-
-import { useState } from 'react'
-import { useReducedMotion } from 'framer-motion'
-// Import only what's needed from lucide-react
-import { SomeIcon } from 'lucide-react'
-
-interface ComponentNameProps {
-  // typed props — no `any`
-}
-
-export function ComponentName({ prop1, prop2 }: ComponentNameProps) {
-  const shouldReduceMotion = useReducedMotion()
-  
-  return (
-    <div
-      role="[appropriate-role]"
-      aria-label="[description]"
-      // Keyboard handler if interactive
-    >
-      {/* Component content */}
-    </div>
-  )
-}
-```
+### Step 17: Completion Report
+Document the completed work:
+- Create a walkthrough (`walkthrough.md` artifact).
+- Summarize what was changed, what manual and automated tests passed, and embed screenshots/videos for UI updates.
+- Declare the feature successfully complete.

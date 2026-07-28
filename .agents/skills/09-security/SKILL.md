@@ -16,9 +16,9 @@ Load `00-pm-academy-core` alongside this skill.
 ## 1. Security Model Overview
 
 PM Academy's security rests on three pillars:
-1. **Supabase Auth** — handles identity (never build custom auth/session/password hashing)
-2. **Row-Level Security (RLS)** — database-layer access control on all user-owned tables
-3. **Server-side authorization** — API routes re-derive user identity from session, never trust request body
+1. **Supabase Auth** — handles identity (never build custom auth/session/password hashing).
+2. **Row-Level Security (RLS)** — database-layer access control on all user-owned tables.
+3. **Server-side authorization** — API routes re-derive user identity from session, never trust request body.
 
 ---
 
@@ -27,18 +27,20 @@ PM Academy's security rests on three pillars:
 **Every user-owned table must have RLS enabled.** No exceptions.
 
 ```sql
--- Template: user-owned data
+-- Step 1: Enable RLS
 ALTER TABLE [table_name] ENABLE ROW LEVEL SECURITY;
 
+-- Step 2: Define Row Policies
 CREATE POLICY "Users manage their own rows"
 ON [table_name]
 FOR ALL
+TO authenticated
 USING (user_id = auth.uid())
 WITH CHECK (user_id = auth.uid());
 ```
 
 ### Tables requiring RLS
-| Table | Policy type |
+| Table | Policy Type |
 |-------|-------------|
 | `user_lesson_progress` | user_id = auth.uid() |
 | `quiz_attempts` | user_id = auth.uid() |
@@ -50,18 +52,23 @@ WITH CHECK (user_id = auth.uid());
 | `user_badges` | user_id = auth.uid() |
 | `cohort_members` | user_id = auth.uid() |
 
-### Portfolio/public content rule
+### Portfolio/Public Content Rule
 Public routes (`/p/[username]`) must ONLY expose `is_public = true` rows:
 ```sql
 -- Reflections: public read for is_public rows
 CREATE POLICY "Public reflections readable by all"
 ON reflections FOR SELECT
 USING (is_public = true OR user_id = auth.uid());
-
--- Same for capstone_submissions
 ```
 
-**Defense in depth:** The query layer ALSO explicitly filters `is_public = true`. Don't rely solely on RLS.
+**Defense in depth:** The query layer MUST ALSO explicitly filter `is_public = true`. Do not rely solely on RLS.
+```typescript
+const { data } = await supabase
+  .from('reflections')
+  .select('id, lesson_slug, content')
+  .eq('user_id', userId)
+  .eq('is_public', true) // ALWAYS add explicit filter
+```
 
 ---
 
@@ -74,7 +81,7 @@ USING (is_public = true OR user_id = auth.uid());
 export async function POST(request: Request) {
   const supabase = createServerSupabaseClient()
   
-  // Always verify session first
+  // Always verify session first using getUser()
   const { data: { user }, error } = await supabase.auth.getUser()
   if (error || !user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -94,21 +101,19 @@ export async function POST(request: Request) {
 
 ---
 
-## 4. Client vs. Server Supabase
+## 4. Client vs. Server Supabase Client
 
 ```typescript
 // createServerSupabaseClient() uses SERVICE_ROLE_KEY — bypasses RLS
-// Only in: app/api/ route handlers
+// Only in: app/api/ route handlers, server components
 // NEVER import in: components, hooks, shared utilities called from browser
 
 // createBrowserSupabaseClient() uses ANON_KEY — subject to RLS
 // In: client components for real-time subscriptions or auth state
-// Assumes RLS is configured correctly — test it explicitly
 ```
 
-**Guard in code:**
+### Guard in Code
 ```typescript
-// If you ever need to check: is this being called server-side?
 if (typeof window !== 'undefined') {
   throw new Error('createServerSupabaseClient cannot be called in browser context')
 }
@@ -116,79 +121,75 @@ if (typeof window !== 'undefined') {
 
 ---
 
-## 5. Secret Management Rules
+## 5. PostgreSQL Function Security
 
-| Variable | Type | Exposed to browser? | Where to set |
-|----------|------|---------------------|-------------|
+When creating database functions or triggers via migrations:
+- **Default to `SECURITY INVOKER`:** Functions run with the privileges of the user calling them. This ensures RLS policies apply to operations within the function.
+- **Avoid `SECURITY DEFINER` by default:** Functions run with the privileges of the user who created them (owner/superuser). This bypasses RLS policies and can create major privilege escalation holes.
+- **`SECURITY DEFINER` Exception Rules:** Only use if a function absolutely must perform operations the user doesn't have privileges for (e.g., updating a denormalized user cache after inserting into an RLS-guarded table).
+  - You MUST set the `search_path` explicitly: `SET search_path = public` to prevent search path hijacking.
+  - Keep the function body extremely minimal and validate all inputs.
+
+```sql
+-- ✅ CORRECT trigger function with SECURITY DEFINER
+CREATE OR REPLACE FUNCTION update_user_xp_cache()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE users
+  SET total_xp = (SELECT COALESCE(SUM(xp_amount), 0) FROM xp_events WHERE user_id = NEW.user_id)
+  WHERE id = NEW.user_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+```
+
+---
+
+## 6. HTTP Security Headers
+
+Secure headers must be configured in `apps/web/next.config.ts` to mitigate security exploits:
+
+- `X-Frame-Options: DENY` (prevents clickjacking)
+- `X-Content-Type-Options: nosniff` (prevents MIME type sniffing)
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy` (limits browser APIs)
+- `Content-Security-Policy` (limits resource loading domains)
+
+Refer to the `05-seo-performance` skill for the complete config block code.
+
+---
+
+## 7. Secret Management Rules
+
+| Variable | Type | Exposed to Browser? | Where to Set |
+|----------|------|---------------------|--------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Public | ✅ Yes | .env.local + Vercel |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public | ✅ Yes | .env.local + Vercel |
 | `SUPABASE_SERVICE_ROLE_KEY` | Secret | ❌ NO | .env.local + Vercel (server only) |
 | `RESEND_API_KEY` | Secret | ❌ NO | .env.local + Vercel (server only) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Public | ✅ Yes | .env.local + Vercel |
 
-**`NEXT_PUBLIC_` prefix = exposed to browser.** Only use it for non-sensitive config. Never prefix secrets with `NEXT_PUBLIC_`.
-
-**If a secret is accidentally committed:**
-1. Rotate it immediately in Supabase/Resend dashboard (the committed key is compromised)
-2. Remove from git history: `git filter-branch` or `git filter-repo`
-3. Force push (after rotating the key — the code history is now safe)
+- **Prefix rule:** Only public config has `NEXT_PUBLIC_` prefix. Never prefix secret keys with it.
+- **If a secret is accidentally committed:** rotate it IMMEDIATELY, rewrite history using `git filter-repo`, and force push.
 
 ---
 
-## 6. XSS Prevention
+## 8. XSS Prevention
 
-- **Never use `dangerouslySetInnerHTML`** unless content is fully sanitized HTML from a controlled source (the pre-generated lesson JSON HTML — which was generated from your own Markdown, not user input).
-- Lesson Theory HTML (from pre-generated JSON): if using `dangerouslySetInnerHTML`, ensure the parser script sanitizes the HTML output. No user-submitted HTML ever rendered via `dangerouslySetInnerHTML`.
+- **Never use `dangerouslySetInnerHTML`** unless content is fully sanitized HTML from a controlled source (e.g., lesson JSON generated by the content pipeline).
 - User-submitted content (reflections, capstone submissions): render as plain text, not HTML. Use `{content}` in JSX, never `dangerouslySetInnerHTML`.
-
----
-
-## 7. Privacy Rules
-
-- **Google Analytics:** configure to anonymize IP addresses. Do not send PII to GA (no email, name, or user ID).
-- **Resend SMTP:** receives only the email address for transactional sends. No additional user data.
-- **Waitlist data:** name, email, career_position stored in Supabase only. Not shared with any third party.
-- **Portfolio export (`/p/[username]`):** only `is_public = true` data — user controls what's public via toggle.
-- **Session data:** Supabase Auth handles JWTs — no custom session storage.
-
----
-
-## 8. Content Security
-
-Since lesson content is pre-generated JSON (not user-submitted):
-- The Markdown parser in `scripts/parse-content.ts` controls what HTML reaches the browser
-- The parser should escape or sanitize any HTML in source Markdown to prevent injected `<script>` tags
-- All content changes go through the CI pipeline (Markdown → validate → JSON) — no direct DB insertion
 
 ---
 
 ## 9. Security Checklist
 
-For any PR touching auth, API routes, or user data:
-- [ ] API route calls `supabase.auth.getUser()` before any data access
-- [ ] `user.id` from session used (not `body.user_id`)
-- [ ] New tables have RLS enabled + policies defined
-- [ ] Public portfolio routes only query `is_public = true`
-- [ ] No secrets in code (no API keys hardcoded)
-- [ ] No `NEXT_PUBLIC_` prefix on secret variables
-- [ ] User-submitted content rendered as text, not HTML
-- [ ] `createServerSupabaseClient` not imported in client components
-
----
-
-## 10. Supabase Auth Configuration
-
-- **Email + Password:** enabled. Email verification required (via Resend SMTP).
-- **Google OAuth:** enabled. Configure with your Google Cloud OAuth credentials.
-- **Magic links / OTP:** optional — Supabase Auth supports this if needed.
-- **MFA:** not required for MVP (Supabase Auth defaults handle standard security).
-- **JWT expiry:** use Supabase defaults (typically 1 hour access token, long refresh token).
-- **Session storage:** Supabase Auth handles this — don't build custom session management.
-
-On new user signup via OAuth callback:
-```typescript
-// app/api/auth/callback/route.ts
-// Exchange code for session
-// Upsert user row in public.users table (if not exists)
-// Redirect to /dashboard (or /onboarding if new user)
-```
+For any PR touching auth, database, API routes, or user data:
+- [ ] API route calls `supabase.auth.getUser()` before any data access.
+- [ ] `user.id` from session is used (not `body.user_id`).
+- [ ] Zod validation is applied to all request payloads.
+- [ ] New tables have RLS enabled + policies defined.
+- [ ] Public routes only query `is_public = true` rows explicitly in SQL.
+- [ ] Database functions default to `SECURITY INVOKER`. If `SECURITY DEFINER` is used, `search_path = public` is set.
+- [ ] No secrets committed or hardcoded in the codebase.
+- [ ] No `NEXT_PUBLIC_` prefix on secret variables.
+- [ ] `createServerSupabaseClient` is not imported in client components.

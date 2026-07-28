@@ -36,9 +36,9 @@ Always cross-reference these before making decisions:
 
 | Layer | Choice |
 |-------|--------|
-| Framework | **Next.js 16 (App Router) + TypeScript 5 (strict mode)** |
+| Framework | **Next.js (App Router) + TypeScript 5 (strict mode)** |
 | Styling | **Tailwind CSS v4 + shadcn/ui** |
-| Content | **Markdown → build-time JSON** (NO runtime parsing) |
+| Content | **Markdown → build-time JSON** (NO runtime parsing, NO MDX) |
 | Database | **Supabase PostgreSQL** — user state ONLY |
 | Auth | **Supabase Auth** — Email+Password + Google Login |
 | Hosting | **Vercel** (Hobby → Pro when free-tier ceiling hit) |
@@ -46,7 +46,7 @@ Always cross-reference these before making decisions:
 | Email | **Resend SMTP** (connected to Supabase) |
 | Analytics | **Google Analytics** |
 | Animation | **Framer Motion** |
-| Forms | **react-hook-form + Zod v4** |
+| Forms | **react-hook-form + Zod** |
 | Icons | **lucide-react** |
 
 **Never add a new service without:** (a) confirming free tier, (b) confirming it doesn't duplicate existing capability, (c) updating Architecture.md §1 table.
@@ -55,15 +55,15 @@ Always cross-reference these before making decisions:
 
 ## 3. Non-Negotiable Architecture Rules
 
-1. **Markdown is the single source of truth.** Content lives in `/content/lessons/`. Never store lesson content in the DB. Never hand-edit generated JSON.
+1. **Markdown is the single source of truth.** Content lives in `/content/` (repo root). Never store lesson content in the DB. Never hand-edit generated JSON.
 2. **Static-first.** Markdown → `scripts/parse-content.ts` → `scripts/validate-content.ts` → `scripts/generate-search-index.ts` → `public/content/`. No runtime parsing.
-3. **Supabase stores user state only.** Tables: `users`, `user_lesson_progress`, `quiz_attempts`, `user_flashcard_srs`, `xp_events`, `reflections`, `bookmarks`, `capstone_submissions`, `badges`, `user_badges`, `cohort_members`, `waitlist`. Content is NEVER stored here.
+3. **Supabase stores user state only.** Tables: `users`, `user_lesson_progress`, `quiz_attempts`, `user_flashcard_srs`, `xp_events`, `reflections`, `bookmarks`, `capstone_submissions`, `badges`, `user_badges`, `cohort_members`, `cohorts`, `waitlist`. Content is NEVER stored here.
 4. **RLS on every user-owned table.** Policy: `user_id = auth.uid()` except `is_public = true` rows.
 5. **Content referenced by slug, not FK.** User-state tables link to content via `lesson_slug` (text). This decouples DB from content rebuilds.
 6. **No global leaderboard.** Ever. Cohort/friends-only, opt-in, weekly-reset, ranked by consistency.
 7. **No dark patterns.** No fake urgency. No streak-purchase. No paywalled lessons. Free means free.
 8. **Deploy through the pipeline only.** GitHub → GitHub Actions (validate → generate → build) → Vercel. No manual deploys.
-9. **XP is append-only.** Write `xp_events` row FIRST, then recompute `users.total_xp`. Never increment directly.
+9. **XP is append-only.** Write `xp_events` row FIRST, then let the DB trigger update `users.total_xp`. Never increment directly.
 10. **Theory-read XP requires server verification.** Scroll-depth + active-time signals. Never trust client-only "mark as read."
 
 ---
@@ -77,16 +77,19 @@ pm-academy/
 │   │   ├── (marketing)/        # /, /curriculum, /lessons/[slug], /about, /waitlist
 │   │   ├── (auth)/             # /signup, /login, /reset-password
 │   │   ├── (portfolio)/        # /p/[username] — PUBLIC, no auth wall
-│   │   ├── (app)/              # Authenticated routes (dashboard, curriculum, review, progress)
+│   │   ├── (app)/              # Authenticated routes (dashboard, curriculum, review, progress, leaderboard, settings)
+│   │   ├── onboarding/         # Onboarding flow (post-signup goal-setting)
 │   │   └── api/                # User-state mutations only
 │   ├── components/
 │   │   ├── ui/                 # shadcn/ui primitives
-│   │   ├── lesson/             # Lesson-specific components
-│   │   ├── quiz/               # Quiz flow components
-│   │   ├── dashboard/          # Dashboard/gamification widgets
-│   │   ├── marketing/          # Marketing page components
-│   │   ├── layout/             # Nav, footer, shell
-│   │   └── forms/              # Reusable form components
+│   │   ├── lesson/             # LessonCard, LessonHeader, TheorySection, MentalModelDiagram, etc.
+│   │   ├── quiz/               # QuizContainer, QuizQuestion, QuizOption, QuizFeedback, QuizSummary
+│   │   ├── dashboard/          # SkillRadarChart, ProgressRing, StreakIndicator, XPCounter, etc.
+│   │   ├── flashcard/          # FlashcardDeck, FlashcardCard, SRSRatingButtons
+│   │   ├── marketing/          # HeroSection, FeatureGrid, SampleLesson, WaitlistForm, CurriculumPreview
+│   │   ├── layout/             # Nav, footer, Sidebar, PageShell, AuthGuard
+│   │   └── forms/              # WaitlistForm, ReflectionForm, ProfileForm
+│   ├── hooks/                  # Custom React hooks (useXP, useStreak, useSearch, etc.)
 │   ├── lib/
 │   │   ├── xp.ts               # XP computation + anti-gaming
 │   │   ├── srs.ts              # SM-2 spaced repetition
@@ -95,15 +98,20 @@ pm-academy/
 │   │   ├── badges.ts           # Badge definitions + evaluation
 │   │   ├── search.ts           # Client-side search
 │   │   ├── supabase.ts         # Supabase clients (server + browser)
+│   │   ├── auth.ts             # Auth helpers
+│   │   ├── email.ts            # Resend email helpers
 │   │   └── analytics.ts        # Google Analytics helpers
-│   ├── supabase/migrations/    # SQL migration files ONLY
+│   ├── supabase/migrations/    # Timestamped SQL migration files (YYYYMMDDHHMMSS_description.sql)
 │   ├── public/content/         # Build-generated JSON (never edit manually)
 │   └── types/                  # Shared TypeScript types
-├── content/lessons/            # 90 source Markdown files (lesson-001.md → lesson-090.md)
+├── content/                    # 90 source Markdown files (repo root — NOT inside apps/web)
+│   └── lessons/                # lesson-001.md → lesson-090.md
 ├── scripts/
 │   ├── parse-content.ts        # Markdown → JSON
 │   ├── validate-content.ts     # Schema validation (fails build if broken)
 │   └── generate-search-index.ts
+├── supabase/
+│   └── migrations/             # Also acceptable at repo root (check actual project structure)
 ├── docs/                       # PRD.md, Architecture.md, Rules.md, Phases.md, Design.md
 └── .github/workflows/ci.yml    # GitHub Actions pipeline
 ```
@@ -122,9 +130,10 @@ pm-academy/
 - `bookmarks` — (user_id, lesson_slug) unique
 - `capstone_submissions` — module_slug, content, status, is_public
 - `badges` / `user_badges` — key, name, description, icon | (user_id, badge_id)
+- `cohorts` / `cohort_members` — cohort opt-in leaderboard
 - `waitlist` — name, email, career_position
 
-**Key design rule:** `xp_events` is source of truth. `users.total_xp` and `users.level` are denormalized caches updated via trigger/function, never directly.
+**Key design rule:** `xp_events` is source of truth. `users.total_xp` and `users.level` are denormalized caches updated via DB trigger, never directly.
 
 ---
 
@@ -144,14 +153,14 @@ pm-academy/
 }
 ```
 
-**STABLE IDs rule:** `quiz[].id` and `flashcard[].id` must be deterministically generated from content/position. `user_lesson_progress`, `quiz_attempts`, `user_flashcard_srs` reference these IDs. Regenerating JSON must NOT change existing IDs.
+**STABLE IDs rule:** `quiz[].id` and `flashcard[].id` must be deterministically generated. Format: `lesson-NNN-q-001`, `lesson-NNN-fc-001`. Once deployed, these IDs NEVER change. They are referenced by `quiz_attempts` and `user_flashcard_srs`.
 
 ---
 
 ## 7. XP System (exact values — do not change without updating PRD.md §4.6)
 
 | Action | XP |
-|--------|----|
+|--------|-----|
 | Theory read (verified scroll + dwell) | 10 |
 | Quiz — per correct answer | 5 |
 | Quiz — first-attempt 100% bonus | +25 |
@@ -170,7 +179,7 @@ pm-academy/
 | `lib/srs.ts` | SM-2 algorithm, self-contained, unit-tested. No UI coupling. |
 | `lib/streaks.ts` | Day boundaries computed from `users.timezone`, NOT server UTC. |
 | `lib/skillRadar.ts` | Single implementation of scoring formula. Never duplicate elsewhere. |
-| `lib/badges.ts` | ~16 badges defined. Each tied to a real milestone. No filler badges. |
+| `lib/badges.ts` | ~16–20 badges defined. Each tied to a real milestone. No filler badges. |
 | `lib/search.ts` | Load `search-index.json` once. No network round-trips per query. |
 
 ---
@@ -179,13 +188,14 @@ pm-academy/
 
 - **TypeScript strict mode everywhere** in `apps/web`. No plain JS for new code.
 - **ESLint + Prettier** — CI blocks on lint errors. No custom rule sets without documented reason.
-- **Package manager:** `npm` with lockfile committed (existing setup). Do not switch to pnpm without documenting the change.
+- **Package manager:** `npm` with lockfile committed. Do not switch without documenting.
 - **Files/folders:** `kebab-case` for routes/non-components; `PascalCase` for React component files.
 - **DB:** `snake_case` for all table/column names.
 - **Types:** `PascalCase`, prefer `type` over `interface`.
 - **API routes:** REST-ish, resource-oriented (`/api/lessons/[slug]/progress`, not `/api/updateLessonProgress`).
 - **Server components by default.** Use `"use client"` only when interactivity genuinely requires it.
-- **Never trust client-reported `user_id`** in API routes — always re-derive from authenticated session.
+- **Never trust client-reported `user_id`** in API routes — always re-derive from `supabase.auth.getUser()`.
+- **Migrations:** timestamped format only — `YYYYMMDDHHMMSS_description.sql`. Never modify an applied migration.
 
 ---
 
@@ -203,11 +213,11 @@ pm-academy/
 ## 11. Current Phase Context
 
 Check `docs/Phases.md` to confirm the active phase before touching any feature area.
-- **Phase 0:** Foundation (content pipeline, deployment, waitlist, auth, design system)
+- **Phase 0:** Foundation (content pipeline, deployment, waitlist, auth, design system) — substantially complete
 - **Phase 1:** Core learning loop MVP (lesson view, quiz, basic progress)
 - **Phase 2:** Gamification layer (XP, streaks, skill radar, flashcard SRS, dashboard)
 - **Phase 3:** Depth + retention (capstones, badges, leaderboard, portfolio export, email)
-- **Phase 4:** Polish, SEO, accessibility hardening + closed beta
+- **Phase 4:** Polish, SEO, search, accessibility hardening + closed beta
 - **Phase 5:** Public launch
 
 **Do not build Phase N+1 features while Phase N's Definition of Done is unmet.**
@@ -218,7 +228,7 @@ Check `docs/Phases.md` to confirm the active phase before touching any feature a
 
 | Decision | Status |
 |----------|--------|
-| AI Mentor feature | OPEN (CRITICAL) — see PRD.md §11. Do NOT build until resolved. |
+| AI Mentor feature | CLOSED — cut from v1. Do NOT build. |
 | Skill radar scoring formula (discrete vs. continuous) | OPEN — lock in Phase 2 |
 | XP thresholds per level/title | OPEN — tune in closed beta |
 
@@ -228,7 +238,7 @@ Check `docs/Phases.md` to confirm the active phase before touching any feature a
 
 1. Lesson content stored in the database.
 2. Generated JSON hand-edited directly.
-3. `users.total_xp` incremented without an `xp_events` row.
+3. `users.total_xp` incremented without an `xp_events` row first.
 4. Theory-read XP awarded via client-only "mark as read."
 5. A global leaderboard built (ever).
 6. Streak freezes purchasable with money or XP.
@@ -236,6 +246,8 @@ Check `docs/Phases.md` to confirm the active phase before touching any feature a
 8. New services added without updating Architecture.md §1.
 9. `createServerSupabaseClient()` imported in client components.
 10. Secrets committed to the repo.
+11. `getSession()` used instead of `getUser()` for auth verification.
+12. A migration applied without a corresponding timestamped `.sql` file.
 
 ---
 
@@ -253,6 +265,23 @@ Documented in `apps/web/.env.example`. Never committed to repo.
 
 ---
 
-## 15. References
+## 15. Mandatory Development Workflow (summary)
+
+Every feature implementation must complete all 17 steps. See `10-feature-workflow` skill for full detail.
+
+```
+1. Requirements Review → 2. Planning → 3. Architecture Validation →
+4. Implementation → 5. Self Review → 6. Refactoring →
+7. Performance Review → 8. Security Review → 9. Accessibility Review →
+10. Documentation Compliance Review → 11. Build → 12. Lint →
+13. Type Check → 14. Testing → 15. Dead Code Removal →
+16. Production Readiness Verification → 17. Completion Report
+```
+
+A sprint is NOT complete until all 17 steps pass. Stopping at step 4 (writing code) is a failure mode.
+
+---
+
+## 16. References
 
 See `/docs/` for full detail on all decisions. The skill files in `.agents/skills/` extend this core context for specific task types. Load the relevant specialist skill alongside this one.

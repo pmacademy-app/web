@@ -17,10 +17,10 @@ Load `00-pm-academy-core` alongside this skill.
 ## 1. The Architect's Prime Directive
 
 **For PM Academy, the constraint set is fixed:**
-- Solo-founder buildable
-- ₹0 infrastructure cost (free tiers only until Phase 7)
-- Static-first, targeting ~5,000 users MVP
-- Capable of scaling later without a rewrite
+- Solo-founder buildable.
+- ₹0 infrastructure cost (free tiers only until Phase 7).
+- Static-first, targeting ~5,000 users MVP.
+- Capable of scaling later without a rewrite.
 
 **Every architectural decision must be evaluated against this constraint set — not against "what would a team of 10 engineers build."**
 
@@ -32,7 +32,7 @@ These are settled. Reopening them without a documented, specific reason wastes s
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Frontend framework | Next.js 16 App Router + TypeScript | SSR for SEO, single deploy, huge ecosystem |
+| Frontend framework | Next.js 16 App Router + TypeScript | SSR/SSG for SEO, single deploy, huge ecosystem |
 | Styling | Tailwind CSS v4 + shadcn/ui | Fast, consistent, no custom design system build cost |
 | Content delivery | Markdown → JSON, build-time | Static, no runtime parsing, CDN-served, zero cost |
 | Database | Supabase PostgreSQL | User state only, free tier sufficient for MVP |
@@ -46,7 +46,29 @@ These are settled. Reopening them without a documented, specific reason wastes s
 
 ---
 
-## 3. How to Evaluate a New Architectural Proposal
+## 3. Next.js 16 App Router Architectural Invariants
+
+Next.js 16 introduces critical changes from previous versions. Every AI agent or developer must adhere to these framework rules:
+
+### Async Params Invariant
+In Next.js 16, route parameters (`params`) and search parameters (`searchParams`) are asynchronous objects (Promises).
+- **Rule:** You MUST `await` `params` and `searchParams` in all layout files, page files, metadata generators, and route handlers.
+- **Why:** Accessing property values directly (e.g., `params.slug` or `searchParams.q`) without awaiting will evaluate to `undefined` or cause compile/runtime errors.
+
+```typescript
+// ✅ CORRECT Next.js 16 Route Handler
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params
+  // ...
+}
+```
+
+---
+
+## 4. How to Evaluate a New Architectural Proposal
 
 For any "should we add X to the stack" question:
 
@@ -71,28 +93,28 @@ Only if ALL five pass: document in Architecture.md §1, add to AGENTS.md, update
 
 ---
 
-## 4. The Content Pipeline — Architectural Invariants
+## 5. The Content Pipeline — Architectural Invariants
 
 These are the load-bearing architectural decisions for content. Touch them only with extreme care.
 
-1. **Source Markdown files are canonical.** The source of truth lives at `/content/lessons/`. Nothing else is canonical.
+1. **Source Markdown files are canonical.** The source of truth lives at `/content/lessons/` (repo root). Nothing else is canonical.
 2. **No content in the database.** `user_lesson_progress.lesson_slug` is a TEXT string that happens to match a JSON file's `meta.slug`. It is not a foreign key. Content can be regenerated without affecting user state.
 3. **Stable IDs are a contract with the database.** Once a `quiz[].id` or `flashcard[].id` is in production JSON, it cannot change. User-state records in Supabase reference it. Changing an ID breaks user progress data. Treat it like a DB migration: backwards-incompatible.
 4. **The parser must be idempotent.** Running it 100 times on the same source files produces the same 90 JSON files. No timestamps, no random UUIDs in IDs.
-5. **Validation is a quality gate, not optional.** The validator in CI is what prevents broken content from reaching production. If the validator needs to be loosened for a content change, that loosening is a product decision — update the schema documentation too.
+5. **Validation is a quality gate, not optional.** The validator in CI is what prevents broken content from reaching production.
 
 ---
 
-## 5. The Data Model — Architectural Invariants
+## 6. The Data Model — Architectural Invariants
 
-1. **`xp_events` is append-only.** Never DELETE. Never UPDATE. It is an audit ledger. `users.total_xp` is a computed cache — deriving it from `xp_events` should always produce the same result. If they diverge, it's a bug.
+1. **`xp_events` is append-only.** Never DELETE. Never UPDATE. It is an audit ledger. `users.total_xp` is a computed cache — deriving it from `xp_events` should always produce the same result. Trigger-based updates are mandatory to maintain consistency.
 2. **User state references content by slug (text), not by FK.** This is the seam between the static content world and the dynamic user-state world. Preserve this seam.
 3. **RLS is the security layer, not the application layer.** Application code should correctly scope queries by user. But if application code has a bug, RLS is the backstop. Both must be correct.
-4. **The `waitlist` table is pre-auth.** Do not add a foreign key from `waitlist` to `users`. They're different signup states.
+4. **The `waitlist` table is pre-auth.** Do not add a foreign key from `waitlist` to `users`.
 
 ---
 
-## 6. Scaling Decisions (make only when actually needed)
+## 7. Scaling Decisions (make only when actually needed)
 
 The static-first architecture means most traffic is CDN-served with zero server load. ~5,000 users is well within free tiers.
 
@@ -106,39 +128,25 @@ The static-first architecture means most traffic is CDN-served with zero server 
 
 ---
 
-## 7. What "Don't Over-Engineer" Means Here
+## 8. What "Don't Over-Engineer" Means Here
 
-- **Avoid microservices.** One Next.js app, one Supabase project. That's the entire infrastructure.
-- **Avoid custom auth.** Supabase Auth handles identity. Don't touch it beyond configuration.
+- **Avoid microservices.** One Next.js app, one Supabase project.
+- **Avoid custom auth.** Supabase Auth handles identity.
 - **Avoid server-side search.** The build-time index + client-side library is fast enough, free, and offline-capable.
-- **Avoid adding a CMS.** Markdown files in the repo, edited via code editor or GitHub, is the content management system.
+- **Avoid adding a CMS.** Markdown files in the repo, edited via code editor, is the CMS.
 - **Avoid real-time features** unless they solve a real problem (Supabase Realtime is available but not needed for MVP).
-- **Avoid a separate CDN.** Vercel Edge Network serves the static JSON content. No additional CDN setup needed.
-
----
-
-## 8. The One Feature That Would Require a Major Architecture Change
-
-**AI Mentor (chatbot)** — PRD.md §11 open decision.
-
-If this gets approved:
-- LLM API calls (OpenAI, Anthropic, etc.) have no meaningful free tier at real usage volume
-- Requires: new stack entry in Architecture.md §1, cost model, Phase 7+ monetization to fund it
-- May require: streaming API responses, rate limiting, credit/token system
-- Contradicts the current ₹0-infra principle
-
-This is the one "feature" that would change the architecture most significantly. It cannot be added silently. It requires full doc updates and explicit product decision.
+- **Avoid a separate CDN.** Vercel Edge Network serves the static JSON content.
 
 ---
 
 ## 9. Architecture Validation Checklist
 
 Before approving any major architectural change:
-- [ ] Evaluated against the 5-question filter in §3
-- [ ] Doesn't duplicate existing stack capability
-- [ ] Has a free tier sufficient for ≥5,000 users
-- [ ] Removal/replacement doesn't require a core logic rewrite
-- [ ] Architecture.md §1 table updated with: choice, why, free-tier ceiling, upgrade trigger
-- [ ] AGENTS.md updated if it affects how AI agents should work
-- [ ] Ripple effects checked across all 5 source-of-truth docs
-- [ ] Change documented with version bump in Architecture.md Changelog
+- [ ] Evaluated against the 5-question filter in §4.
+- [ ] Doesn't duplicate existing stack capability.
+- [ ] Has a free tier sufficient for ≥5,000 users.
+- [ ] Removal/replacement doesn't require a core logic rewrite.
+- [ ] Architecture.md §1 table updated with: choice, why, free-tier ceiling, upgrade trigger.
+- [ ] AGENTS.md updated if it affects how AI agents should work.
+- [ ] Ripple effects checked across all 5 source-of-truth docs.
+- [ ] Change documented with version bump in Architecture.md Changelog.
