@@ -50,7 +50,7 @@ export async function proxy(request: NextRequest) {
         newSession = data.session
       }
     } catch (err) {
-      console.error('[middleware] Refresh session error:', err)
+      console.error('[proxy] Refresh session error:', err)
     }
   }
 

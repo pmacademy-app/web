@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import type { ParsedLesson } from '@/types'
 import { CheckCircle2, Flame, Loader2, BookOpen, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import MarkdownRenderer from '@/components/ui/MarkdownRenderer'
 
 interface TheorySectionProps {
   lesson: ParsedLesson
@@ -92,10 +93,8 @@ export default function TheorySection({
       )}
 
       {/* Theory Content (Prose) */}
-      <div className="prose prose-neutral dark:prose-invert max-w-none">
-        <div className="whitespace-pre-line text-foreground/90 leading-relaxed font-sans text-base md:text-lg">
-          {lesson.theory}
-        </div>
+      <div className="mb-8">
+        <MarkdownRenderer content={lesson.theory} />
       </div>
 
       {/* Mental Model Block */}
@@ -109,14 +108,7 @@ export default function TheorySection({
               {lesson.mentalModel.title}
             </h3>
           </div>
-          <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
-            {lesson.mentalModel.content}
-          </p>
-          {lesson.mentalModel.diagramMermaid && (
-            <div className="mt-4 rounded-lg bg-muted p-4 font-mono text-xs overflow-x-auto border border-border">
-              <pre className="text-muted-foreground">{lesson.mentalModel.diagramMermaid}</pre>
-            </div>
-          )}
+          <MarkdownRenderer content={lesson.mentalModel.content} />
         </div>
       )}
 
@@ -131,9 +123,7 @@ export default function TheorySection({
               {lesson.caseStudy.title}
             </h3>
           </div>
-          <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
-            {lesson.caseStudy.content}
-          </p>
+          <MarkdownRenderer content={lesson.caseStudy.content} />
         </div>
       )}
 
@@ -148,9 +138,7 @@ export default function TheorySection({
               {lesson.framework.title}
             </h3>
           </div>
-          <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
-            {lesson.framework.content}
-          </p>
+          <MarkdownRenderer content={lesson.framework.content} />
         </div>
       )}
 
@@ -161,9 +149,7 @@ export default function TheorySection({
             <AlertCircle className="h-5 w-5" />
             <h3 className="text-lg font-bold font-serif">Common Pitfalls</h3>
           </div>
-          <div className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
-            {lesson.mistakes}
-          </div>
+          <MarkdownRenderer content={lesson.mistakes} />
         </div>
       )}
 
@@ -178,17 +164,15 @@ export default function TheorySection({
               {lesson.realWorldPerspective.title}
             </h3>
           </div>
-          <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
-            {lesson.realWorldPerspective.content}
-          </p>
+          <MarkdownRenderer content={lesson.realWorldPerspective.content} />
         </div>
       )}
 
       {/* Connections / Key Concepts */}
       {lesson.connections && (
         <div className="text-xs text-muted-foreground/80 leading-relaxed border-t border-border pt-4 mt-8">
-          <h4 className="font-semibold uppercase tracking-wider mb-1">Module Connections & Context</h4>
-          <p>{lesson.connections}</p>
+          <h4 className="font-semibold uppercase tracking-wider mb-2">Module Connections & Context</h4>
+          <MarkdownRenderer content={lesson.connections} />
         </div>
       )}
 

@@ -3,6 +3,7 @@ import path from 'path'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import MarkdownRenderer from '@/components/ui/MarkdownRenderer'
 import type { ParsedLesson } from '@/types'
 
 interface PageProps {
@@ -93,11 +94,10 @@ export default async function PublicLessonPage({ params }: PageProps) {
       )}
 
       {/* Theory preview / prose */}
-      <div className="prose prose-neutral dark:prose-invert max-w-none mb-12">
-        <div className="whitespace-pre-line text-foreground/90 leading-relaxed">
-          {lesson.theory.slice(0, 3000)}
-          {lesson.theory.length > 3000 && '...'}
-        </div>
+      <div className="mb-12">
+        <MarkdownRenderer
+          content={lesson.theory.slice(0, 3000) + (lesson.theory.length > 3000 ? '...' : '')}
+        />
       </div>
 
       {/* Quiz Preview CTA */}

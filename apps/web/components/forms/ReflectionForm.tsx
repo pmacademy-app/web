@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, Loader2, Sparkles, AlertCircle, FileText } from 'lucide-react'
+import MarkdownRenderer from '@/components/ui/MarkdownRenderer'
 
 interface ReflectionFormProps {
   lessonSlug: string
@@ -139,9 +140,7 @@ export default function ReflectionForm({
 
       {/* Prompt Card */}
       <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 shadow-sm">
-        <p className="text-sm font-medium text-foreground/90 leading-relaxed font-sans italic">
-          &ldquo;{prompt}&rdquo;
-        </p>
+        <MarkdownRenderer content={prompt} className="text-sm font-medium text-foreground/90 leading-relaxed font-sans italic" />
       </div>
 
       {/* Textarea */}

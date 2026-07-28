@@ -269,6 +269,8 @@ export function createServerSupabaseClient() {
   })
 }
 
+let globalBrowserSupabaseClient: ReturnType<typeof createClient<Database>> | null = null
+
 export function createBrowserSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -280,7 +282,11 @@ export function createBrowserSupabaseClient() {
     )
   }
 
-  return createClient<Database>(supabaseUrl, anonKey)
+  if (!globalBrowserSupabaseClient) {
+    globalBrowserSupabaseClient = createClient<Database>(supabaseUrl, anonKey)
+  }
+
+  return globalBrowserSupabaseClient
 }
 
 export function createAuthenticatedServerClient(accessToken: string) {

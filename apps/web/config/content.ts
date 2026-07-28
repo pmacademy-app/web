@@ -152,11 +152,6 @@ export const EXPERIENCE_FEATURES: FeatureItem[] = [
     description: 'Structured lessons that build on each other, with reading, reflection, and immediate application.',
   },
   {
-    icon: 'BookOpen',
-    title: 'Interactive Lessons',
-    description: 'Structured lessons that build on each other, with reading, reflection, and immediate application.',
-  },
-  {
     icon: 'Layers',
     title: 'Flashcards',
     description: 'Spaced repetition keeps key PM concepts fresh and ready for application.',
