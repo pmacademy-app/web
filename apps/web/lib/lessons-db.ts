@@ -2,12 +2,12 @@ import { readFile } from 'fs/promises'
 import path from 'path'
 import { verifyTheoryReadEngagement, XP_VALUES } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
-import { calculateSM2, SRSRating } from '@/lib/srs'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
+import { awardXp } from '@/lib/xp-service'
+import { completeLesson } from '@/lib/lessons-completion-service'
 
 type ProgressRow = Database['public']['Tables']['user_lesson_progress']['Row']
-type FlashcardSRSRow = Database['public']['Tables']['user_flashcard_srs']['Row']
 type ReflectionRow = Database['public']['Tables']['reflections']['Row']
 
 interface DBChain {
@@ -79,17 +79,18 @@ export async function recordTheoryReadAction(
 
   if (progressError) throw progressError
 
-  // 5. Insert XP event (source of truth ledger)
-  const { error: xpError } = await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .insert({
-      user_id: userId,
-      source_type: 'theory_read',
-      xp_amount: XP_VALUES.THEORY_READ,
-      source_id: slug,
-    })
-
-  if (xpError) console.error(`[lessons-db] Error creating theory_read XP event:`, xpError)
+  // 5. Award theory read XP via canonical XP service
+  try {
+    await awardXp(
+      supabase,
+      userId,
+      'theory_read',
+      XP_VALUES.THEORY_READ,
+      slug
+    )
+  } catch (xpError) {
+    console.error(`[lessons-db] Error creating theory_read XP event:`, xpError)
+  }
 
   // 6. Trigger streak update
   await updateUserStreak(supabase, userId)
@@ -160,47 +161,43 @@ export async function recordQuizAttemptAction(
   }
 
   const totalXpToAward = incrementalXp + perfectBonusXp
-  const newXpEarned = (progress?.xp_earned ?? 0) + totalXpToAward
-  const now = new Date().toISOString()
 
-  // 3. Upsert user progress to completed
-  const { error: progressError } = await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
-    .upsert({
-      user_id: userId,
-      lesson_slug: slug,
-      status: 'completed',
-      quiz_score: Math.max(prevScorePercent, scorePercentage),
-      quiz_attempts: (progress?.quiz_attempts ?? 0) + 1,
-      xp_earned: newXpEarned,
-      completed_at: progress?.completed_at ?? now,
-    }, { onConflict: 'user_id,lesson_slug' })
+  // 3. Persist lesson completion progress via canonical completion service
+  await completeLesson(
+    supabase,
+    userId,
+    slug,
+    scorePercentage,
+    totalXpToAward
+  )
 
-  if (progressError) throw progressError
-
-  // 4. Log XP events
+  // 4. Log XP events via canonical XP service
   if (incrementalXp > 0) {
-    const { error: xpError } = await (supabase
-      .from('xp_events') as unknown as DBChain)
-      .insert({
-        user_id: userId,
-        source_type: 'quiz_correct',
-        xp_amount: incrementalXp,
-        source_id: slug,
-      })
-    if (xpError) console.error(`[lessons-db] Error logging quiz_correct XP:`, xpError)
+    try {
+      await awardXp(
+        supabase,
+        userId,
+        'quiz_correct',
+        incrementalXp,
+        slug
+      )
+    } catch (xpError) {
+      console.error(`[lessons-db] Error logging quiz_correct XP:`, xpError)
+    }
   }
 
   if (perfectBonusXp > 0) {
-    const { error: bonusError } = await (supabase
-      .from('xp_events') as unknown as DBChain)
-      .insert({
-        user_id: userId,
-        source_type: 'quiz_bonus',
-        xp_amount: perfectBonusXp,
-        source_id: slug,
-      })
-    if (bonusError) console.error(`[lessons-db] Error logging quiz_bonus XP:`, bonusError)
+    try {
+      await awardXp(
+        supabase,
+        userId,
+        'quiz_bonus',
+        perfectBonusXp,
+        slug
+      )
+    } catch (bonusError) {
+      console.error(`[lessons-db] Error logging quiz_bonus XP:`, bonusError)
+    }
   }
 
   // 5. Update user streak
@@ -217,74 +214,6 @@ export async function recordQuizAttemptAction(
   }
 }
 
-/**
- * Handles the business logic for recording flashcard review events, computing the next review intervals
- * based on the SM-2 algorithm, persisting SRS states, awarding XP, and logging user streak updates.
- */
-export async function recordFlashcardReviewAction(
-  supabase: SupabaseClient<Database>,
-  userId: string,
-  flashcardId: string,
-  rating: number
-) {
-  // 1. Fetch current SM-2 state from database
-  const { data: srsData, error: srsFetchError } = (await (supabase
-    .from('user_flashcard_srs') as unknown as DBChain)
-    .select('*')
-    .eq('user_id', userId)
-    .eq('flashcard_id', flashcardId)
-    .maybeSingle()) as unknown as { data: FlashcardSRSRow | null; error: unknown }
-
-  if (srsFetchError) throw srsFetchError
-
-  const prevState = srsData
-    ? {
-        repetitions: srsData.repetitions,
-        intervalDays: srsData.interval_days,
-        easeFactor: Number(srsData.ease_factor),
-      }
-    : { repetitions: 0, intervalDays: 0, easeFactor: 2.5 }
-
-  // 2. Compute next spacing intervals using SM-2
-  const nextState = calculateSM2(rating as SRSRating, prevState)
-
-  // 3. Persist SRS review state
-  const { error: upsertError } = await (supabase
-    .from('user_flashcard_srs') as unknown as DBChain)
-    .upsert({
-      user_id: userId,
-      flashcard_id: flashcardId,
-      ease_factor: nextState.easeFactor,
-      interval_days: nextState.intervalDays,
-      repetitions: nextState.repetitions,
-      next_review_at: nextState.nextReviewAt.toISOString(),
-    }, { onConflict: 'user_id,flashcard_id' })
-
-  if (upsertError) throw upsertError
-
-  // 4. Award daily flashcard review XP
-  const { error: xpError } = await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .insert({
-      user_id: userId,
-      source_type: 'flashcard',
-      xp_amount: XP_VALUES.FLASHCARD_REVIEW,
-      source_id: flashcardId,
-    })
-
-  if (xpError) console.error(`[lessons-db] Error logging flashcard XP:`, xpError)
-
-  // 5. Update user streak
-  await updateUserStreak(supabase, userId)
-
-  return {
-    success: true,
-    nextReviewAt: nextState.nextReviewAt,
-    easeFactor: nextState.easeFactor,
-    intervalDays: nextState.intervalDays,
-    repetitions: nextState.repetitions,
-  }
-}
 
 /**
  * Handles the business logic for recording reflections, syncing lesson progress XP,
@@ -326,16 +255,18 @@ export async function recordReflectionAction(
     if (insertError) throw insertError
     result = inserted
 
-    // 3. Award reflection XP (15 XP)
-    const { error: xpError } = await (supabase
-      .from('xp_events') as unknown as DBChain)
-      .insert({
-        user_id: userId,
-        source_type: 'reflection',
-        xp_amount: XP_VALUES.REFLECTION_SUBMITTED,
-        source_id: lessonSlug,
-      })
-    if (xpError) console.error(`[lessons-db] Error logging reflection XP:`, xpError)
+    // 3. Award reflection XP (15 XP) via canonical XP service
+    try {
+      await awardXp(
+        supabase,
+        userId,
+        'reflection',
+        XP_VALUES.REFLECTION_SUBMITTED,
+        lessonSlug
+      )
+    } catch (xpError) {
+      console.error(`[lessons-db] Error logging reflection XP:`, xpError)
+    }
 
     // 4. Update progress xp_earned
     const { data: progress } = (await (supabase

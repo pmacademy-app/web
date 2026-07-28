@@ -1,7 +1,7 @@
 # PM Academy — Rules
 
 **Status:** Living document — the operating manual for how this project is built, by whom (a solo founder, possibly assisted by AI tools/agents), and how any future contributor or AI assistant should behave when picking up this codebase.
-**Companion docs:** `PRD.md` (what/why), `Architecture.md` (technical design), `Phases.md` (when), `Design.md` (what it looks like).
+**Companion docs:** `PRD.md` (what/why), `Architecture.md` (technical design), `Phases.md` (when), `Design.md` (what it looks like), `Supabase-Migration-Guide.md` (the one workflow this doc's change-management rules apply to most literally — a database migration is the highest-consequence "change" a solo founder can make).
 
 ---
 

@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { getLocalDateString, recordActivityStreak, StreakData } from '@/lib/streaks'
 import { XP_VALUES } from '@/lib/xp'
+import { awardXp } from '@/lib/xp-service'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -74,15 +75,15 @@ export async function updateUserStreak(
 
       // 4. Award XP for maintaining streak
       if (result.streakIncremented) {
-        const { error: xpError } = await (supabase
-          .from('xp_events') as unknown as DBChain)
-          .insert({
-            user_id: userId,
-            source_type: 'streak',
-            xp_amount: XP_VALUES.DAILY_STREAK_BASE,
-            source_id: `streak-${result.currentStreak}`,
-          })
-        if (xpError) {
+        try {
+          await awardXp(
+            supabase,
+            userId,
+            'streak',
+            XP_VALUES.DAILY_STREAK_BASE,
+            `streak-${result.currentStreak}`
+          )
+        } catch (xpError) {
           console.error('[streaks-db] Error logging streak XP event:', xpError)
         }
       }

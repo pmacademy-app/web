@@ -5,7 +5,7 @@ import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/l
 import { getAuthenticatedUser } from '@/lib/auth'
 
 const patchSchema = z.object({
-  status: z.enum(['not_started', 'in_progress', 'completed']),
+  status: z.literal('in_progress'),
 })
 
 export async function GET(

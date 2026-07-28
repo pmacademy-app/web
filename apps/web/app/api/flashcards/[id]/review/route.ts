@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
 import { getAuthenticatedUser } from '@/lib/auth'
-import { recordFlashcardReviewAction } from '@/lib/lessons-db'
+import { recordFlashcardReview } from '@/lib/flashcards-service'
 
 const reviewSchema = z.object({
   rating: z.union([
@@ -44,7 +44,7 @@ export async function POST(
     const { rating } = parsed.data
     const serviceSupabase = createServerSupabaseClient()
 
-    const result = await recordFlashcardReviewAction(
+    const result = await recordFlashcardReview(
       serviceSupabase,
       user.id,
       id,

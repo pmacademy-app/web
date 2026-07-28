@@ -1,7 +1,7 @@
 # PM Academy — Architecture
 
 **Status:** Living document — single source of truth for technical decisions.
-**Companion docs:** `PRD.md` (what/why), `Rules.md` (how we work), `Phases.md` (when), `Design.md` (what it looks like).
+**Companion docs:** `PRD.md` (what/why), `Rules.md` (how we work), `Phases.md` (when), `Design.md` (what it looks like), `Supabase-Migration-Guide.md` (how to safely change the schema below — §2 and §9 define what's correct, that doc defines the safe workflow to get there).
 **Read this before writing any code.** Every choice below is optimized for one constraint set: **solo-founder buildable, low infrastructure cost, static-first architecture targeting ~5,000 users, and capable of scaling later without a rewrite.**
 
 ---
@@ -317,26 +317,38 @@ Implement these as isolated, well-tested modules in `lib/` — each should be in
 
 ## 8. Deployment Pipeline
 
-All deployments flow through a single automated pipeline:
+**Two separate GitHub Actions workflows**, not one — this was tightened after the initial single-pipeline description below turned out to be inaccurate once the database migration workflow was actually built out (see `Supabase-Migration-Guide.md`). Keeping them separate is the right call, not just what happened: app code and database schema have different risk profiles and different rollback procedures, and coupling them into one workflow would mean a flaky content-validation step could block an urgent database fix, or vice versa.
 
+**App pipeline** (content + Next.js app, triggers on every push/PR):
 ```
 GitHub (push to main or PR)
        ↓
-GitHub Actions
+GitHub Actions — app-deploy.yml
        ↓
   ┌─ Markdown Validation (schema check, cross-ref check)
   ├─ JSON Generation (parse-content.ts)
-  ├─ Search Index Generation (generate-search-index.ts)
+  ├─ Search Index Generation (generate-search-index.ts) — from Phase 4 onward only; see `Phases.md`. Earlier phases skip this step entirely, not run it against an empty/near-empty index.
   ├─ Lint + Type Check + Unit Tests
   └─ Next.js Build
        ↓
 Vercel Deployment (automatic via Git integration)
 ```
 
+**Database pipeline** (schema changes only, triggers on push/merge to `main`):
+```
+GitHub (push/merge to main)
+       ↓
+GitHub Actions — supabase-deploy.yml
+       ↓
+  npx supabase db push (applies new migrations from supabase/migrations/)
+```
+Full workflow, local testing, rollback, and CI secrets setup: `Supabase-Migration-Guide.md`. That document is authoritative for *how* to change the schema safely; this section and §2/§9 are authoritative for *what* the schema and its RLS policies must be.
+
 **Key rules:**
-- If markdown validation fails, the build fails — broken content never reaches production.
+- If markdown validation fails, the app build fails — broken content never reaches production.
 - JSON generation runs before `next build` so that static JSON is available for Next.js to include in the build output.
 - Vercel preview deployments on every PR provide a free, zero-config staging environment.
+- Database migrations never run automatically on a PR preview — only on merge to `main`, per `Supabase-Migration-Guide.md` §3.3. A PR should never be able to alter the production schema before review.
 - Never commit secrets. Use environment variables (`.env.local`, never committed) for all API keys (Supabase, Resend, Google Analytics). Document required env vars in a checked-in `.env.example`.
 
 ---
@@ -364,6 +376,7 @@ This stack is chosen specifically so that scaling is a **later, success-driven d
 
 ## Changelog
 
+- v2.3 — Reconciled §8 with the real, separately-built database migration workflow: split the "single pipeline" into an app pipeline and a database pipeline, cross-referenced the new `Supabase-Migration-Guide.md`, and corrected search-index generation to only run from Phase 4 onward (was incorrectly shown as universal, contradicting the Phase 1→4 move already made in `Phases.md`).
 - v2.2 — Lean-documentation pass: added explicit scalability trigger for client-side search (revisit past ~300 lessons or ~2MB gzipped index) so the tradeoff has a concrete decision point rather than being implicit.
 - v2.1 — Documentation review pass: added missing `(portfolio)` public route group for the unauthenticated portfolio/certificate export feature (`PRD.md` §4.11), which had no route in the folder structure despite being a required v1 feature.
 - v2.0 — Architecture rewritten for static-first, Markdown-to-JSON build pipeline. Removed database-backed content tables (modules, lessons, quiz_questions, flashcards) — content is now pre-generated static JSON. User-state tables reference content by slug. Added search architecture (client-side, build-time index). Added deployment pipeline (GitHub Actions). Replaced PostHog with Google Analytics. Replaced LinkedIn OAuth with Email + Password and Google Login. Removed Cloudflare Pages. Added Resend SMTP integration. Added waitlist and bookmarks tables. Target: ~5,000-user MVP.

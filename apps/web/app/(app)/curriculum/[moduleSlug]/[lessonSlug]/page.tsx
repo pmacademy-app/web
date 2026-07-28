@@ -9,6 +9,7 @@ import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/l
 import { getAuthenticatedUser } from '@/lib/auth'
 import LessonViewShell from '@/components/lesson/LessonViewShell'
 import { Lock } from 'lucide-react'
+import { isLessonUnlocked } from '@/lib/lessons-completion-service'
 
 interface PageProps {
   params: Promise<{
@@ -73,14 +74,8 @@ export default async function AuthenticatedLessonPage({ params }: PageProps) {
     prevModuleNumber = Math.ceil(prevNum / 10)
 
     const serviceSupabase = createServerSupabaseClient()
-    const { data: prevProgress } = (await serviceSupabase
-      .from('user_lesson_progress')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('lesson_slug', prevLessonSlug)
-      .maybeSingle()) as unknown as { data: { status: string } | null; error: unknown }
-
-    if (!prevProgress || prevProgress.status !== 'completed') {
+    const unlocked = await isLessonUnlocked(serviceSupabase, user.id, lessonNum)
+    if (!unlocked) {
       isLocked = true
     }
   }
