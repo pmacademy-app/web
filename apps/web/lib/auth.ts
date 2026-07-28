@@ -62,3 +62,11 @@ export async function getAuthenticatedUser(supabase: SupabaseClient<Database>): 
   }
   return user
 }
+
+/**
+ * Checks if the user profile has completed onboarding (i.e. has a goal set).
+ */
+export function isProfileComplete(profile: UserProfile): boolean {
+  return !!profile.goal
+}
+

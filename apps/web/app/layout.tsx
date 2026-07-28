@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Fraunces } from 'next/font/google'
 import Script from 'next/script'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import AuthStateListener from '@/components/layout/AuthStateListener'
 import '@/app/globals.css'
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
@@ -137,6 +138,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <TooltipProvider>
+          <AuthStateListener />
           {children}
         </TooltipProvider>
 

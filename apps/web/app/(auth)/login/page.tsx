@@ -3,31 +3,58 @@
 import { useState, useTransition, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email is required.')
+    .email('Please enter a valid email address.')
+    .trim()
+    .toLowerCase(),
+  password: z
+    .string()
+    .min(1, 'Password is required.')
+    .min(6, 'Password must be at least 6 characters.'),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const authErrorParam = searchParams.get('error')
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState<string | null>(
     authErrorParam === 'auth_failed' ? 'Authentication failed. Please try again.' : null
   )
   const [isPending, startTransition] = useTransition()
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  })
+
+  const handleEmailLogin = (values: LoginFormValues) => {
     setErrorMsg(null)
 
     startTransition(async () => {
       try {
         const supabase = createBrowserSupabaseClient()
         const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: values.email,
+          password: values.password,
         })
 
         if (error) {
@@ -69,16 +96,19 @@ function LoginForm() {
     }
   }
 
+  const isLoading = isPending || isGoogleLoading
+
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
       {/* Google OAuth Button */}
       <button
         type="button"
         onClick={handleGoogleLogin}
-        disabled={isPending || isGoogleLoading}
-        className="w-full flex items-center justify-center gap-3 rounded-lg border border-input bg-background py-2.5 px-4 text-sm font-medium text-foreground shadow-sm hover:bg-secondary/80 transition-colors disabled:opacity-50"
+        disabled={isLoading}
+        aria-label="Continue with Google"
+        className="w-full flex items-center justify-center gap-3 rounded-lg border border-input bg-background py-2.5 px-4 text-sm font-medium text-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <svg className="w-4 h-4" viewBox="0 0 24 24">
+        <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="currentColor"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -107,25 +137,35 @@ function LoginForm() {
       </div>
 
       {errorMsg && (
-        <div className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium">
+        <div
+          className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
+          role="alert"
+        >
           {errorMsg}
         </div>
       )}
 
-      <form onSubmit={handleEmailLogin} className="space-y-4">
+      <form onSubmit={handleSubmit(handleEmailLogin)} className="space-y-4" noValidate>
         <div>
           <label htmlFor="login-email" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
-            Email
+            Email Address
           </label>
           <input
             id="login-email"
             type="email"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'email-error' : undefined}
             placeholder="jane@example.com"
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+            {...register('email')}
           />
+          {errors.email && (
+            <p id="email-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+              {errors.email.message}
+            </p>
+          )}
         </div>
 
         <div>
@@ -133,7 +173,10 @@ function LoginForm() {
             <label htmlFor="login-password" className="block text-xs font-semibold uppercase text-foreground/80">
               Password
             </label>
-            <Link href="/reset-password" className="text-xs text-primary hover:underline">
+            <Link
+              href="/reset-password"
+              className="text-xs text-primary font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded"
+            >
               Forgot?
             </Link>
           </div>
@@ -141,16 +184,23 @@ function LoginForm() {
             id="login-password"
             type="password"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            disabled={isLoading}
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? 'password-error' : undefined}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+            {...register('password')}
           />
+          {errors.password && (
+            <p id="password-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+              {errors.password.message}
+            </p>
+          )}
         </div>
 
         <button
           type="submit"
-          disabled={isPending}
-          className="w-full rounded-lg bg-primary py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors disabled:opacity-50"
+          disabled={isLoading}
+          className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? 'Logging in...' : 'Log In'}
         </button>
@@ -158,7 +208,10 @@ function LoginForm() {
 
       <div className="mt-6 text-center text-xs text-muted-foreground border-t border-border pt-4">
         Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-semibold text-primary hover:underline">
+        <Link
+          href="/signup"
+          className="font-semibold text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded"
+        >
           Sign up
         </Link>
       </div>
@@ -178,11 +231,13 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <Suspense fallback={
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm text-center text-sm text-muted-foreground">
-          Loading login form...
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm text-center text-sm text-muted-foreground">
+            Loading login form...
+          </div>
+        }
+      >
         <LoginForm />
       </Suspense>
     </div>

@@ -3,27 +3,55 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
+
+const signupSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Full name is required.')
+    .min(2, 'Name must be at least 2 characters.')
+    .max(80, 'Name must be less than 80 characters.')
+    .trim(),
+  email: z
+    .string()
+    .min(1, 'Email is required.')
+    .email('Please enter a valid email address.')
+    .trim()
+    .toLowerCase(),
+  password: z
+    .string()
+    .min(1, 'Password is required.')
+    .min(6, 'Password must be at least 6 characters.'),
+})
+
+type SignupFormValues = z.infer<typeof signupSchema>
 
 export default function SignupPage() {
   const router = useRouter()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  })
+
+  const handleSignup = (values: SignupFormValues) => {
     setErrorMsg(null)
     setSuccessMsg(null)
-
-    if (password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters.')
-      return
-    }
 
     startTransition(async () => {
       try {
@@ -31,10 +59,10 @@ export default function SignupPage() {
         const origin = window.location.origin
 
         const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
+          email: values.email,
+          password: values.password,
           options: {
-            data: { full_name: name },
+            data: { full_name: values.name },
             emailRedirectTo: `${origin}/api/auth/callback`,
           },
         })
@@ -83,6 +111,8 @@ export default function SignupPage() {
     }
   }
 
+  const isLoading = isPending || isGoogleLoading
+
   return (
     <div className="container mx-auto px-4 py-16 max-w-sm">
       <div className="text-center mb-8">
@@ -99,10 +129,11 @@ export default function SignupPage() {
         <button
           type="button"
           onClick={handleGoogleSignup}
-          disabled={isPending || isGoogleLoading}
-          className="w-full flex items-center justify-center gap-3 rounded-lg border border-input bg-background py-2.5 px-4 text-sm font-medium text-foreground shadow-sm hover:bg-secondary/80 transition-colors disabled:opacity-50"
+          disabled={isLoading}
+          aria-label="Sign up with Google"
+          className="w-full flex items-center justify-center gap-3 rounded-lg border border-input bg-background py-2.5 px-4 text-sm font-medium text-foreground shadow-sm hover:bg-secondary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -131,18 +162,24 @@ export default function SignupPage() {
         </div>
 
         {errorMsg && (
-          <div className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium">
+          <div
+            className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
+            role="alert"
+          >
             {errorMsg}
           </div>
         )}
 
         {successMsg && (
-          <div className="p-3 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-medium">
+          <div
+            className="p-3 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-medium"
+            role="alert"
+          >
             {successMsg}
           </div>
         )}
 
-        <form onSubmit={handleSignup} className="space-y-4">
+        <form onSubmit={handleSubmit(handleSignup)} className="space-y-4" noValidate>
           <div>
             <label htmlFor="signup-name" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
               Full Name
@@ -151,26 +188,40 @@ export default function SignupPage() {
               id="signup-name"
               type="text"
               required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              disabled={isLoading}
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? 'name-error' : undefined}
               placeholder="Jane Doe"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+              {...register('name')}
             />
+            {errors.name && (
+              <p id="name-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+                {errors.name.message}
+              </p>
+            )}
           </div>
 
           <div>
             <label htmlFor="signup-email" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
-              Email
+              Email Address
             </label>
             <input
               id="signup-email"
               type="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? 'email-error' : undefined}
               placeholder="jane@example.com"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+              {...register('email')}
             />
+            {errors.email && (
+              <p id="email-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -181,18 +232,24 @@ export default function SignupPage() {
               id="signup-password"
               type="password"
               required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? 'password-error' : undefined}
               placeholder="Min. 6 characters"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+              {...register('password')}
             />
+            {errors.password && (
+              <p id="password-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
           <button
             type="submit"
-            disabled={isPending}
-            className="w-full rounded-lg bg-primary py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors disabled:opacity-50"
+            disabled={isLoading}
+            className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? 'Creating Account...' : 'Create Account →'}
           </button>
@@ -200,7 +257,10 @@ export default function SignupPage() {
 
         <div className="mt-6 text-center text-xs text-muted-foreground border-t border-border pt-4">
           Already have an account?{' '}
-          <Link href="/login" className="font-semibold text-primary hover:underline">
+          <Link
+            href="/login"
+            className="font-semibold text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded"
+          >
             Log in
           </Link>
         </div>

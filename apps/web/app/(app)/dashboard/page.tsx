@@ -1,34 +1,97 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { SKILL_CLUSTERS } from '@/lib/skillRadar'
+import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
+import { ensureUserProfile, UserProfile } from '@/lib/auth'
 
 export const metadata: Metadata = {
   title: 'Dashboard | PM Academy',
   description: 'Track your skill radar, streak, and progress across the 90 PM Academy lessons.',
 }
 
-export default function DashboardPage() {
-  // Demo authenticated dashboard data
+function getLevelTitle(level: number): string {
+  switch (level) {
+    case 9:
+      return 'Chief Product Officer'
+    case 8:
+    case 7:
+    case 6:
+      return 'VP Product'
+    case 5:
+      return 'Group PM'
+    case 4:
+      return 'Senior PM'
+    case 3:
+      return 'PM'
+    case 2:
+      return 'Junior PM'
+    case 1:
+    default:
+      return 'Associate PM Trainee'
+  }
+}
+
+export default async function DashboardPage() {
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('sb-access-token')?.value
+
+  if (!accessToken) {
+    redirect('/login')
+  }
+
+  // Create an authenticated client to query data
+  const supabase = createAuthenticatedServerClient(accessToken)
+
+  // Get user profile from Supabase Auth
+  const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+  if (authError || !authUser) {
+    redirect('/login')
+  }
+
+  // Fetch the public.users record
+  const { data: dbProfile, error: dbError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', authUser.id)
+    .maybeSingle()
+
+  let profile = dbProfile as UserProfile | null
+
+  if (dbError) {
+    console.error('[dashboard] Error loading database profile:', dbError.message)
+  }
+
+  // Initialize profile if not found
+  if (!profile) {
+    const serviceSupabase = createServerSupabaseClient()
+    profile = await ensureUserProfile(serviceSupabase, authUser)
+    if (!profile) {
+      throw new Error('Failed to initialize user profile.')
+    }
+  }
+
   const user = {
-    name: 'Learner',
-    level: 1,
-    title: 'Associate PM Trainee',
-    totalXp: 120,
-    streak: 3,
-    completedLessons: 1,
+    name: profile.name || 'Learner',
+    level: profile.level,
+    title: getLevelTitle(profile.level),
+    totalXp: profile.total_xp,
+    streak: profile.current_streak,
+    completedLessons: 0, // Will load dynamically in later learning loop sprints
     nextLesson: {
-      number: 2,
-      slug: 'lesson-002',
-      title: 'Product vs. Project',
-      estimatedTime: '25 min',
+      number: 1,
+      slug: 'lesson-001',
+      title: 'Introduction to Product Management',
+      estimatedTime: '15 min',
     },
     skillValues: {
-      discovery: 15,
-      strategy: 30,
+      discovery: 0,
+      strategy: 0,
       design: 0,
-      execution: 10,
+      execution: 0,
       growth: 0,
-      leadership: 20,
+      leadership: 0,
       technical: 0,
     },
   }
@@ -44,6 +107,11 @@ export default function DashboardPage() {
           <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground mt-1">
             Welcome back, {user.name} 👋
           </h1>
+          {profile.goal && (
+            <p className="text-xs text-muted-foreground/80 mt-1 uppercase tracking-wider font-medium">
+              Goal: {profile.goal.replace('_', ' ')}
+            </p>
+          )}
           <p className="text-xs text-muted-foreground mt-1">
             {user.totalXp} XP • {user.completedLessons}/90 Lessons Completed
           </p>
@@ -90,7 +158,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {SKILL_CLUSTERS.map((cluster) => {
-            const val = user.skillValues[cluster.id] || 0
+            const val = user.skillValues[cluster.id as keyof typeof user.skillValues] || 0
             return (
               <div key={cluster.id} className="rounded-lg bg-secondary/40 p-4 border border-border/50">
                 <span className="text-xs font-semibold text-muted-foreground">
