@@ -62,7 +62,6 @@ export default function OnboardingPage() {
 
       if (refreshError) {
         console.error('[onboarding] Session refresh error:', refreshError.message)
-        // Even if refresh failed locally, proceed to trigger middleware token check/refresh
       }
 
       router.push('/dashboard')
