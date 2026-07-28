@@ -3,7 +3,8 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
-import { SKILL_CLUSTERS, SKILL_COLORS, SKILL_LABELS } from '@/lib/design/tokens'
+import { SKILL_COLORS, SKILL_LABELS } from '@/lib/design/tokens'
+import { SKILL_CLUSTER_IDS } from '@/lib/skillRadar'
 import type { SkillValues } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -41,7 +42,7 @@ export function SkillRadar({
   const cy = size / 2
   const maxRadius = (size / 2) * 0.75
   const gridLevels = 4
-  const clusterCount = SKILL_CLUSTERS.length
+  const clusterCount = SKILL_CLUSTER_IDS.length
 
   // Convert a value (0–100) to a point on the radar
   function getPoint(clusterIndex: number, value: number): { x: number; y: number } {
@@ -60,7 +61,7 @@ export function SkillRadar({
 
   // Build SVG polygon points string from values
   function buildPolygon(vals: SkillValues): string {
-    return SKILL_CLUSTERS.map((cluster, i) => {
+    return SKILL_CLUSTER_IDS.map((cluster, i) => {
       const point = getPoint(i, vals[cluster])
       return `${point.x},${point.y}`
     }).join(' ')
@@ -73,7 +74,7 @@ export function SkillRadar({
       {/* Screen-reader text summary */}
       <p className="sr-only">
         Skill radar showing PM Academy progress across 7 competencies:{' '}
-        {SKILL_CLUSTERS.map((c) => `${SKILL_LABELS[c]}: ${values[c]}%`).join(', ')}.
+        {SKILL_CLUSTER_IDS.map((c) => `${SKILL_LABELS[c]}: ${values[c]}%`).join(', ')}.
       </p>
 
       {/* SVG Radar */}
@@ -88,7 +89,7 @@ export function SkillRadar({
         {/* Grid rings */}
         {Array.from({ length: gridLevels }, (_, i) => {
           const r = ((i + 1) / gridLevels) * maxRadius
-          const ringPoints = SKILL_CLUSTERS.map((_, ci) => {
+          const ringPoints = SKILL_CLUSTER_IDS.map((_, ci) => {
             const angle = (Math.PI * 2 * ci) / clusterCount - Math.PI / 2
             return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`
           }).join(' ')
@@ -105,7 +106,7 @@ export function SkillRadar({
         })}
 
         {/* Axis lines */}
-        {SKILL_CLUSTERS.map((_, i) => {
+        {SKILL_CLUSTER_IDS.map((_, i) => {
           const end = getAxisEnd(i)
           return (
             <line
@@ -122,7 +123,7 @@ export function SkillRadar({
         })}
 
         {/* Axis colored dots */}
-        {SKILL_CLUSTERS.map((cluster, i) => {
+        {SKILL_CLUSTER_IDS.map((cluster, i) => {
           const end = getAxisEnd(i)
           return (
             <circle
@@ -166,7 +167,7 @@ export function SkillRadar({
         />
 
         {/* Value dots */}
-        {SKILL_CLUSTERS.map((cluster, i) => {
+        {SKILL_CLUSTER_IDS.map((cluster, i) => {
           const point = getPoint(i, values[cluster])
           return (
             <motion.circle
@@ -187,7 +188,7 @@ export function SkillRadar({
       {/* Legend */}
       {showLegend && (
         <div className="grid grid-cols-1 gap-2" aria-hidden="true">
-          {SKILL_CLUSTERS.map((cluster) => (
+          {SKILL_CLUSTER_IDS.map((cluster) => (
             <div key={cluster} className="flex items-center gap-2">
               <div
                 className="w-2.5 h-2.5 rounded-full flex-shrink-0"

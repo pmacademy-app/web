@@ -5,7 +5,8 @@ import { motion, useInView } from 'framer-motion'
 import { SkillRadar } from '@/components/marketing/product-mockup/skill-radar'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { SKILL_RADAR_DEMO } from '@/config/content'
-import { SKILL_CLUSTERS, SKILL_COLORS, SKILL_LABELS } from '@/lib/design/tokens'
+import { SKILL_COLORS, SKILL_LABELS } from '@/lib/design/tokens'
+import { SKILL_CLUSTER_IDS } from '@/lib/skillRadar'
 import { trackPortfolioView } from '@/lib/analytics'
 
 /**
@@ -63,7 +64,7 @@ export function SkillRadarSection() {
 
             {/* Competency legend */}
             <div className="space-y-3 mb-8">
-              {SKILL_CLUSTERS.map((cluster, index) => (
+              {SKILL_CLUSTER_IDS.map((cluster, index) => (
                 <motion.div
                   key={cluster}
                   initial={prefersReducedMotion ? false : { opacity: 0, x: 8 }}

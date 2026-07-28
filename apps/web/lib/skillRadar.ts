@@ -1,14 +1,15 @@
 import type { SkillCluster, SkillValues } from '@/types'
+import { SKILL_LABELS } from '@/lib/design/tokens'
 
-export const SKILL_CLUSTERS: { id: SkillCluster; label: string }[] = [
-  { id: 'discovery',  label: 'Discovery & Research' },
-  { id: 'strategy',   label: 'Strategy' },
-  { id: 'design',     label: 'Design & UX' },
-  { id: 'execution',  label: 'Execution & Delivery' },
-  { id: 'growth',     label: 'Metrics & Growth' },
-  { id: 'leadership', label: 'Leadership & Communication' },
-  { id: 'technical',  label: 'Technical & Platform' },
+/** Canonical ordered list of skill cluster IDs. */
+export const SKILL_CLUSTER_IDS: SkillCluster[] = [
+  'discovery', 'strategy', 'design', 'execution',
+  'growth', 'leadership', 'technical',
 ]
+
+/** Enriched cluster objects with labels — use for UI rendering. */
+export const SKILL_CLUSTERS: { id: SkillCluster; label: string }[] =
+  SKILL_CLUSTER_IDS.map((id) => ({ id, label: SKILL_LABELS[id] }))
 
 export interface LessonProgressInput {
   lessonSlug: string

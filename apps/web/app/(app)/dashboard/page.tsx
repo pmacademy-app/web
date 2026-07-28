@@ -3,34 +3,13 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { SKILL_CLUSTERS } from '@/lib/skillRadar'
+import { getLevelTitle } from '@/lib/xp'
 import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile } from '@/lib/auth'
 
 export const metadata: Metadata = {
   title: 'Dashboard | PM Academy',
   description: 'Track your skill radar, streak, and progress across the 90 PM Academy lessons.',
-}
-
-function getLevelTitle(level: number): string {
-  switch (level) {
-    case 9:
-      return 'Chief Product Officer'
-    case 8:
-    case 7:
-    case 6:
-      return 'VP Product'
-    case 5:
-      return 'Group PM'
-    case 4:
-      return 'Senior PM'
-    case 3:
-      return 'PM'
-    case 2:
-      return 'Junior PM'
-    case 1:
-    default:
-      return 'Associate PM Trainee'
-  }
 }
 
 export default async function DashboardPage() {
@@ -138,7 +117,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <Link
-          href={`/lessons/${user.nextLesson.slug}`}
+          href="/curriculum"
           className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
         >
           Start Lesson →

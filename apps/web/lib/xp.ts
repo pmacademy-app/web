@@ -36,6 +36,12 @@ export function getTitleForXp(xp: number): { level: number; title: string } {
   return { level: currentLevel.level, title: currentLevel.title }
 }
 
+/** Returns the career title for a given level number (1–9). */
+export function getLevelTitle(level: number): string {
+  const entry = LEVEL_TITLES.find((e) => e.level === level)
+  return entry?.title ?? 'Associate PM Trainee'
+}
+
 /**
  * Anti-gaming verification for Theory reading XP.
  * Requires minimum active dwell time (e.g. 60 seconds) AND scroll depth percentage >= 80%.

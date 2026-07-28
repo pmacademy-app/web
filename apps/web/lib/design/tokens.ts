@@ -28,17 +28,6 @@ export const SKILL_LABELS: Record<SkillCluster, string> = {
   technical:  'Technical Fluency',
 }
 
-/** Ordered array for consistent radar axis rendering. */
-export const SKILL_CLUSTERS: SkillCluster[] = [
-  'discovery',
-  'strategy',
-  'design',
-  'execution',
-  'growth',
-  'leadership',
-  'technical',
-]
-
 // ─── Motion (Sprint 1 §12) ────────────────────────────────────────────────────
 
 export const DURATION = {

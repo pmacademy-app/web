@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Menu, Search, User, LogOut, ChevronRight } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { getLevelTitle } from '@/lib/xp'
 
 interface TopbarProps {
   onMenuOpen: () => void
@@ -12,28 +13,6 @@ interface TopbarProps {
     name: string | null
     email: string
     level: number
-  }
-}
-
-function getLevelTitle(level: number): string {
-  switch (level) {
-    case 9:
-      return 'Chief Product Officer'
-    case 8:
-    case 7:
-    case 6:
-      return 'VP Product'
-    case 5:
-      return 'Group PM'
-    case 4:
-      return 'Senior PM'
-    case 3:
-      return 'PM'
-    case 2:
-      return 'Junior PM'
-    case 1:
-    default:
-      return 'Associate PM Trainee'
   }
 }
 

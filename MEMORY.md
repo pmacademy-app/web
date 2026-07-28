@@ -1,7 +1,7 @@
 # PM Academy — Project Memory (MEMORY.md)
 
 **Last Updated:** 2026-07-28  
-**Project Stage:** Phase 0 Complete / Entering Phase 1  
+**Project Stage:** Sprint 2 Complete / Entering Sprint 3  
 **OS Version:** Windows  
 **Framework:** Next.js 16 (App Router) + TypeScript 5 (Strict) + Tailwind CSS v4 + Supabase
 
@@ -30,7 +30,19 @@ Phase 0 is fully complete and functional:
 
 ---
 
-## 3. Directory Layout
+## 3. Sprint 2 Foundation Cleanup (2026-07-28)
+
+Audit scored **88/100** with 7 issues (2 high, 3 medium, 2 low). All high and medium items fixed:
+- **Consolidated `getLevelTitle()`**: Added canonical version to `lib/xp.ts`, removed duplicates from `dashboard/page.tsx` and `Topbar.tsx`
+- **Fixed dashboard CTA route**: Changed `/lessons/{slug}` (marketing route) to `/curriculum` (authenticated route)
+- **Consolidated `SKILL_CLUSTERS`**: Removed plain string array from `tokens.ts`, derived enriched objects in `skillRadar.ts` from `SKILL_LABELS`
+- **Fixed `SKILL_LABELS.technical` inconsistency**: Aligned both definitions to "Technical Fluency"
+- **Moved `shadcn` CLI to devDependencies**: Runtime dependency → dev tool
+- **Build verified**: lint clean, TypeScript clean, 90 lessons, 1350 quiz questions, 21 routes
+
+---
+
+## 4. Directory Layout
 
 The workspace is organized as follows:
 ```
@@ -56,8 +68,12 @@ pm-academy/
 │   │   ├── animation.ts        # Centralised Framer Motion timings and transition variants
 │   │   ├── auth.ts             # Profile synchronization and session helpers
 │   │   ├── email.ts            # Resend transaction templates and sending functions
+│   │   ├── skillRadar.ts       # Skill radar scoring logic and cluster definitions
 │   │   ├── supabase.ts         # Server/Browser Supabase client factories
-│   │   └── utils.ts            # Tailwind CSS class merging helper (cn)
+│   │   ├── xp.ts               # XP constants, level titles, getLevelTitle()
+│   │   ├── utils.ts            # Tailwind CSS class merging helper (cn)
+│   │   └── design/
+│   │       └── tokens.ts       # Design token constants (colors, labels, durations)
 │   └── public/content/         # Target output folder for parsed static content (git-ignored)
 ├── content/
 │   ├── lessons/                # 90 human-authored Markdown lesson source files
@@ -72,7 +88,7 @@ pm-academy/
 
 ---
 
-## 4. Technical Invariants & Rules
+## 5. Technical Invariants & Rules
 
 Every developer (or AI agent) working on this repository must adhere to the following laws:
 
@@ -88,7 +104,7 @@ Every developer (or AI agent) working on this repository must adhere to the foll
 
 ---
 
-## 5. DB Schema & User State Quick Reference
+## 6. DB Schema & User State Quick Reference
 
 - **`users`:** Core account, streak tracking, cached `total_xp`, and `level`.
 - **`user_lesson_progress`:** Tracks lesson completion status, quiz score, attempts, and XP earned per lesson slug.
@@ -100,7 +116,7 @@ Every developer (or AI agent) working on this repository must adhere to the foll
 
 ---
 
-## 6. Antigravity AI Skill System
+## 7. Antigravity AI Skill System
 
 Workspace rules and specialized assistant guides are housed in `.agents/`. Under normal workflow, the appropriate skills should be consulted:
 - `00-pm-academy-core` — Loads full architecture, stack rules, and invariants. **Load in every session.**
@@ -112,7 +128,7 @@ Workspace rules and specialized assistant guides are housed in `.agents/`. Under
 
 ---
 
-## 7. Next.js 16 Warnings
+## 8. Next.js 16 Warnings
 
 The project runs on Next.js 16 (currently `16.2.12`) and React 19.
 - App Router layout configurations use standard patterns but double-check API signatures against `node_modules/next/dist/docs/` when working on route optimization or runtime rendering context.
