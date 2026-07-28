@@ -9,13 +9,13 @@ const markedInstance = new Marked()
 
 // Custom renderer for code block to handle mermaid diagrams and code classes
 const customRenderer = {
-  code(code: string, infostring: string | undefined, escaped: boolean) {
-    if (infostring === 'mermaid') {
-      return `<div class="mermaid-diagram my-6 flex justify-center overflow-x-auto bg-muted/40 p-4 rounded-xl border border-border" data-diagram="${encodeURIComponent(code)}"></div>`
+  code({ text, lang, escaped }: { text: string; lang?: string; escaped?: boolean }) {
+    if (lang === 'mermaid') {
+      return `<div class="mermaid-diagram my-6 flex justify-center overflow-x-auto bg-muted/40 p-4 rounded-xl border border-border" data-diagram="${encodeURIComponent(text)}"></div>`
     }
-    const cleanInfo = infostring || ''
-    const formattedCode = escaped ? code : escape(code)
-    return `<pre class="overflow-x-auto bg-muted/60 p-4 rounded-lg border border-border"><code class="language-${cleanInfo}">${formattedCode}</code></pre>`
+    const cleanLang = lang || ''
+    const formattedCode = escaped ? text : escape(text)
+    return `<pre class="overflow-x-auto bg-muted/60 p-4 rounded-lg border border-border"><code class="language-${cleanLang}">${formattedCode}</code></pre>`
   }
 }
 markedInstance.use({ renderer: customRenderer })
