@@ -19,7 +19,7 @@ This repository operates under a strict **₹0-infrastructure-cost discipline** 
 
 Phase 0 is fully complete and functional:
 - **Decision Resolution:** 9 modules × 10 lessons structure (90 lessons total) finalized and documented.
-- **Waitlist System:** A desktop-primary, mobile-responsive landing page capturing `name`, `email`, and `current_role` is live. Attributions (`utm_*` fields and HTTP referrers) are parsed. Records are stored in the Supabase `waitlist` table, protected by insert-only Row Level Security (RLS) policies.
+- **Waitlist System:** A desktop-primary, mobile-responsive landing page capturing `name`, `email`, and `career_position` is live. Attributions (`utm_*` fields and HTTP referrers) are parsed. Records are stored in the Supabase `waitlist` table, protected by insert-only Row Level Security (RLS) policies.
 - **Static Content Pipeline:**
   - `scripts/parse-content.ts` parses raw markdown lessons in `/content/lessons/` into structured JSON files at `apps/web/public/content/lessons/`.
   - `scripts/validate-content.ts` verifies lesson formatting, quiz schemas (15 questions per lesson), and generates deterministic, stable IDs for quizzes and flashcards.

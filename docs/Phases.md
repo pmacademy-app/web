@@ -22,12 +22,11 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 - Build the Figma design system: typography, color, component library (buttons, cards, progress rings, quiz UI, search input, auth forms, waitlist form) — see `Design.md` §1–§2 for the locked-in direction to execute against.
 - Technical scaffolding: repo created per `Architecture.md` §3's folder structure, Next.js + Supabase set up, CI/CD on Vercel per `Rules.md` §3.5.
 - **Content parser and JSON generator** (`Architecture.md` §4) — build this as the **first real engineering task**. Parse all source Markdown files into validated, structured JSON. No runtime markdown parsing — the browser consumes pre-generated JSON.
-- **Search index generation** — build `scripts/generate-search-index.ts` to produce `search-index.json` from the generated lesson JSON (see `Architecture.md` §5).
 - **Authentication** — wire Supabase Auth with Email + Password and Google Login (`PRD.md` §4.1).
 - **Waitlist page** — stand up the marketing-site waitlist landing page (see `Design.md` §6) collecting name, email, and current career position. This is independent of every other Phase 0 item and should go live as early in Week 1 as possible. Waitlist data stored in Supabase `waitlist` table (`Architecture.md` §2).
 - **Google Analytics** — integrate for page views and basic user flow tracking.
 - **Resend SMTP** — connect Resend to Supabase via SMTP for email verification, password reset, waitlist confirmation, and welcome emails.
-- **Deployment pipeline** — set up GitHub Actions workflow: Markdown validation → JSON generation → search index generation → Next.js build → Vercel deployment (`Architecture.md` §8).
+- **Deployment pipeline** — set up GitHub Actions workflow: Markdown validation → JSON generation → Next.js build → Vercel deployment (`Architecture.md` §8).
 
 **Explicit exclusions:** no gamification logic, no quiz UI polish, no dashboard — this phase is scaffolding, content pipeline, and deployment infrastructure only.
 
@@ -50,10 +49,9 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 - Lesson reading view: renders pre-generated static JSON content for all fixed sections (`PRD.md` §4.2, `Architecture.md` §4), styled per `Design.md`.
 - Quiz flow: 15 questions, immediate feedback, explanations (`PRD.md` §4.3). Quiz data loaded from static JSON.
 - Basic progress tracking: lesson complete/incomplete, module unlock logic based on the prerequisite graph (`PRD.md` §2). Progress stored in Supabase.
-- Auth + user accounts, onboarding flow (placement quiz + goal-setting, `PRD.md` §4.1).
-- Client-side search using the pre-built `search-index.json` (`Architecture.md` §5).
+- Auth + user accounts, onboarding flow (single goal-setting question only — `PRD.md` §4.1's MVP-trimmed scope, no scored placement quiz yet).
 
-**Explicit exclusions:** no XP/levels, no streaks, no skill radar, no badges, no leaderboard, no flashcard SRS, no capstones. These are all Phase 2–3. Resist the temptation to add "just a little gamification" here — the point of this phase is to validate the *learning* loop in isolation.
+**Explicit exclusions:** no XP/levels, no streaks, no skill radar, no badges, no leaderboard, no flashcard SRS, no capstones, **no search** (moved to Phase 4 — see rationale there). Resist the temptation to add "just a little gamification" here — the point of this phase is to validate the *learning* loop in isolation.
 
 **Definition of Done:**
 - 10–20 real career-switcher users (recruited per `PRD.md`'s Primary segment) can complete the full loop: sign up → onboarding → Lesson 1 theory → Lesson 1 quiz → Lesson 2 unlocks.
@@ -108,15 +106,17 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 
 **Scope:**
 - Full content-audit fixes applied (ideally this ran in parallel since Week 1 — confirm completion here as a gate, don't start it now if it wasn't already in motion).
+- **Search — index generation and UI, moved here from Phase 1.** Build `scripts/generate-search-index.ts` to produce `search-index.json` from the generated lesson JSON (`Architecture.md` §5), and the client-side search UI. Rationale for the move: search adds no value while only 1–2 lessons are unlocked for a 10–20-user test cohort (Phase 1's actual scope); it earns its place once most/all 90 lessons are live and there's real content to search, which naturally aligns with this phase's public-facing SEO push.
 - SSR/SEO pass on lesson pages: public-facing lesson previews indexed by Google (`PRD.md` §5 non-functional requirement, `Design.md` §6 SEO strategy) — this is a major free acquisition channel for "what is product management"-style queries.
-- Accessibility pass: WCAG AA (`PRD.md` §5) — contrast, keyboard nav, screen-reader labels.
+- Accessibility pass: run the full budget in `Design.md` §4 — automated scan plus at least one manual screen-reader pass.
 - Closed beta with 100–200 real users, instrumented with Google Analytics. Fix drop-off points in the funnel — **onboarding → Lesson 1 completion is the single most important metric to fix here.**
 
-**Explicit exclusions:** no new features in this phase — this is a hardening and instrumentation phase only. If a beta user requests a new feature, log it for a post-launch phase; don't let it slip into Phase 4 scope.
+**Explicit exclusions:** no new features beyond search (above) in this phase — this is a hardening and instrumentation phase. If a beta user requests a new feature, log it for a post-launch phase; don't let it slip into Phase 4 scope.
 
 **Definition of Done:**
-- Lighthouse performance score ≥ 90 on lesson pages (`PRD.md` §5).
-- WCAG AA basics verified (automated + at least one manual pass with a screen reader).
+- Every item in `Design.md` §4's Performance Budget is met on lesson pages, verified with real Lighthouse runs, not estimated.
+- WCAG AA basics verified per `Design.md` §4's checklist (automated + at least one manual pass with a screen reader).
+- Client-side search returns relevant results across all live lessons in under 100ms perceived latency.
 - Closed beta cohort's Day-1 activation and Day-7 retention numbers are known and any major funnel drop-off has been addressed (see `PRD.md` §9 for target ranges to compare against).
 - Google Analytics is capturing the funnel end-to-end: signup → onboarding → Lesson 1 theory → quiz → dashboard return.
 
@@ -142,6 +142,17 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 3. Quiz completion rate (are they engaging with assessment, not just skimming?)
 
 These predict long-term success far better than signup counts (`PRD.md` §9).
+
+**Launch Week Success Criteria (directional — the point is having a number to check against, not the specific number):**
+
+| Signal | Target | If missed |
+|---|---|---|
+| Waitlist → signup conversion (first 7 days) | > 15% of waitlist | Not itself a crisis — check whether it's an activation-copy problem (weak "why sign up now" moment) before assuming the whole launch failed. |
+| Day-1 lesson completion (launch cohort) | > 60% (matches the 6-month target in `PRD.md` §9 — launch week is the first real read on whether that target is realistic) | Treat as the #1 priority bug-hunt signal — a low number here almost always means friction in onboarding or Lesson 1 itself, not a demand problem. |
+| Product Hunt launch day | Top 10 in Products of the Day | A miss here doesn't change the plan — SEO and LinkedIn are the compounding channels (`PRD.md` §8.2); Product Hunt is a single-day amplifier, not the growth engine. Don't over-invest founder time chasing PH ranking at the expense of watching Day-1/Day-7 numbers. |
+| Zero P0 bugs in the core reading → quiz → unlock loop during launch week | 0 | This is a hard gate carried over from Phase 1's Definition of Done — if it regresses during launch week, fixing it outranks every growth activity that day. |
+
+If Day-1 completion or Day-7 retention come in meaningfully below target, the right response is diagnosing and fixing the funnel (Phase 6), not pushing harder on acquisition — more signups into a leaky funnel just produces a worse-looking Day-7 number at larger scale.
 
 **Total to public launch: ~5–6 months** for deliberate, non-rushed solo-founder execution — this is a realistic estimate for the scope described, not padded, and should be recalibrated honestly (not compressed under pressure) if Phase 1 or Phase 4 reveal the timeline needs adjustment.
 
@@ -173,7 +184,6 @@ These predict long-term success far better than signup counts (`PRD.md` §9).
 - [ ] Figma design system v1 complete
 - [ ] Repo scaffolded per `Architecture.md` §3
 - [ ] Content parser and JSON generator built and run against all available lessons
-- [ ] Search index (`search-index.json`) generated
 - [ ] Deployment pipeline automated (GitHub Actions → Vercel)
 - [ ] Auth working (Email + Password, Google Login)
 - [ ] Google Analytics tracking page views
@@ -181,13 +191,17 @@ These predict long-term success far better than signup counts (`PRD.md` §9).
 - [ ] Lesson reading view + quiz flow functional (Phase 1 core loop)
 - [ ] 10–20 real users complete the core loop
 - [ ] XP, streaks, skill radar live (Phase 2)
+- [ ] Placement quiz live, seeding skill radar (Phase 2)
 - [ ] Capstones, badges, leaderboard, portfolio export live (Phase 3)
-- [ ] SEO + accessibility pass complete, closed beta run (Phase 4)
+- [ ] Search index generated and search UI live (Phase 4)
+- [ ] Performance budget (`Design.md` §4.1) and accessibility budget (`Design.md` §4) verified, not estimated
+- [ ] Closed beta run (Phase 4)
 - [ ] Public launch executed across all channels (Phase 5)
 
 ---
 
 ## Changelog
 
+- v2.1 — MVP scope trim per documentation review: (1) moved client-side search (index generation + UI) from Phase 1 to Phase 4 — it added no value while only 1-2 lessons were unlocked for the small Phase 1 test cohort, and pairs naturally with Phase 4's SEO push once most lessons are live. (2) Fixed a sequencing bug: Phase 1's onboarding no longer includes a scored placement quiz, since it existed only to seed the skill radar, which doesn't exist until Phase 2 — building that scoring logic in Phase 1 was premature work with no consumer. The placement quiz moves to Phase 2 alongside the skill radar. (3) Added explicit numeric Launch Week Success Criteria to Phase 5, distinct from `PRD.md` §9's 6-month targets. (4) Resolved the AI Mentor open question (see `PRD.md` §11) as cut from v1 — no Phases.md changes were needed since it was never actually in any phase's scope, only in the now-archived marketing copy.
 - v2.0 — Updated for static-first architecture: Phase 0 expanded to include content parser, JSON generator, search index, deployment pipeline (GitHub Actions), Google Analytics, Resend SMTP, waitlist (name/email/career position). Replaced PostHog with Google Analytics throughout. Removed LinkedIn OAuth. Updated content pipeline references from DB seeding to static JSON generation.
 - v1.0 — Initial phased roadmap authored from the "PM Academy — 0→1 Roadmap & Project Plan" source document, with explicit scope/exclusion/definition-of-done added per phase for unambiguous execution.

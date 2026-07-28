@@ -98,7 +98,7 @@ export type RoleOption = (typeof ROLE_OPTIONS)[number]
 export interface WaitlistFormValues {
   name: string
   email: string
-  current_role: RoleOption
+  career_position: RoleOption
 }
 
 /** Shape of the JSON body sent to POST /api/waitlist. */

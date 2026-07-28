@@ -89,7 +89,7 @@ CSS variables inside the `.dark` class block are defined in `globals.css` but da
 Waitlist registrations are verified client-side (Zod + React Hook Form) and sent to `POST /api/waitlist` containing:
 - `name` (Full Name)
 - `email` (Email address)
-- `current_role` (Role dropdown select)
+- `career_position` (Role dropdown select)
 - `utm_*` (Source, medium, campaign) automatically captured client-side
 - `referrer` header automatically parsed server-side
 

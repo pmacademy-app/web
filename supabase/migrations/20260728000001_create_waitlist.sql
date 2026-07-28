@@ -8,7 +8,7 @@ create table if not exists waitlist (
   id           uuid primary key default gen_random_uuid(),
   name         text not null,
   email        text unique not null,
-  "current_role" text not null,
+  "career_position" text not null,
   source       text not null default 'direct',
   utm_source   text,
   utm_medium   text,

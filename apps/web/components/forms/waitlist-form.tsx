@@ -24,7 +24,7 @@ const schema = z.object({
     .string()
     .email('Enter a valid email address.')
     .trim(),
-  current_role: z.enum([
+  career_position: z.enum([
     'Student',
     'Aspiring Product Manager',
     'Product Manager',
@@ -208,13 +208,13 @@ export function WaitlistForm({ className }: { className?: string }) {
       <Field
         id="waitlist-role"
         label="What best describes you?"
-        error={errors.current_role?.message}
+        error={errors.career_position?.message}
       >
         <select
           id="waitlist-role"
           aria-required="true"
-          aria-invalid={!!errors.current_role}
-          aria-describedby={errors.current_role ? 'waitlist-role-error' : undefined}
+          aria-invalid={!!errors.career_position}
+          aria-describedby={errors.career_position ? 'waitlist-role-error' : undefined}
           disabled={status === 'loading'}
           defaultValue=""
           className={cn(
@@ -223,11 +223,11 @@ export function WaitlistForm({ className }: { className?: string }) {
             'focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'appearance-none cursor-pointer',
-            errors.current_role
+            errors.career_position
               ? 'border-danger focus:ring-danger/50'
               : 'border-border hover:border-border-strong',
           )}
-          {...register('current_role')}
+          {...register('career_position')}
         >
           <option value="" disabled>Select your role</option>
           {ROLE_OPTIONS.map((role) => (

@@ -99,7 +99,7 @@ These translate the `PRD.md` §4.6–§4.10 product decisions into hard engineer
    
    If the answer to the first two is "no violation" and the third is "yes," it's a candidate for a future phase. Otherwise, reject or redesign it before it enters the roadmap.
 3. **Content decisions (9 vs. 10 modules, exact XP thresholds, skill radar scoring formula) are tracked in `PRD.md` §11's Open Decisions Log** — resolve them there, not in scattered code comments or chat history that gets lost.
-4. **Don't rebuild what's already decided.** If a document says a decision is made, treat it as made. Reopening settled decisions (stack choices, IA structure, gamification model) without a documented, specific reason wastes the scarce time a solo founder has.
+4. **"Current decision" is not "permanent decision," but reopening one requires a reason.** Every decision in these docs is the current best answer, not something carved in stone before a single user existed — if real usage, a launch metric, or a build that turned out harder than expected gives you a specific reason to change a decision (stack choice, IA structure, gamification model, a design token), change it and update the doc in the same sitting. What you shouldn't do is relitigate a settled decision on a hunch, a mood, or because a newer shiny option appeared — that's the "wastes scarce solo-founder time" failure mode this rule exists to prevent. The bar is low (one sentence of justification in the changelog) but it's not zero.
 
 ---
 
@@ -128,5 +128,6 @@ Since this project explicitly expects to be built or continued with AI coding as
 
 ## Changelog
 
+- v2.1 — Lean-documentation pass: amended §6.4 to explicitly balance "don't reopen settled decisions casually" with "these decisions aren't permanent — revisit with a real reason," per the project's "current decision unless justified" philosophy (`PRD.md` intro). No change to companion doc count — this doc already correctly scoped to the 5 canonical docs, unaffected by archiving the 3 sprint docs and original roadmap.
 - v2.0 — Updated for static-first architecture: added rules for Markdown as source of truth, no content in database, build-time JSON generation, Supabase for user state only, Google Analytics (replaced PostHog), Resend SMTP, Vercel deployment pipeline. Expanded content authoring rules for the automated build pipeline.
 - v1.0 — Initial rules authored to formalize engineering philosophy, coding standards, and change-management process for a solo-founder, AI-assisted build of PM Academy.

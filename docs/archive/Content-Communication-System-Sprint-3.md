@@ -1,3 +1,7 @@
+> **⚠ ARCHIVED — NOT AUTHORITATIVE.** This document is preserved for historical reference and detail-mining only. It has been superseded by the lean canonical doc set (`PRD.md`, `Architecture.md`, `Design.md`, `Rules.md`, `Phases.md`) as of the documentation consolidation review. It may contain stale, contradictory, or since-reversed decisions (e.g. an unscoped "AI Mentor" feature, an email-only waitlist form, "mobile-first" layout guidance) — do not treat anything here as current without cross-checking the canonical docs first. Kept because some component-level and copy-level detail here may still be useful inspiration during implementation.
+
+---
+
 # PM Academy - Content & Communication System Sprint 3
 
 **Status:** Authoritative content and communication system.

@@ -223,7 +223,7 @@ export type Database = {
           id: string
           name: string
           email: string
-          current_role: string
+          career_position: string
           source: string
           utm_source: string | null
           utm_medium: string | null
@@ -235,7 +235,7 @@ export type Database = {
           id?: string
           name: string
           email: string
-          current_role: string
+          career_position: string
           source?: string
           utm_source?: string | null
           utm_medium?: string | null

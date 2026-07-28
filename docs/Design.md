@@ -1,11 +1,10 @@
 # PM Academy — Design
 
-**Status:** Living document — single source of truth for visual design, UX patterns, and the marketing website's content/SEO strategy.
+**Status:** Living document — single source of truth for visual design, UX patterns, brand voice, and the marketing website's content/SEO strategy. This is now the **only** design/content doc — see the Changelog for why the three Sprint docs were consolidated into this one.
 **Platform:** Responsive web application — desktop-first experience with mobile responsiveness. Browser-based navigation (no native app patterns).
 **Companion docs:** `PRD.md` (what/why), `Architecture.md` (technical implementation), `Rules.md` (working standards), `Phases.md` (when).
-**Design system:** `Design-System-Sprint-1.md` is the Phase 0/Sprint 1 foundation for brand, tokens, responsive rules, component specifications, and frontend component architecture. Any UI implementation must follow that document before inventing new patterns.
-**Marketing website:** `Marketing-Website-Sprint-2.md` is the Figma-ready public website specification for sitemap, IA, sections, responsive layouts, motion, component mapping, and developer handoff.
-**Content system:** `Content-Communication-System-Sprint-3.md` is the authoritative voice, messaging, UX writing, email, notification, SEO, social, glossary, and developer copy guidance.
+**Decision confidence:** everything below is the current best decision, not a permanent commitment — see `PRD.md`'s intro for the "current-unless-justified" philosophy this whole doc set follows. Specific values (exact hex codes, spacing numbers) are a confident starting point to build against, not something to re-litigate without a reason, but they're also not sacred — if real usage or user testing gives you a good reason to change one, change it and update this doc in the same sitting.
+**Archived reference:** `archive/Design-System-Sprint-1.md`, `archive/Marketing-Website-Sprint-2.md`, and `archive/Content-Communication-System-Sprint-3.md` contain much more granular, Figma-handoff-level detail (pixel values, per-microstate copy, frame plans) than a solo founder needs to keep in prose sync with working code. They're useful to mine for inspiration on a specific component or copy line, but **they are not maintained and may be stale** — this document is authoritative. Do not "fix" a discrepancy by updating the archive; update this document.
 
 ---
 
@@ -33,7 +32,7 @@ Design (and build) in this order — each screen unlocks meaningful user testing
 3. **Dashboard** — progress ring, skill radar, streak, "continue where you left off." The skill radar must be the single most prominent element (per `PRD.md` §2's key IA decision) — do not let streak or XP visually dominate over it.
 4. **Module/curriculum map** — visual, not a bare list. A game-world-map metaphor works well for 9 modules (locked/unlocked states, prerequisite paths visible).
 5. **Flashcard review session** — card-flip interaction, SM-2-driven due-card queue.
-6. **Onboarding** — placement-style intro quiz (sets initial skill-radar baseline) + goal-setting ("why are you here") that tailors notification cadence and dashboard copy per `PRD.md` §4.1.
+6. **Onboarding** — a single goal-setting question ("why are you here") that tailors notification cadence and dashboard copy per `PRD.md` §4.1. **MVP-trimmed:** no scored placement quiz at launch — that returns in Phase 2 alongside the skill radar it's meant to seed (see `PRD.md` §4.1 for why).
 7. **Authentication pages** — sign up, log in, password reset. Supports Email + Password and Google Login via Supabase Auth. Clean, minimal forms that reinforce the brand.
 8. **Waitlist page** — pre-launch landing page collecting name, email, and current career position. Must go live in Week 1 independent of all other work (see `PRD.md` §8).
 9. **Search experience** — client-side search powered by a build-time generated `search-index.json` (see `Architecture.md` §5). Fast, instant results as the user types. Should feel integrated into the curriculum navigation, not a separate "search page."
@@ -76,10 +75,38 @@ All other XP/progress feedback should be small, quick, and non-disruptive.
 
 ---
 
-## 4. Accessibility & Internationalization
+## 4. Accessibility Budget & Internationalization
 
-- **WCAG AA minimum**, built in from day one, not retrofitted (`PRD.md` §5): sufficient color contrast (verify the chosen primary brand color, §1, against WCAG AA contrast ratios for text use), full keyboard navigation across lesson/quiz/dashboard flows, screen-reader labels on all interactive elements (quiz options, flashcard flip controls, streak/XP indicators).
-- **i18n-ready from day one:** externalize all UI strings (`Rules.md` §3.1/§3.3 principle extends here) even though launch is English-only. Do not hardcode copy inline in components — this matters given the target audience skews global, including a significant India/APAC share given the positioning's b-school framing (`PRD.md` §1).
+**Target: WCAG AA, verified, not assumed.** "Built accessibly" isn't a real check — the list below is. Run it before every phase's Definition of Done that ships new UI (`Phases.md`), not just once before launch:
+
+- [ ] One `<h1>` per page; logical, non-skipping heading hierarchy.
+- [ ] Every interactive element (links, buttons, quiz options, flashcard flip controls, streak/XP indicators) is keyboard-reachable with a visible focus ring.
+- [ ] Color contrast verified for text on every surface — check the chosen primary brand color (§1) against WCAG AA ratios specifically, since a distinctive off-palette color is more likely to fail contrast than a safe default.
+- [ ] Form labels are persistent (not placeholder-only) on all forms (auth, waitlist, onboarding).
+- [ ] Charts (skill radar) have a text alternative — don't let progress data exist only as an unlabeled SVG.
+- [ ] Accordion/disclosure components (FAQ, mobile nav) use correct ARIA semantics, not div-and-onClick approximations.
+- [ ] No content requires motion to be understood (motion is decorative, per §1 — this is also an accessibility requirement, not just a taste preference).
+- [ ] Mobile tap targets are at least 44px.
+- [ ] At least one manual screen-reader pass (not just an automated Lighthouse/axe scan) before public launch (`Phases.md` Phase 4).
+
+**i18n-readiness:** externalize all UI strings from day one (even though launch is English-only) — do not hardcode copy inline in components. The target audience skews global, including a significant India/APAC share given the positioning's b-school framing (`PRD.md` §1).
+
+---
+
+## 4.1 Performance Budget
+
+Numeric targets, not vibes — check these explicitly at the end of Phase 1 and again before Phase 4's launch gate (`Phases.md`):
+
+| Metric | Budget | Why this number |
+|---|---|---|
+| Lighthouse Performance score (lesson pages) | ≥ 90 | Already the stated target in `PRD.md` §5 — restated here as a hard gate, not an aspiration. |
+| Largest Contentful Paint (LCP) | < 2.0s | Static JSON content delivery (`Architecture.md` §4) should make this comfortably achievable — if it's not, something is fetching at runtime that should be pre-generated. |
+| Cumulative Layout Shift (CLS) | < 0.1 | Reserve space for the skill radar/chart components and images before they load — a common CLS failure mode in dashboard-heavy UIs specifically. |
+| Interaction to Next Paint (INP) | < 200ms | Matters most on the quiz flow (§2) — answer selection must feel instant. |
+| JS bundle size (first load, lesson page) | < 200KB gzipped | Keep the reading experience — the single most-used screen — lean. Audit with `next build` output whenever a new dependency is added to a lesson-page-adjacent component. |
+| Lesson page total weight (incl. images) | < 1MB | Prevents the content pipeline (`Architecture.md` §4) from silently becoming heavy as 90 lessons accumulate diagrams/images over time. |
+
+If a budget is blown, the fix is almost always "don't ship the thing causing it" rather than "optimize later" — treat these as gates in Phase 1 and Phase 4's Definition of Done, not aspirational targets to revisit post-launch.
 
 ---
 
@@ -150,19 +177,39 @@ pmacademy.com (marketing site — see Architecture.md §3 for hosting/deployment
 
 ---
 
-## 7. Design Principles Recap (quick-reference)
+## 7. Brand Voice (condensed)
+
+PM Academy sounds like the best PM mentor a learner has ever had: clear, practical, calm under ambiguity, generous with context, serious about craft.
+
+**Is:** serious but not cold · premium but not exclusive · helpful but not patronizing · encouraging but not inflated · practical but not shallow.
+**Is not:** a bootcamp promising 30-day career transformation · a startup using urgency/conversion tricks · hype-as-proof · corporate LMS compliance-speak.
+
+**Five writing rules that cover almost every copy decision:**
+1. Lead with what the learner can now do, build, or understand — not with the product.
+2. Use concrete product language (PRDs, roadmaps, tradeoffs, capstones) over vague "skills."
+3. Never manufacture pressure — no fake scarcity, countdowns, shame, or streak-loss fear language (this is the content-side expression of Product Principle #2, `PRD.md` §1).
+4. Make "free" sound credible by pairing it with specificity and rigor, not by over-explaining that it's free.
+5. Be concise — don't pad copy for drama; respect the learner's time in the writing itself, not just the product mechanics.
+
+For actual copy drafting (exact microcopy for a specific error state, email, or onboarding screen), write it in context as you build that screen — don't pre-write it in a document months before the screen exists. `archive/Content-Communication-System-Sprint-3.md` has extensive example copy if you want a starting reference for tone, but treat it as inspiration, not a script to transcribe verbatim (and note it still contains "AI Mentor" copy that no longer applies).
+
+---
+
+## 8. Design Principles Recap (quick-reference)
 
 1. Rigor of a b-school elective + habit of a language app — never fully cartoon, never sterile-corporate.
 2. Skill radar is the visual hero of the product — protect its prominence on the dashboard against every other competing element.
 3. Motion is purposeful and rare — save real celebration for genuinely big milestones (§3.6's exact list).
 4. No dark patterns in UI copy or interaction design — urgency and scarcity language are never manufactured.
-5. Accessibility and i18n-readiness are built in from day one, not retrofitted.
+5. Accessibility and i18n-readiness are built in from day one, not retrofitted — checked against the §4 budget, not assumed.
 6. The marketing site tells the "gap" story first and proves it with real sample content, not just claims.
+7. Copy leads with what the learner can do, not with the product (§7) — write it in context as each screen is built.
 
 ---
 
 ## Changelog
 
+- v2.1 — **Major consolidation.** Archived `Design-System-Sprint-1.md`, `Marketing-Website-Sprint-2.md`, and `Content-Communication-System-Sprint-3.md` (3,900+ combined lines) to `archive/` — their decision-relevant content was already captured in this document; their remaining bulk was Figma-handoff-level detail (pixel values, per-microstate copy, frame plans) that a solo founder doesn't need to keep in prose lockstep with working code, and which had already drifted out of sync twice (see `PRD.md`'s Documentation Review). Added a condensed Brand Voice section (§7, distilled from the archived content doc) and expanded Accessibility into a checkable budget with a new numeric Performance Budget (§4/§4.1) to close the gap flagged in the documentation review. Updated header framing: this is now the sole design/content doc, not one of four.
 - v2.0 — Updated for responsive web app (desktop-first + mobile). Added authentication pages, waitlist page, and search experience to core screens. Updated waitlist to collect name/email/career position. Added search, auth, and waitlist components to design system. Removed Cloudflare Pages references. Updated marketing site to Vercel-only hosting with Resend SMTP for transactional email.
 - v1.3 - Added `Content-Communication-System-Sprint-3.md` as the Sprint 3 content and communication system.
 - v1.2 - Added `Marketing-Website-Sprint-2.md` as the Sprint 2 public website design specification.

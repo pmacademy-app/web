@@ -18,7 +18,7 @@ const waitlistSchema = z.object({
     .email('Enter a valid email address.')
     .toLowerCase()
     .trim(),
-  current_role: z.enum(ROLE_OPTIONS, {
+  career_position: z.enum(ROLE_OPTIONS, {
     message: 'Please select a role from the list.',
   }),
   // Optional UTM attribution — captured client-side from URL
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
     )
   }
 
-  const { name, email, current_role, utm_source, utm_medium, utm_campaign } = result.data
+  const { name, email, career_position, utm_source, utm_medium, utm_campaign } = result.data
 
   // Capture attribution — server-side (referrer from request headers)
   const referrer = request.headers.get('referer') ?? null
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
     const { error: insertError } = await (supabase.from('waitlist') as any).insert({
       name,
       email,
-      current_role,
+      career_position,
       source,
       utm_source:   utm_source   ?? null,
       utm_medium:   utm_medium   ?? null,

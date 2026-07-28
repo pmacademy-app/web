@@ -285,6 +285,7 @@ Search is implemented entirely at build time and runs client-side. No server-sid
 
 - **Build time:** `scripts/generate-search-index.ts` processes all lesson JSON and produces a `search-index.json` file containing searchable fields (title, summary, key takeaways, glossary terms, module name).
 - **Client side:** A lightweight client-side search library (e.g., Fuse.js or Lunr.js) loads the search index and provides instant, offline-capable search results.
+- **Scalability trigger — when to revisit this approach:** client-side search is the right call at 90 lessons. Revisit (consider a hosted search service) only if lesson count exceeds roughly 300 or the generated `search-index.json` exceeds roughly 2MB gzipped — below that, a hosted search service is solving a problem you don't have yet, at real infra cost you currently avoid entirely.
 - **No Algolia, Elasticsearch, or server-side search** — these add operational complexity and cost with no benefit at ~5,000-user scale.
 
 ---
@@ -363,6 +364,7 @@ This stack is chosen specifically so that scaling is a **later, success-driven d
 
 ## Changelog
 
+- v2.2 — Lean-documentation pass: added explicit scalability trigger for client-side search (revisit past ~300 lessons or ~2MB gzipped index) so the tradeoff has a concrete decision point rather than being implicit.
 - v2.1 — Documentation review pass: added missing `(portfolio)` public route group for the unauthenticated portfolio/certificate export feature (`PRD.md` §4.11), which had no route in the folder structure despite being a required v1 feature.
 - v2.0 — Architecture rewritten for static-first, Markdown-to-JSON build pipeline. Removed database-backed content tables (modules, lessons, quiz_questions, flashcards) — content is now pre-generated static JSON. User-state tables reference content by slug. Added search architecture (client-side, build-time index). Added deployment pipeline (GitHub Actions). Replaced PostHog with Google Analytics. Replaced LinkedIn OAuth with Email + Password and Google Login. Removed Cloudflare Pages. Added Resend SMTP integration. Added waitlist and bookmarks tables. Target: ~5,000-user MVP.
 - v1.0 — Initial architecture authored from the "PM Academy — 0→1 Roadmap & Project Plan" source document, with the data model, folder structure, and content-pipeline detail expanded for direct implementation use.
