@@ -6,23 +6,25 @@ import { notFound } from 'next/navigation'
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer'
 import type { ParsedLesson } from '@/types'
 
+import { cache } from 'react'
+
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
-function getLessonData(slug: string): ParsedLesson | null {
+const getLessonData = cache(async (slug: string): Promise<ParsedLesson | null> => {
   const filePath = path.resolve(process.cwd(), `public/content/lessons/${slug}.json`)
-  if (!fs.existsSync(filePath)) return null
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+    const raw = await fs.promises.readFile(filePath, 'utf-8')
+    return JSON.parse(raw)
   } catch {
     return null
   }
-}
+})
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const lesson = getLessonData(slug)
+  const lesson = await getLessonData(slug)
   if (!lesson) return { title: 'Lesson Not Found | PM Academy' }
 
   return {
@@ -38,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicLessonPage({ params }: PageProps) {
   const { slug } = await params
-  const lesson = getLessonData(slug)
+  const lesson = await getLessonData(slug)
 
   if (!lesson) {
     notFound()

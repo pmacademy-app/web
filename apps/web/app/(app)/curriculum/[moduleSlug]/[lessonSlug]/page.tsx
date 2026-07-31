@@ -9,6 +9,7 @@ import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/l
 import { getAuthenticatedUser } from '@/lib/auth'
 import LessonViewShell from '@/components/lesson/LessonViewShell'
 import { Lock } from 'lucide-react'
+import { cache } from 'react'
 import { isLessonUnlocked } from '@/lib/lessons-completion-service'
 
 interface PageProps {
@@ -18,19 +19,19 @@ interface PageProps {
   }>
 }
 
-function getLessonData(slug: string): ParsedLesson | null {
+const getLessonData = cache(async (slug: string): Promise<ParsedLesson | null> => {
   const filePath = path.resolve(process.cwd(), `public/content/lessons/${slug}.json`)
-  if (!fs.existsSync(filePath)) return null
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+    const raw = await fs.promises.readFile(filePath, 'utf-8')
+    return JSON.parse(raw)
   } catch {
     return null
   }
-}
+})
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lessonSlug } = await params
-  const lesson = getLessonData(lessonSlug)
+  const lesson = await getLessonData(lessonSlug)
   if (!lesson) return { title: 'Lesson Not Found | PM Academy' }
 
   return {
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function AuthenticatedLessonPage({ params }: PageProps) {
   const { lessonSlug } = await params
-  const lesson = getLessonData(lessonSlug)
+  const lesson = await getLessonData(lessonSlug)
 
   if (!lesson) {
     notFound()

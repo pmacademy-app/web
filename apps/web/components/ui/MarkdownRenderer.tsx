@@ -54,6 +54,7 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
       const containers = containerRef.current.querySelectorAll('.mermaid-diagram')
       containers.forEach((container, index) => {
         if (container.getAttribute('data-processed')) return
+        container.setAttribute('data-processed', 'true')
         
         const diagramCode = decodeURIComponent(container.getAttribute('data-diagram') || '')
         if (!diagramCode) return
@@ -63,12 +64,10 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
         mermaid.render(uniqueId, diagramCode)
           .then(({ svg }) => {
             container.innerHTML = svg
-            container.setAttribute('data-processed', 'true')
           })
           .catch((err) => {
             console.error('[MarkdownRenderer] Mermaid rendering error:', err)
             container.innerHTML = `<pre class="text-xs text-red-500 bg-red-500/10 p-2 rounded">${escape(diagramCode)}</pre>`
-            container.setAttribute('data-processed', 'true')
           })
       })
     } catch (err) {
