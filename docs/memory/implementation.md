@@ -7,14 +7,14 @@
 
 ## 1. Current Project Stage
 
-**As of 2026-08-01:**
+**As of 2026-08-02:**
 
 - **Phase 0 (Foundation):** Complete ✅
-- **Phase 1 (Core Learning Loop MVP):** Complete ✅ — functional reading → quiz → unlock loop, but using v1 content pipeline and slug-based routing (v2 migration pending)
+- **Phase 1.1 (Content Pipeline Foundation):** Complete ✅ — v2 remark AST compiler + Zod schema, 90 lessons compiled to `content/dist/`
+- **Phase 1.2 (Renderer Foundation):** Complete ✅ — `BlockTreeRenderer`, `registry.ts`, all block components (Quiz, Flashcard, Mermaid, Connections, Glossary, Default)
+- **Phase 1.3 (Migration & Integration Foundation):** Complete ✅ — DB schema migrated, v2 API routes, `/academy/**` routing, v2 lesson shell
 - **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending ⚠️
 - **Phase 3–5:** Scaffolded or not started ❌
-
-The codebase is transitioning from Phase 1 completion toward Phase 2. A significant architecture alignment task is in progress: migrating the v1 flat-section content pipeline and slug-based routing to the v2 block-tree architecture described in `content-pipeline.md` and `rendering-pipeline.md`.
 
 ---
 
@@ -67,9 +67,9 @@ The codebase is transitioning from Phase 1 completion toward Phase 2. A signific
 |-------------|--------|-------|
 | Waitlist System | ✅ Complete | Live and capturing signups |
 | Auth & Onboarding | ✅ Complete | Email + Google, goal question |
-| Lesson Reading View | ⚠️ Partial | Functional but uses v1 flat-section parsing + client-side `marked`. v2 block-tree pending. |
-| Quiz Flow | ⚠️ Partial | Functional. Uses v1 schema (`correctOptionIndex`). v2 field is `correctAnswer`. |
-| Flashcard SRS Engine | ⚠️ Partial | Service layer built. Review Hub screen is a stub. |
+| Lesson Reading View | ✅ Complete | v2 `/academy/l/[lessonId]` renders via `BlockTreeRenderer` with compiled Block JSON |
+| Quiz Flow | ✅ Complete | v2 `QuizBlock` + `LessonContextProvider` submits to `/api/v2/lessons/[lessonId]/quiz` |
+| Flashcard SRS Engine | ⚠️ Partial | `FlashcardDeckBlock` renders review UI. SRS recording not yet wired. Review Hub screen is a stub. |
 | XP & Level System | ⚠️ Partial | DB ledger + triggers correct. Frontend dashboard shows mocked `0` values. |
 | Streak Tracker | ⚠️ Partial | Calculation engine built (`lib/streaks.ts`). Not wired into dashboard UI. |
 | Skill Radar | ⚠️ Partial | Formula in `lib/skillRadar.ts`. Dashboard hardcodes `0%` for all clusters. |
@@ -77,8 +77,8 @@ The codebase is transitioning from Phase 1 completion toward Phase 2. A signific
 | Progress & Portfolio Export | ❌ Scaffolded | SQL schema supports it. Pages are placeholder text. |
 | Account Settings | ❌ Scaffolded | UI shell exists. Form updates not written. |
 | Client-Side Search | ❌ Not started | Search index generated. UI (`SearchOverlay`) not built. |
-| v2 Content Pipeline | ❌ Not started | Spec in `content-pipeline.md`. Current pipeline is v1. |
-| v2 Renderer / `/academy/` Routes | ❌ Not started | Spec in `rendering-pipeline.md`. Current routes are `/curriculum/[moduleSlug]/[lessonSlug]`. |
+| v2 Content Pipeline | ✅ Complete | 90 lessons compiled to `content/dist/` via remark AST compiler (Phase 1.1) |
+| v2 Renderer / `/academy/` Routes | ✅ Complete | `BlockTreeRenderer` + `registry.ts` + `/academy` index + `/academy/l/[lessonId]` (Phase 1.2+1.3) |
 
 ---
 
@@ -145,8 +145,10 @@ pm-academy/
 | `/waitlist` | Static | Pre-launch waitlist capture |
 | `/login`, `/signup`, `/reset-password` | Static | Auth flows |
 | `/onboarding` | Dynamic (ƒ) | Goal-setting onboarding |
-| `/curriculum` | Static | Curriculum map (marketing layout — known issue, see `mistakes.md`) |
-| `/curriculum/[moduleSlug]/[lessonSlug]` | Dynamic (ƒ) | Authenticated lesson view (v1 slug-based) |
+| `/curriculum` | Static | Marketing curriculum overview (legacy — not in authenticated AppShell) |
+| `/curriculum/[moduleSlug]/[lessonSlug]` | Dynamic (ƒ) | Legacy v1 lesson route (still active for backward compat, to be removed in Phase 1.4) |
+| `/academy` | Dynamic (ƒ) | **v2** Authenticated curriculum index — module cards + full lesson list |
+| `/academy/l/[lessonId]` | Dynamic (ƒ) | **v2** Stable-ID lesson page — reads compiled Block JSON via `BlockTreeRenderer` |
 | `/lessons/[slug]` | Dynamic (ƒ) | Public lesson preview (marketing SEO) |
 | `/dashboard` | Dynamic (ƒ) | Authenticated user dashboard |
 | `/review` | Dynamic (ƒ) | Flashcard review hub (stub) |
@@ -154,24 +156,26 @@ pm-academy/
 | `/leaderboard` | Dynamic (ƒ) | Leaderboard (stub) |
 | `/settings` | Dynamic (ƒ) | Account settings (stub) |
 | `/p/[username]` | Dynamic (ƒ) | Public portfolio (stub) |
-| `/api/*` | Dynamic (ƒ) | API routes (waitlist, auth, progress, quiz, flashcards, reflections) |
+| `/api/lessons/[slug]/*` | Dynamic (ƒ) | Legacy v1 API routes (progress, quiz, theory-read) — still active |
+| `/api/v2/lessons/[lessonId]/*` | Dynamic (ƒ) | **v2** Stable-ID API routes (progress, quiz, theory-read) |
+| `/api/reflections` | Dynamic (ƒ) | Reflections API — supports both `lesson_id` and legacy `lesson_slug` |
+| `/api/*` | Dynamic (ƒ) | Other API routes (waitlist, auth, flashcard review) |
 | `/sitemap.xml`, `/robots.txt` | Static | SEO assets |
-
-**Planned v2 routes** (not yet built): `/academy/` (curriculum shell layout) and `/academy/l/[lessonId]/` (stable ID-based lesson route).
 
 ---
 
-## 6. Build Verification (as of 2026-08-01)
+## 6. Build Verification (as of 2026-08-02)
 
 Last successful production build:
-- ✅ 90 lessons parsed
+- ✅ 90 lessons parsed (v1 legacy pipeline)
+- ✅ 90 lessons compiled to Block JSON (v2 AST pipeline, `content/dist/`)
 - ✅ 1350 quiz questions validated
 - ✅ 770 search index items generated
 - ✅ TypeScript: zero errors
-- ✅ ESLint: zero warnings
-- ✅ Next.js 16.2.12 with Turbopack: compiled in 2.1 min
-- ✅ 22 routes generated (20 static + dynamic + middleware)
-- ✅ Next.js GA: zero `export const runtime` issues
+- ✅ ESLint: 0 errors, 2 non-blocking warnings (correctly underscore-prefixed)
+- ✅ Next.js 16.2.12 with Turbopack: compiled in ~70s
+- ✅ 29 routes generated
+- ✅ Production build worker: clean exit
 
 ---
 
@@ -200,3 +204,4 @@ Specialized Antigravity AI skills for this project are in `.agents/skills/`. Loa
 ## Changelog
 
 - v1.0 (2026-08-01) — Extracted and restructured from the monolithic `MEMORY.md` into the `docs/memory/` system. Added full feature status table and current routing table.
+- v1.3 (2026-08-02) — Phase 1.3 Migration & Integration Foundation complete. Updated feature status table, routing table (added /academy routes), and build verification.

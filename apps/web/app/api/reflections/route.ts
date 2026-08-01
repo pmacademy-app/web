@@ -1,3 +1,13 @@
+/**
+ * GET  /api/reflections?lesson_id=<lessonId>
+ * POST /api/reflections
+ *
+ * Fetches or creates/updates a reflection for the authenticated user.
+ * Updated for v2 migration: uses `lesson_id` column (renamed from lesson_slug).
+ *
+ * Accepts both stable les_XXXXXX IDs (v2) and legacy slug strings (v1 backward compat).
+ */
+
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
@@ -6,7 +16,7 @@ import { getAuthenticatedUser } from '@/lib/auth'
 import { recordReflectionAction } from '@/lib/lessons-db'
 
 const reflectionPostSchema = z.object({
-  lesson_slug: z.string(),
+  lesson_id: z.string(),  // accepts stable les_XXXXXX IDs or legacy slugs
   content: z.string().min(1, 'Reflection content cannot be empty'),
   is_public: z.boolean().default(false),
 })
@@ -14,10 +24,11 @@ const reflectionPostSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const lessonSlug = searchParams.get('lesson_slug')
+    // Accept both ?lesson_id= (v2) and legacy ?lesson_slug= (v1 backward compat)
+    const lessonId = searchParams.get('lesson_id') || searchParams.get('lesson_slug')
 
-    if (!lessonSlug) {
-      return Response.json({ error: 'Missing lesson_slug query parameter' }, { status: 400 })
+    if (!lessonId) {
+      return Response.json({ error: 'Missing lesson_id query parameter' }, { status: 400 })
     }
 
     const cookieStore = await cookies()
@@ -38,7 +49,7 @@ export async function GET(request: NextRequest) {
       .from('reflections')
       .select('*')
       .eq('user_id', user.id)
-      .eq('lesson_slug', lessonSlug)
+      .eq('lesson_id', lessonId)
       .maybeSingle()
 
     if (error) {
@@ -69,18 +80,26 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const parsed = reflectionPostSchema.safeParse(body)
+
+    // Support both v2 (lesson_id) and legacy (lesson_slug) clients during transition
+    const normalizedBody = {
+      ...body,
+      lesson_id: body.lesson_id ?? body.lesson_slug,
+    }
+    delete normalizedBody.lesson_slug
+
+    const parsed = reflectionPostSchema.safeParse(normalizedBody)
     if (!parsed.success) {
       return Response.json({ error: parsed.error.flatten() }, { status: 400 })
     }
 
-    const { lesson_slug, content, is_public } = parsed.data
+    const { lesson_id, content, is_public } = parsed.data
     const serviceSupabase = createServerSupabaseClient()
 
     const result = await recordReflectionAction(
       serviceSupabase,
       user.id,
-      lesson_slug,
+      lesson_id,
       content,
       is_public
     )

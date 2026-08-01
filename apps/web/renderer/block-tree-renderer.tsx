@@ -7,7 +7,7 @@ interface Block {
   blockId: string;
   type: string;
   children?: Block[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface BlockTreeRendererProps {
@@ -20,6 +20,7 @@ class BlockErrorBoundary extends React.Component<{
   lessonId: string;
   children: React.ReactNode;
 }, { hasError: boolean; error: Error | null }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(props: any) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -41,16 +42,17 @@ class BlockErrorBoundary extends React.Component<{
     if (this.state.hasError) {
       const { block } = this.props;
       if (block.type === 'mermaid') {
+        const source = (block.source as string) || '';
         return (
           <div className="border border-destructive/20 bg-destructive/5 p-4 rounded-xl my-6">
             <p className="text-xs font-semibold text-destructive mb-2">Diagram rendering failed:</p>
-            <pre className="text-[10px] overflow-x-auto bg-muted p-2 rounded font-mono">{block.source}</pre>
+            <pre className="text-[10px] overflow-x-auto bg-muted p-2 rounded font-mono">{source}</pre>
           </div>
         );
       }
       return (
         <div className="border border-destructive/20 bg-destructive/5 p-4 rounded-xl text-center text-xs text-destructive my-4">
-          This content section couldn't load — skip to the next one.
+          This content section couldn&apos;t load — skip to the next one.
         </div>
       );
     }
@@ -72,15 +74,15 @@ export function BlockTreeRenderer({ blocks, lessonId }: BlockTreeRendererProps) 
 }
 
 function BlockRenderer({ block, lessonId }: { block: Block; lessonId: string }) {
-  const Component = useBlockComponent(block.type);
+  const component = useBlockComponent(block.type);
 
   if (block.children && Array.isArray(block.children) && block.children.length > 0) {
-    return (
-      <Component block={block} lessonId={lessonId}>
-        <BlockTreeRenderer blocks={block.children} lessonId={lessonId} />
-      </Component>
+    return React.createElement(
+      component,
+      { block, lessonId },
+      React.createElement(BlockTreeRenderer, { blocks: block.children, lessonId })
     );
   }
 
-  return <Component block={block} lessonId={lessonId} />;
+  return React.createElement(component, { block, lessonId });
 }

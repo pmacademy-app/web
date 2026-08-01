@@ -116,7 +116,7 @@ export default function LessonViewShell({ lesson }: LessonViewShellProps) {
             </div>
           )}
           <Link
-            href="/curriculum"
+            href="/academy"
             className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground hover:bg-accent/40 transition-all"
           >
             Back to Curriculum
@@ -138,7 +138,7 @@ export default function LessonViewShell({ lesson }: LessonViewShellProps) {
       {/* Navigation & Tab Headers */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-4">
         <Link
-          href={`/curriculum`}
+          href={`/academy`}
           className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />

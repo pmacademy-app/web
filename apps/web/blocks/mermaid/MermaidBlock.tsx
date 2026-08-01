@@ -52,10 +52,10 @@ export default function MermaidBlock({ block }: BlockProps) {
           setSvg(renderedSvg);
           setLoading(false);
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error('[MermaidBlock] Rendering error:', err);
         if (active) {
-          setError(err.message || 'Failed to render Mermaid diagram.');
+          setError((err as Error).message || 'Failed to render Mermaid diagram.');
           setLoading(false);
         }
       }

@@ -8,12 +8,17 @@ interface DBChain {
 }
 
 /**
- * Service responsible for lesson completion verification and persistence (PRD.md §4.3, Architecture.md §5).
+ * Service responsible for lesson completion verification and persistence.
+ * References: PRD.md §4.3, Architecture.md §5
+ *
+ * v2 migration: accepts stable `lesson_id` (les_XXXXXX) instead of slug.
+ * The `lesson_slug` DB column has been renamed to `lesson_id` in migration
+ * 20260802000001_lesson_id_migration.sql.
  */
 export async function completeLesson(
   supabase: SupabaseClient<Database>,
   userId: string,
-  lessonSlug: string,
+  lessonId: string,  // stable les_XXXXXX ID (was: lessonSlug)
   quizScore: number,
   additionalXp: number
 ): Promise<{ completed_at: string; status: 'completed'; xp_earned: number }> {
@@ -24,7 +29,7 @@ export async function completeLesson(
     .from('user_lesson_progress') as unknown as DBChain)
     .select('*')
     .eq('user_id', userId)
-    .eq('lesson_slug', lessonSlug)
+    .eq('lesson_id', lessonId)
     .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
 
   const currentAttempts = progress?.quiz_attempts ?? 0
@@ -37,13 +42,13 @@ export async function completeLesson(
     .from('user_lesson_progress') as unknown as DBChain)
     .upsert({
       user_id: userId,
-      lesson_slug: lessonSlug,
+      lesson_id: lessonId,
       status: 'completed',
       quiz_score: Math.max(prevScore, quizScore),
       quiz_attempts: currentAttempts + 1,
       xp_earned: prevXpEarned + additionalXp,
       completed_at: completedAt,
-    }, { onConflict: 'user_id,lesson_slug' })
+    }, { onConflict: 'user_id,lesson_id' })
     .select()
     .single()) as unknown as { data: ProgressRow | null; error: unknown }
 
@@ -60,9 +65,45 @@ export async function completeLesson(
 }
 
 /**
- * Verifies if a lesson is unlocked for a given user (Architecture.md §5, sequential unlock check).
+ * Verifies if a lesson is unlocked for a given user using stable lesson IDs.
+ * A lesson is unlocked if the immediately preceding lesson (by curriculum order)
+ * is already completed, OR if it is lesson 1 (no prerequisite).
+ *
+ * References: Architecture.md §5, sequential unlock check.
+ *
+ * @param supabase - Server-side Supabase client
+ * @param userId   - Authenticated user's UUID
+ * @param lessonId - Stable les_XXXXXX ID of the lesson to check
+ * @param prevLessonId - Stable les_XXXXXX ID of the preceding lesson (null for lesson 1)
  */
 export async function isLessonUnlocked(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  lessonId: string,
+  prevLessonId: string | null
+): Promise<boolean> {
+  // First lesson in the curriculum is always unlocked
+  if (!prevLessonId) return true
+
+  const { data: prevProgress } = (await (supabase
+    .from('user_lesson_progress') as unknown as DBChain)
+    .select('status')
+    .eq('user_id', userId)
+    .eq('lesson_id', prevLessonId)
+    .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
+
+  return !!prevProgress && prevProgress.status === 'completed'
+}
+
+/**
+ * Legacy unlock check: accepts lesson order number, constructs the
+ * old-style slug for the preceding lesson, and queries the lesson_id column
+ * with the slug value. Used by the v1 route during the Phase 1.3 transition
+ * where rows were written with slug values before the ID backfill in Phase 1.4.
+ *
+ * @deprecated Use isLessonUnlocked() with stable IDs for v2 routes
+ */
+export async function isLessonUnlockedByOrderNumber(
   supabase: SupabaseClient<Database>,
   userId: string,
   lessonNumber: number
@@ -70,13 +111,14 @@ export async function isLessonUnlocked(
   if (lessonNumber <= 1) return true
 
   const prevNum = lessonNumber - 1
+  // During Phase 1.3, old rows still have slug values in the lesson_id column
   const prevLessonSlug = `lesson-${String(prevNum).padStart(3, '0')}`
 
   const { data: prevProgress } = (await (supabase
     .from('user_lesson_progress') as unknown as DBChain)
-    .select('*')
+    .select('status')
     .eq('user_id', userId)
-    .eq('lesson_slug', prevLessonSlug)
+    .eq('lesson_id', prevLessonSlug)
     .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
 
   return !!prevProgress && prevProgress.status === 'completed'

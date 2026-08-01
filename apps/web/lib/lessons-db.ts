@@ -14,26 +14,40 @@ interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
 }
 
+// Path to v2 compiled lesson files (content/dist/lessons/*.json)
+const DIST_LESSONS_DIR = path.resolve(process.cwd(), '..', '..', 'content', 'dist', 'lessons')
+
 /**
  * Handles the business logic for verifying theory reading engagement, updating lesson progress,
  * awarding XP, and logging the user activity for streak counts.
+ *
+ * v2 migration: accepts stable `lessonId` (les_XXXXXX) and queries `lesson_id` column.
  */
 export async function recordTheoryReadAction(
   supabase: SupabaseClient<Database>,
   userId: string,
-  slug: string,
+  lessonId: string,  // stable les_XXXXXX ID
   activeSeconds: number,
   scrollPercentage: number
 ) {
-  // 1. Read static JSON file to get reading estimate
+  // 1. Read v2 compiled JSON to get reading estimate
   let estMinutesReading = 2
   try {
-    const filePath = path.join(process.cwd(), 'public/content/lessons', `${slug}.json`)
-    const raw = await readFile(filePath, 'utf-8')
-    const lesson = JSON.parse(raw)
-    estMinutesReading = lesson?.meta?.estMinutesReading ?? 2
+    // Try v2 path first (content/dist/lessons/<lessonId>.json)
+    if (/^les_[a-z0-9]+$/.test(lessonId)) {
+      const filePath = path.join(DIST_LESSONS_DIR, `${lessonId}.json`)
+      const raw = await readFile(filePath, 'utf-8')
+      const lesson = JSON.parse(raw)
+      estMinutesReading = lesson?.estimatedReadingTime ?? 2
+    } else {
+      // Fallback: legacy slug-based path (v1 compatibility during Phase 1.3)
+      const filePath = path.join(process.cwd(), 'public/content/lessons', `${lessonId}.json`)
+      const raw = await readFile(filePath, 'utf-8')
+      const lesson = JSON.parse(raw)
+      estMinutesReading = lesson?.meta?.estMinutesReading ?? 2
+    }
   } catch (e) {
-    console.warn(`[lessons-db] Lesson file not found or unreadable for ${slug}. Defaulting to 2 mins.`, e)
+    console.warn(`[lessons-db] Lesson file not found for ${lessonId}. Defaulting to 2 mins.`, e)
   }
 
   // 2. Validate reading engagement anti-gaming thresholds
@@ -52,7 +66,7 @@ export async function recordTheoryReadAction(
     .from('user_lesson_progress') as unknown as DBChain)
     .select('*')
     .eq('user_id', userId)
-    .eq('lesson_slug', slug)
+    .eq('lesson_id', lessonId)
     .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
 
   if (fetchError) throw fetchError
@@ -71,11 +85,11 @@ export async function recordTheoryReadAction(
     .from('user_lesson_progress') as unknown as DBChain)
     .upsert({
       user_id: userId,
-      lesson_slug: slug,
+      lesson_id: lessonId,
       status: newStatus,
       theory_read_at: now,
       xp_earned: newXpEarned,
-    }, { onConflict: 'user_id,lesson_slug' })
+    }, { onConflict: 'user_id,lesson_id' })
 
   if (progressError) throw progressError
 
@@ -86,7 +100,7 @@ export async function recordTheoryReadAction(
       userId,
       'theory_read',
       XP_VALUES.THEORY_READ,
-      slug
+      lessonId
     )
   } catch (xpError) {
     console.error(`[lessons-db] Error creating theory_read XP event:`, xpError)
@@ -101,11 +115,13 @@ export async function recordTheoryReadAction(
 /**
  * Handles the business logic for logging quiz attempts, computing scores, updating lesson completion,
  * awarding correct answer and perfect first-attempt bonus XP, and logging streak progress.
+ *
+ * v2 migration: accepts stable `lessonId` (les_XXXXXX) and queries `lesson_id` column.
  */
 export async function recordQuizAttemptAction(
   supabase: SupabaseClient<Database>,
   userId: string,
-  slug: string,
+  lessonId: string,  // stable les_XXXXXX ID
   attempts: { question_id: string; selected_option: number; is_correct: boolean }[]
 ) {
   const totalQuestions = attempts.length
@@ -119,7 +135,7 @@ export async function recordQuizAttemptAction(
   // 1. Insert individual question attempts
   const insertRows = attempts.map((a) => ({
     user_id: userId,
-    lesson_slug: slug,
+    lesson_id: lessonId,
     question_id: a.question_id,
     selected_option: a.selected_option,
     is_correct: a.is_correct,
@@ -136,7 +152,7 @@ export async function recordQuizAttemptAction(
     .from('user_lesson_progress') as unknown as DBChain)
     .select('*')
     .eq('user_id', userId)
-    .eq('lesson_slug', slug)
+    .eq('lesson_id', lessonId)
     .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
 
   if (progressFetchError) throw progressFetchError
@@ -166,7 +182,7 @@ export async function recordQuizAttemptAction(
   await completeLesson(
     supabase,
     userId,
-    slug,
+    lessonId,
     scorePercentage,
     totalXpToAward
   )
@@ -179,7 +195,7 @@ export async function recordQuizAttemptAction(
         userId,
         'quiz_correct',
         incrementalXp,
-        slug
+        lessonId
       )
     } catch (xpError) {
       console.error(`[lessons-db] Error logging quiz_correct XP:`, xpError)
@@ -193,7 +209,7 @@ export async function recordQuizAttemptAction(
         userId,
         'quiz_bonus',
         perfectBonusXp,
-        slug
+        lessonId
       )
     } catch (bonusError) {
       console.error(`[lessons-db] Error logging quiz_bonus XP:`, bonusError)
@@ -218,11 +234,13 @@ export async function recordQuizAttemptAction(
 /**
  * Handles the business logic for recording reflections, syncing lesson progress XP,
  * and managing public visibility settings for portfolio exports.
+ *
+ * v2 migration: accepts stable `lessonId` (les_XXXXXX) and queries `lesson_id` column.
  */
 export async function recordReflectionAction(
   supabase: SupabaseClient<Database>,
   userId: string,
-  lessonSlug: string,
+  lessonId: string,  // stable les_XXXXXX ID (was: lessonSlug)
   content: string,
   isPublic: boolean
 ) {
@@ -231,7 +249,7 @@ export async function recordReflectionAction(
     .from('reflections') as unknown as DBChain)
     .select('*')
     .eq('user_id', userId)
-    .eq('lesson_slug', lessonSlug)
+    .eq('lesson_id', lessonId)
     .maybeSingle()) as unknown as { data: ReflectionRow | null; error: unknown }
 
   if (selectError) throw selectError
@@ -245,7 +263,7 @@ export async function recordReflectionAction(
       .from('reflections') as unknown as DBChain)
       .insert({
         user_id: userId,
-        lesson_slug: lessonSlug,
+        lesson_id: lessonId,
         content,
         is_public: isPublic,
       })
@@ -262,7 +280,7 @@ export async function recordReflectionAction(
         userId,
         'reflection',
         XP_VALUES.REFLECTION_SUBMITTED,
-        lessonSlug
+        lessonId
       )
     } catch (xpError) {
       console.error(`[lessons-db] Error logging reflection XP:`, xpError)
@@ -273,7 +291,7 @@ export async function recordReflectionAction(
       .from('user_lesson_progress') as unknown as DBChain)
       .select('*')
       .eq('user_id', userId)
-      .eq('lesson_slug', lessonSlug)
+      .eq('lesson_id', lessonId)
       .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
 
     if (progress) {
@@ -283,7 +301,7 @@ export async function recordReflectionAction(
           xp_earned: progress.xp_earned + XP_VALUES.REFLECTION_SUBMITTED,
         })
         .eq('user_id', userId)
-        .eq('lesson_slug', lessonSlug)
+        .eq('lesson_id', lessonId)
     }
   } else {
     // 2. Update existing reflection record

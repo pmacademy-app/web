@@ -10,7 +10,7 @@ import { getAuthenticatedUser } from '@/lib/auth'
 import LessonViewShell from '@/components/lesson/LessonViewShell'
 import { Lock } from 'lucide-react'
 import { cache } from 'react'
-import { isLessonUnlocked } from '@/lib/lessons-completion-service'
+import { isLessonUnlockedByOrderNumber } from '@/lib/lessons-completion-service'
 
 interface PageProps {
   params: Promise<{
@@ -75,7 +75,7 @@ export default async function AuthenticatedLessonPage({ params }: PageProps) {
     prevModuleNumber = Math.ceil(prevNum / 10)
 
     const serviceSupabase = createServerSupabaseClient()
-    const unlocked = await isLessonUnlocked(serviceSupabase, user.id, lessonNum)
+    const unlocked = await isLessonUnlockedByOrderNumber(serviceSupabase, user.id, lessonNum)
     if (!unlocked) {
       isLocked = true
     }
@@ -110,7 +110,7 @@ export default async function AuthenticatedLessonPage({ params }: PageProps) {
             Go to Required Lesson ({prevNum})
           </Link>
           <Link
-            href="/curriculum"
+            href="/academy"
             className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground hover:bg-accent/40 transition-all"
           >
             Return to Curriculum Map

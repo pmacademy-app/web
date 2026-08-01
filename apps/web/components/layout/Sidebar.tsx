@@ -12,7 +12,7 @@ interface SidebarProps {
 
 const SIDEBAR_LINKS = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Curriculum', href: '/curriculum', icon: BookOpen },
+  { label: 'Curriculum', href: '/academy', icon: BookOpen },
   { label: 'Review Hub', href: '/review', icon: RotateCw },
   { label: 'Progress', href: '/progress', icon: BarChart3 },
   { label: 'Leaderboard', href: '/leaderboard', icon: Trophy },
