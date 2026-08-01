@@ -1,7 +1,7 @@
 # PM Academy — Rules
 
 **Status:** Living document — the operating manual for how this project is built, by whom (a solo founder, possibly assisted by AI tools/agents), and how any future contributor or AI assistant should behave when picking up this codebase.
-**Companion docs:** `PRD.md` (what/why), `Architecture.md` (technical design), `Phases.md` (when), `Design.md` (what it looks like), `Supabase-Migration-Guide.md` (the one workflow this doc's change-management rules apply to most literally — a database migration is the highest-consequence "change" a solo founder can make).
+**Companion docs:** `INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `Architecture.md` (technical design), `Phases.md` (when), `Design.md` (what it looks like), `Supabase-Migration-Guide.md` (the one workflow this doc's change-management rules apply to most literally — a database migration is the highest-consequence "change" a solo founder can make), `content-pipeline.md` and `rendering-pipeline.md` (the authoritative specs §4's content-authoring rules and §2's naming conventions defer to).
 
 ---
 
@@ -68,9 +68,9 @@ Before writing a single line of code or making a single product decision:
 
 ## 4. Content Authoring Rules
 
-- Every lesson Markdown file must conform exactly to the fixed section schema in `Architecture.md` §4. Do not add ad hoc sections without updating that schema and the parser together.
-- When editing existing lesson content, edit the source `.md` file and let the build pipeline regenerate the JSON (`Architecture.md` §4) — never hand-edit the generated JSON or attempt to store content in the database.
-- Content changes trigger the full build pipeline: Markdown → validation → JSON generation → search index update → deploy. This is automated via GitHub Actions (`Architecture.md` §8).
+- Every lesson Markdown file must use the existing, already-consistent authoring conventions the compiler recognizes by heading text and shape (Learning Path table, Theory, Quiz, Flashcards, Glossary, Connections, Mermaid diagrams, etc. — see `content-pipeline.md` §3, Stage 1). No YAML frontmatter, no rewriting existing sections into `:::` directive syntax. A genuinely new block type with no existing prose convention (tabs, video, `aiPrompt`, etc.) is added via `remark-directive` syntax and a corresponding plugin (`content-pipeline.md` §6) — not by inventing new heading conventions ad hoc.
+- When editing existing lesson content, edit the source `.md` file and let the build pipeline regenerate the JSON (`content-pipeline.md`) — never hand-edit the generated JSON or attempt to store content in the database.
+- Content changes trigger the full build pipeline: Markdown → AST parse/transform → block extraction → validation → block JSON → asset/search/curriculum aggregation → deploy. This is automated via GitHub Actions (`Architecture.md` §8, `content-pipeline.md` §11). A single lesson's `error`-severity validation issue excludes only that lesson, not the whole deploy (`content-pipeline.md` §4, §10).
 - Every lesson must state an **honest** estimated time — do not inflate or deflate this to game engagement metrics (`PRD.md` §1, Product Principle #3).
 - Every lesson must be tagged with 1–2 of the 7 competency clusters (`PRD.md` §3) — never 0, never 3+, to keep the skill radar meaningful.
 - Quiz questions must map to a stated learning objective (used for the missed-question review queue) — no orphan questions.
@@ -128,6 +128,7 @@ Since this project explicitly expects to be built or continued with AI coding as
 
 ## Changelog
 
+- v2.3 — Added `content-pipeline.md`/`rendering-pipeline.md` as companion docs. Rewrote §4's content authoring rules: replaced the "fixed section schema" description (now superseded by the new content pipeline's pattern-matched block conventions plus directive syntax for new block types) and corrected the build-pipeline failure model to per-lesson exclusion rather than an implied whole-build failure.
 - v2.2 — Updated §3.2 naming conventions to register the newly isolated domain service layers (xp-service.ts, lessons-completion-service.ts, flashcards-service.ts) and database helper files.
 - v2.1 — Lean-documentation pass: amended §6.4 to explicitly balance "don't reopen settled decisions casually" with "these decisions aren't permanent — revisit with a real reason," per the project's "current decision unless justified" philosophy (`PRD.md` intro). No change to companion doc count — this doc already correctly scoped to the 5 canonical docs, unaffected by archiving the 3 sprint docs and original roadmap.
 - v2.0 — Updated for static-first architecture: added rules for Markdown as source of truth, no content in database, build-time JSON generation, Supabase for user state only, Google Analytics (replaced PostHog), Resend SMTP, Vercel deployment pipeline. Expanded content authoring rules for the automated build pipeline.

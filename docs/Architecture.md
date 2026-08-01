@@ -1,7 +1,7 @@
 # PM Academy — Architecture
 
 **Status:** Living document — single source of truth for technical decisions.
-**Companion docs:** `PRD.md` (what/why), `Rules.md` (how we work), `Phases.md` (when), `Design.md` (what it looks like), `Supabase-Migration-Guide.md` (how to safely change the schema below — §2 and §9 define what's correct, that doc defines the safe workflow to get there).
+**Companion docs:** `INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `Rules.md` (how we work), `Phases.md` (when), `Design.md` (what it looks like), `Supabase-Migration-Guide.md` (how to safely change the schema below — §2 and §9 define what's correct, that doc defines the safe workflow to get there), `content-pipeline.md` and `rendering-pipeline.md` (the authoritative, implementation-ready technical specs for the content compiler and the lesson renderer — §4 and §5 below summarize and defer to them; where this document and either of those two specs conflict, `content-pipeline.md`/`rendering-pipeline.md` win).
 **Read this before writing any code.** Every choice below is optimized for one constraint set: **solo-founder buildable, low infrastructure cost, static-first architecture targeting ~5,000 users, and capable of scaling later without a rewrite.**
 
 ---
@@ -54,39 +54,45 @@ users (
   created_at        timestamptz not null default now()
 );
 
--- Progress (references lessons by slug, not foreign key — content is static JSON)
+-- Progress (references lessons by stable lessonId, not foreign key — content is static JSON)
 user_lesson_progress (
   user_id           uuid references users(id),
-  lesson_slug       text not null,               -- matches the slug in the static JSON content
+  lesson_id         text not null,               -- the compiler-assigned, stable `lessonId` (e.g. "les_001a2b") from
+                                                  -- content/dist/lessons/<id>.json — see content-pipeline.md §5. Not the
+                                                  -- human-facing slug: slugs may change on a title edit, lessonId never does.
   status            text not null default 'not_started', -- 'not_started' | 'in_progress' | 'completed'
   theory_read_at    timestamptz,
   quiz_score        int,
   quiz_attempts     int not null default 0,
   xp_earned         int not null default 0,
   completed_at      timestamptz,
-  primary key (user_id, lesson_slug)
+  primary key (user_id, lesson_id)
 );
 
--- Quiz attempts (references questions by a stable content ID from static JSON)
+-- Quiz attempts (references questions by their lesson-scoped stable content ID)
 quiz_attempts (
   id                uuid primary key default gen_random_uuid(),
   user_id           uuid references users(id),
-  lesson_slug       text not null,
-  question_id       text not null,               -- stable ID from the static JSON quiz data
+  lesson_id         text not null,               -- stable lessonId, see above
+  question_id       text not null,               -- the quiz block's per-question `id` (e.g. "q1") from the compiled
+                                                  -- JSON's `quiz` block — unique within the lesson, so always paired with lesson_id
   selected_option   int not null,
   is_correct        boolean not null,
   attempted_at      timestamptz not null default now()
 );
 
--- Flashcard spaced repetition state (references flashcards by stable content ID)
+-- Flashcard spaced repetition state (references cards by a lesson-scoped stable content ID)
 user_flashcard_srs (
   user_id       uuid references users(id),
-  flashcard_id  text not null,                   -- stable ID from the static JSON flashcard data
+  lesson_id     text not null,                   -- stable lessonId that owns this card's flashcardDeck block
+  flashcard_id  text not null,                   -- the card's per-lesson `id` (e.g. "f1") from the compiled `flashcardDeck`
+                                                  -- block — unique within the lesson only, so (lesson_id, flashcard_id) is
+                                                  -- the real key, matching content-pipeline.md §5's (lessonId, blockId) model
   ease_factor   numeric not null default 2.5,   -- SM-2 state
   interval_days int not null default 0,
   repetitions   int not null default 0,
   next_review_at timestamptz not null default now(),
-  primary key (user_id, flashcard_id)
+  primary key (user_id, lesson_id, flashcard_id)
 );
 
 -- XP ledger (source of truth — users.total_xp is a denormalized cache updated from this)
@@ -94,7 +100,7 @@ xp_events (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid references users(id),
   source_type text not null,      -- 'theory_read' | 'quiz_correct' | 'quiz_bonus' | 'flashcard' | 'reflection' | 'capstone' | 'streak'
-  source_id   text,                -- nullable ref to the lesson slug or content ID that triggered it
+  source_id   text,                -- nullable ref to the lessonId or blockId that triggered it (content-pipeline.md §5)
   xp_amount   int not null,
   created_at  timestamptz not null default now()
 );
@@ -103,7 +109,7 @@ xp_events (
 reflections (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid references users(id),
-  lesson_slug text not null,
+  lesson_id   text not null,                     -- stable lessonId, see user_lesson_progress above
   content     text not null,
   is_public   boolean not null default false,
   created_at  timestamptz not null default now()
@@ -113,9 +119,9 @@ reflections (
 bookmarks (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid references users(id),
-  lesson_slug text not null,
+  lesson_id   text not null,                     -- stable lessonId, see user_lesson_progress above
   created_at  timestamptz not null default now(),
-  unique (user_id, lesson_slug)
+  unique (user_id, lesson_id)
 );
 
 -- Capstones
@@ -171,7 +177,7 @@ waitlist (
 **Design notes:**
 - `xp_events` is the append-only source of truth for XP; `users.total_xp` and `users.level` are denormalized caches recomputed by a trigger or application-layer function whenever a new event is inserted. Never let application code increment `total_xp` directly without writing the corresponding `xp_events` row first — this preserves auditability and makes the anti-gaming rule (`PRD.md` §4.6) verifiable after the fact.
 - Row-Level Security (RLS) must be enabled on every user-owned table (`user_lesson_progress`, `quiz_attempts`, `user_flashcard_srs`, `xp_events`, `reflections`, `bookmarks`, `capstone_submissions`, `user_badges`, `cohort_members`). Policy: a user can only read/write rows where `user_id = auth.uid()`, except for explicitly `is_public` rows (reflections, capstones) which are readable by anyone for the portfolio-export feature.
-- User-state tables reference content by **slug** (a stable string identifier from the static JSON), not by foreign-key UUID. This decouples user state from content — content can be rebuilt from Markdown without affecting user progress data.
+- User-state tables reference content by the compiler-assigned **`lessonId`** (and, where relevant, the block-local card/question `id` alongside it — see `content-pipeline.md` §5), not by foreign-key UUID and not by the human-facing slug. This decouples user state from content — content can be rebuilt, retitled, or reorganized from Markdown without affecting user progress data, and it's specifically why `lessonId` (stable across renames/reorders) is the correct reference rather than `slug` (which can legitimately change when a lesson title changes).
 - The `waitlist` table collects name, email, and current career position during the pre-launch phase.
 
 ---
@@ -188,105 +194,123 @@ pm-academy/
 │       │   ├── (portfolio)/        # Public, unauthenticated routes: /p/[username] portfolio export (PRD.md §4.11)
 │       │   │                       #   — must render for logged-out viewers (e.g. a recruiter clicking a LinkedIn link),
 │       │   │                       #   reading only rows explicitly marked is_public = true (Architecture.md §2, §9)
-│       │   ├── (app)/              # Authenticated product routes
+│       │   ├── academy/            # Authenticated curriculum shell + lesson routes (rendering-pipeline.md §2, §15)
+│       │   │   ├── layout.tsx      # Curriculum shell: sidebar nav, Progress Provider, Search Overlay
+│       │   │   └── l/[lessonId]/   # Lesson route — keyed by the compiler-assigned stable lessonId, not a slug/number
+│       │   │       ├── page.tsx
+│       │   │       └── lesson-content.tsx
+│       │   ├── (app)/              # Other authenticated product routes
 │       │   │   ├── dashboard/
-│       │   │   ├── curriculum/
-│       │   │   │   └── [moduleSlug]/[lessonSlug]/
 │       │   │   ├── review/
 │       │   │   ├── progress/
 │       │   │   ├── leaderboard/
 │       │   │   └── settings/
 │       │   └── api/                # API routes (user-state mutations only)
-│       ├── components/             # Shared React components (ui/, lesson/, quiz/, dashboard/, etc.)
-│       ├── lib/                    # Business logic: srs.ts (SM-2), streaks.ts, skillRadar.ts, xp.ts, and isolated services (lessons-db.ts, streaks-db.ts, xp-service.ts, lessons-completion-service.ts, flashcards-service.ts)
-│       ├── styles/                 # Tailwind config, design tokens
-│       └── public/                 # Static assets + generated JSON content
-│           └── content/            # Build-generated JSON files (lessons, quizzes, flashcards)
-│               └── search-index.json
-├── content/                        # Source Markdown files (single source of truth)
-│   ├── roadmap/
-│   ├── interview/
-│   ├── resume/
-│   └── .../                        # Additional topic directories
-├── scripts/                        # Build-time scripts
-│   ├── parse-content.ts            # Markdown parser → structured JSON
-│   ├── validate-content.ts         # Content validation (schema, cross-refs)
-│   └── generate-search-index.ts    # Generates search-index.json
+│       ├── renderer/               # Block-tree renderer core (rendering-pipeline.md §3, §5)
+│       │   ├── block-tree-renderer.tsx
+│       │   └── registry.ts         # Plugin-based, lazy-loaded block component registry
+│       ├── blocks/                 # One folder per block type; blocks/index.ts is the only file touched to add a type
+│       │   ├── quiz/QuizBlock.tsx
+│       │   ├── flashcards/FlashcardDeckBlock.tsx
+│       │   ├── mermaid/MermaidBlock.tsx
+│       │   ├── glossary/GlossaryBlock.tsx
+│       │   ├── connections/ConnectionsBlock.tsx
+│       │   ├── section/SectionBlock.tsx   # shared wrapper for all prose block types (rendering-pipeline.md §4)
+│       │   ├── default/DefaultMarkdown.tsx
+│       │   └── index.ts
+│       ├── providers/              # progress-provider.tsx (rendering-pipeline.md §7), etc.
+│       ├── components/             # Shared React components (ui/, dashboard/, search-overlay.tsx, etc.)
+│       ├── lib/                    # Business logic: srs.ts (SM-2), streaks.ts, skillRadar.ts, xp.ts, progress/sync.ts,
+│       │                           #   and isolated services (lessons-db.ts, streaks-db.ts, xp-service.ts,
+│       │                           #   lessons-completion-service.ts, flashcards-service.ts)
+│       ├── theme/                  # tokens.ts — single design-token source shared by Tailwind classes and Mermaid theming
+│       └── styles/                 # Tailwind config
+├── content/                        # Source Markdown + compiler (single source of truth — content-pipeline.md §2)
+│   ├── modules/
+│   │   ├── 01-foundations/
+│   │   │   ├── module.yaml         # Module-level metadata (title, order, description)
+│   │   │   ├── lesson-001-*.md
+│   │   │   └── _assets/            # Images/diagrams colocated per module
+│   │   └── .../                    # One folder per module
+│   ├── shared/snippets/             # Reusable content fragments
+│   ├── schema/                      # block-schema.ts, lesson-metadata.schema.ts (zod, versioned)
+│   ├── .ids/lesson-id-registry.json # Compiler-managed source-path -> stable lessonId map (checked into the repo)
+│   ├── compiler/                    # compile.ts, migrate.ts — the content:compile / content:migrate entry points
+│   └── dist/                        # Build output: content-addressed, content-pipeline.md §5, §11
+│       ├── lessons/<lessonId>.json
+│       ├── assets/<hash>.<ext>
+│       ├── curriculum.json
+│       ├── module-graph.json
+│       ├── glossary-index.json
+│       └── search-index.json
 ├── supabase/
 │   └── migrations/                 # SQL migration files (user-state schema in §2)
-├── docs/                           # This document set: PRD.md, Architecture.md, Rules.md, Phases.md, Design.md
-└── .github/workflows/              # CI/CD: lint, type-check, test, markdown validation, JSON generation, deploy
+├── docs/                           # This document set: PRD.md, Architecture.md, Rules.md, Phases.md, Design.md,
+│                                   #   content-pipeline.md, rendering-pipeline.md
+└── .github/workflows/              # CI/CD: lint, type-check, test, content:validate, content:compile, deploy
 ```
 
 **Key structural decisions:**
 - The marketing site is folded into the main Next.js app as the `(marketing)` route group — one deploy, one domain, shared design system.
-- The portfolio/certificate export feature (`PRD.md` §4.11) needs its own unauthenticated `(portfolio)` route group, separate from `(app)` — this was missing from earlier versions of this doc. A logged-out recruiter clicking a shared link must be able to render the page without hitting an auth wall; the query layer enforces `is_public = true` (§2, §9), not route-level auth.
-- Source Markdown lives at the repo root in `/content`, separate from the Next.js app. Build scripts process it into static JSON placed in `public/content/` for CDN delivery.
+- The portfolio/certificate export feature (`PRD.md` §4.11) needs its own unauthenticated `(portfolio)` route group, separate from the authenticated routes — this was missing from earlier versions of this doc. A logged-out recruiter clicking a shared link must be able to render the page without hitting an auth wall; the query layer enforces `is_public = true` (§2, §9), not route-level auth.
+- The curriculum/lesson routes live under `app/academy/**`, not `app/(app)/curriculum/[moduleSlug]/[lessonSlug]/` — this is the file layout `rendering-pipeline.md` §2 and §15 specify, keyed by the compiler-assigned stable `lessonId` rather than a module/lesson slug pair, so that renaming or reordering lessons never breaks a URL, a bookmark, or a piece of user-state (§2 above).
+- Source Markdown, the compiler, and its build output all live at the repo root in `/content`, separate from the Next.js app — see §4 and `content-pipeline.md` for the full pipeline. Build output is content-addressed and written to `content/dist/`, which is what the Next.js app reads from (file system in dev, CDN/edge cache in production — `rendering-pipeline.md` §2.3), rather than being copied into `apps/web/public/`.
 - There is no `supabase/seed.sql` — content is never seeded into the database. The database contains only migration files for user-state tables.
 
 ---
 
-## 4. Content Pipeline (Markdown → static JSON, build-time only)
+## 4. Content Pipeline (Markdown → block-tree compiler → static JSON, build-time only)
 
-The Markdown files in `/content` are the **single source of truth**. Content is parsed, validated, and converted to static JSON at build time. **There is no runtime markdown parsing.** The browser consumes pre-generated JSON.
+**Authoritative spec:** `content-pipeline.md`. This section is a summary for orientation only — if anything here and that document disagree, `content-pipeline.md` is correct.
 
-**Content flow:**
+The Markdown files in `/content` are the **single source of truth**. Content is parsed, validated, and compiled to static, content-addressed JSON at build time via a real Markdown AST (`remark`/`mdast`), not string-slicing. **There is no runtime markdown parsing.** The browser consumes pre-generated JSON.
+
+**Content flow (`content-pipeline.md` §1):**
 
 ```
-Markdown files (/content)
+Markdown files (content/modules/**)
        ↓
-  Parser (scripts/parse-content.ts)
+  remark Parser → mdast AST (content-pipeline.md §3, Stage 1)
        ↓
-  Validation (scripts/validate-content.ts)
+  AST Transform Plugins — pattern-match existing conventions, normalize, register directives for new block types (Stage 2)
        ↓
-  JSON Generation (structured lesson/quiz/flashcard JSON)
+  Block Extraction — mdast → recursive Block Tree (Stage 3)
        ↓
-  Search Index Generation (scripts/generate-search-index.ts → search-index.json)
+  Validation — zod schemas + rule-plugin registry, per-lesson (not whole-build) severity gating (Stage 4)
        ↓
-  Static Assets (placed in public/content/)
+  Block JSON — content-addressed, written per-lesson (Stage 5)
+       ↓
+  Asset Pipeline (images/video/Mermaid, Stage 6) + Search Indexing (FlexSearch, Stage 7) + Curriculum Aggregation (Stage 8)
+       ↓
+  content/dist/** (lessons/<lessonId>.json, curriculum.json, module-graph.json, glossary-index.json, search-index.json)
        ↓
   Vercel Deployment (served via Vercel Edge Network CDN)
 ```
 
-**Fixed section schema per lesson Markdown file** (confirmed consistent across all lessons by the content audit):
-
-```
-{
-  meta,                    // slug, title, module, order, difficulty, est_minutes, skill_clusters[]
-  theory,                  // main prose body
-  mistakes,                // common-mistakes section
-  mental_model,            // diagram/framework description
-  case_study,
-  framework,               // framework table
-  interview_perspective,
-  summary,
-  key_takeaways,
-  cheat_sheet,
-  glossary[],
-  resources[],
-  flashcards[],            // { id, front, back, difficulty, tags[] }
-  reflection,              // prompt text
-  quiz[],                  // { id, question_text, options[], correct_option, explanation, learning_objective, difficulty }
-  connections[]            // cross-references to other lessons
-}
-```
+**Key structural properties (see `content-pipeline.md` for full detail):**
+- **No content rewrite required.** The compiler recognizes existing lesson conventions — the `## Learning Path` table, Quiz, Flashcards, Glossary, Connections, and Mermaid diagrams — by heading text and shape, via pattern-matching extractor plugins, not by requiring authors to adopt YAML frontmatter or a new directive syntax. New block types not present in any current lesson (tabs, accordion, video, `aiPrompt`, etc.) use `remark-directive` (`::: type{...}`) syntax going forward.
+- Content compiles to a **recursive block tree**, not a flat, fixed set of sections — the real editorial taxonomy (`learningObjectives`, `theory`, `commonMistakes`, `mentalModel`, `companyExample`, `realWorldPerspective`, `caseStudy`, `framework`, `interviewPerspective`, `summary`, `keyTakeaways`, `cheatSheet`, `glossary`, `resources`, `flashcardDeck`, `reflection`, `quiz`, `connections`, `mermaid`, plus `callout` and future directive-only types) is richer than a fixed 20-field schema and supports arbitrary nesting (e.g., a quiz inside a tab inside an accordion).
+- **Stable identifiers, not positional ones.** A `lessonId` (e.g. `les_001a2b`) is assigned once by the compiler and persisted in `content/.ids/lesson-id-registry.json`, keyed by source file path — it never changes as long as the file isn't renamed outside the `content:migrate --rename` workflow. Every block also gets a content-hash-derived `blockId`, stable across unrelated edits. **User-state tables (§2) reference content by `(lessonId, blockId)`, never by slug or position** — this is what makes reordering, splitting, or retitling a lesson safe.
+- **Validation is per-lesson, not whole-build.** A lesson with an `error`-severity issue is excluded from `content/dist/` and flagged in a build report; the other ~89 lessons still ship. CI can be configured to fail only on error-count > 0 or only on lessons touched in the current PR.
+- **Schema is versioned.** Every compiled lesson carries a `schemaVersion`; a `migrations/` folder holds pure `migrateVNtoVN+1()` functions the compiler runs automatically against stale cached JSON.
+- **Search indexing and glossary aggregation are pipeline stages**, not bolted on afterward — see §5 below.
 
 **Pipeline rules:**
-1. Every content item (quiz question, flashcard) must have a **stable `id`** field generated deterministically from its content or position — this is the key that user-state tables reference (see §2).
-2. The parser script must be **re-runnable and idempotent** — re-running after editing a source Markdown file regenerates the corresponding JSON without breaking user-state references (stable IDs preserve the link).
-3. The validation script enforces the schema above — a missing required field (e.g., a quiz question without an explanation) fails the build. This is the quality gate for content.
+1. Every block (quiz question, flashcard, section) gets a **stable `id`/`blockId`** generated deterministically from its content, not its position — this is the key that user-state tables reference (see §2 and `content-pipeline.md` §5).
+2. The compiler is **incremental and content-addressed** (`content/.cache/manifest.json` maps `sourceFile -> sourceHash -> outputHash`) — unchanged lessons are skipped on every run, so the build scales past a few hundred lessons instead of re-parsing everything every time.
+3. The validation rule-plugin registry enforces structural, referential, content-quality, and accessibility rules (`content-pipeline.md` §4, §9) — an `error`-severity issue (e.g., a quiz question without an explanation) excludes that lesson from `content/dist/`, but never blocks the rest of the build.
 4. Build this pipeline as the **first real engineering task**, before any UI, to de-risk the content pipeline early (see `Phases.md` Phase 0).
 
 ---
 
 ## 5. Search Architecture
 
-Search is implemented entirely at build time and runs client-side. No server-side search infrastructure.
+Search is implemented entirely at build time and runs client-side. No server-side search infrastructure by default. Full detail: `content-pipeline.md` §8 (index generation) and `rendering-pipeline.md` §8 (search UI).
 
-- **Build time:** `scripts/generate-search-index.ts` processes all lesson JSON and produces a `search-index.json` file containing searchable fields (title, summary, key takeaways, glossary terms, module name).
-- **Client side:** A lightweight client-side search library (e.g., Fuse.js or Lunr.js) loads the search index and provides instant, offline-capable search results.
-- **Scalability trigger — when to revisit this approach:** client-side search is the right call at 90 lessons. Revisit (consider a hosted search service) only if lesson count exceeds roughly 300 or the generated `search-index.json` exceeds roughly 2MB gzipped — below that, a hosted search service is solving a problem you don't have yet, at real infra cost you currently avoid entirely.
-- **No Algolia, Elasticsearch, or server-side search** — these add operational complexity and cost with no benefit at ~5,000-user scale.
+- **Build time:** the content compiler's Stage 7 (`content-pipeline.md` §8) emits a `searchable` payload per lesson (plain-text-extracted body, headings, tags, module, difficulty) and feeds every lesson into a **[FlexSearch](https://github.com/nextapp-au/flexsearch)** index serialized to `content/dist/search-index.json` — no separate, hand-maintained search-index script.
+- **Client side:** `SearchOverlay` (triggered by `Cmd/Ctrl+K`) loads the FlexSearch index lazily on first open, not on initial page load, and provides instant, offline-capable results. Results are **block-aware**: selecting one deep-links to `(lessonId, blockId)` and scrolls to/highlights that block, not just the lesson root.
+- **Optional adapter:** the same documents can be pushed to Algolia/Typesense instead, if/when catalog size or fuzzy/typo-tolerant search at scale warrants it.
+- **Scalability trigger — when to revisit FlexSearch-only:** client-side FlexSearch is the right call at 90 lessons. Revisit (consider the Algolia/Typesense adapter) only if lesson count exceeds roughly 2,000 (`content-pipeline.md` §13) or the generated `search-index.json` grows large enough to noticeably affect first-open latency — below that, a hosted search service is solving a problem you don't have yet, at real infra cost you currently avoid entirely.
 
 ---
 
@@ -306,7 +330,7 @@ Implement these as isolated, well-tested modules in `lib/` — each should be in
 | `lib/streaks.ts` | Daily streak increment/reset, freeze application | Compute "day" boundaries using the user's stored `timezone`, not server UTC midnight, or streaks will feel broken to users outside the server's timezone |
 | `lib/skillRadar.ts` | Aggregates lesson/quiz/capstone performance into the 7-cluster radar score | Lock in the exact scoring formula here once decided (see `PRD.md` §11 open decision) and treat this file as the single implementation of that formula — never duplicate the calculation elsewhere |
 | `lib/badges.ts` | Evaluates badge-earning conditions after relevant events | Keep the badge list and its trigger conditions in one place, matching `PRD.md` §4.9 exactly |
-| `lib/search.ts` | Client-side search against the pre-built search index | Load `search-index.json` once, provide instant results — no network round-trips for search queries |
+| `components/search-overlay.tsx` + `lib/search.ts` | Client-side search against the FlexSearch index (`rendering-pipeline.md` §8) | Load `content/dist/search-index.json` lazily on first `Cmd/Ctrl+K` open (not on page load), provide instant, block-aware results — no network round-trips per keystroke |
 
 ---
 
@@ -330,14 +354,16 @@ GitHub (push to main or PR)
        ↓
 GitHub Actions — app-deploy.yml
        ↓
-  ┌─ Markdown Validation (schema check, cross-ref check)
-  ├─ JSON Generation (parse-content.ts)
-  ├─ Search Index Generation (generate-search-index.ts) — from Phase 4 onward only; see `Phases.md`. Earlier phases skip this step entirely, not run it against an empty/near-empty index.
+  ┌─ Content Validation (`content:validate` — schema, referential, accessibility rule-plugin registry; per-lesson, non-blocking — content-pipeline.md §4, §10, §11)
+  ├─ Content Compile (`content:compile` — incremental, content-addressed; produces content/dist/lessons/*.json, curriculum.json, module-graph.json)
+  ├─ Search Index Generation — part of `content:compile`'s Stage 7/8 output (`search-index.json`, `glossary-index.json`) from Phase 4 onward only; see `Phases.md`. Earlier phases skip enabling the search UI, not the pipeline stage itself, which runs on every compile regardless of phase.
   ├─ Lint + Type Check + Unit Tests
   └─ Next.js Build
        ↓
 Vercel Deployment (automatic via Git integration)
 ```
+
+CI restores/saves `content/.cache/manifest.json` as a cache artifact between runs, so a PR touching one lesson doesn't recompile the whole catalog (`content-pipeline.md` §11).
 
 **Database pipeline** (schema changes only, triggers on push/merge to `main`):
 ```
@@ -350,8 +376,8 @@ GitHub Actions — supabase-deploy.yml
 Full workflow, local testing, rollback, and CI secrets setup: `Supabase-Migration-Guide.md`. That document is authoritative for *how* to change the schema safely; this section and §2/§9 are authoritative for *what* the schema and its RLS policies must be.
 
 **Key rules:**
-- If markdown validation fails, the app build fails — broken content never reaches production.
-- JSON generation runs before `next build` so that static JSON is available for Next.js to include in the build output.
+- Content validation is **per-lesson, not whole-build** (`content-pipeline.md` §4, §10): a lesson with an `error`-severity issue is excluded from `content/dist/` and flagged in the build report, but does not block the other lessons from shipping. CI can be configured to fail the pipeline run only if error-count > 0 (strict) or only on lessons touched in the current PR (fast-iteration mode) — either way, broken content for one lesson never silently reaches production undetected, and it never takes the rest of the catalog down with it.
+- Content compilation runs before `next build` so that static JSON is available for Next.js to include in the build output.
 - Vercel preview deployments on every PR provide a free, zero-config staging environment.
 - Database migrations never run automatically on a PR preview — only on merge to `main`, per `Supabase-Migration-Guide.md` §3.3. A PR should never be able to alter the production schema before review.
 - Never commit secrets. Use environment variables (`.env.local`, never committed) for all API keys (Supabase, Resend, Google Analytics). Document required env vars in a checked-in `.env.example`.
@@ -381,6 +407,7 @@ This stack is chosen specifically so that scaling is a **later, success-driven d
 
 ## Changelog
 
+- v2.5 — Realigned with the new, standalone technical specs `content-pipeline.md` and `rendering-pipeline.md`, which now supersede this document's prior content-pipeline detail wherever they conflict. §3: replaced the old flat `content/{roadmap,interview,resume,...}` layout and `public/content/` output with the real `content/modules/**` + `content/dist/**` source/output layout, and updated the app-side folder structure to the `app/academy/**` route + `renderer/`/`blocks/` structure the rendering spec actually calls for (was still showing `app/(app)/curriculum/[moduleSlug]/[lessonSlug]/`). §4: replaced the fixed 20-field flat lesson schema and single-script pipeline description with a summary of the real block-tree compiler (remark/mdast, pattern-matching extractors, content-addressed IDs, per-lesson validation, plugin architecture) — this doc's content-pipeline detail is now a pointer to the authoritative spec, not a competing description. §5: replaced the unspecified Fuse.js/Lunr.js client search library with FlexSearch and added block-aware deep-linking, matching what the two new specs actually build. §8: corrected the deployment pipeline's error-handling rule, which previously said any validation failure aborts the whole build — the real model (per `content-pipeline.md` §4/§10) excludes only the failing lesson and ships the rest. §2: renamed `lesson_slug` to `lesson_id` across all user-state tables (referencing the compiler-assigned stable `lessonId`, not the human-facing slug) and added lesson-scoped flashcard/quiz keys, matching `content-pipeline.md` §5's stable-identifier model — this was a real, previously-undocumented conflict between this doc's slug-based references and the new spec's `(lessonId, blockId)` addressing.
 - v2.4 — Updated §3 and §6 to register the newly isolated domain service layers (xp-service.ts, lessons-completion-service.ts, flashcards-service.ts) and clean feature database helpers (lessons-db.ts, streaks-db.ts).
 - v2.3 — Reconciled §8 with the real, separately-built database migration workflow: split the "single pipeline" into an app pipeline and a database pipeline, cross-referenced the new `Supabase-Migration-Guide.md`, and corrected search-index generation to only run from Phase 4 onward (was incorrectly shown as universal, contradicting the Phase 1→4 move already made in `Phases.md`).
 - v2.2 — Lean-documentation pass: added explicit scalability trigger for client-side search (revisit past ~300 lessons or ~2MB gzipped index) so the tradeoff has a concrete decision point rather than being implicit.

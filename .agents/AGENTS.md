@@ -1,7 +1,7 @@
 # PM Academy — Agent Rules (AGENTS.md)
 
 **This file applies to ALL AI agents working in this workspace.**
-Read this before any other file. Load `docs/Architecture.md`, `docs/PRD.md`, `docs/Rules.md`, `docs/Phases.md`, and `docs/Design.md` before writing any code.
+Read this before any other file. Then read `docs/INDEX.md` — it is the documentation entry point that maps every document, defines the reading order, and resolves conflicts between docs. Review `docs/CURRENT_STATUS.md`, `docs/IMPLEMENTATION_RULES.md`, and `docs/DO_NOT_CHANGE.md` before writing code to align on current status, coding rules, and invariants. Then load `docs/Architecture.md`, `docs/PRD.md`, `docs/Rules.md`, `docs/Phases.md`, and `docs/Design.md`.
 
 ---
 

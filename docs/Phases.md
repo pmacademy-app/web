@@ -1,7 +1,7 @@
 # PM Academy — Phases (Roadmap & Milestones)
 
 **Status:** Living document — single source of truth for sequencing and "what does done mean" at each stage.
-**Companion docs:** `PRD.md` (what/why), `Architecture.md` (how, technically), `Rules.md` (how we work), `Design.md` (what it looks like).
+**Companion docs:** `INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `Architecture.md` (how, technically), `Rules.md` (how we work), `Design.md` (what it looks like), `content-pipeline.md` and `rendering-pipeline.md` (the exact compiler/renderer this roadmap's Phase 0/1/4 milestones build).
 **Context:** Solo-founder execution, optionally aided by AI coding assistants. Timelines are directional (weeks from kickoff) and phases can overlap where explicitly noted — treat the *sequence and definition-of-done* as the fixed part, and the week numbers as recalibratable based on actual solo-founder bandwidth.
 
 ---
@@ -21,7 +21,7 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 - Approve the content backlog/bug-fix list from the content audit; kick off any Module 9 expansion work in parallel with engineering (content work should never block engineering, and vice versa).
 - Build the Figma design system: typography, color, component library (buttons, cards, progress rings, quiz UI, search input, auth forms, waitlist form) — see `Design.md` §1–§2 for the locked-in direction to execute against.
 - Technical scaffolding: repo created per `Architecture.md` §3's folder structure, Next.js + Supabase set up, CI/CD on Vercel per `Rules.md` §3.5.
-- **Content parser and JSON generator** (`Architecture.md` §4) — build this as the **first real engineering task**. Parse all source Markdown files into validated, structured JSON. No runtime markdown parsing — the browser consumes pre-generated JSON.
+- **Content compiler** (`content-pipeline.md`, `Architecture.md` §4) — build this as the **first real engineering task**. Compile all source Markdown files (`content:compile`) into validated, content-addressed block-tree JSON, with per-lesson validation (`content:validate`) so a single bad lesson never blocks the others. No runtime markdown parsing — the browser consumes pre-generated JSON.
 - **Authentication** — wire Supabase Auth with Email + Password and Google Login (`PRD.md` §4.1).
 - **Waitlist page** — stand up the marketing-site waitlist landing page (see `Design.md` §6) collecting name, email, and current career position. This is independent of every other Phase 0 item and should go live as early in Week 1 as possible. Waitlist data stored in Supabase `waitlist` table (`Architecture.md` §2).
 - **Google Analytics** — integrate for page views and basic user flow tracking.
@@ -106,7 +106,7 @@ Each phase lists: **Goal**, **Scope (what ships)**, **Explicit exclusions (what 
 
 **Scope:**
 - Full content-audit fixes applied (ideally this ran in parallel since Week 1 — confirm completion here as a gate, don't start it now if it wasn't already in motion).
-- **Search — index generation and UI, moved here from Phase 1.** Build `scripts/generate-search-index.ts` to produce `search-index.json` from the generated lesson JSON (`Architecture.md` §5), and the client-side search UI. Rationale for the move: search adds no value while only 1–2 lessons are unlocked for a 10–20-user test cohort (Phase 1's actual scope); it earns its place once most/all 90 lessons are live and there's real content to search, which naturally aligns with this phase's public-facing SEO push.
+- **Search — UI enablement, moved here from Phase 1.** The content compiler emits the FlexSearch `search-index.json` (and `glossary-index.json`) as a pipeline stage on every compile regardless of phase (`content-pipeline.md` §8) — what actually moves to this phase is building and turning on the client-side `SearchOverlay` (`rendering-pipeline.md` §8, `Architecture.md` §5). Rationale for the move: search adds no value while only 1–2 lessons are unlocked for a 10–20-user test cohort (Phase 1's actual scope); it earns its place once most/all 90 lessons are live and there's real content to search, which naturally aligns with this phase's public-facing SEO push.
 - SSR/SEO pass on lesson pages: public-facing lesson previews indexed by Google (`PRD.md` §5 non-functional requirement, `Design.md` §6 SEO strategy) — this is a major free acquisition channel for "what is product management"-style queries.
 - Accessibility pass: run the full budget in `Design.md` §4 — automated scan plus at least one manual screen-reader pass.
 - Closed beta with 100–200 real users, instrumented with Google Analytics. Fix drop-off points in the funnel — **onboarding → Lesson 1 completion is the single most important metric to fix here.**
@@ -172,7 +172,7 @@ If Day-1 completion or Day-7 retention come in meaningfully below target, the ri
 2. Approve the fixed-count content backlog and kick off metadata-bug fixes + any module expansion in parallel with Phase 0 engineering.
 3. Commission or draft the Figma design system (`Design.md` §1–§2) so engineering isn't blocked waiting on visual direction.
 4. Stand up the waitlist landing page (`PRD.md` §8, `Design.md` §6) collecting name, email, and career position — this can go live literally this week, independent of everything else, and starts compounding immediately.
-5. Build the content parser and JSON generator (`Architecture.md` §4) as the first real engineering task — it de-risks the entire content pipeline before any UI is built.
+5. Build the content compiler (`content-pipeline.md`, `Architecture.md` §4) as the first real engineering task — it de-risks the entire content pipeline before any UI is built.
 6. Set up the deployment pipeline (`Architecture.md` §8): GitHub Actions → Markdown validation → JSON generation → Vercel deployment.
 
 ---
@@ -183,7 +183,7 @@ If Day-1 completion or Day-7 retention come in meaningfully below target, the ri
 - [ ] Waitlist landing page live
 - [ ] Figma design system v1 complete
 - [ ] Repo scaffolded per `Architecture.md` §3
-- [ ] Content parser and JSON generator built and run against all available lessons
+- [ ] Content compiler built and run against all available lessons
 - [ ] Deployment pipeline automated (GitHub Actions → Vercel)
 - [ ] Auth working (Email + Password, Google Login)
 - [ ] Google Analytics tracking page views
@@ -202,6 +202,7 @@ If Day-1 completion or Day-7 retention come in meaningfully below target, the ri
 
 ## Changelog
 
+- v2.2 — Added `content-pipeline.md`/`rendering-pipeline.md` as companion docs. Updated Phase 0's content-pipeline milestone and Phase 4's search milestone to describe the real block-tree compiler (`content:compile`/`content:validate`, per-lesson validation, FlexSearch indexing built into every compile) rather than a flat parse-content.ts/generate-search-index.ts script pair — no change to phase sequencing or scope, only to the implementation description so it doesn't contradict `content-pipeline.md`.
 - v2.1 — MVP scope trim per documentation review: (1) moved client-side search (index generation + UI) from Phase 1 to Phase 4 — it added no value while only 1-2 lessons were unlocked for the small Phase 1 test cohort, and pairs naturally with Phase 4's SEO push once most lessons are live. (2) Fixed a sequencing bug: Phase 1's onboarding no longer includes a scored placement quiz, since it existed only to seed the skill radar, which doesn't exist until Phase 2 — building that scoring logic in Phase 1 was premature work with no consumer. The placement quiz moves to Phase 2 alongside the skill radar. (3) Added explicit numeric Launch Week Success Criteria to Phase 5, distinct from `PRD.md` §9's 6-month targets. (4) Resolved the AI Mentor open question (see `PRD.md` §11) as cut from v1 — no Phases.md changes were needed since it was never actually in any phase's scope, only in the now-archived marketing copy.
 - v2.0 — Updated for static-first architecture: Phase 0 expanded to include content parser, JSON generator, search index, deployment pipeline (GitHub Actions), Google Analytics, Resend SMTP, waitlist (name/email/career position). Replaced PostHog with Google Analytics throughout. Removed LinkedIn OAuth. Updated content pipeline references from DB seeding to static JSON generation.
 - v1.0 — Initial phased roadmap authored from the "PM Academy — 0→1 Roadmap & Project Plan" source document, with explicit scope/exclusion/definition-of-done added per phase for unambiguous execution.

@@ -1,7 +1,7 @@
 # PM Academy — Supabase CLI Migration Guide
 
 **Status:** Living document — operational runbook for the database migration workflow. Not a decision doc: `Architecture.md` §2/§9 own the actual schema and RLS requirements; this doc owns *how* to change them safely.
-**Companion docs:** `Architecture.md` §2 (data model), §8 (deployment pipeline — this guide implements the database half of it), §9 (security/RLS). `Rules.md` §7 (change management — this doc's own Changelog below follows that rule).
+**Companion docs:** `INDEX.md` (documentation entry point — read this first), `Architecture.md` §2 (data model), §8 (deployment pipeline — this guide implements the database half of it), §9 (security/RLS). `Rules.md` §7 (change management — this doc's own Changelog below follows that rule).
 
 This document defines the version-controlled database workflow for PM Academy. To prevent schema drift, data loss, and deployment issues, **never run manual DDL SQL commands in the Supabase Dashboard SQL Editor**. All database schema modifications must be implemented via Supabase CLI migration scripts.
 
