@@ -389,16 +389,20 @@ export function extractCommonMistakesBlock(nodes: any[], lessonId: string): any 
 
   for (const node of nodes) {
     const text = toMarkdown(node).trim();
-    // Mistake paragraphs look like: **Mistake 1: "PMs manage engineers."**
-    const mistakeMatch = text.match(/^\*?\*?Mistake\s*(\d+):\s*(.*?)(?:\*?\*?|$)/i);
+    const lines = text.split('\n');
+    const firstLine = lines[0].trim();
+    const mistakeMatch = firstLine.match(/^\*?\*?Mistake\s*(\d+):\s*(.*)/i);
 
     if (mistakeMatch) {
       if (currentMistake) {
         mistakes.push(currentMistake);
       }
+      let rawTitle = mistakeMatch[2].trim();
+      rawTitle = rawTitle.replace(/\*?\*?$/, '').trim();
+      const bodyText = lines.slice(1).join('\n').trim();
       currentMistake = {
-        title: mistakeMatch[2].replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim(),
-        body: '',
+        title: rawTitle.replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim(),
+        body: bodyText,
       };
     } else if (currentMistake) {
       currentMistake.body += (currentMistake.body ? '\n\n' : '') + text;
