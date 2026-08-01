@@ -33,5 +33,9 @@ dist/
 .DS_Store
 Thumbs.db
 
-# log files
 *.log
+
+# PM Academy content pipeline
+/content/.cache/
+/content/dist/
+
