@@ -10,7 +10,7 @@
 - **Current Branch:** `main`
 - **Current Version:** `0.1.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
 - **Last Successful Build:** 2026-08-02 (Next.js 16.2.12 Turbopack production compilation clean, zero warnings, 90 lessons / 1350 quiz questions compiled and validated via new v2 AST compiler)
-- **Current Implementation Phase:** Phase 1.1 ✅ Complete
+- **Current Implementation Phase:** Phase 1.2 ✅ Complete
 
 ---
 
@@ -18,9 +18,9 @@
 
 For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roadmap.md`](./memory/roadmap.md).
 
-- **Current Phase:** Phase 1.1 Complete.
-- **Last Completed Milestone:** Phase 1.1 Content Pipeline Foundation (AST transforms, stable Registry IDs, Zod schemas, compiler aggregators, rules-based validator registry, and compiler test suite).
-- **Current Focus:** Database schema migrations and dynamic routing setup.
+- **Current Phase:** Phase 1.2 Complete.
+- **Last Completed Milestone:** Phase 1.2 Renderer Foundation (Recursive block tree renderer, dynamic registration registry, default prose, custom section wraps, and ported block layers for Mermaid, Quizzes, Flashcards, Connections, and Glossary).
+- **Current Focus:** Database schema migrations and dynamic routing setup (Phase 1.3).
 
 ---
 
