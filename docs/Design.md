@@ -2,7 +2,7 @@
 
 **Status:** Living document — single source of truth for visual design, UX patterns, brand voice, and the marketing website's content/SEO strategy. This is now the **only** design/content doc — see the Changelog for why the three Sprint docs were consolidated into this one.
 **Platform:** Responsive web application — desktop-first experience with mobile responsiveness. Browser-based navigation (no native app patterns).
-**Companion docs:** `PRD.md` (what/why), `Architecture.md` (technical implementation), `Rules.md` (working standards), `Phases.md` (when).
+**Companion docs:** `INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `Architecture.md` (technical implementation), `Rules.md` (working standards), `Phases.md` (when), `content-pipeline.md` and `rendering-pipeline.md` (the exact block types and renderer components this document's screen/UI guidance maps onto).
 **Decision confidence:** everything below is the current best decision, not a permanent commitment — see `PRD.md`'s intro for the "current-unless-justified" philosophy this whole doc set follows. Specific values (exact hex codes, spacing numbers) are a confident starting point to build against, not something to re-litigate without a reason, but they're also not sacred — if real usage or user testing gives you a good reason to change one, change it and update this doc in the same sitting.
 **Archived reference:** `archive/Design-System-Sprint-1.md`, `archive/Marketing-Website-Sprint-2.md`, and `archive/Content-Communication-System-Sprint-3.md` contain much more granular, Figma-handoff-level detail (pixel values, per-microstate copy, frame plans) than a solo founder needs to keep in prose sync with working code. They're useful to mine for inspiration on a specific component or copy line, but **they are not maintained and may be stale** — this document is authoritative. Do not "fix" a discrepancy by updating the archive; update this document.
 
@@ -35,7 +35,7 @@ Design (and build) in this order — each screen unlocks meaningful user testing
 6. **Onboarding** — a single goal-setting question ("why are you here") that tailors notification cadence and dashboard copy per `PRD.md` §4.1. **MVP-trimmed:** no scored placement quiz at launch — that returns in Phase 2 alongside the skill radar it's meant to seed (see `PRD.md` §4.1 for why).
 7. **Authentication pages** — sign up, log in, password reset. Supports Email + Password and Google Login via Supabase Auth. Clean, minimal forms that reinforce the brand.
 8. **Waitlist page** — pre-launch landing page collecting name, email, and current career position. Must go live in Week 1 independent of all other work (see `PRD.md` §8).
-9. **Search experience** — client-side search powered by a build-time generated `search-index.json` (see `Architecture.md` §5). Fast, instant results as the user types. Should feel integrated into the curriculum navigation, not a separate "search page."
+9. **Search experience** — client-side search powered by a build-time generated FlexSearch index (`rendering-pipeline.md` §8, `Architecture.md` §5), triggered via `Cmd/Ctrl+K`. Fast, instant, block-aware results as the user types (a result can deep-link straight to the matching quiz/section within a lesson, not just the lesson root). Should feel integrated into the curriculum navigation, not a separate "search page."
 
 ---
 
@@ -209,6 +209,7 @@ For actual copy drafting (exact microcopy for a specific error state, email, or 
 
 ## Changelog
 
+- v2.2 — Added `content-pipeline.md`/`rendering-pipeline.md` as companion docs. Updated §2's search-experience entry to reference the FlexSearch-based, `Cmd/Ctrl+K`, block-aware search UI those specs define, replacing a vaguer `search-index.json` reference.
 - v2.1 — **Major consolidation.** Archived `Design-System-Sprint-1.md`, `Marketing-Website-Sprint-2.md`, and `Content-Communication-System-Sprint-3.md` (3,900+ combined lines) to `archive/` — their decision-relevant content was already captured in this document; their remaining bulk was Figma-handoff-level detail (pixel values, per-microstate copy, frame plans) that a solo founder doesn't need to keep in prose lockstep with working code, and which had already drifted out of sync twice (see `PRD.md`'s Documentation Review). Added a condensed Brand Voice section (§7, distilled from the archived content doc) and expanded Accessibility into a checkable budget with a new numeric Performance Budget (§4/§4.1) to close the gap flagged in the documentation review. Updated header framing: this is now the sole design/content doc, not one of four.
 - v2.0 — Updated for responsive web app (desktop-first + mobile). Added authentication pages, waitlist page, and search experience to core screens. Updated waitlist to collect name/email/career position. Added search, auth, and waitlist components to design system. Removed Cloudflare Pages references. Updated marketing site to Vercel-only hosting with Resend SMTP for transactional email.
 - v1.3 - Added `Content-Communication-System-Sprint-3.md` as the Sprint 3 content and communication system.

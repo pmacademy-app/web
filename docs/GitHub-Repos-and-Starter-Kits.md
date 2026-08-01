@@ -52,12 +52,14 @@ Recommendation: start with `cmdk` via shadcn's own Command block (simplest, matc
 
 ## 5. Content pipeline (Markdown → structured JSON)
 
-No single repo to point to here — as covered in the Documentation Review §3, your content is too structurally specific (fixed 20-section lessons, markdown tables for quiz/glossary/flashcards) for a general blog-content tool. Recommended libraries to build your custom parser *on top of*, rather than a framework to adopt wholesale:
+No single repo to point to here — your content is too structurally specific (a rich, recursive block taxonomy — theory, mental models, case studies, quizzes, flashcards, glossary, connections, etc. — authored via existing prose/table conventions rather than frontmatter, per `content-pipeline.md`) for a general blog-content tool. Recommended libraries to build your custom compiler *on top of*, rather than a framework to adopt wholesale:
 
-- **remarkjs/remark** + **remark-gfm** — the standard Markdown→AST parser and GitHub-Flavored-Markdown plugin (table support). Far more robust than hand-rolled regex for extracting your quiz/glossary/flashcard tables — this is what I'd have used in this conversation's earlier content-audit work had it been building the production pipeline rather than doing one-off edits.
-- **gray-matter** — trivial, extremely stable frontmatter parser, useful if you add any YAML frontmatter to lesson files (e.g., `difficulty`, `module`, `estimated_minutes` as structured metadata instead of parsed from a markdown table).
+- **remarkjs/remark** + **remark-gfm** + **remark-directive** — the standard Markdown→AST (`mdast`) parser, GitHub-Flavored-Markdown plugin (table support, used to parse the Learning Path/Quiz/Glossary tables as typed rows rather than string-scanned lines), and the directive-syntax plugin for genuinely new block types (tabs, video, `aiPrompt`, etc.) that have no existing prose convention to preserve. Far more robust than hand-rolled regex for extracting your quiz/glossary/flashcard content — this is exactly the toolchain `content-pipeline.md` specifies.
+- **zod** — for the versioned block schemas (`content/schema/block-schema.ts`) that the compiler validates against and the renderer uses for prop-typing, per `content-pipeline.md` §4.
 
-Explicitly avoid: **Contentlayer** (unmaintained since mid-2024, PRs going unmerged) and treat **Velite** with caution (actively developed and a reasonable Contentlayer replacement for blog-style content, but still early-stage per its own docs, and — like Contentlayer — optimized for frontmatter-driven prose content rather than your table-heavy structured format). Your best move is genuinely a thin custom parser built on `remark`/`remark-gfm`, not adopting either of these.
+**Do not add `gray-matter` or any YAML-frontmatter parser.** This was recommended in an earlier draft of this document but is now a settled non-decision: `content-pipeline.md` §2 explicitly keeps the existing, human-authored `## Learning Path` table (Module, Difficulty, Prerequisites, etc.) as the canonical metadata source specifically so lessons never need frontmatter added — introducing `gray-matter` would mean maintaining two competing metadata locations for no reader-facing benefit.
+
+Explicitly avoid: **Contentlayer** (unmaintained since mid-2024, PRs going unmerged) and treat **Velite** with caution (actively developed and a reasonable Contentlayer replacement for blog-style content, but still early-stage per its own docs, and — like Contentlayer — optimized for frontmatter-driven prose content rather than your table-heavy, block-tree format). Your best move is genuinely a thin custom compiler built on `remark`/`remark-gfm`/`remark-directive`, not adopting either of these.
 
 ---
 
