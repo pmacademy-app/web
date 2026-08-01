@@ -1,0 +1,495 @@
+import { Block, GlossaryEntrySchema, FlashcardSchema, QuizQuestionSchema } from '../schema/block-schema';
+import { CompilerContext, ValidationIssue } from './remark-plugins';
+import { generateBlockId } from '../registry';
+import { z } from 'zod';
+
+export function toMarkdown(node: any): string {
+  if (!node) return '';
+  if (node.type === 'text') return node.value;
+  if (node.type === 'strong') return `**${(node.children || []).map(toMarkdown).join('')}**`;
+  if (node.type === 'emphasis') return `*${(node.children || []).map(toMarkdown).join('')}*`;
+  if (node.type === 'inlineCode') return `\`${node.value}\``;
+  if (node.type === 'link') return `[${(node.children || []).map(toMarkdown).join('')}](${node.url})`;
+  if (node.type === 'image') return `![${node.alt || ''}](${node.url})`;
+  if (node.type === 'paragraph') return (node.children || []).map(toMarkdown).join('');
+  if (node.type === 'list') {
+    return (node.children || []).map((item: any, idx: number) => {
+      const bullet = node.ordered ? `${idx + 1}. ` : '- ';
+      return `${bullet}${toMarkdown(item)}`;
+    }).join('\n');
+  }
+  if (node.type === 'listItem') {
+    return (node.children || []).map(toMarkdown).join('');
+  }
+  if (node.type === 'code') {
+    return `\`\`\`${node.lang || ''}\n${node.value}\n\`\`\``;
+  }
+  if (node.children) {
+    return node.children.map(toMarkdown).join('');
+  }
+  return '';
+}
+
+export function mdastToBlocks(nodes: any[], lessonId: string): any[] {
+  const blocks: any[] = [];
+  for (const node of nodes) {
+    if (node.type === 'heading') {
+      let text = '';
+      visitText(node, (val) => { text += val; });
+      const block: any = {
+        type: 'heading',
+        level: node.depth,
+        text: text.trim(),
+      };
+      block.blockId = generateBlockId(lessonId, block);
+      blocks.push(block);
+    } else if (node.type === 'paragraph') {
+      const text = toMarkdown(node);
+      if (text.trim().length === 0) continue;
+      const block: any = {
+        type: 'paragraph',
+        text,
+      };
+      block.blockId = generateBlockId(lessonId, block);
+      blocks.push(block);
+    } else if (node.type === 'list') {
+      const items = (node.children || []).map((item: any) => toMarkdown(item));
+      const block: any = {
+        type: 'list',
+        ordered: !!node.ordered,
+        items,
+      };
+      block.blockId = generateBlockId(lessonId, block);
+      blocks.push(block);
+    } else if (node.type === 'table') {
+      const headers = (node.children[0]?.children || []).map(toMarkdown);
+      const rows = (node.children.slice(1) || []).map((row: any) =>
+        (row.children || []).map(toMarkdown)
+      );
+      const block: any = {
+        type: 'table',
+        headers,
+        rows,
+      };
+      block.blockId = generateBlockId(lessonId, block);
+      blocks.push(block);
+    } else if (node.type === 'code') {
+      if (node.lang === 'mermaid') {
+        const block: any = {
+          type: 'mermaid',
+          id: `mer-${lessonId}`,
+          source: node.value,
+          normalized: node.data?.mermaid?.normalized || node.value,
+          authorTheme: node.data?.mermaid?.authorTheme,
+        };
+        block.blockId = generateBlockId(lessonId, block);
+        // Sync ID of mermaid block
+        block.id = block.blockId;
+        blocks.push(block);
+      } else {
+        const block: any = {
+          type: 'code',
+          language: node.lang || undefined,
+          code: node.value,
+        };
+        block.blockId = generateBlockId(lessonId, block);
+        blocks.push(block);
+      }
+    }
+  }
+  return blocks;
+}
+
+function visitText(node: any, callback: (val: string) => void) {
+  if (node.type === 'text') {
+    callback(node.value);
+  }
+  if (node.children) {
+    for (const child of node.children) {
+      visitText(child, callback);
+    }
+  }
+}
+
+// Extract table keys and values from an mdast Table node
+export function parseTableNode(tableNode: any): Record<string, string> {
+  const result: Record<string, string> = {};
+  if (!tableNode || tableNode.type !== 'table') return result;
+
+  for (const row of tableNode.children) {
+    const cells = row.children || [];
+    if (cells.length >= 2) {
+      const rawKey = toMarkdown(cells[0]);
+      // Remove strong tags or other formatting from the key name
+      const key = rawKey.replace(/\*/g, '').trim();
+      const val = toMarkdown(cells[1]).trim();
+      result[key] = val;
+    }
+  }
+  return result;
+}
+
+// Segmentation helper: cuts nodes based on h2 headings
+export function segmentByH2(rootNode: any): Array<{ heading: string; nodes: any[] }> {
+  const segments: Array<{ heading: string; nodes: any[] }> = [];
+  let currentHeading = 'Front Matter';
+  let currentNodes: any[] = [];
+
+  for (const child of rootNode.children || []) {
+    if (child.type === 'heading' && child.depth === 2) {
+      if (currentNodes.length > 0 || currentHeading !== 'Front Matter') {
+        segments.push({ heading: currentHeading, nodes: currentNodes });
+      }
+      let text = '';
+      visitText(child, (val) => { text += val; });
+      currentHeading = text.trim();
+      currentNodes = [];
+    } else {
+      currentNodes.push(child);
+    }
+  }
+
+  if (currentNodes.length > 0 || currentHeading !== 'Front Matter') {
+    segments.push({ heading: currentHeading, nodes: currentNodes });
+  }
+
+  return segments;
+}
+
+// Extract Quiz Block
+export function extractQuizBlock(nodes: any[], lessonId: string, ctx: CompilerContext): any {
+  const quizId = `quiz-${lessonId}`;
+  const quizMarkdown = nodes.map(toMarkdown).join('\n\n');
+  
+  // Split by quiz question headers, e.g., "**1. Question...**" or "1. **Question...**"
+  const questionBlocks = quizMarkdown.split(/\n(?=\*\*\d+\.|\d+\.\s+\*\*)/);
+  const questions: any[] = [];
+
+  for (const block of questionBlocks) {
+    const headerMatch = block.match(/\*?\*?(\d+)\.\s*(.*?)(?:\*?\*?\n|\n)/);
+    if (!headerMatch) continue;
+
+    const qNum = parseInt(headerMatch[1], 10);
+    const qText = headerMatch[2].replace(/^\*\*/, '').replace(/\*\*$/, '').trim();
+
+    // Extract options A), B), C), D)
+    const optionMatches = [...block.matchAll(/(?:^|\n)(?:-\s*)?([A-D])\)\s*(.*?)(?=\n(?:-\s*)?[A-D]\)|\n\*|\n\n|$)/gs)];
+    const options: string[] = [];
+    optionMatches.forEach((m) => {
+      options.push(m[2].trim().replace(/\s+/g, ' '));
+    });
+
+    // Extract Correct Answer
+    const correctMatch = block.match(/\*Correct answer:\s*([A-D])\*/i);
+    const correctLetter = correctMatch ? correctMatch[1].toUpperCase() : 'A';
+    const correctIndex = ['A', 'B', 'C', 'D'].indexOf(correctLetter);
+
+    // Extract Explanation
+    const expMatch = block.match(/\*Explanation:\s*(.*?)\*/is) || block.match(/\*Explanation:\s*([^*]*)/is);
+    const explanation = expMatch ? expMatch[1].trim() : '';
+
+    // Extract Learning Objective
+    const loMatch = block.match(/\*Learning objective tested:\s*(.*?)\*/i);
+    const learningObjectiveStr = loMatch ? loMatch[1].trim() : '';
+    const objectivesTested: number[] = [];
+    const loNumbers = learningObjectiveStr.match(/\d+/g);
+    if (loNumbers) {
+      loNumbers.forEach((n) => objectivesTested.push(parseInt(n, 10)));
+    }
+
+    // Extract Difficulty
+    const diffMatch = block.match(/\*Difficulty:\s*(.*?)\*/i);
+    const difficulty = diffMatch ? diffMatch[1].trim().toLowerCase() : 'medium';
+
+    if (qText && options.length >= 2) {
+      questions.push({
+        id: `q-${lessonId}-${qNum}`,
+        question: qText,
+        options,
+        correctAnswer: correctIndex >= 0 ? correctIndex : 0,
+        explanation,
+        objectivesTested,
+        difficulty,
+      });
+    }
+  }
+
+  const block: any = {
+    type: 'quiz',
+    id: quizId,
+    questions,
+  };
+  block.blockId = generateBlockId(lessonId, block);
+  return block;
+}
+
+// Extract Flashcard Block
+export function extractFlashcardBlock(nodes: any[], lessonId: string, ctx: CompilerContext): any {
+  const flashcardsMarkdown = nodes.map(toMarkdown).join('\n\n');
+  const cards: any[] = [];
+  
+  // Split on **Card N** or **Card N
+  const cardBlocks = flashcardsMarkdown.split(/\n(?=\*\*Card\s+\d+\*\*|\*\*Card\s+\d+)/i);
+  
+  for (const block of cardBlocks) {
+    const cardMatch = block.match(/^\*?\*?Card\s*(\d+)\*?\*?/i);
+    if (!cardMatch) continue;
+
+    const cardIndex = parseInt(cardMatch[1], 10);
+    
+    // Extract Front
+    const frontMatch = block.match(/(?:-\s*)?Front:\s*(.*?)(?=\n-\s*Back:|\n-\s*Difficulty:|\n-\s*Tags:|\n\n|$)/is);
+    const front = frontMatch ? frontMatch[1].trim() : '';
+
+    // Extract Back
+    const backMatch = block.match(/(?:-\s*)?Back:\s*(.*?)(?=\n-\s*Difficulty:|\n-\s*Tags:|\n\n|$)/is);
+    const back = backMatch ? backMatch[1].trim() : '';
+
+    // Extract Difficulty
+    const diffMatch = block.match(/(?:-\s*)?Difficulty:\s*(.*?)(?=\n-\s*Tags:|\n\n|$)/is);
+    const difficultyStr = diffMatch ? diffMatch[1].trim() : 'medium';
+    let difficulty: any = parseInt(difficultyStr, 10);
+    if (isNaN(difficulty)) {
+      difficulty = difficultyStr;
+    }
+
+    // Extract Tags
+    const tagsMatch = block.match(/(?:-\s*)?Tags:\s*(.*?)(?=\n\n|$)/is);
+    const tags = tagsMatch
+      ? tagsMatch[1].split(',').map((t) => t.trim()).filter(Boolean)
+      : [];
+
+    if (front && back) {
+      cards.push({
+        id: `fc-${lessonId}-${cardIndex}`,
+        front,
+        back,
+        difficulty,
+        tags,
+      });
+    }
+  }
+
+  const block: any = {
+    type: 'flashcardDeck',
+    id: `fc-deck-${lessonId}`,
+    cards,
+  };
+  block.blockId = generateBlockId(lessonId, block);
+  return block;
+}
+
+// Extract Glossary Block
+export function extractGlossaryBlock(nodes: any[], lessonId: string, ctx: CompilerContext): any {
+  const entries: any[] = [];
+  const tableNode = nodes.find((n) => n.type === 'table');
+
+  if (tableNode) {
+    const parsedTable = tableNode.children || [];
+    // Skip headers (row 0)
+    for (let r = 1; r < parsedTable.length; r++) {
+      const cells = parsedTable[r].children || [];
+      if (cells.length >= 2) {
+        const term = toMarkdown(cells[0]).replace(/\*\*/g, '').trim();
+        const definition = toMarkdown(cells[1]).trim();
+        const related = cells[2] ? toMarkdown(cells[2]).split(',').map((c) => c.trim()).filter(Boolean) : [];
+        const difficulty = cells[3] ? parseInt(toMarkdown(cells[3]).trim(), 10) : undefined;
+
+        entries.push({
+          term,
+          definition,
+          relatedConcepts: related.length > 0 ? related : undefined,
+          difficulty: isNaN(difficulty as any) ? undefined : difficulty,
+        });
+
+        // Register globally in CompilerContext
+        ctx.glossaryTerms.push({
+          term,
+          definition,
+          sourceFile: ctx.filePath,
+        });
+      }
+    }
+  }
+
+  const block: any = {
+    type: 'glossary',
+    entries,
+  };
+  block.blockId = generateBlockId(lessonId, block);
+  return block;
+}
+
+// Extract Connections Block
+export function extractConnectionsBlock(nodes: any[], lessonId: string, ctx: CompilerContext): any {
+  let previous: any = null;
+  let current: any = { id: lessonId, title: '' }; // Will be populated later
+  let next: any = null;
+  const unlocks: any[] = [];
+
+  const tableNode = nodes.find((n) => n.type === 'table');
+  if (tableNode) {
+    const rows = tableNode.children || [];
+    for (let r = 1; r < rows.length; r++) {
+      const cells = rows[r].children || [];
+      if (cells.length >= 2) {
+        const key = toMarkdown(cells[0]).replace(/\*\*/g, '').replace(/\*/g, '').trim();
+        const val = toMarkdown(cells[1]).trim();
+        
+        // Parse Title and ID if possible
+        // Lesson reference is written like "Lesson 2 — Product vs. Project" or "Lesson 6 (Jobs to Be Done)"
+        const lessonMatch = val.match(/Lesson\s+(\d+)\s*[-—(]\s*(.*?)(?:\)|$)/i) || val.match(/Lesson\s+(\d+)/i);
+        const refTitle = lessonMatch ? lessonMatch[2]?.trim() || val : val;
+        
+        if (key.includes('Previous Lesson')) {
+          if (!val.toLowerCase().includes('none')) {
+            previous = { id: `placeholder_prev`, title: refTitle };
+          }
+        } else if (key.includes('Current Lesson')) {
+          current = { id: lessonId, title: refTitle };
+        } else if (key.includes('Next Lesson')) {
+          if (!val.toLowerCase().includes('none') && val.length > 0) {
+            next = { id: `placeholder_next`, title: refTitle };
+          }
+        } else if (key.includes('Future Concepts Unlocked') || key.includes('Future Topics Unlocked')) {
+          // Unlocks can contain multiple comma separated or bullet items.
+          // e.g. "Lesson 6 (Jobs to Be Done), Lesson 8 (Product Discovery)"
+          const items = val.split(/,|\n/).map((item) => item.trim()).filter(Boolean);
+          for (const item of items) {
+            const itemMatch = item.match(/Lesson\s+(\d+)\s*[-—(]\s*(.*?)(?:\)|$)/i) || item.match(/Lesson\s+(\d+)/i);
+            if (itemMatch) {
+              const itemTitle = itemMatch[2]?.trim() || item;
+              const coreIdea = toMarkdown(cells[2]) || '';
+              unlocks.push({
+                lesson: { id: `placeholder_unlock_${itemMatch[1]}`, title: itemTitle },
+                coreIdea: coreIdea.trim(),
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const block: any = {
+    type: 'connections',
+    previous,
+    current,
+    next,
+    unlocks,
+  };
+  block.blockId = generateBlockId(lessonId, block);
+  return block;
+}
+
+// Extract Common Mistakes
+export function extractCommonMistakesBlock(nodes: any[], lessonId: string): any {
+  const mistakes: any[] = [];
+  let currentMistake: any = null;
+
+  for (const node of nodes) {
+    const text = toMarkdown(node).trim();
+    // Mistake paragraphs look like: **Mistake 1: "PMs manage engineers."**
+    const mistakeMatch = text.match(/^\*?\*?Mistake\s*(\d+):\s*(.*?)(?:\*?\*?|$)/i);
+
+    if (mistakeMatch) {
+      if (currentMistake) {
+        mistakes.push(currentMistake);
+      }
+      currentMistake = {
+        title: mistakeMatch[2].replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim(),
+        body: '',
+      };
+    } else if (currentMistake) {
+      currentMistake.body += (currentMistake.body ? '\n\n' : '') + text;
+    }
+  }
+
+  if (currentMistake) {
+    mistakes.push(currentMistake);
+  }
+
+  const block: any = {
+    type: 'commonMistakes',
+    mistakes,
+  };
+  block.blockId = generateBlockId(lessonId, block);
+  return block;
+}
+
+// Extract Real World Perspective Block
+export function extractRealWorldPerspectiveBlock(nodes: any[], lessonId: string): any {
+  const segments: any[] = [];
+  let currentSegment: any = null;
+
+  for (const node of nodes) {
+    const text = toMarkdown(node).trim();
+    // Subheadings like: **At a startup (roughly pre-seed to Series B):**
+    // or ### Startup (roughly pre-seed to Series B)
+    const contextMatch = text.match(/^\*?\*?(?:At a|At)\s*(.*?)(?:\*?\*?|$)/i) || (node.type === 'heading' && node.depth === 3);
+
+    if (contextMatch) {
+      if (currentSegment) {
+        segments.push(currentSegment);
+      }
+      let contextText = '';
+      if (node.type === 'heading') {
+        visitText(node, (v) => { contextText += v; });
+      } else {
+        contextText = text.replace(/^\*?\*?/, '').replace(/\*?\*?$/, '').replace(/:$/, '').trim();
+      }
+
+      currentSegment = {
+        context: contextText,
+        body: '',
+      };
+    } else if (currentSegment) {
+      currentSegment.body += (currentSegment.body ? '\n\n' : '') + text;
+    }
+  }
+
+  if (currentSegment) {
+    segments.push(currentSegment);
+  }
+
+  const block: any = {
+    type: 'realWorldPerspective',
+    segments,
+  };
+  block.blockId = generateBlockId(lessonId, block);
+  return block;
+}
+
+// Extract Interview Perspective
+export function extractInterviewPerspectiveBlock(nodes: any[], lessonId: string): any {
+  const questions: any[] = [];
+  let currentQuestion: any = null;
+
+  for (const node of nodes) {
+    const text = toMarkdown(node).trim();
+    const qMatch = text.match(/^\*?\*?Typical question\s*\d+:\s*(.*?)(?:\*?\*?|$)/i) || text.match(/^\*?\*?Question\s*\d+:\s*(.*?)(?:\*?\*?|$)/i);
+
+    if (qMatch) {
+      if (currentQuestion) {
+        questions.push(currentQuestion);
+      }
+      currentQuestion = {
+        question: qMatch[1].replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim(),
+        whatItEvaluates: '',
+      };
+    } else if (currentQuestion) {
+      currentQuestion.whatItEvaluates += (currentQuestion.whatItEvaluates ? '\n\n' : '') + text;
+    }
+  }
+
+  if (currentQuestion) {
+    questions.push(currentQuestion);
+  }
+
+  const block: any = {
+    type: 'interviewPerspective',
+    questions,
+  };
+  block.blockId = generateBlockId(lessonId, block);
+  return block;
+}
