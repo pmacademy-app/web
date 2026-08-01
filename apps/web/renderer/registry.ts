@@ -1,7 +1,8 @@
 import React from 'react';
+import type { CompiledBlock } from '@/types';
 
 export interface BlockProps {
-  block: any;
+  block: CompiledBlock;
   lessonId: string;
   children?: React.ReactNode;
 }

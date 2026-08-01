@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { HelpCircle, Sparkles, Award, ArrowRight, Zap, RotateCcw } from 'lucide-react';
+import { HelpCircle, Sparkles, Award, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BlockProps } from '../../renderer/registry';
 
@@ -9,11 +9,11 @@ interface Flashcard {
   id: string;
   front: string;
   back: string;
-  difficulty?: string;
+  difficulty?: number;
   tags?: string[];
 }
 
-export default function FlashcardDeckBlock({ block, lessonId }: BlockProps) {
+export default function FlashcardDeckBlock({ block }: BlockProps) {
   const cards: Flashcard[] = block.cards || [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionXp, setSessionXp] = useState(0);
@@ -25,7 +25,7 @@ export default function FlashcardDeckBlock({ block, lessonId }: BlockProps) {
     setIsFinished(false);
   };
 
-  const handleReview = (rating: number) => {
+  const handleReview = (_rating: number) => {
     // Add XP locally to simulate gamified progression (Rule 5 compliance)
     setSessionXp((x) => x + 2);
 
@@ -109,6 +109,7 @@ function FlashcardItemCard({ card, onReview }: { card: Flashcard; onReview: (rat
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsFlipped(false);
   }, [card.id]);
 

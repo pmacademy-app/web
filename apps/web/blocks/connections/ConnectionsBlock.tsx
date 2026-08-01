@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Lock, Key } from 'lucide-react';
 import { BlockProps } from '../../renderer/registry';
 
 export default function ConnectionsBlock({ block }: BlockProps) {
-  const { previous, current, next, unlocks } = block;
+  const { previous, next, unlocks } = block;
 
   return (
     <div className="border-t border-border pt-8 mt-12 space-y-6">
@@ -81,7 +81,7 @@ export default function ConnectionsBlock({ block }: BlockProps) {
             <span>Future Concepts Unlocked</span>
           </div>
           <ul className="space-y-3">
-            {unlocks.map((u: any, idx: number) => (
+            {unlocks.map((u: { lesson: { id: string; title: string }; coreIdea: string }, idx: number) => (
               <li key={idx} className="text-sm text-foreground/80 leading-relaxed flex items-start gap-2.5">
                 <span className="inline-flex shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
                 <div>

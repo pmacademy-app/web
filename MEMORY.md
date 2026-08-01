@@ -1,7 +1,7 @@
 # PM Academy — Project Memory Index
 
 **Last Updated:** 2026-08-02  
-**Project Stage:** Phase 1.2 Complete / Preparing for Phase 1.3 (Migration Foundation)
+**Project Stage:** Phase 1.3 Complete (Migration & Integration Foundation)
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
 

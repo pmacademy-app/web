@@ -5,6 +5,7 @@ import { Trophy, ArrowRight, RotateCcw, Zap, CheckCircle2, Check, X, Loader2 } f
 import { Button } from '@/components/ui/button';
 import QuizOption from '@/components/quiz/QuizOption';
 import { BlockProps } from '../../renderer/registry';
+import { useLessonContextSafe } from '@/contexts/lesson-context';
 
 interface QuizQuestion {
   id: string;
@@ -12,23 +13,24 @@ interface QuizQuestion {
   options: string[];
   correctAnswer: number;
   explanation: string;
-  difficulty?: string;
-  objectivesTested?: string[];
+  difficulty?: 'easy' | 'medium' | 'medium-hard' | 'hard';
+  objectivesTested?: number[];
 }
 
-export default function QuizBlock({ block, lessonId }: BlockProps) {
+export default function QuizBlock({ block }: BlockProps) {
   const questions: QuizQuestion[] = block.questions || [];
   const totalQuestions = questions.length;
+  const lessonCtx = useLessonContextSafe();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
-  const [attempts, setAttempts] = useState<
-    { question_id: string; selected_option: number; is_correct: boolean }[]
-  >([]);
+  // Ref mirrors attempts state for reliable access in async callbacks
+  const attemptsRef = React.useRef<{ question_id: string; selected_option: number; is_correct: boolean }[]>([]);
 
   const [quizFinished, setQuizFinished] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const currentQuestion = questions[currentIndex];
 
@@ -37,8 +39,9 @@ export default function QuizBlock({ block, lessonId }: BlockProps) {
     setSelectedOption(null);
     setIsConfirmed(false);
     setCorrectCount(0);
-    setAttempts([]);
+    attemptsRef.current = [];
     setQuizFinished(false);
+    setSubmitting(false);
   };
 
   const handleOptionClick = (idx: number) => {
@@ -54,14 +57,13 @@ export default function QuizBlock({ block, lessonId }: BlockProps) {
       setCorrectCount((c) => c + 1);
     }
 
-    setAttempts((prev) => [
-      ...prev,
-      {
-        question_id: currentQuestion.id,
-        selected_option: selectedOption,
-        is_correct: isCorrect,
-      },
-    ]);
+    const newAttempt = {
+      question_id: currentQuestion.id,
+      selected_option: selectedOption,
+      is_correct: isCorrect,
+    };
+
+    attemptsRef.current = [...attemptsRef.current, newAttempt];
 
     setIsConfirmed(true);
   }, [selectedOption, isConfirmed, currentQuestion]);
@@ -75,8 +77,17 @@ export default function QuizBlock({ block, lessonId }: BlockProps) {
       setIsConfirmed(false);
     } else {
       setQuizFinished(true);
+      // Submit all attempts via lesson context (v2 route) if available.
+      // Use attemptsRef which has already been updated synchronously.
+      if (lessonCtx && attemptsRef.current.length > 0) {
+        setSubmitting(true);
+        lessonCtx
+          .onQuizComplete(attemptsRef.current)
+          .catch((err) => console.error('[QuizBlock] Failed to submit quiz:', err))
+          .finally(() => setSubmitting(false));
+      }
     }
-  }, [isConfirmed, currentIndex, totalQuestions]);
+  }, [isConfirmed, currentIndex, totalQuestions, lessonCtx]);
 
   // Keyboard navigation & accessibility keys
   useEffect(() => {
@@ -279,9 +290,18 @@ export default function QuizBlock({ block, lessonId }: BlockProps) {
                 Confirm Answer
               </Button>
             ) : (
-              <Button onClick={handleNext} size="lg" className="w-full sm:w-auto font-bold px-8">
-                {currentIndex + 1 < totalQuestions ? 'Next Question' : 'Finish Quiz'}
-                <ArrowRight className="h-4 w-4 ml-2" />
+              <Button onClick={handleNext} disabled={submitting} size="lg" className="w-full sm:w-auto font-bold px-8">
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    {currentIndex + 1 < totalQuestions ? 'Next Question' : 'Finish Quiz'}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </>
+                )}
               </Button>
             )}
           </div>

@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import { registerBlock } from '../renderer/registry';
+import { registerBlock, BlockProps } from '../renderer/registry';
 import DefaultMarkdown from './default/DefaultMarkdown';
 import SectionBlock from './section/SectionBlock';
 
@@ -12,11 +12,11 @@ const GlossaryBlock = dynamic(() => import('./glossary/GlossaryBlock'));
 
 // Active block registrations
 registerBlock('__default__', DefaultMarkdown);
-registerBlock('quiz', QuizBlock as any);
-registerBlock('flashcardDeck', FlashcardDeckBlock as any);
-registerBlock('mermaid', MermaidBlock as any);
-registerBlock('connections', ConnectionsBlock as any);
-registerBlock('glossary', GlossaryBlock as any);
+registerBlock('quiz', QuizBlock as React.ComponentType<BlockProps>);
+registerBlock('flashcardDeck', FlashcardDeckBlock as React.ComponentType<BlockProps>);
+registerBlock('mermaid', MermaidBlock as React.ComponentType<BlockProps>);
+registerBlock('connections', ConnectionsBlock as React.ComponentType<BlockProps>);
+registerBlock('glossary', GlossaryBlock as React.ComponentType<BlockProps>);
 
 // Prose section types all share the wrapper block SectionBlock
 const PROSE_SECTION_TYPES = [

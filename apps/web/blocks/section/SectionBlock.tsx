@@ -38,7 +38,7 @@ export default function SectionBlock({ block, children }: BlockProps) {
   // Handle badges based on block type
   let badgeText = '';
   let badgeColor = '';
-  let title = block.title || block.name || '';
+  const title = block.title || block.name || '';
 
   switch (type) {
     case 'mentalModel':

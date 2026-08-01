@@ -201,3 +201,127 @@ export interface ParsedLesson {
   rawMarkdownPath: string
 }
 
+
+// ─── v2 Compiled Lesson Types (from content/dist/lessons/*.json) ──────────────
+// These match the Block JSON schema produced by the v2 AST compiler
+// (content-pipeline.md §4). Used by the /academy/** routes.
+
+export interface CompiledLessonRef {
+  id: string    // stable les_XXXXXX ID
+  title: string
+}
+
+export interface CompiledBlock {
+  blockId: string
+  type: string
+  // Shared optional fields across all block types
+  text?: string
+  level?: number
+  items?: string[]
+  ordered?: boolean
+  headers?: string[]
+  rows?: string[][]
+  code?: string
+  language?: string
+  source?: string
+  normalized?: string
+  authorTheme?: Record<string, string>
+  // Block-specific fields
+  objectives?: string[]         // learningObjectives
+  mistakes?: { title: string; body: string }[] // commonMistakes
+  name?: string                 // mentalModel, framework
+  title?: string                // caseStudy, companyExample, etc.
+  company?: string              // companyExample
+  assumptionFlags?: string[]    // companyExample
+  segments?: { context: string; body: string }[] // realWorldPerspective
+  questions?: CompiledQuizQuestion[] // quiz
+  id?: string                   // quiz, flashcardDeck
+  cards?: CompiledFlashcard[]   // flashcardDeck
+  entries?: CompiledGlossaryEntry[] // glossary
+  prompts?: string[]            // reflection
+  // resources items
+  citation?: string
+  note?: string
+  // connections
+  previous?: CompiledLessonRef | null
+  current?: CompiledLessonRef
+  next?: CompiledLessonRef | null
+  unlocks?: { lesson: CompiledLessonRef; coreIdea: string }[]
+  // Recursive children for container blocks
+  children?: CompiledBlock[]
+  // Forward-compatible catch-all
+  [key: string]: unknown
+}
+
+export interface CompiledQuizQuestion {
+  id: string
+  question: string
+  options: string[]
+  correctAnswer: number
+  explanation: string
+  objectivesTested: number[]
+  difficulty: 'easy' | 'medium' | 'medium-hard' | 'hard'
+}
+
+export interface CompiledFlashcard {
+  id: string
+  front: string
+  back: string
+  difficulty: number
+  tags: string[]
+}
+
+export interface CompiledGlossaryEntry {
+  term: string
+  definition: string
+  relatedConcepts?: string[]
+  difficulty?: number
+}
+
+export interface CompiledLesson {
+  schemaVersion: number
+  id: string                    // stable les_XXXXXX ID
+  contentHash: string
+  title: string
+  slug: string                  // e.g. 'lesson-001' (kept for legacy redirects)
+  module: string
+  order: number
+  totalInModule: number
+  difficulty: number
+  estimatedReadingTime: number  // minutes
+  estimatedCompletionTime: number // minutes
+  prerequisites: string[]       // array of les_XXXXXX IDs
+  sourceFile: string
+  blocks: CompiledBlock[]
+  assets?: unknown[]
+  searchable?: {
+    plainText: string
+    headings: string[]
+  }
+  glossaryTermsIntroduced?: string[]
+  generator?: {
+    model: string
+    promptVersion: string
+    generatedAt: string
+  }
+  createdAt?: string
+  updatedAt?: string
+}
+
+/** Minimal curriculum entry for sidebar navigation */
+export interface CurriculumEntry {
+  id: string
+  slug: string
+  title: string
+  module: string
+  order: number
+  difficulty: number
+  estimatedReadingTime: number
+  estimatedCompletionTime: number
+  prerequisites: string[]
+}
+
+/** Full curriculum.json shape from content/dist/ */
+export interface CurriculumData {
+  lessons: CurriculumEntry[]
+}

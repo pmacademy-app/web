@@ -54,7 +54,7 @@ export type Database = {
       user_lesson_progress: {
         Row: {
           user_id: string
-          lesson_slug: string
+          lesson_id: string  // stable les_XXXXXX ID (was lesson_slug pre-migration)
           status: 'not_started' | 'in_progress' | 'completed'
           theory_read_at: string | null
           quiz_score: number | null
@@ -64,7 +64,7 @@ export type Database = {
         }
         Insert: {
           user_id: string
-          lesson_slug: string
+          lesson_id: string
           status?: 'not_started' | 'in_progress' | 'completed'
           theory_read_at?: string | null
           quiz_score?: number | null
@@ -78,7 +78,7 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          lesson_slug: string
+          lesson_id: string  // stable les_XXXXXX ID (was lesson_slug pre-migration)
           question_id: string
           selected_option: number
           is_correct: boolean
@@ -87,7 +87,7 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
-          lesson_slug: string
+          lesson_id: string
           question_id: string
           selected_option: number
           is_correct: boolean
@@ -98,6 +98,7 @@ export type Database = {
       user_flashcard_srs: {
         Row: {
           user_id: string
+          lesson_id: string  // part of composite PK: (user_id, lesson_id, flashcard_id)
           flashcard_id: string
           ease_factor: number
           interval_days: number
@@ -106,6 +107,7 @@ export type Database = {
         }
         Insert: {
           user_id: string
+          lesson_id: string
           flashcard_id: string
           ease_factor?: number
           interval_days?: number
@@ -137,7 +139,7 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          lesson_slug: string
+          lesson_id: string  // stable les_XXXXXX ID (was lesson_slug pre-migration)
           content: string
           is_public: boolean
           created_at: string
@@ -145,7 +147,7 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
-          lesson_slug: string
+          lesson_id: string
           content: string
           is_public?: boolean
           created_at?: string
@@ -156,13 +158,13 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          lesson_slug: string
+          lesson_id: string  // stable les_XXXXXX ID (was lesson_slug pre-migration)
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          lesson_slug: string
+          lesson_id: string
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['bookmarks']['Insert']>
