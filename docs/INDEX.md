@@ -25,13 +25,14 @@ Read in this order before writing any code or making any product decision. Do no
 | 3 | [`PRD.md`](./PRD.md) | Defines *what* to build and *why* — the product vision, principles, and requirements |
 | 4 | [`Architecture.md`](./Architecture.md) | Defines *how* the code is structured — the locked tech stack, data model, and folder layout |
 | 5 | [`IMPLEMENTATION_RULES.md`](./IMPLEMENTATION_RULES.md) | **Developer Rules:** Pre-flight checklists, coding rules, documentation sync, and quality gates |
-| 6 | [`DO_NOT_CHANGE.md`](./DO_NOT_CHANGE.md) | **Architectural Invariants:** Locked system paradigms (static-first, stable IDs, ledger, etc.) and rationale |
-| 7 | [`Rules.md`](./Rules.md) | Defines *how we work* — engineering standards, coding conventions, change management |
-| 8 | [`Phases.md`](./Phases.md) | Defines *when* things ship — the phase-by-phase sequencing and definition of done |
-| 9 | [`Design.md`](./Design.md) | Defines *what it looks like* — visual language, UX patterns, screen designs |
-| 10 | [`content-pipeline.md`](./content-pipeline.md) | **Deep-dive:** the authoritative compiler specification (read before any content pipeline work) |
-| 11 | [`rendering-pipeline.md`](./rendering-pipeline.md) | **Deep-dive:** the authoritative renderer specification (read before any lesson UI work) |
-| 12 | [`docs/memory/`](./memory/) | **Project memory:** implementation status, decisions, pitfalls, and roadmap progress |
+| 6 | [`KNOWN_ISSUES.md`](./KNOWN_ISSUES.md) | **Deferred Backlog & Tech Debt:** Intentionally deferred Phase 1 items and planned technical enhancements |
+| 7 | [`DO_NOT_CHANGE.md`](./DO_NOT_CHANGE.md) | **Architectural Invariants:** Locked system paradigms (static-first, stable IDs, ledger, etc.) and rationale |
+| 8 | [`Rules.md`](./Rules.md) | Defines *how we work* — engineering standards, coding conventions, change management |
+| 9 | [`Phases.md`](./Phases.md) | Defines *when* things ship — the phase-by-phase sequencing and definition of done |
+| 10 | [`Design.md`](./Design.md) | Defines *what it looks like* — visual language, UX patterns, screen designs |
+| 11 | [`content-pipeline.md`](./content-pipeline.md) | **Deep-dive:** the authoritative compiler specification (read before any content pipeline work) |
+| 12 | [`rendering-pipeline.md`](./rendering-pipeline.md) | **Deep-dive:** the authoritative renderer specification (read before any lesson UI work) |
+| 13 | [`docs/memory/`](./memory/) | **Project memory:** implementation status, decisions, pitfalls, and roadmap progress |
 
 **For a quick orientation only** (not a substitute for full reading): read `CURRENT_STATUS.md`, `PRD.md §1`, `Architecture.md §1`, and this document's Source of Truth section below.
 
@@ -50,6 +51,10 @@ These files manage active repository metadata and enforce pre-flight standards d
 #### [`IMPLEMENTATION_RULES.md`](./IMPLEMENTATION_RULES.md) — Implementation Guidelines
 **Owns:** coding standard directives, parity requirements, validation checklists, and documentation sync requirements.  
 **Use it:** before making any changes to ensure compliance with the repository rules and build validations.
+
+#### [`KNOWN_ISSUES.md`](./KNOWN_ISSUES.md) — Deferred Backlog & Tech Debt
+**Owns:** list of intentionally deferred product features, planned enhancements, and non-critical technical debt.  
+**Use it:** to track backlog items and plan technical debt resolutions in future sprints.
 
 #### [`DO_NOT_CHANGE.md`](./DO_NOT_CHANGE.md) — Architectural Invariants
 **Owns:** locked structural and database paradigms (static-first JSON, remark AST, recursive renderer, singleton clients, stable Base36 IDs, append-only XP trigger) and their underlying rationales.  

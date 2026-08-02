@@ -9,13 +9,12 @@
 ## Current Status (as of 2026-08-02)
 
 ```
-Phase 0 — Foundation          ████████████████  Complete ✅
-Phase 1.1–1.4 (v2 Migration)  ████████████████  Complete ✅
-Phase 1.5 (Stabilization)     ███████████████░  In Progress — Curriculum Pass Complete
-Phase 2 — Gamification Layer  ████████░░░░░░░░  In Progress — dashboard and skill radar wired
-Phase 3 — Depth & Retention   ░░░░░░░░░░░░░░░░  Scaffolded / Not Started
-Phase 4 — Polish & SEO        ░░░░░░░░░░░░░░░░  Not Started
-Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░  Not Started
+Phase 0 — Foundation          ████████████████████████████████  Complete ✅
+Phase 1 (Core MVP & v2)       ████████████████████████████████  Complete ✅ — v1.0.0-foundation Release
+Phase 2 — Gamification Layer  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Active Development Stage 🏗️
+Phase 3 — Depth & Retention   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Not Started
+Phase 4 — Polish & SEO        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Not Started
+Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Not Started
 ```
 
 ---
@@ -214,3 +213,4 @@ Step 6  →  Phase 2 Gamification UI Integration
 - v1.6 (2026-08-02) — Phase 1.5 Sprint 2 Learning Flow Stabilization complete. Wired flashcard reviews to API, implemented Previous/Next navigation footer links, verified reflections load/save correctly, and integrated real competency skill radar scores on the dashboard.
 - v1.7 (2026-08-02) — Phase 1.5 Sprint 3 Content Experience & Curriculum Rendering complete. Enhanced MarkdownRenderer styles using Tailwind prose and marked custom renderers, rewrote DefaultMarkdown to output native HTML tables and lists, built customized visual designs for all SectionBlock types (mistakes, objectives, cheat sheets, resources, real-world, interview, case study, framework, mental model, company example), and rebuilt the `/academy` curriculum landing page to display expandable module-grouped lesson lists. All typescript validation checks and compiler tests passed.
 - v1.8 (2026-08-02) — Phase 1.5 Curriculum Integrity & Content Consistency Audit complete. Resolved module-splitting bugs (17 modules down to exactly 9 modules, 10 lessons each) by mapping to canonical slugs via module number parsing; fixed regex matching bugs in `extractors.ts` to fully parse/render Interview and Real World Perspectives; and added a second referential validation pass in `compile.ts` to identify and resolve all glossary consistency warnings across 12 source files, achieving 0 compiler warnings. All production builds, type checks, and tests pass.
+- v1.0.0-foundation (2026-08-02) — Phase 1 Foundation Complete. Resolved all critical Edge middleware route guarding bugs, moved quiz correctness checking and XP ledger calculations entirely to the server, audited XP ledger to prevent duplicate quiz/read/reflection XP, implemented daily flashcard review XP deduplication in user timezone, and disabled the Google OAuth placeholder button with a "Coming Soon" badge. The codebase is clean, builds successfully, and is ready for Phase 2.
