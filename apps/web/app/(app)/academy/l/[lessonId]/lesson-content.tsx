@@ -66,8 +66,8 @@ function getBlocksForTab(blocks: CompiledBlock[], tab: TabType): CompiledBlock[]
 // ─── Theory engagement tracker ───────────────────────────────────────────────
 
 function useTheoryEngagement(isActiveTab: boolean) {
-  const [activeSeconds, setActiveSeconds] = useState(0)
-  const [scrollPercent, setScrollPercent] = useState(0)
+  const activeSecondsRef = useRef(0)
+  const scrollPercentRef = useRef(0)
   const activeRef = useRef(true)
 
   // Track active tab focus time
@@ -75,7 +75,9 @@ function useTheoryEngagement(isActiveTab: boolean) {
     const onVisibility = () => { activeRef.current = !document.hidden && isActiveTab }
     document.addEventListener('visibilitychange', onVisibility)
     const interval = setInterval(() => {
-      if (activeRef.current && isActiveTab) setActiveSeconds((s) => s + 1)
+      if (activeRef.current && isActiveTab) {
+        activeSecondsRef.current += 1
+      }
     }, 1000)
     return () => {
       clearInterval(interval)
@@ -88,16 +90,19 @@ function useTheoryEngagement(isActiveTab: boolean) {
     if (!isActiveTab) return
     const onScroll = () => {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      if (docHeight <= 0) { setScrollPercent(100); return }
+      if (docHeight <= 0) {
+        scrollPercentRef.current = 100
+        return
+      }
       const pct = Math.min(100, Math.round((window.scrollY / docHeight) * 100))
-      setScrollPercent((prev) => Math.max(prev, pct))
+      scrollPercentRef.current = Math.max(scrollPercentRef.current, pct)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
     return () => window.removeEventListener('scroll', onScroll)
   }, [isActiveTab])
 
-  return { activeSeconds, scrollPercent }
+  return { activeSecondsRef, scrollPercentRef }
 }
 
 // ─── Reflection block wrapper — injects submission logic ─────────────────────
@@ -315,7 +320,7 @@ export default function LessonPageContent({
   const [activeTab, setActiveTab] = useState<TabType>('theory')
   const [completedThisSession, setCompletedThisSession] = useState(false)
   const [theorySubmitting, setTheorySubmitting] = useState(false)
-  const { activeSeconds, scrollPercent } = useTheoryEngagement(activeTab === 'theory')
+  const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
 
   // Mark in-progress on first open
   useEffect(() => {
@@ -360,7 +365,7 @@ export default function LessonPageContent({
   const handleTheoryComplete = async () => {
     setTheorySubmitting(true)
     try {
-      await recordTheoryRead(activeSeconds, scrollPercent)
+      await recordTheoryRead(activeSecondsRef.current, scrollPercentRef.current)
       setActiveTab('quiz')
     } catch {
       // Engagement threshold not met — still allow navigation

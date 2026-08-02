@@ -1,3 +1,5 @@
+import path from 'path'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Optimise production builds
@@ -6,6 +8,11 @@ const nextConfig = {
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
+  },
+
+  // Use absolute path to silence "turbopack.root should be absolute" warning
+  turbopack: {
+    root: path.resolve(__dirname, '../../'),
   },
 
   // Security headers

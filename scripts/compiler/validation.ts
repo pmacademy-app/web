@@ -224,26 +224,36 @@ const validationRules: ValidationRule[] = [
     severity: 'warning',
     check(lesson, ctx, allLessons) {
       const issues: ValidationIssue[] = [];
-      if (!allLessons) return [];
+      if (!allLessons || allLessons.length === 0) return [];
 
-      const glossaryBlock = lesson.blocks.find((b: any) => b.type === 'glossary');
-      if (glossaryBlock) {
-        for (const entry of glossaryBlock.entries || []) {
-          const termLower = entry.term.trim().toLowerCase();
-          // Look up in other lessons
-          for (const other of allLessons) {
-            if (other.id === lesson.id) continue;
-            const otherGlossary = other.blocks.find((b: any) => b.type === 'glossary');
-            if (otherGlossary) {
-              const match = otherGlossary.entries.find((e: any) => e.term.trim().toLowerCase() === termLower);
-              if (match && match.definition.trim().toLowerCase() !== entry.definition.trim().toLowerCase()) {
+      // Run exactly once on the first lesson to avoid duplicate site-wide scans
+      if (allLessons[0].id !== lesson.id) return [];
+
+      const glossaryMap = new Map<string, { definition: string; lessonTitle: string; sourceFile: string }>();
+
+      for (const l of allLessons) {
+        const glossaryBlock = l.blocks.find((b: any) => b.type === 'glossary');
+        if (glossaryBlock) {
+          for (const entry of glossaryBlock.entries || []) {
+            const termLower = entry.term.trim().toLowerCase();
+            const defNormalized = entry.definition.trim().toLowerCase();
+            const existing = glossaryMap.get(termLower);
+
+            if (existing) {
+              if (existing.definition !== defNormalized) {
                 issues.push({
                   id: 'glossary-consistency',
                   severity: 'warning',
-                  message: `Glossary conflict: "${entry.term}" has differing definitions in "${lesson.title}" and "${other.title}"`,
-                  filePath: ctx.filePath,
+                  message: `Glossary conflict: "${entry.term}" has differing definitions in "${l.title}" and "${existing.lessonTitle}"`,
+                  filePath: l.sourceFile || ctx.filePath,
                 });
               }
+            } else {
+              glossaryMap.set(termLower, {
+                definition: defNormalized,
+                lessonTitle: l.title,
+                sourceFile: l.sourceFile || '',
+              });
             }
           }
         }
@@ -382,11 +392,19 @@ const validationRules: ValidationRule[] = [
 export function validateCompiledLesson(
   lesson: any,
   ctx: CompilerContext,
-  allLessons?: any[]
+  allLessons?: any[],
+  crossLessonsOnly = false
 ): ValidationIssue[] {
   const allIssues: ValidationIssue[] = [...ctx.issues];
 
   for (const rule of validationRules) {
+    const isCrossRule = rule.id === 'curriculum-integrity' || rule.id === 'glossary-consistency';
+    
+    // Split validation runs: if crossLessonsOnly is true, skip single-lesson rules.
+    // If crossLessonsOnly is false, skip cross-lesson rules.
+    if (crossLessonsOnly && !isCrossRule) continue;
+    if (!crossLessonsOnly && isCrossRule) continue;
+
     try {
       const ruleIssues = rule.check(lesson, ctx, allLessons);
       allIssues.push(...ruleIssues);

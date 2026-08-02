@@ -61,7 +61,7 @@ class BlockErrorBoundary extends React.Component<{
   }
 }
 
-export function BlockTreeRenderer({ blocks, lessonId }: BlockTreeRendererProps) {
+export const BlockTreeRenderer = React.memo(function BlockTreeRenderer({ blocks, lessonId }: BlockTreeRendererProps) {
   if (!blocks || !Array.isArray(blocks)) return null;
   return (
     <>
@@ -72,9 +72,9 @@ export function BlockTreeRenderer({ blocks, lessonId }: BlockTreeRendererProps) 
       ))}
     </>
   );
-}
+});
 
-function BlockRenderer({ block, lessonId }: { block: Block; lessonId: string }) {
+const BlockRenderer = React.memo(function BlockRenderer({ block, lessonId }: { block: Block; lessonId: string }) {
   const component = useBlockComponent(block.type);
 
   if (block.children && Array.isArray(block.children) && block.children.length > 0) {
@@ -86,4 +86,4 @@ function BlockRenderer({ block, lessonId }: { block: Block; lessonId: string }) 
   }
 
   return React.createElement(component, { block, lessonId });
-}
+});
