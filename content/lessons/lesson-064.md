@@ -183,7 +183,7 @@ Organizational metric trust, not the sheer volume of available data, is the true
 | Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Metric Provenance Chain | Five-stage model tracing a metric from raw event to trusted decision input | Goodhart's Law (Lesson 41) | 2 |
-| Metric Definition Drift | The gradual divergence between a metric's original meaning and what it currently measures | Instrumentation Validation | 2 |
+| Metric Definition Drift | The silent, gradual divergence between a metric's original intended meaning and what it has come to actually measure, often caused by local code changes, new feature launches, or migrations. | Instrumentation Validation | 2 |
 | Dashboard Fragmentation | Multiple dashboards independently computing and disagreeing on a nominally identical metric | Single Source of Truth | 2 |
 | Definition Consensus | The stage at which a metric's formula is explicitly agreed upon and documented across teams | Metric Provenance Chain | 2 |
 | Trusted Metric | A metric with a single, owned, authoritative source that other teams defer to | Metric Health Checklist | 2 |

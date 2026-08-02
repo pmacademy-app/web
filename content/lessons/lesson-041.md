@@ -322,7 +322,7 @@ This lesson establishes the definitional discipline that every subsequent Module
 
 | Term | Definition | Related Concepts | Difficulty (1–3) |
 |---|---|---|---|
-| Vanity metric | A metric that trends upward regardless of underlying business health, without indicating a clear action | Actionable metric | 1 |
+| Vanity Metric | A metric that looks encouraging and trends upward over time (such as cumulative signups) without indicating actionable product feedback or testing a clear hypothesis. | Actionable metric | 1 |
 | Actionable metric | A metric tied to a specific behavior a team could change, whose unexpected movement suggests where to investigate | Vanity metric | 1 |
 | Leading indicator | A metric measuring an earlier behavior that tends to predict a lagging indicator's future movement | Lagging indicator | 2 |
 | Lagging indicator | A metric measuring an outcome that has already occurred | Leading indicator | 2 |

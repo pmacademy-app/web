@@ -334,7 +334,7 @@ A user journey map visually represents a specific persona's stages, actions, tho
 |---|---|---|---|
 | User Journey Map | A visual representation of a specific persona's stages, actions, thoughts/emotions, touchpoints, and pain points through a specific process. | Persona (Lesson 14), Pain Points (Lesson 16) | 2 |
 | Touchpoint | A specific product screen, communication, or interaction point involved at a stage of a journey. | User Journey Map | 1 |
-| Happy Path | The smoothest, most successful version of a journey, with no significant friction or detours. | Happy Path Only (Failure Pattern) | 2 |
+| Happy Path | The primary, most common scenario in a user journey or use case where everything goes as intended, with no significant friction, errors, or detours. | Happy Path Only (Failure Pattern) | 2 |
 | Happy Path Only (Failure Pattern) | The mistake of building a journey map that represents only the smoothest version of a process, omitting real friction and detours. | Journey Map Truth Test | 2 |
 | Journey Map Truth Test | A diagnostic checking whether a journey map includes genuine, uncomfortable friction points, as a signal of research-grounded (versus assumption-based) construction. | Persona Substance Test (Lesson 14) | 3 |
 

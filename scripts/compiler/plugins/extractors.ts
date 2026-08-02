@@ -430,22 +430,24 @@ export function extractRealWorldPerspectiveBlock(nodes: any[], lessonId: string)
     const text = toMarkdown(node).trim();
     // Subheadings like: **At a startup (roughly pre-seed to Series B):**
     // or ### Startup (roughly pre-seed to Series B)
-    const contextMatch = text.match(/^\*?\*?(?:At a|At)\s*(.*?)(?:\*?\*?|$)/i) || (node.type === 'heading' && node.depth === 3);
+    const contextMatch = text.match(/^\*?\*?(At a\s+[^*\n]+|At\s+[^*\n]+)\*?\*?(?::\s*|\n|:\s*\n|$)([\s\S]*)/i) || (node.type === 'heading' && node.depth === 3);
 
     if (contextMatch) {
       if (currentSegment) {
         segments.push(currentSegment);
       }
       let contextText = '';
+      let bodyText = '';
       if (node.type === 'heading') {
         visitText(node, (v) => { contextText += v; });
-      } else {
-        contextText = text.replace(/^\*?\*?/, '').replace(/\*?\*?$/, '').replace(/:$/, '').trim();
+      } else if (Array.isArray(contextMatch)) {
+        contextText = contextMatch[1].trim().replace(/:$/, '').trim();
+        bodyText = contextMatch[2].trim();
       }
 
       currentSegment = {
         context: contextText,
-        body: '',
+        body: bodyText,
       };
     } else if (currentSegment) {
       currentSegment.body += (currentSegment.body ? '\n\n' : '') + text;
@@ -464,21 +466,20 @@ export function extractRealWorldPerspectiveBlock(nodes: any[], lessonId: string)
   return block;
 }
 
-// Extract Interview Perspective
 export function extractInterviewPerspectiveBlock(nodes: any[], lessonId: string): any {
   const questions: any[] = [];
   let currentQuestion: any = null;
 
   for (const node of nodes) {
     const text = toMarkdown(node).trim();
-    const qMatch = text.match(/^\*?\*?Typical question\s*\d+:\s*(.*?)(?:\*?\*?|$)/i) || text.match(/^\*?\*?Question\s*\d+:\s*(.*?)(?:\*?\*?|$)/i);
+    const qMatch = text.match(/^\*?\*?(Typical question\s*\d+|Question\s*\d+):\s*(.*?)(?:\*?\*?\s*$|$)/i);
 
     if (qMatch) {
       if (currentQuestion) {
         questions.push(currentQuestion);
       }
       currentQuestion = {
-        question: qMatch[1].replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim(),
+        question: qMatch[2].replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim(),
         whatItEvaluates: '',
       };
     } else if (currentQuestion) {

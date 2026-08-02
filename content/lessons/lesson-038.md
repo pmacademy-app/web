@@ -311,7 +311,7 @@ The PM-design relationship mirrors the PM-engineering relationship covered in Le
 | Term | Definition | Related Concepts | Difficulty (1–3) |
 |---|---|---|---|
 | Double Diamond | A design process framework of two divergent-then-convergent phases: Discover/Define and Develop/Deliver | Fidelity Ladder | 1 |
-| Fidelity Ladder | This lesson's mental model: matching a design artifact's polish (low/mid/high fidelity) to the underlying idea's actual validation status | Confidence Gradient (Lesson 35) | 1 |
+| Fidelity Ladder | A framework representing the sequence of design artifacts from low to high polish (sketch, wireframe, mockup, prototype, finished design), matching the polish level to the validation stage of the underlying idea. | Confidence Gradient (Lesson 35) | 1 |
 | Premature high-fidelity | Producing polished visual design before an idea is validated, creating false confidence and psychological attachment | Fidelity Ladder | 2 |
 | Design Involvement Timing Table | A tool for checking whether design is involved during problem/solution exploration, not just final visual execution | Double Diamond | 2 |
 

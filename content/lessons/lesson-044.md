@@ -291,7 +291,7 @@ Cohort analysis groups users by shared starting period and tracks each group's b
 | Classic (N-day) retention | Whether a user performed a qualifying action on exactly day N after joining | Rolling retention, Bracketed retention | 2 |
 | Rolling retention | Whether a user performed a qualifying action on day N or any day after | Classic retention | 2 |
 | Bracketed retention | Whether a user performed a qualifying action within a window around day N | Classic retention, Rolling retention | 2 |
-| Smile Curve | This lesson's mental model: a retention curve that flattens into a stable plateau, signaling durable product-market fit | Product-market fit | 1 |
+| Smile Curve | A retention curve shape that flattens into a stable, non-zero plateau over time, signaling durable value delivery and product-market fit. | Product-market fit | 1 |
 
 ---
 

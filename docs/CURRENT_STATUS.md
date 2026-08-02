@@ -10,7 +10,7 @@
 - **Current Branch:** `main`
 - **Current Version:** `0.1.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
 - **Last Successful Build:** 2026-08-02 (Next.js 16.2.12 Turbopack production build — clean, 0 errors, 23 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 1.5 — Sprint 3 Complete (Content Experience & Curriculum Rendering) ✅
+- **Current Implementation Phase:** Phase 1.5 — Curriculum Integrity & Content Pass Complete ✅
 
 ---
 
@@ -25,6 +25,7 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 1.5 Sprint 1 Runtime & Navigation:** ✅ Complete
 - **Phase 1.5 Sprint 2 Learning Flow:** ✅ Complete
 - **Phase 1.5 Sprint 3 Content & Curriculum:** ✅ Complete
+- **Phase 1.5 Curriculum & Content Integrity Pass:** ✅ Complete
 - **Current Focus:** Phase 1.5 — Sprint 4: Performance & Infrastructure Optimization.
 
 ---
@@ -42,11 +43,11 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 ### Remaining Sprint 4 Stabilization Items
 - **PERF-001 / PERF-002 / PERF-003:** Performance optimizations for initial load speeds, bundles, and search indexes.
 
-### Resolved This Session (Sprint 3)
-- ✅ **Lesson Rendering Parity:** Refactored SectionBlock helper cards for each metadata type (learning objectives, common mistakes, key takeaways, cheat sheet, resources, real-world perspective, interview perspective, framework, mental model, case study, company example, summary) with clean borders, icons, background color coding, and layouts.
-- ✅ **DefaultMarkdown Enhancements:** Programmed tables to render as native HTML elements (`<table>`) and lists to render as native lists (`<ul>`/`<ol>`) with prose typography, blockquotes support, and correct headings margins.
-- ✅ **MarkdownRenderer Type Safety:** Configured MarkdownRenderer with custom code formatting while removing custom blockquote/table renderers, utilizing standard marked compilation alongside Tailwind prose styles to solve typescript signature errors.
-- ✅ **Curriculum Structure Parity:** Re-designed the `/academy` curriculum landing page using collapsible module details, a group-by-module layout list showing all 10 lessons per module, canonical descriptions, and color indicators.
+### Resolved This Session (Curriculum Integrity & Content Consistency Audit)
+- ✅ **9-Module Curriculum Structure Restored:** Resolved the module splitting issue (17 modules down to exactly 9 modules, 10 lessons each, 90 lessons total) by parsing the module number from the metadata table and mapping it to the 9 canonical slugs.
+- ✅ **Interview Perspective Extraction Fixed:** Fixed lazy regex parsing bugs that matched empty strings and cleared question text details, restoring all interview questions.
+- ✅ **Real World Perspective Formatting Restructured:** Re-engineered the compiler parser to split paragraphs between bold headers and body content, resolving malformed output formatting.
+- ✅ **Skipped Cross-Lesson Validations Resolved:** Programmed a second validation pass in `compile.ts` to run cross-lesson validation rules (such as `glossary-consistency`), and resolved exactly 12 term conflicts ("Happy Path", "Fidelity Ladder", "Technical Debt Quadrant", "Metric Definition Drift", "Vanity Metric", "Smile Curve") across 12 source files, achieving 0 compiler warnings.
 
 ---
 

@@ -282,7 +282,7 @@ Product Operations exists to solve a specific, predictable organizational proble
 | Product Operations (Product Ops) | The function responsible for building and maintaining shared definitions, processes, and infrastructure that let good product practices scale consistently across many teams | Multiplier Layer | 1 |
 | Multiplier Layer | This lesson's mental model: Product Ops as a layer multiplying individual teams' effectiveness, not a decision-making substitute for PM judgment | Product Ops | 2 |
 | Product Ops Maturity Ladder | A framework (Informal → Emerging → Formalized → Embedded) for calibrating how much formal Product Ops investment an organization actually needs | — | 2 |
-| Metric definition drift | The tendency for standardized definitions to gradually diverge again across teams without ongoing maintenance | Lesson 41 (Product Metrics Fundamentals) | 2 |
+| Metric Definition Drift | The silent, gradual divergence between a metric's original intended meaning and what it has come to actually measure, often caused by local code changes, new feature launches, or migrations. | Lesson 41 (Product Metrics Fundamentals) | 2 |
 
 ---
 

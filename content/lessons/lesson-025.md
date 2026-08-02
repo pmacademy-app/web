@@ -331,7 +331,7 @@ A wireframe is a deliberately low-fidelity representation of an interface's stru
 | Wireframe | A deliberately low-fidelity visual representation of an interface's structural layout, without visual design detail. | Mockup, Prototype (Lesson 26) | 1 |
 | Mockup | A higher-fidelity, static visual representation with color, typography, and styling applied. | Wireframe, Prototype | 1 |
 | Premature Visual Commitment | The effect where polished visuals shift reviewer attention toward cosmetic feedback and away from structural questions. | Fidelity Ladder | 2 |
-| Fidelity Ladder | The sequence from rough sketch through wireframe, mockup, prototype, to finished visual design, each matched to a specific stage and purpose. | Premature Visual Commitment | 2 |
+| Fidelity Ladder | A framework representing the sequence of design artifacts from low to high polish (sketch, wireframe, mockup, prototype, finished design), matching the polish level to the validation stage of the underlying idea. | Premature Visual Commitment | 2 |
 
 ---
 

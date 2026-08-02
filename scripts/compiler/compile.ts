@@ -142,12 +142,23 @@ export function compileLesson(
       const estMinutesReflection = estReflectMatch ? parseInt(estReflectMatch[1], 10) : 10;
       const estimatedCompletionTime = estimatedReadingTime + estMinutesReflection;
 
-      // Slugify module name (e.g. "1 — Foundations" -> "foundations")
-      const moduleSlug = moduleStr
-        .replace(/^\d+\s*[-—]\s*/, '')
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '-');
+      // Resolve canonical module slug based on the module number
+      const modNumMatch = moduleStr.match(/^\s*(\d+)/);
+      const modNumber = modNumMatch ? parseInt(modNumMatch[1], 10) : Math.ceil(order / 10);
+      
+      const moduleMap: Record<number, string> = {
+        1: 'foundations',
+        2: 'discovery',
+        3: 'design',
+        4: 'execution',
+        5: 'growth',
+        6: 'leadership',
+        7: 'technical',
+        8: 'strategy',
+        9: 'capstone',
+      };
+      
+      const moduleSlug = moduleMap[modNumber] || 'foundations';
 
       metadata = {
         module: moduleSlug,
@@ -639,6 +650,11 @@ export function compileAllContent(validateOnly = false): boolean {
       errorsReport.push(...fileErrors);
       warningsReport.push(...fileWarnings);
 
+      if (fileWarnings.length > 0) {
+        console.warn(`⚠️ ${relativePath}: Compiled with ${fileWarnings.length} validation warnings.`);
+        fileWarnings.forEach((w) => console.warn(`   - [${w.id}] Line ${w.line || 'unknown'}: ${w.message}`));
+      }
+
       if (fileErrors.length > 0) {
         console.error(`❌ ${relativePath}: Compiled with ${fileErrors.length} validation errors.`);
         fileErrors.forEach((e) => console.error(`   - [${e.id}] Line ${e.line || 'unknown'}: ${e.message}`));
@@ -659,6 +675,37 @@ export function compileAllContent(validateOnly = false): boolean {
       }
     } catch (e) {
       console.error(`💥 Fatal error compiling ${relativePath}:`, e);
+      hasErrors = true;
+    }
+  }
+
+  // Second pass: cross-lesson referential validation
+  console.log('🔍 Running cross-lesson validations...');
+  for (const lesson of compiledLessons) {
+    const relativePath = lesson.sourceFile;
+    
+    const context: CompilerContext = {
+      filePath: lesson.sourceFile,
+      lessonId: lesson.id,
+      issues: [],
+      assets: [],
+      glossaryTerms: [],
+    };
+    
+    const issues = validateCompiledLesson(lesson, context, compiledLessons);
+    const fileErrors = issues.filter((i) => i.severity === 'error');
+    const fileWarnings = issues.filter((i) => i.severity === 'warning');
+
+    errorsReport.push(...fileErrors);
+    warningsReport.push(...fileWarnings);
+
+    if (fileWarnings.length > 0) {
+      console.warn(`⚠️ ${relativePath}: Cross-validation warnings:`);
+      fileWarnings.forEach((w) => console.warn(`   - [${w.id}]: ${w.message}`));
+    }
+    if (fileErrors.length > 0) {
+      console.error(`❌ ${relativePath}: Cross-validation errors:`);
+      fileErrors.forEach((e) => console.error(`   - [${e.id}]: ${e.message}`));
       hasErrors = true;
     }
   }
