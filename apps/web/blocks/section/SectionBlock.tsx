@@ -100,7 +100,6 @@ function KeyTakeawaysSection({ block, children }: BlockProps) {
   if (items.length === 0) {
     return (
       <SectionCard
-        type="keyTakeaways"
         badgeText="Key Takeaways"
         badgeColor="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
         borderColor="border-l-emerald-500"
@@ -142,7 +141,6 @@ function CheatSheetSection({ block, children }: BlockProps) {
   if (items.length === 0) {
     return (
       <SectionCard
-        type="cheatSheet"
         badgeText="Cheat Sheet"
         badgeColor="bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20"
         borderColor="border-l-yellow-500"
@@ -187,7 +185,6 @@ function ResourcesSection({ block, children }: BlockProps) {
   if (items.length === 0) {
     return (
       <SectionCard
-        type="resources"
         badgeText="Additional Resources"
         badgeColor="bg-neutral-500/10 text-neutral-600 dark:text-neutral-400 border-neutral-500/20"
         borderColor="border-l-neutral-400"
@@ -238,7 +235,6 @@ function InterviewPerspectiveSection({ block, children }: BlockProps) {
   if (!hasContent) {
     return (
       <SectionCard
-        type="interviewPerspective"
         badgeText="Interview Perspective"
         badgeColor="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20"
         borderColor="border-l-indigo-500"
@@ -292,7 +288,6 @@ function RealWorldPerspectiveSection({ block, children }: BlockProps) {
   if (segments.length === 0) {
     return (
       <SectionCard
-        type="realWorldPerspective"
         badgeText="Real-World Perspective"
         badgeColor="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
         borderColor="border-l-amber-500"
@@ -449,7 +444,8 @@ function SummarySection({ children }: BlockProps) {
 // ─── Reflection ──────────────────────────────────────────────────────────────
 // Reflection blocks are rendered by ReflectionTabContent in lesson-content.tsx, not here.
 // Show a placeholder text since this is in the theory tab.
-function ReflectionSection() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function ReflectionSection(_props: BlockProps) {
   return (
     <div className="rounded-xl border border-pink-500/20 bg-pink-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-3">
