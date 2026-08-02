@@ -65,26 +65,27 @@ function getBlocksForTab(blocks: CompiledBlock[], tab: TabType): CompiledBlock[]
 
 // ─── Theory engagement tracker ───────────────────────────────────────────────
 
-function useTheoryEngagement() {
+function useTheoryEngagement(isActiveTab: boolean) {
   const [activeSeconds, setActiveSeconds] = useState(0)
   const [scrollPercent, setScrollPercent] = useState(0)
   const activeRef = useRef(true)
 
   // Track active tab focus time
   useEffect(() => {
-    const onVisibility = () => { activeRef.current = !document.hidden }
+    const onVisibility = () => { activeRef.current = !document.hidden && isActiveTab }
     document.addEventListener('visibilitychange', onVisibility)
     const interval = setInterval(() => {
-      if (activeRef.current) setActiveSeconds((s) => s + 1)
+      if (activeRef.current && isActiveTab) setActiveSeconds((s) => s + 1)
     }, 1000)
     return () => {
       clearInterval(interval)
       document.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [])
+  }, [isActiveTab])
 
   // Track scroll depth (max monotonically increasing)
   useEffect(() => {
+    if (!isActiveTab) return
     const onScroll = () => {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
       if (docHeight <= 0) { setScrollPercent(100); return }
@@ -94,7 +95,7 @@ function useTheoryEngagement() {
     window.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [isActiveTab])
 
   return { activeSeconds, scrollPercent }
 }
@@ -314,7 +315,7 @@ export default function LessonPageContent({
   const [activeTab, setActiveTab] = useState<TabType>('theory')
   const [completedThisSession, setCompletedThisSession] = useState(false)
   const [theorySubmitting, setTheorySubmitting] = useState(false)
-  const { activeSeconds, scrollPercent } = useTheoryEngagement()
+  const { activeSeconds, scrollPercent } = useTheoryEngagement(activeTab === 'theory')
 
   // Mark in-progress on first open
   useEffect(() => {

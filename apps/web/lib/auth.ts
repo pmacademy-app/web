@@ -1,5 +1,7 @@
 import { SupabaseClient, User } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
+import { cookies } from 'next/headers'
+import { createAuthenticatedServerClient } from './supabase'
 
 export type UserProfile = Database['public']['Tables']['users']['Row']
 
@@ -61,6 +63,27 @@ export async function getAuthenticatedUser(supabase: SupabaseClient<Database>): 
     return null
   }
   return user
+}
+
+/**
+ * Server-side helper to verify auth session directly from request cookies.
+ * Extracts sb-access-token and returns the authenticated Supabase User or null.
+ */
+export async function getServerUser(): Promise<User | null> {
+  try {
+    const cookieStore = await cookies()
+    const accessToken = cookieStore.get('sb-access-token')?.value
+    if (!accessToken) return null
+
+    const authClient = createAuthenticatedServerClient(accessToken)
+    return await getAuthenticatedUser(authClient)
+  } catch (err: any) {
+    if (err && (err.digest === 'DYNAMIC_SERVER_USAGE' || err.message?.includes('Dynamic server usage'))) {
+      throw err
+    }
+    console.error('[auth] Error in getServerUser:', err)
+    return null
+  }
 }
 
 /**

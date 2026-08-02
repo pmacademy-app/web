@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { fetchCompiledLesson, resolveSlugToId } from '@/lib/lesson-loader'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 
@@ -50,6 +51,17 @@ function formatModuleName(moduleSlug: string): string {
 
 export default async function PublicLessonPage({ params }: PageProps) {
   const { slug } = await params
+
+  // Auth check - if user is authenticated, redirect to the full interactive lesson
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('sb-access-token')?.value
+  if (accessToken) {
+    const lessonId = await resolveSlugToId(slug)
+    if (lessonId) {
+      redirect(`/academy/l/${lessonId}`)
+    }
+  }
+
   const lesson = await getLessonBySlug(slug)
 
   if (!lesson) {

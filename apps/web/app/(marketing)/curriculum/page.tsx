@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { MODULES } from '@/config/content'
 
 export const metadata: Metadata = {
@@ -7,7 +9,13 @@ export const metadata: Metadata = {
   description: 'Explore the complete free 90-lesson Product Management curriculum across 9 core modules.',
 }
 
-export default function CurriculumPage() {
+export default async function CurriculumPage() {
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('sb-access-token')?.value
+
+  if (accessToken) {
+    redirect('/academy')
+  }
   return (
     <div className="container mx-auto px-4 py-12 max-w-5xl">
       <div className="text-center mb-12">

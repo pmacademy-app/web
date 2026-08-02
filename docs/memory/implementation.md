@@ -14,6 +14,8 @@
 - **Phase 1.2 (Renderer Foundation):** Complete ✅ — `BlockTreeRenderer`, `registry.ts`, all block components (Quiz, Flashcard, Mermaid, Connections, Glossary, Default)
 - **Phase 1.3 (Migration & Integration Foundation):** Complete ✅ — DB schema migrated, v2 API routes, `/academy/**` routing, v2 lesson shell
 - **Phase 1.4 (Legacy Cleanup & Finalization):** Complete ✅ — Removed all v1 routes, APIs, hooks, components, and public content JSONs. Codebase runs entirely on a single v2 implementation path.
+- **Phase 1.5 Sprint 1 (Runtime & Navigation Stabilization):** Complete ✅ — Fixed dashboard CTA, blocks compilation, tab engagement timer, and auth helper. Added marketing routing redirects.
+- **Phase 1.5 Sprint 2 (Learning Flow Stabilization):** In Progress ⚠️
 - **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending ⚠️
 - **Phase 3–5:** Scaffolded or not started ❌
 
@@ -214,3 +216,4 @@ Specialized Antigravity AI skills for this project are in `.agents/skills/`. Loa
 
 - v1.0 (2026-08-01) — Extracted and restructured from the monolithic `MEMORY.md` into the `docs/memory/` system. Added full feature status table and current routing table.
 - v1.3 (2026-08-02) — Phase 1.3 Migration & Integration Foundation complete. Updated feature status table, routing table (added /academy routes), and build verification.
+- v1.5 (2026-08-02) — Phase 1.5 Sprint 1 Runtime & Navigation Stabilization complete. Fixed dashboard CTA, blocks compilation, active tab engagement timer, and auth helper. Added marketing redirects. All builds and verification checks clean.

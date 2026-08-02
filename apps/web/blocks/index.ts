@@ -1,3 +1,4 @@
+import React from 'react';
 import dynamic from 'next/dynamic';
 import { registerBlock, BlockProps } from '../renderer/registry';
 import DefaultMarkdown from './default/DefaultMarkdown';

@@ -15,11 +15,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
 import { Lock } from 'lucide-react'
 import { fetchCompiledLesson, getAdjacentLessons } from '@/lib/lesson-loader'
-import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
-import { getAuthenticatedUser } from '@/lib/auth'
+import { createServerSupabaseClient } from '@/lib/supabase'
+import { getServerUser } from '@/lib/auth'
 import { isLessonUnlocked } from '@/lib/lessons-completion-service'
 import LessonPageContent from './lesson-content'
 
@@ -46,12 +45,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   if (!lesson) notFound()
 
   // 2. Auth verification (belt-and-suspenders alongside the layout guard)
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-  if (!accessToken) redirect('/login')
-
-  const authClient = createAuthenticatedServerClient(accessToken)
-  const user = await getAuthenticatedUser(authClient)
+  const user = await getServerUser()
   if (!user) redirect('/login')
 
   // 3. Sequential unlock check using stable IDs
