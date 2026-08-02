@@ -16,7 +16,7 @@ export default function ConnectionsBlock({ block }: BlockProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {previous ? (
           <Link
-            href={`/academy/l/${previous.id}`}
+            href={`/academy/${previous.module || 'foundations'}/${previous.id}`}
             className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card text-left transition-all hover:bg-accent/30 hover:border-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <ArrowLeft className="h-5 w-5 text-primary shrink-0" />
@@ -45,7 +45,7 @@ export default function ConnectionsBlock({ block }: BlockProps) {
 
         {next ? (
           <Link
-            href={`/academy/l/${next.id}`}
+            href={`/academy/${next.module || 'foundations'}/${next.id}`}
             className="flex items-center justify-between gap-4 p-4 rounded-xl border border-border bg-card text-right transition-all hover:bg-accent/30 hover:border-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <div className="flex-1 text-left">
@@ -81,12 +81,12 @@ export default function ConnectionsBlock({ block }: BlockProps) {
             <span>Future Concepts Unlocked</span>
           </div>
           <ul className="space-y-3">
-            {unlocks.map((u: { lesson: { id: string; title: string }; coreIdea: string }, idx: number) => (
+            {unlocks.map((u: { lesson: { id: string; title: string; module?: string }; coreIdea: string }, idx: number) => (
               <li key={idx} className="text-sm text-foreground/80 leading-relaxed flex items-start gap-2.5">
                 <span className="inline-flex shrink-0 w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
                 <div>
                   <Link
-                    href={`/academy/l/${u.lesson.id}`}
+                    href={`/academy/${u.lesson.module || 'foundations'}/${u.lesson.id}`}
                     className="font-bold text-primary hover:underline"
                   >
                     {u.lesson.title}

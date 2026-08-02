@@ -225,7 +225,7 @@ export default async function AcademyPage() {
                   {moduleLessons.map((lesson, lessonIdx) => (
                     <Link
                       key={lesson.id}
-                      href={`/academy/l/${lesson.id}`}
+                      href={`/academy/${lesson.module}/${lesson.id}`}
                       className="flex items-center justify-between px-4 py-3 hover:bg-accent/30 transition-colors group border-b border-border/60 last:border-0"
                       id={`lesson-link-${lesson.id}`}
                     >
@@ -250,7 +250,7 @@ export default async function AcademyPage() {
                 {/* Start module CTA */}
                 {firstLesson && (
                   <Link
-                    href={`/academy/l/${firstLesson.id}`}
+                    href={`/academy/${firstLesson.module}/${firstLesson.id}`}
                     className={`inline-flex items-center justify-between w-full sm:w-auto sm:px-6 px-4 py-2.5 rounded-lg border font-bold text-xs transition-colors ${
                       meta?.color ?? 'bg-muted text-muted-foreground border-border'
                     } hover:opacity-80`}

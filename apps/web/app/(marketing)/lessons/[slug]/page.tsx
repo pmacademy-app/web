@@ -58,7 +58,10 @@ export default async function PublicLessonPage({ params }: PageProps) {
   if (accessToken) {
     const lessonId = await resolveSlugToId(slug)
     if (lessonId) {
-      redirect(`/academy/l/${lessonId}`)
+      const lessonMeta = await fetchCompiledLesson(lessonId)
+      if (lessonMeta) {
+        redirect(`/academy/${lessonMeta.module}/${lessonId}`)
+      }
     }
   }
 

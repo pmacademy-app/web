@@ -49,9 +49,10 @@ Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░
 - [x] Performance optimizations (Sprint 3.5): async file reads, Supabase singleton, Mermaid strict mode fix
 - [x] **Database migration:** Rename `lesson_slug` → `lesson_id` in all user-state tables. Alter `user_flashcard_srs` to add `lesson_id` to composite PK.
 - [x] **v2 content pipeline:** remark/AST compiler per `content-pipeline.md` outputting to `content/dist/`.
-- [x] **v2 routing:** Create `app/academy/layout.tsx` (curriculum shell) and `app/academy/l/[lessonId]/page.tsx` (stable ID-based lesson route).
+- [x] **v2 routing:** Create `app/academy/layout.tsx` (curriculum shell) and `app/academy/[moduleSlug]/[lessonId]/page.tsx` (dynamic canonical route) with `l/[lessonId]` redirect fallbacks.
 - [x] **v2 renderer:** Implement `BlockTreeRenderer` + plugin component registry per `rendering-pipeline.md §3–§4`.
 - [x] **Fix sidebar routing:** The "Curriculum" link in the authenticated sidebar resolves to `/academy` (M-009 fix).
+- [x] **Phase 1.6 Production Polish:** Custom email templates, email verification success page, topbar breadcrumbs context overrides, CI workflow consolidation, and resolved Interview Perspective parser constraints.
 
 ---
 

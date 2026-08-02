@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const LessonRefSchema = z.object({
   id: z.string(),
   title: z.string(),
+  module: z.string().optional(),
 });
 
 export const GlossaryEntrySchema = z.object({

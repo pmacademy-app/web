@@ -209,6 +209,7 @@ export interface ParsedLesson {
 export interface CompiledLessonRef {
   id: string    // stable les_XXXXXX ID
   title: string
+  module?: string
 }
 
 export interface CompiledBlock {

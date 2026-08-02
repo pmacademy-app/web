@@ -478,6 +478,8 @@ export function extractInterviewPerspectiveBlock(nodes: any[], lessonId: string)
 
   for (const node of nodes) {
     const text = toMarkdown(node).trim();
+    if (!text) continue;
+
     const qMatch = text.match(/^\*?\*?(Typical question\s*\d+|Question\s*\d+):\s*(.*?)(?:\*?\*?\s*$|$)/i);
 
     if (qMatch) {
@@ -488,8 +490,19 @@ export function extractInterviewPerspectiveBlock(nodes: any[], lessonId: string)
         question: qMatch[2].replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim(),
         whatItEvaluates: '',
       };
-    } else if (currentQuestion) {
-      currentQuestion.whatItEvaluates += (currentQuestion.whatItEvaluates ? '\n\n' : '') + text;
+    } else {
+      const directMatch = text.match(/^\*?\*?\s*["'“](.*?)["'”]\s*\*?\*?\s*(.*)/is);
+      if (directMatch && directMatch[1].length > 10) {
+        if (currentQuestion) {
+          questions.push(currentQuestion);
+        }
+        currentQuestion = {
+          question: directMatch[1].trim(),
+          whatItEvaluates: directMatch[2].trim(),
+        };
+      } else if (currentQuestion) {
+        currentQuestion.whatItEvaluates += (currentQuestion.whatItEvaluates ? '\n\n' : '') + text;
+      }
     }
   }
 

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile } from '@/lib/auth'
 import AppShell from '@/components/layout/AppShell'
+import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
 
 export default async function AuthenticatedLayout({
   children,
@@ -43,5 +44,9 @@ export default async function AuthenticatedLayout({
     }
   }
 
-  return <AppShell userProfile={profile}>{children}</AppShell>
+  return (
+    <BreadcrumbProvider>
+      <AppShell userProfile={profile}>{children}</AppShell>
+    </BreadcrumbProvider>
+  )
 }

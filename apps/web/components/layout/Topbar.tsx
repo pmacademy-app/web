@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Menu, Search, User, LogOut, ChevronRight } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { getLevelTitle } from '@/lib/xp'
+import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
 
 interface TopbarProps {
   onMenuOpen: () => void
@@ -22,9 +23,11 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  const { breadcrumbs: contextCrumbs } = useBreadcrumbs()
+
   // Dynamically calculate breadcrumbs
   const segments = pathname.split('/').filter(Boolean)
-  const breadcrumbs = segments.map((seg, i) => {
+  const defaultCrumbs = segments.map((seg, i) => {
     // Human-readable labels
     let label = seg.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
     if (label.toLowerCase() === 'curriculum') label = 'Curriculum'
@@ -34,6 +37,8 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
     const href = '/' + segments.slice(0, i + 1).join('/')
     return { label, href }
   })
+
+  const breadcrumbs = contextCrumbs.length > 0 ? contextCrumbs : defaultCrumbs
 
   const handleSignOut = async () => {
     try {
@@ -93,10 +98,14 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1
             return (
-              <div key={crumb.href} className="flex items-center gap-1.5">
+              <div key={`${crumb.label}-${idx}`} className="flex items-center gap-1.5">
                 <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
                 {isLast ? (
                   <span className="text-foreground font-semibold px-1" aria-current="page">
+                    {crumb.label}
+                  </span>
+                ) : !crumb.href ? (
+                  <span className="text-muted-foreground px-1">
                     {crumb.label}
                   </span>
                 ) : (
