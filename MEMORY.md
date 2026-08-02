@@ -1,7 +1,7 @@
 # PM Academy — Project Memory Index
 
 **Last Updated:** 2026-08-02  
-**Project Stage:** Phase 1.5 - Curriculum Integrity & Content Pass Complete
+**Project Stage:** Phase 1.5 - Sprint 7 Release Candidate Blockers Complete
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
 
@@ -11,7 +11,7 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 PM Academy is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
-**Current state:** The Phase 1.5 Curriculum & Content Integrity Pass is complete. We resolved the module splitting issue by mapping raw metadata to exactly 9 modules, 10 lessons each (90 lessons total); corrected regex patterns in `extractors.ts` to fully parse and render all Interview and Real World Perspectives; and implemented a second referential validation pass in the compiler to verify and resolve all glossary consistency warnings across 12 markdown source files. All compilation, type checks, and tests pass.
+**Current state:** The Phase 1.5 Sprint 7 Release Candidate Blockers pass is complete. We verified Next.js 16 standard `proxy.ts` middleware route protection for `/academy/**`, moved all quiz correctness validation and XP ledger calculations entirely to the server, audited XP awarding to enforce strict idempotency (one-time theory read, perfect quiz bonus, reflection XP, and daily timezone-aware deduplicated flashcard review XP), and cleanly disabled the Google OAuth placeholder buttons with a "Coming Soon" badge. All compilation, type checks, and tests pass.
 
 ---
 

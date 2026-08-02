@@ -4,6 +4,7 @@ import { calculateSM2, SRSRating } from '@/lib/srs'
 import { awardXp } from '@/lib/xp-service'
 import { XP_VALUES } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
+import { getLocalDateString } from '@/lib/streaks'
 
 type FlashcardSRSRow = Database['public']['Tables']['user_flashcard_srs']['Row']
 
@@ -56,14 +57,40 @@ export async function recordFlashcardReview(
 
   if (upsertError) throw upsertError
 
-  // 4. Award daily flashcard review XP via canonical XP service
-  await awardXp(
-    supabase,
-    userId,
-    'flashcard',
-    XP_VALUES.FLASHCARD_REVIEW,
-    flashcardId
-  )
+  // 4. Award daily flashcard review XP via canonical XP service (deduplicated)
+  try {
+    const { data: userProfile } = await (supabase
+      .from('users') as unknown as DBChain)
+      .select('timezone')
+      .eq('id', userId)
+      .single() as unknown as { data: { timezone: string } | null; error: unknown }
+
+    const timezone = userProfile?.timezone || 'UTC'
+    const todayStr = getLocalDateString(timezone, new Date())
+
+    const { data: existingEvents } = await (supabase
+      .from('xp_events') as unknown as DBChain)
+      .select('created_at')
+      .eq('user_id', userId)
+      .eq('source_type', 'flashcard')
+      .eq('source_id', flashcardId) as unknown as { data: { created_at: string }[] | null; error: unknown }
+
+    const hasAwardedToday = existingEvents?.some((e) => {
+      return getLocalDateString(timezone, new Date(e.created_at)) === todayStr
+    }) ?? false
+
+    if (!hasAwardedToday) {
+      await awardXp(
+        supabase,
+        userId,
+        'flashcard',
+        XP_VALUES.FLASHCARD_REVIEW,
+        flashcardId
+      )
+    }
+  } catch (err) {
+    console.error(`[flashcards-service] Error checking/awarding flashcard XP:`, err)
+  }
 
   // 5. Update user streak
   await updateUserStreak(supabase, userId)
