@@ -34,7 +34,7 @@ export default function SignupPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  // const [isGoogleLoading, setIsGoogleLoading] = useState(false) // Uncomment when Google OAuth is enabled
 
   const {
     register,
@@ -86,6 +86,7 @@ export default function SignupPage() {
     })
   }
 
+  /*
   const handleGoogleSignup = async () => {
     setErrorMsg(null)
     setIsGoogleLoading(true)
@@ -110,8 +111,9 @@ export default function SignupPage() {
       setIsGoogleLoading(false)
     }
   }
+  */
 
-  const isLoading = isPending || isGoogleLoading
+  const isLoading = isPending
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-sm">

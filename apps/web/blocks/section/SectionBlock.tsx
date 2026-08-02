@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  BookOpen,
   AlertCircle,
   CheckCircle2,
   Target,
@@ -433,7 +432,7 @@ function FrameworkSection({ block, children }: BlockProps) {
 
 // ─── Summary ─────────────────────────────────────────────────────────────────
 
-function SummarySection({ block, children }: BlockProps) {
+function SummarySection({ children }: BlockProps) {
   return (
     <div className="rounded-xl border border-teal-500/20 bg-teal-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-teal-500/15">
@@ -450,7 +449,7 @@ function SummarySection({ block, children }: BlockProps) {
 // ─── Reflection ──────────────────────────────────────────────────────────────
 // Reflection blocks are rendered by ReflectionTabContent in lesson-content.tsx, not here.
 // Show a placeholder text since this is in the theory tab.
-function ReflectionSection({ block, children }: BlockProps) {
+function ReflectionSection() {
   return (
     <div className="rounded-xl border border-pink-500/20 bg-pink-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-3">
@@ -469,7 +468,6 @@ function ReflectionSection({ block, children }: BlockProps) {
 // Used as fallback for section types that have no specialized data arrays
 
 interface SectionCardProps {
-  type: string;
   badgeText: string;
   badgeColor: string;
   borderColor: string;
@@ -477,7 +475,7 @@ interface SectionCardProps {
   children?: React.ReactNode;
 }
 
-function SectionCard({ type, badgeText, badgeColor, borderColor, title, children }: SectionCardProps) {
+function SectionCard({ badgeText, badgeColor, borderColor, title, children }: SectionCardProps) {
   return (
     <div className={`rounded-xl border-l-4 ${borderColor} border border-border bg-card p-6 shadow-sm space-y-3 my-6`}>
       <div className="flex items-center gap-2 border-b border-border pb-3">
@@ -495,7 +493,7 @@ function SectionCard({ type, badgeText, badgeColor, borderColor, title, children
 
 // ─── Theory ──────────────────────────────────────────────────────────────────
 
-function TheorySection({ block, children }: BlockProps) {
+function TheorySection({ children }: BlockProps) {
   return (
     <div className="my-6 space-y-5">{children}</div>
   );

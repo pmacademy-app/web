@@ -77,9 +77,10 @@ export async function getServerUser(): Promise<User | null> {
 
     const authClient = createAuthenticatedServerClient(accessToken)
     return await getAuthenticatedUser(authClient)
-  } catch (err: any) {
-    if (err && (err.digest === 'DYNAMIC_SERVER_USAGE' || err.message?.includes('Dynamic server usage'))) {
-      throw err
+  } catch (err) {
+    const error = err as Error & { digest?: string }
+    if (error && (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('Dynamic server usage'))) {
+      throw error
     }
     console.error('[auth] Error in getServerUser:', err)
     return null

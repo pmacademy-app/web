@@ -22,7 +22,7 @@ export async function fetchSearchIndex(): Promise<SearchDoc[]> {
         cachedIndex = JSON.parse(stored)
         return cachedIndex!
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }
@@ -37,7 +37,7 @@ export async function fetchSearchIndex(): Promise<SearchDoc[]> {
     if (typeof window !== 'undefined') {
       try {
         sessionStorage.setItem('pm-academy-search-index', JSON.stringify(data))
-      } catch (e) {
+      } catch {
         // ignore (quota limit etc.)
       }
     }
