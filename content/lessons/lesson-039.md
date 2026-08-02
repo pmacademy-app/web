@@ -311,7 +311,7 @@ Technical debt, borrowed from finance, describes the trade-off of choosing a fas
 | Technical debt | The cost of choosing a faster, expedient implementation now in exchange for eventual repayment plus ongoing extra cost | Principal, Interest | 1 |
 | Principal (technical debt) | The eventual cost of properly implementing what was shortcut | Technical debt | 2 |
 | Interest (technical debt) | The recurring extra cost paid on every future change that touches the affected area | Debt Interest Curve | 2 |
-| Technical Debt Quadrant | Martin Fowler's framework classifying debt as deliberate/inadvertent × reckless/prudent | Deliberate + Prudent debt | 2 |
+| Technical Debt Quadrant | Martin Fowler's framework classifying team-level technical debt trade-offs along deliberate/inadvertent and reckless/prudent axes. | Deliberate + Prudent debt | 2 |
 | Debt Interest Curve | This lesson's mental model: early paydown is cheap, deferred paydown compounds and becomes expensive | Technical debt | 1 |
 | Debt Paydown Prioritization | Ranking debt items by interest rate, principal cost, and business consequence of inaction | Lesson 29 prioritization | 2 |
 

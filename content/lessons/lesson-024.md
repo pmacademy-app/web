@@ -371,7 +371,7 @@ Acceptance criteria are the specific, testable conditions that define when a use
 |---|---|---|---|
 | Acceptance Criteria | The specific, testable conditions that define when a user story is complete. | User Story (Lesson 23), INVEST | 1 |
 | Given/When/Then (Gherkin) | A structured format for acceptance criteria: a precondition, a triggering action, and a specific, observable outcome. | Behavior-Driven Development | 2 |
-| Happy Path | The primary, most common scenario in which everything goes as intended. | Edge Cases, Negative Scenarios | 1 |
+| Happy Path | The primary, most common scenario in a user journey or use case where everything goes as intended, with no significant friction, errors, or detours. | Edge Cases, Negative Scenarios | 1 |
 | Edge Case | A less common but plausible scenario at the boundaries of expected behavior. | Acceptance Criteria Coverage Map | 2 |
 | Negative Scenario | A scenario where something goes wrong or a precondition isn't met, and the expected system response to it. | Acceptance Criteria Coverage Map | 2 |
 | "Acceptance Criteria Written After the Fact" (Failure Pattern) | Writing criteria only after implementation is complete, inverting the artifact's purpose of forcing clarity before work begins. | Discovery Theater (Lesson 8) | 2 |

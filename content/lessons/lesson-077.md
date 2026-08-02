@@ -189,7 +189,7 @@ Applying uniform, revenue-based metrics across a portfolio of bets at genuinely 
 |---|---|---|---|
 | Portfolio Health Grid | A model plotting bets by Three Horizons classification and validation stage | Three Horizons (Lesson 71) | 2 |
 | Validated Learning | Evidence that a bet's specific, falsifiable hypothesis has been tested and confirmed or disconfirmed | Strategic Bet (Lesson 71) | 2 |
-| Vanity Metric | A number that looks encouraging and trends upward without testing a bet's underlying hypothesis | Portfolio Health Grid | 2 |
+| Vanity Metric | A metric that looks encouraging and trends upward over time (such as cumulative signups) without indicating actionable product feedback or testing a clear hypothesis. | Portfolio Health Grid | 2 |
 | Premature Cancellation | Killing a promising early-stage bet by judging it against inappropriately mature metrics | Portfolio Health Grid | 2 |
 | Prolonged Survival | Allowing a genuinely failing bet to continue based on comfortable but meaningless vanity metrics | Portfolio Health Grid | 2 |
 | Validation Stage | A bet's position in a four-stage progression: Concept, Prototype, Pilot, Scale | Portfolio Health Grid | 2 |

@@ -191,7 +191,7 @@ Platform-scale technical debt differs in kind from team-level technical debt, be
 | Dual-Run Period | A period during which both an old and new capability remain simultaneously functional to support migration | Sunset Runway | 2 |
 | Long-Tail Dependency | Low-volume but potentially critical usage that doesn't show up prominently in aggregate or registered metrics | Dependency Inventory | 2 |
 | Migration Readiness Checklist | A five-item checklist confirming a dependency inventory and migration plan are genuinely thorough before announcement | Sunset Runway | 2 |
-| Technical Debt Quadrant | The Module 4 (Lesson 31–40) framework for categorizing team-level technical debt trade-offs | Sunset Runway (platform-scale extension) | 2 |
+| Technical Debt Quadrant | Martin Fowler's framework classifying team-level technical debt trade-offs along deliberate/inadvertent and reckless/prudent axes. | Sunset Runway (platform-scale extension) | 2 |
 
 ---
 

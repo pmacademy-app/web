@@ -189,7 +189,7 @@ Recommender systems face a structural tension between exploiting a user's alread
 | Diversity Metric | A measure of variety within and across a user's recommendations over time | Recommender Health Checklist | 2 |
 | Novelty Metric | A measure of how much recommended content is genuinely new to a specific user | Recommender Health Checklist | 2 |
 | Cold-Start Problem | The difficulty of generating relevant recommendations for new users or items with little interaction history | Content-Based Recommendations | 2 |
-| Smile Curve | The cohort retention pattern from Lesson 44, used here to detect long-horizon filter bubble damage | Lesson 44, Cohort Analysis | 2 |
+| Smile Curve | A retention curve shape that flattens into a stable, non-zero plateau over time, signaling durable value delivery and product-market fit. | Lesson 44, Cohort Analysis | 2 |
 
 ---
 
