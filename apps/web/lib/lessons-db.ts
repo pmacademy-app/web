@@ -54,6 +54,16 @@ export async function recordTheoryReadAction(
     throw new Error(verifyResult.reason || 'Engagement threshold not met.')
   }
 
+  // Check ledger for existing theory_read event first to ensure idempotency
+  const { data: existingRead } = await (supabase
+    .from('xp_events') as unknown as DBChain)
+    .select('id')
+    .eq('user_id', userId)
+    .eq('source_type', 'theory_read')
+    .eq('source_id', lessonId)
+    .limit(1)
+    .maybeSingle() as unknown as { data: { id: string } | null; error: unknown }
+
   // 3. Retrieve current progress
   const { data: progress, error: fetchError } = (await (supabase
     .from('user_lesson_progress') as unknown as DBChain)
@@ -65,7 +75,7 @@ export async function recordTheoryReadAction(
   if (fetchError) throw fetchError
 
   // If theory has already been read, return early
-  if (progress?.theory_read_at) {
+  if (existingRead || progress?.theory_read_at) {
     return { success: true, xpEarned: 0, message: 'Theory already read.' }
   }
 
@@ -115,18 +125,52 @@ export async function recordQuizAttemptAction(
   supabase: SupabaseClient<Database>,
   userId: string,
   lessonId: string,  // stable les_XXXXXX ID
-  attempts: { question_id: string; selected_option: number; is_correct: boolean }[]
+  attempts: { question_id: string; selected_option: number }[]
 ) {
   const totalQuestions = attempts.length
   if (totalQuestions === 0) {
     throw new Error('Attempts array cannot be empty')
   }
 
-  const correctCount = attempts.filter((a) => a.is_correct).length
+  // 1. Read compile lesson JSON to validate quiz responses
+  let lesson
+  try {
+    const filePath = path.join(DIST_LESSONS_DIR, `${lessonId}.json`)
+    const raw = await readFile(filePath, 'utf-8')
+    lesson = JSON.parse(raw)
+  } catch (e) {
+    throw new Error(`Lesson content file not found for ${lessonId}`)
+  }
+
+  const quizBlock = lesson?.blocks?.find((b: any) => b.type === 'quiz')
+  if (!quizBlock) {
+    throw new Error(`Quiz block not found in lesson content for ${lessonId}`)
+  }
+
+  const quizQuestions = quizBlock.questions || []
+  const questionMap = new Map<string, number>()
+  for (const q of quizQuestions) {
+    questionMap.set(q.id, q.correctAnswer)
+  }
+
+  // Compute correctness server-side (ignore client inputs)
+  const validatedAttempts = attempts.map((a) => {
+    const correctAnswer = questionMap.get(a.question_id)
+    if (correctAnswer === undefined) {
+      throw new Error(`Question ID ${a.question_id} not found in quiz for lesson ${lessonId}`)
+    }
+    return {
+      question_id: a.question_id,
+      selected_option: a.selected_option,
+      is_correct: a.selected_option === correctAnswer,
+    }
+  })
+
+  const correctCount = validatedAttempts.filter((a) => a.is_correct).length
   const scorePercentage = Math.round((correctCount / totalQuestions) * 100)
 
-  // 1. Insert individual question attempts
-  const insertRows = attempts.map((a) => ({
+  // 2. Insert individual question attempts (insert rows using validatedAttempts)
+  const insertRows = validatedAttempts.map((a) => ({
     user_id: userId,
     lesson_id: lessonId,
     question_id: a.question_id,
@@ -140,7 +184,7 @@ export async function recordQuizAttemptAction(
 
   if (attemptsInsertError) throw attemptsInsertError
 
-  // 2. Fetch existing progress
+  // 3. Fetch existing progress
   const { data: progress, error: progressFetchError } = (await (supabase
     .from('user_lesson_progress') as unknown as DBChain)
     .select('*')
@@ -151,27 +195,39 @@ export async function recordQuizAttemptAction(
   if (progressFetchError) throw progressFetchError
 
   const isFirstAttempt = !progress || progress.quiz_attempts === 0
-  const prevScorePercent = progress?.quiz_score ?? 0
-  const prevCorrect = progress?.quiz_score
-    ? Math.round((prevScorePercent / 100) * totalQuestions)
-    : 0
 
-  let incrementalXp = 0
+  // 4. Query total quiz_correct XP already awarded from ledger
+  const { data: existingQuizEvents } = await (supabase
+    .from('xp_events') as unknown as DBChain)
+    .select('xp_amount')
+    .eq('user_id', userId)
+    .eq('source_type', 'quiz_correct')
+    .eq('source_id', lessonId) as unknown as { data: { xp_amount: number }[] | null }
+
+  const alreadyAwardedXp = existingQuizEvents?.reduce((sum, e) => sum + e.xp_amount, 0) ?? 0
+  const maxPossibleXp = correctCount * XP_VALUES.QUIZ_CORRECT
+  const incrementalXp = Math.max(0, maxPossibleXp - alreadyAwardedXp)
+
+  // 5. Award perfect score bonus on first attempt only (with ledger guard)
   let perfectBonusXp = 0
-
-  // Award XP for each new correct answer (incremental to prevent farming)
-  if (correctCount > prevCorrect) {
-    incrementalXp = (correctCount - prevCorrect) * XP_VALUES.QUIZ_CORRECT
-  }
-
-  // Award perfect score bonus on first attempt only
   if (isFirstAttempt && correctCount === totalQuestions) {
-    perfectBonusXp = XP_VALUES.QUIZ_PERFECT_BONUS
+    const { data: existingBonus } = await (supabase
+      .from('xp_events') as unknown as DBChain)
+      .select('id')
+      .eq('user_id', userId)
+      .eq('source_type', 'quiz_bonus')
+      .eq('source_id', lessonId)
+      .limit(1)
+      .maybeSingle() as unknown as { data: { id: string } | null }
+
+    if (!existingBonus) {
+      perfectBonusXp = XP_VALUES.QUIZ_PERFECT_BONUS
+    }
   }
 
   const totalXpToAward = incrementalXp + perfectBonusXp
 
-  // 3. Persist lesson completion progress via canonical completion service
+  // 6. Persist lesson completion progress via canonical completion service
   await completeLesson(
     supabase,
     userId,
@@ -180,7 +236,7 @@ export async function recordQuizAttemptAction(
     totalXpToAward
   )
 
-  // 4. Log XP events via canonical XP service
+  // 7. Log XP events via canonical XP service
   if (incrementalXp > 0) {
     try {
       await awardXp(
@@ -209,7 +265,7 @@ export async function recordQuizAttemptAction(
     }
   }
 
-  // 5. Update user streak
+  // 8. Update user streak
   await updateUserStreak(supabase, userId)
 
   return {
@@ -247,6 +303,17 @@ export async function recordReflectionAction(
 
   if (selectError) throw selectError
 
+  // Check ledger for existing reflection event first to ensure idempotency
+  const { data: existingXp } = await (supabase
+    .from('xp_events') as unknown as DBChain)
+    .select('id')
+    .eq('user_id', userId)
+    .eq('source_type', 'reflection')
+    .eq('source_id', lessonId)
+    .limit(1)
+    .maybeSingle() as unknown as { data: { id: string } | null; error: unknown }
+
+  const xpAlreadyAwarded = !!existingXp
   const isFirstSubmission = !existing
   let result
 
@@ -266,35 +333,37 @@ export async function recordReflectionAction(
     if (insertError) throw insertError
     result = inserted
 
-    // 3. Award reflection XP (15 XP) via canonical XP service
-    try {
-      await awardXp(
-        supabase,
-        userId,
-        'reflection',
-        XP_VALUES.REFLECTION_SUBMITTED,
-        lessonId
-      )
-    } catch (xpError) {
-      console.error(`[lessons-db] Error logging reflection XP:`, xpError)
-    }
+    if (!xpAlreadyAwarded) {
+      // 3. Award reflection XP (15 XP) via canonical XP service
+      try {
+        await awardXp(
+          supabase,
+          userId,
+          'reflection',
+          XP_VALUES.REFLECTION_SUBMITTED,
+          lessonId
+        )
+      } catch (xpError) {
+        console.error(`[lessons-db] Error logging reflection XP:`, xpError)
+      }
 
-    // 4. Update progress xp_earned
-    const { data: progress } = (await (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
-      .select('*')
-      .eq('user_id', userId)
-      .eq('lesson_id', lessonId)
-      .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
-
-    if (progress) {
-      await (supabase
+      // 4. Update progress xp_earned
+      const { data: progress } = (await (supabase
         .from('user_lesson_progress') as unknown as DBChain)
-        .update({
-          xp_earned: progress.xp_earned + XP_VALUES.REFLECTION_SUBMITTED,
-        })
+        .select('*')
         .eq('user_id', userId)
         .eq('lesson_id', lessonId)
+        .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
+
+      if (progress) {
+        await (supabase
+          .from('user_lesson_progress') as unknown as DBChain)
+          .update({
+            xp_earned: progress.xp_earned + XP_VALUES.REFLECTION_SUBMITTED,
+          })
+          .eq('user_id', userId)
+          .eq('lesson_id', lessonId)
+      }
     }
   } else {
     // 2. Update existing reflection record
@@ -318,6 +387,6 @@ export async function recordReflectionAction(
   return {
     success: true,
     reflection: result,
-    xpEarned: isFirstSubmission ? XP_VALUES.REFLECTION_SUBMITTED : 0,
+    xpEarned: (isFirstSubmission && !xpAlreadyAwarded) ? XP_VALUES.REFLECTION_SUBMITTED : 0,
   }
 }

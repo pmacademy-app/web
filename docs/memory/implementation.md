@@ -18,7 +18,8 @@
 - **Phase 1.5 Sprint 2 (Learning Flow Stabilization):** Complete ✅ — Wired flashcard reviews to API, added Previous/Next lesson navigation, verified reflections, and connected skill radar metrics.
 - **Phase 1.5 Sprint 3 (Content Experience & Curriculum Rendering):** Complete ✅ — Enhanced markdown rendering, native lists and tables HTML structures, customized SectionBlock cards, and collapsible dynamic modules list on `/academy`.
 - **Phase 1.5 Curriculum & Content Integrity Pass:** Complete ✅ — Normalized curriculum grouping into exactly 9 modules (10 lessons each), fixed regex extraction for perspectives blocks, resolved all cross-lesson glossary warnings.
-- **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending ⚠️
+- **Phase 1.5 Sprint 7 (Release Candidate Blockers):** Complete ✅ — Resolved all critical auth middleware bugs, server-side correctness checks, XP ledger security checks, and Google OAuth UI placeholders.
+- **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending 🏗️
 - **Phase 3–5:** Scaffolded or not started ❌
 
 ---

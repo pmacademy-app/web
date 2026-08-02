@@ -19,7 +19,7 @@ const quizAttemptSchema = z.object({
   attempts: z.array(z.object({
     question_id: z.string(),
     selected_option: z.number().int().min(0).max(3),
-    is_correct: z.boolean(),
+    is_correct: z.boolean().optional(),
   })).min(1),
 })
 
@@ -51,11 +51,17 @@ export async function POST(
     const { attempts } = parsed.data
     const serviceSupabase = createServerSupabaseClient()
 
+    // Pass only the necessary fields to the service action so correctness validation is strictly server-side
+    const cleanAttempts = attempts.map(a => ({
+      question_id: a.question_id,
+      selected_option: a.selected_option,
+    }))
+
     const result = await recordQuizAttemptAction(
       serviceSupabase,
       user.id,
       lessonId,
-      attempts
+      cleanAttempts
     )
 
     return Response.json(result)

@@ -16,6 +16,7 @@ export async function proxy(request: NextRequest) {
                     path.startsWith('/leaderboard') || 
                     path.startsWith('/settings') || 
                     path.startsWith('/onboarding') ||
+                    path.startsWith('/academy') ||
                     (path.startsWith('/curriculum/') && path !== '/curriculum')
 
   // Fast path for non-guarded public routes
