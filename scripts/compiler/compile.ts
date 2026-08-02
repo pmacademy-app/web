@@ -102,8 +102,8 @@ export function compileLesson(
   const learningPathSegment = segments.find((s) => s.heading.toLowerCase().includes('learning path'));
   let metadata: any = {
     module: 'foundations',
-    order: lessonNumber,
-    totalInModule: 90,
+    order: ((lessonNumber - 1) % 10) + 1,
+    totalInModule: 10,
     difficulty: 1,
     estimatedReadingTime: 25,
     estimatedCompletionTime: 35,
@@ -130,8 +130,9 @@ export function compileLesson(
 
       // Parse current lesson, order, difficulty, and study times
       const currentLessonParts = currentStr.split(/\s+of\s+/i);
-      const order = parseInt(currentLessonParts[0], 10) || lessonNumber;
-      const totalInModule = parseInt(currentLessonParts[1], 10) || 90;
+      const globalOrder = parseInt(currentLessonParts[0], 10) || lessonNumber;
+      const order = ((globalOrder - 1) % 10) + 1;
+      const totalInModule = 10;
 
       const diffVal = parseInt(diffStr.split('/')[0].trim(), 10) || 1;
 

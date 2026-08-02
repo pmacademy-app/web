@@ -251,6 +251,132 @@ const validationRules: ValidationRule[] = [
       return issues;
     },
   },
+  // 8. Flashcard presence
+  {
+    id: 'flashcard-deck-check',
+    severity: 'error',
+    check(lesson, ctx) {
+      const issues: ValidationIssue[] = [];
+      const flashcardBlock = lesson.blocks.find((b: any) => b.type === 'flashcardDeck');
+      if (!flashcardBlock) {
+        issues.push({
+          id: 'flashcard-deck-check',
+          severity: 'error',
+          message: 'Missing required block: Flashcard Deck',
+          filePath: ctx.filePath,
+        });
+      } else {
+        const cardsCount = flashcardBlock.cards?.length || 0;
+        if (cardsCount === 0) {
+          issues.push({
+            id: 'flashcard-deck-check',
+            severity: 'error',
+            message: 'Flashcard deck is empty, must have at least one card',
+            filePath: ctx.filePath,
+          });
+        }
+      }
+      return issues;
+    },
+  },
+
+  // 9. Curriculum-wide structural integrity
+  {
+    id: 'curriculum-integrity',
+    severity: 'error',
+    check(lesson, ctx, allLessons) {
+      const issues: ValidationIssue[] = [];
+      if (!allLessons || allLessons.length === 0) return [];
+      
+      // Only execute once (on the first lesson in the array) to avoid duplicate prints
+      if (allLessons[0].id !== lesson.id) return [];
+      
+      // 1. Total lesson count
+      if (allLessons.length !== 90) {
+        issues.push({
+          id: 'curriculum-integrity',
+          severity: 'error',
+          message: `Curriculum size mismatch: expected exactly 90 lessons, found ${allLessons.length}`,
+          filePath: ctx.filePath,
+        });
+      }
+      
+      // 2. Module checks
+      const canonicalModules = ['foundations', 'discovery', 'design', 'execution', 'growth', 'leadership', 'technical', 'strategy', 'capstone'];
+      const moduleLessons: Record<string, any[]> = {};
+      for (const m of canonicalModules) {
+        moduleLessons[m] = [];
+      }
+      
+      for (const other of allLessons) {
+        if (!canonicalModules.includes(other.module)) {
+          issues.push({
+            id: 'curriculum-integrity',
+            severity: 'error',
+            message: `Lesson "${other.title}" has invalid module slug "${other.module}"`,
+            filePath: other.sourceFile || ctx.filePath,
+          });
+        } else {
+          moduleLessons[other.module].push(other);
+        }
+      }
+      
+      for (const m of canonicalModules) {
+        const count = moduleLessons[m].length;
+        if (count !== 10) {
+          issues.push({
+            id: 'curriculum-integrity',
+            severity: 'error',
+            message: `Module "${m}" size mismatch: expected exactly 10 lessons, found ${count}`,
+            filePath: ctx.filePath,
+          });
+        }
+        // Verify ordering within module is exactly 1 to 10
+        const orders = moduleLessons[m].map((l) => l.order).sort((a, b) => a - b);
+        for (let i = 0; i < 10; i++) {
+          if (orders[i] !== i + 1) {
+            issues.push({
+              id: 'curriculum-integrity',
+              severity: 'error',
+              message: `Module "${m}" has missing or duplicate lesson orders (expected 1..10, found orders: [${orders.join(', ')}])`,
+              filePath: ctx.filePath,
+            });
+            break;
+          }
+        }
+      }
+      
+      // 3. Lesson IDs uniqueness
+      const seenIds = new Set<string>();
+      for (const other of allLessons) {
+        if (seenIds.has(other.id)) {
+          issues.push({
+            id: 'curriculum-integrity',
+            severity: 'error',
+            message: `Duplicate lesson ID detected: "${other.id}"`,
+            filePath: other.sourceFile || ctx.filePath,
+          });
+        }
+        seenIds.add(other.id);
+      }
+      
+      // 4. Prerequisites resolution
+      for (const other of allLessons) {
+        for (const prereq of other.prerequisites || []) {
+          if (!seenIds.has(prereq)) {
+            issues.push({
+              id: 'curriculum-integrity',
+              severity: 'error',
+              message: `Lesson "${other.title}" has unresolved prerequisite ID "${prereq}"`,
+              filePath: other.sourceFile || ctx.filePath,
+            });
+          }
+        }
+      }
+
+      return issues;
+    },
+  },
 ];
 
 export function validateCompiledLesson(

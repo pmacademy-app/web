@@ -43,7 +43,10 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 ### Remaining Sprint 4 Stabilization Items
 - **PERF-001 / PERF-002 / PERF-003:** Performance optimizations for initial load speeds, bundles, and search indexes.
 
-### Resolved This Session (Curriculum Integrity & Content Consistency Audit)
+### Resolved This Session (Phase 1.5 – Sprint 5: Curriculum Integrity & Production Readiness)
+- ✅ **Lesson ID Registry Pollution Fixed (🔴 P0):** Cleaned up duplicate `apps/web/...` entry in the stable registry file, and upgraded `compiler.test.ts` to resolve absolute test paths relative to the workspace root, eliminating pollution.
+- ✅ **Normalized Lesson Local ordering (🔴 P0):** Configured the compiler to calculate relative order within its module (`((globalOrder - 1) % 10) + 1`), matching the 1-to-10 model expected by the validator and UI.
+- ✅ **Flashcards Restored for Lessons 61-90 (🔴 P0):** Enhanced `extractFlashcardBlock` to split on `Front:` and `Card` block boundaries, stripping bold markdown markup formatting to cleanly compile flashcards for lessons 61-90.
 - ✅ **9-Module Curriculum Structure Restored:** Resolved the module splitting issue (17 modules down to exactly 9 modules, 10 lessons each, 90 lessons total) by parsing the module number from the metadata table and mapping it to the 9 canonical slugs.
 - ✅ **Interview Perspective Extraction Fixed:** Fixed lazy regex parsing bugs that matched empty strings and cleared question text details, restoring all interview questions.
 - ✅ **Real World Perspective Formatting Restructured:** Re-engineered the compiler parser to split paragraphs between bold headers and body content, resolving malformed output formatting.
