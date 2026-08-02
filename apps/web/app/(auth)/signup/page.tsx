@@ -63,12 +63,20 @@ export default function SignupPage() {
           password: values.password,
           options: {
             data: { full_name: values.name },
+            // token_hash + type are appended by Supabase; next= tells our callback where to redirect
             emailRedirectTo: `${origin}/api/auth/callback?next=/auth/verified`,
           },
         })
 
         if (error) {
-          setErrorMsg(error.message)
+          // Supabase occasionally returns '{}' as message for ambiguous errors
+          // (e.g. re-registering an unconfirmed email, rate limits, etc.)
+          const raw = error.message?.trim()
+          const msg =
+            !raw || raw === '{}' || raw === 'null'
+              ? 'Could not create account. The email may already be registered — try logging in or resetting your password.'
+              : raw
+          setErrorMsg(msg)
           return
         }
 
