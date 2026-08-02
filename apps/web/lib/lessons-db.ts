@@ -138,11 +138,11 @@ export async function recordQuizAttemptAction(
     const filePath = path.join(DIST_LESSONS_DIR, `${lessonId}.json`)
     const raw = await readFile(filePath, 'utf-8')
     lesson = JSON.parse(raw)
-  } catch (e) {
+  } catch {
     throw new Error(`Lesson content file not found for ${lessonId}`)
   }
 
-  const quizBlock = lesson?.blocks?.find((b: any) => b.type === 'quiz')
+  const quizBlock = lesson?.blocks?.find((b: { type: string }) => b.type === 'quiz')
   if (!quizBlock) {
     throw new Error(`Quiz block not found in lesson content for ${lessonId}`)
   }

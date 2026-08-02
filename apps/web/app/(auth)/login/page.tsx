@@ -32,7 +32,7 @@ function LoginForm() {
     authErrorParam === 'auth_failed' ? 'Authentication failed. Please try again.' : null
   )
   const [isPending, startTransition] = useTransition()
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  // const [isGoogleLoading, setIsGoogleLoading] = useState(false) // Uncomment when Google OAuth is enabled
 
   const {
     register,
@@ -71,6 +71,7 @@ function LoginForm() {
     })
   }
 
+  /*
   const handleGoogleLogin = async () => {
     setErrorMsg(null)
     setIsGoogleLoading(true)
@@ -95,8 +96,9 @@ function LoginForm() {
       setIsGoogleLoading(false)
     }
   }
+  */
 
-  const isLoading = isPending || isGoogleLoading
+  const isLoading = isPending
 
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
