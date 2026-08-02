@@ -693,7 +693,7 @@ export function compileAllContent(validateOnly = false): boolean {
       glossaryTerms: [],
     };
     
-    const issues = validateCompiledLesson(lesson, context, compiledLessons);
+    const issues = validateCompiledLesson(lesson, context, compiledLessons, true);
     const fileErrors = issues.filter((i) => i.severity === 'error');
     const fileWarnings = issues.filter((i) => i.severity === 'warning');
 
