@@ -6,11 +6,11 @@
 
 ---
 
-## Current Status (as of 2026-08-01)
+## Current Status (as of 2026-08-02)
 
 ```
 Phase 0 — Foundation          ████████████████  Complete ✅
-Phase 1 — Core Learning Loop  ████████████░░░░  Complete (v2 migration pending) ⚠️
+Phase 1.1–1.3 (v2 Migration)  ████████████████  Complete ✅
 Phase 2 — Gamification Layer  ████░░░░░░░░░░░░  In Progress — logic built, UI integration pending
 Phase 3 — Depth & Retention   ░░░░░░░░░░░░░░░░  Scaffolded / Not Started
 Phase 4 — Polish & SEO        ░░░░░░░░░░░░░░░░  Not Started
@@ -32,30 +32,26 @@ Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░
 - [x] Google Analytics: GA4 integrated for page views and funnel tracking
 - [x] v1 content pipeline: `parse-content.ts`, `validate-content.ts`, `generate-search-index.ts`
 - [x] 90 lessons validated, 1350 quiz questions, 770 search index items
-
-### Known Gap
-- [ ] v2 content pipeline (remark/AST, stable `lessonId`, block tree, incremental builds) — defined in `content-pipeline.md`, not yet implemented. The v1 pipeline is functional but being replaced.
+- [x] v2 content pipeline compiler (remark/AST, stable `lessonId`, block tree, incremental builds) — compiled to `content/dist/`
 
 ---
 
-## Phase 1 — Core Learning Loop MVP ✅ (with caveats)
+## Phase 1 — Core Learning Loop MVP ✅
 
-**Status:** Functionally complete — real users can read → quiz → unlock. Architecture migration to v2 is the outstanding debt.
+**Status:** Complete. The learning loop is fully migrated to the v2 architecture.
 
 ### Completed Items
-- [x] Lesson reading view: renders static JSON content, `MarkdownRenderer` for rich text + Mermaid
+- [x] Lesson reading view: renders static JSON content, `MarkdownRenderer` (v1) and `BlockTreeRenderer` (v2)
 - [x] Quiz flow: 15-question interactive UI, keyboard navigation, immediate feedback, scoring
 - [x] Progress tracking: `user_lesson_progress` table, sequential unlock via `lessons-completion-service.ts`
 - [x] Auth + onboarding: goal-setting question, profile sync
 - [x] Service layer isolation (Sprint 3): `xp-service.ts`, `lessons-completion-service.ts`, `flashcards-service.ts`
 - [x] Performance optimizations (Sprint 3.5): async file reads, Supabase singleton, Mermaid strict mode fix
-
-### Open Debt Before v2 Migration
-- [ ] **Database migration:** Rename `lesson_slug` → `lesson_id` in all user-state tables. Alter `user_flashcard_srs` to add `lesson_id` to composite PK. See `decisions.md D-006` and `mistakes.md M-001`.
-- [ ] **v2 content pipeline:** Implement remark/AST compiler per `content-pipeline.md`. Output to `content/dist/`. Generate stable `lessonId` registry.
-- [ ] **v2 routing:** Create `app/academy/layout.tsx` (curriculum shell) and `app/academy/l/[lessonId]/page.tsx` (stable ID-based lesson route) per `rendering-pipeline.md §2`.
-- [ ] **v2 renderer:** Implement `BlockTreeRenderer` + plugin component registry per `rendering-pipeline.md §3–§4`.
-- [ ] **Fix sidebar routing:** The "Curriculum" link in the authenticated sidebar resolves to a marketing page (known issue — see `mistakes.md M-009`). Fix requires the `/academy/` route structure.
+- [x] **Database migration:** Rename `lesson_slug` → `lesson_id` in all user-state tables. Alter `user_flashcard_srs` to add `lesson_id` to composite PK.
+- [x] **v2 content pipeline:** remark/AST compiler per `content-pipeline.md` outputting to `content/dist/`.
+- [x] **v2 routing:** Create `app/academy/layout.tsx` (curriculum shell) and `app/academy/l/[lessonId]/page.tsx` (stable ID-based lesson route).
+- [x] **v2 renderer:** Implement `BlockTreeRenderer` + plugin component registry per `rendering-pipeline.md §3–§4`.
+- [x] **Fix sidebar routing:** The "Curriculum" link in the authenticated sidebar resolves to `/academy` (M-009 fix).
 
 ---
 

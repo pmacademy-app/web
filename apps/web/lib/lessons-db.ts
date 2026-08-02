@@ -33,18 +33,11 @@ export async function recordTheoryReadAction(
   // 1. Read v2 compiled JSON to get reading estimate
   let estMinutesReading = 2
   try {
-    // Try v2 path first (content/dist/lessons/<lessonId>.json)
     if (/^les_[a-z0-9]+$/.test(lessonId)) {
       const filePath = path.join(DIST_LESSONS_DIR, `${lessonId}.json`)
       const raw = await readFile(filePath, 'utf-8')
       const lesson = JSON.parse(raw)
       estMinutesReading = lesson?.estimatedReadingTime ?? 2
-    } else {
-      // Fallback: legacy slug-based path (v1 compatibility during Phase 1.3)
-      const filePath = path.join(process.cwd(), 'public/content/lessons', `${lessonId}.json`)
-      const raw = await readFile(filePath, 'utf-8')
-      const lesson = JSON.parse(raw)
-      estMinutesReading = lesson?.meta?.estMinutesReading ?? 2
     }
   } catch (e) {
     console.warn(`[lessons-db] Lesson file not found for ${lessonId}. Defaulting to 2 mins.`, e)

@@ -31,8 +31,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-// Import block registry side-effects (registers all block types)
-import '@/blocks/index'
+
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 

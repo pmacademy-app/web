@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useBlockComponent } from './registry';
+import '@/blocks/index';
 
 interface Block {
   blockId: string;
