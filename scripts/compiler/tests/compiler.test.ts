@@ -1,5 +1,6 @@
 import test, { describe, it } from 'node:test';
 import assert from 'node:assert';
+import path from 'node:path';
 import { generateBlockId, getOrCreateLessonId } from '../registry';
 import { validateCompiledLesson } from '../validation';
 import { CompilerContext } from '../plugins/remark-plugins';
@@ -9,8 +10,9 @@ describe('PM Academy Content Compiler Test Suite', () => {
   
   describe('Stable ID Generator', () => {
     it('generates consistent lesson ID for path', () => {
-      const path1 = 'content/lessons/lesson-001.md';
-      const path2 = 'content/lessons/lesson-001.md';
+      const rootDir = path.resolve(__dirname, '../../..');
+      const path1 = path.join(rootDir, 'content/lessons/lesson-001.md');
+      const path2 = path.join(rootDir, 'content/lessons/lesson-001.md');
       
       const id1 = getOrCreateLessonId(path1);
       const id2 = getOrCreateLessonId(path2);
@@ -95,6 +97,35 @@ describe('PM Academy Content Compiler Test Suite', () => {
       assert.strictEqual(block.cards[0].difficulty, 1);
       assert.deepStrictEqual(block.cards[0].tags, ['tag1', 'tag2']);
     });
+
+    it('extracts flashcards correctly (new format)', () => {
+      const mockFlashcardNodes = [
+        {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'text',
+              value: '**Front:** What is the "who creates the value" test?\n**Back:** Ask who built...\n**Difficulty:** Easy\n**Tags:** #platform-thinking #diagnostic',
+            }
+          ]
+        }
+      ];
+
+      const block = extractFlashcardBlock(mockFlashcardNodes, 'les_test', {
+        filePath: 'test.md',
+        lessonId: 'les_test',
+        issues: [],
+        assets: [],
+        glossaryTerms: [],
+      });
+
+      assert.strictEqual(block.type, 'flashcardDeck');
+      assert.strictEqual(block.cards.length, 1);
+      assert.strictEqual(block.cards[0].front, 'What is the "who creates the value" test?');
+      assert.strictEqual(block.cards[0].back, 'Ask who built...');
+      assert.strictEqual(block.cards[0].difficulty, 'Easy');
+      assert.deepStrictEqual(block.cards[0].tags, ['platform-thinking', 'diagnostic']);
+    });
   });
 
   describe('Validator Registry', () => {
@@ -128,6 +159,33 @@ describe('PM Academy Content Compiler Test Suite', () => {
       // Required blocks validator should trigger
       const requiredBlockFailures = issues.filter((i) => i.id === 'required-blocks');
       assert.strictEqual(requiredBlockFailures.length > 0, true);
+    });
+
+    it('catches missing flashcard deck', () => {
+      const invalidLesson = {
+        id: 'les_test',
+        title: 'Test Lesson',
+        slug: 'test-lesson',
+        blocks: [
+          {
+            type: 'theory',
+            blockId: 'blk_123',
+            children: [],
+          }
+        ]
+      };
+
+      const ctx: CompilerContext = {
+        filePath: 'test.md',
+        lessonId: 'les_test',
+        issues: [],
+        assets: [],
+        glossaryTerms: [],
+      };
+
+      const issues = validateCompiledLesson(invalidLesson, ctx);
+      const flashcardFailures = issues.filter((i) => i.id === 'flashcard-deck-check');
+      assert.strictEqual(flashcardFailures.length > 0, true);
     });
   });
 });

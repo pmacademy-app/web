@@ -228,46 +228,52 @@ export function extractFlashcardBlock(nodes: any[], lessonId: string, ctx: Compi
   const flashcardsMarkdown = nodes.map(toMarkdown).join('\n\n');
   const cards: any[] = [];
   
-  // Split on **Card N** or **Card N
-  const cardBlocks = flashcardsMarkdown.split(/\n(?=\*\*Card\s+\d+\*\*|\*\*Card\s+\d+)/i);
+  // Split on Card N or Front: boundaries
+  const cardBlocks = flashcardsMarkdown.split(/\n(?=\*\*Card\s+\d+\*\*|\*\*Card\s+\d+|\*\*Front\b|\*\*Front:|Front:)/i);
   
+  let cardIndex = 0;
   for (const block of cardBlocks) {
-    const cardMatch = block.match(/^\*?\*?Card\s*(\d+)\*?\*?/i);
-    if (!cardMatch) continue;
+    if (!block.trim()) continue;
 
-    const cardIndex = parseInt(cardMatch[1], 10);
-    
     // Extract Front
-    const frontMatch = block.match(/(?:-\s*)?Front:\s*(.*?)(?=\n-\s*Back:|\n-\s*Difficulty:|\n-\s*Tags:|\n\n|$)/is);
-    const front = frontMatch ? frontMatch[1].trim() : '';
-
+    const frontMatch = block.match(/(?:-\s*|\*?\*?)Front(?::\s*|\*\*:\s*|\s*:\s*)(.*?)(?=\r?\n(?:-\s*|\*?\*?)(?:Back|Difficulty|Tags):|\r?\n\r?\n|$)/is);
     // Extract Back
-    const backMatch = block.match(/(?:-\s*)?Back:\s*(.*?)(?=\n-\s*Difficulty:|\n-\s*Tags:|\n\n|$)/is);
-    const back = backMatch ? backMatch[1].trim() : '';
+    const backMatch = block.match(/(?:-\s*|\*?\*?)Back(?::\s*|\*\*:\s*|\s*:\s*)(.*?)(?=\r?\n(?:-\s*|\*?\*?)(?:Difficulty|Tags):|\r?\n\r?\n|$)/is);
+
+    if (!frontMatch || !backMatch) continue;
+
+    cardIndex++;
+    
+    // Check if there is an explicit card number
+    const cardMatch = block.match(/^\*?\*?Card\s*(\d+)/i) || block.match(/Card\s*(\d+)/i);
+    const finalCardIndex = cardMatch ? parseInt(cardMatch[1], 10) : cardIndex;
+
+    const clean = (val: string) => val.trim().replace(/^\*?\*?/, '').replace(/\*?\*?$/, '').trim();
+
+    const front = clean(frontMatch[1]);
+    const back = clean(backMatch[1]);
 
     // Extract Difficulty
-    const diffMatch = block.match(/(?:-\s*)?Difficulty:\s*(.*?)(?=\n-\s*Tags:|\n\n|$)/is);
-    const difficultyStr = diffMatch ? diffMatch[1].trim() : 'medium';
+    const diffMatch = block.match(/(?:-\s*|\*?\*?)Difficulty(?::\s*|\*\*:\s*|\s*:\s*)(.*?)(?=\r?\n(?:-\s*|\*?\*?)Tags:|\r?\n\r?\n|$)/is);
+    const difficultyStr = diffMatch ? clean(diffMatch[1]) : 'medium';
     let difficulty: any = parseInt(difficultyStr, 10);
     if (isNaN(difficulty)) {
       difficulty = difficultyStr;
     }
 
     // Extract Tags
-    const tagsMatch = block.match(/(?:-\s*)?Tags:\s*(.*?)(?=\n\n|$)/is);
+    const tagsMatch = block.match(/(?:-\s*|\*?\*?)Tags(?::\s*|\*\*:\s*|\s*:\s*)(.*?)(?:\r?\n\r?\n|$)/is);
     const tags = tagsMatch
-      ? tagsMatch[1].split(',').map((t) => t.trim()).filter(Boolean)
+      ? clean(tagsMatch[1]).split(/[\s,]+/).map((t) => t.trim().replace(/^#/, '')).filter(Boolean)
       : [];
 
-    if (front && back) {
-      cards.push({
-        id: `fc-${lessonId}-${cardIndex}`,
-        front,
-        back,
-        difficulty,
-        tags,
-      });
-    }
+    cards.push({
+      id: `fc-${lessonId}-${finalCardIndex}`,
+      front,
+      back,
+      difficulty,
+      tags,
+    });
   }
 
   const block: any = {
