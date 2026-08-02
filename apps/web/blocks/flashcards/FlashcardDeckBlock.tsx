@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { HelpCircle, Sparkles, Award, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BlockProps } from '../../renderer/registry';
+import { useLessonContextSafe } from '@/contexts/lesson-context';
 
 interface Flashcard {
   id: string;
@@ -18,6 +19,10 @@ export default function FlashcardDeckBlock({ block }: BlockProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionXp, setSessionXp] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const lessonCtx = useLessonContextSafe();
+  const onFlashcardsComplete = lessonCtx?.onFlashcardsComplete;
 
   const handleReset = () => {
     setCurrentIndex(0);
@@ -25,14 +30,38 @@ export default function FlashcardDeckBlock({ block }: BlockProps) {
     setIsFinished(false);
   };
 
-  const handleReview = (_rating: number) => {
-    // Add XP locally to simulate gamified progression (Rule 5 compliance)
-    setSessionXp((x) => x + 2);
+  const handleReview = async (rating: number) => {
+    if (isSubmitting) return;
+    const card = cards[currentIndex];
+    setIsSubmitting(true);
 
-    if (currentIndex + 1 < cards.length) {
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      setIsFinished(true);
+    try {
+      const res = await fetch(`/api/flashcards/${card.id}/review`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rating }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to record flashcard review');
+      }
+
+      // Increment session XP count locally by 2 XP (XP_VALUES.FLASHCARD_REVIEW)
+      setSessionXp((x) => x + 2);
+    } catch (err) {
+      console.error('[FlashcardDeckBlock] Error saving review:', err);
+    } finally {
+      setIsSubmitting(false);
+      if (currentIndex + 1 < cards.length) {
+        setCurrentIndex((prev) => prev + 1);
+      } else {
+        setIsFinished(true);
+        if (onFlashcardsComplete) {
+          onFlashcardsComplete();
+        }
+      }
     }
   };
 
@@ -94,13 +123,13 @@ export default function FlashcardDeckBlock({ block }: BlockProps) {
       </div>
 
       <div className="py-2">
-        <FlashcardItemCard key={currentCard.id} card={currentCard} onReview={handleReview} />
+        <FlashcardItemCard key={currentCard.id} card={currentCard} onReview={handleReview} isSubmitting={isSubmitting} />
       </div>
     </div>
   );
 }
 
-function FlashcardItemCard({ card, onReview }: { card: Flashcard; onReview: (rating: number) => void }) {
+function FlashcardItemCard({ card, onReview, isSubmitting }: { card: Flashcard; onReview: (rating: number) => void; isSubmitting: boolean }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const ratingRowRef = useRef<HTMLDivElement>(null);
 
@@ -201,8 +230,9 @@ function FlashcardItemCard({ card, onReview }: { card: Flashcard; onReview: (rat
                 <button
                   key={opt.value}
                   tabIndex={isFlipped ? 0 : -1}
+                  disabled={!isFlipped || isSubmitting}
                   onClick={() => onReview(opt.value)}
-                  className={`flex flex-col items-center justify-center py-2 px-1.5 rounded-lg border text-xs font-bold transition-all focus:outline-none focus:ring-2 focus:ring-primary ${opt.color} hover:brightness-95 active:brightness-90`}
+                  className={`flex flex-col items-center justify-center py-2 px-1.5 rounded-lg border text-xs font-bold transition-all focus:outline-none focus:ring-2 focus:ring-primary ${opt.color} hover:brightness-95 active:brightness-90 disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <span className="text-base font-serif font-extrabold">{opt.value}</span>
                   <span className="text-[10px] font-semibold mt-0.5 tracking-tight">{opt.label}</span>

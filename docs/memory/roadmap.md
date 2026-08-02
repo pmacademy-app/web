@@ -11,8 +11,8 @@
 ```
 Phase 0 — Foundation          ████████████████  Complete ✅
 Phase 1.1–1.4 (v2 Migration)  ████████████████  Complete ✅
-Phase 1.5 (Stabilization)     ████████░░░░░░░░  In Progress — Sprint 1 Complete (Runtime & Navigation)
-Phase 2 — Gamification Layer  ████░░░░░░░░░░░░  Deferred — logic built, UI integration pending
+Phase 1.5 (Stabilization)     ████████████░░░░  In Progress — Sprint 2 Complete (Learning Flow)
+Phase 2 — Gamification Layer  ████████░░░░░░░░  In Progress — dashboard and skill radar wired
 Phase 3 — Depth & Retention   ░░░░░░░░░░░░░░░░  Scaffolded / Not Started
 Phase 4 — Polish & SEO        ░░░░░░░░░░░░░░░░  Not Started
 Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░  Not Started
@@ -70,10 +70,12 @@ Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░
 - [x] Flashcard SRS: `lib/srs.ts` (pure SM-2) + `lib/flashcards-service.ts` (DB orchestration)
 
 ### Remaining for Phase 2 Completion
-- [ ] **Dashboard integration:** Wire `dashboard/page.tsx` to fetch real XP, level, streak, and completed lesson counts from Supabase. Currently shows hardcoded `0` values.
-- [ ] **Skill radar UI:** Connect the radar chart component to `lib/skillRadar.ts` scores computed from real progress data. **Blocker:** Skill radar scoring formula is unresolved (see `decisions.md D-009`). Must be settled before implementation.
 - [ ] **Flashcard Review Hub:** Build the review queue screen at `/review`. Currently a stub. Tie it to `flashcards-service.ts` and the `user_flashcard_srs` table.
 - [ ] **Placement quiz:** Add the onboarding assessment flow that seeds the skill radar. See `PRD.md §4.1` and `Phases.md Phase 2`.
+
+### Completed Phase 2 Items (Integrated in Phase 1.5)
+- [x] **Dashboard integration:** Wired `dashboard/page.tsx` to fetch real XP, level, streak, and completed lesson counts from Supabase.
+- [x] **Skill radar UI:** Connected the radar chart component to `lib/skillRadar.ts` scores computed from real progress data using a robust module-to-competency mapping.
 
 ### Definition of Done (from `Phases.md`)
 > A returning user sees accurate XP, level/title, streak, and a skill radar that updates immediately after each lesson/quiz. Flashcard review sessions correctly schedule next-review dates per SM-2.
@@ -209,3 +211,4 @@ Step 6  →  Phase 2 Gamification UI Integration
 
 - v1.0 (2026-08-01) — Created from `Phases.md`, the project audit report, and `MEMORY.md`. Adds current phase progress tracking, known debt items, and the recommended v2 migration execution sequence.
 - v1.5 (2026-08-02) — Phase 1.5 Sprint 1 Runtime & Navigation Stabilization complete. Fixed dashboard CTA navigation/completed count queries, resolved blocks typecast compiler issue, paused theory timer outside of the theory tab, and added auth redirects to marketing curriculum and public previews. All production builds compile cleanly.
+- v1.6 (2026-08-02) — Phase 1.5 Sprint 2 Learning Flow Stabilization complete. Wired flashcard reviews to API, implemented Previous/Next navigation footer links, verified reflections load/save correctly, and integrated real competency skill radar scores on the dashboard.
