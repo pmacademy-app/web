@@ -16,6 +16,7 @@
 - **Phase 1.4 (Legacy Cleanup & Finalization):** Complete ✅ — Removed all v1 routes, APIs, hooks, components, and public content JSONs. Codebase runs entirely on a single v2 implementation path.
 - **Phase 1.5 Sprint 1 (Runtime & Navigation Stabilization):** Complete ✅ — Fixed dashboard CTA, blocks compilation, tab engagement timer, and auth helper. Added marketing routing redirects.
 - **Phase 1.5 Sprint 2 (Learning Flow Stabilization):** Complete ✅ — Wired flashcard reviews to API, added Previous/Next lesson navigation, verified reflections, and connected skill radar metrics.
+- **Phase 1.5 Sprint 3 (Content Experience & Curriculum Rendering):** Complete ✅ — Enhanced markdown rendering, native lists and tables HTML structures, customized SectionBlock cards, and collapsible dynamic modules list on `/academy`.
 - **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending ⚠️
 - **Phase 3–5:** Scaffolded or not started ❌
 

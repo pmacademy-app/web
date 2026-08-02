@@ -10,7 +10,7 @@
 - **Current Branch:** `main`
 - **Current Version:** `0.1.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
 - **Last Successful Build:** 2026-08-02 (Next.js 16.2.12 Turbopack production build — clean, 0 errors, 23 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 1.5 — Sprint 2 Complete (Learning Flow Stabilization) ✅
+- **Current Implementation Phase:** Phase 1.5 — Sprint 3 Complete (Content Experience & Curriculum Rendering) ✅
 
 ---
 
@@ -24,28 +24,29 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 1.4 Legacy Cleanup & Finalization:** ✅ Complete
 - **Phase 1.5 Sprint 1 Runtime & Navigation:** ✅ Complete
 - **Phase 1.5 Sprint 2 Learning Flow:** ✅ Complete
-- **Current Focus:** Phase 1.5 — Sprint 3: Performance & Optimization.
+- **Phase 1.5 Sprint 3 Content & Curriculum:** ✅ Complete
+- **Current Focus:** Phase 1.5 — Sprint 4: Performance & Infrastructure Optimization.
 
 ---
 
 ## 3. What's Next: Next Planned Tasks
 
-1. **[Phase 1.5 - Sprint 3] Dynamic Import Optimizations (PERF-001):** Lazy-load block components via `dynamic()` inside `apps/web/blocks/index.ts` to reduce initial bundle size and optimize hydration.
-2. **[Phase 1.5 - Sprint 3] Image AVIF/WebP and Layout Shifts (PERF-002):** Optimize local image delivery and configure layout dimensions to achieve 95+ Lighthouse Performance scores.
-3. **[Phase 1.5 - Sprint 3] Search flexsearch index caching (PERF-003):** Implement client-side localStorage/sessionStorage caching for the generated search index.
+1. **[Phase 1.5 - Sprint 4] Dynamic Import Optimizations (PERF-001):** Lazy-load block components via `dynamic()` inside `apps/web/blocks/index.ts` to reduce initial bundle size and optimize hydration.
+2. **[Phase 1.5 - Sprint 4] Image AVIF/WebP and Layout Shifts (PERF-002):** Optimize local image delivery and configure layout dimensions to achieve 95+ Lighthouse Performance scores.
+3. **[Phase 1.5 - Sprint 4] Search flexsearch index caching (PERF-003):** Implement client-side localStorage/sessionStorage caching for the generated search index.
 
 ---
 
 ## 4. Active Issues, Blockers & Bugs
 
-### Remaining Sprint 3 Stabilization Items
+### Remaining Sprint 4 Stabilization Items
 - **PERF-001 / PERF-002 / PERF-003:** Performance optimizations for initial load speeds, bundles, and search indexes.
 
-### Resolved This Session (Sprint 2)
-- ✅ **FUNC-003 Flashcard SRS Integration:** Wired flashcard rating buttons to POST reviews to `/api/flashcards/[id]/review` and record SM-2 spaced repetition state in Supabase, removing local-only placeholders.
-- ✅ **FUNC-005 Lesson Navigation:** Added robust Previous/Next footer navigation using `prevLessonId` and `nextId`, and a back-navigation option on the Lesson Completed screen.
-- ✅ **Reflection Flow Audited:** Verified reflections load, restore, and save successfully. Confirmed architectural choice to keep reflection submission forms decoupled from the static renderer.
-- ✅ **Dashboard Learning Progress:** Connected Competency Skill Radar on the dashboard to calculate real competency levels using the canonical `calculateSkillRadarScores` engine.
+### Resolved This Session (Sprint 3)
+- ✅ **Lesson Rendering Parity:** Refactored SectionBlock helper cards for each metadata type (learning objectives, common mistakes, key takeaways, cheat sheet, resources, real-world perspective, interview perspective, framework, mental model, case study, company example, summary) with clean borders, icons, background color coding, and layouts.
+- ✅ **DefaultMarkdown Enhancements:** Programmed tables to render as native HTML elements (`<table>`) and lists to render as native lists (`<ul>`/`<ol>`) with prose typography, blockquotes support, and correct headings margins.
+- ✅ **MarkdownRenderer Type Safety:** Configured MarkdownRenderer with custom code formatting while removing custom blockquote/table renderers, utilizing standard marked compilation alongside Tailwind prose styles to solve typescript signature errors.
+- ✅ **Curriculum Structure Parity:** Re-designed the `/academy` curriculum landing page using collapsible module details, a group-by-module layout list showing all 10 lessons per module, canonical descriptions, and color indicators.
 
 ---
 
