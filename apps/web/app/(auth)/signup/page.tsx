@@ -63,7 +63,7 @@ export default function SignupPage() {
           password: values.password,
           options: {
             data: { full_name: values.name },
-            emailRedirectTo: `${origin}/api/auth/callback`,
+            emailRedirectTo: `${origin}/api/auth/callback?next=/auth/verified`,
           },
         })
 

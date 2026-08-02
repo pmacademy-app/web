@@ -19,6 +19,7 @@
 - **Phase 1.5 Sprint 3 (Content Experience & Curriculum Rendering):** Complete ✅ — Enhanced markdown rendering, native lists and tables HTML structures, customized SectionBlock cards, and collapsible dynamic modules list on `/academy`.
 - **Phase 1.5 Curriculum & Content Integrity Pass:** Complete ✅ — Normalized curriculum grouping into exactly 9 modules (10 lessons each), fixed regex extraction for perspectives blocks, resolved all cross-lesson glossary warnings.
 - **Phase 1.5 Sprint 7 (Release Candidate Blockers):** Complete ✅ — Resolved all critical auth middleware bugs, server-side correctness checks, XP ledger security checks, and Google OAuth UI placeholders.
+- **Phase 1.6 (Foundation Finalization & Production Polish):** Complete ✅ — Custom email templates, email verification success page, dynamic canonical routing, topbar breadcrumbs context, consolidated CI pipeline, and resolved Interview Perspective parsing.
 - **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending 🏗️
 - **Phase 3–5:** Scaffolded or not started ❌
 
@@ -80,8 +81,8 @@
 | Feature Area | Status | Notes |
 |-------------|--------|-------|
 | Waitlist System | ✅ Complete | Live and capturing signups |
-| Auth & Onboarding | ✅ Complete | Email + Google, goal question |
-| Lesson Reading View | ✅ Complete | v2 `/academy/l/[lessonId]` renders via `BlockTreeRenderer` with compiled Block JSON |
+| Auth & Onboarding | ✅ Complete | Email + Google, custom templates, verified page |
+| Lesson Reading View | ✅ Complete | Dynamic `/academy/[moduleSlug]/[lessonId]` canonical routing, legacy redirect fallback |
 | Quiz Flow | ✅ Complete | v2 `QuizBlock` + `LessonContextProvider` submits to `/api/v2/lessons/[lessonId]/quiz` |
 | Flashcard SRS Engine | ⚠️ Partial | `FlashcardDeckBlock` renders review UI. SRS recording not yet wired. Review Hub screen is a stub. |
 | XP & Level System | ⚠️ Partial | DB ledger + triggers correct. Frontend dashboard shows mocked `0` values. |
@@ -92,7 +93,7 @@
 | Account Settings | ❌ Scaffolded | UI shell exists. Form updates not written. |
 | Client-Side Search | ❌ Not started | Search index generated. UI (`SearchOverlay`) not built. |
 | v2 Content Pipeline | ✅ Complete | 90 lessons compiled to `content/dist/` via remark AST compiler (Phase 1.1) |
-| v2 Renderer / `/academy/` Routes | ✅ Complete | `BlockTreeRenderer` + `registry.ts` + `/academy` index + `/academy/l/[lessonId]` (Phase 1.2+1.3) |
+| v2 Renderer / `/academy/` Routes | ✅ Complete | `BlockTreeRenderer` + `registry.ts` + `/academy` dynamic routes (Phase 1.2+1.3+1.6) |
 
 ---
 
@@ -158,11 +159,12 @@ pm-academy/
 | `/about` | Static | About page |
 | `/waitlist` | Static | Pre-launch waitlist capture |
 | `/login`, `/signup`, `/reset-password` | Static | Auth flows |
+| `/auth/verified` | Static | Email verification success landing page |
 | `/onboarding` | Dynamic (ƒ) | Goal-setting onboarding |
 | `/curriculum` | Static | Marketing curriculum overview (legacy — not in authenticated AppShell) |
-| `/curriculum/[moduleSlug]/[lessonSlug]` | Dynamic (ƒ) | Legacy v1 lesson route (still active for backward compat, to be removed in Phase 1.4) |
 | `/academy` | Dynamic (ƒ) | **v2** Authenticated curriculum index — module cards + full lesson list |
-| `/academy/l/[lessonId]` | Dynamic (ƒ) | **v2** Stable-ID lesson page — reads compiled Block JSON via `BlockTreeRenderer` |
+| `/academy/[moduleSlug]/[lessonId]` | Dynamic (ƒ) | **v2** Dynamic canonical lesson page — reads compiled Block JSON via `BlockTreeRenderer` |
+| `/academy/l/[lessonId]` | Dynamic (ƒ) | **v2** Legacy bookmark fallback — redirects 301 to the canonical dynamic path |
 | `/lessons/[slug]` | Dynamic (ƒ) | Public lesson preview (marketing SEO) |
 | `/dashboard` | Dynamic (ƒ) | Authenticated user dashboard |
 | `/review` | Dynamic (ƒ) | Flashcard review hub (stub) |
@@ -170,7 +172,6 @@ pm-academy/
 | `/leaderboard` | Dynamic (ƒ) | Leaderboard (stub) |
 | `/settings` | Dynamic (ƒ) | Account settings (stub) |
 | `/p/[username]` | Dynamic (ƒ) | Public portfolio (stub) |
-| `/api/lessons/[slug]/*` | Dynamic (ƒ) | Legacy v1 API routes (progress, quiz, theory-read) — still active |
 | `/api/v2/lessons/[lessonId]/*` | Dynamic (ƒ) | **v2** Stable-ID API routes (progress, quiz, theory-read) |
 | `/api/reflections` | Dynamic (ƒ) | Reflections API — supports both `lesson_id` and legacy `lesson_slug` |
 | `/api/*` | Dynamic (ƒ) | Other API routes (waitlist, auth, flashcard review) |
@@ -220,3 +221,4 @@ Specialized Antigravity AI skills for this project are in `.agents/skills/`. Loa
 - v1.0 (2026-08-01) — Extracted and restructured from the monolithic `MEMORY.md` into the `docs/memory/` system. Added full feature status table and current routing table.
 - v1.3 (2026-08-02) — Phase 1.3 Migration & Integration Foundation complete. Updated feature status table, routing table (added /academy routes), and build verification.
 - v1.5 (2026-08-02) — Phase 1.5 Sprint 1 Runtime & Navigation Stabilization complete. Fixed dashboard CTA, blocks compilation, active tab engagement timer, and auth helper. Added marketing redirects. All builds and verification checks clean.
+- v1.6 (2026-08-02) — Phase 1.6 Foundation Finalization & Production Polish complete. Implemented dynamic routing, email templates, success verification page, Topbar breadcrumb overrides, CI consolidation, and solved Interview Perspective parser constraints. Next.js production build verified clean.

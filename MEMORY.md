@@ -1,7 +1,7 @@
 # PM Academy — Project Memory Index
 
 **Last Updated:** 2026-08-02  
-**Project Stage:** Phase 1.5 - Sprint 7 Release Candidate Blockers Complete
+**Project Stage:** Phase 1 Foundation Freeze (Phase 1.6 Complete)
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
 
@@ -11,7 +11,7 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 PM Academy is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
-**Current state:** The Phase 1.5 Sprint 7 Release Candidate Blockers pass is complete. We verified Next.js 16 standard `proxy.ts` middleware route protection for `/academy/**`, moved all quiz correctness validation and XP ledger calculations entirely to the server, audited XP awarding to enforce strict idempotency (one-time theory read, perfect quiz bonus, reflection XP, and daily timezone-aware deduplicated flashcard review XP), and cleanly disabled the Google OAuth placeholder buttons with a "Coming Soon" badge. All compilation, type checks, and tests pass.
+**Current state:** Phase 1 Foundation Freeze (Phase 1.6 Complete) is fully completed and verified. We implemented dynamic canonical routes (`/academy/[moduleSlug]/[lessonId]`), legacy bookmark redirects, custom Supabase auth email templates, verification success page (`/auth/verified`), and custom breadcrumbs mapping. The Interview Perspective parsing issues were fully resolved. The CI workflow was consolidated into a single unified GitHub Actions config (`ci.yml`). All compiler unit tests pass and Next.js builds successfully. The repository is now frozen and ready to begin Phase 2.
 
 ---
 

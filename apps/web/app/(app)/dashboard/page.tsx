@@ -68,6 +68,7 @@ export default async function DashboardPage() {
         id: activeNext.id,
         order: activeNext.order,
         title: activeNext.title,
+        module: activeNext.module,
         estimatedTime: `${activeNext.estimatedReadingTime} min`,
       }
     }
@@ -166,7 +167,7 @@ export default async function DashboardPage() {
               </p>
             </div>
             <Link
-              href={`/academy/l/${user.nextLesson.id}`}
+              href={`/academy/${user.nextLesson.module}/${user.nextLesson.id}`}
               className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
             >
               Start Lesson →

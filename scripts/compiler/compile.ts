@@ -50,6 +50,22 @@ export function computeHash(content: string): string {
   return crypto.createHash('sha256').update(content).digest('hex');
 }
 
+export function getModuleSlugForLessonNumber(num: number): string {
+  const moduleMap: Record<number, string> = {
+    1: 'foundations',
+    2: 'discovery',
+    3: 'design',
+    4: 'execution',
+    5: 'growth',
+    6: 'leadership',
+    7: 'technical',
+    8: 'strategy',
+    9: 'capstone',
+  };
+  const modNum = Math.ceil(num / 10);
+  return moduleMap[modNum] || 'foundations';
+}
+
 export function compileLesson(
   filePath: string,
   registry: Record<string, string>,
@@ -469,17 +485,24 @@ export function compileLesson(
       // Resolve Connection target IDs using numToId map
       if (block.previous && block.previous.id === 'placeholder_prev') {
         const prevNum = lessonNumber - 1;
-        if (numToId[prevNum]) block.previous.id = numToId[prevNum];
+        if (numToId[prevNum]) {
+          block.previous.id = numToId[prevNum];
+          block.previous.module = getModuleSlugForLessonNumber(prevNum);
+        }
       }
       if (block.next && block.next.id === 'placeholder_next') {
         const nextNum = lessonNumber + 1;
-        if (numToId[nextNum]) block.next.id = numToId[nextNum];
+        if (numToId[nextNum]) {
+          block.next.id = numToId[nextNum];
+          block.next.module = getModuleSlugForLessonNumber(nextNum);
+        }
       }
       block.unlocks?.forEach((u: any) => {
         const idParts = u.lesson.id.split('_');
         const num = parseInt(idParts[idParts.length - 1], 10);
         if (num && numToId[num]) {
           u.lesson.id = numToId[num];
+          u.lesson.module = getModuleSlugForLessonNumber(num);
         }
       });
 
