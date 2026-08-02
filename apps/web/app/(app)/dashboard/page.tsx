@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { SKILL_CLUSTERS } from '@/lib/skillRadar'
 import { getLevelTitle } from '@/lib/xp'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import type { Database } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
+import { calculateSkillRadarScores, SKILL_CLUSTERS } from '@/lib/skillRadar'
+import type { SkillCluster } from '@/types'
 
 export const metadata: Metadata = {
   title: 'Dashboard | PM Academy',
@@ -72,6 +73,44 @@ export default async function DashboardPage() {
     }
   }
 
+  // Helper to map module slugs to competency clusters (1-2 per lesson)
+  const getClustersForModule = (moduleSlug: string): SkillCluster[] => {
+    switch (moduleSlug) {
+      case 'discovery':
+        return ['discovery']
+      case 'design':
+        return ['design']
+      case 'strategy':
+        return ['strategy']
+      case 'execution':
+        return ['execution']
+      case 'growth':
+        return ['growth']
+      case 'leadership':
+        return ['leadership']
+      case 'technical':
+        return ['technical']
+      case 'foundations':
+        return ['discovery', 'strategy']
+      case 'capstone':
+        return ['execution', 'strategy']
+      default:
+        return []
+    }
+  }
+
+  const radarInputs = curriculumLessons.map((lesson) => {
+    const progress = progressRows?.find((p) => p.lesson_id === lesson.id)
+    return {
+      lessonSlug: lesson.slug,
+      status: (progress?.status ?? 'not_started') as 'not_started' | 'in_progress' | 'completed',
+      quizScore: progress?.quiz_score ?? null,
+      skillClusters: getClustersForModule(lesson.module),
+    }
+  })
+
+  const skillValues = calculateSkillRadarScores(radarInputs)
+
   const user = {
     name: profile.name || 'Learner',
     level: profile.level,
@@ -80,15 +119,7 @@ export default async function DashboardPage() {
     streak: profile.current_streak,
     completedLessons,
     nextLesson,
-    skillValues: {
-      discovery: 0,
-      strategy: 0,
-      design: 0,
-      execution: 0,
-      growth: 0,
-      leadership: 0,
-      technical: 0,
-    },
+    skillValues,
   }
 
   return (

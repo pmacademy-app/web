@@ -10,7 +10,7 @@
 - **Current Branch:** `main`
 - **Current Version:** `0.1.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
 - **Last Successful Build:** 2026-08-02 (Next.js 16.2.12 Turbopack production build — clean, 0 errors, 23 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 1.5 — Sprint 1 Complete (Runtime & Navigation Stabilization) ✅
+- **Current Implementation Phase:** Phase 1.5 — Sprint 2 Complete (Learning Flow Stabilization) ✅
 
 ---
 
@@ -23,31 +23,29 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 1.3 Migration & Integration Foundation:** ✅ Complete
 - **Phase 1.4 Legacy Cleanup & Finalization:** ✅ Complete
 - **Phase 1.5 Sprint 1 Runtime & Navigation:** ✅ Complete
-- **Current Focus:** Phase 1.5 — Sprint 2: Learning Flow Stabilization.
+- **Phase 1.5 Sprint 2 Learning Flow:** ✅ Complete
+- **Current Focus:** Phase 1.5 — Sprint 3: Performance & Optimization.
 
 ---
 
 ## 3. What's Next: Next Planned Tasks
 
-1. **[Phase 1.5 - Sprint 2] Flashcard SRS API Integration (FUNC-003):** Wire the rating buttons in `FlashcardDeckBlock.tsx` to hit the SM-2 review endpoint `/api/flashcards/[id]/review` to persist spaced repetition states in Supabase.
-2. **[Phase 1.5 - Sprint 2] Lesson Back-Navigation (FUNC-005):** Render the "Previous Lesson" button using `prevLessonId` inside the v2 lesson shell layout.
-3. **[Phase 1.5 - Sprint 2] Marketing Sync (UI-001):** Refactor the public `/curriculum` marketing page to consume `content/dist/curriculum.json` instead of a static hardcoded configuration.
+1. **[Phase 1.5 - Sprint 3] Dynamic Import Optimizations (PERF-001):** Lazy-load block components via `dynamic()` inside `apps/web/blocks/index.ts` to reduce initial bundle size and optimize hydration.
+2. **[Phase 1.5 - Sprint 3] Image AVIF/WebP and Layout Shifts (PERF-002):** Optimize local image delivery and configure layout dimensions to achieve 95+ Lighthouse Performance scores.
+3. **[Phase 1.5 - Sprint 3] Search flexsearch index caching (PERF-003):** Implement client-side localStorage/sessionStorage caching for the generated search index.
 
 ---
 
 ## 4. Active Issues, Blockers & Bugs
 
-### Remaining Sprint 2 Stabilization Items
-- **FUNC-003 Flashcard SRS state is not persisted:** Card reviews do not trigger the API calls to save SM-2 intervals.
-- **FUNC-005 `prevLessonId` is unused:** Users cannot navigate backward inside a lesson.
-- **UI-001 Curriculum marketing mismatches:** Marketing list is disconnected from compiler output.
+### Remaining Sprint 3 Stabilization Items
+- **PERF-001 / PERF-002 / PERF-003:** Performance optimizations for initial load speeds, bundles, and search indexes.
 
-### Resolved This Session (Sprint 1)
-- ✅ **FUNC-001 Dashboard CTA Broken Route:** Fixed — Dashboard start/continue learning buttons now resolve to correct first incomplete dynamic lesson IDs and completed lessons counts are real-time.
-- ✅ **FUNC-002 blocks/index Compilation Error:** Fixed — added missing `React` import.
-- ✅ **FUNC-004 Theory Engagement Tab Leak:** Fixed — timed seconds and scroll listeners now pause unless the `'theory'` tab is active.
-- ✅ **SEC-001 Auth cookie extraction cleanup:** Fixed — consolidated session cookie retrieval and client factory logic in a single server-side `getServerUser()` helper.
-- ✅ **Marketing App Redirects:** Fixed — authenticated users landing on marketing `/curriculum` or `/lessons/[slug]` are redirected to `/academy` and `/academy/l/[lessonId]`.
+### Resolved This Session (Sprint 2)
+- ✅ **FUNC-003 Flashcard SRS Integration:** Wired flashcard rating buttons to POST reviews to `/api/flashcards/[id]/review` and record SM-2 spaced repetition state in Supabase, removing local-only placeholders.
+- ✅ **FUNC-005 Lesson Navigation:** Added robust Previous/Next footer navigation using `prevLessonId` and `nextId`, and a back-navigation option on the Lesson Completed screen.
+- ✅ **Reflection Flow Audited:** Verified reflections load, restore, and save successfully. Confirmed architectural choice to keep reflection submission forms decoupled from the static renderer.
+- ✅ **Dashboard Learning Progress:** Connected Competency Skill Radar on the dashboard to calculate real competency levels using the canonical `calculateSkillRadarScores` engine.
 
 ---
 

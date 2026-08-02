@@ -300,7 +300,7 @@ function formatModuleName(moduleSlug: string): string {
 
 export default function LessonPageContent({
   lesson,
-  prevLessonId: _prevLessonId,
+  prevLessonId,
   nextLessonId,
 }: LessonPageContentProps) {
   const {
@@ -406,6 +406,14 @@ export default function LessonPageContent({
             <div className="p-4 rounded-xl bg-amber-500/10 text-amber-700 border border-amber-500/20 text-sm font-bold">
               👑 You have completed all 90 lessons!
             </div>
+          )}
+          {prevLessonId && (
+            <Link
+              href={`/academy/l/${prevLessonId}`}
+              className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground hover:bg-accent/40 transition-all"
+            >
+              ← Go to Previous Lesson
+            </Link>
           )}
           <Link
             href="/academy"
@@ -549,6 +557,31 @@ export default function LessonPageContent({
           <div id="panel-reflection" role="tabpanel" aria-labelledby="tab-reflection">
             <ReflectionTabContent lesson={lesson} onComplete={handleReflectionComplete} />
           </div>
+        )}
+      </div>
+
+      {/* Lesson Footer Navigation */}
+      <div className="flex justify-between items-center pt-4 border-t border-border/60">
+        {prevLessonId ? (
+          <Link
+            href={`/academy/l/${prevLessonId}`}
+            className="inline-flex items-center justify-center rounded-lg border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-accent/40 transition-all"
+          >
+            ← Previous Lesson
+          </Link>
+        ) : (
+          <div />
+        )}
+        
+        {nextLessonId && progress.status === 'completed' ? (
+          <Link
+            href={`/academy/l/${nextLessonId}`}
+            className="inline-flex items-center justify-center rounded-lg border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-accent/40 transition-all"
+          >
+            Next Lesson →
+          </Link>
+        ) : (
+          <div />
         )}
       </div>
     </div>

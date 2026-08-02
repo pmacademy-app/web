@@ -1,7 +1,7 @@
 # PM Academy — Project Memory Index
 
 **Last Updated:** 2026-08-02  
-**Project Stage:** Phase 1.5 - Sprint 1 Complete (Runtime & Navigation Stabilization)
+**Project Stage:** Phase 1.5 - Sprint 2 Complete (Learning Flow Stabilization)
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
 
@@ -11,7 +11,7 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 PM Academy is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
-**Current state:** The Phase 1.5 Sprint 1 runtime and navigation stabilization is complete. We fixed the compilation and import errors, routed the dashboard CTA to the correct dynamic first incomplete lesson, corrected the theory dwell timer to only fire on the theory tab, and added auth redirects to curriculum/lesson-previews for logged-in users. All production builds and verification checks are clean.
+**Current state:** The Phase 1.5 Sprint 2 learning flow stabilization is complete. We wired the flashcards rating buttons to post SM-2 reviews to the backend database, added lesson footer navigation using stable IDs, verified stateful reflection loading/saving, and connected the dashboard skill radar competency chart to user progress metrics. All production builds, linting, and compiler unit tests are clean.
 
 ---
 
