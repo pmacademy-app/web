@@ -13,6 +13,7 @@
 - **Phase 1.1 (Content Pipeline Foundation):** Complete ✅ — v2 remark AST compiler + Zod schema, 90 lessons compiled to `content/dist/`
 - **Phase 1.2 (Renderer Foundation):** Complete ✅ — `BlockTreeRenderer`, `registry.ts`, all block components (Quiz, Flashcard, Mermaid, Connections, Glossary, Default)
 - **Phase 1.3 (Migration & Integration Foundation):** Complete ✅ — DB schema migrated, v2 API routes, `/academy/**` routing, v2 lesson shell
+- **Phase 1.4 (Legacy Cleanup & Finalization):** Complete ✅ — Removed all v1 routes, APIs, hooks, components, and public content JSONs. Codebase runs entirely on a single v2 implementation path.
 - **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending ⚠️
 - **Phase 3–5:** Scaffolded or not started ❌
 
@@ -58,6 +59,14 @@
 - **Mermaid strict mode fix:** Resolved React 18 strict mode double-render bug by marking diagram nodes as processed synchronously.
 - **Dynamic route optimization:** Refactored synchronous `fs.readFileSync` calls to `fs.promises.readFile` with React `cache` in server components (`[lessonSlug]/page.tsx` and `lessons/[slug]/page.tsx`).
 - **Supabase client optimization:** Singleton factory pattern for `createBrowserSupabaseClient` in `lib/supabase.ts` — prevents duplicate client instantiations.
+
+### Sprint 4 — Phase 1.4 Legacy Cleanup & Finalization (Complete ✅, 2026-08-02)
+
+- **Legacy Deletions:** Obsolete routes (`app/(app)/curriculum`), legacy API handlers (`api/lessons/[slug]`), legacy hooks (`use-lesson-progress.ts`), legacy components (`LessonViewShell`, `TheorySection`, `QuizContainer`, `FlashcardDeck`), legacy scripts (`parse-content`, `validate-content`, `generate-search-index`), and legacy JSON files under `public/content/` successfully removed.
+- **Dynamic Sitemap:** Refactored `sitemap.ts` to read from the v2 `content/dist/curriculum.json` manifest dynamically.
+- **Public Previews:** Refactored `app/(marketing)/lessons/[slug]/page.tsx` to resolve stable IDs and render blocks using `BlockTreeRenderer`.
+- **Engagement Loader:** Simplified `recordTheoryReadAction` in `lessons-db.ts` to query exclusively via the stable `lessonId` v2 path.
+- **Single Path Verification:** Confirmed full learning loop builds cleanly via Turbopack Next.js 16 with 0 TypeScript/ESLint errors and 23 final compiled routes.
 
 ---
 

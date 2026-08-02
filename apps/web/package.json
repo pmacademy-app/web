@@ -4,17 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "content:parse": "npx tsx ../../scripts/parse-content.ts",
-    "content:validate:legacy": "npx tsx ../../scripts/validate-content.ts",
-    "content:search": "npx tsx ../../scripts/generate-search-index.ts",
-    "content:build:legacy": "npm run content:parse && npm run content:validate:legacy && npm run content:search",
     "content:compile": "npx tsx ../../scripts/compiler/compile.ts",
     "content:validate": "npx tsx ../../scripts/compiler/compile.ts --validate-only",
     "content:migrate": "npx tsx ../../scripts/compiler/migrate.ts",
     "content:build": "npm run content:compile",
     "test:compiler": "npx tsx ../../scripts/compiler/tests/compiler.test.ts",
     "test:parity": "npx tsx ../../scripts/compiler/tests/compare-v1-v2.ts",
-    "build": "npm run content:build:legacy && next build",
+    "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"
   },

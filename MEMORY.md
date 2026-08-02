@@ -1,7 +1,7 @@
 # PM Academy — Project Memory Index
 
 **Last Updated:** 2026-08-02  
-**Project Stage:** Phase 1.3 Complete (Migration & Integration Foundation)
+**Project Stage:** Phase 1.4 Complete (Legacy Cleanup & Finalization) — Phase 1 Fully Completed
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
 
@@ -11,7 +11,7 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 PM Academy is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
-**Current state:** The Phase 1 core learning loop (read → quiz → unlock) is functional and deployed. Phase 2 gamification logic modules (XP service, streak engine, skill radar, SM-2 flashcard SRS) are built but not yet wired into the dashboard UI. A significant architecture migration from the v1 flat-section content pipeline to the v2 block-tree pipeline (defined in `docs/content-pipeline.md`) is planned before Phase 2 UI work begins.
+**Current state:** The Phase 1 core learning loop is fully migrated to the v2 block-tree architecture (using remark/AST compilation to `content/dist/` and `BlockTreeRenderer` recursive runtime components). Obsolete legacy v1 routes, hooks, components, and parsers have been safely removed. The repository is production-ready and fully signed off on Phase 1, ready for Phase 2 gamification UI wiring.
 
 ---
 
