@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
 import { SKILL_CLUSTERS } from '@/lib/skillRadar'
 import { getLevelTitle } from '@/lib/xp'
-import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
-import { ensureUserProfile, UserProfile } from '@/lib/auth'
+import { createServerSupabaseClient } from '@/lib/supabase'
+import type { Database } from '@/lib/supabase'
+import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
+import { fetchCurriculumData } from '@/lib/lesson-loader'
 
 export const metadata: Metadata = {
   title: 'Dashboard | PM Academy',
@@ -13,21 +14,12 @@ export const metadata: Metadata = {
 }
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-
-  if (!accessToken) {
+  const authUser = await getServerUser()
+  if (!authUser) {
     redirect('/login')
   }
 
-  // Create an authenticated client to query data
-  const supabase = createAuthenticatedServerClient(accessToken)
-
-  // Get user profile from Supabase Auth
-  const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
-  if (authError || !authUser) {
-    redirect('/login')
-  }
+  const supabase = createServerSupabaseClient()
 
   // Fetch the public.users record
   const { data: dbProfile, error: dbError } = await supabase
@@ -44,10 +36,39 @@ export default async function DashboardPage() {
 
   // Initialize profile if not found
   if (!profile) {
-    const serviceSupabase = createServerSupabaseClient()
-    profile = await ensureUserProfile(serviceSupabase, authUser)
+    profile = await ensureUserProfile(supabase, authUser)
     if (!profile) {
       throw new Error('Failed to initialize user profile.')
+    }
+  }
+
+  // Fetch user lesson progress and curriculum details
+  const { data: progressRows } = await supabase
+    .from('user_lesson_progress')
+    .select('*')
+    .eq('user_id', authUser.id) as unknown as { data: Database['public']['Tables']['user_lesson_progress']['Row'][] | null }
+
+  const curriculum = await fetchCurriculumData()
+  const curriculumLessons = curriculum?.lessons ?? []
+
+  const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0
+
+  // Find the first incomplete lesson in curriculum order
+  let nextLesson = null
+  if (curriculumLessons.length > 0) {
+    const completedIds = new Set(
+      progressRows
+        ?.filter((p) => p.status === 'completed')
+        .map((p) => p.lesson_id) ?? []
+    )
+    const activeNext = curriculumLessons.find((l) => !completedIds.has(l.id))
+    if (activeNext) {
+      nextLesson = {
+        id: activeNext.id,
+        order: activeNext.order,
+        title: activeNext.title,
+        estimatedTime: `${activeNext.estimatedReadingTime} min`,
+      }
     }
   }
 
@@ -57,13 +78,8 @@ export default async function DashboardPage() {
     title: getLevelTitle(profile.level),
     totalXp: profile.total_xp,
     streak: profile.current_streak,
-    completedLessons: 0, // Will load dynamically in later learning loop sprints
-    nextLesson: {
-      number: 1,
-      slug: 'lesson-001',
-      title: 'Introduction to Product Management',
-      estimatedTime: '15 min',
-    },
+    completedLessons,
+    nextLesson,
     skillValues: {
       discovery: 0,
       strategy: 0,
@@ -105,23 +121,47 @@ export default async function DashboardPage() {
 
       {/* Hero CTA: Next Lesson */}
       <div className="rounded-xl border border-primary/30 bg-primary/5 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
-        <div>
-          <span className="text-xs font-semibold uppercase text-primary tracking-wider">
-            Up Next
-          </span>
-          <h2 className="text-xl font-bold font-serif text-foreground mt-1">
-            Lesson {user.nextLesson.number}: {user.nextLesson.title}
-          </h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            Est. Time: {user.nextLesson.estimatedTime} • Theory + 15 Quiz Questions
-          </p>
-        </div>
-        <Link
-          href="/curriculum"
-          className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
-        >
-          Start Lesson →
-        </Link>
+        {user.nextLesson ? (
+          <>
+            <div>
+              <span className="text-xs font-semibold uppercase text-primary tracking-wider">
+                Up Next
+              </span>
+              <h2 className="text-xl font-bold font-serif text-foreground mt-1">
+                Lesson {user.nextLesson.order}: {user.nextLesson.title}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                Est. Time: {user.nextLesson.estimatedTime} • Theory + Practice Quiz
+              </p>
+            </div>
+            <Link
+              href={`/academy/l/${user.nextLesson.id}`}
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
+            >
+              Start Lesson →
+            </Link>
+          </>
+        ) : (
+          <>
+            <div>
+              <span className="text-xs font-semibold uppercase text-primary tracking-wider">
+                Congratulations!
+              </span>
+              <h2 className="text-xl font-bold font-serif text-foreground mt-1">
+                All Lessons Completed 👑
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                You have completed all 90 lessons in the PM Academy curriculum!
+              </p>
+            </div>
+            <Link
+              href="/academy"
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
+            >
+              Curriculum Board →
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Skill Radar Section (Primary Visual Focus) */}

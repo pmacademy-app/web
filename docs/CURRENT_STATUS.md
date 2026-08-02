@@ -10,7 +10,7 @@
 - **Current Branch:** `main`
 - **Current Version:** `0.1.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
 - **Last Successful Build:** 2026-08-02 (Next.js 16.2.12 Turbopack production build — clean, 0 errors, 23 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 1 (1.1-1.4) ✅ Complete & Signed Off
+- **Current Implementation Phase:** Phase 1.5 — Sprint 1 Complete (Runtime & Navigation Stabilization) ✅
 
 ---
 
@@ -22,36 +22,32 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 1.2 Renderer Foundation:** ✅ Complete
 - **Phase 1.3 Migration & Integration Foundation:** ✅ Complete
 - **Phase 1.4 Legacy Cleanup & Finalization:** ✅ Complete
-- **Current Focus:** Phase 2 Gamification UI wiring (dashboard, skill radar, SRS review hub).
+- **Phase 1.5 Sprint 1 Runtime & Navigation:** ✅ Complete
+- **Current Focus:** Phase 1.5 — Sprint 2: Learning Flow Stabilization.
 
 ---
 
 ## 3. What's Next: Next Planned Tasks
 
-Following the recommended sequence in [`docs/memory/roadmap.md`](./memory/roadmap.md#L133-L161):
-
-1. **[Phase 2] Skill Radar:** Wire `lib/skillRadar.ts` to real `user_lesson_progress` data. Resolve D-009 scoring formula decision. Replace dashboard `0%` placeholders.
-2. **[Phase 2] XP & Level UI:** Wire `lib/xp-service.ts` to dashboard stats display. Show real total_xp, level, and recent XP events.
-3. **[Phase 2] Streak Tracker UI:** Wire `lib/streaks.ts` to dashboard streak indicator. Current streak, longest streak, freeze count.
-4. **[Phase 2] SRS Review Hub:** Build the spaced repetition review queue UI at `/review`. Uses `lib/flashcards-service.ts` + `user_flashcard_srs` table.
+1. **[Phase 1.5 - Sprint 2] Flashcard SRS API Integration (FUNC-003):** Wire the rating buttons in `FlashcardDeckBlock.tsx` to hit the SM-2 review endpoint `/api/flashcards/[id]/review` to persist spaced repetition states in Supabase.
+2. **[Phase 1.5 - Sprint 2] Lesson Back-Navigation (FUNC-005):** Render the "Previous Lesson" button using `prevLessonId` inside the v2 lesson shell layout.
+3. **[Phase 1.5 - Sprint 2] Marketing Sync (UI-001):** Refactor the public `/curriculum` marketing page to consume `content/dist/curriculum.json` instead of a static hardcoded configuration.
 
 ---
 
 ## 4. Active Issues, Blockers & Bugs
 
-### Known Blockers
-- **Radar Chart Scoring Formula (D-009):** The skill radar scoring formula is unresolved in [`docs/memory/decisions.md`](./memory/decisions.md#L182-L195). We must lock this formula (continuous `0-100` vs. discrete bands) before connecting real data to the dashboard.
+### Remaining Sprint 2 Stabilization Items
+- **FUNC-003 Flashcard SRS state is not persisted:** Card reviews do not trigger the API calls to save SM-2 intervals.
+- **FUNC-005 `prevLessonId` is unused:** Users cannot navigate backward inside a lesson.
+- **UI-001 Curriculum marketing mismatches:** Marketing list is disconnected from compiler output.
 
-### Known Bugs & Debt (Post Phase 1.4)
-- **2 ESLint Warnings (non-blocking):** `_prevLessonId` unused in `lesson-content.tsx` and `_rating` unused in `FlashcardDeckBlock.tsx`. These are correct underscore-prefixed suppressions and do not block the build.
-- **Sidebar `isActive` Detection:** The `/academy` isActive check uses `pathname.startsWith('/academy')` — this will correctly highlight Curriculum for both `/academy` and `/academy/l/*`.
-
-### Resolved This Session (Phase 1.4)
-- ✅ **M-009 Sidebar Breakage:** Fixed — sidebar "Curriculum" link now points to `/academy`.
-- ✅ **M-001 DB Column Name:** Fixed — DB migration `20260802000001_lesson_id_migration.sql` renames `lesson_slug` → `lesson_id`.
-- ✅ **M-001 SRS PK Gap:** Fixed — `user_flashcard_srs` composite PK now includes `lesson_id`.
-- ✅ **Legacy Code Cleanup:** Removed all v1 routes (`/curriculum/[moduleSlug]/[lessonSlug]`), API endpoints under `/api/lessons`, legacy hooks/components, and legacy JSON content files.
-- ✅ **Sitemap & Previews:** Refactored `sitemap.ts` and dynamic public previews `/lessons/[slug]` to read from the v2 compiled content directories.
+### Resolved This Session (Sprint 1)
+- ✅ **FUNC-001 Dashboard CTA Broken Route:** Fixed — Dashboard start/continue learning buttons now resolve to correct first incomplete dynamic lesson IDs and completed lessons counts are real-time.
+- ✅ **FUNC-002 blocks/index Compilation Error:** Fixed — added missing `React` import.
+- ✅ **FUNC-004 Theory Engagement Tab Leak:** Fixed — timed seconds and scroll listeners now pause unless the `'theory'` tab is active.
+- ✅ **SEC-001 Auth cookie extraction cleanup:** Fixed — consolidated session cookie retrieval and client factory logic in a single server-side `getServerUser()` helper.
+- ✅ **Marketing App Redirects:** Fixed — authenticated users landing on marketing `/curriculum` or `/lessons/[slug]` are redirected to `/academy` and `/academy/l/[lessonId]`.
 
 ---
 

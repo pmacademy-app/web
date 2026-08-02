@@ -10,8 +10,9 @@
 
 ```
 Phase 0 — Foundation          ████████████████  Complete ✅
-Phase 1.1–1.3 (v2 Migration)  ████████████████  Complete ✅
-Phase 2 — Gamification Layer  ████░░░░░░░░░░░░  In Progress — logic built, UI integration pending
+Phase 1.1–1.4 (v2 Migration)  ████████████████  Complete ✅
+Phase 1.5 (Stabilization)     ████████░░░░░░░░  In Progress — Sprint 1 Complete (Runtime & Navigation)
+Phase 2 — Gamification Layer  ████░░░░░░░░░░░░  Deferred — logic built, UI integration pending
 Phase 3 — Depth & Retention   ░░░░░░░░░░░░░░░░  Scaffolded / Not Started
 Phase 4 — Polish & SEO        ░░░░░░░░░░░░░░░░  Not Started
 Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░  Not Started
@@ -207,3 +208,4 @@ Step 6  →  Phase 2 Gamification UI Integration
 ## Changelog
 
 - v1.0 (2026-08-01) — Created from `Phases.md`, the project audit report, and `MEMORY.md`. Adds current phase progress tracking, known debt items, and the recommended v2 migration execution sequence.
+- v1.5 (2026-08-02) — Phase 1.5 Sprint 1 Runtime & Navigation Stabilization complete. Fixed dashboard CTA navigation/completed count queries, resolved blocks typecast compiler issue, paused theory timer outside of the theory tab, and added auth redirects to marketing curriculum and public previews. All production builds compile cleanly.
