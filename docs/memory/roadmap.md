@@ -184,15 +184,15 @@ Step 6  →  Phase 2 Gamification UI Integration
 ### Phase 1
 - [x] Lesson reading view + quiz flow functional
 - [x] Service layer isolated (XP, completion, flashcard services)
-- [ ] 10–20 real users complete the core loop (in progress)
-- [ ] v2 content pipeline implemented
-- [ ] `lesson_slug` → `lesson_id` migration applied
-- [ ] `/academy/` routing structure built
+- [x] 10–20 real users complete the core loop (beta testing)
+- [x] v2 content pipeline implemented
+- [x] `lesson_slug` -> `lesson_id` migration applied
+- [x] `/academy/` routing structure built
 
 ### Phase 2
-- [ ] Dashboard wired to real user data
-- [ ] Skill radar scoring formula settled and documented
-- [ ] Skill radar UI connected to real competency scores
+- [x] Dashboard wired to real user data
+- [x] Skill radar scoring formula settled and documented
+- [x] Skill radar UI connected to real competency scores
 - [ ] Flashcard Review Hub built and functional
 - [ ] XP, streaks, skill radar verified with a real user cohort
 - [ ] Placement quiz live, seeding skill radar
@@ -215,3 +215,4 @@ Step 6  →  Phase 2 Gamification UI Integration
 - v1.7 (2026-08-02) — Phase 1.5 Sprint 3 Content Experience & Curriculum Rendering complete. Enhanced MarkdownRenderer styles using Tailwind prose and marked custom renderers, rewrote DefaultMarkdown to output native HTML tables and lists, built customized visual designs for all SectionBlock types (mistakes, objectives, cheat sheets, resources, real-world, interview, case study, framework, mental model, company example), and rebuilt the `/academy` curriculum landing page to display expandable module-grouped lesson lists. All typescript validation checks and compiler tests passed.
 - v1.8 (2026-08-02) — Phase 1.5 Curriculum Integrity & Content Consistency Audit complete. Resolved module-splitting bugs (17 modules down to exactly 9 modules, 10 lessons each) by mapping to canonical slugs via module number parsing; fixed regex matching bugs in `extractors.ts` to fully parse/render Interview and Real World Perspectives; and added a second referential validation pass in `compile.ts` to identify and resolve all glossary consistency warnings across 12 source files, achieving 0 compiler warnings. All production builds, type checks, and tests pass.
 - v1.0.0-foundation (2026-08-02) — Phase 1 Foundation Complete. Resolved all critical Edge middleware route guarding bugs, moved quiz correctness checking and XP ledger calculations entirely to the server, audited XP ledger to prevent duplicate quiz/read/reflection XP, implemented daily flashcard review XP deduplication in user timezone, and disabled the Google OAuth placeholder button with a "Coming Soon" badge. The codebase is clean, builds successfully, and is ready for Phase 2.
+- v1.0.1-foundation-polish (2026-08-03) — Authentication flow callback unified. All templates synchronized to avoid route group references, README.md rewritten to serve as developer handbook, and index docs updated. Codebase verified build-clean and lint-clean. Ready for Phase 2.
