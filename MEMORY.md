@@ -1,6 +1,6 @@
 # PM Academy — Project Memory Index
 
-**Last Updated:** 2026-08-02  
+**Last Updated:** 2026-08-03  
 **Project Stage:** Phase 1 Foundation Freeze (Phase 1.6 Complete)
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
@@ -11,7 +11,7 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 PM Academy is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
-**Current state:** Phase 1 Foundation Freeze (Phase 1.6 Complete) is fully completed and verified. We implemented dynamic canonical routes (`/academy/[moduleSlug]/[lessonId]`), legacy bookmark redirects, custom Supabase auth email templates, verification success page (`/auth/verified`), and custom breadcrumbs mapping. The Interview Perspective parsing issues were fully resolved. The CI workflow was consolidated into a single unified GitHub Actions config (`ci.yml`). All compiler unit tests pass and Next.js builds successfully. The repository is now frozen and ready to begin Phase 2.
+**Current state:** Phase 1 Foundation Freeze (Phase 1.6 Complete) is fully completed, polished, and verified. We implemented dynamic canonical routes (`/academy/[moduleSlug]/[lessonId]`), legacy bookmark redirects, custom Supabase auth email templates, verification success page (`/verified`), and custom breadcrumbs mapping. The server-side authentication callback route (`/api/auth/callback`) is now the single canonical entry point for all authentication responses, supporting both PKCE code exchanges and email OTP token hash verifications. All compiler unit tests pass and Next.js builds successfully. The repository is now frozen and ready to begin Phase 2.
 
 ---
 

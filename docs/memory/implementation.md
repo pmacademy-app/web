@@ -7,7 +7,7 @@
 
 ## 1. Current Project Stage
 
-**As of 2026-08-02:**
+**As of 2026-08-03:**
 
 - **Phase 0 (Foundation):** Complete ✅
 - **Phase 1.1 (Content Pipeline Foundation):** Complete ✅ — v2 remark AST compiler + Zod schema, 90 lessons compiled to `content/dist/`
@@ -19,7 +19,7 @@
 - **Phase 1.5 Sprint 3 (Content Experience & Curriculum Rendering):** Complete ✅ — Enhanced markdown rendering, native lists and tables HTML structures, customized SectionBlock cards, and collapsible dynamic modules list on `/academy`.
 - **Phase 1.5 Curriculum & Content Integrity Pass:** Complete ✅ — Normalized curriculum grouping into exactly 9 modules (10 lessons each), fixed regex extraction for perspectives blocks, resolved all cross-lesson glossary warnings.
 - **Phase 1.5 Sprint 7 (Release Candidate Blockers):** Complete ✅ — Resolved all critical auth middleware bugs, server-side correctness checks, XP ledger security checks, and Google OAuth UI placeholders.
-- **Phase 1.6 (Foundation Finalization & Production Polish):** Complete ✅ — Custom email templates, email verification success page, dynamic canonical routing, topbar breadcrumbs context, consolidated CI pipeline, and resolved Interview Perspective parsing.
+- **Phase 1.6 (Foundation Finalization & Production Polish):** Complete ✅ — Custom email templates, email verification success page, dynamic canonical routing, topbar breadcrumbs context, consolidated CI pipeline, unified auth callback route `/api/auth/callback` supporting OTP token_hash verification, and resolved Interview Perspective parsing.
 - **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending 🏗️
 - **Phase 3–5:** Scaffolded or not started ❌
 
@@ -222,3 +222,4 @@ Specialized Antigravity AI skills for this project are in `.agents/skills/`. Loa
 - v1.3 (2026-08-02) — Phase 1.3 Migration & Integration Foundation complete. Updated feature status table, routing table (added /academy routes), and build verification.
 - v1.5 (2026-08-02) — Phase 1.5 Sprint 1 Runtime & Navigation Stabilization complete. Fixed dashboard CTA, blocks compilation, active tab engagement timer, and auth helper. Added marketing redirects. All builds and verification checks clean.
 - v1.6 (2026-08-02) — Phase 1.6 Foundation Finalization & Production Polish complete. Implemented dynamic routing, email templates, success verification page, Topbar breadcrumb overrides, CI consolidation, and solved Interview Perspective parser constraints. Next.js production build verified clean.
+- v1.7 (2026-08-03) — Authentication callback integration & documentation cleanup. Unified token_hash and PKCE flows inside a central callback, added AUTH_FLOW.md guide, updated INDEX.md and README.md with script references. Built cleanly.
