@@ -64,7 +64,7 @@ export default function SignupPage() {
           options: {
             data: { full_name: values.name },
             // token_hash + type are appended by Supabase; next= tells our callback where to redirect
-            emailRedirectTo: `${origin}/api/auth/callback?next=/auth/verified`,
+            emailRedirectTo: `${origin}/api/auth/callback?next=/verified`,
           },
         })
 
