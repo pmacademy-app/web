@@ -32,7 +32,8 @@ Read in this order before writing any code or making any product decision. Do no
 | 10 | [`Design.md`](./Design.md) | Defines *what it looks like* — visual language, UX patterns, screen designs |
 | 11 | [`content-pipeline.md`](./content-pipeline.md) | **Deep-dive:** the authoritative compiler specification (read before any content pipeline work) |
 | 12 | [`rendering-pipeline.md`](./rendering-pipeline.md) | **Deep-dive:** the authoritative renderer specification (read before any lesson UI work) |
-| 13 | [`docs/memory/`](./memory/) | **Project memory:** implementation status, decisions, pitfalls, and roadmap progress |
+| 13 | [`AUTH_FLOW.md`](./AUTH_FLOW.md) | **Deep-dive:** routing, redirects, callbacks, email templates, and session creation across all auth flows |
+| 14 | [`docs/memory/`](./memory/) | **Project memory:** implementation status, decisions, pitfalls, and roadmap progress |
 
 **For a quick orientation only** (not a substitute for full reading): read `CURRENT_STATUS.md`, `PRD.md §1`, `Architecture.md §1`, and this document's Source of Truth section below.
 
@@ -111,6 +112,10 @@ These two documents are the definitive implementation blueprints for the content
 ---
 
 ### Operational Guides
+
+#### [`AUTH_FLOW.md`](./AUTH_FLOW.md) — Authentication Flow Specification
+**Owns:** routing, redirects, callbacks, email templates, and session creation across all auth flows.  
+**Use it:** to verify callback parameters and redirect destinations for OAuth, password resets, signup, and login flows.
 
 #### [`Supabase-Migration-Guide.md`](./Supabase-Migration-Guide.md) — Database Migration Runbook
 **Owns:** the safe workflow for making database schema changes via Supabase CLI. This is a *how-to* document, not a *what* document — the schema itself is defined in `Architecture.md §2`.  

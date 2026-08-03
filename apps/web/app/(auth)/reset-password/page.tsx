@@ -57,7 +57,7 @@ function ResetPasswordFormContent() {
         const supabase = createBrowserSupabaseClient()
         const origin = window.location.origin
         const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-          redirectTo: `${origin}/reset-password?mode=update`,
+          redirectTo: `${origin}/api/auth/callback?next=/reset-password%3Fmode%3Dupdate`,
         })
 
         if (error) {
