@@ -13,6 +13,7 @@
     "test:xp": "npx tsx lib/__tests__/xp.test.ts",
     "test:streaks": "npx tsx lib/__tests__/streaks.test.ts",
     "test:radar": "npx tsx lib/__tests__/skillRadar.test.ts",
+    "test:srs": "npx tsx lib/__tests__/srs.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"

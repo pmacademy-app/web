@@ -1,34 +1,47 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { createServerSupabaseClient } from '@/lib/supabase'
+import { getServerUser } from '@/lib/auth'
+import { getReviewQueueData } from '@/lib/flashcards-service'
+import { ReviewHub } from '@/components/review/ReviewHub'
 
 export const metadata: Metadata = {
-  title: 'Review Hub | PM Academy',
-  description: 'Spaced repetition flashcards (SM-2), quiz re-tests, and master glossary search.',
+  title: 'Flashcard Review Hub (SM-2) | PM Academy',
+  description: 'Daily spaced repetition flashcard practice powered by the SM-2 algorithm.',
 }
 
-export default function ReviewHubPage() {
+export default async function ReviewHubPage() {
+  const authUser = await getServerUser()
+  if (!authUser) {
+    redirect('/login')
+  }
+
+  const supabase = createServerSupabaseClient()
+  const queueData = await getReviewQueueData(supabase, authUser.id)
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl space-y-6">
       <div className="border-b border-border pb-4">
         <Link
           href="/dashboard"
-          className="text-xs font-semibold uppercase tracking-wider text-primary hover:underline"
+          className="text-xs font-semibold uppercase tracking-wider text-primary hover:underline inline-flex items-center gap-1"
         >
           ← Back to Dashboard
         </Link>
-        <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground mt-4">
-          Review Hub
+        <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground mt-3">
+          Flashcard Review Hub
         </h1>
         <p className="text-xs text-muted-foreground mt-1">
-          Strengthen your retention loop using spaced repetition.
+          Strengthen your long-term memory retention loop using the SM-2 spaced repetition algorithm.
         </p>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-        <p className="text-sm text-foreground/80 leading-relaxed">
-          Flashcard SRS queue and missed questions re-test area. This page is scaffolded and ready for implementation (Phase 2).
-        </p>
-      </div>
+      <ReviewHub
+        initialDueCards={queueData.dueCards}
+        initialStats={queueData.stats}
+        totalUnlockedCount={queueData.allUnlockedCards.length}
+      />
     </div>
   )
 }
