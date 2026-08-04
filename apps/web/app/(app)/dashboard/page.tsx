@@ -1,17 +1,26 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { getLevelTitle } from '@/lib/xp'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import type { Database } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
-import { calculateSkillRadarScores, SKILL_CLUSTERS } from '@/lib/skillRadar'
-import type { SkillCluster } from '@/types'
+import { getUserXpSummary } from '@/lib/xp-service'
+import { getUserStreakStatus } from '@/lib/streaks-db'
+import { getSkillRadarSummary } from '@/lib/skillRadar'
+import { ContinueLearningCard, NextLessonData } from '@/components/dashboard/ContinueLearningCard'
+import { SkillRadarCard } from '@/components/dashboard/SkillRadarCard'
+import { ProgressRingCard } from '@/components/dashboard/ProgressRingCard'
+import { LevelCard } from '@/components/dashboard/LevelCard'
+import { StreakCard } from '@/components/dashboard/StreakCard'
+import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
+
+interface DBChain {
+  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
+}
 
 export const metadata: Metadata = {
-  title: 'Dashboard | PM Academy',
-  description: 'Track your skill radar, streak, and progress across the 90 PM Academy lessons.',
+  title: 'Dashboard 2.0 | PM Academy',
+  description: 'Track your skill radar, streak, XP rank, and curriculum progress across PM Academy.',
 }
 
 export default async function DashboardPage() {
@@ -22,7 +31,7 @@ export default async function DashboardPage() {
 
   const supabase = createServerSupabaseClient()
 
-  // Fetch the public.users record
+  // 1. Fetch & ensure user profile
   const { data: dbProfile, error: dbError } = await supabase
     .from('users')
     .select('*')
@@ -35,7 +44,6 @@ export default async function DashboardPage() {
     console.error('[dashboard] Error loading database profile:', dbError.message)
   }
 
-  // Initialize profile if not found
   if (!profile) {
     profile = await ensureUserProfile(supabase, authUser)
     if (!profile) {
@@ -43,19 +51,40 @@ export default async function DashboardPage() {
     }
   }
 
-  // Fetch user lesson progress and curriculum details
-  const { data: progressRows } = await supabase
-    .from('user_lesson_progress')
-    .select('*')
-    .eq('user_id', authUser.id) as unknown as { data: Database['public']['Tables']['user_lesson_progress']['Row'][] | null }
+  // 2. Parallel data fetching from Services
+  const [
+    { data: progressRows },
+    curriculum,
+    xpSummary,
+    streakStatus,
+    radarSummary,
+    { data: recentXpEvents },
+  ] = await Promise.all([
+    supabase
+      .from('user_lesson_progress')
+      .select('*')
+      .eq('user_id', authUser.id) as unknown as {
+      data: Database['public']['Tables']['user_lesson_progress']['Row'][] | null
+    },
+    fetchCurriculumData(),
+    getUserXpSummary(supabase, authUser.id),
+    getUserStreakStatus(supabase, authUser.id),
+    getSkillRadarSummary(supabase, authUser.id),
+    (supabase
+      .from('xp_events') as unknown as DBChain)
+      .select('*')
+      .eq('user_id', authUser.id)
+      .order('created_at', { ascending: false })
+      .limit(5) as unknown as {
+      data: { id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }[] | null
+    },
+  ])
 
-  const curriculum = await fetchCurriculumData()
   const curriculumLessons = curriculum?.lessons ?? []
-
   const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0
 
-  // Find the first incomplete lesson in curriculum order
-  let nextLesson = null
+  // 3. Find next lesson in curriculum order
+  let nextLesson: NextLessonData | null = null
   if (curriculumLessons.length > 0) {
     const completedIds = new Set(
       progressRows
@@ -74,164 +103,122 @@ export default async function DashboardPage() {
     }
   }
 
-  // Helper to map module slugs to competency clusters (1-2 per lesson)
-  const getClustersForModule = (moduleSlug: string): SkillCluster[] => {
-    switch (moduleSlug) {
-      case 'discovery':
-        return ['discovery']
-      case 'design':
-        return ['design']
-      case 'strategy':
-        return ['strategy']
-      case 'execution':
-        return ['execution']
-      case 'growth':
-        return ['growth']
-      case 'leadership':
-        return ['leadership']
-      case 'technical':
-        return ['technical']
-      case 'foundations':
-        return ['discovery', 'strategy']
-      case 'capstone':
-        return ['execution', 'strategy']
-      default:
-        return []
-    }
-  }
+  // 4. Map recent activity items
+  const recentActivities: ActivityItem[] = (recentXpEvents || []).map((event) => {
+    let title = 'XP Earned'
+    let description = `Earned ${event.xp_amount} XP`
+    let type: ActivityItem['type'] = 'xp_earned'
 
-  const radarInputs = curriculumLessons.map((lesson) => {
-    const progress = progressRows?.find((p) => p.lesson_id === lesson.id)
+    if (event.source_type === 'theory_read') {
+      title = 'Lesson Theory Read'
+      description = 'Completed engaged theory reading'
+      type = 'lesson_completed'
+    } else if (event.source_type === 'quiz_correct') {
+      title = 'Quiz Score Awarded'
+      description = 'Passed practice quiz question'
+      type = 'quiz_completed'
+    } else if (event.source_type === 'streak') {
+      title = 'Daily Streak Maintained'
+      description = 'Logged daily study activity'
+      type = 'streak_maintained'
+    }
+
+    const dateStr = new Date(event.created_at).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    })
+
     return {
-      lessonSlug: lesson.slug,
-      status: (progress?.status ?? 'not_started') as 'not_started' | 'in_progress' | 'completed',
-      quizScore: progress?.quiz_score ?? null,
-      skillClusters: getClustersForModule(lesson.module),
+      id: event.id,
+      type,
+      title,
+      description,
+      xpAmount: event.xp_amount,
+      timestamp: dateStr,
     }
   })
 
-  const skillValues = calculateSkillRadarScores(radarInputs)
-
-  const user = {
-    name: profile.name || 'Learner',
-    level: profile.level,
-    title: getLevelTitle(profile.level),
-    totalXp: profile.total_xp,
-    streak: profile.current_streak,
-    completedLessons,
-    nextLesson,
-    skillValues,
+  // Determine completed modules count (modules with 100% completed lessons)
+  const moduleLessonCounts = new Map<string, { total: number; completed: number }>()
+  for (const lesson of curriculumLessons) {
+    const current = moduleLessonCounts.get(lesson.module) || { total: 0, completed: 0 }
+    const isCompleted = progressRows?.some(
+      (p) => p.lesson_id === lesson.id && p.status === 'completed'
+    )
+    moduleLessonCounts.set(lesson.module, {
+      total: current.total + 1,
+      completed: current.completed + (isCompleted ? 1 : 0),
+    })
   }
 
+  let completedModules = 0
+  for (const stats of moduleLessonCounts.values()) {
+    if (stats.total > 0 && stats.completed === stats.total) {
+      completedModules += 1
+    }
+  }
+
+  const levelTitle = xpSummary.levelInfo.title
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl space-y-8">
+    <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card border border-border rounded-xl p-6 shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card border border-border rounded-2xl p-6 shadow-sm">
         <div>
           <span className="text-xs uppercase tracking-wider font-semibold text-primary">
-            Level {user.level} — {user.title}
+            Level {xpSummary.levelInfo.level} — {levelTitle}
           </span>
           <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground mt-1">
-            Welcome back, {user.name} 👋
+            Welcome back, {profile.name || 'Learner'} 👋
           </h1>
           {profile.goal && (
             <p className="text-xs text-muted-foreground/80 mt-1 uppercase tracking-wider font-medium">
               Goal: {profile.goal.replace('_', ' ')}
             </p>
           )}
-          <p className="text-xs text-muted-foreground mt-1">
-            {user.totalXp} XP • {user.completedLessons}/90 Lessons Completed
-          </p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-semibold">
-            🔥 {user.streak} Day Streak
+            🔥 {streakStatus.effectiveCurrentStreak} Day Streak
           </div>
         </div>
       </div>
 
-      {/* Hero CTA: Next Lesson */}
-      <div className="rounded-xl border border-primary/30 bg-primary/5 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
-        {user.nextLesson ? (
-          <>
-            <div>
-              <span className="text-xs font-semibold uppercase text-primary tracking-wider">
-                Up Next
-              </span>
-              <h2 className="text-xl font-bold font-serif text-foreground mt-1">
-                Lesson {user.nextLesson.order}: {user.nextLesson.title}
-              </h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Est. Time: {user.nextLesson.estimatedTime} • Theory + Practice Quiz
-              </p>
-            </div>
-            <Link
-              href={`/academy/${user.nextLesson.module}/${user.nextLesson.id}`}
-              className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
-            >
-              Start Lesson →
-            </Link>
-          </>
-        ) : (
-          <>
-            <div>
-              <span className="text-xs font-semibold uppercase text-primary tracking-wider">
-                Congratulations!
-              </span>
-              <h2 className="text-xl font-bold font-serif text-foreground mt-1">
-                All Lessons Completed 👑
-              </h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                You have completed all 90 lessons in the PM Academy curriculum!
-              </p>
-            </div>
-            <Link
-              href="/academy"
-              className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors"
-            >
-              Curriculum Board →
-            </Link>
-          </>
-        )}
+      {/* 1. Continue Learning (Hero CTA) */}
+      <ContinueLearningCard
+        nextLesson={nextLesson}
+        totalLessonsCompleted={completedLessons}
+      />
+
+      {/* 2. Skill Radar (Primary Visual Hero Element) */}
+      <SkillRadarCard
+        skillValues={radarSummary.scores}
+        breakdown={radarSummary.breakdown}
+        overallScore={radarSummary.overallScore}
+      />
+
+      {/* 3, 4, 5. Three-Column Metrics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <ProgressRingCard
+          completedLessons={completedLessons}
+          totalLessons={90}
+          completedModules={completedModules}
+          totalModules={9}
+        />
+
+        <LevelCard
+          level={xpSummary.levelInfo.level}
+          totalXp={xpSummary.totalXp}
+        />
+
+        <StreakCard
+          streakStatus={streakStatus}
+        />
       </div>
 
-      {/* Skill Radar Section (Primary Visual Focus) */}
-      <div className="rounded-xl border border-border bg-card p-6 md:p-8 shadow-sm">
-        <div className="mb-6">
-          <h2 className="text-xl font-bold font-serif text-foreground">
-            Competency Skill Radar
-          </h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            Your progress across 7 PM skill clusters, updated automatically as you complete quizzes & capstones.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {SKILL_CLUSTERS.map((cluster) => {
-            const val = user.skillValues[cluster.id as keyof typeof user.skillValues] || 0
-            return (
-              <div key={cluster.id} className="rounded-lg bg-secondary/40 p-4 border border-border/50">
-                <span className="text-xs font-semibold text-muted-foreground">
-                  {cluster.label}
-                </span>
-                <div className="flex items-baseline justify-between mt-2">
-                  <span className="text-2xl font-bold text-primary">{val}%</span>
-                  <span className="text-[10px] uppercase font-semibold text-muted-foreground">
-                    {val >= 70 ? 'Advanced' : val >= 30 ? 'Intermediate' : 'Beginner'}
-                  </span>
-                </div>
-                <div className="w-full bg-border rounded-full h-1.5 mt-2 overflow-hidden">
-                  <div
-                    className="bg-primary h-1.5 rounded-full transition-all"
-                    style={{ width: `${val}%` }}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      {/* 6. Recent Activity Feed */}
+      <RecentActivityCard activities={recentActivities} />
     </div>
   )
 }
