@@ -242,9 +242,9 @@ All pushes to `main` undergo automated quality assurance via GitHub Actions (`.g
 
 ## 10. Phase Roadmap
 
-*   **Phase 1 (Core learning Loop):** Complete ✅ — Lesson renderer, quiz flow, secure server verification, custom templates.
-*   **Phase 2 (Gamification Layer):** Active 🏗️ — Wired radar competency tracking, XP ledger system. Flashcard queues and placement stubs pending.
-*   **Phase 3 (Depth & Retention):** Planned — Cohorts, capstones, certifications, automated digests.
+*   **Phase 1 (Core Learning Loop):** Complete ✅ — Lesson renderer, quiz flow, secure server verification, custom templates.
+*   **Phase 2 (Gamification Layer):** Complete ✅ — XP Engine, Timezone-aware Streak Engine, Continuous 0–100 Skill Radar, Dashboard 2.0, and SM-2 Flashcard Review Hub (`v0.2.0-phase2-complete`).
+*   **Phase 3 (Social & Portfolio Infrastructure):** Current Focus 🎯 — Public Portfolios (`/p/[username]`), Capstones, Peer Feedback, Leaderboards.
 *   **Phase 4 (Hardening & SEO):** Planned — Accessibility validations, search overlays, speed optimizations.
 
 ---

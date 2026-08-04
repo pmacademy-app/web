@@ -6,13 +6,13 @@
 
 ---
 
-## Current Status (as of 2026-08-02)
+## Current Status (as of 2026-08-05)
 
 ```
 Phase 0 — Foundation          ████████████████████████████████  Complete ✅
 Phase 1 (Core MVP & v2)       ████████████████████████████████  Complete ✅ — v1.0.0-foundation Release
-Phase 2 — Gamification Layer  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Active Development Stage 🏗️
-Phase 3 — Depth & Retention   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Not Started
+Phase 2 — Gamification Layer  ████████████████████████████████  Complete ✅ — v0.2.0-phase2-complete Release
+Phase 3 — Depth & Retention   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Active Development Stage 🎯
 Phase 4 — Polish & SEO        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Not Started
 Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Not Started
 ```
@@ -20,6 +20,7 @@ Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░
 ---
 
 ## Phase 0 — Foundation ✅
+
 
 **Status:** Complete.
 
@@ -56,29 +57,19 @@ Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░
 
 ---
 
-## Phase 2 — Gamification Layer (In Progress ⚠️)
+## Phase 2 — Gamification Layer ✅
 
-**Status:** Logic modules built and tested. Dashboard and UI integration pending.
+**Status:** Complete (`v0.2.0-phase2-complete`). All 5 Sprints fully built, tested, integrated, and verified.
 
 ### Completed Items
-- [x] XP ledger schema: `xp_events` table, SQL triggers recompute `users.total_xp` and `users.level`
-- [x] XP service: `lib/xp-service.ts` writes events correctly
-- [x] XP constants & level titles: `lib/xp.ts`, `getLevelTitle()` consolidated
-- [x] Streak calculation engine: `lib/streaks.ts` (pure, timezone-aware)
-- [x] Streak DB operations: `lib/streaks-db.ts`
-- [x] Skill radar formula: `lib/skillRadar.ts`, 7-cluster competency model defined
-- [x] Flashcard SRS: `lib/srs.ts` (pure SM-2) + `lib/flashcards-service.ts` (DB orchestration)
-
-### Remaining for Phase 2 Completion
-- [ ] **Flashcard Review Hub:** Build the review queue screen at `/review`. Currently a stub. Tie it to `flashcards-service.ts` and the `user_flashcard_srs` table.
-- [ ] **Placement quiz:** Add the onboarding assessment flow that seeds the skill radar. See `PRD.md §4.1` and `Phases.md Phase 2`.
-
-### Completed Phase 2 Items (Integrated in Phase 1.5)
-- [x] **Dashboard integration:** Wired `dashboard/page.tsx` to fetch real XP, level, streak, and completed lesson counts from Supabase.
-- [x] **Skill radar UI:** Connected the radar chart component to `lib/skillRadar.ts` scores computed from real progress data using a robust module-to-competency mapping.
+- [x] **Sprint 1 (XP & Level Engine):** `lib/xp.ts`, `lib/xp-service.ts`, append-only `xp_events`, anti-gaming read checks, 15/15 unit tests passing.
+- [x] **Sprint 2 (Streak Engine):** `lib/streaks.ts`, `lib/streaks-db.ts`, timezone-aware calculation, earned freeze recovery, 16/16 unit tests passing.
+- [x] **Sprint 3 (Skill Radar Engine):** `lib/skillRadar.ts`, continuous 0–100 competency scoring model, 7-cluster curriculum mapping, 11/11 unit tests passing.
+- [x] **Sprint 4 (Dashboard 2.0):** `app/(app)/dashboard/page.tsx`, `components/dashboard/` suite (ContinueLearning, SkillRadar, ProgressRing, Level, Streak, RecentActivity), visual hero integration.
+- [x] **Sprint 5 (Flashcard Review Hub):** `lib/srs.ts`, `lib/flashcards-service.ts`, `app/api/review/queue/route.ts`, `app/(app)/review/page.tsx`, `components/review/` suite (Flashcard 3D flip, QualitySelector 0–5, ReviewProgress, ReviewStats, EmptyState, ReviewComplete), 10/10 unit tests passing.
 
 ### Definition of Done (from `Phases.md`)
-> A returning user sees accurate XP, level/title, streak, and a skill radar that updates immediately after each lesson/quiz. Flashcard review sessions correctly schedule next-review dates per SM-2.
+> A returning user sees accurate XP, level/title, streak, and a skill radar that updates immediately after each lesson/quiz. Flashcard review sessions correctly schedule next-review dates per SM-2. ✅ VERIFIED.
 
 ---
 
