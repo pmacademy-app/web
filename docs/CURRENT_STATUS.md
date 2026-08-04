@@ -8,9 +8,9 @@
 ## 1. Repository Metadata
 
 - **Current Branch:** `main`
-- **Current Version:** `0.1.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
-- **Last Successful Build:** 2026-08-03 (Next.js 16 App Router production build - clean, 0 errors, 29 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 1.6: Foundation Finalization & Production Polish — **COMPLETE** (Polish tag applied)
+- **Current Version:** `0.2.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
+- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build - clean, 0 errors, 35 routes, 90 lessons compiled)
+- **Current Implementation Phase:** Phase 2: Gamification & Retention Engines — **COMPLETE** (`v0.2.0-phase2-complete` tag applied)
 
 ---
 
@@ -18,30 +18,24 @@
 
 For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roadmap.md`](./memory/roadmap.md).
 
-- **Phase 1.1 Content Pipeline Foundation:** ✅ Complete
-- **Phase 1.2 Renderer Foundation:** ✅ Complete
-- **Phase 1.3 Migration & Integration Foundation:** ✅ Complete
-- **Phase 1.4 Legacy Cleanup & Finalization:** ✅ Complete
-- **Phase 1.5 Sprint 1 Runtime & Navigation:** ✅ Complete
-- **Phase 1.5 Sprint 2 Learning Flow (Flashcard SRS + Lesson Nav):** ✅ Complete
-- **Phase 1.5 Sprint 3 Content & Curriculum Experience:** ✅ Complete
-- **Phase 1.5 Sprint 4 Curriculum Integrity & Content Consistency:** ✅ Complete
-- **Phase 1.5 Sprint 5 Production Readiness & 90-Lesson Audit:** ✅ Complete
-- **Phase 1.5 Sprint 6 Performance & Infrastructure Optimization:** ✅ Complete
-- **Phase 1.5 Sprint 7 Release Candidate Blockers:** ✅ Complete
-- **Phase 1.6 Foundation Finalization & Production Polish:** ✅ Complete
-- **Current Focus:** **Phase 2** - ready to begin.
+- **Phase 1 Foundation & Learning Loop:** ✅ Complete
+- **Phase 2 – Sprint 1 (XP & Level Engine):** ✅ Complete
+- **Phase 2 – Sprint 2 (Streak System & Timezone Engine):** ✅ Complete
+- **Phase 2 – Sprint 3 (Skill Radar & Competency Engine):** ✅ Complete
+- **Phase 2 – Sprint 4 (Dashboard 2.0 & Visual Layout):** ✅ Complete
+- **Phase 2 – Sprint 5 (Flashcard Review Hub & SM-2 Spaced Repetition):** ✅ Complete
+- **Current Focus:** **Phase 3** (Social & Portfolio Infrastructure) — ready to begin.
 
 ---
 
 ## 3. What's Next
 
-Phase 1.5 is complete. The application is production-ready. The next focus is **Phase 2**:
+Phase 2 is complete. The gamification and retention engine is fully operational. The next focus is **Phase 3**:
 
-1. **[Phase 2] Gamification Layer:** XP leaderboard persistence, streak recovery mechanics, skill-radar visualisation.
-2. **[Phase 2] Social / Portfolio:** Public profile pages (`/p/[username]`) with earned badges and completed modules.
-3. **[Phase 2] Capstone Projects:** End-of-module capstone submission and peer review flows.
-4. **[Phase 2] Email Notifications:** Resend-powered streak reminders, weekly digests, flashcard review nudges.
+1. **[Phase 3] Public Profile & Portfolio:** Public profile pages (`/p/[username]`) with shareable skill radar, earned titles, and completed module credentials.
+2. **[Phase 3] Capstone Project Submissions:** End-of-module capstone workspace, artifact upload, and submission evaluation flows.
+3. **[Phase 3] Peer Review & Feedback Engine:** Structured peer feedback and evaluation criteria.
+4. **[Phase 3] Leaderboards & Social Feeds:** Weekly/all-time XP leaderboards and cohort activity feed.
 
 ---
 
