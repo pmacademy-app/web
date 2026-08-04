@@ -135,7 +135,15 @@ Each feature below states **what it must do**, **what "done" looks like**, and *
 - **Non-goal:** streak-based monetization of any kind, ever (see §10 exclusions).
 
 ### 4.8 Skill Radar
-- **Requirement:** every lesson tagged with 1–2 of the 7 competency clusters (§3). Dashboard renders a radar/spider chart aggregating lesson completion + quiz performance per cluster into a proficiency level (Beginner/Intermediate/Advanced per cluster, or a continuous 0–100 score — decide and lock in during Phase 1 design, document the final scoring formula here once chosen).
+- **Requirement:** every lesson tagged with 1–2 of the 7 competency clusters (§3). Dashboard renders a radar/spider chart aggregating lesson completion + quiz performance per cluster into a continuous 0–100 score.
+- **Scoring Formula (Locked in Sprint 3):**
+  $$\text{Lesson Contribution} = \text{TheoryRead} \times 40 + \left(\frac{\text{QuizScore}}{100} \times 50\right) + \text{PerfectFirstAttemptBonus} \times 10$$
+  - Theory Read Completion: 40% weight (40 points per lesson)
+  - Quiz Performance: 50% weight (up to 50 points per lesson scaled by quiz score %)
+  - First-Attempt 100% Perfect Quiz Bonus: 10% weight (10 bonus points)
+  - In-Progress Lesson: 20 points
+  - Cluster Score ($0\text{--}100$) = Normalized average of total points earned over total potential points for that cluster ($0\text{--}100$).
+  - Breakdown Levels: `Beginner` ($<30\%$), `Intermediate` ($30\text{--}59\%$), `Advanced` ($60\text{--}84\%$), `Master` ($\ge 85\%$).
 - **Done when:** the radar updates immediately after each lesson/quiz/capstone completion and is the single most prominent element on the dashboard (above streak, above XP).
 - **This is the core differentiator** — do not deprioritize this feature relative to badges/leaderboard if timeline pressure forces cuts.
 
@@ -264,7 +272,7 @@ Track unresolved product decisions here so context is never lost between session
 |---|---|---|
 | 9 vs. 10 modules | **Resolved: 9 modules.** | Locked in. Every downstream document (`Architecture.md` §2/§4, `Design.md`, `Phases.md`, and both marketing/content sprint docs) already builds on 9 modules × 10 lessons = 90 — this was de facto decided by implementation drift even while this table still said "Open." Formally closing it here so no future contributor reopens it. |
 | **AI Mentor** | **Resolved: cut from v1 entirely.** | Was found unscoped in the (now-archived) marketing/content sprint docs — an entire homepage section, FAQ answer, footer link, and hero copy line built around a chat-based AI mentor that never existed in this PRD's feature list, `Architecture.md`'s stack, or `Phases.md`'s roadmap, and directly contradicted §6's non-goal against AI-generated content. It also breaks the $0-infra-cost principle (`Architecture.md` §1) — LLM API calls have no meaningful free tier at real usage volume, unlike the rest of this stack. Treated the same way §10 treats monetization: deferred to Phase 7+, to be built only once the free core is proven and only with a real cost model, never as launch-week marketing copy for a feature engineering hasn't built. All "AI Mentor"/"AI-assisted" copy has been stripped from launch-facing content; the archived docs still contain leftover references — do not resurrect them without re-adding this as a real, budgeted feature first.
-| Skill radar scoring formula (discrete Beginner/Intermediate/Advanced vs. continuous 0–100) | Open | Lock in during Phase 1 design (see `Phases.md`), then document the final formula in this PRD §4.8. |
+| Skill radar scoring formula | **Resolved: Continuous 0–100 score.** | Locked in Sprint 3 (`lib/skillRadar.ts`). Formula: $40\%$ theory read + $50\%$ quiz performance + $10\%$ first-attempt perfect bonus. Documented in §4.8. |
 | Exact XP thresholds per level/title | Open | Tune during closed beta (Phase 4); §4.6 sequence is fixed, numeric thresholds are not. |
 | Expert-reviewed-AI capstone feedback (§10.1) — build in-house or use an LLM API directly | Deferred | Not a v1 decision; revisit only once free core is proven per §10's ordering. Note: if AI Mentor (above) is greenlit, evaluate both together — they'd likely share the same LLM-API cost/vendor decision rather than being solved twice. |
 
@@ -272,6 +280,7 @@ Track unresolved product decisions here so context is never lost between session
 
 ## Changelog
 
+- v2.4 — Phase 2 Completion: Resolved Skill Radar scoring formula as continuous 0–100 weighted model in §4.8 and §11. Documented XP Engine, Timezone-Aware Streak System, Skill Radar, Dashboard 2.0, and SM-2 Flashcard Review Hub implementations.
 - v2.3 — Added `content-pipeline.md` and `rendering-pipeline.md` as companion docs. Updated §3's content-model description: lessons are no longer described as having a "fixed section structure" parsed by a single schema — they use the existing, already-consistent authoring conventions (Learning Path table, Quiz, Flashcards, Glossary, Connections, etc.), compiled into a richer block tree by the new content pipeline; no product-level requirement changed, only the wording that referred to the now-superseded flat-schema description in `Architecture.md`. Updated §5's NFR table to point to `content-pipeline.md` as the authoritative pipeline reference.
 - v2.2 — Lean-documentation pass: resolved AI Mentor as cut from v1 (was Open in v2.1). Added the "current decision unless justified" framing to this doc's intro. MVP-trimmed onboarding (§4.1) — removed the scored placement quiz from Phase 1 since it existed only to seed the skill radar, which doesn't exist until Phase 2; moved it there instead. Noted the archive of the original roadmap and three sprint docs (now `archive/`, superseded by the lean 5-doc set — see `Design.md`'s changelog for what was preserved from them).
 - v2.1 — Documentation review pass: closed the 9-vs-10 modules decision (resolved: 9, per downstream doc consistency). Added critical Open Decision on the "AI Mentor" feature found unscoped in the marketing/content sprint docs — contradicts §6's non-goal and is absent from Architecture/Phases; flagged as launch-blocking until resolved.
