@@ -61,7 +61,16 @@ export function Footer() {
         {/* Footer bottom */}
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-body-sm text-locked">
-            © {currentYear} PM Academy. Built to make serious PM education accessible.
+            © {currentYear} PM Academy. Built by{" "}
+            <Link
+              href="https://adityagangwani.me"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-foreground font-medium"
+            >
+              Aditya Gangwani
+            </Link>{" "}
+            to make serious PM education accessible.
           </p>
           <p className="text-body-sm text-locked">
             Free core curriculum. No paywalled lessons.

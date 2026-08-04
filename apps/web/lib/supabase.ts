@@ -33,6 +33,7 @@ export type Database = {
           streak_freezes_available: number
           total_xp: number
           level: number
+          last_streak_date?: string | null
           created_at: string
         }
         Insert: {
@@ -45,6 +46,7 @@ export type Database = {
           current_streak?: number
           longest_streak?: number
           streak_freezes_available?: number
+          last_streak_date?: string | null
           total_xp?: number
           level?: number
           created_at?: string
