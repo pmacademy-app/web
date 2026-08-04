@@ -11,6 +11,7 @@
     "test:compiler": "npx tsx ../../scripts/compiler/tests/compiler.test.ts",
     "test:parity": "npx tsx ../../scripts/compiler/tests/compare-v1-v2.ts",
     "test:xp": "npx tsx lib/__tests__/xp.test.ts",
+    "test:streaks": "npx tsx lib/__tests__/streaks.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"

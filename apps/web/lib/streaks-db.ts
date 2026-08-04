@@ -1,50 +1,81 @@
-import { createServerSupabaseClient } from '@/lib/supabase'
-import { getLocalDateString, recordActivityStreak, StreakData } from '@/lib/streaks'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/supabase'
+import {
+  getLocalDateString,
+  recordActivityStreak,
+  getStreakStatusSummary,
+  StreakData,
+  StreakStatusSummary,
+} from '@/lib/streaks'
 import { XP_VALUES } from '@/lib/xp'
-import { awardXp } from '@/lib/xp-service'
+import { awardXp, hasXpEvent } from '@/lib/xp-service'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
 }
 
+export interface WeeklySummaryData {
+  daysStudied: number
+  currentStreak: number
+  longestStreak: number
+  streakFreezesAvailable: number
+  lessonsCompleted: number
+  totalXpEarned: number
+  dailyActivityMap: { date: string; studied: boolean; xpEarned: number }[]
+}
+
 /**
- * Updates a user's streak in the database and logs a streak maintenance XP event if applicable.
+ * Atomic processing of streak calculations when a user completes a qualifying learning activity.
+ * Updates user streak fields and awards daily streak XP idempotently.
  */
 export async function updateUserStreak(
-  supabase: ReturnType<typeof createServerSupabaseClient>,
+  supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<void> {
   try {
-    // 1. Fetch user profile
-    const { data: userProfile, error: profileError } = (await supabase
-      .from('users')
-      .select('*')
+    // 1. Fetch user profile with last_streak_date
+    const { data: userProfile, error: profileError } = (await (supabase
+      .from('users') as unknown as DBChain)
+      .select('timezone, current_streak, longest_streak, streak_freezes_available, last_streak_date')
       .eq('id', userId)
-      .single()) as unknown as { data: { timezone: string; current_streak: number; longest_streak: number; streak_freezes_available: number } | null; error: unknown }
+      .single()) as unknown as {
+      data: {
+        timezone: string
+        current_streak: number
+        longest_streak: number
+        streak_freezes_available: number
+        last_streak_date?: string | null
+      } | null
+      error: unknown
+    }
 
     if (profileError || !userProfile) {
       console.error('[streaks-db] Error fetching user profile for streak:', profileError)
       return
     }
 
-    const { timezone, current_streak, longest_streak, streak_freezes_available } = userProfile
+    const {
+      timezone,
+      current_streak,
+      longest_streak,
+      streak_freezes_available,
+      last_streak_date,
+    } = userProfile
 
-    // 2. Fetch the most recent xp_event to find the last activity date
-    const { data: lastEvent, error: eventError } = (await supabase
-      .from('xp_events')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()) as unknown as { data: { created_at: string } | null; error: unknown }
+    // Fallback: If last_streak_date is missing, fetch from recent xp_events
+    let lastActivityDate = last_streak_date || ''
+    if (!lastActivityDate) {
+      const { data: lastEvent } = (await (supabase
+        .from('xp_events') as unknown as DBChain)
+        .select('created_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()) as unknown as { data: { created_at: string } | null; error: unknown }
 
-    if (eventError) {
-      console.error('[streaks-db] Error fetching last xp event for streak:', eventError)
-    }
-
-    let lastActivityDate = ''
-    if (lastEvent?.created_at) {
-      lastActivityDate = getLocalDateString(timezone, new Date(lastEvent.created_at))
+      if (lastEvent?.created_at) {
+        lastActivityDate = getLocalDateString(timezone, new Date(lastEvent.created_at))
+      }
     }
 
     const currentStreakData: StreakData = {
@@ -56,16 +87,16 @@ export async function updateUserStreak(
 
     const now = new Date()
     const result = recordActivityStreak(currentStreakData, timezone, now)
-    const todayStr = getLocalDateString(timezone, now)
 
-    // 3. Update DB if the activity date changed
-    if (lastActivityDate !== todayStr) {
+    // Update DB if streak was incremented or date changed
+    if (result.streakIncremented || lastActivityDate !== result.todayStr) {
       const { error: updateError } = await (supabase
         .from('users') as unknown as DBChain)
         .update({
           current_streak: result.currentStreak,
           longest_streak: result.longestStreak,
           streak_freezes_available: result.streakFreezesAvailable,
+          last_streak_date: result.todayStr,
         })
         .eq('id', userId)
 
@@ -73,18 +104,23 @@ export async function updateUserStreak(
         console.error('[streaks-db] Error updating user streak fields:', updateError)
       }
 
-      // 4. Award XP for maintaining streak
+      // Award daily streak XP using Sprint 1 XP engine with date-specific source_id for idempotency
       if (result.streakIncremented) {
-        try {
-          await awardXp(
-            supabase,
-            userId,
-            'streak',
-            XP_VALUES.DAILY_STREAK_BASE,
-            `streak-${result.currentStreak}`
-          )
-        } catch (xpError) {
-          console.error('[streaks-db] Error logging streak XP event:', xpError)
+        const streakSourceId = `streak-${result.todayStr}`
+        const alreadyAwardedToday = await hasXpEvent(supabase, userId, 'streak', streakSourceId)
+
+        if (!alreadyAwardedToday) {
+          try {
+            await awardXp(
+              supabase,
+              userId,
+              'streak',
+              XP_VALUES.DAILY_STREAK_BASE,
+              streakSourceId
+            )
+          } catch (xpError) {
+            console.error('[streaks-db] Error logging streak XP event:', xpError)
+          }
         }
       }
     }
@@ -92,3 +128,148 @@ export async function updateUserStreak(
     console.error('[streaks-db] Unhandled error in updateUserStreak:', err)
   }
 }
+
+/**
+ * Fetches passive streak status summary for user dashboard and headers.
+ */
+export async function getUserStreakStatus(
+  supabase: SupabaseClient<Database>,
+  userId: string
+): Promise<StreakStatusSummary> {
+  const { data: userProfile, error: profileError } = (await (supabase
+    .from('users') as unknown as DBChain)
+    .select('timezone, current_streak, longest_streak, streak_freezes_available, last_streak_date')
+    .eq('id', userId)
+    .single()) as unknown as {
+    data: {
+      timezone: string
+      current_streak: number
+      longest_streak: number
+      streak_freezes_available: number
+      last_streak_date?: string | null
+    } | null
+    error: unknown
+  }
+
+  if (profileError || !userProfile) {
+    return {
+      status: 'not_started',
+      effectiveCurrentStreak: 0,
+      longestStreak: 0,
+      streakFreezesAvailable: 0,
+      isTodayCompleted: false,
+      lastActivityDate: '',
+      daysSinceLastActivity: 0,
+      statusMessage: 'Start your first streak today by completing a lesson!',
+    }
+  }
+
+  const { timezone, current_streak, longest_streak, streak_freezes_available, last_streak_date } = userProfile
+
+  let lastActivityDate = last_streak_date || ''
+  if (!lastActivityDate) {
+    const { data: lastEvent } = (await (supabase
+      .from('xp_events') as unknown as DBChain)
+      .select('created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()) as unknown as { data: { created_at: string } | null; error: unknown }
+
+    if (lastEvent?.created_at) {
+      lastActivityDate = getLocalDateString(timezone, new Date(lastEvent.created_at))
+    }
+  }
+
+  const streakData: StreakData = {
+    currentStreak: current_streak,
+    longestStreak: longest_streak,
+    streakFreezesAvailable: streak_freezes_available,
+    lastActivityDate,
+  }
+
+  return getStreakStatusSummary(streakData, timezone, new Date())
+}
+
+/**
+ * Generates backend weekly recap summary data over the past 7 local days.
+ * Prepares data layer for future weekly email summaries.
+ */
+export async function getWeeklySummary(
+  supabase: SupabaseClient<Database>,
+  userId: string
+): Promise<WeeklySummaryData> {
+  const statusSummary = await getUserStreakStatus(supabase, userId)
+  
+  // Fetch user timezone
+  const { data: user } = (await (supabase
+    .from('users') as unknown as DBChain)
+    .select('timezone')
+    .eq('id', userId)
+    .single()) as unknown as { data: { timezone: string } | null }
+
+  const timezone = user?.timezone || 'UTC'
+  const now = new Date()
+
+  // Generate 7-day date window in user timezone (from 6 days ago to today)
+  const past7Days: string[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * 84600000)
+    past7Days.push(getLocalDateString(timezone, d))
+  }
+
+  // Fetch XP events in past 7 days
+  const sevenDaysAgoIso = new Date(now.getTime() - 8 * 84600000).toISOString()
+  const { data: xpEvents } = (await (supabase
+    .from('xp_events') as unknown as DBChain)
+    .select('source_type, xp_amount, created_at')
+    .eq('user_id', userId)
+    .gte('created_at', sevenDaysAgoIso)) as unknown as {
+    data: { source_type: string; xp_amount: number; created_at: string }[] | null
+  }
+
+  // Fetch completed lessons in past 7 days
+  const { data: progressRows } = (await (supabase
+    .from('user_lesson_progress') as unknown as DBChain)
+    .select('lesson_id, status, completed_at')
+    .eq('user_id', userId)
+    .eq('status', 'completed')
+    .gte('completed_at', sevenDaysAgoIso)) as unknown as {
+    data: { lesson_id: string; status: string; completed_at: string }[] | null
+  }
+
+  const events = xpEvents || []
+  const completedLessons = progressRows || []
+
+  // Map activity per day
+  const dailyXpMap = new Map<string, number>()
+  let totalXpEarned = 0
+
+  for (const event of events) {
+    const eventDate = getLocalDateString(timezone, new Date(event.created_at))
+    dailyXpMap.set(eventDate, (dailyXpMap.get(eventDate) || 0) + (event.xp_amount || 0))
+    totalXpEarned += event.xp_amount || 0
+  }
+
+  const dailyActivityMap = past7Days.map((dateStr) => {
+    const xp = dailyXpMap.get(dateStr) || 0
+    return {
+      date: dateStr,
+      studied: xp > 0,
+      xpEarned: xp,
+    }
+  })
+
+  const daysStudied = dailyActivityMap.filter((d) => d.studied).length
+
+  return {
+    daysStudied,
+    currentStreak: statusSummary.effectiveCurrentStreak,
+    longestStreak: statusSummary.longestStreak,
+    streakFreezesAvailable: statusSummary.streakFreezesAvailable,
+    lessonsCompleted: completedLessons.length,
+    totalXpEarned,
+    dailyActivityMap,
+  }
+}
+
