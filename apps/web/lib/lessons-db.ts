@@ -4,8 +4,9 @@ import { verifyTheoryReadEngagement, XP_VALUES } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
-import { awardXp } from '@/lib/xp-service'
+import { awardXp, hasXpEvent } from '@/lib/xp-service'
 import { completeLesson } from '@/lib/lessons-completion-service'
+
 
 type ProgressRow = Database['public']['Tables']['user_lesson_progress']['Row']
 type ReflectionRow = Database['public']['Tables']['reflections']['Row']
@@ -55,14 +56,7 @@ export async function recordTheoryReadAction(
   }
 
   // Check ledger for existing theory_read event first to ensure idempotency
-  const { data: existingRead } = await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .select('id')
-    .eq('user_id', userId)
-    .eq('source_type', 'theory_read')
-    .eq('source_id', lessonId)
-    .limit(1)
-    .maybeSingle() as unknown as { data: { id: string } | null; error: unknown }
+  const existingRead = await hasXpEvent(supabase, userId, 'theory_read', lessonId)
 
   // 3. Retrieve current progress
   const { data: progress, error: fetchError } = (await (supabase
@@ -211,16 +205,8 @@ export async function recordQuizAttemptAction(
   // 5. Award perfect score bonus on first attempt only (with ledger guard)
   let perfectBonusXp = 0
   if (isFirstAttempt && correctCount === totalQuestions) {
-    const { data: existingBonus } = await (supabase
-      .from('xp_events') as unknown as DBChain)
-      .select('id')
-      .eq('user_id', userId)
-      .eq('source_type', 'quiz_bonus')
-      .eq('source_id', lessonId)
-      .limit(1)
-      .maybeSingle() as unknown as { data: { id: string } | null }
-
-    if (!existingBonus) {
+    const hasBonus = await hasXpEvent(supabase, userId, 'quiz_bonus', lessonId)
+    if (!hasBonus) {
       perfectBonusXp = XP_VALUES.QUIZ_PERFECT_BONUS
     }
   }
@@ -304,16 +290,7 @@ export async function recordReflectionAction(
   if (selectError) throw selectError
 
   // Check ledger for existing reflection event first to ensure idempotency
-  const { data: existingXp } = await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .select('id')
-    .eq('user_id', userId)
-    .eq('source_type', 'reflection')
-    .eq('source_id', lessonId)
-    .limit(1)
-    .maybeSingle() as unknown as { data: { id: string } | null; error: unknown }
-
-  const xpAlreadyAwarded = !!existingXp
+  const xpAlreadyAwarded = await hasXpEvent(supabase, userId, 'reflection', lessonId)
   const isFirstSubmission = !existing
   let result
 
