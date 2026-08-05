@@ -1,24 +1,52 @@
 'use client'
 
 import React from 'react'
-import { Trophy, Award, Flame, Zap, Shield, Lock } from 'lucide-react'
+import { Trophy, Award, Flame, Zap, Shield, CheckCircle2 } from 'lucide-react'
 import type { PublicPortfolioPayload } from '@/lib/portfolio-db'
+import { BADGE_DEFINITIONS } from '@/config/badges'
 
 interface PortfolioAchievementsProps {
   user: PublicPortfolioPayload['user']
+  progress?: PublicPortfolioPayload['progress']
+  capstonesCount?: number
 }
 
-export function PortfolioAchievements({ user }: PortfolioAchievementsProps) {
+export function PortfolioAchievements({ user, progress, capstonesCount = 0 }: PortfolioAchievementsProps) {
   const { currentStreak, longestStreak, totalXp, levelInfo } = user
+  const lessonsCompletedCount = progress?.completedLessonsCount ?? 0
+  const modulesCompletedCount = progress?.completedModulesCount ?? 0
 
-  // Placeholder badges grid for Phase 3
-  const badgePlaceholders = [
-    { key: 'first_quiz', name: 'First Quiz Completed', icon: 'CheckCircle', earned: true },
-    { key: 'first_capstone', name: 'First Capstone Submitted', icon: 'Award', earned: true },
-    { key: 'streak_7', name: '7-Day Learning Streak', icon: 'Flame', earned: currentStreak >= 7 },
-    { key: 'module_1_complete', name: 'Foundations Master', icon: 'BookOpen', earned: true },
-    { key: 'cpo_completion', name: 'Chief Product Officer', icon: 'Crown', earned: levelInfo.level >= 9 },
-  ]
+  // Compute earned badges dynamically based on public user achievements
+  const earnedBadges = BADGE_DEFINITIONS.filter((badge) => {
+    switch (badge.key) {
+      case 'first_lesson':
+        return lessonsCompletedCount >= 1
+      case 'module_complete':
+        return modulesCompletedCount >= 1
+      case 'curriculum_explorer':
+        return lessonsCompletedCount >= 30
+      case 'first_level_up':
+        return levelInfo.level >= 2
+      case 'xp_1000':
+        return totalXp >= 1000
+      case 'xp_5000':
+        return totalXp >= 5000
+      case 'streak_7':
+        return Math.max(currentStreak, longestStreak) >= 7
+      case 'streak_30':
+        return Math.max(currentStreak, longestStreak) >= 30
+      case 'first_capstone':
+        return capstonesCount >= 1
+      case 'capstones_all':
+        return capstonesCount >= 9
+      case 'portfolio_published':
+        return true
+      case 'pm_academy_graduate':
+        return lessonsCompletedCount >= 90
+      default:
+        return false
+    }
+  })
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
@@ -74,34 +102,38 @@ export function PortfolioAchievements({ user }: PortfolioAchievementsProps) {
         </div>
       </div>
 
-      {/* Badges Placeholder Grid */}
+      {/* Badges Grid */}
       <div className="space-y-3 pt-2">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          Earned Badges & Milestones
-        </h3>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {badgePlaceholders.map((b) => (
-            <div
-              key={b.key}
-              className={`p-3 rounded-xl border flex items-center gap-3 transition-colors ${
-                b.earned
-                  ? 'border-primary/30 bg-primary/5 text-foreground'
-                  : 'border-border/50 bg-card/40 text-muted-foreground opacity-60'
-              }`}
-            >
-              <div className={`p-2 rounded-lg ${b.earned ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                {b.earned ? <Award className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-              </div>
-              <div className="min-w-0">
-                <span className="text-xs font-bold block truncate">{b.name}</span>
-                <span className="text-[10px] text-muted-foreground block">
-                  {b.earned ? 'Milestone Unlocked' : 'Locked Milestone'}
-                </span>
-              </div>
-            </div>
-          ))}
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Earned Badges ({earnedBadges.length})
+          </h3>
         </div>
+
+        {earnedBadges.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic py-2">
+            No public milestone badges earned yet.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {earnedBadges.map((b) => (
+              <div
+                key={b.key}
+                className="p-3.5 rounded-xl border border-primary/30 bg-primary/5 text-foreground flex items-center gap-3 transition-colors"
+              >
+                <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+                  <Award className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-xs font-bold block truncate">{b.name}</span>
+                  <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> {b.category}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

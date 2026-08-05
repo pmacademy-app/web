@@ -129,8 +129,8 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
         {/* Verified Applied Capstones */}
         <PortfolioCapstones capstones={capstones} />
 
-        {/* Achievements & Badges Placeholder */}
-        <PortfolioAchievements user={user} />
+        {/* Achievements & Badges */}
+        <PortfolioAchievements user={user} progress={progress} capstonesCount={capstones.length} />
 
         {/* Verified Footer Branding */}
         <div className="text-center pt-8 border-t border-border/60 text-xs text-muted-foreground space-y-1">
