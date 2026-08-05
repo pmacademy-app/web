@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BookOpen, RotateCw, BarChart3, Trophy, Settings, X } from 'lucide-react'
+import { LayoutDashboard, BookOpen, Award, RotateCw, BarChart3, Trophy, Settings, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface SidebarProps {
@@ -13,6 +13,7 @@ interface SidebarProps {
 const SIDEBAR_LINKS = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Curriculum', href: '/academy', icon: BookOpen },
+  { label: 'Capstones', href: '/capstones', icon: Award },
   { label: 'Review Hub', href: '/review', icon: RotateCw },
   { label: 'Progress', href: '/progress', icon: BarChart3 },
   { label: 'Leaderboard', href: '/leaderboard', icon: Trophy },
