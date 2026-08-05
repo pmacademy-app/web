@@ -32,6 +32,19 @@
 
 **Why not a no-code tool / off-the-shelf LMS:** Kajabi/Teachable/Thinkific are built for *paid* cohort courses, not free gamified self-serve learning, and don't give real control over a custom XP/streak/skill-radar system — which is the core differentiator. Moodle (open-source LMS) is the opposite problem: heavy, dated UX, wrong aesthetic for a "Duolingo of PM" positioning. Custom-built on the stack above is correct because the gamification mechanics *are* the product.
 
+### 7.5 Admin Console Security & Authorization (Sprint 6.4.4)
+
+The Admin Console (`/admin`) enforces strict dual-layer authorization:
+
+1. **Authentication & Proxy Middleware (`proxy.ts`)**:
+   - Matches all `/admin/*` routes. Unauthenticated requests are redirected to `/admin/login`.
+   - Checks `ADMIN_EMAILS` environment variable (comma-separated email list) and `user_metadata.is_admin` boolean flag.
+   - Non-admin authenticated users attempting access are redirected to `/admin/access-denied`.
+2. **Server-Side API Guard (`requireAdminUser`)**:
+   - Every handler under `/api/admin/*` executes `requireAdminUser(request)`.
+   - Performs server-side verification against `ADMIN_EMAILS` env var and Supabase `users.is_admin` column.
+   - Rejects unauthorized calls with `401 Unauthorized` or `403 Forbidden` and records an audit log entry via `logAdminAction()`.
+
 ---
 
 ## 2. Data Model

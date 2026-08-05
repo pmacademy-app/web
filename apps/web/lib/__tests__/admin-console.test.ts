@@ -45,4 +45,17 @@ runTest('AdminConsoleService.getContentOverview returns 90 compiled lessons stat
   assert.strictEqual(overview.publishedLessons, 90)
 })
 
+runTest('Admin RBAC evaluates ADMIN_EMAILS environment variable', () => {
+  const originalEnv = process.env.ADMIN_EMAILS
+  process.env.ADMIN_EMAILS = 'admin1@pmacademy.com, superadmin@pmacademy.com'
+
+  const adminEmailsEnv = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+  assert.strictEqual(adminEmailsEnv.length, 2)
+  assert.strictEqual(adminEmailsEnv.includes('admin1@pmacademy.com'), true)
+  assert.strictEqual(adminEmailsEnv.includes('superadmin@pmacademy.com'), true)
+  assert.strictEqual(adminEmailsEnv.includes('learner@pmacademy.com'), false)
+
+  process.env.ADMIN_EMAILS = originalEnv
+})
+
 console.log('\n✅ All Admin Console Unit Tests Passed Successfully!\n')

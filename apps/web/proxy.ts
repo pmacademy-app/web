@@ -69,18 +69,30 @@ export async function proxy(request: NextRequest) {
   // Authenticated application routes
   if (isAppPage) {
     if (!user) {
-      // Unauthenticated users are redirected to login
-      const response = NextResponse.redirect(new URL('/login', request.url))
+      // Unauthenticated users trying to access admin go to /admin/login
+      const loginTarget = isAdminPage ? '/admin/login' : '/login'
+      const response = NextResponse.redirect(new URL(loginTarget, request.url))
       response.cookies.delete('sb-access-token')
       response.cookies.delete('sb-refresh-token')
       return response
     }
 
+    // RBAC Check for /admin routes
+    if (isAdminPage && path !== '/admin/login' && path !== '/admin/access-denied') {
+      const adminEmailsEnv = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+      const isEnvAdmin = adminEmailsEnv.length > 0 && adminEmailsEnv.includes((user.email || '').toLowerCase())
+      const isDbAdmin = Boolean(user.user_metadata?.is_admin)
+
+      if (!isEnvAdmin && !isDbAdmin) {
+        return NextResponse.redirect(new URL('/admin/access-denied', request.url))
+      }
+    }
+
     const isOnboardingComplete = !!user.user_metadata?.onboarding_complete
     const isOnboardingPage = path === '/onboarding'
 
-    if (!isOnboardingComplete && !isOnboardingPage) {
-      // Force onboarding goal selection
+    if (!isOnboardingComplete && !isOnboardingPage && !isAdminPage) {
+      // Force onboarding goal selection for learners
       const response = NextResponse.redirect(new URL('/onboarding', request.url))
       if (newSession) {
         response.cookies.set('sb-access-token', newSession.access_token, {

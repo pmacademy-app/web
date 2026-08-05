@@ -8,6 +8,27 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 6.4.4: Admin Authentication & Access Security
+
+- **Status:** Development Complete — Fully Secured
+- **Release Date:** 2026-08-05
+
+### Added & Secured
+
+- **Dedicated Admin Login (`app/admin/login/page.tsx`)**:
+  - Purpose-built dark operational login interface reusing Supabase Auth (`signInWithPassword`) and setting secure HTTP cookies.
+- **Access Denied Page (`app/admin/access-denied/page.tsx`)**:
+  - Polished `403 Forbidden` page explaining access restriction without leaking system implementation details.
+- **Dual-Layer Admin Authorization Model**:
+  - Support for `ADMIN_EMAILS` environment variable (comma-separated email list) alongside database `users.is_admin = true`.
+  - Updated server guard `requireAdminUser()` in `lib/admin/guard.ts` to check both environment variables and DB columns.
+- **Middleware Security & Redirect Routing (`proxy.ts`)**:
+  - Intercepts all `/admin/*` routes. Unauthenticated requests redirect to `/admin/login`. Non-admin authenticated users redirect to `/admin/access-denied`.
+- **Audit Logging**:
+  - Logged access attempts, access denials, and administrative operations via `logAdminAction()`.
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 6.4.3: Admin Operational Functionality & Live Actions
 
 - **Status:** Development Complete — Fully Functional

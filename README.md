@@ -73,6 +73,10 @@ RESEND_API_KEY=re_your_api_key
 
 # Google Analytics
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# Admin & Cron
+ADMIN_EMAILS=admin1@example.com,admin2@example.com
+CRON_SECRET=your_secret_token
 ```
 
 > [!CAUTION]
