@@ -13,6 +13,8 @@ import { ProgressRingCard } from '@/components/dashboard/ProgressRingCard'
 import { LevelCard } from '@/components/dashboard/LevelCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
+import { DashboardLeaderboardWidget } from '@/components/dashboard/DashboardLeaderboardWidget'
+import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -59,6 +61,7 @@ export default async function DashboardPage() {
     streakStatus,
     radarSummary,
     { data: recentXpEvents },
+    weeklyLeaderboard,
   ] = await Promise.all([
     supabase
       .from('user_lesson_progress')
@@ -78,12 +81,13 @@ export default async function DashboardPage() {
       .limit(5) as unknown as {
       data: { id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }[] | null
     },
+    getWeeklyLeaderboard(supabase, authUser.id),
   ])
 
   const curriculumLessons = curriculum?.lessons ?? []
   const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0
 
-  // 3. Find next lesson in curriculum order
+  // 3. Find next lesson in global curriculum order (1 to 90)
   let nextLesson: NextLessonData | null = null
   if (curriculumLessons.length > 0) {
     const completedIds = new Set(
@@ -91,11 +95,12 @@ export default async function DashboardPage() {
         ?.filter((p) => p.status === 'completed')
         .map((p) => p.lesson_id) ?? []
     )
-    const activeNext = curriculumLessons.find((l) => !completedIds.has(l.id))
-    if (activeNext) {
+    const activeNextIndex = curriculumLessons.findIndex((l) => !completedIds.has(l.id))
+    if (activeNextIndex !== -1) {
+      const activeNext = curriculumLessons[activeNextIndex]
       nextLesson = {
         id: activeNext.id,
-        order: activeNext.order,
+        order: activeNextIndex + 1, // Global 1-indexed lesson order (1..90)
         title: activeNext.title,
         module: activeNext.module,
         estimatedTime: `${activeNext.estimatedReadingTime} min`,
@@ -118,106 +123,56 @@ export default async function DashboardPage() {
       description = 'Passed practice quiz question'
       type = 'quiz_completed'
     } else if (event.source_type === 'streak') {
-      title = 'Daily Streak Maintained'
-      description = 'Logged daily study activity'
+      title = 'Streak Milestone'
+      description = 'Maintained active daily study streak'
       type = 'streak_maintained'
     }
 
-    const dateStr = new Date(event.created_at).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    })
-
     return {
       id: event.id,
-      type,
       title,
       description,
-      xpAmount: event.xp_amount,
-      timestamp: dateStr,
+      timestamp: event.created_at,
+      type,
     }
   })
 
-  // Determine completed modules count (modules with 100% completed lessons)
-  const moduleLessonCounts = new Map<string, { total: number; completed: number }>()
-  for (const lesson of curriculumLessons) {
-    const current = moduleLessonCounts.get(lesson.module) || { total: 0, completed: 0 }
-    const isCompleted = progressRows?.some(
-      (p) => p.lesson_id === lesson.id && p.status === 'completed'
-    )
-    moduleLessonCounts.set(lesson.module, {
-      total: current.total + 1,
-      completed: current.completed + (isCompleted ? 1 : 0),
-    })
-  }
-
-  let completedModules = 0
-  for (const stats of moduleLessonCounts.values()) {
-    if (stats.total > 0 && stats.completed === stats.total) {
-      completedModules += 1
-    }
-  }
-
-  const levelTitle = xpSummary.levelInfo.title
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card border border-border rounded-2xl p-6 shadow-sm">
-        <div>
-          <span className="text-xs uppercase tracking-wider font-semibold text-primary">
-            Level {xpSummary.levelInfo.level} — {levelTitle}
-          </span>
-          <h1 className="text-2xl md:text-3xl font-bold font-serif text-foreground mt-1">
-            Welcome back, {profile.name || 'Learner'} 👋
-          </h1>
-          {profile.goal && (
-            <p className="text-xs text-muted-foreground/80 mt-1 uppercase tracking-wider font-medium">
-              Goal: {profile.goal.replace('_', ' ')}
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-semibold">
-            🔥 {streakStatus.effectiveCurrentStreak} Day Streak
-          </div>
-        </div>
-      </div>
-
-      {/* 1. Continue Learning (Hero CTA) */}
+    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+      {/* Continue Learning Header CTA */}
       <ContinueLearningCard
         nextLesson={nextLesson}
         totalLessonsCompleted={completedLessons}
       />
 
-      {/* 2. Skill Radar (Primary Visual Hero Element) */}
-      <SkillRadarCard
-        skillValues={radarSummary.scores}
-        breakdown={radarSummary.breakdown}
-        overallScore={radarSummary.overallScore}
-      />
-
-      {/* 3, 4, 5. Three-Column Metrics Grid */}
+      {/* Primary Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <LevelCard level={xpSummary.levelInfo.level} totalXp={xpSummary.totalXp} />
+        <StreakCard streakStatus={streakStatus} />
         <ProgressRingCard
           completedLessons={completedLessons}
           totalLessons={90}
-          completedModules={completedModules}
-          totalModules={9}
-        />
-
-        <LevelCard
-          level={xpSummary.levelInfo.level}
-          totalXp={xpSummary.totalXp}
-        />
-
-        <StreakCard
-          streakStatus={streakStatus}
         />
       </div>
 
-      {/* 6. Recent Activity Feed */}
+      {/* Leaderboard Widget & Skill Radar */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-1">
+          <DashboardLeaderboardWidget
+            rank={weeklyLeaderboard.personalEntry?.rank ?? null}
+            daysStudied={weeklyLeaderboard.personalEntry?.daysStudied ?? 0}
+          />
+        </div>
+        <div className="md:col-span-2">
+          <SkillRadarCard
+            skillValues={radarSummary.scores}
+            breakdown={radarSummary.breakdown}
+            overallScore={radarSummary.overallScore}
+          />
+        </div>
+      </div>
+
+      {/* Recent Activity */}
       <RecentActivityCard activities={recentActivities} />
     </div>
   )

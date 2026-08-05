@@ -14,12 +14,20 @@ import {
 import { BlockProps } from '../../renderer/registry';
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
 
+// Helper to check if children contains non-null renderable elements
+function hasRenderableChildren(children: React.ReactNode): boolean {
+  if (!children) return false;
+  if (Array.isArray(children)) return children.length > 0;
+  return true;
+}
+
 // ─── LearningObjectives ──────────────────────────────────────────────────────
 
 function LearningObjectivesSection({ block, children }: BlockProps) {
-  const objectives: string[] = block.objectives as string[] || [];
+  const objectives: string[] = (block.objectives as string[]) || [];
 
   if (objectives.length === 0) {
+    if (!hasRenderableChildren(children)) return null;
     return <div className="my-6 space-y-4">{children}</div>;
   }
 
@@ -54,6 +62,7 @@ function CommonMistakesSection({ block, children }: BlockProps) {
   const mistakes = (block.mistakes as MistakeItem[]) || [];
 
   if (mistakes.length === 0) {
+    if (!hasRenderableChildren(children)) return null;
     return (
       <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 shadow-sm space-y-3 my-6">
         <div className="flex items-center gap-2 border-b border-destructive/10 pb-3 text-destructive">
@@ -98,6 +107,7 @@ function KeyTakeawaysSection({ block, children }: BlockProps) {
   const items = (block.items as string[]) || [];
 
   if (items.length === 0) {
+    if (!hasRenderableChildren(children)) return null;
     return (
       <SectionCard
         badgeText="Key Takeaways"
@@ -139,6 +149,7 @@ function CheatSheetSection({ block, children }: BlockProps) {
   const items = (block.items as string[]) || [];
 
   if (items.length === 0) {
+    if (!hasRenderableChildren(children)) return null;
     return (
       <SectionCard
         badgeText="Cheat Sheet"
@@ -183,6 +194,7 @@ function ResourcesSection({ block, children }: BlockProps) {
   const items = (block.items as ResourceItem[]) || [];
 
   if (items.length === 0) {
+    if (!hasRenderableChildren(children)) return null;
     return (
       <SectionCard
         badgeText="Additional Resources"
@@ -230,9 +242,10 @@ interface InterviewQuestion {
 
 function InterviewPerspectiveSection({ block, children }: BlockProps) {
   const questions = (block.questions as InterviewQuestion[]) || [];
-  const hasContent = questions.some(q => q.question || q.whatItEvaluates);
+  const hasContent = questions.some((q) => q.question || q.whatItEvaluates);
 
   if (!hasContent) {
+    if (!hasRenderableChildren(children)) return null;
     return (
       <SectionCard
         badgeText="Interview Perspective"
@@ -253,7 +266,7 @@ function InterviewPerspectiveSection({ block, children }: BlockProps) {
       </div>
       <div className="space-y-4">
         {questions.map((q, i) => (
-          <div key={i} className="space-y-2">
+          <div key={i} className="space-y-2 font-sans text-sm">
             {q.question && (
               <div className="rounded-lg border border-indigo-500/15 bg-indigo-500/5 p-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-1.5">
@@ -286,6 +299,7 @@ function RealWorldPerspectiveSection({ block, children }: BlockProps) {
   const segments = (block.segments as PerspectiveSegment[]) || [];
 
   if (segments.length === 0) {
+    if (!hasRenderableChildren(children)) return null;
     return (
       <SectionCard
         badgeText="Real-World Perspective"
@@ -332,6 +346,8 @@ function CompanyExampleSection({ block, children }: BlockProps) {
   const company = String(block.company || 'Company Example');
   const assumptionFlags = (block.assumptionFlags as string[]) || [];
 
+  if (!hasRenderableChildren(children) && !company) return null;
+
   return (
     <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-sky-500/15">
@@ -363,6 +379,7 @@ function CompanyExampleSection({ block, children }: BlockProps) {
 
 function MentalModelSection({ block, children }: BlockProps) {
   const name = String(block.name || block.title || '');
+  if (!hasRenderableChildren(children) && !name) return null;
 
   return (
     <div className="rounded-xl border-l-4 border-l-emerald-500 border border-emerald-500/20 bg-emerald-500/5 p-6 shadow-sm my-6">
@@ -385,6 +402,7 @@ function MentalModelSection({ block, children }: BlockProps) {
 
 function CaseStudySection({ block, children }: BlockProps) {
   const title = String(block.title || block.name || '');
+  if (!hasRenderableChildren(children) && !title) return null;
 
   return (
     <div className="rounded-xl border-l-4 border-l-violet-500 border border-violet-500/20 bg-violet-500/5 p-6 shadow-sm my-6">
@@ -407,6 +425,7 @@ function CaseStudySection({ block, children }: BlockProps) {
 
 function FrameworkSection({ block, children }: BlockProps) {
   const name = String(block.name || block.title || '');
+  if (!hasRenderableChildren(children) && !name) return null;
 
   return (
     <div className="rounded-xl border-l-4 border-l-blue-500 border border-blue-500/20 bg-blue-500/5 p-6 shadow-sm my-6">
@@ -428,6 +447,8 @@ function FrameworkSection({ block, children }: BlockProps) {
 // ─── Summary ─────────────────────────────────────────────────────────────────
 
 function SummarySection({ children }: BlockProps) {
+  if (!hasRenderableChildren(children)) return null;
+
   return (
     <div className="rounded-xl border border-teal-500/20 bg-teal-500/5 p-6 shadow-sm my-6">
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-teal-500/15">
@@ -442,8 +463,6 @@ function SummarySection({ children }: BlockProps) {
 }
 
 // ─── Reflection ──────────────────────────────────────────────────────────────
-// Reflection blocks are rendered by ReflectionTabContent in lesson-content.tsx, not here.
-// Show a placeholder text since this is in the theory tab.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ReflectionSection(_props: BlockProps) {
   return (
@@ -461,7 +480,6 @@ function ReflectionSection(_props: BlockProps) {
 }
 
 // ─── Generic Section Card ─────────────────────────────────────────────────────
-// Used as fallback for section types that have no specialized data arrays
 
 interface SectionCardProps {
   badgeText: string;
@@ -472,6 +490,8 @@ interface SectionCardProps {
 }
 
 function SectionCard({ badgeText, badgeColor, borderColor, title, children }: SectionCardProps) {
+  if (!hasRenderableChildren(children) && !title) return null;
+
   return (
     <div className={`rounded-xl border-l-4 ${borderColor} border border-border bg-card p-6 shadow-sm space-y-3 my-6`}>
       <div className="flex items-center gap-2 border-b border-border pb-3">
@@ -490,6 +510,7 @@ function SectionCard({ badgeText, badgeColor, borderColor, title, children }: Se
 // ─── Theory ──────────────────────────────────────────────────────────────────
 
 function TheorySection({ children }: BlockProps) {
+  if (!hasRenderableChildren(children)) return null;
   return (
     <div className="my-6 space-y-5">{children}</div>
   );
@@ -530,8 +551,8 @@ export default function SectionBlock({ block, children, lessonId }: BlockProps) 
     case 'reflection':
       return <ReflectionSection block={block} lessonId={lessonId}>{children}</ReflectionSection>;
     default: {
-      // Fallback for any unrecognized section types
       const title = String(block.title || block.name || '');
+      if (!hasRenderableChildren(children) && !title) return null;
       return (
         <div className="my-6 space-y-3 leading-relaxed">
           {title && <h3 className="text-lg font-bold text-foreground font-serif">{title}</h3>}

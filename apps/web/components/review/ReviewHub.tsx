@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { FlashcardItem, ReviewStats as ReviewStatsType, SRSRating } from '@/lib/srs'
 import { ReviewStats } from './ReviewStats'
 import { ReviewProgress } from './ReviewProgress'
@@ -21,6 +22,7 @@ export function ReviewHub({
   initialStats,
   totalUnlockedCount,
 }: ReviewHubProps) {
+  const router = useRouter()
   const [dueCards, setDueCards] = useState<FlashcardItem[]>(initialDueCards)
   const [stats, setStats] = useState<ReviewStatsType>(initialStats)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -62,14 +64,27 @@ export function ReviewHub({
           cardsReviewedCount={reviewedCount}
           totalXpEarned={xpEarned}
           passedCount={passedCount}
-          onRestartSession={() => {
-            setDueCards(initialDueCards)
-            setCurrentIndex(0)
-            setIsFlipped(false)
-            setSessionCompleted(false)
-            setReviewedCount(0)
-            setXpEarned(0)
-            setPassedCount(0)
+          onRestartSession={async () => {
+            setIsSubmitting(true)
+            try {
+              const res = await fetch('/api/review/queue')
+              if (res.ok) {
+                const data = await res.json()
+                setDueCards(data.dueCards || [])
+                setStats(data.stats || stats)
+              }
+            } catch (e) {
+              console.warn('[ReviewHub] Error refreshing queue:', e)
+            } finally {
+              setIsSubmitting(false)
+              setCurrentIndex(0)
+              setIsFlipped(false)
+              setSessionCompleted(false)
+              setReviewedCount(0)
+              setXpEarned(0)
+              setPassedCount(0)
+              router.refresh()
+            }
           }}
         />
       </div>
@@ -93,12 +108,19 @@ export function ReviewHub({
       if (!response.ok) {
         console.error('[ReviewHub] Failed to save flashcard review rating.')
       } else {
-        // Track session stats
+        // Track session stats & immediate real-time stats update
         setReviewedCount((prev) => prev + 1)
         setXpEarned((prev) => prev + 2) // 2 XP per card
         if (rating >= 3) {
           setPassedCount((prev) => prev + 1)
         }
+
+        // Real-time decrement of dueTodayCount and increment of completedTodayCount
+        setStats((prev) => ({
+          ...prev,
+          dueTodayCount: Math.max(0, prev.dueTodayCount - 1),
+          completedTodayCount: prev.completedTodayCount + 1,
+        }))
       }
     } catch (err) {
       console.error('[ReviewHub] Error submitting review:', err)
@@ -110,12 +132,9 @@ export function ReviewHub({
         setIsFlipped(false)
         setCurrentIndex((prev) => prev + 1)
       } else {
+        setDueCards([])
         setSessionCompleted(true)
-        setStats((prev) => ({
-          ...prev,
-          dueTodayCount: 0,
-          completedTodayCount: prev.completedTodayCount + (currentIndex + 1),
-        }))
+        router.refresh()
       }
     }
   }

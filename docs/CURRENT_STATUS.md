@@ -8,9 +8,9 @@
 ## 1. Repository Metadata
 
 - **Current Branch:** `main`
-- **Current Version:** `0.2.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
-- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build - clean, 0 errors, 35 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 5 (Friends & Cohort Leaderboard System) COMPLETE**
+- **Current Version:** `0.3.0-rc` (Phase 3 Stabilization complete, awaiting release tag)
+- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build - clean, 0 errors, 39 routes, 90 lessons compiled)
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Stabilization Sprint COMPLETE**
 
 ---
 
@@ -25,59 +25,60 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 3 – Sprint 3 (Certificates & PDF Export `/verify/[certificateId]`):** ✅ Complete
 - **Phase 3 – Sprint 4 (Badge & Achievement System `/badges`):** ✅ Complete
 - **Phase 3 – Sprint 5 (Friends & Cohort Leaderboard `/leaderboard`):** ✅ Complete
-- **Current Focus:** **Phase 3 – Sprint 6** (Peer Review & Feedback Engine).
+- **Phase 3 – Stabilization Sprint (Priority 1 + 2 + 3):** ✅ Complete
+- **Current Focus:** Phase 3 – Sprint 6 (Email Infrastructure)
 
 ---
 
 ## 3. What's Next
 
-Phase 3 Sprint 5 (Friends & Cohort Leaderboard System) is complete. The next focus is **Phase 3 Sprint 6**:
+Phase 3 Stabilization Sprint is complete. The next focus is **Phase 3 Sprint 6**:
 
-1. **[Phase 3 - Sprint 6] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
-2. **[Phase 3 - Sprint 7] Email Automation & Weekly Summary Digests:** Resend SMTP transactional notification emails and weekly progress digests.
+1. **[Phase 3 - Sprint 6] Email Automation & Weekly Summary Digests:** Resend SMTP transactional emails, certificate issuance notifications, and weekly progress digests.
+2. **[Phase 3 - Sprint 7] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
 
 ---
 
 ## 4. Active Issues, Blockers & Bugs
 
-None. All Release Candidate blockers resolved.
+None. All stabilization sprint items resolved.
 
-### Resolved This Session (Phase 1.5 - Sprint 7: Release Candidate Blockers)
+### Resolved This Session (Phase 3 — Stabilization Sprint Priority 1, 2, 3)
 
-- 🔒 **Server-Side Quiz Verification:** Moved quiz correctness checking and score computation entirely to the server in `recordQuizAttemptAction` by comparing client submissions against compiled lesson JSON. The client-provided `is_correct` field is discarded.
-- 🔒 **XP Auditing & Idempotency:** Implemented ledger lookup checks on `xp_events` for `theory_read`, `quiz_bonus`, and `reflection` events to ensure they can be awarded at most once per lesson. Incremental quiz score XP is calculated relative to total previously awarded `quiz_correct` XP.
-- 🔒 **Daily Flashcard XP Deduplication:** Added timezone-aware calendar day checking on `xp_events` for flashcard reviews to prevent XP farming (maximum 2 XP per card per user local day).
-- ⚙️ **Next.js 16 Middleware & Route Guarding:** Verified the Next.js 16 standard `proxy.ts` middleware file. Updated it to include `/academy` and `/academy/**` under protected app routes so that unauthenticated users are correctly redirected to `/login` and edge token refresh logic is run.
-- 🚫 **Disabled Google OAuth Placeholder:** Cleanly marked Google login/signup options as "Coming Soon" and disabled interactive pathways on auth pages until the Supabase OAuth provider is fully configured.
+**Priority 1 — Critical Functional Fixes:**
+- 🔒 **Lesson Rendering:** Empty section components (`InterviewPerspectiveSection`, etc.) returned `null` when data arrays and children were both empty. Added `hasRenderableChildren` guard to all 13 section types in `SectionBlock.tsx`.
+- 🔒 **Review Hub Progress:** `stats` counts (`dueTodayCount`, `completedTodayCount`) were not updated in real-time during a session. Fixed `handleRatingSelect` to progressively update local state on each card submission and call `router.refresh()` on session completion.
+- 🔒 **Portfolio Settings API 401:** `getAuthenticatedUserFromRequest` was destructured incorrectly in `/api/settings/portfolio/route.ts`. Fixed to correct direct assignment.
+- 🔒 **Lesson Navigation Display:** Dashboard displayed "Lesson 1: User Research" (module-scoped order) for Lesson 11. Fixed `dashboard/page.tsx` to use `activeNextIndex + 1` (global 1-indexed order).
 
-### Previously Resolved (Phase 1.5 - Sprint 6: Performance & Infrastructure)
+**Priority 2 — Product Experience Fixes:**
+- 🏆 **Module Completion Celebration:** Added dedicated Module Completion view when `globalOrder % 10 === 0` (every 10th lesson) with Trophy badge, Capstone unlock CTA, Continue to Next Module button, Flashcard review link, and Share Achievement.
+- 🗺️ **Continue Learning Flow:** Updated `/academy` curriculum page to point module action buttons to the learner's first uncompleted lesson in each module (not always Lesson 1).
+- 📊 **Progress Page:** Replaced scaffold placeholder with full competency dashboard — level, streak, skill radar, 9-capstone status grid, and certificate eligibility/discovery.
+- 📜 **Certificate Visibility:** Certificates now prominently shown on `/progress`, `/dashboard`, `/settings`, and `/p/[username]`. Eligibility progress bar shown for learners who haven't earned a certificate yet.
+- ⚙️ **Capstone Page Auth:** Replaced `supabase.auth.getUser()` direct call with `getServerUser()` in `capstones/page.tsx`.
 
-- ⚡ **O(N) Glossary Validation:** Replaced nested-loop cross-lesson duplicate-term check with a Set-based single-pass accumulator in `validation.ts`. `content:validate` time reduced from ~15 s to **< 5 s**.
-- ⚡ **`crossLessonsOnly` Flag in Compiler:** Added flag to skip per-lesson Zod validation on cross-lesson-only passes, enabling faster incremental rebuilds.
-- ⚡ **Scroll/Timer Refs in `lesson-content.tsx`:** Converted `scrollProgress` and `elapsedSeconds` from `useState` to `useRef`, eliminating re-renders on every scroll event and timer tick.
-- ⚡ **`React.memo()` on Block Renderers:** Wrapped `BlockTreeRenderer` and `BlockRenderer` in `React.memo()` to prevent unnecessary re-renders when parent state changes.
-- ⚡ **`sessionStorage` Search Index Cache:** Added a `sessionStorage` tier to `fetchSearchIndex()` so the 200 KB search index is fetched at most once per browser session.
-- ⚡ **Absolute `turbopack.root` in `next.config.ts`:** Used `path.resolve(__dirname, '../../')` to silence both the "inferred workspace root" and "should be absolute" Turbopack warnings.
-- ⚡ **Simplified `package.json` Scripts:** Removed redundant `cd ../.. && npm install && cd apps/web &&` prefix from scripts, saving 3-5 s per invocation.
-
-### Previously Resolved (Phase 1.5 – Sprint 5)
-- ? Lesson ID Registry Pollution Fixed (?? P0)
-- ? Normalized Lesson Local ordering (?? P0)
-- ? Flashcards Restored for Lessons 61-90 (?? P0)
-- ? 9-Module Curriculum Structure Restored
-- ? Interview Perspective Extraction Fixed
-- ? Real World Perspective Formatting Restructured
-- ? Skipped Cross-Lesson Validations Resolved (0 warnings)
+**Priority 3 — Navigation & Performance:**
+- 🧭 **Curriculum Navigation Bug Fixed (Root Cause):** The locked lesson screen displayed "Lesson 2" (module-scoped `order`) when user tried to skip to Lesson 12. Root cause: `lesson.order` is module-scoped (1-10), not global. Fixed `page.tsx` to compute `globalOrder = curriculumIndex + 1` from the global lesson array and pass it to `LessonPageContent` as a prop. The locked screen now correctly reads "Complete Lesson 11: User Research" with the correct button link.
+- 🧭 **Module Completion Detection:** `isModuleComplete = lesson.order % 10 === 0` used module-scoped order (always triggered on Lesson 10 of each module but incorrectly on lesson 1 of a new module). Fixed to `globalOrder % 10 === 0`.
+- 🧭 **Breadcrumbs:** Lesson breadcrumbs displayed module-scoped order. Fixed to use `globalOrder` from server component prop.
+- 🧭 **Metadata Title:** Lesson page `<title>` used `lesson.order` (module-scoped). Fixed to `globalOrder`.
 
 ---
 
-## 5. Definition of Done for Phase 1.5 (All Complete ?)
+## 5. Definition of Done for Phase 3 Stabilization (All Complete ✅)
 
-- [x] End-to-end learning flow functional: lesson unlock, theory read, quiz, flashcard SRS, reflection, XP award.
-- [x] Curriculum: exactly 9 modules × 10 lessons = 90 lessons, correct ordering and IDs.
-- [x] All block types render correctly: tables, callouts, frameworks, interview/real-world perspectives, glossaries, flashcards, quizzes, reflections.
-- [x] Content pipeline: `content:validate` passes with 0 errors, 0 warnings across all 90 lessons.
-- [x] Compiler tests: 7/7 pass.
-- [x] Production build: 0 TypeScript errors, 0 ESLint errors, 23 routes compiled, all 90 lessons emitted.
-- [x] Performance: compiler, renderer, and search optimized; redundant work eliminated.
-- [x] Infrastructure: clean scripts, no spurious warnings in `next dev` / `next build`.
+- [x] Lesson rendering: empty sections do not render visible empty cards.
+- [x] Review Hub: Due Today count updates in real-time during a session.
+- [x] Portfolio Settings: saves persist across refresh and re-login.
+- [x] Lesson Navigation: Continue Learning shows correct global lesson number.
+- [x] Module Completion: trophy screen fires on global lesson 10, 20, 30... 90.
+- [x] Locked lesson screen: shows correct previous lesson name and global number.
+- [x] Breadcrumbs: display correct global lesson number (1–90).
+- [x] Continue Learning: all pages resolve next uncompleted lesson correctly.
+- [x] Progress page: uses real data (no placeholders).
+- [x] Certificates: discoverable from dashboard, progress, settings, portfolio.
+- [x] Capstone page: auth uses unified `getServerUser()`.
+- [x] Curriculum page: progress-aware module action buttons.
+- [x] Production build: 0 TypeScript errors, 0 ESLint errors, 39 routes, 90 lessons.
+- [x] Unit tests: 3/3 leaderboard tests pass.

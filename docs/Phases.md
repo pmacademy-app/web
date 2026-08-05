@@ -192,7 +192,7 @@ If Day-1 completion or Day-7 retention come in meaningfully below target, the ri
 - [ ] 10–20 real users complete the core loop
 - [ ] XP, streaks, skill radar live (Phase 2)
 - [ ] Placement quiz live, seeding skill radar (Phase 2)
-- [ ] Capstones, badges, leaderboard, portfolio export live (Phase 3)
+- [x] Capstones, badges, leaderboard, portfolio export, certificates live (Phase 3 — Stabilization Sprint Complete)
 - [ ] Search index generated and search UI live (Phase 4)
 - [ ] Performance budget (`Design.md` §4.1) and accessibility budget (`Design.md` §4) verified, not estimated
 - [ ] Closed beta run (Phase 4)

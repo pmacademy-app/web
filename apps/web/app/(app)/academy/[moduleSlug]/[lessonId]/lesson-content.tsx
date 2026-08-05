@@ -28,6 +28,7 @@ import {
   ArrowLeft,
   Loader2,
   Award,
+  Trophy,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
@@ -40,6 +41,9 @@ interface LessonPageContentProps {
   lesson: CompiledLesson
   prevLessonUrl: string | null
   nextLessonUrl: string | null
+  globalOrder: number       // 1-indexed global curriculum position (1..90)
+  moduleNumber: number      // 1-indexed module number (1..9)
+  moduleName: string        // formatted module display name
 }
 
 type TabType = 'theory' | 'quiz' | 'flashcards' | 'reflection'
@@ -282,32 +286,15 @@ function TheoryReadButton({
   )
 }
 
-// ─── Module name formatter ───────────────────────────────────────────────────
-
-function formatModuleName(moduleSlug: string): string {
-  const nameMap: Record<string, string> = {
-    'foundations': 'Foundations',
-    'discovery': 'Discovery & User Research',
-    'strategy': 'Product Strategy',
-    'execution': 'Product Execution',
-    'growth': 'Growth & Metrics',
-    'leadership': 'PM Leadership',
-    'technical': 'Technical Fundamentals',
-    'design': 'Design Thinking',
-    'capstone': 'Capstone Projects',
-  }
-  return nameMap[moduleSlug] ?? moduleSlug
-    .split('-')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
-}
-
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function LessonPageContent({
   lesson,
   prevLessonUrl,
   nextLessonUrl,
+  globalOrder,
+  moduleNumber,
+  moduleName,
 }: LessonPageContentProps) {
   const {
     progress,
@@ -324,18 +311,16 @@ export default function LessonPageContent({
   const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
 
   const { setBreadcrumbs } = useBreadcrumbs()
-  const moduleNumber = Math.ceil(lesson.order / 10)
-  const moduleName = formatModuleName(lesson.module)
 
-  // Sync breadcrumbs with topbar
+  // Sync breadcrumbs with topbar — use globalOrder for correct display
   useEffect(() => {
     setBreadcrumbs([
       { label: 'Curriculum', href: '/academy' },
       { label: `Module ${String(moduleNumber).padStart(2, '0')}: ${moduleName}`, href: `/academy#${lesson.module}` },
-      { label: `Lesson ${lesson.order}: ${lesson.title}` },
+      { label: `Lesson ${globalOrder}: ${lesson.title}` },
     ])
     return () => setBreadcrumbs([])
-  }, [lesson, moduleNumber, moduleName, setBreadcrumbs])
+  }, [lesson, globalOrder, moduleNumber, moduleName, setBreadcrumbs])
 
   // Mark in-progress on first open
   useEffect(() => {
@@ -396,6 +381,95 @@ export default function LessonPageContent({
 
   // ── Lesson Mastered screen ────────────────────────────────────────────────
   if (completedThisSession) {
+    // A module is complete when the globalOrder is divisible by 10 (lessons 10, 20, 30... 90)
+    const isModuleComplete = globalOrder % 10 === 0
+
+    if (isModuleComplete) {
+      return (
+        <div className="max-w-lg mx-auto text-center py-12 space-y-8 animate-scale-up">
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="absolute -inset-2 rounded-full bg-amber-500/30 blur-lg animate-pulse" />
+              <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-xl">
+                <Trophy className="h-12 w-12" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
+              🏆 Module Achievement Unlocked
+            </span>
+            <h1 className="text-3xl md:text-4xl font-bold font-serif text-foreground">
+              Module {moduleNumber} Completed!
+            </h1>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+              Congratulations! You have completed all 10 lessons in <strong>{moduleName}</strong> and unlocked the Module Capstone Deliverable.
+            </p>
+          </div>
+
+          {/* Module Capstone Card */}
+          <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6 text-left space-y-3 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                Capstone Project Available
+              </span>
+              <span className="text-xs font-bold text-emerald-500">+100 XP</span>
+            </div>
+            <h3 className="text-lg font-bold font-serif text-foreground">
+              {moduleName} Capstone Project
+            </h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Apply what you learned across Module {moduleNumber} by building a real-world product deliverable for your public portfolio.
+            </p>
+            <Link
+              href={`/capstones/${lesson.module}`}
+              className="inline-flex items-center justify-center w-full rounded-xl bg-primary px-5 py-3 text-xs font-bold text-primary-foreground shadow hover:bg-primary/90 transition-all"
+            >
+              Start Capstone Project →
+            </Link>
+          </div>
+
+          {/* Navigation Actions */}
+          <div className="flex flex-col gap-3">
+            {nextLessonUrl && (
+              <Link
+                href={nextLessonUrl}
+                className="inline-flex items-center justify-center rounded-xl bg-secondary border border-border px-6 py-3.5 text-sm font-bold text-foreground hover:bg-secondary/80 transition-all"
+              >
+                Continue to Next Module →
+              </Link>
+            )}
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                href="/review"
+                className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-accent/40 transition-all"
+              >
+                Review Flashcards
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: `Completed Module ${moduleNumber} on PM Academy`,
+                      url: window.location.href,
+                    }).catch(() => {})
+                  } else {
+                    navigator.clipboard.writeText(window.location.href)
+                    alert('Achievement link copied to clipboard!')
+                  }
+                }}
+                className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-accent/40 transition-all"
+              >
+                Share Achievement
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="max-w-md mx-auto text-center py-16 space-y-8 animate-scale-up">
         <div className="flex justify-center">
