@@ -1,9 +1,34 @@
 'use client'
 
 import React from 'react'
-import { ShieldCheck, Activity } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { ShieldCheck, Activity, LogOut } from 'lucide-react'
+import { createBrowserSupabaseClient } from '@/lib/supabase'
 
 export function AdminHeader() {
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    try {
+      const supabase = createBrowserSupabaseClient()
+      await supabase.auth.signOut()
+
+      // Clear server-side session cookies
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ session: null }),
+      })
+
+      router.push('/admin/login')
+      router.refresh()
+    } catch (err) {
+      console.error('[AdminHeader] Sign out error:', err)
+    }
+  }
+
   return (
     <header className="h-16 bg-slate-900/80 backdrop-blur border-b border-slate-800 px-6 flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center gap-3">
@@ -19,10 +44,19 @@ export function AdminHeader() {
           <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
           <span className="font-semibold text-slate-200">Admin Mode Active</span>
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-400">
+        <div className="hidden lg:flex items-center gap-2 text-xs text-slate-400">
           <Activity className="w-3.5 h-3.5 text-slate-500" />
           <span>Next.js 16 App Router</span>
         </div>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          aria-label="Sign out of Admin Console"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold text-rose-300 hover:text-rose-200 hover:bg-rose-500/10 transition-colors cursor-pointer"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Sign Out</span>
+        </button>
       </div>
     </header>
   )

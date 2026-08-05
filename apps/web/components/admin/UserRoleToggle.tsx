@@ -31,7 +31,7 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           targetUserId: userId,
-          isAdmin: nextRole,
+          makeAdmin: nextRole,
         }),
       })
 

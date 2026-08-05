@@ -3,6 +3,7 @@ process.env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ||
 
 import assert from 'node:assert'
 import { AdminConsoleService } from '../admin/service'
+import { isAdminEmail, isAdminUser } from '../admin/authorization'
 
 function runTest(name: string, fn: () => Promise<void> | void) {
   Promise.resolve(fn())
@@ -47,13 +48,72 @@ runTest('AdminConsoleService.getContentOverview returns 90 compiled lessons stat
 
 runTest('Admin RBAC evaluates ADMIN_EMAILS environment variable', () => {
   const originalEnv = process.env.ADMIN_EMAILS
-  process.env.ADMIN_EMAILS = 'admin1@pmacademy.com, superadmin@pmacademy.com'
+  process.env.ADMIN_EMAILS = 'admin1@pmacademy.com, superadmin@pmacademy.com ,'
 
-  const adminEmailsEnv = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
-  assert.strictEqual(adminEmailsEnv.length, 2)
-  assert.strictEqual(adminEmailsEnv.includes('admin1@pmacademy.com'), true)
-  assert.strictEqual(adminEmailsEnv.includes('superadmin@pmacademy.com'), true)
-  assert.strictEqual(adminEmailsEnv.includes('learner@pmacademy.com'), false)
+  // Comma-separated, whitespace-trimmed, empty entries filtered
+  assert.strictEqual(isAdminEmail('admin1@pmacademy.com'), true)
+  assert.strictEqual(isAdminEmail('superadmin@pmacademy.com'), true)
+  assert.strictEqual(isAdminEmail('learner@pmacademy.com'), false)
+
+  // Case-insensitive comparison
+  assert.strictEqual(isAdminEmail('ADMIN1@pmacademy.com'), true)
+  assert.strictEqual(isAdminEmail('Admin1@PMAcademy.com'), true)
+
+  // Missing / empty emails are never admin
+  assert.strictEqual(isAdminEmail(''), false)
+  assert.strictEqual(isAdminEmail(null), false)
+  assert.strictEqual(isAdminEmail(undefined), false)
+
+  process.env.ADMIN_EMAILS = originalEnv
+})
+
+runTest('Admin RBAC grants access via users.is_admin database flag', async () => {
+  const originalEnv = process.env.ADMIN_EMAILS
+  process.env.ADMIN_EMAILS = ''
+
+  const mockClient = (isAdminRow: boolean | null) =>
+    ({
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            maybeSingle: async () =>
+              isAdminRow === null
+                ? { data: null, error: { message: 'Not found' } }
+                : { data: { is_admin: isAdminRow }, error: null },
+          }),
+        }),
+      }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any
+
+  // DB flag true -> admin (even though email is not in ADMIN_EMAILS)
+  assert.strictEqual(await isAdminUser(mockClient(true), 'user-1', 'someone@pmacademy.com'), true)
+  // DB flag false -> not admin
+  assert.strictEqual(await isAdminUser(mockClient(false), 'user-1', 'someone@pmacademy.com'), false)
+  // No row -> not admin
+  assert.strictEqual(await isAdminUser(mockClient(null), 'user-1', 'someone@pmacademy.com'), false)
+
+  process.env.ADMIN_EMAILS = originalEnv
+})
+
+runTest('Admin RBAC short-circuits to ADMIN_EMAILS without a database call', async () => {
+  const originalEnv = process.env.ADMIN_EMAILS
+  process.env.ADMIN_EMAILS = 'boss@pmacademy.com'
+
+  let dbCalled = false
+  const mockClient = () =>
+    ({
+      from: () => {
+        dbCalled = true
+        return {
+          select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { is_admin: false }, error: null }) }) }),
+        }
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any
+
+  assert.strictEqual(await isAdminUser(mockClient(), 'user-1', 'boss@pmacademy.com'), true)
+  assert.strictEqual(dbCalled, false)
 
   process.env.ADMIN_EMAILS = originalEnv
 })

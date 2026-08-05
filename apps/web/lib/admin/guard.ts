@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '../supabase'
 import { getAuthenticatedUserFromRequest } from '../auth'
+import { isAdminEmail } from './authorization'
 
 export interface AdminAuthResult {
   authorized: boolean
@@ -42,8 +43,7 @@ export async function requireAdminUser(request: Request): Promise<AdminAuthResul
   }
 
   // Evaluate Admin authorization: ADMIN_EMAILS env var OR database users.is_admin = true
-  const adminEmailsEnv = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
-  const isEnvAdmin = adminEmailsEnv.length > 0 && adminEmailsEnv.includes(typedUserRow.email.toLowerCase())
+  const isEnvAdmin = isAdminEmail(typedUserRow.email)
   const isDbAdmin = Boolean(typedUserRow.is_admin)
 
   const isAuthorizedAdmin = isEnvAdmin || isDbAdmin

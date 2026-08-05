@@ -66,9 +66,9 @@ export class AdminConsoleService {
       systemHealth,
     ] = await Promise.all([
       supabase.from('users').select('id, created_at', { count: 'exact' }),
-      supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('completed', true),
+      supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('status', 'completed'),
       supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }),
-      supabase.from('user_certificates').select('id', { count: 'exact', head: true }),
+      supabase.from('certificates').select('id', { count: 'exact', head: true }),
       supabase.from('users').select('id', { count: 'exact', head: true }).eq('is_portfolio_public', true),
       supabase.from('xp_events').select('xp_amount'),
       this.getSystemHealth(),
@@ -169,10 +169,10 @@ export class AdminConsoleService {
     }
 
     const [lessonsRes, quizzesRes, capstonesRes, certsRes] = await Promise.all([
-      supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('user_id', userId).eq('completed', true),
+      supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'completed'),
       supabase.from('quiz_attempts').select('id', { count: 'exact', head: true }).eq('user_id', userId),
       supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-      supabase.from('user_certificates').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+      supabase.from('certificates').select('id', { count: 'exact', head: true }).eq('user_id', userId),
     ])
 
     return {
