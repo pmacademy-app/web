@@ -8,9 +8,9 @@
 ## 1. Repository Metadata
 
 - **Current Branch:** `main`
-- **Current Version:** `0.3.0-architecture` (Architecture Review & Refactor complete)
-- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 47 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Architecture Refactor COMPLETE**
+- **Current Version:** `0.3.0-notifications` (Sprint 6.3 In-App Notifications complete)
+- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 48 routes, 90 lessons compiled)
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 6.3 In-App Notifications COMPLETE**
 
 ---
 
@@ -28,18 +28,18 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 3 – Stabilization Sprint (Priority 1 + 2 + 3):** ✅ Complete
 - **Phase 3 – Sprint 6.1 (Notification Platform Foundation):** ✅ Complete (`apps/web/lib/notifications/`)
 - **Phase 3 – Sprint 6.2 (Email Engine & Delivery Infrastructure):** ✅ Complete (`apps/web/emails/`, `app/api/cron/`)
-- **Phase 3 – Architecture Refactor Sprint:** ✅ Complete (`apps/web/lib/` domain organization, `lib/admin/` foundation, 11/11 passing test suites)
-- **Current Focus:** Awaiting Review before Phase 3 Sprint 6.3 (Notifications UI & Preferences)
+- **Phase 3 – Architecture Refactor Sprint:** ✅ Complete (`apps/web/lib/` domain organization)
+- **Phase 3 – Sprint 6.3 (In-App Notification Center & Preferences):** ✅ Complete (`NotificationBell`, `NotificationCenterDrawer`, `/api/notifications/`)
+- **Current Focus:** Awaiting Review before Phase 3 Sprint 6.4 (Admin Console UI)
 
 ---
 
 ## 3. What's Next
 
-Architecture Refactor Sprint is complete with 0 breaking changes and 11 passing test suites (87+ unit tests). Awaiting review before **Sprint 6.3**:
+Sprint 6.3 In-App Notifications is complete with 22 passing notification unit tests (91+ total unit tests). Awaiting review before **Sprint 6.4**:
 
-1. **[Phase 3 - Sprint 6.3 — Next] Notifications UI & Preferences:** Notification Bell component, topbar unread indicator, In-App Notification Center drawer, and `/settings` notification preferences management.
-2. **[Phase 3 - Sprint 6.4] Admin Console UI:** Modular `/admin` dashboard views (Dashboard, Users, Notifications, Emails, System).
-3. **[Phase 3 - Sprint 7] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
+1. **[Phase 3 - Sprint 6.4 — Next] Admin Console UI:** Modular `/admin` dashboard views (Dashboard, Users, Notifications, Emails, System).
+2. **[Phase 3 - Sprint 7] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
 
 ---
 
