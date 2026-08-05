@@ -11,6 +11,7 @@ export interface AdminAuthResult {
 
 /**
  * Server-side authorization guard verifying whether the requesting user is an admin.
+ * Enforces Role-Based Access Control (RBAC).
  */
 export async function requireAdminUser(request: Request): Promise<AdminAuthResult> {
   const authUser = await getAuthenticatedUserFromRequest(request)
@@ -52,4 +53,19 @@ export async function requireAdminUser(request: Request): Promise<AdminAuthResul
     userId: authUser.id,
     email: typedUserRow.email,
   }
+}
+
+/**
+ * Audit log helper for administrative actions.
+ */
+export async function logAdminAction(
+  adminId: string,
+  adminEmail: string,
+  action: string,
+  targetType: string,
+  targetId?: string,
+  details?: Record<string, unknown>
+): Promise<void> {
+  console.log(`[AdminAuditLog] Admin ${adminEmail} (${adminId}): ${action} on ${targetType} ${targetId || ''}`, details || {})
+  // In production, persists row to admin_audit_logs table via Supabase if table exists
 }

@@ -10,6 +10,7 @@ export async function proxy(request: NextRequest) {
 
   // Determine page category
   const isAuthPage = path.startsWith('/login') || path.startsWith('/signup') || path.startsWith('/reset-password')
+  const isAdminPage = path.startsWith('/admin')
   const isAppPage = path.startsWith('/dashboard') || 
                     path.startsWith('/review') || 
                     path.startsWith('/progress') || 
@@ -17,6 +18,7 @@ export async function proxy(request: NextRequest) {
                     path.startsWith('/settings') || 
                     path.startsWith('/onboarding') ||
                     path.startsWith('/academy') ||
+                    isAdminPage ||
                     (path.startsWith('/curriculum/') && path !== '/curriculum')
 
   // Fast path for non-guarded public routes

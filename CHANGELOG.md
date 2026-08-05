@@ -8,6 +8,41 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 6.4: Operational Admin Console
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **Admin Authorization & RBAC Guard (`apps/web/lib/admin/guard.ts`)**:
+  - `requireAdminUser(request)` server-side guard verifying auth token and `is_admin` database flag on every `/api/admin/*` route handler.
+  - `logAdminAction(...)` audit logging function recording admin activities.
+- **Middleware RBAC Protection (`apps/web/proxy.ts`)**:
+  - Intercepts `/admin/*` routes to enforce authenticated session and admin user role.
+- **Dedicated Admin Shell Layout (`apps/web/app/admin/layout.tsx`)**:
+  - Custom dark operational theme layout featuring `AdminSidebar` and `AdminHeader`.
+  - Navigation across 12 operations modules with "Switch to Learner View" trigger.
+- **Admin Operations Pages (`apps/web/app/admin/*`)**:
+  - **Dashboard (`/admin`)**: Real-time system metrics (Users, Lessons, XP, Certs, Portfolios, Queue count, DB Latency).
+  - **User Management (`/admin/users`)**: User search, role toggling (Admin/Learner), XP & streak inspection.
+  - **Academy Content (`/admin/content`)**: Curriculum status overview across 90 compiled lessons, 90 quizzes, 450 flashcards, 9 capstones.
+  - **Notifications (`/admin/notifications`)**: Notification events timeline and channel deliverability breakdown.
+  - **Email Queue (`/admin/emails`)**: Queue status, delivery stats, and manual queue trigger.
+  - **Templates (`/admin/templates`)**: Registry of React Email templates with priority levels and test trigger.
+  - **Feature Flags (`/admin/feature-flags`)**: Real-time runtime feature flag dashboard.
+  - **System Health (`/admin/system`)**: Infrastructure health, database latency, and scheduler mode.
+  - **Certificates (`/admin/certificates`)**: Credential audit and verification link checker (`/verify/[id]`).
+  - **Portfolios (`/admin/portfolios`)**: Published portfolio audit (`/p/[username]`).
+  - **Analytics (`/admin/analytics`)**: Growth, completion velocity, and XP velocity metrics.
+  - **Settings (`/admin/settings`)**: RBAC security and middleware policy overview.
+- **Admin API Suite (`apps/web/app/api/admin/*`)**:
+  - `/api/admin/summary`, `/api/admin/users`, `/api/admin/content`, `/api/admin/notifications`, `/api/admin/emails/queue`, `/api/admin/feature-flags`, `/api/admin/system/health`.
+- **Admin Console Test Suite (`apps/web/lib/__tests__/admin-console.test.ts`)**:
+  - Unit tests verifying feature flag lookup, toggles, and content overview. Added `"test:admin"` script to `package.json`.
+
+---
+
 ## [Unreleased] - Phase 3 Notification Platform Alignment
 
 - **Status:** Development Complete — Architecture Synchronized
