@@ -4,6 +4,7 @@ import { AdminConsoleService } from '@/lib/admin/service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
+import { FeatureFlagToggle } from '@/components/admin/FeatureFlagToggle'
 
 export const revalidate = 0
 
@@ -43,15 +44,7 @@ export default async function AdminFeatureFlagsPage() {
       headerClassName: 'text-right',
       className: 'text-right',
       cell: (flag) => (
-        <button
-          className={`px-3 py-1 rounded text-[11px] font-bold border transition-colors ${
-            flag.enabled
-              ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border-rose-500/30'
-              : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-          }`}
-        >
-          {flag.enabled ? 'Disable Flag' : 'Enable Flag'}
-        </button>
+        <FeatureFlagToggle flagKey={flag.key} initialEnabled={flag.enabled} />
       ),
     },
   ]

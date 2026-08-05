@@ -8,6 +8,25 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 6.4.3: Admin Operational Functionality & Live Actions
+
+- **Status:** Development Complete — Fully Functional
+- **Release Date:** 2026-08-05
+
+### Added & Functionalized
+
+- **User Role Management & User Inspection**:
+  - Created `UserRoleToggle` component (`components/admin/UserRoleToggle.tsx`) executing real-time `PATCH /api/admin/users` role promotions (`Admin` vs `Learner`).
+  - Created User Detail page (`app/admin/users/[id]/page.tsx`) displaying account metadata, completed lessons count, quiz attempts, certificates issued, goal, and embedded `DeveloperActionsSection`.
+- **Manual Email Queue Trigger**:
+  - Created `ProcessEmailQueueButton` component (`components/admin/ProcessEmailQueueButton.tsx`) invoking `POST /api/admin/emails/queue` to trigger real-time queue processing.
+- **Runtime Feature Flag Control**:
+  - Created `FeatureFlagToggle` component (`components/admin/FeatureFlagToggle.tsx`) invoking `PATCH /api/admin/feature-flags` to toggle feature states in real time.
+- **Transactional Test Email Sender**:
+  - Created `SendTestEmailButton` component (`components/admin/SendTestEmailButton.tsx`) invoking `POST /api/dev/send-test-email` to send test email previews directly from the template registry.
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 6.4.2: Admin Console UI/UX Alignment
 
 - **Status:** Development Complete — UI/UX Polish Applied

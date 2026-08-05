@@ -1,8 +1,9 @@
 import React from 'react'
-import { FileCode, Send } from 'lucide-react'
+import { FileCode } from 'lucide-react'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
+import { SendTestEmailButton } from '@/components/admin/SendTestEmailButton'
 
 export const revalidate = 0
 
@@ -55,10 +56,8 @@ export default async function AdminTemplatesPage() {
       header: 'Actions',
       headerClassName: 'text-right',
       className: 'text-right',
-      cell: () => (
-        <button className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold border border-slate-700 transition-colors inline-flex items-center gap-1">
-          <Send className="w-3 h-3 text-amber-400" /> Send Test
-        </button>
+      cell: (tpl) => (
+        <SendTestEmailButton templateKey={tpl.key} templateName={tpl.name} />
       ),
     },
   ]
