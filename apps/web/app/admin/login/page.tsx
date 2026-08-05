@@ -4,11 +4,21 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ShieldCheck, Lock, Mail, Loader2, ArrowRight } from 'lucide-react'
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserSupabaseClient } from '@/lib/supabase'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
+/**
+ * Admin Console login.
+ *
+ * PM Academy has a SINGLE authentication system: this page authenticates the
+ * user with the same Supabase account used for the learner side. After
+ * authentication, authorization (ADMIN_EMAILS OR users.is_admin) is verified
+ * server-side before routing:
+ *   - authorized  -> /admin
+ *   - unauthorized-> /admin/access-denied
+ *
+ * Session cookies are persisted via /api/auth/session so tokens stay
+ * httpOnly (never exposed to document.cookie / XSS).
+ */
 export default function AdminLoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
@@ -22,7 +32,7 @@ export default function AdminLoginPage() {
     setError(null)
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      const supabase = createBrowserSupabaseClient()
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -34,12 +44,33 @@ export default function AdminLoginPage() {
         return
       }
 
-      // Store auth tokens in cookies for middleware proxy
-      document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${data.session.expires_in}; SameSite=Lax; ${location.protocol === 'https:' ? 'Secure;' : ''}`
-      document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax; ${location.protocol === 'https:' ? 'Secure;' : ''}`
+      // Persist the session as httpOnly server-side cookies so the middleware
+      // and server components can verify the request.
+      const syncRes = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session: data.session }),
+      })
 
-      // Redirect to /admin — proxy & layout guard will perform final RBAC verification
-      router.push('/admin')
+      if (!syncRes.ok) {
+        setError('Failed to persist your session. Please try again.')
+        setLoading(false)
+        return
+      }
+
+      // Verify authorization before entering the console. This endpoint runs
+      // the server-side RBAC guard (ADMIN_EMAILS OR users.is_admin).
+      let authorized = false
+      try {
+        const verifyRes = await fetch('/api/admin/verify')
+        const verifyData = (await verifyRes.json()) as { authorized?: boolean }
+        authorized = Boolean(verifyData.authorized)
+      } catch {
+        // Fall back to middleware routing if the verification call fails.
+        authorized = false
+      }
+
+      router.push(authorized ? '/admin' : '/admin/access-denied')
       router.refresh()
     } catch {
       setError('An error occurred during authentication')
