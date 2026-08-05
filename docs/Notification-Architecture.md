@@ -365,28 +365,33 @@ The queue processor parses and executes pending entries based on Priority values
 
 ## 8. Scheduler Architecture
 
-### 8.1 GitHub Actions Scheduler
+### 8.1 Provider-Agnostic Scheduler Abstraction
 
-Scheduled tasks are managed via GitHub Actions cron triggers defined in `.github/workflows/notification-scheduler.yml`. This decouples scheduling from serverless platform vendors (e.g. Vercel Cron).
+Scheduled background tasks are managed via a provider-agnostic scheduler abstraction. Business logic and queue processing do not depend on any specific platform (such as Vercel Cron, GitHub Actions, or Supabase Scheduled Functions).
 
-All scheduled HTTP calls execute as `POST` requests to API route endpoints protected by `Authorization: Bearer ${CRON_SECRET}`.
+The runtime feature flag controlling scheduled background execution is named `SCHEDULER_ENABLED`.
 
-```yaml
-# .github/workflows/notification-scheduler.yml
-on:
-  schedule:
-    - cron: '*/15 * * * *'  # Process email queue every 15 minutes
-    - cron: '0 * * * *'     # Retry failed emails every hour
-    - cron: '0 18 * * 0'    # Weekly recap (Sunday 18:00 UTC)
-    - cron: '0 2 * * *'     # Queue & log cleanup (Daily 02:00 UTC)
-```
+All scheduled tasks invoke system cron API routes via HTTP `POST` requests secured with `Authorization: Bearer ${CRON_SECRET}`:
 
-| Route Endpoint | Schedule | Purpose |
-|----------------|----------|---------|
-| `/api/cron/process-email-queue` | Every 15 min | Processes pending queue items in priority order |
-| `/api/cron/retry-failed` | Every 1 hour | Retries failed emails with exponential backoff |
-| `/api/cron/weekly-recap` | Sunday 18:00 UTC | Generates weekly learning summary emails for active users |
-| `/api/cron/cleanup` | Daily 02:00 UTC | Purges expired in-app notifications and old queue logs |
+| Route Endpoint | Default Frequency | Purpose |
+|----------------|-------------------|---------|
+| `/api/cron/process-email-queue` | Every 15 min | Processes pending queue items ordered by priority |
+| `/api/cron/retry-failed` | Every 1 hour | Retries failed emails using exponential backoff |
+| `/api/cron/weekly-recap` | Weekly trigger | Evaluates timezone-eligible learners and queues weekly recaps |
+| `/api/cron/cleanup` | Daily 02:00 UTC | Purges expired in-app notifications (>14d) & queue logs |
+
+### 8.2 Timezone-Aware Weekly Recap Evaluator
+
+The weekly recap schedule is **timezone-aware**. Rather than broadcasting to all users simultaneously at a static UTC hour:
+
+1. The scheduler invokes `/api/cron/weekly-recap` periodically (e.g. weekly or daily).
+2. The endpoint evaluates each learner against `isUserEligibleForWeeklyRecap()` based on:
+   - `userPreferences.timezone` (e.g., `'America/New_York'`, `'Asia/Kolkata'`, `'UTC'`)
+   - `userPreferences.preferredRecapDay` (0 = Sunday, 1 = Monday, ..., 6 = Saturday; default: `0`)
+   - `userPreferences.preferredRecapHour` (0-23 local hour; default: `18` / 6 PM local)
+3. Only learners whose local day and hour match their preferred window (within a configurable tolerance) are queued for recap generation.
+
+This allows swapping the underlying runner (GitHub Actions workflow, AWS EventBridge, Supabase Cron, etc.) without altering any core notification or timezone business logic.
 
 ---
 
