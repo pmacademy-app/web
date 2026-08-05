@@ -45,7 +45,6 @@ export async function isAdminUser(
     .eq('id', userId)
     .maybeSingle()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const row = data as unknown as { is_admin?: boolean } | null
   return Boolean(row?.is_admin)
 }

@@ -75,7 +75,6 @@ export default async function AdminTemplatesPage() {
         columns={columns}
         data={EMAIL_TEMPLATES}
         keyExtractor={(tpl) => tpl.id}
-        searchPlaceholder="Filter email templates..."
       />
     </div>
   )

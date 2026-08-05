@@ -62,7 +62,6 @@ export default async function AdminFeatureFlagsPage() {
         columns={columns}
         data={flags}
         keyExtractor={(f) => f.key}
-        searchPlaceholder="Filter feature flags..."
         emptyTitle="No feature flags configured"
       />
     </div>

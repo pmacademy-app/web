@@ -59,7 +59,6 @@ export default async function AdminPortfoliosPage() {
         columns={columns}
         data={portfolioUsers}
         keyExtractor={(u) => u.id}
-        searchPlaceholder="Filter published portfolios..."
         emptyTitle="No public portfolios published yet"
         emptyDescription="Learners can enable public portfolio links from their account settings."
       />

@@ -59,7 +59,6 @@ export default async function AdminCertificatesPage() {
         columns={columns}
         data={certList}
         keyExtractor={(c) => c.id}
-        searchPlaceholder="Filter certificates..."
         emptyTitle="No certificates issued yet"
         emptyDescription="Certificates will appear here once learners complete modules or the full curriculum."
       />
