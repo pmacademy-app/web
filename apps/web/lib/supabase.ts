@@ -267,6 +267,95 @@ export type Database = {
         }
         Update: Partial<Database['public']['Tables']['user_badges']['Insert']>
       }
+      user_leaderboard_settings: {
+        Row: {
+          user_id: string
+          is_opted_in: boolean
+          allow_friend_requests: boolean
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          is_opted_in?: boolean
+          allow_friend_requests?: boolean
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['user_leaderboard_settings']['Insert']>
+      }
+      weekly_leaderboard_snapshots: {
+        Row: {
+          id: string
+          week_start: string
+          user_id: string
+          days_studied: number
+          lessons_completed: number
+          xp_earned: number
+          rank: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          week_start: string
+          user_id: string
+          days_studied?: number
+          lessons_completed?: number
+          xp_earned?: number
+          rank?: number
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['weekly_leaderboard_snapshots']['Insert']>
+      }
+      user_friends: {
+        Row: {
+          id: string
+          user_id: string
+          friend_id: string
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          friend_id: string
+          status?: string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['user_friends']['Insert']>
+      }
+      cohorts: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          description: string | null
+          is_private: boolean
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          description?: string | null
+          is_private?: boolean
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['cohorts']['Insert']>
+      }
+      cohort_members: {
+        Row: {
+          cohort_id: string
+          user_id: string
+          joined_at: string
+        }
+        Insert: {
+          cohort_id: string
+          user_id: string
+          joined_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['cohort_members']['Insert']>
+      }
       waitlist: {
         Row: {
           id: string
