@@ -1,10 +1,11 @@
 import React from 'react'
-import { Mail, RefreshCw, Play } from 'lucide-react'
+import { Mail, RefreshCw } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
+import { ProcessEmailQueueButton } from '@/components/admin/ProcessEmailQueueButton'
 
 export const revalidate = 0
 
@@ -49,11 +50,7 @@ export default async function AdminEmailsPage() {
         description="Monitor outgoing transactional emails, queue processing states, and delivery logs."
         icon={Mail}
         iconColor="text-blue-400"
-        actions={
-          <button className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-colors inline-flex items-center gap-1.5 shadow-lg">
-            <Play className="w-3.5 h-3.5 fill-slate-950" /> Process Queue Now
-          </button>
-        }
+        actions={<ProcessEmailQueueButton />}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

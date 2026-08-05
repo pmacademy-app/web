@@ -1,9 +1,10 @@
 import React from 'react'
+import Link from 'next/link'
 import { Users, Flame, Zap } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
-import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
+import { UserRoleToggle } from '@/components/admin/UserRoleToggle'
 import { DeveloperActionsSection } from '@/components/admin/DeveloperActionsSection'
 import type { AdminUserOverview } from '@/lib/admin/types'
 
@@ -30,9 +31,10 @@ export default async function AdminUsersPage() {
     {
       header: 'Role',
       cell: (user) => (
-        <AdminStatusBadge
-          status={user.isAdmin ? 'admin' : 'learner'}
-          label={user.isAdmin ? 'Admin' : 'Learner'}
+        <UserRoleToggle
+          userId={user.id}
+          initialIsAdmin={user.isAdmin}
+          userEmail={user.email}
         />
       ),
     },
@@ -71,10 +73,13 @@ export default async function AdminUsersPage() {
       header: 'Actions',
       headerClassName: 'text-right',
       className: 'text-right',
-      cell: () => (
-        <button className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold border border-slate-700 transition-colors">
+      cell: (user) => (
+        <Link
+          href={`/admin/users/${user.id}`}
+          className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold border border-slate-700 transition-colors"
+        >
           Inspect Profile
-        </button>
+        </Link>
       ),
     },
   ]
