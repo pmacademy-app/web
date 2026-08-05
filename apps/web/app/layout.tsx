@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Fraunces } from 'next/font/google'
 import Script from 'next/script'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { Analytics } from '@vercel/analytics/next'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AuthStateListener from '@/components/layout/AuthStateListener'
 import '@/app/globals.css'
@@ -158,6 +159,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {process.env.NODE_ENV === 'production' && GA_ID && (
           <GoogleAnalytics gaId={GA_ID} />
         )}
+
+        {/* Vercel Web Analytics */}
+        <Analytics />
       </body>
     </html>
   )
