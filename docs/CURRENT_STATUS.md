@@ -8,9 +8,9 @@
 ## 1. Repository Metadata
 
 - **Current Branch:** `main`
-- **Current Version:** `0.3.0-rc` (Sprint 6.1 Foundation complete)
-- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 39 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 6.1 Platform Foundation COMPLETE**
+- **Current Version:** `0.3.0-rc` (Sprint 6.2 Email Engine complete)
+- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 47 routes, 90 lessons compiled)
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 6.2 Email Engine & Delivery COMPLETE**
 
 ---
 
@@ -27,17 +27,18 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 3 – Sprint 5 (Friends & Cohort Leaderboard `/leaderboard`):** ✅ Complete
 - **Phase 3 – Stabilization Sprint (Priority 1 + 2 + 3):** ✅ Complete
 - **Phase 3 – Sprint 6.1 (Notification Platform Foundation):** ✅ Complete (`apps/web/lib/notifications/`)
-- **Current Focus:** Awaiting Review before Phase 3 Sprint 6.2 (Email Templates, Queue Workers & Crons)
+- **Phase 3 – Sprint 6.2 (Email Engine & Delivery Infrastructure):** ✅ Complete (`apps/web/emails/`, `app/api/cron/`)
+- **Current Focus:** Awaiting Review before Phase 3 Sprint 6.3 (Notifications UI & Preferences)
 
 ---
 
 ## 3. What's Next
 
-Sprint 6.1 Notification Platform Foundation is complete with 10 passing unit tests. Awaiting review before **Sprint 6.2**:
+Sprint 6.2 Email Engine & Delivery Infrastructure is complete with 8 passing unit tests (18 total notification tests). Awaiting review before **Sprint 6.3**:
 
-1. **[Phase 3 - Sprint 6.2 — Next] Email Templates, Queue Workers & Cron Jobs:** React Email template components (`EmailWrapper`, `BadgeEarned`, `Welcome`, `LevelUp`, `WeeklyRecap`), Vercel Cron worker routes (`/api/cron/process-email-queue`, `/api/cron/daily-reminders`, etc.), and Resend webhooks.
-2. **[Phase 3 - Sprint 6.3] Notifications UI & Preferences:** Notification Bell, In-App Notification Center, `/settings` notification toggles.
-3. **[Phase 3 - Sprint 6.4] Admin Console UI:** `/admin` module dashboards.
+1. **[Phase 3 - Sprint 6.3 — Next] Notifications UI & Preferences:** Notification Bell component, topbar unread indicator, In-App Notification Center drawer, and `/settings` notification preferences management.
+2. **[Phase 3 - Sprint 6.4] Admin Console UI:** Modular `/admin` dashboard views (Dashboard, Users, Notifications, Emails, System).
+3. **[Phase 3 - Sprint 7] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
 
 ---
 
