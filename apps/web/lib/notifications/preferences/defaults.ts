@@ -1,19 +1,44 @@
 import type { UserNotificationPreferences } from './types'
 import type { NotificationCategory, NotificationChannel } from '../types'
 
+/**
+ * Default notification preferences aligned with the finalized PM Academy communication strategy.
+ *
+ * Communication hierarchy:
+ *   PRIMARY  → In-App Notifications (all learning events)
+ *   SECONDARY → Email (Auth/Security, Major Milestones, Weekly Recap, Admin broadcasts only)
+ *
+ * Email is disabled by default for:
+ *   - lesson.completed, quiz.completed, review.completed (In-App only)
+ *   - badge.earned, xp.level_up, streak.* (In-App only)
+ *
+ * Email is enabled by default for:
+ *   - Security: welcome, verify, password reset, suspicious login (always on)
+ *   - Major milestones: module.completed, certificate.generated, portfolio.published
+ *   - Weekly learning recap (max once/week, meaningful activity required)
+ *   - Admin product announcements (manually triggered)
+ */
 export function createDefaultNotificationPreferences(userId: string): UserNotificationPreferences {
   return {
     userId,
     allNotifications: true,
     allEmail: true,
     allInApp: true,
+    // Security: always email + in-app (non-negotiable)
     security: { email: true, inApp: true },
-    learning: { email: true, inApp: true },
-    achievements: { email: true, inApp: true },
+    // Learning events: In-App only. Email disabled (lesson/quiz/review/streak/flashcard are in-app)
+    learning: { email: false, inApp: true },
+    // Achievements: In-App only. Badge earned, XP level up are in-app.
+    // Major module completion emails handled by certificates/portfolio channels.
+    achievements: { email: false, inApp: true },
+    // Portfolio published: email + in-app (major milestone)
     portfolio: { email: true, inApp: true },
+    // Certificate generated: email + in-app (major milestone)
     certificates: { email: true, inApp: true },
+    // Product updates / Admin broadcasts: email + in-app (manually initiated by admin)
     productUpdates: { email: true, inApp: true },
-    marketing: { email: false, inApp: false }, // Explicit opt-in
+    // Marketing: explicit opt-in only, default OFF
+    marketing: { email: false, inApp: false },
     preferredReminderHour: 9,
     timezone: 'UTC',
     updatedAt: new Date().toISOString(),

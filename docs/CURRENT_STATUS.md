@@ -8,9 +8,9 @@
 ## 1. Repository Metadata
 
 - **Current Branch:** `main`
-- **Current Version:** `0.3.0-notifications` (Sprint 6.3 In-App Notifications complete)
+- **Current Version:** `0.3.0-notifications` (Sprint 6 Alignment complete)
 - **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 48 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 6.3 In-App Notifications COMPLETE**
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Notification Platform Alignment COMPLETE**
 
 ---
 
@@ -30,6 +30,7 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 3 – Sprint 6.2 (Email Engine & Delivery Infrastructure):** ✅ Complete (`apps/web/emails/`, `app/api/cron/`)
 - **Phase 3 – Architecture Refactor Sprint:** ✅ Complete (`apps/web/lib/` domain organization)
 - **Phase 3 – Sprint 6.3 (In-App Notification Center & Preferences):** ✅ Complete (`NotificationBell`, `NotificationCenterDrawer`, `/api/notifications/`)
+- **Phase 3 – Notification Platform Alignment:** ✅ Complete (In-App primary, Email restricted, GitHub Actions scheduler, daily reminders removed)
 - **Current Focus:** Awaiting Review before Phase 3 Sprint 6.4 (Admin Console UI)
 
 ---

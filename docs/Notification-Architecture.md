@@ -1,7 +1,7 @@
 # PM Academy — Notification & Communication Architecture
 
-**Status:** Design Complete — Pre-Implementation Blueprint
-**Version:** 1.1
+**Status:** Implementation Complete — Architecture Aligned
+**Version:** 1.2
 **Created:** 2026-08-05
 **Owner:** Solo founder
 **Companion docs:** `Architecture.md`, `PRD.md`, `AUTH_FLOW.md`, `Phases.md`
@@ -247,18 +247,19 @@ Resend Webhooks -> /api/email/webhooks
       └── Bounces/complaints -> email_suppressions
 ```
 
-### 4.2 Channels and Opt-out Rules
+### 4.2 Communication Strategy & Channel Rules
 
-| Category | Email Opt-out | In-App Opt-out | Default Config |
-|----------|---------------|----------------|----------------|
-| **Transactional / Auth** | ❌ Allowed | ❌ Allowed | Always Enabled |
-| **Security** | ❌ Allowed | ❌ Allowed | Always Enabled |
-| **Learning — Achievements**| ✅ Allowed | ✅ Allowed | Default ON |
-| **Learning — Reminders** | ✅ Allowed | ✅ Allowed | Default ON |
-| **Learning — Recaps** | ✅ Allowed | ✅ Allowed | Default ON |
-| **Product Updates** | ✅ Allowed | ✅ Allowed | Default ON |
-| **Admin Broadcasts** | ✅ Allowed | ❌ Allowed | Default ON |
-| **Marketing** | ✅ Allowed | ✅ Allowed | Default OFF |
+| Category | Primary Channel | Secondary Channel | Email Opt-out | In-App Opt-out | Default Config | Trigger / Notes |
+|----------|-----------------|-------------------|---------------|----------------|----------------|-----------------|
+| **Transactional / Auth** | Email | In-App | ❌ Allowed | ❌ Allowed | Always Enabled | Welcome, Verify, Password Reset |
+| **Security** | Email + In-App | — | ❌ Allowed | ❌ Allowed | Always Enabled | Suspicious Login, Security Alert |
+| **Major Achievements** | In-App | Email | ✅ Allowed | ✅ Allowed | Default ON | Module Completed, Certificate, Portfolio |
+| **Daily Learning / Gamification** | In-App Only | — | ❌ N/A | ✅ Allowed | In-App ON / Email OFF | Lesson completed, Quiz, Badge, XP, Streak |
+| **Weekly Recap** | Email + In-App | — | ✅ Allowed | ✅ Allowed | Default ON | Weekly scheduled summary (activity required) |
+| **Product Announcements** | In-App | Email | ✅ Allowed | ✅ Allowed | Default ON | Admin-initiated broadcasts only (No Auto-send) |
+| **Marketing** | Email | In-App | ✅ Allowed | ✅ Allowed | Default OFF | Explicit opt-in only |
+
+*Note: Daily reminder emails, inactivity reminder emails, and daily streak loss reminder emails have been explicitly removed to uphold the Learner Respect Principle.*
 
 ---
 
@@ -364,23 +365,28 @@ The queue processor parses and executes pending entries based on Priority values
 
 ## 8. Scheduler Architecture
 
-### 8.1 Vercel Cron Jobs
+### 8.1 GitHub Actions Scheduler
 
-Scheduled communications are managed via Vercel Cron routes. All cron handlers require `Authorization: Bearer ${CRON_SECRET}`.
+Scheduled tasks are managed via GitHub Actions cron triggers defined in `.github/workflows/notification-scheduler.yml`. This decouples scheduling from serverless platform vendors (e.g. Vercel Cron).
 
-```json
-{
-  "crons": [
-    { "path": "/api/cron/process-email-queue", "schedule": "*/10 * * * *" },
-    { "path": "/api/cron/daily-reminders",     "schedule": "0 * * * *" },
-    { "path": "/api/cron/weekly-recap",         "schedule": "0 18 * * 0" },
-    { "path": "/api/cron/inactive-nudge",       "schedule": "0 9 * * *" },
-    { "path": "/api/cron/capstone-reminder",    "schedule": "0 10 * * 1" },
-    { "path": "/api/cron/retry-failed",         "schedule": "0 */3 * * *" },
-    { "path": "/api/cron/cleanup",              "schedule": "0 2 * * *" }
-  ]
-}
+All scheduled HTTP calls execute as `POST` requests to API route endpoints protected by `Authorization: Bearer ${CRON_SECRET}`.
+
+```yaml
+# .github/workflows/notification-scheduler.yml
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Process email queue every 15 minutes
+    - cron: '0 * * * *'     # Retry failed emails every hour
+    - cron: '0 18 * * 0'    # Weekly recap (Sunday 18:00 UTC)
+    - cron: '0 2 * * *'     # Queue & log cleanup (Daily 02:00 UTC)
 ```
+
+| Route Endpoint | Schedule | Purpose |
+|----------------|----------|---------|
+| `/api/cron/process-email-queue` | Every 15 min | Processes pending queue items in priority order |
+| `/api/cron/retry-failed` | Every 1 hour | Retries failed emails with exponential backoff |
+| `/api/cron/weekly-recap` | Sunday 18:00 UTC | Generates weekly learning summary emails for active users |
+| `/api/cron/cleanup` | Daily 02:00 UTC | Purges expired in-app notifications and old queue logs |
 
 ---
 

@@ -1,14 +1,34 @@
 import type { StandardFeatureFlagKey, FeatureFlagRecord } from './types'
 
+/**
+ * Default feature flag values for PM Academy Notification Platform.
+ *
+ * Communication strategy:
+ * - In-App Notifications = Primary channel for all learning events
+ * - Email = Secondary, restricted to Auth/Security + Major Milestones + Weekly Recap + Admin broadcasts
+ * - Daily reminder emails are NOT supported (learner respect principle)
+ * - All product announcement emails are Admin-initiated only (no automatic broadcasts)
+ * - Scheduler: GitHub Actions (not Vercel Cron)
+ */
 export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
+  // Global channel controls
   EMAIL_ENABLED: true,
-  WEEKLY_RECAP_ENABLED: true,
-  BADGE_EMAILS_ENABLED: true,
   IN_APP_NOTIFICATIONS_ENABLED: true,
-  PORTFOLIO_EMAILS_ENABLED: true,
-  DAILY_REMINDERS_ENABLED: true,
-  MARKETING_EMAILS_ENABLED: false,
   QUEUE_PROCESSING_ENABLED: true,
+
+  // Email scope: Only major achievement milestones (module completed, certificate, portfolio)
+  // Per-lesson/badge/XP events are In-App only
+  ACHIEVEMENT_EMAIL_ENABLED: true,
+  PORTFOLIO_EMAILS_ENABLED: true,
+
+  // Scheduled emails
+  WEEKLY_RECAP_ENABLED: true,     // Only scheduled learner email — max once/week if meaningful activity
+
+  // Marketing: explicit opt-in only, default OFF
+  MARKETING_EMAILS_ENABLED: false,
+
+  // Scheduler mode: GitHub Actions (not Vercel Cron)
+  GITHUB_ACTIONS_SCHEDULER_ENABLED: true,
 }
 
 export class FeatureFlagService {
