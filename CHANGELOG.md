@@ -8,6 +8,22 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 1: Capstone Workspace
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **Module Capstone Workspace (`app/(app)/capstones/page.tsx`, `app/(app)/capstones/[module]/page.tsx`):** Complete Capstone Workspace supporting all 9 modules with module status overview (`locked`, `unlocked`, `draft`, `submitted`, `reviewed`), interactive guidelines panel, Notion/Linear-like rich text editor, reflection integration, and responsive Design System v3 layout.
+- **Capstone Data & Business Services (`config/capstones.ts`, `lib/capstones.ts`, `lib/capstones-db.ts`):** 9 module capstone definitions, word & character count calculators, submission validator (`validateCapstoneSubmission`), status derivator, and database operations for loading, draft saving, and submitting capstones.
+- **Debounced Autosave System (`hooks/useCapstoneAutosave.ts`):** 2.5s debounced background draft saver with LocalStorage offline fallback buffer and automatic draft restoration.
+- **API Endpoints (`app/api/capstones/`):** Authenticated route handlers for capstones overview (`GET /api/capstones`), module detail (`GET /api/capstones/[module]`), draft saving (`POST /api/capstones/[module]/draft`), and server-side submission (`POST /api/capstones/[module]/submit`).
+- **XP & Progress Integration (`lib/capstones-db.ts`):** Idempotent 150 XP award on capstone submission via append-only `xp_events` ledger, reflection update, and streak tracking.
+- **Capstones Unit Tests (`lib/__tests__/capstones.test.ts`):** Automated test suite verifying definitions, word count calculations, requirement validation, status logic, and XP constants (7 tests).
+
+---
+
 ## [v0.2.0] - Phase 2 Complete
 
 - **Status:** Stable Release

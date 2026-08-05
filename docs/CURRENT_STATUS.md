@@ -10,7 +10,7 @@
 - **Current Branch:** `main`
 - **Current Version:** `0.2.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
 - **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build - clean, 0 errors, 35 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 2: Gamification & Retention Engines — **COMPLETE** (`v0.2.0-phase2-complete` tag applied)
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 1 (Capstone Workspace) COMPLETE**
 
 ---
 
@@ -19,23 +19,19 @@
 For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roadmap.md`](./memory/roadmap.md).
 
 - **Phase 1 Foundation & Learning Loop:** ✅ Complete
-- **Phase 2 – Sprint 1 (XP & Level Engine):** ✅ Complete
-- **Phase 2 – Sprint 2 (Streak System & Timezone Engine):** ✅ Complete
-- **Phase 2 – Sprint 3 (Skill Radar & Competency Engine):** ✅ Complete
-- **Phase 2 – Sprint 4 (Dashboard 2.0 & Visual Layout):** ✅ Complete
-- **Phase 2 – Sprint 5 (Flashcard Review Hub & SM-2 Spaced Repetition):** ✅ Complete
-- **Current Focus:** **Phase 3** (Social & Portfolio Infrastructure) — ready to begin.
+- **Phase 2 Gamification & Retention Layer:** ✅ Complete (`v0.2.0-stable`)
+- **Phase 3 – Sprint 1 (Capstone Workspace):** ✅ Complete
+- **Current Focus:** **Phase 3 – Sprint 2** (Public Portfolios & Profiles `/p/[username]`).
 
 ---
 
 ## 3. What's Next
 
-Phase 2 is complete. The gamification and retention engine is fully operational. The next focus is **Phase 3**:
+Phase 3 Sprint 1 (Capstone Workspace) is complete. The next focus is **Phase 3 Sprint 2**:
 
-1. **[Phase 3] Public Profile & Portfolio:** Public profile pages (`/p/[username]`) with shareable skill radar, earned titles, and completed module credentials.
-2. **[Phase 3] Capstone Project Submissions:** End-of-module capstone workspace, artifact upload, and submission evaluation flows.
-3. **[Phase 3] Peer Review & Feedback Engine:** Structured peer feedback and evaluation criteria.
-4. **[Phase 3] Leaderboards & Social Feeds:** Weekly/all-time XP leaderboards and cohort activity feed.
+1. **[Phase 3 - Sprint 2] Public Profile & Shareable Portfolio (`/p/[username]`):** Public profile pages showcasing user's skill radar, earned career title, completed module credentials, public reflections, and submitted capstones.
+2. **[Phase 3 - Sprint 3] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops.
+3. **[Phase 3 - Sprint 4] Leaderboards & Cohort Feeds:** Weekly/all-time consistency leaderboards and cohort activity feed.
 
 ---
 
