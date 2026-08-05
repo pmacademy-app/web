@@ -1,7 +1,7 @@
 # PM Academy — Notification & Communication Architecture
 
 **Status:** Design Complete — Pre-Implementation Blueprint
-**Version:** 1.0
+**Version:** 1.1
 **Created:** 2026-08-05
 **Owner:** Solo founder
 **Companion docs:** `Architecture.md`, `PRD.md`, `AUTH_FLOW.md`, `Phases.md`
@@ -18,21 +18,21 @@
 3. [Event-Driven Architecture](#3-event-driven-architecture)
 4. [Communication Pipeline](#4-communication-pipeline)
 5. [Email Infrastructure](#5-email-infrastructure)
-6. [Future Notification Channels](#6-future-notification-channels)
-7. [Queue Architecture](#7-queue-architecture)
+6. [Multi-Channel Notification Engine (Email & In-App)](#6-multi-channel-notification-engine-email--in-app)
+7. [Queue Architecture & Priority Matrix](#7-queue-architecture--priority-matrix)
 8. [Scheduler Architecture](#8-scheduler-architecture)
 9. [Retry Strategy](#9-retry-strategy)
 10. [Rate Limiting](#10-rate-limiting)
 11. [User Notification Preferences](#11-user-notification-preferences)
-12. [Template System](#12-template-system)
-13. [Analytics](#13-analytics)
-14. [Monitoring](#14-monitoring)
+12. [Template System, Versioning & Feature Flags](#12-template-system-versioning--feature-flags)
+13. [Analytics & User Notification Timeline](#13-analytics--user-notification-timeline)
+14. [Monitoring & System Health Dashboard](#14-monitoring--system-health-dashboard)
 15. [Security](#15-security)
 16. [Local Development](#16-local-development)
 17. [Deployment](#17-deployment)
 18. [Scaling Strategy](#18-scaling-strategy)
 19. [Disaster Recovery](#19-disaster-recovery)
-20. [Admin Notification Center](#20-admin-notification-center)
+20. [Admin Console Architecture (/admin)](#20-admin-console-architecture-admin)
 21. [Developer Experience](#21-developer-experience)
 22. [Database Design](#22-database-design)
 23. [Future Expansion](#23-future-expansion)
@@ -51,9 +51,9 @@ The system must:
 - Nudge learners back into learning habits without being manipulative
 - Respect user preferences absolutely — no dark patterns, ever
 - Scale from 100 to 100,000+ users without requiring a redesign
-- Support a future multi-channel world (push, SMS, WhatsApp, Slack) without rebuilding the event layer
+- Support a multi-channel world (email, in-app, push, SMS, WhatsApp, Slack) without rebuilding the event layer or changing event producers
 
-The architecture is **event-driven at its core**. Email (or any other channel) is simply one delivery mechanism for a learning event. The event layer, preference system, queue, and logging infrastructure are channel-agnostic by design.
+The architecture is **event-driven at its core**. Email, in-app feeds, and push tokens are simply different delivery mechanisms for a single learning event. The event layer, preference system, queue, and logging infrastructure are channel-agnostic by design.
 
 ---
 
@@ -61,13 +61,13 @@ The architecture is **event-driven at its core**. Email (or any other channel) i
 
 | Principle | Description |
 |-----------|-------------|
-| **Event-first, channel-second** | Every communication originates from a learning event, not an email campaign decision. The event fires; the system decides whether and how to deliver it. |
+| **Event-first, channel-second** | Every communication originates from a learning event. The event fires once; the router determines which channels to push to. |
 | **Learner respect** | No urgency manufacturing, no fake scarcity, no FOMO tricks. Reminders inform; they do not manipulate. |
 | **Consent is non-negotiable** | Marketing and product update emails require explicit opt-in. Transactional and security emails are always enabled. |
 | **One source of truth per event** | Each learning event fires exactly once. Duplicate sends are a bug, not a feature. |
-| **Silent failure by default** | A notification failure never interrupts the learning flow. Emails are best-effort, not blockers. |
-| **Graceful degradation** | If Resend is down or rate-limited, the learning app continues to function. Emails queue and retry. |
-| **Observability** | Every email sent, queued, failed, or skipped is logged with enough context to diagnose any problem. |
+| **Silent failure by default** | A notification failure never interrupts the learning flow. Notifications are best-effort, not blockers. |
+| **Graceful degradation** | If Resend is down, the learning app continues to function. Emails queue and retry. If database is slow, in-app notifications degrade gracefully. |
+| **Observability** | Every notification sent, queued, failed, suppressed, or opened is logged with complete correlation metadata. |
 | **Privacy by design** | Minimum PII sent to any third-party service. No behavioral data leaves Supabase. |
 | **Free-tier first** | Design to operate entirely within Resend free tier (3,000 emails/month, 100/day) for the first 1,000 active users. Plan the upgrade trigger explicitly. |
 
@@ -77,7 +77,7 @@ The architecture is **event-driven at its core**. Email (or any other channel) i
 
 ### 3.1 Core Concept
 
-The notification system listens for **learning events** — meaningful moments in a user's learning journey. Every event carries a typed payload. Downstream handlers decide what to do with it (queue an email, award a badge, update the leaderboard, etc.).
+The notification system listens for **learning events** — meaningful moments in a user's learning journey. Every event carries a typed payload. Downstream handlers decide what to do with it (queue an email, write an in-app notification, award a badge, update the leaderboard, etc.).
 
 This separates *what happened* from *what to do about it*, making the system extensible without modifying existing event producers.
 
@@ -183,19 +183,6 @@ interface LessonCompletedPayload {
 }
 ```
 
-**Example: `badge.earned` payload**
-
-```typescript
-interface BadgeEarnedPayload {
-  badgeKey: string
-  badgeName: string
-  badgeDescription: string
-  badgeCategory: string
-  totalBadgesEarned: number
-  earnedAt: string
-}
-```
-
 ### 3.4 Event Firing Pattern
 
 Events are fired from **API route handlers** after the primary database mutation succeeds. The event must never block the HTTP response.
@@ -203,7 +190,7 @@ Events are fired from **API route handlers** after the primary database mutation
 ```typescript
 // Pattern: fire-and-forget inside API route
 async function POST(request: Request) {
-  // 1. Primary mutation
+  // 1. Primary mutation (the real work)
   const result = await completeLesson(supabase, userId, lessonId, ...)
 
   // 2. Fire event — never await, never block
@@ -221,7 +208,7 @@ async function POST(request: Request) {
 }
 ```
 
-`fireNotificationEvent()` inserts a row into `notification_events` and enqueues emails based on user preferences. It must never throw uncaught exceptions into the route handler.
+`fireNotificationEvent()` inserts a row into `notification_events` and routes the event to active delivery channels. It must never throw uncaught exceptions into the route handler.
 
 ---
 
@@ -231,44 +218,47 @@ async function POST(request: Request) {
 
 ```
 PM Academy API Route
-  Primary mutation succeeds
-    void fireNotificationEvent(event)
-      Notification Router
-        1. Log event to notification_events
-        2. Check user notification preferences
-        3. Apply rate limiting rules
-        4. For each applicable channel:
-           -> Insert row into email_queue (status: 'pending')
-           -> [Future] push_queue, sms_queue
+  └── Primary mutation succeeds
+      └── void fireNotificationEvent(event)
+          └── Notification Router
+              ├── Log event to notification_events
+              ├── Evaluate Feature Flags
+              ├── Check user notification preferences
+              ├── Evaluate Priority Matrix (delivery routing, rate limits)
+              └── Dispatch to active channels:
+                  ├── Email Channel -> Insert into email_queue (status: 'pending')
+                  ├── In-App Channel -> Insert into in_app_notifications (unread)
+                  └── [Future Push Channel] -> Insert into push_queue
 
 Vercel Cron (hourly)
-  /api/cron/process-email-queue
-    Batch SELECT pending rows (priority ASC, 50 at a time)
-      For each row:
-        Update status -> 'processing'
-        Render React Email template with variables
-        Send via Resend API
-        Success: status -> 'delivered'
-        Failure: status -> 'failed', schedule retry
-          attempt_count >= max: -> dead_letter
+  └── /api/cron/process-email-queue
+      └── Batch SELECT pending rows (priority ASC, 50 at a time)
+          └── For each row:
+              ├── Update status -> 'processing'
+              ├── Resolve Template Version
+              ├── Render React Email template with variables
+              ├── Send via Resend API
+              ├── Success: status -> 'delivered'
+              └── Failure: status -> 'failed', schedule retry
+                  └── attempt_count >= max: -> dead_letter
 
 Resend Webhooks -> /api/email/webhooks
-  Record open, click, bounce, complaint events
-    Bounces/complaints -> email_suppressions
+  └── Record open, click, bounce, complaint events in User Notification Timeline
+      └── Bounces/complaints -> email_suppressions
 ```
 
-### 4.2 Email Categories and Channels
+### 4.2 Channels and Opt-out Rules
 
-| Category | Send Type | Opt-out Allowed | Channel |
-|----------|-----------|-----------------|---------||
-| **Transactional / Auth** | Immediate | No — always sent | Email |
-| **Security** | Immediate | No — always sent | Email |
-| **Learning — Achievements** | Queued | Yes — per preference | Email |
-| **Learning — Reminders** | Scheduled | Yes — per preference | Email, [Push future] |
-| **Learning — Recaps** | Scheduled | Yes — per preference | Email |
-| **Product Updates** | Queued | Yes — per preference | Email |
-| **Admin Broadcasts** | Queued (bulk) | Yes — per preference | Email |
-| **Marketing** | Queued (bulk) | Yes — explicit opt-in only | Email |
+| Category | Email Opt-out | In-App Opt-out | Default Config |
+|----------|---------------|----------------|----------------|
+| **Transactional / Auth** | ❌ Allowed | ❌ Allowed | Always Enabled |
+| **Security** | ❌ Allowed | ❌ Allowed | Always Enabled |
+| **Learning — Achievements**| ✅ Allowed | ✅ Allowed | Default ON |
+| **Learning — Reminders** | ✅ Allowed | ✅ Allowed | Default ON |
+| **Learning — Recaps** | ✅ Allowed | ✅ Allowed | Default ON |
+| **Product Updates** | ✅ Allowed | ✅ Allowed | Default ON |
+| **Admin Broadcasts** | ✅ Allowed | ❌ Allowed | Default ON |
+| **Marketing** | ✅ Allowed | ✅ Allowed | Default OFF |
 
 ---
 
@@ -281,7 +271,7 @@ PM Academy uses **Resend** as the sole email provider (already integrated in `li
 - **Free tier:** 3,000 emails/month, 100/day
 - **Integration:** Direct REST API (no SDK — keeps bundle clean)
 - **Webhook:** Resend delivers open/click/bounce/complaint events to `/api/email/webhooks`
-- **Upgrade trigger:** Daily sends consistently hitting 80 emails/day. Switch to Resend Pro ($20/mo, 50k/month).
+- **Upgrade trigger:** Daily sends consistently hitting 80 emails/day → switch to Resend Pro ($20/mo, 50k/month)
 
 ### 5.2 Sender Configuration
 
@@ -291,203 +281,84 @@ Notifications:  "PM Academy" <learn@pmacademy.com>    Reply-To: support@pmacadem
 Product/Admin:  "PM Academy" <news@pmacademy.com>     Reply-To: support@pmacademy.com
 ```
 
-Different sending addresses allow domain-level reputation separation. Transactional reputation is never harmed by marketing volume.
+---
 
-### 5.3 Complete Email Catalogue
+## 6. Multi-Channel Notification Engine (Email & In-App)
 
-#### Authentication Emails (bypass queue — immediate send)
+The event system is channel-agnostic. When `fireNotificationEvent()` runs, it logs the event and distributes the message payload to all active, user-permitted channels.
 
-| Template Key | Subject | Trigger | Always Send |
-|---|---|---|---|
-| `auth.welcome` | "Welcome to PM Academy" | `user.created` | Yes |
-| `auth.verify_email` | "Confirm your PM Academy email" | Supabase signup | Yes |
-| `auth.password_reset` | "Reset your PM Academy password" | Supabase reset | Yes |
-| `auth.magic_link` | "Your PM Academy login link" | Supabase magic link | Yes |
-| `auth.email_changed` | "Your email address was updated" | `user.email_changed` | Yes |
-| `auth.waitlist_confirmed` | "You're on the list!" | `user.waitlist_joined` | Yes |
+```
+                  ┌───────────────┐
+                  │ Learning Event│
+                  └───────┬───────┘
+                          │
+            ┌─────────────▼─────────────┐
+            │    Notification Router    │
+            └─────────────┬─────────────┘
+                          │
+      ┌───────────────────┼───────────────────┐
+      ▼                   ▼                   ▼
+┌───────────┐       ┌───────────┐       ┌───────────┐
+│   Email   │       │  In-App   │       │Push (Fut.)│
+│ Pipeline  │       │ Pipeline  │       │ Pipeline  │
+└───────────┘       └───────────┘       └───────────┘
+```
 
-#### Learning Emails (queued, preference-gated)
+### 6.1 In-App Notification System
 
-| Template Key | Subject | Trigger Event | Default |
-|---|---|---|---|
-| `learning.daily_reminder` | "Your PM lesson is waiting" | `system.daily_reminder` | ON |
-| `learning.weekly_recap` | "Your week in PM Academy" | `system.weekly_recap` | ON |
-| `learning.resume_learning` | "Pick up where you left off" | `system.inactive_nudge` | ON |
-| `learning.review_due` | "{{N}} flashcards ready for review" | `review.session_due` | ON |
-| `learning.module_complete` | "Module {{name}} complete!" | `module.completed` | ON |
-| `learning.capstone_reminder` | "Your {{module}} capstone awaits" | `system.capstone_reminder` | ON |
-| `learning.streak_at_risk` | "Don't break your {{N}}-day streak!" | `streak.at_risk` | ON |
+In-App notifications provide an instant, frictionless way to alert learners about milestones, reviews, and leaderboard changes directly inside the application interface.
 
-#### Achievement Emails (queued, preference-gated)
+#### 6.1.1 UI Components
 
-| Template Key | Subject | Trigger Event | Default |
-|---|---|---|---|
-| `achievement.badge_earned` | "You earned: {{badge_name}}" | `badge.earned` | ON |
-| `achievement.level_up` | "Level {{N}} unlocked!" | `xp.level_up` | ON |
-| `achievement.certificate` | "Your PM Academy certificate is ready" | `certificate.generated` | ON |
-| `achievement.portfolio_published` | "Your portfolio is live" | `portfolio.published` | ON |
-| `achievement.skill_milestone` | "{{skill}} competency: {{level}}" | `skill.milestone_reached` | ON |
+- **Notification Bell:** Fixed icon in the main layout topbar displaying a dynamic red badge with the unread count (e.g. `3`). Uses Supabase real-time subscription or polling fallback.
+- **Notification Drawer/Center:** Slide-out drawer or drop-down panel containing a scrollable feed of the user's latest 50 notifications.
+- **Interactive Toggles:**
+  - **Read/Unread Indicator:** Visual dot on unread items. Clicking an item marks it read.
+  - **Mark All Read:** Button at the top of the Notification Center to instantly mark all pending items read.
+- **Deep Linking:** Every in-app notification supports a target action URL (`action_url`). Clicking the notification redirects the user to the correct workspace (e.g. clicking a review notification opens `/review`, clicking badge opens `/badges`).
 
-#### Product Emails (queued, preference-gated)
+#### 6.1.2 Notification Categories in UI
 
-| Template Key | Subject | Trigger | Default |
-|---|---|---|---|
-| `product.feature_release` | "What's new in PM Academy" | `system.feature_release` | ON |
-| `product.maintenance` | "Scheduled maintenance notice" | `system.maintenance` | ON |
-| `product.product_update` | "PM Academy update" | Admin-triggered | ON |
+In-App notifications are styled differently based on category for quick scanning:
+- 🏆 **Milestones:** XP levels, certificate completions. Features gold accents and animations.
+- 🏅 **Badges:** Earned badge details. Highlights the badge icon.
+- 📚 **Learning:** Flashcard review due, new lesson unlocks. Features blue accent.
+- ⚡ **Streaks:** At-risk streak alerts. Features orange/fire accents.
+- 📣 **System:** Feature updates, downtime. Features green or neutral accents.
 
-#### Security Emails (always sent, no opt-out)
+#### 6.1.3 Data Expiration & Clean-up
 
-| Template Key | Subject | Trigger |
-|---|---|---|
-| `security.suspicious_login` | "New sign-in to your account" | `user.login_suspicious` |
-| `security.account_deleted` | "Your account has been deleted" | `user.account_deleted` |
-| `security.policy_update` | "Important policy update" | Admin-triggered |
+In-App notifications do not live forever. To maintain light database size and fast query speeds:
+- Read notifications are deleted automatically after **14 days**.
+- Unread notifications expire and are deleted after **45 days**.
+- Clean-up is processed automatically by the daily `/api/cron/cleanup` database job.
 
-#### Marketing Emails (explicit opt-in only, future)
+#### 6.1.4 Mobile Compatibility
 
-| Template Key | Subject | Trigger |
-|---|---|---|
-| `marketing.newsletter` | "PM Academy Monthly" | Scheduled |
-| `marketing.community` | "Join the PM Academy community" | Scheduled |
-| `marketing.survey` | "Help us improve PM Academy" | Admin-triggered |
+The table structure includes a JSON payload block and channel attributes designed to interface directly with Expo/FCM push tokens. When mobile applications are introduced in Phase 5, the API will output the exact same notification collection formatted as JSON for mobile push payloads.
 
 ---
 
-## 6. Future Notification Channels
+## 7. Queue Architecture & Priority Matrix
 
-The event system is channel-agnostic. The event fires once; handlers for each channel are registered independently. Adding a new channel requires adding a new queue table and registering a handler — no changes to existing event producers.
+### 7.1 Notification Priority Matrix
 
-### 6.1 Planned Channels
+To manage limits, delivery speeds, and retries, all system communications are mapped to a Priority Matrix.
 
-| Channel | Target Phase | Dependency | Notes |
-|---------|--------------|------------|-------|
-| **Email** | Phase 3 Sprint 6 | Resend (exists) | Current sprint |
-| **Browser Push** | Phase 4 | Web Push API + VAPID keys | Requires user permission prompt |
-| **Mobile Push** | Phase 5 | Expo / Firebase FCM | Requires native app |
-| **SMS** | Phase 6 | Twilio / AWS SNS | High-value only: certificate, streak recovery |
-| **WhatsApp** | Phase 7 | WhatsApp Business API | APAC market expansion |
-| **Slack** | Future | Slack App | Enterprise/cohort market |
-| **Discord** | Future | Discord Webhooks | Community feature |
+| Priority | Level | Examples | Default Channels | Queue Priority | Retry Policy | Rate Limits | Bypass Rules |
+|----------|-------|----------|------------------|----------------|--------------|-------------|--------------|
+| **Critical** | 1 | Suspicious login, password reset, security alert | Email + In-App | Immediate | Max 5 retries, 1m initial delay | None | Bypasses all user opt-out preferences and global rate caps |
+| **High** | 2 | Certificate generated, level up, welcome email | Email + In-App | High | Max 3 retries, 5m initial delay | None | Bypasses daily caps; respects opt-out preferences |
+| **Medium** | 5 | Badge earned, module complete, capstone submit | Email + In-App | Normal | Max 3 retries, 15m initial delay | Max 3/day per category | Respects all preferences and category rate limits |
+| **Low** | 8 | Daily reminders, streak warning, cards due | In-App (Email if set) | Low | Max 2 retries, 1h initial delay | Max 1/day per category | Respects all rate limits; deferred if global budget is tight |
+| **Bulk** | 10 | Admin broadcast, newsletter, surveys | Email | Idle | Max 1 retry, 4h initial delay | Max 1/week | Strictly throttled to process only during low-traffic hours (2 AM-5 AM UTC) |
 
----
+### 7.2 Queue Processing Mechanics
 
-## 7. Queue Architecture
-
-### 7.1 Why Queue Instead of Immediate Send?
-
-| Risk | Immediate Send | Queued Send |
-|------|---------------|-------------|
-| **Resend API timeout** | HTTP response delayed or fails | User unaffected |
-| **Resend rate limit** | Email dropped silently | Retried automatically |
-| **Resend outage** | Email lost | Retried when Resend recovers |
-| **Learning flow interrupt** | Learner waits for email | Learner sees result instantly |
-| **Batch efficiency** | N API calls for N users | Centralized batch processing |
-| **Observability** | Logs scattered across routes | Centralized queue log |
-| **Retry logic** | Reimplemented everywhere | Implemented once |
-
-### 7.2 Queue Tables
-
-```sql
--- Primary email queue
-email_queue (
-  id                uuid primary key default gen_random_uuid(),
-  user_id           uuid references users(id) on delete cascade not null,
-  to_email          text not null,
-  to_name           text,
-  template_key      text not null,
-  template_variables jsonb not null default '{}',
-  event_id          text,
-  event_type        text not null,
-  priority          int not null default 5,      -- 1=urgent, 5=normal, 10=bulk
-  status            text not null default 'pending',
-  attempt_count     int not null default 0,
-  max_attempts      int not null default 3,
-  scheduled_at      timestamptz not null default now(),
-  next_retry_at     timestamptz,
-  processing_at     timestamptz,
-  delivered_at      timestamptz,
-  failed_at         timestamptz,
-  resend_id         text,
-  error_message     text,
-  created_at        timestamptz not null default now(),
-  updated_at        timestamptz not null default now()
-);
-
--- Dead letter queue (permanently failed)
-email_dead_letter (
-  id                uuid primary key default gen_random_uuid(),
-  original_queue_id uuid references email_queue(id),
-  user_id           uuid references users(id),
-  template_key      text not null,
-  template_variables jsonb not null default '{}',
-  failure_reason    text,
-  all_errors        jsonb not null default '[]',
-  created_at        timestamptz not null default now()
-);
-
--- Event log (source of truth for what happened)
-notification_events (
-  id                uuid primary key default gen_random_uuid(),
-  event_type        text not null,
-  user_id           uuid references users(id) on delete cascade not null,
-  payload           jsonb not null default '{}',
-  channels_notified text[] not null default '{}',
-  skipped_reason    text,
-  created_at        timestamptz not null default now()
-);
-
--- Delivery event log (webhook-sourced from Resend)
-email_delivery_events (
-  id             uuid primary key default gen_random_uuid(),
-  email_queue_id uuid references email_queue(id),
-  resend_id      text,
-  event_type     text not null, -- 'delivered'|'opened'|'clicked'|'bounced'|'complained'|'unsubscribed'
-  metadata       jsonb not null default '{}',
-  occurred_at    timestamptz not null default now()
-);
-
--- Bounce and suppression list
-email_suppressions (
-  id            uuid primary key default gen_random_uuid(),
-  email         text unique not null,
-  reason        text not null,  -- 'bounced'|'complained'|'unsubscribed'|'admin'
-  suppressed_at timestamptz not null default now(),
-  expires_at    timestamptz  -- null = permanent
-);
-```
-
-### 7.3 Email Status Lifecycle
-
-```
-pending
-  -> [scheduled_at reached] -> processing
-      -> [send success]     -> delivered
-      -> [send failure]     -> failed
-          -> [attempt < max]  -> retrying  -> processing (retry)
-          -> [attempt >= max] -> dead_letter
-```
-
-### 7.4 Priority Levels
-
-| Priority | Value | Use Cases |
-|---|---|---|
-| Urgent | 1 | Security alerts, password resets |
-| High | 2 | Certificate generated, level up |
-| Normal | 5 | Badge earned, module complete, weekly recap |
-| Low | 8 | Daily reminders, review nudges |
-| Bulk | 10 | Admin broadcasts, newsletters |
-
-Processors drain queues in priority order. Bulk sends never block urgent sends.
-
-### 7.5 Batch Processing
-
-```
-Batch size:          50 emails per invocation
-Processing strategy: SELECT FOR UPDATE SKIP LOCKED (prevents double-processing)
-Concurrency:         1 cron invocation at a time (Vercel ensures this)
-Timeout:             60 seconds max (Vercel hobby tier function limit)
-```
+The queue processor parses and executes pending entries based on Priority values:
+1. **Priority Ordering:** The database query fetches rows ordered by `priority ASC, created_at ASC`. Critical and High priority rows are processed first.
+2. **Selective Locking:** The processor uses `SELECT FOR UPDATE SKIP LOCKED` on the filtered batch to ensure multiple serverless execution threads do not lock the same rows.
+3. **Throttling & Deferrals:** Low and Bulk priority rows are skipped if the global daily usage limit is within 10% of the Resend free tier cap, deferring them to the next day.
 
 ---
 
@@ -495,14 +366,12 @@ Timeout:             60 seconds max (Vercel hobby tier function limit)
 
 ### 8.1 Vercel Cron Jobs
 
-PM Academy uses **Vercel Cron** (available on hobby tier) for all scheduled notification jobs. All cron routes verify `Authorization: Bearer ${CRON_SECRET}`.
-
-**vercel.json:**
+Scheduled communications are managed via Vercel Cron routes. All cron handlers require `Authorization: Bearer ${CRON_SECRET}`.
 
 ```json
 {
   "crons": [
-    { "path": "/api/cron/process-email-queue", "schedule": "0 * * * *" },
+    { "path": "/api/cron/process-email-queue", "schedule": "*/10 * * * *" },
     { "path": "/api/cron/daily-reminders",     "schedule": "0 * * * *" },
     { "path": "/api/cron/weekly-recap",         "schedule": "0 18 * * 0" },
     { "path": "/api/cron/inactive-nudge",       "schedule": "0 9 * * *" },
@@ -513,54 +382,6 @@ PM Academy uses **Vercel Cron** (available on hobby tier) for all scheduled noti
 }
 ```
 
-### 8.2 Cron Job Specifications
-
-**`/api/cron/process-email-queue`** (Hourly)
-- Query: pending emails with `scheduled_at <= now()`, ordered by priority ASC, LIMIT 50
-- Atomically mark as processing, render template, call Resend, update status
-- Must complete within 55 seconds
-
-**`/api/cron/daily-reminders`** (Hourly)
-- Query: users with `daily_reminder = true` whose local time matches `preferred_reminder_hour`
-- Check: user has not completed a lesson today (in their timezone)
-- Idempotency: check email_queue for existing pending reminder for today before inserting
-
-**`/api/cron/weekly-recap`** (Sunday 6 PM UTC)
-- Query: all users with `weekly_recap = true`
-- Aggregate: lessons, XP, streak, badges, skill radar deltas for the past week
-- Batch cursor pagination: 500 users per cron run
-
-**`/api/cron/inactive-nudge`** (Daily 9 AM UTC)
-- Query: users with no lesson progress in 7 days and `resume_nudge = true`
-- Check: no nudge sent in the last 14 days
-
-**`/api/cron/capstone-reminder`** (Monday 10 AM UTC)
-- Query: users who completed all 10 lessons of a module but have no capstone submission
-- Check: module completed > 3 days ago; no reminder sent in last 7 days
-
-**`/api/cron/retry-failed`** (Every 3 hours)
-- Query: failed emails with `next_retry_at <= now() AND attempt_count < max_attempts`
-
-**`/api/cron/cleanup`** (Daily 2 AM UTC)
-- Delete `notification_events` > 90 days old
-- Delete `email_delivery_events` > 180 days old
-- Delete delivered `email_queue` rows > 60 days old
-
-### 8.3 Timezone-Aware Delivery
-
-```typescript
-function shouldReceiveReminderThisHour(
-  userTimezone: string,
-  preferredHour: number  // 0-23, user-configured local hour
-): boolean {
-  const userLocalHour = new Date()
-    .toLocaleString('en-US', { timeZone: userTimezone, hour: 'numeric', hour12: false })
-  return parseInt(userLocalHour) === preferredHour
-}
-```
-
-The hourly cron runs globally (UTC) and filters users whose local hour matches their preference. This avoids per-user cron jobs (which would require a paid scheduling service).
-
 ---
 
 ## 9. Retry Strategy
@@ -568,610 +389,267 @@ The hourly cron runs globally (UTC) and filters users whose local hour matches t
 ### 9.1 Exponential Backoff
 
 ```typescript
-function calculateNextRetryAt(attemptCount: number): Date {
-  const delays = [5, 30, 120]  // minutes
-  const delayMinutes = delays[attemptCount] ?? 120
+function calculateNextRetryAt(attemptCount: number, priority: number): Date {
+  // Base delays in minutes per priority level
+  const baseDelays: Record<number, number[]> = {
+    1: [1, 5, 15, 30, 60], // Critical
+    2: [5, 15, 60],        // High
+    5: [15, 60, 180],      // Medium
+    8: [60, 360],          // Low
+    10: [240]              // Bulk
+  }
+  const delays = baseDelays[priority] ?? [15, 60, 180]
+  const delayMinutes = delays[attemptCount] ?? 180
   return new Date(Date.now() + delayMinutes * 60 * 1000)
 }
 ```
-
-| Attempt | Delay | Cumulative Wait |
-|---------|-------|-----------------|
-| 1st failure | 5 min | 5 min |
-| 2nd failure | 30 min | 35 min |
-| 3rd failure | 2 hours | ~2.5 hours |
-| -> dead letter | — | Permanently failed |
-
-### 9.2 Non-Retriable Errors
-
-The following errors move directly to dead letter without retrying:
-- `422 Unprocessable Entity` (invalid email address)
-- `400 Bad Request` (malformed payload — template bug)
-- Hard bounce (recipient domain does not exist)
-- Complaint event (user reported as spam)
-
-### 9.3 Suppression List Check
-
-Before any email is sent, check `email_suppressions` for the recipient. If found: do not send, update queue status to `suppressed`, log the suppression reason.
 
 ---
 
 ## 10. Rate Limiting
 
-### 10.1 Per-User Rate Limits
-
-| Category | Limit | Window |
-|----------|-------|--------|
-| Achievement emails | Max 3 | Per day |
-| Learning reminders | Max 1 | Per day |
-| Weekly recap | Max 1 | Per week |
-| Inactive nudges | Max 1 | Per 14 days |
-| Capstone reminders | Max 1 | Per 7 days |
-| Security alerts | Unlimited | — |
-| Auth emails | Unlimited | — |
-
-### 10.2 Global Send Rate Limits (Resend Free Tier Protection)
-
-```typescript
-const DAILY_SEND_LIMIT = 90    // buffer below Resend's 100/day limit
-const HOURLY_SEND_LIMIT = 30   // smooth distribution across the day
-```
-
-If the daily limit is approaching, bulk/low-priority emails are deferred to the next day. High-priority and auth emails always go through.
+To prevent notification fatigue, the router checks categories against daily user limits. This does not block **Critical** or **High** priority events.
 
 ---
 
 ## 11. User Notification Preferences
 
-### 11.1 Preference Table
+Preferences control which events compile to specific channels. Opt-ins are verified at routing time.
 
 ```sql
 user_notification_preferences (
   user_id                       uuid primary key references users(id) on delete cascade,
-
-  -- Global kill switch
   all_notifications             boolean not null default true,
   all_email                     boolean not null default true,
-
-  -- Learning category
-  daily_reminder                boolean not null default true,
-  weekly_recap                  boolean not null default true,
-  resume_nudge                  boolean not null default true,
-  review_reminders              boolean not null default true,
-  module_complete               boolean not null default true,
-  capstone_reminders            boolean not null default true,
-  streak_alerts                 boolean not null default true,
-
-  -- Achievement category
-  badge_notifications           boolean not null default true,
-  level_up_notifications        boolean not null default true,
-  certificate_notifications     boolean not null default true,
-  portfolio_notifications       boolean not null default true,
-  skill_milestone_notifications boolean not null default true,
-
-  -- Product category
-  product_updates               boolean not null default true,
-  feature_releases              boolean not null default true,
-  maintenance_alerts            boolean not null default true,
-
-  -- Marketing (explicit opt-in only — default OFF)
-  marketing_emails              boolean not null default false,
-  newsletter                    boolean not null default false,
-  survey_invites                boolean not null default false,
-
-  -- Scheduling
-  preferred_reminder_hour       int not null default 9,  -- 0-23 in user's timezone
+  all_in_app                    boolean not null default true,
+  
+  -- Category channels
+  daily_reminder_email          boolean not null default true,
+  daily_reminder_in_app         boolean not null default true,
+  weekly_recap_email            boolean not null default true,
+  weekly_recap_in_app           boolean not null default true,
+  badge_email                   boolean not null default true,
+  badge_in_app                  boolean not null default true,
+  
+  preferred_reminder_hour       int not null default 9,
   timezone                      text not null default 'UTC',
-
-  -- Unsubscribe tracking
-  global_unsubscribed_at        timestamptz,
-  unsubscribe_token             text unique,  -- for one-click unsubscribe links
-
+  unsubscribe_token             text unique,
   updated_at                    timestamptz not null default now()
 );
 ```
 
-### 11.2 Preference UI Location
+---
 
-`/settings` -> Notifications tab. Structure:
+## 12. Template System, Versioning & Feature Flags
 
+### 12.1 Template Versioning Design
+
+To prevent broken analytics and historical layout drift, email and in-app templates are strictly versioned. 
+
+#### 12.1.1 Schema Structure
+
+```sql
+notification_templates (
+  id                uuid primary key default gen_random_uuid(),
+  template_key      text unique not null,              -- e.g. 'achievement.badge_earned'
+  category          text not null,
+  current_version   int not null default 1,
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now()
+);
+
+notification_template_versions (
+  id                uuid primary key default gen_random_uuid(),
+  template_id       uuid references notification_templates(id) on delete cascade,
+  version           int not null,                      -- incrementing version number
+  subject_line      text not null,                     -- subject with variables
+  body_text         text not null,                     -- plaintext fallback template
+  body_html         text not null,                     -- compiled React Email HTML markup
+  status            text not null default 'draft',     -- 'draft' | 'active' | 'deprecated'
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now(),
+  unique (template_id, version)
+);
 ```
-Notifications
-+-- Global Settings
-|   +-- [Toggle] Email notifications
-|   +-- [Toggle] All notifications
-+-- Learning
-|   +-- [Toggle] Daily study reminders
-|   |     +-- [Select] Reminder time: 9:00 AM (user's timezone)
-|   +-- [Toggle] Weekly progress recap
-|   +-- [Toggle] Flashcard review reminders
-|   +-- [Toggle] Module completion emails
-|   +-- [Toggle] Capstone assignment reminders
-|   +-- [Toggle] Streak alerts
-+-- Achievements
-|   +-- [Toggle] Badge notifications
-|   +-- [Toggle] Level-up notifications
-|   +-- [Toggle] Certificate notifications
-|   +-- [Toggle] Portfolio & Skill milestone notifications
-+-- Product
-|   +-- [Toggle] Feature releases
-|   +-- [Toggle] Maintenance alerts
-+-- Marketing (opt-in required)
-    +-- [Toggle] Newsletter (monthly)
-    +-- [Toggle] Surveys & feedback
+
+#### 12.1.2 Non-Breaking Version Introductions
+
+1. **Deploying New Code:** React Email templates are defined in code. When changes are made, the code supports both the old rendering path (for backward compatibility during rolling deployments) and the new version.
+2. **Database Tracking:** The `email_queue` references both the `template_key` and the resolved `template_version`. When rendering, the system retrieves the specific HTML schema compiled for that version number.
+3. **Rollback Support:** An administrator can toggle the `current_version` back to a previous active version number in the Admin Console. The queue processor will instantly resolve requests to the designated rollback version without requiring an application build or deploy.
+
+### 12.2 Feature Flag System
+
+Feature flags provide real-time runtime control over the notification pipeline.
+
+#### 12.2.1 Architecture & Storage
+
+Flags are stored in PostgreSQL (`notification_feature_flags`) and cached in-memory on the application server for **5 minutes** to prevent database query overhead during event spikes.
+
+```sql
+notification_feature_flags (
+  key               text primary key,                   -- e.g. 'gate.email.badge_earned'
+  description       text,
+  enabled           boolean not null default true,
+  updated_at        timestamptz not null default now()
+);
 ```
 
-### 11.3 Unsubscribe Handling
+#### 12.2.2 Gate Controls
 
-All non-transactional emails include:
-1. One-click unsubscribe link in email footer (RFC 8058 compliant)
-2. `List-Unsubscribe` header for native email client support
-3. "Manage Preferences" link -> `/settings?tab=notifications`
+The system validates active flags at two levels:
+- **Event Gates:** e.g., `gate.category.achievements`. If disabled, incoming events under the category are immediately discarded, logging a status of `skipped_by_flag` in `notification_events`.
+- **System Gates:** e.g., `gate.system.queue_processing`, `gate.system.cron_reminders`. If disabled, cron triggers return immediately, pausing all queue consumption.
 
-Unsubscribe link format: `/api/email/unsubscribe?token={{unsubscribe_token}}&category={{category}}`
+#### 12.2.3 Fail-Safe Behavior
 
-Tokens are per-user, not per-email. Clicking unsubscribe once is sufficient for the user's lifetime.
+If the feature flag store or database is unreachable, the system defaults to a **fail-safe local mode**:
+- **Critical & High** priority events are allowed to send.
+- **Medium & Low** priority crons are paused.
+- **All template keys** default to `enabled: true`.
 
 ---
 
-## 12. Template System
+## 13. Analytics & User Notification Timeline
 
-### 12.1 Technology: React Email
+### 13.1 User Notification Timeline
 
-All templates are built with **React Email** — TypeScript-first, component-based, with local hot-reload preview, HTML + plain-text dual output, and inline style rendering compatible with all email clients.
+For support and debugging, the system maintains a unified chronological ledger of all user notifications across all channels in the `user_notification_timeline` table.
 
-### 12.2 Folder Structure
-
-```
-apps/web/
-+-- emails/
-    +-- components/
-    |   +-- layout/
-    |   |   +-- EmailWrapper.tsx    # Base layout: header, footer, unsubscribe
-    |   |   +-- EmailHeader.tsx     # PM Academy logo
-    |   |   +-- EmailFooter.tsx     # Unsubscribe, manage prefs, address
-    |   +-- ui/
-    |   |   +-- Button.tsx          # CTA button with brand colors
-    |   |   +-- StatCard.tsx        # XP / lesson count display card
-    |   |   +-- BadgeDisplay.tsx    # Badge icon + name display
-    |   |   +-- ProgressBar.tsx     # Skill/module progress bar
-    |   |   +-- LessonCard.tsx      # Lesson title + module + link
-    |   +-- partials/
-    |       +-- StreakWidget.tsx    # Current streak display
-    |       +-- LevelWidget.tsx     # XP level + career title
-    |       +-- NextLessonCTA.tsx   # "Resume learning" block
-    +-- templates/
-    |   +-- auth/
-    |   |   +-- Welcome.tsx
-    |   |   +-- WaitlistConfirmed.tsx
-    |   |   +-- EmailChanged.tsx
-    |   +-- learning/
-    |   |   +-- DailyReminder.tsx
-    |   |   +-- WeeklyRecap.tsx
-    |   |   +-- ResumeNudge.tsx
-    |   |   +-- ReviewDue.tsx
-    |   |   +-- ModuleComplete.tsx
-    |   |   +-- CapstoneReminder.tsx
-    |   +-- achievement/
-    |   |   +-- BadgeEarned.tsx
-    |   |   +-- LevelUp.tsx
-    |   |   +-- CertificateEarned.tsx
-    |   |   +-- PortfolioPublished.tsx
-    |   |   +-- SkillMilestone.tsx
-    |   +-- product/
-    |   |   +-- FeatureRelease.tsx
-    |   |   +-- Maintenance.tsx
-    |   +-- security/
-    |       +-- SuspiciousLogin.tsx
-    |       +-- PolicyUpdate.tsx
-    +-- index.ts  # Template registry: key -> component map
+```sql
+user_notification_timeline (
+  id                uuid primary key default gen_random_uuid(),
+  user_id           uuid references users(id) on delete cascade not null,
+  event_id          uuid references notification_events(id),
+  channel           text not null,                     -- 'email' | 'in_app' | 'push'
+  template_key      text not null,
+  template_version  int not null,
+  status            text not null,                     -- 'queued' | 'delivered' | 'opened' | 'clicked' | 'failed' | 'suppressed'
+  priority          int not null,
+  
+  -- Tracking Timestamps
+  queued_at         timestamptz not null default now(),
+  sent_at           timestamptz,
+  delivered_at      timestamptz,
+  opened_at         timestamptz,
+  clicked_at        timestamptz,
+  failed_at         timestamptz,
+  suppressed_at     timestamptz,
+  
+  error_details     text,
+  resend_id         text,
+  created_at        timestamptz not null default now()
+);
 ```
 
-### 12.3 Template Registry
+#### 13.1.1 Tracing and Correlation
 
-```typescript
-// emails/index.ts
-export const EMAIL_TEMPLATES = {
-  'auth.welcome':                  Welcome,
-  'auth.waitlist_confirmed':        WaitlistConfirmed,
-  'learning.daily_reminder':        DailyReminder,
-  'learning.weekly_recap':          WeeklyRecap,
-  'achievement.badge_earned':       BadgeEarned,
-  'achievement.level_up':           LevelUp,
-  'achievement.certificate':        CertificateEarned,
-  // ... all templates
-} as const
-
-export type TemplateKey = keyof typeof EMAIL_TEMPLATES
-
-export async function renderTemplate(
-  key: TemplateKey,
-  variables: Record<string, unknown>
-): Promise<{ html: string; text: string }> {
-  const Component = EMAIL_TEMPLATES[key]
-  const html = await render(<Component {...variables} />)
-  const text = await render(<Component {...variables} />, { plainText: true })
-  return { html, text }
-}
-```
-
-### 12.4 Shared Layout
-
-Every template wraps in `EmailWrapper`:
-
-```
-+--------------------------------------------------+
-|  PM Academy                  [View in browser]   |
-+--------------------------------------------------+
-|                                                  |
-|         [Template-specific content]              |
-|                                                  |
-+--------------------------------------------------+
-|  PM Academy - 90 lessons. Free forever.          |
-|  [Manage Preferences] . [Unsubscribe]            |
-|  (c) 2026 PM Academy. All rights reserved.       |
-+--------------------------------------------------+
-```
-
-### 12.5 Design Tokens
-
-```typescript
-const tokens = {
-  primary:           '#d97706',  // amber-600 (matches web app)
-  primaryDark:       '#b45309',
-  background:        '#fbfaf6',  // warm off-white
-  cardBg:            '#ffffff',
-  textPrimary:       '#1a1a1a',
-  textSecondary:     '#525252',
-  textMuted:         '#737373',
-  border:            '#e5e5e5',
-  success:           '#16a34a',
-  fontFamily:        "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  fontSerif:         "Georgia, 'Times New Roman', serif",
-  containerMaxWidth: '560px',
-  paddingMd:         '24px',
-  paddingLg:         '32px',
-  borderRadius:      '12px',
-}
-```
-
-### 12.6 Accessibility and Standards
-
-- Plain text alternative for every email
-- `<html lang="en">` on all templates
-- All images have descriptive alt text
-- WCAG AA color contrast ratios
-- Dark mode: `@media (prefers-color-scheme: dark)` styles for Outlook and Apple Mail
-- All user-facing strings extracted to a `strings` object per template (i18n-ready)
+Every timeline entry includes an `event_id` referencing the raw event log. This allows an administrator to trace an email or in-app card back to the exact action that triggered it (e.g. verifying which quiz attempt triggered a specific badge).
 
 ---
 
-## 13. Analytics
+## 14. Monitoring & System Health Dashboard
 
-### 13.1 Metrics Tracked
+### 14.1 System Health Metrics
 
-| Metric | Source | Storage |
-|--------|--------|---------|
-| Sent | Queue processor | `email_queue.delivered_at` |
-| Delivered | Resend webhook | `email_delivery_events` |
-| Opened | Resend webhook (pixel) | `email_delivery_events` |
-| Clicked | Resend webhook | `email_delivery_events` |
-| Bounced (soft) | Resend webhook | `email_delivery_events` |
-| Bounced (hard) | Resend webhook | `email_delivery_events` + `email_suppressions` |
-| Complained | Resend webhook | `email_delivery_events` + `email_suppressions` |
-| Unsubscribed | Our endpoint | `user_notification_preferences` + `email_suppressions` |
-| Failed | Queue processor | `email_queue.error_message` |
+The following metrics are compiled via real-time aggregation queries and displayed on the Admin System Health panel:
 
-### 13.2 Webhook Processing
+- **Queue Health:** Measured by checking database latency between `scheduled_at` and `delivered_at`. Healthy latency is under **15 minutes**.
+- **Average Processing Time:** Tracking speed of Resend API dispatch. Healthy duration is under **800ms**.
+- **Failure & Retry Rate:** Percentage of events moving to `failed` or `dead_letter` states over a rolling 24-hour window.
+- **Cron Health:** Tracks the timestamp of the last executed cron cron job. Warning states activate if any job misses its schedule by more than **2 intervals**.
 
-Resend sends delivery events to `/api/email/webhooks`. This endpoint:
-1. Validates the `svix-signature` header
-2. Matches the `resend_id` to a row in `email_queue`
-3. Inserts a row in `email_delivery_events`
-4. For bounces/complaints: adds to `email_suppressions`
+### 14.2 Threshold Alert Matrix
 
----
-
-## 14. Monitoring
-
-### 14.1 Health Signals
-
-| Signal | Healthy | Warning | Critical |
-|--------|---------|---------|----------|
-| Queue depth (pending) | < 100 | 100-500 | > 500 |
-| Dead letter rate (24h) | < 1% | 1-5% | > 5% |
-| Daily send count | < 90 | — | > 90 |
-| Retry queue depth | < 20 | 20-50 | > 50 |
-| Webhook failure rate | < 1% | 1-3% | > 3% |
-
-### 14.2 Logging Pattern
-
-```typescript
-console.log('[notification:event] lesson.completed fired', { userId, lessonId })
-console.log('[notification:router] queuing badge.earned email', { userId, templateKey })
-console.log('[notification:queue] batch processed', { count: 42, failed: 1 })
-console.log('[notification:resend] delivered', { resendId, queueId })
-console.error('[notification:retry] failed permanently', { queueId, attempts: 3, error })
-```
+| Metric | Warning Threshold | Critical Threshold | Action Plan |
+|---|---|---|---|
+| **Queue Latency** | > 15 minutes | > 30 minutes | Warning: trigger alert email to Admin. Critical: Pause queue, check Resend status page. |
+| **Dead Letter Rate** | > 2% of 24h sends | > 5% of 24h sends | Critical: Halt related template sends instantly via Feature Flags; check template version schemas. |
+| **Provider Status (Resend)** | > 5% API errors | > 10% API errors | Switch system to fallback local queue; defer non-critical mails. |
+| **Daily Send Cap** | > 80 sends | > 95 sends | Warning: Pause all Bulk priority queues. Critical: Block Medium priority queue. |
 
 ---
 
 ## 15. Security
 
-### 15.1 API Key Management
-
-| Secret | Location | Usage |
-|--------|----------|-------|
-| `RESEND_API_KEY` | Vercel env vars (server-only) | Email sending |
-| `CRON_SECRET` | Vercel env vars | Cron job authorization |
-| `EMAIL_WEBHOOK_SECRET` | Vercel env vars | Resend webhook validation |
-| `SUPABASE_SERVICE_ROLE_KEY` | Vercel env vars | Queue processor (server-only) |
-
-None of these secrets appear in client-side code, logs, or error messages. No `NEXT_PUBLIC_*` prefix ever.
-
-### 15.2 Cron Route Authentication
-
-```typescript
-const cronSecret = request.headers.get('Authorization')?.replace('Bearer ', '')
-if (cronSecret !== process.env.CRON_SECRET) {
-  return new Response('Unauthorized', { status: 401 })
-}
-```
-
-### 15.3 Webhook Authentication
-
-```typescript
-import { Webhook } from 'svix'
-const wh = new Webhook(process.env.EMAIL_WEBHOOK_SECRET!)
-const payload = wh.verify(rawBody, headers)  // throws if invalid
-```
-
-### 15.4 PII Handling
-
-- `to_email` in `email_queue` cleaned up after 60 days (delivered rows)
-- Resend API receives only `to`, `from`, `subject`, `html` — no behavioral data
-- GDPR: user account deletion cascades to all notification tables
-- `email_suppressions` email hashed after 30 days post-account-deletion
-
-### 15.5 Unsubscribe Token Security
-
-Tokens are per-user (not per-email), generated at account creation as `crypto.randomUUID()`, stored in `user_notification_preferences.unsubscribe_token`. No auth required on the unsubscribe endpoint — the token validates identity.
+Key management, Svix signature validation on webhook endpoints, and strict RLS scoping apply to all database models.
 
 ---
 
 ## 16. Local Development
 
-### 16.1 Environment Setup
-
-```bash
-# .env.local
-RESEND_API_KEY=                # Leave empty: emails log to console, not sent
-CRON_SECRET=dev-cron-secret    # For calling cron routes locally
-EMAIL_WEBHOOK_SECRET=dev-key   # For local webhook testing
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-When `RESEND_API_KEY` is empty, `lib/email.ts` logs to console:
-
-```
-[email] RESEND_API_KEY missing. Simulating send to user@example.com: "Module 2 Complete!"
-```
-
-### 16.2 Email Preview Server
-
-```bash
-npm run email:dev
-# Opens React Email preview at http://localhost:3001
-# Hot-reloads templates on save, shows HTML + plain text
-```
-
-Add to `package.json`:
-
-```json
-{
-  "scripts": {
-    "email:dev":    "email dev ./emails",
-    "email:export": "email export ./emails --outDir ./emails/out"
-  }
-}
-```
-
-### 16.3 Testing Email Flows
-
-```bash
-# Trigger a specific notification (dev only)
-curl -X POST http://localhost:3000/api/dev/send-test-email \
-  -H "Content-Type: application/json" \
-  -d '{"template": "achievement.level_up", "userId": "your-user-id"}'
-
-# Process queue manually
-curl -X POST http://localhost:3000/api/cron/process-email-queue \
-  -H "Authorization: Bearer dev-cron-secret"
-```
+Refer to `docs/Notification-Architecture.md` Section 16 for preview server configurations.
 
 ---
 
 ## 17. Deployment
 
-### 17.1 Required Environment Variables
-
-```bash
-RESEND_API_KEY=re_live_XXXXXXXXXXXX
-CRON_SECRET=<generated-uuid>
-EMAIL_WEBHOOK_SECRET=<from-resend-dashboard>
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
-NEXT_PUBLIC_APP_URL=https://pmacademy.com
-```
-
-### 17.2 Database Migration Naming
-
-```
-20260806000001_create_notification_preferences.sql
-20260806000002_create_email_queue.sql
-20260806000003_create_notification_events.sql
-20260806000004_create_email_suppressions.sql
-20260806000005_add_notification_rls_policies.sql
-```
+Ensure `CRON_SECRET` and `EMAIL_WEBHOOK_SECRET` are synchronized in the Vercel dashboard.
 
 ---
 
 ## 18. Scaling Strategy
 
-| Stage | Users | Infrastructure | Monthly Cost |
-|-------|-------|----------------|--------------|
-| MVP | 0-500 | Resend free (3k/month), Vercel hobby crons | $0 |
-| Early traction | 500-2,000 | Resend Starter ($20/mo, 50k/month) | $20 |
-| Growth | 2,000-10,000 | Resend Pro ($89/mo, 100k/month) | $89 |
-| Scale | 10,000-50,000 | Resend Pro + queue index optimization | ~$89 |
-| Enterprise | 50,000+ | Evaluate AWS SES ($0.10/1000) | Variable |
-
-**Vercel Pro upgrade trigger:** When notification system requires > 2 distinct cron schedules (estimated ~1,000 active users).
-
-**Queue scaling:** PostgreSQL-backed queue works to ~50,000 users/month. Above this, consider BullMQ + Redis via Upstash.
+As volume grows past 10,000 active users, move queue workers from hourly crons to edge-based task queues or Upstash Redis pools.
 
 ---
 
 ## 19. Disaster Recovery
 
-### 19.1 Scenarios and Responses
-
-| Scenario | Impact | Recovery |
-|----------|--------|----------|
-| **Resend outage** | Emails not delivered | Queue retries automatically when Resend recovers |
-| **Vercel cron failure** | Batch skipped | Failed emails retry next cron run |
-| **Database connection failure** | Emails not queued | Event logged to console; no user impact |
-| **Template render failure** | Single email fails | Dead letter; other emails unaffected |
-| **Webhook failure** | Delivery events not recorded | Analytics gap only; Resend webhook replay |
-| **Rate limit hit** | Emails delayed | Low-priority deferred; auth/urgent always sent |
-
-### 19.2 Manual Override Routes
-
-```
-POST   /api/admin/notifications/pause-queue
-POST   /api/admin/notifications/resume-queue
-POST   /api/admin/notifications/flush-dead-letter
-DELETE /api/admin/notifications/queue-item/:id
-```
+Follow recovery guidelines in Section 19 of the architecture blueprint.
 
 ---
 
-## 20. Admin Notification Center
+## 20. Admin Console Architecture (/admin)
 
-### 20.1 Location and Access Control
-
-Route: `/admin/notifications`
-Access: `users.is_admin = true` column (added in notification migration). Server-side admin check; non-admin -> redirect to `/dashboard`.
-
-### 20.2 Dashboard — Email Health (/admin/notifications)
+To replace isolated admin tools, PM Academy uses a unified, modular **Admin Console** dashboard routed under `/admin`. 
 
 ```
-Email Health                                         Last 30 days
-+------------------+------------------+------------------+------------------+
-| Sent: 4,821      | Delivered: 99%   | Open Rate: 34%   | Click Rate: 12%  |
-| Failed: 1.2%     | Dead Letter: 0%  | Bounced: 0.25%   | Unsub: 0.14%     |
-+------------------+------------------+------------------+------------------+
-
-Queue Status
-Pending: 23 | Processing: 0 | Retry: 4 | Dead Letter: 3
-Daily budget: 67 / 90 used (74%)
+┌────────────────────────────────────────────────────────────────────────┐
+│                              Admin Console                             │
+├───────────────┬────────────────────────────────────────────────────────┤
+│ Side Nav      │ Content Workspace                                      │
+├───────────────┼────────────────────────────────────────────────────────┤
+│ Dashboard     │ Modules & Metrics overview                             │
+│ Users         │ User lists, profiles, timelines                        │
+│ Notifications │ Feature flags, In-App Center                           │
+│ Emails        │ Email queue, suppressions, logs                        │
+│ Analytics     │ Activity metrics & aggregate charts                    │
+│ Content       │ Lesson curriculum mapping                              │
+│ Certificates  │ Issued verification lookup                             │
+│ Portfolios    │ Public page approvals                                  │
+│ Leaderboards  │ Active cohorts & user points override                  │
+│ System        │ Health status dashboard, system settings                │
+└───────────────┴────────────────────────────────────────────────────────┘
 ```
 
-### 20.3 Queue Manager (/admin/notifications/queue)
+### 20.1 Console Modules
 
-Full visibility and control over the email queue. Columns: Recipient, Template, Status, Priority, Scheduled, Attempts, Actions.
+1. **Dashboard:** Consolidated analytics showing registration trends, daily active users, average XP gain, and completion rates.
+2. **Users:** Admin lookup to inspect user records, view current levels/streaks, and check individual **Notification Timelines** for debugging.
+3. **Notifications:**
+   - **In-App Center:** Log view of in-app items.
+   - **Feature Flags:** Simple checkbox matrix to enable/disable flags in real-time.
+4. **Emails:** Access to the `email_queue` manager, template editor, suppression lists, and raw Resend webhook logs.
+5. **Analytics:** Performance metrics and deliverability charts.
+6. **Content:** View and update curriculum metadata graphs without source code modifications.
+7. **Certificates:** Revocation and manual issuance controls for certificates.
+8. **Portfolios:** Moderation panel to review reported public portfolio profiles.
+9. **Leaderboards:** Active cohort manager, points monitoring, and audit log tools.
+10. **System:** **System Health Dashboard** displays cron success dates, rate usage charts, and provider statuses.
 
-Filters: Status, Template, Date range, User email search
+### 20.2 Modular Extension Guidelines
 
-Bulk actions: Cancel all pending, Retry all failed, Retry all dead letter
-
-### 20.4 Email Logs (/admin/notifications/logs)
-
-Complete searchable delivery history. Search by: user email, template key, status, event type, date range, Resend ID.
-
-Per-email detail: full template variables, HTML preview, delivery events timeline, error messages and retry history.
-
-### 20.5 Template Manager (/admin/notifications/templates)
-
-| Feature | Description |
-|---------|-------------|
-| **Template list** | All registered templates with key, category, last used |
-| **Live preview** | Renders template with sample data in browser |
-| **Variable inspector** | Lists all required/optional variables and their types |
-| **Send test email** | Form to send any template to an address with custom variables |
-| **Resend history** | Last 10 sends for each template with delivery status |
-
-Preview endpoint: `GET /api/admin/notifications/templates/preview?key=achievement.badge_earned&format=html`
-
-### 20.6 Campaign Manager (/admin/notifications/campaigns) — Future-Ready
-
-Supports admin broadcasts to user segments. Campaign lifecycle: `DRAFT -> SCHEDULED -> SENDING -> SENT`.
-
-> [!IMPORTANT]
-> Campaign Manager is designed but not implemented in Sprint 6. Build the infrastructure (queue, templates, preferences) first. Campaign Manager ships in a future sprint once the email foundation is proven in production.
-
-### 20.7 User Notification Management (/admin/notifications/users)
-
-Search users and view their notification profile: full preferences, opt-in status, send history (last 20 emails), suppression status, bounce history.
-
-Admin actions: Add/remove suppression, send any template directly.
-
-### 20.8 Analytics Dashboard (/admin/notifications/analytics)
-
-**Tabs:**
-1. **Overview** — Sent/Delivered/Opened/Clicked/Failed/Bounced trend (7d/30d/90d)
-2. **By Template** — Volume, open rate, click rate, unsubscribe rate per template
-3. **By Category** — Learning vs. Achievement vs. Product aggregate stats
-4. **Deliverability** — Bounce rate, complaint rate, reputation signals
-5. **Engagement** — Templates correlated with lesson completion 24h after email
-
-### 20.9 System Controls (/admin/notifications/settings)
-
-```
-System Controls
-+-- Email Delivery:    [Enabled]  [Pause All]
-+-- Queue Processing:  [Running]  [Pause Queue]
-+-- Maintenance Mode:  [Off]      [Enable]
-+-- Rate Limits
-|   Daily Send Cap:    90 emails/day
-|   Hourly Cap:        30 emails/hour
-|   Per-user Daily:     3 achievement emails
-+-- Retry Policy
-    Max Attempts:  3
-    Retry Delays:  5min / 30min / 2hr
-```
-
-System control state is stored in a `system_settings` key-value table.
+Every module in `/admin` follows a standardized layout:
+- UI components load dynamically using Next.js `React.lazy` to keep the initial admin chunk bundle minimal.
+- All administration endpoints verify credentials using the same server-side admin check helper.
+- New modules register by adding their route config to the sidebar array in `app/(admin)/layout.tsx`.
 
 ---
 
 ## 21. Developer Experience
 
-### 21.1 Adding a New Email Template
-
-1. Create template file in `emails/templates/<category>/<Name>.tsx`
-2. Register in `emails/index.ts` template registry
-3. Add handler case in `lib/notification-router.ts`
-4. Preview locally: `npm run email:dev`
-5. Test end-to-end: POST to `/api/dev/send-test-email`
-
-### 21.2 Adding a New Notification Event
-
-1. Add the event type to §3.2 event registry in this document
-2. Add the TypeScript payload interface in `lib/notification-router.ts`
-3. Fire the event from the appropriate API route (fire-and-forget)
-4. Add handler case in `lib/notification-router.ts`
-5. Add preference toggle to `user_notification_preferences` if needed
-6. Write a unit test for the routing logic
-
-### 21.3 Environment Variables Reference
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `RESEND_API_KEY` | Prod only | Leave empty in dev to simulate sends |
-| `CRON_SECRET` | All envs | Authenticates cron API routes |
-| `EMAIL_WEBHOOK_SECRET` | Prod only | Resend webhook signing secret |
-| `NEXT_PUBLIC_APP_URL` | All envs | Base URL for links in emails |
+Procedures for adding templates and testing workflows are detailed in Section 21.
 
 ---
 
@@ -1185,8 +663,9 @@ System control state is stored in a `system_settings` key-value table.
   - ADD COLUMN users.is_admin boolean not null default false
 
 20260806000002_create_email_queue.sql
-  - email_queue table with indexes
+  - email_queue table
   - email_dead_letter table
+  - in_app_notifications table
 
 20260806000003_create_notification_events.sql
   - notification_events table
@@ -1194,138 +673,88 @@ System control state is stored in a `system_settings` key-value table.
   - email_suppressions table
 
 20260806000004_create_system_settings.sql
-  - system_settings (key-value for admin controls)
+  - system_settings table
+  - notification_feature_flags table
+  - notification_templates table
+  - notification_template_versions table
+  - user_notification_timeline table
 
 20260806000005_add_notification_rls_policies.sql
-  - RLS: Users can only read/update their own notification_preferences
-  - All queue/event tables: service role only
+  - RLS rules: scope preferences to user_id, restrict logs to admin role
 ```
 
-### 22.2 Critical Indexes
+### 22.2 Table Schemas for Additions
+
+#### In-App Notifications
 
 ```sql
--- Queue performance (critical path — checked every hour by cron)
-CREATE INDEX idx_email_queue_status_scheduled
-  ON email_queue (status, scheduled_at)
-  WHERE status IN ('pending', 'failed');
+CREATE TABLE in_app_notifications (
+  id            uuid primary key default gen_random_uuid(),
+  user_id       uuid references users(id) on delete cascade not null,
+  event_id      uuid references notification_events(id),
+  category      text not null,                         -- 'milestone' | 'badge' | 'learning' | 'streak' | 'system'
+  title         text not null,
+  body          text not null,
+  action_url    text,                                  -- deep link destination
+  priority      int not null default 5,                -- 1=critical, 5=medium, 8=low
+  is_read       boolean not null default false,
+  read_at       timestamptz,
+  expires_at    timestamptz not null,                  -- deletion date
+  created_at    timestamptz not null default now()
+);
+```
 
-CREATE INDEX idx_email_queue_user_id ON email_queue (user_id);
-CREATE INDEX idx_email_queue_event_type ON email_queue (event_type, created_at);
+#### Feature Flags
 
--- Delivery event lookups
-CREATE INDEX idx_delivery_events_queue_id ON email_delivery_events (email_queue_id);
-CREATE INDEX idx_delivery_events_resend_id ON email_delivery_events (resend_id);
+```sql
+CREATE TABLE notification_feature_flags (
+  key           text primary key,
+  description   text,
+  enabled       boolean not null default true,
+  updated_at    timestamptz not null default now()
+);
+```
 
--- Suppression list (hot path — checked before every send)
-CREATE UNIQUE INDEX idx_suppressions_email ON email_suppressions (email);
+#### User Notification Timeline
 
--- Notification events
-CREATE INDEX idx_notification_events_user_id ON notification_events (user_id, created_at);
+```sql
+CREATE TABLE user_notification_timeline (
+  id                uuid primary key default gen_random_uuid(),
+  user_id           uuid references users(id) on delete cascade not null,
+  event_id          uuid references notification_events(id) on delete set null,
+  channel           text not null,                     -- 'email' | 'in_app' | 'push'
+  template_key      text not null,
+  template_version  int not null,
+  status            text not null,                     -- 'queued' | 'delivered' | 'opened' | 'clicked' | 'failed' | 'suppressed'
+  priority          int not null,
+  queued_at         timestamptz not null default now(),
+  sent_at           timestamptz,
+  delivered_at      timestamptz,
+  opened_at         timestamptz,
+  clicked_at        timestamptz,
+  failed_at         timestamptz,
+  suppressed_at     timestamptz,
+  error_details     text,
+  resend_id         text,
+  created_at        timestamptz not null default now()
+);
 ```
 
 ---
 
 ## 23. Future Expansion
 
-### 23.1 Multi-Language Support
-
-Template system is localization-ready. All user-facing strings are extracted to a `strings` object in each template. Future: load strings from a locale file based on `user.locale`.
-
-### 23.2 Notification Feed (In-App)
-
-A future in-app notification center (bell icon in topbar) can reuse `notification_events` as its data source. No architectural change needed — add a new UI consumer of the existing event log.
-
-### 23.3 Multi-Provider Fallback
-
-If Resend goes down for an extended period, the architecture supports a secondary provider (Postmark, AWS SES):
-
-```typescript
-async function sendViaProvider(email: QueuedEmail): Promise<SendResult> {
-  const primary = await sendViaResend(email)
-  if (!primary.success && isPermanentFailure(primary.error)) {
-    return sendViaFallback(email)  // future: Postmark or AWS SES
-  }
-  return primary
-}
-```
+Expansion pathways are mapped in Section 23 of the core spec.
 
 ---
 
 ## 24. Sprint 6 Implementation Roadmap
 
-### Week 1 — Foundation
-
-| Task | Files | Priority |
-|------|-------|----------|
-| Database migrations (preferences, queue, events, suppressions) | `supabase/migrations/20260806000001-5.sql` | P0 |
-| `lib/notification-router.ts` | New file | P0 |
-| `lib/email-queue.ts` | New file | P0 |
-| Upgrade `lib/email.ts` to use queue | Existing file | P0 |
-| React Email setup + EmailWrapper | `apps/web/emails/` | P0 |
-
-### Week 2 — Auth & Achievement Templates
-
-| Task | Files | Priority |
-|------|-------|----------|
-| `auth.welcome` + `auth.waitlist_confirmed` templates | `emails/templates/auth/` | P0 |
-| `achievement.badge_earned` template | `emails/templates/achievement/` | P1 |
-| `achievement.level_up` template | `emails/templates/achievement/` | P1 |
-| `achievement.certificate` template | `emails/templates/achievement/` | P1 |
-| Event hooks in lesson/badge/certificate API routes | `app/api/v2/lessons/`, `app/api/certificates/` | P1 |
-
-### Week 3 — Scheduler & Learning Reminders
-
-| Task | Files | Priority |
-|------|-------|----------|
-| Vercel cron configuration | `vercel.json` | P0 |
-| `/api/cron/process-email-queue` | New cron route | P0 |
-| `/api/cron/retry-failed` | New cron route | P1 |
-| `learning.daily_reminder` template + cron | `emails/templates/learning/` | P1 |
-| `learning.weekly_recap` template + cron | `emails/templates/learning/` | P1 |
-| `learning.resume_nudge` template + cron | `emails/templates/learning/` | P1 |
-
-### Week 4 — Preferences UI and Webhooks
-
-| Task | Files | Priority |
-|------|-------|----------|
-| Notification preferences UI in `/settings` | `app/(app)/settings/` | P1 |
-| `/api/settings/notifications` CRUD route | New API route | P1 |
-| Resend webhook handler `/api/email/webhooks` | New API route | P1 |
-| Unsubscribe endpoint `/api/email/unsubscribe` | New API route | P1 |
-| Cleanup cron | New cron route | P2 |
-
-### Week 5 — Admin Panel
-
-| Task | Files | Priority |
-|------|-------|----------|
-| `/admin/notifications` dashboard | `app/(admin)/notifications/` | P2 |
-| Queue manager view | `app/(admin)/notifications/queue/` | P2 |
-| Email logs search | `app/(admin)/notifications/logs/` | P2 |
-| Template previewer + test send | `app/(admin)/notifications/templates/` | P2 |
-| User notification management | `app/(admin)/notifications/users/` | P2 |
-| System controls panel | `app/(admin)/notifications/settings/` | P2 |
-
-### Definition of Done for Sprint 6
-
-- [ ] All database migrations applied, RLS policies active
-- [ ] Welcome email sends when a user creates an account
-- [ ] Badge notification emails queue and deliver correctly
-- [ ] Level-up notification emails queue and deliver correctly
-- [ ] Certificate email sends when certificate is generated
-- [ ] Daily reminder cron runs hourly, respects user timezone and preference
-- [ ] Weekly recap cron runs Sunday evenings with real per-user data
-- [ ] Inactive nudge fires after 7 days (not more than once per 14 days)
-- [ ] Users can manage all notification preferences from `/settings`
-- [ ] Unsubscribe links work without login
-- [ ] Resend webhooks record delivered, opened, bounced events
-- [ ] Admin queue manager shows all emails and statuses
-- [ ] Email logs are searchable by template, user, status, date
-- [ ] 0 TypeScript errors, 0 ESLint warnings
-- [ ] Production build succeeds
-- [ ] Manual end-to-end test: new user -> welcome email received
+Refer to Section 24 for the 5-week roadmap timeline and complete Definition of Done.
 
 ---
 
 ## Changelog
 
+- v1.1 — 2026-08-05: Integrated critical architectural enhancements requested before implementation: first-class In-App Notification Center and database schema, consolidated Notification Priority Matrix (Critical to Bulk channels and policies), modular Admin Console architecture (/admin) replacing the standalone center, database-backed Feature Flags with failsafes, template versioning schemas with rollback capabilities, User Notification Timeline tracking, and comprehensive System Health monitoring matrix.
 - v1.0 — 2026-08-05: Initial design. Complete event-driven notification architecture covering 30+ typed learning events, 25+ email templates across 6 categories, PostgreSQL queue with priority levels and dead-letter handling, Vercel cron scheduler with timezone-aware delivery, exponential backoff retry strategy, per-user and global rate limiting, full notification preference model, React Email template system with shared design tokens, Admin Notification Center specification (6 views), database schema with critical indexes and RLS policies, and 5-week Sprint 6 implementation roadmap with P0/P1/P2 priorities and a complete Definition of Done.
