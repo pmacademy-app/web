@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { saveDraftAction } from '@/lib/capstones-db'
 import { getCapstoneDefinition } from '@/config/capstones'
 
@@ -20,34 +21,17 @@ export async function POST(
       return NextResponse.json({ error: 'Content payload must be a string.' }, { status: 400 })
     }
 
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+    const user = await getAuthenticatedUserFromRequest(request)
 
-    const supabase = createServerSupabaseClient()
-    let userId: string | null = null
-
-    if (token) {
-      const { data: { user }, error: tokenErr } = await supabase.auth.getUser(token)
-      if (!tokenErr && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (!authError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
       )
     }
 
-    const result = await saveDraftAction(supabase, userId, moduleSlug, content)
+    const supabase = createServerSupabaseClient()
+    const result = await saveDraftAction(supabase, user.id, moduleSlug, content)
 
     return NextResponse.json({
       success: true,

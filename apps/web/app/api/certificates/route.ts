@@ -1,37 +1,21 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { issueCertificate, getUserCertificates } from '@/lib/certificates-db'
 
 export async function GET(request: Request) {
   try {
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+    const user = await getAuthenticatedUserFromRequest(request)
 
-    const supabase = createServerSupabaseClient()
-    let userId: string | null = null
-
-    if (token) {
-      const { data: { user }, error: tokenErr } = await supabase.auth.getUser(token)
-      if (!tokenErr && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (!authError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
       )
     }
 
-    const certificates = await getUserCertificates(supabase, userId)
+    const supabase = createServerSupabaseClient()
+    const certificates = await getUserCertificates(supabase, user.id)
     return NextResponse.json({ success: true, certificates })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to fetch certificates.'
@@ -42,38 +26,21 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+    const user = await getAuthenticatedUserFromRequest(request)
 
-    const supabase = createServerSupabaseClient()
-    let userId: string | null = null
-
-    if (token) {
-      const { data: { user }, error: tokenErr } = await supabase.auth.getUser(token)
-      if (!tokenErr && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (!authError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
       )
     }
 
+    const supabase = createServerSupabaseClient()
     const body = await request.json().catch(() => ({}))
     const type = body.type || 'full_curriculum'
     const moduleSlug = body.moduleSlug || null
 
-    const certificate = await issueCertificate(supabase, userId, type, moduleSlug)
+    const certificate = await issueCertificate(supabase, user.id, type, moduleSlug)
     return NextResponse.json({ success: true, certificate })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to issue certificate.'
