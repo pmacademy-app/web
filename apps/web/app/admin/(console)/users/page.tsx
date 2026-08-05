@@ -97,8 +97,6 @@ export default async function AdminUsersPage() {
         columns={columns}
         data={users}
         keyExtractor={(u) => u.id}
-        searchPlaceholder="Search learner by email or name..."
-        searchValue=""
         emptyTitle="No learners registered"
         emptyDescription="No user accounts match your search filters."
       />
