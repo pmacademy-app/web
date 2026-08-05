@@ -54,6 +54,13 @@ users (
   streak_freezes_available int not null default 0,
   total_xp          int not null default 0,     -- denormalized cache, source of truth is xp_events
   level             int not null default 1,
+  username          text unique,                -- public portfolio handle (e.g. /p/johndoe)
+  bio               text,                       -- public profile bio / headline
+  avatar_url        text,                       -- custom avatar image URL
+  linkedin_url      text,                       -- LinkedIn profile URL
+  github_url        text,                       -- GitHub profile URL
+  website_url       text,                       -- personal website URL
+  is_portfolio_public boolean not null default true, -- portfolio privacy toggle
   created_at        timestamptz not null default now()
 );
 

@@ -15,6 +15,7 @@
     "test:radar": "npx tsx lib/__tests__/skillRadar.test.ts",
     "test:srs": "npx tsx lib/__tests__/srs.test.ts",
     "test:capstones": "npx tsx lib/__tests__/capstones.test.ts",
+    "test:portfolio": "npx tsx lib/__tests__/portfolio.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"

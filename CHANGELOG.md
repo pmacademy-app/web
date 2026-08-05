@@ -8,6 +8,23 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 2: Public Portfolio
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **Public Portfolio Page (`app/(portfolio)/p/[username]/page.tsx`):** Shareable personal website profile displaying user's verified career title, level badge, total XP, study streak, bio, social links (LinkedIn, GitHub, Website), Skill Radar competency breakdown, curriculum progress, verified capstones, public reflections, and milestone achievement badges.
+- **SEO & Structured Data (`lib/portfolio.ts`):** Dynamic SEO metadata (`og:title`, `og:description`, `og:image`, `twitter:card`, canonical URLs), Person JSON-LD schema generation, and `robots` directive handling (`index, follow` for public vs `noindex, nofollow` for private).
+- **Portfolio Database & Business Services (`lib/portfolio.ts`, `lib/portfolio-db.ts`):** `getPublicPortfolioData`, `getPortfolioSettings`, `updatePortfolioSettings`, username format validation (`validateUsername`), and URL validation.
+- **Portfolio Settings (`app/(app)/settings/page.tsx`, `components/settings/PortfolioSettingsForm.tsx`, `app/api/settings/portfolio/route.ts`):** Authenticated user settings page allowing configuration of handle/username, display name, bio, avatar URL, social links, and public/private portfolio visibility toggle.
+- **Share & Copy Component (`components/portfolio/ShareButton.tsx`):** Interactive Share button supporting Native Web Share API (`navigator.share`) and clipboard copy fallback with toast confirmation.
+- **Database Migration (`supabase/migrations/20260805000003_add_portfolio_columns.sql`):** Added `username`, `bio`, `avatar_url`, `linkedin_url`, `github_url`, `website_url`, and `is_portfolio_public` columns to `users` table with public RLS policy.
+- **Portfolio Unit Tests (`lib/__tests__/portfolio.test.ts`):** Automated unit tests verifying username validation, URL validation, Person schema JSON-LD generation, and share URL formatting (5 tests).
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 1: Capstone Workspace
 
 - **Status:** Development Complete
