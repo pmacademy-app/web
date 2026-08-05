@@ -40,6 +40,8 @@ export function createDefaultNotificationPreferences(userId: string): UserNotifi
     // Marketing: explicit opt-in only, default OFF
     marketing: { email: false, inApp: false },
     preferredReminderHour: 9,
+    preferredRecapDay: 0, // Sunday
+    preferredRecapHour: 18, // 6 PM local
     timezone: 'UTC',
     updatedAt: new Date().toISOString(),
   }
