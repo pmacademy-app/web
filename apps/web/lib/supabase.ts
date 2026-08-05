@@ -41,6 +41,7 @@ export type Database = {
           github_url?: string | null
           website_url?: string | null
           is_portfolio_public?: boolean
+          is_admin?: boolean
           created_at: string
         }
         Insert: {
@@ -63,6 +64,7 @@ export type Database = {
           github_url?: string | null
           website_url?: string | null
           is_portfolio_public?: boolean
+          is_admin?: boolean
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['users']['Insert']>
