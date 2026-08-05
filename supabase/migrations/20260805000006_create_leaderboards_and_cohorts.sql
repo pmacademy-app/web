@@ -37,13 +37,29 @@ create table if not exists user_friends (
 -- 4. Cohorts
 create table if not exists cohorts (
   id uuid primary key default gen_random_uuid(),
-  slug text unique not null,
+  slug text unique,
   name text not null,
   description text,
   is_private boolean not null default false,
   created_by uuid references users(id) on delete set null,
   created_at timestamptz not null default now()
 );
+
+-- Alter cohorts table to ensure missing columns exist if table was created by an earlier migration
+alter table cohorts add column if not exists slug text;
+alter table cohorts add column if not exists description text;
+alter table cohorts add column if not exists is_private boolean not null default false;
+alter table cohorts add column if not exists created_by uuid references users(id) on delete set null;
+
+-- Ensure slug constraint if slug column was just added
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'cohorts_slug_key'
+  ) then
+    alter table cohorts add constraint cohorts_slug_key unique (slug);
+  end if;
+end $$;
 
 -- 5. Cohort Members
 create table if not exists cohort_members (
