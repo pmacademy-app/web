@@ -106,8 +106,8 @@ runTest('deriveCapstoneStatus returns appropriate status based on submission and
   assert.strictEqual(deriveCapstoneStatus('submitted'), 'submitted')
   assert.strictEqual(deriveCapstoneStatus('reviewed'), 'reviewed')
   assert.strictEqual(deriveCapstoneStatus('draft'), 'draft')
-  assert.strictEqual(deriveCapstoneStatus(null, 8, 10), 'unlocked')
-  assert.strictEqual(deriveCapstoneStatus(null, 2, 10), 'locked')
+  assert.strictEqual(deriveCapstoneStatus(null, 8), 'unlocked')
+  assert.strictEqual(deriveCapstoneStatus(null, 2), 'locked')
 })
 
 // 5. XP Constant Verification

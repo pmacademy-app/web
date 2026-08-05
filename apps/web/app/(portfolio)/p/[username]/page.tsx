@@ -1,111 +1,149 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { createServerSupabaseClient } from '@/lib/supabase'
+import { getPublicPortfolioData } from '@/lib/portfolio-db'
+import { generatePersonJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
+import { PortfolioHero } from '@/components/portfolio/PortfolioHero'
+import { PortfolioSkillRadar } from '@/components/portfolio/PortfolioSkillRadar'
+import { PortfolioProgress } from '@/components/portfolio/PortfolioProgress'
+import { PortfolioCapstones } from '@/components/portfolio/PortfolioCapstones'
+import { PortfolioAchievements } from '@/components/portfolio/PortfolioAchievements'
+import { Lock, ArrowLeft } from 'lucide-react'
 
 interface PageProps {
   params: Promise<{ username: string }>
 }
 
+const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://pmacademy.com'
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params
+  const supabase = createServerSupabaseClient()
+  const portfolio = await getPublicPortfolioData(supabase, username)
+
+  if (!portfolio || !portfolio.user.isPortfolioPublic) {
+    return {
+      title: 'Private Portfolio | PM Academy',
+      description: 'This PM Academy learning portfolio is private.',
+      robots: { index: false, follow: false },
+    }
+  }
+
+  const { name, bio, levelInfo, totalXp, avatarUrl } = portfolio.user
+  const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, username)
+
+  const metaTitle = `${name}'s PM Portfolio & Skill Radar | PM Academy`
+  const metaDesc = bio
+    ? `${name} — ${levelInfo.title} (${totalXp} XP). ${bio}`
+    : `Explore ${name}'s verified Product Management portfolio, continuous skill radar, and applied module capstones on PM Academy.`
+
   return {
-    title: `${username}'s PM Portfolio & Skill Radar | PM Academy`,
-    description: `View ${username}'s Product Management portfolio, skill radar, and completed module capstones on PM Academy.`,
+    title: metaTitle,
+    description: metaDesc,
+    alternates: {
+      canonical: shareUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    openGraph: {
+      type: 'profile',
+      title: metaTitle,
+      description: metaDesc,
+      url: shareUrl,
+      images: avatarUrl ? [{ url: avatarUrl, alt: name }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: metaTitle,
+      description: metaDesc,
+      images: avatarUrl ? [avatarUrl] : undefined,
+    },
   }
 }
 
 export default async function PublicPortfolioPage({ params }: PageProps) {
   const { username } = await params
+  const supabase = createServerSupabaseClient()
+  const portfolio = await getPublicPortfolioData(supabase, username)
 
-  // Mock public profile data for SSG / SSR demonstration
-  const profile = {
-    username,
-    name: decodeURIComponent(username).replace(/[-_]/g, ' '),
-    title: 'Senior PM (Level 4)',
-    streak: 14,
-    totalXp: 1850,
-    completedLessons: 32,
-    skillRadar: {
-      discovery: 75,
-      strategy: 65,
-      design: 80,
-      execution: 85,
-      growth: 60,
-      leadership: 70,
-      technical: 50,
-    },
-    publicCapstones: [
-      {
-        moduleNumber: 1,
-        title: 'Product Thinking Foundations',
-        outcome: 'Product Judgment Basics & Accountability Triangle Memo',
-        submittedAt: '2026-06-15',
-        content: 'Analyzed product accountability across 3 core questions and established a decision-chain framework for problem-solution fit.',
-      },
-    ],
+  // Private or non-existent profile state
+  if (!portfolio) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+        <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center space-y-4 shadow-sm">
+          <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500 w-fit mx-auto">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h1 className="text-xl font-bold font-serif text-foreground">
+            Portfolio Unavailable or Private
+          </h1>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            The profile <strong className="font-mono text-foreground">@{username}</strong> is either private, does not exist, or has been restricted by the author.
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors pt-2"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to PM Academy Home
+          </Link>
+        </div>
+      </div>
+    )
   }
 
+  const { user, progress, skillRadar, capstones } = portfolio
+
+  // Generate Person Schema JSON-LD
+  const personJsonLd = generatePersonJsonLd({
+    name: user.name,
+    username: user.username,
+    title: user.levelInfo.title,
+    bio: user.bio,
+    avatarUrl: user.avatarUrl,
+    linkedinUrl: user.linkedinUrl,
+    githubUrl: user.githubUrl,
+    websiteUrl: user.websiteUrl,
+    siteOrigin: SITE_ORIGIN,
+  })
+
   return (
-    <div className="min-h-screen bg-background text-foreground py-12 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="rounded-xl border border-border bg-card p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm">
-          <div>
-            <span className="text-xs uppercase tracking-wider font-semibold text-primary">
-              PM Academy Public Portfolio
-            </span>
-            <h1 className="text-3xl font-bold font-serif capitalize mt-1">
-              {profile.name}
-            </h1>
-            <p className="text-sm font-medium text-muted-foreground mt-1">
-              {profile.title} • {profile.totalXp} XP • {profile.completedLessons}/90 Lessons
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-              🔥 {profile.streak} Day Streak
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-background text-foreground py-8 md:py-12 px-4">
+      {/* Schema.org Person Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Portfolio Hero */}
+        <PortfolioHero user={user} />
 
         {/* Skill Radar Overview */}
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <h2 className="text-xl font-bold font-serif mb-4">Competency Skill Radar</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {Object.entries(profile.skillRadar).map(([cluster, score]) => (
-              <div key={cluster} className="rounded-lg bg-secondary/50 p-3 border border-border/50">
-                <span className="text-xs font-semibold uppercase text-muted-foreground capitalize">
-                  {cluster}
-                </span>
-                <div className="text-2xl font-bold text-primary mt-1">{score}%</div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <PortfolioSkillRadar skillRadar={skillRadar} />
 
-        {/* Verified Public Capstones */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold font-serif">Verified Applied Capstones</h2>
-          {profile.publicCapstones.map((cap) => (
-            <div key={cap.moduleNumber} className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-xs font-semibold uppercase text-primary">
-                  Module {cap.moduleNumber} Capstone
-                </span>
-                <span className="text-xs text-muted-foreground">{cap.submittedAt}</span>
-              </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">{cap.title}</h3>
-              <p className="text-sm text-foreground/80">{cap.content}</p>
-            </div>
-          ))}
-        </div>
+        {/* Curriculum Progress */}
+        <PortfolioProgress progress={progress} />
 
-        {/* Branding Footer */}
-        <div className="text-center pt-8 border-t border-border text-xs text-muted-foreground">
-          Verified learning history powered by{' '}
-          <Link href="/" className="font-semibold text-primary hover:underline">
-            PM Academy
-          </Link>
-          . 90 lessons. Free forever.
+        {/* Verified Applied Capstones */}
+        <PortfolioCapstones capstones={capstones} />
+
+        {/* Achievements & Badges Placeholder */}
+        <PortfolioAchievements user={user} />
+
+        {/* Verified Footer Branding */}
+        <div className="text-center pt-8 border-t border-border/60 text-xs text-muted-foreground space-y-1">
+          <p>
+            Verified Product Management Learning Record powered by{' '}
+            <Link href="/" className="font-bold text-primary hover:underline">
+              PM Academy
+            </Link>
+            .
+          </p>
+          <p className="text-[11px] text-muted-foreground/60">
+            90 lessons · 9 modules · 0 dark patterns · Static-first verified architecture.
+          </p>
         </div>
       </div>
     </div>

@@ -34,6 +34,13 @@ export type Database = {
           total_xp: number
           level: number
           last_streak_date?: string | null
+          username?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          linkedin_url?: string | null
+          github_url?: string | null
+          website_url?: string | null
+          is_portfolio_public?: boolean
           created_at: string
         }
         Insert: {
@@ -49,6 +56,13 @@ export type Database = {
           last_streak_date?: string | null
           total_xp?: number
           level?: number
+          username?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          linkedin_url?: string | null
+          github_url?: string | null
+          website_url?: string | null
+          is_portfolio_public?: boolean
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['users']['Insert']>
