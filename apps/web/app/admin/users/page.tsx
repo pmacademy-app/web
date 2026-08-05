@@ -1,6 +1,7 @@
 import React from 'react'
 import { Users, Search, Shield, Flame, Zap } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
+import { DeveloperActionsSection } from '@/components/admin/DeveloperActionsSection'
 
 export const revalidate = 0
 
@@ -106,6 +107,14 @@ export default async function AdminUsersPage() {
           </table>
         </div>
       </div>
+
+      {/* Developer Testing Tools Section for Selected User */}
+      {users.length > 0 && (
+        <DeveloperActionsSection
+          targetUserId={users[0].id}
+          targetUserEmail={users[0].email}
+        />
+      )}
     </div>
   )
 }
