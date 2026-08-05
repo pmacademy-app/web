@@ -8,6 +8,36 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 6.2: Email Engine & Delivery Infrastructure
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **React Email Templates (`apps/web/emails/`):** Built 9 responsive HTML & plain text email templates using brand tokens (`#d97706`), accessibility WCAG AA compliance, and Light/Dark mode styling.
+  - **Auth**: `auth.welcome`, `auth.verify_email`, `auth.password_reset`.
+  - **Learning**: `learning.module_complete`, `learning.weekly_recap`.
+  - **Achievements**: `achievement.badge_earned`, `achievement.level_up`, `achievement.certificate`, `achievement.portfolio_published`.
+  - **Shared UI Components**: `EmailWrapper` (base layout with headers, footers, unsubscribe links), `Button`, `StatCard`, `BadgeDisplay`, `ProgressBar`.
+  - **Template Renderer Registry (`emails/index.ts`)**: Pure template compilation converting React Email component trees to static HTML & plain-text strings with subject variable substitution.
+- **Production Resend Provider (`apps/web/lib/notifications/providers/resend-provider.ts`):** Upgraded `ResendProvider` with direct REST API dispatch (`fetch` to `https://api.resend.com/emails`), headers (`List-Unsubscribe`), template tags, replyTo support, error detail extraction, and dev simulation fallback when `RESEND_API_KEY` is absent.
+- **Queue Processor & Retry Engine (`apps/web/lib/notifications/queue/processor.ts`):**
+  - `enqueueNotificationItem()`: Handles feature flag validation, user preferences gating, priority bypass rules, duplicate enqueuing prevention, and in-memory queue fallback.
+  - `processEmailQueue()`: Batch processor executing atomic locks, suppression checks, template rendering, provider dispatch, status lifecycle state updates (`pending` → `processing` → `delivered` / `retrying` / `dead_letter` / `suppressed`), and timeline logging.
+  - Exponential backoff retry handling and permanent error dead-letter routing.
+- **Event-to-Queue Connectors (`apps/web/lib/notifications/events/connectors.ts`):** Default event handlers registering 8 canonical events (`user.registered`, `user.verified`, `password.reset_requested`, `module.completed`, `badge.earned`, `xp.level_up`, `certificate.generated`, `portfolio.published`) to the `NotificationEventDispatcher`.
+- **Scheduled Cron Routes & Configuration (`app/api/cron/`, `vercel.json`):**
+  - Next.js App Router authenticated cron routes: `/api/cron/process-email-queue`, `/api/cron/daily-reminders`, `/api/cron/weekly-recap`, `/api/cron/retry-failed`, `/api/cron/cleanup`.
+  - Registered schedules in root `vercel.json`.
+- **Webhooks & Unsubscribe API (`app/api/email/`):**
+  - `/api/email/webhooks`: Resend event delivery webhook handler.
+  - `/api/email/unsubscribe`: One-click unsubscribe endpoint returning user preference confirmation.
+  - `/api/dev/send-test-email`: Development endpoint for testing template rendering and queue execution.
+- **Email Engine Test Suite (`apps/web/lib/__tests__/email-engine.test.ts`):** 8 automated unit tests verifying template rendering output, event-to-queue dispatching, queue processor delivery, duplicate prevention, feature flags gating, user preferences gating, suppression filtering, and dead-letter handling. Added `test:email` script to `package.json`.
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 6.1: Notification Platform Foundation
 
 - **Status:** Development Complete

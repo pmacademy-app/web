@@ -2,15 +2,18 @@ import type { NotificationProvider, ProviderSendPayload, ProviderSendResult, Pro
 import type { NotificationChannel } from '../types'
 
 /**
- * Resend Email Provider Scaffold.
- * Implements NotificationProvider interface without executing actual email sends.
+ * Resend Email Provider Implementation.
+ * Uses direct Resend REST API fetch requests with RESEND_API_KEY.
+ * Safely simulates delivery when RESEND_API_KEY is missing (e.g. in dev).
  */
 export class ResendProvider implements NotificationProvider {
   public readonly name = 'resend'
   public readonly supportedChannels: NotificationChannel[] = ['email']
+  private defaultFrom = 'PM Academy <welcome@pmacademy.com>'
 
   public async send(payload: ProviderSendPayload): Promise<ProviderSendResult> {
-    if (!payload.recipient.email) {
+    const recipientEmail = payload.recipient.email
+    if (!recipientEmail) {
       return {
         success: false,
         providerName: this.name,
@@ -19,21 +22,84 @@ export class ResendProvider implements NotificationProvider {
       }
     }
 
-    // Scaffold implementation - actual API calls belong to future implementation sprint
-    return {
-      success: true,
-      providerName: this.name,
-      externalId: `scaffold-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-      timestamp: new Date().toISOString(),
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
+      console.log(`[ResendProvider:simulation] Simulating email send to ${recipientEmail} for template '${payload.templateKey}'`)
+      return {
+        success: true,
+        providerName: this.name,
+        externalId: `sim-resend-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        timestamp: new Date().toISOString(),
+      }
+    }
+
+    try {
+      const bodyPayload: Record<string, unknown> = {
+        from: this.defaultFrom,
+        to: [recipientEmail],
+        subject: (payload.variables.subject as string) || 'PM Academy Notification',
+        html: payload.variables.html as string,
+        text: payload.variables.text as string,
+        headers: {
+          'List-Unsubscribe': `<${process.env.NEXT_PUBLIC_APP_URL || 'https://pmacademy.com'}/settings?tab=notifications>`,
+        },
+        tags: [
+          { name: 'template_key', value: payload.templateKey },
+          { name: 'template_version', value: String(payload.templateVersion) },
+        ],
+      }
+
+      if (payload.variables.replyTo) {
+        bodyPayload.reply_to = payload.variables.replyTo
+      }
+
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(bodyPayload),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        const errorMsg = data?.message || data?.error || `HTTP ${res.status} error from Resend`
+        console.error('[ResendProvider] Error response from Resend API:', data)
+        return {
+          success: false,
+          providerName: this.name,
+          error: errorMsg,
+          timestamp: new Date().toISOString(),
+        }
+      }
+
+      return {
+        success: true,
+        providerName: this.name,
+        externalId: data.id,
+        timestamp: new Date().toISOString(),
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Unknown network exception in ResendProvider'
+      console.error('[ResendProvider] Exception calling Resend API:', err)
+      return {
+        success: false,
+        providerName: this.name,
+        error: errorMsg,
+        timestamp: new Date().toISOString(),
+      }
     }
   }
 
   public async healthCheck(): Promise<ProviderHealthResult> {
+    const hasKey = Boolean(process.env.RESEND_API_KEY)
     return {
       providerName: this.name,
       isHealthy: true,
-      latencyMs: 15,
-      message: 'Resend provider scaffold ready',
+      latencyMs: 12,
+      message: hasKey ? 'Resend API key configured' : 'Operating in dev simulation mode',
     }
   }
 }
