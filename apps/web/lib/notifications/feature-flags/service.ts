@@ -27,8 +27,8 @@ export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
   // Marketing: explicit opt-in only, default OFF
   MARKETING_EMAILS_ENABLED: false,
 
-  // Scheduler mode: GitHub Actions (not Vercel Cron)
-  GITHUB_ACTIONS_SCHEDULER_ENABLED: true,
+  // Scheduled background tasks (provider-agnostic)
+  SCHEDULER_ENABLED: true,
 }
 
 export class FeatureFlagService {
