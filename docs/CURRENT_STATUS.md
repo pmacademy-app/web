@@ -9,8 +9,8 @@
 
 - **Current Branch:** `main`
 - **Current Version:** `0.3.0-rc` (Phase 3 Stabilization complete, awaiting release tag)
-- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build - clean, 0 errors, 39 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Stabilization Sprint COMPLETE**
+- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 39 routes, 90 lessons compiled)
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 6 Architecture Design Complete**
 
 ---
 
@@ -26,15 +26,16 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 3 – Sprint 4 (Badge & Achievement System `/badges`):** ✅ Complete
 - **Phase 3 – Sprint 5 (Friends & Cohort Leaderboard `/leaderboard`):** ✅ Complete
 - **Phase 3 – Stabilization Sprint (Priority 1 + 2 + 3):** ✅ Complete
-- **Current Focus:** Phase 3 – Sprint 6 (Email Infrastructure)
+- **Phase 3 – Sprint 6 (Notification Architecture Design):** ✅ Design Complete — `docs/Notification-Architecture.md` authored
+- **Current Focus:** Phase 3 – Sprint 6 Implementation (Email Infrastructure)
 
 ---
 
 ## 3. What's Next
 
-Phase 3 Stabilization Sprint is complete. The next focus is **Phase 3 Sprint 6**:
+Phase 3 Stabilization Sprint is complete. Sprint 6 architecture design is complete. The next focus is **Sprint 6 implementation**:
 
-1. **[Phase 3 - Sprint 6] Email Automation & Weekly Summary Digests:** Resend SMTP transactional emails, certificate issuance notifications, and weekly progress digests.
+1. **[Phase 3 - Sprint 6 — In Progress] Notification & Email Infrastructure:** Database migrations, notification router, email queue, React Email templates, Vercel crons, preference UI, Resend webhooks, Admin Notification Center. Full specification in [`docs/Notification-Architecture.md`](./Notification-Architecture.md).
 2. **[Phase 3 - Sprint 7] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
 
 ---

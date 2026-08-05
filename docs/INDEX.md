@@ -33,7 +33,8 @@ Read in this order before writing any code or making any product decision. Do no
 | 11 | [`content-pipeline.md`](./content-pipeline.md) | **Deep-dive:** the authoritative compiler specification (read before any content pipeline work) |
 | 12 | [`rendering-pipeline.md`](./rendering-pipeline.md) | **Deep-dive:** the authoritative renderer specification (read before any lesson UI work) |
 | 13 | [`AUTH_FLOW.md`](./AUTH_FLOW.md) | **Deep-dive:** routing, redirects, callbacks, email templates, and session creation across all auth flows |
-| 14 | [`docs/memory/`](./memory/) | **Project memory:** implementation status, decisions, pitfalls, and roadmap progress |
+| 14 | [`Notification-Architecture.md`](./Notification-Architecture.md) | **Deep-dive:** the authoritative notification and email architecture — event system, queue, scheduler, templates, Admin Notification Center |
+| 15 | [`docs/memory/`](./memory/) | **Project memory:** implementation status, decisions, pitfalls, and roadmap progress |
 
 **For a quick orientation only** (not a substitute for full reading): read `CURRENT_STATUS.md`, `PRD.md §1`, `Architecture.md §1`, and this document's Source of Truth section below.
 
@@ -117,6 +118,10 @@ These two documents are the definitive implementation blueprints for the content
 **Owns:** routing, redirects, callbacks, email templates, and session creation across all auth flows.  
 **Use it:** to verify callback parameters and redirect destinations for OAuth, password resets, signup, and login flows.
 
+#### [`Notification-Architecture.md`](./Notification-Architecture.md) — Notification & Communication Architecture
+**Owns:** the complete notification system design — 30+ typed learning events, 25+ email templates across 6 categories, PostgreSQL-backed queue with priority levels and dead-letter handling, Vercel cron scheduler with timezone-aware delivery, exponential backoff retry strategy, per-user rate limiting, full user notification preference model, React Email template system, Admin Notification Center specification (6 views), database schema, and Sprint 6 implementation roadmap.  
+**Use it:** before writing any email, notification, or communication code. This is the single source of truth for all PM Academy communications.
+
 #### [`Supabase-Migration-Guide.md`](./Supabase-Migration-Guide.md) — Database Migration Runbook
 **Owns:** the safe workflow for making database schema changes via Supabase CLI. This is a *how-to* document, not a *what* document — the schema itself is defined in `Architecture.md §2`.  
 **Critical rule it enforces:** Never run manual DDL in the Supabase Dashboard SQL Editor. All changes via migration files. RLS must ship in the same migration as the table it protects.
@@ -192,4 +197,5 @@ For a full list, see `Rules.md` and `Architecture.md`. The most critical invaria
 
 ## Changelog
 
+- v1.1 (2026-08-05) — Added `Notification-Architecture.md` to reading order (step 14), document map (Operational Guides), and shifted memory system to step 15. Registered notification architecture as the authoritative source for all communication system work.
 - v1.0 (2026-08-01) — Initial creation. Establishes the documentation entry point, reading order, document map, source-of-truth conflict resolution rules, and links to the new memory system under `docs/memory/`.
