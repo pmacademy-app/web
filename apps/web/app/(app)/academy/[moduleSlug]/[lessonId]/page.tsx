@@ -10,7 +10,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Lock } from 'lucide-react'
-import { fetchCompiledLesson, getAdjacentLessons, getLessonMeta } from '@/lib/lesson-loader'
+import {
+  fetchCompiledLesson,
+  fetchCurriculumData,
+  getAdjacentLessons,
+  getLessonMeta,
+} from '@/lib/lesson-loader'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { isLessonUnlocked } from '@/lib/lessons-completion-service'
@@ -22,11 +27,17 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lessonId } = await params
-  const lesson = await fetchCompiledLesson(lessonId)
+  const [lesson, curriculum] = await Promise.all([
+    fetchCompiledLesson(lessonId),
+    fetchCurriculumData(),
+  ])
   if (!lesson) return { title: 'Lesson Not Found | PM Academy' }
 
+  const globalIndex = curriculum?.lessons.findIndex((l) => l.id === lessonId) ?? -1
+  const globalOrder = globalIndex >= 0 ? globalIndex + 1 : lesson.order
+
   return {
-    title: `Lesson ${lesson.order}: ${lesson.title} | PM Academy`,
+    title: `Lesson ${globalOrder}: ${lesson.title} | PM Academy`,
     description: `Interactive lesson — theory, practice quiz, spaced repetition flashcards, and reflection exercise.`,
   }
 }
@@ -47,15 +58,40 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   const user = await getServerUser()
   if (!user) redirect('/login')
 
-  // 4. Sequential unlock check using stable IDs
+  // 4. Sequential unlock check using stable IDs from global curriculum array
+  //    getAdjacentLessons uses curriculum.lessons array index — always global order
   const { prevId, nextId } = await getAdjacentLessons(lessonId)
-  const [prevMeta, nextMeta] = await Promise.all([
+  const [prevMeta, nextMeta, curriculum] = await Promise.all([
     prevId ? getLessonMeta(prevId) : null,
     nextId ? getLessonMeta(nextId) : null,
+    fetchCurriculumData(),
   ])
 
   const prevLessonUrl = prevMeta ? `/academy/${prevMeta.module}/${prevMeta.id}` : null
   const nextLessonUrl = nextMeta ? `/academy/${nextMeta.module}/${nextMeta.id}` : null
+
+  // Compute the global 1-indexed lesson numbers for display (not module-scoped order)
+  const lessons = curriculum?.lessons ?? []
+  const globalIndex = lessons.findIndex((l) => l.id === lessonId)
+  const globalOrder = globalIndex >= 0 ? globalIndex + 1 : lesson.order
+
+  const prevGlobalIndex = prevMeta ? lessons.findIndex((l) => l.id === prevMeta.id) : -1
+  const prevGlobalOrder = prevGlobalIndex >= 0 ? prevGlobalIndex + 1 : null
+
+  // Human-readable module name
+  const MODULE_NAMES: Record<string, string> = {
+    foundations: 'Foundations',
+    discovery: 'Discovery & User Research',
+    strategy: 'Product Strategy',
+    execution: 'Product Execution',
+    growth: 'Growth & Metrics',
+    leadership: 'PM Leadership',
+    technical: 'Technical Fundamentals',
+    design: 'Design Thinking',
+    capstone: 'Capstone Projects',
+  }
+  const moduleName = MODULE_NAMES[lesson.module] ?? lesson.module
+  const moduleNum = Math.ceil(globalOrder / 10)
 
   let isLocked = false
   if (prevId) {
@@ -79,21 +115,27 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         <div className="space-y-3">
           <h1 className="text-2xl font-bold font-serif text-foreground">Lesson Locked</h1>
           <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
-            You must complete the previous lesson before unlocking{' '}
+            You must complete{' '}
+            {prevMeta && prevGlobalOrder && (
+              <span className="font-semibold text-foreground">
+                Lesson {prevGlobalOrder}: {prevMeta.title}
+              </span>
+            )}{' '}
+            before you can unlock{' '}
             <span className="font-semibold text-foreground">
-              Lesson {lesson.order}: {lesson.title}
+              Lesson {globalOrder}: {lesson.title}
             </span>
             .
           </p>
         </div>
 
         <div className="flex flex-col gap-3">
-          {prevLessonUrl && (
+          {prevLessonUrl && prevMeta && prevGlobalOrder && (
             <Link
               href={prevLessonUrl}
               className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all"
             >
-              Go to Required Lesson →
+              Complete Lesson {prevGlobalOrder}: {prevMeta.title} →
             </Link>
           )}
           <Link
@@ -113,6 +155,9 @@ export default async function AcademyLessonPage({ params }: PageProps) {
       lesson={lesson}
       prevLessonUrl={prevLessonUrl}
       nextLessonUrl={nextLessonUrl}
+      globalOrder={globalOrder}
+      moduleNumber={moduleNum}
+      moduleName={moduleName}
     />
   )
 }

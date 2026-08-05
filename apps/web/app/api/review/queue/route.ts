@@ -1,37 +1,20 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getReviewQueueData } from '@/lib/flashcards-service'
 
 export async function GET(request: Request) {
   try {
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
-
-    const supabase = createServerSupabaseClient()
-    let userId: string | null = null
-
-    if (token) {
-      const { data: { user }, error: userError } = await supabase.auth.getUser(token)
-      if (!userError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (!authError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
+    const user = await getAuthenticatedUserFromRequest(request)
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
       )
     }
 
-    const queueData = await getReviewQueueData(supabase, userId)
+    const supabase = createServerSupabaseClient()
+    const queueData = await getReviewQueueData(supabase, user.id)
 
     return NextResponse.json({
       success: true,

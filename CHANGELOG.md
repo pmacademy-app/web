@@ -8,6 +8,32 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3: Stabilization Sprint (Priority 1 + 2 + 3)
+
+- **Status:** Complete
+- **Release Date:** 2026-08-05
+
+### Fixed
+
+- **Lesson Rendering — Empty Section Cards (Priority 1):** Added `hasRenderableChildren` guard across all 13 section components in `SectionBlock.tsx`. Empty sections (e.g., `InterviewPerspectiveSection` with no content) now return `null` instead of rendering empty card containers.
+- **Review Hub Real-Time Progress (Priority 1):** Fixed `ReviewHub.tsx` to progressively decrement `dueTodayCount` and increment `completedTodayCount` on each card submission, clear `dueCards` on session completion, and call `router.refresh()` to invalidate server state.
+- **Portfolio Settings 401 (Priority 1):** Corrected `getAuthenticatedUserFromRequest` call in `/api/settings/portfolio/route.ts` — was destructured as `{ user }` instead of used directly.
+- **Lesson Navigation Display (Priority 1):** Dashboard "Continue Learning" card showed "Lesson 1: User Research" for Lesson 11 because `activeNext.order` was module-scoped. Fixed to `activeNextIndex + 1` (global curriculum index).
+- **Locked Lesson Screen Navigation Bug (Priority 3 — Root Cause):** Locked lesson screen displayed "Lesson 2" (module-scoped order) when attempting Lesson 12. Fixed `page.tsx` to compute `globalOrder` from the 90-lesson curriculum array index and pass it to `LessonPageContent`. Screen now correctly reads "Complete Lesson 11: User Research →".
+- **Module Completion Detection (Priority 3):** `isModuleComplete = lesson.order % 10 === 0` used module-scoped order. Fixed to `globalOrder % 10 === 0` using server-computed global position.
+- **Breadcrumb Lesson Numbering (Priority 3):** Breadcrumbs displayed module-scoped order. Fixed to use `globalOrder` prop passed from server.
+- **Metadata Page Title (Priority 3):** Lesson `<title>` tag used `lesson.order` (module-scoped). Fixed to `globalOrder`.
+- **Capstone Auth (Priority 2):** `capstones/page.tsx` used `supabase.auth.getUser()` directly instead of `getServerUser()`.
+
+### Added
+
+- **Module Completion Celebration Screen (Priority 2):** Completing the 10th lesson of a module (global lessons 10, 20, 30… 90) now shows a dedicated trophy celebration view with Capstone unlock CTA, Continue to Next Module button, Review Flashcards shortcut, and Share Achievement action.
+- **Dynamic Curriculum Navigation (Priority 2):** `/academy` curriculum page now fetches user progress and points module action buttons to the learner's first uncompleted lesson in each module (not always Lesson 1). Completed modules show a "✓ Completed" badge and "Review Module" CTA.
+- **Progress Page — Single Source of Truth (Priority 2):** Replaced the placeholder scaffold at `/progress` with a full competency dashboard: level & career rank, streak status, skill radar breakdown, 9-module capstone status grid, and certificate eligibility/discovery.
+- **Certificate Discoverability (Priority 2):** Certificates now visible and linked from `/progress`, `/dashboard`, `/settings`, and the public `/p/[username]` portfolio. Learners who haven't earned a certificate see an eligibility progress bar.
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 5: Friends & Cohort Leaderboard System
 
 - **Status:** Development Complete

@@ -289,19 +289,28 @@ export function PortfolioSettingsForm() {
         </div>
       </div>
 
-      {/* Save Button Bar */}
-      <div className="flex items-center justify-between border-t border-border pt-4">
-        {formData.username && (
+      {/* Quick Action Links Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
+        <div className="flex items-center gap-4">
+          {formData.username && (
+            <a
+              href={`/p/${formData.username}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
+            >
+              <span>Preview Public Portfolio</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
           <a
-            href={`/p/${formData.username}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
+            href="/progress"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 hover:underline"
           >
-            <span>Preview Public Portfolio</span>
+            <span>View Progress &amp; Certificates</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
-        )}
+        </div>
 
         <button
           type="submit"
