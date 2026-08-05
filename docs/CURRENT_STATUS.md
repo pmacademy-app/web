@@ -8,9 +8,9 @@
 ## 1. Repository Metadata
 
 - **Current Branch:** `main`
-- **Current Version:** `0.3.0-notifications` (Sprint 6.4 Admin Console complete)
+- **Current Version:** `0.3.0-notifications` (Sprint 6.4.2 Design System Alignment complete)
 - **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 78 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 6.4 Admin Console COMPLETE**
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 6.4.2 COMPLETE**
 
 ---
 
@@ -31,8 +31,9 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 3 – Architecture Refactor Sprint:** ✅ Complete (`apps/web/lib/` domain organization)
 - **Phase 3 – Sprint 6.3 (In-App Notification Center & Preferences):** ✅ Complete (`NotificationBell`, `NotificationCenterDrawer`, `/api/notifications/`)
 - **Phase 3 – Notification Platform Alignment:** ✅ Complete (In-App primary, Email restricted, GitHub Actions scheduler)
-- **Phase 3 – Sprint 6.4 (Admin Console):** ✅ Complete (`/admin`, RBAC middleware, 12 modules)
-- **Current Focus:** Awaiting Review before Phase 3 Sprint 6.5 (Campaign Manager) / Phase 4 (Peer Review)
+- **Phase 3 – Sprint 6.4 (Admin Console & Dev Tools):** ✅ Complete (`/admin`, RBAC middleware, Dev Certificate Tools)
+- **Phase 3 – Sprint 6.4.2 (Admin UI/UX Polish & Design System Alignment):** ✅ Complete (Standardized `AdminDataTable`, `AdminKpiCard`, `AdminPageHeader`, `AdminStatusBadge`)
+- **Current Focus:** Awaiting Review before Phase 3 Sprint 6.4.3 / Sprint 6.5 (Campaign Manager)
 
 ---
 

@@ -1,54 +1,45 @@
 import React from 'react'
 import { Bell, ShieldCheck, Mail } from 'lucide-react'
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
+import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
+import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 
 export const revalidate = 0
 
 export default async function AdminNotificationsPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Bell className="w-6 h-6 text-amber-400" />
-            Notification Timeline & Event Logs
-          </h1>
-          <p className="text-sm text-slate-400">System-wide notification routing timeline and deliverability diagnostics.</p>
-        </div>
+    <div className="space-y-8">
+      <AdminPageHeader
+        title="Notification System & Timeline"
+        description="Event dispatcher telemetry, in-app notification center activity, and channel routing status."
+        icon={Bell}
+        iconColor="text-amber-400"
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <AdminKpiCard title="Primary Channel" value="In-App" subtitle="Real-time drawer notifications" icon={Bell} iconColor="text-amber-400" />
+        <AdminKpiCard title="Secondary Channel" value="Email Engine" subtitle="Auth, Milestones & Weekly Recap" icon={Mail} iconColor="text-blue-400" />
+        <AdminKpiCard title="Dispatcher Status" value="Active" subtitle="Event-driven notification platform" icon={ShieldCheck} iconColor="text-emerald-400" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Primary Channel</span>
-            <Bell className="w-4 h-4 text-blue-400" />
+      <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4 shadow-xl">
+        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Event Routing Matrix</h2>
+        <div className="space-y-3 text-xs">
+          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+            <div>
+              <p className="font-bold text-white">Daily Learning Events (`lesson.completed`, `streak.updated`, `badge.earned`)</p>
+              <p className="text-slate-400">Routed exclusively to In-App Notification Center.</p>
+            </div>
+            <AdminStatusBadge status="published" label="In-App Only" />
           </div>
-          <p className="text-xl font-bold text-white">In-App Feed</p>
-          <p className="text-xs text-slate-400">Active for all daily learning & milestone events.</p>
-        </div>
 
-        <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Secondary Channel</span>
-            <Mail className="w-4 h-4 text-emerald-400" />
+          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+            <div>
+              <p className="font-bold text-white">Major Milestones (`module.completed`, `certificate.generated`, `weekly_recap`)</p>
+              <p className="text-slate-400">Routed to both In-App and Email Queue (respecting user preferences).</p>
+            </div>
+            <AdminStatusBadge status="healthy" label="In-App + Email" />
           </div>
-          <p className="text-xl font-bold text-white">Resend Email</p>
-          <p className="text-xs text-slate-400">Restricted to Auth, Major Milestones & Weekly Recap.</p>
-        </div>
-
-        <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Deliverability Health</span>
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          </div>
-          <p className="text-xl font-bold text-emerald-400">100% Delivery</p>
-          <p className="text-xs text-slate-400">0 failed dispatches in last 24h.</p>
-        </div>
-      </div>
-
-      <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Recent System Notification Events</h2>
-        <div className="p-8 text-center bg-slate-950/60 rounded-lg border border-slate-800/80 text-slate-500 text-xs">
-          No failed or suppressed notification events recorded. Notification platform running normally.
         </div>
       </div>
     </div>
