@@ -14,6 +14,7 @@ import { LevelCard } from '@/components/dashboard/LevelCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
 import { DashboardLeaderboardWidget } from '@/components/dashboard/DashboardLeaderboardWidget'
+import { DashboardNotificationsWidget } from '@/components/notifications/DashboardNotificationsWidget'
 import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
 
 interface DBChain {
@@ -172,7 +173,8 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Activity */}
+      {/* Notifications & Recent Activity */}
+      <DashboardNotificationsWidget />
       <RecentActivityCard activities={recentActivities} />
     </div>
   )

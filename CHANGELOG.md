@@ -8,6 +8,38 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 6.3: In-App Notification Center & Preferences
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **Navigation Notification Bell (`apps/web/components/notifications/NotificationBell.tsx`)**:
+  - Main header navigation trigger with unread badge count pill (e.g. `3`, `99+`).
+  - Popover dropdown previewing top 4 latest notifications with "Mark All Read" action and link to full Notification Center.
+  - 60-second polling fallback strategy for real-time unread count synchronization.
+- **In-App Notification Center Drawer (`apps/web/components/notifications/NotificationCenterDrawer.tsx`)**:
+  - Slide-over drawer displaying complete user notification timeline.
+  - **Date Grouping**: Organizes notifications into relative sections (`Today`, `Yesterday`, `This Week`, `Earlier`).
+  - **Category Filter Bar**: Filter by `All`, `Unread`, `Achievements`, `Learning`, `Security`.
+  - **WCAG AA Compliance**: Full keyboard navigation (ESC key to close), focus trap management, and ARIA accessibility labels (`role="dialog"`).
+- **Notification Item Card (`apps/web/components/notifications/NotificationItemCard.tsx`)**:
+  - Rich notification cards with category icons (`🏆`, `📚`, `🎓`, `🔒`, `🔔`), priority badges, relative time (`Just now`, `5m ago`, `2d ago`), read/unread state toggles, and deep links.
+- **Deep Linking Engine**:
+  - Routes notifications directly to target pages (`lesson.completed` → `/academy`, `badge.earned` → `/badges`, `srs.review_due` → `/review`, `certificate.generated` → `/verify/[id]`, `portfolio.published` → `/p/[username]`).
+- **Dashboard Integration (`apps/web/components/notifications/DashboardNotificationsWidget.tsx`)**:
+  - Compact dashboard widget on `/dashboard` rendering recent updates and unread alerts.
+- **Notification Preferences Tab (`apps/web/components/notifications/NotificationPreferencesTab.tsx`)**:
+  - Tabbed settings panel (`/settings?tab=notifications`) allowing users to toggle per-category In-App & Email permissions, daily reminder hour, and quiet mode.
+- **API Endpoints (`app/api/notifications/`, `app/api/settings/notifications/`)**:
+  - `GET /api/notifications`: Returns timeline items, total counts, unread count, and date-grouped payload.
+  - `PATCH /api/notifications`: Supports `mark_read`, `mark_unread`, and `mark_all_read`.
+  - `GET & PATCH /api/settings/notifications`: Retrieves and updates user notification preferences.
+- **In-App Notification Test Suite (`apps/web/lib/__tests__/in-app-notifications.test.ts`)**: 4 unit tests verifying deep link resolution, category icon mapping, date grouping, feature flag evaluation, and preference permissions. Added `"test:in-app"` script to `package.json`.
+
+---
+
 ## [Unreleased] - Phase 3 Architecture Refactor Sprint
 
 - **Status:** Development Complete

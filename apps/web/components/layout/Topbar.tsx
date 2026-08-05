@@ -7,6 +7,7 @@ import { Menu, Search, User, LogOut, ChevronRight } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { getLevelTitle } from '@/lib/xp'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 
 interface TopbarProps {
   onMenuOpen: () => void
@@ -138,6 +139,9 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
           <Search className="w-4 h-4" />
           <span className="hidden md:inline">Search (Ctrl+K)</span>
         </button>
+
+        {/* Notification Bell Header Control */}
+        <NotificationBell />
 
         {/* Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
-import { PortfolioSettingsForm } from '@/components/settings/PortfolioSettingsForm'
+import { SettingsTabs } from '@/components/settings/SettingsTabs'
 import { Settings, Shield } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Portfolio & Profile Settings | PM Academy',
-  description: 'Manage your PM Academy public portfolio handle, bio, social links, and privacy settings.',
+  title: 'Settings & Preferences | PM Academy',
+  description: 'Manage your PM Academy public portfolio handle, notification preferences, and privacy controls.',
 }
 
 export default function SettingsPage() {
@@ -15,19 +15,19 @@ export default function SettingsPage() {
         <div className="flex items-center gap-2">
           <Settings className="h-5 w-5 text-primary" />
           <span className="text-xs font-bold uppercase tracking-wider text-primary">
-            Account & Portfolio Settings
+            Account & Preference Settings
           </span>
         </div>
         <h1 className="text-3xl md:text-4xl font-bold font-serif text-foreground">
-          Portfolio & Profile Configuration
+          Settings & Preferences
         </h1>
         <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
-          Customize how your public portfolio and skill radar appear to recruiters and peers.
+          Customize how your public portfolio appears and control your in-app and email notification preferences.
         </p>
       </div>
 
-      {/* Settings Form */}
-      <PortfolioSettingsForm />
+      {/* Tabbed Settings */}
+      <SettingsTabs />
 
       {/* Privacy Notice */}
       <div className="p-4 rounded-xl border border-border bg-card/40 text-xs text-muted-foreground flex items-start gap-3">
