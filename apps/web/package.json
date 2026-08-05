@@ -19,6 +19,7 @@
     "test:certificates": "npx tsx lib/__tests__/certificates.test.ts",
     "test:badges": "npx tsx lib/__tests__/badges.test.ts",
     "test:leaderboard": "npx tsx lib/__tests__/leaderboard.test.ts",
+    "test:notifications": "npx tsx lib/__tests__/notifications.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"

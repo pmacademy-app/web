@@ -8,6 +8,33 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 6.1: Notification Platform Foundation
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **Notification Module Architecture (`apps/web/lib/notifications/`):** Clean, modular, type-safe notification platform foundation.
+  - `types.ts` & `constants.ts`: Core NotificationPriority ('critical'|'high'|'medium'|'low'|'bulk'), Channel, Category, EventEnvelope, and Priority Matrix definitions.
+  - `events/`: Strongly typed event payloads (`lesson.completed`, `module.completed`, `quiz.completed`, `review.completed`, `badge.earned`, `xp.level_up`, `streak.updated`, `portfolio.published`, `certificate.generated`, `capstone.submitted`, `user.registered`, `user.verified`, `password.reset_requested`) and payload validators.
+  - `dispatcher.ts`: `NotificationEventDispatcher` for registering event handlers, validating payloads, multi-handler dispatching, and fire-and-forget error isolation.
+  - `providers/`: Channel-agnostic `NotificationProvider` interface and `ResendProvider` scaffold.
+  - `priority/`: `PriorityMatrix` service for exponential backoff calculations and rate limit/preference bypass evaluations.
+  - `feature-flags/`: `FeatureFlagService` providing runtime flags (`EMAIL_ENABLED`, `IN_APP_NOTIFICATIONS_ENABLED`, `BADGE_EMAILS_ENABLED`, etc.) with in-memory caching and safe defaults.
+  - `preferences/`: Channel-agnostic notification preference models and category permission checkers.
+  - `templates/`: `TemplateRegistryService` for template version metadata lookup, active version resolution, and deprecation checks.
+  - `queue/`: Queue item types, status lifecycle (`pending`, `processing`, `delivered`, `failed`, `retrying`, `dead_letter`, `suppressed`), priority sorters, and ready filters.
+  - `timeline/`: `UserNotificationTimelineRecord` model and queue-item transformer helpers.
+  - `analytics/`: Metric tracking models and rate calculation helpers (`openRatePercent`, `clickRatePercent`).
+  - `admin/`: `AdminFoundationService` backend interfaces for system status inspection, queue inspection, template registry, and feature flags toggle.
+  - `registry.ts`: `NotificationPlatformRegistry` central barrel wrapper.
+- **Database Migration (`supabase/migrations/20260806000001_notification_platform_foundation.sql`):** Created `user_notification_preferences`, `notification_events`, `email_queue`, `email_dead_letter`, `in_app_notifications`, `email_delivery_events`, `email_suppressions`, `notification_feature_flags`, `notification_templates`, `notification_template_versions`, `user_notification_timeline`, and `system_settings` tables with indexes and RLS policies. Updated `users.is_admin` column.
+- **Supabase Type Definitions (`apps/web/lib/supabase.ts`):** Extended `Database['public']['Tables']` types to include `is_admin` on `users`.
+- **Unit Test Suite (`apps/web/lib/__tests__/notifications.test.ts`):** 10 automated unit tests verifying event registration, dispatching, payload validation, provider abstraction, feature flags, priority calculations, preferences, template metadata versioning, and queue sorting. Registered `test:notifications` script in `package.json`.
+
+---
+
 ## [Unreleased] - Phase 3: Stabilization Sprint (Priority 1 + 2 + 3)
 
 - **Status:** Complete
