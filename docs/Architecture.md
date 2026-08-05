@@ -64,6 +64,22 @@ users (
   created_at        timestamptz not null default now()
 );
 
+-- Certificates & Completion Credentials
+certificates (
+  id                uuid primary key default gen_random_uuid(),
+  user_id           uuid references users(id) on delete cascade not null,
+  certificate_code  text unique not null,         -- deterministic code (e.g. PMA-2026-X89B2C4F)
+  type              text not null default 'full_curriculum', -- 'full_curriculum' | 'module_completion'
+  module_slug       text,
+  learner_name      text not null,
+  level             int not null default 1,
+  career_title      text not null,
+  total_xp          int not null default 0,
+  lessons_completed int not null default 0,
+  modules_completed int not null default 0,
+  issued_at         timestamptz not null default now()
+);
+
 -- Progress (references lessons by stable lessonId, not foreign key — content is static JSON)
 user_lesson_progress (
   user_id           uuid references users(id),

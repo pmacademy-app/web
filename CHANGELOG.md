@@ -8,6 +8,24 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 3: Certificate & PDF Export System
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **Public Certificate Verification Page (`app/verify/[certificateId]/page.tsx`):** Official verification page for completion certificates displaying verified learner name, career title, level badge, issue date, completion summary metrics, interactive certificate card, and schema.org `EducationalOccupationalCredential` structured data.
+- **Printable Certificate Layout (`components/certificates/CertificateCard.tsx`):** High-resolution landscape completion certificate featuring double gold/navy border, PM Academy watermark logo, learner metrics, official signature block, and pure SVG QR Code matrix linking directly to learner's public portfolio.
+- **Certificate Actions Bar (`components/certificates/CertificateActions.tsx`):** Interactive action triggers for Print / Download PDF (`window.print()`), Copy Verification Link with toast feedback, Native Web Share API (`navigator.share`), and View Public Portfolio.
+- **Certificate Data Services (`lib/certificates.ts`, `lib/certificates-db.ts`):** Certificate code generator (`generateCertificateCode`), QR code SVG matrix generator (`generateQrCodeSvg`), EducationalOccupationalCredential JSON-LD builder, and database service methods (`issueCertificate`, `verifyCertificate`, `getUserCertificates`).
+- **Certificate API Route (`app/api/certificates/route.ts`):** Authenticated route handlers for querying (`GET`) and issuing (`POST`) official completion certificates.
+- **Database Migration (`supabase/migrations/20260805000004_create_certificates.sql`):** Added `certificates` table storing deterministic certificate codes, user references, learner names, levels, titles, and completion stats with a public verification RLS policy.
+- **Print CSS Layout (`app/globals.css`):** Added `@media print` rules for landscape print dimensions, background color retention, and hiding non-printable page elements.
+- **Certificates Unit Tests (`lib/__tests__/certificates.test.ts`):** Automated unit tests verifying certificate code formatting, credential JSON-LD generation, and vector SVG QR code matrix rendering (4 tests).
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 2: Public Portfolio
 
 - **Status:** Development Complete

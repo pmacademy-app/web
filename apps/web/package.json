@@ -16,6 +16,7 @@
     "test:srs": "npx tsx lib/__tests__/srs.test.ts",
     "test:capstones": "npx tsx lib/__tests__/capstones.test.ts",
     "test:portfolio": "npx tsx lib/__tests__/portfolio.test.ts",
+    "test:certificates": "npx tsx lib/__tests__/certificates.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"
