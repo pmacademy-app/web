@@ -22,6 +22,7 @@
     "test:notifications": "npx tsx lib/__tests__/notifications.test.ts",
     "test:email": "npx tsx lib/__tests__/email-engine.test.ts",
     "test:in-app": "npx tsx lib/__tests__/in-app-notifications.test.ts",
+    "test:recap": "npx tsx lib/__tests__/recap-evaluator.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"

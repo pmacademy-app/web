@@ -6,7 +6,7 @@ export type StandardFeatureFlagKey =
   | 'PORTFOLIO_EMAILS_ENABLED'
   | 'MARKETING_EMAILS_ENABLED'
   | 'QUEUE_PROCESSING_ENABLED'
-  | 'GITHUB_ACTIONS_SCHEDULER_ENABLED'
+  | 'SCHEDULER_ENABLED'
 
 export interface FeatureFlagRecord {
   key: string
