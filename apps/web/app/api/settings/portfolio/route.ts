@@ -1,37 +1,21 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getPortfolioSettings, updatePortfolioSettings } from '@/lib/portfolio-db'
 
 export async function GET(request: Request) {
   try {
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+    const user = await getAuthenticatedUserFromRequest(request)
 
-    const supabase = createServerSupabaseClient()
-    let userId: string | null = null
-
-    if (token) {
-      const { data: { user }, error: tokenErr } = await supabase.auth.getUser(token)
-      if (!tokenErr && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (!authError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
       )
     }
 
-    const settings = await getPortfolioSettings(supabase, userId)
+    const supabase = createServerSupabaseClient()
+    const settings = await getPortfolioSettings(supabase, user.id)
     return NextResponse.json({ success: true, settings })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to fetch portfolio settings.'
@@ -42,35 +26,18 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+    const user = await getAuthenticatedUserFromRequest(request)
 
-    const supabase = createServerSupabaseClient()
-    let userId: string | null = null
-
-    if (token) {
-      const { data: { user }, error: tokenErr } = await supabase.auth.getUser(token)
-      if (!tokenErr && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (!authError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
       )
     }
 
+    const supabase = createServerSupabaseClient()
     const body = await request.json()
-    const result = await updatePortfolioSettings(supabase, userId, body)
+    const result = await updatePortfolioSettings(supabase, user.id, body)
 
     return NextResponse.json({ success: true, settings: result.settings })
   } catch (error: unknown) {

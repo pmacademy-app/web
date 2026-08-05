@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { submitCapstoneAction } from '@/lib/capstones-db'
 import { getCapstoneDefinition } from '@/config/capstones'
 
@@ -16,58 +17,37 @@ export async function POST(
     const body = await request.json()
     const { content, reflectionContent, reflectionIsPublic } = body ?? {}
 
-    if (typeof content !== 'string' || content.trim().length === 0) {
-      return NextResponse.json({ error: 'Content cannot be empty.' }, { status: 400 })
+    if (typeof content !== 'string') {
+      return NextResponse.json({ error: 'Content payload must be a string.' }, { status: 400 })
     }
 
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+    const user = await getAuthenticatedUserFromRequest(request)
 
-    const supabase = createServerSupabaseClient()
-    let userId: string | null = null
-
-    if (token) {
-      const { data: { user }, error: tokenErr } = await supabase.auth.getUser(token)
-      if (!tokenErr && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (!authError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
       )
     }
 
+    const supabase = createServerSupabaseClient()
     const result = await submitCapstoneAction(
       supabase,
-      userId,
+      user.id,
       moduleSlug,
       content,
-      reflectionContent,
+      typeof reflectionContent === 'string' ? reflectionContent : '',
       Boolean(reflectionIsPublic)
     )
 
     return NextResponse.json({
       success: true,
       submission: result.submission,
-      xpEarned: result.xpEarned,
       message: result.message,
     })
   } catch (error: unknown) {
-    const errMsg = error instanceof Error ? error.message : 'Internal server error submitting capstone.'
+    const msg = error instanceof Error ? error.message : 'Internal server error processing submission.'
     console.error('[API POST /api/capstones/[module]/submit] Error:', error)
-    return NextResponse.json(
-      { error: errMsg },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: msg }, { status: 400 })
   }
 }
