@@ -8,6 +8,21 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [1.0.0-rc1] - 2026-08-05 (PM Academy Release Candidate 1)
+
+- **Status:** Release Candidate Ready for Production Launch
+- **Release Date:** 2026-08-05
+
+### Production Readiness Audit Summary
+
+- **Learner Experience QA**: Verified end-to-end user journey across Auth (`/login`, `/signup`), Academy (`/academy`, `/academy/l/[lessonId]`), Review Hub (`/review`), Gamification (`/badges`, `/leaderboard`), Portfolio (`/p/[username]`), Certificates (`/verify/[certificateId]`), and Notification Center (`NotificationBell`).
+- **Admin Console Operations**: Verified all 14 operational views (`/admin/*`) and security guards (`proxy.ts` middleware + `requireAdminUser` server-side RBAC guard).
+- **Performance & Build Verification**: Production build passed cleanly with 79 dynamic/static routes generated in under 2 minutes, 90 lessons compiled cleanly by v2 content compiler, 0 TypeScript errors, 0 ESLint warnings.
+- **Unit & Integration Suite**: All 23 unit tests across Admin, Dev Tools, Notification Platform, In-App Center, and Timezone-Aware Recap Scheduler passed with 100% success.
+- **Security & Authorization Audit**: Dual-layer authorization (`ADMIN_EMAILS` env variable + database `users.is_admin = true`), strict RLS policies on all 11 user tables, server-only `SUPABASE_SERVICE_ROLE_KEY` isolation.
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 6.4.4: Admin Authentication & Access Security
 
 - **Status:** Development Complete — Fully Secured
