@@ -9,13 +9,13 @@ import type { SkillCluster } from '@/types'
 // ─── Competency Colors (Sprint 1 §4.3) ───────────────────────────────────────
 
 export const SKILL_COLORS: Record<SkillCluster, string> = {
-  discovery:  '#0F766E',
-  strategy:   '#1D4ED8',
-  design:     '#DB2777',
-  execution:  '#7C3AED',
-  growth:     '#16A34A',
-  leadership: '#D97706',
-  technical:  '#475569',
+  discovery:  '#14B8A6',
+  strategy:   '#10B981',
+  design:     '#38BDF8',
+  execution:  '#F59E0B',
+  growth:     '#8B5CF6',
+  leadership: '#F43F5E',
+  technical:  '#64748B',
 }
 
 export const SKILL_LABELS: Record<SkillCluster, string> = {
