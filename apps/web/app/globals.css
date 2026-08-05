@@ -423,3 +423,32 @@ body {
     @apply font-sans;
   }
 }
+
+/* PM Academy Print & PDF Export Styles */
+@media print {
+  @page {
+    size: landscape;
+    margin: 0.5in;
+  }
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .no-print, nav, header, footer, button, .no-print-area {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .certificate-print-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-inside: avoid;
+  }
+}

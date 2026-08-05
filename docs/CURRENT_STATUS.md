@@ -10,7 +10,7 @@
 - **Current Branch:** `main`
 - **Current Version:** `0.2.0` (defined in [`apps/web/package.json`](../apps/web/package.json))
 - **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build - clean, 0 errors, 35 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 2 (Public Portfolio) COMPLETE**
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 3 (Certificates & PDF Export) COMPLETE**
 
 ---
 
@@ -22,16 +22,17 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 2 Gamification & Retention Layer:** ✅ Complete (`v0.2.0-stable`)
 - **Phase 3 – Sprint 1 (Capstone Workspace):** ✅ Complete
 - **Phase 3 – Sprint 2 (Public Portfolio `/p/[username]`):** ✅ Complete
-- **Current Focus:** **Phase 3 – Sprint 3** (Peer Review & Feedback Engine).
+- **Phase 3 – Sprint 3 (Certificates & PDF Export `/verify/[certificateId]`):** ✅ Complete
+- **Current Focus:** **Phase 3 – Sprint 4** (Peer Review & Feedback Engine / Leaderboards).
 
 ---
 
 ## 3. What's Next
 
-Phase 3 Sprint 2 (Public Portfolio) is complete. The next focus is **Phase 3 Sprint 3**:
+Phase 3 Sprint 3 (Certificates & PDF Export) is complete. The next focus is **Phase 3 Sprint 4**:
 
-1. **[Phase 3 - Sprint 3] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
-2. **[Phase 3 - Sprint 4] Leaderboards & Cohort Feeds:** Weekly/all-time consistency leaderboards and cohort activity feed.
+1. **[Phase 3 - Sprint 4] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
+2. **[Phase 3 - Sprint 5] Consistency Leaderboards & Cohort Feeds:** Weekly/all-time consistency leaderboards and cohort activity feed.
 
 ---
 
