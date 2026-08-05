@@ -8,6 +8,23 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 5: Friends & Cohort Leaderboard System
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **Consistency Leaderboard Home (`app/(app)/leaderboard/page.tsx`):** Consistency-first leaderboard page displaying global weekly rankings, friend rankings, learning cohorts, personal rank metric, weekly days studied count (`X / 7`), lessons completed, and opt-in privacy status toggle.
+- **Pure Ranking Logic (`lib/leaderboard.ts`):** `calculateWeekStart` (UTC Monday date math) and `calculateRankings` sorting users primarily by `daysStudied` DESC, `lessonsCompleted` DESC, and `xpEarned` DESC as a tie-breaker.
+- **Leaderboard & Cohort Database Services (`lib/leaderboard-db.ts`):** `getWeeklyLeaderboard`, `toggleLeaderboardOptIn`, `getFriendLeaderboard`, `addFriend`, `removeFriend`, `getCohortsData`, and `toggleCohortMembership`.
+- **API Endpoints (`app/api/leaderboard/route.ts`, `app/api/friends/route.ts`, `app/api/cohorts/route.ts`):** Authenticated route handlers for querying rankings, toggling opt-in privacy, adding/removing friends, and managing cohort memberships.
+- **UI Components & Dashboard Integration (`components/leaderboard/LeaderboardTable.tsx`, `components/leaderboard/LeaderboardHeader.tsx`, `components/leaderboard/ProfileComparisonModal.tsx`, `components/dashboard/DashboardLeaderboardWidget.tsx`):** Responsive rank table with position change arrows, opt-in privacy button, peer profile comparison modal, and lightweight dashboard widget.
+- **Database Migration (`supabase/migrations/20260805000006_create_leaderboards_and_cohorts.sql`):** Created `user_leaderboard_settings`, `weekly_leaderboard_snapshots`, `user_friends`, `cohorts`, and `cohort_members` tables with public/opt-in RLS policies.
+- **Leaderboard Unit Tests (`lib/__tests__/leaderboard.test.ts`):** Automated unit tests verifying Monday date math, consistency-first ranking order, tie-breaking logic, and position change calculations (3 tests).
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 4: Badge & Achievement System
 
 - **Status:** Development Complete
