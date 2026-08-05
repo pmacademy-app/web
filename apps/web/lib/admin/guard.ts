@@ -33,6 +33,7 @@ export async function requireAdminUser(request: Request): Promise<AdminAuthResul
   const typedUserRow = userRow as unknown as { is_admin?: boolean; email: string } | null
 
   if (error || !typedUserRow) {
+    await logAdminAction(authUser.id, authUser.email || 'unknown', 'access_denied', 'system', undefined, { reason: 'User record missing' })
     return {
       authorized: false,
       error: 'User account record not found',
@@ -40,7 +41,15 @@ export async function requireAdminUser(request: Request): Promise<AdminAuthResul
     }
   }
 
-  if (!typedUserRow.is_admin) {
+  // Evaluate Admin authorization: ADMIN_EMAILS env var OR database users.is_admin = true
+  const adminEmailsEnv = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+  const isEnvAdmin = adminEmailsEnv.length > 0 && adminEmailsEnv.includes(typedUserRow.email.toLowerCase())
+  const isDbAdmin = Boolean(typedUserRow.is_admin)
+
+  const isAuthorizedAdmin = isEnvAdmin || isDbAdmin
+
+  if (!isAuthorizedAdmin) {
+    await logAdminAction(authUser.id, typedUserRow.email, 'access_denied', 'system', undefined, { reason: 'Non-admin user' })
     return {
       authorized: false,
       error: 'Access denied: Admin privileges required',
