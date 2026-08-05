@@ -8,9 +8,9 @@
 ## 1. Repository Metadata
 
 - **Current Branch:** `main`
-- **Current Version:** `0.3.0-rc` (Sprint 6.2 Email Engine complete)
+- **Current Version:** `0.3.0-architecture` (Architecture Review & Refactor complete)
 - **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 47 routes, 90 lessons compiled)
-- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Sprint 6.2 Email Engine & Delivery COMPLETE**
+- **Current Implementation Phase:** Phase 3: Social & Portfolio Infrastructure — **Architecture Refactor COMPLETE**
 
 ---
 
@@ -28,13 +28,14 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 3 – Stabilization Sprint (Priority 1 + 2 + 3):** ✅ Complete
 - **Phase 3 – Sprint 6.1 (Notification Platform Foundation):** ✅ Complete (`apps/web/lib/notifications/`)
 - **Phase 3 – Sprint 6.2 (Email Engine & Delivery Infrastructure):** ✅ Complete (`apps/web/emails/`, `app/api/cron/`)
+- **Phase 3 – Architecture Refactor Sprint:** ✅ Complete (`apps/web/lib/` domain organization, `lib/admin/` foundation, 11/11 passing test suites)
 - **Current Focus:** Awaiting Review before Phase 3 Sprint 6.3 (Notifications UI & Preferences)
 
 ---
 
 ## 3. What's Next
 
-Sprint 6.2 Email Engine & Delivery Infrastructure is complete with 8 passing unit tests (18 total notification tests). Awaiting review before **Sprint 6.3**:
+Architecture Refactor Sprint is complete with 0 breaking changes and 11 passing test suites (87+ unit tests). Awaiting review before **Sprint 6.3**:
 
 1. **[Phase 3 - Sprint 6.3 — Next] Notifications UI & Preferences:** Notification Bell component, topbar unread indicator, In-App Notification Center drawer, and `/settings` notification preferences management.
 2. **[Phase 3 - Sprint 6.4] Admin Console UI:** Modular `/admin` dashboard views (Dashboard, Users, Notifications, Emails, System).
