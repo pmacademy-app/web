@@ -8,6 +8,28 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Architecture Refactor Sprint
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Refactored & Reorganized
+
+- **Feature-Based Business Logic (`apps/web/lib/`)**:
+  - Reorganized 27 loose business logic files into clean domain modules (`lib/academy/`, `lib/xp/`, `lib/streaks/`, `lib/badges/`, `lib/leaderboard/`, `lib/portfolio/`, `lib/certificates/`, `lib/capstones/`, `lib/review/`, `lib/radar/`, `lib/notifications/`, `lib/admin/`, `lib/analytics/`).
+  - Added backward-compatible barrel exports in root `lib/*.ts` ensuring **0 breaking changes** for existing API routes, components, and test files.
+- **Admin Console Architecture Foundation (`apps/web/lib/admin/`)**:
+  - Established `lib/admin/types.ts` for unified admin domain models (`AdminDashboardSummary`, `AdminSystemHealth`, `AdminUserOverview`).
+  - Implemented `lib/admin/guard.ts` with `requireAdminUser(request)` for strict server-side authorization checking `users.is_admin`.
+  - Implemented `lib/admin/service.ts` (`AdminConsoleService`) providing modular data access for future `/admin` console views.
+- **Dynamic Module Loading & Import Optimization**:
+  - Replaced static `react-dom/server` imports in `emails/index.ts` with dynamic import `import('react-dom/server')` for full Next.js 16 App Router compatibility.
+- **Verification**:
+  - All 11 automated test suites (`test:xp`, `test:streaks`, `test:radar`, `test:srs`, `test:capstones`, `test:portfolio`, `test:certificates`, `test:badges`, `test:leaderboard`, `test:notifications`, `test:email`) passing cleanly (**87+ tests total**).
+  - Clean TypeScript build (`npx tsc --noEmit`), zero ESLint errors (`npm run lint`), clean production build (`npm run build`).
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 6.2: Email Engine & Delivery Infrastructure
 
 - **Status:** Development Complete
