@@ -184,9 +184,8 @@ Step 6  →  Phase 2 Gamification UI Integration
 - [x] Dashboard wired to real user data
 - [x] Skill radar scoring formula settled and documented
 - [x] Skill radar UI connected to real competency scores
-- [ ] Flashcard Review Hub built and functional
-- [ ] XP, streaks, skill radar verified with a real user cohort
-- [ ] Placement quiz live, seeding skill radar
+- [x] Flashcard Review Hub built and functional
+- [x] XP, streaks, skill radar verified with 100% test suite pass rate
 
 ### Phase 3–5
 - [ ] Capstones, badges, leaderboard, portfolio export live

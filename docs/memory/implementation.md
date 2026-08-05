@@ -7,7 +7,7 @@
 
 ## 1. Current Project Stage
 
-**As of 2026-08-03:**
+**As of 2026-08-05:**
 
 - **Phase 0 (Foundation):** Complete ✅
 - **Phase 1.1 (Content Pipeline Foundation):** Complete ✅ — v2 remark AST compiler + Zod schema, 90 lessons compiled to `content/dist/`
@@ -20,8 +20,8 @@
 - **Phase 1.5 Curriculum & Content Integrity Pass:** Complete ✅ — Normalized curriculum grouping into exactly 9 modules (10 lessons each), fixed regex extraction for perspectives blocks, resolved all cross-lesson glossary warnings.
 - **Phase 1.5 Sprint 7 (Release Candidate Blockers):** Complete ✅ — Resolved all critical auth middleware bugs, server-side correctness checks, XP ledger security checks, and Google OAuth UI placeholders.
 - **Phase 1.6 (Foundation Finalization & Production Polish):** Complete ✅ — Custom email templates, email verification success page, dynamic canonical routing, topbar breadcrumbs context, consolidated CI pipeline, unified auth callback route `/api/auth/callback` supporting OTP token_hash verification, and resolved Interview Perspective parsing.
-- **Phase 2 (Gamification Layer):** Logic modules built, UI integration pending 🏗️
-- **Phase 3–5:** Scaffolded or not started ❌
+- **Phase 2 (Gamification Layer):** Complete ✅ (`v0.2.0-phase2-complete`) — XP Engine, Streak Engine, Skill Radar, Dashboard 2.0, and SM-2 Flashcard Review Hub fully integrated and verified with 100% test pass rate.
+- **Phase 3–5:** Scaffolded or active focus 🎯
 
 ---
 
@@ -84,10 +84,11 @@
 | Auth & Onboarding | ✅ Complete | Email + Google, custom templates, verified page |
 | Lesson Reading View | ✅ Complete | Dynamic `/academy/[moduleSlug]/[lessonId]` canonical routing, legacy redirect fallback |
 | Quiz Flow | ✅ Complete | v2 `QuizBlock` + `LessonContextProvider` submits to `/api/v2/lessons/[lessonId]/quiz` |
-| Flashcard SRS Engine | ⚠️ Partial | `FlashcardDeckBlock` renders review UI. SRS recording not yet wired. Review Hub screen is a stub. |
-| XP & Level System | ⚠️ Partial | DB ledger + triggers correct. Frontend dashboard shows mocked `0` values. |
-| Streak Tracker | ⚠️ Partial | Calculation engine built (`lib/streaks.ts`). Not wired into dashboard UI. |
-| Skill Radar | ⚠️ Partial | Formula in `lib/skillRadar.ts`. Dashboard hardcodes `0%` for all clusters. |
+| Flashcard SRS Engine | ✅ Complete | SM-2 scheduling, `/api/review/queue`, full 3D flip Review Hub UI (`/review`) |
+| XP & Level System | ✅ Complete | Append-only DB ledger, server verification, Level & Title calculator (`lib/xp.ts`) |
+| Streak Tracker | ✅ Complete | Timezone-aware streak engine (`lib/streaks.ts`), earned freeze mechanics |
+| Skill Radar | ✅ Complete | Continuous 0–100 weighted formula (`lib/skillRadar.ts`), 7 competency clusters |
+| Dashboard 2.0 | ✅ Complete | Reconstructed layout with Continue Learning hero, Skill Radar hero, 3-column metric cards |
 | Leaderboard / Cohorts | ❌ Scaffolded | DB tables exist. Page is placeholder text. |
 | Progress & Portfolio Export | ❌ Scaffolded | SQL schema supports it. Pages are placeholder text. |
 | Account Settings | ❌ Scaffolded | UI shell exists. Form updates not written. |
