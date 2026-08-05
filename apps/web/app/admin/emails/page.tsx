@@ -1,70 +1,75 @@
 import React from 'react'
-import { Mail, RefreshCw, Send, CheckCircle2, AlertCircle, Clock } from 'lucide-react'
+import { Mail, RefreshCw, Play } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
+import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
+import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
+import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 
 export const revalidate = 0
 
-export default async function AdminEmailQueuePage() {
+interface EmailLogItem {
+  id: string
+  toEmail: string
+  templateKey: string
+  status: string
+  createdAt: string
+}
+
+export default async function AdminEmailsPage() {
   const queue = await AdminConsoleService.getEmailQueueOverview()
 
+  const columns: Column<EmailLogItem>[] = [
+    {
+      header: 'Recipient',
+      cell: (item) => <span className="font-mono text-white font-semibold">{item.toEmail}</span>,
+    },
+    {
+      header: 'Template Key',
+      cell: (item) => <span className="font-mono text-amber-400 font-bold">{item.templateKey}</span>,
+    },
+    {
+      header: 'Delivery Status',
+      cell: (item) => <AdminStatusBadge status={item.status} />,
+    },
+    {
+      header: 'Created At',
+      cell: (item) => (
+        <span className="text-slate-400 font-mono text-[11px]">
+          {new Date(item.createdAt).toLocaleString()}
+        </span>
+      ),
+    },
+  ]
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Mail className="w-6 h-6 text-amber-400" />
-            Email Queue & Deliverability
-          </h1>
-          <p className="text-sm text-slate-400">Monitor queue status, process pending batches, and retry failed emails.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg transition-colors">
-            <Send className="w-3.5 h-3.5" />
-            Process Queue Now
+    <div className="space-y-8">
+      <AdminPageHeader
+        title="Email Queue & Deliverability"
+        description="Monitor outgoing transactional emails, queue processing states, and delivery logs."
+        icon={Mail}
+        iconColor="text-blue-400"
+        actions={
+          <button className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-colors inline-flex items-center gap-1.5 shadow-lg">
+            <Play className="w-3.5 h-3.5 fill-slate-950" /> Process Queue Now
           </button>
-        </div>
+        }
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <AdminKpiCard title="Pending Queue" value={queue.pendingCount} subtitle="Awaiting worker pickup" icon={Mail} iconColor="text-amber-400" />
+        <AdminKpiCard title="Processing" value={queue.processingCount} subtitle="Currently dispatching" icon={RefreshCw} iconColor="text-blue-400" />
+        <AdminKpiCard title="Delivered (24h)" value={queue.deliveredCount} subtitle="Successfully delivered" icon={Mail} iconColor="text-emerald-400" />
+        <AdminKpiCard title="Failed / Bounced" value={queue.failedCount} subtitle="Delivery failures" icon={Mail} iconColor="text-rose-400" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-          <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-            <span>Pending</span>
-            <Clock className="w-4 h-4 text-amber-400" />
-          </div>
-          <p className="text-2xl font-extrabold text-white mt-2">{queue.pendingCount}</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-          <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-            <span>Processing</span>
-            <RefreshCw className="w-4 h-4 text-blue-400 animate-spin" />
-          </div>
-          <p className="text-2xl font-extrabold text-blue-400 mt-2">{queue.processingCount}</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-          <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-            <span>Delivered</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          </div>
-          <p className="text-2xl font-extrabold text-emerald-400 mt-2">{queue.deliveredCount}</p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-          <div className="flex items-center justify-between text-xs text-slate-400 font-semibold">
-            <span>Failed</span>
-            <AlertCircle className="w-4 h-4 text-rose-400" />
-          </div>
-          <p className="text-2xl font-extrabold text-rose-400 mt-2">{queue.failedCount}</p>
-        </div>
-      </div>
-
-      <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Queue Delivery Stream</h2>
-        <div className="p-8 text-center bg-slate-950/60 rounded-lg border border-slate-800/80 text-slate-500 text-xs">
-          No pending or failed emails in queue. All transactional notifications delivered.
-        </div>
-      </div>
+      <AdminDataTable
+        columns={columns}
+        data={queue.recentLogs as EmailLogItem[]}
+        keyExtractor={(item) => item.id}
+        emptyTitle="No email logs available"
+        emptyDescription="The outgoing email queue is currently empty."
+      />
     </div>
   )
 }

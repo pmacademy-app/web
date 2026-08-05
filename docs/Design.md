@@ -4,7 +4,7 @@
 **Platform:** Responsive web application — desktop-first experience with mobile responsiveness. Browser-based navigation (no native app patterns).
 **Companion docs:** `INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `Architecture.md` (technical implementation), `Rules.md` (working standards), `Phases.md` (when), `content-pipeline.md` and `rendering-pipeline.md` (the exact block types and renderer components this document's screen/UI guidance maps onto).
 **Decision confidence:** everything below is the current best decision, not a permanent commitment — see `PRD.md`'s intro for the "current-unless-justified" philosophy this whole doc set follows. Specific values (exact hex codes, spacing numbers) are a confident starting point to build against, not something to re-litigate without a reason, but they're also not sacred — if real usage or user testing gives you a good reason to change one, change it and update this doc in the same sitting.
-**Archived reference:** `archive/Design-System-Sprint-1.md`, `archive/Marketing-Website-Sprint-2.md`, and `archive/Content-Communication-System-Sprint-3.md` contain much more granular, Figma-handoff-level detail (pixel values, per-microstate copy, frame plans) than a solo founder needs to keep in prose sync with working code. They're useful to mine for inspiration on a specific component or copy line, but **they are not maintained and may be stale** — this document is authoritative. Do not "fix" a discrepancy by updating the archive; update this document.
+**Archived reference:** `archive/Design-Session-Sprint-1.md`, `archive/Marketing-Website-Sprint-2.md`, and `archive/Content-Communication-System-Sprint-3.md` contain much more granular, Figma-handoff-level detail (pixel values, per-microstate copy, frame plans) than a solo founder needs to keep in prose sync with working code. They're useful to mine for inspiration on a specific component or copy line, but **they are not maintained and may be stale** — this document is authoritative. Do not "fix" a discrepancy by updating the archive; update this document.
 
 ---
 
@@ -205,9 +205,20 @@ For actual copy drafting (exact microcopy for a specific error state, email, or 
 6. The marketing site tells the "gap" story first and proves it with real sample content, not just claims.
 7. Copy leads with what the learner can do, not with the product (§7) — write it in context as each screen is built.
 
+
 ---
 
-## Changelog
+## 10. Admin Console Visual & UI System (Sprint 6.4.2)
+
+The Admin Console (`/admin`) is designed as a natural operational extension of PM Academy, sharing the exact same design language, typography, and color tokens:
+
+- **Typography & Aesthetics**: Clean sans-serif UI typography (`var(--font-sans)`), dark operations background (`#0E1110` / `bg-slate-950`), subtle borders (`border-slate-800`), and warm amber accents (`#D98B24` / `text-amber-400`).
+- **Standardized Reusable Components**:
+  - `AdminPageHeader`: Uniform page title with icon container, subtitle, and action buttons.
+  - `AdminKpiCard`: Operational metric cards with label, bold value, trend indicators, and icons.
+  - `AdminDataTable`: Sticky header, custom column cell rendering, search filtering, empty states, and pagination bar.
+  - `AdminStatusBadge`: Unified status badge supporting `healthy`, `unhealthy`, `pending`, `processing`, `delivered`, `failed`, `published`, `draft`, `archived`, `admin`, `learner`.
+- **Accessibility & Micro-Interactions**: Keyboard focus rings (`focus-visible:ring-1 focus-visible:ring-amber-500/30`), pulse animation for active pending queues, and clear ARIA labels for pagination and search controls.
 
 - v2.2 — Added `content-pipeline.md`/`rendering-pipeline.md` as companion docs. Updated §2's search-experience entry to reference the FlexSearch-based, `Cmd/Ctrl+K`, block-aware search UI those specs define, replacing a vaguer `search-index.json` reference.
 - v2.1 — **Major consolidation.** Archived `Design-System-Sprint-1.md`, `Marketing-Website-Sprint-2.md`, and `Content-Communication-System-Sprint-3.md` (3,900+ combined lines) to `archive/` — their decision-relevant content was already captured in this document; their remaining bulk was Figma-handoff-level detail (pixel values, per-microstate copy, frame plans) that a solo founder doesn't need to keep in prose lockstep with working code, and which had already drifted out of sync twice (see `PRD.md`'s Documentation Review). Added a condensed Brand Voice section (§7, distilled from the archived content doc) and expanded Accessibility into a checkable budget with a new numeric Performance Budget (§4/§4.1) to close the gap flagged in the documentation review. Updated header framing: this is now the sole design/content doc, not one of four.
