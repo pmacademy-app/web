@@ -1,0 +1,45 @@
+name: Notification Scheduler
+
+on:
+  schedule:
+    # Process email queue every 15 minutes
+    - cron: '*/15 * * * *'
+    # Retry failed emails every hour
+    - cron: '0 * * * *'
+    # Weekly recap every Sunday at 18:00 UTC
+    - cron: '0 18 * * 0'
+    # Queue / log cleanup daily at 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  run-scheduled-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process Email Queue
+        if: github.event.schedule == '*/15 * * * *' || github.event_name == 'workflow_dispatch'
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/process-email-queue" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+      - name: Retry Failed Emails
+        if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/retry-failed" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+      - name: Weekly Recap
+        if: github.event.schedule == '0 18 * * 0' || github.event_name == 'workflow_dispatch'
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/weekly-recap" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+      - name: Cleanup Timeline & Logs
+        if: github.event.schedule == '0 2 * * *' || github.event_name == 'workflow_dispatch'
+        run: |
+          curl -X POST "${{ secrets.APP_URL }}/api/cron/cleanup" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

@@ -8,6 +8,35 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Notification Platform Alignment
+
+- **Status:** Development Complete — Architecture Synchronized
+- **Release Date:** 2026-08-05
+
+### Changed
+
+- **Communicaton Architecture Alignment**:
+  - Restructured notification channel hierarchy: **In-App Notifications** established as the primary channel for all learning & gamification events (`lesson.completed`, `quiz.completed`, `badge.earned`, `xp.level_up`, `review.completed`, `streak.*`).
+  - Restricted **Email Channel** strictly to Auth/Security, Major Milestones (`module.completed`, `certificate.generated`, `portfolio.published`), Weekly Learning Recap, and Admin-controlled Product Announcements.
+  - Updated `createDefaultNotificationPreferences()` to default `learning.email: false` and `achievements.email: false`.
+- **Scheduler Migration (Vercel Cron → GitHub Actions)**:
+  - Replaced Vercel Cron (`vercel.json`) with `.github/workflows/notification-scheduler.yml`.
+  - Cron routes now invoked via GitHub Actions schedules (Queue: 15m, Retry: 1h, Weekly Recap: Sunday 18:00 UTC, Cleanup: Daily 02:00 UTC).
+
+### Removed
+
+- **Daily Reminder Emails**:
+  - Deleted `/api/cron/daily-reminders` route.
+  - Removed `DAILY_REMINDERS_ENABLED` feature flag and preference options per Learner Respect Principle.
+
+### Technical
+
+- **Feature Flag Restructuring**:
+  - Renamed `BADGE_EMAILS_ENABLED` → `ACHIEVEMENT_EMAIL_ENABLED` (scoped to major milestones).
+  - Added `GITHUB_ACTIONS_SCHEDULER_ENABLED: true`.
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 6.3: In-App Notification Center & Preferences
 
 - **Status:** Development Complete

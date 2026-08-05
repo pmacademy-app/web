@@ -176,11 +176,13 @@ async function runAllTests() {
   // 7. Preference Model & Channel Verification
   runTest('isChannelEnabledByPreferences evaluates category channel permissions', () => {
     const prefs = createDefaultNotificationPreferences('user-100')
-    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'learning', 'email'), true)
+    // Under new communication strategy, learning & achievement email defaults to false (In-App primary)
+    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'learning', 'email'), false)
+    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'security', 'email'), true)
     assert.strictEqual(isChannelEnabledByPreferences(prefs, 'marketing', 'email'), false) // Opt-in default false
 
     prefs.allEmail = false
-    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'learning', 'email'), false)
+    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'security', 'email'), false)
   })
 
   // 8. Template Metadata & Version Registry
