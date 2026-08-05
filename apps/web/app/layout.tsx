@@ -97,7 +97,7 @@ export const viewport: Viewport = {
 
 // ─── Analytics ────────────────────────────────────────────────────────────────
 
-const GA_ID  = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID
 
 // ─── JSON-LD Structured Data ──────────────────────────────────────────────────

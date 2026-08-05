@@ -17,6 +17,7 @@
     "test:capstones": "npx tsx lib/__tests__/capstones.test.ts",
     "test:portfolio": "npx tsx lib/__tests__/portfolio.test.ts",
     "test:certificates": "npx tsx lib/__tests__/certificates.test.ts",
+    "test:badges": "npx tsx lib/__tests__/badges.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"
@@ -26,6 +27,7 @@
     "@hookform/resolvers": "^5.5.7",
     "@next/third-parties": "^16.2.12",
     "@supabase/supabase-js": "^2.110.8",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "flexsearch": "^0.8.212",

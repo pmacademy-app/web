@@ -14,6 +14,7 @@ const SIDEBAR_LINKS = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Curriculum', href: '/academy', icon: BookOpen },
   { label: 'Capstones', href: '/capstones', icon: Award },
+  { label: 'Badges', href: '/badges', icon: Trophy },
   { label: 'Review Hub', href: '/review', icon: RotateCw },
   { label: 'Progress', href: '/progress', icon: BarChart3 },
   { label: 'Leaderboard', href: '/leaderboard', icon: Trophy },

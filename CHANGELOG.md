@@ -8,6 +8,23 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ---
 
+## [Unreleased] - Phase 3 Sprint 4: Badge & Achievement System
+
+- **Status:** Development Complete
+- **Release Date:** 2026-08-05
+
+### Added
+
+- **Badge Gallery Page (`app/(app)/badges/page.tsx`):** Complete achievement gallery displaying total badges earned, completion percentage progress bar, recent milestone highlight, category filters (`Learning`, `Quiz`, `XP`, `Consistency`, `Capstones`, `Portfolio`, `Completion`), and live progress tracking (`X / Y`) towards locked badges.
+- **Centralized Badge Configuration (`config/badges.ts`):** Defined structured badge metadata and criteria rules across 7 categories (`first_lesson`, `module_complete`, `curriculum_explorer`, `first_perfect_quiz`, `quiz_master`, `first_level_up`, `xp_1000`, `xp_5000`, `streak_7`, `streak_30`, `streak_comeback`, `first_capstone`, `capstones_all`, `portfolio_published`, `pm_academy_graduate`).
+- **Badge Engine & DB Services (`lib/badges.ts`, `lib/badges-db.ts`):** Pure badge progress calculator (`calculateBadgeProgress`), eligible badge evaluator (`evaluateEligibleBadges`), database query service (`getUserBadgesData`), and idempotent badge awarding function (`evaluateAndAwardBadges`).
+- **Badge API Endpoints (`app/api/badges/route.ts`):** Authenticated `GET` handler returning user's earned badges and progress metrics, and `POST` handler triggering automated badge evaluation and returning newly unlocked badges.
+- **UI Components & Portfolio Integration (`components/badges/BadgeCard.tsx`, `components/badges/BadgeNotification.tsx`, `components/portfolio/PortfolioAchievements.tsx`):** Responsive badge cards with category tags, subtle unlock toast notifications, and dynamic portfolio achievement grid rendering live earned badges.
+- **Database Migration (`supabase/migrations/20260805000005_seed_badges.sql`):** Seeded standard badge definitions into `badges` table with idempotent `ON CONFLICT (key) DO UPDATE` handling.
+- **Badge System Unit Tests (`lib/__tests__/badges.test.ts`):** Automated unit tests verifying badge metadata structure, progress calculations, and duplicate award prevention (3 tests).
+
+---
+
 ## [Unreleased] - Phase 3 Sprint 3: Certificate & PDF Export System
 
 - **Status:** Development Complete
