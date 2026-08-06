@@ -11,41 +11,59 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 - **Status:** Development Complete — Fully Branded & Synchronized
 - **Release Date:** 2026-08-06
 
-### Added & Standardized
+### Added
 
 - **Centralized Branding System (`lib/brand.ts`)**:
   - Defined `BRAND` configuration object with `company` ("Prodigy"), `product` ("PM Academy"), `fullName` ("Prodigy PM Academy"), `shortName` ("PM Academy"), certificate issuer lines, and asset metadata.
+  - All colors source from `theme/tokens.ts` (`TOKENS`); no hardcoded brand hexes remain in components or emails.
 - **Reusable `BrandLogo` Component (`components/brand/BrandLogo.tsx`)**:
   - Implemented variants: `animated-full` (hero/marketing animation), `full` / `static-full` (navbar, sidebar, auth, admin, certificates, email, footer), `icon` / `mark` (mobile nav, favicon, compact UI).
-- **Static Brand Assets (`public/brand/`)**:
-  - Deployed `logo-full.png` (sourced directly from `docs/design/assets/logo.png`), `logo-mark.png`, `logo-full.svg`, `logo-mark.svg`, `og-image.png`.
+  - Added `onDark` variant (`logo-mark-on-dark.svg`) for the Admin Console's dark surfaces.
+- **New Logo System (`public/brand/` + `app/favicon.ico`)**:
+  - Approved two-tone mark (teal hexagonal ring `#019E75` + dark-navy gem `#011229`), with canonical vector geometry extracted from `docs/design/assets/logo.png` into `scripts/brand/mark-source.ts`.
+  - Emits `logo-mark.svg` (natural aspect 422.46×497.69), `logo-mark-on-dark.svg`, `wordmark.svg` (600×200), `logo-full.svg` (800×200), `favicon.svg`, `safari-pinned-tab.svg`, plus sharp rasters (`logo-mark.png`, `logo-full.png`, `og-image.png`, `icon-192/512`, `apple-touch-icon.png`) and a real multi-size `app/favicon.ico` (16/32/48 PNG entries).
+- **Homepage Branding Improvements**:
+  - Animated Prodigy logo hero (`animated-full` variant) with Framer Motion; full lockup used in marketing sections, footer, and certificates; mark-only in compact/nav contexts.
+- **Static SVG Asset Pipeline (`scripts/brand/generate-assets.ts`, `npm run brand:generate`)**:
+  - Replaced ~883 KB base64 PNG data-URI SVG stubs with genuine, lightweight vector files (1–3 KB each) generated from the canonical vector mark.
+  - Deterministic regeneration; `lib/brand.ts` `BRAND.assets` updated (logoMarkDimensions 422.46×497.69, logoFullDimensions 800×200).
 - **Compile-Time Mermaid Static SVG Stage (`scripts/compiler/mermaid-svg.ts`)**:
-  - Added build-time static SVG compilation for Mermaid diagrams styled using design system tokens (`theme/tokens.ts`). Removed runtime client JS overhead.
+  - Build-time static SVG compilation for Mermaid diagrams (code fences **and** top-level `mentalModel` / `framework` blocks), styled from design system tokens (`theme/tokens.ts`). Removed runtime client JS overhead.
+- **Favicon Generation & Metadata**:
+  - `app/favicon.ico` generated via `buildIco` (multi-resolution ICO); `favicon.svg` is the two-tone mark centered on a 512×512 canvas; `app/manifest.ts`, `app/robots.ts`, `app/sitemap.ts` added; mask-icon/theme colors read from `BRAND`/`TOKENS`.
 - **Documentation Synchronization**:
-  - Updated `docs/INDEX.md`, `CURRENT_STATUS.md`, `Brand-Architecture.md`, `content-pipeline.md`, and resolved items in `KNOWN_ISSUES.md`.
+  - Reorganized `docs/` into `product/`, `architecture/`, `development/`, `design/`, `roadmap/`, `reports/`, `archive/`; updated `docs/INDEX.md`, `docs/CURRENT_STATUS.md`, `Brand-Architecture.md`, `content-pipeline.md`, `rendering-pipeline.md`; added per-sprint roadmap docs (Sprints 7.1–8.6) and audit reports; resolved items in `KNOWN_ISSUES.md`.
+- **CI Brand Hardening (`.github/workflows/ci.yml`)**:
+  - Added checks: no base64 data-URI SVGs in `public/`, and no hardcoded brand hexes outside `theme/tokens.ts`.
 
-### Changed & Completed
+### Changed & Improved
 
-- **Real Vector Brand Assets (`scripts/brand/generate-assets.ts`, `npm run brand:generate`)**:
-  - Replaced the ~883 KB base64-PNG data-URI SVG stubs (every `public/brand/*.svg` was an identical wrapper) with genuine, lightweight vector files (1–3 KB each) generated from the canonical 716×716 vector mark embedded in `docs/design/assets/logo.png` (C2PA content credentials). Emits `logo-mark.svg` (716), `wordmark.svg` (600×200), `logo-full.svg` (800×200), `favicon.svg`, `safari-pinned-tab.svg`, plus `sharp` rasters (`logo-mark.png`, `logo-full.png`, `og-image.png`, `icon-192/512`, `apple-touch-icon.png`) and a real multi-size `favicon.ico` (16/32/48 PNG entries, written to both `public/` and `app/`). Stale `twitter-card.png` / `wordmark.png` are deleted.
-  - All colors source from `theme/tokens.ts` (`TOKENS`); added `cream` / `mint` brand surface tokens.
-  - `lib/brand.ts` now sources `colors` from `TOKENS`, drops dead `twitterCard`/`twitterImage`/`wordmarkPng` keys, and fixes `logoMarkDimensions` (716×716) / `logoFullDimensions` (800×200); `BrandLogo` uses the correct intrinsic ratio for the `wordmark` variant.
+- **Mermaid Rendering — parser and layout rewrite**:
+  - Supports chained edges (`A --> B --> C`), `---` plain edges, `<br/>` label splitting, rhombus/decision nodes, `subgraph` grouping, and TD/LR layouts with curve-routed feedback loops.
+  - Tight content-bound `viewBox` with adaptive scaling; responsive sizing for narrow diagrams (fluid `max-width`) and horizontal scroll for wide LR diagrams (locked `min-width`), preserving readable font sizes.
 - **Branded Color / Metadata Sourcing**:
-  - `app/layout.tsx` mask-icon color + `themeColor` and `app/manifest.ts` `background_color` / `theme_color` now read from `BRAND`/`TOKENS` instead of hardcoded hexes.
-  - Removed remaining hardcoded brand hexes from `lib/email.ts`, `app/api/email/unsubscribe/route.ts`, and `components/marketing/sections/journey.tsx`; corrected the email `logo-full.png` aspect ratio (192×48).
-- **Mermaid Static Pipeline — completed end-to-end**:
-  - `scripts/compiler/compile.ts` renders **top-level** `mentalModel` / `framework` mermaid blocks (not just code fences) to static SVG; `CACHE_VERSION` bumped to `3` (invalidates old manifest).
-  - Validation rule `mermaid-svg` (error) requires every mermaid block to carry a compiled `svg`/`staticSvg`; `mermaid` zod schema extended.
-  - Runtime path removed: `MarkdownRenderer` drops mermaid fences, `MermaidBlock` renders SVG only (no raw-source fallback), error boundary hides source, dynamic import no longer `ssr:false`, and the unused `mermaid` dependency was removed from `package.json`.
-- **CI Hardening (`.github/workflows/ci.yml`)**:
-  - Added brand checks: no base64 data-URI SVGs in `public/`, and no hardcoded brand hexes outside `theme/tokens.ts`.
+  - `app/layout.tsx` mask-icon color + `themeColor` and `app/manifest.ts` `background_color` / `theme_color` read from `BRAND`/`TOKENS` instead of hardcoded hexes.
+  - Removed remaining hardcoded brand hexes from `lib/email.ts`, `app/api/email/unsubscribe/route.ts`, and `components/marketing/sections/journey.tsx`; corrected email `logo-full.png` aspect ratio.
+- **Runtime Mermaid Path Removed**:
+  - `MarkdownRenderer` drops mermaid fences, `MermaidBlock` renders compiled SVG only (no raw-source fallback), error boundary hides source, dynamic import no longer `ssr:false`, and the unused `mermaid` dependency was removed from `package.json`.
+
+### Fixed
+
+- **Mermaid static SVG sizing (ISSUE 2):** static diagrams previously rendered with broken sizing — extremely narrow, incorrect scaling, unusable responsive layout. Resolved via content-bound `viewBox`, adaptive `MIN_SCALE`, fluid vs. scroll-mode width logic, and a non-flex `overflow-x-auto` wrapper in `MermaidBlock`.
+- **Mermaid parser edge cases:** chain edges landing at wrong split indices (missing label capture group), labels retaining surrounding `"` delimiters, and chained-edge/subgraph parse failures.
+- **Brand assets:** stale base64 data-URI SVG stubs replaced with real vectors; `favicon.ico` relocated to `app/` per App Router convention (removed from `public/`); corrected `logoMarkDimensions`; fixed email logo intrinsic ratio.
+
+### Refactored
+
+- **Asset pipeline** rewritten around `mark-source.ts` as the single vector source of truth (replacing embedded-C2PA extraction) with reusable `markGroup`/`markGroupSquare` composition helpers.
+- **`docs/` reorganized by concern** with `docs/INDEX.md` as canonical entry point and a documented source-of-truth hierarchy.
 
 ### Verification
 
-- 10/10 compiler tests pass, including new tests: mermaid fence → static SVG, top-level `mentalModel`/`framework` → static SVG, and rejection of mermaid blocks lacking compiled SVG.
-- Fresh `npm run content:compile`: 90 lessons emitted; 203/203 mermaid blocks carry SVG (0 missing).
-- `npm run brand:generate` verified (assets 1–39 KB vs. prior ~883 KB; ICO decodes as 16/32/48 PNG entries; rasters render the mark in `#1F6B4E`).
-- `tsc --noEmit`, `eslint`, `test:email` (8/8), and full production `next build` pass clean.
+- 10/10 compiler tests pass, including tests for mermaid fence → static SVG, top-level `mentalModel`/`framework` → static SVG, and rejection of mermaid blocks lacking compiled SVG.
+- Fresh `npm run content:compile`: 90 lessons emitted; 203/203 mermaid blocks carry SVG (0 missing); validation `mermaid-svg` rule enforced.
+- `npm run brand:generate` verified (assets 1–39 KB vs. prior ~883 KB; ICO decodes as 16/32/48 PNG entries; rasters render the two-tone mark).
+- `tsc --noEmit`, `eslint`, and full production `next build` pass clean.
 
 ---
 
