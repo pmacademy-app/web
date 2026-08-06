@@ -8,6 +8,8 @@ import { useScrolled } from '@/hooks/use-scrolled'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { trackHeroCTAClick } from '@/lib/analytics'
 import { NAV_LINKS } from '@/config/navigation'
+import { BRAND } from '@/lib/brand'
+import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
 import { cn } from '@/lib/utils'
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
@@ -16,20 +18,10 @@ function Logo() {
   return (
     <Link
       href="/"
-      aria-label="PM Academy — Home"
-      className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm"
+      aria-label={`${BRAND.fullName} — Home`}
+      className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm"
     >
-      {/* Mark */}
-      <div
-        aria-hidden="true"
-        className="w-7 h-7 rounded-sm bg-primary flex items-center justify-center flex-shrink-0"
-      >
-        <span className="text-primary-foreground text-micro font-bold tracking-tight">PM</span>
-      </div>
-      {/* Wordmark */}
-      <span className="text-body font-semibold text-foreground tracking-tight">
-        PM Academy
-      </span>
+      <BrandMarkProdigy size="sm" priority />
     </Link>
   )
 }

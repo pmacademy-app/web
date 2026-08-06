@@ -90,8 +90,8 @@ PM Academy
 Before writing any code in a new session:
 
 - [ ] Loaded `00-pm-academy-core` skill
-- [ ] Checked `docs/Phases.md` — what phase are we in?
-- [ ] Checked `docs/PRD.md §11` — any open decisions affect this task?
+- [ ] Checked `docs/product/Phases.md` — what phase are we in?
+- [ ] Checked `docs/product/PRD.md §11` — any open decisions affect this task?
 - [ ] Read the relevant source-of-truth doc section for the feature area
 - [ ] Confirmed this feature is in scope for the current phase
 

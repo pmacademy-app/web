@@ -4,6 +4,7 @@ import React from 'react'
 import { ShieldCheck, Award } from 'lucide-react'
 import type { VerifiedCertificatePayload } from '@/lib/certificates-db'
 import { generateQrCodeSvg } from '@/lib/certificates'
+import { StaticBrandLogo } from '@/components/brand/BrandLogo'
 
 interface CertificateCardProps {
   certificate: VerifiedCertificatePayload
@@ -41,17 +42,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       {/* Header Bar */}
       <div className="flex items-center justify-between border-b border-border/80 pb-6">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-primary text-primary-foreground font-serif font-bold text-xl tracking-tight shadow-xs">
-            PMA
-          </div>
-          <div>
-            <h2 className="text-lg md:text-xl font-bold font-serif text-foreground tracking-wide uppercase">
-              PM Academy
-            </h2>
-            <p className="text-[11px] text-muted-foreground font-mono">
-              Institute of Applied Product Management
-            </p>
-          </div>
+          <StaticBrandLogo size="md" />
         </div>
 
         <div className="text-right space-y-0.5">

@@ -22,7 +22,7 @@ interface DBChain {
 }
 
 export const metadata: Metadata = {
-  title: 'My Progress & Competency Dashboard | PM Academy',
+  title: 'My Progress & Competency Dashboard',
   description: 'Single source of truth for your PM skills, lesson progress, capstones, XP rank, and certificates.',
 }
 
@@ -228,7 +228,7 @@ export default async function ProgressPage() {
                     Verified Credential • {cert.certificate_code}
                   </span>
                   <h3 className="text-lg font-bold font-serif text-foreground">
-                    PM Academy Full Curriculum Completion Certificate
+                    Prodigy PM Academy Full Curriculum Completion Certificate
                   </h3>
                   <p className="text-xs text-muted-foreground">
                     Issued on {new Date(cert.issued_at).toLocaleDateString()} for mastering 90 lessons and achieving Level {cert.level} ({cert.career_title}).

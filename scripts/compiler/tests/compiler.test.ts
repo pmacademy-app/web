@@ -4,7 +4,8 @@ import path from 'node:path';
 import { generateBlockId, getOrCreateLessonId } from '../registry';
 import { validateCompiledLesson } from '../validation';
 import { CompilerContext } from '../plugins/remark-plugins';
-import { extractQuizBlock, extractFlashcardBlock } from '../plugins/extractors';
+import { extractQuizBlock, extractFlashcardBlock, mdastToBlocks } from '../plugins/extractors';
+import { compileLesson, compileAllContent } from '../compile';
 
 describe('PM Academy Content Compiler Test Suite', () => {
   
@@ -41,6 +42,45 @@ describe('PM Academy Content Compiler Test Suite', () => {
   });
 
   describe('Block Extractors', () => {
+    it('compiles mermaid code fences to static SVG (no runtime mermaid path)', () => {
+      const node = {
+        type: 'code',
+        lang: 'mermaid',
+        value: 'graph TD\n  A[Problem Statement] --> B[Understanding]',
+        data: {
+          mermaid: {
+            source: 'graph TD\n  A[Problem Statement] --> B[Understanding]',
+            normalized: 'graph TD\n  A[Problem Statement] --> B[Understanding]',
+          },
+        },
+      };
+
+      const blocks = mdastToBlocks([node], 'les_test');
+      assert.strictEqual(blocks.length, 1);
+      assert.strictEqual(blocks[0].type, 'mermaid');
+      assert.ok(typeof blocks[0].svg === 'string' && blocks[0].svg.length > 0, 'expected compiled svg');
+      assert.ok(blocks[0].svg.includes('<svg'), 'expected svg markup');
+      assert.ok(blocks[0].svg.includes('Problem Statement'), 'expected node label in svg');
+      assert.strictEqual(blocks[0].staticSvg, blocks[0].svg);
+    });
+
+    it('compiles top-level mental model / framework mermaid blocks to static SVG', () => {
+      const rootDir = path.resolve(__dirname, '../../..');
+      const filePath = path.join(rootDir, 'content/lessons/lesson-004.md');
+      const { lesson } = compileLesson(filePath, { [filePath]: 'les_abc123' }, {});
+
+      const mermaidBlocks = lesson.blocks.filter((b) => b.type === 'mermaid');
+      assert.ok(mermaidBlocks.length > 0, 'expected at least one top-level mermaid block in lesson-004');
+
+      for (const block of mermaidBlocks) {
+        assert.ok(
+          typeof block.svg === 'string' && block.svg.length > 0,
+          `block ${block.blockId} missing static svg`
+        );
+        assert.ok(block.svg.includes('<svg'), `block ${block.blockId} svg is not valid markup`);
+      }
+    });
+
     it('extracts quiz questions correctly', () => {
       const mockQuizNodes = [
         {
@@ -186,6 +226,40 @@ describe('PM Academy Content Compiler Test Suite', () => {
       const issues = validateCompiledLesson(invalidLesson, ctx);
       const flashcardFailures = issues.filter((i) => i.id === 'flashcard-deck-check');
       assert.strictEqual(flashcardFailures.length > 0, true);
+    });
+
+    it('rejects mermaid blocks that lack compiled static SVG', () => {
+      const invalidLesson = {
+        id: 'les_test',
+        title: 'Test Lesson',
+        slug: 'test-lesson',
+        blocks: [
+          {
+            type: 'mermaid',
+            blockId: 'blk_123',
+            id: 'mer-1',
+            source: 'graph TD\n  A --> B',
+            normalized: 'graph TD\n  A --> B',
+          },
+          {
+            type: 'theory',
+            blockId: 'blk_456',
+            children: [],
+          }
+        ]
+      };
+
+      const ctx: CompilerContext = {
+        filePath: 'test.md',
+        lessonId: 'les_test',
+        issues: [],
+        assets: [],
+        glossaryTerms: [],
+      };
+
+      const issues = validateCompiledLesson(invalidLesson, ctx);
+      const svgFailures = issues.filter((i) => i.id === 'mermaid-svg');
+      assert.strictEqual(svgFailures.length > 0, true);
     });
   });
 });

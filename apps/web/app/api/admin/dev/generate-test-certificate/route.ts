@@ -3,6 +3,7 @@ import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { issueCertificate } from '@/lib/certificates-db'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
+import { BRAND } from '@/lib/brand'
 
 export async function POST(request: Request) {
   // 1. Enforce RBAC
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
       })
       .eq('id', certRow.id)
 
-    const siteOrigin = process.env.NEXT_PUBLIC_APP_URL || 'https://pmacademy.com'
+    const siteOrigin = process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl
     const verificationUrl = `${siteOrigin}/verify/${encodeURIComponent(testCertCode)}`
 
     // 3. Trigger Notification Event (reuses production event & email queue pipeline)

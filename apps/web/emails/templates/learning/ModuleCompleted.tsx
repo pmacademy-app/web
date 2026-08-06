@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 
 export interface ModuleCompletedEmailProps {
   userName?: string
@@ -16,7 +17,7 @@ export const ModuleCompletedEmail: React.FC<ModuleCompletedEmailProps> = ({
   moduleName = 'Foundations of Product Management',
   moduleSlug = 'foundations',
   xpBonus = 200,
-  appUrl = 'https://pmacademy.com',
+  appUrl = BRAND.siteUrl,
   unsubscribeToken,
 }) => {
   return (

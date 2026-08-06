@@ -2,17 +2,17 @@
 
 > **Purpose:** A living record of phase-by-phase implementation progress, the current state of each development phase, remaining work, and future direction.  
 > **Part of:** the [`docs/memory/`](./) system. See [`docs/INDEX.md`](../INDEX.md) for the full documentation map.  
-> **Authoritative source for phase definitions and DOD:** [`docs/Phases.md`](../Phases.md) — this file tracks *actual progress*; `Phases.md` defines *what done means*.
+> **Authoritative source for phase definitions and DOD:** [`docs/Phases.md`](../product/Phases.md) — this file tracks *actual progress*; `Phases.md` defines *what done means*.
 
 ---
 
-## Current Status (as of 2026-08-05)
+## Current Status (as of 2026-08-06)
 
 ```
 Phase 0 — Foundation          ████████████████████████████████  Complete ✅
 Phase 1 (Core MVP & v2)       ████████████████████████████████  Complete ✅ — v1.0.0-foundation Release
 Phase 2 — Gamification Layer  ████████████████████████████████  Complete ✅ — v0.2.0-phase2-complete Release
-Phase 3 — Depth & Retention   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Active Development Stage 🎯
+Phase 3 — Depth & Retention   ████████████████████████████████  Complete ✅ — v1.0.0-rc1 Release Candidate
 Phase 4 — Polish & SEO        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Not Started
 Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  Not Started
 ```
@@ -73,21 +73,21 @@ Phase 5 — Public Launch       ░░░░░░░░░░░░░░░░
 
 ---
 
-## Phase 3 — Depth & Retention (Not Started / Scaffolded ❌)
+## Phase 3 — Depth & Retention ✅
 
-**Status:** DB schema supports the features. UI pages are placeholder stubs.
+**Status:** Complete (`v1.0.0-rc1` Release Candidate). All Phase 3 sprints shipped, tested, and verified.
 
-### Scaffolded (DB ready, UI pending)
-- Capstone submissions: `capstone_submissions` table in schema
-- Reflections: `reflections` table with `is_public` flag for portfolio exposure
-- Public portfolio page: `app/(portfolio)/p/[username]/page.tsx` exists as a stub
-
-### Remaining Work
-- [ ] Module capstone submission form and display
-- [ ] Badge system: ~20 badges tied to real learning milestones
-- [ ] Opt-in cohort leaderboard: weekly-reset, consistency-ranked
-- [ ] Email re-engagement: streak reminder and weekly recap emails via Resend
-- [ ] Portfolio/certificate export: shareable public profile page for recruiters
+### Completed Sprints
+- [x] **Sprint 1 (Capstone Workspace):** `/capstones` workspace, per-module submission + draft APIs, admin oversight.
+- [x] **Sprint 2 (Public Portfolio):** `/p/[username]` shareable page — public skill radar, reflections, capstones, achievement badges.
+- [x] **Sprint 3 (Certificates & Verification):** `/verify/[certificateId]`, schema.org EducationalOccupationalCredential JSON-LD, QR verification, PDF export.
+- [x] **Sprint 4 (Badge & Achievement System):** `/badges` gallery, badge rule evaluations tied to real learning milestones.
+- [x] **Sprint 5 (Friends & Cohort Leaderboard):** `/leaderboard`, weekly-reset consistency ranking, friends/cohort APIs.
+- [x] **Stabilization Sprint (Priority 1+2+3):** empty-section render guards, module-completion detection (global ordering), Continue Learning flow, portfolio settings 401, certificate discoverability, breadcrumb/metadata global ordering.
+- [x] **Sprint 6.1–6.3 (Notification Platform):** typed event system, email engine + queue delivery, in-app notification center + preferences (`apps/web/lib/notifications/`, `apps/web/emails/`, `/api/cron/`).
+- [x] **Sprint 6.4 (Admin Console & Dev Tools):** `/admin` RBAC (ADMIN_EMAILS + `users.is_admin`, proxy middleware guard), user ops, notification/email queue tooling, dev certificate tools.
+- [x] **Sprint 6.5 (Release Candidate Audit):** `v1.0.0-rc1` production-readiness audit complete.
+- [x] **Sprint 7.1 (Global Branding & Documentation):** `lib/brand.ts` + `BrandLogo` + static brand assets (`public/brand/`), full rebrand pass (layouts, metadata, emails, certificates, admin), doc-sync sweep. Build-time Mermaid→SVG stage deferred — see `KNOWN_ISSUES.md §2`.
 
 ---
 
@@ -199,6 +199,7 @@ Step 6  →  Phase 2 Gamification UI Integration
 
 ## Changelog
 
+- v2.0 (2026-08-06) — Phase 3 marked **Complete** (`v1.0.0-rc1`), mirroring `CURRENT_STATUS.md`. Added Sprint 6.x + 7.1 completion entries and replaced the stale "scaffolded / not started" Phase 3 section with the shipped sprint list.
 - v1.0 (2026-08-01) — Created from `Phases.md`, the project audit report, and `MEMORY.md`. Adds current phase progress tracking, known debt items, and the recommended v2 migration execution sequence.
 - v1.5 (2026-08-02) — Phase 1.5 Sprint 1 Runtime & Navigation Stabilization complete. Fixed dashboard CTA navigation/completed count queries, resolved blocks typecast compiler issue, paused theory timer outside of the theory tab, and added auth redirects to marketing curriculum and public previews. All production builds compile cleanly.
 - v1.6 (2026-08-02) — Phase 1.5 Sprint 2 Learning Flow Stabilization complete. Wired flashcard reviews to API, implemented Previous/Next navigation footer links, verified reflections load/save correctly, and integrated real competency skill radar scores on the dashboard.

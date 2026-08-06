@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 
 export interface VerifyEmailProps {
   userName?: string
@@ -9,7 +10,7 @@ export interface VerifyEmailProps {
 
 export const VerifyEmail: React.FC<VerifyEmailProps> = ({
   userName = 'Learner',
-  verificationUrl = 'https://pmacademy.com/auth/callback',
+  verificationUrl = `${BRAND.siteUrl}/auth/callback`,
 }) => {
   return (
     <EmailWrapper previewText="Confirm your PM Academy email address.">

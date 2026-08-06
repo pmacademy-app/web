@@ -4,31 +4,38 @@ This document lists all intentionally deferred features, planned enhancements, a
 
 ---
 
-## 1. Intentionally Deferred Product Features
+## 1. Resolved Items (as of 2026-08-06)
 
-### 🔑 Google OAuth Integration (Deferred to Phase 3)
+Items previously deferred that have shipped in Phase 3. Retained for historical reference only.
+
+### ✅ Module Capstones — RESOLVED (Phase 3)
+*   **Status:** Shipped. Capstone Workspace (`/capstones`), per-module submission + draft APIs (`/api/capstones/...`), and admin oversight are live in Phase 3 Sprint 1.
+*   **Original deferral:** DB scaffold only, no rendering or submission UI.
+
+### ✅ Badge Showcases & Leaderboards — RESOLVED (Phase 3)
+*   **Status:** Shipped. Badge & Achievement Gallery (`/badges`), weekly cohort leaderboards (`/leaderboard`, friends/cohorts APIs), and HTML5-based certificate generation (`/verify/[certificateId]`, public portfolio `/p/[username]`) are live in Phase 3 Sprints 3–5.
+*   **Original deferral:** placeholder stubs; gamification UI and certification exports scheduled for Phase 3.
+
+### ✅ Mermaid → Static SVG Build-Time Rendering — RESOLVED (Sprint 7.1)
+*   **Status:** Shipped. Mermaid diagrams are rendered to static SVGs at `content:compile` time via `scripts/compiler/mermaid-svg.ts`, styled using `theme/tokens.ts`. Zero client-side Mermaid JS runtime overhead is shipped to the browser.
+*   **Original deferral:** deferred to Sprint 7.1 per `Architecture-Review-Report.md §6` and `content-pipeline.md`.
+
+---
+
+## 2. Intentionally Deferred Product Features
+
+### 🔑 Google OAuth Integration (Still Deferred)
 *   **Description:** The "Continue with Google" buttons on the auth pages are currently disabled and marked with a "Coming Soon" badge.
-*   **Reason:** Supabase requires a configured Google Cloud Platform (GCP) OAuth client ID/secret and a verified production domain callback. Email + Password login/signup is fully functional and sufficient for the initial beta.
-*   **Resolution:** Configure GCP credentials and enable the Google provider in Supabase settings during Phase 3 rollout.
+*   **Reason:** Supabase requires a configured Google Cloud Platform (GCP) OAuth client ID/secret and a verified production domain callback. Email + Password login/signup is fully functional and sufficient for the beta.
+*   **Resolution:** Configure GCP credentials and enable the Google provider in Supabase settings once the production domain is finalized (tracked in `Roadmap.md` "Gaps Identified").
 
-### 📝 Module Capstones (Deferred to Phase 3)
-*   **Description:** End-of-module capstone submissions (`/capstone`) are scaffolded in the database schema (`capstone_submissions` table) but have no rendering or submission UI.
-*   **Reason:** PRD/Phases roadmap schedules the capstones for Phase 3 (Retention & Depth).
-*   **Resolution:** Build submission dashboard, markdown/PDF submission uploader, and peer review flow.
-
-### 🏆 Badge Showcases & Leaderboards (Deferred to Phase 3)
-*   **Description:** The badge showcase UI, weekly cohort leaderboards, and certificate generation are placeholder stubs.
-*   **Reason:** Gamification UI and certification exports are scheduled in Phase 3.
-*   **Resolution:** Implement badge rules evaluations, weekly resetting cohort cron, and HTML5 canvas-based certificate generator.
-
-### 📊 Onboarding Placement Assessment (Deferred to Phase 2)
-*   **Description:** The placement quiz that seeds the user's initial skill radar during onboarding is excluded.
-*   **Reason:** The MVP onboarding flow is restricted to a simple goal-setting selection (Job Search, Fill Gaps, Exploring).
+### 📊 Onboarding Placement Assessment (Still Deferred)
+*   **Description:** The placement quiz that seeds the user's initial skill radar during onboarding is excluded. The onboarding flow is restricted to a simple goal-setting selection (Job Search, Fill Gaps, Exploring).
 *   **Resolution:** Design a 5-question baseline quiz that populates initial competency levels.
 
 ---
 
-## 2. Non-Critical Technical Debt & Remaining Enhancements
+## 3. Non-Critical Technical Debt & Remaining Enhancements
 
 ### 📐 Supabase DB Query Type Casts (`as unknown as DBChain`)
 *   **Description:** Widespread usage of `as unknown as DBChain` and custom return type casting in service layers (`lessons-db.ts`, `flashcards-service.ts`, `lessons-completion-service.ts`, `xp-service.ts`).

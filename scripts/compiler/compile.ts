@@ -31,12 +31,16 @@ import {
 import { getOrCreateLessonId, loadRegistry, normalizePath, generateBlockId } from './registry';
 import { validateCompiledLesson } from './validation';
 import { RawLearningPathMetadataSchema, ParsedLessonMetadataSchema } from './schema/lesson-metadata.schema';
+import { compileMermaidToSvg } from './mermaid-svg';
 
 const ROOT_DIR = path.resolve(__dirname, '../..');
 const SOURCE_DIR = path.join(ROOT_DIR, 'content/lessons');
 const DIST_DIR = path.join(ROOT_DIR, 'content/dist');
 const DIST_LESSONS_DIR = path.join(DIST_DIR, 'lessons');
 const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
+
+// Bump whenever the compiler's output shape changes so cached lessons recompile.
+const CACHE_VERSION = '3';
 
 interface CacheManifest {
   version: string;
@@ -256,13 +260,18 @@ export function compileLesson(
           blockId: `mer-${lessonId}`,
           type: 'mermaid',
         };
-        // Build and push the actual mermaid block separately in child blocks
+        // Build and push the actual mermaid block separately in child blocks.
+        // Render to static SVG at compile time — never ships raw Mermaid source
+        // to the browser. Throws on parse failure, failing the build (Requirement 5).
+        const svg = compileMermaidToSvg(mermaidNode.value, mermaidNode.data?.mermaid?.authorTheme);
         const mBlock: any = {
           type: 'mermaid',
           id: `mer-${lessonId}`,
           source: mermaidNode.value,
           normalized: mermaidNode.data?.mermaid?.normalized || mermaidNode.value,
           authorTheme: mermaidNode.data?.mermaid?.authorTheme,
+          svg,
+          staticSvg: svg,
         };
         mBlock.blockId = getOrCreateBlockId(lessonId, mBlock);
         mBlock.id = mBlock.blockId;
@@ -346,13 +355,16 @@ export function compileLesson(
           blockId: `mer-fw-${lessonId}`,
           type: 'mermaid',
         };
-        // Build and push actual mermaid block
+        // Build and push actual mermaid block (static SVG at compile time)
+        const svg = compileMermaidToSvg(mermaidNode.value, mermaidNode.data?.mermaid?.authorTheme);
         const mBlock: any = {
           type: 'mermaid',
           id: `mer-fw-${lessonId}`,
           source: mermaidNode.value,
           normalized: mermaidNode.data?.mermaid?.normalized || mermaidNode.value,
           authorTheme: mermaidNode.data?.mermaid?.authorTheme,
+          svg,
+          staticSvg: svg,
         };
         mBlock.blockId = getOrCreateBlockId(lessonId, mBlock);
         mBlock.id = mBlock.blockId;
@@ -590,12 +602,16 @@ function visitText(node: any, callback: (v: string) => void) {
 function loadCacheManifest(): CacheManifest {
   if (fs.existsSync(CACHE_MANIFEST_PATH)) {
     try {
-      return JSON.parse(fs.readFileSync(CACHE_MANIFEST_PATH, 'utf-8'));
+      const parsed = JSON.parse(fs.readFileSync(CACHE_MANIFEST_PATH, 'utf-8'));
+      // Invalidate the cache entirely if the compiler version changed
+      if (parsed.version === CACHE_VERSION) {
+        return parsed;
+      }
     } catch {
       // ignore
     }
   }
-  return { version: '2', files: {} };
+  return { version: CACHE_VERSION, files: {} };
 }
 
 function saveCacheManifest(manifest: CacheManifest) {

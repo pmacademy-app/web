@@ -1,5 +1,6 @@
 import type { NotificationProvider, ProviderSendPayload, ProviderSendResult, ProviderHealthResult } from './types'
 import type { NotificationChannel } from '../types'
+import { BRAND } from '@/lib/brand'
 
 /**
  * Resend Email Provider Implementation.
@@ -9,7 +10,7 @@ import type { NotificationChannel } from '../types'
 export class ResendProvider implements NotificationProvider {
   public readonly name = 'resend'
   public readonly supportedChannels: NotificationChannel[] = ['email']
-  private defaultFrom = 'PM Academy <welcome@pmacademy.com>'
+  private defaultFrom = `${BRAND.emailFromName} <${BRAND.emailFromAddress}>`
 
   public async send(payload: ProviderSendPayload): Promise<ProviderSendResult> {
     const recipientEmail = payload.recipient.email
@@ -41,7 +42,7 @@ export class ResendProvider implements NotificationProvider {
         html: payload.variables.html as string,
         text: payload.variables.text as string,
         headers: {
-          'List-Unsubscribe': `<${process.env.NEXT_PUBLIC_APP_URL || 'https://pmacademy.com'}/settings?tab=notifications>`,
+          'List-Unsubscribe': `<${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/settings?tab=notifications>`,
         },
         tags: [
           { name: 'template_key', value: payload.templateKey },

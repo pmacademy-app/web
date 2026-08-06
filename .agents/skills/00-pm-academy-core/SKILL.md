@@ -22,11 +22,11 @@ Always cross-reference these before making decisions:
 
 | Doc | Owns |
 |-----|------|
-| `docs/PRD.md` | What to build & why. Product Principles. Feature requirements. |
-| `docs/Architecture.md` | Stack, data model, folder structure, content pipeline, API design. |
-| `docs/Rules.md` | Engineering philosophy, coding standards, git workflow, content authoring. |
-| `docs/Phases.md` | Sequencing, Definition-of-Done per phase. Current phase context. |
-| `docs/Design.md` | Visual direction, component inventory, gamification UI, marketing/SEO. |
+| `docs/product/PRD.md` | What to build & why. Product Principles. Feature requirements. |
+| `docs/architecture/Architecture.md` | Stack, data model, folder structure, content pipeline, API design. |
+| `docs/development/Rules.md` | Engineering philosophy, coding standards, git workflow, content authoring. |
+| `docs/product/Phases.md` | Sequencing, Definition-of-Done per phase. Current phase context. |
+| `docs/design/Design.md` | Visual direction, component inventory, gamification UI, marketing/SEO. |
 
 **If these docs contradict each other:** PRD wins for product behavior; Architecture wins for technical implementation.
 
@@ -212,7 +212,7 @@ pm-academy/
 
 ## 11. Current Phase Context
 
-Check `docs/Phases.md` to confirm the active phase before touching any feature area.
+Check `docs/product/Phases.md` to confirm the active phase before touching any feature area.
 - **Phase 0:** Foundation (content pipeline, deployment, waitlist, auth, design system) — substantially complete
 - **Phase 1:** Core learning loop MVP (lesson view, quiz, basic progress)
 - **Phase 2:** Gamification layer (XP, streaks, skill radar, flashcard SRS, dashboard)

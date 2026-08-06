@@ -41,13 +41,11 @@ class BlockErrorBoundary extends React.Component<{
 
   render() {
     if (this.state.hasError) {
-      const { block } = this.props;
-      if (block.type === 'mermaid') {
-        const source = (block.source as string) || '';
+      // Never surface raw Mermaid source to the browser, even on render failure.
+      if (this.props.block.type === 'mermaid') {
         return (
           <div className="border border-destructive/20 bg-destructive/5 p-4 rounded-xl my-6">
-            <p className="text-xs font-semibold text-destructive mb-2">Diagram rendering failed:</p>
-            <pre className="text-[10px] overflow-x-auto bg-muted p-2 rounded font-mono">{source}</pre>
+            <p className="text-xs font-semibold text-destructive mb-2">This diagram couldn&apos;t be rendered — skip to the next section.</p>
           </div>
         );
       }

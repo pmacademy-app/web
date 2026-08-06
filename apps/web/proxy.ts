@@ -213,6 +213,6 @@ export const config = {
      * - static files (css, js, images, robots, sitemap)
      * - favicon.ico
      */
-    '/((?!_next/static|_next/image|favicon.ico|content|robots.txt|sitemap.xml|api/waitlist|api/auth/callback|og-image.png|[^/]*\\.[^/]*$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/waitlist|api/auth/callback|[^/]*\\.[^/]*$).*)',
   ],
 }

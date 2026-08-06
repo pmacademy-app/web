@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { FOOTER_LINK_GROUPS } from '@/config/navigation'
+import { BRAND } from '@/lib/brand'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 
 /**
  * Marketing site footer — Sprint 2 §20 + Sprint 3 footer copy.
@@ -14,24 +16,16 @@ export function Footer() {
       aria-label="Site footer"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8 py-16">
-        {/* Main footer grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-8 lg:gap-12 mb-12">
-          {/* Brand block */}
           <div className="col-span-2 md:col-span-3 xl:col-span-1">
-            {/* Logo */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-6 h-6 rounded-xs bg-primary flex items-center justify-center flex-shrink-0">
-                <span className="text-primary-foreground text-micro font-bold">PM</span>
-              </div>
-              <span className="text-body-sm font-semibold text-foreground">PM Academy</span>
+            <div className="flex items-center mb-4">
+              <BrandLogo variant="full" size="sm" />
             </div>
-            {/* Brand line — Sprint 3 verbatim */}
             <p className="text-body-sm text-locked leading-relaxed max-w-[240px]">
               A free PM academy for people building real product judgment.
             </p>
           </div>
 
-          {/* Link groups */}
           {FOOTER_LINK_GROUPS.map((group) => (
             <div key={group.heading}>
               <h3 className="text-caption font-semibold text-foreground uppercase tracking-wide mb-4">
@@ -58,10 +52,9 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Footer bottom */}
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <p className="text-body-sm text-locked">
-            © {currentYear} PM Academy. Built by{" "}
+            © {currentYear} {BRAND.fullName}. Built by{' '}
             <Link
               href="https://adityagangwani.me"
               target="_blank"
@@ -69,7 +62,7 @@ export function Footer() {
               className="underline underline-offset-4 hover:text-foreground font-medium"
             >
               Aditya Gangwani
-            </Link>{" "}
+            </Link>{' '}
             to make serious PM education accessible.
           </p>
           <p className="text-body-sm text-locked">

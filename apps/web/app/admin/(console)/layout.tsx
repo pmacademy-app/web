@@ -7,8 +7,8 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 
 export const metadata = {
-  title: 'Admin Console | PM Academy',
-  description: 'Operational control center for PM Academy administrators.',
+  title: 'Admin Console',
+  description: 'Operational control center for Prodigy PM Academy administrators.',
 }
 
 /**

@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, BookOpen, Award, RotateCw, BarChart3, Trophy, Settings, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
+import { BRAND } from '@/lib/brand'
 
 interface SidebarProps {
   isOpen: boolean
@@ -26,19 +28,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-card border-r border-border py-6 px-4">
-      {/* Logo */}
+      {/* Logo: Logo Mark + Prodigy */}
       <div className="flex items-center justify-between px-2 mb-8">
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
+          className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
           onClick={onClose}
         >
-          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold tracking-tight text-sm">PM</span>
-          </div>
-          <span className="font-bold text-foreground text-lg tracking-tight font-serif">
-            PM Academy
-          </span>
+          <BrandMarkProdigy size="sm" />
         </Link>
         {/* Mobile close button */}
         <button
@@ -80,7 +77,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Footer / Built with tag */}
       <div className="border-t border-border pt-4 px-2">
         <p className="text-[10px] text-muted-foreground/60 uppercase font-semibold tracking-wider">
-          Built with PM Academy
+          Built with {BRAND.shortName}
         </p>
       </div>
     </div>

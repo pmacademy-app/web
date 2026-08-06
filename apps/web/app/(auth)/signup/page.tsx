@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
 
 const signupSchema = z.object({
   name: z
@@ -125,7 +126,8 @@ export default function SignupPage() {
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-sm">
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 flex flex-col items-center">
+        <BrandMarkProdigy size="md" className="mb-4" />
         <h1 className="text-2xl font-bold font-serif text-foreground mb-2">
           Create Your Free Account
         </h1>

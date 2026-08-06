@@ -2,15 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'About PM Academy — Why Free Forever',
-  description: 'Learn why PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
+  title: 'About — Why Free Forever',
+  description: 'Learn why Prodigy PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
 }
 
 export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-3xl">
       <h1 className="text-4xl md:text-5xl font-bold font-serif text-foreground mb-6">
-        Why PM Academy is Free Forever
+        Why Prodigy PM Academy is Free Forever
       </h1>
 
       <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6 text-foreground/80 leading-relaxed">

@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 import { MODULES } from '@/config/content'
 
 export const metadata: Metadata = {
-  title: 'Full Curriculum — 9 Modules, 90 Lessons | PM Academy',
+  title: 'Full Curriculum — 9 Modules, 90 Lessons',
   description: 'Explore the complete free 90-lesson Product Management curriculum across 9 core modules.',
 }
 

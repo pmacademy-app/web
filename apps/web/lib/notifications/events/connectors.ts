@@ -1,6 +1,7 @@
 import type { EventEnvelope } from '../types'
 import { globalNotificationDispatcher } from '../dispatcher'
 import { enqueueNotificationItem } from '../queue/processor'
+import { BRAND } from '@/lib/brand'
 
 /**
  * Registers default system event handlers that map Notification Events to Email Queue entries.
@@ -36,7 +37,7 @@ export function initializeNotificationConnectors(): void {
       templateKey: 'auth.verify_email',
       templateVariables: {
         userName: event.userName || 'Learner',
-        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_APP_URL || 'https://pmacademy.com'}/auth/callback`,
+        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/auth/callback`,
       },
       eventId: event.id,
       eventType: event.event,
@@ -55,7 +56,7 @@ export function initializeNotificationConnectors(): void {
       templateKey: 'auth.password_reset',
       templateVariables: {
         userName: event.userName || 'Learner',
-        resetUrl: event.payload.resetUrl || `${process.env.NEXT_PUBLIC_APP_URL || 'https://pmacademy.com'}/auth/reset-password`,
+        resetUrl: event.payload.resetUrl || `${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/auth/reset-password`,
       },
       eventId: event.id,
       eventType: event.event,
@@ -138,7 +139,7 @@ export function initializeNotificationConnectors(): void {
       templateVariables: {
         userName: event.userName || 'Learner',
         certificateCode: event.payload.certificateCode,
-        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_APP_URL || 'https://pmacademy.com'}/verify/${event.payload.certificateCode}`,
+        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/verify/${event.payload.certificateCode}`,
       },
       eventId: event.id,
       eventType: event.event,
@@ -158,7 +159,7 @@ export function initializeNotificationConnectors(): void {
       templateVariables: {
         userName: event.userName || 'Learner',
         username: event.payload.username,
-        portfolioUrl: event.payload.portfolioUrl || `${process.env.NEXT_PUBLIC_APP_URL || 'https://pmacademy.com'}/p/${event.payload.username}`,
+        portfolioUrl: event.payload.portfolioUrl || `${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/p/${event.payload.username}`,
       },
       eventId: event.id,
       eventType: event.event,

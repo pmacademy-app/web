@@ -7,7 +7,7 @@ import SectionBlock from './section/SectionBlock';
 // Lazily load large or interactive client components to optimize bundle size and page load speed
 const QuizBlock = dynamic(() => import('./quiz/QuizBlock'));
 const FlashcardDeckBlock = dynamic(() => import('./flashcards/FlashcardDeckBlock'));
-const MermaidBlock = dynamic(() => import('./mermaid/MermaidBlock'), { ssr: false });
+const MermaidBlock = dynamic(() => import('./mermaid/MermaidBlock'));
 const ConnectionsBlock = dynamic(() => import('./connections/ConnectionsBlock'));
 const GlossaryBlock = dynamic(() => import('./glossary/GlossaryBlock'));
 

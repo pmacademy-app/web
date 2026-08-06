@@ -31,13 +31,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     fetchCompiledLesson(lessonId),
     fetchCurriculumData(),
   ])
-  if (!lesson) return { title: 'Lesson Not Found | PM Academy' }
+  if (!lesson) return { title: 'Lesson Not Found' }
 
   const globalIndex = curriculum?.lessons.findIndex((l) => l.id === lessonId) ?? -1
   const globalOrder = globalIndex >= 0 ? globalIndex + 1 : lesson.order
 
   return {
-    title: `Lesson ${globalOrder}: ${lesson.title} | PM Academy`,
+    title: `Lesson ${globalOrder}: ${lesson.title}`,
     description: `Interactive lesson — theory, practice quiz, spaced repetition flashcards, and reflection exercise.`,
   }
 }

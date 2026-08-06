@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 import { StatCard } from '../../components/StatCard'
 
 export interface WeeklyRecapProps {
@@ -19,7 +20,7 @@ export const WeeklyRecap: React.FC<WeeklyRecapProps> = ({
   xpEarnedThisWeek = 250,
   currentStreak = 7,
   daysStudiedThisWeek = 5,
-  appUrl = 'https://pmacademy.com',
+  appUrl = BRAND.siteUrl,
   unsubscribeToken,
 }) => {
   return (

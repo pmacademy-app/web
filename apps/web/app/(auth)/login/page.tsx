@@ -7,6 +7,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { BRAND } from '@/lib/brand'
+import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
 
 const loginSchema = z.object({
   email: z
@@ -32,7 +34,6 @@ function LoginForm() {
     authErrorParam === 'auth_failed' ? 'Authentication failed. Please try again.' : null
   )
   const [isPending, startTransition] = useTransition()
-  // const [isGoogleLoading, setIsGoogleLoading] = useState(false) // Uncomment when Google OAuth is enabled
 
   const {
     register,
@@ -70,33 +71,6 @@ function LoginForm() {
       }
     })
   }
-
-  /*
-  const handleGoogleLogin = async () => {
-    setErrorMsg(null)
-    setIsGoogleLoading(true)
-
-    try {
-      const supabase = createBrowserSupabaseClient()
-      const origin = window.location.origin
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${origin}/api/auth/callback`,
-        },
-      })
-
-      if (error) {
-        setErrorMsg(error.message)
-        setIsGoogleLoading(false)
-      }
-    } catch (err) {
-      console.error('[login] Google login error:', err)
-      setErrorMsg('Could not initialize Google login.')
-      setIsGoogleLoading(false)
-    }
-  }
-  */
 
   const isLoading = isPending
 
@@ -226,9 +200,10 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-sm">
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 flex flex-col items-center">
+        <BrandMarkProdigy size="md" className="mb-4" />
         <h1 className="text-2xl font-bold font-serif text-foreground mb-2">
-          Welcome Back to PM Academy
+          Welcome Back to {BRAND.fullName}
         </h1>
         <p className="text-xs text-muted-foreground">
           Log in to resume your learning path.

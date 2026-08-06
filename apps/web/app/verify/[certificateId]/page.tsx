@@ -7,12 +7,13 @@ import { CertificateCard } from '@/components/certificates/CertificateCard'
 import { CertificateActions } from '@/components/certificates/CertificateActions'
 import { VerificationBadge } from '@/components/certificates/VerificationBadge'
 import { Award, AlertCircle, ArrowLeft, BookOpen, Layers, Zap, User } from 'lucide-react'
+import { BRAND } from '@/lib/brand'
 
 interface PageProps {
   params: Promise<{ certificateId: string }>
 }
 
-const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://pmacademy.com'
+const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { certificateId } = await params
@@ -21,14 +22,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!cert) {
     return {
-      title: 'Invalid Certificate Verification | PM Academy',
-      description: 'The requested PM Academy certificate code could not be verified.',
+      title: 'Invalid Certificate Verification',
+      description: `The requested ${BRAND.fullName} certificate code could not be verified.`,
       robots: { index: false, follow: false },
     }
   }
 
-  const metaTitle = `Verified Certificate: ${cert.learnerName} — ${cert.levelInfo.title} | PM Academy`
-  const metaDesc = `Official PM Academy Certificate of Completion for ${cert.learnerName} (${cert.levelInfo.title}, ${cert.lessonsCompleted} lessons completed). Certificate ID: ${cert.certificateCode}.`
+  const metaTitle = `Verified Certificate: ${cert.learnerName} — ${cert.levelInfo.title}`
+  const metaDesc = `Official ${BRAND.fullName} Certificate of Completion for ${cert.learnerName} (${cert.levelInfo.title}, ${cert.lessonsCompleted} lessons completed). Certificate ID: ${cert.certificateCode}.`
 
   return {
     title: metaTitle,
@@ -70,13 +71,13 @@ export default async function CertificateVerificationPage({ params }: PageProps)
             Certificate Code Unverified
           </h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            The certificate identifier <strong className="font-mono text-foreground">{certificateId}</strong> was not found in the official PM Academy verification registry.
+            The certificate identifier <strong className="font-mono text-foreground">{certificateId}</strong> was not found in the official {BRAND.product} verification registry.
           </p>
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors pt-2"
           >
-            <ArrowLeft className="w-4 h-4" /> Return to PM Academy
+            <ArrowLeft className="w-4 h-4" /> Return to {BRAND.fullName}
           </Link>
         </div>
       </div>
@@ -183,11 +184,7 @@ export default async function CertificateVerificationPage({ params }: PageProps)
         {/* Footer Branding */}
         <div className="no-print text-center pt-8 border-t border-border/60 text-xs text-muted-foreground space-y-1">
           <p>
-            Official Verified Credential issued by{' '}
-            <Link href="/" className="font-bold text-primary hover:underline">
-              PM Academy
-            </Link>
-            .
+            Official Verified Credential. {BRAND.certificateIssuerLine}.
           </p>
           <p className="text-[11px] text-muted-foreground/60">
             Immutable Verification Code: {cert.certificateCode} · 0 dark patterns.

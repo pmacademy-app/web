@@ -9,12 +9,13 @@ import { PortfolioProgress } from '@/components/portfolio/PortfolioProgress'
 import { PortfolioCapstones } from '@/components/portfolio/PortfolioCapstones'
 import { PortfolioAchievements } from '@/components/portfolio/PortfolioAchievements'
 import { Lock, ArrowLeft } from 'lucide-react'
+import { BRAND } from '@/lib/brand'
 
 interface PageProps {
   params: Promise<{ username: string }>
 }
 
-const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://pmacademy.com'
+const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params
@@ -23,8 +24,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!portfolio || !portfolio.user.isPortfolioPublic) {
     return {
-      title: 'Private Portfolio | PM Academy',
-      description: 'This PM Academy learning portfolio is private.',
+      title: 'Private Portfolio',
+      description: `This ${BRAND.fullName} learning portfolio is private.`,
       robots: { index: false, follow: false },
     }
   }
@@ -32,10 +33,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { name, bio, levelInfo, totalXp, avatarUrl } = portfolio.user
   const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, username)
 
-  const metaTitle = `${name}'s PM Portfolio & Skill Radar | PM Academy`
+  const metaTitle = `${name}'s PM Portfolio & Skill Radar`
   const metaDesc = bio
     ? `${name} — ${levelInfo.title} (${totalXp} XP). ${bio}`
-    : `Explore ${name}'s verified Product Management portfolio, continuous skill radar, and applied module capstones on PM Academy.`
+    : `Explore ${name}'s verified Product Management portfolio, continuous skill radar, and applied module capstones on ${BRAND.fullName}.`
 
   return {
     title: metaTitle,
@@ -86,7 +87,7 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
             href="/"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors pt-2"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to PM Academy Home
+            <ArrowLeft className="w-4 h-4" /> Back to {BRAND.product} Home
           </Link>
         </div>
       </div>
@@ -137,7 +138,7 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
           <p>
             Verified Product Management Learning Record powered by{' '}
             <Link href="/" className="font-bold text-primary hover:underline">
-              PM Academy
+              {BRAND.product}
             </Link>
             .
           </p>
