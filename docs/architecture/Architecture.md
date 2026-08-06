@@ -4,7 +4,7 @@
 > [!IMPORTANT]
 > As of the `v1.0.0-foundation` release, the core learning infrastructure (content compiler, block rendering engine, static-first pipeline, routing structure, and database schema) is frozen. Future work must not modify these subsystems unless required for critical security vulnerability fixes or high-severity functional bugs.
 
-**Companion docs:** `INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `Rules.md` (how we work), `Phases.md` (when), `Design.md` (what it looks like), `Supabase-Migration-Guide.md` (how to safely change the schema below — §2 and §9 define what's correct, that doc defines the safe workflow to get there), `content-pipeline.md` and `rendering-pipeline.md` (the authoritative, implementation-ready technical specs for the content compiler and the lesson renderer — §4 and §5 below summarize and defer to them; where this document and either of those two specs conflict, `content-pipeline.md`/`rendering-pipeline.md` win), `Notification-Architecture.md` (the authoritative event-driven notification and email architecture — read before writing any email, notification, or communication code).
+**Companion docs:** `../INDEX.md` (documentation entry point — read this first), `../product/PRD.md` (what/why), `../development/Rules.md` (how we work), `../product/Phases.md` (when), `../design/Design.md` (what it looks like), `Supabase-Migration-Guide.md` (how to safely change the schema below — §2 and §9 define what's correct, that doc defines the safe workflow to get there), `content-pipeline.md` and `rendering-pipeline.md` (the authoritative, implementation-ready technical specs for the content compiler and the lesson renderer — §4 and §5 below summarize and defer to them; where this document and either of those two specs conflict, `content-pipeline.md`/`rendering-pipeline.md` win), `Notification-Architecture.md` (the authoritative event-driven notification and email architecture — read before writing any email, notification, or communication code).
 **Read this before writing any code.** Every choice below is optimized for one constraint set: **solo-founder buildable, low infrastructure cost, static-first architecture targeting ~5,000 users, and capable of scaling later without a rewrite.**
 
 ---
@@ -385,13 +385,13 @@ Implement these as isolated, well-tested modules in `lib/` — each should be in
 
 ## 8. Deployment Pipeline
 
-**Two separate GitHub Actions workflows**, not one — this was tightened after the initial single-pipeline description below turned out to be inaccurate once the database migration workflow was actually built out (see `Supabase-Migration-Guide.md`). Keeping them separate is the right call, not just what happened: app code and database schema have different risk profiles and different rollback procedures, and coupling them into one workflow would mean a flaky content-validation step could block an urgent database fix, or vice versa.
+**Two separate pipelines in one GitHub Actions workflow** (`ci.yml`), not one — this was tightened after the initial single-pipeline description below turned out to be inaccurate once the database migration pipeline was actually built out (see `Supabase-Migration-Guide.md`). Keeping them separate is the right call, not just what happened: app code and database schema have different risk profiles and different rollback procedures, and coupling them into one job would mean a flaky content-validation step could block an urgent database fix, or vice versa.
 
 **App pipeline** (content + Next.js app, triggers on every push/PR):
 ```
 GitHub (push to main or PR)
        ↓
-GitHub Actions — app-deploy.yml
+GitHub Actions — ci.yml (job: build-and-validate)
        ↓
   ┌─ Content Validation (`content:validate` — schema, referential, accessibility rule-plugin registry; per-lesson, non-blocking — content-pipeline.md §4, §10, §11)
   ├─ Content Compile (`content:compile` — incremental, content-addressed; produces content/dist/lessons/*.json, curriculum.json, module-graph.json)
@@ -408,7 +408,7 @@ CI restores/saves `content/.cache/manifest.json` as a cache artifact between run
 ```
 GitHub (push/merge to main)
        ↓
-GitHub Actions — supabase-deploy.yml
+GitHub Actions — ci.yml (job: deploy-supabase, main only)
        ↓
   npx supabase db push (applies new migrations from supabase/migrations/)
 ```
@@ -446,6 +446,7 @@ This stack is chosen specifically so that scaling is a **later, success-driven d
 
 ## Changelog
 
+- v2.6 (2026-08-06) — Documentation structure pass: §8 corrected to match the real CI layout — the app and database pipelines are two jobs (`build-and-validate`, `deploy-supabase`) in one workflow file, `ci.yml`, not the previously-named separate `app-deploy.yml` / `supabase-deploy.yml` files (which never existed). Companion-docs header updated to the new subfolder paths.
 - v2.5 — Realigned with the new, standalone technical specs `content-pipeline.md` and `rendering-pipeline.md`, which now supersede this document's prior content-pipeline detail wherever they conflict. §3: replaced the old flat `content/{roadmap,interview,resume,...}` layout and `public/content/` output with the real `content/modules/**` + `content/dist/**` source/output layout, and updated the app-side folder structure to the `app/academy/**` route + `renderer/`/`blocks/` structure the rendering spec actually calls for (was still showing `app/(app)/curriculum/[moduleSlug]/[lessonSlug]/`). §4: replaced the fixed 20-field flat lesson schema and single-script pipeline description with a summary of the real block-tree compiler (remark/mdast, pattern-matching extractors, content-addressed IDs, per-lesson validation, plugin architecture) — this doc's content-pipeline detail is now a pointer to the authoritative spec, not a competing description. §5: replaced the unspecified Fuse.js/Lunr.js client search library with FlexSearch and added block-aware deep-linking, matching what the two new specs actually build. §8: corrected the deployment pipeline's error-handling rule, which previously said any validation failure aborts the whole build — the real model (per `content-pipeline.md` §4/§10) excludes only the failing lesson and ships the rest. §2: renamed `lesson_slug` to `lesson_id` across all user-state tables (referencing the compiler-assigned stable `lessonId`, not the human-facing slug) and added lesson-scoped flashcard/quiz keys, matching `content-pipeline.md` §5's stable-identifier model — this was a real, previously-undocumented conflict between this doc's slug-based references and the new spec's `(lessonId, blockId)` addressing.
 - v2.4 — Updated §3 and §6 to register the newly isolated domain service layers (xp-service.ts, lessons-completion-service.ts, flashcards-service.ts) and clean feature database helpers (lessons-db.ts, streaks-db.ts).
 - v2.3 — Reconciled §8 with the real, separately-built database migration workflow: split the "single pipeline" into an app pipeline and a database pipeline, cross-referenced the new `Supabase-Migration-Guide.md`, and corrected search-index generation to only run from Phase 4 onward (was incorrectly shown as universal, contradicting the Phase 1→4 move already made in `Phases.md`).

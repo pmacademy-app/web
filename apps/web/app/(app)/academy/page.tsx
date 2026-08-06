@@ -7,7 +7,7 @@ import { createServerSupabaseClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 
 export const metadata: Metadata = {
-  title: 'Curriculum | PM Academy',
+  title: 'Curriculum',
   description: 'All 90 PM Academy lessons across 9 modules — theory, quizzes, flashcards, and reflections.',
 }
 

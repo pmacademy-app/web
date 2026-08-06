@@ -104,7 +104,7 @@ async function runAllEmailEngineTests() {
       templateVariables: { userName: 'Alex', newLevel: 3, totalXp: 900 },
       eventType: 'xp.level_up',
       category: 'achievements',
-      priorityLevel: 'high',
+      priorityLevel: 'critical',
     })
 
     const processResult = await processEmailQueue(10)
@@ -129,6 +129,7 @@ async function runAllEmailEngineTests() {
       eventId: 'evt-dup-100',
       eventType: 'module.completed',
       category: 'learning',
+      priorityLevel: 'critical',
     })
 
     assert.strictEqual(res1.success, true)
@@ -142,6 +143,7 @@ async function runAllEmailEngineTests() {
       eventId: 'evt-dup-100',
       eventType: 'module.completed',
       category: 'learning',
+      priorityLevel: 'critical',
     })
 
     assert.strictEqual(res2.success, false)
@@ -191,6 +193,7 @@ async function runAllEmailEngineTests() {
       templateVariables: {},
       eventType: 'system.weekly_recap',
       category: 'learning',
+      priorityLevel: 'critical',
     })
 
     const processRes = await processEmailQueue(10)
@@ -212,6 +215,7 @@ async function runAllEmailEngineTests() {
       templateVariables: {},
       eventType: 'bad.event',
       category: 'learning',
+      priorityLevel: 'critical',
     })
 
     const processRes = await processEmailQueue(10)

@@ -22,7 +22,7 @@ interface DBChain {
 }
 
 export const metadata: Metadata = {
-  title: 'Dashboard 2.0 | PM Academy',
+  title: 'Dashboard',
   description: 'Track your skill radar, streak, XP rank, and curriculum progress across PM Academy.',
 }
 

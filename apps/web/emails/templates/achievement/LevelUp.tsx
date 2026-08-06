@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 import { StatCard } from '../../components/StatCard'
 
 export interface LevelUpEmailProps {
@@ -17,7 +18,7 @@ export const LevelUpEmail: React.FC<LevelUpEmailProps> = ({
   newLevel = 2,
   levelTitle = 'Associate Product Manager',
   totalXp = 500,
-  appUrl = 'https://pmacademy.com',
+  appUrl = BRAND.siteUrl,
   unsubscribeToken,
 }) => {
   return (

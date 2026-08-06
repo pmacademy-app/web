@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ShieldAlert, ArrowLeft, Lock } from 'lucide-react'
 
 export const metadata = {
-  title: 'Access Denied | PM Academy Admin Console',
+  title: 'Access Denied',
   description: 'Administrator privileges are required to access this area.',
 }
 

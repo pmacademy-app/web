@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
+import { BRAND } from '@/lib/brand'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://pmacademy.com'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export default function robots(): MetadataRoute.Robots {
   return {

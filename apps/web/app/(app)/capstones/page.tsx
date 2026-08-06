@@ -6,7 +6,7 @@ import { CapstoneCard } from '@/components/capstones/CapstoneCard'
 import { Award, BookOpen, Layers, CheckCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Capstone Workspace | PM Academy',
+  title: 'Capstone Workspace',
   description: 'Applied module capstone deliverables for practical product management mastery.',
 }
 

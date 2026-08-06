@@ -4,6 +4,7 @@ import Script from 'next/script'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AuthStateListener from '@/components/layout/AuthStateListener'
+import { BRAND } from '@/lib/brand'
 import '@/app/globals.css'
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
@@ -23,18 +24,17 @@ const fraunces = Fraunces({
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://pmacademy.com'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
 
   title: {
-    default: 'PM Academy — Learn Product Management Free',
-    template: '%s | PM Academy',
+    default: BRAND.metadata.homeTitle,
+    template: BRAND.metadata.titleTemplate,
   },
 
-  description:
-    'A complete, free Product Management curriculum with 90 structured lessons, interactive quizzes, skill analytics, and portfolio projects. Built for career switchers and ambitious builders.',
+  description: BRAND.metadata.description,
 
   keywords: [
     'Product Management course',
@@ -46,29 +46,39 @@ export const metadata: Metadata = {
     'product thinking',
   ],
 
-  authors: [{ name: 'PM Academy', url: siteUrl }],
+  authors: [{ name: BRAND.fullName, url: siteUrl }],
+
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      { rel: 'mask-icon', url: BRAND.assets.safariPinnedTab, color: BRAND.colors.primary },
+    ],
+  },
 
   openGraph: {
     type: 'website',
     url: siteUrl,
-    siteName: 'PM Academy',
-    title: 'PM Academy — Learn Product Management Free',
-    description: '90 lessons. 9 modules. One skill: product judgment. Completely free.',
+    siteName: BRAND.fullName,
+    title: BRAND.metadata.homeTitle,
+    description: BRAND.metadata.shortDescription,
     images: [
       {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'PM Academy — Learn Product Management Free',
+        url: BRAND.assets.ogImage,
+        width: BRAND.assets.ogImageDimensions.width,
+        height: BRAND.assets.ogImageDimensions.height,
+        alt: BRAND.metadata.homeTitle,
       },
     ],
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'PM Academy — Learn Product Management Free',
-    description: '90 lessons. 9 modules. One skill: product judgment. Completely free.',
-    images: ['/og-image.png'],
+    title: BRAND.metadata.homeTitle,
+    description: BRAND.metadata.shortDescription,
+    images: [BRAND.assets.ogImage],
   },
 
   robots: {
@@ -90,7 +100,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#FBFAF6',
+  themeColor: BRAND.colors.background,
   width: 'device-width',
   initialScale: 1,
 }
@@ -105,7 +115,7 @@ const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'PM Academy',
+  name: BRAND.fullName,
   url: siteUrl,
   description: 'A free Product Management learning platform with structured lessons, skill analytics, and portfolio projects.',
 }
@@ -113,7 +123,7 @@ const organizationJsonLd = {
 const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'PM Academy',
+  name: BRAND.fullName,
   url: siteUrl,
   description: 'Learn Product Management free. 90 lessons, 9 modules, portfolio-ready capstones.',
 }
@@ -143,20 +153,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </TooltipProvider>
 
-        {/* Google Tag Manager — architecture-ready */}
-        {GTM_ID && (
-          <Script id="gtm-init" strategy="afterInteractive">
-            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','${GTM_ID}');`}
-          </Script>
-        )}
-
         {/* Google Analytics 4 */}
-        {process.env.NODE_ENV === 'production' && GA_ID && (
-          <GoogleAnalytics gaId={GA_ID} />
+        {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
+
+        {/* Google Tag Manager (optional) */}
+        {GTM_ID && (
+          <Script
+            id="gtm-script"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${GTM_ID}');`,
+            }}
+          />
         )}
       </body>
     </html>

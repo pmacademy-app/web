@@ -16,10 +16,10 @@ import {
   Flag,
   Activity,
   Settings,
-  ShieldAlert,
   ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
 
 export interface NavItem {
   name: string
@@ -50,15 +50,9 @@ export function AdminSidebar() {
     <aside className="w-64 bg-slate-900 border-r border-slate-800 text-slate-200 flex flex-col h-screen sticky top-0">
       {/* Brand Header */}
       <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-sm">
-            <ShieldAlert className="w-4 h-4" />
-          </div>
-          <div>
-            <h1 className="font-bold text-white text-sm tracking-tight">PM Academy</h1>
-            <p className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider">Admin Console</p>
-          </div>
-        </div>
+        <Link href="/admin" className="flex items-center gap-2 focus:outline-none rounded">
+          <BrandMarkProdigy size="sm" badgeText="Admin" onDark />
+        </Link>
         <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-slate-400 border border-slate-700">
           v0.3.0
         </span>

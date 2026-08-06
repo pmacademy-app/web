@@ -207,6 +207,40 @@ const validationRules: ValidationRule[] = [
     },
   },
 
+  // 5b. Static SVG rendering: every mermaid block must carry compiled SVG output.
+  // The browser must never receive raw Mermaid source — this is the build-time gate.
+  {
+    id: 'mermaid-svg',
+    severity: 'error',
+    check(lesson, ctx) {
+      const issues: ValidationIssue[] = [];
+      const checkMermaid = (blocks: any[]) => {
+        for (const block of blocks) {
+          if (block.type === 'mermaid' && typeof block.source === 'string') {
+            const hasSvg = typeof block.svg === 'string' && block.svg.length > 0;
+            const hasStaticSvg = typeof block.staticSvg === 'string' && block.staticSvg.length > 0;
+            if (!hasSvg && !hasStaticSvg) {
+              issues.push({
+                id: 'mermaid-svg',
+                severity: 'error',
+                message: `Mermaid block (${block.blockId || block.id || 'unknown'}) is missing compiled static SVG — compileMermaidToSvg must run at content:compile time`,
+                filePath: ctx.filePath,
+              });
+            }
+          }
+          if (block.children) {
+            checkMermaid(block.children);
+          }
+          if (block.diagram) {
+            checkMermaid([block.diagram]);
+          }
+        }
+      };
+      checkMermaid(lesson.blocks);
+      return issues;
+    },
+  },
+
   // 6. Accessibility image check
   {
     id: 'a11y-image-alt',

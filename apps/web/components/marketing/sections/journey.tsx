@@ -5,6 +5,7 @@ import { motion, useInView } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { JOURNEY_STAGES } from '@/config/content'
 import { SKILL_COLORS } from '@/lib/design/tokens'
+import { TOKENS } from '@/theme/tokens'
 import { cn } from '@/lib/utils'
 
 /**
@@ -61,7 +62,7 @@ export function JourneySection() {
 
           {JOURNEY_STAGES.map((stage, index) => {
             const cluster = stage.cluster
-            const color = cluster ? SKILL_COLORS[cluster] : '#1F6B4E'
+            const color = cluster ? SKILL_COLORS[cluster] : TOKENS.colors.primary
             const isActive = activeStage === index
 
             return (

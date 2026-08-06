@@ -7,7 +7,7 @@ import { getReviewQueueData } from '@/lib/flashcards-service'
 import { ReviewHub } from '@/components/review/ReviewHub'
 
 export const metadata: Metadata = {
-  title: 'Flashcard Review Hub (SM-2) | PM Academy',
+  title: 'Flashcard Review Hub (SM-2)',
   description: 'Daily spaced repetition flashcard practice powered by the SM-2 algorithm.',
 }
 

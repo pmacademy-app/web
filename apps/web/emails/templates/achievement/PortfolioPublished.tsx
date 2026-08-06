@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 
 export interface PortfolioPublishedProps {
   userName?: string
@@ -11,7 +12,7 @@ export interface PortfolioPublishedProps {
 
 export const PortfolioPublished: React.FC<PortfolioPublishedProps> = ({
   userName = 'Learner',
-  portfolioUrl = 'https://pmacademy.com/p/pm-learner',
+  portfolioUrl = `${BRAND.siteUrl}/p/pm-learner`,
   unsubscribeToken,
 }) => {
   return (

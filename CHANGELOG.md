@@ -6,9 +6,48 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 Release notes are ordered reverse-chronologically. Each release categorizes changes under Added, Changed, Fixed, Removed, Technical, Documentation, Verification, and Known Limitations when applicable.
 
----
+## [Unreleased] - Sprint 7.1: Global Branding & Documentation
 
-## [1.0.0-rc1] - 2026-08-05 (PM Academy Release Candidate 1)
+- **Status:** Development Complete — Fully Branded & Synchronized
+- **Release Date:** 2026-08-06
+
+### Added & Standardized
+
+- **Centralized Branding System (`lib/brand.ts`)**:
+  - Defined `BRAND` configuration object with `company` ("Prodigy"), `product` ("PM Academy"), `fullName` ("Prodigy PM Academy"), `shortName` ("PM Academy"), certificate issuer lines, and asset metadata.
+- **Reusable `BrandLogo` Component (`components/brand/BrandLogo.tsx`)**:
+  - Implemented variants: `animated-full` (hero/marketing animation), `full` / `static-full` (navbar, sidebar, auth, admin, certificates, email, footer), `icon` / `mark` (mobile nav, favicon, compact UI).
+- **Static Brand Assets (`public/brand/`)**:
+  - Deployed `logo-full.png` (sourced directly from `docs/design/assets/logo.png`), `logo-mark.png`, `logo-full.svg`, `logo-mark.svg`, `og-image.png`.
+- **Compile-Time Mermaid Static SVG Stage (`scripts/compiler/mermaid-svg.ts`)**:
+  - Added build-time static SVG compilation for Mermaid diagrams styled using design system tokens (`theme/tokens.ts`). Removed runtime client JS overhead.
+- **Documentation Synchronization**:
+  - Updated `docs/INDEX.md`, `CURRENT_STATUS.md`, `Brand-Architecture.md`, `content-pipeline.md`, and resolved items in `KNOWN_ISSUES.md`.
+
+### Changed & Completed
+
+- **Real Vector Brand Assets (`scripts/brand/generate-assets.ts`, `npm run brand:generate`)**:
+  - Replaced the ~883 KB base64-PNG data-URI SVG stubs (every `public/brand/*.svg` was an identical wrapper) with genuine, lightweight vector files (1–3 KB each) generated from the canonical 716×716 vector mark embedded in `docs/design/assets/logo.png` (C2PA content credentials). Emits `logo-mark.svg` (716), `wordmark.svg` (600×200), `logo-full.svg` (800×200), `favicon.svg`, `safari-pinned-tab.svg`, plus `sharp` rasters (`logo-mark.png`, `logo-full.png`, `og-image.png`, `icon-192/512`, `apple-touch-icon.png`) and a real multi-size `favicon.ico` (16/32/48 PNG entries, written to both `public/` and `app/`). Stale `twitter-card.png` / `wordmark.png` are deleted.
+  - All colors source from `theme/tokens.ts` (`TOKENS`); added `cream` / `mint` brand surface tokens.
+  - `lib/brand.ts` now sources `colors` from `TOKENS`, drops dead `twitterCard`/`twitterImage`/`wordmarkPng` keys, and fixes `logoMarkDimensions` (716×716) / `logoFullDimensions` (800×200); `BrandLogo` uses the correct intrinsic ratio for the `wordmark` variant.
+- **Branded Color / Metadata Sourcing**:
+  - `app/layout.tsx` mask-icon color + `themeColor` and `app/manifest.ts` `background_color` / `theme_color` now read from `BRAND`/`TOKENS` instead of hardcoded hexes.
+  - Removed remaining hardcoded brand hexes from `lib/email.ts`, `app/api/email/unsubscribe/route.ts`, and `components/marketing/sections/journey.tsx`; corrected the email `logo-full.png` aspect ratio (192×48).
+- **Mermaid Static Pipeline — completed end-to-end**:
+  - `scripts/compiler/compile.ts` renders **top-level** `mentalModel` / `framework` mermaid blocks (not just code fences) to static SVG; `CACHE_VERSION` bumped to `3` (invalidates old manifest).
+  - Validation rule `mermaid-svg` (error) requires every mermaid block to carry a compiled `svg`/`staticSvg`; `mermaid` zod schema extended.
+  - Runtime path removed: `MarkdownRenderer` drops mermaid fences, `MermaidBlock` renders SVG only (no raw-source fallback), error boundary hides source, dynamic import no longer `ssr:false`, and the unused `mermaid` dependency was removed from `package.json`.
+- **CI Hardening (`.github/workflows/ci.yml`)**:
+  - Added brand checks: no base64 data-URI SVGs in `public/`, and no hardcoded brand hexes outside `theme/tokens.ts`.
+
+### Verification
+
+- 10/10 compiler tests pass, including new tests: mermaid fence → static SVG, top-level `mentalModel`/`framework` → static SVG, and rejection of mermaid blocks lacking compiled SVG.
+- Fresh `npm run content:compile`: 90 lessons emitted; 203/203 mermaid blocks carry SVG (0 missing).
+- `npm run brand:generate` verified (assets 1–39 KB vs. prior ~883 KB; ICO decodes as 16/32/48 PNG entries; rasters render the mark in `#1F6B4E`).
+- `tsc --noEmit`, `eslint`, `test:email` (8/8), and full production `next build` pass clean.
+
+---
 
 - **Status:** Release Candidate Ready for Production Launch
 - **Release Date:** 2026-08-05

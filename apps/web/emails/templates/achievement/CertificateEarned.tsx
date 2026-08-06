@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 
 export interface CertificateEarnedProps {
   userName?: string
@@ -13,7 +14,7 @@ export interface CertificateEarnedProps {
 export const CertificateEarned: React.FC<CertificateEarnedProps> = ({
   userName = 'Learner',
   certificateCode = 'PMA-2026-X8K9L2',
-  verificationUrl = 'https://pmacademy.com/verify/PMA-2026-X8K9L2',
+  verificationUrl = `${BRAND.siteUrl}/verify/PMA-2026-X8K9L2`,
   unsubscribeToken,
 }) => {
   return (

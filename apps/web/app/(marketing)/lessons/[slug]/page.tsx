@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { fetchCompiledLesson, resolveSlugToId } from '@/lib/lesson-loader'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
+import { BRAND } from '@/lib/brand'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -18,11 +19,11 @@ async function getLessonBySlug(slug: string) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const lesson = await getLessonBySlug(slug)
-  if (!lesson) return { title: 'Lesson Not Found | PM Academy' }
+  if (!lesson) return { title: 'Lesson Not Found' }
 
   return {
-    title: `Lesson ${lesson.order}: ${lesson.title} | PM Academy`,
-    description: `Read Lesson ${lesson.order} of PM Academy. ${lesson.title} — Module ${lesson.module}.`,
+    title: `Lesson ${lesson.order}: ${lesson.title}`,
+    description: `Read Lesson ${lesson.order} of ${BRAND.product}. ${lesson.title} — Module ${lesson.module}.`,
     openGraph: {
       title: `Lesson ${lesson.order}: ${lesson.title}`,
       description: `Free Product Management lesson: ${lesson.title}`,
@@ -79,8 +80,8 @@ export default async function PublicLessonPage({ params }: PageProps) {
     description: `Module: ${formatModuleName(lesson.module)}`,
     provider: {
       '@type': 'Organization',
-      name: 'PM Academy',
-      sameAs: 'https://pmacademy.com',
+      name: BRAND.fullName,
+      sameAs: BRAND.siteUrl,
     },
   }
 

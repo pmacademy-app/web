@@ -6,6 +6,8 @@
  * Zero UI coupling.
  */
 
+import { BRAND } from '@/lib/brand'
+
 export interface CredentialJsonLdOptions {
   certificateCode: string
   learnerName: string
@@ -35,7 +37,7 @@ export function generateCertificateCode(
   }
   
   const hexPart = (hash >>> 0).toString(16).padStart(8, '0').substring(0, 8).toUpperCase()
-  return `PMA-${year}-${hexPart}`
+  return `${BRAND.certificateCodePrefix}-${year}-${hexPart}`
 }
 
 /**
@@ -52,7 +54,7 @@ export function generateCredentialJsonLd({
   return {
     '@context': 'https://schema.org',
     '@type': 'EducationalOccupationalCredential',
-    name: `PM Academy Product Management Completion Credential`,
+    name: `${BRAND.fullName} Product Management Completion Credential`,
     credentialCategory: 'Certificate of Completion',
     identifier: certificateCode,
     educationalLevel: careerTitle,
@@ -60,8 +62,8 @@ export function generateCredentialJsonLd({
     url: verificationUrl,
     recognizedBy: {
       '@type': 'Organization',
-      name: 'PM Academy',
-      url: 'https://pmacademy.com',
+      name: BRAND.fullName,
+      url: BRAND.siteUrl,
     },
     grantee: {
       '@type': 'Person',

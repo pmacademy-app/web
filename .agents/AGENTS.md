@@ -1,7 +1,7 @@
 # PM Academy — Agent Rules (AGENTS.md)
 
 **This file applies to ALL AI agents working in this workspace.**
-Read this before any other file. Then read `docs/INDEX.md` — it is the documentation entry point that maps every document, defines the reading order, and resolves conflicts between docs. Review `docs/CURRENT_STATUS.md`, `docs/IMPLEMENTATION_RULES.md`, and `docs/DO_NOT_CHANGE.md` before writing code to align on current status, coding rules, and invariants. Then load `docs/Architecture.md`, `docs/PRD.md`, `docs/Rules.md`, `docs/Phases.md`, and `docs/Design.md`.
+Read this before any other file. Then read `docs/INDEX.md` — it is the documentation entry point that maps every document, defines the reading order, and resolves conflicts between docs. Review `docs/CURRENT_STATUS.md`, `docs/development/IMPLEMENTATION_RULES.md`, and `docs/development/DO_NOT_CHANGE.md` before writing code to align on current status, coding rules, and invariants. Then load `docs/architecture/Architecture.md`, `docs/product/PRD.md`, `docs/development/Rules.md`, `docs/product/Phases.md`, and `docs/design/Design.md`.
 
 ---
 
@@ -25,7 +25,7 @@ Read this before any other file. Then read `docs/INDEX.md` — it is the documen
 **Next.js 16 App Router + TypeScript 5 (strict) + Tailwind CSS v4 + shadcn/ui + Framer Motion**
 **Supabase (PostgreSQL + Auth) + Vercel + Resend SMTP + Google Analytics**
 
-See `docs/Architecture.md §1` for the full locked-in stack table.
+See `docs/architecture/Architecture.md §1` for the full locked-in stack table.
 
 ---
 

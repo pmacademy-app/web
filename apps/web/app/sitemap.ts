@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next'
 import fs from 'fs'
 import path from 'path'
+import { BRAND } from '@/lib/brand'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://pmacademy.com'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [

@@ -16,7 +16,7 @@
 
 ## 2. Project Stage & Milestones
 
-For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roadmap.md`](./memory/roadmap.md).
+For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/memory/roadmap.md`](./memory/roadmap.md).
 
 - **Phase 1 Foundation & Learning Loop:** ✅ Complete
 - **Phase 2 Gamification & Retention Layer:** ✅ Complete (`v0.2.0-stable`)
@@ -36,16 +36,17 @@ For phase definitions, see [`docs/Phases.md`](./Phases.md) and [`docs/memory/roa
 - **Phase 3 – Sprint 6.4.3 (Admin Operational Functionality & Live Actions):** ✅ Complete (Interactive user role toggles, user profile inspection `/admin/users/[id]`, manual queue trigger, live feature flag toggles, test email sender)
 - **Phase 3 – Sprint 6.4.4 (Admin Authentication, RBAC & Access Security):** ✅ Complete (`/admin/login`, `/admin/access-denied`, `ADMIN_EMAILS` env support, proxy middleware & API guard audit logging)
 - **Sprint 6.5 (Release Candidate & Production Readiness Audit):** ✅ Complete (`v1.0.0-rc1` ready for production tagging)
-- **Current Focus:** Awaiting Final Manual Review before Release Candidate Tagging & Public Launch
+- **Sprint 7.1 (Global Branding & Documentation):** ✅ Complete (`lib/brand.ts`, `BrandLogo` system, static brand assets, full rebrand pass across app/emails/certs/admin, build-time Mermaid→SVG static compilation stage, documentation sync)
+- **Current Focus:** Ready for Sprint 7.2 (Settings 2.0)
 
 ---
 
 ## 3. What's Next
 
-Sprint 6.3 In-App Notifications is complete with 22 passing notification unit tests (91+ total unit tests). Awaiting review before **Sprint 6.4**:
+Sprint 7.1 Global Branding & Documentation complete. Ready for **Sprint 7.2 (Settings 2.0)**:
 
-1. **[Phase 3 - Sprint 6.4 — Next] Admin Console UI:** Modular `/admin` dashboard views (Dashboard, Users, Notifications, Emails, System).
-2. **[Phase 3 - Sprint 7] Peer Review & Feedback Engine:** Structured evaluation criteria and peer feedback loops for capstone submissions.
+1. **[Sprint 7.2 — Next] Settings 2.0:** Unified Settings IA (Profile, Security, Portfolio, Notifications, Danger Zone) with ledger-respecting reset actions.
+2. **[Sprint 7.3] Certificate System 2.0:** Versioned certificates, QR verification, and LinkedIn profile integration.
 
 ---
 

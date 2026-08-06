@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 
 export interface PasswordResetProps {
   userName?: string
@@ -9,7 +10,7 @@ export interface PasswordResetProps {
 
 export const PasswordReset: React.FC<PasswordResetProps> = ({
   userName = 'Learner',
-  resetUrl = 'https://pmacademy.com/auth/reset-password',
+  resetUrl = `${BRAND.siteUrl}/auth/reset-password`,
 }) => {
   return (
     <EmailWrapper previewText="Reset your PM Academy account password.">

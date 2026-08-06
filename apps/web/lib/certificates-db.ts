@@ -6,6 +6,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
+import { BRAND } from '@/lib/brand'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { generateCertificateCode } from '@/lib/certificates'
 
@@ -112,7 +113,7 @@ export async function issueCertificate(
 export async function verifyCertificate(
   supabase: SupabaseClient<Database>,
   codeOrId: string,
-  siteOrigin: string = 'https://pmacademy.com'
+  siteOrigin: string = BRAND.siteUrl
 ): Promise<VerifiedCertificatePayload | null> {
   const cleanCode = codeOrId.trim()
 

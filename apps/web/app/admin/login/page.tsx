@@ -5,11 +5,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ShieldCheck, Lock, Mail, Loader2, ArrowRight } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { BRAND } from '@/lib/brand'
 
 /**
  * Admin Console login.
  *
- * PM Academy has a SINGLE authentication system: this page authenticates the
+ * This app has a SINGLE authentication system: this page authenticates the
  * user with the same Supabase account used for the learner side. After
  * authentication, authorization (ADMIN_EMAILS OR users.is_admin) is verified
  * server-side before routing:
@@ -86,7 +87,7 @@ export default function AdminLoginPage() {
           <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold mx-auto shadow-inner">
             <ShieldCheck className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">PM Academy</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">{BRAND.fullName}</h1>
           <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider">Operational Control Center Login</p>
         </div>
 

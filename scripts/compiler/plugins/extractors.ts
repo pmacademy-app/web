@@ -1,6 +1,7 @@
 import { Block, GlossaryEntrySchema, FlashcardSchema, QuizQuestionSchema } from '../schema/block-schema';
 import { CompilerContext, ValidationIssue } from './remark-plugins';
 import { generateBlockId } from '../registry';
+import { compileMermaidToSvg } from '../mermaid-svg';
 import { z } from 'zod';
 
 export function toMarkdown(node: any): string {
@@ -75,12 +76,18 @@ export function mdastToBlocks(nodes: any[], lessonId: string): any[] {
       blocks.push(block);
     } else if (node.type === 'code') {
       if (node.lang === 'mermaid') {
+        const source = node.value;
+        const normalized = node.data?.mermaid?.normalized || node.value;
+        const authorTheme = node.data?.mermaid?.authorTheme;
+        const svg = compileMermaidToSvg(source, authorTheme);
         const block: any = {
           type: 'mermaid',
           id: `mer-${lessonId}`,
-          source: node.value,
-          normalized: node.data?.mermaid?.normalized || node.value,
-          authorTheme: node.data?.mermaid?.authorTheme,
+          source,
+          normalized,
+          authorTheme,
+          svg,
+          staticSvg: svg,
         };
         block.blockId = generateBlockId(lessonId, block);
         // Sync ID of mermaid block

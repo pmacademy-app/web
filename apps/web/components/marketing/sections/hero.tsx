@@ -10,6 +10,7 @@ import { WaitlistForm } from '@/components/forms/waitlist-form'
 import { trackHeroCTAClick } from '@/lib/analytics'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { FADE_UP, STAGGER_CONTAINER } from '@/lib/animation'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { ArrowRight, GraduationCap } from 'lucide-react'
 
 /**
@@ -51,6 +52,10 @@ export function HeroSection() {
             animate="visible"
             className="flex flex-col gap-6"
           >
+            <motion.div variants={prefersReducedMotion ? undefined : FADE_UP}>
+              <BrandLogo variant="animated-full" size="xl" priority className="justify-start" />
+            </motion.div>
+
             {/* Badge */}
             <motion.div variants={prefersReducedMotion ? undefined : FADE_UP}>
               <span className="

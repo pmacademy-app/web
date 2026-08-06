@@ -7,7 +7,7 @@ import { BadgeCard } from '@/components/badges/BadgeCard'
 import { Trophy, Award, Sparkles } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Badge & Achievement Gallery | PM Academy',
+  title: 'Badge & Achievement Gallery',
   description:
     'Celebrate genuine product management learning milestones, streak habits, and capstone achievements.',
 }

@@ -8,7 +8,7 @@ import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable'
 import { Users, Shield, Trophy } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Consistency Leaderboard & Cohorts | PM Academy',
+  title: 'Consistency Leaderboard & Cohorts',
   description:
     'Weekly product management learning consistency rankings, study streak accountability, friend comparisons, and cohorts.',
 }

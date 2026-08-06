@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
 
 const requestSchema = z.object({
   email: z
@@ -234,7 +235,8 @@ function ResetPasswordHeader() {
   const isUpdateMode = mode === 'update'
 
   return (
-    <div className="text-center mb-8">
+    <div className="text-center mb-8 flex flex-col items-center">
+      <BrandMarkProdigy size="md" className="mb-4" />
       <h1 className="text-2xl font-bold font-serif text-foreground mb-2">
         {isUpdateMode ? 'Set New Password' : 'Reset Your Password'}
       </h1>

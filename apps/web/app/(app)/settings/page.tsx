@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import { SettingsTabs } from '@/components/settings/SettingsTabs'
 import { Settings, Shield } from 'lucide-react'
+import { BRAND } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Settings & Preferences | PM Academy',
-  description: 'Manage your PM Academy public portfolio handle, notification preferences, and privacy controls.',
+  title: 'Settings & Preferences',
+  description: `Manage your ${BRAND.product} public portfolio handle, notification preferences, and privacy controls.`,
 }
 
 export default function SettingsPage() {
@@ -33,7 +34,7 @@ export default function SettingsPage() {
       <div className="p-4 rounded-xl border border-border bg-card/40 text-xs text-muted-foreground flex items-start gap-3">
         <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          <strong className="text-foreground font-semibold">Privacy Commitment:</strong> PM Academy never sells or exposes private reflection notes. Only reflections and capstones explicitly marked as public will appear on your public portfolio page.
+          <strong className="text-foreground font-semibold">Privacy Commitment:</strong> {BRAND.product} never sells or exposes private reflection notes. Only reflections and capstones explicitly marked as public will appear on your public portfolio page.
         </p>
       </div>
     </div>

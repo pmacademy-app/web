@@ -8,43 +8,44 @@ import { BadgeEarnedEmail } from './templates/achievement/BadgeEarned'
 import { LevelUpEmail } from './templates/achievement/LevelUp'
 import { CertificateEarned } from './templates/achievement/CertificateEarned'
 import { PortfolioPublished } from './templates/achievement/PortfolioPublished'
+import { BRAND } from '@/lib/brand'
 
 export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType<Record<string, unknown>>; subjectLine: string }> = {
   'auth.welcome': {
     component: WelcomeEmail,
-    subjectLine: 'Welcome to PM Academy! 🎉',
+    subjectLine: `Welcome to ${BRAND.shortName}!`,
   },
   'auth.verify_email': {
     component: VerifyEmail,
-    subjectLine: 'Confirm your PM Academy email address',
+    subjectLine: `Confirm your ${BRAND.shortName} email address`,
   },
   'auth.password_reset': {
     component: PasswordReset,
-    subjectLine: 'Reset your PM Academy password',
+    subjectLine: `Reset your ${BRAND.shortName} password`,
   },
   'learning.module_complete': {
     component: ModuleCompletedEmail,
-    subjectLine: 'Module Complete: {{moduleName}}! 🏆',
+    subjectLine: 'Module Complete: {{moduleName}}!',
   },
   'learning.weekly_recap': {
     component: WeeklyRecap,
-    subjectLine: 'Your Week in PM Academy 📊',
+    subjectLine: `Your Week in ${BRAND.shortName}`,
   },
   'achievement.badge_earned': {
     component: BadgeEarnedEmail,
-    subjectLine: 'New Badge Unlocked: {{badgeName}}! 🏅',
+    subjectLine: 'New Badge Unlocked: {{badgeName}}!',
   },
   'achievement.level_up': {
     component: LevelUpEmail,
-    subjectLine: 'Level Up Unlocked: Level {{newLevel}}! 🚀',
+    subjectLine: 'Level Up Unlocked: Level {{newLevel}}!',
   },
   'achievement.certificate': {
     component: CertificateEarned,
-    subjectLine: 'Your PM Academy Certificate is Ready! 🎓',
+    subjectLine: `Your ${BRAND.shortName} Certificate is Ready!`,
   },
   'achievement.portfolio_published': {
     component: PortfolioPublished,
-    subjectLine: 'Your Public Portfolio is Live! 🌐',
+    subjectLine: 'Your Public Portfolio is Live!',
   },
 }
 
@@ -73,7 +74,6 @@ export async function renderEmailTemplate(
   const html = `<!DOCTYPE html>${rawHtml}`
   const text = stripHtmlToPlainText(rawHtml)
 
-  // Replace subject line variables e.g. {{badgeName}}
   let subject = entry.subjectLine
   for (const [k, v] of Object.entries(variables)) {
     subject = subject.replace(new RegExp(`{{${k}}}`, 'g'), String(v))

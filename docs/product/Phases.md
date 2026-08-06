@@ -1,7 +1,7 @@
 # PM Academy — Phases (Roadmap & Milestones)
 
 **Status:** Living document — single source of truth for sequencing and "what does done mean" at each stage.
-**Companion docs:** `INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `Architecture.md` (how, technically), `Rules.md` (how we work), `Design.md` (what it looks like), `content-pipeline.md` and `rendering-pipeline.md` (the exact compiler/renderer this roadmap's Phase 0/1/4 milestones build).
+**Companion docs:** `../INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `../architecture/Architecture.md` (how, technically), `../development/Rules.md` (how we work), `../design/Design.md` (what it looks like), `../architecture/content-pipeline.md` and `../architecture/rendering-pipeline.md` (the exact compiler/renderer this roadmap's Phase 0/1/4 milestones build).
 **Context:** Solo-founder execution, optionally aided by AI coding assistants. Timelines are directional (weeks from kickoff) and phases can overlap where explicitly noted — treat the *sequence and definition-of-done* as the fixed part, and the week numbers as recalibratable based on actual solo-founder bandwidth.
 
 ---

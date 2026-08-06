@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-head-element */
 import React from 'react'
+import { BRAND } from '@/lib/brand'
 
 export interface EmailWrapperProps {
   children: React.ReactNode
@@ -12,7 +13,7 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
   previewText,
   unsubscribeToken,
 }) => {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pmacademy.com'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl
   const unsubscribeUrl = unsubscribeToken
     ? `${appUrl}/api/email/unsubscribe?token=${unsubscribeToken}`
     : `${appUrl}/settings?tab=notifications`
@@ -22,7 +23,7 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PM Academy</title>
+        <title>{BRAND.fullName}</title>
         {previewText && (
           <div
             style={{
@@ -59,24 +60,26 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
           cellSpacing={0}
           style={{ width: '100%', maxWidth: '560px', margin: '0 auto' }}
         >
-          {/* Header */}
           <tr>
             <td style={{ paddingBottom: '24px', textAlign: 'left' }}>
-              <span
-                style={{
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  fontSize: '22px',
-                  fontWeight: 'bold',
-                  color: '#1a1a1a',
-                  letterSpacing: '-0.5px',
-                }}
-              >
-                PM Academy
-              </span>
+              <table role="presentation" border={0} cellPadding={0} cellSpacing={0}>
+                <tr>
+                  <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+                    <img
+                      src={`${appUrl}${BRAND.assets.logoMarkPng}`}
+                      alt={BRAND.company}
+                      height="32"
+                      style={{ display: 'block', border: 'none', borderRadius: '4px', width: 'auto' }}
+                    />
+                  </td>
+                  <td style={{ verticalAlign: 'middle', fontSize: '18px', fontWeight: 'bold', color: '#1F6B4E' }}>
+                    {BRAND.company}
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
-          {/* Main Card */}
           <tr>
             <td
               style={{
@@ -91,7 +94,6 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
             </td>
           </tr>
 
-          {/* Footer */}
           <tr>
             <td
               style={{
@@ -103,7 +105,7 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
               }}
             >
               <p style={{ margin: '0 0 8px 0' }}>
-                PM Academy — 90 lessons. 9 modules. Free forever.
+                {BRAND.fullName} - {BRAND.positioning}
               </p>
               <p style={{ margin: '0' }}>
                 <a
@@ -112,7 +114,7 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
                 >
                   Manage Preferences
                 </a>
-                ·
+                {' · '}
                 <a
                   href={unsubscribeUrl}
                   style={{ color: '#737373', textDecoration: 'underline', marginLeft: '12px' }}
@@ -121,7 +123,7 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
                 </a>
               </p>
               <p style={{ margin: '12px 0 0 0', color: '#a3a3a3' }}>
-                © {new Date().getFullYear()} PM Academy. All rights reserved.
+                © {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
               </p>
             </td>
           </tr>

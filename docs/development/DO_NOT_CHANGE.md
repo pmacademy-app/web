@@ -1,7 +1,7 @@
 # PM Academy — Do Not Change (Architectural Invariants)
 
 > **Core System Invariants.** This document outlines the fundamental architectural design decisions of the PM Academy codebase. These decisions are locked to preserve the project's ₹0-infrastructure constraint, performance budget, and data integrity. Do **not** modify, bypass, or refactor these paradigms without deliberate architectural discussion.
-> **Documentation entry point:** See [`docs/INDEX.md`](./INDEX.md) for the full doc map.
+> **Documentation entry point:** See [`docs/INDEX.md`](../INDEX.md) for the full doc map.
 
 ---
 

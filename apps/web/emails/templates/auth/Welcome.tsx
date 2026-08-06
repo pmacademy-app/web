@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 
 export interface WelcomeEmailProps {
   userName?: string
@@ -10,7 +11,7 @@ export interface WelcomeEmailProps {
 
 export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
   userName = 'Learner',
-  appUrl = 'https://pmacademy.com',
+  appUrl = BRAND.siteUrl,
   unsubscribeToken,
 }) => {
   return (

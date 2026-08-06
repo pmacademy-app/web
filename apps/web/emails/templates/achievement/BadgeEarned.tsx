@@ -1,6 +1,7 @@
 import React from 'react'
 import { EmailWrapper } from '../../components/EmailWrapper'
 import { Button } from '../../components/Button'
+import { BRAND } from '@/lib/brand'
 import { BadgeDisplay } from '../../components/BadgeDisplay'
 
 export interface BadgeEarnedEmailProps {
@@ -17,7 +18,7 @@ export const BadgeEarnedEmail: React.FC<BadgeEarnedEmailProps> = ({
   badgeName = 'First Step',
   badgeDescription = 'Completed your very first PM Academy lesson',
   badgeIcon = '🏅',
-  appUrl = 'https://pmacademy.com',
+  appUrl = BRAND.siteUrl,
   unsubscribeToken,
 }) => {
   return (

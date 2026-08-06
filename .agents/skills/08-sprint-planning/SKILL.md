@@ -38,7 +38,7 @@ Load `00-pm-academy-core` alongside this skill.
 
 ## 2. Phase Scope & Definition of Done
 
-Check `docs/Phases.md` for current phase completion status. Timelines are directional, but sequencing is fixed.
+Check `docs/product/Phases.md` for current phase completion status. Timelines are directional, but sequencing is fixed.
 
 ### Phase 0 — Foundation (Completed/Scaffolding)
 **Scope:** Content pipeline, design system, repo scaffolding, auth, waitlist, Google Analytics, Resend SMTP, CI/CD.
@@ -139,7 +139,7 @@ Phase 4: SEO pass → Phase 5 (lesson pages must be indexable before launch)
 
 ## 5. Recurring Open Decisions (check before planning)
 
-Before each sprint, check `docs/PRD.md §11`:
+Before each sprint, check `docs/product/PRD.md §11`:
 
 | Decision | Blocks | Action |
 |----------|--------|--------|
