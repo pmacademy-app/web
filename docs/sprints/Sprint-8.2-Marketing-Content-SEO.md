@@ -1,7 +1,7 @@
 # Sprint 8.2 — Marketing Content & SEO
 
 **Phase:** 4 (Public Launch Preparation) · **Depends on:** Sprint 8.1 (pages must exist before they can be optimized/indexed). · **Blocks:** Sprint 8.6 (Public Launch QA verifies SEO/search as part of final regression).
-**Companion docs:** `content-pipeline.md §8` (search index generation — already runs on every compile, unaffected by this sprint), `rendering-pipeline.md §8` (`SearchOverlay` spec this sprint turns on), `Design.md §6` (SEO strategy), `PRD.md §5` (SEO as a non-functional requirement).
+**Companion docs:** `../architecture/content-pipeline.md §8` (search index generation — already runs on every compile, unaffected by this sprint), `../architecture/rendering-pipeline.md §8` (`SearchOverlay` spec this sprint turns on), `../design/Design.md §6` (SEO strategy), `../product/PRD.md §5` (SEO as a non-functional requirement).
 
 ---
 

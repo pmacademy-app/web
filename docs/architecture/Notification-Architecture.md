@@ -4,7 +4,7 @@
 **Version:** 1.2
 **Created:** 2026-08-05
 **Owner:** Solo founder
-**Companion docs:** `Architecture.md`, `PRD.md`, `AUTH_FLOW.md`, `Phases.md`
+**Companion docs:** `Architecture.md`, `../product/PRD.md`, `AUTH_FLOW.md`, `../product/Phases.md`
 
 > [!IMPORTANT]
 > This is the **single source of truth** for every notification, communication, and email feature in PM Academy. No notification system may be built without first aligning to this blueprint. Read this before writing any email-related code.

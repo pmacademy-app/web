@@ -1,7 +1,7 @@
 # Prodigy PM Academy — Roadmap (Phase 3.7 → Public Launch)
 
 **Status:** Authoritative sequencing document from this point forward. **Supersedes `Phases.md`** for everything after Phase 3 (Phases 0–3 in `Phases.md` are historical record — accurate, complete, and archived alongside this doc's predecessor once this ships; see `Documentation-Synchronization-Report.md §2.1`).
-**Companion docs:** `INDEX.md`, `PRD.md`, `Architecture.md` (esp. the narrowed freeze in §0), `Architecture-Review-Report.md`, `Product-Review-Report.md`, `Brand-Architecture.md`, and the per-sprint docs under `docs/sprints/`.
+**Companion docs:** `../INDEX.md`, `PRD.md`, `../architecture/Architecture.md` (esp. the narrowed freeze in §0), `../reports/Architecture-Review-Report.md`, `../reports/Product-Review-Report.md`, `Brand-Architecture.md`, and the per-sprint docs under `docs/sprints/`.
 **Where the project actually is:** `v1.0.0-rc1`. Phases 0–3 (Foundation → Core Loop → Gamification → Depth/Retention, including capstones, badges, leaderboard, portfolio, certificates, and the notification platform) are complete per `CURRENT_STATUS.md`. This document picks up from there.
 
 ---

@@ -1,7 +1,7 @@
 # Sprint 8.6 — Public Launch QA
 
 **Phase:** 4 (Public Launch Preparation) · **Depends on:** every prior sprint in this roadmap (7.1–8.5) — this is the final gate before Phase 5. · **Blocks:** Phase 5 (Public Launch) — launch does not proceed until this sprint's Definition of Done is met.
-**Companion docs:** `Roadmap.md` (Phase 5's launch-week success criteria, carried forward unchanged), `Sprint 7.5` (the checklist this sprint re-runs as its baseline), original `Phases.md` Phase 1 Definition of Done (the zero-P0-bugs-in-the-core-loop gate, still the single highest-priority invariant in the entire roadmap).
+**Companion docs:** `../product/Roadmap.md` (Phase 5's launch-week success criteria, carried forward unchanged), `Sprint 7.5` (the checklist this sprint re-runs as its baseline), original `../product/Phases.md` Phase 1 Definition of Done (the zero-P0-bugs-in-the-core-loop gate, still the single highest-priority invariant in the entire roadmap).
 
 ---
 

@@ -3,7 +3,7 @@
 
 > **Status**: Implementation-ready blueprint for a standalone rebuild.
 > **Supersedes**: `md-to-json-pipeline-audit.md` (v1).
-> **Documentation entry point**: See `INDEX.md` for the full doc map and source-of-truth rules.
+> **Documentation entry point**: See `../INDEX.md` for the full doc map and source-of-truth rules.
 > **Audience**: Engineers building the new compiler from scratch.
 > **Grounded in**: `lesson-001.md` (the actual reference lesson) — every schema, parser, and block type below is derived from patterns that already exist in real PM Academy content, not invented conventions authors would need to adopt. Where this spec previously proposed a convention that didn't match real lessons (YAML frontmatter, `:::` directive syntax for existing block types), it has been corrected in place; see the inline notes marked **(aligned to lesson-001.md)**.
 
@@ -52,7 +52,7 @@ flowchart LR
     H --> K[content/dist/**]
     I --> K
     J --> K
-    K --> L[Rendering Pipeline\nsee rendering-pipeline-spec-v2.md]
+    K --> L[Rendering Pipeline\nsee rendering-pipeline.md]
 ```
 
 Key structural change from v1: **validation no longer gates the whole build.** Each lesson compiles independently; a lesson with `error`-level issues is excluded from the output set and flagged in a build report, but does not block the other 400 lessons from shipping.
@@ -170,7 +170,9 @@ A pipeline of composable `unified` plugins, each with a single responsibility (m
 | Plugin | Responsibility |
 |---|---|
 | `remark-normalize-whitespace` | Line-ending / trailing-whitespace normalization (replaces bespoke `normalizeMarkdownText`) |
-| `remark-mermaid-extract` | Finds ` ```mermaid ` fences, normalizes and validates syntax (wraps existing `lib/mermaid/normalize.ts` logic, ported to operate on AST nodes instead of strings). **(aligned to lesson-001.md)** Real diagrams are authored with a hand-written `%%{init: {...}}%%` theme-config block hardcoding a dark palette — this plugin **extracts that config separately** from the diagram body: the raw diagram (`graph LR ...`) is stored as `normalized`, and the author's `themeVariables` are stored as `authorTheme` (used as the lesson's custom accent palette, e.g. the `#8b5cf6` purple), while the base dark/light *swap* is still applied dynamically by the renderer from `resolvedTheme` (rendering spec §4.1). This means authors keep hand-tuning diagram colors exactly as they do today, without fighting the renderer's theme system at runtime. |
+| `remark-mermaid-extract` | Finds ` ```mermaid ` fences, normalizes and validates syntax (wraps existing `lib/mermaid/normalize.ts` logic, ported to operate on AST nodes instead of strings). **(aligned to lesson-001.md)** Real diagrams are authored with a hand-written `%%{init: {...}}%%` theme-config block hardcoding a dark palette — this plugin **extracts that config separately** from the diagram body: the raw diagram (`graph LR ...`) is stored as `normalized`, and the author's `themeVariables` are stored as `authorTheme` (used as the lesson's custom accent palette, e.g. the `#8b5cf6` purple). The static SVG stage (§3) compiles from this extracted source, so authors keep hand-tuning diagram colors exactly as they do today. |
+
+> **Shipped (Sprint 7.1): build-time Mermaid→SVG stage.** Diagrams are rendered to static SVG at `content:compile` time via `scripts/compiler/mermaid-svg.ts`, styled from `theme/tokens.ts` (per `Architecture-Review-Report.md §6`). Every mermaid block — code fences, `mentalModel.diagram`, and `framework.diagram` — must carry a compiled `svg` (or `staticSvg`) string or the build fails (validation rule `mermaid-svg`). The browser never receives raw Mermaid source or the Mermaid runtime; `MarkdownRenderer` drops mermaid fences and `MermaidBlock` renders only the compiled SVG. The dark/light theme *swap* is no longer applied at runtime — diagrams ship as static SVG authored with the lesson's `authorTheme` palette.
 | `remark-glossary-collect` | Collects each lesson's authored Glossary table entries (no lookup against a shared file — see §2) and tags each with `sourceLesson` for the Stage 8 cross-lesson aggregation step |
 | `remark-asset-resolve` | Resolves relative image/video paths to asset-pipeline IDs (§7) |
 | `remark-heading-ids` | Injects stable slugged IDs on every heading, for deep-linking and search-result anchors |
@@ -206,7 +208,7 @@ type Block =
   | { type: 'reflection'; prompts: string[] }
   | { type: 'quiz'; id: string; questions: QuizQuestion[] }
   | { type: 'connections'; previous?: LessonRef; current: LessonRef; next?: LessonRef; unlocks: { lesson: LessonRef; coreIdea: string }[] }
-  | { type: 'mermaid'; id: string; source: string; normalized: string; authorTheme?: Record<string, string> }
+  | { type: 'mermaid'; id: string; source: string; normalized: string; authorTheme?: Record<string, string>; svg?: string; staticSvg?: string }
 
   // Callouts are supported but optional — no lesson currently uses them; kept for authors who want a styled aside
   | { type: 'callout'; variant: 'info'|'warning'|'tip'|'danger'; children: Block[] }
@@ -243,6 +245,7 @@ Rule categories:
 - **Structural** — required blocks present (Learning Objectives, ≥3 quiz questions), no duplicate headings, Learning Path table present and parses against `lesson-metadata.schema.ts` (zod) — the table-parsing equivalent of frontmatter validation.
 - **Referential** — prerequisite lesson references (title/number, as authored) resolve against the ID registry and `curriculum.json`; internal links aren't dangling; a term appearing in more than one lesson's Glossary table with a materially different definition is flagged (cross-lesson consistency check, run at the Stage 8 aggregation step).
 - **Content-quality** — duplicate-paragraph detection (ported from v1), Mermaid syntax/readability (ported from v1's `validateMermaidSyntax`/`validateDiagramReadability`).
+- **Mermaid SVG** (new) — every mermaid block with a `source` string must carry a compiled static `svg`/`staticSvg` (`mermaid-svg` rule); recursive over `children`/`diagram`, so top-level `mentalModel`/`framework` diagrams are covered.
 - **Accessibility** (new, see §9) — alt text present, heading hierarchy not skipped, quiz options operable without color alone.
 - **Schema** — every block validates against its `zod` schema for that `schemaVersion`.
 
@@ -408,7 +411,7 @@ No changes to `compiler.ts`, `validator.ts`, or the block-tree extraction core. 
 - All images/video/diagrams referenced from markdown are resolved during Stage 2 to asset records: `{ assetId, sourcePath, hash, dimensions, mimeType }`.
 - **Build-time image optimization**: generate responsive variants (AVIF/WebP + fallback) and content-hashed filenames for cache-busting, written to `content/dist/assets/<hash>.<ext>`.
 - **Dead-asset detection**: a build step diffs `_assets/**` against referenced `assetId`s and warns (not errors) on orphaned files.
-- **Mermaid diagrams** are treated as a special asset subtype: normalized source is stored in the block JSON (for live re-render/theming client-side, matching v1's dynamic dark/light behavior), *and* optionally pre-rendered to a static SVG at build time as a fallback for no-JS / print / SEO contexts.
+- **Mermaid diagrams** are a special asset subtype: the normalized source is stored in the block JSON for debugging/SEO, and every mermaid block **must** carry a build-time-compiled static SVG (`svg` / `staticSvg`) produced by `scripts/compiler/mermaid-svg.ts` — the renderer ships zero Mermaid runtime JS (see §3 note).
 - **Video**: stores `assetId` + auto-detected/uploaded caption track reference — captions are **required** by the accessibility validation rule (§9), not optional.
 
 ---
@@ -447,6 +450,7 @@ Ported into Stage 4 as first-class rules, not left to the renderer alone:
 |---|---|---|
 | Single lesson has an `error`-level validation issue | **Entire build aborts** | Only that lesson is excluded from `content/dist/`; build report lists it; other lessons ship normally |
 | Mermaid syntax invalid | Build-wide error | Lesson-level error; diagram block flagged, rest of lesson still compiles if severity policy allows |
+| Mermaid block missing compiled static SVG (`svg`/`staticSvg`) | — | Lesson-level error (`mermaid-svg` rule) |
 | Missing required section (Quiz, Learning Path) | Build-wide error | Lesson-level error |
 | Schema version mismatch on cached JSON | Not handled (v1 has no schemaVersion) | Auto-migrated via `migrations/` (see §4) |
 | CI gating | Non-zero exit on any error | Configurable threshold: fail on error-count > 0 (strict) or only on lessons touched in the current PR (fast iteration mode) |
@@ -481,7 +485,7 @@ Ported into Stage 4 as first-class rules, not left to the renderer alone:
 4. **Mermaid theme extraction**: a one-time pass runs the new `remark-mermaid-extract` plugin (§3, Stage 2) across all existing diagrams to split the hand-authored `%%{init}%%` block into `authorTheme`, verifying the extracted diagram still renders identically before/after — a diff-based regression check, not a content edit (the `.md` source is untouched; only the compiler's *reading* of it changes).
 5. **Search index backfill**: run the Stage 7 indexer once against all migrated content to produce the initial index; no source-content changes needed.
 6. **Directives are additive only.** New block types introduced going forward (tabs, video, aiPrompt, etc.) use `:::` directive syntax in *new* lessons or *new* sections of existing lessons — existing quiz/flashcard/glossary content is never retrofitted to directives, since the pattern-matching extractors already handle it losslessly.
-7. **Parallel-run period**: recommend running v1 and v2 compilers side-by-side against the same, unmodified source tree for one release cycle, diffing outputs field-by-field (this is now a meaningful diff, since the source itself hasn't changed — any discrepancy is a parser bug, not a content-migration artifact), before cutting the renderer over (see rendering-pipeline-spec-v2.md §10 for the corresponding renderer migration plan).
+7. **Parallel-run period**: recommend running v1 and v2 compilers side-by-side against the same, unmodified source tree for one release cycle, diffing outputs field-by-field (this is now a meaningful diff, since the source itself hasn't changed — any discrepancy is a parser bug, not a content-migration artifact), before cutting the renderer over (see rendering-pipeline.md §10 for the corresponding renderer migration plan).
 
 ---
 

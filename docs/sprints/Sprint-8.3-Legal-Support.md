@@ -1,7 +1,7 @@
 # Sprint 8.3 — Legal & Support
 
 **Phase:** 4 (Public Launch Preparation) · **Depends on:** Sprint 8.1 (stub Privacy/Terms pages must exist to receive real content). · **Blocks:** Sprint 8.6 (Public Launch QA checks legal pages are live, not stubs).
-**Companion docs:** `Brand-Architecture.md §2` (legal entity naming — `Prodigy`), `Architecture.md §9` (Google Analytics privacy configuration this sprint verifies).
+**Companion docs:** `../product/Brand-Architecture.md §2` (legal entity naming — `Prodigy`), `../architecture/Architecture.md §9` (Google Analytics privacy configuration this sprint verifies).
 
 ---
 

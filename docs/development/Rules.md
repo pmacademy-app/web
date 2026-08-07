@@ -1,7 +1,7 @@
 # PM Academy — Rules
 
 **Status:** Living document — the operating manual for how this project is built, by whom (a solo founder, possibly assisted by AI tools/agents), and how any future contributor or AI assistant should behave when picking up this codebase.
-**Companion docs:** `INDEX.md` (documentation entry point — read this first), `PRD.md` (what/why), `Architecture.md` (technical design), `Phases.md` (when), `Design.md` (what it looks like), `Supabase-Migration-Guide.md` (the one workflow this doc's change-management rules apply to most literally — a database migration is the highest-consequence "change" a solo founder can make), `content-pipeline.md` and `rendering-pipeline.md` (the authoritative specs §4's content-authoring rules and §2's naming conventions defer to).
+**Companion docs:** `../INDEX.md` (documentation entry point — read this first), `../product/PRD.md` (what/why), `../architecture/Architecture.md` (technical design), `../product/Phases.md` (when), `../design/Design.md` (what it looks like), `../architecture/Supabase-Migration-Guide.md` (the one workflow this doc's change-management rules apply to most literally — a database migration is the highest-consequence "change" a solo founder can make), `../architecture/content-pipeline.md` and `../architecture/rendering-pipeline.md` (the authoritative specs §4's content-authoring rules and §2's naming conventions defer to).
 
 ---
 
