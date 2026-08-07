@@ -1,7 +1,7 @@
 # Sprint 7.6 — Dashboard & Learning Experience
 
 **Phase:** 3 (Product Completion) · **Depends on:** Sprint 7.1 (brand chrome). · **Blocks:** none downstream directly, but should land before Sprint 8.5 (Mobile Experience) since it's the last sprint to meaningfully change learner-facing screen structure before the mobile pass.
-**Companion docs:** `Architecture-Review-Report.md` (no dedicated section — this sprint operationalizes `PRD.md §2`'s existing IA principle, which was never fully enforced in the shipped Dashboard/Progress split), `Design.md §2`, `§3`.
+**Companion docs:** `../reports/Architecture-Review-Report.md` (no dedicated section — this sprint operationalizes `../product/PRD.md §2`'s existing IA principle, which was never fully enforced in the shipped Dashboard/Progress split), `../design/Design.md §2`, `§3`.
 
 ---
 

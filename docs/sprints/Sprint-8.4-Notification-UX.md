@@ -1,7 +1,7 @@
 # Sprint 8.4 — Notification UX
 
 **Phase:** 4 (Public Launch Preparation) · **Depends on:** none new (reuses existing `NotificationBell`/`NotificationCenterDrawer` primitives from Sprint 6.3, unchanged by anything in Phase 3.7). · **Blocks:** Sprint 8.5 (Mobile Experience needs the panel's mobile behavior finalized before the mobile pass).
-**Companion docs:** `Architecture-Review-Report.md §3.1` (owns this sprint's design decision), `Notification-Architecture.md §6` (existing in-app notification data layer this sprint re-surfaces, doesn't rebuild).
+**Companion docs:** `../reports/Architecture-Review-Report.md §3.1` (owns this sprint's design decision), `../architecture/Notification-Architecture.md §6` (existing in-app notification data layer this sprint re-surfaces, doesn't rebuild).
 
 ---
 

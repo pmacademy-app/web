@@ -1,7 +1,7 @@
 # Sprint 8.1 — Marketing Website v2
 
 **Phase:** 4 (Public Launch Preparation) · **Depends on:** Sprint 7.1 (brand assets/domain), Sprint 7.4 (Feedback moderation must exist to source real testimonials), Sprint 7.3 (certificate showcase, if included, needs the final template). · **Blocks:** Sprint 8.2 (SEO pass targets these pages), Sprint 8.3 (Legal pages link from this site's footer/signup).
-**Companion docs:** `Design.md §6` (owns the content structure/SEO strategy this sprint implements), `PRD.md §8` (functional requirements for the marketing site), `Brand-Architecture.md`.
+**Companion docs:** `../design/Design.md §6` (owns the content structure/SEO strategy this sprint implements), `../product/PRD.md §8` (functional requirements for the marketing site), `../product/Brand-Architecture.md`.
 
 ---
 

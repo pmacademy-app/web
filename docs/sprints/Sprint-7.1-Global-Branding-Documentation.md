@@ -1,7 +1,9 @@
 # Sprint 7.1 — Global Branding & Documentation
 
 **Phase:** 3 (Product Completion) · **Depends on:** none (first sprint of this phase) · **Blocks:** every subsequent sprint indirectly, since `lib/brand.ts` and `BrandLogo` are referenced by Certificates 2.0, Marketing v2, and email templates.
-**Companion docs:** `Brand-Architecture.md` (owns the naming/logo decisions this sprint implements), `Documentation-Synchronization-Report.md` (owns the doc-sync work this sprint implements).
+**Companion docs:** `../product/Brand-Architecture.md` (owns the naming/logo decisions this sprint implements), `../reports/Documentation-Synchronization-Report.md` (owns the doc-sync work this sprint implements).
+
+> **Status: SHIPPED.** Mermaid static-SVG pipeline and the real vector asset set are complete (see `CHANGELOG.md`). All brand raster/vector assets are generated from the embedded vector mark inside `docs/design/assets/logo.png` via `npm run brand:generate` (run from `apps/web`). CI enforces: no base64 data-URI SVGs in `public/`, and no hardcoded brand hexes outside `theme/tokens.ts`.
 
 ---
 
@@ -13,9 +15,9 @@ Establish `Prodigy` / `PM Academy` as a centrally-configured brand across the en
 
 1. `apps/web/lib/brand.ts` — the `BRAND` config object (full contract in `Brand-Architecture.md §3`).
 2. `apps/web/components/brand/BrandLogo.tsx` — the shared React logo component (`variant`/`size` props per `Brand-Architecture.md §4.2`).
-3. Static brand assets in `apps/web/public/brand/`: `logo-full.svg`, `logo-mark.svg`, `logo-full.png`, favicon set, `og-image.png`.
+3. Static brand assets in `apps/web/public/brand/` — **regenerated from the master `docs/design/assets/logo.png`** (which embeds the canonical vector mark) by `scripts/brand/generate-assets.ts` (`npm run brand:generate`): `logo-mark.svg` (716), `wordmark.svg` (600×200), `logo-full.svg` (800×200), `favicon.svg`, `safari-pinned-tab.svg`, `logo-mark.png`/`logo-full.png`/`og-image.png`, PWA icons, and a real multi-size `favicon.ico`.
 4. Rebrand pass: every page `<title>`/meta tag, email template header, certificate issuer field, footer, and `manifest.json` updated to source from `BRAND` instead of a hardcoded string.
-5. `content-pipeline.md` addendum: new compiler stage that renders Mermaid diagrams to static SVG at `content:compile` time (see `Architecture-Review-Report.md §6`), styled from `theme/tokens.ts`.
+5. `content-pipeline.md` addendum: **shipped** — a build-time stage renders every Mermaid diagram (fences plus `mentalModel`/`framework` top-level diagrams) to static SVG at `content:compile` time (see `Architecture-Review-Report.md §6`), styled from `theme/tokens.ts`; validation rule `mermaid-svg` fails any block without a compiled SVG.
 6. `KNOWN_ISSUES.md` resolved-items sweep: move Phase-3-resolved items (Google OAuth, Module Capstones, Badges/Leaderboards, Placement Assessment) into a dated "Resolved" section; keep only genuinely open tech debt.
 7. `memory/roadmap.md` correction to match `CURRENT_STATUS.md` (RC1 reality).
 8. `Phases.md` archived; `Roadmap.md`, `Brand-Architecture.md`, `Architecture-Review-Report.md`, `Product-Review-Report.md`, and this `docs/sprints/` folder added to `INDEX.md`'s reading order and document map.
@@ -44,8 +46,8 @@ None. No API contract changes — this is a presentation-layer and documentation
 - [ ] `grep -ri "pm academy"` across `apps/web/` (excluding `lib/brand.ts` itself and code comments) returns zero hardcoded matches outside approved short-form UI copy explicitly permitted by `Brand-Architecture.md §2`.
 - [ ] Every email template renders with the correct "From" name and logo image in a real Resend test-send (via the Admin test-email tool, `Architecture.md §7.5`).
 - [ ] A newly generated certificate shows `Issued by Prodigy · PM Academy` in the issuer field.
-- [ ] A lesson containing a Mermaid diagram (spot-check at least 3 lessons known to contain one) renders the diagram as a static SVG with zero Mermaid runtime JS present in the shipped bundle for that route (verify via bundle analysis, not just visual inspection).
-- [ ] `content:compile` runs clean with the new Mermaid stage against all 90 lessons — no lesson regresses from the per-lesson validation gate (`content-pipeline.md §4`).
+- [x] A lesson containing a Mermaid diagram (spot-check at least 3 lessons known to contain one) renders the diagram as a static SVG with zero Mermaid runtime JS present in the shipped bundle for that route (verify via bundle analysis, not just visual inspection). — **verified at pipeline level:** `mermaid` was removed from `package.json`, `MarkdownRenderer` drops mermaid fences, `MermaidBlock` renders only the compiled SVG, and all 203 mermaid blocks (incl. top-level `mentalModel`/`framework`) carry an `svg`.
+- [x] `content:compile` runs clean with the new Mermaid stage against all 90 lessons — no lesson regresses from the per-lesson validation gate (`content-pipeline.md §4`). — **verified:** fresh compile emits 90 lessons; 203/203 mermaid blocks have SVG, 0 missing; 10/10 compiler tests pass.
 - [ ] `INDEX.md`'s reading order resolves correctly — every linked doc exists at the stated path.
 - [ ] `memory/roadmap.md` and `CURRENT_STATUS.md` no longer contradict each other on Phase 3 status.
 

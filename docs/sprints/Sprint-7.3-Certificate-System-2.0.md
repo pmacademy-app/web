@@ -1,7 +1,7 @@
 # Sprint 7.3 — Certificate System 2.0
 
 **Phase:** 3 (Product Completion) · **Depends on:** Sprint 7.1 (`BRAND.certificateIssuer`, logo image asset) · **Blocks:** Sprint 8.1 (Marketing v2's "sample certificate" showcase, if included, needs the final template).
-**Companion docs:** `Architecture-Review-Report.md §5` (owns the versioning/QR/LinkedIn decisions this sprint implements), `Brand-Architecture.md §4.1` (owns the static logo asset used on the certificate).
+**Companion docs:** `../reports/Architecture-Review-Report.md §5` (owns the versioning/QR/LinkedIn decisions this sprint implements), `../product/Brand-Architecture.md §4.1` (owns the static logo asset used on the certificate).
 
 ---
 

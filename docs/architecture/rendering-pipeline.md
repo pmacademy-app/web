@@ -3,7 +3,7 @@
 
 > **Status**: Implementation-ready blueprint for a standalone rebuild.
 > **Supersedes**: `lesson-rendering-pipeline-audit.md` (v1).
-> **Documentation entry point**: See `INDEX.md` for the full doc map and source-of-truth rules.
+> **Documentation entry point**: See `../INDEX.md` for the full doc map and source-of-truth rules.
 > **Depends on**: `content-pipeline.md` (produces the Block JSON this spec consumes).
 > **Grounded in**: `lesson-001.md`, via the content pipeline's real block taxonomy (§3 there) — the specialized renderer list in §4 below has been corrected to match the block types real lessons actually produce (learning objectives, theory, common mistakes, mental models, company examples, case studies, frameworks, interview perspective, summary, key takeaways, cheat sheet, glossary, resources, connections, flashcards, quiz), not the smaller five-type set assumed by an earlier draft.
 

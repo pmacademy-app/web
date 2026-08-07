@@ -1,7 +1,7 @@
 # Sprint 7.4 — Admin Console Polish
 
 **Phase:** 3 (Product Completion) · **Depends on:** Sprint 7.1 (brand assets in Admin chrome). **Soft dependency:** benefits from Sprint 7.2's audit-record pattern (Users drawer surfaces reset/delete history) but does not block on it. · **Blocks:** Sprint 8.3's Feedback-to-Marketing pipeline needs this sprint's Feedback + Content views to exist first.
-**Companion docs:** `Architecture-Review-Report.md §2` (owns the IA decisions this sprint implements), `Notification-Architecture.md §20` (existing Admin Console spec this sprint reorganizes, not replaces).
+**Companion docs:** `../reports/Architecture-Review-Report.md §2` (owns the IA decisions this sprint implements), `../architecture/Notification-Architecture.md §20` (existing Admin Console spec this sprint reorganizes, not replaces).
 
 ---
 

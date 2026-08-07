@@ -1,7 +1,7 @@
 # Sprint 7.5 — Security & Performance
 
 **Phase:** 3 (Product Completion) · **Depends on:** Sprints 7.2–7.4 (new surfaces to audit — Settings, Certificates, Admin). Best run after those, not before, so the audit covers the final surface area rather than a moving target. · **Blocks:** Sprint 8.6 (Public Launch QA reuses this sprint's checklist as its re-verification baseline).
-**Companion docs:** `Architecture.md §9` (existing security section this sprint operationalizes into a threat model), `Design.md §4` (existing performance/accessibility budget this sprint verifies against real measurements).
+**Companion docs:** `../architecture/Architecture.md §9` (existing security section this sprint operationalizes into a threat model), `../design/Design.md §4` (existing performance/accessibility budget this sprint verifies against real measurements).
 
 ---
 

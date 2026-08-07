@@ -1,7 +1,7 @@
 # Sprint 8.5 — Mobile Experience
 
 **Phase:** 4 (Public Launch Preparation) · **Depends on:** Sprints 7.2, 7.3, 7.4, 7.6, 8.1, 8.4 (every screen this sprint re-passes must exist first). · **Blocks:** Sprint 8.6 (Public Launch QA's final regression assumes mobile is already verified, not discovered late).
-**Companion docs:** `PRD.md §6` (explicit non-goal: no native app — this is a responsive-web verification sprint, not a new platform build), `Design.md §4` (existing performance/accessibility budget, re-verified here at mobile viewports specifically).
+**Companion docs:** `../product/PRD.md §6` (explicit non-goal: no native app — this is a responsive-web verification sprint, not a new platform build), `../design/Design.md §4` (existing performance/accessibility budget, re-verified here at mobile viewports specifically).
 
 ---
 

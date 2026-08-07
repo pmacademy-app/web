@@ -1,7 +1,7 @@
 # Sprint 7.2 — Settings 2.0
 
 **Phase:** 3 (Product Completion) · **Depends on:** Sprint 7.1 (`BrandLogo`/`BRAND` used in confirmation dialogs and account-deletion emails) · **Blocks:** none downstream, but shares the typed-confirmation dialog component with no other sprint — build it here as a reusable primitive since Certificates 2.0 (Sprint 7.3) does not need destructive-confirmation UX, only Settings does.
-**Companion docs:** `Architecture-Review-Report.md §4` (owns the IA and ledger-respecting reset decisions this sprint implements), `Notification-Architecture.md §11` (owns the preference model this sprint's Notifications tab wires up to).
+**Companion docs:** `../reports/Architecture-Review-Report.md §4` (owns the IA and ledger-respecting reset decisions this sprint implements), `../architecture/Notification-Architecture.md §11` (owns the preference model this sprint's Notifications tab wires up to).
 
 ---
 
