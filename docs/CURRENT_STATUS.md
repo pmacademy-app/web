@@ -36,10 +36,10 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Phase 3 – Sprint 6.4.3 (Admin Operational Functionality & Live Actions):** ✅ Complete (Interactive user role toggles, user profile inspection `/admin/users/[id]`, manual queue trigger, live feature flag toggles, test email sender)
 - **Phase 3 – Sprint 6.4.4 (Admin Authentication, RBAC & Access Security):** ✅ Complete (`/admin/login`, `/admin/access-denied`, `ADMIN_EMAILS` env support, proxy middleware & API guard audit logging)
 - **Sprint 6.5 (Release Candidate & Production Readiness Audit):** ✅ Complete (`v1.0.0-rc1` ready for production tagging)
-- **Sprint 7.1 (Global Branding & Documentation):** ✅ Complete (`lib/brand.ts`, `BrandLogo` system, static brand assets, full rebrand pass across app/emails/certs/admin, build-time Mermaid→SVG static compilation stage, documentation sync)
-- **Sprint 7.2 (Settings 2.0):** ✅ Complete (Unified 5-tab Settings IA, `ConfirmDestructiveAction` typed confirmation dialogs, ledger-respecting XP reset, account deletion cascade, `lib/settings/settings-service.ts`, 8 new API routes under `/api/settings/`, and automated regression test suite)
-- **Sprint 7.3 (Certificate System 2.0):** ✅ Complete (`20260808000001_add_certificate_template_version.sql` additive migration, versioned renderer V1 vs V2, pure `lib/certificates/linkedin-url.ts` builder, direct `/verify/[certificateId]` QR code embedding, `test:certificates` test suite)
-- **Current Focus:** Ready for Sprint 7.4 (Admin Console Polish)
+- **Sprint 7.1 (Global Branding & Documentation):** ✅ Complete & Audited (`lib/brand.ts`, `BrandLogo` system, static brand assets, full rebrand pass, build-time Mermaid→SVG static compilation stage, 0 runtime Mermaid overhead)
+- **Sprint 7.2 (Settings 2.0):** ✅ Complete & Audited (Unified 5-tab Settings IA, `ConfirmDestructiveAction` typed confirmation dialogs, ledger-respecting XP reset, account deletion cascade, `lib/settings/settings-service.ts`, 8 new API routes under `/api/settings/`, and automated regression test suite)
+- **Sprint 7.3 (Certificate System 2.0):** ✅ Complete & Audited (Clean single production certificate renderer, pure `lib/certificates/linkedin-url.ts` builder, direct `/verify/[certificateId]` QR code embedding, `test:certificates` test suite, zero internal V1/V2 terminology exposed)
+- **Current Focus:** Production Audit Complete — Ready for Sprint 7.4 (Admin Console Polish)
 
 ---
 

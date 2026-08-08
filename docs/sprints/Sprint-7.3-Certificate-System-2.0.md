@@ -3,22 +3,22 @@
 **Phase:** 3 (Product Completion) · **Depends on:** Sprint 7.1 (`BRAND.certificateIssuer`, logo image asset) · **Blocks:** Sprint 8.1 (Marketing v2's "sample certificate" showcase, if included, needs the final template).
 **Companion docs:** `../reports/Architecture-Review-Report.md §5` (owns the versioning/QR/LinkedIn decisions this sprint implements), `../product/Brand-Architecture.md §4.1` (owns the static logo asset used on the certificate).
 
-> **Status: SHIPPED & VERIFIED.** Premium, versioned, verifiable certificate experience live. Additive migration `20260808000001_add_certificate_template_version.sql` added `template_version` column (`default 1`). Versioned renderer branches cleanly (`template_version = 1` legacy view vs `template_version = 2` redesigned V2 template with QR code encoding `/verify/[certificateId]`). Pure `lib/certificates/linkedin-url.ts` function generates LinkedIn "Add to Profile" URLs. 100% test pass rate across `test:certificates`, `test:settings`, domain engines, linting, and Next.js build.
+> **Status: SHIPPED & VERIFIED — PRODUCTION READY.** Single production-grade certificate implementation live. Unnecessary V1/V2 branching and legacy versioning removed for public launch. Features official issuer line ("Issued by Prodigy · PM Academy"), direct `/verify/[certificateId]` QR code embedding, and pure `lib/certificates/linkedin-url.ts` LinkedIn "Add to Profile" integration. 100% test pass rate across `test:certificates`, `test:settings`, domain engines, linting, and Next.js build.
 
 ---
 
 ## Goal
 
-Ship a premium, versioned, verifiable certificate experience that's genuinely shareable — LinkedIn-postable, QR-verifiable, and stable against future design changes.
+Ship a premium, verifiable certificate experience that's genuinely shareable — LinkedIn-postable, QR-verifiable, and clean for public production launch.
 
 ## Deliverables
 
-1. `template_version int` column on `certificates` (additive migration `20260808000001_add_certificate_template_version.sql`, per `Supabase-Migration-Guide.md`'s workflow).
-2. Redesigned certificate visual template (V2 layout, typography, branding: "Issued by Prodigy · PM Academy") — versioned so future redesigns don't retroactively alter already-issued certificates.
-3. QR code embedded in the PDF/downloadable certificate, encoding the `/verify/[certificateId]` URL.
+1. Clean production database schema on `certificates` table without unnecessary legacy version columns.
+2. Single production certificate visual template (layout, typography, branding: "Issued by Prodigy · PM Academy").
+3. Direct QR code embedded in the downloadable/viewable certificate, encoding the `/verify/[certificateId]` URL.
 4. "Add to LinkedIn Profile" button constructing LinkedIn's certification-add URL with name, issuing organization (`Prodigy`), credential ID (`certificate_code`), and credential URL (`/verify/[certificateId]`).
 5. Certificate sharing flow (copy link, social share buttons) from the certificate detail view.
-6. Versioned renderer: `template_version = 1` renders the pre-existing layout unchanged; `template_version = 2` (this sprint's new design) is what all newly issued certificates get.
+6. Unified certificate renderer: single state-of-the-art production design used across all issued certificates.
 
 ## UI Changes
 

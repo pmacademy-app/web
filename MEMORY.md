@@ -1,7 +1,7 @@
 # Prodigy PM Academy — Project Memory Index
 
 **Last Updated:** 2026-08-08  
-**Project Stage:** Sprint 7.3 Complete — Certificate System 2.0 (brand: **Prodigy**, product: **PM Academy**)
+**Project Stage:** Production Audit Complete for Sprints 7.1–7.3 (brand: **Prodigy**, product: **PM Academy**)
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
 
@@ -11,7 +11,7 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 **Prodigy PM Academy** is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
-**Current state:** All phases 0–3 and Sprints 1–7.3 are complete, including the v1.0.0-rc1 release candidate, Sprint 7.1 global rebrand, Sprint 7.2 Settings 2.0 overhaul, and Sprint 7.3 Certificate System 2.0. The repository is ready for **Sprint 7.4 (Admin Console Polish)**.
+**Current state:** All phases 0–3, Sprints 1–7.3, and the Sprints 7.1–7.3 Production-Readiness Audit are complete. All Vercel build failures have been diagnosed and resolved, V1/V2 branching removed in favor of a single production certificate architecture, and zero internal development terminology is exposed. The repository is 100% production-ready for **Sprint 7.4 (Admin Console Polish)**.
 
 ---
 
