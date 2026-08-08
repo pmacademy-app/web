@@ -43,17 +43,17 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
     it('calculates negative XP row amount to bring total XP balance to 0 without deleting ledger rows', async () => {
       // Mock Supabase client with existing XP total of 1250
       const currentTotalXp = 1250
-      let insertedRow: any = null
-      let updatedUserRow: any = null
+      let insertedRow: Record<string, unknown> | null = null
+      let updatedUserRow: Record<string, unknown> | null = null
 
-      const mockSupabase: any = {
+      const mockSupabase: unknown = {
         from: (table: string) => {
           if (table === 'xp_events') {
             return {
               select: () => ({
                 eq: () => Promise.resolve({ data: [{ xp_amount: currentTotalXp }], error: null }),
               }),
-              insert: (row: any) => {
+              insert: (row: Record<string, unknown>) => {
                 insertedRow = row
                 return Promise.resolve({ data: null, error: null })
               },
@@ -61,8 +61,8 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
           }
           if (table === 'users') {
             return {
-              update: (row: any) => ({
-                eq: (col: string, val: string) => {
+              update: (row: Record<string, unknown>) => ({
+                eq: (_col: string, _val: string) => {
                   updatedUserRow = row
                   return Promise.resolve({ data: null, error: null })
                 },
@@ -73,7 +73,7 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
         },
       }
 
-      const newTotal = await resetXp(mockSupabase, 'user_123')
+      const newTotal = await resetXp(mockSupabase as unknown as Parameters<typeof resetXp>[0], 'user_123')
 
       assert.strictEqual(newTotal, 0, 'New total XP must be 0')
       assert.ok(insertedRow, 'An audit row must be inserted into xp_events')
