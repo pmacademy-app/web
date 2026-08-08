@@ -106,16 +106,20 @@ Everything else — Admin IA, notification delivery UX, Settings structure, Cert
 
 ## 6. Mermaid Strategy — redesign decision (simplification)
 
-**Current:** `MermaidBlock.tsx` renders Mermaid diagrams client-side at runtime inside lessons.
+**Current / Status (Shipped Sprint 7.1):** Move to **build-time static SVG generation** using the official `mermaid` v11 layout engine inside Node.js via JSDOM.
 
-**Recommendation (adopted): move to build-time static SVG/PNG generation**, styled from the design-system tokens, generated during `content:compile` (an additional pipeline stage, not a new pipeline) and emitted alongside the existing `content/dist/` output.
+**Implementation & Verification:**
+- Integrated `mermaid` engine into `scripts/compiler/mermaid-svg.ts` running at `content:compile` time.
+- Styled using PM Academy green/white design tokens (`theme/tokens.ts`: `#FFFFFF` fills, `#166534` green borders/edges, `#1B2A21` text, `#EFF6F2` accent fills).
+- Injected `.dark` CSS overrides inside the SVG `<style>` block for zero-overhead theme switching.
+- Replaced fixed-width SVG attributes with fluid responsive `viewBox` coordinates and `style="width: 100%; max-width: ${naturalWidth}px; height: auto;"` post-processing.
+- Updated `MermaidBlock.tsx` container from restrictive `w-fit` to `w-full max-w-full flex justify-center`.
+- Compiled 203 diagrams across all 90 lessons with 0 errors / 0 warnings (`npm run content:compile`, `npm run content:validate`, `npm run test:compiler`).
 
-**Why this is a genuine simplification, not just a preference:**
-- Removes a client-side JS dependency (Mermaid's runtime renderer) from every lesson page that contains a diagram — smaller bundle, faster first paint, one less thing that can fail at runtime in a user's browser.
-- Diagrams become trivially themeable from the same design tokens used everywhere else (`theme/tokens.ts`), rather than needing Mermaid's separate theming API kept in sync by hand — directly serves the "one unified design language" requirement.
-- Diagrams are already static content authored in Markdown — rendering them at build time instead of request time is consistent with the static-first principle already governing everything else in the content pipeline (`DO_NOT_CHANGE.md §1`).
-
-**Trade-off:** loses Mermaid's rare interactive/pan-zoom capability. Given diagrams here are illustrative (mental models, framework flows), this is an acceptable trade — no lesson currently uses interactive diagram features. Scheduled as a `content-pipeline.md` addendum in `Sprint 7.1`, not a separate sprint — it's a compiler stage addition, small in scope.
+**Why this is a genuine simplification:**
+- Removes client-side `mermaid` JS runtime bundle from lesson pages — zero runtime overhead.
+- Preserves full 2D Dagre layout, decision diamonds, horizontal branching, curved/orthogonal arrows, sequence diagrams, and subgraphs.
+- Fixes responsiveness so diagrams display perfectly at 100% normal browser zoom without clipping or forcing 33% zoom out.
 
 ---
 

@@ -40,7 +40,7 @@ const DIST_LESSONS_DIR = path.join(DIST_DIR, 'lessons');
 const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
 
 // Bump whenever the compiler's output shape changes so cached lessons recompile.
-const CACHE_VERSION = '4';
+const CACHE_VERSION = '6';
 
 interface CacheManifest {
   version: string;
@@ -70,11 +70,11 @@ export function getModuleSlugForLessonNumber(num: number): string {
   return moduleMap[modNum] || 'foundations';
 }
 
-export function compileLesson(
+export async function compileLesson(
   filePath: string,
   registry: Record<string, string>,
   numToId: Record<number, string>
-): { lesson: any; context: CompilerContext } {
+): Promise<{ lesson: any; context: CompilerContext }> {
   const sourceContent = fs.readFileSync(filePath, 'utf-8');
   const lessonId = getOrCreateLessonId(filePath);
 
@@ -234,7 +234,7 @@ export function compileLesson(
       blocks.push(block);
       searchableTextParts.push(...objectives);
     } else if (headingLower === 'theory') {
-      const children = mdastToBlocks(segment.nodes, lessonId);
+      const children = await mdastToBlocks(segment.nodes, lessonId);
       const block: any = {
         type: 'theory',
         children,
@@ -251,7 +251,7 @@ export function compileLesson(
     } else if (headingLower.includes('mental model')) {
       const titleMatch = segment.heading.match(/Mental Model:\s*(.*)/i);
       const mmTitle = titleMatch ? titleMatch[1].trim() : 'Mental Model';
-      const children = mdastToBlocks(segment.nodes.filter((n) => !(n.type === 'code' && n.lang === 'mermaid')), lessonId);
+      const children = await mdastToBlocks(segment.nodes.filter((n) => !(n.type === 'code' && n.lang === 'mermaid')), lessonId);
       
       const mermaidNode = segment.nodes.find((n) => n.type === 'code' && n.lang === 'mermaid');
       let diagram: any = undefined;
@@ -263,7 +263,7 @@ export function compileLesson(
         // Build and push the actual mermaid block separately in child blocks.
         // Render to static SVG at compile time — never ships raw Mermaid source
         // to the browser. Throws on parse failure, failing the build (Requirement 5).
-        const svg = compileMermaidToSvg(mermaidNode.value, mermaidNode.data?.mermaid?.authorTheme);
+        const svg = await compileMermaidToSvg(mermaidNode.value, mermaidNode.data?.mermaid?.authorTheme);
         const mBlock: any = {
           type: 'mermaid',
           id: `mer-${lessonId}`,
@@ -313,7 +313,7 @@ export function compileLesson(
         return true;
       });
 
-      const children = mdastToBlocks(nonAssumptionNodes, lessonId);
+      const children = await mdastToBlocks(nonAssumptionNodes, lessonId);
       const block: any = {
         type: 'companyExample',
         company,
@@ -333,7 +333,7 @@ export function compileLesson(
     } else if (headingLower.includes('case study')) {
       const titleMatch = segment.heading.match(/(?:Detailed\s+)?Case Study:\s*(.*)/i);
       const csTitle = titleMatch ? titleMatch[1].trim() : 'Case Study';
-      const children = mdastToBlocks(segment.nodes, lessonId);
+      const children = await mdastToBlocks(segment.nodes, lessonId);
       const block: any = {
         type: 'caseStudy',
         title: csTitle,
@@ -346,7 +346,7 @@ export function compileLesson(
     } else if (headingLower.includes('framework')) {
       const titleMatch = segment.heading.match(/(?:Framework\s+Explanation|Framework):\s*(.*)/i);
       const fwTitle = titleMatch ? titleMatch[1].trim() : 'Framework';
-      const children = mdastToBlocks(segment.nodes.filter((n) => !(n.type === 'code' && n.lang === 'mermaid')), lessonId);
+      const children = await mdastToBlocks(segment.nodes.filter((n) => !(n.type === 'code' && n.lang === 'mermaid')), lessonId);
 
       const mermaidNode = segment.nodes.find((n) => n.type === 'code' && n.lang === 'mermaid');
       let diagram: any = undefined;
@@ -356,7 +356,7 @@ export function compileLesson(
           type: 'mermaid',
         };
         // Build and push actual mermaid block (static SVG at compile time)
-        const svg = compileMermaidToSvg(mermaidNode.value, mermaidNode.data?.mermaid?.authorTheme);
+        const svg = await compileMermaidToSvg(mermaidNode.value, mermaidNode.data?.mermaid?.authorTheme);
         const mBlock: any = {
           type: 'mermaid',
           id: `mer-fw-${lessonId}`,
@@ -389,7 +389,7 @@ export function compileLesson(
         searchableTextParts.push(q.question, q.whatItEvaluates);
       });
     } else if (headingLower === 'summary') {
-      const children = mdastToBlocks(segment.nodes, lessonId);
+      const children = await mdastToBlocks(segment.nodes, lessonId);
       const block: any = {
         type: 'summary',
         children,
@@ -521,7 +521,7 @@ export function compileLesson(
       blocks.push(block);
     } else {
       // Treat any other custom section as a theory sub-block or callout if matching callout syntax
-      const children = mdastToBlocks(segment.nodes, lessonId);
+      const children = await mdastToBlocks(segment.nodes, lessonId);
       if (children.length > 0) {
         // Just push them as generic blocks in the lesson body
         blocks.push(...children);
@@ -622,7 +622,7 @@ function saveCacheManifest(manifest: CacheManifest) {
   fs.writeFileSync(CACHE_MANIFEST_PATH, JSON.stringify(manifest, null, 2), 'utf-8');
 }
 
-export function compileAllContent(validateOnly = false): boolean {
+export async function compileAllContent(validateOnly = false): Promise<boolean> {
   console.log('🚀 Running PM Academy Content Compiler v2...');
   
   if (!fs.existsSync(DIST_LESSONS_DIR)) {
@@ -680,7 +680,7 @@ export function compileAllContent(validateOnly = false): boolean {
 
     // Compile
     try {
-      const { lesson, context } = compileLesson(file, registryMap, numToId);
+      const { lesson, context } = await compileLesson(file, registryMap, numToId);
       
       // Validate
       const issues = validateCompiledLesson(lesson, context);
@@ -930,9 +930,10 @@ if (require.main === module) {
     compileAllContent();
     watchAndCompile();
   } else {
-    const success = compileAllContent(validateOnly);
-    if (!success) {
-      process.exit(1);
-    }
+    compileAllContent(validateOnly).then((success) => {
+      if (!success) {
+        process.exit(1);
+      }
+    });
   }
 }

@@ -143,11 +143,11 @@ This directly fixes limitation #2 (no nesting) — a `tabs` block's renderer rec
 
 ### 4.1 MermaidBlock — Preserved From v1 (it was good), Theme Handling Corrected
 
-- Dynamic `import('mermaid')` on first use — same bundle-size discipline as v1.
-- Post-render pipeline unchanged in spirit: strip clip-paths, expand `foreignObject`, `fixNodeShapes`, recompute `viewBox` with padding.
-- Two-pass layout fix (immediate + ~150ms follow-up for late font loads) — kept as-is; it's a pragmatic, working solution to a real browser quirk.
-- **Theme handling — (aligned to lesson-001.md):** real diagrams are authored with a hand-picked `%%{init}%%` palette (a purple/dark accent scheme) baked into the source. The compiler splits this into `normalized` (the diagram body only) and `authorTheme` (the extracted `themeVariables`) — see content spec §3, Stage 2. `MermaidBlock` renders using `authorTheme` as the base palette and only swaps the small set of *structural* dark/light tokens (background, text, border contrast) via `resolvedTheme`, preserving the author's deliberate accent color rather than overriding it with a generic site-wide Mermaid theme. This is a correction from an earlier draft of this spec, which assumed diagrams had no author-authored theme config at all.
-- **New**: build-time static SVG (from content pipeline §7) used as the SSR/first-paint placeholder, swapped for the live-themed version on hydration — removes the "diagram pops in" flash v1 has.
+- **Shipped & Verified (Sprint 7.1): Build-Time Static SVG Rendering.** `MermaidBlock.tsx` renders the pre-compiled static SVG string generated at `content:compile` time via `scripts/compiler/mermaid-svg.ts` using the real Mermaid layout engine (in Node.js via JSDOM) styled with PM Academy green/white design tokens (`theme/tokens.ts`).
+- Zero client-side Mermaid JS runtime is loaded in the browser.
+- Diagrams are rendered inside `<div className="mermaid-diagram my-6 w-full max-w-full overflow-x-auto rounded-xl border border-border bg-card p-4 sm:p-6 flex justify-center">` with an inner `<div className="w-full max-w-full flex justify-center" dangerouslySetInnerHTML={{ __html: svg }} />` wrapper.
+- Generated SVGs use fluid responsive `viewBox` sizing (`width: 100%; max-width: ${naturalWidth}px; height: auto`) ensuring perfect scaling at 100% normal browser zoom without clipping or horizontal overflow.
+- Dark mode theme toggling is handled CSS-only via `.dark` style rules embedded directly inside the SVG `<style>` tag.
 
 ---
 

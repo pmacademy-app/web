@@ -11,8 +11,9 @@ export default function MermaidBlock({ block }: BlockProps) {
   }
 
   return (
-    <div className="mermaid-diagram my-6 overflow-x-auto rounded-xl border border-border bg-muted/40 p-4">
-      <div className="mx-auto w-fit" dangerouslySetInnerHTML={{ __html: svg }} />
+    <div className="mermaid-diagram my-6 w-full max-w-full overflow-x-auto rounded-xl border border-border bg-card p-4 sm:p-6 flex justify-center">
+      <div className="w-full max-w-full flex justify-center" dangerouslySetInnerHTML={{ __html: svg }} />
     </div>
   );
 }
+

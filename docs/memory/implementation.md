@@ -40,7 +40,7 @@
 
 ### Phase 1 — Core Learning Loop MVP (Complete ✅)
 
-- **Lesson reading view:** Renders pre-generated static JSON content across all section types. Client-side `MarkdownRenderer` component (using `marked` parser) handles rich text and Mermaid diagrams. Integrated into `TheorySection`, `ReflectionForm`, and the public lesson page.
+- **Lesson reading view:** Renders pre-generated static JSON content across all section types. Build-time compiler (`scripts/compiler/mermaid-svg.ts`) uses the real `mermaid` v11 engine inside Node.js via JSDOM to compile all code fence and top-level (`mentalModel`, `framework`) Mermaid blocks to static SVGs with green/white design system tokens (`theme/tokens.ts`) and fluid responsive `viewBox` coordinates (`width: 100%; max-width: ${naturalWidth}px; height: auto`). `MermaidBlock.tsx` renders static SVGs directly inside responsive flex containers (`w-full max-w-full flex justify-center`). Zero client-side Mermaid JS runtime is shipped to the browser.
 - **Quiz flow:** 15-question interactive UI with keyboard navigation, immediate feedback, scoring logic. 1350 quiz questions validated across 90 lessons.
 - **Progress tracking:** `user_lesson_progress` table tracks status, quiz score, and XP per lesson. Sequential unlock logic implemented via `lessons-completion-service.ts`.
 - **Auth + onboarding:** Goal-setting onboarding question ("Why are you here?") captures `goal` field and tailors UX. MVP scope: no scored placement quiz.
