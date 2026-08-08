@@ -40,7 +40,7 @@ const DIST_LESSONS_DIR = path.join(DIST_DIR, 'lessons');
 const CACHE_MANIFEST_PATH = path.join(ROOT_DIR, 'content/.cache/manifest.json');
 
 // Bump whenever the compiler's output shape changes so cached lessons recompile.
-const CACHE_VERSION = '3';
+const CACHE_VERSION = '4';
 
 interface CacheManifest {
   version: string;

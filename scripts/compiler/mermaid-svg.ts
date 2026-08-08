@@ -170,8 +170,6 @@ export function parseMermaidSource(source: string): DiagramData {
 
 const FONT_STACK = `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
 const CHAR_W = 0.6;
-const MAX_DESIGN_WIDTH = 900;
-const MIN_SCALE = 0.75;
 
 function escapeXml(s: string): string {
   return s
@@ -185,23 +183,37 @@ function textWidth(text: string, fontSize: number): number {
   return Array.from(text).length * fontSize * CHAR_W + 1;
 }
 
+function wrapToChars(text: string, maxChars: number): string[] {
+  const chars = Array.from(text);
+  const out: string[] = [];
+  for (let i = 0; i < chars.length; i += maxChars) {
+    out.push(chars.slice(i, i + maxChars).join(''));
+  }
+  return out;
+}
+
 function splitLabelLines(label: string, fontSize: number): string[] {
   const maxChars = Math.floor(260 / (fontSize * CHAR_W));
-  const segments = label.split(/<br\s*\/?>/i);
   const lines: string[] = [];
+  const pushLine = (line: string) => {
+    // Guard against single unbroken tokens wider than the wrap threshold —
+    // without char-level wrapping they would overflow the node's box.
+    lines.push(...(Array.from(line).length > maxChars ? wrapToChars(line, maxChars) : [line]));
+  };
+  const segments = label.split(/<br\s*\/?>/i);
   for (const seg of segments) {
     const trimmed = seg.replace(/\s+/g, ' ').trim();
     if (!trimmed) continue;
     let current = '';
     for (const word of trimmed.split(' ')) {
       if (current && Array.from(`${current} ${word}`).length > maxChars) {
-        lines.push(current);
+        pushLine(current);
         current = word;
       } else {
         current = current ? `${current} ${word}` : word;
       }
     }
-    if (current) lines.push(current);
+    if (current) pushLine(current);
   }
   return lines.length ? lines : [' '];
 }
@@ -217,7 +229,7 @@ function measureNode(node: MermaidNode, scale: number): NodeMeasure {
   const lineHeight = 20 * scale;
   const padX = 20 * scale;
   const padY = 14 * scale;
-  const minW = 128 * scale;
+  const minW = 48 * scale;
   const maxW = 320 * scale;
 
   const lines = splitLabelLines(node.label, fontSize);
@@ -457,11 +469,12 @@ export function compileMermaidToSvg(source: string, authorTheme?: Record<string,
     throw new Error(`[Mermaid Compiler Error] Failed to parse diagram. Zero valid nodes extracted from source:\n${source}`);
   }
 
-  let layout = computeLayout(diagram, 1);
-  if (layout.vw > MAX_DESIGN_WIDTH) {
-    const scale = Math.max(MIN_SCALE, MAX_DESIGN_WIDTH / layout.vw);
-    if (scale < 1) layout = computeLayout(diagram, scale);
-  }
+  // Layout is always computed at the base font size (scale = 1) so every
+  // diagram ships with the same 14px/11.5px text. Diagrams wider than the
+  // content area shrink proportionally via `max-width:100%` in the SVG style
+  // (below) rather than by reducing the font at compile time — this keeps font
+  // sizing consistent across diagrams and avoids fixed-width horizontal overflow.
+  const layout = computeLayout(diagram, 1);
 
   const { vw, vh, scale, parts } = layout;
   const nodeFont = 14 * scale;
@@ -525,11 +538,10 @@ export function compileMermaidToSvg(source: string, authorTheme?: Record<string,
   const viewBoxX = px(layout.bounds.length ? Math.min(...layout.bounds.map((b) => b.x), 0) - 26 * scale : 0);
   const viewBoxY = px(layout.bounds.length ? Math.min(...layout.bounds.map((b) => b.y), 0) - 26 * scale : 0);
 
-  const scrollMode = vw > 720;
-  const minWidth = scrollMode ? vw : Math.min(vw, 560);
-  const styleAttr = scrollMode
-    ? `width:${px(vw)}px;min-width:${px(vw)}px;`
-    : `width:${px(vw)}px;max-width:100%;min-width:${px(minWidth)}px;`;
+  // Responsive: render at natural size up to the content area, then shrink
+  // proportionally on narrower screens. No fixed/min width — diagrams fit
+  // their container without horizontal overflow, clipping, or distortion.
+  const styleAttr = `width:${px(vw)}px;max-width:100%;height:auto;display:block;margin:0 auto;`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBoxX} ${viewBoxY} ${px(vw)} ${px(vh)}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escapeXml(ariaLabel)}" class="mermaid-static-svg" style="${styleAttr}height:auto;display:block;margin:0 auto;">
   <style>${style}</style>
