@@ -31,7 +31,7 @@ export function toMarkdown(node: any): string {
   return '';
 }
 
-export function mdastToBlocks(nodes: any[], lessonId: string): any[] {
+export async function mdastToBlocks(nodes: any[], lessonId: string): Promise<any[]> {
   const blocks: any[] = [];
   for (const node of nodes) {
     if (node.type === 'heading') {
@@ -79,7 +79,7 @@ export function mdastToBlocks(nodes: any[], lessonId: string): any[] {
         const source = node.value;
         const normalized = node.data?.mermaid?.normalized || node.value;
         const authorTheme = node.data?.mermaid?.authorTheme;
-        const svg = compileMermaidToSvg(source, authorTheme);
+        const svg = await compileMermaidToSvg(source, authorTheme);
         const block: any = {
           type: 'mermaid',
           id: `mer-${lessonId}`,

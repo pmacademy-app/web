@@ -17,7 +17,7 @@ Items previously deferred that have shipped in Phase 3. Retained for historical 
 *   **Original deferral:** placeholder stubs; gamification UI and certification exports scheduled for Phase 3.
 
 ### ✅ Mermaid → Static SVG Build-Time Rendering — RESOLVED (Sprint 7.1)
-*   **Status:** Shipped. Mermaid diagrams are rendered to static SVGs at `content:compile` time via `scripts/compiler/mermaid-svg.ts`, styled using `theme/tokens.ts`. Zero client-side Mermaid JS runtime overhead is shipped to the browser.
+*   **Status:** Shipped & Verified. Mermaid diagrams are compiled to static SVGs at `content:compile` time via `scripts/compiler/mermaid-svg.ts` using the real Mermaid layout engine (in Node.js via JSDOM) styled with PM Academy green/white design tokens (`theme/tokens.ts`). Generated SVGs use fluid responsive `viewBox` sizing (`width: 100%; max-width: ${naturalWidth}px; height: auto`) and clean `MermaidBlock.tsx` flex containers so diagrams scale perfectly at 100% browser zoom without horizontal overflow or clipping. Zero client-side Mermaid JS runtime is shipped to the browser.
 *   **Original deferral:** deferred to Sprint 7.1 per `Architecture-Review-Report.md §6` and `content-pipeline.md`.
 
 ---

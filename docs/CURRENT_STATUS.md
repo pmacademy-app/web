@@ -54,7 +54,12 @@ Sprint 7.1 Global Branding & Documentation complete. Ready for **Sprint 7.2 (Set
 
 None. All stabilization sprint items resolved.
 
-### Resolved This Session (Phase 3 — Stabilization Sprint Priority 1, 2, 3)
+### Resolved This Session (Sprint 7.1 — Universal Mermaid System Rebuild & Branding)
+
+**Sprint 7.1 — Universal Mermaid System Rebuild:**
+- 🎨 **Real Engine Layout & Green/White Styling:** Replaced custom mock parser with official `mermaid` v11 engine executing at build time (`content:compile`) in Node.js via JSDOM (`scripts/compiler/mermaid-svg.ts`). Restored 2D Dagre layout, decision diamonds, horizontal branching, curved/orthogonal arrows, sequence diagrams, and subgraphs with PM Academy green/white design tokens (`theme/tokens.ts`) and embedded `.dark` CSS overrides.
+- 📐 **Fluid Responsive Sizing & 100% Zoom:** Post-processed SVG output with fluid `viewBox`, `preserveAspectRatio="xMidYMid meet"`, and `style="width: 100%; max-width: ${naturalWidth}px; height: auto;"` inside `w-full max-w-full flex justify-center` flex containers in `MermaidBlock.tsx`. Resolved issue where diagrams forced browser zoom down to ~33%.
+- 🚀 **Zero Runtime Overhead:** Compiled all 90 lessons and 203/203 Mermaid diagrams with 0 errors / 0 warnings (`npm run content:compile`, `npm run content:validate`, `npm run test:compiler`, `npm run build`). Zero client-side Mermaid JS runtime shipped to browser.
 
 **Priority 1 — Critical Functional Fixes:**
 - 🔒 **Lesson Rendering:** Empty section components (`InterviewPerspectiveSection`, etc.) returned `null` when data arrays and children were both empty. Added `hasRenderableChildren` guard to all 13 section types in `SectionBlock.tsx`.

@@ -38,20 +38,21 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
 
 ### Changed & Improved
 
-- **Mermaid Rendering — parser and layout rewrite**:
-  - Supports chained edges (`A --> B --> C`), `---` plain edges, `<br/>` label splitting, rhombus/decision nodes, `subgraph` grouping, and TD/LR layouts with curve-routed feedback loops.
-  - Tight content-bound `viewBox` with adaptive scaling; responsive sizing for narrow diagrams (fluid `max-width`) and horizontal scroll for wide LR diagrams (locked `min-width`), preserving readable font sizes.
-- **Branded Color / Metadata Sourcing**:
-  - `app/layout.tsx` mask-icon color + `themeColor` and `app/manifest.ts` `background_color` / `theme_color` read from `BRAND`/`TOKENS` instead of hardcoded hexes.
-  - Removed remaining hardcoded brand hexes from `lib/email.ts`, `app/api/email/unsubscribe/route.ts`, and `components/marketing/sections/journey.tsx`; corrected email `logo-full.png` aspect ratio.
-- **Runtime Mermaid Path Removed**:
-  - `MarkdownRenderer` drops mermaid fences, `MermaidBlock` renders compiled SVG only (no raw-source fallback), error boundary hides source, dynamic import no longer `ssr:false`, and the unused `mermaid` dependency was removed from `package.json`.
+- **Universal Mermaid Diagram System Rebuild & Responsive Sizing Fix**:
+  - Replaced custom mock string parser with the real, official `mermaid` v11 engine executing at build-time (`content:compile`) inside Node.js via JSDOM (`scripts/compiler/mermaid-svg.ts`).
+  - Restored full 2D Dagre layout engine capabilities: decision diamonds, horizontal branching, curved/orthogonal arrows, sequence diagrams, and subgraphs matching original Mermaid visual hierarchy.
+  - Styled all diagrams using PM Academy green/white design tokens (`#FFFFFF` fills, `#166534` green borders/edges, `#1B2A21` text, `#EFF6F2` accent fills) with embedded `.dark` CSS overrides for zero-overhead theme switching.
+  - Resolved diagram sizing & responsiveness bugs by stripping fixed pixel SVG `width`/`height` attributes, post-processing with fluid `viewBox`, `preserveAspectRatio="xMidYMid meet"`, and `style="width: 100%; max-width: ${naturalWidth}px; height: auto;"`, and updating `MermaidBlock.tsx` container to `<div className="mermaid-diagram my-6 w-full max-w-full overflow-x-auto rounded-xl border border-border bg-card p-4 sm:p-6 flex justify-center">`.
+  - Bumped compiler `CACHE_VERSION` to `'6'` and converted `compileLesson`, `compileAllContent`, and `mdastToBlocks` to `async`/`await` for clean SVG generation.
+  - Re-compiled all 90 lessons and 203/203 Mermaid diagrams with 0 errors and 0 warnings (`npm run content:compile`, `npm run content:validate`, `npm run test:compiler`, `npm run build`).
 
 ### Fixed
 
-- **Mermaid static SVG sizing (ISSUE 2):** static diagrams previously rendered with broken sizing — extremely narrow, incorrect scaling, unusable responsive layout. Resolved via content-bound `viewBox`, adaptive `MIN_SCALE`, fluid vs. scroll-mode width logic, and a non-flex `overflow-x-auto` wrapper in `MermaidBlock`.
-- **Mermaid parser edge cases:** chain edges landing at wrong split indices (missing label capture group), labels retaining surrounding `"` delimiters, and chained-edge/subgraph parse failures.
-- **Brand assets:** stale base64 data-URI SVG stubs replaced with real vectors; `favicon.ico` relocated to `app/` per App Router convention (removed from `public/`); corrected `logoMarkDimensions`; fixed email logo intrinsic ratio.
+- **Mermaid layout & sizing breakdown (Universal Fix):**
+  - Resolved awkward edge routing, misplaced curved arrows, and vertical stacking of horizontal decision branches caused by the former custom parser by running the official `mermaid` layout engine in Node.js via JSDOM.
+  - Resolved page scale distortion where diagrams forced browser zoom down to ~33% by applying fluid `viewBox` coordinates and `max-width: ${naturalWidth}px` constraints on responsive flex wrappers.
+  - Added JSDOM `CSSStyleSheet` polyfill and `getBBox` mock for reliable server-side rendering without browser dependencies.
+  - Added multi-line `cleanSource` regex (`replace(/%%\{init:[\s\S]*?\}%%/gi, '')`) to strip legacy `%%{init}` blocks.
 
 ### Refactored
 

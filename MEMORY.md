@@ -37,21 +37,18 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 - Approved **two-tone mark**: teal hexagonal ring (`#019E75`) + dark-navy gem (`#011229`).
 
 ### Mermaid Architecture
-- Mermaid diagrams are **compiled into static SVGs at build time** during the content compilation pipeline (`scripts/compiler/mermaid-svg.ts` invoked from `scripts/compiler/compile.ts`) — for both code fences and top-level `mentalModel` / `framework` blocks.
-- **Runtime Mermaid rendering has been removed**: `MermaidBlock.tsx` renders the compiled static SVG inline; `MarkdownRenderer` drops raw mermaid fences; the `mermaid` npm dependency is gone.
-- Parser/layout supports chained edges, subgraph grouping, TD & LR layouts, feedback loops, multi-line labels; responsive proportional scaling — diagrams render at a consistent 14px base font with content-sized boxes and char-level text wrapping, and scale to fit the lesson content area on all screen sizes (no horizontal scroll).
+- Mermaid diagrams are **compiled into static SVGs at build time** during content compilation (`scripts/compiler/mermaid-svg.ts` invoked from `compile.ts`) using the **official `mermaid` v11 engine inside Node.js via JSDOM**.
+- **Real Engine Layout**: Preserves full 2D Dagre layout, decision diamonds, horizontal branching, curved/orthogonal arrows, sequence diagrams, and subgraphs matching original Mermaid visual structure.
+- **Green/White Design System Styling**: Color tokens directly sourced from `theme/tokens.ts` (`#FFFFFF` node fills, `#166534` green borders/edges, `#1B2A21` text, `#EFF6F2` accent fills) with embedded `.dark` CSS overrides for zero-overhead dark theme switching.
+- **Fluid Responsive Sizing & 100% Zoom**: Strips fixed pixel SVG `width`/`height` attributes, post-processes with fluid `viewBox`, `preserveAspectRatio="xMidYMid meet"`, and `style="width: 100%; max-width: ${naturalWidth}px; height: auto;"`, and wraps SVGs in responsive flex containers inside `MermaidBlock.tsx` (`w-full max-w-full flex justify-center`). Never causes horizontal overflow or forces ~33% browser zoom out.
+- **Zero Runtime Overhead**: `MermaidBlock.tsx` renders pre-compiled static SVGs directly; zero client-side Mermaid JS runtime is shipped to the browser.
+- **Cache Invalidation & Verification**: `CACHE_VERSION` bumped to `'6'`; all 90 lessons (203/203 Mermaid blocks) compiled cleanly with 0 validation errors and 14/14 compiler test passes.
 
-### UI, Branding & Documentation Improvements
-- Rebrand pass across every surface: marketing pages, curriculum, dashboard, auth, admin console, certificates, emails, footer/nav, portfolio.
-- Metadata now token-driven: `app/layout.tsx`, `app/manifest.ts`, `app/robots.ts`, `app/sitemap.ts`, favicon/mask-icon colors sourced from `BRAND`/`TOKENS`.
-- Documentation reorganized into `docs/product/`, `docs/architecture/`, `docs/development/`, `docs/design/`, `docs/roadmap/`, `docs/reports/`, `docs/archive/`; added `Brand-Architecture.md`, `Roadmap.md`, per-sprint roadmap docs (7.1–8.6), and audit reports.
-- CI hardening (`.github/workflows/ci.yml`): rejects base64 data-URI SVGs in `public/` and hardcoded brand hexes outside `theme/tokens.ts`.
-
-### Sprint 7.1 Wrap-up Hotfixes (2026-08-08)
+### Sprint 7.1 Wrap-up Hotfixes & Rebuilds (2026-08-08)
+- **Universal Mermaid Engine Rebuild**: Replaced mock string parser with real `mermaid` v11 layout engine in JSDOM, added JSDOM `CSSStyleSheet` polyfill, and added regex `cleanSource` for multi-line `%%{init}` blocks.
 - **Lesson rendering**: theory tab no longer drops authored `connections`/`unlocks` content; lesson header shows the true course position (`Lesson {globalOrder}`, not per-module `order`).
-- **Mermaid diagrams**: removed the design-width downscale (fixed inconsistent 11.12px/10.5px/9.14px label fonts), shrank the minimum box size (128px→48px), added char-level text wrapping, and switched the emitted style from fixed `min-width`/scroll to `width:{vw}px;max-width:100%;height:auto` proportional scaling — no more horizontal overflow. Bumped the compiler `CACHE_VERSION` to `4` so stale `content/dist` SVGs are not served from cache; added 4 rendering-quality unit tests.
-- **`notification-scheduler.yml`**: required GitHub secrets `APP_URL` + `CRON_SECRET` documented (see below); workflow now falls back to the canonical origin and fails loudly (`curl --fail-with-body`) instead of silently no-opping on 401s/404s.
-- **`ci.yml`**: automatic triggers (push/PR to `main`) confirmed present in history; the Sprint 7.1 brand-hardening check that `6fb9800` accidentally removed was restored verbatim.
+- **`notification-scheduler.yml`**: required GitHub secrets `APP_URL` + `CRON_SECRET` documented; workflow falls back to canonical origin and fails loudly (`curl --fail-with-body`) instead of silently no-opping on 401s/404s.
+- **`ci.yml`**: automatic triggers (push/PR to `main`) confirmed present; Sprint 7.1 brand-hardening check restored verbatim.
 
 ### Architectural Decisions (Sprint 7.1)
 1. **Single source of truth for brand**: `lib/brand.ts` + `theme/tokens.ts`; no hardcoded brand hexes in components/emails.

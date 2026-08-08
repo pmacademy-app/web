@@ -227,6 +227,29 @@ Each entry follows this structure:
 
 ---
 
+## D-011: Build-Time Static SVG Mermaid Compilation via JSDOM Layout Engine
+
+**Status:** Settled ✅ (Sprint 7.1)
+
+**Decision:** Render all Mermaid diagrams (code fences, `mentalModel`, and `framework` blocks) to static SVGs at `content:compile` time via `scripts/compiler/mermaid-svg.ts` using the official `mermaid` v11 engine executing inside Node.js via JSDOM.
+
+**Rationale:**
+- **Zero Runtime Overhead:** Completely eliminates the client-side Mermaid JS runtime bundle from lesson pages, reducing client bundle size and preventing hydration pop-in flashes.
+- **Layout Fidelity:** Using the real `mermaid` layout engine in JSDOM preserves full 2D Dagre layout capabilities, decision diamonds, horizontal branching, curved/orthogonal arrows, sequence diagrams, and subgraphs without relying on inaccurate custom string parsers.
+- **Brand Alignment:** SVGs are styled at build time using PM Academy green/white design tokens (`theme/tokens.ts`: `#FFFFFF` fills, `#166534` green borders/edges, `#1B2A21` text, `#EFF6F2` accent fills). Dark mode theme toggling is handled CSS-only via embedded `.dark` rules inside the SVG `<style>` tag.
+- **Fluid Sizing:** Post-processed SVGs use fluid `viewBox` attributes and `max-width` styling inside responsive flex containers (`MermaidBlock.tsx`), scaling cleanly at 100% normal browser zoom without forced 33% zoom out or horizontal overflow.
+
+**Alternatives Considered:**
+- **Custom string-based layout algorithm:** Rejected. Lacks proper 2D Dagre layout routing, causing horizontal decision branches to stack vertically and curved arrows to break.
+- **Client-side runtime rendering (`mermaid.js` in browser):** Rejected. Adds heavy JS bundle overhead, hydration delay, and theme flickering.
+
+**Consequences:**
+- Zero client-side Mermaid JS runtime shipped to the browser.
+- All 90 lessons and 203 Mermaid blocks pre-rendered to SVG at build time (`content:compile`).
+
+---
+
 ## Changelog
 
+- v1.1 (2026-08-08) — Added D-011 (Build-Time Static SVG Mermaid Compilation via JSDOM Layout Engine).
 - v1.0 (2026-08-01) — Created from information distributed across `MEMORY.md`, the project audit report, and the architecture docs. Synthesizes 10 major decisions with full rationale.
