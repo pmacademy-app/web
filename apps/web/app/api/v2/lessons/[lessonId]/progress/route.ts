@@ -14,6 +14,7 @@ import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
+import { evaluateRateLimit } from '@/lib/rate-limit'
 import { getAuthenticatedUser } from '@/lib/auth'
 
 const patchSchema = z.object({
@@ -108,6 +109,12 @@ export async function PATCH(
     const user = await getAuthenticatedUser(authClient)
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Rate limiting (30 requests per minute per user)
+    const rl = evaluateRateLimit(`progress_${user.id}`, { limit: 30, windowMs: 60 * 1000 })
+    if (!rl.success) {
+      return Response.json({ error: 'Too many requests. Please try again shortly.' }, { status: 429 })
     }
 
     const body = await request.json()

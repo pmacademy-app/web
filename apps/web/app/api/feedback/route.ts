@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
+import { evaluateRateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
   try {
     const user = await getAuthenticatedUserFromRequest(request)
+    const rateCheck = evaluateRateLimit(user ? user.id : 'anon_feedback', { limit: 5, windowMs: 60 * 1000 })
+    if (!rateCheck.success) {
+      return NextResponse.json({ error: 'Too many feedback submissions. Please wait a moment.' }, { status: 429 })
+    }
     const body = await request.json()
 
     const { content, sourceEvent } = body
