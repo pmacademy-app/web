@@ -6,44 +6,42 @@
 import type { NavLink, FooterLinkGroup } from '@/types'
 
 export const NAV_LINKS: NavLink[] = [
-  { label: 'Curriculum',          href: '/#curriculum',   futureRoute: '/curriculum' },
-  { label: 'Learning Experience', href: '/#experience',   futureRoute: '/experience' },
-  { label: 'Portfolio',           href: '/#portfolio',    futureRoute: '/portfolio' },
-  { label: 'About',               href: '/#why',          futureRoute: '/about' },
-  { label: 'FAQ',                 href: '/#faq',          futureRoute: '/faq' },
+  { label: 'Curriculum', href: '/#curriculum' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+  { label: 'FAQ', href: '/#faq' },
 ]
 
 export const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
   {
     heading: 'Resources',
     links: [
-      { label: 'Curriculum',     href: '/#curriculum' },
-      { label: 'Sample Lessons', href: '/#experience' },
-      { label: 'Glossary',       href: '/#curriculum' },
-      { label: 'Updates',        href: '/#waitlist' },
+      { label: 'Curriculum', href: '/#curriculum' },
+      { label: 'Sample Lessons', href: '/academy' },
+      { label: 'Buy Me a Coffee', href: 'https://buymeacoffee.com/pmacademy' },
     ],
   },
   {
     heading: 'Product',
     links: [
       { label: 'Learning Experience', href: '/#experience' },
-      { label: 'Skill Radar',         href: '/#skill-radar' },
-      { label: 'Portfolio',           href: '/#portfolio' },
+      { label: 'Skill Radar', href: '/#skill-radar' },
+      { label: 'Portfolio', href: '/#portfolio' },
     ],
   },
   {
     heading: 'Company',
     links: [
-      { label: 'About',   href: '/#why' },
-      { label: 'Contact', href: 'mailto:hello@pmacademy.com' },
-      { label: 'FAQ',     href: '/#faq' },
+      { label: 'About', href: '/about' },
+      { label: 'Contact', href: '/contact' },
+      { label: 'FAQ', href: '/#faq' },
     ],
   },
   {
     heading: 'Legal',
     links: [
       { label: 'Privacy', href: '/privacy' },
-      { label: 'Terms',   href: '/terms' },
+      { label: 'Terms', href: '/terms' },
     ],
   },
 ]

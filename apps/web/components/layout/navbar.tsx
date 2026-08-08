@@ -62,21 +62,36 @@ function CTAButton({
   }
 
   return (
-    <Link
-      href="/#waitlist"
-      onClick={handleClick}
-      className={cn(
-        'inline-flex items-center font-medium rounded-sm',
-        'bg-primary text-primary-foreground',
-        'hover:opacity-90 active:scale-[0.98]',
-        'transition-all duration-[120ms]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-        size === 'md' && 'px-4 py-2 text-body-sm',
-        size === 'sm' && 'px-3 py-1.5 text-body-sm',
-      )}
-    >
-      Join Waitlist
-    </Link>
+    <div className="flex items-center gap-3">
+      <Link
+        href={BRAND.social.buyMeACoffee}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(
+          'hidden sm:inline-flex items-center font-medium rounded-sm border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-all',
+          size === 'md' && 'px-3 py-1.5 text-xs',
+          size === 'sm' && 'px-2.5 py-1 text-xs',
+        )}
+      >
+        ☕ Buy Me a Coffee
+      </Link>
+
+      <Link
+        href="/academy"
+        onClick={handleClick}
+        className={cn(
+          'inline-flex items-center font-medium rounded-sm',
+          'bg-primary text-primary-foreground',
+          'hover:opacity-90 active:scale-[0.98]',
+          'transition-all duration-[120ms]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+          size === 'md' && 'px-4 py-2 text-body-sm',
+          size === 'sm' && 'px-3 py-1.5 text-body-sm',
+        )}
+      >
+        Start Learning Free
+      </Link>
+    </div>
   )
 }
 

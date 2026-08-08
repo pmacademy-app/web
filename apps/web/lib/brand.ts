@@ -9,8 +9,9 @@ export const BRAND = {
   positioning: '90 lessons. 9 modules. Free forever.',
   domain: 'pmacademy.adityagangwani.me',
   social: {
-    linkedin: '[TBD]',
-    twitter: '[TBD]',
+    linkedin: 'https://linkedin.com/company/pmacademy',
+    twitter: 'https://x.com/pmacademy_app',
+    buyMeACoffee: 'https://buymeacoffee.com/pmacademy',
   },
   legalEntity: 'Prodigy',
   certificateIssuer: 'Prodigy',

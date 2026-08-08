@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { FeatureCard } from '@/components/marketing/feature-card'
+import { BRAND } from '@/lib/brand'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { STAGGER_CONTAINER } from '@/lib/animation'
 
@@ -21,7 +22,7 @@ const COMPARISON_CARDS = [
   },
   {
     icon: 'BookOpen',
-    title: 'PM Academy',
+    title: BRAND.product,
     description: 'Structured curriculum, skill analytics, interactive quizzes, and portfolio artifacts. Completely free.',
     variant: 'comparison-highlighted' as const,
   },

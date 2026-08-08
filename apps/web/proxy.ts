@@ -55,16 +55,23 @@ export async function proxy(request: NextRequest) {
   const isAdminArea = path.startsWith('/admin')
   const isAdminProtectedPage = isAdminArea && !isAdminLoginPage && !isAccessDeniedPage
 
+  const PUBLIC_SAMPLE_LESSONS = [
+    '/academy',
+    '/academy/foundations/les_zoyq8a',
+    '/academy/foundations/les_prrl23',
+    '/academy/foundations/les_0q4aih',
+  ]
+
   const isAppPage =
-    path.startsWith('/dashboard') ||
+    (path.startsWith('/dashboard') ||
     path.startsWith('/review') ||
     path.startsWith('/progress') ||
     path.startsWith('/leaderboard') ||
     path.startsWith('/settings') ||
     path.startsWith('/onboarding') ||
-    path.startsWith('/academy') ||
+    (path.startsWith('/academy') && !PUBLIC_SAMPLE_LESSONS.includes(path)) ||
     isAdminProtectedPage ||
-    (path.startsWith('/curriculum/') && path !== '/curriculum')
+    (path.startsWith('/curriculum/') && path !== '/curriculum'))
 
   const isPublicPage = isGeneralAuthPage || isAdminLoginPage || isAccessDeniedPage
 
