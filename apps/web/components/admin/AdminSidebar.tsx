@@ -7,15 +7,10 @@ import {
   LayoutDashboard,
   Users,
   BookOpen,
-  Bell,
   Mail,
-  FileCode,
-  BarChart3,
   Award,
   Briefcase,
-  Flag,
   Activity,
-  Settings,
   ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -29,18 +24,13 @@ export interface NavItem {
 }
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { name: 'Content', href: '/admin/content', icon: BookOpen },
   { name: 'Users', href: '/admin/users', icon: Users },
-  { name: 'Academy Content', href: '/admin/content', icon: BookOpen },
-  { name: 'Notifications', href: '/admin/notifications', icon: Bell },
-  { name: 'Email Queue', href: '/admin/emails', icon: Mail },
-  { name: 'Templates', href: '/admin/templates', icon: FileCode },
-  { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+  { name: 'Communications', href: '/admin/communications', icon: Mail },
   { name: 'Certificates', href: '/admin/certificates', icon: Award },
-  { name: 'Portfolios', href: '/admin/portfolios', icon: Briefcase },
-  { name: 'Feature Flags', href: '/admin/feature-flags', icon: Flag },
-  { name: 'System & Health', href: '/admin/system', icon: Activity },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
+  { name: 'Feedback', href: '/admin/feedback', icon: Briefcase },
+  { name: 'System', href: '/admin/system', icon: Activity },
 ]
 
 export function AdminSidebar() {
