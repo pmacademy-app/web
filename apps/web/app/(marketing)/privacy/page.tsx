@@ -3,9 +3,19 @@ import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
 import { ShieldCheck } from 'lucide-react'
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
+
 export const metadata: Metadata = {
   title: 'Privacy Policy — Prodigy PM Academy',
   description: 'Privacy Policy for Prodigy PM Academy.',
+  openGraph: {
+    title: 'Privacy Policy — Prodigy PM Academy',
+    description: 'Prodigy PM Academy privacy policy and data handling practices.',
+    url: `${siteUrl}/privacy`,
+    type: 'website',
+    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodigy PM Academy' }],
+  },
+  twitter: { card: 'summary_large_image', title: 'Privacy Policy — Prodigy PM Academy', images: [BRAND.assets.ogImage] },
 }
 
 export default function PrivacyPage() {

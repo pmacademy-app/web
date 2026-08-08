@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Menu, Search, User, LogOut, ChevronRight } from 'lucide-react'
+import { useSearch } from '@/components/search/SearchOverlayProvider'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { getLevelTitle } from '@/lib/xp'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
@@ -23,6 +24,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
   const pathname = usePathname()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const { openSearch } = useSearch()
 
   const { breadcrumbs: contextCrumbs } = useBreadcrumbs()
 
@@ -130,14 +132,20 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
 
       {/* Right: Search trigger & Profile Dropdown */}
       <div className="flex items-center gap-4">
-        {/* Search Trigger Button placeholder for Sprint 4 */}
+        {/* Search Trigger — opens SearchOverlay (Sprint 8.2) */}
         <button
           type="button"
-          aria-label="Search curriculum"
+          id="search-trigger-btn"
+          onClick={openSearch}
+          aria-label="Search curriculum (Ctrl+K)"
+          aria-keyshortcuts="Control+k Meta+k"
           className="flex items-center gap-2 border border-input bg-card hover:bg-secondary/40 text-muted-foreground px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <Search className="w-4 h-4" />
-          <span className="hidden md:inline">Search (Ctrl+K)</span>
+          <span className="hidden md:inline">Search</span>
+          <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-medium bg-muted border border-border rounded opacity-70">
+            ⌘K
+          </kbd>
         </button>
 
         {/* Notification Bell Header Control */}

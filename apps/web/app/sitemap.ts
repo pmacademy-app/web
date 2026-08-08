@@ -1,12 +1,22 @@
 import type { MetadataRoute } from 'next'
-import fs from 'fs'
-import path from 'path'
 import { BRAND } from '@/lib/brand'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
+/**
+ * Build-time sitemap.xml generation.
+ *
+ * Includes:
+ *  - All public marketing pages
+ *  - The 3 public sample lessons accessible to logged-out visitors
+ *
+ * Excludes:
+ *  - All authenticated app routes (/dashboard, /settings, /admin, etc.)
+ *  - The remaining 87 auth-gated lessons (not indexable)
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes: MetadataRoute.Sitemap = [
+  // ── Marketing pages ────────────────────────────────────────────────────────
+  const marketingRoutes: MetadataRoute.Sitemap = [
     {
       url: siteUrl,
       lastModified: new Date(),
@@ -26,30 +36,47 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/waitlist`,
+      url: `${siteUrl}/contact`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.9,
+      priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${siteUrl}/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
   ]
 
-  // Dynamically append all 90 lesson page routes
-  try {
-    const curriculumPath = path.resolve(process.cwd(), '..', '..', 'content', 'dist', 'curriculum.json')
-    if (fs.existsSync(curriculumPath)) {
-      const raw = fs.readFileSync(curriculumPath, 'utf-8')
-      const curriculum = JSON.parse(raw) as { lessons: { slug: string }[] }
-      const lessonRoutes = curriculum.lessons.map((lesson) => ({
-        url: `${siteUrl}/lessons/${lesson.slug}`,
-        lastModified: new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.8,
-      }))
-      return [...staticRoutes, ...lessonRoutes]
-    }
-  } catch (err) {
-    console.error('[sitemap] Error reading curriculum.json for dynamic sitemap:', err)
-  }
+  // ── Public sample lessons (logged-out accessible) ──────────────────────────
+  // Only the 3 lessons exempted in proxy.ts — the other 87 are auth-gated.
+  const sampleLessonRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${siteUrl}/academy/foundations/les_zoyq8a`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/academy/foundations/les_prrl23`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/academy/foundations/les_0q4aih`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+  ]
 
-  return staticRoutes
+  return [...marketingRoutes, ...sampleLessonRoutes]
 }

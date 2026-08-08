@@ -3,9 +3,29 @@ import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
 import { CheckCircle2, ArrowRight } from 'lucide-react'
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
+
 export const metadata: Metadata = {
   title: 'About — Free Product Management Academy',
   description: 'Learn why Prodigy PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
+  openGraph: {
+    title: 'About — Prodigy PM Academy',
+    description: 'Learn why Prodigy PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
+    url: `${siteUrl}/about`,
+    type: 'website',
+    images: [{
+      url: BRAND.assets.ogImage,
+      width: BRAND.assets.ogImageDimensions.width,
+      height: BRAND.assets.ogImageDimensions.height,
+      alt: 'Prodigy PM Academy — Learn Product Management Free',
+    }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About — Prodigy PM Academy',
+    description: '90 lessons. 9 modules. Free forever. No paywalls.',
+    images: [BRAND.assets.ogImage],
+  },
 }
 
 export default function AboutPage() {

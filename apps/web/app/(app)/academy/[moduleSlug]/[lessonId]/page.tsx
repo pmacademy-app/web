@@ -19,10 +19,25 @@ import {
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { isLessonUnlocked } from '@/lib/lessons-completion-service'
+import { BRAND } from '@/lib/brand'
 import LessonPageContent from './lesson-content'
 
 interface PageProps {
   params: Promise<{ moduleSlug: string; lessonId: string }>
+}
+
+const SAMPLE_LESSON_IDS = ['les_zoyq8a', 'les_prrl23', 'les_0q4aih']
+
+const MODULE_LABEL: Record<string, string> = {
+  foundations: 'Product Thinking Foundations',
+  discovery: 'Discovery & User Research',
+  strategy: 'Product Strategy',
+  execution: 'Product Execution',
+  growth: 'Growth & Metrics',
+  leadership: 'PM Leadership',
+  technical: 'Technical Fundamentals for PMs',
+  design: 'Design Thinking & UX',
+  capstone: 'Capstone & Career Portfolio',
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -33,12 +48,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   ])
   if (!lesson) return { title: 'Lesson Not Found' }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
   const globalIndex = curriculum?.lessons.findIndex((l) => l.id === lessonId) ?? -1
   const globalOrder = globalIndex >= 0 ? globalIndex + 1 : lesson.order
+  const lessonUrl = `${siteUrl}/academy/${lesson.module}/${lessonId}`
+  const description = `Lesson ${globalOrder}: ${lesson.title} — part of the ${MODULE_LABEL[lesson.module] ?? lesson.module} module. Includes theory, interactive quiz, spaced repetition flashcards, and reflection exercise.`
+  const isSample = SAMPLE_LESSON_IDS.includes(lessonId)
 
   return {
     title: `Lesson ${globalOrder}: ${lesson.title}`,
-    description: `Interactive lesson — theory, practice quiz, spaced repetition flashcards, and reflection exercise.`,
+    description,
+    // Only public sample lessons should be indexed
+    robots: isSample ? { index: true, follow: true } : { index: false, follow: false },
+    openGraph: {
+      title: `Lesson ${globalOrder}: ${lesson.title} | Prodigy PM Academy`,
+      description,
+      url: lessonUrl,
+      type: 'article',
+      images: [{
+        url: BRAND.assets.ogImage,
+        width: BRAND.assets.ogImageDimensions.width,
+        height: BRAND.assets.ogImageDimensions.height,
+        alt: lesson.title,
+      }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `Lesson ${globalOrder}: ${lesson.title}`,
+      description,
+      images: [BRAND.assets.ogImage],
+    },
   }
 }
 
@@ -56,7 +95,6 @@ export default async function AcademyLessonPage({ params }: PageProps) {
 
   // 3. Auth verification & sample lesson handling
   const user = await getServerUser()
-  const SAMPLE_LESSON_IDS = ['les_zoyq8a', 'les_prrl23', 'les_0q4aih']
   const isSampleLesson = SAMPLE_LESSON_IDS.includes(lessonId)
 
   if (!user && !isSampleLesson) {
@@ -155,14 +193,54 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   }
 
   // 6. Render lesson content via the v2 client shell
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
+  const lessonUrl = `${siteUrl}/academy/${lesson.module}/${lessonId}`
+
+  const articleJsonLd = isSampleLesson ? {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: lesson.title,
+    description: `Learn about ${lesson.title} — part of the free ${MODULE_LABEL[lesson.module] ?? lesson.module} curriculum.`,
+    url: lessonUrl,
+    image: `${siteUrl}${BRAND.assets.ogImage}`,
+    author: {
+      '@type': 'Organization',
+      name: BRAND.fullName,
+      url: siteUrl,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: BRAND.fullName,
+      url: siteUrl,
+    },
+    isPartOf: {
+      '@type': 'Course',
+      name: BRAND.fullName,
+      url: `${siteUrl}/academy`,
+      provider: {
+        '@type': 'Organization',
+        name: BRAND.fullName,
+      },
+    },
+    position: globalOrder,
+  } : null
+
   return (
-    <LessonPageContent
-      lesson={lesson}
-      prevLessonUrl={prevLessonUrl}
-      nextLessonUrl={nextLessonUrl}
-      globalOrder={globalOrder}
-      moduleNumber={moduleNum}
-      moduleName={moduleName}
-    />
+    <>
+      {articleJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        />
+      )}
+      <LessonPageContent
+        lesson={lesson}
+        prevLessonUrl={prevLessonUrl}
+        nextLessonUrl={nextLessonUrl}
+        globalOrder={globalOrder}
+        moduleNumber={moduleNum}
+        moduleName={moduleName}
+      />
+    </>
   )
 }
