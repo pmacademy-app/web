@@ -4,18 +4,14 @@ import { createServerSupabaseClient } from '@/lib/supabase'
 import type { Database } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
-import { getUserXpSummary } from '@/lib/xp-service'
 import { getUserStreakStatus } from '@/lib/streaks-db'
-import { getSkillRadarSummary } from '@/lib/skillRadar'
+import { getReviewQueueData } from '@/lib/flashcards-service'
+import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
 import { ContinueLearningCard, NextLessonData } from '@/components/dashboard/ContinueLearningCard'
-import { SkillRadarCard } from '@/components/dashboard/SkillRadarCard'
-import { ProgressRingCard } from '@/components/dashboard/ProgressRingCard'
-import { LevelCard } from '@/components/dashboard/LevelCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
-import { DashboardLeaderboardWidget } from '@/components/dashboard/DashboardLeaderboardWidget'
-import { DashboardNotificationsWidget } from '@/components/notifications/DashboardNotificationsWidget'
-import { getWeeklyLeaderboard } from '@/lib/leaderboard-db'
+import { FlashcardReviewPromptCard } from '@/components/dashboard/FlashcardReviewPromptCard'
+import { NextCapstonePromptCard } from '@/components/dashboard/NextCapstonePromptCard'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -23,7 +19,7 @@ interface DBChain {
 
 export const metadata: Metadata = {
   title: 'Dashboard',
-  description: 'Track your skill radar, streak, XP rank, and curriculum progress across PM Academy.',
+  description: 'Action-oriented dashboard for Prodigy PM Academy learners. Continue your next lesson, review flashcards, and submit capstones.',
 }
 
 export default async function DashboardPage() {
@@ -54,15 +50,14 @@ export default async function DashboardPage() {
     }
   }
 
-  // 2. Parallel data fetching from Services
+  // 2. Parallel data fetching
   const [
     { data: progressRows },
     curriculum,
-    xpSummary,
     streakStatus,
-    radarSummary,
+    reviewQueue,
+    { data: capstoneRows },
     { data: recentXpEvents },
-    weeklyLeaderboard,
   ] = await Promise.all([
     supabase
       .from('user_lesson_progress')
@@ -71,9 +66,14 @@ export default async function DashboardPage() {
       data: Database['public']['Tables']['user_lesson_progress']['Row'][] | null
     },
     fetchCurriculumData(),
-    getUserXpSummary(supabase, authUser.id),
     getUserStreakStatus(supabase, authUser.id),
-    getSkillRadarSummary(supabase, authUser.id),
+    getReviewQueueData(supabase, authUser.id),
+    (supabase
+      .from('capstone_submissions') as unknown as DBChain)
+      .select('*')
+      .eq('user_id', authUser.id) as unknown as {
+      data: Database['public']['Tables']['capstone_submissions']['Row'][] | null
+    },
     (supabase
       .from('xp_events') as unknown as DBChain)
       .select('*')
@@ -82,26 +82,25 @@ export default async function DashboardPage() {
       .limit(5) as unknown as {
       data: { id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }[] | null
     },
-    getWeeklyLeaderboard(supabase, authUser.id),
   ])
 
   const curriculumLessons = curriculum?.lessons ?? []
-  const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0
+  const completedLessonIds = new Set(
+    progressRows
+      ?.filter((p) => p.status === 'completed')
+      .map((p) => p.lesson_id) ?? []
+  )
+  const completedLessonsCount = completedLessonIds.size
 
-  // 3. Find next lesson in global curriculum order (1 to 90)
+  // 3. Determine Next Lesson CTA
   let nextLesson: NextLessonData | null = null
   if (curriculumLessons.length > 0) {
-    const completedIds = new Set(
-      progressRows
-        ?.filter((p) => p.status === 'completed')
-        .map((p) => p.lesson_id) ?? []
-    )
-    const activeNextIndex = curriculumLessons.findIndex((l) => !completedIds.has(l.id))
+    const activeNextIndex = curriculumLessons.findIndex((l) => !completedLessonIds.has(l.id))
     if (activeNextIndex !== -1) {
       const activeNext = curriculumLessons[activeNextIndex]
       nextLesson = {
         id: activeNext.id,
-        order: activeNextIndex + 1, // Global 1-indexed lesson order (1..90)
+        order: activeNextIndex + 1,
         title: activeNext.title,
         module: activeNext.module,
         estimatedTime: `${activeNext.estimatedReadingTime} min`,
@@ -109,7 +108,49 @@ export default async function DashboardPage() {
     }
   }
 
-  // 4. Map recent activity items
+  // 4. Determine Next Capstone Prompt
+  // Find completed modules where capstone is not yet submitted or reviewed
+  const capstoneStatusMap = new Map<string, string>()
+  if (capstoneRows) {
+    for (const sub of capstoneRows) {
+      capstoneStatusMap.set(sub.module_slug, sub.status)
+    }
+  }
+
+  const submittedCapstonesCount = Array.from(capstoneStatusMap.values()).filter(
+    (s) => s === 'submitted' || s === 'reviewed'
+  ).length
+
+  let nextCapstonePrompt: {
+    moduleSlug: string
+    moduleNumber: number
+    title: string
+    deliverableType: string
+  } | null = null
+
+  const capstoneDefs = Object.values(CAPSTONE_DEFINITIONS)
+  for (const cap of capstoneDefs) {
+    const status = capstoneStatusMap.get(cap.moduleSlug) || 'not_started'
+    const isDone = status === 'submitted' || status === 'reviewed'
+
+    if (!isDone) {
+      // Check if all lessons in this module are completed
+      const moduleLessons = curriculumLessons.filter((l) => l.module === cap.moduleSlug)
+      const allModuleLessonsDone = moduleLessons.length > 0 && moduleLessons.every((l) => completedLessonIds.has(l.id))
+
+      if (allModuleLessonsDone) {
+        nextCapstonePrompt = {
+          moduleSlug: cap.moduleSlug,
+          moduleNumber: cap.moduleNumber,
+          title: cap.title,
+          deliverableType: cap.deliverableType,
+        }
+        break
+      }
+    }
+  }
+
+  // 5. Map recent XP activity items for small ticker
   const recentActivities: ActivityItem[] = (recentXpEvents || []).map((event) => {
     let title = 'XP Earned'
     let description = `Earned ${event.xp_amount} XP`
@@ -140,41 +181,26 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* Continue Learning Header CTA */}
+      {/* 1. Continue Learning Header CTA */}
       <ContinueLearningCard
         nextLesson={nextLesson}
-        totalLessonsCompleted={completedLessons}
+        totalLessonsCompleted={completedLessonsCount}
       />
 
-      {/* Primary Metrics Row */}
+      {/* 2. Action Prompts Grid: "What should I do next?" */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <LevelCard level={xpSummary.levelInfo.level} totalXp={xpSummary.totalXp} />
-        <StreakCard streakStatus={streakStatus} />
-        <ProgressRingCard
-          completedLessons={completedLessons}
-          totalLessons={90}
+        <FlashcardReviewPromptCard
+          dueCount={reviewQueue.dueCards.length}
+          totalUnlocked={reviewQueue.allUnlockedCards.length}
         />
+        <NextCapstonePromptCard
+          prompt={nextCapstonePrompt}
+          submittedCount={submittedCapstonesCount}
+        />
+        <StreakCard streakStatus={streakStatus} />
       </div>
 
-      {/* Leaderboard Widget & Skill Radar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-          <DashboardLeaderboardWidget
-            rank={weeklyLeaderboard.personalEntry?.rank ?? null}
-            daysStudied={weeklyLeaderboard.personalEntry?.daysStudied ?? 0}
-          />
-        </div>
-        <div className="md:col-span-2">
-          <SkillRadarCard
-            skillValues={radarSummary.scores}
-            breakdown={radarSummary.breakdown}
-            overallScore={radarSummary.overallScore}
-          />
-        </div>
-      </div>
-
-      {/* Notifications & Recent Activity */}
-      <DashboardNotificationsWidget />
+      {/* 3. Small Recent-XP Activity Ticker */}
       <RecentActivityCard activities={recentActivities} />
     </div>
   )
