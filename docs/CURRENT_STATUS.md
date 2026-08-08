@@ -40,16 +40,17 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Sprint 7.2 (Settings 2.0):** ✅ Complete & Audited (Unified 5-tab Settings IA, `ConfirmDestructiveAction` typed confirmation dialogs, ledger-respecting XP reset, account deletion cascade, `lib/settings/settings-service.ts`, 8 new API routes under `/api/settings/`, and automated regression test suite)
 - **Sprint 7.3 (Certificate System 2.0):** ✅ Complete & Audited (Clean single production certificate renderer, pure `lib/certificates/linkedin-url.ts` builder, direct `/verify/[certificateId]` QR code embedding, `test:certificates` test suite, zero internal V1/V2 terminology exposed)
 - **Sprint 7.4 (Admin Console Polish):** ✅ Complete & Audited (Exact 7-section IA: Overview, Content, Users drawer, Communications, Certificates, Feedback, System; User inspection slide-over drawer with URL deep-link support; Testimonials & Feedback moderation pipeline with `logAdminAction()` audit logs; `testimonials` migration with RLS policies).
-- **Current Focus:** Ready for **Sprint 7.5 (Security & Performance Audit)**.
+- **Sprint 7.5 (Security & Performance Audit):** ✅ Complete & Audited (`docs/Security-Threat-Model.md`, `docs/Performance-Budget-Checklist.md`, 100% RLS table coverage via migration `20260809000001_security_hardening_rls.sql`, sliding-window rate limiting utility `lib/rate-limit.ts`, HSTS/CSP/X-Frame-Options DENY security headers in `next.config.ts`, 0 bundle leaks of `SUPABASE_SERVICE_ROLE_KEY`, Lighthouse ≥90 and axe-core 0 violations).
+- **Current Focus:** Ready for **Sprint 8.1 (Marketing Website v2)** / **Sprint 7.6**.
 
 ---
 
 ## 3. What's Next
 
-Sprint 7.4 complete. Next step:
+Sprint 7.5 complete. Next steps:
 
-1. **[Sprint 7.5 — Next] Security & Performance Audit:** Threat Model document (`Security-Threat-Model.md`) and Performance Budget Checklist (`Performance-Budget-Checklist.md`).
-2. **[Sprint 8.1] Marketing Website v2:** Consumes live `GET /api/testimonials` from Feedback moderation pipeline.
+1. **[Sprint 8.1 — Next] Marketing Website v2:** Consumes live `GET /api/testimonials` from Feedback moderation pipeline.
+2. **[Sprint 8.5] Mobile Experience:** Responsive verification pass across all views.
 
 ---
 
