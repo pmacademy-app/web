@@ -385,37 +385,6 @@ export type Database = {
         }
         Update: Partial<Database['public']['Tables']['waitlist']['Insert']>
       }
-      certificates: {
-        Row: {
-          id: string
-          user_id: string
-          certificate_code: string
-          type: string
-          module_slug: string | null
-          learner_name: string
-          level: number
-          career_title: string
-          total_xp: number
-          lessons_completed: number
-          modules_completed: number
-          issued_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          certificate_code: string
-          type?: string
-          module_slug?: string | null
-          learner_name: string
-          level?: number
-          career_title: string
-          total_xp?: number
-          lessons_completed?: number
-          modules_completed?: number
-          issued_at?: string
-        }
-        Update: Partial<Database['public']['Tables']['certificates']['Insert']>
-      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
