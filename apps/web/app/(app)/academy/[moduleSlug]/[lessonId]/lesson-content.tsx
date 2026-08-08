@@ -52,8 +52,9 @@ type TabType = 'theory' | 'quiz' | 'flashcards' | 'reflection'
 
 function getBlocksForTab(blocks: CompiledBlock[], tab: TabType): CompiledBlock[] {
   if (tab === 'theory') {
-    // Theory tab: everything except quiz, flashcardDeck, reflection, connections
-    const EXCLUDED = new Set(['quiz', 'flashcardDeck', 'reflection', 'connections'])
+    // Theory tab: everything except quiz, flashcardDeck, reflection
+    // (connections is authored lesson content — rendered at the end of the theory tab)
+    const EXCLUDED = new Set(['quiz', 'flashcardDeck', 'reflection'])
     return blocks.filter((b) => !EXCLUDED.has(b.type))
   }
   if (tab === 'quiz') {
@@ -579,7 +580,7 @@ export default function LessonPageContent({
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary mb-3">
             <span>Module {moduleNumber}: {moduleName}</span>
             <span className="text-muted-foreground/40">•</span>
-            <span>Lesson {lesson.order}</span>
+            <span>Lesson {globalOrder}</span>
             <span className="text-muted-foreground/40">•</span>
             <span>{lesson.estimatedReadingTime} min read</span>
             <span className="text-muted-foreground/40">•</span>
