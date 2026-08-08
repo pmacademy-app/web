@@ -77,10 +77,15 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
 
       assert.strictEqual(newTotal, 0, 'New total XP must be 0')
       assert.ok(insertedRow, 'An audit row must be inserted into xp_events')
-      assert.strictEqual(insertedRow.source_type, 'user_reset', 'Source type must be user_reset')
-      assert.strictEqual(insertedRow.xp_amount, -1250, 'XP amount inserted must equal negative current total')
-      assert.strictEqual(updatedUserRow.total_xp, 0, 'User total_xp cache updated to 0')
-      assert.strictEqual(updatedUserRow.level, 1, 'User level updated to 1')
+      
+      const inserted = insertedRow as unknown as Record<string, unknown>
+      assert.strictEqual(inserted.source_type, 'user_reset', 'Source type must be user_reset')
+      assert.strictEqual(inserted.xp_amount, -1250, 'XP amount inserted must equal negative current total')
+      
+      const updated = updatedUserRow as unknown as Record<string, unknown>
+      assert.ok(updated, 'User row must be updated')
+      assert.strictEqual(updated.total_xp, 0, 'User total_xp cache updated to 0')
+      assert.strictEqual(updated.level, 1, 'User level updated to 1')
     })
   })
 })

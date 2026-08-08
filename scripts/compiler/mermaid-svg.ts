@@ -76,12 +76,44 @@ async function getMermaid() {
 
   if (!window.SVGElement.prototype.getBBox) {
     (window.SVGElement.prototype as any).getBBox = function () {
+      const tagName = this.tagName.toLowerCase();
       const text = this.textContent || '';
-      const lines = text.split('\n');
-      const maxLen = Math.max(...lines.map((l: string) => l.length), 1);
-      const width = Math.max(48, Math.min(360, maxLen * 8.5 + 24));
-      const height = Math.max(36, lines.length * 20 + 16);
-      return { x: 0, y: 0, width, height };
+      
+      // Measure text elements
+      if (tagName === 'text' || tagName === 'tspan') {
+        const tspans = this.getElementsByTagName ? this.getElementsByTagName('tspan') : [];
+        if (tagName === 'text' && tspans.length > 0) {
+          let maxWidth = 0;
+          let totalHeight = 0;
+          for (let i = 0; i < tspans.length; i++) {
+            const tspanText = tspans[i].textContent || '';
+            const w = Math.max(48, tspanText.length * 8.5 + 24);
+            if (w > maxWidth) maxWidth = w;
+            totalHeight += 20; // 20px per line
+          }
+          return { x: 0, y: 0, width: maxWidth, height: Math.max(36, totalHeight + 16) };
+        }
+        
+        // Single line element fallback
+        const lines = text.split('\n');
+        const maxLen = Math.max(...lines.map((l: string) => l.length), 1);
+        const width = Math.max(48, Math.min(360, maxLen * 8.5 + 24));
+        const height = Math.max(36, lines.length * 20 + 16);
+        return { x: 0, y: 0, width, height };
+      }
+
+      // Measure rect shapes
+      if (tagName === 'rect') {
+        return {
+          x: parseFloat(this.getAttribute('x') || '0'),
+          y: parseFloat(this.getAttribute('y') || '0'),
+          width: parseFloat(this.getAttribute('width') || '0'),
+          height: parseFloat(this.getAttribute('height') || '0'),
+        };
+      }
+
+      // Default fallback
+      return { x: 0, y: 0, width: 100, height: 50 };
     };
   }
 
@@ -102,6 +134,15 @@ async function getMermaid() {
     theme: 'base',
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: 14,
+    htmlLabels: false,
+    flowchart: {
+      htmlLabels: false,
+      useMaxWidth: true,
+    },
+    sequence: {
+      htmlLabels: false,
+      showSequenceNumbers: false,
+    },
     themeVariables: {
       darkMode: false,
       background: '#FFFFFF',
