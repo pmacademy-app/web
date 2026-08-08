@@ -307,6 +307,31 @@ export type Database = {
         }
         Update: Partial<Database['public']['Tables']['weekly_leaderboard_snapshots']['Insert']>
       }
+      testimonials: {
+        Row: {
+          id: string
+          user_id: string | null
+          source_event: string
+          content: string
+          status: 'pending' | 'approved' | 'rejected'
+          is_published: boolean
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          source_event: string
+          content: string
+          status?: 'pending' | 'approved' | 'rejected'
+          is_published?: boolean
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['testimonials']['Insert']>
+      }
       user_friends: {
         Row: {
           id: string

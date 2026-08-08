@@ -1,0 +1,132 @@
+'use client'
+
+import React from 'react'
+import { X, Zap, Flame, Award, BookOpen } from 'lucide-react'
+import { AdminKpiCard } from './AdminKpiCard'
+import { AdminStatusBadge } from './AdminStatusBadge'
+import { UserRoleToggle } from './UserRoleToggle'
+import { DeveloperActionsSection } from './DeveloperActionsSection'
+import type { AdminUserDetail } from '@/lib/admin/types'
+
+interface UserDetailDrawerProps {
+  user: AdminUserDetail | null
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProps) {
+  if (!isOpen || !user) return null
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+
+      {/* Slide-over Drawer Panel */}
+      <div className="relative w-full max-w-2xl bg-slate-900 border-l border-slate-800 text-slate-100 shadow-2xl h-full overflow-y-auto z-10 flex flex-col p-6 space-y-6 animate-in slide-in-from-right duration-200">
+        {/* Drawer Header */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+              {user.fullName.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                {user.fullName}
+              </h2>
+              <p className="text-xs text-slate-400 font-mono">{user.email}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <UserRoleToggle
+              userId={user.id}
+              initialIsAdmin={user.isAdmin}
+              userEmail={user.email}
+            />
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+              aria-label="Close drawer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* KPI Metrics */}
+        <div className="grid grid-cols-2 gap-3">
+          <AdminKpiCard
+            title="Level & Total XP"
+            value={`Lvl ${user.level}`}
+            subtitle={`${user.totalXp.toLocaleString()} Total XP`}
+            icon={Zap}
+            iconColor="text-purple-400"
+          />
+          <AdminKpiCard
+            title="Active Streak"
+            value={`${user.streakDays}d`}
+            subtitle="Current streak days"
+            icon={Flame}
+            iconColor="text-amber-400"
+          />
+          <AdminKpiCard
+            title="Lessons Completed"
+            value={user.lessonsCompleted}
+            subtitle="Curriculum lessons"
+            icon={BookOpen}
+            iconColor="text-emerald-400"
+          />
+          <AdminKpiCard
+            title="Certificates Issued"
+            value={user.certificatesCount}
+            subtitle="Signed credentials"
+            icon={Award}
+            iconColor="text-blue-400"
+          />
+        </div>
+
+        {/* Account Details Breakdown */}
+        <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            Account Profile & Metadata
+          </h3>
+          <div className="space-y-2 text-xs">
+            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
+              <span className="text-slate-400">User ID</span>
+              <span className="font-mono text-slate-200 text-[11px] select-all">{user.id}</span>
+            </div>
+            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
+              <span className="text-slate-400">Account Goal</span>
+              <span className="text-slate-200">{user.goal || 'General Skill Upgrade'}</span>
+            </div>
+            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
+              <span className="text-slate-400">Public Portfolio</span>
+              <AdminStatusBadge
+                status={user.hasPublicPortfolio ? 'published' : 'archived'}
+                label={user.hasPublicPortfolio ? 'Enabled' : 'Disabled'}
+              />
+            </div>
+            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
+              <span className="text-slate-400">Joined Date</span>
+              <span className="font-mono text-slate-200">
+                {new Date(user.createdAt).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Developer / Admin Operational Actions */}
+        <div className="pt-2">
+          <DeveloperActionsSection
+            targetUserId={user.id}
+            targetUserEmail={user.email}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,8 +1,11 @@
 import React from 'react'
-import { Award } from 'lucide-react'
+import Link from 'next/link'
+import { Award, ExternalLink, ShieldCheck } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
+import { DeveloperActionsSection } from '@/components/admin/DeveloperActionsSection'
+import { AdminConsoleService } from '@/lib/admin/service'
 
 export const revalidate = 0
 
@@ -10,18 +13,21 @@ interface CertificateRow {
   id: string
   certificate_code: string
   user_id: string
-  certificate_type: string
-  module_slug?: string
+  type: string
+  learner_name?: string
   issued_at: string
 }
 
 export default async function AdminCertificatesPage() {
   const supabase = createServerSupabaseClient()
+  const users = await AdminConsoleService.getUsersOverview(1)
+
+  // Fetch certificates from certificates table
   const { data: certs } = await supabase
-    .from('user_certificates')
+    .from('certificates')
     .select('*')
     .order('issued_at', { ascending: false })
-    .limit(30)
+    .limit(50)
 
   const certList = (certs || []) as unknown as CertificateRow[]
 
@@ -31,18 +37,30 @@ export default async function AdminCertificatesPage() {
       cell: (cert) => <span className="font-mono font-bold text-amber-400">{cert.certificate_code}</span>,
     },
     {
-      header: 'Type',
-      cell: (cert) => <span className="text-slate-300 capitalize">{cert.certificate_type.replace('_', ' ')}</span>,
+      header: 'Learner',
+      cell: (cert) => <span className="text-white font-semibold">{cert.learner_name || 'Learner'}</span>,
     },
     {
-      header: 'Issued At',
+      header: 'Credential Type',
+      cell: (cert) => <span className="text-slate-300 capitalize">{(cert.type || 'Full Curriculum').replace('_', ' ')}</span>,
+    },
+    {
+      header: 'Issued Date',
       cell: (cert) => <span className="text-slate-400 font-mono text-[11px]">{new Date(cert.issued_at).toLocaleDateString()}</span>,
     },
     {
-      header: 'Verification URL',
+      header: 'Verification Link',
       headerClassName: 'text-right',
-      className: 'text-right font-mono text-xs text-blue-400',
-      cell: (cert) => `/verify/${cert.certificate_code}`,
+      className: 'text-right',
+      cell: (cert) => (
+        <Link
+          href={`/verify/${encodeURIComponent(cert.certificate_code)}`}
+          target="_blank"
+          className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-mono"
+        >
+          Verify <ExternalLink className="w-3 h-3" />
+        </Link>
+      ),
     },
   ]
 
@@ -50,11 +68,12 @@ export default async function AdminCertificatesPage() {
     <div className="space-y-8">
       <AdminPageHeader
         title="Certificate Audit & Verification"
-        description="Inspect issued certificates, verify credential integrity, and test public verification pages."
+        description="Inspect issued certificates, verify credential integrity, and test public verification lookups."
         icon={Award}
         iconColor="text-amber-400"
       />
 
+      {/* Certificates Data Table */}
       <AdminDataTable
         columns={columns}
         data={certList}
@@ -62,6 +81,20 @@ export default async function AdminCertificatesPage() {
         emptyTitle="No certificates issued yet"
         emptyDescription="Certificates will appear here once learners complete modules or the full curriculum."
       />
+
+      {/* Dev Certificate Tools Section */}
+      {users.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Dev Certificate Tools</h2>
+          </div>
+          <DeveloperActionsSection
+            targetUserId={users[0].id}
+            targetUserEmail={users[0].email}
+          />
+        </div>
+      )}
     </div>
   )
 }
