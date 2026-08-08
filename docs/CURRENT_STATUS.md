@@ -38,16 +38,17 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Sprint 6.5 (Release Candidate & Production Readiness Audit):** ✅ Complete (`v1.0.0-rc1` ready for production tagging)
 - **Sprint 7.1 (Global Branding & Documentation):** ✅ Complete (`lib/brand.ts`, `BrandLogo` system, static brand assets, full rebrand pass across app/emails/certs/admin, build-time Mermaid→SVG static compilation stage, documentation sync)
 - **Sprint 7.2 (Settings 2.0):** ✅ Complete (Unified 5-tab Settings IA, `ConfirmDestructiveAction` typed confirmation dialogs, ledger-respecting XP reset, account deletion cascade, `lib/settings/settings-service.ts`, 8 new API routes under `/api/settings/`, and automated regression test suite)
-- **Current Focus:** Ready for Sprint 7.3 (Certificate System 2.0)
+- **Sprint 7.3 (Certificate System 2.0):** ✅ Complete (`20260808000001_add_certificate_template_version.sql` additive migration, versioned renderer V1 vs V2, pure `lib/certificates/linkedin-url.ts` builder, direct `/verify/[certificateId]` QR code embedding, `test:certificates` test suite)
+- **Current Focus:** Ready for Sprint 7.4 (Admin Console Polish)
 
 ---
 
 ## 3. What's Next
 
-Sprint 7.2 Settings 2.0 complete. Ready for **Sprint 7.3 (Certificate System 2.0)**:
+Sprint 7.3 Certificate System 2.0 complete. Ready for **Sprint 7.4 (Admin Console Polish)**:
 
-1. **[Sprint 7.3 — Next] Certificate System 2.0:** Versioned certificates (`template_version`), QR code verification linking to `/verify/[certificateId]`, and LinkedIn "Add to Profile" deep link integration.
-2. **[Sprint 7.4] Admin Console Polish:** Redesigned Admin IA (Overview, Content, Users drawer, Communications, Certificates, Feedback, System).
+1. **[Sprint 7.4 — Next] Admin Console Polish:** Redesigned Admin IA (Overview, Content, Users drawer, Communications, Certificates, Feedback, System).
+2. **[Sprint 7.5] Security & Performance Audit:** Threat Model document (`Security-Threat-Model.md`) and Performance Budget Checklist (`Performance-Budget-Checklist.md`).
 
 ---
 

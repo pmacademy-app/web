@@ -109,11 +109,14 @@ export default async function CertificateVerificationPage({ params }: PageProps)
           issuedAt={cert.issuedAt}
         />
 
-        {/* Action Bar (Print, Share, Download PDF, Copy Link) */}
+        {/* Action Bar (Print, Share, Download PDF, Copy Link, Add to LinkedIn) */}
         <CertificateActions
           verificationUrl={cert.verificationUrl}
           portfolioUrl={cert.portfolioUrl}
           certificateCode={cert.certificateCode}
+          careerTitle={cert.levelInfo.title}
+          type={cert.type}
+          issuedAt={cert.issuedAt}
         />
 
         {/* Official Printable Certificate Layout */}

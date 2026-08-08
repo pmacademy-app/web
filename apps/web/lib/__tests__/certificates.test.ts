@@ -4,8 +4,9 @@ import {
   generateCredentialJsonLd,
   generateQrCodeSvg,
 } from '../certificates'
+import { buildLinkedInCertificationUrl } from '../certificates/linkedin-url'
 
-console.log('🧪 Running Certificates & Credentials Unit Test Suite...\n')
+console.log('🧪 Running Certificates & Credentials System 2.0 Unit Test Suite...\n')
 
 let passedTests = 0
 
@@ -57,12 +58,36 @@ runTest('generateCredentialJsonLd generates valid schema.org EducationalOccupati
 })
 
 // 3. QR Code SVG Generator
-runTest('generateQrCodeSvg outputs clean SVG vector markup containing rectangles', () => {
-  const svg = generateQrCodeSvg('https://pmacademy.com/p/sconnor', 100)
+runTest('generateQrCodeSvg outputs clean SVG vector markup containing rectangles for verification URL', () => {
+  const verifyUrl = 'https://pmacademy.com/verify/PMA-2026-A1B2C3D4'
+  const svg = generateQrCodeSvg(verifyUrl, 100)
 
   assert.ok(svg.includes('<svg'), 'Output should contain <svg element')
   assert.ok(svg.includes('rect'), 'Output should contain <rect elements for QR pixels')
   assert.ok(svg.includes('viewBox="0 0 21 21"'), 'Output should have 21x21 viewBox')
 })
 
-console.log(`\n✅ All ${passedTests} Certificates Unit Tests Passed Successfully!\n`)
+// 4. LinkedIn Certification Add-to-Profile URL Builder (Sprint 7.3)
+runTest('buildLinkedInCertificationUrl constructs valid LinkedIn add-to-profile URL with full parameters', () => {
+  const certCode = 'PMA-2026-B87F129C'
+  const verifyUrl = 'https://pmacademy.com/verify/PMA-2026-B87F129C'
+  const issuedAt = '2026-08-08T00:00:00.000Z'
+
+  const linkedinUrl = buildLinkedInCertificationUrl({
+    certificateCode: certCode,
+    careerTitle: 'Principal Product Manager',
+    type: 'full_curriculum',
+    issuedAt,
+    verificationUrl: verifyUrl,
+  })
+
+  assert.ok(linkedinUrl.startsWith('https://www.linkedin.com/profile/add'), 'Must start with LinkedIn profile add endpoint')
+  assert.ok(linkedinUrl.includes('startTask=CERTIFICATION_NAME'), 'Must specify CERTIFICATION_NAME task')
+  assert.ok(linkedinUrl.includes('organizationName=Prodigy'), 'Must set issuing organization to Prodigy')
+  assert.ok(linkedinUrl.includes('certId=PMA-2026-B87F129C'), 'Must include exact credential ID')
+  assert.ok(linkedinUrl.includes('issueYear=2026'), 'Must set issue year correctly')
+  assert.ok(linkedinUrl.includes('issueMonth=8'), 'Must set issue month correctly')
+  assert.ok(linkedinUrl.includes(encodeURIComponent(verifyUrl)), 'Must URL-encode verification link parameter')
+})
+
+console.log(`\n✅ All ${passedTests} Certificates 2.0 Unit Tests Passed Successfully!\n`)
