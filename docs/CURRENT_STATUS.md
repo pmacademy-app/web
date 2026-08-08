@@ -42,16 +42,17 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Sprint 7.4 (Admin Console Polish):** ✅ Complete & Audited (Exact 7-section IA: Overview, Content, Users drawer, Communications, Certificates, Feedback, System; User inspection slide-over drawer with URL deep-link support; Testimonials & Feedback moderation pipeline with `logAdminAction()` audit logs; `testimonials` migration with RLS policies).
 - **Sprint 7.5 (Security & Performance Audit):** ✅ Complete & Audited (`docs/Security-Threat-Model.md`, `docs/Performance-Budget-Checklist.md`, 100% RLS table coverage via migration `20260809000001_security_hardening_rls.sql`, sliding-window rate limiting utility `lib/rate-limit.ts`, HSTS/CSP/X-Frame-Options DENY security headers in `next.config.ts`, 0 bundle leaks of `SUPABASE_SERVICE_ROLE_KEY`, Lighthouse ≥90 and axe-core 0 violations).
 - **Sprint 7.6 (Dashboard & Learning Experience):** ✅ Complete & Audited (`docs/sprints/Dashboard-Progress-IA-Audit.md`, `/dashboard` focused strictly on "What should I do next?", `/progress` focused strictly on "How have I performed?" with Skill Radar as dominant visual, zero duplication).
-- **Current Focus:** Ready for **Sprint 8.1 (Marketing Website v2)**.
+- **Sprint 8.1 (Marketing Website v2):** ✅ Complete & Audited (Full launch page set under `app/(marketing)/`: `/`, `/about`, `/contact`, `/privacy`, `/terms`, Buy Me a Coffee integration, live `GET /api/testimonials` consumption without hardcoded copy, finalized `lib/brand.ts` domain/social links, prominent Free Forever messaging, public sample lessons accessible to logged-out visitors).
+- **Current Focus:** Ready for **Sprint 8.5 (Mobile Experience)**.
 
 ---
 
 ## 3. What's Next
 
-Sprint 7.6 complete. Next steps:
+Sprint 8.1 complete. Next steps:
 
-1. **[Sprint 8.1 — Next] Marketing Website v2:** Consumes live `GET /api/testimonials` from Feedback moderation pipeline.
-2. **[Sprint 8.5] Mobile Experience:** Responsive verification pass across all views.
+1. **[Sprint 8.5 — Next] Mobile Experience:** Responsive verification pass across all surfaces (Settings 2.0, Certificates 2.0, Admin Console, Dashboard, Marketing v2, Notification Panel).
+2. **[Sprint 8.6] Public Launch QA & Regression Gate:** Final production launch verification.
 
 ---
 
