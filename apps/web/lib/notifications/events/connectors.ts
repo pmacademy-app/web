@@ -37,7 +37,7 @@ export function initializeNotificationConnectors(): void {
       templateKey: 'auth.verify_email',
       templateVariables: {
         userName: event.userName || 'Learner',
-        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/auth/callback`,
+        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/auth/callback`,
       },
       eventId: event.id,
       eventType: event.event,
@@ -56,7 +56,7 @@ export function initializeNotificationConnectors(): void {
       templateKey: 'auth.password_reset',
       templateVariables: {
         userName: event.userName || 'Learner',
-        resetUrl: event.payload.resetUrl || `${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/auth/reset-password`,
+        resetUrl: event.payload.resetUrl || `${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/auth/reset-password`,
       },
       eventId: event.id,
       eventType: event.event,
@@ -139,7 +139,7 @@ export function initializeNotificationConnectors(): void {
       templateVariables: {
         userName: event.userName || 'Learner',
         certificateCode: event.payload.certificateCode,
-        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/verify/${event.payload.certificateCode}`,
+        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/verify/${event.payload.certificateCode}`,
       },
       eventId: event.id,
       eventType: event.event,
@@ -159,7 +159,7 @@ export function initializeNotificationConnectors(): void {
       templateVariables: {
         userName: event.userName || 'Learner',
         username: event.payload.username,
-        portfolioUrl: event.payload.portfolioUrl || `${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/p/${event.payload.username}`,
+        portfolioUrl: event.payload.portfolioUrl || `${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/p/${event.payload.username}`,
       },
       eventId: event.id,
       eventType: event.event,

@@ -7,7 +7,7 @@ export const BRAND = {
   shortName: 'PM Academy',
   tagline: 'The Duolingo of Product Management.',
   positioning: '90 lessons. 9 modules. Free forever.',
-  domain: '[final domain — TBD at Sprint 8.1]',
+  domain: 'pmacademy.adityagangwani.me',
   social: {
     linkedin: '[TBD]',
     twitter: '[TBD]',
@@ -15,8 +15,10 @@ export const BRAND = {
   legalEntity: 'Prodigy',
   certificateIssuer: 'Prodigy',
   adminName: 'Prodigy PM Academy Admin',
-  siteUrl: 'https://pmacademy.com',
-  supportEmail: 'hello@pmacademy.com',
+  // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
+  // This value is the production default for any server-side context where env is available.
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://pmacademy.adityagangwani.me',
+  supportEmail: 'hello@pmacademy.adityagangwani.me',
   emailFromName: 'Prodigy PM Academy',
   emailFromAddress: 'welcome@pmacademy.com',
   certificateIssuerLine: 'Issued by Prodigy · PM Academy',

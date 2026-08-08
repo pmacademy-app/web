@@ -6,7 +6,30 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 Release notes are ordered reverse-chronologically. Each release categorizes changes under Added, Changed, Fixed, Removed, Technical, Documentation, Verification, and Known Limitations when applicable.
 
-## [Unreleased] - Sprint 7.3: Certificate System 2.0
+## [Unreleased] - Production Debugging Pass & Root-Cause Fixes
+
+- **Status:** Complete — All Production-Blocking Root-Cause Issues Fixed
+- **Release Date:** 2026-08-08
+
+### Fixed
+
+- **Permanent Supabase Auth User Deletion (`app/api/settings/delete-account/route.ts`)**:
+  - Updated `/api/settings/delete-account` to invoke `supabase.auth.admin.deleteUser(userId)` via the service-role client following application database row cleanup.
+  - The Auth user is now completely purged from Supabase Authentication (`auth.users`), preventing subsequent logins.
+  - Session cookies (`sb-access-token`, `sb-refresh-token`) are explicitly deleted from response headers.
+- **Domain Resolution & QR Code Verification URLs (`lib/brand.ts`, `connectors.ts`, `resend-provider.ts`, `EmailWrapper.tsx`)**:
+  - Replaced hardcoded `https://pmacademy.com` fallback and legacy `NEXT_PUBLIC_APP_URL` references with `NEXT_PUBLIC_SITE_URL` across all certificate generators, email templates, and notification event connectors.
+  - Updated `BRAND.siteUrl` to read `process.env.NEXT_PUBLIC_SITE_URL` dynamically at runtime, defaulting to `https://pmacademy.adityagangwani.me`.
+  - Documented `NEXT_PUBLIC_SITE_URL` in `apps/web/.env.example`.
+- **Mermaid SVG ViewBox & Node Dimension Calculation (`scripts/compiler/mermaid-svg.ts`)**:
+  - Upgraded JSDOM `getBBox` polyfill to measure inner HTML text inside `foreignObject` and `<g>` node containers.
+  - Resolved 52px height collapsing bug across all 203 Mermaid diagrams; each diagram now calculates dynamic viewBox dimensions based on content size.
+  - Cleaned SVG tag post-processing in `compileMermaidToSvg` to strip existing `class`, `role`, `viewBox`, `preserveAspectRatio`, and `aria-roledescription` attributes before applying PM Academy static SVG styling, eliminating duplicate attribute conflicts.
+  - Bumped compiler cache manifest version to `'7'` to invalidate stale outputs and recompile all 90 lessons.
+- **Responsive Mermaid CSS (`apps/web/app/globals.css`)**:
+  - Added `.mermaid-static-svg` class styling in `globals.css` to enforce responsive fluid width (`width: 100%; height: auto; display: block; margin: 0 auto; overflow: visible`).
+
+## Sprint 7.3: Certificate System 2.0
 
 - **Status:** Development Complete — Versioned, Verifiable & Shareable Certificates
 - **Release Date:** 2026-08-08

@@ -76,10 +76,26 @@ async function getMermaid() {
 
   if (!window.SVGElement.prototype.getBBox) {
     (window.SVGElement.prototype as any).getBBox = function () {
-      const tagName = this.tagName.toLowerCase();
+      const tagName = (this.tagName || '').toLowerCase();
       const text = this.textContent || '';
-      
-      // Measure text elements
+
+      // foreignObject elements contain HTML-rendered node labels.
+      // Mermaid flowchart-v2 always uses foreignObject for node content
+      // regardless of the htmlLabels setting. Measure by collecting inner text.
+      if (tagName === 'foreignobject') {
+        // Walk the DOM inside the foreignObject to collect all text
+        const innerText = this.textContent?.trim() || '';
+        if (!innerText) return { x: 0, y: 0, width: 60, height: 34 };
+        
+        // Estimate dimensions from text content (approximate char width + padding)
+        const lines = innerText.split('\n').filter((l: string) => l.trim());
+        const maxLineLen = Math.max(...lines.map((l: string) => l.trim().length), 1);
+        const width = Math.max(60, Math.min(280, maxLineLen * 7.5 + 32));
+        const height = Math.max(34, lines.length * 22 + 16);
+        return { x: 0, y: 0, width, height };
+      }
+
+      // Measure text/tspan elements
       if (tagName === 'text' || tagName === 'tspan') {
         const tspans = this.getElementsByTagName ? this.getElementsByTagName('tspan') : [];
         if (tagName === 'text' && tspans.length > 0) {
@@ -93,7 +109,7 @@ async function getMermaid() {
           }
           return { x: 0, y: 0, width: maxWidth, height: Math.max(36, totalHeight + 16) };
         }
-        
+
         // Single line element fallback
         const lines = text.split('\n');
         const maxLen = Math.max(...lines.map((l: string) => l.length), 1);
@@ -102,14 +118,39 @@ async function getMermaid() {
         return { x: 0, y: 0, width, height };
       }
 
-      // Measure rect shapes
+      // Measure rect shapes (nodes use label-container rects)
       if (tagName === 'rect') {
-        return {
-          x: parseFloat(this.getAttribute('x') || '0'),
-          y: parseFloat(this.getAttribute('y') || '0'),
-          width: parseFloat(this.getAttribute('width') || '0'),
-          height: parseFloat(this.getAttribute('height') || '0'),
-        };
+        const attrW = parseFloat(this.getAttribute('width') || '0');
+        const attrH = parseFloat(this.getAttribute('height') || '0');
+        if (attrW > 0 && attrH > 0) {
+          return {
+            x: parseFloat(this.getAttribute('x') || '0'),
+            y: parseFloat(this.getAttribute('y') || '0'),
+            width: attrW,
+            height: attrH,
+          };
+        }
+        // Unmeasured rect: estimate from parent foreignObject text content
+        const parent = this.parentElement;
+        const innerText = parent?.textContent?.trim() || '';
+        if (innerText) {
+          const maxLen2 = Math.max(...innerText.split('\n').map((l: string) => l.trim().length), 1);
+          return { x: 0, y: 0, width: Math.max(60, maxLen2 * 7.5 + 32), height: 34 };
+        }
+        return { x: 0, y: 0, width: 60, height: 34 };
+      }
+
+      // <g> group elements — typically the node wrappers; measure inner text
+      if (tagName === 'g') {
+        const innerText = text.trim();
+        if (innerText) {
+          const lines = innerText.split('\n').filter((l: string) => l.trim());
+          const maxLineLen = Math.max(...lines.map((l: string) => l.trim().length), 1);
+          const width = Math.max(60, Math.min(280, maxLineLen * 7.5 + 32));
+          const height = Math.max(34, lines.length * 22 + 16);
+          return { x: 0, y: 0, width, height };
+        }
+        return { x: 0, y: 0, width: 100, height: 50 };
       }
 
       // Default fallback
@@ -141,13 +182,10 @@ async function getMermaid() {
     theme: 'base',
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: 14,
-    htmlLabels: false,
     flowchart: {
-      htmlLabels: false,
       useMaxWidth: true,
     },
     sequence: {
-      htmlLabels: false,
       showSequenceNumbers: false,
     },
     themeVariables: {
@@ -252,16 +290,23 @@ export async function compileMermaidToSvg(source: string, _authorTheme?: Record<
     .dark .cluster rect { fill: rgba(255,255,255,0.04) !important; stroke: #2E4538 !important; }
   </style>`;
 
-  // Post-process SVG tag attributes for fluid responsive rendering
+  // Post-process SVG tag attributes for fluid responsive rendering.
+  // Strip all attributes that we will re-set to avoid duplicates (browsers use first occurrence only).
   let processedSvg = rawSvg
     .replace(/<svg\b([^>]*?)>/i, (_match, attrs) => {
       const cleanedAttrs = attrs
         .replace(/\bwidth="[^"]*"/g, '')
         .replace(/\bheight="[^"]*"/g, '')
         .replace(/\bstyle="[^"]*"/g, '')
-        .replace(/\bviewBox="[^"]*"/g, '');
+        .replace(/\bviewBox="[^"]*"/gi, '')
+        .replace(/\bpreserveAspectRatio="[^"]*"/g, '')
+        .replace(/\bclass="[^"]*"/g, '')
+        .replace(/\brole="[^"]*"/g, '')
+        .replace(/\baria-roledescription="[^"]*"/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 
-      return `<svg ${cleanedAttrs} viewBox="${vbX} ${vbY} ${naturalWidth} ${naturalHeight}" preserveAspectRatio="xMidYMid meet" role="img" class="mermaid-static-svg w-full h-auto" style="width: 100%; max-width: ${naturalWidth}px; height: auto; display: block; margin: 0 auto;">`;
+      return `<svg ${cleanedAttrs} viewBox="${vbX} ${vbY} ${naturalWidth} ${naturalHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram" class="mermaid-static-svg" style="width: 100%; max-width: ${naturalWidth}px; height: auto; display: block; margin: 0 auto;">`;
     });
 
   // Inject dark mode overrides right after opening <svg> tag
