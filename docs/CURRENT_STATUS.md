@@ -9,7 +9,7 @@
 
 - **Current Branch:** `main`
 - **Current Version:** `1.0.0-rc1` (Release Candidate 1 complete)
-- **Last Successful Build:** 2026-08-05 (Next.js 16 App Router production build — clean, 0 errors, 79 routes, 90 lessons compiled)
+- **Last Successful Build:** 2026-08-08 (Next.js 16 App Router production build — clean, exit 0, 90 lessons compiled)
 - **Current Implementation Phase:** **PM Academy v1.0.0-rc1 RELEASE CANDIDATE COMPLETE**
 
 ---
@@ -74,6 +74,17 @@ None. All stabilization sprint items resolved.
 - 🧭 **Module Completion Detection:** `isModuleComplete = lesson.order % 10 === 0` used module-scoped order (always triggered on Lesson 10 of each module but incorrectly on lesson 1 of a new module). Fixed to `globalOrder % 10 === 0`.
 - 🧭 **Breadcrumbs:** Lesson breadcrumbs displayed module-scoped order. Fixed to use `globalOrder` from server component prop.
 - 🧭 **Metadata Title:** Lesson page `<title>` used `lesson.order` (module-scoped). Fixed to `globalOrder`.
+
+### Resolved This Session (2026-08-08 — Lesson Rendering Hotfix)
+
+- 🧭 **Connections Content Dropped from All Lesson Pages:** The theory-tab block filter in `apps/web/app/(app)/academy/[moduleSlug]/[lessonId]/lesson-content.tsx` excluded the compiled `connections` block, and no other tab rendered it — so the authored `## Connections` table (Previous/Current/Next + "Future Concepts Unlocked") never appeared on any lesson page, even though `ConnectionsBlock` is registered. Removed `'connections'` from the exclusion set; the block now renders at the end of the theory tab. Verified against `les_04ix6b` (full-featured lesson: all 24 authored blocks render, zero orphaned content) and a clean production build.
+- 🔢 **Lesson Header Number:** The lesson page header showed `Lesson {lesson.order}` (module-scoped 1–10), so lessons 11–90 displayed the wrong lesson number. Now renders `Lesson {globalOrder}` (1–90), consistent with the breadcrumbs/title/locked-screen fixes from the stabilization sprint.
+
+### Resolved This Session (2026-08-08 — Sprint 7.1 Wrap-up Hotfixes)
+
+- 📐 **Mermaid Diagram Rendering Quality:** Static-SVG compiler (`scripts/compiler/mermaid-svg.ts`) produced inconsistent label fonts (11.12px/10.5px/9.14px vs 14px from a design-width downscale), oversized boxes (`minW = 128*scale`), and forced horizontal overflow (`min-width` ≥720px, up to 1423px natural width on LR diagrams; short unbroken tokens clipped). Fixes: removed the downscale, `minW` 128→48, added char-level label wrapping, and switched emitted style to `width:{vw}px;max-width:100%;height:auto` (proportional scaling, no horizontal scroll). Bumped compiler `CACHE_VERSION` to `4` so stale `content/dist` SVGs (old format) are never served from cache. Added 4 rendering-quality unit tests (14/14 compiler tests pass). Audit of all 203 diagrams: 14px font everywhere, zero `min-width`, zero viewBox clips, zero real text overflow.
+- 🔔 **`notification-scheduler.yml` Silent Failure:** Workflow referenced the undocumented `secrets.APP_URL` (unset → malformed cron URL) and plain `curl` swallowed HTTP errors (401 from `CRON_SECRET` check exited 0), so every scheduled job silently no-opped. Fixes: job-level `CRON_ORIGIN = ${{ secrets.APP_URL || 'https://pmacademy.com' }}` fallback and `curl --fail-with-body` on all four cron steps; `APP_URL`/`CRON_SECRET` GitHub secrets documented in `Notification-Architecture.md` §17.
+- 🚀 **`ci.yml` Automatic Triggers:** Confirmed the workflow always had automatic triggers (push/PR to `main` since `0e9d0c9`, `workflow_dispatch` since `9afc064`) — the real regression was `6fb9800` removing the Sprint 7.1 brand-hardening check, which has been restored verbatim (passes against the current tree).
 
 ---
 

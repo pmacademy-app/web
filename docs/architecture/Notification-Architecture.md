@@ -597,6 +597,15 @@ Refer to `docs/Notification-Architecture.md` Section 16 for preview server confi
 
 Ensure `CRON_SECRET` and `EMAIL_WEBHOOK_SECRET` are synchronized in the Vercel dashboard.
 
+The scheduled jobs in [`.github/workflows/notification-scheduler.yml`](../../.github/workflows/notification-scheduler.yml) invoke the cron API routes (§8.1) over HTTPS. They require two GitHub Actions secrets under **Repository → Settings → Secrets and variables → Actions**:
+
+| GitHub secret | Purpose |
+|---|---|
+| `APP_URL` | Origin of the deployed app (e.g. `https://pmacademy.com`). If unset, the workflow falls back to the canonical production origin from `lib/brand.ts` (`BRAND.siteUrl`). |
+| `CRON_SECRET` | Must match the `CRON_SECRET` environment variable set on Vercel; sent as `Authorization: Bearer <CRON_SECRET>` so the cron routes authenticate (§8.1). |
+
+The workflow fails loudly on non-2xx responses (`curl --fail-with-body`) so a missing or misconfigured secret surfaces as a failed run instead of a silent no-op.
+
 ---
 
 ## 18. Scaling Strategy
@@ -769,3 +778,4 @@ Refer to Section 24 for the 5-week roadmap timeline and complete Definition of D
 
 - v1.1 — 2026-08-05: Integrated critical architectural enhancements requested before implementation: first-class In-App Notification Center and database schema, consolidated Notification Priority Matrix (Critical to Bulk channels and policies), modular Admin Console architecture (/admin) replacing the standalone center, database-backed Feature Flags with failsafes, template versioning schemas with rollback capabilities, User Notification Timeline tracking, and comprehensive System Health monitoring matrix.
 - v1.0 — 2026-08-05: Initial design. Complete event-driven notification architecture covering 30+ typed learning events, 25+ email templates across 6 categories, PostgreSQL queue with priority levels and dead-letter handling, Vercel cron scheduler with timezone-aware delivery, exponential backoff retry strategy, per-user and global rate limiting, full notification preference model, React Email template system with shared design tokens, Admin Notification Center specification (6 views), database schema with critical indexes and RLS policies, and 5-week Sprint 6 implementation roadmap with P0/P1/P2 priorities and a complete Definition of Done.
+- v1.1 — 2026-08-08: Documented the `APP_URL` and `CRON_SECRET` GitHub Actions secrets required by `.github/workflows/notification-scheduler.yml` (§17); scheduler workflow hardened to fall back to the canonical `BRAND.siteUrl` origin and to fail loudly on non-2xx cron responses.

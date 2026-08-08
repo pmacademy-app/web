@@ -157,6 +157,48 @@ This pattern is implemented as of Sprint 3.5. Apply it to any server component t
 
 ---
 
+## M-011: Lesson Theory Tab Silently Dropping `connections` / `unlocks` Content
+
+**Category:** Rendering / Content integrity  
+**Severity:** High — silently deleted authored content on every lesson page
+
+**What went wrong:** `lesson-content.tsx` treated `connections` as a standalone section alongside `theory`, `quiz`, `flashcards`, etc. The theory tab's block filter EXCLUDED `connections` (and the separate unlock-pane logic only rendered it for locked lessons). Authored `Connections`/`Unlocks` blocks were therefore compiled into the lesson JSON but **never rendered** for unlocked lessons — silent content loss with no error.
+
+**Symptoms:** `les_04ix6b` lesson showed only 22 of 24 authored blocks; no error anywhere in logs or build.
+
+**Correct approach:** Render every block whose block type belongs to the active section. A Connections block is authored *inside* the theory section — it must render in the theory tab, never be filtered out. Fixed 2026-08-08 (`lesson-content.tsx`).
+
+**Key lesson:** When a sectioned view filters blocks by type, every type must be explicitly mapped to a section. Any block type present in the lesson schema but missing from the filter map is silently dropped — add a build-time or test-time check that all compiled block types are covered.
+
+---
+
+## M-012: Compiler Cache Serving Stale `content/dist` Output
+
+**Category:** Build tooling / Content pipeline  
+**Severity:** High — produced inconsistent diagram output between local and production builds
+
+**What went wrong:** The content compiler caches per-lesson output in `content/.cache/manifest.json`, keyed **only on the lesson source hash**. When the compiler's output shape changed (the static Mermaid SVG engine in `scripts/compiler/mermaid-svg.ts` was rewritten), lessons whose Markdown source had not changed were served from cache with the **old SVG format** while fresh lessons got the new one. `content/dist` is gitignored, so the staleness shipped silently and production (clean cache) rendered differently than local dev (stale cache).
+
+**Correct approach:** Bump `CACHE_VERSION` in `scripts/compiler/compile.ts` whenever the compiler changes its output shape (SVG layout, label fonts, box sizes, JSON schema). Delete `content/.cache` + `content/dist` to force a fresh compile when in doubt.
+
+**Key lesson:** Any content-pipeline output cache must be versioned against the code that produces it, not just the input content. If you change a renderer/compiler stage, bump the cache version in the same change.
+
+---
+
+## M-013: Undocumented Workflow Secret Causing Silent Cron Failure
+
+**Category:** CI/CD / Secret management  
+**Severity:** Medium — every scheduled job failed with no visible error
+
+**What went wrong:** `notification-scheduler.yml` referenced `secrets.APP_URL` to build the cron endpoint URL, but `APP_URL` was not documented in `.env.example` or any deployment doc. The secret was unset in GitHub, so `${{ secrets.APP_URL }}` expanded to an empty string, producing a malformed URL (`/api/cron/...`). The `curl` steps also ignored HTTP status (`--fail` absent), so even a 401 from the `CRON_SECRET` check exited 0 — the workflow "succeeded" while every job failed to hit a real endpoint.
+
+**Correct approach:** Every secret a workflow consumes must be documented with the owning doc (deployment section + `.env.example` template). Fail loudly on non-2xx responses (`curl --fail-with-body`) so a misconfigured secret surfaces as a failed run. Fix 2026-08-08: workflow now falls back to the canonical `BRAND.siteUrl` origin and passes `--fail-with-body`.
+
+**Key lesson:** A missing secret is indistinguishable from "cron never ran" unless the step fails loudly. Document every GitHub Actions secret next to the deployment section it supports.
+
+---
+
 ## Changelog
 
 - v1.0 (2026-08-01) — Created from the project audit report, MEMORY.md, and sprint notes. Synthesizes 10 concrete mistakes with actionable prevention guidance.
+- v1.1 (2026-08-08) — Added M-011 (connections dropped from theory tab), M-012 (compiler cache serving stale dist), and M-013 (undocumented workflow secret silently failing cron).
