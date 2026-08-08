@@ -423,6 +423,24 @@ body {
     @apply font-sans;
   }
 }
+/* ── Mermaid Static SVG Rendering ─────────────────────────────────────────── */
+.mermaid-static-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.mermaid-static-svg foreignObject {
+  overflow: visible;
+}
+
+.mermaid-diagram-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
 
 /* PM Academy Print & PDF Export Styles */
 @media print {

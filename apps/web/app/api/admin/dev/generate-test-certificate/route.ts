@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       })
       .eq('id', certRow.id)
 
-    const siteOrigin = process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl
+    const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
     const verificationUrl = `${siteOrigin}/verify/${encodeURIComponent(testCertCode)}`
 
     // 3. Trigger Notification Event (reuses production event & email queue pipeline)

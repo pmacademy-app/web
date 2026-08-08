@@ -39,13 +39,13 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Sprint 7.1 (Global Branding & Documentation):** ✅ Complete & Audited (`lib/brand.ts`, `BrandLogo` system, static brand assets, full rebrand pass, build-time Mermaid→SVG static compilation stage, 0 runtime Mermaid overhead)
 - **Sprint 7.2 (Settings 2.0):** ✅ Complete & Audited (Unified 5-tab Settings IA, `ConfirmDestructiveAction` typed confirmation dialogs, ledger-respecting XP reset, account deletion cascade, `lib/settings/settings-service.ts`, 8 new API routes under `/api/settings/`, and automated regression test suite)
 - **Sprint 7.3 (Certificate System 2.0):** ✅ Complete & Audited (Clean single production certificate renderer, pure `lib/certificates/linkedin-url.ts` builder, direct `/verify/[certificateId]` QR code embedding, `test:certificates` test suite, zero internal V1/V2 terminology exposed)
-- **Current Focus:** Production Audit Complete — Ready for Sprint 7.4 (Admin Console Polish)
+- **Current Focus:** Production Root-Cause Debugging Pass Complete — Ready for Sprint 7.4 (Admin Console Polish)
 
 ---
 
 ## 3. What's Next
 
-Sprint 7.3 Certificate System 2.0 complete. Ready for **Sprint 7.4 (Admin Console Polish)**:
+Sprint 7.3 Certificate System 2.0 & Production Root-Cause Debugging complete. Ready for **Sprint 7.4 (Admin Console Polish)**:
 
 1. **[Sprint 7.4 — Next] Admin Console Polish:** Redesigned Admin IA (Overview, Content, Users drawer, Communications, Certificates, Feedback, System).
 2. **[Sprint 7.5] Security & Performance Audit:** Threat Model document (`Security-Threat-Model.md`) and Performance Budget Checklist (`Performance-Budget-Checklist.md`).
@@ -54,9 +54,14 @@ Sprint 7.3 Certificate System 2.0 complete. Ready for **Sprint 7.4 (Admin Consol
 
 ## 4. Active Issues, Blockers & Bugs
 
-None. All stabilization sprint items resolved.
+None. All root-cause bugs resolved.
 
-### Resolved This Session (Sprint 7.1 — Universal Mermaid System Rebuild & Branding)
+### Resolved This Session (Production Debugging & Root Cause Pass)
+
+- **Supabase Auth Permanent User Deletion (Resolved):** Updated `/api/settings/delete-account` to call `supabase.auth.admin.deleteUser(userId)` via the service-role client after deleting database application rows. The Auth user is now permanently deleted from Supabase Authentication.
+- **Certificate Verification URL & QR Code Domain (Resolved):** Replaced hardcoded `https://pmacademy.com` fallback and legacy `NEXT_PUBLIC_APP_URL` references with `NEXT_PUBLIC_SITE_URL` across `lib/brand.ts`, certificate generators, notification event connectors, and email wrappers. Updated `.env.example`.
+- **Mermaid Diagram Collapsed Height (Resolved):** Fixed JSDOM `getBBox` polyfill in `scripts/compiler/mermaid-svg.ts` to inspect HTML label text within `foreignObject` and `<g>` containers. All 90 compiled lessons now compute accurate viewBox dimensions instead of collapsing to 52px height.
+- **SVG Post-Processing Attribute Duplication (Resolved):** Cleaned raw SVG tag post-processing in `compileMermaidToSvg` to strip existing `class`, `role`, and `viewBox` attributes before inserting PM Academy styles, preventing duplicate `class` attribute conflicts in browsers. Bumped compiler cache version to `'7'`.
 
 **Sprint 7.1 — Universal Mermaid System Rebuild:**
 - 🎨 **Real Engine Layout & Green/White Styling:** Replaced custom mock parser with official `mermaid` v11 engine executing at build time (`content:compile`) in Node.js via JSDOM (`scripts/compiler/mermaid-svg.ts`). Restored 2D Dagre layout, decision diamonds, horizontal branching, curved/orthogonal arrows, sequence diagrams, and subgraphs with PM Academy green/white design tokens (`theme/tokens.ts`) and embedded `.dark` CSS overrides.

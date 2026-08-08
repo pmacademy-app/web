@@ -13,7 +13,7 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
   previewText,
   unsubscribeToken,
 }) => {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl
+  const appUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
   const unsubscribeUrl = unsubscribeToken
     ? `${appUrl}/api/email/unsubscribe?token=${unsubscribeToken}`
     : `${appUrl}/settings?tab=notifications`

@@ -42,7 +42,7 @@ export class ResendProvider implements NotificationProvider {
         html: payload.variables.html as string,
         text: payload.variables.text as string,
         headers: {
-          'List-Unsubscribe': `<${process.env.NEXT_PUBLIC_APP_URL || BRAND.siteUrl}/settings?tab=notifications>`,
+          'List-Unsubscribe': `<${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/settings?tab=notifications>`,
         },
         tags: [
           { name: 'template_key', value: payload.templateKey },
