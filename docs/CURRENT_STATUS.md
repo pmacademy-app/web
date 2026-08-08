@@ -39,16 +39,17 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Sprint 7.1 (Global Branding & Documentation):** ✅ Complete & Audited (`lib/brand.ts`, `BrandLogo` system, static brand assets, full rebrand pass, build-time Mermaid→SVG static compilation stage, 0 runtime Mermaid overhead)
 - **Sprint 7.2 (Settings 2.0):** ✅ Complete & Audited (Unified 5-tab Settings IA, `ConfirmDestructiveAction` typed confirmation dialogs, ledger-respecting XP reset, account deletion cascade, `lib/settings/settings-service.ts`, 8 new API routes under `/api/settings/`, and automated regression test suite)
 - **Sprint 7.3 (Certificate System 2.0):** ✅ Complete & Audited (Clean single production certificate renderer, pure `lib/certificates/linkedin-url.ts` builder, direct `/verify/[certificateId]` QR code embedding, `test:certificates` test suite, zero internal V1/V2 terminology exposed)
-- **Current Focus:** Production Root-Cause Debugging Pass Complete — Ready for Sprint 7.4 (Admin Console Polish)
+- **Sprint 7.4 (Admin Console Polish):** ✅ Complete & Audited (Exact 7-section IA: Overview, Content, Users drawer, Communications, Certificates, Feedback, System; User inspection slide-over drawer with URL deep-link support; Testimonials & Feedback moderation pipeline with `logAdminAction()` audit logs; `testimonials` migration with RLS policies).
+- **Current Focus:** Ready for **Sprint 7.5 (Security & Performance Audit)**.
 
 ---
 
 ## 3. What's Next
 
-Sprint 7.3 Certificate System 2.0 & Production Root-Cause Debugging complete. Ready for **Sprint 7.4 (Admin Console Polish)**:
+Sprint 7.4 complete. Next step:
 
-1. **[Sprint 7.4 — Next] Admin Console Polish:** Redesigned Admin IA (Overview, Content, Users drawer, Communications, Certificates, Feedback, System).
-2. **[Sprint 7.5] Security & Performance Audit:** Threat Model document (`Security-Threat-Model.md`) and Performance Budget Checklist (`Performance-Budget-Checklist.md`).
+1. **[Sprint 7.5 — Next] Security & Performance Audit:** Threat Model document (`Security-Threat-Model.md`) and Performance Budget Checklist (`Performance-Budget-Checklist.md`).
+2. **[Sprint 8.1] Marketing Website v2:** Consumes live `GET /api/testimonials` from Feedback moderation pipeline.
 
 ---
 
