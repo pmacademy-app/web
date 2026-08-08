@@ -398,7 +398,6 @@ export type Database = {
           total_xp: number
           lessons_completed: number
           modules_completed: number
-          template_version: number
           issued_at: string
         }
         Insert: {
@@ -413,7 +412,6 @@ export type Database = {
           total_xp?: number
           lessons_completed?: number
           modules_completed?: number
-          template_version?: number
           issued_at?: string
         }
         Update: Partial<Database['public']['Tables']['certificates']['Insert']>
