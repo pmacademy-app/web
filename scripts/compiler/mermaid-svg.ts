@@ -75,86 +75,104 @@ async function getMermaid() {
   }
 
   if (!window.SVGElement.prototype.getBBox) {
-    (window.SVGElement.prototype as any).getBBox = function () {
+    (window.SVGElement.prototype as any).getBBox = function (): { x: number; y: number; width: number; height: number } {
       const tagName = (this.tagName || '').toLowerCase();
-      const text = this.textContent || '';
 
-      // foreignObject elements contain HTML-rendered node labels.
-      // Mermaid flowchart-v2 always uses foreignObject for node content
-      // regardless of the htmlLabels setting. Measure by collecting inner text.
+      // 1. Container elements (<g>, <svg>): compute bounding box union over all children
+      if (tagName === 'g' || tagName === 'svg') {
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+
+        const children = this.children || [];
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          if (!child || typeof child.getBBox !== 'function') continue;
+
+          const box = child.getBBox();
+          if (!box || isNaN(box.width) || isNaN(box.height)) continue;
+
+          // Parse transform="translate(tx, ty)" if present on child
+          let tx = 0;
+          let ty = 0;
+          const transformAttr = child.getAttribute('transform') || '';
+          const matchTrans = transformAttr.match(/translate\(\s*([\d.-]+)\s*(?:,\s*([\d.-]+))?\s*\)/i);
+          if (matchTrans) {
+            tx = parseFloat(matchTrans[1]) || 0;
+            ty = parseFloat(matchTrans[2] || '0') || 0;
+          }
+
+          const childMinX = (box.x || 0) + tx;
+          const childMinY = (box.y || 0) + ty;
+          const childMaxX = childMinX + (box.width || 0);
+          const childMaxY = childMinY + (box.height || 0);
+
+          if (childMinX < minX) minX = childMinX;
+          if (childMinY < minY) minY = childMinY;
+          if (childMaxX > maxX) maxX = childMaxX;
+          if (childMaxY > maxY) maxY = childMaxY;
+        }
+
+        if (minX !== Infinity && minY !== Infinity && maxX !== -Infinity && maxY !== -Infinity) {
+          return {
+            x: minX,
+            y: minY,
+            width: Math.max(10, maxX - minX),
+            height: Math.max(10, maxY - minY),
+          };
+        }
+
+        // Fallback for empty container: measure inner text if present
+        const innerText = this.textContent?.trim() || '';
+        if (innerText) {
+          const lines = innerText.split('\n').filter((l: string) => l.trim());
+          const maxLineLen = Math.max(...lines.map((l: string) => l.trim().length), 1);
+          return { x: 0, y: 0, width: Math.max(60, maxLineLen * 8.5 + 32), height: Math.max(34, lines.length * 24 + 16) };
+        }
+
+        return { x: 0, y: 0, width: 100, height: 50 };
+      }
+
+      // 2. Leaf elements (foreignObject, text, tspan, rect, circle, polygon, path)
       if (tagName === 'foreignobject') {
-        // Walk the DOM inside the foreignObject to collect all text
         const innerText = this.textContent?.trim() || '';
         if (!innerText) return { x: 0, y: 0, width: 60, height: 34 };
-        
-        // Estimate dimensions from text content (approximate char width + padding)
         const lines = innerText.split('\n').filter((l: string) => l.trim());
         const maxLineLen = Math.max(...lines.map((l: string) => l.trim().length), 1);
-        const width = Math.max(60, Math.min(280, maxLineLen * 7.5 + 32));
-        const height = Math.max(34, lines.length * 22 + 16);
+        const width = Math.max(60, maxLineLen * 8.5 + 32);
+        const height = Math.max(34, lines.length * 24 + 16);
         return { x: 0, y: 0, width, height };
       }
 
-      // Measure text/tspan elements
       if (tagName === 'text' || tagName === 'tspan') {
-        const tspans = this.getElementsByTagName ? this.getElementsByTagName('tspan') : [];
-        if (tagName === 'text' && tspans.length > 0) {
-          let maxWidth = 0;
-          let totalHeight = 0;
-          for (let i = 0; i < tspans.length; i++) {
-            const tspanText = tspans[i].textContent || '';
-            const w = Math.max(48, tspanText.length * 8.5 + 24);
-            if (w > maxWidth) maxWidth = w;
-            totalHeight += 20; // 20px per line
-          }
-          return { x: 0, y: 0, width: maxWidth, height: Math.max(36, totalHeight + 16) };
-        }
-
-        // Single line element fallback
+        const text = this.textContent || '';
         const lines = text.split('\n');
         const maxLen = Math.max(...lines.map((l: string) => l.length), 1);
-        const width = Math.max(48, Math.min(360, maxLen * 8.5 + 24));
+        const width = Math.max(48, maxLen * 8.5 + 24);
         const height = Math.max(36, lines.length * 20 + 16);
         return { x: 0, y: 0, width, height };
       }
 
-      // Measure rect shapes (nodes use label-container rects)
       if (tagName === 'rect') {
         const attrW = parseFloat(this.getAttribute('width') || '0');
         const attrH = parseFloat(this.getAttribute('height') || '0');
+        const x = parseFloat(this.getAttribute('x') || '0');
+        const y = parseFloat(this.getAttribute('y') || '0');
         if (attrW > 0 && attrH > 0) {
-          return {
-            x: parseFloat(this.getAttribute('x') || '0'),
-            y: parseFloat(this.getAttribute('y') || '0'),
-            width: attrW,
-            height: attrH,
-          };
+          return { x, y, width: attrW, height: attrH };
         }
-        // Unmeasured rect: estimate from parent foreignObject text content
-        const parent = this.parentElement;
-        const innerText = parent?.textContent?.trim() || '';
-        if (innerText) {
-          const maxLen2 = Math.max(...innerText.split('\n').map((l: string) => l.trim().length), 1);
-          return { x: 0, y: 0, width: Math.max(60, maxLen2 * 7.5 + 32), height: 34 };
-        }
-        return { x: 0, y: 0, width: 60, height: 34 };
+        return { x: -30, y: -17, width: 60, height: 34 };
       }
 
-      // <g> group elements — typically the node wrappers; measure inner text
-      if (tagName === 'g') {
-        const innerText = text.trim();
-        if (innerText) {
-          const lines = innerText.split('\n').filter((l: string) => l.trim());
-          const maxLineLen = Math.max(...lines.map((l: string) => l.trim().length), 1);
-          const width = Math.max(60, Math.min(280, maxLineLen * 7.5 + 32));
-          const height = Math.max(34, lines.length * 22 + 16);
-          return { x: 0, y: 0, width, height };
-        }
-        return { x: 0, y: 0, width: 100, height: 50 };
+      if (tagName === 'circle') {
+        const r = parseFloat(this.getAttribute('r') || '15');
+        const cx = parseFloat(this.getAttribute('cx') || '0');
+        const cy = parseFloat(this.getAttribute('cy') || '0');
+        return { x: cx - r, y: cy - r, width: 2 * r, height: 2 * r };
       }
 
-      // Default fallback
-      return { x: 0, y: 0, width: 100, height: 50 };
+      return { x: 0, y: 0, width: 60, height: 34 };
     };
   }
 
