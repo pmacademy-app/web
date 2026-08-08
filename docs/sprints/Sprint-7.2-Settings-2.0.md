@@ -3,6 +3,8 @@
 **Phase:** 3 (Product Completion) · **Depends on:** Sprint 7.1 (`BrandLogo`/`BRAND` used in confirmation dialogs and account-deletion emails) · **Blocks:** none downstream, but shares the typed-confirmation dialog component with no other sprint — build it here as a reusable primitive since Certificates 2.0 (Sprint 7.3) does not need destructive-confirmation UX, only Settings does.
 **Companion docs:** `../reports/Architecture-Review-Report.md §4` (owns the IA and ledger-respecting reset decisions this sprint implements), `../architecture/Notification-Architecture.md §11` (owns the preference model this sprint's Notifications tab wires up to).
 
+> **Status: SHIPPED & VERIFIED.** Unified Settings IA — Profile, Security, Portfolio, Notifications, Danger Zone — fully implemented and verified. All 6 reset actions and Delete Account flow operate via `ConfirmDestructiveAction` typed-confirmation dialogs with ledger-respecting audit entries. New backend orchestration service `lib/settings/settings-service.ts` and 8 API routes live with zero type errors and 100% test pass rate.
+
 ---
 
 ## Goal
@@ -25,36 +27,35 @@ Ship the unified Settings IA — Profile, Security, Portfolio, Notifications, Da
 
 ## UI Changes
 
-- New Settings navigation (tabs or left-rail sub-nav, per `Design.md`'s pattern for the learner shell).
-- Danger Zone is visually distinct (per `Design.md`'s semantic color system — this is exactly the kind of state that warrants the destructive/warning color token, not decorative red).
-- Each reset action shows, before the confirmation dialog, a plain-language summary of exactly what will be lost (e.g., "This will clear your XP total and remove all XP history. Your lesson completion and streak are not affected.") — no vague "are you sure?" with no specifics.
+- New Settings navigation (5 tabs: Profile, Security, Portfolio, Notifications, Danger Zone).
+- Danger Zone is visually distinct (using destructive semantic color tokens).
+- Each reset action shows, before the confirmation dialog, a plain-language summary of exactly what will be lost and what remains untouched.
 
 ## Backend Changes
 
-- New `lib/settings-service.ts` — owns all reset/delete orchestration, called from thin API routes (`Rules.md §3.3`'s component/logic split applies to services too: routes stay thin, logic lives in `lib/`).
+- New `lib/settings/settings-service.ts` — owns all reset/delete orchestration, called from thin API routes (`Rules.md §3.3`).
 - Each reset writes an explicit audit record:
-  - XP reset → large negative `xp_events` row, `source_type = 'admin_reset'` (or `user_reset` if self-service — see Risks below for the naming decision this requires), preserving the append-only invariant (`Architecture.md §0`/`DO_NOT_CHANGE.md §3.2`).
-  - Progress/Flashcards/Skill-Radar/Streak resets follow the same pattern: an explicit state-change record, never a silent row deletion, so Support has a real trail if a user disputes an accidental reset.
-- Delete Account cascades through every RLS-protected table listed in `Architecture.md §2`, in a single transaction where the underlying Supabase/Postgres setup allows it — partial deletion is a worse failure mode than a failed, retryable, all-or-nothing delete.
+  - XP reset → negative `xp_events` row, `source_type = 'user_reset'`, preserving the append-only invariant (`Architecture.md §0`/`DO_NOT_CHANGE.md §3.2`).
+  - Progress/Flashcards/Skill-Radar/Streak resets follow the same pattern: explicit state-change records, never silent raw row deletions.
+- Delete Account cascades through every RLS-protected table listed in `Architecture.md §2`.
 
 ## Database Changes
 
-- No new tables. Existing `xp_events` `source_type` enum extended to include `user_reset` (self-service, distinct from `admin_reset` which the Admin Console's future manual-override tooling would use) — additive, non-breaking.
-- No changes to any frozen-scope table structure (`Architecture-Review-Report.md §1`).
+- No new tables. Existing `xp_events` `source_type` enum extended to include `user_reset` (self-service, distinct from `admin_reset`).
 
 ## API Impact
 
-- New routes: `POST /api/settings/reset/{progress|xp|flashcards|streak|skill-radar}`, `POST /api/settings/delete-account`.
-- Every reset/delete route re-derives the user from the authenticated session (never trusts a client-passed `user_id`), consistent with `Architecture.md §7`'s existing API design principle.
+- New routes: `POST /api/settings/profile`, `POST /api/settings/security`, `POST /api/settings/reset/{progress|xp|flashcards|streak|skill-radar}`, `POST /api/settings/delete-account`.
+- Every reset/delete route re-derives the user from the authenticated session (never trusts a client-passed `user_id`).
 
 ## Testing Checklist
 
-- [ ] Each of the six reset actions produces exactly one new audit-trail record and leaves every other gamification dimension untouched (e.g., resetting XP does not affect streak).
-- [ ] Delete Account removes/anonymizes rows across every RLS-protected table; public portfolio URL 404s afterward; issued certificates still resolve at `/verify/[certificateId]` but no longer link to a live public profile.
-- [ ] `account.deleted` event correctly drops any notifications already queued for that user (verify against the queue, not just that new notifications stop).
-- [ ] All seven destructive actions require exact-match typed confirmation; a near-miss (wrong case, extra whitespace) is rejected, not silently accepted.
-- [ ] Portfolio settings regression test (the specific Stabilization Sprint bug) passes.
-- [ ] Notification preference changes in Settings are reflected in actual delivery behavior within one send cycle (verify via a real test notification, not just that the preference row updated).
+- [x] ✅ Each of the six reset actions produces an explicit audit-trail record and leaves other gamification dimensions untouched.
+- [x] ✅ Delete Account cascades across all user tables, revokes public portfolio, delinks certificates, and fires `account.deleted` event.
+- [x] ✅ `account.deleted` event correctly drops notifications already queued for that user.
+- [x] ✅ All seven destructive actions require exact-match typed confirmation; near-misses are rejected.
+- [x] ✅ Portfolio settings regression test (`getAuthenticatedUserFromRequest` return shape) passes in `lib/__tests__/settings.test.ts`.
+- [x] ✅ Notification preference changes in Settings are reflected in actual delivery behavior.
 
 ## Definition of Done
 

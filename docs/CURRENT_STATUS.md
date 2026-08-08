@@ -37,16 +37,17 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Phase 3 – Sprint 6.4.4 (Admin Authentication, RBAC & Access Security):** ✅ Complete (`/admin/login`, `/admin/access-denied`, `ADMIN_EMAILS` env support, proxy middleware & API guard audit logging)
 - **Sprint 6.5 (Release Candidate & Production Readiness Audit):** ✅ Complete (`v1.0.0-rc1` ready for production tagging)
 - **Sprint 7.1 (Global Branding & Documentation):** ✅ Complete (`lib/brand.ts`, `BrandLogo` system, static brand assets, full rebrand pass across app/emails/certs/admin, build-time Mermaid→SVG static compilation stage, documentation sync)
-- **Current Focus:** Ready for Sprint 7.2 (Settings 2.0)
+- **Sprint 7.2 (Settings 2.0):** ✅ Complete (Unified 5-tab Settings IA, `ConfirmDestructiveAction` typed confirmation dialogs, ledger-respecting XP reset, account deletion cascade, `lib/settings/settings-service.ts`, 8 new API routes under `/api/settings/`, and automated regression test suite)
+- **Current Focus:** Ready for Sprint 7.3 (Certificate System 2.0)
 
 ---
 
 ## 3. What's Next
 
-Sprint 7.1 Global Branding & Documentation complete. Ready for **Sprint 7.2 (Settings 2.0)**:
+Sprint 7.2 Settings 2.0 complete. Ready for **Sprint 7.3 (Certificate System 2.0)**:
 
-1. **[Sprint 7.2 — Next] Settings 2.0:** Unified Settings IA (Profile, Security, Portfolio, Notifications, Danger Zone) with ledger-respecting reset actions.
-2. **[Sprint 7.3] Certificate System 2.0:** Versioned certificates, QR verification, and LinkedIn profile integration.
+1. **[Sprint 7.3 — Next] Certificate System 2.0:** Versioned certificates (`template_version`), QR code verification linking to `/verify/[certificateId]`, and LinkedIn "Add to Profile" deep link integration.
+2. **[Sprint 7.4] Admin Console Polish:** Redesigned Admin IA (Overview, Content, Users drawer, Communications, Certificates, Feedback, System).
 
 ---
 

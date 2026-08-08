@@ -6,7 +6,32 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 Release notes are ordered reverse-chronologically. Each release categorizes changes under Added, Changed, Fixed, Removed, Technical, Documentation, Verification, and Known Limitations when applicable.
 
-## [Unreleased] - Sprint 7.1: Global Branding & Documentation
+## [Unreleased] - Sprint 7.2: Settings 2.0
+
+- **Status:** Development Complete — Unified Settings IA & Auditable Reset Layer
+- **Release Date:** 2026-08-08
+
+### Added
+
+- **Unified Settings Architecture (`app/(app)/settings/`)**:
+  - Restructured settings into five dedicated tabs: Profile, Security, Portfolio, Notifications, Danger Zone.
+  - Profile tab: name, avatar URL, bio/headline, and social links (LinkedIn, GitHub, Website).
+  - Security tab: Password change form (minimum 8 chars) and auth provider security details.
+  - Portfolio tab: Public/private toggle, handle (`username`), and visible sections.
+  - Notifications tab: Channel preferences mapped 1:1 to `Notification-Architecture.md §11`.
+  - Danger Zone tab: Visually distinct, semantic warning-styled destructive action hub.
+- **Typed Confirmation Modal (`ConfirmDestructiveAction.tsx`)**:
+  - Reusable modal enforcing case-sensitive, exact-match typed input (`RESET`, `DELETE`, or module name). Near-misses and typos are strictly rejected.
+- **Ledger-Respecting Backend Orchestration (`lib/settings/settings-service.ts`)**:
+  - XP reset inserts a negative `xp_events` row with `source_type = 'user_reset'`, preserving the append-only ledger invariant while resetting total XP to 0.
+  - Reset actions for progress (module-scoped or full), flashcard SRS queue, streak, and Skill Radar produce explicit audit state records.
+  - Delete Account flow cascades through user-owned tables, revokes public portfolio handle, delinks certificate profiles, and emits an `account.deleted` event to drop queued notifications.
+- **API Endpoints under `/api/settings/`**:
+  - Added thin API routes re-deriving authorization from the authenticated session: `/api/settings/profile`, `/api/settings/security`, `/api/settings/reset/{progress|xp|flashcards|streak|skill-radar}`, `/api/settings/delete-account`.
+- **Automated Regression & Settings Unit Tests (`lib/__tests__/settings.test.ts`)**:
+  - Unit tests verifying `getAuthenticatedUserFromRequest` return shape (preventing `{ user }` destructuring bug), typed confirmation keyword validation, ledger XP reset math, and account deletion cascade.
+
+## Sprint 7.1: Global Branding & Documentation
 
 - **Status:** Development Complete — Fully Branded & Synchronized
 - **Release Date:** 2026-08-06

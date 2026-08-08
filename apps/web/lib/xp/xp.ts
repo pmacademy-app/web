@@ -16,6 +16,8 @@ export type XpSourceType =
   | 'reflection'
   | 'capstone'
   | 'streak'
+  | 'user_reset'
+  | 'admin_reset'
 
 export interface LevelThreshold {
   level: number
