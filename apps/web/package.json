@@ -26,6 +26,7 @@
     "test:recap": "npx tsx lib/__tests__/recap-evaluator.test.ts",
     "test:admin": "npx tsx lib/__tests__/admin-console.test.ts",
     "test:dev-cert": "npx tsx lib/__tests__/dev-certificate.test.ts",
+    "test:settings": "npx tsx lib/__tests__/settings.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"
