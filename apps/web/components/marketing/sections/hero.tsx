@@ -11,6 +11,7 @@ import { trackHeroCTAClick } from '@/lib/analytics'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { FADE_UP, STAGGER_CONTAINER } from '@/lib/animation'
 import { BrandLogo } from '@/components/brand/BrandLogo'
+import { BRAND } from '@/lib/brand'
 import { ArrowRight, GraduationCap } from 'lucide-react'
 
 /**
@@ -96,23 +97,38 @@ export function HeroSection() {
               className="flex flex-wrap gap-3"
             >
               <Link
-                href="/#waitlist"
+                href="/academy"
                 onClick={() => trackHeroCTAClick('hero')}
                 className="
-                  inline-flex items-center gap-2 px-5 py-2.5
+                  inline-flex items-center gap-2 px-6 py-3
                   bg-primary text-primary-foreground
-                  text-body-sm font-semibold rounded-sm
+                  text-body-sm font-semibold rounded-sm shadow-sm
                   hover:opacity-90 active:scale-[0.98]
                   transition-all duration-[120ms]
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
                 "
               >
-                Join Waitlist
+                Start Learning Free <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+              <Link
+                href={BRAND.social.buyMeACoffee}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-flex items-center gap-2 px-5 py-3
+                  bg-amber-500/10 text-amber-600 dark:text-amber-400
+                  border border-amber-500/30 hover:bg-amber-500/20
+                  text-body-sm font-semibold rounded-sm
+                  transition-all duration-[120ms]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
+                "
+              >
+                ☕ Buy Me a Coffee
               </Link>
               <Link
                 href="/#curriculum"
                 className="
-                  inline-flex items-center gap-2 px-5 py-2.5
+                  inline-flex items-center gap-2 px-5 py-3
                   bg-transparent text-foreground
                   border border-border hover:border-border-strong
                   text-body-sm font-semibold rounded-sm
@@ -121,16 +137,17 @@ export function HeroSection() {
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
                 "
               >
-                Explore Curriculum <ArrowRight size={14} aria-hidden="true" />
+                Explore Curriculum
               </Link>
             </motion.div>
 
             {/* Trust line */}
             <motion.p
               variants={prefersReducedMotion ? undefined : FADE_UP}
-              className="text-body-sm text-locked"
+              className="text-body-sm text-locked font-medium flex items-center gap-2"
             >
-              90 lessons. 9 modules. No paywalled lessons.
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+              90 structured lessons • 100% Free Forever • No paywalls
             </motion.p>
           </motion.div>
 

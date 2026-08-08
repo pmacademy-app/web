@@ -1,8 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
-import { WaitlistForm } from '@/components/forms/waitlist-form'
 
 /**
  * Final CTA section — Sprint 2 §19 + Sprint 3 final CTA copy.
@@ -32,11 +32,19 @@ export function FinalCTASection() {
             Start building product judgment before you pay for another course.
           </h2>
           <p className="text-body-lg text-locked leading-relaxed">
-            Join the waitlist for launch updates, preview lessons, and early access.
+            90 structured lessons, 9 modules, 9 portfolio capstones, and interactive spaced-repetition flashcards—100% Free Forever.
           </p>
 
-          <div className="w-full bg-surface border border-border rounded-lg p-6 lg:p-8 shadow-sm">
-            <WaitlistForm />
+          <div className="w-full bg-surface border border-border rounded-xl p-8 shadow-xs flex flex-col items-center gap-4">
+            <Link
+              href="/academy"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground font-bold text-sm rounded-lg shadow-sm hover:opacity-90 transition-all"
+            >
+              <span>Start Learning Free Now</span>
+            </Link>
+            <p className="text-xs text-muted-foreground">
+              No credit card required. Instant access to all 90 lessons.
+            </p>
           </div>
         </motion.div>
       </div>

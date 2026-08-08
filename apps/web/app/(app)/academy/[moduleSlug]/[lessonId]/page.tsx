@@ -54,9 +54,14 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     redirect(`/academy/${lesson.module}/${lesson.id}`)
   }
 
-  // 3. Auth verification
+  // 3. Auth verification & sample lesson handling
   const user = await getServerUser()
-  if (!user) redirect('/login')
+  const SAMPLE_LESSON_IDS = ['les_zoyq8a', 'les_prrl23', 'les_0q4aih']
+  const isSampleLesson = SAMPLE_LESSON_IDS.includes(lessonId)
+
+  if (!user && !isSampleLesson) {
+    redirect('/login')
+  }
 
   // 4. Sequential unlock check using stable IDs from global curriculum array
   //    getAdjacentLessons uses curriculum.lessons array index — always global order
@@ -94,7 +99,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   const moduleNum = Math.ceil(globalOrder / 10)
 
   let isLocked = false
-  if (prevId) {
+  if (user && prevId) {
     const serviceSupabase = createServerSupabaseClient()
     const unlocked = await isLessonUnlocked(serviceSupabase, user.id, lessonId, prevId)
     if (!unlocked) {
