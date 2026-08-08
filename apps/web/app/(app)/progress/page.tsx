@@ -4,17 +4,17 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import type { Database } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
-import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getUserXpSummary } from '@/lib/xp-service'
 import { getUserStreakStatus } from '@/lib/streaks-db'
 import { getSkillRadarSummary } from '@/lib/skillRadar'
 import { getUserCertificates, issueCertificate } from '@/lib/certificates-db'
+import { getUserBadgesData } from '@/lib/badges-db'
 import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
 import { LevelCard } from '@/components/dashboard/LevelCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { ProgressRingCard } from '@/components/dashboard/ProgressRingCard'
 import { SkillRadarCard } from '@/components/dashboard/SkillRadarCard'
-import { ContinueLearningCard, NextLessonData } from '@/components/dashboard/ContinueLearningCard'
+import { BadgeShowcaseCard } from '@/components/progress/BadgeShowcaseCard'
 import { Shield, Award as CertIcon, ExternalLink, ArrowRight } from 'lucide-react'
 
 interface DBChain {
@@ -23,7 +23,7 @@ interface DBChain {
 
 export const metadata: Metadata = {
   title: 'My Progress & Competency Dashboard',
-  description: 'Single source of truth for your PM skills, lesson progress, capstones, XP rank, and certificates.',
+  description: 'Single source of truth for your PM skills, competency radar, lesson progress, capstones, XP rank, and certificates.',
 }
 
 export default async function ProgressPage() {
@@ -34,13 +34,13 @@ export default async function ProgressPage() {
 
   const supabase = createServerSupabaseClient()
 
-  // Fetch all progress data in parallel
+  // Fetch all performance & competency data in parallel
   const [
     { data: progressRows },
-    curriculum,
     xpSummary,
     streakStatus,
     radarSummary,
+    badgesData,
     { data: capstoneRows },
     userCertificates,
   ] = await Promise.all([
@@ -50,10 +50,10 @@ export default async function ProgressPage() {
       .eq('user_id', user.id) as unknown as {
       data: Database['public']['Tables']['user_lesson_progress']['Row'][] | null
     },
-    fetchCurriculumData(),
     getUserXpSummary(supabase, user.id),
     getUserStreakStatus(supabase, user.id),
     getSkillRadarSummary(supabase, user.id),
+    getUserBadgesData(supabase, user.id),
     (supabase
       .from('capstone_submissions') as unknown as DBChain)
       .select('*')
@@ -63,30 +63,8 @@ export default async function ProgressPage() {
     getUserCertificates(supabase, user.id),
   ])
 
-  const curriculumLessons = curriculum?.lessons ?? []
   const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0
   const completedPercentage = Math.min(100, Math.round((completedLessons / 90) * 100))
-
-  // Find next lesson
-  let nextLesson: NextLessonData | null = null
-  if (curriculumLessons.length > 0) {
-    const completedIds = new Set(
-      progressRows
-        ?.filter((p) => p.status === 'completed')
-        .map((p) => p.lesson_id) ?? []
-    )
-    const activeNextIndex = curriculumLessons.findIndex((l) => !completedIds.has(l.id))
-    if (activeNextIndex !== -1) {
-      const activeNext = curriculumLessons[activeNextIndex]
-      nextLesson = {
-        id: activeNext.id,
-        order: activeNextIndex + 1,
-        title: activeNext.title,
-        module: activeNext.module,
-        estimatedTime: `${activeNext.estimatedReadingTime} min`,
-      }
-    }
-  }
 
   // Auto-issue certificate if 90 lessons completed and no certificate exists yet
   let certificates = userCertificates
@@ -107,6 +85,15 @@ export default async function ProgressPage() {
     }
   }
 
+  // Map badge items for showcase
+  const badgeItems = badgesData.allBadges.map((b) => ({
+    key: b.definition.key,
+    name: b.definition.name,
+    description: b.definition.description,
+    unlocked: b.isEarned,
+    icon: b.definition.icon,
+  }))
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8 pb-16">
       {/* Header */}
@@ -118,34 +105,35 @@ export default async function ProgressPage() {
           ← Back to Dashboard
         </Link>
         <h1 className="text-2xl md:text-4xl font-bold font-serif text-foreground mt-3">
-          My Progress &amp; Competency Dashboard
+          My Progress &amp; Competency
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground mt-1">
-          Single source of truth for your product management mastery, skill radar, capstones, and certificates.
+          Single source of truth for your product management skill radar, XP performance, capstones, and verified credentials.
         </p>
       </div>
 
-      {/* Continue Learning Banner */}
-      <ContinueLearningCard
-        nextLesson={nextLesson}
-        totalLessonsCompleted={completedLessons}
-      />
-
-      {/* Primary Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <LevelCard level={xpSummary.levelInfo.level} totalXp={xpSummary.totalXp} />
-        <StreakCard streakStatus={streakStatus} />
-        <ProgressRingCard completedLessons={completedLessons} totalLessons={90} />
-      </div>
-
-      {/* Skill Radar Section */}
+      {/* 1. Skill Radar (DOMINANT VISUAL) */}
       <SkillRadarCard
         skillValues={radarSummary.scores}
         breakdown={radarSummary.breakdown}
         overallScore={radarSummary.overallScore}
       />
 
-      {/* Capstone Projects Section */}
+      {/* 2. Primary Performance Metrics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <LevelCard level={xpSummary.levelInfo.level} totalXp={xpSummary.totalXp} />
+        <StreakCard streakStatus={streakStatus} />
+        <ProgressRingCard completedLessons={completedLessons} totalLessons={90} />
+      </div>
+
+      {/* 3. Badge & Achievement Case */}
+      <BadgeShowcaseCard
+        unlockedCount={badgesData.totalEarned}
+        totalBadges={badgesData.totalAvailable}
+        badges={badgeItems}
+      />
+
+      {/* 4. Capstone Projects Section */}
       <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div className="flex items-center gap-2">
@@ -205,7 +193,7 @@ export default async function ProgressPage() {
         </div>
       </div>
 
-      {/* Certificate Visibility Section */}
+      {/* 5. Certificates & Credentials Section */}
       <div className="rounded-2xl border border-border bg-card p-6 space-y-6 shadow-xs">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div className="flex items-center gap-2">
