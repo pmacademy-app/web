@@ -117,6 +117,13 @@ async function getMermaid() {
     };
   }
 
+  if (!window.SVGElement.prototype.getComputedTextLength) {
+    (window.SVGElement.prototype as any).getComputedTextLength = function () {
+      const text = this.textContent || '';
+      return Math.max(48, text.length * 8.5);
+    };
+  }
+
   let mermaidModule: any;
   try {
     mermaidModule = await import('mermaid');
