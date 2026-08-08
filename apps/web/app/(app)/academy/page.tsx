@@ -5,6 +5,7 @@ import type { CurriculumEntry } from '@/types'
 import { BookOpen, Clock, ChevronRight, GraduationCap, Layers } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
+import { BRAND } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: 'Curriculum',
@@ -123,7 +124,40 @@ export default async function AcademyPage() {
     ([, a], [, b]) => (a[0]?.order ?? 0) - (b[0]?.order ?? 0)
   )
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
+
+  const courseJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: BRAND.fullName,
+    description: '90 structured lessons across 9 modules covering Product Management strategy, execution, growth, and leadership. Completely free with interactive quizzes, spaced repetition, and portfolio capstones.',
+    url: `${siteUrl}/academy`,
+    image: `${siteUrl}${BRAND.assets.ogImage}`,
+    provider: {
+      '@type': 'Organization',
+      name: BRAND.fullName,
+      url: siteUrl,
+    },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+    },
+    educationalLevel: 'Beginner to Advanced',
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'online',
+      courseWorkload: 'PT90H',
+    },
+  }
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+      />
     <div className="container mx-auto px-4 py-8 max-w-5xl space-y-8">
       {/* Page Header */}
       <div className="space-y-3">
@@ -274,5 +308,6 @@ export default async function AcademyPage() {
         })}
       </div>
     </div>
+    </>
   )
 }

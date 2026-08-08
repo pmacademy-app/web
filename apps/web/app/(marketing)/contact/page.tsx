@@ -3,9 +3,29 @@ import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
 import { Mail, Heart, ArrowRight } from 'lucide-react'
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
+
 export const metadata: Metadata = {
   title: 'Contact Us — Prodigy PM Academy',
   description: 'Get in touch with the Prodigy PM Academy team for support, feedback, or inquiries.',
+  openGraph: {
+    title: 'Contact — Prodigy PM Academy',
+    description: 'Get in touch with the PM Academy team for support, feedback, or questions.',
+    url: `${siteUrl}/contact`,
+    type: 'website',
+    images: [{
+      url: BRAND.assets.ogImage,
+      width: BRAND.assets.ogImageDimensions.width,
+      height: BRAND.assets.ogImageDimensions.height,
+      alt: 'Prodigy PM Academy',
+    }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact — Prodigy PM Academy',
+    description: 'Get in touch with the PM Academy team.',
+    images: [BRAND.assets.ogImage],
+  },
 }
 
 export default function ContactPage() {

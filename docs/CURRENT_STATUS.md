@@ -43,16 +43,17 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Sprint 7.5 (Security & Performance Audit):** ✅ Complete & Audited (`docs/Security-Threat-Model.md`, `docs/Performance-Budget-Checklist.md`, 100% RLS table coverage via migration `20260809000001_security_hardening_rls.sql`, sliding-window rate limiting utility `lib/rate-limit.ts`, HSTS/CSP/X-Frame-Options DENY security headers in `next.config.ts`, 0 bundle leaks of `SUPABASE_SERVICE_ROLE_KEY`, Lighthouse ≥90 and axe-core 0 violations).
 - **Sprint 7.6 (Dashboard & Learning Experience):** ✅ Complete & Audited (`docs/sprints/Dashboard-Progress-IA-Audit.md`, `/dashboard` focused strictly on "What should I do next?", `/progress` focused strictly on "How have I performed?" with Skill Radar as dominant visual, zero duplication).
 - **Sprint 8.1 (Marketing Website v2):** ✅ Complete & Audited (Full launch page set under `app/(marketing)/`: `/`, `/about`, `/contact`, `/privacy`, `/terms`, Buy Me a Coffee integration, live `GET /api/testimonials` consumption without hardcoded copy, finalized `lib/brand.ts` domain/social links, prominent Free Forever messaging, public sample lessons accessible to logged-out visitors).
-- **Current Focus:** Ready for **Sprint 8.5 (Mobile Experience)**.
+- **Sprint 8.2 (Marketing Content & SEO):** ✅ Complete & Audited (`SearchOverlay` live (Cmd/Ctrl+K, lazy `GET /api/search-index`, `useReducer` state, keyboard navigation, block-aware result display); OG+Twitter metadata on all marketing pages (`/about`, `/contact`, `/privacy`, `/terms`) and lesson pages; Article JSON-LD on 3 public sample lesson pages; Course JSON-LD on `/academy`; corrected `sitemap.xml` (marketing pages + 3 public sample lessons only, correct `/academy/{module}/{lessonId}` URLs); hardened `robots.txt` (explicit disallows for `/dashboard`, `/settings`, `/admin`, `/review`, `/progress`, `/leaderboard`, `/onboarding`, `/capstones`, `/badges`, `/p/`, `/academy/`, `/api/`)).
+- **Current Focus:** Ready for **Sprint 8.3 (Legal & Support)**.
 
 ---
 
 ## 3. What's Next
 
-Sprint 8.1 complete. Next steps:
 
-1. **[Sprint 8.5 — Next] Mobile Experience:** Responsive verification pass across all surfaces (Settings 2.0, Certificates 2.0, Admin Console, Dashboard, Marketing v2, Notification Panel).
-2. **[Sprint 8.6] Public Launch QA & Regression Gate:** Final production launch verification.
+1. **[Sprint 8.3 — Next] Legal & Support:** `/privacy` and `/terms` full legal content, support flow.
+2. **[Sprint 8.5] Mobile Experience:** Responsive verification pass across all surfaces.
+3. **[Sprint 8.6] Public Launch QA & Regression Gate:** Final production launch verification.
 
 ---
 
