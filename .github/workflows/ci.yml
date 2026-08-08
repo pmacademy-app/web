@@ -37,6 +37,33 @@ jobs:
       - name: Type check & Lint
         run: npm run lint
 
+      - name: Brand hardening check
+        run: |
+          set -e
+          # 1. No hardcoded brand URL outside the brand config and test fixtures.
+          if grep -rn "https://pmacademy.com" --include="*.ts" --include="*.tsx" . \
+            | grep -v "lib/brand.ts" | grep -v "lib/__tests__/"; then
+            echo "::error::Hardcoded brand URL found — source from lib/brand.ts (BRAND.siteUrl) instead."
+            exit 1
+          fi
+          # 2. No legacy title-suffix pattern — the root layout template already appends the brand.
+          if grep -rn "| PM Academy'" --include="*.tsx" app/; then
+            echo "::error::Legacy '| PM Academy' title suffix found — strip it; the root layout title.template appends the brand."
+            exit 1
+          fi
+          # 3. No base64 data-URI wrapper SVGs — assets must be real, lightweight vector files
+          #    regenerated from docs/design/assets/logo.png via `npm run brand:generate`.
+          if grep -rln "data:image/png;base64" --include="*.svg" public/; then
+            echo "::error::Base64 data-URI SVG found in public/ — run 'npm run brand:generate' to emit real vector assets."
+            exit 1
+          fi
+          # 4. No hardcoded brand hex values outside the design token source of truth.
+          if grep -rn -i -e "#1f6b4e" -e "#fbfaf6" -e "#171a17" -e "#d98b24" --include="*.ts" --include="*.tsx" app/ components/ lib/ blocks/ renderer/ \
+            | grep -v "theme/tokens.ts"; then
+            echo "::error::Hardcoded brand color found — source from theme/tokens.ts (TOKENS) or lib/brand.ts (BRAND) instead."
+            exit 1
+          fi
+
       - name: Next.js Production Build
         run: npm run build
 
