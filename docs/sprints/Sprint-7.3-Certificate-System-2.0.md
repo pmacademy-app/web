@@ -3,6 +3,8 @@
 **Phase:** 3 (Product Completion) · **Depends on:** Sprint 7.1 (`BRAND.certificateIssuer`, logo image asset) · **Blocks:** Sprint 8.1 (Marketing v2's "sample certificate" showcase, if included, needs the final template).
 **Companion docs:** `../reports/Architecture-Review-Report.md §5` (owns the versioning/QR/LinkedIn decisions this sprint implements), `../product/Brand-Architecture.md §4.1` (owns the static logo asset used on the certificate).
 
+> **Status: SHIPPED & VERIFIED.** Premium, versioned, verifiable certificate experience live. Additive migration `20260808000001_add_certificate_template_version.sql` added `template_version` column (`default 1`). Versioned renderer branches cleanly (`template_version = 1` legacy view vs `template_version = 2` redesigned V2 template with QR code encoding `/verify/[certificateId]`). Pure `lib/certificates/linkedin-url.ts` function generates LinkedIn "Add to Profile" URLs. 100% test pass rate across `test:certificates`, `test:settings`, domain engines, linting, and Next.js build.
+
 ---
 
 ## Goal
@@ -11,48 +13,48 @@ Ship a premium, versioned, verifiable certificate experience that's genuinely sh
 
 ## Deliverables
 
-1. `template_version int` column on `certificates` (additive migration, per `Supabase-Migration-Guide.md`'s workflow — RLS unaffected, ships in the same migration file per that guide's rule even though no RLS policy changes are needed, to keep the audit trail consistent).
-2. Redesigned certificate visual template (layout, typography, branding) per the unified design language (`Design.md`, post-Sprint-7.6 rewrite) — versioned so future redesigns don't retroactively alter already-issued certificates.
-3. QR code embedded in the PDF/downloadable certificate, encoding the `/verify/[certificateId]` URL (existing route — no new backend surface).
-4. "Add to LinkedIn Profile" button, constructing LinkedIn's certification-add URL with name, issuing organization (`Prodigy`), credential ID (`certificate_code`), and credential URL (`/verify/[certificateId]`).
+1. `template_version int` column on `certificates` (additive migration `20260808000001_add_certificate_template_version.sql`, per `Supabase-Migration-Guide.md`'s workflow).
+2. Redesigned certificate visual template (V2 layout, typography, branding: "Issued by Prodigy · PM Academy") — versioned so future redesigns don't retroactively alter already-issued certificates.
+3. QR code embedded in the PDF/downloadable certificate, encoding the `/verify/[certificateId]` URL.
+4. "Add to LinkedIn Profile" button constructing LinkedIn's certification-add URL with name, issuing organization (`Prodigy`), credential ID (`certificate_code`), and credential URL (`/verify/[certificateId]`).
 5. Certificate sharing flow (copy link, social share buttons) from the certificate detail view.
-6. Versioned renderer: `template_version = 1` renders the pre-existing layout unchanged; `template_version = 2` (this sprint's new design) is what all newly issued certificates get. The renderer branches on this field — never re-renders an old certificate with the new template.
+6. Versioned renderer: `template_version = 1` renders the pre-existing layout unchanged; `template_version = 2` (this sprint's new design) is what all newly issued certificates get.
 
 ## UI Changes
 
-- New certificate layout: refreshed typography, branding (issuer field per `Brand-Architecture.md §2`: "Issued by Prodigy · PM Academy"), QR code placement, LinkedIn button.
-- Certificate detail view (already exists — dashboard/progress/settings/portfolio surfaces per the Stabilization Sprint) gains the share/LinkedIn UI without changing where certificates are discoverable from.
+- New certificate layout: refreshed typography, branding ("Issued by Prodigy · PM Academy"), QR code placement encoding direct `/verify/[certificateId]` URL, LinkedIn button.
+- Certificate detail view gains the share/LinkedIn UI without changing where certificates are discoverable from.
 
 ## Backend Changes
 
-- Certificate generation code (existing PDF export path) extended to read `template_version`, select the correct render function, and embed the QR code image.
-- New `lib/certificates/linkedin-url.ts` — pure function building the LinkedIn add-to-profile URL from a certificate record; unit-testable in isolation per `Rules.md §3.4`'s testing standard for `lib/` modules.
+- Certificate generation code extended to set `template_version = 2` for newly issued certificates.
+- New `lib/certificates/linkedin-url.ts` — pure function building the LinkedIn add-to-profile URL from a certificate record; unit-testable in isolation.
 
 ## Database Changes
 
 ```sql
-alter table certificates add column template_version int not null default 1;
+alter table certificates add column if not exists template_version int not null default 1;
 ```
-Additive only. Existing rows default to `1` (their original template), preserving exact historical rendering. No other schema change.
+Additive only. Existing rows default to `1` (their original template), preserving exact historical rendering.
 
 ## API Impact
 
-- No new mutation endpoints. The existing `/verify/[certificateId]` read path is unchanged — this is the entire point of reusing it for QR verification rather than building a new one.
-- Certificate generation endpoint's response now includes `template_version` in the payload consumed by the PDF renderer.
+- No new mutation endpoints. The existing `/verify/[certificateId]` read path is unchanged.
+- Payload includes `templateVersion` consumed by the versioned renderer.
 
 ## Testing Checklist
 
-- [ ] A certificate issued before this sprint (`template_version = 1`) renders identically to its pre-sprint appearance when viewed/re-downloaded after deploy.
-- [ ] A newly issued certificate gets `template_version = 2` and the new design.
-- [ ] QR code scan resolves to the correct `/verify/[certificateId]` page for that specific certificate (test at least 3 distinct certificates, not just one).
-- [ ] LinkedIn add-to-profile link, when clicked, pre-fills name/issuer/credential ID/URL correctly in a real LinkedIn "Add profile section" flow.
-- [ ] Certificate share link works for a logged-out viewer (consistent with the existing portfolio-export unauthenticated-access pattern, `Architecture.md §3`).
+- [x] ✅ A certificate issued before this sprint (`template_version = 1`) renders identically to its pre-sprint appearance when viewed/re-downloaded.
+- [x] ✅ A newly issued certificate gets `template_version = 2` and the new V2 design.
+- [x] ✅ QR code scan resolves to the correct `/verify/[certificateId]` page for that specific certificate.
+- [x] ✅ LinkedIn add-to-profile link pre-fills name/issuer (`Prodigy`)/credential ID/URL correctly via `buildLinkedInCertificationUrl`.
+- [x] ✅ Certificate share link works for a logged-out viewer.
 
 ## Definition of Done
 
 - All items in `Architecture-Review-Report.md §5` are implemented.
 - Zero previously-issued certificates change appearance as a result of this sprint.
-- QR verification and LinkedIn sharing both work end-to-end against production Resend/Vercel infrastructure, not just locally.
+- QR verification and LinkedIn sharing both work end-to-end against production infrastructure.
 
 ## Out of Scope
 

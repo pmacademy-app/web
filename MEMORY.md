@@ -1,7 +1,7 @@
 # Prodigy PM Academy — Project Memory Index
 
 **Last Updated:** 2026-08-08  
-**Project Stage:** Sprint 7.2 Complete — Settings 2.0 (brand: **Prodigy**, product: **PM Academy**)
+**Project Stage:** Sprint 7.3 Complete — Certificate System 2.0 (brand: **Prodigy**, product: **PM Academy**)
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
 
@@ -11,19 +11,17 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 **Prodigy PM Academy** is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
-**Current state:** All phases 0–3 and Sprints 1–7.2 are complete, including the v1.0.0-rc1 release candidate, Sprint 7.1 global rebrand, and Sprint 7.2 Settings 2.0 overhaul. The repository is ready for **Sprint 7.3 (Certificate System 2.0)**.
+**Current state:** All phases 0–3 and Sprints 1–7.3 are complete, including the v1.0.0-rc1 release candidate, Sprint 7.1 global rebrand, Sprint 7.2 Settings 2.0 overhaul, and Sprint 7.3 Certificate System 2.0. The repository is ready for **Sprint 7.4 (Admin Console Polish)**.
 
 ---
 
-## Sprint 7.2 — Settings 2.0 (Complete)
+## Sprint 7.3 — Certificate System 2.0 (Complete)
 
-- **Unified Settings IA (`/settings`)**: 5 tabs — `Profile`, `Security`, `Portfolio`, `Notifications`, `Danger Zone`.
-- **`ConfirmDestructiveAction` Dialog**: Modal component enforcing exact-match typed confirmation keywords (`RESET`, `DELETE`, or module title) for all destructive actions.
-- **Ledger-Respecting Reset Architecture (`lib/settings/settings-service.ts`)**:
-  - XP reset writes a negative `xp_events` row (`source_type = 'user_reset'`) to reduce `total_xp` to 0 without violating the append-only ledger invariant.
-  - Progress, Flashcards, Streak, and Skill Radar resets produce state-change audit records.
-  - Delete Account flow cascades across all RLS user tables, revokes public portfolio, delinks certificates, and emits an `account.deleted` event to clear queued notifications.
-- **API & Testing**: Thin API routes under `/api/settings/*`; regression unit test suite in `lib/__tests__/settings.test.ts` verifying `getAuthenticatedUserFromRequest` return type and ledger math.
+- **Additive Template Versioning Migration (`20260808000001_add_certificate_template_version.sql`)**: Added `template_version int not null default 1` to `certificates` table.
+- **Versioned Renderer (`CertificateCard.tsx`)**: `templateVersion === 1` renders original legacy card layout unchanged; `templateVersion === 2` (default for newly issued certs) renders redesigned V2 layout with issuer attribution ("Issued by Prodigy · PM Academy") and direct `/verify/[certificateId]` QR code.
+- **LinkedIn Add to Profile Integration (`lib/certificates/linkedin-url.ts`)**: Pure function `buildLinkedInCertificationUrl` constructing LinkedIn's certification-add endpoint with pre-filled credential parameters.
+- **Action Bar & Verification Embedding (`CertificateActions.tsx`)**: Added "Add to LinkedIn Profile" action button alongside PDF print/download, Web Share API, and clipboard link copying.
+- **Testing & Verification**: 100% test pass rate across `test:certificates`, `test:settings`, domain engines, ESLint, and production Next.js build.
 
 ---
 

@@ -28,6 +28,7 @@ export interface VerifiedCertificatePayload {
   totalXp: number
   lessonsCompleted: number
   modulesCompleted: number
+  templateVersion: number
   issuedAt: string
   isValid: boolean
   verificationUrl: string
@@ -36,6 +37,7 @@ export interface VerifiedCertificatePayload {
 
 /**
  * Issues or retrieves an official certificate record for a user.
+ * Newly issued certificates get template_version = 2.
  */
 export async function issueCertificate(
   supabase: SupabaseClient<Database>,
@@ -78,7 +80,7 @@ export async function issueCertificate(
     return existing
   }
 
-  // 4. Insert new certificate
+  // 4. Insert new certificate (template_version = 2 for new certificates)
   const newCert = {
     user_id: userId,
     certificate_code: certCode,
@@ -90,6 +92,7 @@ export async function issueCertificate(
     total_xp: user.total_xp || 0,
     lessons_completed: lessonsCompleted,
     modules_completed: modulesCompleted,
+    template_version: 2,
     issued_at: new Date().toISOString(),
   }
 
@@ -170,6 +173,7 @@ export async function verifyCertificate(
     totalXp: cert.total_xp,
     lessonsCompleted: cert.lessons_completed,
     modulesCompleted: cert.modules_completed,
+    templateVersion: cert.template_version ?? 1,
     issuedAt: cert.issued_at,
     isValid: true,
     verificationUrl: `${origin}/verify/${encodeURIComponent(cert.certificate_code)}`,

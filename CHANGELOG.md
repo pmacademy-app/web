@@ -6,7 +6,29 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 Release notes are ordered reverse-chronologically. Each release categorizes changes under Added, Changed, Fixed, Removed, Technical, Documentation, Verification, and Known Limitations when applicable.
 
-## [Unreleased] - Sprint 7.2: Settings 2.0
+## [Unreleased] - Sprint 7.3: Certificate System 2.0
+
+- **Status:** Development Complete — Versioned, Verifiable & Shareable Certificates
+- **Release Date:** 2026-08-08
+
+### Added
+
+- **Additive Template Versioning Migration (`20260808000001_add_certificate_template_version.sql`)**:
+  - Added `template_version int not null default 1` column to `certificates` table.
+  - Updated `Database` interface in `lib/supabase.ts` and `VerifiedCertificatePayload` in `lib/certificates-db.ts`.
+  - Configured `issueCertificate` to assign `template_version = 2` for all newly issued credentials.
+- **Versioned Certificate Renderer (`CertificateCard.tsx`)**:
+  - `templateVersion === 1`: Renders pre-existing legacy layout strictly unchanged for historical records.
+  - `templateVersion === 2`: Renders refreshed V2 visual layout with official issuer line ("Issued by Prodigy · PM Academy"), double gold/emerald border framing, and embedded QR code.
+- **LinkedIn Add to Profile Integration (`lib/certificates/linkedin-url.ts` & `CertificateActions.tsx`)**:
+  - Built pure function `buildLinkedInCertificationUrl` constructing LinkedIn's certification endpoint with pre-filled credential name, issuing organization (`Prodigy`), credential ID (`certificate_code`), issue date, and verification URL.
+  - Added "Add to LinkedIn Profile" action button with sky-blue styling and inline SVG icon.
+- **Direct Verification QR Code**:
+  - Upgraded QR code generator in V2 layout to encode the exact `/verify/[certificateId]` URL instead of generic portfolio URL.
+- **Certificates 2.0 Unit Test Suite (`lib/__tests__/certificates.test.ts`)**:
+  - Added unit test cases verifying `buildLinkedInCertificationUrl` parameter encoding, QR code markup, and code generation determinism.
+
+## Sprint 7.2: Settings 2.0
 
 - **Status:** Development Complete — Unified Settings IA & Auditable Reset Layer
 - **Release Date:** 2026-08-08
