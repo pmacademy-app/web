@@ -74,6 +74,51 @@ async function getMermaid() {
     (global as any).CSSStyleSheet = MockCSSStyleSheet;
   }
 
+  // Polyfill getBoundingClientRect for JSDOM elements (used by D3 / Mermaid label layout engine)
+  if (!window.Element.prototype.getBoundingClientRect || (window.Element.prototype.getBoundingClientRect as any).__isMock !== true) {
+    const mockFn = function (this: any) {
+      const text = (this.textContent || '').trim();
+      const lines = text.split('\n').map((l: string) => l.trim()).filter(Boolean);
+      const maxLen = Math.max(1, ...lines.map((l: string) => l.length));
+      const width = Math.max(60, maxLen * 8.5 + 32);
+      const height = Math.max(34, Math.max(1, lines.length) * 22 + 16);
+      return {
+        x: 0,
+        y: 0,
+        width,
+        height,
+        top: 0,
+        right: width,
+        bottom: height,
+        left: 0,
+        toJSON() { return this; },
+      };
+    };
+    (mockFn as any).__isMock = true;
+    window.Element.prototype.getBoundingClientRect = mockFn;
+  }
+
+  // Polyfill offsetWidth and offsetHeight for HTMLElement in JSDOM
+  try {
+    Object.defineProperty(window.HTMLElement.prototype, 'offsetWidth', {
+      get() {
+        const text = (this.textContent || '').trim();
+        const lines = text.split('\n').map((l: string) => l.trim()).filter(Boolean);
+        const maxLen = Math.max(1, ...lines.map((l: string) => l.length));
+        return Math.max(60, maxLen * 8.5 + 32);
+      },
+      configurable: true,
+    });
+    Object.defineProperty(window.HTMLElement.prototype, 'offsetHeight', {
+      get() {
+        const text = (this.textContent || '').trim();
+        const lines = text.split('\n').map((l: string) => l.trim()).filter(Boolean);
+        return Math.max(34, Math.max(1, lines.length) * 22 + 16);
+      },
+      configurable: true,
+    });
+  } catch {}
+
   if (!window.SVGElement.prototype.getBBox) {
     (window.SVGElement.prototype as any).getBBox = function (): { x: number; y: number; width: number; height: number } {
       const tagName = (this.tagName || '').toLowerCase();
@@ -161,6 +206,16 @@ async function getMermaid() {
         const y = parseFloat(this.getAttribute('y') || '0');
         if (attrW > 0 && attrH > 0) {
           return { x, y, width: attrW, height: attrH };
+        }
+        // If rect is not sized yet, estimate from node label text in parent container
+        const parent = this.parentElement || this.parentNode;
+        const innerText = parent?.textContent?.trim() || '';
+        if (innerText) {
+          const lines = innerText.split('\n').filter((l: string) => l.trim());
+          const maxLen = Math.max(1, ...lines.map((l: string) => l.trim().length));
+          const width = Math.max(60, maxLen * 8.5 + 32);
+          const height = Math.max(34, lines.length * 24 + 16);
+          return { x: -width / 2, y: -height / 2, width, height };
         }
         return { x: -30, y: -17, width: 60, height: 34 };
       }
