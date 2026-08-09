@@ -8,9 +8,9 @@
 ## 1. Repository Metadata
 
 - **Current Branch:** `main`
-- **Current Version:** `1.0.0-rc1` (Release Candidate 1 complete)
-- **Last Successful Build:** 2026-08-08 (Next.js 16 App Router production build — clean, exit 0, 90 lessons compiled)
-- **Current Implementation Phase:** **PM Academy v1.0.0-rc1 RELEASE CANDIDATE COMPLETE**
+- **Current Version:** `1.0.0-GA` (General Availability / Public Launch Ready)
+- **Last Successful Build:** 2026-08-10 (Next.js 16 App Router production build — clean, exit 0, 90 lessons compiled, 84 routes prerendered)
+- **Current Implementation Phase:** **PM Academy v1.0.0-GA PUBLIC LAUNCH GATE PASSED (READY FOR PRODUCTION LAUNCH)**
 
 ---
 
@@ -44,16 +44,17 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Sprint 7.6 (Dashboard & Learning Experience):** ✅ Complete & Audited (`docs/sprints/Dashboard-Progress-IA-Audit.md`, `/dashboard` focused strictly on "What should I do next?", `/progress` focused strictly on "How have I performed?" with Skill Radar as dominant visual, zero duplication).
 - **Sprint 8.1 (Marketing Website v2):** ✅ Complete & Audited (Full launch page set under `app/(marketing)/`: `/`, `/about`, `/contact`, `/privacy`, `/terms`, Buy Me a Coffee integration, live `GET /api/testimonials` consumption without hardcoded copy, finalized `lib/brand.ts` domain/social links, prominent Free Forever messaging, public sample lessons accessible to logged-out visitors).
 - **Sprint 8.2 (Marketing Content & SEO):** ✅ Complete & Audited (`SearchOverlay` live (Cmd/Ctrl+K, lazy `GET /api/search-index`, `useReducer` state, keyboard navigation, block-aware result display); OG+Twitter metadata on all marketing pages (`/about`, `/contact`, `/privacy`, `/terms`) and lesson pages; Article JSON-LD on 3 public sample lesson pages; Course JSON-LD on `/academy`; corrected `sitemap.xml` (marketing pages + 3 public sample lessons only, correct `/academy/{module}/{lessonId}` URLs); hardened `robots.txt` (explicit disallows for `/dashboard`, `/settings`, `/admin`, `/review`, `/progress`, `/leaderboard`, `/onboarding`, `/capstones`, `/badges`, `/p/`, `/academy/`, `/api/`)).
-- **Current Focus:** Ready for **Sprint 8.3 (Legal & Support)**.
+- **Sprint 8.3 (Legal & Support):** ✅ Complete & Audited (`/privacy` and `/terms` production legal pages, `hello@prodily.adityagangwani.me` support contact, GA4 default IP anonymization & zero PII audit).
+- **Sprint 8.4 (Notification UX):** ✅ Complete & Audited (In-App Notification Center Panel over active screen with focus trap, ESC key close, scroll lock, category tabs, and `/notifications` safe redirect).
+- **Sprint 8.5 (Mobile Experience):** ✅ Complete & Audited (Full-screen Notification Panel takeover on mobile, Danger Zone scrollable modal, Settings scrollable tabs, Certificate Card mobile padding, Admin mobile drawer & header).
+- **Sprint 8.6 (Public Launch QA & Regression Gate):** ✅ Complete & Audited (**READY FOR GENERAL AVAILABILITY LAUNCH** — 0 P0/P1 issues).
 
 ---
 
 ## 3. What's Next
 
-
-1. **[Sprint 8.3 — Next] Legal & Support:** `/privacy` and `/terms` full legal content, support flow.
-2. **[Sprint 8.5] Mobile Experience:** Responsive verification pass across all surfaces.
-3. **[Sprint 8.6] Public Launch QA & Regression Gate:** Final production launch verification.
+1. **Tag Production Release:** `v1.0.0-GA` on `main`.
+2. **Founder Action Items:** Deploy production environment variables (`NEXT_PUBLIC_SITE_URL`, `SEND_EMAIL_HOOK_SECRET`, `RESEND_API_KEY`, `ADMIN_EMAILS`) to Vercel/Supabase and perform legal sign-off.
 
 ---
 
