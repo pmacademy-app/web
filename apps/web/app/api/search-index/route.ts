@@ -1,31 +1,32 @@
 import { NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
 import fs from 'fs'
 import path from 'path'
 
-/**
- * GET /api/search-index
- *
- * Serves the pre-compiled FlexSearch-friendly search index produced by the
- * content compiler at `content/dist/search-index.json`.
- *
- * This route is intentionally not cached aggressively — the index is re-generated
- * on every `content:compile` run. A 1-hour CDN cache is sufficient for production.
- */
+const getCachedSearchIndex = unstable_cache(
+  async () => {
+    const indexPath = path.resolve(process.cwd(), '..', '..', 'content', 'dist', 'search-index.json')
+    if (!fs.existsSync(indexPath)) {
+      return null
+    }
+    return fs.readFileSync(indexPath, 'utf-8')
+  },
+  ['search-index-v1'],
+  { revalidate: 3600, tags: ['search-index'] }
+)
+
 export async function GET() {
   try {
-    const indexPath = path.resolve(process.cwd(), '..', '..', 'content', 'dist', 'search-index.json')
+    const raw = await getCachedSearchIndex()
 
-    if (!fs.existsSync(indexPath)) {
+    if (!raw) {
       return NextResponse.json({ error: 'Search index not found' }, { status: 404 })
     }
-
-    const raw = fs.readFileSync(indexPath, 'utf-8')
 
     return new NextResponse(raw, {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        // Cache for 1 hour in CDN, 5 minutes in browser
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300',
       },
     })
