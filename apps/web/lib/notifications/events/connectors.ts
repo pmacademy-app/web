@@ -1,13 +1,49 @@
 import type { EventEnvelope } from '../types'
 import { globalNotificationDispatcher } from '../dispatcher'
 import { enqueueNotificationItem } from '../queue/processor'
+import { createInAppNotification, buildInAppContentFromEvent } from '../in-app/service'
 import { BRAND } from '@/lib/brand'
 
 /**
- * Registers default system event handlers that map Notification Events to Email Queue entries.
+ * Registers default system event handlers that map Notification Events to
+ * In-App rows (primary channel) and Email Queue entries (secondary channel).
  */
 export function initializeNotificationConnectors(): void {
   const d = globalNotificationDispatcher
+
+  // ── In-App write handlers (primary channel for all platform events) ─────────
+  const IN_APP_EVENTS = [
+    'user.registered',
+    'user.verified',
+    'password.reset_requested',
+    'module.completed',
+    'badge.earned',
+    'xp.level_up',
+    'certificate.generated',
+    'portfolio.published',
+    'lesson.completed',
+    'srs.review_due',
+    'capstone.submitted',
+  ] as const
+
+  for (const eventType of IN_APP_EVENTS) {
+    d.registerHandler(
+      eventType,
+      `connector.in_app.${eventType}`,
+      async (event: EventEnvelope<Record<string, unknown>>) => {
+        const content = buildInAppContentFromEvent(event)
+        await createInAppNotification({
+          userId: event.userId,
+          eventId: event.id,
+          category: event.category,
+          title: content.title,
+          body: content.body,
+          actionUrl: content.actionUrl,
+          priority: event.priority,
+        })
+      }
+    )
+  }
 
   // 1. Auth: user.registered -> auth.welcome
   d.registerHandler('user.registered', 'connector.auth.welcome', async (event: EventEnvelope<Record<string, unknown>>) => {

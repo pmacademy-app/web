@@ -2,24 +2,22 @@ import { NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { globalFeatureFlagService } from '@/lib/notifications/feature-flags/service'
+import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
+import type { NotificationPriorityLevel } from '@/lib/notifications/types'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
 }
 
-interface TimelineRow {
+interface InAppNotificationRow {
   id: string
   user_id: string
-  event_type?: string
-  title?: string
-  body?: string
-  message?: string
-  category?: string
-  priority?: string
-  is_read?: boolean
-  deep_link?: string
-  icon?: string
-  metadata?: Record<string, unknown>
+  category: string
+  title: string
+  body: string
+  action_url?: string | null
+  priority: number
+  is_read: boolean
   created_at: string
 }
 
@@ -52,7 +50,7 @@ export async function GET(request: Request) {
 
   try {
     let query = supabase
-      .from('user_notification_timeline')
+      .from('in_app_notifications')
       .select('*', { count: 'exact' })
       .eq('user_id', authUser.id)
       .order('created_at', { ascending: false })
@@ -74,26 +72,26 @@ export async function GET(request: Request) {
 
     // Query total unread count
     const { count: unreadCount } = await supabase
-      .from('user_notification_timeline')
+      .from('in_app_notifications')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', authUser.id)
       .eq('is_read', false)
 
     if (error) {
-      console.warn('[API:notifications] Error fetching timeline items from Supabase:', error)
+      console.warn('[API:notifications] Error fetching notification items from Supabase:', error)
     }
 
-    const rawItems = (items || []) as unknown as TimelineRow[]
+    const rawItems = (items || []) as unknown as InAppNotificationRow[]
     const formattedItems = rawItems.map((item) => ({
       id: item.id,
       userId: item.user_id,
-      title: item.title || item.event_type || 'Notification',
-      body: item.body || item.message || '',
+      title: item.title || 'Notification',
+      body: item.body || '',
       category: item.category || 'system',
-      priority: item.priority || 'medium',
+      priority: priorityLevelFromNumber(item.priority),
       isRead: Boolean(item.is_read),
-      deepLink: item.deep_link || getDeepLinkForEventType(item.event_type, item.metadata),
-      icon: item.icon || getIconForCategory(item.category),
+      deepLink: item.action_url || getDeepLinkForCategory(item.category),
+      icon: item.category ? getIconForCategory(item.category) : '🔔',
       createdAt: item.created_at,
     }))
 
@@ -127,7 +125,7 @@ export async function PATCH(request: Request) {
 
     if (action === 'mark_all_read') {
       const { error } = await (supabase
-        .from('user_notification_timeline') as unknown as DBChain)
+        .from('in_app_notifications') as unknown as DBChain)
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq('user_id', authUser.id)
         .eq('is_read', false)
@@ -147,7 +145,7 @@ export async function PATCH(request: Request) {
     const readAt = isRead ? new Date().toISOString() : null
 
     const { error } = await (supabase
-      .from('user_notification_timeline') as unknown as DBChain)
+      .from('in_app_notifications') as unknown as DBChain)
       .update({ is_read: isRead, read_at: readAt })
       .eq('id', notificationId)
       .eq('user_id', authUser.id)
@@ -163,23 +161,16 @@ export async function PATCH(request: Request) {
   }
 }
 
-function getDeepLinkForEventType(eventType?: string, metadata?: Record<string, unknown>): string {
-  switch (eventType) {
-    case 'lesson.completed':
-    case 'module.completed':
-      return '/academy'
-    case 'badge.earned':
+function getDeepLinkForCategory(category?: string): string {
+  switch (category) {
+    case 'achievements':
       return '/badges'
-    case 'xp.level_up':
+    case 'learning':
+      return '/academy'
+    case 'certificates':
       return '/progress'
-    case 'certificate.generated':
-      return typeof metadata?.certificateCode === 'string' ? `/verify/${metadata.certificateCode}` : '/progress'
-    case 'portfolio.published':
-      return typeof metadata?.username === 'string' ? `/p/${metadata.username}` : '/settings'
-    case 'srs.review_due':
-      return '/review'
-    case 'capstone.submitted':
-      return '/capstones'
+    case 'security':
+      return '/account'
     default:
       return '/dashboard'
   }
@@ -200,6 +191,14 @@ function getIconForCategory(category?: string): string {
   }
 }
 
+/**
+ * Converts a numeric DB priority back into its level key for the UI.
+ */
+function priorityLevelFromNumber(priority: number): NotificationPriorityLevel {
+  const match = Object.entries(PRIORITY_MATRIX).find(([, def]) => def.numericValue === priority)
+  return (match?.[0] as NotificationPriorityLevel) || 'medium'
+}
+
 interface NotificationFormattedItem {
   id: string
   userId: string
@@ -216,7 +215,7 @@ interface NotificationFormattedItem {
 function groupNotificationsByDate(items: NotificationFormattedItem[]) {
   const now = new Date()
   const todayStr = now.toISOString().split('T')[0]
-  
+
   const yesterday = new Date(now)
   yesterday.setDate(yesterday.getDate() - 1)
   const yesterdayStr = yesterday.toISOString().split('T')[0]
