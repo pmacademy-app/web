@@ -309,6 +309,22 @@ describe('PM Academy Content Compiler Test Suite', () => {
       const width = parseFloat(wMatch![1]);
       assert.ok(width < 900, `expected node box width to reflect line breaks (< 900px), got ${width}px`);
     });
+
+    it('correctly calculates diamond shape polygon bounds and non-overlapping edge routing', async () => {
+      const src = `graph TD
+    A[Research Question] --> B{Why or How? Understanding<br/>Depth, Mental Models, Motivation}
+    A --> C{How Many or How Much? Scale,<br/>Prevalence, Statistical Confidence}
+    B --> D[Qualitative Methods]`;
+      const svg = await compileMermaidToSvg(src);
+      assert.ok(svg.includes('<svg'), 'expected valid svg');
+
+      const matchA = svg.match(/id="[^"]*flowchart-A-[^"]*"[^>]*transform="translate\(\s*[\d.-]+\s*,\s*([\d.-]+)\s*\)"/);
+      const matchB = svg.match(/id="[^"]*flowchart-B-[^"]*"[^>]*transform="translate\(\s*[\d.-]+\s*,\s*([\d.-]+)\s*\)"/);
+      assert.ok(matchA && matchB, 'expected transform attributes for nodes A and B');
+      const yA = parseFloat(matchA[1]);
+      const yB = parseFloat(matchB[1]);
+      assert.ok(yB - yA > 150, `expected rank separation > 150px between rect A and diamond B, got ${yB - yA}px`);
+    });
   });
 });
 
