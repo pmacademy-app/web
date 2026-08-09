@@ -9,7 +9,7 @@ export const BRAND = {
   positioning: '90 lessons. 9 modules. Free forever.',
   domain: 'prodily.adityagangwani.me',
   social: {
-    linkedin: 'https://linkedin.com/company/prodily',
+    linkedin: 'https://www.linkedin.com/company/prodilypmacademy',
     twitter: 'https://x.com/prodily',
     buyMeACoffee: 'https://buymeacoffee.com/prodily',
   },
