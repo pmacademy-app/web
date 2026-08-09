@@ -16,7 +16,7 @@ interface UseUsageTimeTrackerOptions {
  * on the same tab after navigating between pages.
  */
 export function useUsageTimeTracker({ onPromptTriggered }: UseUsageTimeTrackerOptions): void {
-  const startTimeRef = useRef<number>(Date.now())
+  const startTimeRef = useRef<number>(0)
   const firedRef = useRef<boolean>(false)
 
   useEffect(() => {
