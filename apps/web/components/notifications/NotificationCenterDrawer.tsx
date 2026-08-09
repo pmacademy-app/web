@@ -32,18 +32,24 @@ export function NotificationCenterDrawer({
 
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-  // Focus management & body scroll lock
+  // Focus management, keyboard escape, & body scroll lock
   useEffect(() => {
     if (isOpen) {
       closeButtonRef.current?.focus()
       const originalOverflow = document.body.style.overflow
       document.body.style.overflow = 'hidden'
 
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose()
+      }
+      window.addEventListener('keydown', handleKeyDown)
+
       return () => {
         document.body.style.overflow = originalOverflow
+        window.removeEventListener('keydown', handleKeyDown)
       }
     }
-  }, [isOpen])
+  }, [isOpen, onClose])
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true)

@@ -62,6 +62,7 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
           if (table === 'users') {
             return {
               update: (row: Record<string, unknown>) => ({
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 eq: (_col: string, _val: string) => {
                   updatedUserRow = row
                   return Promise.resolve({ data: null, error: null })

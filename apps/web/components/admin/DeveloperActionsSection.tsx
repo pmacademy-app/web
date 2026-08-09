@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { SendTestEmailButton } from './SendTestEmailButton'
 import { Terminal, Award, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 
 export interface DeveloperActionsProps {
@@ -93,14 +94,10 @@ export function DeveloperActionsSection({ targetUserId, targetUserEmail }: Devel
           {loading && <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />}
         </button>
 
-        {/* Future developer action placeholders */}
-        <div className="p-3 rounded-lg bg-slate-950/40 border border-slate-800/60 text-slate-600 text-xs flex items-center justify-between opacity-50 cursor-not-allowed">
-          <div>
-            <p className="font-bold text-slate-500">Award Test XP / Level Up</p>
-            <p className="text-[10px]">Future action placeholder</p>
-          </div>
-          <span className="text-[10px] uppercase font-mono">Future</span>
-        </div>
+        <SendTestEmailButton
+          templateKey="auth.welcome"
+          templateName="Auth Welcome Email"
+        />
       </div>
 
       {/* Action result notification */}

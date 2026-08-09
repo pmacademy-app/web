@@ -5,6 +5,7 @@ import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import { SearchOverlayProvider } from '@/components/search/SearchOverlayProvider'
 import { SearchOverlay } from '@/components/search/SearchOverlay'
+import { LearnerFeedbackProvider } from '@/components/feedback/LearnerFeedbackProvider'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -38,6 +39,7 @@ export default function AppShell({ children, userProfile }: AppShellProps) {
 
       {/* Search Overlay — mounted at shell level, lazy index loaded on first open */}
       <SearchOverlay />
+      <LearnerFeedbackProvider />
     </SearchOverlayProvider>
   )
 }
