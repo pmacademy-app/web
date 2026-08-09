@@ -1,3 +1,4 @@
+import { unstable_cache, revalidateTag } from 'next/cache'
 import { createServerSupabaseClient } from '../supabase'
 import { logAdminAction } from './guard'
 
@@ -180,6 +181,12 @@ export class FeedbackAdminService {
       updatedContent: updatedContent ? true : false,
     })
 
+    try {
+      revalidateTag('testimonials', 'default')
+    } catch {
+      // Ignored outside request context
+    }
+
     return true
   }
 
@@ -187,43 +194,51 @@ export class FeedbackAdminService {
    * Fetches published testimonials for public Marketing site (GET /api/testimonials).
    */
   public static async getPublishedTestimonials(): Promise<Array<{ id: string; authorName: string; role: string; content: string; createdAt: string }>> {
-    const supabase = createServerSupabaseClient()
+    const fetcher = unstable_cache(
+      async () => {
+        const supabase = createServerSupabaseClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from('testimonials' as any) as any)
-      .select('*')
-      .eq('is_published', true)
-      .eq('status', 'approved')
-      .order('created_at', { ascending: false })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (supabase.from('testimonials' as any) as any)
+          .select('id, user_id, content, created_at')
+          .eq('is_published', true)
+          .eq('status', 'approved')
+          .order('created_at', { ascending: false })
 
-    if (error || !data) return []
+        if (error || !data) return []
 
-    const rows = data as TestimonialRow[]
+        const rows = data as Array<{ id: string; user_id: string | null; content: string; created_at: string }>
 
-    const userIds = rows.map((t) => t.user_id).filter(Boolean) as string[]
-    const userMap = new Map<string, string>()
+        const userIds = rows.map((t) => t.user_id).filter(Boolean) as string[]
+        const userMap = new Map<string, string>()
 
-    if (userIds.length > 0) {
-      const { data: usersData } = await supabase
-        .from('users')
-        .select('id, full_name, username, email')
-        .in('id', userIds)
+        if (userIds.length > 0) {
+          const { data: usersData } = await supabase
+            .from('users')
+            .select('id, full_name, username, email')
+            .in('id', userIds)
 
-      if (usersData) {
-        const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
-        uList.forEach((u) => {
-          userMap.set(u.id, u.full_name || u.username || u.email.split('@')[0])
-        })
-      }
-    }
+          if (usersData) {
+            const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
+            uList.forEach((u) => {
+              userMap.set(u.id, u.full_name || u.username || u.email.split('@')[0])
+            })
+          }
+        }
 
-    return rows.map((t) => ({
-      id: t.id,
-      authorName: (t.user_id ? userMap.get(t.user_id) : null) || 'PM Academy Alum',
-      role: 'Verified PM Academy Graduate',
-      content: t.content,
-      createdAt: t.created_at,
-    }))
+        return rows.map((t) => ({
+          id: t.id,
+          authorName: (t.user_id ? userMap.get(t.user_id) : null) || 'PM Academy Alum',
+          role: 'Verified PM Academy Graduate',
+          content: t.content,
+          createdAt: t.created_at,
+        }))
+      },
+      ['published-testimonials-v1'],
+      { revalidate: 60, tags: ['testimonials'] }
+    )
+
+    return fetcher()
   }
 
   /**

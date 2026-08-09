@@ -51,7 +51,7 @@ export async function GET(request: Request) {
   try {
     let query = supabase
       .from('in_app_notifications')
-      .select('*', { count: 'exact' })
+      .select('id, user_id, category, title, body, action_url, priority, is_read, created_at', { count: 'exact' })
       .eq('user_id', authUser.id)
       .order('created_at', { ascending: false })
 
@@ -68,14 +68,18 @@ export async function GET(request: Request) {
 
     query = query.range(fromOffset, toOffset)
 
-    const { data: items, count, error } = await query
+    // Execute item query and unread count query concurrently in parallel
+    const [itemsResult, unreadResult] = await Promise.all([
+      query,
+      supabase
+        .from('in_app_notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', authUser.id)
+        .eq('is_read', false),
+    ])
 
-    // Query total unread count
-    const { count: unreadCount } = await supabase
-      .from('in_app_notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', authUser.id)
-      .eq('is_read', false)
+    const { data: items, count, error } = itemsResult
+    const unreadCount = unreadResult.count
 
     if (error) {
       console.warn('[API:notifications] Error fetching notification items from Supabase:', error)
