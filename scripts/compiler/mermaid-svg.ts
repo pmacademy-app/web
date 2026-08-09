@@ -249,6 +249,42 @@ async function getMermaid() {
         return { x: -30, y: -17, width: 60, height: 34 };
       }
 
+      if (tagName === 'polygon') {
+        const pointsAttr = this.getAttribute('points') || '';
+        const pts = pointsAttr.trim().split(/[\s,]+/).map(parseFloat).filter((n: number) => !isNaN(n));
+        if (pts.length >= 2) {
+          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+          for (let i = 0; i < pts.length; i += 2) {
+            const px = pts[i];
+            const py = pts[i + 1] ?? pts[i];
+            if (px < minX) minX = px;
+            if (px > maxX) maxX = px;
+            if (py < minY) minY = py;
+            if (py > maxY) maxY = py;
+          }
+          if (minX !== Infinity && minY !== Infinity && maxX !== -Infinity && maxY !== -Infinity) {
+            return {
+              x: minX,
+              y: minY,
+              width: Math.max(1, maxX - minX),
+              height: Math.max(1, maxY - minY),
+            };
+          }
+        }
+        return { x: -30, y: -30, width: 60, height: 60 };
+      }
+
+      if (tagName === 'ellipse') {
+        const rx = parseFloat(this.getAttribute('rx') || '0');
+        const ry = parseFloat(this.getAttribute('ry') || '0');
+        const cx = parseFloat(this.getAttribute('cx') || '0');
+        const cy = parseFloat(this.getAttribute('cy') || '0');
+        if (rx > 0 && ry > 0) {
+          return { x: cx - rx, y: cy - ry, width: 2 * rx, height: 2 * ry };
+        }
+        return { x: -30, y: -20, width: 60, height: 40 };
+      }
+
       if (tagName === 'circle') {
         const r = parseFloat(this.getAttribute('r') || '15');
         const cx = parseFloat(this.getAttribute('cx') || '0');
