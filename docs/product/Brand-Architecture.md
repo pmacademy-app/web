@@ -97,7 +97,7 @@ Two variants, used in two distinct contexts. Do not use one where the other belo
 ```tsx
 <BrandLogo variant="full" | "mark" size="sm" | "md" | "lg" />
 ```
-`variant="mark-prodigy"` is the icon + "Prodigy" wordmark lockup (navbar, sidebar, auth, admin); `variant="icon"`/`"mark"` is icon-only (mobile nav, compact UI); `variant="full"`/`"static-full"` includes the full lockup (footer, certificates); `variant="animated-full"`/`"hero-full"` is the hero animation; `variant="wordmark"` is text-only. This is the only branded logo component permitted inside `apps/web/` React code — no component should inline its own `<svg>` logo markup or reference the static PNG/SVG assets directly.
+`variant="mark-prodily"` is the icon + "Prodily" wordmark lockup (navbar, sidebar, auth, admin); `variant="icon"`/`"mark"` is icon-only (mobile nav, compact UI); `variant="full"`/`"static-full"` includes the full lockup (footer, certificates); `variant="animated-full"`/`"hero-full"` is the hero animation; `variant="wordmark"` is text-only. This is the only branded logo component permitted inside `apps/web/` React code — no component should inline its own `<svg>` logo markup or reference the static PNG/SVG assets directly.
 
 ## 5. Decision Rule for Future Additions
 

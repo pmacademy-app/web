@@ -34,16 +34,16 @@ function runTest(name: string, fn: () => void | Promise<void>) {
 }
 
 async function runSendEmailHookTests() {
-  const siteUrl = 'https://prodigy.adityagangwani.me'
+  const siteUrl = 'https://prodily.adityagangwani.me'
 
   // 0. Canonical Sender Verification
-  runTest('getFromEmail returns canonical verified domain welcome@prodigy.adityagangwani.me and respects RESEND_FROM_EMAIL', () => {
+  runTest('getFromEmail returns canonical verified domain welcome@prodily.adityagangwani.me and respects RESEND_FROM_EMAIL', () => {
     delete process.env.RESEND_FROM_EMAIL
-    assert.strictEqual(getFromEmail(), 'Prodily PM Academy <welcome@prodigy.adityagangwani.me>')
-    assert.strictEqual(BRAND.emailFromAddress, 'welcome@prodigy.adityagangwani.me')
+    assert.strictEqual(getFromEmail(), 'Prodily PM Academy <welcome@prodily.adityagangwani.me>')
+    assert.strictEqual(BRAND.emailFromAddress, 'welcome@prodily.adityagangwani.me')
 
-    process.env.RESEND_FROM_EMAIL = 'custom@prodigy.adityagangwani.me'
-    assert.strictEqual(getFromEmail(), 'Prodily PM Academy <custom@prodigy.adityagangwani.me>')
+    process.env.RESEND_FROM_EMAIL = 'custom@prodily.adityagangwani.me'
+    assert.strictEqual(getFromEmail(), 'Prodily PM Academy <custom@prodily.adityagangwani.me>')
 
     delete process.env.RESEND_FROM_EMAIL
   })
@@ -51,12 +51,12 @@ async function runSendEmailHookTests() {
   // 1. buildAuthCallbackUrl - canonical link generation
   runTest('buildAuthCallbackUrl generates canonical callback URLs with token_hash and type', () => {
     const signupUrl = buildAuthCallbackUrl(siteUrl, 'hash_abc123', 'signup')
-    assert.strictEqual(signupUrl, 'https://prodigy.adityagangwani.me/api/auth/callback?token_hash=hash_abc123&type=signup&next=%2Fverified')
+    assert.strictEqual(signupUrl, 'https://prodily.adityagangwani.me/api/auth/callback?token_hash=hash_abc123&type=signup&next=%2Fverified')
 
     const recoveryUrl = buildAuthCallbackUrl(siteUrl, 'hash_pwd456', 'recovery')
-    assert.strictEqual(recoveryUrl, 'https://prodigy.adityagangwani.me/api/auth/callback?token_hash=hash_pwd456&type=recovery&next=%2Freset-password%3Fmode%3Dupdate')
+    assert.strictEqual(recoveryUrl, 'https://prodily.adityagangwani.me/api/auth/callback?token_hash=hash_pwd456&type=recovery&next=%2Freset-password%3Fmode%3Dupdate')
 
-    const customRedirect = buildAuthCallbackUrl(siteUrl, 'hash_789', 'signup', 'https://prodigy.adityagangwani.me/api/auth/callback?next=/custom-destination')
+    const customRedirect = buildAuthCallbackUrl(siteUrl, 'hash_789', 'signup', 'https://prodily.adityagangwani.me/api/auth/callback?next=/custom-destination')
     assert.ok(customRedirect.includes('token_hash=hash_789'))
     assert.ok(customRedirect.includes('type=signup'))
     assert.ok(customRedirect.includes('next=%2Fcustom-destination'))

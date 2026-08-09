@@ -7,7 +7,7 @@ export const BRAND = {
   shortName: 'PM Academy',
   tagline: 'The Duolingo of Product Management.',
   positioning: '90 lessons. 9 modules. Free forever.',
-  domain: 'prodigy.adityagangwani.me',
+  domain: 'prodily.adityagangwani.me',
   social: {
     linkedin: 'https://linkedin.com/company/prodily',
     twitter: 'https://x.com/prodily',
@@ -18,14 +18,13 @@ export const BRAND = {
   adminName: 'Prodily PM Academy Admin',
   // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
   // This value is the production default for any server-side context where env is available.
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodigy.adityagangwani.me',
-  supportEmail: 'hello@prodigy.adityagangwani.me',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
+  supportEmail: 'hello@prodily.adityagangwani.me',
   // NOTE: emailFromAddress uses the Resend verified sender domain.
-  // Changing this requires updating Resend DNS settings first — do not change without that.
   emailFromName: 'Prodily PM Academy',
   emailFromAddress:
     process.env.RESEND_FROM_EMAIL?.replace(/^.*<|>$/g, '').trim() ||
-    'welcome@prodigy.adityagangwani.me',
+    'welcome@prodily.adityagangwani.me',
   certificateIssuerLine: 'Issued by Prodily · PM Academy',
   certificateCodePrefix: 'PMA',
   learnerFallbackName: 'PM Academy Learner',

@@ -21,7 +21,7 @@ function test(name: string, fn: () => void) {
 // 1. Certificate Scannable QR Matrix
 test('generateQrCodeSvg creates ISO/IEC 18004 compliant QR matrix with rects', () => {
   const code = generateCertificateCode('test-user-123', 'full_curriculum')
-  const url = `https://prodigy.adityagangwani.me/verify/${code}`
+  const url = `https://prodily.adityagangwani.me/verify/${code}`
   const svg = generateQrCodeSvg(url, 150)
 
   assert.ok(svg.includes('<svg'), 'Must produce <svg> element')

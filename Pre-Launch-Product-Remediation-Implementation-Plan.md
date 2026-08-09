@@ -2,9 +2,9 @@
 
 > **Document Status:** Revised Planning & Architecture Review  
 > **Target Release:** Prodily PM Academy v1.0.0 (Public Launch)  
-> **Canonical Domain:** `https://prodigy.adityagangwani.me`  
+> **Canonical Domain:** `https://prodily.adityagangwani.me`  
 > **Intended Receiving Inbox:** `pmacademyapp@gmail.com`  
-> **Public Support Address:** `hello@prodigy.adityagangwani.me`  
+> **Public Support Address:** `hello@prodily.adityagangwani.me`  
 
 ---
 
@@ -16,7 +16,7 @@ All architectural recommendations have been updated following strict review prin
 - **No Unnecessary Custom Encoders:** Prefer a mature, well-tested QR generation library compatible with Next.js/SSR over custom bitwise matrix builders.
 - **Server-Authoritative Milestones:** Client-side active time tracking acts strictly as a measurement mechanism; server-persisted milestone records (`user_feedback_prompts`) prevent duplicate prompts across devices, tabs, or clearing `localStorage`.
 - **Strict Private Feedback vs. Public Testimonials:** Private product feedback (`user_feedback`) is kept completely isolated from public testimonials (`testimonials`). Feedback never automatically becomes a public review. Public reviews require deliberate learner action, explicit opt-in, and Admin approval (`Pending → Approved/Rejected → Published/Unpublished`).
-- **Verified Resend Inbound Pipeline:** Website contact form processing (Outbound alert to `pmacademyapp@gmail.com`) is strictly separated from direct inbound email receiving (`hello@prodigy.adityagangwani.me`). Exact MX records, webhook signatures, and forwarding capabilities must be verified during implementation before DNS changes.
+- **Verified Resend Inbound Pipeline:** Website contact form processing (Outbound alert to `pmacademyapp@gmail.com`) is strictly separated from direct inbound email receiving (`hello@prodily.adityagangwani.me`). Exact MX records, webhook signatures, and forwarding capabilities must be verified during implementation before DNS changes.
 - **Infrastructure Security for Admin Privileges:** `Toggle Admin Role` is removed from the operational console; Admin privileges remain controlled infrastructure config (`ADMIN_EMAILS`). Admin email authorization is strictly separated from contact query inbox routing (`pmacademyapp@gmail.com`).
 - **Scope Discipline:** Certificate revocation/re-issue is marked as **Optional / Post-Launch** as current PRD requirements specify permanent credential issuance.
 
@@ -232,7 +232,7 @@ Learner explicitly opens Testimonial modal (e.g. after earning certificate)
   - Inserts row into `contact_messages` table in Supabase.
   - Uses `enqueueNotificationItem()` / Resend to send an alert email to `pmacademyapp@gmail.com` with:
     - Subject: `[PM Academy Inquiry] ${subject}`
-    - Sender: `Prodily PM Academy Support <welcome@prodigy.adityagangwani.me>`
+    - Sender: `Prodily PM Academy Support <welcome@prodily.adityagangwani.me>`
     - Reply-To: `${userEmail}`
   - Sends a confirmation email to the user ("We received your message").
 - **Admin Management:** Expose contact submissions under `/admin/communications` with status toggles (`new`, `in_progress`, `replied`, `archived`).
@@ -281,19 +281,19 @@ Visitor on /contact fills out form
 
 ---
 
-### Area 5: Resend Inbound Email Receiving (`hello@prodigy.adityagangwani.me`)
+### Area 5: Resend Inbound Email Receiving (`hello@prodily.adityagangwani.me`)
 
 #### 1. Current State
-- **Sending Domain:** `prodigy.adityagangwani.me` configured for outbound emails via Resend.
-- **Missing:** Verified Inbound Email Receiving configuration for emails sent to `hello@prodigy.adityagangwani.me`.
+- **Sending Domain:** `prodily.adityagangwani.me` configured for outbound emails via Resend.
+- **Missing:** Verified Inbound Email Receiving configuration for emails sent to `hello@prodily.adityagangwani.me`.
 
 #### 2. Root Cause / Gap Analysis
 - Resend outbound API sends emails cleanly. Inbound email receiving requires verifying Resend's supported receiving configuration, MX records, and webhook payload format during implementation before DNS changes are applied.
 
 #### 3. Recommended Final Implementation
 - **Verification-First Implementation Flow B (Direct Inbound Email):**
-  1. Audit current Resend domain setup for `prodigy.adityagangwani.me` to confirm receiving status and exact MX target hostname.
-  2. Configure DNS MX record for `prodigy.adityagangwani.me` based on verified Resend instructions.
+  1. Audit current Resend domain setup for `prodily.adityagangwani.me` to confirm receiving status and exact MX target hostname.
+  2. Configure DNS MX record for `prodily.adityagangwani.me` based on verified Resend instructions.
   3. Implement webhook endpoint `POST /api/email/webhooks`:
      - Verify Svix/Resend signature header (`RESEND_WEBHOOK_SECRET`).
      - Extract `from`, `to`, `subject`, `text`, `html` fields.
@@ -309,8 +309,8 @@ Visitor on /contact fills out form
 #### 6. Manual Actions Required
 - **Required only if the implementation uses Resend Receiving architecture:**
   - Verify Resend Inbound Email receiving capability in Resend Dashboard.
-  - Add designated MX record for `prodigy.adityagangwani.me` in Cloudflare / DNS.
-  - Set Resend Webhook URL to `https://prodigy.adityagangwani.me/api/email/webhooks`.
+  - Add designated MX record for `prodily.adityagangwani.me` in Cloudflare / DNS.
+  - Set Resend Webhook URL to `https://prodily.adityagangwani.me/api/email/webhooks`.
   - Set `RESEND_WEBHOOK_SECRET` in environment variables.
 
 ---
@@ -397,7 +397,7 @@ Learner earns certificate or completes curriculum
 
 #### 6. Testing Plan
 - **Unit Test:** `npm run test:certificates` verifies SVG output structure.
-- **Manual Verification:** Scan QR code with physical iOS Camera & Android Google Lens to verify instant resolution to `https://prodigy.adityagangwani.me/verify/PMA-2026-XXXXXX`.
+- **Manual Verification:** Scan QR code with physical iOS Camera & Android Google Lens to verify instant resolution to `https://prodily.adityagangwani.me/verify/PMA-2026-XXXXXX`.
 
 #### 7. Manual Actions Required
 - `Not required.` (Verification only).
@@ -557,16 +557,16 @@ Every external manual action is explicitly classified below:
    - Execute migration files in order: `20260810000001`, `20260810000002`, `20260810000003`, `20260810000004`.
 2. **Cloudflare / DNS Setup (Resend Inbound Receiving):**  
    - **Classification:** `Required only if the implementation uses Resend Receiving architecture`  
-   - Add verified MX record for `prodigy.adityagangwani.me` in Cloudflare / DNS provider.
+   - Add verified MX record for `prodily.adityagangwani.me` in Cloudflare / DNS provider.
 3. **Resend Dashboard Configuration:**  
    - **Classification:** `Required only if the implementation uses Resend Receiving architecture`  
-   - Enable Inbound Email Receiving for `prodigy.adityagangwani.me`, set Webhook URL to `https://prodigy.adityagangwani.me/api/email/webhooks`, and set `RESEND_WEBHOOK_SECRET`.
+   - Enable Inbound Email Receiving for `prodily.adityagangwani.me`, set Webhook URL to `https://prodily.adityagangwani.me/api/email/webhooks`, and set `RESEND_WEBHOOK_SECRET`.
 4. **Vercel / Environment Variables:**  
    - **Classification:** `Required`  
-   - Verify `NEXT_PUBLIC_SITE_URL = https://prodigy.adityagangwani.me`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, and `ADMIN_EMAILS = adityagangwani@gmail.com`.
+   - Verify `NEXT_PUBLIC_SITE_URL = https://prodily.adityagangwani.me`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, and `ADMIN_EMAILS = adityagangwani@gmail.com`.
 5. **Physical QR Code Phone Scan Test:**  
    - **Classification:** `Verification only`  
-   - Scan issued certificate on a phone camera to verify resolution to `https://prodigy.adityagangwani.me/verify/PMA-YYYY-XXXXXXXX`.
+   - Scan issued certificate on a phone camera to verify resolution to `https://prodily.adityagangwani.me/verify/PMA-YYYY-XXXXXXXX`.
 
 ---
 
@@ -576,7 +576,7 @@ Every external manual action is explicitly classified below:
 - **Notification Drawer:** Keyboard accessible (`Tab`, `Space`, `Enter`, `ESC`), date-grouped, responsive across mobile and desktop.
 - **Contextual Feedback System:** Prompts trigger after Module/Capstone completion and ~1hr site usage; 1-hour usage state is server-authoritative; each prompt displays AT MOST ONCE per milestone.
 - **Contact Us System:** Web contact form saves inquiries to DB, sends alert email to `pmacademyapp@gmail.com` with Reply-To set to sender, and lists inquiries in Admin Console.
-- **Resend Inbound Email:** Direct emails sent to `hello@prodigy.adityagangwani.me` verified against actual Resend receiving capabilities, routing to `contact_messages` DB and forwarding to `pmacademyapp@gmail.com`.
+- **Resend Inbound Email:** Direct emails sent to `hello@prodily.adityagangwani.me` verified against actual Resend receiving capabilities, routing to `contact_messages` DB and forwarding to `pmacademyapp@gmail.com`.
 - **Testimonial Moderation:** Public reviews require explicit user opt-in and Admin approval before appearing on homepage; zero fake testimonials presented as genuine.
 - **Certificate QR Code:** Renders standard compliant QR Code SVG using a mature QR library; physically scannable on real iOS/Android phone cameras.
 - **Admin Operational Console:** Allows user inspection, progress resets, user deletion, and moderation with full `admin_audit_logs` tracking; toggle admin role removed; no unrestricted DB editing.

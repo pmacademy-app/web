@@ -45,21 +45,21 @@ runTest('generateCredentialJsonLd generates valid schema.org EducationalOccupati
     learnerName: 'Sarah Connor',
     careerTitle: 'Senior Product Manager',
     issuedAt: '2026-08-05T00:00:00Z',
-    verificationUrl: 'https://prodigy.adityagangwani.me/verify/PMA-2026-A1B2C3D4',
-    portfolioUrl: 'https://prodigy.adityagangwani.me/p/sconnor',
-    siteOrigin: 'https://prodigy.adityagangwani.me',
+    verificationUrl: 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4',
+    portfolioUrl: 'https://prodily.adityagangwani.me/p/sconnor',
+    siteOrigin: 'https://prodily.adityagangwani.me',
   })
 
   assert.strictEqual(jsonLd['@context'], 'https://schema.org')
   assert.strictEqual(jsonLd['@type'], 'EducationalOccupationalCredential')
   assert.strictEqual(jsonLd.identifier, 'PMA-2026-A1B2C3D4')
   assert.strictEqual((jsonLd.grantee as { name: string }).name, 'Sarah Connor')
-  assert.strictEqual(jsonLd.url, 'https://prodigy.adityagangwani.me/verify/PMA-2026-A1B2C3D4')
+  assert.strictEqual(jsonLd.url, 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4')
 })
 
 // 3. QR Code SVG Generator
 runTest('generateQrCodeSvg outputs clean SVG vector markup containing rectangles for verification URL', () => {
-  const verifyUrl = 'https://prodigy.adityagangwani.me/verify/PMA-2026-A1B2C3D4'
+  const verifyUrl = 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4'
   const svg = generateQrCodeSvg(verifyUrl, 100)
 
   assert.ok(svg.includes('<svg'), 'Output should contain <svg element')
@@ -70,7 +70,7 @@ runTest('generateQrCodeSvg outputs clean SVG vector markup containing rectangles
 // 4. LinkedIn Certification Add-to-Profile URL Builder (Sprint 7.3)
 runTest('buildLinkedInCertificationUrl constructs valid LinkedIn add-to-profile URL with full parameters', () => {
   const certCode = 'PMA-2026-B87F129C'
-  const verifyUrl = 'https://prodigy.adityagangwani.me/verify/PMA-2026-B87F129C'
+  const verifyUrl = 'https://prodily.adityagangwani.me/verify/PMA-2026-B87F129C'
   const issuedAt = '2026-08-08T00:00:00.000Z'
 
   const linkedinUrl = buildLinkedInCertificationUrl({
