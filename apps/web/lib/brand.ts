@@ -18,7 +18,7 @@ export const BRAND = {
   adminName: 'Prodily PM Academy Admin',
   // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
   // This value is the production default for any server-side context where env is available.
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://pmacademy.adityagangwani.me',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
   supportEmail: 'hello@pmacademy.adityagangwani.me',
   // NOTE: emailFromAddress uses the Resend verified sender domain.
   // Changing this requires updating Resend DNS settings first — do not change without that.
