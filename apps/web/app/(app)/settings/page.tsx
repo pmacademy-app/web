@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { SettingsTabs } from '@/components/settings/SettingsTabs'
-import { Settings, Shield } from 'lucide-react'
+import { Settings, Shield, HelpCircle } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
 
 export const metadata: Metadata = {
@@ -30,12 +31,34 @@ export default function SettingsPage() {
       {/* Tabbed Settings */}
       <SettingsTabs />
 
-      {/* Privacy Notice */}
-      <div className="p-4 rounded-xl border border-border bg-card/40 text-xs text-muted-foreground flex items-start gap-3">
-        <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-        <p className="leading-relaxed">
-          <strong className="text-foreground font-semibold">Privacy Commitment:</strong> {BRAND.product} never sells or exposes private reflection notes. Only reflections and capstones explicitly marked as public will appear on your public portfolio page.
-        </p>
+      {/* Privacy & Support Notice */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-4 rounded-xl border border-border bg-card/40 text-xs text-muted-foreground flex items-start gap-3">
+          <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <p className="leading-relaxed">
+            <strong className="text-foreground font-semibold">Privacy Commitment:</strong> {BRAND.product} never sells or exposes private reflection notes. Only reflections and capstones explicitly marked as public will appear on your public portfolio page. Read our{' '}
+            <Link href="/privacy" className="text-primary underline font-medium">Privacy Policy</Link> and{' '}
+            <Link href="/terms" className="text-primary underline font-medium">Terms of Service</Link>.
+          </p>
+        </div>
+
+        <div className="p-4 rounded-xl border border-border bg-card/40 text-xs text-muted-foreground flex items-start gap-3 justify-between">
+          <div className="flex items-start gap-3">
+            <HelpCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-foreground font-semibold">Need Help or Support?</p>
+              <p className="leading-relaxed">
+                Have questions about your progress, certificates, or platform features? Reach out to our team anytime.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/contact"
+            className="text-xs font-bold text-primary hover:underline shrink-0 pt-0.5"
+          >
+            Contact Support →
+          </Link>
+        </div>
       </div>
     </div>
   )
