@@ -9,11 +9,9 @@ export const BRAND = {
   positioning: '90 lessons. 9 modules. Free forever.',
   domain: 'prodily.adityagangwani.me',
   social: {
-    linkedin: 'https://linkedin.com/company/pmacademy',
-    twitter: 'https://x.com/pmacademy_app',
-    // NOTE: External accounts (Twitter/LinkedIn/BMC) still use old handles.
-    // These must be renamed/migrated at the platform level separately.
-    buyMeACoffee: 'https://buymeacoffee.com/pmacademy',
+    linkedin: 'https://linkedin.com/company/prodily',
+    twitter: 'https://x.com/prodily',
+    buyMeACoffee: 'https://buymeacoffee.com/prodily',
   },
   legalEntity: 'Prodily',
   certificateIssuer: 'Prodily',
