@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AlertTriangle, RotateCcw, Zap, Flame, Compass, Award, UserX, CheckCircle2 } from 'lucide-react'
 import { ConfirmDestructiveAction } from '@/components/settings/ConfirmDestructiveAction'
 
@@ -18,6 +19,7 @@ const MODULE_OPTIONS = [
 ]
 
 export function DangerZoneTab() {
+  const router = useRouter()
   const [selectedModule, setSelectedModule] = useState('all')
   const [activeDialog, setActiveDialog] = useState<string | null>(null)
   const [successToast, setSuccessToast] = useState<string | null>(null)
@@ -36,6 +38,7 @@ export function DangerZoneTab() {
     })
     const data = await res.json()
     if (!res.ok || !data.success) throw new Error(data.error || 'Failed to reset progress.')
+    router.refresh()
     showSuccess(
       selectedModule === 'all'
         ? 'Full curriculum progress reset successfully.'

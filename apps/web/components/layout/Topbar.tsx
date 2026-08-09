@@ -9,6 +9,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { getLevelTitle } from '@/lib/xp'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
+import { NotificationToast } from '@/components/notifications/NotificationToast'
 
 interface TopbarProps {
   onMenuOpen: () => void
@@ -211,6 +212,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
           )}
         </div>
       </div>
+      <NotificationToast />
     </header>
   )
 }

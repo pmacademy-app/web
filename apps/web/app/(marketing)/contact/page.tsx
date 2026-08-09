@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ContactForm } from '@/components/contact/ContactForm'
 import { BRAND } from '@/lib/brand'
 import { Mail, Heart, ArrowRight } from 'lucide-react'
 
@@ -42,6 +43,9 @@ export default function ContactPage() {
           Have a question, feedback, or issue? We are here to help you get the most out of your PM learning journey.
         </p>
       </div>
+
+      {/* Contact Form */}
+      <ContactForm />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Support Email Box */}
