@@ -19,7 +19,7 @@ Release notes are ordered reverse-chronologically. Each release categorizes chan
   - Session cookies (`sb-access-token`, `sb-refresh-token`) are explicitly deleted from response headers.
 - **Domain Resolution & QR Code Verification URLs (`lib/brand.ts`, `connectors.ts`, `resend-provider.ts`, `EmailWrapper.tsx`)**:
   - Replaced hardcoded `https://pmacademy.com` fallback and legacy `NEXT_PUBLIC_APP_URL` references with `NEXT_PUBLIC_SITE_URL` across all certificate generators, email templates, and notification event connectors.
-  - Updated `BRAND.siteUrl` to read `process.env.NEXT_PUBLIC_SITE_URL` dynamically at runtime, defaulting to `https://pmacademy.adityagangwani.me`.
+  - Updated `BRAND.siteUrl` to read `process.env.NEXT_PUBLIC_SITE_URL` dynamically at runtime, defaulting to `https://prodily.adityagangwani.me`.
   - Documented `NEXT_PUBLIC_SITE_URL` in `apps/web/.env.example`.
 - **Mermaid SVG ViewBox & Node Dimension Calculation (`scripts/compiler/mermaid-svg.ts`)**:
   - Upgraded JSDOM `getBBox` polyfill to measure inner HTML text inside `foreignObject` and `<g>` node containers.

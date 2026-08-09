@@ -7,7 +7,7 @@ export const BRAND = {
   shortName: 'PM Academy',
   tagline: 'The Duolingo of Product Management.',
   positioning: '90 lessons. 9 modules. Free forever.',
-  domain: 'pmacademy.adityagangwani.me',
+  domain: 'prodily.adityagangwani.me',
   social: {
     linkedin: 'https://linkedin.com/company/prodily',
     twitter: 'https://x.com/prodily',

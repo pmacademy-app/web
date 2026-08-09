@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { X, CheckCheck, Bell, RefreshCw, Layers } from 'lucide-react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import Link from 'next/link'
+import { X, CheckCheck, Bell, RefreshCw, Layers, Settings, AlertTriangle } from 'lucide-react'
 import { NotificationItemCard, type NotificationItem } from './NotificationItemCard'
 
 interface NotificationCenterDrawerProps {
@@ -20,6 +21,7 @@ export function NotificationCenterDrawer({
   const [items, setItems] = useState<NotificationItem[]>([])
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('all')
   const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
   const [unreadCount, setUnreadCount] = useState<number>(0)
   const [grouped, setGrouped] = useState<{
     today: NotificationItem[]
@@ -28,8 +30,24 @@ export function NotificationCenterDrawer({
     earlier: NotificationItem[]
   }>({ today: [], yesterday: [], thisWeek: [], earlier: [] })
 
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  // Focus management & body scroll lock
+  useEffect(() => {
+    if (isOpen) {
+      closeButtonRef.current?.focus()
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isOpen])
+
   const fetchNotifications = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const url =
         activeCategory === 'unread'
@@ -45,9 +63,12 @@ export function NotificationCenterDrawer({
         setUnreadCount(data.unreadCount || 0)
         onUnreadCountChange?.(data.unreadCount || 0)
         setGrouped(data.grouped || { today: [], yesterday: [], thisWeek: [], earlier: [] })
+      } else {
+        setError(data.error || 'Failed to fetch notifications.')
       }
     } catch (err) {
       console.error('[NotificationCenterDrawer] Error fetching notifications:', err)
+      setError('Unable to load notifications. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -58,6 +79,7 @@ export function NotificationCenterDrawer({
     if (isOpen) {
       const load = async () => {
         setLoading(true)
+        setError(null)
         try {
           const url =
             activeCategory === 'unread'
@@ -73,9 +95,12 @@ export function NotificationCenterDrawer({
             setUnreadCount(data.unreadCount || 0)
             onUnreadCountChange?.(data.unreadCount || 0)
             setGrouped(data.grouped || { today: [], yesterday: [], thisWeek: [], earlier: [] })
+          } else if (mounted) {
+            setError(data.error || 'Failed to fetch notifications.')
           }
         } catch (err) {
           console.error('[NotificationCenterDrawer] Error fetching notifications:', err)
+          if (mounted) setError('Unable to load notifications. Please try again.')
         } finally {
           if (mounted) setLoading(false)
         }
@@ -140,17 +165,22 @@ export function NotificationCenterDrawer({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs animate-in fade-in duration-200 motion-reduce:animate-none"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
       <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
         <div
-          className="w-screen max-w-md bg-background border-l border-border shadow-2xl flex flex-col focus:outline-none"
+          className="w-screen max-w-md bg-background border-l border-border shadow-2xl flex flex-col focus:outline-none animate-in slide-in-from-right duration-200 motion-reduce:animate-none"
           role="dialog"
           aria-modal="true"
           aria-label="In-App Notification Center"
         >
           {/* Header */}
           <div className="p-4 border-b border-border flex items-center justify-between bg-card/50">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
                 <Bell className="w-4 h-4" />
               </div>
@@ -167,16 +197,29 @@ export function NotificationCenterDrawer({
                 <button
                   type="button"
                   onClick={handleMarkAllRead}
+                  aria-label="Mark all notifications as read"
                   className="px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/10 rounded-lg transition-colors flex items-center gap-1 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
                 >
                   <CheckCheck className="w-3.5 h-3.5" />
                   Mark All Read
                 </button>
               )}
+
+              <Link
+                href="/settings?tab=notifications"
+                onClick={onClose}
+                aria-label="Notification Preferences"
+                title="Notification Preferences"
+                className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              >
+                <Settings className="w-4 h-4" />
+              </Link>
+
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={onClose}
-                aria-label="Close notification drawer"
+                aria-label="Close notification panel"
                 className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
               >
                 <X className="w-4 h-4" />
@@ -184,8 +227,12 @@ export function NotificationCenterDrawer({
             </div>
           </div>
 
-          {/* Filter Bar */}
-          <div className="px-4 py-2 border-b border-border bg-card/20 flex items-center gap-1.5 overflow-x-auto text-xs scrollbar-none">
+          {/* Category Filter Bar */}
+          <div
+            className="px-4 py-2 border-b border-border bg-card/20 flex items-center gap-1.5 overflow-x-auto text-xs scrollbar-none"
+            role="tablist"
+            aria-label="Filter notifications by category"
+          >
             {(
               [
                 { id: 'all', label: 'All' },
@@ -198,8 +245,11 @@ export function NotificationCenterDrawer({
               <button
                 key={cat.id}
                 type="button"
+                role="tab"
+                aria-selected={activeCategory === cat.id}
+                aria-controls="notification-list-panel"
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   activeCategory === cat.id
                     ? 'bg-primary text-primary-foreground shadow-xs'
                     : 'bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary'
@@ -210,22 +260,40 @@ export function NotificationCenterDrawer({
             ))}
           </div>
 
-          {/* Notification List Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-5">
+          {/* Notification List Panel */}
+          <div
+            id="notification-list-panel"
+            role="tabpanel"
+            className="flex-1 overflow-y-auto p-4 space-y-5"
+          >
             {loading ? (
-              <div className="py-12 text-center text-muted-foreground flex flex-col items-center gap-2">
+              <div className="py-16 text-center text-muted-foreground flex flex-col items-center justify-center gap-2">
                 <RefreshCw className="w-5 h-5 animate-spin text-primary" />
-                <span className="text-xs">Loading notifications...</span>
+                <span className="text-xs font-medium">Loading notifications...</span>
+              </div>
+            ) : error ? (
+              <div className="py-12 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <p className="text-xs text-foreground font-medium max-w-xs">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => void fetchNotifications()}
+                  className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary font-bold text-xs hover:bg-primary/20 transition-colors cursor-pointer"
+                >
+                  Retry Loading
+                </button>
               </div>
             ) : items.length === 0 ? (
-              <div className="py-16 text-center text-muted-foreground flex flex-col items-center gap-3">
+              <div className="py-16 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-secondary/80 flex items-center justify-center text-foreground/50">
                   <Layers className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-foreground mb-1">No notifications</h4>
-                  <p className="text-xs max-w-xs text-muted-foreground">
-                    You&apos;re all caught up! Check back after completing lessons or earning new achievements.
+                  <h4 className="text-sm font-semibold text-foreground mb-1">No notifications right now</h4>
+                  <p className="text-xs max-w-xs text-muted-foreground leading-relaxed">
+                    You&apos;re all caught up! Check back after completing lessons, earning badges, or completing capstones.
                   </p>
                 </div>
               </div>
@@ -309,6 +377,28 @@ export function NotificationCenterDrawer({
                 )}
               </>
             )}
+          </div>
+
+          {/* Footer Bar */}
+          <div className="p-3 border-t border-border bg-card/40 flex items-center justify-between text-xs">
+            <Link
+              href="/settings?tab=notifications"
+              onClick={onClose}
+              className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1.5"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              Notification Settings
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => void fetchNotifications()}
+              aria-label="Refresh notifications"
+              title="Refresh notifications"
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
