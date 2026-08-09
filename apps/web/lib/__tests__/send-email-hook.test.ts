@@ -2,6 +2,7 @@ import assert from 'assert'
 import { NextRequest } from 'next/server'
 import crypto from 'crypto'
 import { buildAuthCallbackUrl, POST } from '../../app/api/auth/send-email-hook/route'
+import { getFromEmail } from '../../lib/email'
 import { BRAND } from '@/lib/brand'
 
 console.log('🧪 Running Supabase Send Email Auth Hook Unit Test Suite...\n')
@@ -34,6 +35,18 @@ function runTest(name: string, fn: () => void | Promise<void>) {
 
 async function runSendEmailHookTests() {
   const siteUrl = 'https://prodily.adityagangwani.me'
+
+  // 0. Canonical Sender Verification
+  runTest('getFromEmail returns canonical verified domain welcome@prodily.adityagangwani.me and respects RESEND_FROM_EMAIL', () => {
+    delete process.env.RESEND_FROM_EMAIL
+    assert.strictEqual(getFromEmail(), 'Prodily PM Academy <welcome@prodily.adityagangwani.me>')
+    assert.strictEqual(BRAND.emailFromAddress, 'welcome@prodily.adityagangwani.me')
+
+    process.env.RESEND_FROM_EMAIL = 'custom@prodily.adityagangwani.me'
+    assert.strictEqual(getFromEmail(), 'Prodily PM Academy <custom@prodily.adityagangwani.me>')
+
+    delete process.env.RESEND_FROM_EMAIL
+  })
 
   // 1. buildAuthCallbackUrl - canonical link generation
   runTest('buildAuthCallbackUrl generates canonical callback URLs with token_hash and type', () => {
