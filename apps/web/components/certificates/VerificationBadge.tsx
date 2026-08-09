@@ -16,7 +16,7 @@ export function VerificationBadge({ certificateCode, issuedAt }: VerificationBad
   })
 
   return (
-    <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-center justify-between gap-4 text-emerald-500 animate-in fade-in duration-300">
+    <div className="no-print rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-center justify-between gap-4 text-emerald-500 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-500 shrink-0">
           <ShieldCheck className="w-5 h-5" />
