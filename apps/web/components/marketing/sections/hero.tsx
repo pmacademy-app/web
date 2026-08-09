@@ -6,12 +6,10 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { ModuleCardPreview } from '@/components/marketing/product-mockup/module-card-preview'
 import { LessonCardPreview } from '@/components/marketing/product-mockup/lesson-card-preview'
 import { XPRowPreview } from '@/components/marketing/product-mockup/xp-row-preview'
-import { WaitlistForm } from '@/components/forms/waitlist-form'
 import { trackHeroCTAClick } from '@/lib/analytics'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { FADE_UP, STAGGER_CONTAINER } from '@/lib/animation'
 import { BrandLogo } from '@/components/brand/BrandLogo'
-import { BRAND } from '@/lib/brand'
 import { ArrowRight, GraduationCap } from 'lucide-react'
 
 /**
@@ -97,12 +95,13 @@ export function HeroSection() {
               className="flex flex-wrap gap-3"
             >
               <Link
-                href="/academy"
+                href="/signup"
                 onClick={() => trackHeroCTAClick('hero')}
                 className="
                   inline-flex items-center gap-2 px-6 py-3
                   bg-primary text-primary-foreground
-                  text-body-sm font-semibold rounded-sm shadow-sm
+                  text-body-sm font-semibold rounded-sm
+                  shadow-xs hover:shadow-sm
                   hover:opacity-90 active:scale-[0.98]
                   transition-all duration-[120ms]
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
@@ -111,24 +110,9 @@ export function HeroSection() {
                 Start Learning Free <ArrowRight size={16} aria-hidden="true" />
               </Link>
               <Link
-                href={BRAND.social.buyMeACoffee}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/curriculum"
                 className="
-                  inline-flex items-center gap-2 px-5 py-3
-                  bg-amber-500/10 text-amber-600 dark:text-amber-400
-                  border border-amber-500/30 hover:bg-amber-500/20
-                  text-body-sm font-semibold rounded-sm
-                  transition-all duration-[120ms]
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
-                "
-              >
-                ☕ Buy Me a Coffee
-              </Link>
-              <Link
-                href="/#curriculum"
-                className="
-                  inline-flex items-center gap-2 px-5 py-3
+                  inline-flex items-center gap-2 px-6 py-3
                   bg-transparent text-foreground
                   border border-border hover:border-border-strong
                   text-body-sm font-semibold rounded-sm
@@ -147,7 +131,7 @@ export function HeroSection() {
               className="text-body-sm text-locked font-medium flex items-center gap-2"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-              90 structured lessons • 100% Free Forever • No paywalls
+              90 structured lessons • 100% Free Forever • Free account required for progress tracking
             </motion.p>
           </motion.div>
 
@@ -177,11 +161,6 @@ export function HeroSection() {
               <XPRowPreview />
             </div>
           </motion.div>
-        </div>
-
-        {/* Mobile form — shown below hero copy on mobile only */}
-        <div className="mt-12 lg:hidden max-w-[480px]">
-          <WaitlistForm />
         </div>
       </div>
     </section>

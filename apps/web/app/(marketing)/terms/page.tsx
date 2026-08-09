@@ -66,7 +66,7 @@ export default function TermsPage() {
               <strong className="text-foreground">Minimum Age:</strong> You must be at least 13 years of age (or the minimum legal age required in your jurisdiction) to register for an account.
             </li>
             <li>
-              <strong className="text-foreground">Registration Accuracy:</strong> You agree to provide accurate, current information when registering via Supabase Auth or Google Login.
+              <strong className="text-foreground">Registration Accuracy:</strong> You agree to provide accurate, current information when creating an account.
             </li>
             <li>
               <strong className="text-foreground">Credential Security:</strong> You are responsible for safeguarding your login credentials and for all learning activity, progress updates, or submissions taking place under your account.
@@ -83,9 +83,9 @@ export default function TermsPage() {
             You agree to use the Platform strictly for lawful educational and career development purposes. You must not engage in any of the following prohibited activities:
           </p>
           <ul className="list-disc pl-5 space-y-2 text-xs">
-            <li>Attempting to bypass, probe, or breach database Row Level Security (RLS), authentication APIs, or rate-limiting security controls.</li>
-            <li>Using automated bots, scrapers, or scripts to bulk-extract curriculum markdown, quiz question banks, or platform code.</li>
-            <li>Uploading malicious code, XSS payloads, or unauthorized scripts into reflection notes, feedback forms, or capstone text.</li>
+            <li>Attempting to bypass, probe, or breach platform security, authentication APIs, or rate-limiting controls.</li>
+            <li>Using automated bots, scrapers, or scripts to bulk-extract curriculum content, quiz question banks, or platform code.</li>
+            <li>Uploading malicious code, unauthorized scripts, or harmful input into reflection notes, feedback forms, or capstone text.</li>
             <li>Submitting plagiarized, offensive, or fraudulent content for capstones or feedback moderation.</li>
             <li>Impersonating another learner, administrator, or misrepresenting your identity or certificate status.</li>
           </ul>
@@ -98,10 +98,10 @@ export default function TermsPage() {
           </h2>
           <div className="space-y-3 text-xs">
             <p>
-              <strong className="text-foreground font-semibold">Platform Materials:</strong> All 90 curriculum lessons, structured text, interactive quiz banks, SVG diagrams, compiler code, site graphics, trademarks (`{BRAND.company}`, `{BRAND.product}`), and brand assets are the exclusive intellectual property of {BRAND.legalEntity} and protected by copyright and intellectual property laws.
+              <strong className="text-foreground font-semibold">Platform Materials:</strong> All 90 curriculum lessons, structured text, interactive quiz banks, SVG diagrams, compiler code, site graphics, trademarks ({BRAND.company}, {BRAND.product}), and brand assets are the exclusive intellectual property of {BRAND.legalEntity} and protected by copyright and intellectual property laws.
             </p>
             <p>
-              <strong className="text-foreground font-semibold">Learner-Generated Content:</strong> You retain 100% ownership of your written capstone projects, self-reflection responses, and portfolio summaries. By setting your portfolio to public (`is_public = true`), you grant {BRAND.fullName} a non-exclusive, worldwide license to render and display your public portfolio page at `/p/[username]`.
+              <strong className="text-foreground font-semibold">Learner-Generated Content:</strong> You retain 100% ownership of your written capstone projects, self-reflection responses, and portfolio summaries. By setting your portfolio to public, you grant {BRAND.fullName} a non-exclusive, worldwide license to render and display your public portfolio page.
             </p>
           </div>
         </section>

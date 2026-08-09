@@ -254,8 +254,8 @@ export const FAQ_ITEMS: FAQItem[] = [
     answer: 'Community features will open gradually, including study groups, peer review, and opt-in cohort leaderboards.',
   },
   {
-    question: 'When will PM Academy launch?',
-    answer: 'Join the waitlist and we will send launch updates, preview lessons, and beta access information as they become available.',
+    question: 'Is PM Academy live and accessible now?',
+    answer: 'Yes! All 90 lessons across 9 modules are live and completely free forever. Create your free account to start learning and track your progress instantly.',
   },
   {
     question: 'Will lessons ever be paywalled?',

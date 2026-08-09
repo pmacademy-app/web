@@ -65,13 +65,13 @@ export default function PrivacyPage() {
           </p>
           <ul className="list-disc pl-5 space-y-2 text-xs">
             <li>
-              <strong className="text-foreground">Authentication Credentials:</strong> When registering, we store your email address and authentication identity via Supabase Auth. If you choose Google OAuth sign-in, we receive your email and basic profile identity provided by Google.
+              <strong className="text-foreground">Authentication Credentials:</strong> When registering, we store your email address and authentication identity securely.
             </li>
             <li>
-              <strong className="text-foreground">Learner Profile:</strong> Your optional display name, handle (`username`), avatar URL, bio, target role, target company, career stage, and professional links (LinkedIn, GitHub, Twitter). Profiles are <strong className="text-foreground">private by default</strong> unless you explicitly enable public portfolio sharing.
+              <strong className="text-foreground">Learner Profile:</strong> Your optional display name, handle (username), avatar image, bio, target role, target company, career stage, and professional links (LinkedIn, GitHub, Twitter). Profiles are <strong className="text-foreground">private by default</strong> unless you explicitly enable public portfolio sharing.
             </li>
             <li>
-              <strong className="text-foreground">Learning Activity & Progress:</strong> Completed lesson IDs, quiz attempt scores, total XP earned (recorded via an append-only `xp_events` ledger), active streaks, SRS flashcard repetition schedules, lesson bookmarks, and private self-reflection notes.
+              <strong className="text-foreground">Learning Activity & Progress:</strong> Completed lesson records, quiz attempt scores, total XP earned (recorded via an immutable progress ledger), active streaks, spaced-repetition (SRS) flashcard schedules, lesson bookmarks, and private self-reflection notes.
             </li>
             <li>
               <strong className="text-foreground">Capstones & Certificates:</strong> Draft and submitted module capstone projects, earned achievement badges, and issued completion certificates (`PMA-2026-XXXXXX`) with cryptographic verification hashes.
@@ -149,7 +149,7 @@ export default function PrivacyPage() {
             We use minimal cookies and local browser storage essential for service operation:
           </p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li><strong className="text-foreground">Essential Session Cookies:</strong> Supabase authentication cookies (`sb-*-auth-token`) required to maintain your logged-in state.</li>
+            <li><strong className="text-foreground">Essential Session Cookies:</strong> Encrypted authentication session cookies required to maintain your logged-in state across browser sessions.</li>
             <li><strong className="text-foreground">Local Storage Preferences:</strong> Storing UI theme selection (`dark`, `light`, `system`), active tab state, and client-side curriculum search index cache for fast search.</li>
           </ul>
         </section>

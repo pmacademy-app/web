@@ -429,6 +429,20 @@ export async function compileMermaidToSvg(source: string, _authorTheme?: Record<
     .dark .cluster rect { fill: rgba(255,255,255,0.04) !important; stroke: #2E4538 !important; }
   </style>`;
 
+  // Extract text labels from nodes for screen reader accessibility
+  const labelMatches = Array.from(rawSvg.matchAll(/class="[^"]*nodeLabel[^"]*"[^>]*>([\s\S]*?)<\/span>/gi));
+  const extractedLabels = labelMatches
+    .map((m) => m[1].replace(/<[^>]+>/g, '').trim())
+    .filter((txt) => txt.length > 0 && !/^\d+$/.test(txt));
+
+  let accessibleLabel = 'Product process diagram';
+  if (extractedLabels.length > 0) {
+    const sequence = extractedLabels.slice(0, 5).join(' → ');
+    accessibleLabel = `Process diagram showing flow: ${sequence}${extractedLabels.length > 5 ? '...' : ''}`;
+  }
+
+  const escapedAriaLabel = accessibleLabel.replace(/"/g, '&quot;');
+
   // Post-process SVG tag attributes for fluid responsive rendering.
   // Strip all attributes that we will re-set to avoid duplicates (browsers use first occurrence only).
   let processedSvg = rawSvg
@@ -442,10 +456,11 @@ export async function compileMermaidToSvg(source: string, _authorTheme?: Record<
         .replace(/\bclass="[^"]*"/g, '')
         .replace(/\brole="[^"]*"/g, '')
         .replace(/\baria-roledescription="[^"]*"/g, '')
+        .replace(/\baria-label="[^"]*"/g, '')
         .replace(/\s+/g, ' ')
         .trim();
 
-      return `<svg ${cleanedAttrs} width="${naturalWidth}" height="${naturalHeight}" viewBox="${vbX} ${vbY} ${naturalWidth} ${naturalHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram" class="mermaid-static-svg" style="width: auto; height: auto; display: block;">`;
+      return `<svg ${cleanedAttrs} width="${naturalWidth}" height="${naturalHeight}" viewBox="${vbX} ${vbY} ${naturalWidth} ${naturalHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${escapedAriaLabel}" class="mermaid-static-svg" style="width: auto; height: auto; display: block;">\n<title>${accessibleLabel}</title>`;
     });
 
   // Inject dark mode overrides right after opening <svg> tag
