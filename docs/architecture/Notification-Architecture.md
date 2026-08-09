@@ -601,7 +601,7 @@ The scheduled jobs in [`.github/workflows/notification-scheduler.yml`](../../.gi
 
 | GitHub secret | Purpose |
 |---|---|
-| `APP_URL` | Origin of the deployed app (e.g. `https://pmacademy.com`). If unset, the workflow falls back to the canonical production origin from `lib/brand.ts` (`BRAND.siteUrl`). |
+| `APP_URL` | Origin of the deployed app (e.g. `https://prodily.adityagangwani.me`). If unset, the workflow falls back to the canonical production origin from `lib/brand.ts` (`BRAND.siteUrl`). |
 | `CRON_SECRET` | Must match the `CRON_SECRET` environment variable set on Vercel; sent as `Authorization: Bearer <CRON_SECRET>` so the cron routes authenticate (§8.1). |
 
 The workflow fails loudly on non-2xx responses (`curl --fail-with-body`) so a missing or misconfigured secret surfaces as a failed run instead of a silent no-op.

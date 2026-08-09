@@ -136,7 +136,7 @@ The marketing site is the **official information page for PM Academy** — it pr
 ### 6.1 Site Structure
 
 ```
-pmacademy.com (marketing site — see Architecture.md §3 for hosting/deployment decision)
+prodily.adityagangwani.me (marketing site — see Architecture.md §3 for hosting/deployment decision)
 ├── / (Home)
 │   ├── Hero: positioning line (PRD.md §1) + primary CTA (waitlist pre-launch, "Start Learning Free" post-launch)
 │   ├── The gap section: fragmented free content vs. $200–$2,000 paid courses vs. PM Academy

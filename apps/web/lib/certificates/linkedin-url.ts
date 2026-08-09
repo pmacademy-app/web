@@ -35,7 +35,7 @@ export function buildLinkedInCertificationUrl({
   const params = new URLSearchParams({
     startTask: 'CERTIFICATION_NAME',
     name,
-    organizationName: BRAND.company, // "Prodigy"
+    organizationName: BRAND.company, // "Prodily"
     issueYear: String(year),
     issueMonth: String(month),
     certId: certificateCode,

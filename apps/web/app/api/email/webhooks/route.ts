@@ -1,10 +1,101 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
 import { createServerSupabaseClient } from '@/lib/supabase'
-import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
+import { sendEmail } from '@/lib/email'
+
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+function verifyResendWebhookSignature(request: Request, rawBody: string, secret: string): boolean {
+  const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id')
+  const svixTimestamp = request.headers.get('svix-timestamp') || request.headers.get('webhook-timestamp')
+  const svixSignature = request.headers.get('svix-signature') || request.headers.get('webhook-signature')
+
+  if (!svixId || !svixTimestamp || !svixSignature) {
+    return false
+  }
+
+  // Reject signatures older than 5 minutes
+  const timestampNum = parseInt(svixTimestamp, 10)
+  if (isNaN(timestampNum)) return false
+  const nowSec = Math.floor(Date.now() / 1000)
+  if (Math.abs(nowSec - timestampNum) > 300) {
+    return false
+  }
+
+  let cleanSecret = secret.trim()
+  if (cleanSecret.startsWith('whsec_')) {
+    cleanSecret = cleanSecret.substring(6)
+  }
+
+  let secretBytes: Buffer
+  try {
+    secretBytes = Buffer.from(cleanSecret, 'base64')
+  } catch {
+    secretBytes = Buffer.from(cleanSecret, 'utf-8')
+  }
+
+  const toSign = `${svixId}.${svixTimestamp}.${rawBody}`
+  const computedHmac = crypto.createHmac('sha256', secretBytes).update(toSign).digest('base64')
+  const expectedSig = `v1,${computedHmac}`
+
+  const signatures = svixSignature.split(' ')
+  for (const sig of signatures) {
+    try {
+      const sigBuf = Buffer.from(sig.trim())
+      const expectedBuf = Buffer.from(expectedSig)
+      if (sigBuf.length === expectedBuf.length && crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+        return true
+      }
+    } catch {
+      // Ignored
+    }
+  }
+
+  return false
+}
+
+async function fetchInboundEmailBody(emailId: string): Promise<{ text?: string; html?: string }> {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey || !emailId) return {}
+
+  try {
+    const res = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    })
+    if (!res.ok) return {}
+    const emailData = await res.json()
+    return {
+      text: typeof emailData.text === 'string' ? emailData.text : undefined,
+      html: typeof emailData.html === 'string' ? emailData.html : undefined,
+    }
+  } catch {
+    return {}
+  }
+}
 
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text()
+    const secret = process.env.RESEND_WEBHOOK_SECRET
+
+    // 1. Verify Webhook Signature if configured in environment
+    if (secret) {
+      const isValid = verifyResendWebhookSignature(request, rawBody, secret)
+      if (!isValid) {
+        console.warn('[ResendWebhook] Unauthorized webhook request: Svix signature verification failed.')
+        return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
+      }
+    }
+
     let payload: Record<string, unknown> = {}
     try {
       payload = JSON.parse(rawBody)
@@ -12,56 +103,82 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
     }
 
-    console.log('[ResendWebhook] Inbound webhook received event type:', payload?.type || 'email.received')
+    const eventType = String(payload.type || 'email.received')
+    console.log('[ResendWebhook] Inbound webhook received event type:', eventType)
 
-    // Handle email.received event
     const data = (payload.data || payload) as Record<string, unknown>
-    const fromAddress = String(data.from || data.sender || 'unknown@example.com')
-    const subject = String(data.subject || 'Direct Inbound Inquiry')
-    const textBody = String(data.text || data.html || 'Inbound email received')
+    const emailId = String(data.email_id || data.id || '')
+    const fromRaw = String(data.from || data.sender || 'unknown@example.com')
+    const subject = String(data.subject || 'Direct Inbound Email Inquiry')
 
-    const supabase = createServerSupabaseClient()
+    // Parse sender name & email
+    const senderName = fromRaw.includes('<') ? fromRaw.split('<')[0].replace(/"/g, '').trim() : fromRaw
+    const senderEmail = fromRaw.includes('<') ? fromRaw.split('<')[1].replace('>', '').trim() : fromRaw
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: inserted, error } = await (supabase.from('contact_messages' as any) as any)
-      .insert({
-        user_id: null,
-        name: fromAddress.split('<')[0]?.trim() || fromAddress,
-        email: fromAddress.includes('<') ? fromAddress.split('<')[1]?.replace('>', '').trim() : fromAddress,
-        subject: subject.substring(0, 200),
-        category: 'inbound_email',
-        message: textBody.substring(0, 3000),
-        status: 'new',
-        source: 'inbound_email',
-      })
-      .select('id')
-      .single()
+    // 2. Fetch full email content from Resend Receiving API if email_id is present
+    let textBody = String(data.text || '')
+    let htmlBody = String(data.html || '')
 
-    if (error) {
-      console.warn('[ResendWebhook] Warning saving inbound message to DB:', error)
+    if ((!textBody && !htmlBody) && emailId) {
+      const fetched = await fetchInboundEmailBody(emailId)
+      if (fetched.text) textBody = fetched.text
+      if (fetched.html) htmlBody = fetched.html
     }
 
-    // Outbound email alert to pmacademyapp@gmail.com forwarding direct inbound query
+    const finalMessageBody = textBody.trim() || 'Inbound email received without body content.'
+
+    // 3. Persist inbound message into Supabase contact_messages table
+    let insertedId: string | null = null
     try {
-      await enqueueNotificationItem({
-        userId: '00000000-0000-0000-0000-000000000000',
-        toEmail: 'pmacademyapp@gmail.com',
-        toName: 'PM Academy Inbound Inbox',
-        channel: 'email',
-        templateKey: 'auth.welcome',
-        templateVariables: {
-          userName: `Direct Email from ${fromAddress}: "${subject}"`,
-        },
-        eventId: `inbound_${inserted?.id || Date.now()}`,
-        eventType: 'inbound.received',
-        category: 'security',
-        priorityLevel: 'high',
-      })
-    } catch (enqueueErr) {
-      console.warn('[ResendWebhook] Non-fatal warning forwarding inbound alert:', enqueueErr)
+      const supabase = createServerSupabaseClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: inserted, error } = await (supabase.from('contact_messages' as any) as any)
+        .insert({
+          user_id: null,
+          name: senderName.substring(0, 100) || senderEmail,
+          email: senderEmail.substring(0, 150),
+          subject: subject.substring(0, 200),
+          category: 'inbound_email',
+          message: finalMessageBody.substring(0, 3000),
+          status: 'new',
+          source: 'inbound_email',
+        })
+        .select('id')
+        .single()
+
+      if (error) {
+        console.warn('[ResendWebhook] Warning saving inbound message to DB:', error)
+      } else if (inserted) {
+        insertedId = inserted.id
+      }
+    } catch (dbErr) {
+      console.warn('[ResendWebhook] Non-fatal DB warning (env or connection unavailable):', dbErr)
     }
 
-    return NextResponse.json({ success: true, processed: true })
+    // 4. Forward alert email to pmacademyapp@gmail.com inbox via sendEmail()
+    try {
+      await sendEmail({
+        to: 'pmacademyapp@gmail.com',
+        subject: `Fwd: [Direct Email Inquiry] ${subject}`,
+        html: `
+          <h2>Direct Inbound Email Received</h2>
+          <p><strong>From:</strong> ${escapeHtml(senderName)} (&lt;<a href="mailto:${escapeHtml(senderEmail)}">${escapeHtml(senderEmail)}</a>&gt;)</p>
+          <p><strong>To:</strong> hello@prodily.adityagangwani.me</p>
+          <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+          <p><strong>Database Record ID:</strong> <code>${insertedId || 'N/A'}</code></p>
+          <hr />
+          <p><strong>Message Content:</strong></p>
+          <blockquote style="background:#f5f5f5; padding:12px; border-left:4px solid #3b82f6; font-family:sans-serif;">
+            ${htmlBody || escapeHtml(finalMessageBody).replace(/\n/g, '<br />')}
+          </blockquote>
+        `,
+        text: `Direct Inbound Email Received\n\nFrom: ${senderName} (${senderEmail})\nTo: hello@prodily.adityagangwani.me\nSubject: ${subject}\nRecord ID: ${insertedId || 'N/A'}\n\nContent:\n${finalMessageBody}`,
+      })
+    } catch (forwardErr) {
+      console.warn('[ResendWebhook] Non-fatal warning forwarding inbound email to Gmail:', forwardErr)
+    }
+
+    return NextResponse.json({ success: true, processed: true, messageId: insertedId })
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : 'Invalid webhook payload'
     return NextResponse.json({ success: false, error: errorMsg }, { status: 400 })

@@ -2,8 +2,9 @@ import assert from 'assert'
 import { NextRequest } from 'next/server'
 import { POST as contactPOST } from '../../app/api/contact/route'
 import { GET as adminContactGET, PATCH as adminContactPATCH } from '../../app/api/admin/contact/route'
+import { POST as webhookPOST } from '../../app/api/email/webhooks/route'
 
-console.log('🧪 Running Contact Flow & Fail-Safe Contract Unit Test Suite...\n')
+console.log('🧪 Running Contact Flow & Inbound Webhook Unit Test Suite...\n')
 
 let passed = 0
 
@@ -59,7 +60,6 @@ async function executeContactTestSuite() {
       message: 'Testing rate limit threshold',
     }
 
-    // Call multiple times to test throttling logic
     let rateLimited = false
     for (let i = 0; i < 6; i++) {
       const req = new NextRequest('http://localhost:3000/api/contact', {
@@ -76,7 +76,31 @@ async function executeContactTestSuite() {
     assert.strictEqual(rateLimited, true, 'Subsequent attempts beyond threshold should trigger HTTP 429')
   })
 
-  console.log(`\n✅ All ${passed} Contact Flow Unit Tests Passed Successfully!\n`)
+  // 5. Resend Inbound Webhook Handling
+  await runTest('/api/email/webhooks processes email.received event payload', async () => {
+    delete process.env.RESEND_WEBHOOK_SECRET
+    const payload = {
+      type: 'email.received',
+      data: {
+        email_id: 'em_test_123',
+        from: 'Alice <alice@example.com>',
+        to: ['hello@prodily.adityagangwani.me'],
+        subject: 'Inbound Webhook Test Inquiry',
+        text: 'Hello PM Academy support team!',
+      },
+    }
+    const req = new NextRequest('http://localhost:3000/api/email/webhooks', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+    const res = await webhookPOST(req)
+    assert.strictEqual(res.status, 200)
+    const data = await res.json()
+    assert.strictEqual(data.success, true)
+    assert.strictEqual(data.processed, true)
+  })
+
+  console.log(`\n✅ All ${passed} Contact Flow & Webhook Unit Tests Passed Successfully!\n`)
 }
 
 void executeContactTestSuite()
