@@ -3,6 +3,7 @@ import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { issueCertificate } from '@/lib/certificates-db'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
+import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 import { BRAND } from '@/lib/brand'
 
 export async function POST(request: Request) {
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
     const verificationUrl = `${siteOrigin}/verify/${encodeURIComponent(testCertCode)}`
 
     // 3. Trigger Notification Event (reuses production event & email queue pipeline)
+    initializeNotificationConnectors()
     await globalNotificationDispatcher.dispatch({
       id: `dev-cert-event-${Date.now()}`,
       event: 'certificate.generated',
