@@ -276,7 +276,7 @@ describe('PM Academy Content Compiler Test Suite', () => {
         const svg = await compileMermaidToSvg(src);
         assert.ok(svg.includes('<svg'), `expected valid svg markup for: ${src}`);
         assert.ok(svg.includes('viewBox='), `expected viewBox attribute for: ${src}`);
-        assert.ok(svg.includes('max-width:'), `expected max-width style for: ${src}`);
+        assert.ok(svg.includes('width: auto'), `expected natural-size width style for: ${src}`);
         assert.ok(svg.includes('role="img"'), `expected role="img" accessibility attribute for: ${src}`);
       }
     });
@@ -285,7 +285,11 @@ describe('PM Academy Content Compiler Test Suite', () => {
       const wide = 'graph LR\n  A[Growth] --> B[Acquisition] --> C[Activation] --> D[Retention] --> E[Revenue] --> F[Referral] --> G[Product-Led] --> H[Expansion]';
       const svg = await compileMermaidToSvg(wide);
       assert.ok(!svg.includes('min-width'), 'min-width forces horizontal overflow');
-      assert.ok(svg.includes('width: 100%') || svg.includes('width="100%"'), 'expected responsive 100% width');
+      // Diagrams render at natural size (explicit width/height + width:auto) so text stays
+      // readable; the MermaidBlock container scrolls horizontally when the diagram overflows.
+      assert.ok(svg.includes('width="'), 'expected explicit natural width attribute');
+      assert.ok(svg.includes('height="'), 'expected explicit natural height attribute');
+      assert.ok(svg.includes('width: auto'), 'expected natural-size width style');
       assert.ok(svg.includes('height: auto') || svg.includes('height="100%"'), 'expected height auto/100%');
     });
 

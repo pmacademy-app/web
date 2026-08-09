@@ -380,7 +380,7 @@ export async function compileMermaidToSvg(source: string, _authorTheme?: Record<
         .replace(/\s+/g, ' ')
         .trim();
 
-      return `<svg ${cleanedAttrs} viewBox="${vbX} ${vbY} ${naturalWidth} ${naturalHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram" class="mermaid-static-svg" style="width: 100%; max-width: ${naturalWidth}px; height: auto; display: block; margin: 0 auto;">`;
+      return `<svg ${cleanedAttrs} width="${naturalWidth}" height="${naturalHeight}" viewBox="${vbX} ${vbY} ${naturalWidth} ${naturalHeight}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram" class="mermaid-static-svg" style="width: auto; height: auto; display: block;">`;
     });
 
   // Inject dark mode overrides right after opening <svg> tag
