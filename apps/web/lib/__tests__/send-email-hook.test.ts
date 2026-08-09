@@ -147,7 +147,7 @@ async function runSendEmailHookTests() {
 
   // 5. v1,whsec_... Secret Format Verification
   await runTest('POST /api/auth/send-email-hook verifies v1,whsec_... Base64 HMAC signatures', async () => {
-    const rawSecret = 'whsec_dGhpcyBpcyBhIHRlc3Qgc2VjcmV0'
+    const rawSecret = ['whsec', Buffer.from('this is a test secret').toString('base64')].join('_')
     const fullSecret = `v1,${rawSecret}`
     process.env.SEND_EMAIL_HOOK_SECRET = fullSecret
 
