@@ -1,4 +1,4 @@
-# Prodigy PM Academy — Brand Architecture
+# Prodily PM Academy — Brand Architecture
 
 **Status:** Authoritative — single source of truth for naming, brand/product relationship, and logo usage.
 **Companion docs:** `../design/Design.md` (visual design system that implements this brand), `Roadmap.md` (`Sprint 7.1` ships this document's requirements in code).
@@ -8,29 +8,29 @@
 ## 1. Brand Structure
 
 ```
-Prodigy                    ← Parent brand (company/umbrella)
+Prodily                    ← Parent brand (company/umbrella)
   └── PM Academy            ← Product (this codebase)
-        = Prodigy PM Academy   ← Full product name, used in formal/first-reference contexts
+        = Prodily PM Academy   ← Full product name, used in formal/first-reference contexts
 ```
 
-- **Prodigy** is the company/umbrella brand. It exists so future products can share the parent brand without every one of them being named "PM Academy something."
+- **Prodily** is the company/umbrella brand. It exists so future products can share the parent brand without every one of them being named "PM Academy something."
 - **PM Academy** is this specific product: the 90-lesson Product Management curriculum.
-- **Prodigy PM Academy** is the full name — used on the marketing homepage `<title>`, in the site footer, in the certificate issuer field, in email "From" display names, and the first mention on any given page. Subsequent mentions on the same page/screen may shorten to "PM Academy" or "the Academy" for readability — this is a deliberate exception to strict full-name-everywhere branding, chosen because "Prodigy PM Academy" repeated in every UI string reads as noisy, not premium.
+- **Prodily PM Academy** is the full name — used on the marketing homepage `<title>`, in the site footer, in the certificate issuer field, in email "From" display names, and the first mention on any given page. Subsequent mentions on the same page/screen may shorten to "PM Academy" or "the Academy" for readability — this is a deliberate exception to strict full-name-everywhere branding, chosen because "Prodily PM Academy" repeated in every UI string reads as noisy, not premium.
 
 ## 2. Naming Conventions
 
 | Context | Use |
 |---|---|
-| Page `<title>`, meta tags, Open Graph | `Prodigy PM Academy — [Page-specific title]` |
-| Marketing site hero, footer, About page | `Prodigy PM Academy` (full name) |
+| Page `<title>`, meta tags, Open Graph | `Prodily PM Academy — [Page-specific title]` |
+| Marketing site hero, footer, About page | `Prodily PM Academy` (full name) |
 | In-app chrome (sidebar, topbar, dashboard greeting) | `PM Academy` (short form — full brand every screen is noise, not premium) |
-| Certificates — issuing organization field | `Prodigy` (the company issues the credential; the curriculum is `PM Academy`) — rendered as `Issued by Prodigy · PM Academy` |
-| Email "From" display name | `Prodigy PM Academy <hello@[domain]>` |
+| Certificates — issuing organization field | `Prodily` (the company issues the credential; the curriculum is `PM Academy`) — rendered as `Issued by Prodily · PM Academy` |
+| Email "From" display name | `Prodily PM Academy <hello@[domain]>` |
 | Admin Console | `PM Academy Admin` (internal tool, short form always) |
-| Legal/Terms/Privacy | `Prodigy` (the legal entity), referencing `PM Academy` as "the Service" |
-| Social handles / LinkedIn company page | `Prodigy PM Academy` |
+| Legal/Terms/Privacy | `Prodily` (the legal entity), referencing `PM Academy` as "the Service" |
+| Social handles / LinkedIn company page | `Prodily PM Academy` |
 
-**Rule for any future second product under Prodigy:** it takes the same pattern — `Prodigy [Product Name]` — and this document is updated to list it alongside PM Academy in §1's structure diagram. Do not invent a different naming pattern per product.
+**Rule for any future second product under Prodily:** it takes the same pattern — `Prodily [Product Name]` — and this document is updated to list it alongside PM Academy in §1's structure diagram. Do not invent a different naming pattern per product.
 
 ## 3. Centralized Brand Configuration
 
@@ -42,18 +42,18 @@ apps/web/lib/brand.ts
 
 ```ts
 export const BRAND = {
-  company: "Prodigy",
+  company: "Prodily",
   product: "PM Academy",
-  fullName: "Prodigy PM Academy",
+  fullName: "Prodily PM Academy",
   shortName: "PM Academy",
   tagline: "The Duolingo of Product Management.",   // PRD.md §1 primary positioning line
-  domain: "[final domain — TBD at Sprint 8.1]",
+  domain: "prodily.adityagangwani.me",
   social: {
     linkedin: "[TBD]",
     twitter: "[TBD]",
   },
-  legalEntity: "Prodigy",
-  certificateIssuer: "Prodigy",
+  legalEntity: "Prodily",
+  certificateIssuer: "Prodily",
 } as const;
 ```
 

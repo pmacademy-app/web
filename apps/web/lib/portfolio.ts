@@ -84,7 +84,7 @@ export function generatePersonJsonLd({
     name: name || username,
     alternateName: username,
     jobTitle: title,
-    description: bio || `${name || username}'s Product Management portfolio and skill radar on Prodigy PM Academy.`,
+    description: bio || `${name || username}'s Product Management portfolio and skill radar on Prodily PM Academy.`,
     url: profileUrl,
     image: avatarUrl || undefined,
     sameAs: sameAs.length > 0 ? sameAs : undefined,

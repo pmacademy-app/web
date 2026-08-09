@@ -9,7 +9,7 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { trackHeroCTAClick } from '@/lib/analytics'
 import { NAV_LINKS } from '@/config/navigation'
 import { BRAND } from '@/lib/brand'
-import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
+import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { cn } from '@/lib/utils'
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ function Logo() {
       aria-label={`${BRAND.fullName} — Home`}
       className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm"
     >
-      <BrandMarkProdigy size="sm" priority />
+      <BrandMarkProdily size="sm" priority />
     </Link>
   )
 }

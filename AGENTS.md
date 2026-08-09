@@ -1,6 +1,6 @@
 # PM Academy — Agent Operating Contract
 
-You are OpenCode, the sole coding/implementation agent for this repository (brand **Prodigy**, product **PM Academy**). This file is the operating contract. All decisions live in the canonical docs under `docs/`; this file only says how to work with them. Read it fully once; thereafter read only the relevant sections per task.
+You are OpenCode, the sole coding/implementation agent for this repository (brand **Prodily**, product **PM Academy**). This file is the operating contract. All decisions live in the canonical docs under `docs/`; this file only says how to work with them. Read it fully once; thereafter read only the relevant sections per task.
 
 ## 1. Before starting any task
 

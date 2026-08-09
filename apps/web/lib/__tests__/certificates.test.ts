@@ -83,7 +83,7 @@ runTest('buildLinkedInCertificationUrl constructs valid LinkedIn add-to-profile 
 
   assert.ok(linkedinUrl.startsWith('https://www.linkedin.com/profile/add'), 'Must start with LinkedIn profile add endpoint')
   assert.ok(linkedinUrl.includes('startTask=CERTIFICATION_NAME'), 'Must specify CERTIFICATION_NAME task')
-  assert.ok(linkedinUrl.includes('organizationName=Prodigy'), 'Must set issuing organization to Prodigy')
+  assert.ok(linkedinUrl.includes('organizationName=Prodily'), 'Must set issuing organization to Prodily')
   assert.ok(linkedinUrl.includes('certId=PMA-2026-B87F129C'), 'Must include exact credential ID')
   assert.ok(linkedinUrl.includes('issueYear=2026'), 'Must set issue year correctly')
   assert.ok(linkedinUrl.includes('issueMonth=8'), 'Must set issue month correctly')

@@ -1,4 +1,4 @@
-# Prodigy PM Academy — Architecture
+# Prodily PM Academy — Architecture
 
 **Status:** Stable core, actively extended surface. See §0 — the blanket freeze from `v1.0.0-foundation` is now precisely scoped.
 **Companion docs:** `../INDEX.md` (entry point), `../product/PRD.md` (what/why), `../development/Rules.md` (how we work), `../product/Roadmap.md` (when — supersedes `Phases.md` from Phase 3.7 onward), `../design/Design.md` (what it looks like), `../product/Brand-Architecture.md` (naming/logo), `Supabase-Migration-Guide.md` (safe schema-change workflow), `content-pipeline.md` / `rendering-pipeline.md` (authoritative compiler/renderer specs — §4/§5 defer to them), `Notification-Architecture.md` (authoritative communication architecture), `Security-Threat-Model.md`, `Performance-Budget-Checklist.md` (new — Sprint 7.5 deliverables), `Architecture-Review-Report.md` (the reasoning behind every decision in this rewrite).

@@ -216,7 +216,7 @@ export default async function ProgressPage() {
                     Verified Credential • {cert.certificate_code}
                   </span>
                   <h3 className="text-lg font-bold font-serif text-foreground">
-                    Prodigy PM Academy Full Curriculum Completion Certificate
+                    Prodily PM Academy Full Curriculum Completion Certificate
                   </h3>
                   <p className="text-xs text-muted-foreground">
                     Issued on {new Date(cert.issued_at).toLocaleDateString()} for mastering 90 lessons and achieving Level {cert.level} ({cert.career_title}).

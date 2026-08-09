@@ -19,7 +19,7 @@ interface DBChain {
 
 export const metadata: Metadata = {
   title: 'Dashboard',
-  description: 'Action-oriented dashboard for Prodigy PM Academy learners. Continue your next lesson, review flashcards, and submit capstones.',
+  description: 'Action-oriented dashboard for Prodily PM Academy learners. Continue your next lesson, review flashcards, and submit capstones.',
 }
 
 export default async function DashboardPage() {

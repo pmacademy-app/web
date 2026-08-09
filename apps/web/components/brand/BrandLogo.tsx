@@ -7,7 +7,7 @@ export type BrandLogoVariant =
   | 'hero-full'
   | 'full'
   | 'static-full'
-  | 'mark-prodigy'
+  | 'mark-prodily'
   | 'icon'
   | 'mark'
   | 'wordmark'
@@ -60,7 +60,7 @@ export function BrandLogo({
   badgeText,
   onDark = false,
 }: BrandLogoProps) {
-  if (variant === 'mark-prodigy') {
+  if (variant === 'mark-prodily') {
     return (
       <span className={cn('inline-flex items-center gap-2.5 select-none', className)}>
         <Image
@@ -134,9 +134,12 @@ export function StaticBrandLogo(props: Omit<BrandLogoProps, 'variant'>) {
   return <BrandLogo variant="full" {...props} />
 }
 
-export function BrandMarkProdigy(props: Omit<BrandLogoProps, 'variant'>) {
-  return <BrandLogo variant="mark-prodigy" {...props} />
+export function BrandMarkProdily(props: Omit<BrandLogoProps, 'variant'>) {
+  return <BrandLogo variant="mark-prodily" {...props} />
 }
+
+/** @deprecated Use BrandMarkProdily */
+export const BrandMarkProdigy = BrandMarkProdily
 
 export function BrandIcon(props: Omit<BrandLogoProps, 'variant'>) {
   return <BrandLogo variant="icon" {...props} />

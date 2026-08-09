@@ -1,28 +1,32 @@
 import { TOKENS } from '@/theme/tokens'
 
 export const BRAND = {
-  company: 'Prodigy',
+  company: 'Prodily',
   product: 'PM Academy',
-  fullName: 'Prodigy PM Academy',
+  fullName: 'Prodily PM Academy',
   shortName: 'PM Academy',
   tagline: 'The Duolingo of Product Management.',
   positioning: '90 lessons. 9 modules. Free forever.',
-  domain: 'pmacademy.adityagangwani.me',
+  domain: 'prodily.adityagangwani.me',
   social: {
     linkedin: 'https://linkedin.com/company/pmacademy',
     twitter: 'https://x.com/pmacademy_app',
+    // NOTE: External accounts (Twitter/LinkedIn/BMC) still use old handles.
+    // These must be renamed/migrated at the platform level separately.
     buyMeACoffee: 'https://buymeacoffee.com/pmacademy',
   },
-  legalEntity: 'Prodigy',
-  certificateIssuer: 'Prodigy',
-  adminName: 'Prodigy PM Academy Admin',
+  legalEntity: 'Prodily',
+  certificateIssuer: 'Prodily',
+  adminName: 'Prodily PM Academy Admin',
   // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
   // This value is the production default for any server-side context where env is available.
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://pmacademy.adityagangwani.me',
-  supportEmail: 'hello@pmacademy.adityagangwani.me',
-  emailFromName: 'Prodigy PM Academy',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
+  supportEmail: 'hello@prodily.adityagangwani.me',
+  // NOTE: emailFromAddress uses the Resend verified sender domain.
+  // Changing this requires updating Resend DNS settings first — do not change without that.
+  emailFromName: 'Prodily PM Academy',
   emailFromAddress: 'welcome@pmacademy.com',
-  certificateIssuerLine: 'Issued by Prodigy · PM Academy',
+  certificateIssuerLine: 'Issued by Prodily · PM Academy',
   certificateCodePrefix: 'PMA',
   learnerFallbackName: 'PM Academy Learner',
   colors: {
@@ -31,8 +35,8 @@ export const BRAND = {
     background: TOKENS.colors.background,
   },
   metadata: {
-    homeTitle: 'Prodigy PM Academy — Learn Product Management Free',
-    titleTemplate: '%s | Prodigy PM Academy',
+    homeTitle: 'Prodily PM Academy — Learn Product Management Free',
+    titleTemplate: '%s | Prodily PM Academy',
     description:
       'A complete, free Product Management curriculum with 90 structured lessons, interactive quizzes, skill analytics, and portfolio projects. Built for career switchers and ambitious builders.',
     shortDescription: '90 lessons. 9 modules. One skill: product judgment. Completely free.',

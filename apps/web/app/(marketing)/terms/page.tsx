@@ -6,16 +6,16 @@ import { FileText } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — Prodigy PM Academy',
-  description: 'Terms of Service for Prodigy PM Academy.',
+  title: 'Terms of Service — Prodily PM Academy',
+  description: 'Terms of Service for Prodily PM Academy.',
   openGraph: {
-    title: 'Terms of Service — Prodigy PM Academy',
-    description: 'Prodigy PM Academy terms of service and usage policies.',
+    title: 'Terms of Service — Prodily PM Academy',
+    description: 'Prodily PM Academy terms of service and usage policies.',
     url: `${siteUrl}/terms`,
     type: 'website',
-    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodigy PM Academy' }],
+    images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodily PM Academy' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Terms of Service — Prodigy PM Academy', images: [BRAND.assets.ogImage] },
+  twitter: { card: 'summary_large_image', title: 'Terms of Service — Prodily PM Academy', images: [BRAND.assets.ogImage] },
 }
 
 export default function TermsPage() {
