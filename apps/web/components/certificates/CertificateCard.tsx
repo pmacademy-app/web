@@ -13,11 +13,15 @@ interface CertificateCardProps {
 
 /**
  * Official Production Certificate Component
- * Features:
- * - Refreshed typography & dual-accent borders.
- * - Issuer attribution: "Issued by Prodily · PM Academy".
- * - Verification QR code encoding exact /verify/[certificateId] URL.
- * - Authenticated credential status badge.
+ *
+ * Designed to read as a genuine professional PM credential both on the
+ * verification page and as a standalone printed/PDF export:
+ * - Clear visual hierarchy: issuer → recipient → credential → milestones.
+ * - Serif display type for the recipient name (Fraunces via font-serif).
+ * - Double-frame border treatment with brand accent.
+ * - Verification QR code encoding the exact /verify/[certificateId] URL.
+ * - Print-safe: the whole card is wrapped in `.certificate-print-container`
+ *   so the global print stylesheet prints only this element.
  */
 export function CertificateCard({ certificate }: CertificateCardProps) {
   const {
@@ -36,29 +40,30 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
     day: 'numeric',
   })
 
-  // QR Code encodes direct verification URL for online scanning
+  // QR Code encodes the direct verification URL for online scanning
   const qrCodeSvg = generateQrCodeSvg(verificationUrl, 96)
 
   return (
-    <div className="certificate-print-container relative w-full bg-card text-foreground rounded-2xl border-4 border-primary/50 p-8 md:p-12 shadow-lg space-y-8 overflow-hidden select-none">
-      {/* Decorative Inset Frame */}
-      <div className="absolute inset-3 border-2 border-emerald-600/30 rounded-xl pointer-events-none" />
+    <div className="certificate-print-container relative w-full bg-card text-foreground rounded-2xl border border-border shadow-lg overflow-hidden select-none">
+      {/* Outer decorative frame */}
+      <div className="absolute inset-2 border-2 border-primary/25 rounded-xl pointer-events-none" />
+      <div className="absolute inset-3 border border-accent/30 rounded-lg pointer-events-none" />
 
       {/* Watermark Crest */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
-        <Award className="w-[420px] h-[420px] text-primary" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.04] pointer-events-none">
+        <Award className="w-[460px] h-[460px] text-primary" />
       </div>
 
-      {/* Header: Logo, Issuer Line & Verification Badge */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border pb-6">
-        <div className="space-y-1">
+      {/* Header: Logo, Issuer Line & Credential ID */}
+      <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-8 md:px-12 pt-8 md:pt-10 pb-6 border-b border-border">
+        <div className="space-y-1.5">
           <StaticBrandLogo size="md" />
           <p className="text-[11px] font-semibold text-muted-foreground tracking-wide">
             {BRAND.certificateIssuerLine}
           </p>
         </div>
 
-        <div className="sm:text-right space-y-1 shrink-0">
+        <div className="sm:text-right space-y-1.5 shrink-0">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[11px] font-bold">
             <CheckCircle2 className="w-3.5 h-3.5" /> Verified Credential
           </span>
@@ -69,51 +74,54 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       </div>
 
       {/* Certificate Body */}
-      <div className="text-center space-y-6 py-6">
-        <div className="space-y-1">
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary block">
-            Official Completion & Mastery Credential
+      <div className="relative text-center px-8 md:px-12 py-8 md:py-10 space-y-6">
+        <div className="space-y-2">
+          <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary block">
+            Certificate of Completion
           </span>
-          <h2 className="text-sm font-medium text-muted-foreground">
+          <div className="flex items-center justify-center gap-3">
+            <span className="h-px w-14 bg-primary/30" />
+            <span className="text-primary/50 text-xs">✦</span>
+            <span className="h-px w-14 bg-primary/30" />
+          </div>
+          <p className="text-sm font-medium text-muted-foreground">
             This credential certifies that
-          </h2>
+          </p>
         </div>
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-foreground tracking-tight py-1">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight leading-tight">
           {learnerName}
         </h1>
 
         <p className="text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          has successfully fulfilled all curriculum requirements, demonstrating mastery in product strategy, user discovery, data analytics, stakeholder leadership, and capstone execution.
+          has successfully fulfilled all curriculum requirements, demonstrating mastery in product
+          strategy, user discovery, data analytics, stakeholder leadership, and capstone execution.
         </p>
 
         {/* Level & Milestone Pill */}
-        <div className="inline-flex flex-col items-center gap-1.5 px-8 py-4 rounded-2xl bg-primary/10 border border-primary/20 shadow-xs">
+        <div className="inline-flex flex-col items-center gap-2 px-8 md:px-12 py-4 md:py-5 rounded-2xl bg-primary/10 border border-primary/20 shadow-xs">
           <span className="text-xl md:text-2xl font-bold font-serif text-primary">
-            {levelInfo.title} (Level {levelInfo.level})
+            {levelInfo.title}
           </span>
-          <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground">
-            <span>{lessonsCompleted} Lessons Completed</span>
-            <span>•</span>
-            <span>{modulesCompleted} Modules Mastered</span>
-          </div>
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Level {levelInfo.level} · {lessonsCompleted} Lessons Completed · {modulesCompleted}{' '}
+            Modules Mastered
+          </span>
         </div>
       </div>
 
-      {/* Footer: Date, Board Signature & Verification QR Code */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-border pt-6">
-        {/* Date */}
+      {/* Footer: Date, Signatory & Verification QR */}
+      <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6 px-8 md:px-12 pt-6 pb-8 md:pb-10 border-t border-border">
+        {/* Date Granted */}
         <div className="text-center sm:text-left space-y-1">
           <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
             Date Granted
           </span>
-          <span className="text-xs md:text-sm font-bold text-foreground">
-            {formattedDate}
-          </span>
+          <span className="text-xs md:text-sm font-bold text-foreground">{formattedDate}</span>
         </div>
 
-        {/* Board Signature */}
-        <div className="text-center space-y-1 border-t sm:border-t-0 sm:border-x border-border px-8 pt-4 sm:pt-0">
+        {/* Signatory */}
+        <div className="text-center space-y-1 px-4">
           <div className="font-serif italic font-bold text-lg md:text-xl text-primary tracking-wide">
             {BRAND.fullName} Academic Board
           </div>
@@ -122,7 +130,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
           </span>
         </div>
 
-        {/* Direct Verification QR Code */}
+        {/* Verification QR */}
         <div className="flex items-center gap-3">
           <div
             className="w-20 h-20 rounded-xl bg-background border border-border p-1.5 shadow-xs flex items-center justify-center shrink-0"
@@ -136,8 +144,8 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
             <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
               <ShieldCheck className="w-3.5 h-3.5" /> Scan to Verify
             </div>
-            <span className="text-[9px] text-muted-foreground font-mono truncate block max-w-[120px]">
-              /verify/{certificateCode}
+            <span className="text-[9px] text-muted-foreground font-mono truncate block max-w-[130px]">
+              {verificationUrl.replace(/^https?:\/\//, '')}
             </span>
           </div>
         </div>
