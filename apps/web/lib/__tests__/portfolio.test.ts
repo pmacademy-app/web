@@ -57,22 +57,22 @@ runTest('generatePersonJsonLd generates valid schema.org Person structured data'
     avatarUrl: 'https://example.com/avatar.jpg',
     linkedinUrl: 'https://linkedin.com/in/arivera',
     githubUrl: 'https://github.com/arivera',
-    siteOrigin: 'https://pmacademy.com',
+    siteOrigin: 'https://pmacademy.adityagangwani.me',
   })
 
   assert.strictEqual(jsonLd['@context'], 'https://schema.org')
   assert.strictEqual(jsonLd['@type'], 'Person')
   assert.strictEqual(jsonLd.name, 'Alex Rivera')
   assert.strictEqual(jsonLd.jobTitle, 'Senior PM')
-  assert.strictEqual(jsonLd.url, 'https://pmacademy.com/p/arivera')
+  assert.strictEqual(jsonLd.url, 'https://pmacademy.adityagangwani.me/p/arivera')
   assert.ok(Array.isArray(jsonLd.sameAs))
   assert.strictEqual((jsonLd.sameAs as string[]).length, 2)
 })
 
 // 4. Share URL Formatting
 runTest('formatPortfolioShareUrl returns clean canonical URL', () => {
-  const url = formatPortfolioShareUrl('https://pmacademy.com/', 'arivera')
-  assert.strictEqual(url, 'https://pmacademy.com/p/arivera')
+  const url = formatPortfolioShareUrl('https://pmacademy.adityagangwani.me/', 'arivera')
+  assert.strictEqual(url, 'https://pmacademy.adityagangwani.me/p/arivera')
 })
 
 console.log(`\n✅ All ${passedTests} Portfolio Unit Tests Passed Successfully!\n`)

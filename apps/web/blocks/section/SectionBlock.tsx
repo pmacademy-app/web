@@ -217,9 +217,9 @@ function ResourcesSection({ block, children }: BlockProps) {
         {items.map((item, i) => (
           <li key={i} className="space-y-1">
             {item.citation && (
-              <p className="text-sm font-semibold text-foreground leading-snug">
+              <div className="text-sm font-semibold text-foreground leading-snug">
                 <MarkdownRenderer content={item.citation} className="inline [&>p]:inline [&>p]:m-0" />
-              </p>
+              </div>
             )}
             {item.note && (
               <p className="text-xs text-muted-foreground leading-relaxed">
