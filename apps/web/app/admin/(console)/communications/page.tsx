@@ -1,13 +1,15 @@
 import React from 'react'
 import Link from 'next/link'
-import { Mail, FileCode, RefreshCw, Bell, ShieldCheck, Send } from 'lucide-react'
+import { Mail, FileCode, RefreshCw, Bell, ShieldCheck, Send, MessageSquare } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
+import { createServerSupabaseClient } from '@/lib/supabase'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { ProcessEmailQueueButton } from '@/components/admin/ProcessEmailQueueButton'
 import { SendTestEmailButton } from '@/components/admin/SendTestEmailButton'
+import { AdminContactQueriesView, type ContactMessageItem } from '@/components/admin/AdminContactQueriesView'
 
 export const revalidate = 0
 
@@ -43,8 +45,29 @@ const EMAIL_TEMPLATES: TemplateItem[] = [
 ]
 
 export default async function AdminCommunicationsPage({ searchParams }: PageProps) {
-  const { tab = 'templates' } = await searchParams
+  const { tab = 'contact' } = await searchParams
   const queue = await AdminConsoleService.getEmailQueueOverview()
+
+  const supabase = createServerSupabaseClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: contactData } = await (supabase.from('contact_messages' as any) as any)
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100)
+
+  const contactMessages: ContactMessageItem[] = (contactData || []).map((c: Record<string, unknown>) => ({
+    id: String(c.id),
+    user_id: c.user_id ? String(c.user_id) : null,
+    name: String(c.name || 'Anonymous'),
+    email: String(c.email || ''),
+    subject: String(c.subject || 'Inquiry'),
+    category: String(c.category || 'general'),
+    message: String(c.message || ''),
+    status: (c.status as ContactMessageItem['status']) || 'new',
+    source: (c.source as ContactMessageItem['source']) || 'web_form',
+    admin_notes: c.admin_notes ? String(c.admin_notes) : null,
+    created_at: String(c.created_at || new Date().toISOString()),
+  }))
 
   const templateColumns: Column<TemplateItem>[] = [
     {
@@ -108,27 +131,37 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
     <div className="space-y-8">
       <AdminPageHeader
         title="Communications & Notifications"
-        description="Unified management of in-app notifications, transactional email queue, templates, and broadcast triggers."
+        description="Unified management of contact inquiries, in-app notifications, transactional email queue, and templates."
         icon={Mail}
         iconColor="text-blue-400"
         actions={<ProcessEmailQueueButton />}
       />
 
       {/* Sub-navigation Tabs */}
-      <div className="border-b border-slate-800 flex gap-6 text-xs font-semibold">
+      <div className="border-b border-slate-800 flex gap-6 text-xs font-semibold overflow-x-auto scrollbar-none">
+        <Link
+          href="/admin/communications?tab=contact"
+          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+            tab === 'contact'
+              ? 'border-amber-400 text-amber-400'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <MessageSquare className="w-4 h-4" /> Contact Queries ({contactMessages.length})
+        </Link>
         <Link
           href="/admin/communications?tab=templates"
-          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors ${
+          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
             tab === 'templates'
               ? 'border-amber-400 text-amber-400'
               : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
-          <FileCode className="w-4 h-4" /> Templates
+          <FileCode className="w-4 h-4" /> Email Templates
         </Link>
         <Link
           href="/admin/communications?tab=queue"
-          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors ${
+          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
             tab === 'queue'
               ? 'border-amber-400 text-amber-400'
               : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -138,7 +171,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
         </Link>
         <Link
           href="/admin/communications?tab=broadcasts"
-          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors ${
+          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
             tab === 'broadcasts'
               ? 'border-amber-400 text-amber-400'
               : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -148,7 +181,12 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
         </Link>
       </div>
 
-      {/* Tab 1: Templates */}
+      {/* Tab 1: Contact Queries */}
+      {tab === 'contact' && (
+        <AdminContactQueriesView initialMessages={contactMessages} />
+      )}
+
+      {/* Tab 2: Email Templates */}
       {tab === 'templates' && (
         <div className="space-y-6">
           <AdminDataTable
@@ -159,7 +197,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
         </div>
       )}
 
-      {/* Tab 2: Queue & Health */}
+      {/* Tab 3: Queue & Health */}
       {tab === 'queue' && (
         <div className="space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -200,7 +238,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
         </div>
       )}
 
-      {/* Tab 3: Broadcasts & Test Sends */}
+      {/* Tab 4: Broadcasts & Test Sends */}
       {tab === 'broadcasts' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
