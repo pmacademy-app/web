@@ -29,6 +29,7 @@
     "test:settings": "npx tsx lib/__tests__/settings.test.ts",
     "test:send-email-hook": "npx tsx lib/__tests__/send-email-hook.test.ts",
     "test:remediation": "npx tsx lib/__tests__/remediation.test.ts",
+    "test:contact": "npx tsx lib/__tests__/contact.test.ts",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"
