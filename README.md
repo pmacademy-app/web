@@ -1,15 +1,15 @@
-# Prodigy — PM Academy Developer Handbook
+# Prodily — PM Academy Developer Handbook
 
-Welcome to the **Prodigy PM Academy** core workspace (**Prodigy** is the brand, **PM Academy** is the product). This document serves as the canonical developer guide for onboarding, local development setup, architectural invariants, database migrations, and deployment workflows.
+Welcome to the **Prodily PM Academy** core workspace (**Prodily** is the brand, **PM Academy** is the product). This document serves as the canonical developer guide for onboarding, local development setup, architectural invariants, database migrations, and deployment workflows.
 
 ---
 
 ## 1. Project Overview & Scope
 
-**Prodigy PM Academy** is an interactive, gamified learning platform for product managers. It features a curated **90-lesson curriculum** divided into exactly **9 modules × 10 lessons each**. 
+**Prodily PM Academy** is an interactive, gamified learning platform for product managers. It features a curated **90-lesson curriculum** divided into exactly **9 modules × 10 lessons each**. 
 
 ### Branding
-The product ships under the **Prodigy** brand with the **PM Academy** product name (`Prodigy PM Academy` formally). Branding is centralized in `apps/web/lib/brand.ts` (the `BRAND` object) and `apps/web/theme/tokens.ts`, and rendered through the reusable `BrandLogo` component:
+The product ships under the **Prodily** brand with the **PM Academy** product name (`Prodily PM Academy` formally). Branding is centralized in `apps/web/lib/brand.ts` (the `BRAND` object) and `apps/web/theme/tokens.ts`, and rendered through the reusable `BrandLogo` component:
 *   **Animated logo** on the homepage hero (`animated-full`).
 *   **Static logo components** everywhere else (navbar, sidebar, auth, admin, certificates, emails, footer).
 *   **Full logo** (mark + wordmark) only where space allows; **logo-mark only** for compact UI.
@@ -276,7 +276,7 @@ All pushes to `main` undergo automated quality assurance via GitHub Actions (`.g
 *   **Phase 1 (Core Learning Loop):** Complete ✅ — Lesson renderer, quiz flow, secure server verification, custom templates.
 *   **Phase 2 (Gamification Layer):** Complete ✅ — XP Engine, Timezone-aware Streak Engine, Continuous 0–100 Skill Radar, Dashboard 2.0, and SM-2 Flashcard Review Hub (`v0.2.0-phase2-complete`).
 *   **Phase 3 (Social & Portfolio Infrastructure):** Complete ✅ — Public Portfolios, Capstones, Certificates, Badges, Leaderboards, Notification Platform, Admin Console (`v1.0.0-rc1`).
-*   **Sprint 7.1 (Global Branding & Documentation):** Complete ✅ — Prodigy rebrand, `BrandLogo` system, static brand asset pipeline, static Mermaid SVG compilation, docs reorganization.
+*   **Sprint 7.1 (Global Branding & Documentation):** Complete ✅ — Prodily rebrand, `BrandLogo` system, static brand asset pipeline, static Mermaid SVG compilation, docs reorganization.
 *   **Sprint 7.2 (Settings 2.0):** Current Focus 🎯 — Unified Settings IA (Profile, Security, Portfolio, Notifications, Danger Zone).
 *   **Phase 4 (Hardening & SEO):** Planned — Accessibility validations, search overlays, speed optimizations.
 
@@ -288,6 +288,6 @@ For deep architectural guides, consult these documents:
 *   [`docs/architecture/Architecture.md`](docs/architecture/Architecture.md) — Detailed folder structure and schema diagrams.
 *   [`docs/development/IMPLEMENTATION_RULES.md`](docs/development/IMPLEMENTATION_RULES.md) — Pre-flight coding rules and quality checks.
 *   [`docs/development/KNOWN_ISSUES.md`](docs/development/KNOWN_ISSUES.md) — Deferred technical debt tracking backlog.
-*   [`docs/product/Brand-Architecture.md`](docs/product/Brand-Architecture.md) — Prodigy brand, naming, and logo usage rules.
+*   [`docs/product/Brand-Architecture.md`](docs/product/Brand-Architecture.md) — Prodily brand, naming, and logo usage rules.
 *   [`docs/roadmap/Sprint-7.2-Settings-2.0.md`](docs/roadmap/Sprint-7.2-Settings-2.0.md) — Next sprint scope (Settings 2.0).
 *   [`MEMORY.md`](MEMORY.md) — Lightweight orientation index.

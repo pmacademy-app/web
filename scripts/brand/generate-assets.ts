@@ -101,7 +101,7 @@ async function generateBrandingAssets() {
   // Used for icon-only renderings (navbar/auth/sidebar collapse, BrandLogo icon).
   const markW = round2(MARK_SIZE.width);
   const markH = round2(MARK_SIZE.height);
-  const logoMarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${markW} ${markH}" width="${markW}" height="${markH}" role="img" aria-label="Prodigy PM Academy mark">
+  const logoMarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${markW} ${markH}" width="${markW}" height="${markH}" role="img" aria-label="Prodily PM Academy mark">
   ${markGroupNatural()}
 </svg>`;
   fs.writeFileSync(path.join(publicBrandDir, 'logo-mark.svg'), logoMarkSvg);
@@ -109,14 +109,14 @@ async function generateBrandingAssets() {
   // logo-mark-on-dark.svg — monochrome-light variant for dark surfaces
   // (Admin Console). Same geometry; single light mint fill so the silhouette
   // stays legible on near-black backgrounds.
-  const logoMarkOnDarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${markW} ${markH}" width="${markW}" height="${markH}" role="img" aria-label="Prodigy PM Academy mark">
+  const logoMarkOnDarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${markW} ${markH}" width="${markW}" height="${markH}" role="img" aria-label="Prodily PM Academy mark">
   ${markGroupNatural(TOKENS.colors.dark.primary, TOKENS.colors.dark.primary)}
 </svg>`;
   fs.writeFileSync(path.join(publicBrandDir, 'logo-mark-on-dark.svg'), logoMarkOnDarkSvg);
 
-  // wordmark.svg — text-only lockup (Prodigy + PM ACADEMY), 600x200.
-  const wordmarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200" role="img" aria-label="Prodigy PM Academy wordmark">
-  <text x="0" y="126" font-family="${FONT_SERIF}" font-size="108" font-weight="600" fill="${MARK_COLORS.gem}">Prodigy</text>
+  // wordmark.svg — text-only lockup (Prodily + PM ACADEMY), 600x200.
+  const wordmarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200" role="img" aria-label="Prodily PM Academy wordmark">
+  <text x="0" y="126" font-family="${FONT_SERIF}" font-size="108" font-weight="600" fill="${MARK_COLORS.gem}">Prodily</text>
   <text x="2" y="182" font-family="${FONT_SANS}" font-size="32" font-weight="600" letter-spacing="14" fill="${MARK_COLORS.ring}">PM ACADEMY</text>
 </svg>`;
   fs.writeFileSync(path.join(publicBrandDir, 'wordmark.svg'), wordmarkSvg);
@@ -127,10 +127,10 @@ async function generateBrandingAssets() {
   const markX = 24;
   const markY = 36;
   const textX = Math.round(markX + markWidthPx + 44);
-  const logoFullSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200" role="img" aria-label="Prodigy PM Academy">
+  const logoFullSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200" role="img" aria-label="Prodily PM Academy">
   ${markGroup(`translate(${markX}, ${markY}) scale(${round5(markScale)}) translate(${-MARK_ORIGIN.x}, ${-MARK_ORIGIN.y})`)}
   <g transform="translate(${textX}, -8)">
-    <text x="0" y="122" font-family="${FONT_SERIF}" font-size="96" font-weight="600" fill="${MARK_COLORS.gem}">Prodigy</text>
+    <text x="0" y="122" font-family="${FONT_SERIF}" font-size="96" font-weight="600" fill="${MARK_COLORS.gem}">Prodily</text>
     <text x="2" y="182" font-family="${FONT_SANS}" font-size="32" font-weight="600" letter-spacing="12" fill="${MARK_COLORS.ring}">PM ACADEMY</text>
   </g>
 </svg>`;
@@ -155,7 +155,7 @@ async function generateBrandingAssets() {
   const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="${MARK_COLORS.gem}"/>
   ${markGroup(`translate(120, 228) scale(${round5(0.34)}) translate(${-MARK_ORIGIN.x}, ${-MARK_ORIGIN.y})`, '#FFFFFF', '#FFFFFF')}
-  <text x="350" y="318" font-family="${FONT_SERIF}" font-size="88" font-weight="600" fill="#FFFFFF">Prodigy</text>
+  <text x="350" y="318" font-family="${FONT_SERIF}" font-size="88" font-weight="600" fill="#FFFFFF">Prodily</text>
   <text x="352" y="382" font-family="${FONT_SANS}" font-size="34" font-weight="600" letter-spacing="16" fill="${MARK_COLORS.ring}">PM ACADEMY</text>
   <text x="352" y="432" font-family="${FONT_SANS}" font-size="24" fill="#FFD9A0">90 lessons. 9 modules. Free forever.</text>
 </svg>`;

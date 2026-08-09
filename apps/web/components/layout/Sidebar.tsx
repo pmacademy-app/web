@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, BookOpen, Award, RotateCw, BarChart3, Trophy, Settings, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
+import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { BRAND } from '@/lib/brand'
 
 interface SidebarProps {
@@ -28,14 +28,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-card border-r border-border py-6 px-4">
-      {/* Logo: Logo Mark + Prodigy */}
+      {/* Logo: Logo Mark + Prodily */}
       <div className="flex items-center justify-between px-2 mb-8">
         <Link
           href="/dashboard"
           className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
           onClick={onClose}
         >
-          <BrandMarkProdigy size="sm" />
+          <BrandMarkProdily size="sm" />
         </Link>
         {/* Mobile close button */}
         <button

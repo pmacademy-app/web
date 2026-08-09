@@ -1,4 +1,4 @@
-# Prodigy PM Academy — Documentation Index
+# Prodily PM Academy — Documentation Index
 
 > **Start here.** This is the first document any developer, contributor, or AI agent should read. It maps the entire documentation system, explains what each document owns, defines the reading order, and resolves precedence when documents conflict.
 
@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-Prodigy PM Academy is a free, structured, habit-forming curriculum for learning Product Management — 90 lessons across 9 modules, built with the gamification mechanics of Duolingo and the rigor of a business-school elective. The product is a Next.js web application running on a ₹0-at-launch infrastructure stack (Vercel + Supabase free tiers). See `product/Brand-Architecture.md` for the full naming system (`Prodigy` / `PM Academy` / `Prodigy PM Academy`).
+Prodily PM Academy is a free, structured, habit-forming curriculum for learning Product Management — 90 lessons across 9 modules, built with the gamification mechanics of Duolingo and the rigor of a business-school elective. The product is a Next.js web application running on a ₹0-at-launch infrastructure stack (Vercel + Supabase free tiers). See `product/Brand-Architecture.md` for the full naming system (`Prodily` / `PM Academy` / `Prodily PM Academy`).
 
 **Core constraint:** Solo-founder buildable, static-first architecture, targeting ~5,000 users without a paid infrastructure upgrade.
 
@@ -26,7 +26,7 @@ Read in this order before writing any code or making any product decision. Do no
 | 2 | [`CURRENT_STATUS.md`](./CURRENT_STATUS.md) | **Live Repository State:** current branch, version, focus, active blockers, and bugs |
 | 3 | [`product/PRD.md`](./product/PRD.md) | Defines *what* to build and *why* — product vision, principles, requirements |
 | 4 | [`architecture/Architecture.md`](./architecture/Architecture.md) | Defines *how* the code is structured — locked tech stack, data model, folder layout, and **§0: the precise scope of what's frozen vs. open for redesign** |
-| 5 | [`product/Brand-Architecture.md`](./product/Brand-Architecture.md) | Defines the brand system — `Prodigy` / `PM Academy` naming, centralized config, logo strategy |
+| 5 | [`product/Brand-Architecture.md`](./product/Brand-Architecture.md) | Defines the brand system — `Prodily` / `PM Academy` naming, centralized config, logo strategy |
 | 6 | [`product/Roadmap.md`](./product/Roadmap.md) | Defines *when* things ship from Phase 3.7 onward — sprint sequencing, goals, DoD (supersedes `Phases.md` for this range) |
 | 7 | [`development/IMPLEMENTATION_RULES.md`](./development/IMPLEMENTATION_RULES.md) | **Developer Rules:** pre-flight checklists, coding rules, documentation sync, quality gates |
 | 8 | [`development/KNOWN_ISSUES.md`](./development/KNOWN_ISSUES.md) | **Deferred Backlog & Tech Debt:** open items only — resolved items moved to §1 as of the Sprint 7.1 sweep |

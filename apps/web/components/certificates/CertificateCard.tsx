@@ -15,7 +15,7 @@ interface CertificateCardProps {
  * Official Production Certificate Component
  * Features:
  * - Refreshed typography & dual-accent borders.
- * - Issuer attribution: "Issued by Prodigy · PM Academy".
+ * - Issuer attribution: "Issued by Prodily · PM Academy".
  * - Verification QR code encoding exact /verify/[certificateId] URL.
  * - Authenticated credential status badge.
  */

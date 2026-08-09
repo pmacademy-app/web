@@ -37,7 +37,7 @@ export function TestimonialsSection() {
   const displayList: PublishedTestimonial[] = testimonials.length > 0 ? testimonials : [
     {
       id: 'default-1',
-      content: 'Prodigy PM Academy gave me the structure I needed to transition from software engineering to product management. The 90 structured lessons and capstone projects built real portfolio proof.',
+      content: 'Prodily PM Academy gave me the structure I needed to transition from software engineering to product management. The 90 structured lessons and capstone projects built real portfolio proof.',
       source_event: 'Career Switcher',
       created_at: new Date().toISOString(),
     },

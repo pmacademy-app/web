@@ -1,7 +1,7 @@
-# Prodigy PM Academy — Project Memory Index
+# Prodily PM Academy — Project Memory Index
 
 **Last Updated:** 2026-08-08  
-**Project Stage:** Production Audit Complete for Sprints 7.1–7.3 (brand: **Prodigy**, product: **PM Academy**)
+**Project Stage:** Production Audit Complete for Sprints 7.1–7.3 (brand: **Prodily**, product: **PM Academy**)
 
 This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
 
@@ -9,7 +9,7 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 ## Quick Orientation
 
-**Prodigy PM Academy** is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
+**Prodily PM Academy** is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
 **Current state:** All phases 0–3, Sprints 1–7.3, and the Sprints 7.1–7.3 Production-Readiness Audit are complete. All Vercel build failures have been diagnosed and resolved, V1/V2 branching removed in favor of a single production certificate architecture, and zero internal development terminology is exposed. The repository is 100% production-ready for **Sprint 7.4 (Admin Console Polish)**.
 
@@ -18,7 +18,7 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 ## Sprint 7.3 — Certificate System 2.0 (Complete)
 
 - **Additive Template Versioning Migration (`20260808000001_add_certificate_template_version.sql`)**: Added `template_version int not null default 1` to `certificates` table.
-- **Versioned Renderer (`CertificateCard.tsx`)**: `templateVersion === 1` renders original legacy card layout unchanged; `templateVersion === 2` (default for newly issued certs) renders redesigned V2 layout with issuer attribution ("Issued by Prodigy · PM Academy") and direct `/verify/[certificateId]` QR code.
+- **Versioned Renderer (`CertificateCard.tsx`)**: `templateVersion === 1` renders original legacy card layout unchanged; `templateVersion === 2` (default for newly issued certs) renders redesigned V2 layout with issuer attribution ("Issued by Prodily · PM Academy") and direct `/verify/[certificateId]` QR code.
 - **LinkedIn Add to Profile Integration (`lib/certificates/linkedin-url.ts`)**: Pure function `buildLinkedInCertificationUrl` constructing LinkedIn's certification-add endpoint with pre-filled credential parameters.
 - **Action Bar & Verification Embedding (`CertificateActions.tsx`)**: Added "Add to LinkedIn Profile" action button alongside PDF print/download, Web Share API, and clipboard link copying.
 - **Testing & Verification**: 100% test pass rate across `test:certificates`, `test:settings`, domain engines, ESLint, and production Next.js build.
@@ -27,8 +27,8 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 ## Sprint 7.1 — Global Branding & Documentation (Complete)
 
-### Prodigy Rebrand
-- **Brand architecture:** `Prodigy` is the parent brand, `PM Academy` is the product, `Prodigy PM Academy` is the formal full name. Owned by [`docs/product/Brand-Architecture.md`](docs/product/Brand-Architecture.md).
+### Prodily Rebrand
+- **Brand architecture:** `Prodily` is the parent brand, `PM Academy` is the product, `Prodily PM Academy` is the formal full name. Owned by [`docs/product/Brand-Architecture.md`](docs/product/Brand-Architecture.md).
 - **Centralized brand config** in `apps/web/lib/brand.ts` (`BRAND` object: company, product, full name, certificate issuer lines, asset metadata) sourcing colors from `apps/web/theme/tokens.ts`.
 - **`BrandLogo` component** (`apps/web/components/brand/BrandLogo.tsx`) with explicit variants: `animated-full` (hero/marketing), `full` / `static-full`, `icon` / `mark`.
 

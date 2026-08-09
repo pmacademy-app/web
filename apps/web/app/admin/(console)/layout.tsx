@@ -8,7 +8,7 @@ import { AdminHeader } from '@/components/admin/AdminHeader'
 
 export const metadata = {
   title: 'Admin Console',
-  description: 'Operational control center for Prodigy PM Academy administrators.',
+  description: 'Operational control center for Prodily PM Academy administrators.',
 }
 
 /**

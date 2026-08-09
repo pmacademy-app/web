@@ -14,7 +14,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { BrandMarkProdigy } from '@/components/brand/BrandLogo'
+import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 
 export interface NavItem {
   name: string
@@ -41,7 +41,7 @@ export function AdminSidebar() {
       {/* Brand Header */}
       <div className="p-4 border-b border-slate-800 flex items-center justify-between">
         <Link href="/admin" className="flex items-center gap-2 focus:outline-none rounded">
-          <BrandMarkProdigy size="sm" badgeText="Admin" onDark />
+          <BrandMarkProdily size="sm" badgeText="Admin" onDark />
         </Link>
         <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-slate-400 border border-slate-700">
           v0.3.0

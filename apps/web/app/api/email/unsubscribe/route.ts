@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       <body>
         <div class="card">
           <h1>You have been unsubscribed</h1>
-          <p>You will no longer receive non-essential notification emails from Prodigy PM Academy.</p>
+          <p>You will no longer receive non-essential notification emails from Prodily PM Academy.</p>
           <p><a href="/settings?tab=notifications">Manage your notification settings</a></p>
         </div>
       </body>
