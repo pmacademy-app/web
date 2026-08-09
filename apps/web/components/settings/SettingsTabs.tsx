@@ -26,7 +26,7 @@ export function SettingsTabs() {
   return (
     <div className="space-y-6">
       {/* 5-Tab Navigation */}
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-border pb-2">
+      <div className="flex items-center gap-1.5 border-b border-border pb-2 overflow-x-auto scrollbar-none max-w-full">
         <button
           type="button"
           onClick={() => handleTabChange('profile')}
