@@ -269,7 +269,7 @@ Resend Webhooks -> /api/email/webhooks
 
 PM Academy uses **Resend** as the sole email provider (already integrated in `lib/email.ts`).
 
-- **Free tier:** 3,000 emails/month, 100/day
+- **Free tier:** 1000 emails/month, 100/day
 - **Integration:** Direct REST API (no SDK — keeps bundle clean)
 - **Webhook:** Resend delivers open/click/bounce/complaint events to `/api/email/webhooks`
 - **Upgrade trigger:** Daily sends consistently hitting 80 emails/day → switch to Resend Pro ($20/mo, 50k/month)
@@ -277,9 +277,9 @@ PM Academy uses **Resend** as the sole email provider (already integrated in `li
 ### 5.2 Sender Configuration
 
 ```
-Transactional:  "PM Academy" <welcome@pmacademy.com>  Reply-To: support@pmacademy.com
-Notifications:  "PM Academy" <learn@pmacademy.com>    Reply-To: support@pmacademy.com
-Product/Admin:  "PM Academy" <news@pmacademy.com>     Reply-To: support@pmacademy.com
+Transactional:  "Prodily PM Academy" <welcome@prodily.adityagangwani.me>  Reply-To: support@prodily.adityagangwani.me
+Notifications:  "Prodily PM Academy" <learn@prodily.adityagangwani.me>    Reply-To: support@prodily.adityagangwani.me
+Product/Admin:  "Prodily PM Academy" <news@prodily.adityagangwani.me>     Reply-To: support@prodily.adityagangwani.me
 ```
 
 ---

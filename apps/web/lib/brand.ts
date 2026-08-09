@@ -20,10 +20,10 @@ export const BRAND = {
   // This value is the production default for any server-side context where env is available.
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
   supportEmail: 'hello@prodily.adityagangwani.me',
-  // NOTE: emailFromAddress uses the Resend verified sender domain.
-  // Changing this requires updating Resend DNS settings first — do not change without that.
   emailFromName: 'Prodily PM Academy',
-  emailFromAddress: 'welcome@pmacademy.com',
+  emailFromAddress:
+    process.env.RESEND_FROM_EMAIL?.replace(/^.*<|>$/g, '').trim() ||
+    'welcome@prodily.adityagangwani.me',
   certificateIssuerLine: 'Issued by Prodily · PM Academy',
   certificateCodePrefix: 'PMA',
   learnerFallbackName: 'PM Academy Learner',
