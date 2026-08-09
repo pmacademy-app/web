@@ -36,12 +36,38 @@ export interface SupabaseSendEmailHookPayload {
 
 // ─── Verification Helper ──────────────────────────────────────────────────────
 
+function getSecretBytes(secret: string): Buffer {
+  let clean = secret.trim()
+  if (clean.startsWith('v1,')) {
+    clean = clean.substring(3).trim()
+  }
+  if (clean.startsWith('whsec_')) {
+    const base64Part = clean.substring(6).trim()
+    try {
+      const buf = Buffer.from(base64Part, 'base64')
+      if (buf.length > 0) return buf
+    } catch {
+      // Fall back to raw UTF-8 bytes if base64 decoding fails
+    }
+  }
+  return Buffer.from(clean, 'utf-8')
+}
+
 function verifyHookSecret(request: NextRequest, rawBody: string, secret: string): boolean {
+  const cleanSecret = secret.trim()
+  let unprefixedSecret = cleanSecret
+  if (unprefixedSecret.startsWith('v1,')) {
+    unprefixedSecret = unprefixedSecret.substring(3).trim()
+  }
+  if (unprefixedSecret.startsWith('whsec_')) {
+    unprefixedSecret = unprefixedSecret.substring(6).trim()
+  }
+
   // 1. Authorization header check (Bearer token)
   const authHeader = request.headers.get('authorization')
   if (authHeader) {
     const token = authHeader.replace(/^Bearer\s+/i, '').trim()
-    if (token === secret) return true
+    if (token === secret || token === cleanSecret || token === unprefixedSecret) return true
   }
 
   // 2. Custom header checks
@@ -49,50 +75,88 @@ function verifyHookSecret(request: NextRequest, rawBody: string, secret: string)
     request.headers.get('x-supabase-auth-secret') ||
     request.headers.get('x-hook-secret') ||
     request.headers.get('x-secret')
-  if (headerSecret && headerSecret.trim() === secret) return true
+  if (headerSecret) {
+    const val = headerSecret.trim()
+    if (val === secret || val === cleanSecret || val === unprefixedSecret) return true
+  }
 
   // 3. Query string check
   const searchParams = request.nextUrl.searchParams
   const querySecret = searchParams.get('secret')
-  if (querySecret && querySecret.trim() === secret) return true
+  if (querySecret) {
+    const val = querySecret.trim()
+    if (val === secret || val === cleanSecret || val === unprefixedSecret) return true
+  }
 
-  // 4. HMAC-SHA256 signature check (x-supabase-signature / x-signature)
+  // 4. Standard Webhook / Svix / Supabase signature check
   const signatureHeader =
+    request.headers.get('webhook-signature') ||
+    request.headers.get('svix-signature') ||
     request.headers.get('x-supabase-signature') ||
     request.headers.get('x-signature') ||
     request.headers.get('x-webhook-signature')
 
   if (signatureHeader) {
-    let sigToMatch = signatureHeader
-    let payloadToSign = rawBody
+    const msgId =
+      request.headers.get('webhook-id') ||
+      request.headers.get('svix-id') ||
+      request.headers.get('x-supabase-id') ||
+      ''
 
-    if (signatureHeader.includes('v1=')) {
-      const parts = signatureHeader.split(',')
-      const tPart = parts.find((p) => p.trim().startsWith('t='))
-      const v1Part = parts.find((p) => p.trim().startsWith('v1='))
-      if (v1Part) {
-        sigToMatch = v1Part.replace('v1=', '').trim()
-      }
-      if (tPart) {
-        const timestamp = tPart.replace('t=', '').trim()
-        payloadToSign = `${timestamp}.${rawBody}`
+    const msgTimestamp =
+      request.headers.get('webhook-timestamp') ||
+      request.headers.get('svix-timestamp') ||
+      ''
+
+    const sigParts = signatureHeader.split(/[\s,]+/)
+    let v1Sig = ''
+    let tSig = msgTimestamp
+
+    if (signatureHeader.startsWith('v1,')) {
+      v1Sig = signatureHeader.substring(3).trim()
+    } else {
+      for (const part of sigParts) {
+        const p = part.trim()
+        if (p.startsWith('v1=')) {
+          v1Sig = p.substring(3).trim()
+        } else if (p.startsWith('t=') && !tSig) {
+          tSig = p.substring(2).trim()
+        } else if (!v1Sig && p && !p.startsWith('t=')) {
+          v1Sig = p
+        }
       }
     }
 
-    try {
-      const computedSig = crypto
-        .createHmac('sha256', secret)
-        .update(payloadToSign)
-        .digest('hex')
+    if (v1Sig) {
+      const secretBytes = getSecretBytes(secret)
 
-      if (
-        computedSig.length === sigToMatch.length &&
-        crypto.timingSafeEqual(Buffer.from(computedSig), Buffer.from(sigToMatch))
-      ) {
-        return true
+      const payloadCandidates: string[] = []
+      if (msgId && tSig) {
+        payloadCandidates.push(`${msgId}.${tSig}.${rawBody}`)
       }
-    } catch {
-      return false
+      if (tSig) {
+        payloadCandidates.push(`${tSig}.${rawBody}`)
+      }
+      payloadCandidates.push(rawBody)
+
+      for (const candidate of payloadCandidates) {
+        const hmacBase64 = crypto.createHmac('sha256', secretBytes).update(candidate).digest('base64')
+        const hmacBase64Url = Buffer.from(hmacBase64, 'base64').toString('base64url')
+        const hmacHex = crypto.createHmac('sha256', secretBytes).update(candidate).digest('hex')
+
+        for (const expected of [hmacBase64, hmacBase64Url, hmacHex]) {
+          try {
+            if (
+              expected.length === v1Sig.length &&
+              crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(v1Sig))
+            ) {
+              return true
+            }
+          } catch {
+            // Ignore length mismatches
+          }
+        }
+      }
     }
   }
 
