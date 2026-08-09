@@ -36,8 +36,11 @@ export function SkillRadarSection() {
             initial={prefersReducedMotion ? false : { opacity: 0, x: -16 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.3, ease: [0, 0, 0.2, 1] }}
-            className="flex justify-center"
+            className="flex flex-col items-center justify-center"
           >
+            <div className="mb-3 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-bold uppercase tracking-wider">
+              Sample Competency Profile
+            </div>
             <SkillRadar
               values={SKILL_RADAR_DEMO.after}
               previousValues={SKILL_RADAR_DEMO.before}

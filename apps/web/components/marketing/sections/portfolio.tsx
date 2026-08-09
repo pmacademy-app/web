@@ -138,9 +138,14 @@ export function PortfolioSection() {
 
             {/* Public Profile */}
             <div className="p-5">
-              <p className="text-caption font-semibold text-locked uppercase tracking-wide mb-4">
-                Public Profile
-              </p>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-caption font-semibold text-locked uppercase tracking-wide">
+                  Public Profile
+                </p>
+                <span className="text-[10px] text-primary font-bold px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                  Sample Profile
+                </span>
+              </div>
               <div className="flex flex-col items-center text-center gap-3">
                 {/* Avatar */}
                 <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center">

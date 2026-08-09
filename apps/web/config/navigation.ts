@@ -6,7 +6,8 @@
 import type { NavLink, FooterLinkGroup } from '@/types'
 
 export const NAV_LINKS: NavLink[] = [
-  { label: 'Curriculum', href: '/#curriculum' },
+  { label: 'Home', href: '/' },
+  { label: 'Curriculum', href: '/curriculum' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
   { label: 'FAQ', href: '/#faq' },
@@ -16,8 +17,7 @@ export const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
   {
     heading: 'Resources',
     links: [
-      { label: 'Curriculum', href: '/#curriculum' },
-      { label: 'Sample Lessons', href: '/academy' },
+      { label: 'Curriculum', href: '/curriculum' },
       { label: 'Buy Me a Coffee', href: 'https://buymeacoffee.com/prodily' },
     ],
   },
@@ -32,6 +32,7 @@ export const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
   {
     heading: 'Company',
     links: [
+      { label: 'Home', href: '/' },
       { label: 'About', href: '/about' },
       { label: 'Contact', href: '/contact' },
       { label: 'FAQ', href: '/#faq' },

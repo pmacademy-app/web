@@ -56,7 +56,6 @@ export async function proxy(request: NextRequest) {
   const isAdminProtectedPage = isAdminArea && !isAdminLoginPage && !isAccessDeniedPage
 
   const PUBLIC_SAMPLE_LESSONS = [
-    '/academy',
     '/academy/foundations/les_zoyq8a',
     '/academy/foundations/les_prrl23',
     '/academy/foundations/les_0q4aih',

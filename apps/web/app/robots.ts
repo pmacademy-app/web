@@ -15,11 +15,7 @@ export default function robots(): MetadataRoute.Robots {
           '/privacy',
           '/terms',
           '/curriculum',
-          '/waitlist',
-          // 3 public sample lessons accessible to logged-out visitors
-          '/academy/foundations/les_zoyq8a',
-          '/academy/foundations/les_prrl23',
-          '/academy/foundations/les_0q4aih',
+          '/lessons/',
         ],
         disallow: [
           '/dashboard',
@@ -33,7 +29,6 @@ export default function robots(): MetadataRoute.Robots {
           '/badges',
           '/p/',
           '/api/',
-          // All authenticated academy routes (individual lessons not in sample set)
           '/academy/',
         ],
       },

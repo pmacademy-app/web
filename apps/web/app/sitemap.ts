@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { BRAND } from '@/lib/brand'
+import { fetchCurriculumData } from '@/lib/lesson-loader'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
@@ -8,14 +9,12 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
  *
  * Includes:
  *  - All public marketing pages
- *  - The 3 public sample lessons accessible to logged-out visitors
+ *  - All 90 public lesson preview pages (/lessons/lesson-001 ... /lessons/lesson-090)
  *
  * Excludes:
- *  - All authenticated app routes (/dashboard, /settings, /admin, etc.)
- *  - The remaining 87 auth-gated lessons (not indexable)
+ *  - All authenticated app routes (/dashboard, /settings, /admin, /academy, etc.)
  */
-export default function sitemap(): MetadataRoute.Sitemap {
-  // ── Marketing pages ────────────────────────────────────────────────────────
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const marketingRoutes: MetadataRoute.Sitemap = [
     {
       url: siteUrl,
@@ -55,28 +54,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  // ── Public sample lessons (logged-out accessible) ──────────────────────────
-  // Only the 3 lessons exempted in proxy.ts — the other 87 are auth-gated.
-  const sampleLessonRoutes: MetadataRoute.Sitemap = [
-    {
-      url: `${siteUrl}/academy/foundations/les_zoyq8a`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/academy/foundations/les_prrl23`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${siteUrl}/academy/foundations/les_0q4aih`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-  ]
+  const curriculum = await fetchCurriculumData()
+  const lessonRoutes: MetadataRoute.Sitemap = (curriculum?.lessons ?? []).map((lesson) => ({
+    url: `${siteUrl}/lessons/${lesson.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
 
-  return [...marketingRoutes, ...sampleLessonRoutes]
+  return [...marketingRoutes, ...lessonRoutes]
 }

@@ -17,12 +17,29 @@ import { trackFAQExpand } from '@/lib/analytics'
 export function FAQSection() {
   const prefersReducedMotion = useReducedMotion()
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_ITEMS.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  }
+
   return (
     <section
       id="faq"
       aria-labelledby="faq-heading"
       className="py-20 lg:py-28 bg-surface"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[8fr_4fr] gap-12 lg:gap-16 items-start">
           {/* Left: Accordion */}

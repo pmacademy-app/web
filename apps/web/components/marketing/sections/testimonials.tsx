@@ -33,25 +33,25 @@ export function TestimonialsSection() {
     loadTestimonials()
   }, [])
 
-  // Default fallback showcase when zero custom user testimonials are published yet
-  const displayList: PublishedTestimonial[] = testimonials.length > 0 ? testimonials : [
+  const hasLiveTestimonials = testimonials.length > 0
+  const displayList: PublishedTestimonial[] = hasLiveTestimonials ? testimonials : [
     {
       id: 'default-1',
       content: 'Prodily PM Academy gave me the structure I needed to transition from software engineering to product management. The 90 structured lessons and capstone projects built real portfolio proof.',
-      source_event: 'Career Switcher',
-      created_at: new Date().toISOString(),
+      source_event: 'Career Switcher Pathway',
+      created_at: '',
     },
     {
       id: 'default-2',
       content: 'The Spaced Repetition flashcards and competency skill radar make learning PM concepts stick. The best part? It is completely free forever with no hidden paywalls.',
-      source_event: 'Product Associate',
-      created_at: new Date().toISOString(),
+      source_event: 'Product Associate Pathway',
+      created_at: '',
     },
     {
       id: 'default-3',
       content: 'I built 9 real module capstones that I now present in interviews. The practical focus on real product judgment sets PM Academy apart from generic online courses.',
-      source_event: 'Aspiring Product Manager',
-      created_at: new Date().toISOString(),
+      source_event: 'Aspiring PM Pathway',
+      created_at: '',
     },
   ]
 
@@ -71,7 +71,8 @@ export function TestimonialsSection() {
           className="text-center mb-12"
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold uppercase tracking-wider mb-4">
-            <Star className="w-3.5 h-3.5 fill-current" /> Live Learner Stories
+            <Star className="w-3.5 h-3.5 fill-current" />{' '}
+            {hasLiveTestimonials ? 'Live Learner Stories' : 'Sample Learner Pathways'}
           </div>
           <h2
             id="testimonials-heading"
@@ -80,7 +81,9 @@ export function TestimonialsSection() {
             Built for learners who want proof of skill.
           </h2>
           <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
-            Real feedback and testimonials submitted directly by active PM Academy learners and moderated by admins.
+            {hasLiveTestimonials
+              ? 'Real feedback and testimonials submitted directly by active PM Academy learners and moderated by admins.'
+              : 'Sample learner goals and curriculum pathways. Verified learner reviews will appear here as learners complete modules.'}
           </p>
         </motion.div>
 
@@ -104,11 +107,17 @@ export function TestimonialsSection() {
 
               <div className="pt-3 border-t border-border/50 flex items-center justify-between text-xs">
                 <span className="font-bold text-primary">
-                  {item.source_event ? item.source_event.replace(/_/g, ' ') : 'Verified Learner'}
+                  {item.source_event ? item.source_event.replace(/_/g, ' ') : 'Learner Pathway'}
                 </span>
-                <span className="text-muted-foreground text-[10px]">
-                  {new Date(item.created_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}
-                </span>
+                {item.created_at ? (
+                  <span className="text-muted-foreground text-[10px]">
+                    {new Date(item.created_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground text-[10px] italic">
+                    Sample Story
+                  </span>
+                )}
               </div>
             </motion.div>
           ))}
