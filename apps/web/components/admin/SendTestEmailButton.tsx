@@ -20,7 +20,7 @@ export function SendTestEmailButton({ templateKey, templateName }: SendTestEmail
     setSuccess(false)
 
     try {
-      const res = await fetch('/api/dev/send-test-email', {
+      const res = await fetch('/api/admin/emails/test-send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

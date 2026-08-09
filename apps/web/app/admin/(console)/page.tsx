@@ -9,11 +9,11 @@ import {
   Zap,
   TrendingUp,
   ShieldCheck,
-  RefreshCw,
 } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
+import { AdminDashboardRefreshButton } from '@/components/admin/AdminDashboardRefreshButton'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 
 export const revalidate = 0
@@ -35,12 +35,7 @@ export default async function AdminDashboardPage() {
             <span className="text-xs text-slate-400 font-mono hidden sm:inline">
               Last Refreshed: {new Date().toLocaleTimeString()}
             </span>
-            <button
-              aria-label="Refresh operational metrics"
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-colors"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
+            <AdminDashboardRefreshButton />
           </div>
         }
       />
