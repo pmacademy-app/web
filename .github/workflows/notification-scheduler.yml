@@ -21,7 +21,7 @@ jobs:
       # fallback is the canonical production origin used across the app
       # (lib/brand.ts BRAND.siteUrl) so a missing secret fails loudly on the
       # endpoint instead of producing a malformed URL.
-      CRON_ORIGIN: ${{ secrets.APP_URL || 'https://pmacademy.com' }}
+      CRON_ORIGIN: ${{ secrets.APP_URL || 'https://pmacademy.adityagangwani.me' }}
     steps:
       - name: Process Email Queue
         if: github.event.schedule == '*/15 * * * *' || github.event_name == 'workflow_dispatch'

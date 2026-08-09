@@ -107,7 +107,7 @@ export function TestimonialsSection() {
                   {item.source_event ? item.source_event.replace(/_/g, ' ') : 'Verified Learner'}
                 </span>
                 <span className="text-muted-foreground text-[10px]">
-                  {new Date(item.created_at).toLocaleDateString()}
+                  {new Date(item.created_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}
                 </span>
               </div>
             </motion.div>
