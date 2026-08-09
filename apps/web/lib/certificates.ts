@@ -73,69 +73,29 @@ export function generateCredentialJsonLd({
   }
 }
 
+import QRCode from 'qrcode'
+
 /**
- * Renders a clean pure vector SVG QR code matrix for a given URL.
- * Generates standard 21x21 QR Code Version 1 matrix using deterministic encoding.
+ * Renders a clean pure vector SVG QR code matrix for a given URL using ISO/IEC 18004 compliant QRCode matrix.
  */
 export function generateQrCodeSvg(url: string, size: number = 100): string {
-  // Deterministic 21x21 grid pattern generator with standard finder patterns
-  const grid = Array.from({ length: 21 }, () => Array(21).fill(0))
+  try {
+    const qr = QRCode.create(url, { errorCorrectionLevel: 'M' })
+    const sizeModules = qr.modules.size
+    const data = qr.modules.data
+    const rects: string[] = []
 
-  // Helper to place finder pattern (7x7)
-  const addFinderPattern = (startRow: number, startCol: number) => {
-    for (let r = 0; r < 7; r++) {
-      for (let c = 0; c < 7; c++) {
-        if (
-          r === 0 || r === 6 || c === 0 || c === 6 ||
-          (r >= 2 && r <= 4 && c >= 2 && c <= 4)
-        ) {
-          grid[startRow + r][startCol + c] = 1
+    for (let r = 0; r < sizeModules; r++) {
+      for (let c = 0; c < sizeModules; c++) {
+        if (data[r * sizeModules + c]) {
+          rects.push(`<rect x="${c}" y="${r}" width="1" height="1" fill="currentColor" />`)
         }
       }
     }
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${sizeModules} ${sizeModules}" width="${size}" height="${size}" class="w-full h-full text-foreground">${rects.join('')}</svg>`
+  } catch (err) {
+    console.error('[certificates] Error generating QR code SVG:', err)
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" width="${size}" height="${size}" class="w-full h-full text-foreground"><rect width="21" height="21" fill="currentColor" opacity="0.1"/></svg>`
   }
-
-  // Top-left, top-right, bottom-left finders
-  addFinderPattern(0, 0)
-  addFinderPattern(0, 14)
-  addFinderPattern(14, 0)
-
-  // Timing patterns
-  for (let i = 8; i < 13; i += 2) {
-    grid[6][i] = 1
-    grid[i][6] = 1
-  }
-
-  // Fill pseudo-random data bits based on URL character hash
-  let seed = 0
-  for (let i = 0; i < url.length; i++) {
-    seed = (seed * 31 + url.charCodeAt(i)) & 0xffffffff
-  }
-
-  for (let r = 0; r < 21; r++) {
-    for (let c = 0; c < 21; c++) {
-      // Skip finders
-      if (
-        (r < 8 && c < 8) ||
-        (r < 8 && c > 12) ||
-        (r > 12 && c < 8)
-      ) {
-        continue
-      }
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff
-      grid[r][c] = (seed % 3 === 0 || seed % 5 === 0) ? 1 : 0
-    }
-  }
-
-  // Render SVG elements
-  const rects: string[] = []
-  for (let r = 0; r < 21; r++) {
-    for (let c = 0; c < 21; c++) {
-      if (grid[r][c] === 1) {
-        rects.push(`<rect x="${c}" y="${r}" width="1" height="1" fill="currentColor" />`)
-      }
-    }
-  }
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" width="${size}" height="${size}" class="w-full h-full text-foreground">${rects.join('')}</svg>`
 }

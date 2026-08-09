@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Bell } from 'lucide-react'
 import { NotificationCenterDrawer } from './NotificationCenterDrawer'
+import { subscribeClientNotificationEvent } from '@/lib/events/client-event-bus'
 
 export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState<number>(0)
@@ -25,12 +26,17 @@ export function NotificationBell() {
 
     void loadState()
 
+    const unsubscribe = subscribeClientNotificationEvent(() => {
+      void loadState()
+    })
+
     const interval = setInterval(() => {
       void loadState()
     }, 60000)
 
     return () => {
       mounted = false
+      unsubscribe()
       clearInterval(interval)
     }
   }, [])

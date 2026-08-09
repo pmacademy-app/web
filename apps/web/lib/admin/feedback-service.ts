@@ -225,4 +225,70 @@ export class FeedbackAdminService {
       createdAt: t.created_at,
     }))
   }
+
+  /**
+   * Fetches private product feedback items for Admin Console.
+   */
+  public static async getPrivateFeedbackList(): Promise<Array<{
+    id: string
+    userId: string | null
+    authorName: string
+    category: string
+    sourceEvent: string
+    content: string
+    rating: number | null
+    status: string
+    createdAt: string
+  }>> {
+    const supabase = createServerSupabaseClient()
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('user_feedback' as any) as any)
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100)
+
+    if (error || !data) return []
+
+    type FeedbackRow = {
+      id: string
+      user_id: string | null
+      category: string
+      source_event: string
+      content: string
+      rating: number | null
+      status: string
+      created_at: string
+    }
+
+    const rows = data as FeedbackRow[]
+    const userIds = rows.map((f) => f.user_id).filter(Boolean) as string[]
+    const userMap = new Map<string, string>()
+
+    if (userIds.length > 0) {
+      const { data: usersData } = await supabase
+        .from('users')
+        .select('id, full_name, username, email')
+        .in('id', userIds)
+
+      if (usersData) {
+        const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
+        uList.forEach((u) => {
+          userMap.set(u.id, u.full_name || u.username || u.email.split('@')[0])
+        })
+      }
+    }
+
+    return rows.map((f) => ({
+      id: f.id,
+      userId: f.user_id,
+      authorName: (f.user_id ? userMap.get(f.user_id) : null) || 'Anonymous Learner',
+      category: f.category,
+      sourceEvent: f.source_event,
+      content: f.content,
+      rating: f.rating,
+      status: f.status,
+      createdAt: f.created_at,
+    }))
+  }
 }
