@@ -32,6 +32,41 @@ export interface DiagramData {
 
 let mermaidInstance: any = null;
 
+/**
+ * Helper to extract line-separated text from a JSDOM element (HTML or SVG) by converting
+ * line-breaking tags (<br>, <div>, <p>, <tspan>, <tr>) into newlines before stripping HTML.
+ * JSDOM's textContent strips tags without inserting newlines, causing multiline labels
+ * to be measured as 1 giant single line, breaking Mermaid's node bounds & connector routing.
+ */
+function extractElementLines(element: any): string[] {
+  if (!element) return [];
+
+  let html = '';
+  try {
+    html = element.innerHTML || '';
+  } catch {}
+
+  if (typeof html === 'string' && html.length > 0) {
+    const textWithNewlines = html
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(p|div|tspan|tr|li|h[1-6])>/gi, '\n')
+      .replace(/<[^>]+>/g, '');
+
+    const decoded = textWithNewlines
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+
+    const lines = decoded.split('\n').map((l: string) => l.trim()).filter(Boolean);
+    if (lines.length > 0) return lines;
+  }
+
+  const rawText = (element?.textContent || '').trim();
+  return rawText.split('\n').map((l: string) => l.trim()).filter(Boolean);
+}
+
 function getJSDOMClass() {
   try {
     return require('jsdom').JSDOM;
@@ -78,8 +113,7 @@ async function getMermaid() {
   // Polyfill getBoundingClientRect for JSDOM elements (used by D3 / Mermaid label layout engine)
   if (!window.Element.prototype.getBoundingClientRect || (window.Element.prototype.getBoundingClientRect as any).__isMock !== true) {
     const mockFn = function (this: any) {
-      const text = (this.textContent || '').trim();
-      const lines = text.split('\n').map((l: string) => l.trim()).filter(Boolean);
+      const lines = extractElementLines(this);
       const maxLen = Math.max(1, ...lines.map((l: string) => l.length));
       const width = Math.max(60, maxLen * 8.5 + 32);
       const height = Math.max(34, Math.max(1, lines.length) * 22 + 16);
@@ -103,8 +137,7 @@ async function getMermaid() {
   try {
     Object.defineProperty(window.HTMLElement.prototype, 'offsetWidth', {
       get() {
-        const text = (this.textContent || '').trim();
-        const lines = text.split('\n').map((l: string) => l.trim()).filter(Boolean);
+        const lines = extractElementLines(this);
         const maxLen = Math.max(1, ...lines.map((l: string) => l.length));
         return Math.max(60, maxLen * 8.5 + 32);
       },
@@ -112,8 +145,7 @@ async function getMermaid() {
     });
     Object.defineProperty(window.HTMLElement.prototype, 'offsetHeight', {
       get() {
-        const text = (this.textContent || '').trim();
-        const lines = text.split('\n').map((l: string) => l.trim()).filter(Boolean);
+        const lines = extractElementLines(this);
         return Math.max(34, Math.max(1, lines.length) * 22 + 16);
       },
       configurable: true,
@@ -170,10 +202,9 @@ async function getMermaid() {
         }
 
         // Fallback for empty container: measure inner text if present
-        const innerText = this.textContent?.trim() || '';
-        if (innerText) {
-          const lines = innerText.split('\n').filter((l: string) => l.trim());
-          const maxLineLen = Math.max(...lines.map((l: string) => l.trim().length), 1);
+        const lines = extractElementLines(this);
+        if (lines.length > 0) {
+          const maxLineLen = Math.max(...lines.map((l: string) => l.length), 1);
           return { x: 0, y: 0, width: Math.max(60, maxLineLen * 8.5 + 32), height: Math.max(34, lines.length * 24 + 16) };
         }
 
@@ -182,21 +213,19 @@ async function getMermaid() {
 
       // 2. Leaf elements (foreignObject, text, tspan, rect, circle, polygon, path)
       if (tagName === 'foreignobject') {
-        const innerText = this.textContent?.trim() || '';
-        if (!innerText) return { x: 0, y: 0, width: 60, height: 34 };
-        const lines = innerText.split('\n').filter((l: string) => l.trim());
-        const maxLineLen = Math.max(...lines.map((l: string) => l.trim().length), 1);
+        const lines = extractElementLines(this);
+        if (lines.length === 0) return { x: 0, y: 0, width: 60, height: 34 };
+        const maxLineLen = Math.max(...lines.map((l: string) => l.length), 1);
         const width = Math.max(60, maxLineLen * 8.5 + 32);
         const height = Math.max(34, lines.length * 24 + 16);
         return { x: 0, y: 0, width, height };
       }
 
       if (tagName === 'text' || tagName === 'tspan') {
-        const text = this.textContent || '';
-        const lines = text.split('\n');
+        const lines = extractElementLines(this);
         const maxLen = Math.max(...lines.map((l: string) => l.length), 1);
         const width = Math.max(48, maxLen * 8.5 + 24);
-        const height = Math.max(36, lines.length * 20 + 16);
+        const height = Math.max(36, Math.max(1, lines.length) * 20 + 16);
         return { x: 0, y: 0, width, height };
       }
 
@@ -210,10 +239,9 @@ async function getMermaid() {
         }
         // If rect is not sized yet, estimate from node label text in parent container
         const parent = this.parentElement || this.parentNode;
-        const innerText = parent?.textContent?.trim() || '';
-        if (innerText) {
-          const lines = innerText.split('\n').filter((l: string) => l.trim());
-          const maxLen = Math.max(1, ...lines.map((l: string) => l.trim().length));
+        const lines = extractElementLines(parent);
+        if (lines.length > 0) {
+          const maxLen = Math.max(1, ...lines.map((l: string) => l.length));
           const width = Math.max(60, maxLen * 8.5 + 32);
           const height = Math.max(34, lines.length * 24 + 16);
           return { x: -width / 2, y: -height / 2, width, height };
@@ -234,8 +262,9 @@ async function getMermaid() {
 
   if (!window.SVGElement.prototype.getComputedTextLength) {
     (window.SVGElement.prototype as any).getComputedTextLength = function () {
-      const text = this.textContent || '';
-      return Math.max(48, text.length * 8.5);
+      const lines = extractElementLines(this);
+      const maxLen = Math.max(1, ...lines.map((l: string) => l.length));
+      return Math.max(48, maxLen * 8.5);
     };
   }
 

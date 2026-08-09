@@ -298,6 +298,17 @@ describe('PM Academy Content Compiler Test Suite', () => {
       const svg = await compileMermaidToSvg(src);
       assert.ok(svg.includes('#166534') || svg.includes('#FFFFFF') || svg.includes('#EFF6F2') || svg.includes('#F4F0E6'), 'expected design token colors in svg');
     });
+
+    it('correctly calculates multiline node dimensions and aspect ratio for labels with <br> tags', async () => {
+      const src = `graph BT
+    A[Weakest: Stated Preference, from an<br/>Unrepresentative, Self-selected Sample,<br/>Gathered with Leading Questions] --> B[Strong: Revealed Preference]`;
+      const svg = await compileMermaidToSvg(src);
+      assert.ok(svg.includes('<svg'), 'expected valid svg');
+      const wMatch = svg.match(/width="([\d.]+)"/);
+      assert.ok(wMatch, 'expected width attribute');
+      const width = parseFloat(wMatch![1]);
+      assert.ok(width < 900, `expected node box width to reflect line breaks (< 900px), got ${width}px`);
+    });
   });
 });
 
