@@ -171,9 +171,9 @@ export function NotificationCenterDrawer({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
+      <div className="absolute inset-y-0 right-0 w-full sm:w-auto flex pl-0 sm:pl-10">
         <div
-          className="w-screen max-w-md bg-background border-l border-border shadow-2xl flex flex-col focus:outline-none animate-in slide-in-from-right duration-200 motion-reduce:animate-none"
+          className="w-full sm:w-80 md:w-96 bg-background border-l border-border shadow-2xl flex flex-col focus:outline-none h-full animate-in slide-in-from-right duration-200 motion-reduce:animate-none"
           role="dialog"
           aria-modal="true"
           aria-label="In-App Notification Center"

@@ -55,7 +55,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       </div>
 
       {/* Header: Logo, Issuer Line & Credential ID */}
-      <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-8 md:px-12 pt-8 md:pt-10 pb-6 border-b border-border">
+      <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-8 md:px-12 pt-6 sm:pt-8 md:pt-10 pb-6 border-b border-border">
         <div className="space-y-1.5">
           <StaticBrandLogo size="md" />
           <p className="text-[11px] font-semibold text-muted-foreground tracking-wide">
@@ -74,7 +74,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       </div>
 
       {/* Certificate Body */}
-      <div className="relative text-center px-8 md:px-12 py-8 md:py-10 space-y-6">
+      <div className="relative text-center px-4 sm:px-8 md:px-12 py-6 sm:py-8 md:py-10 space-y-6">
         <div className="space-y-2">
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary block">
             Certificate of Completion
@@ -89,7 +89,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
           </p>
         </div>
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight leading-tight break-words">
           {learnerName}
         </h1>
 
@@ -99,11 +99,11 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         </p>
 
         {/* Level & Milestone Pill */}
-        <div className="inline-flex flex-col items-center gap-2 px-8 md:px-12 py-4 md:py-5 rounded-2xl bg-primary/10 border border-primary/20 shadow-xs">
-          <span className="text-xl md:text-2xl font-bold font-serif text-primary">
+        <div className="inline-flex flex-col items-center gap-2 px-4 sm:px-8 md:px-12 py-3.5 sm:py-4 md:py-5 rounded-2xl bg-primary/10 border border-primary/20 shadow-xs max-w-full">
+          <span className="text-lg sm:text-xl md:text-2xl font-bold font-serif text-primary">
             {levelInfo.title}
           </span>
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-muted-foreground text-center">
             Level {levelInfo.level} · {lessonsCompleted} Lessons Completed · {modulesCompleted}{' '}
             Modules Mastered
           </span>
@@ -111,7 +111,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       </div>
 
       {/* Footer: Date, Signatory & Verification QR */}
-      <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6 px-8 md:px-12 pt-6 pb-8 md:pb-10 border-t border-border">
+      <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6 px-4 sm:px-8 md:px-12 pt-6 pb-6 sm:pb-8 md:pb-10 border-t border-border">
         {/* Date Granted */}
         <div className="text-center sm:text-left space-y-1">
           <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">

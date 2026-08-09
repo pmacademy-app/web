@@ -2,10 +2,14 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { ShieldCheck, Activity, LogOut } from 'lucide-react'
+import { ShieldCheck, Activity, LogOut, Menu } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 
-export function AdminHeader() {
+interface AdminHeaderProps {
+  onToggleMobileMenu?: () => void
+}
+
+export function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps = {}) {
   const router = useRouter()
 
   const handleSignOut = async () => {
@@ -30,8 +34,18 @@ export function AdminHeader() {
   }
 
   return (
-    <header className="h-16 bg-slate-900/80 backdrop-blur border-b border-slate-800 px-6 flex items-center justify-between sticky top-0 z-30">
+    <header className="h-16 bg-slate-900/80 backdrop-blur border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center gap-3">
+        {onToggleMobileMenu && (
+          <button
+            type="button"
+            onClick={onToggleMobileMenu}
+            aria-label="Open admin navigation menu"
+            className="md:hidden p-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition-colors"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+        )}
         <span className="flex h-2 w-2 relative">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>

@@ -33,14 +33,19 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
   { name: 'System', href: '/admin/system', icon: Activity },
 ]
 
-export function AdminSidebar() {
+export interface AdminSidebarProps {
+  mobileOpen?: boolean
+  onMobileClose?: () => void
+}
+
+export function AdminSidebar({ mobileOpen, onMobileClose }: AdminSidebarProps = {}) {
   const pathname = usePathname()
 
-  return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 text-slate-200 flex flex-col h-screen sticky top-0">
+  const content = (
+    <div className="w-64 bg-slate-900 border-r border-slate-800 text-slate-200 flex flex-col h-full">
       {/* Brand Header */}
       <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-        <Link href="/admin" className="flex items-center gap-2 focus:outline-none rounded">
+        <Link href="/admin" onClick={onMobileClose} className="flex items-center gap-2 focus:outline-none rounded">
           <BrandMarkProdily size="sm" badgeText="Admin" onDark />
         </Link>
         <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-slate-400 border border-slate-700">
@@ -60,8 +65,9 @@ export function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onMobileClose}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-colors relative group',
+                'flex items-center gap-3 px-3 py-2.5 text-xs font-medium rounded-lg transition-colors relative group',
                 isActive
                   ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -78,6 +84,7 @@ export function AdminSidebar() {
       <div className="p-3 border-t border-slate-800 bg-slate-950/40">
         <Link
           href="/dashboard"
+          onClick={onMobileClose}
           className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-slate-400 hover:text-white bg-slate-800/40 hover:bg-slate-800 rounded-lg border border-slate-700/50 transition-colors"
         >
           <span className="flex items-center gap-2">
@@ -86,6 +93,29 @@ export function AdminSidebar() {
           </span>
         </Link>
       </div>
-    </aside>
+    </div>
+  )
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-64 h-screen sticky top-0 flex-shrink-0 z-30">
+        {content}
+      </aside>
+
+      {/* Mobile Drawer Overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={onMobileClose}
+            aria-hidden="true"
+          />
+          <div className="relative flex flex-col w-64 max-w-xs h-full bg-slate-900 animate-in slide-in-from-left duration-200">
+            {content}
+          </div>
+        </div>
+      )}
+    </>
   )
 }
