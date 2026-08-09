@@ -132,6 +132,38 @@ async function runSendEmailHookTests() {
     delete process.env.SEND_EMAIL_HOOK_SECRET
   })
 
+  // 5. v1,whsec_... Secret Format Verification
+  await runTest('POST /api/auth/send-email-hook verifies v1,whsec_... Base64 HMAC signatures', async () => {
+    const rawSecret = 'whsec_dGhpcyBpcyBhIHRlc3Qgc2VjcmV0'
+    const fullSecret = `v1,${rawSecret}`
+    process.env.SEND_EMAIL_HOOK_SECRET = fullSecret
+
+    const payloadObj = {
+      user: { id: 'usr-whsec', email: 'whsec@example.com', user_metadata: { full_name: 'Whsec Tester' } },
+      email_data: { email_action_type: 'signup', token_hash: 'th_whsec_123' },
+    }
+    const rawBody = JSON.stringify(payloadObj)
+    const msgId = 'msg_123456789'
+    const msgTimestamp = '1700000000'
+    const payloadToSign = `${msgId}.${msgTimestamp}.${rawBody}`
+    const keyBytes = Buffer.from('dGhpcyBpcyBhIHRlc3Qgc2VjcmV0', 'base64')
+    const computedBase64Sig = crypto.createHmac('sha256', keyBytes).update(payloadToSign).digest('base64')
+
+    const whsecReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
+      method: 'POST',
+      headers: {
+        'webhook-id': msgId,
+        'webhook-timestamp': msgTimestamp,
+        'webhook-signature': `v1,${computedBase64Sig}`,
+      },
+      body: rawBody,
+    })
+    const res = await POST(whsecReq)
+    assert.strictEqual(res.status, 200)
+
+    delete process.env.SEND_EMAIL_HOOK_SECRET
+  })
+
   // 5. Auth Actions (Signup, Password Reset, Email Change, Invite) Execution
   await runTest('POST /api/auth/send-email-hook executes signup & recovery email templates successfully', async () => {
     const signupPayload = {
