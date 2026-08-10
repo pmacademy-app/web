@@ -48,12 +48,12 @@ export function ContextualFeedbackModal({
     if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleDismiss()
+        onClose()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen])
+  }, [isOpen, onClose])
 
   if (!isOpen) return null
 
@@ -136,7 +136,7 @@ export function ContextualFeedbackModal({
           type="button"
           onClick={handleDismiss}
           aria-label="Dismiss feedback prompt"
-          className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-foreground rounded-lg transition-colors cursor-pointer"
+          className="absolute top-3 right-3 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg transition-colors cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -205,7 +205,7 @@ export function ContextualFeedbackModal({
                     key={star}
                     type="button"
                     onClick={() => setRating(star)}
-                    className="p-1 cursor-pointer focus:outline-none"
+                    className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
                   >
                     <Star
                       className={`w-5 h-5 transition-colors ${

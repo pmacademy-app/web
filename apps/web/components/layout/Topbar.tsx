@@ -98,7 +98,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
         <button
           type="button"
           onClick={onMenuOpen}
-          className="lg:hidden p-2 rounded-lg border border-border text-foreground hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          className="lg:hidden w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-border text-foreground hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           aria-label="Open navigation menu"
         >
           <Menu className="w-5 h-5" />
@@ -153,7 +153,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
           onClick={openSearch}
           aria-label="Search curriculum (Ctrl+K)"
           aria-keyshortcuts="Control+k Meta+k"
-          className="flex items-center gap-2 border border-input bg-card hover:bg-secondary/40 text-muted-foreground px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          className="flex items-center gap-2 border border-input bg-card hover:bg-secondary/40 text-muted-foreground px-3.5 py-2.5 min-h-[44px] rounded-lg text-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <Search className="w-4 h-4" />
           <span className="hidden md:inline">Search</span>
@@ -173,7 +173,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
             aria-expanded={dropdownOpen}
             aria-haspopup="menu"
             aria-label="Open user profile menu"
-            className="flex items-center gap-2 p-1 rounded-full border border-border bg-card hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer"
+            className="flex items-center justify-center p-1.5 min-w-[44px] min-h-[44px] rounded-full border border-border bg-card hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer"
           >
             <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
               {userProfile.name ? userProfile.name[0].toUpperCase() : <User className="w-4 h-4" />}

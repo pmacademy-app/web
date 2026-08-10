@@ -80,13 +80,13 @@ function CTAButton({
         href="/signup"
         onClick={handleClick}
         className={cn(
-          'inline-flex items-center font-medium rounded-sm',
+          'inline-flex items-center justify-center font-medium rounded-sm min-h-[44px]',
           'bg-primary text-primary-foreground',
           'hover:opacity-90 active:scale-[0.98]',
           'transition-all duration-[120ms]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-          size === 'md' && 'px-4 py-2 text-body-sm',
-          size === 'sm' && 'px-3 py-1.5 text-body-sm',
+          size === 'md' && 'px-4 py-2.5 text-body-sm',
+          size === 'sm' && 'px-3 py-2 text-body-sm',
         )}
       >
         Start Learning Free
@@ -160,7 +160,7 @@ export function Navbar() {
             onClick={() => setMenuOpen((prev) => !prev)}
             className="
               lg:hidden flex items-center justify-center
-              w-10 h-10 rounded-sm text-foreground
+              w-11 h-11 min-w-[44px] min-h-[44px] rounded-sm text-foreground
               hover:bg-surface-muted
               transition-colors duration-[120ms]
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
@@ -208,8 +208,8 @@ export function Navbar() {
                 aria-label="Close menu"
                 onClick={closeMenu}
                 className="
-                  absolute top-4 right-4
-                  w-10 h-10 flex items-center justify-center rounded-sm
+                  absolute top-3 right-3
+                  w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-sm
                   text-foreground hover:bg-surface-muted
                   transition-colors duration-[120ms]
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus

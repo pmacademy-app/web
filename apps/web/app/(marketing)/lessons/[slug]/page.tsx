@@ -153,7 +153,7 @@ export default async function PublicLessonPage({ params }: PageProps) {
       <div className="space-y-4">
         <Link
           href="/curriculum"
-          className="inline-flex items-center gap-2 px-3 py-1.5 -ml-3 rounded-lg text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+          className="inline-flex items-center gap-2 px-3.5 py-2.5 -ml-3.5 min-h-[44px] rounded-lg text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Curriculum</span>
