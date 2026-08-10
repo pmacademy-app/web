@@ -27,7 +27,6 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
   useEffect(() => {
     // If initial server testimonials were provided, do not re-fetch on client unless empty
     if (initialTestimonials && initialTestimonials.length > 0) {
-      setLoading(false)
       return
     }
 
