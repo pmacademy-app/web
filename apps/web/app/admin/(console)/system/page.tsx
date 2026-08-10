@@ -56,23 +56,36 @@ export default async function AdminSystemPage() {
       {/* System Errors & Alerts Section */}
       <AdminSystemAlertsView />
 
-      {/* External Platform Infrastructure Monitoring */}
+      {/* External Platform Infrastructure Integration Status */}
       <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4 shadow-xl">
         <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          External Platform Integration Status
+          External Platform Integration & Telemetry Status
         </h2>
         <div className="space-y-3 text-xs">
           <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
             <div>
-              <span className="text-slate-300 font-medium block">Resend Transactional Email API</span>
+              <span className="text-slate-300 font-medium block">Supabase PostgreSQL Database</span>
               <span className="text-[11px] text-slate-500">
-                {hasResendKey ? 'RESEND_API_KEY configured' : 'Requires RESEND_API_KEY in environment'}
+                Live SQL ping latency query ({health.databaseLatencyMs} ms)
               </span>
             </div>
             <AdminStatusBadge
-              status={hasResendKey ? 'healthy' : 'archived'}
-              label={hasResendKey ? 'Connected & Ready' : 'Monitoring Not Configured'}
+              status="healthy"
+              label="Connected & Monitored (Live Ping)"
+            />
+          </div>
+
+          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span className="text-slate-300 font-medium block">Resend Transactional Email REST API</span>
+              <span className="text-[11px] text-slate-500">
+                {hasResendKey ? 'RESEND_API_KEY present — Outbound error logger instrumented' : 'Requires RESEND_API_KEY in environment'}
+              </span>
+            </div>
+            <AdminStatusBadge
+              status={hasResendKey ? 'degraded' : 'archived'}
+              label={hasResendKey ? 'API Key Present (No Status Monitored)' : 'Not Configured'}
             />
           </div>
 
@@ -80,12 +93,12 @@ export default async function AdminSystemPage() {
             <div>
               <span className="text-slate-300 font-medium block">GitHub Actions Cron Scheduler</span>
               <span className="text-[11px] text-slate-500">
-                {hasCronSecret ? 'CRON_SECRET authorized' : 'Requires CRON_SECRET in repository secrets'}
+                {hasCronSecret ? 'CRON_SECRET present — Authorization instrumented' : 'Requires CRON_SECRET in repository secrets'}
               </span>
             </div>
             <AdminStatusBadge
-              status={hasCronSecret ? 'healthy' : 'archived'}
-              label={hasCronSecret ? 'Active (Cron)' : 'Integration Unavailable'}
+              status={hasCronSecret ? 'degraded' : 'archived'}
+              label={hasCronSecret ? 'Secret Present (No Telemetry Polled)' : 'Not Configured'}
             />
           </div>
 
@@ -93,12 +106,12 @@ export default async function AdminSystemPage() {
             <div>
               <span className="text-slate-300 font-medium block">Vercel Deployment Platform</span>
               <span className="text-[11px] text-slate-500">
-                {hasVercelToken ? 'Vercel API token active' : 'Requires VERCEL_API_TOKEN for platform logs'}
+                {hasVercelToken ? 'VERCEL_API_TOKEN present' : 'Requires VERCEL_API_TOKEN for Vercel REST telemetry'}
               </span>
             </div>
             <AdminStatusBadge
-              status={hasVercelToken ? 'healthy' : 'archived'}
-              label={hasVercelToken ? 'Connected' : 'Not Configured'}
+              status={hasVercelToken ? 'degraded' : 'archived'}
+              label={hasVercelToken ? 'Token Present (No Logs Polled)' : 'Not Configured'}
             />
           </div>
 
@@ -106,12 +119,12 @@ export default async function AdminSystemPage() {
             <div>
               <span className="text-slate-300 font-medium block">Supabase Management API</span>
               <span className="text-[11px] text-slate-500">
-                {hasSupabaseMgmt ? 'Management Key active' : 'Requires SUPABASE_MANAGEMENT_API_KEY'}
+                {hasSupabaseMgmt ? 'SUPABASE_MANAGEMENT_API_KEY present' : 'Requires SUPABASE_MANAGEMENT_API_KEY'}
               </span>
             </div>
             <AdminStatusBadge
-              status={hasSupabaseMgmt ? 'healthy' : 'archived'}
-              label={hasSupabaseMgmt ? 'Connected' : 'Not Connected'}
+              status={hasSupabaseMgmt ? 'degraded' : 'archived'}
+              label={hasSupabaseMgmt ? 'Key Present (No Management API Polled)' : 'Not Connected'}
             />
           </div>
         </div>

@@ -8,6 +8,13 @@ export async function POST(request: Request) {
   const authHeader = request.headers.get('Authorization')
 
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const { logSystemError } = await import('@/lib/monitoring/logger')
+    void logSystemError({
+      severity: 'warning',
+      category: 'cron',
+      operation: 'cron_weekly_recap_auth',
+      message: 'Unauthorized cron request: CRON_SECRET mismatch on /api/cron/weekly-recap',
+    })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -30,10 +37,20 @@ export async function POST(request: Request) {
   try {
     // Fetch active users with email from users table
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: rawUsers } = await (supabase.from('users' as any) as any)
+    const { data: rawUsers, error: queryErr } = await (supabase.from('users' as any) as any)
       .select('id, email, name, total_xp, current_streak')
       .not('email', 'is', null)
       .limit(100)
+
+    if (queryErr) {
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'error',
+        category: 'cron',
+        operation: 'cron_weekly_recap_query',
+        message: `Database query failure in /api/cron/weekly-recap: ${queryErr.message}`,
+      })
+    }
 
     const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; total_xp?: number; current_streak?: number }>
 
@@ -64,6 +81,13 @@ export async function POST(request: Request) {
     }
   } catch (err) {
     console.error('[cron/weekly-recap] Failed to process weekly recaps:', err)
+    const { logSystemError } = await import('@/lib/monitoring/logger')
+    void logSystemError({
+      severity: 'error',
+      category: 'cron',
+      operation: 'cron_weekly_recap_exception',
+      message: `Unhandled exception in /api/cron/weekly-recap: ${err instanceof Error ? err.message : String(err)}`,
+    })
   }
 
   return NextResponse.json({

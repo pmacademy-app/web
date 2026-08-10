@@ -6,6 +6,13 @@ export async function POST(request: Request) {
   const authHeader = request.headers.get('Authorization')
 
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const { logSystemError } = await import('@/lib/monitoring/logger')
+    void logSystemError({
+      severity: 'warning',
+      category: 'cron',
+      operation: 'cron_process_queue_auth',
+      message: 'Unauthorized cron request: CRON_SECRET mismatch on /api/cron/process-email-queue',
+    })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -18,6 +25,13 @@ export async function POST(request: Request) {
     })
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : 'Cron execution failed'
+    const { logSystemError } = await import('@/lib/monitoring/logger')
+    void logSystemError({
+      severity: 'error',
+      category: 'cron',
+      operation: 'cron_process_queue_exception',
+      message: `Unhandled exception in /api/cron/process-email-queue: ${errorMsg}`,
+    })
     return NextResponse.json({ success: false, error: errorMsg }, { status: 500 })
   }
 }
