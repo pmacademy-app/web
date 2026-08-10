@@ -2,8 +2,12 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Page Not Found',
+  title: 'Page Not Found | Prodily PM Academy',
   description: 'This page is not in the curriculum.',
+  robots: {
+    index: false,
+    follow: true,
+  },
 }
 
 /**

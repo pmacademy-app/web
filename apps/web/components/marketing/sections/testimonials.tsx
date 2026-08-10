@@ -6,7 +6,7 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { Quote, Star, MessageSquarePlus } from 'lucide-react'
 import { ContextualFeedbackModal } from '@/components/feedback/ContextualFeedbackModal'
 
-interface PublishedTestimonial {
+export interface PublishedTestimonial {
   id: string
   authorName: string
   role?: string
@@ -14,13 +14,23 @@ interface PublishedTestimonial {
   createdAt: string
 }
 
-export function TestimonialsSection() {
+interface TestimonialsSectionProps {
+  initialTestimonials?: PublishedTestimonial[]
+}
+
+export function TestimonialsSection({ initialTestimonials }: TestimonialsSectionProps) {
   const prefersReducedMotion = useReducedMotion()
-  const [testimonials, setTestimonials] = useState<PublishedTestimonial[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [testimonials, setTestimonials] = useState<PublishedTestimonial[]>(initialTestimonials || [])
+  const [loading, setLoading] = useState<boolean>(!initialTestimonials)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
+    // If initial server testimonials were provided, do not re-fetch on client unless empty
+    if (initialTestimonials && initialTestimonials.length > 0) {
+      setLoading(false)
+      return
+    }
+
     async function loadTestimonials() {
       setLoading(true)
       try {
@@ -38,7 +48,7 @@ export function TestimonialsSection() {
       }
     }
     void loadTestimonials()
-  }, [])
+  }, [initialTestimonials])
 
   const hasLiveTestimonials = testimonials.length > 0
 
