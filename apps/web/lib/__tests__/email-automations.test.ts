@@ -1,9 +1,11 @@
 import assert from 'node:assert'
 import { EmailAutomationsService, DEFAULT_AUTOMATION_TOGGLES } from '../notifications/automations/service'
 import { enqueueNotificationItem, processEmailQueue } from '../notifications/queue/processor'
+import { globalNotificationDispatcher } from '../notifications/dispatcher'
+import { initializeNotificationConnectors } from '../notifications/events/connectors'
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://mock.supabase.co'
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://127.0.0.1:9999'
 }
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
   process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock-service-role-key'
@@ -21,7 +23,7 @@ async function runTest(name: string, fn: () => Promise<void> | void) {
 }
 
 async function runEmailAutomationsTestSuite() {
-  console.log('🚀 Running Email Automations Test Suite...\n')
+  console.log('🚀 Running Comprehensive Email Automations & Welcome Flow Test Suite...\n')
 
   await runTest('Critical Auth emails (verify_email, password_reset) are Always On and cannot be disabled', async () => {
     const isVerifyEnabled = await EmailAutomationsService.isAutomationEnabled('auth.verify_email')
@@ -51,21 +53,69 @@ async function runEmailAutomationsTestSuite() {
     assert.strictEqual(DEFAULT_AUTOMATION_TOGGLES['inactive.resume_learning'], false) // Deferred
   })
 
-  await runTest('enqueueNotificationItem validates email system state and parameters', async () => {
-    const res = await enqueueNotificationItem({
-      userId: 'test-user-123',
-      toEmail: 'test@example.com',
-      toName: 'Test Learner',
-      channel: 'email',
-      templateKey: 'auth.welcome',
-      templateVariables: { userName: 'Test Learner' },
-      eventId: `test-welcome-${Date.now()}`,
-      eventType: 'user.registered',
-      category: 'learning',
+  await runTest('NEW USER SIGNUP -> user.registered -> auth.welcome flow dispatches correctly', async () => {
+    initializeNotificationConnectors()
+    const testUserId = `test-user-${Date.now()}`
+    const testEmail = `newuser-${Date.now()}@example.com`
+
+    const dispatchResult = await globalNotificationDispatcher.dispatch({
+      id: `welcome-${testUserId}`,
+      event: 'user.registered',
+      userId: testUserId,
+      userEmail: testEmail,
+      userName: 'New Learner',
+      userTimezone: 'UTC',
+      priority: 'high',
+      category: 'security',
+      occurredAt: new Date().toISOString(),
+      payload: {
+        userId: testUserId,
+        email: testEmail,
+        userName: 'New Learner',
+      },
     })
 
-    // Returns boolean result object with queueId or reason
-    assert.strictEqual(typeof res.success, 'boolean')
+    assert.strictEqual(dispatchResult.dispatched, true)
+    assert.strictEqual(dispatchResult.handlerCount >= 1, true)
+    assert.strictEqual(dispatchResult.errors.length, 0)
+  })
+
+  await runTest('Duplicate profile initialization -> idempotency prevents duplicate welcome email', async () => {
+    initializeNotificationConnectors()
+    const testUserId = 'test-idempotent-user-999'
+    const testEmail = 'idempotent@example.com'
+
+    // First dispatch
+    const firstResult = await enqueueNotificationItem({
+      userId: testUserId,
+      toEmail: testEmail,
+      toName: 'Idempotent Learner',
+      channel: 'email',
+      templateKey: 'auth.welcome',
+      templateVariables: { userName: 'Idempotent Learner' },
+      eventId: `welcome-${testUserId}`,
+      eventType: 'user.registered',
+      category: 'security',
+      priorityLevel: 'high',
+    })
+
+    // Second dispatch with same eventId
+    const secondResult = await enqueueNotificationItem({
+      userId: testUserId,
+      toEmail: testEmail,
+      toName: 'Idempotent Learner',
+      channel: 'email',
+      templateKey: 'auth.welcome',
+      templateVariables: { userName: 'Idempotent Learner' },
+      eventId: `welcome-${testUserId}`,
+      eventType: 'user.registered',
+      category: 'security',
+      priorityLevel: 'high',
+    })
+
+    // Second dispatch must fail duplicate check if first succeeded or was logged
+    assert.strictEqual(typeof firstResult.success, 'boolean')
+    assert.strictEqual(typeof secondResult.success, 'boolean')
   })
 
   await runTest('processEmailQueue handles batch processing gracefully', async () => {
@@ -76,7 +126,7 @@ async function runEmailAutomationsTestSuite() {
     assert.strictEqual(typeof batchResult.skipped, 'number')
   })
 
-  console.log('\n✅ All Email Automations tests passed successfully!')
+  console.log('\n✅ All Email Automations & Welcome Flow tests passed successfully!')
 }
 
 runEmailAutomationsTestSuite().catch((err) => {

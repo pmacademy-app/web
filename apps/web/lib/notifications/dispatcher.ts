@@ -71,7 +71,17 @@ export class NotificationEventDispatcher {
       ] }
     }
 
-    const eventHandlers = this.handlers.get(event.event)
+    let eventHandlers = this.handlers.get(event.event)
+    if (!eventHandlers || eventHandlers.size === 0) {
+      try {
+        const { initializeNotificationConnectors } = await import('./events/connectors')
+        initializeNotificationConnectors()
+        eventHandlers = this.handlers.get(event.event)
+      } catch {
+        // Fall through
+      }
+    }
+
     if (!eventHandlers || eventHandlers.size === 0) {
       return { dispatched: true, handlerCount: 0, errors: [] }
     }
