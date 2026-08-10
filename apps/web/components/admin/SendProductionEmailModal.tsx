@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Send, AlertTriangle, CheckCircle2, X, ShieldAlert, Eye } from 'lucide-react'
+import { Send, AlertTriangle, CheckCircle2, X, ShieldAlert } from 'lucide-react'
 
 export interface TargetUser {
   id: string
@@ -38,7 +38,6 @@ export function SendProductionEmailModal({
   const [confirmed, setConfirmed] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [resultMessage, setResultMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-  const [showPreview, setShowPreview] = useState<boolean>(false)
 
   if (!isOpen) return null
 

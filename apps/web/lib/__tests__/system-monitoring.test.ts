@@ -9,7 +9,7 @@ async function runSystemMonitoringTests() {
   console.log('🧪 Running System Monitoring & Error Instrumentation Unit Test Suite...\n')
 
   // 1. Verify logSystemError sanitizes sensitive Bearer tokens and whsec_ secrets
-  const sanitizedId = await logSystemError({
+  void await logSystemError({
     severity: 'error',
     category: 'system',
     operation: 'unit_test_sanitization',

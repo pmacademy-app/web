@@ -26,7 +26,7 @@ export function AdminSystemAlertsView() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [unackCriticalCount, setUnackCriticalCount] = useState<number>(0)
 
-  const loadAlerts = async () => {
+  const loadAlerts = React.useCallback(async () => {
     setLoading(true)
     try {
       const query = new URLSearchParams({
@@ -46,10 +46,36 @@ export function AdminSystemAlertsView() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [statusFilter, severityFilter, categoryFilter])
 
   useEffect(() => {
-    void loadAlerts()
+    let isMounted = true
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+        const query = new URLSearchParams({
+          status: statusFilter,
+          severity: severityFilter,
+          category: categoryFilter,
+        })
+        const res = await fetch(`/api/admin/system/alerts?${query.toString()}`)
+        const data = await res.json()
+
+        if (isMounted && data.success) {
+          setAlerts(data.alerts || [])
+          setUnackCriticalCount(data.unacknowledgedCriticalCount || 0)
+        }
+      } catch (err) {
+        console.error('[AdminSystemAlertsView] Error loading alerts:', err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    void fetchData()
+    return () => {
+      isMounted = false
+    }
   }, [statusFilter, severityFilter, categoryFilter])
 
   const handleUpdateStatus = async (alertId: string, newStatus: 'acknowledged' | 'resolved') => {
