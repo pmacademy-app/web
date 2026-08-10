@@ -195,60 +195,72 @@ export class FeedbackAdminService {
    * Fetches published testimonials for public Marketing site (GET /api/testimonials).
    */
   public static async getPublishedTestimonials(): Promise<Array<{ id: string; authorName: string; role: string; content: string; createdAt: string }>> {
-    const fetcher = unstable_cache(
-      async () => {
-        const supabase = createServerSupabaseClient()
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return []
+    }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data, error } = await (supabase.from('testimonials' as any) as any)
-          .select('id, user_id, author_name, author_role, headline, rating, content, created_at')
-          .eq('is_published', true)
-          .eq('status', 'approved')
-          .order('created_at', { ascending: false })
+    try {
+      const fetcher = unstable_cache(
+        async () => {
+          try {
+            const supabase = createServerSupabaseClient()
 
-        if (error || !data) return []
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data, error } = await (supabase.from('testimonials' as any) as any)
+              .select('id, user_id, author_name, author_role, headline, rating, content, created_at')
+              .eq('is_published', true)
+              .eq('status', 'approved')
+              .order('created_at', { ascending: false })
 
-        const rows = data as Array<{
-          id: string
-          user_id: string | null
-          author_name?: string | null
-          author_role?: string | null
-          headline?: string | null
-          rating?: number | null
-          content: string
-          created_at: string
-        }>
+            if (error || !data) return []
 
-        const userIds = rows.map((t) => t.user_id).filter(Boolean) as string[]
-        const userMap = new Map<string, string>()
+            const rows = data as Array<{
+              id: string
+              user_id: string | null
+              author_name?: string | null
+              author_role?: string | null
+              headline?: string | null
+              rating?: number | null
+              content: string
+              created_at: string
+            }>
 
-        if (userIds.length > 0) {
-          const { data: usersData } = await supabase
-            .from('users')
-            .select('id, full_name, username, email')
-            .in('id', userIds)
+            const userIds = rows.map((t) => t.user_id).filter(Boolean) as string[]
+            const userMap = new Map<string, string>()
 
-          if (usersData) {
-            const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
-            uList.forEach((u) => {
-              userMap.set(u.id, u.full_name || u.username || 'Learner')
-            })
+            if (userIds.length > 0) {
+              const { data: usersData } = await supabase
+                .from('users')
+                .select('id, full_name, username, email')
+                .in('id', userIds)
+
+              if (usersData) {
+                const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
+                uList.forEach((u) => {
+                  userMap.set(u.id, u.full_name || u.username || 'Learner')
+                })
+              }
+            }
+
+            return rows.map((t) => ({
+              id: t.id,
+              authorName: t.author_name || (t.user_id ? userMap.get(t.user_id) : null) || 'PM Academy Learner',
+              role: t.author_role || 'Verified PM Academy Learner',
+              content: t.content,
+              createdAt: t.created_at,
+            }))
+          } catch {
+            return []
           }
-        }
+        },
+        ['published-testimonials-v1'],
+        { revalidate: 60, tags: ['testimonials'] }
+      )
 
-        return rows.map((t) => ({
-          id: t.id,
-          authorName: t.author_name || (t.user_id ? userMap.get(t.user_id) : null) || 'PM Academy Learner',
-          role: t.author_role || 'Verified PM Academy Learner',
-          content: t.content,
-          createdAt: t.created_at,
-        }))
-      },
-      ['published-testimonials-v1'],
-      { revalidate: 60, tags: ['testimonials'] }
-    )
-
-    return fetcher()
+      return await fetcher()
+    } catch {
+      return []
+    }
   }
 
   /**

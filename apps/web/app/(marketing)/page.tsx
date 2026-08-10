@@ -19,7 +19,12 @@ export const revalidate = 60
  * Server-renders published testimonials into HTML for search engine indexing.
  */
 export default async function MarketingPage() {
-  const publishedTestimonials = await FeedbackAdminService.getPublishedTestimonials()
+  let publishedTestimonials: Awaited<ReturnType<typeof FeedbackAdminService.getPublishedTestimonials>> = []
+  try {
+    publishedTestimonials = await FeedbackAdminService.getPublishedTestimonials()
+  } catch {
+    publishedTestimonials = []
+  }
 
   return (
     <>
