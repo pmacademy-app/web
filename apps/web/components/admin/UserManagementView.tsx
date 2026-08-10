@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Users, Flame, Zap } from 'lucide-react'
 import { AdminPageHeader } from './AdminPageHeader'
 import { AdminDataTable, Column } from './AdminDataTable'
-import { UserRoleToggle } from './UserRoleToggle'
 import { UserDetailDrawer } from './UserDetailDrawer'
 import type { AdminUserOverview, AdminUserDetail } from '@/lib/admin/types'
 
@@ -47,11 +46,9 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
     {
       header: 'Role',
       cell: (user) => (
-        <UserRoleToggle
-          userId={user.id}
-          initialIsAdmin={user.isAdmin}
-          userEmail={user.email}
-        />
+        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${user.isAdmin ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
+          {user.isAdmin ? 'Admin' : 'Learner'}
+        </span>
       ),
     },
     {

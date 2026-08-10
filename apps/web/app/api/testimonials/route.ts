@@ -27,16 +27,21 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { content, rating, headline, authorRole, allowPublicFeature } = body
+    const { content, rating, headline, authorName, authorRole, allowPublicFeature } = body
 
     if (!allowPublicFeature) {
       return NextResponse.json({ error: 'Explicit opt-in permission is required for public testimonial submissions.' }, { status: 400 })
+    }
+
+    if (!authorName || typeof authorName !== 'string' || !authorName.trim()) {
+      return NextResponse.json({ error: 'Your name is required for public review submissions.' }, { status: 400 })
     }
 
     if (!content || typeof content !== 'string' || !content.trim()) {
       return NextResponse.json({ error: 'Review content is required.' }, { status: 400 })
     }
 
+    const cleanAuthorName = authorName.trim().substring(0, 100)
     const cleanContent = content.trim().substring(0, 1500)
     const cleanRating = typeof rating === 'number' && rating >= 1 && rating <= 5 ? rating : 5
     const cleanHeadline = typeof headline === 'string' ? headline.trim().substring(0, 150) : null
@@ -49,6 +54,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         source_event: 'user_submitted',
+        author_name: cleanAuthorName,
         content: cleanContent,
         rating: cleanRating,
         headline: cleanHeadline,

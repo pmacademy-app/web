@@ -16,6 +16,7 @@ export default function robots(): MetadataRoute.Robots {
           '/terms',
           '/curriculum',
           '/lessons/',
+          '/p/',
         ],
         disallow: [
           '/dashboard',
@@ -27,7 +28,6 @@ export default function robots(): MetadataRoute.Robots {
           '/onboarding',
           '/capstones',
           '/badges',
-          '/p/',
           '/api/',
           '/academy/',
         ],

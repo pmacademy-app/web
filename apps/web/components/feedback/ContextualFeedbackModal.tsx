@@ -23,6 +23,7 @@ export function ContextualFeedbackModal({
   const [feedbackType, setFeedbackType] = useState<'private' | 'public'>('private')
   const [content, setContent] = useState('')
   const [rating, setRating] = useState(5)
+  const [authorName, setAuthorName] = useState('')
   const [headline, setHeadline] = useState('')
   const [authorRole, setAuthorRole] = useState('')
   const [allowPublicFeature, setAllowPublicFeature] = useState(false)
@@ -52,6 +53,12 @@ export function ContextualFeedbackModal({
 
     try {
       if (feedbackType === 'public') {
+        if (!authorName || !authorName.trim()) {
+          setError('Please provide your name for the public review.')
+          setLoading(false)
+          return
+        }
+
         if (!allowPublicFeature) {
           setError('Please check the opt-in box to submit a public homepage review.')
           setLoading(false)
@@ -62,6 +69,7 @@ export function ContextualFeedbackModal({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            authorName: authorName.trim(),
             content,
             rating,
             headline,
@@ -200,6 +208,21 @@ export function ContextualFeedbackModal({
 
             {feedbackType === 'public' && (
               <>
+                <div className="space-y-1">
+                  <label htmlFor="review-name" className="text-xs font-bold text-foreground">
+                    Your Full Name <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    id="review-name"
+                    type="text"
+                    required={feedbackType === 'public'}
+                    value={authorName}
+                    onChange={(e) => setAuthorName(e.target.value)}
+                    placeholder="e.g. Alex Rivera"
+                    className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
                 <div className="space-y-1">
                   <label htmlFor="review-headline" className="text-xs font-bold text-foreground">
                     Headline
