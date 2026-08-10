@@ -7,7 +7,7 @@ import { Mail, Heart, ArrowRight } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Contact Us — Prodily PM Academy',
+  title: 'Contact Us',
   description: 'Get in touch with the Prodily PM Academy team for support, feedback, or inquiries.',
   openGraph: {
     title: 'Contact — Prodily PM Academy',

@@ -116,15 +116,49 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
               Write First Review
             </button>
           </div>
+        ) : testimonials.length < 3 ? (
+          /* Static Centered Display for Early Reviews (No Duplication) */
+          <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto py-4">
+            {testimonials.map((item) => (
+              <div
+                key={item.id}
+                className="w-full sm:w-96 p-6 rounded-2xl border border-border bg-card shadow-xs flex flex-col justify-between space-y-4 hover:border-primary/40 transition-all"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Quote className="w-6 h-6 text-primary/40" />
+                    <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      Verified Review
+                    </span>
+                  </div>
+                  <p className="text-body-sm text-foreground leading-relaxed font-sans">
+                    &ldquo;{item.content}&rdquo;
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-border/50 flex items-center justify-between text-xs">
+                  <div className="space-y-0.5">
+                    <p className="font-bold text-foreground">{item.authorName}</p>
+                    <p className="text-[11px] text-primary">{item.role || 'Verified PM Academy Learner'}</p>
+                  </div>
+                  {item.createdAt && (
+                    <span className="text-[10px] text-muted-foreground">
+                      {new Date(item.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC' })}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
-          /* Continuous Right-to-Left Review Stream Carousel */
+          /* Continuous Right-to-Left Review Stream Marquee for 3+ Reviews */
           <div className="relative w-full overflow-hidden group py-4">
             {/* Left & Right Gradient Fades */}
             <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-surface-muted to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-surface-muted to-transparent z-10 pointer-events-none" />
 
             <div className="flex gap-6 w-max animate-marquee group-hover:[animation-play-state:paused] motion-reduce:animate-none">
-              {carouselItems.map((item, idx) => (
+              {[...testimonials, ...testimonials, ...testimonials].map((item, idx) => (
                 <div
                   key={`${item.id}-${idx}`}
                   className="w-80 sm:w-96 p-6 rounded-2xl border border-border bg-card shadow-xs flex flex-col justify-between space-y-4 shrink-0 hover:border-primary/40 transition-all"

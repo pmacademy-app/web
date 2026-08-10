@@ -37,7 +37,7 @@ export function FinalCTASection() {
 
           <div className="w-full bg-surface border border-border rounded-xl p-8 shadow-xs flex flex-col items-center gap-4">
             <Link
-              href="/academy"
+              href="/signup"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground font-bold text-sm rounded-lg shadow-sm hover:opacity-90 transition-all"
             >
               <span>Start Learning Free Now</span>

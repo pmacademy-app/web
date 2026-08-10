@@ -5,9 +5,11 @@ import { BlockProps } from '../../renderer/registry';
 // ─── Heading ──────────────────────────────────────────────────────────────────
 
 function HeadingBlock({ level, text }: { level: number; text: string }) {
+  // Page header already renders the primary <h1> title.
+  // Demote level 1 headings inside the content body to <h2> to enforce a single <h1> per page.
+  const effectiveLevel = level === 1 ? 2 : level;
   const className = (() => {
-    switch (level) {
-      case 1: return 'text-3xl md:text-4xl font-bold font-serif text-foreground mt-10 mb-4 leading-tight';
+    switch (effectiveLevel) {
       case 2: return 'text-2xl font-bold font-serif text-foreground mt-8 mb-3 leading-snug';
       case 3: return 'text-xl font-bold font-serif text-foreground mt-7 mb-2.5 leading-snug';
       case 4: return 'text-lg font-bold font-serif text-foreground mt-5 mb-2';
@@ -18,7 +20,7 @@ function HeadingBlock({ level, text }: { level: number; text: string }) {
   })();
 
   // Render heading with MarkdownRenderer to support bold/italic in headings
-  const headingMarkdown = '#'.repeat(level) + ' ' + text;
+  const headingMarkdown = '#'.repeat(effectiveLevel) + ' ' + text;
   return <MarkdownRenderer content={headingMarkdown} className={className} />;
 }
 
