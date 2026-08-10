@@ -24,10 +24,10 @@ export const WeeklyRecap: React.FC<WeeklyRecapProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText={`Your weekly PM Academy recap: ${lessonsCompletedThisWeek} lessons, ${xpEarnedThisWeek} XP!`} unsubscribeToken={unsubscribeToken}>
-      <h2 style={{ fontSize: '20px', color: '#1a1a1a', marginTop: 0 }}>Your Weekly Progress Recap 📊</h2>
-      <p style={{ fontSize: '14px', color: '#525252' }}>
-        Hi {userName}, here is a look at your PM learning progress over the past week:
+    <EmailWrapper previewText={`Your weekly Prodily PM Academy recap: ${lessonsCompletedThisWeek} lessons, ${xpEarnedThisWeek} XP!`} unsubscribeToken={unsubscribeToken}>
+      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Your Weekly Progress Recap 📊</h2>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
+        Hi {userName}, here is a look at your learning progress in Prodily PM Academy over the past week:
       </p>
 
       <table role="presentation" width="100%" border={0} cellPadding={0} cellSpacing={0}>
@@ -49,7 +49,7 @@ export const WeeklyRecap: React.FC<WeeklyRecapProps> = ({
         </tr>
       </table>
 
-      <p style={{ fontSize: '14px', color: '#525252', marginTop: '16px' }}>
+      <p style={{ fontSize: '14px', color: '#70685A', marginTop: '16px' }}>
         Consistency is the secret to mastering Product Management. Keep building your daily learning habit!
       </p>
 

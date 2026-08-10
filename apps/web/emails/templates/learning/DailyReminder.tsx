@@ -20,10 +20,10 @@ export const DailyReminder: React.FC<DailyReminderProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText={`Daily Reminder: Keep your ${currentStreak}-day streak alive!`} unsubscribeToken={unsubscribeToken}>
-      <h2 style={{ fontSize: '20px', color: '#1a1a1a', marginTop: 0 }}>Daily Learning &amp; Review Reminder 🔥</h2>
-      <p style={{ fontSize: '14px', color: '#525252' }}>
-        Hi {userName}, your daily flashcard reviews and learning streak are waiting for you today.
+    <EmailWrapper previewText={`Daily Reminder: Keep your ${currentStreak}-day streak alive on Prodily PM Academy!`} unsubscribeToken={unsubscribeToken}>
+      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Daily Learning &amp; Review Reminder 🔥</h2>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
+        Hi {userName}, your daily flashcard reviews and learning streak are waiting for you today in Prodily PM Academy.
       </p>
 
       <table role="presentation" width="100%" border={0} cellPadding={0} cellSpacing={0}>
@@ -37,8 +37,8 @@ export const DailyReminder: React.FC<DailyReminderProps> = ({
         </tr>
       </table>
 
-      <p style={{ fontSize: '14px', color: '#525252', marginTop: '16px' }}>
-        Spend just 5 minutes today to solidify your product management knowledge and preserve your streak!
+      <p style={{ fontSize: '14px', color: '#70685A', marginTop: '16px' }}>
+        Spend just 5 minutes today to solidify your product management knowledge and preserve your learning streak!
       </p>
 
       <Button href={`${appUrl}/review`}>Start Daily Review</Button>

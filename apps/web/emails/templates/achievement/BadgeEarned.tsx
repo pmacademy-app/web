@@ -23,14 +23,14 @@ export const BadgeEarnedEmail: React.FC<BadgeEarnedEmailProps> = ({
 }) => {
   return (
     <EmailWrapper previewText={`Congratulations! You earned the "${badgeName}" badge.`} unsubscribeToken={unsubscribeToken}>
-      <h2 style={{ fontSize: '20px', color: '#1a1a1a', marginTop: 0 }}>New Badge Unlocked! 🎉</h2>
-      <p style={{ fontSize: '14px', color: '#525252' }}>
-        Awesome work, {userName}! You&apos;ve reached a new achievement milestone in PM Academy.
+      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>New Badge Unlocked! 🎉</h2>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
+        Awesome work, {userName}! You&apos;ve reached a new achievement milestone in Prodily PM Academy.
       </p>
 
       <BadgeDisplay badgeName={badgeName} badgeDescription={badgeDescription} badgeIcon={badgeIcon} />
 
-      <p style={{ fontSize: '14px', color: '#525252' }}>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
         Your new badge is now visible on your public portfolio and achievement gallery.
       </p>
 

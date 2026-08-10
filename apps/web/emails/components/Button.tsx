@@ -15,16 +15,16 @@ export const Button: React.FC<ButtonProps> = ({ href, children, variant = 'prima
         href={href}
         style={{
           display: 'inline-block',
-          backgroundColor: isPrimary ? '#d97706' : '#f3f4f6',
-          color: isPrimary ? '#ffffff' : '#1f2937',
+          backgroundColor: isPrimary ? '#1F6B4E' : '#F2EFE7',
+          color: isPrimary ? '#FFFFFF' : '#171A17',
           padding: '12px 24px',
           borderRadius: '8px',
           textDecoration: 'none',
-          fontWeight: 600,
+          fontWeight: 700,
           fontSize: '14px',
           textAlign: 'center',
-          boxShadow: isPrimary ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-          border: isPrimary ? 'none' : '1px solid #e5e7eb',
+          boxShadow: isPrimary ? '0 2px 4px rgba(31, 107, 78, 0.2)' : 'none',
+          border: isPrimary ? 'none' : '1px solid #DED8CB',
         }}
       >
         {children}
