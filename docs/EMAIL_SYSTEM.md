@@ -1,7 +1,7 @@
 # Email Infrastructure & Delivery Pipeline — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
+**Current Baseline HEAD:** `7158925`  
 **Last Updated:** August 10, 2026  
 
 ---
@@ -19,7 +19,7 @@ Outbound email delivery is split into distinct, specialized execution paths:
 | **Welcome Email** | Triggered on new signup | `/api/auth/send-email-hook` | YES (`email_queue`) | YES | Optional Automation | 🟢 Verified in Production |
 | **Daily Reminders** | GitHub Actions Cron (09:00 UTC) | `/api/cron/daily-reminder` | YES (`email_queue`) | YES | Optional Automation | 🟡 Implemented — Verification Required |
 | **Weekly Recaps** | GitHub Actions Cron (Mondays) | `/api/cron/weekly-recap` | YES (`email_queue`) | YES | Optional Automation | 🟡 Implemented — Verification Required |
-| **Admin Production Send** | Admin click in `/admin/emails` | `/api/admin/emails/production-send` | YES (`email_queue`) | YES (if non-critical) | Optional Automation | 🟢 Verified in Production |
+| **Admin Production Send** | Admin click in `/admin/emails` | `/api/admin/emails/production-send` | YES (`email_queue`) | YES (if non-critical) | Optional Automation | 🟠 Known Production Failure (`ISSUE-05`) |
 | **Admin Test Send** | Admin click "Send Test Email" | `/api/admin/emails/test-send` | NO (Direct send) | NO | Test / Diagnostic | 🟢 Verified in Production |
 | **Contact Form Inquiry Forwarding**| User submit `/contact` | `/api/contact` | NO (Direct send) | NO | Administrative Inquiry | 🟢 Verified in Production |
 | **Webhook Bounce Alert** | Resend bounce event webhook | `/api/email/webhooks` | NO (Direct alert send) | NO | System Alert | 🟡 Implemented — Verification Required |
@@ -57,17 +57,10 @@ Optional transactional emails are processed through PostgreSQL queue tables (`pu
 
 ---
 
-## 4. Email Templates
+## 4. Known Email System Production Failures
 
-Templates are authored as React components under `apps/web/emails/templates/`:
-
-1. `auth.verify_email`: Branded Prodily verification email with CTA button.
-2. `auth.password_reset`: Branded password reset link email.
-3. `auth.welcome`: Welcome onboarding email for new learners.
-4. `learning.daily_reminder`: Daily study reminder with streak count.
-5. `learning.weekly_recap`: Weekly summary of lessons completed and XP earned.
-6. `learning.module_complete`: Module completion congratulatory email.
-7. `achievement.badge_earned`: Badge unlock notification.
-8. `achievement.level_up`: Level up congratulatory email.
-9. `achievement.certificate_earned`: Certificate issue notification.
-10. `achievement.portfolio_published`: Portfolio publication receipt.
+### ISSUE-05: Admin Production Send Zero-Processed Delivery Gap
+- **Status**: 🟠 Partially Verified / Known Production Failure
+- **Observed Production Evidence**: Sending optional templates (such as `auth.welcome`) from `/api/admin/emails/production-send` resulted in `processResult: { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }` and `queueId: 'unknown'`.
+- **Impact**: Zero emails were submitted to Resend, yet `public.admin_audit_logs` recorded the action as successful.
+- **Cross-Reference**: Detailed investigation scope documented in `docs/ISSUES_KNOWN.md#issue-05-admin-production-email-zero-processed-delivery-gap`.
