@@ -128,6 +128,7 @@ export class AdminConsoleService {
       total_xp?: number
       level?: number
       current_streak?: number
+      is_portfolio_public?: boolean
       created_at: string
       updated_at?: string
     }>
@@ -142,6 +143,7 @@ export class AdminConsoleService {
       totalXp: u.total_xp || 0,
       level: u.level || 1,
       streakDays: u.current_streak || 0,
+      hasPublicPortfolio: Boolean(u.is_portfolio_public),
       createdAt: u.created_at,
       lastActiveAt: u.updated_at || null,
     }))

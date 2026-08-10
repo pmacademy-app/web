@@ -26,6 +26,7 @@ export interface AdminUserOverview {
   totalXp: number
   level: number
   streakDays: number
+  hasPublicPortfolio?: boolean
   createdAt: string
   lastActiveAt: string | null
 }

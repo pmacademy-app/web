@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Users, Flame, Zap } from 'lucide-react'
+import { Users, Flame, Zap, ExternalLink } from 'lucide-react'
 import { AdminPageHeader } from './AdminPageHeader'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { UserDetailDrawer } from './UserDetailDrawer'
@@ -87,12 +87,26 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
       headerClassName: 'text-right',
       className: 'text-right',
       cell: (user) => (
-        <button
-          onClick={() => handleInspectUser(user.id)}
-          className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold border border-slate-700 transition-colors"
-        >
-          Inspect Profile
-        </button>
+        <div className="flex items-center justify-end gap-2">
+          {user.hasPublicPortfolio && user.username ? (
+            <a
+              href={`/p/${user.username}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[11px] font-semibold border border-emerald-500/20 transition-colors"
+              title={`View ${user.fullName}'s public portfolio in a new tab`}
+            >
+              <ExternalLink className="w-3 h-3" />
+              <span>View Portfolio</span>
+            </a>
+          ) : null}
+          <button
+            onClick={() => handleInspectUser(user.id)}
+            className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold border border-slate-700 transition-colors"
+          >
+            Inspect Profile
+          </button>
+        </div>
       ),
     },
   ]
