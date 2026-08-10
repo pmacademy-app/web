@@ -23,7 +23,9 @@ export async function ensureUserProfile(
     .maybeSingle()
 
   if (existing) {
-    return existing
+    const profile = existing as unknown as UserProfile
+    await dispatchWelcomeEmailIfNeeded(supabase, user, profile.name, profile.timezone)
+    return profile
   }
 
   const name = extra?.name ?? user.user_metadata?.full_name ?? user.user_metadata?.name ?? null
@@ -52,30 +54,47 @@ export async function ensureUserProfile(
     return null
   }
 
-  // Exactly-once welcome email dispatch on new user creation
+  await dispatchWelcomeEmailIfNeeded(supabase, user, name, timezone)
+  return inserted
+}
+
+/**
+ * Dispatches welcome email for newly registered or newly verified user.
+ * Idempotency key `welcome-${user.id}` guarantees exactly-once queueing.
+ */
+async function dispatchWelcomeEmailIfNeeded(
+  supabase: SupabaseClient<Database>,
+  user: User,
+  name?: string | null,
+  timezone?: string
+): Promise<void> {
+  const email = user.email
+  if (!email) return
+
+  const userName = name || user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0] || 'Learner'
+  const userTz = timezone || 'UTC'
+
   try {
     initializeNotificationConnectors()
     await globalNotificationDispatcher.dispatch({
       id: `welcome-${user.id}`,
       event: 'user.registered',
       userId: user.id,
-      userEmail: user.email ?? '',
-      userName: name ?? user.email?.split('@')[0] ?? 'Learner',
-      userTimezone: timezone,
+      userEmail: email,
+      userName,
+      userTimezone: userTz,
       priority: 'high',
       category: 'security',
       occurredAt: new Date().toISOString(),
       payload: {
         userId: user.id,
-        email: user.email ?? '',
-        userName: name ?? user.email?.split('@')[0] ?? 'Learner',
+        email,
+        userName,
       },
     })
   } catch (dispatchErr) {
     console.warn('[auth] Non-fatal notification dispatch error:', dispatchErr)
   }
-
-  return inserted
 }
 
 /**

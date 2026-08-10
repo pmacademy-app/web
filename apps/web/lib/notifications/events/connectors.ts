@@ -4,11 +4,16 @@ import { enqueueNotificationItem } from '../queue/processor'
 import { createInAppNotification, buildInAppContentFromEvent } from '../in-app/service'
 import { BRAND } from '@/lib/brand'
 
+let isConnectorsInitialized = false
+
 /**
  * Registers default system event handlers that map Notification Events to
  * In-App rows (primary channel) and Email Queue entries (secondary channel).
  */
-export function initializeNotificationConnectors(): void {
+export function initializeNotificationConnectors(force: boolean = false): void {
+  if (isConnectorsInitialized && !force) return
+  isConnectorsInitialized = true
+
   const d = globalNotificationDispatcher
 
   // ── In-App write handlers (primary channel for all platform events) ─────────

@@ -118,6 +118,17 @@ export async function enqueueNotificationItem(
       return { success: false, reason: `Failed to insert queue record: ${error?.message || 'Unknown error'}` }
     }
 
+    // Near-real-time queue flush for high/critical priority transactional items (e.g. Welcome email)
+    if ((priorityLevel === 'high' || priorityLevel === 'critical') && process.env.NODE_ENV !== 'test') {
+      try {
+        processEmailQueue(5).catch((err) => {
+          console.warn('[enqueueNotificationItem] Non-fatal background queue process error:', err)
+        })
+      } catch {
+        // Non-fatal background trigger
+      }
+    }
+
     return {
       success: true,
       queueId: rawInserted.id,

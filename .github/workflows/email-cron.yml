@@ -6,11 +6,18 @@ on:
     - cron: '0 9 * * *'        # Daily reminder at 09:00 UTC
     - cron: '0 9 * * 1'        # Weekly recap on Mondays at 09:00 UTC
   workflow_dispatch:
+    inputs:
+      job_to_run:
+        description: 'Specific job to trigger (queue, daily, weekly, all)'
+        required: false
+        default: 'all'
 
 jobs:
   process-email-queue:
     name: Process Email Queue
-    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/5 * * * *'
+    if: |
+      github.event_name == 'schedule' && (github.event.schedule == '*/5 * * * *' || github.event.schedule == '0 9 * * *' || github.event.schedule == '0 9 * * 1') ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'queue')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     concurrency:
@@ -19,30 +26,43 @@ jobs:
     steps:
       - name: Trigger Process Queue Endpoint
         run: |
-          curl -f -s -S -X POST "${{ secrets.PRODUCTION_SITE_URL }}/api/cron/process-email-queue" \
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl -f -s -S -X POST "${SITE_URL}/api/cron/process-email-queue" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
   daily-reminder:
     name: Queue Daily Reminders
-    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 9 * * *'
+    if: |
+      github.event_name == 'schedule' && (github.event.schedule == '0 9 * * *' || github.event.schedule == '0 9 * * 1') ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'daily')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Trigger Daily Reminder Endpoint
         run: |
-          curl -f -s -S -X POST "${{ secrets.PRODUCTION_SITE_URL }}/api/cron/daily-reminder" \
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl -f -s -S -X POST "${SITE_URL}/api/cron/daily-reminder" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
   weekly-recap:
     name: Queue Weekly Recaps
-    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 9 * * 1'
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '0 9 * * 1' ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'weekly')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Trigger Weekly Recap Endpoint
         run: |
-          curl -f -s -S -X POST "${{ secrets.PRODUCTION_SITE_URL }}/api/cron/weekly-recap" \
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl -f -s -S -X POST "${SITE_URL}/api/cron/weekly-recap" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
