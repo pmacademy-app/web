@@ -108,18 +108,21 @@ export class AdminConsoleService {
   /**
    * Fetches paginated user list with role & activity status.
    */
+  /**
+   * Fetches paginated user list with role, activity status, and verification status.
+   * Merges Supabase Auth users (auth.users) with public.users profiles to capture unverified accounts.
+   */
   public static async getUsersOverview(limit = 50, search = ''): Promise<AdminUserOverview[]> {
     const supabase = createServerSupabaseClient()
-    let query = supabase.from('users').select('*').order('created_at', { ascending: false }).limit(limit)
 
+    // 1. Fetch public.users profiles
+    let query = supabase.from('users').select('*').order('created_at', { ascending: false }).limit(limit)
     if (search) {
       query = query.or(`email.ilike.%${search}%,name.ilike.%${search}%`)
     }
+    const { data: publicData } = await query
 
-    const { data, error } = await query
-    if (error || !data) return []
-
-    const userRows = data as unknown as Array<{
+    const publicRows = (publicData || []) as unknown as Array<{
       id: string
       email: string
       name?: string
@@ -133,30 +136,94 @@ export class AdminConsoleService {
       updated_at?: string
     }>
 
-    return userRows.map((u) => ({
-      id: u.id,
-      email: u.email,
-      fullName: u.name || u.email.split('@')[0],
-      username: u.username || null,
-      role: u.is_admin ? 'Admin' : 'Learner',
-      isAdmin: Boolean(u.is_admin),
-      totalXp: u.total_xp || 0,
-      level: u.level || 1,
-      streakDays: u.current_streak || 0,
-      hasPublicPortfolio: Boolean(u.is_portfolio_public),
-      createdAt: u.created_at,
-      lastActiveAt: u.updated_at || null,
-    }))
+    const publicMap = new Map(publicRows.map((r) => [r.id, r]))
+
+    // 2. Fetch Supabase Auth users via service role client (includes unverified users)
+    let authUsers: Array<{
+      id: string
+      email?: string
+      email_confirmed_at?: string | null
+      created_at: string
+      user_metadata?: { full_name?: string; name?: string }
+    }> = []
+
+    try {
+      const { data: authUsersData } = await supabase.auth.admin.listUsers({ perPage: 1000 })
+      if (authUsersData?.users) {
+        authUsers = authUsersData.users as typeof authUsers
+      }
+    } catch (err) {
+      console.warn('[AdminConsoleService] Service role listUsers fallback:', err)
+    }
+
+    // Merge Auth users and Public users
+    const allUserIds = new Set([
+      ...publicRows.map((r) => r.id),
+      ...authUsers.map((a) => a.id),
+    ])
+
+    const authMap = new Map(authUsers.map((a) => [a.id, a]))
+    const result: AdminUserOverview[] = []
+
+    for (const userId of allUserIds) {
+      const pub = publicMap.get(userId)
+      const auth = authMap.get(userId)
+
+      const email = pub?.email || auth?.email || ''
+      if (!email) continue
+
+      if (search && !email.toLowerCase().includes(search.toLowerCase()) && !pub?.name?.toLowerCase().includes(search.toLowerCase())) {
+        continue
+      }
+
+      const emailConfirmedAt = auth?.email_confirmed_at || (pub ? pub.created_at : null)
+      const isVerified = Boolean(emailConfirmedAt)
+
+      result.push({
+        id: userId,
+        email,
+        fullName: pub?.name || auth?.user_metadata?.full_name || auth?.user_metadata?.name || email.split('@')[0],
+        username: pub?.username || null,
+        role: pub?.is_admin ? 'Admin' : 'Learner',
+        isAdmin: Boolean(pub?.is_admin),
+        isVerified,
+        emailConfirmedAt,
+        totalXp: pub?.total_xp || 0,
+        level: pub?.level || 1,
+        streakDays: pub?.current_streak || 0,
+        hasPublicPortfolio: Boolean(pub?.is_portfolio_public),
+        createdAt: pub?.created_at || auth?.created_at || new Date().toISOString(),
+        lastActiveAt: pub?.updated_at || auth?.created_at || null,
+      })
+    }
+
+    return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, limit)
   }
 
   /**
-   * Fetches detailed profile breakdown for a specific user.
+   * Fetches detailed profile breakdown for a specific user (verified or unverified).
    */
   public static async getUserDetail(userId: string): Promise<AdminUserDetail | null> {
     const supabase = createServerSupabaseClient()
 
-    const { data: userRow, error } = await supabase.from('users').select('*').eq('id', userId).single()
-    if (error || !userRow) return null
+    const { data: userRow } = await supabase.from('users').select('*').eq('id', userId).maybeSingle()
+
+    interface AuthUserDetailRecord {
+      email?: string
+      email_confirmed_at?: string | null
+      created_at: string
+      user_metadata?: { full_name?: string }
+    }
+
+    let authUser: AuthUserDetailRecord | null = null
+    try {
+      const { data: authData } = await supabase.auth.admin.getUserById(userId)
+      if (authData?.user) authUser = authData.user as unknown as AuthUserDetailRecord
+    } catch {
+      // Fallback
+    }
+
+    if (!userRow && !authUser) return null
 
     const u = userRow as unknown as {
       id: string
@@ -171,7 +238,7 @@ export class AdminConsoleService {
       goal?: string
       created_at: string
       updated_at?: string
-    }
+    } | null
 
     const [lessonsRes, quizzesRes, capstonesRes, certsRes] = await Promise.all([
       supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'completed'),
@@ -180,24 +247,30 @@ export class AdminConsoleService {
       supabase.from('certificates').select('id', { count: 'exact', head: true }).eq('user_id', userId),
     ])
 
+    const targetAuthUser = authUser as AuthUserDetailRecord | null
+    const email = u?.email || targetAuthUser?.email || ''
+    const emailConfirmedAt = targetAuthUser?.email_confirmed_at || (u ? u.created_at : null)
+
     return {
-      id: u.id,
-      email: u.email,
-      fullName: u.name || u.email.split('@')[0],
-      username: u.username || null,
-      role: u.is_admin ? 'Admin' : 'Learner',
-      isAdmin: Boolean(u.is_admin),
-      totalXp: u.total_xp || 0,
-      level: u.level || 1,
-      streakDays: u.current_streak || 0,
-      createdAt: u.created_at,
-      lastActiveAt: u.updated_at || null,
+      id: userId,
+      email,
+      fullName: u?.name || targetAuthUser?.user_metadata?.full_name || email.split('@')[0],
+      username: u?.username || null,
+      role: u?.is_admin ? 'Admin' : 'Learner',
+      isAdmin: Boolean(u?.is_admin),
+      isVerified: Boolean(emailConfirmedAt),
+      emailConfirmedAt,
+      totalXp: u?.total_xp || 0,
+      level: u?.level || 1,
+      streakDays: u?.current_streak || 0,
+      createdAt: u?.created_at || targetAuthUser?.created_at || new Date().toISOString(),
+      lastActiveAt: u?.updated_at || targetAuthUser?.created_at || null,
       lessonsCompleted: lessonsRes.count || 0,
       quizzesCompleted: quizzesRes.count || 0,
       capstonesSubmitted: capstonesRes.count || 0,
       certificatesCount: certsRes.count || 0,
-      hasPublicPortfolio: Boolean(u.is_portfolio_public),
-      goal: u.goal,
+      hasPublicPortfolio: Boolean(u?.is_portfolio_public),
+      goal: u?.goal,
     }
   }
 

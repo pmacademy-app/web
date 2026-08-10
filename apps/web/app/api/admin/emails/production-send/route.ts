@@ -26,20 +26,43 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServerSupabaseClient()
 
-    // 1. Fetch Target Learner Account
-    const { data: targetUser, error: userErr } = await supabase
+    // 1. Fetch Target Learner Account (Auth + public.users)
+    const { data: userRow } = await supabase
       .from('users')
-      .select('id, email, name, email_confirmed_at')
+      .select('id, email, name')
       .eq('id', targetUserId)
       .maybeSingle()
 
-    if (userErr || !targetUser) {
+    interface AuthUserRecord {
+      email?: string
+      email_confirmed_at?: string | null
+      user_metadata?: { full_name?: string }
+    }
+
+    let authUser: AuthUserRecord | null = null
+    try {
+      const { data: authData } = await supabase.auth.admin.getUserById(targetUserId)
+      if (authData?.user) authUser = authData.user as unknown as AuthUserRecord
+    } catch {
+      // Fallback
+    }
+
+    if (!userRow && !authUser) {
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'error',
+        category: 'resend',
+        operation: 'admin_production_send_user_not_found',
+        message: `Target user account not found for ID: ${targetUserId}`,
+        details: { targetUserId, templateKey },
+      })
       return NextResponse.json({ error: 'Target user account not found' }, { status: 404 })
     }
 
-    const userRow = targetUser as unknown as { id: string; email: string; name?: string | null; email_confirmed_at?: string | null }
-    const recipientEmail = userRow.email
-    const recipientName = userRow.name || recipientEmail.split('@')[0] || 'Learner'
+    const pubRow = userRow as unknown as { id: string; email: string; name?: string | null } | null
+    const targetAuthUser = authUser as AuthUserRecord | null
+    const recipientEmail = pubRow?.email || targetAuthUser?.email || ''
+    const recipientName = pubRow?.name || targetAuthUser?.user_metadata?.full_name || recipientEmail.split('@')[0] || 'Learner'
     const isCriticalAuth = templateKey === 'auth.verify_email' || templateKey === 'auth.password_reset'
 
     // 2. Pre-Send Diagnostic & Quota Validation
@@ -73,11 +96,11 @@ export async function POST(request: NextRequest) {
 
       if (resendErr) {
         void logSystemError({
-          severity: 'warning',
-          category: 'verification',
+          severity: 'error',
+          category: 'resend',
           operation: 'admin_resend_verification',
           message: resendErr.message,
-          userId: userRow.id,
+          userId: targetUserId,
         })
         return NextResponse.json({ error: `Verification resend failed: ${resendErr.message}` }, { status: 400 })
       }
@@ -87,7 +110,7 @@ export async function POST(request: NextRequest) {
         adminUser.email,
         'SEND_PRODUCTION_EMAIL',
         'email_queue',
-        userRow.id,
+        targetUserId,
         {
           recipientEmail,
           templateKey,
@@ -127,13 +150,13 @@ export async function POST(request: NextRequest) {
 
     const { enqueueNotificationItem, processEmailQueue } = await import('@/lib/notifications/queue/processor')
     const enqueueRes = await enqueueNotificationItem({
-      userId: userRow.id,
+      userId: targetUserId,
       toEmail: recipientEmail,
       toName: recipientName,
       channel: 'email',
       templateKey,
       templateVariables: templateVars,
-      eventId: `admin-prod-${Date.now()}-${userRow.id}`,
+      eventId: `admin-prod-${Date.now()}-${targetUserId}`,
       eventType: 'admin.manual_trigger',
       category: 'learning',
       priorityLevel: 'high',
