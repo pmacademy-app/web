@@ -1,3 +1,5 @@
+import { BRAND } from '@/lib/brand'
+
 /**
  * Notification Platform Runtime Configuration
  */
@@ -19,7 +21,7 @@ export function getNotificationConfig(): NotificationPlatformConfig {
     defaultTimezone: 'UTC',
     resendApiKey,
     cronSecret: process.env.CRON_SECRET,
-    appUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'http://localhost:3000',
+    appUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl,
     isSimulationMode: !resendApiKey,
   }
 }
