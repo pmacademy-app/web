@@ -48,6 +48,7 @@ For phase definitions, see [`docs/Phases.md`](./product/Phases.md) and [`docs/me
 - **Sprint 8.4 (Notification UX):** ✅ Complete & Audited (In-App Notification Center Panel over active screen with focus trap, ESC key close, scroll lock, category tabs, and `/notifications` safe redirect).
 - **Sprint 8.5 (Mobile Experience):** ✅ Complete & Audited (Full-screen Notification Panel takeover on mobile, Danger Zone scrollable modal, Settings scrollable tabs, Certificate Card mobile padding, Admin mobile drawer & header).
 - **Sprint 8.6 (Public Launch QA & Regression Gate):** ✅ Complete & Audited (**READY FOR GENERAL AVAILABILITY LAUNCH** — 0 P0/P1 issues).
+- **Sprint 8.7 (Persistent Email Automation & Delivery System):** ✅ Complete & Audited (Supabase `email_queue` persistent queueing, `claim_email_queue_items` atomic RPC row claiming via `FOR UPDATE SKIP LOCKED`, Admin Email Automations Control Center with `Always On` critical auth isolation, GitHub Actions cron scheduler, Resend delivery webhooks, 100% test coverage).
 
 ---
 
