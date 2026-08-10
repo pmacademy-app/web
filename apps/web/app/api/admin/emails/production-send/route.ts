@@ -82,54 +82,40 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Execution Path: Critical Auth Verification vs Optional Queue Processing
+    let customVerificationUrl: string | undefined
+
+    // 3. Execution Path: Generate link for auth.verify_email or process production queue
     if (templateKey === 'auth.verify_email') {
-      // Canonical Supabase Auth Resend Flow
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me'
-      const { error: resendErr } = await supabase.auth.resend({
-        type: 'signup',
+
+      let linkRes = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
         email: recipientEmail,
         options: {
-          emailRedirectTo: `${siteUrl}/verified`,
+          redirectTo: `${siteUrl}/verified`,
         },
       })
 
-      if (resendErr) {
+      if (linkRes.data?.properties?.action_link) {
+        customVerificationUrl = linkRes.data.properties.action_link
+      } else {
+        const linkError = linkRes.error?.message || 'Failed to generate verification link'
         void logSystemError({
           severity: 'error',
-          category: 'resend',
-          operation: 'admin_resend_verification',
-          message: resendErr.message,
+          category: 'verification',
+          operation: 'admin_generate_verification_link',
+          message: linkError,
           userId: targetUserId,
         })
-        return NextResponse.json({ error: `Verification resend failed: ${resendErr.message}` }, { status: 400 })
+        return NextResponse.json({ error: `Could not generate verification link: ${linkError}` }, { status: 400 })
       }
-
-      await logAdminAction(
-        adminUser.id,
-        adminUser.email,
-        'SEND_PRODUCTION_EMAIL',
-        'email_queue',
-        targetUserId,
-        {
-          recipientEmail,
-          templateKey,
-          isCriticalAuth: true,
-          mode: 'canonical_auth_resend',
-        }
-      )
-
-      return NextResponse.json({
-        success: true,
-        message: `Canonical production verification email successfully dispatched to ${recipientEmail}.`,
-        mode: 'canonical_auth_resend',
-      })
     }
 
-    // Optional / Milestone Email Enqueue Flow
+    // Production Email Queue Enqueue & Immediate Resend Dispatch Flow
     const templateVars: Record<string, unknown> = {
       userName: recipientName,
       appUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
+      ...(customVerificationUrl ? { verificationUrl: customVerificationUrl } : {}),
       ...customVariables,
     }
 
