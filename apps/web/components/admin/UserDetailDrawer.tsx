@@ -110,9 +110,9 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
                   status={user.hasPublicPortfolio ? 'published' : 'archived'}
                   label={user.hasPublicPortfolio ? 'Enabled' : 'Disabled'}
                 />
-                {user.hasPublicPortfolio && user.username && (
+                {user.hasPublicPortfolio && (
                   <a
-                    href={`/p/${user.username}`}
+                    href={`/p/${user.username || user.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline font-bold"
@@ -190,9 +190,9 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
               Delete User Account
             </button>
 
-            {user.hasPublicPortfolio && user.username ? (
+            {user.hasPublicPortfolio ? (
               <a
-                href={`/p/${user.username}`}
+                href={`/p/${user.username || user.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold hover:bg-emerald-500/20 transition-colors"

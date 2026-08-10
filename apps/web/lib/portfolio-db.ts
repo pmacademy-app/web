@@ -297,13 +297,19 @@ export async function updatePortfolioSettings(
 
   if (updatePayload.is_portfolio_public) {
     try {
+      const { data: userRec } = await (supabase
+        .from('users') as unknown as DBChain)
+        .select('email, name')
+        .eq('id', userId)
+        .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+
       initializeNotificationConnectors()
       await globalNotificationDispatcher.dispatch({
         id: `portfolio-pub-${userId}`,
         event: 'portfolio.published',
         userId,
-        userEmail: '',
-        userName: cleanUsername,
+        userEmail: userRec?.email || '',
+        userName: userRec?.name || cleanUsername,
         userTimezone: 'UTC',
         priority: 'high',
         category: 'portfolio',

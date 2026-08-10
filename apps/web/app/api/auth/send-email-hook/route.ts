@@ -335,8 +335,29 @@ export async function POST(request: NextRequest) {
     return jsonResponse({ error: `Email delivery failure: ${sendResult.error}` }, 500)
   }
 
-  console.log(`[send-email-hook] Auth email ("${actionType}") successfully sent to ${toEmail} (resendId: ${sendResult.id})`)
+  // 6. Enqueue Welcome Email for new account registration (high priority, idempotent)
+  if (actionType === 'signup') {
+    try {
+      const { enqueueNotificationItem } = await import('@/lib/notifications/queue/processor')
+      enqueueNotificationItem({
+        userId: user.id,
+        toEmail,
+        toName: userName,
+        channel: 'email',
+        templateKey: 'auth.welcome',
+        templateVariables: { userName },
+        eventId: `welcome-${user.id}`,
+        eventType: 'user.registered',
+        category: 'security',
+        priorityLevel: 'high',
+      }).catch((err) => {
+        console.warn('[send-email-hook] Non-fatal welcome email enqueue warning:', err)
+      })
+    } catch (err) {
+      console.warn('[send-email-hook] Non-fatal welcome email enqueue error:', err)
+    }
+  }
 
-  // 6. Return HTTP 200 to Supabase Auth Hook
+  // 7. Return HTTP 200 to Supabase Auth Hook
   return jsonResponse({ success: true, message: 'Email sent successfully', id: sendResult.id }, 200)
 }

@@ -88,9 +88,9 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
       className: 'text-right',
       cell: (user) => (
         <div className="flex items-center justify-end gap-2">
-          {user.hasPublicPortfolio && user.username ? (
+          {user.hasPublicPortfolio ? (
             <a
-              href={`/p/${user.username}`}
+              href={`/p/${user.username || user.id}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[11px] font-semibold border border-emerald-500/20 transition-colors"

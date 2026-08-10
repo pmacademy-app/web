@@ -88,6 +88,8 @@ async function fetchUserStatsForBadges(
     capstonesSubmittedCount,
     isPortfolioPublic: user?.is_portfolio_public ?? true,
     usedStreakFreeze: (user?.streak_freezes_available ?? 0) > 0,
+    email: user?.email || '',
+    name: user?.name || '',
   }
 }
 
@@ -228,8 +230,8 @@ export async function evaluateAndAwardBadges(
           id: `badge-${userId}-${badgeDef.key}`,
           event: 'badge.earned',
           userId,
-          userEmail: stats.isPortfolioPublic ? 'user@example.com' : '',
-          userName: 'Learner',
+          userEmail: stats.email || '',
+          userName: stats.name || 'Learner',
           userTimezone: 'UTC',
           priority: 'high',
           category: 'achievements',
