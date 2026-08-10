@@ -60,7 +60,7 @@ export class FeatureFlagService {
   }
 
   /**
-   * Enables a feature flag in runtime state.
+   * Enables a feature flag in runtime state and persists to system_settings.
    */
   public enable(key: StandardFeatureFlagKey | string, description?: string): FeatureFlagRecord {
     const record: FeatureFlagRecord = {
@@ -70,11 +70,12 @@ export class FeatureFlagService {
       updatedAt: new Date().toISOString(),
     }
     this.inMemoryCache.set(key, record)
+    this.persistToDatabase().catch((err) => console.warn('[FeatureFlagService] Non-fatal DB persist warning:', err))
     return record
   }
 
   /**
-   * Disables a feature flag in runtime state.
+   * Disables a feature flag in runtime state and persists to system_settings.
    */
   public disable(key: StandardFeatureFlagKey | string, description?: string): FeatureFlagRecord {
     const record: FeatureFlagRecord = {
@@ -84,6 +85,7 @@ export class FeatureFlagService {
       updatedAt: new Date().toISOString(),
     }
     this.inMemoryCache.set(key, record)
+    this.persistToDatabase().catch((err) => console.warn('[FeatureFlagService] Non-fatal DB persist warning:', err))
     return record
   }
 
@@ -92,6 +94,28 @@ export class FeatureFlagService {
    */
   public getAll(): FeatureFlagRecord[] {
     return Array.from(this.inMemoryCache.values())
+  }
+
+  /**
+   * Persists active feature flags to system_settings in Supabase.
+   */
+  private async persistToDatabase(): Promise<void> {
+    try {
+      const { createServerSupabaseClient } = await import('../../supabase')
+      const supabase = createServerSupabaseClient()
+      const flagsObj: Record<string, boolean> = {}
+      for (const [k, v] of this.inMemoryCache.entries()) {
+        flagsObj[k] = v.enabled
+      }
+      type DBChain = { upsert: (row: unknown) => Promise<{ error: unknown }> }
+      await (supabase.from('system_settings') as unknown as DBChain).upsert({
+        key: 'feature_flags',
+        value: flagsObj,
+        updated_at: new Date().toISOString(),
+      })
+    } catch {
+      // Graceful fallback for offline / test environments
+    }
   }
 
   /**

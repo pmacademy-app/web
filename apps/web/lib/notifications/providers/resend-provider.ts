@@ -45,8 +45,8 @@ export class ResendProvider implements NotificationProvider {
           'List-Unsubscribe': `<${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/settings?tab=notifications>`,
         },
         tags: [
-          { name: 'template_key', value: payload.templateKey },
-          { name: 'template_version', value: String(payload.templateVersion) },
+          { name: 'template_key', value: payload.templateKey.replace(/[^a-zA-Z0-9_-]/g, '_') },
+          { name: 'template_version', value: String(payload.templateVersion).replace(/[^a-zA-Z0-9_-]/g, '_') },
         ],
       }
 

@@ -32,6 +32,9 @@ export async function awardXp(
     return
   }
 
+  const oldTotalXp = await getTotalXp(supabase, userId)
+  const oldLevelInfo = calculateLevel(oldTotalXp)
+
   const { error } = await (supabase
     .from('xp_events') as unknown as DBChain)
     .insert({
@@ -44,6 +47,43 @@ export async function awardXp(
   if (error) {
     console.error(`[xp-service] Error inserting XP event for user ${userId}:`, error)
     throw new Error('Failed to record XP event')
+  }
+
+  const newTotalXp = oldTotalXp + xpAmount
+  const newLevelInfo = calculateLevel(newTotalXp)
+
+  if (newLevelInfo.level > oldLevelInfo.level) {
+    try {
+      const { data: userRec } = await (supabase
+        .from('users') as unknown as DBChain)
+        .select('email, name')
+        .eq('id', userId)
+        .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+
+      const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
+      const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
+      initializeNotificationConnectors()
+
+      await globalNotificationDispatcher.dispatch({
+        id: `level-up-${userId}-${newLevelInfo.level}`,
+        event: 'xp.level_up',
+        userId,
+        userEmail: userRec?.email || '',
+        userName: userRec?.name || 'Learner',
+        userTimezone: 'UTC',
+        priority: 'high',
+        category: 'achievements',
+        occurredAt: new Date().toISOString(),
+        payload: {
+          userId,
+          newLevel: newLevelInfo.level,
+          levelTitle: newLevelInfo.title,
+          totalXp: newTotalXp,
+        },
+      })
+    } catch (lvlErr) {
+      console.warn('[xp-service] Level up notification dispatch warning:', lvlErr)
+    }
   }
 }
 

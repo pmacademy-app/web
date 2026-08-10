@@ -62,7 +62,7 @@ export async function createInAppNotification(params: InAppNotificationWritePara
       .from('in_app_notifications') as unknown as DBChain)
       .insert({
         user_id: params.userId,
-        event_id: params.eventId || null,
+        event_id: (params.eventId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(params.eventId)) ? params.eventId : null,
         category: params.category,
         title: params.title,
         body: params.body,

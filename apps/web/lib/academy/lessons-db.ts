@@ -287,6 +287,47 @@ export async function recordQuizAttemptAction(
 
   await updateUserStreak(supabase, userId)
 
+  try {
+    const { data: userProgress } = await (supabase
+      .from('user_lesson_progress') as unknown as DBChain)
+      .select('lesson_id, status')
+      .eq('user_id', userId) as unknown as { data: { lesson_id: string; status: string }[] | null }
+
+    const completedCount = userProgress?.filter((p) => p.status === 'completed').length || 0
+    if (completedCount > 0 && completedCount % 10 === 0) {
+      const moduleIndex = Math.floor(completedCount / 10)
+      const { data: userRec } = await (supabase
+        .from('users') as unknown as DBChain)
+        .select('email, name')
+        .eq('id', userId)
+        .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+
+      const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
+      const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
+      initializeNotificationConnectors()
+
+      await globalNotificationDispatcher.dispatch({
+        id: `module-complete-${userId}-${moduleIndex}`,
+        event: 'module.completed',
+        userId,
+        userEmail: userRec?.email || '',
+        userName: userRec?.name || 'Learner',
+        userTimezone: 'UTC',
+        priority: 'medium',
+        category: 'learning',
+        occurredAt: new Date().toISOString(),
+        payload: {
+          userId,
+          moduleName: `Module ${moduleIndex}`,
+          moduleSlug: `module-${moduleIndex}`,
+          xpBonusEarned: 200,
+        },
+      })
+    }
+  } catch (modErr) {
+    console.warn('[lessons-db] Module complete notification dispatch warning:', modErr)
+  }
+
   return {
     success: true,
     correctCount,

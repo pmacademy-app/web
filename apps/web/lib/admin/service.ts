@@ -113,7 +113,7 @@ export class AdminConsoleService {
     let query = supabase.from('users').select('*').order('created_at', { ascending: false }).limit(limit)
 
     if (search) {
-      query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`)
+      query = query.or(`email.ilike.%${search}%,name.ilike.%${search}%`)
     }
 
     const { data, error } = await query
@@ -122,7 +122,7 @@ export class AdminConsoleService {
     const userRows = data as unknown as Array<{
       id: string
       email: string
-      full_name?: string
+      name?: string
       username?: string
       is_admin?: boolean
       total_xp?: number
@@ -136,7 +136,7 @@ export class AdminConsoleService {
     return userRows.map((u) => ({
       id: u.id,
       email: u.email,
-      fullName: u.full_name || u.email.split('@')[0],
+      fullName: u.name || u.email.split('@')[0],
       username: u.username || null,
       role: u.is_admin ? 'Admin' : 'Learner',
       isAdmin: Boolean(u.is_admin),
@@ -161,7 +161,7 @@ export class AdminConsoleService {
     const u = userRow as unknown as {
       id: string
       email: string
-      full_name?: string
+      name?: string
       username?: string
       is_admin?: boolean
       total_xp?: number
@@ -183,7 +183,7 @@ export class AdminConsoleService {
     return {
       id: u.id,
       email: u.email,
-      fullName: u.full_name || u.email.split('@')[0],
+      fullName: u.name || u.email.split('@')[0],
       username: u.username || null,
       role: u.is_admin ? 'Admin' : 'Learner',
       isAdmin: Boolean(u.is_admin),

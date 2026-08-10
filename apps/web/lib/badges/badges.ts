@@ -12,6 +12,8 @@ export interface UserStatsForBadges {
   capstonesSubmittedCount: number
   isPortfolioPublic: boolean
   usedStreakFreeze?: boolean
+  email?: string
+  name?: string
 }
 
 export interface BadgeProgressItem {

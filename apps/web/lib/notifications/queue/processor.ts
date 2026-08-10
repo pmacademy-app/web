@@ -100,7 +100,7 @@ export async function enqueueNotificationItem(
         to_name: params.toName || null,
         template_key: params.templateKey,
         template_variables: params.templateVariables,
-        event_id: params.eventId || null,
+        event_id: (params.eventId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(params.eventId)) ? params.eventId : null,
         event_type: params.eventType,
         priority: priorityDef.numericValue,
         status: 'pending',
