@@ -68,6 +68,7 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
               <table role="presentation" border={0} cellPadding={0} cellSpacing={0}>
                 <tr>
                   <td style={{ verticalAlign: 'middle', paddingRight: '12px' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={`${appUrl}${BRAND.assets.logoMarkPng}`}
                       alt={BRAND.company}
