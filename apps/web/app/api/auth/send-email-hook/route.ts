@@ -221,6 +221,15 @@ export async function POST(request: NextRequest) {
     const isValid = verifyHookSecret(request, rawBody, secret)
     if (!isValid) {
       console.warn('[send-email-hook] Unauthorized request: signature/secret verification failed.')
+      try {
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'warning',
+          category: 'auth',
+          operation: 'send_email_hook_auth',
+          message: 'Unauthorized request: signature or secret verification failed',
+        })
+      } catch {}
       return jsonResponse({ error: 'Unauthorized: Invalid hook signature or secret' }, 401)
     }
   } else {
@@ -233,6 +242,15 @@ export async function POST(request: NextRequest) {
     payload = JSON.parse(rawBody)
   } catch (err) {
     console.error('[send-email-hook] Invalid JSON payload:', err)
+    try {
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'error',
+        category: 'auth',
+        operation: 'send_email_hook_parse',
+        message: `Invalid JSON payload in Auth Send Email Hook: ${err instanceof Error ? err.message : 'Parse failure'}`,
+      })
+    } catch {}
     return jsonResponse({ error: 'Invalid JSON payload' }, 400)
   }
 

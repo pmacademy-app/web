@@ -173,7 +173,7 @@ export function NotificationCenterDrawer({
       role="dialog"
       aria-modal="true"
       aria-label="In-App Notification Center"
-      className="absolute right-0 top-full mt-2.5 w-[calc(100vw-2rem)] max-w-sm sm:w-96 max-h-[85vh] z-50 bg-background border border-border rounded-2xl shadow-2xl flex flex-col focus:outline-none overflow-hidden animate-in fade-in zoom-in-95 duration-150 motion-reduce:animate-none"
+      className="fixed top-16 left-4 right-4 max-w-[calc(100vw-32px)] max-h-[80vh] sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2.5 sm:w-96 sm:max-w-sm sm:max-h-[85vh] z-50 bg-background border border-border rounded-2xl shadow-2xl flex flex-col focus:outline-none overflow-hidden animate-in fade-in zoom-in-95 duration-150 motion-reduce:animate-none"
     >
       {/* Header */}
       <div className="p-4 border-b border-border flex items-center justify-between bg-card/50">

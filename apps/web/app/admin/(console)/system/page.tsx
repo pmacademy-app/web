@@ -5,6 +5,7 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { ProcessEmailQueueButton } from '@/components/admin/ProcessEmailQueueButton'
+import { AdminSystemAlertsView } from '@/components/admin/AdminSystemAlertsView'
 
 export const revalidate = 0
 
@@ -12,11 +13,16 @@ export default async function AdminSystemPage() {
   const health = await AdminConsoleService.getSystemHealth()
   const flags = AdminConsoleService.getFeatureFlags()
 
+  const hasResendKey = Boolean(process.env.RESEND_API_KEY)
+  const hasCronSecret = Boolean(process.env.CRON_SECRET)
+  const hasVercelToken = Boolean(process.env.VERCEL_API_TOKEN)
+  const hasSupabaseMgmt = Boolean(process.env.SUPABASE_MANAGEMENT_API_KEY)
+
   return (
     <div className="space-y-8">
       <AdminPageHeader
         title="System Diagnostics & Infrastructure"
-        description="Database query latency, read-only feature flag state, audit logs, and cron scheduler triggers."
+        description="Database query latency, application health, system alerts log, and cron scheduler triggers."
         icon={Activity}
         iconColor="text-amber-400"
         actions={<ProcessEmailQueueButton />}
@@ -32,7 +38,7 @@ export default async function AdminSystemPage() {
           iconColor="text-emerald-400"
         />
         <AdminKpiCard
-          title="System Status"
+          title="Application Status"
           value={health.status.toUpperCase()}
           subtitle={`Last checked: ${new Date(health.lastCheckedAt).toLocaleTimeString()}`}
           icon={CheckCircle}
@@ -47,24 +53,66 @@ export default async function AdminSystemPage() {
         />
       </div>
 
-      {/* Diagnostic Checklist */}
+      {/* System Errors & Alerts Section */}
+      <AdminSystemAlertsView />
+
+      {/* External Platform Infrastructure Monitoring */}
       <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4 shadow-xl">
         <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          Infrastructure Diagnostic Checklist
+          External Platform Integration Status
         </h2>
         <div className="space-y-3 text-xs">
           <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-            <span className="text-slate-300 font-medium">Supabase Auth & RLS Security Enforcer</span>
-            <AdminStatusBadge status="healthy" label="Enforced" />
+            <div>
+              <span className="text-slate-300 font-medium block">Resend Transactional Email API</span>
+              <span className="text-[11px] text-slate-500">
+                {hasResendKey ? 'RESEND_API_KEY configured' : 'Requires RESEND_API_KEY in environment'}
+              </span>
+            </div>
+            <AdminStatusBadge
+              status={hasResendKey ? 'healthy' : 'archived'}
+              label={hasResendKey ? 'Connected & Ready' : 'Monitoring Not Configured'}
+            />
           </div>
+
           <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-            <span className="text-slate-300 font-medium">Scheduler Workflow (`SCHEDULER_ENABLED`)</span>
-            <AdminStatusBadge status="healthy" label="Active (GitHub Actions)" />
+            <div>
+              <span className="text-slate-300 font-medium block">GitHub Actions Cron Scheduler</span>
+              <span className="text-[11px] text-slate-500">
+                {hasCronSecret ? 'CRON_SECRET authorized' : 'Requires CRON_SECRET in repository secrets'}
+              </span>
+            </div>
+            <AdminStatusBadge
+              status={hasCronSecret ? 'healthy' : 'archived'}
+              label={hasCronSecret ? 'Active (Cron)' : 'Integration Unavailable'}
+            />
           </div>
+
           <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-            <span className="text-slate-300 font-medium">Resend Transactional Email REST API</span>
-            <AdminStatusBadge status="healthy" label="Connected" />
+            <div>
+              <span className="text-slate-300 font-medium block">Vercel Deployment Platform</span>
+              <span className="text-[11px] text-slate-500">
+                {hasVercelToken ? 'Vercel API token active' : 'Requires VERCEL_API_TOKEN for platform logs'}
+              </span>
+            </div>
+            <AdminStatusBadge
+              status={hasVercelToken ? 'healthy' : 'archived'}
+              label={hasVercelToken ? 'Connected' : 'Not Configured'}
+            />
+          </div>
+
+          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span className="text-slate-300 font-medium block">Supabase Management API</span>
+              <span className="text-[11px] text-slate-500">
+                {hasSupabaseMgmt ? 'Management Key active' : 'Requires SUPABASE_MANAGEMENT_API_KEY'}
+              </span>
+            </div>
+            <AdminStatusBadge
+              status={hasSupabaseMgmt ? 'healthy' : 'archived'}
+              label={hasSupabaseMgmt ? 'Connected' : 'Not Connected'}
+            />
           </div>
         </div>
       </div>
