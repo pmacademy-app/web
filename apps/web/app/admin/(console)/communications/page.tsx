@@ -10,6 +10,8 @@ import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { ProcessEmailQueueButton } from '@/components/admin/ProcessEmailQueueButton'
 import { SendTestEmailButton } from '@/components/admin/SendTestEmailButton'
 import { AdminContactQueriesView, type ContactMessageItem } from '@/components/admin/AdminContactQueriesView'
+import { EmailAutomationsService } from '@/lib/notifications/automations/service'
+import { AdminEmailAutomationsView } from '@/components/admin/AdminEmailAutomationsView'
 
 export const revalidate = 0
 
@@ -45,8 +47,9 @@ const EMAIL_TEMPLATES: TemplateItem[] = [
 ]
 
 export default async function AdminCommunicationsPage({ searchParams }: PageProps) {
-  const { tab = 'contact' } = await searchParams
+  const { tab = 'automations' } = await searchParams
   const queue = await AdminConsoleService.getEmailQueueOverview()
+  const automationsState = await EmailAutomationsService.getState()
 
   const supabase = createServerSupabaseClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,7 +134,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
     <div className="space-y-8">
       <AdminPageHeader
         title="Communications & Notifications"
-        description="Unified management of contact inquiries, in-app notifications, transactional email queue, and templates."
+        description="Unified management of contact inquiries, email automations, transactional queue, and templates."
         icon={Mail}
         iconColor="text-blue-400"
         actions={<ProcessEmailQueueButton />}
@@ -139,6 +142,16 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
 
       {/* Sub-navigation Tabs */}
       <div className="border-b border-slate-800 flex gap-6 text-xs font-semibold overflow-x-auto scrollbar-none">
+        <Link
+          href="/admin/communications?tab=automations"
+          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+            tab === 'automations'
+              ? 'border-amber-400 text-amber-400'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Bell className="w-4 h-4" /> Email Automations
+        </Link>
         <Link
           href="/admin/communications?tab=contact"
           className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
@@ -167,7 +180,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
               : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
-          <RefreshCw className="w-4 h-4" /> Queue & Health
+          <RefreshCw className="w-4 h-4" /> Queue &amp; Health
         </Link>
         <Link
           href="/admin/communications?tab=broadcasts"
@@ -177,9 +190,14 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
               : 'border-transparent text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Send className="w-4 h-4" /> Broadcasts & Test Sends
+          <Send className="w-4 h-4" /> Broadcasts &amp; Test Sends
         </Link>
       </div>
+
+      {/* Tab 0: Email Automations Control Center */}
+      {tab === 'automations' && (
+        <AdminEmailAutomationsView initialState={automationsState} />
+      )}
 
       {/* Tab 1: Contact Queries */}
       {tab === 'contact' && (

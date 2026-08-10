@@ -31,6 +31,7 @@
     "test:remediation": "npx tsx lib/__tests__/remediation.test.ts",
     "test:contact": "npx tsx lib/__tests__/contact.test.ts",
     "test:admin-email": "npx tsx lib/__tests__/admin-email-test-send.test.ts",
+    "test:automations": "npx tsx lib/__tests__/email-automations.test.ts",
     "benchmark": "npx tsx ../../scripts/benchmark-concurrency.ts",
     "build": "npm run content:build && next build",
     "start": "next start",

@@ -1,0 +1,48 @@
+name: Production Email Automation Scheduler
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'      # Near-real-time queue processing every 5 minutes
+    - cron: '0 9 * * *'        # Daily reminder at 09:00 UTC
+    - cron: '0 9 * * 1'        # Weekly recap on Mondays at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  process-email-queue:
+    name: Process Email Queue
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/5 * * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: email-queue-runner
+      cancel-in-progress: false
+    steps:
+      - name: Trigger Process Queue Endpoint
+        run: |
+          curl -f -s -S -X POST "${{ secrets.PRODUCTION_SITE_URL }}/api/cron/process-email-queue" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+  daily-reminder:
+    name: Queue Daily Reminders
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 9 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Daily Reminder Endpoint
+        run: |
+          curl -f -s -S -X POST "${{ secrets.PRODUCTION_SITE_URL }}/api/cron/daily-reminder" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+  weekly-recap:
+    name: Queue Weekly Recaps
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 9 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Weekly Recap Endpoint
+        run: |
+          curl -f -s -S -X POST "${{ secrets.PRODUCTION_SITE_URL }}/api/cron/weekly-recap" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

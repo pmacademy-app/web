@@ -2,6 +2,8 @@ import { SupabaseClient, User } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { cookies } from 'next/headers'
 import { createAuthenticatedServerClient } from './supabase'
+import { globalNotificationDispatcher } from './notifications/dispatcher'
+import { initializeNotificationConnectors } from './notifications/events/connectors'
 
 export type UserProfile = Database['public']['Tables']['users']['Row']
 
@@ -48,6 +50,29 @@ export async function ensureUserProfile(
   if (error) {
     console.error('[auth] Error creating user profile:', error.message)
     return null
+  }
+
+  // Exactly-once welcome email dispatch on new user creation
+  try {
+    initializeNotificationConnectors()
+    await globalNotificationDispatcher.dispatch({
+      id: `welcome-${user.id}`,
+      event: 'user.registered',
+      userId: user.id,
+      userEmail: user.email ?? '',
+      userName: name ?? user.email?.split('@')[0] ?? 'Learner',
+      userTimezone: timezone,
+      priority: 'high',
+      category: 'security',
+      occurredAt: new Date().toISOString(),
+      payload: {
+        userId: user.id,
+        email: user.email ?? '',
+        userName: name ?? user.email?.split('@')[0] ?? 'Learner',
+      },
+    })
+  } catch (dispatchErr) {
+    console.warn('[auth] Non-fatal notification dispatch error:', dispatchErr)
   }
 
   return inserted

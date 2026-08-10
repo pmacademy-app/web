@@ -14,6 +14,8 @@ import {
   type BadgeProgressItem,
   type UserStatsForBadges,
 } from '@/lib/badges'
+import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
+import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type BadgeRow = Database['public']['Tables']['badges']['Row']
@@ -220,6 +222,28 @@ export async function evaluateAndAwardBadges(
 
     if (!insertErr) {
       newlyAwarded.push(badgeDef)
+      try {
+        initializeNotificationConnectors()
+        await globalNotificationDispatcher.dispatch({
+          id: `badge-${userId}-${badgeDef.key}`,
+          event: 'badge.earned',
+          userId,
+          userEmail: stats.isPortfolioPublic ? 'user@example.com' : '',
+          userName: 'Learner',
+          userTimezone: 'UTC',
+          priority: 'high',
+          category: 'achievements',
+          occurredAt: new Date().toISOString(),
+          payload: {
+            userId,
+            badgeId: badgeDef.key,
+            badgeName: badgeDef.name,
+            badgeDescription: badgeDef.description,
+          },
+        })
+      } catch (dispatchErr) {
+        console.warn('[badges-db] Non-fatal notification dispatch warning:', dispatchErr)
+      }
     }
   }
 

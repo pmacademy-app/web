@@ -108,6 +108,65 @@ export async function POST(request: Request) {
 
     const data = (payload.data || payload) as Record<string, unknown>
     const emailId = String(data.email_id || data.id || '')
+
+    // Handle Outbound Resend Delivery Events (sent, delivered, failed, bounced, complained)
+    if (eventType !== 'email.received' && eventType.startsWith('email.')) {
+      try {
+        const supabase = createServerSupabaseClient()
+
+        // 1. Find target queue item by resend_id
+        let queueId: string | null = null
+        if (emailId) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: queueItem } = await (supabase.from('email_queue' as any) as any)
+            .select('id')
+            .eq('resend_id', emailId)
+            .maybeSingle()
+          if (queueItem && queueItem.id) queueId = String(queueItem.id)
+        }
+
+        // 2. Insert into email_delivery_events log
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase.from('email_delivery_events' as any) as any).insert({
+          email_queue_id: queueId,
+          resend_id: emailId || null,
+          event_type: eventType,
+          metadata: data,
+          occurred_at: new Date().toISOString(),
+        })
+
+        // 3. Update queue item status if matched
+        if (queueId) {
+          if (eventType === 'email.delivered') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase.from('email_queue' as any) as any)
+              .update({ status: 'delivered', delivered_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+              .eq('id', queueId)
+          } else if (eventType === 'email.failed' || eventType === 'email.bounced') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase.from('email_queue' as any) as any)
+              .update({ status: 'failed', error_message: `Resend event: ${eventType}`, failed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+              .eq('id', queueId)
+          }
+        }
+
+        // 4. Auto-suppress on spam complaints
+        if (eventType === 'email.complained') {
+          const recipientEmail = String(data.to || data.recipient || '')
+          if (recipientEmail) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase.from('email_suppressions' as any) as any)
+              .upsert({ email: recipientEmail, reason: 'spam_complaint', suppressed_at: new Date().toISOString() })
+          }
+        }
+
+        return NextResponse.json({ success: true, processed: true, outboundEventType: eventType })
+      } catch (outboundErr) {
+        console.warn('[ResendWebhook] Non-fatal outbound event persistence warning:', outboundErr)
+        return NextResponse.json({ success: true, warning: 'Outbound processing logged warning' })
+      }
+    }
+
     const fromRaw = String(data.from || data.sender || 'unknown@example.com')
     const subject = String(data.subject || 'Direct Inbound Email Inquiry')
 
