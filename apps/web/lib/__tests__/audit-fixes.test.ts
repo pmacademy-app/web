@@ -7,7 +7,6 @@ if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
 
 import { POST as handleProductionSend } from '../../app/api/admin/emails/production-send/route'
 import { AdminConsoleService } from '../admin/service'
-import { logSystemError } from '../monitoring/logger'
 
 async function runAuditFixesTests() {
   console.log('🧪 Running End-to-End Production Remediation Audit & Fixes Test Suite...\n')
