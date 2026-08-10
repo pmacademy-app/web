@@ -17,7 +17,7 @@ export default async function CurriculumPage() {
     redirect('/academy')
   }
   return (
-    <div className="container mx-auto px-4 py-12 max-w-5xl">
+    <div className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-5xl">
       <div className="text-center mb-12">
         <h1 className="text-3xl md:text-5xl font-bold font-serif text-foreground mb-4">
           Full PM Curriculum

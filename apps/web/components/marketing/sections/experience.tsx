@@ -90,7 +90,7 @@ export function ExperienceSection() {
     <section
       id="experience"
       aria-labelledby="experience-heading"
-      className="py-20 lg:py-28"
+      className="py-20 lg:py-28 scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-12 lg:gap-16 items-start">

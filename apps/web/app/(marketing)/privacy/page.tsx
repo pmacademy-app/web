@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
-import { ShieldCheck, Lock, Database, Mail, Cookie, RefreshCw } from 'lucide-react'
+import { ShieldCheck, Lock, Database, Mail, Cookie, RefreshCw, ArrowLeft } from 'lucide-react'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
@@ -20,7 +20,15 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="container mx-auto px-4 py-16 md:py-24 max-w-3xl space-y-10">
+    <div className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-3xl space-y-10">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-2 px-3 py-1.5 -ml-3 rounded-lg text-xs font-bold text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        <span>Back to Home</span>
+      </Link>
+
       {/* Header */}
       <div className="space-y-3 border-b border-border pb-6">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">

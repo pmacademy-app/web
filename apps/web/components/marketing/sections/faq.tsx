@@ -34,7 +34,7 @@ export function FAQSection() {
     <section
       id="faq"
       aria-labelledby="faq-heading"
-      className="py-20 lg:py-28 bg-surface"
+      className="py-20 lg:py-28 bg-surface scroll-mt-24 lg:scroll-mt-28"
     >
       <script
         type="application/ld+json"

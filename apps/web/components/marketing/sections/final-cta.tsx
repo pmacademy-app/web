@@ -15,7 +15,7 @@ export function FinalCTASection() {
     <section
       id="waitlist"
       aria-labelledby="cta-heading"
-      className="py-20 lg:py-28 bg-surface-muted border-t border-border"
+      className="py-20 lg:py-28 bg-surface-muted border-t border-border scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         <motion.div

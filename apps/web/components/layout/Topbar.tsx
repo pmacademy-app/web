@@ -38,7 +38,11 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
     else if (label.toLowerCase() === 'review') label = 'Review Hub'
     else if (label.toLowerCase() === 'leaderboard') label = 'Cohort Leaderboard'
 
-    const href = '/' + segments.slice(0, i + 1).join('/')
+    let href = '/' + segments.slice(0, i + 1).join('/')
+    // Redirect standalone module slug breadcrumbs to /academy to prevent 404 dead links
+    if (segments[0] === 'academy' && i === 1 && segments.length > 1) {
+      href = '/academy'
+    }
     return { label, href }
   })
 
@@ -65,15 +69,24 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
     }
   }
 
-  // Close dropdown on outside click
+  // Close dropdown on outside click or Escape key
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false)
       }
     }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setDropdownOpen(false)
+      }
+    }
     document.addEventListener('mousedown', handleOutsideClick)
-    return () => document.removeEventListener('mousedown', handleOutsideClick)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [])
 
   const levelTitle = getLevelTitle(userProfile.level)
