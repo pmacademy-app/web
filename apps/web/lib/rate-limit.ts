@@ -52,3 +52,72 @@ export function evaluateRateLimit(
   entry.count++
   return { success: true, remaining: limit - entry.count, resetInMs: Math.max(0, entry.resetAt - now) }
 }
+
+/**
+ * Evaluates rate limit against the persistent PostgreSQL public.rate_limits table.
+ * Fallback to in-memory evaluation if database is unreachable.
+ */
+export async function evaluatePersistentRateLimit(
+  key: string,
+  options: RateLimitOptions = {}
+): Promise<{ success: boolean; remaining: number; resetInMs: number }> {
+  const limit = options.limit ?? 1
+  const windowMs = options.windowMs ?? 60 * 1000
+  const now = Date.now()
+
+  try {
+    const { createServerSupabaseClient } = await import('@/lib/supabase')
+    const supabase = createServerSupabaseClient()
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing } = await (supabase.from('rate_limits' as any) as any)
+      .select('key, last_requested_at, count')
+      .eq('key', key)
+      .maybeSingle()
+
+    if (existing) {
+      const lastTime = new Date(existing.last_requested_at).getTime()
+      const elapsed = now - lastTime
+
+      if (elapsed < windowMs) {
+        if (existing.count >= limit) {
+          return {
+            success: false,
+            remaining: 0,
+            resetInMs: Math.max(0, windowMs - elapsed),
+          }
+        }
+        
+        const newCount = existing.count + 1
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase.from('rate_limits' as any) as any)
+          .update({ count: newCount, updated_at: new Date().toISOString() })
+          .eq('key', key)
+
+        return {
+          success: true,
+          remaining: limit - newCount,
+          resetInMs: Math.max(0, windowMs - elapsed),
+        }
+      }
+    }
+
+    // Upsert fresh record
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('rate_limits' as any) as any).upsert({
+      key,
+      last_requested_at: new Date(now).toISOString(),
+      count: 1,
+      updated_at: new Date(now).toISOString(),
+    })
+
+    return {
+      success: true,
+      remaining: limit - 1,
+      resetInMs: windowMs,
+    }
+  } catch (err) {
+    console.warn('[rate-limit] Persistent rate limit DB query failed, falling back to memory:', err)
+    return evaluateRateLimit(key, options)
+  }
+}

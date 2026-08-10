@@ -68,6 +68,21 @@ export class ResendProvider implements NotificationProvider {
       if (!res.ok) {
         const errorMsg = data?.message || data?.error || `HTTP ${res.status} error from Resend`
         console.error('[ResendProvider] Error response from Resend API:', data)
+        
+        try {
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'critical',
+            category: 'resend',
+            operation: 'send_email',
+            message: errorMsg,
+            templateKey: payload.templateKey,
+            details: { status: res.status },
+          })
+        } catch {
+          // Non-fatal logger fallback
+        }
+
         return {
           success: false,
           providerName: this.name,
@@ -85,6 +100,20 @@ export class ResendProvider implements NotificationProvider {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown network exception in ResendProvider'
       console.error('[ResendProvider] Exception calling Resend API:', err)
+      
+      try {
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'critical',
+          category: 'resend',
+          operation: 'send_email',
+          message: errorMsg,
+          templateKey: payload.templateKey,
+        })
+      } catch {
+        // Non-fatal logger fallback
+      }
+
       return {
         success: false,
         providerName: this.name,
@@ -98,9 +127,9 @@ export class ResendProvider implements NotificationProvider {
     const hasKey = Boolean(process.env.RESEND_API_KEY)
     return {
       providerName: this.name,
-      isHealthy: true,
+      isHealthy: hasKey,
       latencyMs: 12,
-      message: hasKey ? 'Resend API key configured' : 'Operating in dev simulation mode',
+      message: hasKey ? 'Resend API key configured and ready' : 'Monitoring Not Configured (RESEND_API_KEY missing)',
     }
   }
 }

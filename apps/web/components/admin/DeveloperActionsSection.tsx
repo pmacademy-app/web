@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import { SendTestEmailButton } from './SendTestEmailButton'
-import { Terminal, Award, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
+import { SendProductionEmailModal } from './SendProductionEmailModal'
+import { Terminal, Award, CheckCircle, AlertCircle, Loader2, Send } from 'lucide-react'
 
 export interface DeveloperActionsProps {
   targetUserId: string
@@ -10,6 +11,7 @@ export interface DeveloperActionsProps {
 }
 
 export function DeveloperActionsSection({ targetUserId, targetUserEmail }: DeveloperActionsProps) {
+  const [prodModalOpen, setProdModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<{
     success: boolean
@@ -98,7 +100,32 @@ export function DeveloperActionsSection({ targetUserId, targetUserEmail }: Devel
           templateKey="auth.welcome"
           templateName="Auth Welcome Email"
         />
+
+        <button
+          type="button"
+          onClick={() => setProdModalOpen(true)}
+          className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-all text-left group cursor-pointer col-span-1 md:col-span-2"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <Send className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold group-hover:text-emerald-300 transition-colors">Send Production Email</p>
+              <p className="text-[10px] text-emerald-400/80 font-normal">Dispatches real production template to {targetUserEmail}</p>
+            </div>
+          </div>
+          <span className="px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            Production
+          </span>
+        </button>
       </div>
+
+      <SendProductionEmailModal
+        isOpen={prodModalOpen}
+        onClose={() => setProdModalOpen(false)}
+        targetUser={{ id: targetUserId, name: targetUserEmail.split('@')[0], email: targetUserEmail }}
+      />
 
       {/* Action result notification */}
       {result && (

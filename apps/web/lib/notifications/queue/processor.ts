@@ -391,6 +391,21 @@ async function handlePermanentFailure(
     .eq('id', queueId)
 
   try {
+    const { logSystemError } = await import('@/lib/monitoring/logger')
+    void logSystemError({
+      severity: 'error',
+      category: 'queue',
+      operation: 'dead_letter_drop',
+      message: failureReason,
+      queueId,
+      templateKey,
+      userId,
+    })
+  } catch {
+    // Non-fatal logging fallback
+  }
+
+  try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase.from('email_dead_letter' as any) as any).insert({
       original_queue_id: queueId,

@@ -9,6 +9,7 @@ import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
+import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 
 const loginSchema = z.object({
   email: z
@@ -78,11 +79,16 @@ function LoginForm() {
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
 
       {errorMsg && (
-        <div
-          className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
-          role="alert"
-        >
-          {errorMsg}
+        <div className="space-y-3">
+          <div
+            className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
+            role="alert"
+          >
+            {errorMsg}
+          </div>
+          {(errorMsg.toLowerCase().includes('email not confirmed') || errorMsg.toLowerCase().includes('verify')) && (
+            <ResendVerificationCard />
+          )}
         </div>
       )}
 
