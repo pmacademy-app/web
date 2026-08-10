@@ -92,7 +92,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
         {/* Testimonials Display */}
         {loading ? (
           <div className="py-12 text-center text-xs text-muted-foreground">Loading learner reviews...</div>
-        ) : !hasLiveTestimonials ? (
+        ) : testimonials.length === 0 ? (
           <div className="p-8 rounded-2xl border border-dashed border-border bg-card/60 text-center max-w-xl mx-auto space-y-3">
             <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
               <Star className="w-6 h-6" />
