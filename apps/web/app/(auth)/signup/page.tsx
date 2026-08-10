@@ -69,13 +69,24 @@ export default function SignupPage() {
           },
         })
 
+        const isExistingAccountError =
+          Boolean(error && (
+            error.message?.toLowerCase().includes('already registered') ||
+            error.message?.toLowerCase().includes('already in use') ||
+            error.message?.toLowerCase().includes('already exists')
+          )) ||
+          Boolean(data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
+
+        if (isExistingAccountError) {
+          setErrorMsg('An account already exists with this email address. Please log in instead.')
+          return
+        }
+
         if (error) {
-          // Supabase occasionally returns '{}' as message for ambiguous errors
-          // (e.g. re-registering an unconfirmed email, rate limits, etc.)
           const raw = error.message?.trim()
           const msg =
             !raw || raw === '{}' || raw === 'null'
-              ? 'Could not create account. The email may already be registered — try logging in or resetting your password.'
+              ? 'Could not create account. Please check your credentials or try logging in.'
               : raw
           setErrorMsg(msg)
           return
@@ -140,10 +151,18 @@ export default function SignupPage() {
 
         {errorMsg && (
           <div
-            className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
+            className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium flex flex-col gap-1.5"
             role="alert"
           >
-            {errorMsg}
+            <span>{errorMsg}</span>
+            {errorMsg.includes('already exists') && (
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-1 font-bold underline hover:opacity-80 text-primary w-fit"
+              >
+                Go to Login →
+              </Link>
+            )}
           </div>
         )}
 

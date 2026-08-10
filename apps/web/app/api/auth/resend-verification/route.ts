@@ -15,12 +15,7 @@ export async function POST(request: NextRequest) {
       // Body optional if authenticated
     }
 
-    const supabase = createServerSupabaseClient()
-    const {
-      data: { user: sessionUser },
-    } = await supabase.auth.getUser()
-
-    const targetEmail = (sessionUser?.email || email || '').trim().toLowerCase()
+    const targetEmail = (email || '').trim().toLowerCase()
 
     if (!targetEmail) {
       return NextResponse.json({ success: false, error: 'Email address is required' }, { status: 400 })
@@ -43,6 +38,11 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       )
     }
+
+    const supabase = createServerSupabaseClient()
+    const {
+      data: { user: sessionUser },
+    } = await supabase.auth.getUser()
 
     // 2. If user is logged in, check if already verified
     if (sessionUser && sessionUser.email_confirmed_at) {

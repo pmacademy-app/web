@@ -124,6 +124,15 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
               </div>
             </div>
             <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
+              <span className="text-slate-400">Email Verification</span>
+              <div className="flex items-center gap-2">
+                <AdminStatusBadge
+                  status={user.isVerified ? 'published' : 'archived'}
+                  label={user.isVerified ? 'Verified' : 'Unverified'}
+                />
+              </div>
+            </div>
+            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
               <span className="text-slate-400">Joined Date</span>
               <span className="font-mono text-slate-200">
                 {new Date(user.createdAt).toLocaleString()}
@@ -138,6 +147,34 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
             Admin Controlled User Management
           </h3>
           <div className="flex flex-wrap gap-2 text-xs">
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/admin/emails/production-send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      targetUserId: user.id,
+                      templateKey: 'auth.verify_email',
+                      confirmProductionSend: true,
+                    }),
+                  })
+                  const data = await res.json()
+                  if (res.ok && data.success) {
+                    alert(`Verification email resent successfully to ${user.email}.`)
+                  } else {
+                    alert(data.error || 'Failed to resend verification email.')
+                  }
+                } catch {
+                  alert('Network error resending verification email.')
+                }
+              }}
+              className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold hover:bg-blue-500/20 transition-colors cursor-pointer"
+            >
+              Resend Verification Email
+            </button>
+
             <button
               type="button"
               onClick={async () => {

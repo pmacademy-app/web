@@ -70,10 +70,14 @@ export async function evaluatePersistentRateLimit(
     const supabase = createServerSupabaseClient()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing } = await (supabase.from('rate_limits' as any) as any)
+    const { data: existing, error: selectError } = await (supabase.from('rate_limits' as any) as any)
       .select('key, last_requested_at, count')
       .eq('key', key)
       .maybeSingle()
+
+    if (selectError) {
+      throw selectError
+    }
 
     if (existing) {
       const lastTime = new Date(existing.last_requested_at).getTime()
@@ -118,6 +122,6 @@ export async function evaluatePersistentRateLimit(
     }
   } catch (err) {
     console.warn('[rate-limit] Persistent rate limit DB query failed, falling back to memory:', err)
-    return evaluateRateLimit(key, options)
+    return evaluateRateLimit(key, { limit, windowMs })
   }
 }

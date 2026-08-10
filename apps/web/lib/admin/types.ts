@@ -23,6 +23,8 @@ export interface AdminUserOverview {
   username?: string | null
   role: string
   isAdmin: boolean
+  isVerified: boolean
+  emailConfirmedAt?: string | null
   totalXp: number
   level: number
   streakDays: number
