@@ -1,7 +1,5 @@
-'use client'
-
-
-import { useScrollDepth } from '@/hooks/use-analytics'
+import { FeedbackAdminService } from '@/lib/admin/feedback-service'
+import { PageAnalytics } from '@/components/marketing/page-analytics'
 import { HeroSection } from '@/components/marketing/sections/hero'
 import { WhySection } from '@/components/marketing/sections/why'
 import { JourneySection } from '@/components/marketing/sections/journey'
@@ -14,17 +12,18 @@ import { TestimonialsSection } from '@/components/marketing/sections/testimonial
 import { FAQSection } from '@/components/marketing/sections/faq'
 import { FinalCTASection } from '@/components/marketing/sections/final-cta'
 
+export const revalidate = 60
+
 /**
  * Main marketing landing page.
- * Assembles core marketing sections.
- * Triggers scroll analytics hook on mount.
+ * Server-renders published testimonials into HTML for search engine indexing.
  */
-export default function MarketingPage() {
-  // Fire GA4 scroll depth metric
-  useScrollDepth()
+export default async function MarketingPage() {
+  const publishedTestimonials = await FeedbackAdminService.getPublishedTestimonials()
 
   return (
     <>
+      <PageAnalytics />
       <HeroSection />
       <WhySection />
       <JourneySection />
@@ -33,7 +32,7 @@ export default function MarketingPage() {
       <SkillRadarSection />
       <PortfolioSection />
       <CommunitySection />
-      <TestimonialsSection />
+      <TestimonialsSection initialTestimonials={publishedTestimonials} />
       <FAQSection />
       <FinalCTASection />
     </>

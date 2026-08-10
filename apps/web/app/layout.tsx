@@ -13,6 +13,7 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
+  preload: true,
 })
 
 const fraunces = Fraunces({
@@ -20,6 +21,7 @@ const fraunces = Fraunces({
   display: 'swap',
   variable: '--font-fraunces',
   axes: ['opsz', 'SOFT', 'WONK'],
+  preload: true,
 })
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────

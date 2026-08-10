@@ -34,6 +34,14 @@ function formatModuleName(moduleSlug: string): string {
     .join(' ')
 }
 
+export async function generateStaticParams() {
+  const curriculum = await fetchCurriculumData()
+  if (!curriculum) return []
+  return curriculum.lessons.map((lesson) => ({
+    slug: lesson.slug,
+  }))
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const [lesson, curriculum] = await Promise.all([
