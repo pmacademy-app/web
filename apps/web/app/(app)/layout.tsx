@@ -1,9 +1,17 @@
+import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile } from '@/lib/auth'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+}
 
 export default async function AuthenticatedLayout({
   children,

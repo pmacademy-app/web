@@ -124,7 +124,7 @@ export default function AboutPage() {
             </Link>
 
             <Link
-              href="/academy"
+              href="/signup"
               className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-all flex items-center gap-1.5"
             >
               <span>Start Learning Free</span>

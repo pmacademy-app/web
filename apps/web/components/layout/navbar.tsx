@@ -77,7 +77,7 @@ function CTAButton({
       </Link>
 
       <Link
-        href="/academy"
+        href="/signup"
         onClick={handleClick}
         className={cn(
           'inline-flex items-center font-medium rounded-sm',

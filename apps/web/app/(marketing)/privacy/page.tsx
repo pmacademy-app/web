@@ -6,7 +6,7 @@ import { ShieldCheck, Lock, Database, Mail, Cookie, RefreshCw } from 'lucide-rea
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Prodily PM Academy',
+  title: 'Privacy Policy',
   description: 'Comprehensive Privacy Policy for Prodily PM Academy detailing Supabase RLS security, learner data collection, analytics practices, and account deletion rights.',
   openGraph: {
     title: 'Privacy Policy — Prodily PM Academy',

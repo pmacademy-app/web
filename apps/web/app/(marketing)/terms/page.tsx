@@ -6,7 +6,7 @@ import { FileText, CheckCircle2, ShieldAlert, Award, FileCode, AlertCircle, Mail
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — Prodily PM Academy',
+  title: 'Terms of Service',
   description: 'Terms of Service for Prodily PM Academy outlining free-forever curriculum commitment, acceptable use, intellectual property, certificates, and learner guidelines.',
   openGraph: {
     title: 'Terms of Service — Prodily PM Academy',

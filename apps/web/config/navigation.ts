@@ -18,6 +18,7 @@ export const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
     heading: 'Resources',
     links: [
       { label: 'Curriculum', href: '/curriculum' },
+      { label: 'Preview Sample Lesson', href: '/lessons/lesson-001' },
       { label: 'Buy Me a Coffee', href: 'https://buymeacoffee.com/prodily' },
     ],
   },
