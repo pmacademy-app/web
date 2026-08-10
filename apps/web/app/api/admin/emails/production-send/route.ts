@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     if (templateKey === 'auth.verify_email') {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me'
 
-      let linkRes = await supabase.auth.admin.generateLink({
+      const linkRes = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email: recipientEmail,
         options: {
