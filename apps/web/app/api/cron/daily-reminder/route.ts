@@ -8,6 +8,13 @@ export async function POST(request: Request) {
   const authHeader = request.headers.get('Authorization')
 
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const { logSystemError } = await import('@/lib/monitoring/logger')
+    void logSystemError({
+      severity: 'warning',
+      category: 'cron',
+      operation: 'cron_daily_reminder_auth',
+      message: 'Unauthorized cron request: CRON_SECRET mismatch on /api/cron/daily-reminder',
+    })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -29,11 +36,21 @@ export async function POST(request: Request) {
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: rawUsers } = await (supabase.from('users' as any) as any)
+    const { data: rawUsers, error: queryErr } = await (supabase.from('users' as any) as any)
       .select('id, email, name, current_streak')
       .gt('current_streak', 0)
       .not('email', 'is', null)
       .limit(100)
+
+    if (queryErr) {
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'error',
+        category: 'cron',
+        operation: 'cron_daily_reminder_query',
+        message: `Database query failure in /api/cron/daily-reminder: ${queryErr.message}`,
+      })
+    }
 
     const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; current_streak?: number }>
 
@@ -62,6 +79,13 @@ export async function POST(request: Request) {
     }
   } catch (err) {
     console.error('[cron/daily-reminder] Failed to queue daily reminders:', err)
+    const { logSystemError } = await import('@/lib/monitoring/logger')
+    void logSystemError({
+      severity: 'error',
+      category: 'cron',
+      operation: 'cron_daily_reminder_exception',
+      message: `Unhandled exception in /api/cron/daily-reminder: ${err instanceof Error ? err.message : String(err)}`,
+    })
   }
 
   return NextResponse.json({

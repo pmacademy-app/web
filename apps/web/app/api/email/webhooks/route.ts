@@ -92,6 +92,13 @@ export async function POST(request: Request) {
       const isValid = verifyResendWebhookSignature(request, rawBody, secret)
       if (!isValid) {
         console.warn('[ResendWebhook] Unauthorized webhook request: Svix signature verification failed.')
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'warning',
+          category: 'webhook',
+          operation: 'resend_webhook_auth',
+          message: 'Unauthorized request: Svix signature or secret verification failed',
+        })
         return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
       }
     }
@@ -99,7 +106,15 @@ export async function POST(request: Request) {
     let payload: Record<string, unknown> = {}
     try {
       payload = JSON.parse(rawBody)
-    } catch {
+    } catch (parseErr) {
+      const parseMsg = parseErr instanceof Error ? parseErr.message : 'Invalid JSON'
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'error',
+        category: 'webhook',
+        operation: 'resend_webhook_parse',
+        message: `Invalid JSON payload in Resend webhook: ${parseMsg}`,
+      })
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
     }
 
@@ -163,6 +178,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, processed: true, outboundEventType: eventType })
       } catch (outboundErr) {
         console.warn('[ResendWebhook] Non-fatal outbound event persistence warning:', outboundErr)
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'error',
+          category: 'webhook',
+          operation: 'resend_webhook_process',
+          message: `Outbound event processing failure: ${outboundErr instanceof Error ? outboundErr.message : String(outboundErr)}`,
+          resendId: emailId || undefined,
+        })
         return NextResponse.json({ success: true, warning: 'Outbound processing logged warning' })
       }
     }
@@ -207,11 +230,25 @@ export async function POST(request: Request) {
 
       if (error) {
         console.warn('[ResendWebhook] Warning saving inbound message to DB:', error)
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'warning',
+          category: 'webhook',
+          operation: 'resend_webhook_db',
+          message: `Inbound message DB save warning: ${error.message}`,
+        })
       } else if (inserted) {
         insertedId = inserted.id
       }
     } catch (dbErr) {
       console.warn('[ResendWebhook] Non-fatal DB warning (env or connection unavailable):', dbErr)
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'warning',
+        category: 'webhook',
+        operation: 'resend_webhook_db',
+        message: `Inbound message DB save exception: ${dbErr instanceof Error ? dbErr.message : String(dbErr)}`,
+      })
     }
 
     // 4. Forward alert email to pmacademyapp@gmail.com inbox via sendEmail()
@@ -235,11 +272,25 @@ export async function POST(request: Request) {
       })
     } catch (forwardErr) {
       console.warn('[ResendWebhook] Non-fatal warning forwarding inbound email to Gmail:', forwardErr)
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'warning',
+        category: 'webhook',
+        operation: 'resend_webhook_forward',
+        message: `Inbound email forwarding warning: ${forwardErr instanceof Error ? forwardErr.message : String(forwardErr)}`,
+      })
     }
 
     return NextResponse.json({ success: true, processed: true, messageId: insertedId })
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : 'Invalid webhook payload'
+    const { logSystemError } = await import('@/lib/monitoring/logger')
+    void logSystemError({
+      severity: 'error',
+      category: 'webhook',
+      operation: 'resend_webhook_exception',
+      message: `Unhandled exception in Resend webhook: ${errorMsg}`,
+    })
     return NextResponse.json({ success: false, error: errorMsg }, { status: 400 })
   }
 }
