@@ -11,34 +11,34 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const isEnabled = await EmailAutomationsService.isAutomationEnabled('learning.weekly_recap')
+  const isEnabled = await EmailAutomationsService.isAutomationEnabled('learning.daily_reminder')
   const isGlobalPause = await EmailAutomationsService.isGlobalPauseActive()
 
   if (!isEnabled || isGlobalPause) {
     return NextResponse.json({
       success: true,
-      message: 'Weekly recap disabled via Admin Automations or Global Pause',
+      message: 'Daily reminder disabled via Admin Automations or Global Pause',
       isEnabled,
       isGlobalPause,
-      recapsQueued: 0,
+      remindersQueued: 0,
     })
   }
 
   const supabase = createServerSupabaseClient()
-  let recapsQueued = 0
+  let remindersQueued = 0
 
   try {
-    // Fetch active users with email from users table
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: rawUsers } = await (supabase.from('users' as any) as any)
-      .select('id, email, name, total_xp, current_streak')
+      .select('id, email, name, current_streak')
+      .gt('current_streak', 0)
       .not('email', 'is', null)
       .limit(100)
 
-    const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; total_xp?: number; current_streak?: number }>
+    const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; current_streak?: number }>
 
     if (users.length > 0) {
-      const weekNumber = Math.ceil(new Date().getDate() / 7)
+      const todayDate = new Date().toISOString().slice(0, 10)
       for (const user of users) {
         if (!user.email) continue
         const result = await enqueueNotificationItem({
@@ -46,30 +46,28 @@ export async function POST(request: Request) {
           toEmail: user.email,
           toName: user.name || user.email.split('@')[0],
           channel: 'email',
-          templateKey: 'learning.weekly_recap',
+          templateKey: 'learning.daily_reminder',
           templateVariables: {
             userName: user.name || user.email.split('@')[0],
-            lessonsCompletedCount: Math.floor((user.total_xp || 0) / 50),
-            xpEarnedThisWeek: Math.min(300, user.total_xp || 0),
-            currentStreak: user.current_streak || 0,
-            weekNumber,
+            currentStreak: user.current_streak || 1,
+            dueCount: 5,
           },
-          eventId: `weekly-recap-${user.id}-${new Date().toISOString().slice(0, 10)}`,
-          eventType: 'system.weekly_recap',
+          eventId: `daily-reminder-${user.id}-${todayDate}`,
+          eventType: 'learning.daily_reminder',
           category: 'learning',
           priorityLevel: 'medium',
         })
-        if (result.success) recapsQueued++
+        if (result.success) remindersQueued++
       }
     }
   } catch (err) {
-    console.error('[cron/weekly-recap] Failed to process weekly recaps:', err)
+    console.error('[cron/daily-reminder] Failed to queue daily reminders:', err)
   }
 
   return NextResponse.json({
     success: true,
     timestamp: new Date().toISOString(),
-    recapsQueued,
+    remindersQueued,
   })
 }
 

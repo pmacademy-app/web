@@ -13,6 +13,8 @@ import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { getSkillRadarSummary, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { validateUsername, validateOptionalUrl } from '@/lib/portfolio'
+import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
+import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type CapstoneSubmissionRow = Database['public']['Tables']['capstone_submissions']['Row']
@@ -291,6 +293,30 @@ export async function updatePortfolioSettings(
   if (updateError) {
     console.error('[portfolio-db] Error updating user portfolio settings:', updateError)
     throw new Error('Failed to update portfolio settings.')
+  }
+
+  if (updatePayload.is_portfolio_public) {
+    try {
+      initializeNotificationConnectors()
+      await globalNotificationDispatcher.dispatch({
+        id: `portfolio-pub-${userId}`,
+        event: 'portfolio.published',
+        userId,
+        userEmail: '',
+        userName: cleanUsername,
+        userTimezone: 'UTC',
+        priority: 'high',
+        category: 'portfolio',
+        occurredAt: new Date().toISOString(),
+        payload: {
+          userId,
+          username: cleanUsername,
+          portfolioUrl: `https://prodily.adityagangwani.me/p/${cleanUsername}`,
+        },
+      })
+    } catch (dispatchErr) {
+      console.warn('[portfolio-db] Non-fatal notification dispatch warning:', dispatchErr)
+    }
   }
 
   return {

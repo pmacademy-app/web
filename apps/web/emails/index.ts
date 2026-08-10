@@ -4,6 +4,7 @@ import { VerifyEmail } from './templates/auth/VerifyEmail'
 import { PasswordReset } from './templates/auth/PasswordReset'
 import { ModuleCompletedEmail } from './templates/learning/ModuleCompleted'
 import { WeeklyRecap } from './templates/learning/WeeklyRecap'
+import { DailyReminder } from './templates/learning/DailyReminder'
 import { BadgeEarnedEmail } from './templates/achievement/BadgeEarned'
 import { LevelUpEmail } from './templates/achievement/LevelUp'
 import { CertificateEarned } from './templates/achievement/CertificateEarned'
@@ -11,10 +12,7 @@ import { PortfolioPublished } from './templates/achievement/PortfolioPublished'
 import { BRAND } from '@/lib/brand'
 
 export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType<Record<string, unknown>>; subjectLine: string }> = {
-  'auth.welcome': {
-    component: WelcomeEmail,
-    subjectLine: `Welcome to ${BRAND.shortName}!`,
-  },
+  // Critical Auth (Always On - Direct / Hook)
   'auth.verify_email': {
     component: VerifyEmail,
     subjectLine: `Confirm your ${BRAND.shortName} email address`,
@@ -23,13 +21,15 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
     component: PasswordReset,
     subjectLine: `Reset your ${BRAND.shortName} password`,
   },
+
+  // Optional Transactional Automations
+  'auth.welcome': {
+    component: WelcomeEmail,
+    subjectLine: `Welcome to ${BRAND.shortName}!`,
+  },
   'learning.module_complete': {
     component: ModuleCompletedEmail,
     subjectLine: 'Module Complete: {{moduleName}}!',
-  },
-  'learning.weekly_recap': {
-    component: WeeklyRecap,
-    subjectLine: `Your Week in ${BRAND.shortName}`,
   },
   'achievement.badge_earned': {
     component: BadgeEarnedEmail,
@@ -46,6 +46,24 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   'achievement.portfolio_published': {
     component: PortfolioPublished,
     subjectLine: 'Your Public Portfolio is Live!',
+  },
+
+  // Scheduled Digests & Reminders
+  'learning.weekly_recap': {
+    component: WeeklyRecap,
+    subjectLine: `Your Week in ${BRAND.shortName}`,
+  },
+  'system.weekly_recap': {
+    component: WeeklyRecap,
+    subjectLine: `Your Week in ${BRAND.shortName}`,
+  },
+  'learning.daily_reminder': {
+    component: DailyReminder,
+    subjectLine: `Keep your learning streak alive on ${BRAND.shortName}!`,
+  },
+  'inactive.resume_learning': {
+    component: WelcomeEmail,
+    subjectLine: `Resume your learning path on ${BRAND.shortName}`,
   },
 }
 
