@@ -119,6 +119,77 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
           </div>
         </div>
 
+        {/* Admin Operational Controls: Progress Reset & Controlled User Deletion */}
+        <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            Admin Controlled User Management
+          </h3>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <button
+              type="button"
+              onClick={async () => {
+                if (confirm(`Reset all curriculum progress, XP, and streak data for ${user.email}? This action cannot be undone.`)) {
+                  try {
+                    const res = await fetch(`/api/admin/users/${user.id}`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ action: 'reset_progress' }),
+                    })
+                    const data = await res.json()
+                    if (res.ok && data.success) {
+                      alert(`Successfully reset user progress for ${user.email}.`)
+                      onClose()
+                    } else {
+                      alert(data.error || 'Failed to reset progress.')
+                    }
+                  } catch {
+                    alert('Network error resetting progress.')
+                  }
+                }
+              }}
+              className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold hover:bg-amber-500/20 transition-colors cursor-pointer"
+            >
+              Reset User Progress
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                if (confirm(`DANGER: Delete user account for ${user.email}? This will permanently remove all account data, progress, and certificates.`)) {
+                  try {
+                    const res = await fetch(`/api/admin/users/${user.id}`, {
+                      method: 'DELETE',
+                    })
+                    const data = await res.json()
+                    if (res.ok && data.success) {
+                      alert(`Successfully deleted user account for ${user.email}.`)
+                      onClose()
+                    } else {
+                      alert(data.error || 'Failed to delete account.')
+                    }
+                  } catch {
+                    alert('Network error deleting user account.')
+                  }
+                }
+              }}
+              className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 font-bold hover:bg-rose-500/20 transition-colors cursor-pointer"
+            >
+              Delete User Account
+            </button>
+
+            {user.username && (
+              <a
+                href={`/p/${user.username}`}
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-bold hover:text-white transition-colors"
+              >
+                Inspect Portfolio →
+              </a>
+            )}
+          </div>
+        </div>
+
         {/* Developer / Admin Operational Actions */}
         <div className="pt-2">
           <DeveloperActionsSection

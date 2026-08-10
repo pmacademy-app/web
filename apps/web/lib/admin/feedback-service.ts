@@ -115,12 +115,13 @@ export class FeedbackAdminService {
     }
 
     return rows.map((item) => {
+      const itemExt = item as unknown as TestimonialRow & { author_name?: string; author_role?: string }
       const userMeta = item.user_id ? userMap.get(item.user_id) : null
       return {
         id: item.id,
         userId: item.user_id,
-        authorName: userMeta?.name || 'Anonymous PM Learner',
-        authorRole: 'PM Academy Graduate',
+        authorName: itemExt.author_name || userMeta?.name || 'PM Academy Learner',
+        authorRole: itemExt.author_role || 'PM Academy Learner',
         sourceEvent: item.source_event,
         content: item.content,
         status: item.status as 'pending' | 'approved' | 'rejected',
@@ -200,14 +201,23 @@ export class FeedbackAdminService {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data, error } = await (supabase.from('testimonials' as any) as any)
-          .select('id, user_id, content, created_at')
+          .select('id, user_id, author_name, author_role, headline, rating, content, created_at')
           .eq('is_published', true)
           .eq('status', 'approved')
           .order('created_at', { ascending: false })
 
         if (error || !data) return []
 
-        const rows = data as Array<{ id: string; user_id: string | null; content: string; created_at: string }>
+        const rows = data as Array<{
+          id: string
+          user_id: string | null
+          author_name?: string | null
+          author_role?: string | null
+          headline?: string | null
+          rating?: number | null
+          content: string
+          created_at: string
+        }>
 
         const userIds = rows.map((t) => t.user_id).filter(Boolean) as string[]
         const userMap = new Map<string, string>()
@@ -221,15 +231,15 @@ export class FeedbackAdminService {
           if (usersData) {
             const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
             uList.forEach((u) => {
-              userMap.set(u.id, u.full_name || u.username || u.email.split('@')[0])
+              userMap.set(u.id, u.full_name || u.username || 'Learner')
             })
           }
         }
 
         return rows.map((t) => ({
           id: t.id,
-          authorName: (t.user_id ? userMap.get(t.user_id) : null) || 'PM Academy Alum',
-          role: 'Verified PM Academy Graduate',
+          authorName: t.author_name || (t.user_id ? userMap.get(t.user_id) : null) || 'PM Academy Learner',
+          role: t.author_role || 'Verified PM Academy Learner',
           content: t.content,
           createdAt: t.created_at,
         }))
