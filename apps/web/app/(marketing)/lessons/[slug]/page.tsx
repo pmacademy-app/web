@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { fetchCompiledLesson, fetchCurriculumData, resolveSlugToId } from '@/lib/lesson-loader'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { BRAND } from '@/lib/brand'
 
@@ -143,27 +144,28 @@ export default async function PublicLessonPage({ params }: PageProps) {
     .slice(0, 8)
 
   return (
-    <article className="container mx-auto px-4 py-12 max-w-4xl space-y-8">
+    <article className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-4xl space-y-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div>
+      <div className="space-y-4">
         <Link
           href="/curriculum"
-          className="text-xs font-semibold uppercase tracking-wider text-primary hover:underline"
+          className="inline-flex items-center gap-2 px-3 py-1.5 -ml-3 rounded-lg text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
-          ← Back to Curriculum
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Curriculum</span>
         </Link>
-        <div className="flex items-center gap-3 mt-4 text-sm text-muted-foreground">
-          <span>Module: {formatModuleName(lesson.module)}</span>
+        <div className="flex flex-wrap items-center gap-3 pt-2 text-sm text-muted-foreground">
+          <span className="font-semibold text-primary">Module: {formatModuleName(lesson.module)}</span>
           <span>•</span>
           <span>Lesson {globalOrder}</span>
           <span>•</span>
           <span>{lesson.estimatedReadingTime} min read</span>
         </div>
-        <h1 className="text-3xl md:text-5xl font-bold font-serif text-foreground mt-2 leading-tight">
+        <h1 className="text-3xl md:text-5xl font-bold font-serif text-foreground leading-tight">
           {lesson.title}
         </h1>
       </div>
@@ -185,40 +187,43 @@ export default async function PublicLessonPage({ params }: PageProps) {
         <div className="flex justify-center">
           <Link
             href="/signup"
-            className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
           >
-            Start Lesson {globalOrder} Free →
+            <span>Start Lesson {globalOrder} Free</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
 
       {/* Lesson Navigation Footer */}
-      <div className="flex justify-between items-center pt-6 border-t border-border/60 text-xs">
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center pt-8 border-t border-border/60 text-xs">
         {prevLesson ? (
           <Link
             href={`/lessons/${prevLesson.slug}`}
-            className="inline-flex items-center gap-1.5 font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-border bg-card font-semibold text-foreground hover:bg-accent/40 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
           >
-            ← Previous Lesson
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Previous Lesson</span>
           </Link>
         ) : (
-          <div />
+          <div className="hidden sm:block" />
         )}
         <Link
           href="/curriculum"
-          className="font-semibold text-primary hover:underline"
+          className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-primary/20 bg-primary/5 text-primary font-bold hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
           View Full Curriculum
         </Link>
         {nextLesson ? (
           <Link
             href={`/lessons/${nextLesson.slug}`}
-            className="inline-flex items-center gap-1.5 font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-border bg-card font-semibold text-foreground hover:bg-accent/40 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
           >
-            Next Lesson →
+            <span>Next Lesson</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         ) : (
-          <div />
+          <div className="hidden sm:block" />
         )}
       </div>
     </article>

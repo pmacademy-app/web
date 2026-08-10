@@ -53,7 +53,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
     <section
       id="testimonials"
       aria-labelledby="testimonials-heading"
-      className="py-20 lg:py-28 bg-surface-muted border-t border-border overflow-hidden relative"
+      className="py-20 lg:py-28 bg-surface-muted border-t border-border overflow-hidden relative scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         {/* Header */}

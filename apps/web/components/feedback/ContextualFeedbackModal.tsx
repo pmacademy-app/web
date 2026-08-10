@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { MessageSquare, Star, X, Send, CheckCircle2, Loader2, Award } from 'lucide-react'
 
 interface ContextualFeedbackModalProps {
@@ -31,8 +31,6 @@ export function ContextualFeedbackModal({
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  if (!isOpen) return null
-
   const handleDismiss = async () => {
     try {
       await fetch('/api/feedback', {
@@ -45,6 +43,19 @@ export function ContextualFeedbackModal({
     }
     onClose()
   }
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleDismiss()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen])
+
+  if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

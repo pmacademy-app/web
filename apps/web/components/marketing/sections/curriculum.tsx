@@ -26,7 +26,7 @@ export function CurriculumSection() {
     <section
       id="curriculum"
       aria-labelledby="curriculum-heading"
-      className="bg-surface-muted py-20 lg:py-28"
+      className="bg-surface-muted py-20 lg:py-28 scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         {/* Header */}

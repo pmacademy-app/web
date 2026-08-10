@@ -16,7 +16,7 @@ export function CommunitySection() {
     <section
       id="community"
       aria-labelledby="community-heading"
-      className="py-20 lg:py-28 bg-surface"
+      className="py-20 lg:py-28 bg-surface scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         {/* Header */}

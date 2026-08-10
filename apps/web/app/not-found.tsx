@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Page Not Found | Prodily PM Academy',
+  title: 'Page Not Found',
   description: 'This page is not in the curriculum.',
   robots: {
     index: false,
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
  */
 export default function NotFound() {
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
+    <div className="min-h-[70vh] pt-24 pb-16 lg:pt-28 lg:pb-20 flex flex-col items-center justify-center px-4 text-center">
       <p className="text-body-sm text-locked font-medium mb-3">404</p>
       <h1 className="text-h1 font-semibold text-foreground mb-3">
         This page is not in the curriculum.
