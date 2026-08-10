@@ -20,6 +20,7 @@ export interface AdminUserOverview {
   id: string
   email: string
   fullName: string
+  username?: string | null
   role: string
   isAdmin: boolean
   totalXp: number

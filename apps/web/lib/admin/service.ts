@@ -123,6 +123,7 @@ export class AdminConsoleService {
       id: string
       email: string
       full_name?: string
+      username?: string
       is_admin?: boolean
       total_xp?: number
       level?: number
@@ -135,6 +136,7 @@ export class AdminConsoleService {
       id: u.id,
       email: u.email,
       fullName: u.full_name || u.email.split('@')[0],
+      username: u.username || null,
       role: u.is_admin ? 'Admin' : 'Learner',
       isAdmin: Boolean(u.is_admin),
       totalXp: u.total_xp || 0,
@@ -158,6 +160,7 @@ export class AdminConsoleService {
       id: string
       email: string
       full_name?: string
+      username?: string
       is_admin?: boolean
       total_xp?: number
       level?: number
@@ -179,6 +182,7 @@ export class AdminConsoleService {
       id: u.id,
       email: u.email,
       fullName: u.full_name || u.email.split('@')[0],
+      username: u.username || null,
       role: u.is_admin ? 'Admin' : 'Learner',
       isAdmin: Boolean(u.is_admin),
       totalXp: u.total_xp || 0,
