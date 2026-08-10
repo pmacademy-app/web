@@ -1,7 +1,7 @@
 # Observability & Metric Telemetry Specification — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
+**Current Baseline HEAD:** `7158925`  
 **Last Updated:** August 10, 2026  
 
 ---
@@ -63,11 +63,15 @@ A key observability distinction exists between upstream provider usage and inter
 
 ---
 
-## 3. Known Observability / UX Issue Register
+## 3. Known Observability & Audit Log Issue Register
 
-- **Issue**: Admin Panel presents Prodily Automation Quota (`daily_email_quota_count`) under the label `"Daily Email Quota Usage"`.
+### ISSUE-04: Admin Panel Email Quota vs. Resend Account Usage Metric Labeling
 - **Status**: 🟡 Known Observability / UX Issue
-- **Impact**: Risks giving the false impression that internal automation quota usage is equivalent to total Resend account usage.
-- **Future Resolution**: Expose two separate cards in Admin Panel:
-  1. **Resend Account Outbound Usage** (Provider Telemetry)
-  2. **Prodily Automation Quota** (Queue Throttling Counter)
+- **Impact**: Admin Panel presents Prodily Automation Quota (`daily_email_quota_count`) under `"Daily Email Quota Usage"`, risking confusion with total Resend account usage.
+- **Future Resolution**: Expose two separate metric cards: **Resend Account Outbound Usage** and **Prodily Automation Quota**.
+
+### ISSUE-05: Admin Production Audit Trail False-Positive Success Reporting
+- **Status**: 🟠 Partially Verified / Known Production Failure
+- **Impact**: In live production, `public.admin_audit_logs` records `SEND_PRODUCTION_EMAIL` even when `processEmailQueue()` returns `processed: 0` and zero emails are delivered to Resend.
+- **Observability Gap**: The audit trail records the administrative trigger attempt as successful even when delivery fails silently upstream.
+- **Cross-Reference**: Documented in `docs/ISSUES_KNOWN.md#issue-05-admin-production-email-zero-processed-delivery-gap`.

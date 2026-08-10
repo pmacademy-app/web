@@ -1,7 +1,7 @@
 # Admin Console Specification & Audit — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
+**Current Baseline HEAD:** `7158925`  
 **Last Updated:** August 10, 2026  
 
 ---
@@ -25,7 +25,7 @@ The Admin Console (`/admin`) is a centralized management platform for administra
 | **3. Users** | `UserManagementView`, `UserDetailDrawer` | User list, verified/unverified badges, search, detail view | `auth.users`, `public.users` | 🟢 Verified in Production |
 | **4. Portfolios** | `AdminPortfoliosView` | Public portfolio toggle & showcase audit | `public.users`, `public.capstone_submissions` | 🟢 Verified in Production |
 | **5. Notifications** | `AdminNotificationsView` | Dispatch broadcast notifications, view delivery logs | `public.notifications`, `public.notification_delivery_events` | 🟢 Verified in Production |
-| **6. Emails** | `AdminEmailsView`, `ProductionSendModal`, `TestSendModal` | Send Production Email, Send Test Email, Queue Overview | `public.email_queue`, Resend API | 🟢 Verified in Production |
+| **6. Emails** | `AdminEmailsView`, `ProductionSendModal`, `TestSendModal` | Send Production Email, Send Test Email, Queue Overview | `public.email_queue`, Resend API | 🟠 Known Production Failure (`ISSUE-05`) |
 | **7. Feature Flags** | `AdminFeatureFlagsView` | Runtime toggle of feature flags (`email_automations_enabled`, etc.) | `public.system_settings` | 🟢 Verified in Production |
 | **8. Feedback** | `AdminFeedbackView` | View learner feedback & ratings | `public.user_feedback` | 🟢 Verified in Production |
 | **9. Certificates** | `AdminCertificatesView` | Manual certificate generation & verification audit | `public.certificates` | 🟢 Verified in Production |
@@ -49,7 +49,12 @@ The Admin Console (`/admin`) is a centralized management platform for administra
    - For all other templates: Enqueues into `email_queue` and executes `processEmailQueue(50)`.
    - Records an entry in `public.admin_audit_logs` and `public.notification_delivery_events`.
 
-### C. System Alerts & Error Audit Logs
-- **Implementation**: `/admin/system` displays real-time system errors logged via `logSystemError()`.
-- **Sanitization**: Secret tokens (`Bearer`, `whsec_`, `sk_`) are sanitized before insertion into `public.system_errors`.
-- **Deduplication**: Identical errors within 15 minutes match fingerprint signatures and increment `occurrence_count` instead of creating duplicate rows.
+---
+
+## 4. Known Administrative Limitations & Unresolved Issues
+
+### ISSUE-05: Admin Production Email Zero-Processed Delivery Gap
+- **Status**: 🟠 Partially Verified / Known Production Failure
+- **Observed Gap**: In live production, triggering Send Production Email for optional templates (e.g. `auth.welcome`) executed without displaying an error in the Admin UI, but Vercel logs recorded `queueId: 'unknown'` and `processResult: { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }`.
+- **Audit Limitation**: The Admin audit log (`public.admin_audit_logs`) records the production send action as successful even when zero emails are processed or delivered.
+- **Cross-Reference**: Documented in `docs/ISSUES_KNOWN.md#issue-05-admin-production-email-zero-processed-delivery-gap`.
