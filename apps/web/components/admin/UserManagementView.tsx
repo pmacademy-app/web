@@ -97,6 +97,25 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
     },
   ]
 
+  const [searchQuery, setSearchQuery] = React.useState('')
+  const [roleFilter, setRoleFilter] = React.useState<'all' | 'admin' | 'learner'>('all')
+
+  const filteredUsers = React.useMemo(() => {
+    return initialUsers.filter((u) => {
+      const matchesSearch =
+        !searchQuery.trim() ||
+        u.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchQuery.toLowerCase())
+
+      const matchesRole =
+        roleFilter === 'all' ||
+        (roleFilter === 'admin' && u.isAdmin) ||
+        (roleFilter === 'learner' && !u.isAdmin)
+
+      return matchesSearch && matchesRole
+    })
+  }, [initialUsers, searchQuery, roleFilter])
+
   return (
     <div className="space-y-8">
       <AdminPageHeader
@@ -106,12 +125,39 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
         iconColor="text-amber-400"
       />
 
+      {/* Filter & Search Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search learners by name or email..."
+            className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500/50"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value as 'all' | 'admin' | 'learner')}
+            className="px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+          >
+            <option value="all">All Roles</option>
+            <option value="learner">Learners Only</option>
+            <option value="admin">Admins Only</option>
+          </select>
+          <span className="text-xs text-slate-500 font-mono">
+            {filteredUsers.length} of {initialUsers.length}
+          </span>
+        </div>
+      </div>
+
       <AdminDataTable
         columns={columns}
-        data={initialUsers}
+        data={filteredUsers}
         keyExtractor={(u) => u.id}
-        emptyTitle="No learners registered"
-        emptyDescription="No user accounts match your search filters."
+        emptyTitle="No learners found"
+        emptyDescription="No user accounts match your active search or role filters."
       />
 
       {/* Slide-over User Detail Drawer */}

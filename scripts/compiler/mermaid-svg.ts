@@ -323,9 +323,15 @@ async function getMermaid() {
     fontSize: 14,
     flowchart: {
       useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis',
+      nodeSpacing: 45,
+      rankSpacing: 45,
+      padding: 16,
     },
     sequence: {
       showSequenceNumbers: false,
+      actorMargin: 50,
     },
     themeVariables: {
       darkMode: false,
