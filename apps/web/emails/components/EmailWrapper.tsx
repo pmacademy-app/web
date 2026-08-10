@@ -6,12 +6,14 @@ export interface EmailWrapperProps {
   children: React.ReactNode
   previewText?: string
   unsubscribeToken?: string
+  isCriticalAuth?: boolean
 }
 
 export const EmailWrapper: React.FC<EmailWrapperProps> = ({
   children,
   previewText,
   unsubscribeToken,
+  isCriticalAuth = false,
 }) => {
   const appUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
   const unsubscribeUrl = unsubscribeToken
@@ -44,11 +46,11 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
       <body
         style={{
           margin: 0,
-          padding: '24px 12px',
-          backgroundColor: '#fbfaf6',
+          padding: '32px 16px',
+          backgroundColor: '#FBFAF6',
           fontFamily:
             "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-          color: '#1a1a1a',
+          color: '#171A17',
           lineHeight: 1.6,
         }}
       >
@@ -60,69 +62,79 @@ export const EmailWrapper: React.FC<EmailWrapperProps> = ({
           cellSpacing={0}
           style={{ width: '100%', maxWidth: '560px', margin: '0 auto' }}
         >
+          {/* Header */}
           <tr>
             <td style={{ paddingBottom: '24px', textAlign: 'left' }}>
               <table role="presentation" border={0} cellPadding={0} cellSpacing={0}>
                 <tr>
-                  <td style={{ verticalAlign: 'middle', paddingRight: '8px' }}>
+                  <td style={{ verticalAlign: 'middle', paddingRight: '12px' }}>
                     <img
                       src={`${appUrl}${BRAND.assets.logoMarkPng}`}
                       alt={BRAND.company}
-                      height="32"
-                      style={{ display: 'block', border: 'none', borderRadius: '4px', width: 'auto' }}
+                      height="36"
+                      style={{ display: 'block', border: 'none', borderRadius: '6px', width: 'auto' }}
                     />
                   </td>
-                  <td style={{ verticalAlign: 'middle', fontSize: '18px', fontWeight: 'bold', color: '#1F6B4E' }}>
-                    {BRAND.company}
+                  <td style={{ verticalAlign: 'middle' }}>
+                    <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#1F6B4E', letterSpacing: '-0.02em', display: 'block' }}>
+                      {BRAND.company}
+                    </span>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#70685A', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {BRAND.product}
+                    </span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
+          {/* Body Card */}
           <tr>
             <td
               style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '12px',
-                padding: '32px',
-                border: '1px solid #e5e5e5',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '16px',
+                padding: '36px 32px',
+                border: '1px solid #DED8CB',
+                boxShadow: '0 2px 8px rgba(31, 107, 78, 0.04)',
               }}
             >
               {children}
             </td>
           </tr>
 
+          {/* Footer */}
           <tr>
             <td
               style={{
-                paddingTop: '24px',
+                paddingTop: '28px',
                 textAlign: 'center',
                 fontSize: '12px',
-                color: '#737373',
+                color: '#70685A',
                 lineHeight: 1.5,
               }}
             >
-              <p style={{ margin: '0 0 8px 0' }}>
-                {BRAND.fullName} - {BRAND.positioning}
+              <p style={{ margin: '0 0 8px 0', fontWeight: 600, color: '#171A17' }}>
+                {BRAND.fullName} · {BRAND.positioning}
               </p>
-              <p style={{ margin: '0' }}>
-                <a
-                  href={`${appUrl}/settings?tab=notifications`}
-                  style={{ color: '#d97706', textDecoration: 'none', marginRight: '12px' }}
-                >
-                  Manage Preferences
-                </a>
-                {' · '}
-                <a
-                  href={unsubscribeUrl}
-                  style={{ color: '#737373', textDecoration: 'underline', marginLeft: '12px' }}
-                >
-                  Unsubscribe
-                </a>
-              </p>
-              <p style={{ margin: '12px 0 0 0', color: '#a3a3a3' }}>
+              {!isCriticalAuth && (
+                <p style={{ margin: '0 0 8px 0' }}>
+                  <a
+                    href={`${appUrl}/settings?tab=notifications`}
+                    style={{ color: '#1F6B4E', textDecoration: 'none', fontWeight: 600, marginRight: '10px' }}
+                  >
+                    Manage Preferences
+                  </a>
+                  {' · '}
+                  <a
+                    href={unsubscribeUrl}
+                    style={{ color: '#70685A', textDecoration: 'underline', marginLeft: '10px' }}
+                  >
+                    Unsubscribe
+                  </a>
+                </p>
+              )}
+              <p style={{ margin: '12px 0 0 0', color: '#9EA59D', fontSize: '11px' }}>
                 © {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
               </p>
             </td>

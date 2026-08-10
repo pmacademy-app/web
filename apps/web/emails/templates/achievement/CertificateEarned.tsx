@@ -18,35 +18,35 @@ export const CertificateEarned: React.FC<CertificateEarnedProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText="Your official PM Academy Certificate is ready!" unsubscribeToken={unsubscribeToken}>
-      <h2 style={{ fontSize: '20px', color: '#1a1a1a', marginTop: 0 }}>Certificate Issued! 🎓</h2>
-      <p style={{ fontSize: '14px', color: '#525252' }}>
-        Congratulations, {userName}! You have earned your official PM Academy Credential.
+    <EmailWrapper previewText="Your official Prodily PM Academy Certificate is ready!" unsubscribeToken={unsubscribeToken}>
+      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Certificate Issued! 🎓</h2>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
+        Congratulations, {userName}! You have earned your official Prodily PM Academy Credential.
       </p>
 
       <div
         style={{
-          backgroundColor: '#f8fafc',
-          border: '1px solid #cbd5e1',
-          borderRadius: '8px',
-          padding: '16px',
-          margin: '16px 0',
+          backgroundColor: '#FBFAF6',
+          border: '1px solid #DED8CB',
+          borderRadius: '10px',
+          padding: '20px',
+          margin: '20px 0',
           textAlign: 'center',
         }}
       >
-        <div style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>
+        <div style={{ fontSize: '11px', color: '#70685A', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
           Credential ID
         </div>
-        <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a', margin: '4px 0', fontFamily: 'monospace' }}>
+        <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1F6B4E', margin: '6px 0', fontFamily: 'monospace' }}>
           {certificateCode}
         </div>
       </div>
 
-      <p style={{ fontSize: '14px', color: '#525252' }}>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
         Your certificate includes verifiable Schema.org metadata and can be shared on LinkedIn or embedded on your public portfolio.
       </p>
 
-      <Button href={verificationUrl}>View & Download Certificate</Button>
+      <Button href={verificationUrl}>View &amp; Download Certificate</Button>
     </EmailWrapper>
   )
 }

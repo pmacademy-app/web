@@ -8,6 +8,7 @@ import { subscribeClientNotificationEvent } from '@/lib/events/client-event-bus'
 export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState<number>(0)
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
+  const bellContainerRef = useRef<HTMLDivElement>(null)
   const triggerButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -43,19 +44,18 @@ export function NotificationBell() {
 
   const handleCloseDrawer = () => {
     setDrawerOpen(false)
-    // Restore focus to trigger button when panel closes
     setTimeout(() => {
       triggerButtonRef.current?.focus()
     }, 50)
   }
 
   return (
-    <>
+    <div ref={bellContainerRef} className="relative inline-block">
       {/* Bell Trigger Button */}
       <button
         ref={triggerButtonRef}
         type="button"
-        onClick={() => setDrawerOpen(true)}
+        onClick={() => setDrawerOpen((prev) => !prev)}
         aria-label={`Notifications (${unreadCount} unread update${unreadCount === 1 ? '' : 's'})`}
         aria-expanded={drawerOpen}
         aria-haspopup="dialog"
@@ -69,12 +69,13 @@ export function NotificationBell() {
         )}
       </button>
 
-      {/* Notification Center Panel (Drawer) */}
+      {/* Notification Center Popover Panel */}
       <NotificationCenterDrawer
         isOpen={drawerOpen}
         onClose={handleCloseDrawer}
         onUnreadCountChange={(cnt) => setUnreadCount(cnt)}
+        containerRef={bellContainerRef}
       />
-    </>
+    </div>
   )
 }

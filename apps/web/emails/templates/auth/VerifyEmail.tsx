@@ -13,13 +13,13 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({
   verificationUrl = `${BRAND.siteUrl}/auth/callback`,
 }) => {
   return (
-    <EmailWrapper previewText="Confirm your PM Academy email address.">
-      <h2 style={{ fontSize: '20px', color: '#1a1a1a', marginTop: 0 }}>Confirm your email address</h2>
-      <p style={{ fontSize: '14px', color: '#525252' }}>
-        Hi {userName}, please confirm your email address to secure your account and track your PM Academy progress.
+    <EmailWrapper previewText="Confirm your Prodily PM Academy email address." isCriticalAuth={true}>
+      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Confirm your email address</h2>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
+        Hi {userName}, please confirm your email address to secure your account and start your PM Academy learning path.
       </p>
       <Button href={verificationUrl}>Verify Email Address</Button>
-      <p style={{ fontSize: '12px', color: '#737373', marginTop: '16px' }}>
+      <p style={{ fontSize: '12px', color: '#9EA59D', marginTop: '20px' }}>
         If you did not request this account, you can safely ignore this email.
       </p>
     </EmailWrapper>

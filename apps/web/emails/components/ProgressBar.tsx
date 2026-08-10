@@ -19,16 +19,17 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progressPercent, label
         style={{
           width: '100%',
           height: '10px',
-          backgroundColor: '#e5e5e5',
+          backgroundColor: '#F2EFE7',
           borderRadius: '5px',
           overflow: 'hidden',
+          border: '1px solid #DED8CB',
         }}
       >
         <div
           style={{
             width: `${percent}%`,
             height: '100%',
-            backgroundColor: '#d97706',
+            backgroundColor: '#1F6B4E',
             borderRadius: '5px',
           }}
         />

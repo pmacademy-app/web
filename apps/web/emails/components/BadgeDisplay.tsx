@@ -14,19 +14,19 @@ export const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
   return (
     <div
       style={{
-        backgroundColor: '#fffbe6',
-        border: '1px solid #ffe58f',
+        backgroundColor: '#FBFAF6',
+        border: '1px solid #DED8CB',
         borderRadius: '12px',
-        padding: '20px',
+        padding: '24px 20px',
         textAlign: 'center',
         margin: '20px 0',
       }}
     >
       <div style={{ fontSize: '40px', marginBottom: '8px' }}>{badgeIcon}</div>
-      <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#b45309' }}>
+      <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1F6B4E' }}>
         {badgeName}
       </div>
-      <div style={{ fontSize: '14px', color: '#78350f', marginTop: '4px' }}>
+      <div style={{ fontSize: '14px', color: '#70685A', marginTop: '4px' }}>
         {badgeDescription}
       </div>
     </div>

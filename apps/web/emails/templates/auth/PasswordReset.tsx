@@ -13,14 +13,14 @@ export const PasswordReset: React.FC<PasswordResetProps> = ({
   resetUrl = `${BRAND.siteUrl}/auth/reset-password`,
 }) => {
   return (
-    <EmailWrapper previewText="Reset your PM Academy account password.">
-      <h2 style={{ fontSize: '20px', color: '#1a1a1a', marginTop: 0 }}>Reset your password</h2>
-      <p style={{ fontSize: '14px', color: '#525252' }}>
-        Hi {userName}, we received a request to reset your password for your PM Academy account.
+    <EmailWrapper previewText="Reset your Prodily PM Academy account password." isCriticalAuth={true}>
+      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Reset your password</h2>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
+        Hi {userName}, we received a request to reset your password for your Prodily PM Academy account.
       </p>
       <Button href={resetUrl}>Reset Password</Button>
-      <p style={{ fontSize: '12px', color: '#737373', marginTop: '16px' }}>
-        This link is valid for 1 hour. If you did not request a password reset, please ignore this email or contact support if you have concerns.
+      <p style={{ fontSize: '12px', color: '#9EA59D', marginTop: '20px' }}>
+        This link is valid for 1 hour. If you did not request a password reset, please ignore this email.
       </p>
     </EmailWrapper>
   )

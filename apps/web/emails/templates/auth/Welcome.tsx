@@ -15,18 +15,18 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText="Welcome to PM Academy! Start your product journey today." unsubscribeToken={unsubscribeToken}>
-      <h2 style={{ fontSize: '20px', color: '#1a1a1a', marginTop: 0 }}>Welcome to PM Academy, {userName}! 🎉</h2>
-      <p style={{ fontSize: '14px', color: '#525252' }}>
-        You&apos;ve unlocked full access to a structured, 90-lesson product management curriculum designed with the rigor of a top business school and the habit-building power of daily learning.
+    <EmailWrapper previewText="Welcome to Prodily PM Academy! Start your product management journey today." unsubscribeToken={unsubscribeToken}>
+      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Welcome to Prodily PM Academy, {userName}! 🎉</h2>
+      <p style={{ fontSize: '14px', color: '#70685A' }}>
+        You&apos;ve unlocked full access to a structured, 90-lesson product management curriculum designed to build real product judgment through daily habit learning.
       </p>
-      <p style={{ fontSize: '14px', color: '#525252' }}>
+      <p style={{ fontSize: '14px', color: '#70685A', fontWeight: 600 }}>
         Here is what awaits you:
       </p>
-      <ul style={{ fontSize: '14px', color: '#525252', paddingLeft: '20px' }}>
-        <li><strong>9 Structured Modules</strong> — From foundational principles to advanced strategy.</li>
-        <li><strong>Interactive Quizzes & Spaced Repetition</strong> — Lock in core concepts.</li>
-        <li><strong>Real-World Capstones & Portfolio</strong> — Build verifiable PM artifacts.</li>
+      <ul style={{ fontSize: '14px', color: '#70685A', paddingLeft: '20px', lineHeight: 1.8 }}>
+        <li><strong>9 Structured Modules</strong> — From PM foundations to product strategy &amp; execution.</li>
+        <li><strong>Interactive Quizzes &amp; Spaced Repetition</strong> — Retain core concepts.</li>
+        <li><strong>Real-World Capstones &amp; Portfolio</strong> — Build verifiable PM project credentials.</li>
       </ul>
       <Button href={`${appUrl}/dashboard`}>Start Lesson 1</Button>
     </EmailWrapper>
