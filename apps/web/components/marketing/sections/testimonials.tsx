@@ -49,13 +49,6 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
     void loadTestimonials()
   }, [initialTestimonials])
 
-  const hasLiveTestimonials = testimonials.length > 0
-
-  // Quadruple the array for continuous smooth CSS marquee loop if items exist
-  const carouselItems = hasLiveTestimonials
-    ? [...testimonials, ...testimonials, ...testimonials, ...testimonials]
-    : []
-
   return (
     <section
       id="testimonials"
