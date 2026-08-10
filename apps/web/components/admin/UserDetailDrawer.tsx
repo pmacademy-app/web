@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { X, Zap, Flame, Award, BookOpen } from 'lucide-react'
+import { X, Zap, Flame, Award, BookOpen, ExternalLink } from 'lucide-react'
 import { AdminKpiCard } from './AdminKpiCard'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { UserRoleToggle } from './UserRoleToggle'
@@ -105,10 +105,23 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
             </div>
             <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
               <span className="text-slate-400">Public Portfolio</span>
-              <AdminStatusBadge
-                status={user.hasPublicPortfolio ? 'published' : 'archived'}
-                label={user.hasPublicPortfolio ? 'Enabled' : 'Disabled'}
-              />
+              <div className="flex items-center gap-2">
+                <AdminStatusBadge
+                  status={user.hasPublicPortfolio ? 'published' : 'archived'}
+                  label={user.hasPublicPortfolio ? 'Enabled' : 'Disabled'}
+                />
+                {user.hasPublicPortfolio && user.username && (
+                  <a
+                    href={`/p/${user.username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline font-bold"
+                  >
+                    <span>View</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
             </div>
             <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
               <span className="text-slate-400">Joined Date</span>
@@ -177,16 +190,17 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
               Delete User Account
             </button>
 
-            {user.username && (
+            {user.hasPublicPortfolio && user.username ? (
               <a
                 href={`/p/${user.username}`}
                 target="_blank"
-                rel="noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-bold hover:text-white transition-colors"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold hover:bg-emerald-500/20 transition-colors"
               >
-                Inspect Portfolio →
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>View Portfolio</span>
               </a>
-            )}
+            ) : null}
           </div>
         </div>
 

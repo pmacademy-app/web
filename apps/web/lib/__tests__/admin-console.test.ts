@@ -46,6 +46,16 @@ runTest('AdminConsoleService.getContentOverview returns 90 compiled lessons stat
   assert.strictEqual(overview.publishedLessons, 90)
 })
 
+runTest('AdminConsoleService.getUsersOverview maps is_portfolio_public to hasPublicPortfolio', async () => {
+  // Verifies data mapping contract for Admin Users tab
+  const users = await AdminConsoleService.getUsersOverview(10)
+  assert(Array.isArray(users))
+  if (users.length > 0) {
+    const user = users[0]
+    assert.strictEqual(typeof user.hasPublicPortfolio, 'boolean')
+  }
+})
+
 runTest('Admin RBAC evaluates ADMIN_EMAILS environment variable', () => {
   const originalEnv = process.env.ADMIN_EMAILS
   process.env.ADMIN_EMAILS = 'admin1@pmacademy.com, superadmin@pmacademy.com ,'
