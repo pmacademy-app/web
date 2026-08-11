@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Menu, Search, User, LogOut, ChevronRight } from 'lucide-react'
+import { Menu, Search, User, LogOut, ChevronRight, Sparkles } from 'lucide-react'
 import { useSearch } from '@/components/search/SearchOverlayProvider'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { getLevelTitle } from '@/lib/xp'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { NotificationToast } from '@/components/notifications/NotificationToast'
+import { useQuickStart } from '@/components/quick-start/QuickStartContext'
 
 interface TopbarProps {
   onMenuOpen: () => void
@@ -26,6 +27,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const { openSearch } = useSearch()
+  const { openQuickStart } = useQuickStart()
 
   const { breadcrumbs: contextCrumbs } = useBreadcrumbs()
 
@@ -169,6 +171,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
         <div className="relative" ref={dropdownRef}>
           <button
             type="button"
+            id="user-profile-menu-btn"
             onClick={() => setDropdownOpen((prev) => !prev)}
             aria-expanded={dropdownOpen}
             aria-haspopup="menu"
@@ -212,6 +215,18 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
                   type="button"
                   onClick={() => {
                     setDropdownOpen(false)
+                    openQuickStart('manual')
+                  }}
+                  className="w-full text-left flex items-center gap-2.5 px-4 py-2 text-sm text-foreground hover:bg-secondary/40 transition-colors focus:outline-none focus:bg-secondary/40 cursor-pointer"
+                  role="menuitem"
+                >
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  Quick Start Tour
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDropdownOpen(false)
                     handleSignOut()
                   }}
                   className="w-full text-left flex items-center gap-2.5 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors focus:outline-none focus:bg-destructive/10 cursor-pointer"
@@ -229,3 +244,4 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
     </header>
   )
 }
+

@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { User, Globe, Save, Loader2, CheckCircle2 } from 'lucide-react'
+import { User, Globe, Save, Loader2, CheckCircle2, Sparkles } from 'lucide-react'
+import { useQuickStart } from '@/components/quick-start/QuickStartContext'
 
 function LinkedInIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   return (
@@ -20,6 +21,7 @@ function GitHubIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
 }
 
 export function ProfileSettingsTab() {
+  const { openQuickStart } = useQuickStart()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState(false)
@@ -208,6 +210,30 @@ export function ProfileSettingsTab() {
             </div>
           </div>
         </div>
+
+        {/* Quick Start Tour Reopen */}
+        <div className="space-y-3 pt-4 border-t border-border">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                Product Tour & Workspace Guide
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Need a refresher on Prodily features and navigation? Reopen the Quick Start tour anytime.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => openQuickStart('manual')}
+              className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-bold text-foreground hover:bg-secondary/60 transition-all cursor-pointer shrink-0"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              Reopen Tour
+            </button>
+          </div>
+        </div>
+
 
         {/* Feedback Messages & Save Button */}
         <div className="flex items-center justify-between pt-4 border-t border-border">
