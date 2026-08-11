@@ -13,8 +13,6 @@ export interface EmailRecipient {
   name?: string
 }
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY
-
 export function getFromEmail(): string {
   const envFrom = process.env.RESEND_FROM_EMAIL?.trim()
   if (envFrom) {
@@ -38,8 +36,9 @@ export async function sendEmail({
   text: string
 }): Promise<{ success: boolean; id?: string; error?: string }> {
   const fromEmail = getFromEmail()
+  const apiKey = process.env.RESEND_API_KEY
 
-  if (!RESEND_API_KEY) {
+  if (!apiKey) {
     console.log(`[email] RESEND_API_KEY missing. Simulating send to ${to}: "${subject}" from "${fromEmail}"`)
     return { success: true, id: 'simulated-dev-id' }
   }
@@ -49,7 +48,7 @@ export async function sendEmail({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${RESEND_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         from: fromEmail,

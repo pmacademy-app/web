@@ -136,6 +136,23 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  async function hasCurriculumAccessOverride(): Promise<boolean> {
+    if (!user) return false
+    if (user.user_metadata?.curriculum_access_override) return true
+
+    try {
+      const { data } = await authorizedClient
+        .from('users')
+        .select('curriculum_access_override')
+        .eq('id', user.id)
+        .maybeSingle()
+      return Boolean(data?.curriculum_access_override)
+    } catch (err) {
+      console.error('[proxy] Curriculum access override check error:', err)
+      return false
+    }
+  }
+
   // ── Public auth pages (/login, /signup, /reset-password) ─────────────────
   if (isGeneralAuthPage) {
     if (!user) return NextResponse.next()
@@ -183,8 +200,8 @@ export async function proxy(request: NextRequest) {
     const isOnboardingComplete = !!user.user_metadata?.onboarding_complete
     const isOnboardingPage = path === '/onboarding'
 
-    if (!isOnboardingComplete && !isOnboardingPage && !isAdminArea) {
-      // Force onboarding goal selection for learners (admins are unaffected)
+    if (!isOnboardingComplete && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {
+      // Force onboarding goal selection for learners (admins & override users are unaffected)
       const response = NextResponse.redirect(new URL('/onboarding', request.url))
       return newSession ? withSessionCookies(response, newSession) : response
     }

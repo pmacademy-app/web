@@ -85,6 +85,15 @@ export async function isLessonUnlocked(
   // First lesson in the curriculum is always unlocked
   if (!prevLessonId) return true
 
+  // Check if user has curriculum_access_override set to true
+  const { data: user } = (await (supabase
+    .from('users') as unknown as DBChain)
+    .select('curriculum_access_override')
+    .eq('id', userId)
+    .maybeSingle()) as unknown as { data: { curriculum_access_override?: boolean } | null; error: unknown }
+
+  if (user?.curriculum_access_override) return true
+
   const { data: prevProgress } = (await (supabase
     .from('user_lesson_progress') as unknown as DBChain)
     .select('status')
@@ -109,6 +118,14 @@ export async function isLessonUnlockedByOrderNumber(
   lessonNumber: number
 ): Promise<boolean> {
   if (lessonNumber <= 1) return true
+
+  const { data: user } = (await (supabase
+    .from('users') as unknown as DBChain)
+    .select('curriculum_access_override')
+    .eq('id', userId)
+    .maybeSingle()) as unknown as { data: { curriculum_access_override?: boolean } | null; error: unknown }
+
+  if (user?.curriculum_access_override) return true
 
   const prevNum = lessonNumber - 1
   // During Phase 1.3, old rows still have slug values in the lesson_id column

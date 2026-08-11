@@ -42,6 +42,7 @@ export type Database = {
           website_url?: string | null
           is_portfolio_public?: boolean
           is_admin?: boolean
+          curriculum_access_override?: boolean
           created_at: string
         }
         Insert: {
@@ -65,6 +66,7 @@ export type Database = {
           website_url?: string | null
           is_portfolio_public?: boolean
           is_admin?: boolean
+          curriculum_access_override?: boolean
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['users']['Insert']>

@@ -21,7 +21,7 @@ export const BRAND = {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
   supportEmail: 'hello@prodily.adityagangwani.me',
   // NOTE: emailFromAddress uses the Resend verified sender domain.
-  emailFromName: 'Prodily PM Academy',
+  emailFromName: 'Prodily',
   emailFromAddress:
     process.env.RESEND_FROM_EMAIL?.replace(/^.*<|>$/g, '').trim() ||
     'welcome@prodily.adityagangwani.me',
