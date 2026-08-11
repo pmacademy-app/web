@@ -13,6 +13,7 @@ import { useQuickStart } from './QuickStartContext'
 import { Button } from '@/components/ui/button'
 import { ProgressBar } from '@/components/ui/progress-bar'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
+import { TOKENS } from '@/theme/tokens'
 
 /** Bounding rect of a DOM element — null when unavailable */
 interface TargetRect {
@@ -262,7 +263,7 @@ export function QuickStartModal() {
           height={holeH}
           rx={RADIUS}
           fill="none"
-          stroke="var(--color-primary, #1F6B4E)"
+          stroke={TOKENS.colors.primary}
           strokeWidth="2"
           strokeOpacity="0.9"
         />
@@ -274,7 +275,7 @@ export function QuickStartModal() {
           height={holeH + 6}
           rx={RADIUS + 3}
           fill="none"
-          stroke="var(--color-primary, #1F6B4E)"
+          stroke={TOKENS.colors.primary}
           strokeWidth="1"
           strokeOpacity="0.25"
         />
@@ -287,7 +288,7 @@ export function QuickStartModal() {
     if (!isDesktop || !arrowGeom || !targetRect) return null
 
     const { dir, startX, startY, endX, endY } = arrowGeom
-    const color = 'var(--color-primary, #1F6B4E)'
+    const color = TOKENS.colors.primary
 
     const HEAD_LEN = 8
     const HEAD_HALF = 5
