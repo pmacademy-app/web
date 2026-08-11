@@ -25,6 +25,14 @@ interface TargetRect {
 /** Arrow direction from modal toward spotlight target */
 type ArrowDir = 'left' | 'right' | 'up' | 'down' | null
 
+interface ArrowGeometry {
+  dir: ArrowDir
+  startX: number
+  startY: number
+  endX: number
+  endY: number
+}
+
 export function QuickStartModal() {
   const router = useRouter()
   const {
@@ -45,8 +53,7 @@ export function QuickStartModal() {
 
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null)
   const [isDesktop, setIsDesktop] = useState(false)
-  const [arrowDir, setArrowDir] = useState<ArrowDir>(null)
-  const [arrowPos, setArrowPos] = useState<{ top: number; left: number } | null>(null)
+  const [arrowGeom, setArrowGeom] = useState<ArrowGeometry | null>(null)
 
   // Compute spotlight target rect and arrow position
   const updateLayout = useCallback(() => {
@@ -58,8 +65,7 @@ export function QuickStartModal() {
     const selector = currentStep.highlightSelector
     if (!selector || !desktop) {
       setTargetRect(null)
-      setArrowDir(null)
-      setArrowPos(null)
+      setArrowGeom(null)
       return
     }
 
@@ -68,8 +74,7 @@ export function QuickStartModal() {
 
     if (!targetEl || !cardEl) {
       setTargetRect(null)
-      setArrowDir(null)
-      setArrowPos(null)
+      setArrowGeom(null)
       return
     }
 
@@ -79,8 +84,7 @@ export function QuickStartModal() {
     // Clamp target rect to ensure it is on-screen
     if (tRect.width === 0 || tRect.height === 0) {
       setTargetRect(null)
-      setArrowDir(null)
-      setArrowPos(null)
+      setArrowGeom(null)
       return
     }
 
@@ -91,14 +95,14 @@ export function QuickStartModal() {
       height: tRect.height,
     })
 
-    // Determine arrow direction: where is the target relative to modal?
-    const targetCenterX = tRect.left + tRect.width / 2
-    const targetCenterY = tRect.top + tRect.height / 2
-    const cardCenterX = cRect.left + cRect.width / 2
-    const cardCenterY = cRect.top + cRect.height / 2
+    // Determine direction: where is target relative to modal?
+    const tX = tRect.left + tRect.width / 2
+    const tY = tRect.top + tRect.height / 2
+    const cX = cRect.left + cRect.width / 2
+    const cY = cRect.top + cRect.height / 2
 
-    const dx = targetCenterX - cardCenterX
-    const dy = targetCenterY - cardCenterY
+    const dx = tX - cX
+    const dy = tY - cY
 
     let dir: ArrowDir
     if (Math.abs(dx) >= Math.abs(dy)) {
@@ -106,58 +110,58 @@ export function QuickStartModal() {
     } else {
       dir = dy < 0 ? 'up' : 'down'
     }
-    setArrowDir(dir)
 
-    // Position the arrow along the modal edge closest to the target
-    const ARROW_SIZE = 32
-    let arrowLeft = 0
-    let arrowTop = 0
+    let startX = 0
+    let startY = 0
+    let endX = 0
+    let endY = 0
 
     if (dir === 'left') {
-      arrowLeft = cRect.left - ARROW_SIZE - 4
-      arrowTop = Math.max(
-        cRect.top + 8,
-        Math.min(cRect.bottom - ARROW_SIZE - 8, tRect.top + tRect.height / 2 - ARROW_SIZE / 2)
-      )
+      startX = cRect.left - 4
+      startY = Math.max(cRect.top + 32, Math.min(cRect.bottom - 32, tY))
+      endX = tRect.left + tRect.width + 10
+      endY = startY
+      if (startX - endX < 12) {
+        setArrowGeom(null)
+        return
+      }
     } else if (dir === 'right') {
-      arrowLeft = cRect.right + 4
-      arrowTop = Math.max(
-        cRect.top + 8,
-        Math.min(cRect.bottom - ARROW_SIZE - 8, tRect.top + tRect.height / 2 - ARROW_SIZE / 2)
-      )
+      startX = cRect.right + 4
+      startY = Math.max(cRect.top + 32, Math.min(cRect.bottom - 32, tY))
+      endX = tRect.left - 10
+      endY = startY
+      if (endX - startX < 12) {
+        setArrowGeom(null)
+        return
+      }
     } else if (dir === 'up') {
-      arrowLeft = Math.max(
-        cRect.left + 8,
-        Math.min(cRect.right - ARROW_SIZE - 8, tRect.left + tRect.width / 2 - ARROW_SIZE / 2)
-      )
-      arrowTop = cRect.top - ARROW_SIZE - 4
+      startX = Math.max(cRect.left + 32, Math.min(cRect.right - 32, tX))
+      startY = cRect.top - 4
+      endX = startX
+      endY = tRect.top + tRect.height + 10
+      if (startY - endY < 12) {
+        setArrowGeom(null)
+        return
+      }
     } else {
-      arrowLeft = Math.max(
-        cRect.left + 8,
-        Math.min(cRect.right - ARROW_SIZE - 8, tRect.left + tRect.width / 2 - ARROW_SIZE / 2)
-      )
-      arrowTop = cRect.bottom + 4
+      startX = Math.max(cRect.left + 32, Math.min(cRect.right - 32, tX))
+      startY = cRect.bottom + 4
+      endX = startX
+      endY = tRect.top - 10
+      if (endY - startY < 12) {
+        setArrowGeom(null)
+        return
+      }
     }
 
-    // Hide arrow if it would go off-screen
-    if (
-      arrowLeft < 0 || arrowTop < 0 ||
-      arrowLeft + ARROW_SIZE > window.innerWidth ||
-      arrowTop + ARROW_SIZE > window.innerHeight
-    ) {
-      setArrowDir(null)
-      setArrowPos(null)
-    } else {
-      setArrowPos({ top: arrowTop, left: arrowLeft })
-    }
+    setArrowGeom({ dir, startX, startY, endX, endY })
   }, [currentStep.highlightSelector])
 
   useEffect(() => {
     if (!isOpen) {
       const raf = requestAnimationFrame(() => {
         setTargetRect(null)
-        setArrowDir(null)
-        setArrowPos(null)
+        setArrowGeom(null)
       })
       return () => cancelAnimationFrame(raf)
     }
@@ -258,7 +262,7 @@ export function QuickStartModal() {
           height={holeH}
           rx={RADIUS}
           fill="none"
-          stroke="hsl(var(--primary))"
+          stroke="var(--color-primary, #1F6B4E)"
           strokeWidth="2"
           strokeOpacity="0.9"
         />
@@ -270,7 +274,7 @@ export function QuickStartModal() {
           height={holeH + 6}
           rx={RADIUS + 3}
           fill="none"
-          stroke="hsl(var(--primary))"
+          stroke="var(--color-primary, #1F6B4E)"
           strokeWidth="1"
           strokeOpacity="0.25"
         />
@@ -280,23 +284,38 @@ export function QuickStartModal() {
 
   // ── Arrow pointing from modal edge toward spotlight target ────────────────
   const renderArrow = () => {
-    if (!isDesktop || !arrowDir || !arrowPos || !targetRect) return null
+    if (!isDesktop || !arrowGeom || !targetRect) return null
 
-    // SVG arrow pointing in arrowDir direction
-    const SIZE = 32
-    let points = ''
-    if (arrowDir === 'left') {
-      // Arrow pointing left ←
-      points = `${SIZE},${SIZE / 2 - 6} ${SIZE},${SIZE / 2 + 6} 0,${SIZE / 2}`
-    } else if (arrowDir === 'right') {
-      // Arrow pointing right →
-      points = `0,${SIZE / 2 - 6} 0,${SIZE / 2 + 6} ${SIZE},${SIZE / 2}`
-    } else if (arrowDir === 'up') {
-      // Arrow pointing up ↑
-      points = `${SIZE / 2 - 6},${SIZE} ${SIZE / 2 + 6},${SIZE} ${SIZE / 2},0`
-    } else {
-      // Arrow pointing down ↓
-      points = `${SIZE / 2 - 6},0 ${SIZE / 2 + 6},0 ${SIZE / 2},${SIZE}`
+    const { dir, startX, startY, endX, endY } = arrowGeom
+    const color = 'var(--color-primary, #1F6B4E)'
+
+    const HEAD_LEN = 8
+    const HEAD_HALF = 5
+
+    let lineEndX = endX
+    let lineEndY = endY
+    let headPoints = ''
+
+    if (dir === 'left') {
+      // Arrowhead tip points LEFT towards target (endX, endY)
+      lineEndX = endX + HEAD_LEN
+      lineEndY = endY
+      headPoints = `${endX},${endY} ${endX + HEAD_LEN},${endY - HEAD_HALF} ${endX + HEAD_LEN},${endY + HEAD_HALF}`
+    } else if (dir === 'right') {
+      // Arrowhead tip points RIGHT towards target (endX, endY)
+      lineEndX = endX - HEAD_LEN
+      lineEndY = endY
+      headPoints = `${endX},${endY} ${endX - HEAD_LEN},${endY - HEAD_HALF} ${endX - HEAD_LEN},${endY + HEAD_HALF}`
+    } else if (dir === 'up') {
+      // Arrowhead tip points UP towards target (endX, endY)
+      lineEndX = endX
+      lineEndY = endY + HEAD_LEN
+      headPoints = `${endX},${endY} ${endX - HEAD_HALF},${endY + HEAD_LEN} ${endX + HEAD_HALF},${endY + HEAD_LEN}`
+    } else if (dir === 'down') {
+      // Arrowhead tip points DOWN towards target (endX, endY)
+      lineEndX = endX
+      lineEndY = endY - HEAD_LEN
+      headPoints = `${endX},${endY} ${endX - HEAD_HALF},${endY - HEAD_LEN} ${endX + HEAD_HALF},${endY - HEAD_LEN}`
     }
 
     return (
@@ -304,19 +323,34 @@ export function QuickStartModal() {
         aria-hidden="true"
         style={{
           position: 'fixed',
-          top: arrowPos.top,
-          left: arrowPos.left,
-          width: SIZE,
-          height: SIZE,
+          inset: 0,
+          width: '100%',
+          height: '100%',
           zIndex: 60,
           pointerEvents: 'none',
-          filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
         }}
       >
+        {/* Connector shaft line */}
+        <line
+          x1={startX}
+          y1={startY}
+          x2={lineEndX}
+          y2={lineEndY}
+          stroke={color}
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        {/* Target-facing arrowhead tip */}
         <polygon
-          points={points}
-          fill="hsl(var(--primary))"
-          fillOpacity="0.95"
+          points={headPoints}
+          fill={color}
+        />
+        {/* Modal edge anchor dot */}
+        <circle
+          cx={startX}
+          cy={startY}
+          r="3"
+          fill={color}
         />
       </svg>
     )
