@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { Mail, CheckCircle2, Clock, ShieldCheck } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
+import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 
 const signupSchema = z.object({
   name: z
@@ -34,9 +36,9 @@ type SignupFormValues = z.infer<typeof signupSchema>
 export default function SignupPage() {
   const router = useRouter()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [submittedEmail, setSubmittedEmail] = useState<string>('')
+  const [verificationPending, setVerificationPending] = useState<boolean>(false)
   const [isPending, startTransition] = useTransition()
-  // const [isGoogleLoading, setIsGoogleLoading] = useState(false) // Uncomment when Google OAuth is enabled
 
   const {
     register,
@@ -53,7 +55,6 @@ export default function SignupPage() {
 
   const handleSignup = (values: SignupFormValues) => {
     setErrorMsg(null)
-    setSuccessMsg(null)
 
     startTransition(async () => {
       try {
@@ -98,7 +99,8 @@ export default function SignupPage() {
           router.push('/dashboard')
           router.refresh()
         } else {
-          setSuccessMsg('Account created! Please check your email to verify your address.')
+          setSubmittedEmail(values.email)
+          setVerificationPending(true)
         }
       } catch (err) {
         console.error('[signup] Error registering:', err)
@@ -106,33 +108,6 @@ export default function SignupPage() {
       }
     })
   }
-
-  /*
-  const handleGoogleSignup = async () => {
-    setErrorMsg(null)
-    setIsGoogleLoading(true)
-
-    try {
-      const supabase = createBrowserSupabaseClient()
-      const origin = window.location.origin
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${origin}/api/auth/callback`,
-        },
-      })
-
-      if (error) {
-        setErrorMsg(error.message)
-        setIsGoogleLoading(false)
-      }
-    } catch (err) {
-      console.error('[signup] Google signup error:', err)
-      setErrorMsg('Could not initialize Google signup.')
-      setIsGoogleLoading(false)
-    }
-  }
-  */
 
   const isLoading = isPending
 
@@ -147,127 +122,178 @@ export default function SignupPage() {
           <BrandMarkProdily size="md" />
         </a>
         <h1 className="text-2xl font-bold font-serif text-foreground mb-2">
-          Create Your Free Account
+          {verificationPending ? 'Verification Required' : 'Create Your Free Account'}
         </h1>
         <p className="text-xs text-muted-foreground">
           90 lessons. 9 modules. Always free.
         </p>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
-
-        {errorMsg && (
-          <div
-            className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium flex flex-col gap-1.5"
-            role="alert"
-          >
-            <span>{errorMsg}</span>
-            {errorMsg.includes('already exists') && (
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-1 font-bold underline hover:opacity-80 text-primary w-fit"
-              >
-                Go to Login →
-              </Link>
-            )}
-          </div>
-        )}
-
-        {successMsg && (
-          <div
-            className="p-3 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-medium"
-            role="alert"
-          >
-            {successMsg}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(handleSignup)} className="space-y-4" noValidate>
-          <div>
-            <label htmlFor="signup-name" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
-              Full Name
-            </label>
-            <input
-              id="signup-name"
-              type="text"
-              required
-              disabled={isLoading}
-              aria-invalid={!!errors.name}
-              aria-describedby={errors.name ? 'name-error' : undefined}
-              placeholder="Jane Doe"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
-              {...register('name')}
-            />
-            {errors.name && (
-              <p id="name-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
-                {errors.name.message}
-              </p>
-            )}
+      {verificationPending ? (
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-5">
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-1">
+              <Mail className="w-6 h-6" />
+            </div>
+            <h2 className="text-lg font-bold font-serif text-foreground">
+              Check Your Email to Verify Your Account
+            </h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              We sent a verification link to <strong className="text-foreground font-semibold">{submittedEmail}</strong>.
+            </p>
           </div>
 
-          <div>
-            <label htmlFor="signup-email" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
-              Email Address
-            </label>
-            <input
-              id="signup-email"
-              type="email"
-              required
-              disabled={isLoading}
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? 'email-error' : undefined}
-              placeholder="jane@example.com"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
-              {...register('email')}
-            />
-            {errors.email && (
-              <p id="email-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
-                {errors.email.message}
-              </p>
-            )}
+          {/* Verification Pipeline Progress */}
+          <div className="p-3 rounded-lg bg-secondary/50 border border-border space-y-2 text-xs">
+            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>Signup request received</span>
+            </div>
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold">
+              <Clock className="w-4 h-4 shrink-0 animate-pulse" />
+              <span>Email verification pending</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <ShieldCheck className="w-4 h-4 shrink-0" />
+              <span>Account ready after email confirmation</span>
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="signup-password" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
-              Password
-            </label>
-            <input
-              id="signup-password"
-              type="password"
-              required
-              disabled={isLoading}
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? 'password-error' : undefined}
-              placeholder="Min. 6 characters"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
-              {...register('password')}
-            />
-            {errors.password && (
-              <p id="password-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
-                {errors.password.message}
-              </p>
-            )}
+          {/* Guidelines and Bounce Notice */}
+          <div className="text-xs text-muted-foreground space-y-2 bg-muted/40 p-3 rounded-lg border border-border/60">
+            <p className="font-semibold text-foreground">Next steps:</p>
+            <ul className="list-disc list-inside space-y-1 text-[11px] leading-relaxed">
+              <li>Click the link in the email to activate your account.</li>
+              <li>Check your <strong>spam or junk folder</strong> if it does not appear within a few minutes.</li>
+              <li>
+                <strong>If you mistyped your email address</strong>, you will not receive the confirmation email.
+              </li>
+            </ul>
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isPending ? 'Creating Account...' : 'Create Account →'}
-          </button>
-        </form>
+          {/* Resend Verification Email Control */}
+          <ResendVerificationCard email={submittedEmail} />
 
-        <div className="mt-6 text-center text-xs text-muted-foreground border-t border-border pt-4">
-          Already have an account?{' '}
-          <Link
-            href="/login"
-            className="font-semibold text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded"
-          >
-            Log in
-          </Link>
+          {/* Reset / Change Email Link */}
+          <div className="pt-2 text-center border-t border-border">
+            <button
+              type="button"
+              onClick={() => {
+                setVerificationPending(false)
+                setSubmittedEmail('')
+              }}
+              className="text-xs text-primary font-semibold hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded p-1 cursor-pointer"
+            >
+              Entered the wrong email? Sign up again with a different address →
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
+          {errorMsg && (
+            <div
+              className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium flex flex-col gap-1.5"
+              role="alert"
+            >
+              <span>{errorMsg}</span>
+              {errorMsg.includes('already exists') && (
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-1 font-bold underline hover:opacity-80 text-primary w-fit"
+                >
+                  Go to Login →
+                </Link>
+              )}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(handleSignup)} className="space-y-4" noValidate>
+            <div>
+              <label htmlFor="signup-name" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
+                Full Name
+              </label>
+              <input
+                id="signup-name"
+                type="text"
+                required
+                disabled={isLoading}
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? 'name-error' : undefined}
+                placeholder="Jane Doe"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+                {...register('name')}
+              />
+              {errors.name && (
+                <p id="name-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="signup-email" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
+                Email Address
+              </label>
+              <input
+                id="signup-email"
+                type="email"
+                required
+                disabled={isLoading}
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+                placeholder="jane@example.com"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+                {...register('email')}
+              />
+              {errors.email && (
+                <p id="email-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="signup-password" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
+                Password
+              </label>
+              <input
+                id="signup-password"
+                type="password"
+                required
+                disabled={isLoading}
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                placeholder="Min. 6 characters"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+                {...register('password')}
+              />
+              {errors.password && (
+                <p id="password-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isPending ? 'Submitting...' : 'Create Account →'}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center text-xs text-muted-foreground border-t border-border pt-4">
+            Already have an account?{' '}
+            <Link
+              href="/login"
+              className="font-semibold text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded"
+            >
+              Log in
+            </Link>
+          </div>
+        </div>
+      )}
 
       <AuthHelpCard
         title="Having trouble creating your account?"
@@ -276,3 +302,4 @@ export default function SignupPage() {
     </div>
   )
 }
+
