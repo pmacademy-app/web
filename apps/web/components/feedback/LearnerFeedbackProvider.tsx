@@ -22,6 +22,8 @@ export function LearnerFeedbackProvider() {
       setTitle('Congratulations on Completing the Module!')
     } else if (key === 'capstone_complete') {
       setTitle('Amazing Job Completing Your Capstone!')
+    } else if (key === 'header_feedback' || key === 'manual') {
+      setTitle('Share Your Feedback & Review')
     } else {
       setTitle('Enjoying PM Academy?')
     }

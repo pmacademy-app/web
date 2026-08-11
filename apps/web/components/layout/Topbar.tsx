@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Menu, Search, User, LogOut, ChevronRight, Sparkles } from 'lucide-react'
+import { Menu, Search, User, LogOut, ChevronRight, Sparkles, MessageSquare } from 'lucide-react'
 import { useSearch } from '@/components/search/SearchOverlayProvider'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { getLevelTitle } from '@/lib/xp'
@@ -162,6 +162,25 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
           <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-medium bg-muted border border-border rounded opacity-70">
             ⌘K
           </kbd>
+        </button>
+
+        {/* Feedback Trigger — opens ContextualFeedbackModal via LearnerFeedbackProvider */}
+        <button
+          type="button"
+          id="feedback-trigger-btn"
+          onClick={() => {
+            window.dispatchEvent(
+              new CustomEvent('learner:feedback:prompt', {
+                detail: { key: 'header_feedback' },
+              })
+            )
+          }}
+          title="Give Feedback"
+          aria-label="Give Feedback"
+          className="flex items-center gap-2 border border-input bg-card hover:bg-secondary/40 text-muted-foreground hover:text-foreground px-3.5 py-2.5 min-h-[44px] rounded-lg text-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span className="hidden md:inline">Feedback</span>
         </button>
 
         {/* Notification Bell Header Control */}
