@@ -45,11 +45,14 @@ export function QuickStartProvider({
   // Auto-launch trigger on mount
   useEffect(() => {
     if (initialOnboardingComplete && !initialQuickStartCompleted) {
-      setIsOpen(true)
-      setIsManualReopen(false)
-      setCurrentStepIndex(0)
-      trackQuickStartOpened('auto')
-      trackQuickStartStepViewed(1, QUICK_START_STEPS[0].title)
+      const raf = requestAnimationFrame(() => {
+        setIsOpen(true)
+        setIsManualReopen(false)
+        setCurrentStepIndex(0)
+        trackQuickStartOpened('auto')
+        trackQuickStartStepViewed(1, QUICK_START_STEPS[0].title)
+      })
+      return () => cancelAnimationFrame(raf)
     }
   }, [initialOnboardingComplete, initialQuickStartCompleted])
 
