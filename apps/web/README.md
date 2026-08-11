@@ -33,7 +33,9 @@ apps/web/
 │   └── robots.ts            # Dynamic robots.txt generator
 ├── components/
 │   ├── ui/                  # Extended shadcn primitives (CVA customized variants)
-│   ├── layout/              # Shared structure: Navbar, Footer
+│   ├── layout/              # Shared structure: Topbar (Search | Feedback | Bell | Profile), Sidebar
+│   ├── auth/                # Auth components: ResendVerificationCard, AuthHelpCard
+│   ├── feedback/            # Learner feedback: LearnerFeedbackProvider, ContextualFeedbackModal
 │   ├── marketing/
 │   │   ├── sections/        # Homepage section components (Hero, Why, Curriculum, etc.)
 │   │   └── product-mockup/  # Visual UI mockup mockups (SkillRadar, AIChat, cards)

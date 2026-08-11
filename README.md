@@ -178,21 +178,27 @@ All authorization flows are handled through a single canonical callback route (`
 [Client Signup / Reset] ──► [Supabase Link / OTP] ──► [/api/auth/callback] ──► [Cookie Session Setup] ──► [Final Destination]
 ```
 
-### Flow 1: Signup & Verification
-1.  User enters email/password in `/signup`.
-2.  Supabase sends confirmation email containing a raw `token_hash` query parameter.
-3.  Email link directs to `/api/auth/callback?token_hash=...&type=signup&next=/verified`.
-4.  Callback handles OTP validation, synchronizes the database `users` record, saves secure HTTP-only cookies, and redirects the user to `/verified`.
+### Flow 1: Signup & Verification Lifecycle
+1. User submits email and password on `/signup`.
+2. Supabase Auth creates unverified user record and triggers Send Email Hook (`/api/auth/send-email-hook`), rendering and queueing the email in Resend API.
+3. **Verification Pending UX**: The signup form switches immediately to a dedicated **Check Your Email to Verify Your Account** screen displaying a 3-step progress pipeline (*Signup request received → Email verification pending → Account ready after confirmation*).
+4. **Resend & Recovery**: Includes `ResendVerificationCard` with a persistent 60s cooldown limit (`/api/auth/resend-verification`) and a 1-click *"Entered the wrong email? Sign up again with a different address →"* button to reset form state and correct typos.
+5. **Asynchronous Bounce Handling**: Synchronous inbox existence validation during signup is not possible because Resend accepts emails into its queue synchronously (HTTP 200) and performs SMTP delivery out-of-band. If an email bounces, Resend posts an `email.bounced` event to `/api/email/webhooks`, which logs the event to `public.email_delivery_events`.
+6. Email link directs to `/api/auth/callback?token_hash=...&type=signup&next=/verified`.
+7. Callback handles OTP validation, synchronizes the database `users` record, sets secure HTTP-only cookies, and redirects to `/verified`.
 
 ### Flow 2: Password Reset
-1.  User requests reset on `/reset-password`.
-2.  Reset link directs to `/api/auth/callback?token_hash=...&type=recovery&next=/reset-password%3Fmode%3Dupdate`.
-3.  Callback validates recovery token, establishes a server-side session, and redirects to the update password form.
+1. User requests reset on `/reset-password`.
+2. Reset link directs to `/api/auth/callback?token_hash=...&type=recovery&next=/reset-password%3Fmode%3Dupdate`.
+3. Callback validates recovery token, establishes a server-side session, and redirects to the update password form.
+
+### Header Navigation & Feedback Control
+The authenticated topbar header (`components/layout/Topbar.tsx`) displays controls in sequence: `Search | Feedback | Notifications | Profile`. The Feedback button dispatches a `learner:feedback:prompt` CustomEvent to `LearnerFeedbackProvider` (`components/feedback/LearnerFeedbackProvider.tsx`), opening `ContextualFeedbackModal` for private feedback (`/api/feedback`) or public homepage reviews (`/api/testimonials`).
 
 ### Session Cookies
 Auth cookies are configured securely on the HTTP response:
-*   `sb-access-token` (HttpOnly, Secure in prod, Lax, Expires at session end)
-*   `sb-refresh-token` (HttpOnly, Secure in prod, Lax, MaxAge 30 days)
+* `sb-access-token` (HttpOnly, Secure in prod, Lax, Expires at session end)
+* `sb-refresh-token` (HttpOnly, Secure in prod, Lax, MaxAge 30 days)
 
 ---
 
