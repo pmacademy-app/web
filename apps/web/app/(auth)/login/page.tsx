@@ -10,6 +10,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
+import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 
 const loginSchema = z.object({
   email: z
@@ -170,7 +171,13 @@ export default function LoginPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-sm">
       <div className="text-center mb-8 flex flex-col items-center">
-        <BrandMarkProdily size="md" className="mb-4" />
+        <a
+          href="https://prodily.adityagangwani.me"
+          aria-label="Go to Prodily homepage"
+          className="mb-4 inline-flex items-center justify-center rounded-lg transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          <BrandMarkProdily size="md" />
+        </a>
         <h1 className="text-2xl font-bold font-serif text-foreground mb-2">
           Welcome Back to {BRAND.fullName}
         </h1>
@@ -188,6 +195,11 @@ export default function LoginPage() {
       >
         <LoginForm />
       </Suspense>
+
+      <AuthHelpCard
+        title="Having trouble signing in?"
+        description="Facing an authentication or login issue? Email us and we'll help you out."
+      />
     </div>
   )
 }

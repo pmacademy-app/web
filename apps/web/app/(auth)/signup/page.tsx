@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
+import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 
 const signupSchema = z.object({
   name: z
@@ -138,7 +139,13 @@ export default function SignupPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-sm">
       <div className="text-center mb-8 flex flex-col items-center">
-        <BrandMarkProdily size="md" className="mb-4" />
+        <a
+          href="https://prodily.adityagangwani.me"
+          aria-label="Go to Prodily homepage"
+          className="mb-4 inline-flex items-center justify-center rounded-lg transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          <BrandMarkProdily size="md" />
+        </a>
         <h1 className="text-2xl font-bold font-serif text-foreground mb-2">
           Create Your Free Account
         </h1>
@@ -261,6 +268,11 @@ export default function SignupPage() {
           </Link>
         </div>
       </div>
+
+      <AuthHelpCard
+        title="Having trouble creating your account?"
+        description="If you run into an issue during registration, email us and we'll help you out."
+      />
     </div>
   )
 }
