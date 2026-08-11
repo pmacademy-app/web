@@ -1,8 +1,8 @@
 # Admin Console Specification & Audit — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `7158925`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `875f6ba`  
+**Last Updated:** August 11, 2026  
 
 ---
 
@@ -27,7 +27,7 @@ The Admin Console (`/admin`) is a centralized management platform for administra
 | **5. Notifications** | `AdminNotificationsView` | Dispatch broadcast notifications, view delivery logs | `public.notifications`, `public.notification_delivery_events` | 🟢 Verified in Production |
 | **6. Emails** | `AdminEmailsView`, `ProductionSendModal`, `TestSendModal` | Send Production Email, Send Test Email, Queue Overview | `public.email_queue`, Resend API | 🟠 Known Production Failure (`ISSUE-05`) |
 | **7. Feature Flags** | `AdminFeatureFlagsView` | Runtime toggle of feature flags (`email_automations_enabled`, etc.) | `public.system_settings` | 🟢 Verified in Production |
-| **8. Feedback** | `AdminFeedbackView` | View learner feedback & ratings | `public.user_feedback` | 🟢 Verified in Production |
+| **8. Feedback** | `AdminFeedbackView` | View learner feedback & ratings submitted via topbar header trigger or contextual prompts | `public.user_feedback` | 🟢 Verified in Production |
 | **9. Certificates** | `AdminCertificatesView` | Manual certificate generation & verification audit | `public.certificates` | 🟢 Verified in Production |
 | **10. Communications**| `AdminContactQueriesView` | Review contact form submissions | `public.contact_queries` | 🟢 Verified in Production |
 | **11. Templates** | `AdminTemplatesView` | Preview email templates with sample variables | `emails/index.ts` | 🟢 Verified in Production |

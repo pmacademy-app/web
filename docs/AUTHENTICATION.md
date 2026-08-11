@@ -1,8 +1,8 @@
 # Authentication Infrastructure & User State Sync — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `875f6ba`  
+**Last Updated:** August 11, 2026  
 
 ---
 
@@ -16,13 +16,27 @@ Authentication is powered by Supabase Auth with PKCE flow and custom email rende
 
 ---
 
-## 2. User Signup & Duplicate Account Handling
+## 2. User Signup & Verification Lifecycle
 
-- **Signup Endpoint / Form**: `app/(auth)/signup/page.tsx` submits email and password to Supabase Auth `signUp()`.
-- **Existing Account Detection**: When a user attempts to sign up with an already registered email, Supabase Auth returns an empty identities array (`data.user.identities.length === 0`) or an error message.
-- **User UX**: Form intercepts existing account responses and immediately displays:
+### A. Signup Submission & Verification Pending UX
+- **Signup Endpoint / Form**: `app/(auth)/signup/page.tsx` submits user credentials to Supabase Auth `signUp()`.
+- **Existing Account Interception**: If an account already exists for the email address (`data.user.identities.length === 0` or explicit auth error), the form displays:
   > *"An account already exists with this email address. Please log in instead."*
   > **[Go to Login →]** button leading directly to `/login`.
+- **Verification Required View**: Upon successful signup submission when email confirmation is enabled (`data.session === null`), the UI replaces the registration form with a dedicated **Check Your Email to Verify Your Account** screen.
+- **Progress Pipeline**: Explicitly communicates the three-stage lifecycle:
+  1. `Signup request received` ✅
+  2. `Email verification pending (confirmation link sent)` ⏳
+  3. `Account ready after email confirmation` 🔒
+
+### B. Resend Verification & Wrong-Email Recovery Flow
+- **Resend Integration**: Reuses `ResendVerificationCard` (`components/auth/ResendVerificationCard.tsx`), which calls `/api/auth/resend-verification` and enforces a persistent 60-second rate-limit cooldown.
+- **Typo Recovery Option**: Includes an *"Entered the wrong email? Sign up again with a different address →"* trigger allowing learners to reset form state and re-submit with the corrected address immediately if a typo occurred during registration.
+
+### C. Asynchronous Email Bounce & Mailbox Validation Limits
+- **Synchronous Mailbox Validation Limitation**: Resend accepts confirmation emails for delivery synchronously (returning HTTP 200 with message ID) and performs SMTP delivery out-of-band. Therefore, synchronous verification of whether an email address inbox actually exists at the exact moment of clicking "Create Account" is technically impossible in modern email infrastructure.
+- **Asynchronous Bounce Handling**: If a confirmation email bounces due to a non-existent or invalid address, Resend posts an `email.bounced` webhook event to `/api/email/webhooks`, which persists the bounce event to `public.email_delivery_events`.
+- **Verification Invariant**: The UI never claims "Account created" or "Account ready" while email confirmation remains unverified.
 
 ---
 
@@ -52,9 +66,12 @@ When a learner creates an account:
 | Authentication Flow | Location | Status |
 |---|---|---|
 | **User Signup & Form Validation** | `app/(auth)/signup/page.tsx` | 🟢 Verified in Production |
-| **Duplicate Account UX** | `app/(auth)/signup/page.tsx` | 🟢 Verified in Production |
+| **Verification Pending UX & Steps** | `app/(auth)/signup/page.tsx` | 🟢 Verified in Production |
+| **Duplicate Account Interception** | `app/(auth)/signup/page.tsx` | 🟢 Verified in Production |
+| **Wrong-Email Recovery & Resend** | `components/auth/ResendVerificationCard.tsx` | 🟢 Verified in Production |
 | **Login & Session Management** | `app/(auth)/login/page.tsx` | 🟢 Verified in Production |
 | **Password Recovery Flow** | `app/(auth)/reset-password/page.tsx` | 🟢 Verified in Production |
 | **Persistent 60s Rate Limiter** | `lib/rate-limit.ts`, `public.rate_limits` | 🟢 Verified in Production |
 | **Unverified User Discovery** | `lib/admin/service.ts` | 🟢 Verified in Production |
-| **Supabase Auth Hook Integration** | `app/api/auth/send-email-hook/route.ts` | 🟡 Implemented — Verification Required |
+| **Supabase Auth Hook Integration** | `app/api/auth/send-email-hook/route.ts` | 🟢 Verified in Production |
+

@@ -1,8 +1,8 @@
 # Canonical Documentation Index & Reading Map — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `875f6ba`  
+**Last Updated:** August 11, 2026  
 
 ---
 

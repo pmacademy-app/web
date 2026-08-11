@@ -1,9 +1,9 @@
 # Prodily PM Academy — Project Memory Index
 
-**Last Updated:** 2026-08-08  
-**Project Stage:** Production Audit Complete for Sprints 7.1–7.3 (brand: **Prodily**, product: **PM Academy**)
+**Last Updated:** August 11, 2026  
+**Project Stage:** Production Baseline HEAD `875f6ba` (brand: **Prodily**, product: **PM Academy**)
 
-This file is a **lightweight index** into the full memory system under `docs/memory/`. Read this first for a quick orientation, then follow the links for detailed context.
+This file is a **lightweight index** into the canonical documentation suite under `docs/`. Read this first for a quick orientation, then follow the links for detailed context.
 
 ---
 
@@ -11,7 +11,16 @@ This file is a **lightweight index** into the full memory system under `docs/mem
 
 **Prodily PM Academy** is a free, structured, gamified Product Management curriculum — 90 lessons across 9 modules, built as a Next.js 16 App Router application on a ₹0-at-launch infrastructure stack.
 
-**Current state:** All phases 0–3, Sprints 1–7.3, and the Sprints 7.1–7.3 Production-Readiness Audit are complete. Quick Start product tour feature branch (`quick-start`) implemented with 100% test, type-check, and build pass rates. All Vercel build failures have been diagnosed and resolved, V1/V2 branching removed in favor of a single production certificate architecture, and zero internal development terminology is exposed.
+**Current state:** All phases 0–3, Sprints 1–8, Quick Start tour, Header Feedback / Review trigger integration, Verification Pending signup UX, and Re-engagement Email Campaign (`reengagement_aug_2026`) are fully implemented and verified in production (100% build & lint pass rate).
+
+---
+
+## Recent August 2026 Updates
+
+- **Signup Verification Pending UX**: Updated `app/(auth)/signup/page.tsx` to replace generic "Account created" messages with a dedicated **Check Your Email to Verify Your Account** screen featuring a 3-step progress pipeline (*Signup request received → Email verification pending → Account ready after confirmation*). Includes `ResendVerificationCard` (persistent 60s cooldown limit on `/api/auth/resend-verification`) and a 1-click typo recovery option (*"Entered the wrong email? Sign up again with a different address →"*).
+- **Asynchronous Bounce Handling**: Documented out-of-band SMTP delivery via Resend. Bounced emails trigger an `email.bounced` event on `/api/email/webhooks` and log to `public.email_delivery_events`. Clarified that synchronous mailbox existence validation during signup is technically impossible.
+- **Header Feedback / Review Integration**: Added responsive Feedback button to `components/layout/Topbar.tsx` in sequence `Search | Feedback | Notifications | Profile`. Clicking the button dispatches `learner:feedback:prompt` CustomEvent to `LearnerFeedbackProvider`, opening `ContextualFeedbackModal` for private feedback (`/api/feedback`) or public review (`/api/testimonials`).
+- **Re-engagement Email Campaign (`reengagement_aug_2026`)**: Documented one-time marketing campaign targeting Audience A (0 completed lessons) and Audience B (1–5 completed lessons), excluding 6+ completed lessons. Uses Supabase as real-time source of truth immediately prior to each send, respects marketing opt-outs and `email_suppressions`, enforces idempotency, supports dry-run/test-send/production batch modes, and keeps execution code local outside version control (`.gitignore`).
 
 ---
 
