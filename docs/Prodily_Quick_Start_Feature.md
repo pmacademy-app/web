@@ -1,693 +1,634 @@
-# Quick Start Feature — Prodily
+# Prodily Quick Start Feature — Implementation & UI/UX Specification v2
 
-## 1. Overview
+## Document Status
 
-Add a **Quick Start** product tour to the Prodily dashboard for first-time users.
+Updated specification for the existing Quick Start implementation and its next UI/UX enhancement pass.
 
-The purpose of Quick Start is to help a newly onboarded user understand what Prodily offers and where the important features live.
+**Implementation order:**
 
-### Existing user journey
+> Asset Audit → Spotlight Enhancement → Feature Preview Integration → Final Polish & Validation
 
-The expected flow is:
-
-1. User signs up
-2. User verifies their email
-3. User logs in again
-4. User completes the existing onboarding flow
-5. User reaches the Dashboard
-6. **Quick Start automatically opens**
-7. User goes through the product tour or skips it
-8. User continues using the Dashboard normally
-
-Quick Start is **not a replacement for the existing onboarding flow**. It is a short product-tour experience that happens after onboarding when the user first reaches the Dashboard.
+The existing Quick Start functionality is already implemented and must be preserved.
 
 ---
 
-## 2. Goals
+# 1. Purpose
 
-Quick Start should:
-
-- Explain the major features available in Prodily.
-- Help users understand the purpose of each major dashboard/navigation section.
-- Reduce confusion for first-time users.
-- Make the dashboard easier to navigate.
-- Give users a clear first action after completing onboarding.
-- Feel native to the existing Prodily UI and branding.
-- Avoid overwhelming the user with too much information at once.
+Quick Start is a first-time product tour shown after a new learner completes the existing onboarding flow and reaches the authenticated Dashboard.
 
 The experience should answer:
 
-> **“What can I do on Prodily, and where do I find it?”**
+> **“What can I do on Prodily, where do I find it, and what should I do next?”**
+
+It is a product tour, not a replacement for onboarding.
 
 ---
 
-## 3. Non-Goals
+# 2. Existing User Journey
 
-Do not turn Quick Start into a detailed tutorial for every feature.
+```text
+Signup
+  ↓
+Email Verification
+  ↓
+Login
+  ↓
+Existing Onboarding
+  ↓
+Dashboard
+  ↓
+Quick Start automatically opens
+  ↓
+User completes or skips the tour
+  ↓
+Normal Prodily usage
+```
 
-Do not:
+Automatic launch requires:
 
-- Explain every button or minor UI element.
-- Duplicate the existing onboarding questions.
-- Force users to complete the tour.
-- Show the tour on every dashboard visit.
-- Introduce a completely different visual design system.
-- Create unnecessary database entities when an existing user preference/state mechanism can be reused.
+```text
+authenticated
+AND
+onboarding_complete === true
+AND
+quick_start_completed !== true
+```
 
----
+Completion/skip is persisted using Supabase Auth `user_metadata.quick_start_completed`.
 
-## 4. Trigger Behavior
+Supabase remains the single source of truth.
 
-Quick Start should automatically open when all of the following are true:
-
-- The user is authenticated.
-- The user's email is verified.
-- The user has completed the existing onboarding flow.
-- The user reaches the Dashboard.
-- The user has not previously completed or skipped Quick Start.
-
-### Important
-
-Quick Start should **not** appear:
-
-- Before email verification.
-- During the existing onboarding flow.
-- Every time the user visits the Dashboard.
-- For existing users who have already completed/skipped the tour.
-
----
-
-## 5. Persistence
-
-Quick Start completion should be persisted against the user's account.
-
-Preferred behavior:
-
-- `quickStartCompleted = true` after the user finishes the tour.
-- Treat skipping the tour as completed/dismissed for automatic-launch purposes.
-- Do not rely only on `localStorage` because the same account may be used across devices/browsers.
-
-If the existing user model already has a suitable onboarding/preferences field, reuse the existing architecture rather than creating unnecessary duplicate state.
-
-The implementation should inspect the current codebase and follow its established patterns.
+Do not introduce localStorage persistence.
 
 ---
 
-# 6. Quick Start Tour Structure
+# 3. Existing Quick Start Implementation
 
-The tour should use a **multi-step modal/product-tour experience**, not one large block of text.
+The current implementation already provides:
 
-Each step should contain:
+- 8-step tour.
+- Automatic first-time launch.
+- Next / Back navigation.
+- Skip Tour.
+- Final Start Learning CTA.
+- Supabase persistence.
+- Manual reopening.
+- Profile dropdown entry.
+- Settings entry.
+- Keyboard handling.
+- Responsive behavior.
+- Analytics.
+- Quick Start tests.
+- Production build compatibility.
 
-- Step number/progress indicator.
-- Feature name.
-- Short explanation.
-- Relevant icon/visual.
-- Next button.
-- Back button where applicable.
-- Skip Tour option.
-- Final step should use a completion CTA.
-
-Example progress:
-
-> Step 1 of 8
-
-The exact number of steps may change if the current Prodily dashboard contains more/less major navigation areas. The implementation should inspect the current UI before finalizing the steps.
-
----
-
-# 7. Suggested Tour Content
-
-## Step 1 — Welcome to Prodily
-
-### Title
-
-**Welcome to Prodily 👋**
-
-### Description
-
-Welcome to your Product Management learning journey.
-
-Prodily brings your learning, progress, achievements, and PM portfolio together in one place.
-
-### CTA
-
-**Let's get started →**
+The UI/UX work in this document must **not rebuild or unnecessarily change this functionality**.
 
 ---
 
-## Step 2 — Curriculum
+# 4. Tour Steps
 
-### Title
+The current tour is aligned to the actual Prodily application.
 
-**📚 Curriculum**
+| Step | Title | Target | Purpose |
+|---|---|---|---|
+| 1 | Welcome to Prodily 👋 | Modal | Introduce the platform |
+| 2 | 📚 Curriculum | `/academy` | Explain structured PM learning |
+| 3 | 🏆 Leaderboard & Cohorts | `/leaderboard` | Explain ranking, XP and cohorts |
+| 4 | 🎯 Capstones & Portfolio | `/capstones` | Explain applied work and portfolio |
+| 5 | 🏅 Badges & Achievements | `/badges` | Explain milestones and badges |
+| 6 | 📊 Progress & Review Hub | `/review` / `/progress` | Explain review and skill progress |
+| 7 | 👤 Profile & Settings | `/settings` / profile | Explain account and preferences |
+| 8 | 🚀 You're Ready! | CTA | Send user into the learning experience |
 
-### Description
+Descriptions should remain concise.
 
-This is where your Product Management learning journey happens.
-
-Explore structured lessons and work through the PM curriculum step by step. Track your progress as you complete lessons and move forward.
-
-### Highlight
-
-Highlight the **Curriculum** navigation item/tab.
-
-### CTA
-
-**Next →**
-
----
-
-## Step 3 — Leaderboard
-
-### Title
-
-**🏆 Leaderboard**
-
-### Description
-
-See how you rank against other Prodily learners.
-
-Earn points through your activity and learning progress, and use the leaderboard as a little extra motivation to keep learning.
-
-### Highlight
-
-Highlight the **Leaderboard** navigation item/tab.
-
-### CTA
-
-**Next →**
+The visual preview should do part of the explaining instead of adding more text.
 
 ---
 
-## Step 4 — Portfolio
+# 5. UI/UX Direction
 
-### Title
+The Quick Start should feel like:
 
-**🎯 Your PM Portfolio**
+> **“Welcome to Prodily — let me show you around.”**
 
-### Description
+Not:
 
-Build your Product Management portfolio as you learn.
+> “Here is a large modal containing a lot of text.”
 
-Use your portfolio to showcase your projects, work, achievements, and PM journey — something you can eventually share with others.
+The experience should combine:
 
-### Highlight
-
-Highlight the **Portfolio** navigation item/tab.
-
-### CTA
-
-**Next →**
-
----
-
-## Step 5 — Badges & Achievements
-
-### Title
-
-**🏅 Badges & Achievements**
-
-### Description
-
-Your progress comes with milestones worth celebrating.
-
-Complete activities, reach milestones, and unlock badges as you continue your PM journey.
-
-### Highlight
-
-Highlight the **Badges/Achievements** area if it exists in the current dashboard/navigation.
-
-### CTA
-
-**Next →**
+```text
+Short explanation
+      +
+Actual feature preview
+      +
+Clear spotlight
+      +
+Directional arrow
+```
 
 ---
 
-## Step 6 — Progress & Dashboard
+# 6. Screenshot / Feature Preview Asset Audit
 
-### Title
+## This must happen BEFORE UI implementation
 
-**📊 Track Your Progress**
+Before modifying the Quick Start modal, inspect the current repository and actual application.
 
-### Description
+Inspect at minimum:
 
-Your Dashboard gives you a quick view of your learning journey.
+- `apps/web/public/`
+- Existing PNG files.
+- Existing JPG/JPEG files.
+- Existing WebP files.
+- Existing SVG assets.
+- Existing dashboard visuals.
+- Existing curriculum visuals.
+- Existing leaderboard visuals.
+- Existing capstone/portfolio visuals.
+- Existing badges visuals.
+- Existing progress/review visuals.
+- Existing settings/profile visuals.
+- Existing Quick Start assets, if any.
+- Existing documentation/demo screenshots.
 
-See your progress, completed work, current activity, and what you can continue working on next.
+Also inspect the actual current feature pages/components.
 
-### Highlight
+## Asset decision hierarchy
 
-Highlight the most relevant dashboard/progress component currently available.
+### Option A — Suitable screenshots already exist
 
-### CTA
+Reuse them.
 
-**Next →**
+Do not create duplicates.
 
----
+### Option B — Feature UI exists but no suitable screenshot exists
 
-## Step 7 — Profile & Settings
+Determine whether a clean static preview can be created from the existing UI using the repository's existing conventions.
 
-### Title
+Avoid introducing a new screenshot-generation system just for Quick Start.
 
-**👤 Your Profile**
+### Option C — No suitable preview exists
 
-### Description
+Create only the required preview asset.
 
-Manage your Prodily profile, account information, preferences, and other settings from here.
+The new preview must:
 
-### Highlight
+- Match the actual current Prodily UI.
+- Use current branding.
+- Use the repository's existing image conventions.
+- Be optimized for web use.
+- Be lightweight.
+- Not contain fake/future functionality.
+- Not use generic stock imagery.
 
-Highlight the Profile/Settings area currently available in the application.
+## Required asset audit report
 
-### CTA
+Before adding assets, provide:
 
-**Next →**
+```text
+Existing assets found:
+- ...
 
----
+Reusable for:
+- Step X
+- Step Y
 
-## Step 8 — You're Ready!
+Missing previews:
+- Step Z
 
-### Title
+New assets required:
+- ...
 
-**🚀 You're ready to start!**
+Reason:
+- ...
+```
 
-### Description
-
-That's the quick tour.
-
-Explore the curriculum, build your skills, earn achievements, and create your PM portfolio along the way.
-
-Your Product Management journey starts now.
-
-### CTA
-
-**Start Learning**
-
----
-
-# 8. UX Requirements
-
-## Navigation
-
-The tour must support:
-
-- `Next`
-- `Back`
-- `Skip Tour`
-- Final `Start Learning` / `Finish` action
-
-### Step indicator
-
-Show progress clearly, for example:
-
-`1 / 8`
-
-or
-
-`Step 1 of 8`
-
-Use whichever pattern best matches the existing Prodily design system.
+Do not create assets that are unnecessary.
 
 ---
 
-## Skip behavior
+# 7. Feature Preview Mapping
 
-The user must be able to skip the tour at any point.
+The intended mapping is:
 
-When the user selects **Skip Tour**:
+| Step | Feature Preview |
+|---|---|
+| Welcome | Dashboard overview |
+| Curriculum | Actual Curriculum page |
+| Leaderboard & Cohorts | Actual Leaderboard page |
+| Capstones & Portfolio | Actual Capstone/Portfolio experience |
+| Badges & Achievements | Actual Badges page |
+| Progress & Review Hub | Actual Progress/Review experience |
+| Profile & Settings | Actual Settings/Profile experience |
+| You're Ready | Curriculum or Dashboard |
 
-1. Close the Quick Start modal.
-2. Persist the dismissed/completed state.
-3. Do not automatically show the tour again on the next Dashboard visit.
-
-The user should still be able to manually reopen Quick Start later.
-
----
-
-# 9. Reopen Quick Start
-
-Add a way for users to manually access the tour again after they have completed/skipped it.
-
-Possible locations:
-
-- Help icon
-- Dashboard help menu
-- Profile menu
-- Settings
-
-Use whichever location fits the existing Prodily UI best.
-
-Suggested label:
-
-**Quick Start**
-
-or
-
-**Product Tour**
-
-Do not add a new navigation tab solely for this unless the existing information architecture makes that necessary.
+The exact asset must be chosen after inspecting the current application.
 
 ---
 
-# 10. Visual Design
+# 8. Preview Design
 
-The Quick Start experience must match the existing Prodily design language.
+Inside a feature step, the modal should follow:
 
-Before implementing the UI:
+```text
+Brand / Feature badge
+        ↓
+Progress
+        ↓
+Feature title
+        ↓
+Short description
+        ↓
+Feature preview
+        ↓
+Navigation
+```
 
-1. Inspect the current Dashboard.
-2. Inspect the current navigation/sidebar.
-3. Inspect existing modals.
-4. Inspect buttons, typography, spacing, cards, icons, and colors.
-5. Reuse existing components wherever possible.
-6. Reuse existing design tokens/theme variables.
+The preview should:
 
-Do not introduce an unrelated visual style.
+- Have consistent dimensions across steps.
+- Use consistent aspect ratio.
+- Match Prodily border radius.
+- Use existing design tokens.
+- Have a subtle border.
+- Avoid excessive shadows.
+- Be readable without requiring interaction.
+- Remain responsive.
+- Not make the modal unnecessarily huge.
 
-### Recommended visual treatment
-
-Use a polished product-tour modal with:
-
-- Rounded corners consistent with existing Prodily cards/modals.
-- Clear title hierarchy.
-- Short readable descriptions.
-- Existing Prodily iconography where available.
-- Subtle animation between steps.
-- Optional background overlay.
-- Spotlight/highlight around the relevant navigation item or UI section.
-
-The tour should feel like a part of Prodily, not an external third-party widget.
+The preview is a **visual explanation**, not an interactive duplicate of the page.
 
 ---
 
-# 11. Spotlight / Feature Highlight
+# 9. Spotlight Redesign
 
-Where technically appropriate, each step should visually point to the feature being explained.
+## Current behavior
 
-For example:
+The current implementation dims/blurs the background and places a box over the selected sidebar item.
 
-**Curriculum step**
+This should be changed.
 
-- Darken/blur the rest of the page slightly.
-- Highlight the Curriculum navigation item.
-- Position the Quick Start card near the highlighted area.
+## Desired behavior
 
-Repeat this pattern for:
+Use a real spotlight cutout.
+
+### Desktop
+
+```text
+Rest of page
+     ↓
+Dimmed
+
+Target feature
+     ↓
+Completely clear
+
+Quick Start modal
+     ↓
+Directional arrow
+     ↓
+Target feature
+```
+
+The target must remain part of the original page and must not be covered by a duplicate opaque box.
+
+### Target styling
+
+The target may receive:
+
+- Subtle border.
+- Subtle glow.
+- Small emphasis ring.
+
+But the underlying UI must remain visible.
+
+---
+
+# 10. Directional Arrow
+
+Add a small polished directional arrow from the Quick Start modal toward the highlighted feature.
+
+The arrow should:
+
+- Be visually subtle.
+- Clearly indicate the target.
+- Use the actual target element's DOM position.
+- Dynamically calculate its position.
+- Respond to viewport changes.
+- Avoid hardcoded feature-specific coordinates.
+- Never leave the viewport.
+- Hide itself if safe positioning is impossible.
+
+Do not use manually calculated coordinates such as:
+
+```text
+Curriculum = top: 180px
+Leaderboard = top: 350px
+```
+
+Instead use the target element's actual bounding rectangle.
+
+---
+
+# 11. Spotlight Targets
+
+Desktop spotlight targets:
 
 - Curriculum
 - Leaderboard
-- Portfolio
-- Badges/Achievements
-- Progress/Dashboard
-- Profile/Settings
+- Capstones
+- Badges
+- Review Hub
+- Progress
+- Settings
 
-If a spotlight implementation would create major responsive/accessibility issues, use a centered modal with a clear feature icon instead.
+No spotlight is required for:
 
-The experience should remain usable on mobile.
+- Welcome.
+- Final step.
 
----
-
-# 12. Responsive Behavior
-
-Quick Start must work properly on:
-
-- Desktop
-- Laptop
-- Tablet
-- Mobile
-
-On smaller screens:
-
-- Do not position the modal outside the viewport.
-- Ensure all text remains readable.
-- Ensure buttons remain easily tappable.
-- Ensure the highlighted feature does not become inaccessible.
-- Allow the modal/card to scroll internally if necessary.
-- Avoid requiring horizontal scrolling.
+Use the actual selectors/target references already defined by the Quick Start implementation.
 
 ---
 
-# 13. Accessibility
+# 12. Mobile Behavior
 
-The Quick Start modal must follow the application's existing accessibility patterns.
+Do not force the desktop spotlight system onto mobile.
 
-At minimum:
+On mobile or when the sidebar is collapsed:
 
-- Proper dialog semantics.
-- Keyboard navigation.
-- Visible focus states.
-- Buttons must have meaningful labels.
-- Escape key should close/skip the tour if consistent with existing modal behavior.
-- Screen readers should be able to understand the current step.
-- Do not rely only on color or visual highlighting to communicate information.
+```text
+Centered Quick Start modal
+        +
+Feature preview
+```
+
+Prioritize:
+
+- Readability.
+- Touch usability.
+- Correct viewport positioning.
+- No horizontal scrolling.
+- No off-screen arrows.
+- No inaccessible sidebar elements.
+
+The feature preview becomes especially important on mobile because the user may not see the sidebar target.
 
 ---
 
-# 14. Animation
+# 13. Modal Layout
 
-Use subtle transitions.
+The current modal should be enhanced rather than replaced.
 
-Recommended:
+Target structure:
 
-- Fade/scale when opening.
-- Smooth transition between steps.
-- Subtle movement when the spotlight changes.
+```text
+┌──────────────────────────────────┐
+│ Prodily       Feature   Step X/8 │
+│──────────────────────────────────│
+│                                  │
+│  Feature title                   │
+│  Short description               │
+│                                  │
+│  ┌────────────────────────────┐  │
+│  │                            │  │
+│  │      Feature Preview       │  │
+│  │                            │  │
+│  └────────────────────────────┘  │
+│                                  │
+│  Skip Tour   Back        Next →  │
+└──────────────────────────────────┘
+```
 
-Avoid:
-
-- Excessive animations.
-- Long delays.
-- Distracting effects.
-
-The user should always feel in control.
+Do not make the modal so large that it feels like a full page.
 
 ---
 
-# 15. Technical Implementation Guidance
+# 14. Implementation Phases
 
-Before coding, inspect the repository and identify:
+## Phase 1 — Screenshot / Asset Audit
 
-- Existing authentication flow.
-- Existing onboarding completion state.
-- User database/schema.
-- Dashboard entry point.
-- Existing modal/dialog components.
-- Existing navigation/sidebar components.
-- Existing design tokens.
-- Existing analytics/event tracking, if available.
-- Existing user preference/settings patterns.
+Before modifying UI:
 
-Then implement Quick Start using the project's existing architecture.
+1. Inspect existing assets.
+2. Inspect actual feature pages.
+3. Identify reusable screenshots.
+4. Map screenshots to Quick Start steps.
+5. Identify missing screenshots.
+6. Add only necessary missing assets.
+7. Verify image sizes and loading.
+8. Report the asset mapping.
 
-### Important
-
-Do not blindly create a new architecture.
-
-Prefer:
-
-- Existing components.
-- Existing hooks.
-- Existing state management.
-- Existing database patterns.
-- Existing API/server-action patterns.
-- Existing UI primitives.
-
-Only introduce new abstractions where the existing architecture does not support the feature cleanly.
+**No Quick Start behavior should change during this phase.**
 
 ---
 
-# 16. Suggested State Model
+## Phase 2 — Spotlight Enhancement
 
-Conceptually, the feature needs a state similar to:
+After the asset audit:
 
-```text
-quickStartStatus:
-  not_started
-  active
-  completed
-  skipped
-```
-
-However, the persisted user state only needs to distinguish whether the automatic tour should appear again.
-
-For example:
-
-```text
-quickStartCompleted: boolean
-```
-
-or an equivalent existing user-preference field.
-
-The temporary `active` state should remain client/UI state.
+1. Replace the current highlighted box with a true overlay cutout.
+2. Keep the actual target element completely clear.
+3. Add subtle target emphasis.
+4. Add dynamic directional arrow.
+5. Handle viewport resizing.
+6. Handle mobile fallback.
+7. Verify existing Quick Start behavior remains unchanged.
 
 ---
 
-# 17. Error Handling
+## Phase 3 — Feature Preview Integration
 
-If the application cannot persist the Quick Start completion state:
+After the spotlight is working:
 
-- Do not break the Dashboard.
-- Do not block the user from using Prodily.
-- Handle the persistence failure gracefully.
-- Follow the application's existing error handling/logging conventions.
-
-Quick Start is an enhancement and must never prevent normal Dashboard usage.
-
----
-
-# 18. Analytics
-
-If Prodily already has analytics/event tracking, consider tracking:
-
-- Quick Start opened
-- Quick Start step viewed
-- Quick Start skipped
-- Quick Start completed
-- Quick Start reopened manually
-
-Do not introduce a new analytics system solely for this feature.
-
-If analytics are not currently available, do not block implementation on analytics.
+1. Add the preview area below the description.
+2. Connect each step to its approved preview asset.
+3. Keep descriptions concise.
+4. Keep preview dimensions consistent.
+5. Ensure desktop modal proportions remain balanced.
+6. Ensure mobile previews fit correctly.
+7. Optimize image loading.
 
 ---
 
-# 19. Testing Requirements
+## Phase 4 — Final Polish & Validation
 
-Before considering the feature complete, test the complete user journey.
+After Phases 1–3:
 
-### New user
+1. Review typography.
+2. Review spacing.
+3. Review modal size.
+4. Review preview quality.
+5. Review spotlight cutouts.
+6. Review arrow positioning.
+7. Review transitions.
+8. Review desktop.
+9. Review tablet.
+10. Review mobile.
+11. Review keyboard navigation.
+12. Review accessibility.
+13. Run targeted Quick Start tests.
+14. Run relevant regression tests.
+15. Run production build.
+16. Deploy to Vercel Preview.
+17. Perform complete browser verification.
+18. Inspect final git diff.
 
-Verify:
+Only then consider the branch ready for merge.
 
-```text
-Sign up
-→ Email verification
-→ Login
-→ Existing onboarding
-→ Dashboard
-→ Quick Start automatically opens
-```
+---
 
-### Complete tour
+# 15. Preservation Rules
 
-Verify:
+Do not change these unless a real defect is discovered:
 
-```text
-Quick Start opens
-→ User goes through every step
-→ User clicks Start Learning
-→ Tour closes
-→ Completion state is persisted
-→ Dashboard works normally
-→ Quick Start does not automatically open again
-```
+- Authentication flow.
+- Email verification.
+- Existing onboarding.
+- `onboarding_complete`.
+- `quick_start_completed`.
+- Supabase persistence.
+- Automatic launch.
+- Skip behavior.
+- Finish behavior.
+- Manual reopen.
+- Existing 8-step business logic.
+- Analytics.
+- Authenticated app boundaries.
 
-### Skip tour
+Do not introduce:
 
-Verify:
+- localStorage persistence.
+- New database migrations.
+- Third-party product-tour libraries.
+- New analytics infrastructure.
+- New onboarding architecture.
+- Unrelated Dashboard changes.
 
-```text
-Quick Start opens
-→ User clicks Skip Tour
-→ Tour closes
-→ Dismissal state is persisted
-→ Dashboard works normally
-→ Tour does not automatically open again
-```
+---
 
-### Returning user
+# 16. Testing
 
-Verify:
+After the UI enhancement:
 
-```text
-Existing user
-→ Login
-→ Dashboard
-→ Quick Start does NOT automatically open
-```
+### Automated
 
-### Manual reopen
-
-Verify:
-
-```text
-Completed/skipped user
-→ Opens Quick Start from Help/Profile/Settings
-→ Tour opens normally
-→ All steps work
-```
-
-### Refresh
-
-Verify that refreshing the Dashboard does not unexpectedly reopen the tour after completion/skip.
-
-### Multiple devices/browser
-
-If the state is persisted server-side:
+Run:
 
 ```text
-Complete/skip tour on Device A
-→ Login on Device B
-→ Tour should not automatically open
+npm run test:quick-start
+npm run test:settings
+npm run test:srs
+npm run build
 ```
 
-### Responsive testing
+Also run lint/type checks where available.
 
-Test at minimum:
-
-- Desktop
-- Tablet
-- Mobile
-
-### Accessibility testing
+### Browser — Vercel Preview
 
 Test:
 
-- Keyboard navigation
-- Focus management
-- Escape behavior
-- Screen reader semantics
-- Button labels
+#### New user
+
+```text
+Signup
+→ Email verification
+→ Login
+→ Onboarding
+→ Dashboard
+→ Quick Start opens
+```
+
+#### Tour
+
+- Step 1.
+- Next.
+- Back.
+- Skip.
+- Finish.
+- All 8 steps.
+- Spotlight targets.
+- Arrow positioning.
+- Preview images.
+
+#### Persistence
+
+```text
+Complete/Skip
+→ Refresh
+→ Tour does not reopen
+
+Logout
+→ Login
+→ Tour does not reopen
+```
+
+#### Manual reopen
+
+- Profile dropdown.
+- Settings.
+- Opens at Step 1.
+- Does not reset completion state.
+
+#### Responsive
+
+- Desktop.
+- Tablet.
+- Mobile.
+
+#### Accessibility
+
+- Keyboard navigation.
+- Escape.
+- Focus management.
+- Dialog semantics.
+- Screen-reader labels.
+- Reduced motion.
 
 ---
 
-# 20. Definition of Done
+# 17. Definition of Done
 
-Quick Start is complete only when:
-
-- [ ] New users see Quick Start after onboarding and first Dashboard entry.
-- [ ] Existing users are not unexpectedly shown the tour.
-- [ ] Tour explains the major Prodily features.
-- [ ] Curriculum is explained.
-- [ ] Leaderboard is explained.
-- [ ] Portfolio is explained.
-- [ ] Badges/Achievements are explained.
-- [ ] Dashboard/Progress is explained.
-- [ ] Profile/Settings are explained.
-- [ ] User can move forward and backward.
-- [ ] User can skip the tour.
-- [ ] Completion/skip state persists.
-- [ ] Tour does not repeatedly appear.
-- [ ] Users can manually reopen Quick Start.
-- [ ] UI matches the existing Prodily design.
-- [ ] Desktop and mobile layouts work.
-- [ ] Accessibility requirements are met.
-- [ ] Existing Dashboard functionality is unaffected.
-- [ ] All relevant tests pass.
+- [ ] Existing Quick Start functionality remains intact.
+- [ ] Existing Quick Start tests pass.
+- [ ] Regression tests pass.
 - [ ] Production build passes.
-- [ ] No unrelated files/features are changed.
+- [ ] Repository assets were audited before creating new screenshots.
+- [ ] Existing suitable screenshots are reused.
+- [ ] Missing previews are added only where necessary.
+- [ ] Preview assets match the current Prodily UI.
+- [ ] Feature previews appear in relevant steps.
+- [ ] Desktop spotlight uses a real cutout/exclusion.
+- [ ] Target remains completely clear.
+- [ ] Target is not covered by a duplicate box.
+- [ ] Directional arrow points dynamically to the actual target.
+- [ ] Arrow has no hardcoded feature-specific coordinates.
+- [ ] Arrow remains within viewport.
+- [ ] Mobile uses a safe centered modal/preview experience.
+- [ ] No horizontal overflow.
+- [ ] Modal remains visually balanced.
+- [ ] Accessibility remains functional.
+- [ ] Vercel Preview browser verification passes.
+- [ ] No unrelated files or functionality are changed.
+- [ ] Final git diff is reviewed.
+- [ ] Branch is ready for merge only after all checks pass.
 
 ---
 
-# 21. Implementation Principle
+# 18. Implementation Principle
 
-**Build the simplest polished version that fits the existing Prodily architecture.**
+**Do not rebuild what already works.**
 
-The goal is not to create a complicated onboarding framework.
+The existing Quick Start is functionally working.
 
-The goal is to give a new Prodily user a short, clear introduction to:
+This phase should make it:
 
-> **What Prodily has → where each feature is → what they should do next.**
+> **More visual → clearer → more polished → more native to Prodily**
 
-Inspect the current application first, adapt the exact feature names/content to what actually exists in the codebase, then implement the Quick Start experience without breaking the existing onboarding or Dashboard flow.
+The required order is:
+
+> **Asset Audit → Spotlight → Feature Previews → Polish & Validation**
+
+No implementation of the new UI should begin until the asset audit has been completed and the screenshot/preview strategy is clear.

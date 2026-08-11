@@ -13,14 +13,14 @@ interface SidebarProps {
 }
 
 const SIDEBAR_LINKS = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Curriculum', href: '/academy', icon: BookOpen },
-  { label: 'Capstones', href: '/capstones', icon: Award },
-  { label: 'Badges', href: '/badges', icon: Trophy },
-  { label: 'Review Hub', href: '/review', icon: RotateCw },
-  { label: 'Progress', href: '/progress', icon: BarChart3 },
-  { label: 'Leaderboard', href: '/leaderboard', icon: Trophy },
-  { label: 'Settings', href: '/settings', icon: Settings },
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, quickStartTarget: undefined },
+  { label: 'Curriculum', href: '/academy', icon: BookOpen, quickStartTarget: 'curriculum' },
+  { label: 'Capstones', href: '/capstones', icon: Award, quickStartTarget: 'capstones' },
+  { label: 'Badges', href: '/badges', icon: Trophy, quickStartTarget: 'badges' },
+  { label: 'Review Hub', href: '/review', icon: RotateCw, quickStartTarget: 'review' },
+  { label: 'Progress', href: '/progress', icon: BarChart3, quickStartTarget: undefined },
+  { label: 'Leaderboard', href: '/leaderboard', icon: Trophy, quickStartTarget: 'leaderboard' },
+  { label: 'Settings', href: '/settings', icon: Settings, quickStartTarget: 'settings' },
 ]
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -60,6 +60,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               key={link.href}
               href={link.href}
               onClick={onClose}
+              {...(link.quickStartTarget ? { 'data-quick-start-target': link.quickStartTarget } : {})}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
                 isActive

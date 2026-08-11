@@ -17,6 +17,8 @@ export interface QuickStartStep {
   description: string
   icon: LucideIcon
   highlightSelector?: string
+  previewImage?: string
+  previewAlt?: string
   ctaText?: string
   featureBadge?: string
 }
@@ -40,7 +42,9 @@ export const QUICK_START_STEPS: QuickStartStep[] = [
     description:
       'This is where your Product Management learning journey happens. Work through structured lessons, sharpen your judgment with practice quizzes, and track your progress.',
     icon: BookOpen,
-    highlightSelector: 'a[href="/academy"]',
+    highlightSelector: '[data-quick-start-target="curriculum"]',
+    previewImage: '/quick-start/curriculum-preview.webp',
+    previewAlt: 'Curriculum page showing PM modules and lesson list',
     ctaText: 'Next →',
     featureBadge: 'Curriculum',
   },
@@ -52,7 +56,9 @@ export const QUICK_START_STEPS: QuickStartStep[] = [
     description:
       'See how you rank against other Prodily learners. Earn XP through daily study activities, track weekly leaderboard snapshots, and connect with learning cohorts.',
     icon: Trophy,
-    highlightSelector: 'a[href="/leaderboard"]',
+    highlightSelector: '[data-quick-start-target="leaderboard"]',
+    previewImage: '/quick-start/leaderboard-preview.webp',
+    previewAlt: 'Leaderboard page showing weekly consistency rankings and XP',
     ctaText: 'Next →',
     featureBadge: 'Leaderboard',
   },
@@ -64,7 +70,9 @@ export const QUICK_START_STEPS: QuickStartStep[] = [
     description:
       'Build your Product Management portfolio as you learn. Submit hands-on capstones for each module to showcase your structured thinking and real-world projects.',
     icon: Award,
-    highlightSelector: 'a[href="/capstones"]',
+    highlightSelector: '[data-quick-start-target="capstones"]',
+    previewImage: '/quick-start/capstone-preview.webp',
+    previewAlt: 'Capstones page showing module deliverables and portfolio link',
     ctaText: 'Next →',
     featureBadge: 'Capstones',
   },
@@ -76,7 +84,9 @@ export const QUICK_START_STEPS: QuickStartStep[] = [
     description:
       'Complete learning activities, reach daily streak goals, and unlock exclusive achievement badges as you progress through the curriculum.',
     icon: Trophy,
-    highlightSelector: 'a[href="/badges"]',
+    highlightSelector: '[data-quick-start-target="badges"]',
+    previewImage: '/quick-start/badges-preview.webp',
+    previewAlt: 'Badges page showing earned and locked milestone achievements',
     ctaText: 'Next →',
     featureBadge: 'Badges',
   },
@@ -88,7 +98,9 @@ export const QUICK_START_STEPS: QuickStartStep[] = [
     description:
       'Master PM concepts with spaced repetition flashcards in the Review Hub, maintain active daily study streaks, and monitor your overall skill progress.',
     icon: RotateCw,
-    highlightSelector: 'a[href="/review"]',
+    highlightSelector: '[data-quick-start-target="review"]',
+    previewImage: '/quick-start/review-preview.webp',
+    previewAlt: 'Review Hub page showing spaced repetition flashcards and study streak',
     ctaText: 'Next →',
     featureBadge: 'Review Hub',
   },
@@ -100,7 +112,9 @@ export const QUICK_START_STEPS: QuickStartStep[] = [
     description:
       'Manage your profile, customize your public portfolio link, configure notification preferences, and reopen this Quick Start tour anytime.',
     icon: Settings,
-    highlightSelector: 'a[href="/settings"]',
+    highlightSelector: '[data-quick-start-target="settings"]',
+    previewImage: '/quick-start/settings-preview.webp',
+    previewAlt: 'Settings page showing profile fields and portfolio visibility controls',
     ctaText: 'Next →',
     featureBadge: 'Settings',
   },
