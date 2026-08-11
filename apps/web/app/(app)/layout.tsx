@@ -5,6 +5,8 @@ import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/l
 import { ensureUserProfile, UserProfile } from '@/lib/auth'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
+import { QuickStartProvider } from '@/components/quick-start/QuickStartContext'
+import { QuickStartModal } from '@/components/quick-start/QuickStartModal'
 
 export const metadata: Metadata = {
   robots: {
@@ -52,9 +54,19 @@ export default async function AuthenticatedLayout({
     }
   }
 
+  const isOnboardingComplete = Boolean(authUser.user_metadata?.onboarding_complete || profile?.goal)
+  const isQuickStartCompleted = Boolean(authUser.user_metadata?.quick_start_completed)
+
   return (
     <BreadcrumbProvider>
-      <AppShell userProfile={profile}>{children}</AppShell>
+      <QuickStartProvider
+        initialOnboardingComplete={isOnboardingComplete}
+        initialQuickStartCompleted={isQuickStartCompleted}
+      >
+        <AppShell userProfile={profile}>{children}</AppShell>
+        <QuickStartModal />
+      </QuickStartProvider>
     </BreadcrumbProvider>
   )
 }
+
