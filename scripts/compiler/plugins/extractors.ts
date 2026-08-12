@@ -435,41 +435,82 @@ export function extractCommonMistakesBlock(nodes: any[], lessonId: string): any 
 }
 
 // Extract Real World Perspective Block
+//
+// Handles all three bold-paragraph segment formats used across lessons:
+//   1. **At a startup (roughly pre-seed to Series B):** body text
+//   2. **Startup:** body text
+//   3. **In B2B/enterprise SaaS:** body text
+//   4. ### Heading (h3 node)
+//
+// Detection rule: any paragraph whose first node is a <strong> containing
+// only a context label (possibly ending with ':'), OR an h3 heading.
 export function extractRealWorldPerspectiveBlock(nodes: any[], lessonId: string): any {
   const segments: any[] = [];
   let currentSegment: any = null;
 
   for (const node of nodes) {
-    const text = toMarkdown(node).trim();
-    // Subheadings like: **At a startup (roughly pre-seed to Series B):**
-    // or ### Startup (roughly pre-seed to Series B)
-    const contextMatch = text.match(/^\*?\*?(At a\s+[^*\n]+|At\s+[^*\n]+)\*?\*?(?::\s*|\n|:\s*\n|$)([\s\S]*)/i) || (node.type === 'heading' && node.depth === 3);
-
-    if (contextMatch) {
-      if (currentSegment) {
-        segments.push(currentSegment);
-      }
+    // H3 heading always starts a new segment
+    if (node.type === 'heading' && node.depth === 3) {
+      if (currentSegment) segments.push(currentSegment);
       let contextText = '';
-      let bodyText = '';
-      if (node.type === 'heading') {
-        visitText(node, (v) => { contextText += v; });
-      } else if (Array.isArray(contextMatch)) {
-        contextText = contextMatch[1].trim().replace(/:$/, '').trim();
-        bodyText = contextMatch[2].trim();
-      }
+      visitText(node, (v) => { contextText += v; });
+      currentSegment = { context: contextText.trim(), body: '' };
+      continue;
+    }
 
-      currentSegment = {
-        context: contextText,
-        body: bodyText,
-      };
-    } else if (currentSegment) {
+    if (node.type === 'paragraph') {
+      const children = node.children || [];
+
+      // A segment opener is a paragraph that begins with a <strong> node
+      // and whose strong text looks like a stage label (ends with ':' or is short).
+      // We accept any bold text that is the first (or only) substantive child.
+      const firstChild = children[0];
+      const isStrongOpener =
+        firstChild &&
+        firstChild.type === 'strong' &&
+        (() => {
+          // Collect the text inside the strong node
+          let strongText = '';
+          visitText(firstChild, (v) => { strongText += v; });
+          strongText = strongText.trim();
+          // Treat it as a context label if it ends with ':' or is purely a
+          // stage label (no internal sentence punctuation like '.' mid-way)
+          return strongText.endsWith(':') || strongText.endsWith(':\u00a0');
+        })();
+
+      if (isStrongOpener) {
+        if (currentSegment) segments.push(currentSegment);
+
+        // Extract the strong label as context, stripping the trailing ':'
+        let contextText = '';
+        visitText(firstChild, (v) => { contextText += v; });
+        contextText = contextText.trim().replace(/:$/, '').trim();
+
+        // Everything after the strong node in the same paragraph is body preamble
+        const restChildren = children.slice(1);
+        let bodyPreamble = '';
+        if (restChildren.length > 0) {
+          // Build a temporary paragraph node to reuse toMarkdown
+          bodyPreamble = restChildren.map(toMarkdown).join('').trim();
+        }
+
+        currentSegment = { context: contextText, body: bodyPreamble };
+        continue;
+      }
+    }
+
+    // Not a segment opener — append to current segment's body
+    const text = toMarkdown(node).trim();
+    if (!text) continue;
+    if (currentSegment) {
       currentSegment.body += (currentSegment.body ? '\n\n' : '') + text;
+    } else {
+      // Content before any segment opener — treat as preamble in a generic segment
+      currentSegment = { context: '', body: text };
     }
   }
 
-  if (currentSegment) {
-    segments.push(currentSegment);
-  }
+  if (currentSegment) segments.push(currentSegment);
 
   const block: any = {
     type: 'realWorldPerspective',
@@ -484,44 +525,99 @@ export function extractInterviewPerspectiveBlock(nodes: any[], lessonId: string)
   let currentQuestion: any = null;
 
   for (const node of nodes) {
-    const text = toMarkdown(node).trim();
-    if (!text) continue;
+    if (node.type === 'paragraph') {
+      const children = node.children || [];
 
-    const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+      // ── Format A: **Typical question N: "text"** ──────────────────────────
+      // The entire first child is a <strong> node containing the question label + text.
+      // Everything after it (italic or plain text) is the evaluation explanation.
+      const firstChild = children[0];
+      if (firstChild && firstChild.type === 'strong') {
+        let strongText = '';
+        visitText(firstChild, (v) => { strongText += v; });
+        strongText = strongText.trim();
 
-    for (const line of lines) {
-      const qMatch = line.match(/^\*?\*?(?:Typical question(?:\s*\d+)?|Question(?:\s*\d+)?):\s*(.*?)(?:\*?\*?\s*$|$)/i);
-
-      if (qMatch) {
-        if (currentQuestion) {
-          questions.push(currentQuestion);
+        const typicalMatch = strongText.match(
+          /^(?:Typical question(?:\s*\d+)?|Question(?:\s*\d+)?):\s*(.*)/i
+        );
+        if (typicalMatch) {
+          if (currentQuestion) questions.push(currentQuestion);
+          let qStr = typicalMatch[1]
+            .replace(/^["'\u201c\u2018]/, '')
+            .replace(/["'\u201d\u2019]$/, '')
+            .trim();
+          // Remainder of the paragraph (non-strong children) = evaluation text
+          const evalText = children.slice(1).map(toMarkdown).join('').trim();
+          currentQuestion = { question: qStr, whatItEvaluates: evalText };
+          continue;
         }
-        let qStr = qMatch[1].replace(/^\*?\*?/, '').replace(/\*?\*?$/, '').trim();
-        qStr = qStr.replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim();
-        currentQuestion = {
-          question: qStr,
-          whatItEvaluates: '',
-        };
-      } else {
-        const directMatch = line.match(/^\*?\*?\s*["'“](.*?)["'”]\s*\*?\*?\s*(.*)/i);
-        if (directMatch && directMatch[1].length > 10 && !currentQuestion) {
-          if (currentQuestion) {
-            questions.push(currentQuestion);
-          }
-          currentQuestion = {
-            question: directMatch[1].trim(),
-            whatItEvaluates: directMatch[2].trim(),
-          };
+
+        // ── Format B: **"Question text."** The interviewer is evaluating... ──
+        // The strong node contains the question in quotes; the rest of the
+        // paragraph children (typically a plain text node starting with a space)
+        // contain the evaluation text.
+        const boldQuoteMatch = strongText.match(
+          /^["'\u201c\u2018](.*?)["'\u201d\u2019]\s*$|^(.*?)\s*$/
+        );
+        // Only treat as Format B if the strong text looks like a question
+        // (contains a '?' or is wrapped in quotes)
+        const looksLikeQuestion =
+          strongText.includes('?') ||
+          /^["'\u201c\u2018]/.test(strongText);
+
+        if (looksLikeQuestion && boldQuoteMatch) {
+          if (currentQuestion) questions.push(currentQuestion);
+          // Strip surrounding quotes from the question text
+          const rawQ = (boldQuoteMatch[1] || boldQuoteMatch[2] || strongText)
+            .replace(/^["'\u201c\u2018]/, '')
+            .replace(/["'\u201d\u2019]$/, '')
+            .trim();
+          // Everything after the strong in the same paragraph = evaluation
+          const evalText = children.slice(1).map(toMarkdown).join('').trim();
+          currentQuestion = { question: rawQ, whatItEvaluates: evalText };
+          continue;
+        }
+      }
+
+      // ── Fallback: plain paragraph text appended to current question's evaluation
+      const text = toMarkdown(node).trim();
+      if (!text) continue;
+
+      // Check line-by-line for the "Typical question" label (older single-line format)
+      const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+      let handledAsQuestion = false;
+      for (const line of lines) {
+        const qMatch = line.match(
+          /^\*?\*?(?:Typical question(?:\s*\d+)?|Question(?:\s*\d+)?):\s*(.*?)(?:\*?\*?\s*$|$)/i
+        );
+        if (qMatch) {
+          if (currentQuestion) questions.push(currentQuestion);
+          let qStr = qMatch[1].replace(/^\*?\*?/, '').replace(/\*?\*?$/, '').trim();
+          qStr = qStr
+            .replace(/^["'\u201c\u2018]/, '')
+            .replace(/["'\u201d\u2019]$/, '')
+            .trim();
+          currentQuestion = { question: qStr, whatItEvaluates: '' };
+          handledAsQuestion = true;
         } else if (currentQuestion) {
-          currentQuestion.whatItEvaluates += (currentQuestion.whatItEvaluates ? '\n\n' : '') + line;
+          currentQuestion.whatItEvaluates +=
+            (currentQuestion.whatItEvaluates ? '\n\n' : '') + line;
         }
+      }
+      if (!handledAsQuestion && !currentQuestion) {
+        // preamble paragraph — ignore
+      }
+    } else {
+      // Non-paragraph nodes (e.g., lists, blockquotes) — append to current question
+      const text = toMarkdown(node).trim();
+      if (text && currentQuestion) {
+        currentQuestion.whatItEvaluates +=
+          (currentQuestion.whatItEvaluates ? '\n\n' : '') + text;
       }
     }
   }
 
-  if (currentQuestion) {
-    questions.push(currentQuestion);
-  }
+  if (currentQuestion) questions.push(currentQuestion);
 
   const block: any = {
     type: 'interviewPerspective',
