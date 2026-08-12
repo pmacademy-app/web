@@ -12,6 +12,17 @@ import { TestimonialsSection } from '@/components/marketing/sections/testimonial
 import { FAQSection } from '@/components/marketing/sections/faq'
 import { FinalCTASection } from '@/components/marketing/sections/final-cta'
 
+import type { Metadata } from 'next'
+import { BRAND } from '@/lib/brand'
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: siteUrl,
+  },
+}
+
 export const revalidate = 60
 
 /**

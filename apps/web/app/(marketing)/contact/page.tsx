@@ -9,6 +9,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 export const metadata: Metadata = {
   title: 'Contact Us',
   description: 'Get in touch with the Prodily PM Academy team for support, feedback, or inquiries.',
+  alternates: {
+    canonical: `${siteUrl}/contact`,
+  },
   openGraph: {
     title: 'Contact — Prodily PM Academy',
     description: 'Get in touch with the PM Academy team for support, feedback, or questions.',

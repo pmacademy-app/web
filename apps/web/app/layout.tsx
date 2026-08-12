@@ -91,10 +91,6 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
 
-  alternates: {
-    canonical: siteUrl,
-  },
-
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
     other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION

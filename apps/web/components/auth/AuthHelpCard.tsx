@@ -1,5 +1,6 @@
 import React from 'react'
 import { HelpCircle } from 'lucide-react'
+import { BRAND } from '@/lib/brand'
 
 interface AuthHelpCardProps {
   title: string
@@ -20,10 +21,10 @@ export function AuthHelpCard({ title, description }: AuthHelpCardProps) {
           </p>
           <div className="pt-1">
             <a
-              href="mailto:prodilypm@gmail.com"
+              href={`mailto:${BRAND.supportEmail}`}
               className="font-medium text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded"
             >
-              prodilypm@gmail.com
+              {BRAND.supportEmail}
             </a>
           </div>
         </div>

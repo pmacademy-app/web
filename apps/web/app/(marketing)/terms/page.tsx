@@ -8,6 +8,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'Terms of Service for Prodily PM Academy outlining free-forever curriculum commitment, acceptable use, intellectual property, certificates, and learner guidelines.',
+  alternates: {
+    canonical: `${siteUrl}/terms`,
+  },
   openGraph: {
     title: 'Terms of Service — Prodily PM Academy',
     description: 'Prodily PM Academy terms of service, acceptable use, and platform policies.',

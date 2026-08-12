@@ -8,6 +8,10 @@ import { AdminConsoleShell } from '@/components/admin/AdminConsoleShell'
 export const metadata = {
   title: 'Admin Console',
   description: 'Operational control center for Prodily PM Academy administrators.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 /**
