@@ -159,7 +159,7 @@ A "no" on Single Source of Truth in particular should be treated as an active or
 
 **"Tell me about a time data from two sources disagreed, and how you resolved it."** The interviewer is evaluating whether you can diagnose the disagreement using something like the Metric Provenance Chain — tracing back to a missing Definition Consensus or Single Source of Truth — rather than simply picking whichever number was more convenient.
 
-**"How would you build trust in a company's metrics if teams currently don't agree on basic numbers?**" The interviewer is testing whether you propose a governance process (documented definitions, designated ownership, a single source of truth) rather than a purely technical fix, since the root problem is usually organizational, not computational.
+**"How would you build trust in a company's metrics if teams currently don't agree on basic numbers?"** The interviewer is testing whether you propose a governance process (documented definitions, designated ownership, a single source of truth) rather than a purely technical fix, since the root problem is usually organizational, not computational.
 
 **"What's the danger of adding more dashboards to a company with existing data trust issues?"** The interviewer is listening for recognition that more dashboards, without governance, typically worsens fragmentation rather than improving visibility — a direct application of the dashboard fragmentation diagnostic from this lesson.
 
@@ -219,46 +219,46 @@ Organizational metric trust, not the sheer volume of available data, is the true
 ## Flashcards
 
 **Card 1**
-- Front: ** What is the actual constraint on data-informed decision-making at scale, according to this lesson?
-- Back: ** Organizational metric trust, not the volume of available data.
+- Front: What is the actual constraint on data-informed decision-making at scale, according to this lesson?
+- Back: Organizational metric trust, not the volume of available data.
 - Difficulty: 2
-- Tags: **, metrics-culture, core-concept
+- Tags: metrics-culture, core-concept
 
 **Card 2**
-- Front: ** Name the five stages of the Metric Provenance Chain in order.
-- Back: ** Instrumentation, Validation, Definition Consensus, Trusted Metric, Decision.
+- Front: Name the five stages of the Metric Provenance Chain in order.
+- Back: Instrumentation, Validation, Definition Consensus, Trusted Metric, Decision.
 - Difficulty: 2
-- Tags: **, provenance-chain
+- Tags: provenance-chain
 
 **Card 3**
-- Front: ** What is metric definition drift?
-- Back: ** The gradual, often silent divergence between a metric's original intended meaning and what it currently actually measures.
+- Front: What is metric definition drift?
+- Back: The gradual, often silent divergence between a metric's original intended meaning and what it currently actually measures.
 - Difficulty: 2
-- Tags: **, drift
+- Tags: drift
 
 **Card 4**
-- Front: ** What does dashboard fragmentation indicate about an organization?
-- Back: ** That its Metric Provenance Chain is broken somewhere between Definition Consensus and Trusted Metric status.
+- Front: What does dashboard fragmentation indicate about an organization?
+- Back: That its Metric Provenance Chain is broken somewhere between Definition Consensus and Trusted Metric status.
 - Difficulty: 2
-- Tags: **, fragmentation
+- Tags: fragmentation
 
 **Card 5**
-- Front: ** In the Case Study, why didn't either retention dashboard get flagged as "wrong"?
-- Back: ** Both were internally valid and consistently computed — the failure was the absence of company-wide Definition Consensus and a designated single source of truth, not a calculation error in either dashboard.
+- Front: In the Case Study, why didn't either retention dashboard get flagged as "wrong"?
+- Back: Both were internally valid and consistently computed — the failure was the absence of company-wide Definition Consensus and a designated single source of truth, not a calculation error in either dashboard.
 - Difficulty: 2
-- Tags: **, case-study, provenance-chain
+- Tags: case-study, provenance-chain
 
 **Card 6**
-- Front: ** Why is an executive's personal dashboard not automatically a Trusted Metric?
-- Back: ** Organizational seniority is not a substitute for provenance — any metric must pass through Validation and Definition Consensus regardless of its source.
+- Front: Why is an executive's personal dashboard not automatically a Trusted Metric?
+- Back: Organizational seniority is not a substitute for provenance — any metric must pass through Validation and Definition Consensus regardless of its source.
 - Difficulty: 2
-- Tags: **, metric-health
+- Tags: metric-health
 
 **Card 7**
-- Front: ** What should a PM do if a metric fails the Single Source of Truth check?
-- Back: ** Treat it as an active organizational risk — decisions may currently be resting on incompatible versions of the same nominal number.
+- Front: What should a PM do if a metric fails the Single Source of Truth check?
+- Back: Treat it as an active organizational risk — decisions may currently be resting on incompatible versions of the same nominal number.
 - Difficulty: 2
-- Tags: **, metric-health-checklist
+- Tags: metric-health-checklist
 
 
 ## Reflection Exercise
