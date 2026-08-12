@@ -3,10 +3,16 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { MODULES } from '@/config/content'
+import { BRAND } from '@/lib/brand'
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
   title: 'Full Curriculum — 9 Modules, 90 Lessons',
   description: 'Explore the complete free 90-lesson Product Management curriculum across 9 core modules.',
+  alternates: {
+    canonical: `${siteUrl}/curriculum`,
+  },
 }
 
 export default async function CurriculumPage() {

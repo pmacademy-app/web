@@ -30,6 +30,8 @@ export default function robots(): MetadataRoute.Robots {
           '/badges',
           '/api/',
           '/academy/',
+          '/login',
+          '/app',
         ],
       },
     ],

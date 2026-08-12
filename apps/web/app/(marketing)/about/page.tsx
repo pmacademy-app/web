@@ -8,6 +8,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 export const metadata: Metadata = {
   title: 'About — Free Product Management Academy',
   description: 'Learn why Prodily PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
+  alternates: {
+    canonical: `${siteUrl}/about`,
+  },
   openGraph: {
     title: 'About — Prodily PM Academy',
     description: 'Learn why Prodily PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
