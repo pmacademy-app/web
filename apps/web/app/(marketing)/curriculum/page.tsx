@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { getCourseSchema } from '@/lib/schema'
+
 export default async function CurriculumPage() {
   const cookieStore = await cookies()
   const accessToken = cookieStore.get('sb-access-token')?.value
@@ -22,8 +24,15 @@ export default async function CurriculumPage() {
   if (accessToken) {
     redirect('/academy')
   }
+
+  const courseSchema = getCourseSchema()
+
   return (
     <div className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-5xl">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
       <div className="text-center mb-12">
         <h1 className="text-3xl md:text-5xl font-bold font-serif text-foreground mb-4">
           Full PM Curriculum
