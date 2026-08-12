@@ -137,21 +137,27 @@ The most common confusion for new PMs is conflating their role with the Scrum Ma
 ## Common Beginner Mistakes
 
 **Mistake 1: Treating Agile as a synonym for "fast."**
+
 Agile is not a speed technique; it is an uncertainty-management technique. A team can move fast under Waterfall (with enough resources) and can move slowly under Agile (if batches are too large or feedback loops are ignored). The value of Agile comes from short feedback loops, not raw velocity.
 
-**Mistake 2: Believing the Manifesto rejects planning entirely.**
+**Mistake 2: Believing the Manifesto rejects planning entirely**
+
 "Responding to change over following a plan" is frequently misquoted as "we don't need plans." The Manifesto values planning — it simply treats a plan as a working hypothesis to be revised with evidence, rather than a contract to be defended regardless of what is learned.
 
-**Mistake 3: Confusing ceremony attendance with Agile practice.**
+**Mistake 3: Confusing ceremony attendance with Agile practice**
+
 As covered above, a team can run every ceremony precisely on schedule while still operating in a fundamentally Waterfall mindset internally. New PMs often assume that because standups and sprints exist, the team is "Agile" by default — this is the single most common misdiagnosis in the industry.
 
-**Mistake 4: Assuming Agile removes the need for upfront strategic thinking.**
+**Mistake 4: Assuming Agile removes the need for upfront strategic thinking**
+
 Short iteration cycles at the execution level do not eliminate the need for the longer-horizon reasoning covered in Lesson 29 (Prioritization) and Lesson 35 (Roadmapping, upcoming). Agile governs how work is executed once prioritized; it does not replace the discipline of deciding what deserves to be worked on in the first place.
 
-**Mistake 5: Using "we're Agile" to avoid commitments to stakeholders.**
+**Mistake 5: Using "we're Agile" to avoid commitments to stakeholders**
+
 Some PMs and teams invoke Agile as a shield against giving any forward-looking estimate at all — "we can't tell you when this will ship, we're Agile." This is a misuse of the philosophy. Agile changes *how confidently and how far in advance* you commit, and demands that commitments be revisited as evidence arrives — it does not exempt a team from giving stakeholders a reasonable, honestly-caveated sense of direction and timing, a skill covered directly in Lesson 47 (Stakeholder Management).
 
 ---
+
 
 ## Mental Model: The Iteration Loop
 
@@ -209,7 +215,7 @@ The underlying logic connects directly to this lesson's theory: small, autonomou
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Agile Fundamentals at Different Company Stages
 
 **At a startup:**
 Agile is often practiced informally and without much ceremony — a founder-PM might simply talk to engineers daily and adjust plans in real time, without a named framework, a tracked velocity chart, or a scheduled retrospective. This is not a failure to "do Agile properly"; in a five-person team sitting in one room, many formal ceremonies exist to solve coordination problems that don't yet exist at that scale. The values (short feedback loops, responsiveness to learning) are often present even when the vocabulary (sprints, standups) is not.
@@ -301,7 +307,7 @@ Agile is not a single process but a family of practices built on a specific bet 
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Agile | A family of iterative software development practices prioritizing short feedback loops and responsiveness to change over rigid up-front planning | Waterfall, Iteration Loop | 1 |
 | Waterfall | A sequential development model (requirements → design → build → test → release) borrowed from manufacturing/civil engineering | Agile Manifesto | 1 |
@@ -325,48 +331,47 @@ Agile is not a single process but a family of practices built on a specific bet 
 ## Flashcards
 
 **Card 1**
-Front: What problem was Agile originally designed to solve?
-Back: The high cost of discovering wrong assumptions late, after long sequential (Waterfall) commitments had already been fully built out.
-Difficulty: 1
-Tags: history, waterfall
+- Front: What problem was Agile originally designed to solve?
+- Back: The high cost of discovering wrong assumptions late, after long sequential (Waterfall) commitments had already been fully built out.
+- Difficulty: 1
+- Tags: history, waterfall
 
 **Card 2**
-Front: Name the four values of the Agile Manifesto.
-Back: Individuals and interactions over processes and tools; working software over comprehensive documentation; customer collaboration over contract negotiation; responding to change over following a plan.
-Difficulty: 2
-Tags: manifesto, values
+- Front: Name the four values of the Agile Manifesto.
+- Back: Individuals and interactions over processes and tools; working software over comprehensive documentation; customer collaboration over contract negotiation; responding to change over following a plan.
+- Difficulty: 2
+- Tags: manifesto, values
 
 **Card 3**
-Front: What are the five stages of the Iteration Loop?
-Back: Small Batch of Work → Build → Demo/Release → Feedback → (feeds back into) next Small Batch.
-Difficulty: 1
-Tags: mental-model, iteration-loop
+- Front: What are the five stages of the Iteration Loop?
+- Back: Small Batch of Work → Build → Demo/Release → Feedback → (feeds back into) next Small Batch.
+- Difficulty: 1
+- Tags: mental-model, iteration-loop
 
 **Card 4**
-Front: What's the simplest test for whether a team is "being Agile" versus just "doing Agile"?
-Back: When the team learns something significant mid-cycle, does the plan actually change, or does the team finish the original commitment regardless?
-Difficulty: 2
-Tags: diagnosis
+- Front: What's the simplest test for whether a team is "being Agile" versus just "doing Agile"?
+- Back: When the team learns something significant mid-cycle, does the plan actually change, or does the team finish the original commitment regardless?
+- Difficulty: 2
+- Tags: diagnosis
 
 **Card 5**
-Front: In an Agile team, who owns the backlog and outcome direction — the PM or the Scrum Master?
-Back: The PM. The Scrum Master owns process facilitation; the PM owns what gets built and why.
-Difficulty: 1
-Tags: roles
+- Front: In an Agile team, who owns the backlog and outcome direction — the PM or the Scrum Master?
+- Back: The PM. The Scrum Master owns process facilitation; the PM owns what gets built and why.
+- Difficulty: 1
+- Tags: roles
 
 **Card 6**
-Front: Why does Amazon's reported "two-pizza team" principle connect to the Iteration Loop?
-Back: Smaller, more autonomous teams require less coordination overhead, allowing them to complete small batches and gather feedback faster than large teams can.
-Difficulty: 2
-Tags: amazon, team-size
+- Front: Why does Amazon's reported "two-pizza team" principle connect to the Iteration Loop?
+- Back: Smaller, more autonomous teams require less coordination overhead, allowing them to complete small batches and gather feedback faster than large teams can.
+- Difficulty: 2
+- Tags: amazon, team-size
 
 **Card 7**
-Front: Does Agile eliminate the need for upfront prioritization and roadmapping?
-Back: No. Agile governs how already-prioritized work is executed; it does not replace the separate discipline of deciding what deserves to be built in the first place (Lesson 29, Lesson 35).
-Difficulty: 2
-Tags: scope, prioritization
+- Front: Does Agile eliminate the need for upfront prioritization and roadmapping?
+- Back: No. Agile governs how already-prioritized work is executed; it does not replace the separate discipline of deciding what deserves to be built in the first place (Lesson 29, Lesson 35).
+- Difficulty: 2
+- Tags: scope, prioritization
 
----
 
 ## Reflection Exercise
 

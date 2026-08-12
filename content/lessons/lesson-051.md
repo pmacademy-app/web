@@ -12,7 +12,7 @@ This lesson matters because executive communication is a genuinely distinct skil
 
 | Field | Detail |
 |---|---|
-| **Module** | 6 — Leadership, Communication & Career (opening lesson) |
+| **Module** | 6 — Leadership, Communication & Career |
 | **Current Lesson** | 51 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
@@ -87,22 +87,28 @@ Combining BLUF, the Pyramid Principle, and appropriate altitude, a well-structur
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Building up to the conclusion chronologically, rather than leading with it.**
+**Mistake 1: Building up to the conclusion chronologically, rather than leading with it**
+
 As covered in Theory, this works against a time-constrained executive audience's actual needs, risking the recommendation never being reached if attention runs out before the narrative arrives at its point.
 
-**Mistake 2: Presenting only one option as though it were the only one considered.**
+**Mistake 2: Presenting only one option as though it were the only one considered**
+
 As covered in Theory, this undermines an executive's ability to trust that genuine analysis, rather than a predetermined conclusion, drove the recommendation — even when the analysis behind the scenes was actually rigorous.
 
-**Mistake 3: Pitching communication at the wrong altitude — either too much granular detail, or too little substantive grounding.**
+**Mistake 3: Pitching communication at the wrong altitude — either too much granular detail, or too little substantive grounding**
+
 Excessive Sprint-level or implementation detail overwhelms an executive audience's actual decision-making needs; conversely, communication so abstract it offers no real trade-off or evidence leaves an executive unable to evaluate whether a recommendation is actually sound.
 
-**Mistake 4: Treating an executive's request for more detail as a sign the initial communication failed.**
+**Mistake 4: Treating an executive's request for more detail as a sign the initial communication failed**
+
 A well-structured Pyramid Principle communication *should* prompt targeted follow-up questions from an engaged executive wanting to verify a specific claim — this is the structure working as intended, not evidence the top-level summary was insufficient.
 
-**Mistake 5: Failing to state a specific, explicit ask.**
+**Mistake 5: Failing to state a specific, explicit ask**
+
 An update that shares information without clarifying what decision or action is actually being requested leaves an executive unclear on what response is expected, risking either no action at all or a misaligned one.
 
 ---
+
 
 ## Mental Model: The Pyramid Principle
 
@@ -133,7 +139,7 @@ The underlying principle connects directly to this lesson's Theory: a well-struc
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Communicating with Executives at Different Company Stages
 
 **At a startup:**
 Executive communication is often informal and frequent — a PM may talk with a founder or small leadership team daily, making some of this lesson's structural discipline feel less immediately necessary. The risk here is assuming this informality will remain sufficient as the organization grows, rather than building strong communication habits (BLUF, considering alternatives explicitly) early, before executive time becomes a much scarcer, more contested resource.
@@ -225,7 +231,7 @@ Executive communication requires a genuinely different structural approach than 
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | BLUF (Bottom Line Up Front) | Stating the conclusion or recommendation first, before supporting context or reasoning | Pyramid Principle | 1 |
 | Pyramid Principle | A framework (Barbara Minto) organizing communication as a conclusion, supporting arguments, and detailed evidence in a standalone hierarchy | BLUF | 2 |
@@ -245,42 +251,41 @@ Executive communication requires a genuinely different structural approach than 
 ## Flashcards
 
 **Card 1**
-Front: What does BLUF stand for, and what does it require?
-Back: Bottom Line Up Front — stating the conclusion or recommendation first, before supporting context or background.
-Difficulty: 1
-Tags: bluf
+- Front: What does BLUF stand for, and what does it require?
+- Back: Bottom Line Up Front — stating the conclusion or recommendation first, before supporting context or background.
+- Difficulty: 1
+- Tags: bluf
 
 **Card 2**
-Front: What is the key discipline the Pyramid Principle enforces?
-Back: Each level of the argument (conclusion, supporting arguments, detailed evidence) should be a complete, standalone answer at its own level of detail.
-Difficulty: 2
-Tags: pyramid-principle
+- Front: What is the key discipline the Pyramid Principle enforces?
+- Back: Each level of the argument (conclusion, supporting arguments, detailed evidence) should be a complete, standalone answer at its own level of detail.
+- Difficulty: 2
+- Tags: pyramid-principle
 
 **Card 3**
-Front: What does the Altitude Dial concept describe?
-Back: Matching the level of detail and abstraction in communication to the audience's actual decision-making needs — higher altitude (trade-offs, decisions) for executives, lower altitude for peers and teams.
-Difficulty: 2
-Tags: altitude-dial
+- Front: What does the Altitude Dial concept describe?
+- Back: Matching the level of detail and abstraction in communication to the audience's actual decision-making needs — higher altitude (trade-offs, decisions) for executives, lower altitude for peers and teams.
+- Difficulty: 2
+- Tags: altitude-dial
 
 **Card 4**
-Front: What five elements does a well-structured decision memo include?
-Back: Recommendation, context, alternatives considered, key trade-offs, and an explicit ask.
-Difficulty: 2
-Tags: decision-memo
+- Front: What five elements does a well-structured decision memo include?
+- Back: Recommendation, context, alternatives considered, key trade-offs, and an explicit ask.
+- Difficulty: 2
+- Tags: decision-memo
 
 **Card 5**
-Front: Why does omitting "alternatives considered" undermine trust in a recommendation?
-Back: An executive presented with only one option has no visible basis to trust that genuine analysis, rather than a predetermined conclusion, drove the recommendation.
-Difficulty: 2
-Tags: alternatives-considered
+- Front: Why does omitting "alternatives considered" undermine trust in a recommendation?
+- Back: An executive presented with only one option has no visible basis to trust that genuine analysis, rather than a predetermined conclusion, drove the recommendation.
+- Difficulty: 2
+- Tags: alternatives-considered
 
 **Card 6**
-Front: In the Detailed Case Study, what was the actual problem with the technical debt reallocation proposal?
-Back: The underlying analysis was sound, but the document's chronological structure buried the actual recommendation on page four, past where the time-constrained executive audience's attention typically held — a structure problem, not a content problem.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what was the actual problem with the technical debt reallocation proposal?
+- Back: The underlying analysis was sound, but the document's chronological structure buried the actual recommendation on page four, past where the time-constrained executive audience's attention typically held — a structure problem, not a content problem.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

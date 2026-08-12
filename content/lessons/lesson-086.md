@@ -71,14 +71,22 @@ Surface translation has a clear, verifiable correctness standard — a sentence 
 
 ## Common Beginner Mistakes
 
-1. **Assuming translation-level localization is sufficient for full international expansion.**
-2. **Failing to research local payment method preferences before launch.**
-3. **Assuming regulatory compliance in the home market transfers automatically to a new jurisdiction.**
-4. **Underestimating the cultural adaptation layer, treating translation as equivalent to cultural fit.**
-5. **Building a single global product structure when local market dynamics genuinely require a structural variant.**
-6. **Mistaking early traffic and signups in a new market as validation of Structural readiness.** Early engagement can reflect only the sliver of the market whose payment methods and regulatory situation happen to already be compatible with a translation-only launch, not the broader addressable market.
+**Mistake 1: Assuming translation-level localization is sufficient for full international expansion**
+
+**Mistake 2: Failing to research local payment method preferences before launch**
+
+**Mistake 3: Assuming regulatory compliance in the home market transfers automatically to a new jurisdiction**
+
+**Mistake 4: Underestimating the cultural adaptation layer, treating translation as equivalent to cultural fit**
+
+**Mistake 5: Building a single global product structure when local market dynamics genuinely require a structural variant**
+
+**Mistake 6: Mistaking early traffic and signups in a new market as validation of Structural readiness**
+
+Early engagement can reflect only the sliver of the market whose payment methods and regulatory situation happen to already be compatible with a translation-only launch, not the broader addressable market.
 
 ---
+
 
 ## Mental Model: The Adaptation Depth Model
 
@@ -94,7 +102,7 @@ Spotify's market-by-market international expansion, including its well-documente
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Scaling International Products: Beyond Localization at Different Company Stages
 
 **At a startup:** Early international expansion often stops at Surface-level translation, sometimes supplemented with basic Cultural review, which is appropriate for cheaply testing initial interest in a new market before committing significant resources. This is a reasonable, deliberate tradeoff at small scale, but teams frequently mistake early traffic and signups in a new market as validation that the full expansion playbook has worked, when in fact those early numbers may reflect only the segment of the market whose payment methods and regulatory situation happen to already be compatible with a translation-only launch — a much smaller and less representative slice of the addressable market than the team realizes.
 
@@ -164,6 +172,9 @@ International product scaling requires distinguishing four depths of adaptation 
 ---
 
 ## Cheat Sheet
+
+*A two-minute review of everything in this lesson.*
+
 - Adaptation Depth: Surface → Cultural → Structural → Product.
 - Translation success ≠ Structural readiness.
 - Check local payment preferences and regulatory variance before launch.
@@ -186,45 +197,50 @@ International product scaling requires distinguishing four depths of adaptation 
 ---
 
 ## Further Reading / Resources
-1. *The Culture Map* by Erin Meyer
-2. *Global Product Management* industry practitioner resources
-3. World Bank published data on payment method usage by country
+- Erin Meyer, *The Culture Map*
+- *Global Product Management* industry practitioner resources
+- World Bank published data on payment method usage by country
 
 ---
 
 ## Flashcards
 
-**Front:** Why is translation insufficient for genuine international scaling?
-**Back:** Deeper adaptation layers — cultural fit, payment methods, regulatory requirements — are invisible from a translation-only perspective and can block adoption regardless of translation quality.
-**Difficulty:** Easy
-**Tags:** #international-scaling
+**Card 1**
+- Front: ** Why is translation insufficient for genuine international scaling?
+- Back: ** Deeper adaptation layers — cultural fit, payment methods, regulatory requirements — are invisible from a translation-only perspective and can block adoption regardless of translation quality.
+- Difficulty: 2
+- Tags: **, international-scaling
 
-**Front:** Name the four levels of the Adaptation Depth Model.
-**Back:** Surface, Cultural, Structural, Product.
-**Difficulty:** Easy
-**Tags:** #adaptation-depth-model
+**Card 2**
+- Front: ** Name the four levels of the Adaptation Depth Model.
+- Back: ** Surface, Cultural, Structural, Product.
+- Difficulty: 2
+- Tags: **, adaptation-depth-model
 
-**Front:** Why is payment method localization commonly underestimated?
-**Back:** Payment infrastructure varies sharply by country, and a product supporting only home-market payment methods can see adoption blocked entirely in a new market.
-**Difficulty:** Medium
-**Tags:** #payment-localization
+**Card 3**
+- Front: ** Why is payment method localization commonly underestimated?
+- Back: ** Payment infrastructure varies sharply by country, and a product supporting only home-market payment methods can see adoption blocked entirely in a new market.
+- Difficulty: 2
+- Tags: **, payment-localization
 
-**Front:** What went wrong in the Payment Wall case study?
-**Back:** Excellent Surface and Cultural adaptation still failed to drive conversion because the product only supported credit card payments in a market where mobile-money and cash-on-delivery dominated.
-**Difficulty:** Hard
-**Tags:** #case-study
+**Card 4**
+- Front: ** What went wrong in the Payment Wall case study?
+- Back: ** Excellent Surface and Cultural adaptation still failed to drive conversion because the product only supported credit card payments in a market where mobile-money and cash-on-delivery dominated.
+- Difficulty: 2
+- Tags: **, case-study
 
-**Front:** Why is Cultural adaptation harder to verify than Surface translation?
-**Back:** Translation has an objective correctness standard, but cultural fit (color meaning, imagery, communication style) has no equivalent checkpoint — a product can be linguistically flawless and culturally tone-deaf at the same time.
-**Difficulty:** Hard
-**Tags:** #cultural-adaptation
+**Card 5**
+- Front: ** Why is Cultural adaptation harder to verify than Surface translation?
+- Back: ** Translation has an objective correctness standard, but cultural fit (color meaning, imagery, communication style) has no equivalent checkpoint — a product can be linguistically flawless and culturally tone-deaf at the same time.
+- Difficulty: 2
+- Tags: **, cultural-adaptation
 
-**Front:** Why did the Payment Wall team take a long time to diagnose their conversion problem?
-**Back:** Their funnel analytics weren't broken down by payment method, so the drop-off concentrated at the payment step was masked within an otherwise strong-looking aggregate funnel.
-**Difficulty:** Hard
-**Tags:** #case-study #analytics
+**Card 6**
+- Front: ** Why did the Payment Wall team take a long time to diagnose their conversion problem?
+- Back: ** Their funnel analytics weren't broken down by payment method, so the drop-off concentrated at the payment step was masked within an otherwise strong-looking aggregate funnel.
+- Difficulty: 2
+- Tags: **, case-study, analytics
 
----
 
 ## Reflection Exercise
 

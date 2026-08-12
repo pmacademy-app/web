@@ -134,22 +134,28 @@ Used together, these techniques counteract a natural tendency in conversation �
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Asking "would you use this?" partway through an interview, then treating the answer as reliable evidence.**
+**Mistake 1: Asking "would you use this?" partway through an interview, then treating the answer as reliable evidence**
+
 As covered in Lesson 11, this remains one of the single most reliable ways to generate falsely confident, stated-preference-only validation — an interview format doesn't inoculate against this trap; it requires the same discipline of avoiding hypothetical framing.
 
-**Mistake 2: Describing the proposed solution before fully understanding the respondent's existing behavior.**
+**Mistake 2: Describing the proposed solution before fully understanding the respondent's existing behavior**
+
 Once a solution is on the table, every subsequent answer is anchored to it, making it far harder to learn what the respondent's actual, solution-independent experience and need really are.
 
-**Mistake 3: Treating a vague answer as a complete answer.**
+**Mistake 3: Treating a vague answer as a complete answer**
+
 "It's frustrating" or "I wish it were easier" are starting points, not findings — a skilled interviewer follows up for concrete, specific detail rather than recording the vague version as the finding itself.
 
-**Mistake 4: Recruiting only friendly, easy-to-reach participants.**
+**Mistake 4: Recruiting only friendly, easy-to-reach participants**
+
 This produces exactly the unrepresentative sample problem from Lesson 11 — a systematic bias toward the perspectives of people already inclined to be positive and engaged, at the expense of skeptics, churned users, or people who never adopted the product at all.
 
-**Mistake 5: Rushing past silence.**
+**Mistake 5: Rushing past silence**
+
 Jumping in to rescue a respondent from a pause, or offering a multiple-choice-style prompt ("was it more about cost, or more about time?") before they've had a chance to answer in their own words, often produces a shallower, more interviewer-shaped answer than genuine patience would have.
 
 ---
+
 
 ## Mental Model: The Interview Depth Staircase
 
@@ -365,7 +371,6 @@ A customer interview is a structured conversation designed to surface specific p
 - Difficulty: 3
 - Tags: case-study
 
----
 
 ## Reflection Exercise
 

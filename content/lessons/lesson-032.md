@@ -130,22 +130,28 @@ A specific, frequent PM mistake deserves its own subsection because it recurs so
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating the Product Owner role as a project-manager-style status tracker.**
+**Mistake 1: Treating the Product Owner role as a project-manager-style status tracker**
+
 The Product Owner's job is maximizing product value through backlog ordering — a strategic, prioritization-heavy accountability, not a scheduling or status-reporting one. A PO who spends most of their time updating a burndown chart, rather than refining and reordering the backlog based on evidence, has drifted into exactly the role confusion Lesson 1 and Lesson 31 both warned against.
 
-**Mistake 2: Confusing a Sprint Backlog with a Sprint Goal.**
+**Mistake 2: Confusing a Sprint Backlog with a Sprint Goal**
+
 A list of ten tickets is not a Sprint Goal. A Sprint Goal is a single coherent objective — "reduce onboarding drop-off for new mobile users" — that the ten tickets exist to serve. Teams that skip forming a real Sprint Goal lose their ability to make sound mid-sprint trade-offs, because there's no shared "why" to weigh a dropped or added item against.
 
 **Mistake 3: Running all five events without empirical value — "Zombie Scrum."**
+
 This is Scrum's version of Lesson 31's "doing Agile without being Agile." A team can hold Sprint Planning, Daily Scrums, a Sprint Review, and a Retrospective every single Sprint, on schedule, while transparency is thin (status is fudged), inspection is shallow (no one asks hard questions), and adaptation never actually happens (the same retrospective action items recur unaddressed). The calendar shows a functioning Scrum team; the outcomes show otherwise.
 
-**Mistake 4: Treating the Sprint Review as a one-way demo rather than a two-way inspection.**
+**Mistake 4: Treating the Sprint Review as a one-way demo rather than a two-way inspection**
+
 The Sprint Review exists to inspect the Increment *with stakeholders* and adapt the Product Backlog based on what's learned — it is a feedback-gathering event, not a presentation. A team that treats it purely as "showing off what we built," without genuinely updating backlog priorities based on stakeholder reaction, has converted an inspection event into a status broadcast.
 
-**Mistake 5: Skipping or trivializing the Definition of Done.**
+**Mistake 5: Skipping or trivializing the Definition of Done**
+
 Without an explicit, shared Definition of Done, "done" silently means different things to different people — an engineer may consider a ticket done once code is merged, while a PM may consider it done once it's live for all users. This ambiguity routinely surfaces as a painful surprise during the Sprint Review, when stakeholders discover that "done" items aren't actually usable yet.
 
 ---
+
 
 ## Mental Model: The Empirical Loop of a Sprint
 
@@ -205,7 +211,7 @@ The pairing illustrates a useful structural point: V2MOM-style strategic goal-se
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Scrum Framework at Different Company Stages
 
 **At a startup:**
 Scrum, if used at all, is often adopted in a lightweight, partial form — a Sprint Goal and a rough weekly check-in, without necessarily running all five named events formally. This is often appropriate: with five people in one room, transparency and inspection can happen constantly and informally, without needing a scheduled Daily Scrum to manufacture them. The risk here is different from Zombie Scrum — it's under-formalization to the point that adaptation happens on gut feel rather than any structured backlog reordering, which can work at small scale but breaks down as headcount grows.
@@ -295,7 +301,7 @@ Scrum is the most widely adopted concrete framework built on top of Lesson 31's 
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Scrum | A lightweight Agile framework built on empiricism, with three roles, three artifacts, and five events | Empiricism, Iteration Loop | 1 |
 | Empiricism | Scrum's foundational principle: knowledge comes from experience and decisions are based on what is observed (transparency, inspection, adaptation) | Transparency, Inspection, Adaptation | 2 |
@@ -319,48 +325,47 @@ Scrum is the most widely adopted concrete framework built on top of Lesson 31's 
 ## Flashcards
 
 **Card 1**
-Front: What are Scrum's three pillars of empiricism?
-Back: Transparency, Inspection, and Adaptation.
-Difficulty: 1
-Tags: pillars, empiricism
+- Front: What are Scrum's three pillars of empiricism?
+- Back: Transparency, Inspection, and Adaptation.
+- Difficulty: 1
+- Tags: pillars, empiricism
 
 **Card 2**
-Front: What are Scrum's three roles?
-Back: Product Owner, Scrum Master, and Developers.
-Difficulty: 1
-Tags: roles
+- Front: What are Scrum's three roles?
+- Back: Product Owner, Scrum Master, and Developers.
+- Difficulty: 1
+- Tags: roles
 
 **Card 3**
-Front: Match each Scrum artifact to its associated commitment.
-Back: Product Backlog → Product Goal; Sprint Backlog → Sprint Goal; Increment → Definition of Done.
-Difficulty: 2
-Tags: artifacts, commitments
+- Front: Match each Scrum artifact to its associated commitment.
+- Back: Product Backlog → Product Goal; Sprint Backlog → Sprint Goal; Increment → Definition of Done.
+- Difficulty: 2
+- Tags: artifacts, commitments
 
 **Card 4**
-Front: What is "Zombie Scrum"?
-Back: A team that runs all five Scrum events on schedule without genuine transparency, inspection, or adaptation — the Scrum-specific version of "doing Agile without being Agile."
-Difficulty: 2
-Tags: diagnosis, zombie-scrum
+- Front: What is "Zombie Scrum"?
+- Back: A team that runs all five Scrum events on schedule without genuine transparency, inspection, or adaptation — the Scrum-specific version of "doing Agile without being Agile."
+- Difficulty: 2
+- Tags: diagnosis, zombie-scrum
 
 **Card 5**
-Front: Who does the Daily Scrum belong to, and what is it for?
-Back: It belongs to the Developers, for their own re-planning of the next 24 hours toward the Sprint Goal — not a status briefing for the PM.
-Difficulty: 2
-Tags: daily-scrum, roles
+- Front: Who does the Daily Scrum belong to, and what is it for?
+- Back: It belongs to the Developers, for their own re-planning of the next 24 hours toward the Sprint Goal — not a status briefing for the PM.
+- Difficulty: 2
+- Tags: daily-scrum, roles
 
 **Card 6**
-Front: What distinguishes a healthy Sprint Retrospective from an unhealthy one, per this lesson's Case Study?
-Back: A healthy one resolves previous action items before adding new ones; an unhealthy one records the same unresolved issues repeatedly across consecutive Sprints.
-Difficulty: 2
-Tags: retrospective, adaptation
+- Front: What distinguishes a healthy Sprint Retrospective from an unhealthy one, per this lesson's Case Study?
+- Back: A healthy one resolves previous action items before adding new ones; an unhealthy one records the same unresolved issues repeatedly across consecutive Sprints.
+- Difficulty: 2
+- Tags: retrospective, adaptation
 
 **Card 7**
-Front: Why is a Sprint Backlog without a real Sprint Goal a problem?
-Back: It becomes an arbitrary list of tickets with no shared objective, making mid-sprint trade-off decisions (what to drop or add) unanswerable.
-Difficulty: 2
-Tags: sprint-goal
+- Front: Why is a Sprint Backlog without a real Sprint Goal a problem?
+- Back: It becomes an arbitrary list of tickets with no shared objective, making mid-sprint trade-off decisions (what to drop or add) unanswerable.
+- Difficulty: 2
+- Tags: sprint-goal
 
----
 
 ## Reflection Exercise
 

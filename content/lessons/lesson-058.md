@@ -78,22 +78,28 @@ Extending Lesson 1's output-versus-outcome discipline directly: adding an AI-pow
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Relying on a small number of manual spot-checks to evaluate AI feature quality, as though it were traditional deterministic software.**
+**Mistake 1: Relying on a small number of manual spot-checks to evaluate AI feature quality, as though it were traditional deterministic software**
+
 As covered in Theory, this provides far weaker assurance for a probabilistic system than for deterministic software, since a handful of good examples doesn't rule out a meaningfully high failure rate elsewhere in the output distribution.
 
-**Mistake 2: Presenting AI-generated output with unwarranted confidence, contributing to user over-trust.**
+**Mistake 2: Presenting AI-generated output with unwarranted confidence, contributing to user over-trust**
+
 An AI feature presented without any indication of its actual reliability or known limitations invites users to trust it more than its true accuracy warrants, risking real harm when incorrect outputs are acted upon without verification.
 
-**Mistake 3: Adding AI capability primarily for competitive or marketing signaling, without a clear underlying user problem it specifically and uniquely solves.**
+**Mistake 3: Adding AI capability primarily for competitive or marketing signaling, without a clear underlying user problem it specifically and uniquely solves**
+
 This is the AI-specific version of Lesson 1's output-versus-outcome trap — an AI feature that exists because AI is currently prominent, rather than because it solves a genuine problem better than the available alternatives, risks investing real effort in something that doesn't move genuine value.
 
-**Mistake 4: Failing to design a clear, low-friction correction mechanism for when an AI output is wrong.**
+**Mistake 4: Failing to design a clear, low-friction correction mechanism for when an AI output is wrong**
+
 Without an easy way for users to correct or flag an incorrect AI output, errors compound (both in terms of immediate user harm and in terms of lost signal that could otherwise improve the system), and users are pushed toward the binary choice of fully trusting or fully abandoning the feature rather than productively engaging with its actual, imperfect reliability.
 
-**Mistake 5: Treating AI hallucination and bias as purely a technical/model problem outside product responsibility.**
+**Mistake 5: Treating AI hallucination and bias as purely a technical/model problem outside product responsibility**
+
 Extending Lesson 57's ethical framework directly: a PM shipping an AI feature bears real product responsibility for the human-in-the-loop safeguards, transparency, and appropriate use-case scoping that mitigate these known risks — deferring this responsibility entirely to the model or engineering team, treating it as outside the PM's scope, misses the product judgment (per Lesson 37's context-not-commands principle) that a PM is specifically positioned to contribute.
 
 ---
+
 
 ## Mental Model: The Trust Calibration Curve
 
@@ -120,7 +126,7 @@ The underlying principle connects directly to this lesson's Theory: an education
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: AI in Product Management at Different Company Stages
 
 **At a startup:**
 AI feature evaluation is often informal, relying on a founding team's direct, hands-on testing rather than a systematic eval set, given limited resources. The risk here is Mistake 1's exposure at meaningful scale — a startup shipping an AI feature based on encouraging but limited manual testing may not discover a significant failure mode until it affects real users at volume.
@@ -213,7 +219,7 @@ AI-powered features break traditional software's deterministic assumption, produ
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Probabilistic system | A system where the same input can produce different outputs across invocations, described by a distribution rather than a fixed behavior | Evaluation set | 2 |
 | Evaluation set (eval set) | A curated, representative collection of test inputs used to systematically measure AI feature quality across common and edge cases | Probabilistic system | 2 |
@@ -235,42 +241,41 @@ AI-powered features break traditional software's deterministic assumption, produ
 ## Flashcards
 
 **Card 1**
-Front: Why do AI features require different evaluation approaches than traditional deterministic software?
-Back: AI systems are often probabilistic — the same input can produce different outputs across invocations — so a handful of manually-tested examples provides much weaker quality assurance than for deterministic software, requiring systematic eval sets instead.
-Difficulty: 1
-Tags: probabilistic-systems
+- Front: Why do AI features require different evaluation approaches than traditional deterministic software?
+- Back: AI systems are often probabilistic — the same input can produce different outputs across invocations — so a handful of manually-tested examples provides much weaker quality assurance than for deterministic software, requiring systematic eval sets instead.
+- Difficulty: 1
+- Tags: probabilistic-systems
 
 **Card 2**
-Front: What is an evaluation set (eval set)?
-Back: A curated, representative collection of test inputs, covering common and known difficult edge cases, run systematically against an AI system with outputs scored against defined quality criteria.
-Difficulty: 2
-Tags: eval-set
+- Front: What is an evaluation set (eval set)?
+- Back: A curated, representative collection of test inputs, covering common and known difficult edge cases, run systematically against an AI system with outputs scored against defined quality criteria.
+- Difficulty: 2
+- Tags: eval-set
 
 **Card 3**
-Front: What is Trust Calibration, and what are its two failure modes?
-Back: Designing a feature so user confidence in its outputs accurately tracks actual reliability; failure modes are over-trust (treating outputs as more reliable than they are) and under-trust (discounting genuinely useful outputs).
-Difficulty: 2
-Tags: trust-calibration
+- Front: What is Trust Calibration, and what are its two failure modes?
+- Back: Designing a feature so user confidence in its outputs accurately tracks actual reliability; failure modes are over-trust (treating outputs as more reliable than they are) and under-trust (discounting genuinely useful outputs).
+- Difficulty: 2
+- Tags: trust-calibration
 
 **Card 4**
-Front: How does this lesson extend Lesson 1's output-versus-outcome discipline to AI features specifically?
-Back: Adding AI capability is itself an output, not an outcome — a PM should ask whether a problem genuinely requires AI's specific capabilities, rather than adding AI for competitive signaling without a clear underlying user problem it uniquely solves.
-Difficulty: 2
-Tags: ai-for-ais-sake
+- Front: How does this lesson extend Lesson 1's output-versus-outcome discipline to AI features specifically?
+- Back: Adding AI capability is itself an output, not an outcome — a PM should ask whether a problem genuinely requires AI's specific capabilities, rather than adding AI for competitive signaling without a clear underlying user problem it uniquely solves.
+- Difficulty: 2
+- Tags: ai-for-ais-sake
 
 **Card 5**
-Front: How does this lesson extend Lesson 57's ethical debt framework to AI features?
-Back: Hallucination and bias are genuine product responsibilities, not purely technical concerns; a PM bears responsibility for human-in-the-loop safeguards, appropriate scoping, and transparency that mitigate these AI-specific harms.
-Difficulty: 2
-Tags: ai-ethical-debt
+- Front: How does this lesson extend Lesson 57's ethical debt framework to AI features?
+- Back: Hallucination and bias are genuine product responsibilities, not purely technical concerns; a PM bears responsibility for human-in-the-loop safeguards, appropriate scoping, and transparency that mitigate these AI-specific harms.
+- Difficulty: 2
+- Tags: ai-ethical-debt
 
 **Card 6**
-Front: In the Detailed Case Study, why did twenty successful manual tests fail to predict the support assistant's real-world failure rate?
-Back: Twenty hand-picked examples provided weak, anecdotal assurance about a probabilistic system's true output distribution, and didn't cover the less-common, harder edge cases where the assistant actually failed at meaningful rates once deployed broadly.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, why did twenty successful manual tests fail to predict the support assistant's real-world failure rate?
+- Back: Twenty hand-picked examples provided weak, anecdotal assurance about a probabilistic system's true output distribution, and didn't cover the less-common, harder edge cases where the assistant actually failed at meaningful rates once deployed broadly.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

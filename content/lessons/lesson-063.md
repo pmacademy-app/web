@@ -81,13 +81,28 @@ At any moment, one side is usually the actual constraint on marketplace growth �
 
 ## Common Beginner Mistakes
 
-1. **Treating both sides of a marketplace as a single undifferentiated user base.** Supply and demand have different needs, different acquisition channels, and different churn drivers, and lumping them into one "user" metric obscures which side is actually failing.
-2. **Chasing raw registration numbers on both sides instead of liquidity.** A marketplace can look impressively large by signup count while having almost no successful matches, and registration growth alone does not indicate marketplace health.
-3. **Applying a growth initiative to both sides simultaneously without first diagnosing the binding constraint.** If supply is the actual bottleneck, a demand-side marketing campaign will only worsen the experience for the demand side you just acquired, since there still isn't enough supply to serve them.
-4. **Underestimating how much harder acquiring the "hard side" of the market is.** In most marketplaces, one side (often supply, particularly specialized or professional supply) is structurally harder and slower to acquire than the other, and treating acquisition cost as symmetric across both sides leads to under-resourcing the actual bottleneck.
-5. **Expanding geography before achieving liquidity in the initial market.** Spreading a fixed amount of supply-and-demand-building effort across many thin markets often produces low liquidity everywhere, rather than the strong, defensible liquidity that concentrated effort in one market can achieve.
+**Mistake 1: Treating both sides of a marketplace as a single undifferentiated user base**
+
+Supply and demand have different needs, different acquisition channels, and different churn drivers, and lumping them into one "user" metric obscures which side is actually failing.
+
+**Mistake 2: Chasing raw registration numbers on both sides instead of liquidity**
+
+A marketplace can look impressively large by signup count while having almost no successful matches, and registration growth alone does not indicate marketplace health.
+
+**Mistake 3: Applying a growth initiative to both sides simultaneously without first diagnosing the binding constraint**
+
+If supply is the actual bottleneck, a demand-side marketing campaign will only worsen the experience for the demand side you just acquired, since there still isn't enough supply to serve them.
+
+**Mistake 4: Underestimating how much harder acquiring the "hard side" of the market is**
+
+In most marketplaces, one side (often supply, particularly specialized or professional supply) is structurally harder and slower to acquire than the other, and treating acquisition cost as symmetric across both sides leads to under-resourcing the actual bottleneck.
+
+**Mistake 5: Expanding geography before achieving liquidity in the initial market**
+
+Spreading a fixed amount of supply-and-demand-building effort across many thin markets often produces low liquidity everywhere, rather than the strong, defensible liquidity that concentrated effort in one market can achieve.
 
 ---
+
 
 ## Mental Model: The Two-Sided Balance Model
 
@@ -111,7 +126,7 @@ This illustrates the Two-Sided Balance Model directly: rather than treating grow
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Two-Sided Marketplaces and Network Effects at Different Company Stages
 
 **Startup:** Nearly every early-stage marketplace startup's central existential question is how to solve the chicken-and-egg problem within a small enough geographic or vertical niche to reach liquidity before running out of capital, making the strategies described above (single-player mode, geographic concentration, subsidy, owned supply) not optional refinements but the core of the early strategy itself.
 
@@ -149,7 +164,7 @@ The key discipline is reading supply-side and demand-side signals separately, ne
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you grow a marketplace that has plenty of demand but not enough supply?"** The interviewer is evaluating whether you correctly identify supply as the binding constraint and reach for supply-side-specific strategies (recruitment, onboarding, incentives), rather than defaulting to more demand-side marketing simply because "growth" is the stated goal.
 
@@ -179,6 +194,8 @@ A two-sided marketplace is a distinct species of product whose entire value prop
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Two-sided marketplace: both populations need each other's presence to get any value at all.
 - Chicken-and-egg fixes: single-player mode, geographic concentration, subsidy, owned supply/demand.
 - Diagnose, don't guess: use the Two-Sided Balance Model to find the binding constraint before launching a growth initiative.
@@ -202,50 +219,56 @@ A two-sided marketplace is a distinct species of product whose entire value prop
 
 ## Further Reading / Resources
 
-1. *Matchmakers: The New Economics of Multisided Platforms* by David Evans and Richard Schmalensee
-2. *The Cold Start Problem* by Andrew Chen
-3. *Platform Revolution* by Geoffrey Parker, Marshall Van Alstyne, and Sangeet Paul Choudary
+- David Evans and Richard Schmalensee, *Matchmakers: The New Economics of Multisided Platforms*
+- Andrew Chen, *The Cold Start Problem*
+- Geoffrey Parker, Marshall Van Alstyne, and Sangeet Paul Choudary, *Platform Revolution*
 
 ---
 
 ## Flashcards
 
-**Front:** What makes a marketplace "two-sided" rather than just having two user types?
-**Back:** Each population derives no value from the platform without sufficient presence of the other — the two sides are mutually dependent for the core value proposition.
-**Difficulty:** Easy
-**Tags:** #marketplaces #core-concept
+**Card 1**
+- Front: ** What makes a marketplace "two-sided" rather than just having two user types?
+- Back: ** Each population derives no value from the platform without sufficient presence of the other — the two sides are mutually dependent for the core value proposition.
+- Difficulty: 2
+- Tags: **, marketplaces, core-concept
 
-**Front:** What is the chicken-and-egg problem?
-**Back:** Neither side of a marketplace wants to join until the other side is already present in sufficient numbers.
-**Difficulty:** Easy
-**Tags:** #chicken-and-egg
+**Card 2**
+- Front: ** What is the chicken-and-egg problem?
+- Back: ** Neither side of a marketplace wants to join until the other side is already present in sufficient numbers.
+- Difficulty: 2
+- Tags: **, chicken-and-egg
 
-**Front:** Name three strategies for solving the chicken-and-egg problem.
-**Back:** Single-player mode, geographic/niche concentration, subsidizing the harder-to-acquire side, or seeding with owned supply/demand.
-**Difficulty:** Medium
-**Tags:** #bootstrapping
+**Card 3**
+- Front: ** Name three strategies for solving the chicken-and-egg problem.
+- Back: ** Single-player mode, geographic/niche concentration, subsidizing the harder-to-acquire side, or seeding with owned supply/demand.
+- Difficulty: 2
+- Tags: **, bootstrapping
 
-**Front:** Why is liquidity a better marketplace health metric than registered-user count?
-**Back:** A marketplace can have huge registered-user counts on both sides with almost no successful matches — liquidity measures whether the core value proposition is actually being delivered.
-**Difficulty:** Medium
-**Tags:** #liquidity #metrics
+**Card 4**
+- Front: ** Why is liquidity a better marketplace health metric than registered-user count?
+- Back: ** A marketplace can have huge registered-user counts on both sides with almost no successful matches — liquidity measures whether the core value proposition is actually being delivered.
+- Difficulty: 2
+- Tags: **, liquidity, metrics
 
-**Front:** In the Case Study, why did tripling demand-side signups hurt the marketplace?
-**Back:** Supply hadn't grown proportionally, so the constrained side (supply) was flooded with more demand than it could serve, worsening fill rate and client satisfaction.
-**Difficulty:** Hard
-**Tags:** #case-study #two-sided-balance
+**Card 5**
+- Front: ** In the Case Study, why did tripling demand-side signups hurt the marketplace?
+- Back: ** Supply hadn't grown proportionally, so the constrained side (supply) was flooded with more demand than it could serve, worsening fill rate and client satisfaction.
+- Difficulty: 2
+- Tags: **, case-study, two-sided-balance
 
-**Front:** What three questions does the Two-Sided Balance Model ask before approving a growth initiative?
-**Back:** Which side's leading indicators are weak? Is the initiative targeted at the constrained side? Could it worsen the imbalance by growing the abundant side further?
-**Difficulty:** Medium
-**Tags:** #two-sided-balance
+**Card 6**
+- Front: ** What three questions does the Two-Sided Balance Model ask before approving a growth initiative?
+- Back: ** Which side's leading indicators are weak? Is the initiative targeted at the constrained side? Could it worsen the imbalance by growing the abundant side further?
+- Difficulty: 2
+- Tags: **, two-sided-balance
 
-**Front:** Why should supply-side and demand-side signals never be blended into one aggregate health score?
-**Back:** Blending obscures which specific side actually needs attention, leading to misdirected growth investment.
-**Difficulty:** Hard
-**Tags:** #liquidity-diagnostic
+**Card 7**
+- Front: ** Why should supply-side and demand-side signals never be blended into one aggregate health score?
+- Back: ** Blending obscures which specific side actually needs attention, leading to misdirected growth investment.
+- Difficulty: 2
+- Tags: **, liquidity-diagnostic
 
----
 
 ## Reflection Exercise
 

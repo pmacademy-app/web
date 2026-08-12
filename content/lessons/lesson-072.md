@@ -75,13 +75,28 @@ A specific and common trap is mistaking a strong pocket of individual enthusiasm
 
 ## Common Beginner Mistakes
 
-1. **Treating enterprise readiness as simply "more features" rather than a distinct category of organizational trust and control capability.** Security certifications, admin controls, and reliability commitments serve a fundamentally different purpose than the core features an individual user experiences.
-2. **Mistaking strong individual or departmental enthusiasm for evidence of organization-wide rollout progress.** These are different rungs of the Adoption Ladder, and success at one does not guarantee progress at the next.
-3. **Assuming a single enterprise readiness gap can be compensated for by strength elsewhere.** Procurement and security review processes typically treat security, admin control, reliability, and integration as separate, non-negotiable gates.
-4. **Underestimating how much of enterprise adoption depends on stakeholders who never used the product directly.** Central IT and security teams, who may have no firsthand experience with the product's core value proposition, frequently hold effective veto power over Rung 3 progression.
-5. **Building enterprise readiness capabilities reactively, only after a specific deal is blocked by their absence.** Since these capabilities (certifications in particular) often require significant lead time to obtain, waiting until a specific deal demands them can cause avoidable delays or lost opportunities.
+**Mistake 1: Treating enterprise readiness as simply "more features" rather than a distinct category of organizational trust and control capability**
+
+Security certifications, admin controls, and reliability commitments serve a fundamentally different purpose than the core features an individual user experiences.
+
+**Mistake 2: Mistaking strong individual or departmental enthusiasm for evidence of organization-wide rollout progress**
+
+These are different rungs of the Adoption Ladder, and success at one does not guarantee progress at the next.
+
+**Mistake 3: Assuming a single enterprise readiness gap can be compensated for by strength elsewhere**
+
+Procurement and security review processes typically treat security, admin control, reliability, and integration as separate, non-negotiable gates.
+
+**Mistake 4: Underestimating how much of enterprise adoption depends on stakeholders who never used the product directly**
+
+Central IT and security teams, who may have no firsthand experience with the product's core value proposition, frequently hold effective veto power over Rung 3 progression.
+
+**Mistake 5: Building enterprise readiness capabilities reactively, only after a specific deal is blocked by their absence**
+
+Since these capabilities (certifications in particular) often require significant lead time to obtain, waiting until a specific deal demands them can cause avoidable delays or lost opportunities.
 
 ---
+
 
 ## Mental Model: The Enterprise Adoption Ladder
 
@@ -103,7 +118,7 @@ Slack's growth within large enterprise organizations, from initial adoption by i
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Enterprise & B2B Product Management Fundamentals at Different Company Stages
 
 **Startup:** Early-stage B2B companies typically focus almost entirely on Rung 1 and Rung 2 capabilities, since landing initial pilot and departmental customers is the immediate priority, and building out Rung 3 and 4 capabilities before there is evidence of genuine demand for organization-wide deployment can represent a premature and costly investment.
 
@@ -140,7 +155,7 @@ A "no" on Security & Compliance in particular should be treated as an especially
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you approach expanding a product's footprint within a large enterprise account, starting from a single team's adoption?"** The interviewer is evaluating whether you recognize the Enterprise Adoption Ladder's distinct rungs, and specifically whether you identify security, administrative, and reliability capabilities as necessary for Rung 3 progression, rather than assuming continued core feature development alone will drive expansion.
 
@@ -170,6 +185,8 @@ Enterprise and B2B products require a fundamentally different category of capabi
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Enterprise readiness ≠ more features. It's organizational trust and control capability.
 - Adoption Ladder: Pilot → Departmental → Organization-Wide → Mission-Critical.
 - Four readiness categories: security/compliance, admin control, reliability/support, integration.
@@ -192,50 +209,56 @@ Enterprise and B2B products require a fundamentally different category of capabi
 
 ## Further Reading / Resources
 
-1. *Crossing the Chasm* by Geoffrey Moore
-2. *The SaaS Sales Method* by Winning by Design (Jacco van der Kooij and Fernando Pizarro)
-3. *B2B Product Management* industry resources from Product-Led Growth practitioner communities (e.g., OpenView Partners' published research)
+- Geoffrey Moore, *Crossing the Chasm*
+- Winning by Design (Jacco van der Kooij and Fernando Pizarro), *The SaaS Sales Method*
+- *B2B Product Management* industry resources from Product-Led Growth practitioner communities (e.g., OpenView Partners' published research)
 
 ---
 
 ## Flashcards
 
-**Front:** Why is enterprise readiness a distinct category from "more features"?
-**Back:** It establishes organizational trust and control — security, administrative oversight, reliability, integration — rather than serving an individual user's core task directly.
-**Difficulty:** Easy
-**Tags:** #enterprise-readiness #core-concept
+**Card 1**
+- Front: ** Why is enterprise readiness a distinct category from "more features"?
+- Back: ** It establishes organizational trust and control — security, administrative oversight, reliability, integration — rather than serving an individual user's core task directly.
+- Difficulty: 2
+- Tags: **, enterprise-readiness, core-concept
 
-**Front:** Name the four rungs of the Enterprise Adoption Ladder.
-**Back:** Pilot, Departmental Adoption, Organization-Wide Rollout, Mission-Critical Entrenchment.
-**Difficulty:** Easy
-**Tags:** #adoption-ladder
+**Card 2**
+- Front: ** Name the four rungs of the Enterprise Adoption Ladder.
+- Back: ** Pilot, Departmental Adoption, Organization-Wide Rollout, Mission-Critical Entrenchment.
+- Difficulty: 2
+- Tags: **, adoption-ladder
 
-**Front:** Name the four categories of enterprise readiness capability.
-**Back:** Security and compliance, administrative control, reliability and support commitments, integration capability.
-**Difficulty:** Medium
-**Tags:** #enterprise-readiness
+**Card 3**
+- Front: ** Name the four categories of enterprise readiness capability.
+- Back: ** Security and compliance, administrative control, reliability and support commitments, integration capability.
+- Difficulty: 2
+- Tags: **, enterprise-readiness
 
-**Front:** Why couldn't strong user satisfaction metrics unblock the security review stall in the Case Study?
-**Back:** Security review criteria (certifications, access control, audit logs) are entirely separate from user satisfaction, and central IT/security stakeholders were never part of the original grassroots adoption.
-**Difficulty:** Hard
-**Tags:** #case-study #adoption-ladder
+**Card 4**
+- Front: ** Why couldn't strong user satisfaction metrics unblock the security review stall in the Case Study?
+- Back: ** Security review criteria (certifications, access control, audit logs) are entirely separate from user satisfaction, and central IT/security stakeholders were never part of the original grassroots adoption.
+- Difficulty: 2
+- Tags: **, case-study, adoption-ladder
 
-**Front:** Why can a single missing enterprise readiness category block a deal regardless of strength elsewhere?
-**Back:** Procurement and security review processes typically treat each category as a separate, non-negotiable gate rather than allowing compensation across categories.
-**Difficulty:** Medium
-**Tags:** #enterprise-readiness
+**Card 5**
+- Front: ** Why can a single missing enterprise readiness category block a deal regardless of strength elsewhere?
+- Back: ** Procurement and security review processes typically treat each category as a separate, non-negotiable gate rather than allowing compensation across categories.
+- Difficulty: 2
+- Tags: **, enterprise-readiness
 
-**Front:** Why should enterprise readiness capabilities often be built proactively rather than reactively?
-**Back:** Certifications and related capabilities often require significant lead time to obtain, and waiting until a specific deal demands them can cause avoidable delays.
-**Difficulty:** Medium
-**Tags:** #enterprise-readiness-timing
+**Card 6**
+- Front: ** Why should enterprise readiness capabilities often be built proactively rather than reactively?
+- Back: ** Certifications and related capabilities often require significant lead time to obtain, and waiting until a specific deal demands them can cause avoidable delays.
+- Difficulty: 2
+- Tags: **, enterprise-readiness-timing
 
-**Front:** What distinguishes isolated enthusiasm from genuine organizational rollout progress?
-**Back:** Isolated enthusiasm reflects Rung 1/2 success among individual users, while organizational rollout requires engagement and approval from Rung 3 gatekeepers like central IT and security, who evaluate entirely different criteria.
-**Difficulty:** Hard
-**Tags:** #isolated-enthusiasm
+**Card 7**
+- Front: ** What distinguishes isolated enthusiasm from genuine organizational rollout progress?
+- Back: ** Isolated enthusiasm reflects Rung 1/2 success among individual users, while organizational rollout requires engagement and approval from Rung 3 gatekeepers like central IT and security, who evaluate entirely different criteria.
+- Difficulty: 2
+- Tags: **, isolated-enthusiasm
 
----
 
 ## Reflection Exercise
 

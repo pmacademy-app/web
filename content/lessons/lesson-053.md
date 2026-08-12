@@ -83,22 +83,28 @@ A specific, high-leverage practice: rather than attempting to persuade a key dec
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Leading with a position rather than exploring underlying interests.**
+**Mistake 1: Leading with a position rather than exploring underlying interests**
+
 As covered in Theory, this tends to produce adversarial, zero-sum framing and misses opportunities to discover creative solutions that would actually serve both parties' genuine underlying needs.
 
-**Mistake 2: Entering a negotiation without having thought through BATNA — your own or the other party's.**
+**Mistake 2: Entering a negotiation without having thought through BATNA — your own or the other party's**
+
 Without this groundwork, a PM cannot judge whether a proposed outcome is genuinely favorable or simply the first thing offered, and risks either conceding too readily or holding out for something the other party has no reason to grant.
 
-**Mistake 3: Assuming goodwill or organizational obligation alone will secure cooperation from someone with no direct authority relationship.**
+**Mistake 3: Assuming goodwill or organizational obligation alone will secure cooperation from someone with no direct authority relationship**
+
 As covered in Theory, influence without authority is an exchange — a PM should think concretely about what genuine currency (per the Cohen/Bradford model) they can offer, rather than expecting cooperation to be freely given without any real reciprocity.
 
-**Mistake 4: Attempting to persuade a key decision-maker in a single, high-stakes conversation with no prior groundwork.**
+**Mistake 4: Attempting to persuade a key decision-maker in a single, high-stakes conversation with no prior groundwork**
+
 This misses the compounding advantage of building coalition support incrementally, and risks the decision-maker experiencing the request as a surprise or an imposition rather than a natural continuation of ideas they've already had some exposure to.
 
-**Mistake 5: Treating every negotiation as adversarial, even when interests are genuinely compatible.**
+**Mistake 5: Treating every negotiation as adversarial, even when interests are genuinely compatible**
+
 Some PMs, anticipating conflict, approach every request defensively, missing opportunities where a counterpart's actual interests align closely with the PM's own and a collaborative, non-adversarial framing would have worked more effectively than a guarded, competitive one.
 
 ---
+
 
 ## Mental Model: The Interest Iceberg
 
@@ -124,7 +130,7 @@ The underlying principle connects directly to this lesson's Theory: an organizat
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Negotiation & Influence Without Authority at Different Company Stages
 
 **At a startup:**
 Influence without authority is often less acute a challenge, since small teams typically share close working relationships and immediate, visible common goals, making genuine cooperation easier to secure through simple, direct conversation rather than requiring formal negotiation technique. The skills in this lesson still matter, but the stakes and structural friction are often lower at this scale.
@@ -217,7 +223,7 @@ Negotiation and influence without authority is the practical discipline underlyi
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Position (negotiation) | What someone explicitly states they want in a negotiation | Interest | 1 |
 | Interest (negotiation) | The underlying reason or need behind a stated position | Position, Interest Iceberg | 1 |
@@ -239,42 +245,41 @@ Negotiation and influence without authority is the practical discipline underlyi
 ## Flashcards
 
 **Card 1**
-Front: What is the difference between a position and an interest in a negotiation?
-Back: A position is what someone explicitly states they want; an interest is the underlying reason or need behind that stated position.
-Difficulty: 1
-Tags: interests-vs-positions
+- Front: What is the difference between a position and an interest in a negotiation?
+- Back: A position is what someone explicitly states they want; an interest is the underlying reason or need behind that stated position.
+- Difficulty: 1
+- Tags: interests-vs-positions
 
 **Card 2**
-Front: What is BATNA, and why does it matter?
-Back: Best Alternative to a Negotiated Agreement — what a party would do if the negotiation fails; it clarifies genuine leverage and how much a party should be willing to concede.
-Difficulty: 2
-Tags: batna
+- Front: What is BATNA, and why does it matter?
+- Back: Best Alternative to a Negotiated Agreement — what a party would do if the negotiation fails; it clarifies genuine leverage and how much a party should be willing to concede.
+- Difficulty: 2
+- Tags: batna
 
 **Card 3**
-Front: What is ZOPA?
-Back: Zone of Possible Agreement — the range within which both parties' interests and BATNAs can genuinely be satisfied.
-Difficulty: 2
-Tags: zopa
+- Front: What is ZOPA?
+- Back: Zone of Possible Agreement — the range within which both parties' interests and BATNAs can genuinely be satisfied.
+- Difficulty: 2
+- Tags: zopa
 
 **Card 4**
-Front: Name the four currencies in the Cohen/Bradford exchange model.
-Back: Task-related, position-related, relationship-related, and personal.
-Difficulty: 2
-Tags: currencies-of-exchange
+- Front: Name the four currencies in the Cohen/Bradford exchange model.
+- Back: Task-related, position-related, relationship-related, and personal.
+- Difficulty: 2
+- Tags: currencies-of-exchange
 
 **Card 5**
-Front: Why does building coalition support incrementally often succeed where a single, high-stakes conversation fails?
-Back: Influence compounds through prior exposure and relationships; a decision that feels like a natural continuation of ideas already discussed is less likely to feel like a surprise or imposition than one presented cold in a single conversation.
-Difficulty: 2
-Tags: coalition-building
+- Front: Why does building coalition support incrementally often succeed where a single, high-stakes conversation fails?
+- Back: Influence compounds through prior exposure and relationships; a decision that feels like a natural continuation of ideas already discussed is less likely to feel like a surprise or imposition than one presented cold in a single conversation.
+- Difficulty: 2
+- Tags: coalition-building
 
 **Card 6**
-Front: In the Detailed Case Study, what changed between the PM's failed first attempt and successful second attempt?
-Back: The first attempt was purely positional with no understanding of the other team's interests; the second attempt uncovered the other team's actual priority (technical debt reduction) and reframed the request to help serve it, rather than compete with it.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what changed between the PM's failed first attempt and successful second attempt?
+- Back: The first attempt was purely positional with no understanding of the other team's interests; the second attempt uncovered the other team's actual priority (technical debt reduction) and reframed the request to help serve it, rather than compete with it.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

@@ -487,28 +487,34 @@ export function extractInterviewPerspectiveBlock(nodes: any[], lessonId: string)
     const text = toMarkdown(node).trim();
     if (!text) continue;
 
-    const qMatch = text.match(/^\*?\*?(Typical question\s*\d+|Question\s*\d+):\s*(.*?)(?:\*?\*?\s*$|$)/i);
+    const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
 
-    if (qMatch) {
-      if (currentQuestion) {
-        questions.push(currentQuestion);
-      }
-      currentQuestion = {
-        question: qMatch[2].replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim(),
-        whatItEvaluates: '',
-      };
-    } else {
-      const directMatch = text.match(/^\*?\*?\s*["'“](.*?)["'”]\s*\*?\*?\s*(.*)/is);
-      if (directMatch && directMatch[1].length > 10) {
+    for (const line of lines) {
+      const qMatch = line.match(/^\*?\*?(?:Typical question(?:\s*\d+)?|Question(?:\s*\d+)?):\s*(.*?)(?:\*?\*?\s*$|$)/i);
+
+      if (qMatch) {
         if (currentQuestion) {
           questions.push(currentQuestion);
         }
+        let qStr = qMatch[1].replace(/^\*?\*?/, '').replace(/\*?\*?$/, '').trim();
+        qStr = qStr.replace(/^["'“”]/, '').replace(/["'“”]$/, '').trim();
         currentQuestion = {
-          question: directMatch[1].trim(),
-          whatItEvaluates: directMatch[2].trim(),
+          question: qStr,
+          whatItEvaluates: '',
         };
-      } else if (currentQuestion) {
-        currentQuestion.whatItEvaluates += (currentQuestion.whatItEvaluates ? '\n\n' : '') + text;
+      } else {
+        const directMatch = line.match(/^\*?\*?\s*["'“](.*?)["'”]\s*\*?\*?\s*(.*)/i);
+        if (directMatch && directMatch[1].length > 10 && !currentQuestion) {
+          if (currentQuestion) {
+            questions.push(currentQuestion);
+          }
+          currentQuestion = {
+            question: directMatch[1].trim(),
+            whatItEvaluates: directMatch[2].trim(),
+          };
+        } else if (currentQuestion) {
+          currentQuestion.whatItEvaluates += (currentQuestion.whatItEvaluates ? '\n\n' : '') + line;
+        }
       }
     }
   }

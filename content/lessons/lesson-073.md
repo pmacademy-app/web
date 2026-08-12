@@ -76,13 +76,28 @@ Each stakeholder role's definition of "this product is good" differs meaningfull
 
 ## Common Beginner Mistakes
 
-1. **Treating a single enthusiastic stakeholder's feedback as representative of the whole buying committee.** Strong Champion or End User enthusiasm says little about whether the Economic Buyer or Technical Evaluator have been engaged or satisfied.
-2. **Assuming a Champion has more internal authority than they actually do.** A Champion without budget or technical sign-off authority cannot unilaterally close a deal, however strong their advocacy.
-3. **Pitching every stakeholder with the same narrative and the same level of detail.** A pitch optimized for an End User's task-fit concerns may fail to address an Economic Buyer's ROI concerns or a Technical Evaluator's risk concerns at all.
-4. **Engaging the Technical Evaluator only late in the process, after significant momentum has already built with other stakeholders.** Given the veto-level authority Technical Evaluators typically hold, per Lesson 72's Rung 3 discussion, late engagement risks a costly, momentum-killing stall at exactly the point a deal seemed closest to completion.
-5. **Assuming all four roles are always occupied by different individuals.** In smaller organizations, a single person may occupy multiple roles simultaneously (for example, a founder who is both Economic Buyer and Technical Evaluator), and failing to recognize this can lead to either redundant or entirely missed stakeholder engagement.
+**Mistake 1: Treating a single enthusiastic stakeholder's feedback as representative of the whole buying committee**
+
+Strong Champion or End User enthusiasm says little about whether the Economic Buyer or Technical Evaluator have been engaged or satisfied.
+
+**Mistake 2: Assuming a Champion has more internal authority than they actually do**
+
+A Champion without budget or technical sign-off authority cannot unilaterally close a deal, however strong their advocacy.
+
+**Mistake 3: Pitching every stakeholder with the same narrative and the same level of detail**
+
+A pitch optimized for an End User's task-fit concerns may fail to address an Economic Buyer's ROI concerns or a Technical Evaluator's risk concerns at all.
+
+**Mistake 4: Engaging the Technical Evaluator only late in the process, after significant momentum has already built with other stakeholders**
+
+Given the veto-level authority Technical Evaluators typically hold, per Lesson 72's Rung 3 discussion, late engagement risks a costly, momentum-killing stall at exactly the point a deal seemed closest to completion.
+
+**Mistake 5: Assuming all four roles are always occupied by different individuals**
+
+In smaller organizations, a single person may occupy multiple roles simultaneously (for example, a founder who is both Economic Buyer and Technical Evaluator), and failing to recognize this can lead to either redundant or entirely missed stakeholder engagement.
 
 ---
+
 
 ## Mental Model: The Stakeholder Compass
 
@@ -105,7 +120,7 @@ Salesforce's long history selling into large enterprise accounts is widely discu
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Selling to Committees: Buyer vs. User in B2B at Different Company Stages
 
 **Startup:** Early-stage B2B companies frequently sell into smaller organizations where a single person may genuinely occupy multiple Stakeholder Compass roles simultaneously (a small business owner who is Economic Buyer, Technical Evaluator, and End User all at once), making the full four-role framework feel like unnecessary complexity — a reasonable simplification at this scale, but one that stops holding as soon as the startup begins selling into larger organizations with genuinely distributed roles.
 
@@ -142,7 +157,7 @@ A "no" on direct engagement with either the Economic Buyer or the Technical Eval
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you approach a B2B sales process where you have a very enthusiastic internal contact but haven't yet spoken with anyone else at the company?"** The interviewer is evaluating whether you recognize the Champion-Without-Authority Trap, and propose actively working to identify and engage the Economic Buyer and Technical Evaluator rather than relying solely on the enthusiastic contact's account of progress.
 
@@ -172,6 +187,8 @@ B2B purchasing decisions of meaningful size typically involve multiple distinct 
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - B2B deals have multiple stakeholders, not one customer. Map them explicitly.
 - Stakeholder Compass: Champion, Economic Buyer, Technical Evaluator, End User.
 - Champion enthusiasm ≠ deal progress if the Champion lacks budget or technical sign-off authority.
@@ -195,50 +212,56 @@ B2B purchasing decisions of meaningful size typically involve multiple distinct 
 
 ## Further Reading / Resources
 
-1. *The New Strategic Selling* by Robert Miller and Stephen Heiman
-2. *Crossing the Chasm* by Geoffrey Moore
-3. *The Challenger Sale* by Matthew Dixon and Brent Adamson
+- Robert Miller and Stephen Heiman, *The New Strategic Selling*
+- Geoffrey Moore, *Crossing the Chasm*
+- Matthew Dixon and Brent Adamson, *The Challenger Sale*
 
 ---
 
 ## Flashcards
 
-**Front:** Why do B2B purchasing decisions typically involve multiple stakeholder roles, unlike consumer purchases?
-**Back:** In B2B, the functions of using, deciding, and paying for a product are frequently distributed across different people with different incentives, unlike a consumer purchase where one person fulfills all roles.
-**Difficulty:** Easy
-**Tags:** #stakeholder-compass #core-concept
+**Card 1**
+- Front: ** Why do B2B purchasing decisions typically involve multiple stakeholder roles, unlike consumer purchases?
+- Back: ** In B2B, the functions of using, deciding, and paying for a product are frequently distributed across different people with different incentives, unlike a consumer purchase where one person fulfills all roles.
+- Difficulty: 2
+- Tags: **, stakeholder-compass, core-concept
 
-**Front:** Name the four roles of the Stakeholder Compass.
-**Back:** Champion, Economic Buyer, Technical Evaluator, End User.
-**Difficulty:** Easy
-**Tags:** #stakeholder-compass
+**Card 2**
+- Front: ** Name the four roles of the Stakeholder Compass.
+- Back: ** Champion, Economic Buyer, Technical Evaluator, End User.
+- Difficulty: 2
+- Tags: **, stakeholder-compass
 
-**Front:** What is the Champion-Without-Authority Trap?
-**Back:** Over-relying on a genuinely enthusiastic Champion's account of deal progress without directly engaging the Economic Buyer or Technical Evaluator, who hold actual approval authority.
-**Difficulty:** Medium
-**Tags:** #champion-trap
+**Card 3**
+- Front: ** What is the Champion-Without-Authority Trap?
+- Back: ** Over-relying on a genuinely enthusiastic Champion's account of deal progress without directly engaging the Economic Buyer or Technical Evaluator, who hold actual approval authority.
+- Difficulty: 2
+- Tags: **, champion-trap
 
-**Front:** What does the Economic Buyer primarily evaluate a purchase on?
-**Back:** Return on investment and total cost relative to alternatives, often with limited firsthand exposure to the product itself.
-**Difficulty:** Medium
-**Tags:** #economic-buyer
+**Card 4**
+- Front: ** What does the Economic Buyer primarily evaluate a purchase on?
+- Back: ** Return on investment and total cost relative to alternatives, often with limited firsthand exposure to the product itself.
+- Difficulty: 2
+- Tags: **, economic-buyer
 
-**Front:** Why did the Champion Who Couldn't Deliver case study's deal ultimately stall?
-**Back:** The startup invested exclusively in the enthusiastic Champion, never directly engaging the Economic Buyer (who controlled budget) or the Technical Evaluator (who required security review), both of whom held actual approval authority.
-**Difficulty:** Hard
-**Tags:** #case-study #champion-trap
+**Card 5**
+- Front: ** Why did the Champion Who Couldn't Deliver case study's deal ultimately stall?
+- Back: ** The startup invested exclusively in the enthusiastic Champion, never directly engaging the Economic Buyer (who controlled budget) or the Technical Evaluator (who required security review), both of whom held actual approval authority.
+- Difficulty: 2
+- Tags: **, case-study, champion-trap
 
-**Front:** Why should the Technical Evaluator be engaged early rather than late in a B2B sales process?
-**Back:** Given their veto-level authority, late engagement risks a costly, momentum-killing stall at exactly the point a deal seemed closest to completion.
-**Difficulty:** Medium
-**Tags:** #technical-evaluator
+**Card 6**
+- Front: ** Why should the Technical Evaluator be engaged early rather than late in a B2B sales process?
+- Back: ** Given their veto-level authority, late engagement risks a costly, momentum-killing stall at exactly the point a deal seemed closest to completion.
+- Difficulty: 2
+- Tags: **, technical-evaluator
 
-**Front:** Why might a single person occupy multiple Stakeholder Compass roles simultaneously?
-**Back:** In smaller organizations, one person (e.g., a small business owner) may be Economic Buyer, Technical Evaluator, and End User all at once.
-**Difficulty:** Medium
-**Tags:** #stakeholder-compass-scale
+**Card 7**
+- Front: ** Why might a single person occupy multiple Stakeholder Compass roles simultaneously?
+- Back: ** In smaller organizations, one person (e.g., a small business owner) may be Economic Buyer, Technical Evaluator, and End User all at once.
+- Difficulty: 2
+- Tags: **, stakeholder-compass-scale
 
----
 
 ## Reflection Exercise
 

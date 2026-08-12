@@ -87,19 +87,24 @@ Product thinking is distinguished by holding all three legs of the Triangle in v
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating product thinking as a personality trait rather than a practice.**
+**Mistake 1: Treating product thinking as a personality trait rather than a practice**
+
 New PMs sometimes conclude that some people are just naturally "good at product" and others aren't, treating it as an innate gift rather than a skill built through repetition (like the Five Whys technique above). This is discouraging and also inaccurate — it is a learnable habit, developed the same way any diagnostic skill is developed: by deliberately practicing it on real requests, repeatedly, until it becomes automatic.
 
-**Mistake 2: Applying the Five Whys as a rigid script in front of stakeholders.**
+**Mistake 2: Applying the Five Whys as a rigid script in front of stakeholders**
+
 Interrogating a stakeholder with five rapid-fire "why" questions in a live meeting can come across as adversarial or as though you're stalling the request. The technique is meant to structure your own internal reasoning and follow-up questions — it should surface as natural, curious follow-up ("help me understand what you're trying to accomplish for the customer here") rather than a visible checklist being read aloud.
 
-**Mistake 3: Assuming product thinking means always saying no to feature requests.**
+**Mistake 3: Assuming product thinking means always saying no to feature requests**
+
 Some new PMs, having learned to distrust surface-level requests, overcorrect into reflexive skepticism of every incoming idea, which damages trust with stakeholders and slows down genuinely good, low-risk ideas. Product thinking is about *examining* a request appropriately to its size and risk — not treating every request as a five-alarm investigation. A low-cost, low-risk, clearly justified request doesn't need the same scrutiny as a request for a major new engineering investment.
 
 **Mistake 4: Confusing "asking why" with "questioning the requester's competence."**
+
 Digging into the underlying need behind a stakeholder's request can feel, to the requester, like their judgment is being doubted. Skilled PMs frame these questions collaboratively ("I want to make sure whatever we build actually solves this for you — can you walk me through what happens right now?") rather than skeptically ("why do you think you need this?"), which preserves the relationship while still doing the underlying diagnostic work.
 
 ---
+
 
 ## Mental Model: The Iceberg
 
@@ -156,7 +161,7 @@ Instead, applying deeper product thinking to the underlying need — customers w
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Product Thinking at Different Company Stages
 
 **At a startup:** Product thinking is often applied under extreme time pressure, with very little data. The practice looks less like rigorous Five Whys interviews and more like rapid, reasoned hypothesis-forming ("we believe users are churning because of X, based on the five conversations we've had this week") followed by fast, cheap validation. Speed and judgment substitute for exhaustive process.
 
@@ -263,6 +268,8 @@ Product thinking is the habit of examining the underlying user and business need
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - **Product thinking:** examine underlying need before evaluating a solution.
 - **Feature thinking (its opposite):** evaluate requests at face value — buildable and wanted, nothing deeper.
 - **Five Whys:** ask "why" repeatedly to move from surface request to underlying need; use conversationally, not as an interrogation.
@@ -324,7 +331,6 @@ Product thinking is the habit of examining the underlying user and business need
 - Difficulty: 3
 - Tags: symptom, root-cause, framework
 
----
 
 ## Reflection Exercise
 

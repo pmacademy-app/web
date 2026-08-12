@@ -132,22 +132,28 @@ A piece of evidence that fails several of these checks is not necessarily worthl
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating a handful of enthusiastic conversations as sufficient validation.**
+**Mistake 1: Treating a handful of enthusiastic conversations as sufficient validation**
+
 As covered in Lesson 8, a small number of positive conversations with self-selected, engaged users is highly vulnerable to both an unrepresentative sample and to stated-preference overstatement — it is a reasonable starting point for generating hypotheses, not a sufficient basis for a major investment decision.
 
-**Mistake 2: Asking "would you use this?" and treating the answer as reliable.**
+**Mistake 2: Asking "would you use this?" and treating the answer as reliable**
+
 This is the single most common instance of the stated-preference trap described above, and one of the most reliable ways to generate falsely confident validation for an idea that will underperform once it requires a real behavioral commitment.
 
-**Mistake 3: Only talking to existing power users or the most vocal customers.**
+**Mistake 3: Only talking to existing power users or the most vocal customers**
+
 This produces a systematically unrepresentative sample — existing power users, almost by definition, already like the product enough to use it heavily, and their feedback tends to reflect refinements to an already-working experience rather than the concerns of the larger population of casual users, non-users, or churned users who might reveal more fundamental problems.
 
-**Mistake 4: Phrasing questions in a way that signals the "right" answer.**
+**Mistake 4: Phrasing questions in a way that signals the "right" answer**
+
 Even subtle framing ("What did you love about this feature?" rather than "What was your experience with this feature?") primes respondents toward a particular kind of answer, contaminating the resulting data before analysis has even begun.
 
-**Mistake 5: Confusing the volume of research conducted with the quality or decision-relevance of what was learned.**
+**Mistake 5: Confusing the volume of research conducted with the quality or decision-relevance of what was learned**
+
 Echoing Lesson 8's related warning about discovery theater, a large number of interviews or a large survey sample does not guarantee useful findings if the sample was unrepresentative, the questions were leading, or the research measured stated rather than revealed preference throughout.
 
 ---
+
 
 ## Mental Model: The Evidence Trustworthiness Ladder
 
@@ -364,7 +370,6 @@ User research is the disciplined, bias-aware collection of evidence about real u
 - Difficulty: 3
 - Tags: case-study, revealed-preference
 
----
 
 ## Reflection Exercise
 

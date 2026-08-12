@@ -90,13 +90,28 @@ A platform must eventually answer how it captures value from the ecosystem it en
 
 ## Common Beginner Mistakes
 
-1. **Building Layer 3 or 4 features before Layer 2 is trustworthy.** Investing in a public app directory or partner marketing before your API has stable versioning and reliable uptime guarantees builders will be burned, and burned builders do not return.
-2. **Treating developers as a segment of "users" rather than a distinct accountable population.** Developer needs (stability, predictability, clear deprecation policies) are frequently in tension with end-user needs (frequent visible changes, rapid iteration), and conflating the two leads to decisions that satisfy neither well.
-3. **Measuring platform health using only end-user metrics.** A platform can show healthy end-user engagement metrics for a long time after its Developer Surface has started to rot, because the existing integrations built years ago continue to function even as new integration is quietly grinding to a halt.
-4. **Underestimating the cost of a breaking API change.** A change that costs the internal team one sprint to make can cost the entire external developer ecosystem months of collective work to adapt to, multiplied across every integration — a cost that does not appear on the internal team's own roadmap.
-5. **Assuming platform success is a scaled-up version of feature success.** The skills that make someone excellent at shipping features that delight end users directly (fast iteration, frequent visible change, tight internal feedback loops) are not the same skills that make a platform trustworthy to build upon (stability, advance notice, backward compatibility) — and a team can be excellent at one while actively undermining the other.
+**Mistake 1: Building Layer 3 or 4 features before Layer 2 is trustworthy**
+
+Investing in a public app directory or partner marketing before your API has stable versioning and reliable uptime guarantees builders will be burned, and burned builders do not return.
+
+**Mistake 2: Treating developers as a segment of "users" rather than a distinct accountable population**
+
+Developer needs (stability, predictability, clear deprecation policies) are frequently in tension with end-user needs (frequent visible changes, rapid iteration), and conflating the two leads to decisions that satisfy neither well.
+
+**Mistake 3: Measuring platform health using only end-user metrics**
+
+A platform can show healthy end-user engagement metrics for a long time after its Developer Surface has started to rot, because the existing integrations built years ago continue to function even as new integration is quietly grinding to a halt.
+
+**Mistake 4: Underestimating the cost of a breaking API change**
+
+A change that costs the internal team one sprint to make can cost the entire external developer ecosystem months of collective work to adapt to, multiplied across every integration — a cost that does not appear on the internal team's own roadmap.
+
+**Mistake 5: Assuming platform success is a scaled-up version of feature success**
+
+The skills that make someone excellent at shipping features that delight end users directly (fast iteration, frequent visible change, tight internal feedback loops) are not the same skills that make a platform trustworthy to build upon (stability, advance notice, backward compatibility) — and a team can be excellent at one while actively undermining the other.
 
 ---
+
 
 ## Mental Model: The Leverage Stack
 
@@ -120,7 +135,7 @@ Public reporting on Shopify's app ecosystem suggests the company has invested he
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Platform Thinking: Products, Platforms, and Ecosystems at Different Company Stages
 
 **Startup:** Most startups never need to think about the Leverage Stack, because they are, correctly, entirely focused on Layer 1 — proving a feature product works for a well-defined set of end users. Premature platform thinking at this stage (building a public API before product-market fit) is a common and expensive form of scope creep; the Build Trap referenced in Lesson 1 has a platform-specific variant where "let's make it extensible" substitutes for the harder work of nailing the core experience first.
 
@@ -160,7 +175,7 @@ A "no" on more than one or two of these criteria is a strong signal that Layer 3
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"Tell me about a product you'd consider a platform, and explain why."** The interviewer is evaluating whether you can apply the "who creates the value" test correctly, rather than simply labeling any large or successful product a "platform" without justification.
 
@@ -190,6 +205,8 @@ Platform products differ from feature products in a fundamental way: their value
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Feature product: value from your team. Platform: value from others building on you.
 - Leverage Stack order: Core Product → Developer Surface → Marketplace → Ecosystem.
 - Never invest heavily in Layer 3/4 until Layer 2 passes the Platform Readiness Checklist.
@@ -214,50 +231,56 @@ Platform products differ from feature products in a fundamental way: their value
 
 ## Further Reading / Resources
 
-1. *Platform Revolution* by Geoffrey Parker, Marshall Van Alstyne, and Sangeet Paul Choudary
-2. *The Business of Platforms* by Michael Cusumano, Annabelle Gawer, and David Yoffie
-3. *Matchmakers: The New Economics of Multisided Platforms* by David Evans and Richard Schmalensee
+- Geoffrey Parker, Marshall Van Alstyne, and Sangeet Paul Choudary, *Platform Revolution*
+- Michael Cusumano, Annabelle Gawer, and David Yoffie, *The Business of Platforms*
+- David Evans and Richard Schmalensee, *Matchmakers: The New Economics of Multisided Platforms*
 
 ---
 
 ## Flashcards
 
-**Front:** What is the "who creates the value" test?
-**Back:** Ask who built the thing that made a user's experience good — your own team (feature product) or a third party using your tools (platform).
-**Difficulty:** Easy
-**Tags:** #platform-thinking #diagnostic
+**Card 1**
+- Front: ** What is the "who creates the value" test?
+- Back: ** Ask who built the thing that made a user's experience good — your own team (feature product) or a third party using your tools (platform).
+- Difficulty: 2
+- Tags: **, platform-thinking, diagnostic
 
-**Front:** Name the four layers of the Leverage Stack in order.
-**Back:** Core Product → Developer Surface → Marketplace → Ecosystem.
-**Difficulty:** Easy
-**Tags:** #leverage-stack
+**Card 2**
+- Front: ** Name the four layers of the Leverage Stack in order.
+- Back: ** Core Product → Developer Surface → Marketplace → Ecosystem.
+- Difficulty: 2
+- Tags: **, leverage-stack
 
-**Front:** Why can a healthy end-user engagement metric mask a decaying platform?
-**Back:** Existing integrations keep working even as new developer investment quietly stalls, so end-user dashboards lag the real signal.
-**Difficulty:** Medium
-**Tags:** #metrics #platform-risk
+**Card 3**
+- Front: ** Why can a healthy end-user engagement metric mask a decaying platform?
+- Back: ** Existing integrations keep working even as new developer investment quietly stalls, so end-user dashboards lag the real signal.
+- Difficulty: 2
+- Tags: **, metrics, platform-risk
 
-**Front:** What is a cross-side network effect?
-**Back:** A loop where growth in one population (builders or end users) increases the platform's value for the other population, and vice versa.
-**Difficulty:** Medium
-**Tags:** #network-effects
+**Card 4**
+- Front: ** What is a cross-side network effect?
+- Back: ** A loop where growth in one population (builders or end users) increases the platform's value for the other population, and vice versa.
+- Difficulty: 2
+- Tags: **, network-effects
 
-**Front:** What does the Platform Readiness Checklist assess?
-**Back:** Whether a Developer Surface (Layer 2) is stable and trustworthy enough to support Marketplace or Ecosystem investment (Layers 3–4).
-**Difficulty:** Medium
-**Tags:** #platform-readiness
+**Card 5**
+- Front: ** What does the Platform Readiness Checklist assess?
+- Back: ** Whether a Developer Surface (Layer 2) is stable and trustworthy enough to support Marketplace or Ecosystem investment (Layers 3–4).
+- Difficulty: 2
+- Tags: **, platform-readiness
 
-**Front:** Why did the SaaS company's Marketplace fail in the Case Study?
-**Back:** It invested in a public Layer 3 marketplace while its Layer 2 API was still unversioned and prone to undocumented breaking changes.
-**Difficulty:** Hard
-**Tags:** #case-study #sequencing
+**Card 6**
+- Front: ** Why did the SaaS company's Marketplace fail in the Case Study?
+- Back: ** It invested in a public Layer 3 marketplace while its Layer 2 API was still unversioned and prone to undocumented breaking changes.
+- Difficulty: 2
+- Tags: **, case-study, sequencing
 
-**Front:** Name two things that are typically in tension between developers and end users.
-**Back:** Developers want stability and advance notice; end users often want frequent, visible change and rapid iteration.
-**Difficulty:** Hard
-**Tags:** #tradeoffs
+**Card 7**
+- Front: ** Name two things that are typically in tension between developers and end users.
+- Back: ** Developers want stability and advance notice; end users often want frequent, visible change and rapid iteration.
+- Difficulty: 2
+- Tags: **, tradeoffs
 
----
 
 ## Reflection Exercise
 

@@ -75,13 +75,28 @@ The Liability Layer often has the most direct and immediate influence on product
 
 ## Common Beginner Mistakes
 
-1. **Treating regulatory compliance as a late-stage review rather than an architectural constraint.** Structural requirements like audit trails and human review steps are far more expensive to retrofit than to design in from the outset.
-2. **Assuming a well-documented process automatically satisfies regulatory requirements.** A product can pass Process Layer scrutiny while still failing at the Outcome Layer, if its results are discriminatory or otherwise impermissible regardless of process quality.
-3. **Treating human-in-the-loop requirements as an unnecessary friction to be minimized rather than a legally mandated accountability mechanism.** In many regulated contexts, this requirement is not a design preference but a compliance obligation directly tied to liability.
-4. **Underestimating how much of a product's architecture the Liability Layer actually shapes.** A system that cannot reconstruct its own decision history after the fact cannot support the accountability assignment regulation frequently requires, regardless of how well the product otherwise functions.
-5. **Assuming regulatory requirements are static and can be addressed once, rather than something requiring ongoing monitoring.** Regulations in healthcare, finance, and government contexts change, and a product compliant at launch can drift out of compliance as rules evolve.
+**Mistake 1: Treating regulatory compliance as a late-stage review rather than an architectural constraint**
+
+Structural requirements like audit trails and human review steps are far more expensive to retrofit than to design in from the outset.
+
+**Mistake 2: Assuming a well-documented process automatically satisfies regulatory requirements**
+
+A product can pass Process Layer scrutiny while still failing at the Outcome Layer, if its results are discriminatory or otherwise impermissible regardless of process quality.
+
+**Mistake 3: Treating human-in-the-loop requirements as an unnecessary friction to be minimized rather than a legally mandated accountability mechanism**
+
+In many regulated contexts, this requirement is not a design preference but a compliance obligation directly tied to liability.
+
+**Mistake 4: Underestimating how much of a product's architecture the Liability Layer actually shapes**
+
+A system that cannot reconstruct its own decision history after the fact cannot support the accountability assignment regulation frequently requires, regardless of how well the product otherwise functions.
+
+**Mistake 5: Assuming regulatory requirements are static and can be addressed once, rather than something requiring ongoing monitoring**
+
+Regulations in healthcare, finance, and government contexts change, and a product compliant at launch can drift out of compliance as rules evolve.
 
 ---
+
 
 ## Mental Model: The Regulatory Surface Map
 
@@ -104,7 +119,7 @@ Palantir's work building software for highly regulated government and healthcare
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Regulated Industries: PM in Healthcare, Finance, and Government at Different Company Stages
 
 **Startup:** Early-stage companies entering a regulated industry for the first time often underestimate how early regulatory architecture decisions must be made, since the instinct to move fast and iterate, well-suited to unregulated consumer products, can lead to costly rearchitecture once a structural compliance gap — an audit trail never built in, a human review step never designed — is discovered after significant product development has already occurred.
 
@@ -142,7 +157,7 @@ A "no" on Outcome Layer Verification should be treated with particular urgency, 
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you approach building a product feature that makes automated decisions affecting people's financial or health outcomes?"** The interviewer is evaluating whether you propose systematically identifying applicable regulatory layers — data, process, outcome, and liability — before development begins, rather than treating compliance as a late-stage review.
 
@@ -172,6 +187,8 @@ Regulatory compliance in healthcare, finance, and government contexts frequently
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Regulatory compliance shapes architecture, not just a final review checklist.
 - Regulatory Surface Map: Data → Process → Outcome → Liability. A feature must satisfy all four, not just one.
 - Well-documented process ≠ permissible outcome. Check both separately.
@@ -195,50 +212,56 @@ Regulatory compliance in healthcare, finance, and government contexts frequently
 
 ## Further Reading / Resources
 
-1. *Weapons of Math Destruction* by Cathy O'Neil
-2. *The Alignment Problem* by Brian Christian
-3. HHS Office for Civil Rights published HIPAA guidance (U.S. Department of Health and Human Services)
+- Cathy O'Neil, *Weapons of Math Destruction*
+- Brian Christian, *The Alignment Problem*
+- HHS Office for Civil Rights published HIPAA guidance (U.S. Department of Health and Human Services)
 
 ---
 
 ## Flashcards
 
-**Front:** Why must regulatory compliance often shape product architecture from the outset in regulated industries?
-**Back:** Structural requirements like audit trails and mandatory human review steps are far more costly to retrofit than to design in from the beginning.
-**Difficulty:** Easy
-**Tags:** #regulated-industries #core-concept
+**Card 1**
+- Front: ** Why must regulatory compliance often shape product architecture from the outset in regulated industries?
+- Back: ** Structural requirements like audit trails and mandatory human review steps are far more costly to retrofit than to design in from the beginning.
+- Difficulty: 2
+- Tags: **, regulated-industries, core-concept
 
-**Front:** Name the four layers of the Regulatory Surface Map.
-**Back:** Data, Process, Outcome, Liability.
-**Difficulty:** Easy
-**Tags:** #regulatory-surface-map
+**Card 2**
+- Front: ** Name the four layers of the Regulatory Surface Map.
+- Back: ** Data, Process, Outcome, Liability.
+- Difficulty: 2
+- Tags: **, regulatory-surface-map
 
-**Front:** Why can a well-documented process still fail regulatory compliance?
-**Back:** Process Layer compliance doesn't guarantee Outcome Layer compliance — a carefully documented decision process can still produce an impermissible result, such as a discriminatory outcome.
-**Difficulty:** Medium
-**Tags:** #outcome-layer
+**Card 3**
+- Front: ** Why can a well-documented process still fail regulatory compliance?
+- Back: ** Process Layer compliance doesn't guarantee Outcome Layer compliance — a carefully documented decision process can still produce an impermissible result, such as a discriminatory outcome.
+- Difficulty: 2
+- Tags: **, outcome-layer
 
-**Front:** How do human-in-the-loop requirements connect to the Ownership Zones Model from Lesson 65?
-**Back:** They formalize Zone 4's discipline — that a model's output shouldn't be treated as an automatic action — into a legal obligation rather than an optional best practice.
-**Difficulty:** Hard
-**Tags:** #human-in-the-loop
+**Card 4**
+- Front: ** How do human-in-the-loop requirements connect to the Ownership Zones Model from Lesson 65?
+- Back: ** They formalize Zone 4's discipline — that a model's output shouldn't be treated as an automatic action — into a legal obligation rather than an optional best practice.
+- Difficulty: 2
+- Tags: **, human-in-the-loop
 
-**Front:** What two regulatory gaps did the Undocumented Lending Decision case study reveal?
-**Back:** A discriminatory disparity in approval rates across demographic groups (Outcome Layer), and a missing mandatory human review step for denied applications (Liability Layer) — despite thorough Process Layer documentation.
-**Difficulty:** Hard
-**Tags:** #case-study #regulatory-surface-map
+**Card 5**
+- Front: ** What two regulatory gaps did the Undocumented Lending Decision case study reveal?
+- Back: ** A discriminatory disparity in approval rates across demographic groups (Outcome Layer), and a missing mandatory human review step for denied applications (Liability Layer) — despite thorough Process Layer documentation.
+- Difficulty: 2
+- Tags: **, case-study, regulatory-surface-map
 
-**Front:** Why does the Liability Layer often shape a product's core architecture directly?
-**Back:** A system that cannot reconstruct its own decision history after the fact cannot support the accountability assignment regulation frequently requires.
-**Difficulty:** Medium
-**Tags:** #liability-layer
+**Card 6**
+- Front: ** Why does the Liability Layer often shape a product's core architecture directly?
+- Back: ** A system that cannot reconstruct its own decision history after the fact cannot support the accountability assignment regulation frequently requires.
+- Difficulty: 2
+- Tags: **, liability-layer
 
-**Front:** Why is ongoing regulatory monitoring necessary even after a product is compliant at launch?
-**Back:** Regulations in healthcare, finance, and government contexts change over time, and a product can drift out of compliance as rules evolve.
-**Difficulty:** Medium
-**Tags:** #ongoing-compliance
+**Card 7**
+- Front: ** Why is ongoing regulatory monitoring necessary even after a product is compliant at launch?
+- Back: ** Regulations in healthcare, finance, and government contexts change over time, and a product can drift out of compliance as rules evolve.
+- Difficulty: 2
+- Tags: **, ongoing-compliance
 
----
 
 ## Reflection Exercise
 

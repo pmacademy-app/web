@@ -152,22 +152,28 @@ The discipline here parallels Lesson 22's Precision Dial directly: too little fi
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Adding visual polish to a wireframe "just to make it look nicer" before structural feedback has been gathered.**
+**Mistake 1: Adding visual polish to a wireframe "just to make it look nicer" before structural feedback has been gathered**
+
 Even well-intentioned polish introduced too early triggers premature visual commitment, shifting reviewer attention away from the structural questions a wireframe is meant to surface.
 
-**Mistake 2: Skipping wireframing entirely and moving directly from a text specification to a fully polished mockup or prototype.**
+**Mistake 2: Skipping wireframing entirely and moving directly from a text specification to a fully polished mockup or prototype**
+
 This skips an entire, cheap, fast round of structural iteration, and any structural problems discovered later (during prototype testing or, worse, during implementation) become significantly more expensive to fix, since polished visual investment has already been made.
 
-**Mistake 3: Treating a wireframe review meeting as if it were a final design approval, inviting cosmetic rather than structural feedback.**
+**Mistake 3: Treating a wireframe review meeting as if it were a final design approval, inviting cosmetic rather than structural feedback**
+
 This confuses the purpose of the wireframe stage specifically, and often results from either excessive fidelity or from framing the review incorrectly, regardless of the wireframe's actual visual polish level.
 
-**Mistake 4: Showing a purely internal, rough sketch-level wireframe to real users without adjusting fidelity for that audience.**
+**Mistake 4: Showing a purely internal, rough sketch-level wireframe to real users without adjusting fidelity for that audience**
+
 Real users, lacking the team's internal context, may struggle to meaningfully interpret an extremely rough sketch, producing confused or unreliable feedback rather than genuine structural insight.
 
-**Mistake 5: Treating wireframing as purely a design-team responsibility disconnected from the PM's specification work.**
+**Mistake 5: Treating wireframing as purely a design-team responsibility disconnected from the PM's specification work**
+
 Since a wireframe's core function is translating specific acceptance criteria and journey map touchpoints into structure, a PM's active involvement — checking that the wireframe actually reflects the specified behavior and required scenarios — remains important, not something to fully delegate away.
 
 ---
+
 
 ## Mental Model: The Fidelity Ladder
 
@@ -387,7 +393,6 @@ A wireframe is a deliberately low-fidelity representation of an interface's stru
 - Difficulty: 2
 - Tags: review-framing
 
----
 
 ## Reflection Exercise
 

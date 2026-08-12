@@ -73,13 +73,28 @@ A specific organizational pressure frequently pushes toward premature full integ
 
 ## Common Beginner Mistakes
 
-1. **Defaulting to Full Absorption regardless of the acquisition's actual strategic rationale.** An acquisition made for talent or a specific technology component may not benefit from, and can be actively harmed by, forcing complete product and organizational unification.
-2. **Underestimating how quickly acquired talent can depart if integration feels forced or disrespectful of the acquired team's prior culture and autonomy.** A poorly-managed integration can cause the exact people the acquisition was meant to retain to leave before their value has been captured.
-3. **Treating acquired customer migration as a purely technical exercise, without applying the dependency-aware discipline from Lesson 68's Sunset Runway.** Customers of an acquired product are, in a real sense, dependents whose migration requires the same inventory, notice, and support discipline as any other platform migration.
-4. **Assuming integration timeline pressure from leadership justifies skipping careful rationale-matching.** Pressure to show quick post-acquisition results can push toward premature Full Absorption even when a slower, more selective approach would preserve more of the acquisition's actual value.
-5. **Failing to communicate clearly and early with the acquired team about what kind of integration to expect.** Ambiguity about whether a team will be preserved, selectively integrated, or fully absorbed creates unnecessary anxiety and can accelerate departures, regardless of which approach ultimately proves correct.
+**Mistake 1: Defaulting to Full Absorption regardless of the acquisition's actual strategic rationale**
+
+An acquisition made for talent or a specific technology component may not benefit from, and can be actively harmed by, forcing complete product and organizational unification.
+
+**Mistake 2: Underestimating how quickly acquired talent can depart if integration feels forced or disrespectful of the acquired team's prior culture and autonomy**
+
+A poorly-managed integration can cause the exact people the acquisition was meant to retain to leave before their value has been captured.
+
+**Mistake 3: Treating acquired customer migration as a purely technical exercise, without applying the dependency-aware discipline from Lesson 68's Sunset Runway**
+
+Customers of an acquired product are, in a real sense, dependents whose migration requires the same inventory, notice, and support discipline as any other platform migration.
+
+**Mistake 4: Assuming integration timeline pressure from leadership justifies skipping careful rationale-matching**
+
+Pressure to show quick post-acquisition results can push toward premature Full Absorption even when a slower, more selective approach would preserve more of the acquisition's actual value.
+
+**Mistake 5: Failing to communicate clearly and early with the acquired team about what kind of integration to expect**
+
+Ambiguity about whether a team will be preserved, selectively integrated, or fully absorbed creates unnecessary anxiety and can accelerate departures, regardless of which approach ultimately proves correct.
 
 ---
+
 
 ## Mental Model: The Integration Continuum
 
@@ -102,7 +117,7 @@ Google's long history of acquisitions — including YouTube, Android, and Double
 
 ---
 
-## Real World Perspective
+## Real World Perspective: M&A and Product Integration at Different Company Stages
 
 **Startup:** Early-stage companies typically pursue acquisitions rarely, and when they do, it is almost always a talent-focused acqui-hire of a small team or an early-stage competitor, making the Preserve or Selective Integration end of the Continuum the most common and appropriate approach, given the limited organizational capacity to manage a complex full-absorption process at this stage.
 
@@ -140,7 +155,7 @@ A "no" on Rationale Documented should be treated as a fundamental planning gap �
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you approach integrating a newly acquired product and team into your organization?"** The interviewer is evaluating whether you propose matching the integration approach to the acquisition's actual strategic rationale, per the Integration Continuum, rather than defaulting to full absorption as an assumed universal best practice.
 
@@ -170,6 +185,8 @@ M&A value is realized or destroyed primarily during the integration process that
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Deals succeed or fail during integration, not at signing. Strategy and execution are separate questions.
 - Integration Continuum: Preserve → Selective Integration → Full Absorption → Sunset and Migrate.
 - Match the Continuum position to the rationale: talent, technology, customer base, or market consolidation.
@@ -192,50 +209,56 @@ M&A value is realized or destroyed primarily during the integration process that
 
 ## Further Reading / Resources
 
-1. *HBR's 10 Must Reads on Mergers and Acquisitions* (Harvard Business Review Press)
-2. *The Synergy Trap* by Mark Sirower
-3. *Winning at Acquisitions* industry research from McKinsey & Company's published M&A practice insights
+- *HBR's 10 Must Reads on Mergers and Acquisitions* (Harvard Business Review Press)
+- Mark Sirower, *The Synergy Trap*
+- *Winning at Acquisitions* industry research from McKinsey & Company's published M&A practice insights
 
 ---
 
 ## Flashcards
 
-**Front:** Why is poor integration, rather than flawed strategy, the more common cause of M&A value destruction?
-**Back:** An acquisition's value is realized or destroyed over the months and years of integration following the deal, not at the moment the deal closes.
-**Difficulty:** Easy
-**Tags:** #ma-integration #core-concept
+**Card 1**
+- Front: ** Why is poor integration, rather than flawed strategy, the more common cause of M&A value destruction?
+- Back: ** An acquisition's value is realized or destroyed over the months and years of integration following the deal, not at the moment the deal closes.
+- Difficulty: 2
+- Tags: **, ma-integration, core-concept
 
-**Front:** Name the four points on the Integration Continuum.
-**Back:** Preserve, Selective Integration, Full Absorption, Sunset and Migrate.
-**Difficulty:** Easy
-**Tags:** #integration-continuum
+**Card 2**
+- Front: ** Name the four points on the Integration Continuum.
+- Back: ** Preserve, Selective Integration, Full Absorption, Sunset and Migrate.
+- Difficulty: 2
+- Tags: **, integration-continuum
 
-**Front:** Name the four common strategic rationales for an acquisition.
-**Back:** Talent acquisition, technology acquisition, customer base acquisition, market consolidation.
-**Difficulty:** Medium
-**Tags:** #ma-rationales
+**Card 3**
+- Front: ** Name the four common strategic rationales for an acquisition.
+- Back: ** Talent acquisition, technology acquisition, customer base acquisition, market consolidation.
+- Difficulty: 2
+- Tags: **, ma-rationales
 
-**Front:** Why is premature Full Absorption such a common mistake?
-**Back:** Internal stakeholders often prefer a unified codebase and structure for its own sake, regardless of whether the acquisition's actual rationale calls for full integration.
-**Difficulty:** Medium
-**Tags:** #premature-integration
+**Card 4**
+- Front: ** Why is premature Full Absorption such a common mistake?
+- Back: ** Internal stakeholders often prefer a unified codebase and structure for its own sake, regardless of whether the acquisition's actual rationale calls for full integration.
+- Difficulty: 2
+- Tags: **, premature-integration
 
-**Front:** What went wrong in the Rushed Absorption case study?
-**Back:** The acquisition's rationale was customer-base retention, but leadership forced rapid Full Absorption without understanding what drove customer loyalty, causing significant churn.
-**Difficulty:** Hard
-**Tags:** #case-study #integration-continuum
+**Card 5**
+- Front: ** What went wrong in the Rushed Absorption case study?
+- Back: ** The acquisition's rationale was customer-base retention, but leadership forced rapid Full Absorption without understanding what drove customer loyalty, causing significant churn.
+- Difficulty: 2
+- Tags: **, case-study, integration-continuum
 
-**Front:** Why should acquired customer migration follow Sunset Runway discipline from Lesson 68?
-**Back:** Acquired customers are genuine dependents whose loyalty drivers and workflow needs must be understood before a migration timeline is set, just like external API dependents.
-**Difficulty:** Hard
-**Tags:** #customer-migration
+**Card 6**
+- Front: ** Why should acquired customer migration follow Sunset Runway discipline from Lesson 68?
+- Back: ** Acquired customers are genuine dependents whose loyalty drivers and workflow needs must be understood before a migration timeline is set, just like external API dependents.
+- Difficulty: 2
+- Tags: **, customer-migration
 
-**Front:** Why does ambiguous communication with an acquired team accelerate departures?
-**Back:** Uncertainty about which integration approach applies to them creates anxiety that can drive talent away regardless of which approach ultimately proves correct.
-**Difficulty:** Medium
-**Tags:** #team-communication
+**Card 7**
+- Front: ** Why does ambiguous communication with an acquired team accelerate departures?
+- Back: ** Uncertainty about which integration approach applies to them creates anxiety that can drive talent away regardless of which approach ultimately proves correct.
+- Difficulty: 2
+- Tags: **, team-communication
 
----
 
 ## Reflection Exercise
 

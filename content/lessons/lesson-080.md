@@ -91,13 +91,28 @@ The nine models connect directly. The Strategy Cascade (Lesson 71) provides the 
 
 ## Common Beginner Mistakes
 
-1. **Applying only the first model that seems to fit, without checking whether others are also relevant.** Most significant strategic problems involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
-2. **Treating the nine models as an unordered checklist rather than a connected structure.** Understanding how the models depend on each other produces faster, more accurate diagnosis than treating each model as unrelated to the others.
-3. **Skipping the Strategy Cascade's falsifiability check when diagnosing any other problem.** A bet that was never made falsifiable in the first place cannot be genuinely evaluated using any of the other eight models, since there is no clear success criterion to measure progress against.
-4. **Forgetting that the Concession Exchange Map applies to internal negotiations too, not just external customer contracts.** The same precedent-cost logic applies whenever any concession is granted that other parties might reasonably expect to be extended again.
-5. **Assuming strategic judgment is complete once all nine models are individually memorized.** Genuine strategic judgment is the ability to recognize which combination applies to a novel, real situation — a skill built through practice, not memorization alone.
+**Mistake 1: Applying only the first model that seems to fit, without checking whether others are also relevant**
+
+Most significant strategic problems involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
+
+**Mistake 2: Treating the nine models as an unordered checklist rather than a connected structure**
+
+Understanding how the models depend on each other produces faster, more accurate diagnosis than treating each model as unrelated to the others.
+
+**Mistake 3: Skipping the Strategy Cascade's falsifiability check when diagnosing any other problem**
+
+A bet that was never made falsifiable in the first place cannot be genuinely evaluated using any of the other eight models, since there is no clear success criterion to measure progress against.
+
+**Mistake 4: Forgetting that the Concession Exchange Map applies to internal negotiations too, not just external customer contracts**
+
+The same precedent-cost logic applies whenever any concession is granted that other parties might reasonably expect to be extended again.
+
+**Mistake 5: Assuming strategic judgment is complete once all nine models are individually memorized**
+
+Genuine strategic judgment is the ability to recognize which combination applies to a novel, real situation — a skill built through practice, not memorization alone.
 
 ---
+
 
 ## Mental Model: The Strategic Judgment Radar
 
@@ -125,7 +140,7 @@ Adobe's strategic history offers a useful synthesis example spanning several of 
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Module Synthesis: Advanced Strategic Judgment at Different Company Stages
 
 **Startup:** Early-stage companies typically encounter only a small subset of these nine models as immediately relevant — usually the Strategy Cascade and, once initial B2B traction emerges, the early rungs of the Enterprise Adoption Ladder — since moat durability, M&A integration, and sophisticated concession strategy typically become pressing concerns only once the company has scaled meaningfully.
 
@@ -167,7 +182,7 @@ A thorough strategic investigation moves through this table deliberately, ruling
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"Walk me through how you'd diagnose a company facing several simultaneous, seemingly unrelated business problems."** The interviewer is evaluating whether you approach this as a potentially connected, multi-dimensional problem, checking multiple axes rather than treating each symptom as an isolated issue requiring its own unrelated fix.
 
@@ -197,6 +212,8 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Nine axes: Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, Concession Exchange Map.
 - Don't stop at the first model that fits — run the full Cross-Lesson Strategic Diagnostic Protocol.
 - The models connect: Adoption Ladder ↔ Stakeholder Compass (same process, two angles). Moat Durability → feeds Capability Sourcing. Strategy Cascade → underlies Portfolio Health Grid.
@@ -218,50 +235,56 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 
 ## Further Reading / Resources
 
-1. *Good Strategy Bad Strategy* by Richard Rumelt
-2. *7 Powers* by Hamilton Helmer
-3. *Playing to Win* by A.G. Lafley and Roger Martin
+- Richard Rumelt, *Good Strategy Bad Strategy*
+- Hamilton Helmer, *7 Powers*
+- A.G. Lafley and Roger Martin, *Playing to Win*
 
 ---
 
 ## Flashcards
 
-**Front:** Name all nine Module 8 mental models in the order they were introduced.
-**Back:** Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, Concession Exchange Map.
-**Difficulty:** Medium
-**Tags:** #module-synthesis
+**Card 1**
+- Front: ** Name all nine Module 8 mental models in the order they were introduced.
+- Back: ** Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, Concession Exchange Map.
+- Difficulty: 2
+- Tags: **, module-synthesis
 
-**Front:** What is the Strategic Judgment Radar?
-**Back:** An integrated diagnostic tool assessing a strategic situation across all nine Module 8 dimensions simultaneously, rather than applying one model in isolation.
-**Difficulty:** Easy
-**Tags:** #strategic-judgment-radar
+**Card 2**
+- Front: ** What is the Strategic Judgment Radar?
+- Back: ** An integrated diagnostic tool assessing a strategic situation across all nine Module 8 dimensions simultaneously, rather than applying one model in isolation.
+- Difficulty: 2
+- Tags: **, strategic-judgment-radar
 
-**Front:** How does the Enterprise Adoption Ladder relate to the Stakeholder Compass?
-**Back:** They describe the same B2B adoption process from complementary angles — rungs of organizational progress, and the specific people who gate that progress at each rung.
-**Difficulty:** Medium
-**Tags:** #model-interconnection
+**Card 3**
+- Front: ** How does the Enterprise Adoption Ladder relate to the Stakeholder Compass?
+- Back: ** They describe the same B2B adoption process from complementary angles — rungs of organizational progress, and the specific people who gate that progress at each rung.
+- Difficulty: 2
+- Tags: **, model-interconnection
 
-**Front:** How does the Moat Durability Matrix relate to the Capability Sourcing Matrix?
-**Back:** Genuine competitive differentiation, assessed by the Moat Durability Matrix, is one of the two core axes the Capability Sourcing Matrix uses to recommend Build, Buy, or Partner.
-**Difficulty:** Hard
-**Tags:** #model-interconnection
+**Card 4**
+- Front: ** How does the Moat Durability Matrix relate to the Capability Sourcing Matrix?
+- Back: ** Genuine competitive differentiation, assessed by the Moat Durability Matrix, is one of the two core axes the Capability Sourcing Matrix uses to recommend Build, Buy, or Partner.
+- Difficulty: 2
+- Tags: **, model-interconnection
 
-**Front:** Why did the Multi-Front Strategic Stall case study require more than one model to diagnose correctly?
-**Back:** The true cause was a shared pattern across an unmatched acquisition integration, incomplete stakeholder engagement in stalled accounts, and premature evaluation of a maturing bet — three seemingly unrelated symptoms with one underlying root cause.
-**Difficulty:** Hard
-**Tags:** #case-study #multi-front-stall
+**Card 5**
+- Front: ** Why did the Multi-Front Strategic Stall case study require more than one model to diagnose correctly?
+- Back: ** The true cause was a shared pattern across an unmatched acquisition integration, incomplete stakeholder engagement in stalled accounts, and premature evaluation of a maturing bet — three seemingly unrelated symptoms with one underlying root cause.
+- Difficulty: 2
+- Tags: **, case-study, multi-front-stall
 
-**Front:** What is the risk of applying only the first model that seems to fit a strategic symptom?
-**Back:** Most significant strategic problems involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
-**Difficulty:** Medium
-**Tags:** #diagnostic-discipline
+**Card 6**
+- Front: ** What is the risk of applying only the first model that seems to fit a strategic symptom?
+- Back: ** Most significant strategic problems involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
+- Difficulty: 2
+- Tags: **, diagnostic-discipline
 
-**Front:** What does genuine "advanced strategic judgment" mean, per this synthesis lesson?
-**Back:** The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
-**Difficulty:** Medium
-**Tags:** #strategic-judgment
+**Card 7**
+- Front: ** What does genuine "advanced strategic judgment" mean, per this synthesis lesson?
+- Back: ** The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
+- Difficulty: 2
+- Tags: **, strategic-judgment
 
----
 
 ## Reflection Exercise
 

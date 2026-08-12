@@ -74,13 +74,28 @@ Network effects are frequently treated as the strongest, most unassailable categ
 
 ## Common Beginner Mistakes
 
-1. **Describing any current market leadership position as a "moat" without examining its structural durability.** Being ahead currently is not evidence of a genuine moat, and the two claims should not be conflated.
-2. **Treating network effects as automatically the strongest, most durable moat category.** Network effects are significantly weakened by multi-homing, and their strength depends heavily on the specific competitive context, not the mere presence of a network.
-3. **Assuming a moat, once established, requires no ongoing investment to maintain.** Quadrant B of the Moat Durability Matrix — high replication difficulty but high erosion risk — describes real moats that still require active, ongoing defense rather than passive assumption of permanence.
-4. **Overestimating switching costs from the vendor's own perspective rather than the customer's.** A switching cost that feels significant to the vendor (extensive integration work, customized configuration) may feel much smaller to a customer facing genuine dissatisfaction, particularly if a competitor offers migration assistance.
-5. **Conflating brand recognition with brand trust as a moat.** Widespread awareness of a brand is not the same as customer trust deep enough to resist a comparable competitor's offer, and the two should be evaluated separately.
+**Mistake 1: Describing any current market leadership position as a "moat" without examining its structural durability**
+
+Being ahead currently is not evidence of a genuine moat, and the two claims should not be conflated.
+
+**Mistake 2: Treating network effects as automatically the strongest, most durable moat category**
+
+Network effects are significantly weakened by multi-homing, and their strength depends heavily on the specific competitive context, not the mere presence of a network.
+
+**Mistake 3: Assuming a moat, once established, requires no ongoing investment to maintain**
+
+Quadrant B of the Moat Durability Matrix — high replication difficulty but high erosion risk — describes real moats that still require active, ongoing defense rather than passive assumption of permanence.
+
+**Mistake 4: Overestimating switching costs from the vendor's own perspective rather than the customer's**
+
+A switching cost that feels significant to the vendor (extensive integration work, customized configuration) may feel much smaller to a customer facing genuine dissatisfaction, particularly if a competitor offers migration assistance.
+
+**Mistake 5: Conflating brand recognition with brand trust as a moat**
+
+Widespread awareness of a brand is not the same as customer trust deep enough to resist a comparable competitor's offer, and the two should be evaluated separately.
 
 ---
+
 
 ## Mental Model: The Moat Durability Matrix
 
@@ -102,7 +117,7 @@ Netflix's competitive position in streaming video, and the shifting nature of it
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Competitive Strategy and Moats at Different Company Stages
 
 **Startup:** Early-stage companies typically have no genuine moat at all in the strong sense this lesson describes, and claiming otherwise can create dangerous overconfidence; the honest early-stage strategic priority is usually building toward a genuine moat (a specific switching cost, a proprietary data advantage, an emerging network effect) rather than assuming one already exists.
 
@@ -140,7 +155,7 @@ A moat claim that fails its category's specific diagnostic question should be tr
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you assess whether a company's current market leadership represents a genuine competitive moat?"** The interviewer is evaluating whether you distinguish current advantage from structural durability, and reach for something like the Moat Durability Matrix rather than assuming leadership position alone is sufficient evidence of a moat.
 
@@ -170,6 +185,8 @@ A current market advantage — leadership in usage, revenue, or brand recognitio
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Current advantage ≠ moat. A moat must survive a well-resourced competitor actually trying to replicate it.
 - Moat Durability Matrix: replication difficulty × erosion risk. Only high-difficulty, low-erosion is a genuine, low-maintenance moat.
 - Five moat types: network effects, switching costs, scale economies, brand/trust, proprietary assets.
@@ -192,50 +209,56 @@ A current market advantage — leadership in usage, revenue, or brand recognitio
 
 ## Further Reading / Resources
 
-1. *7 Powers* by Hamilton Helmer
-2. *Competitive Strategy* by Michael Porter
-3. *Platform Revolution* by Geoffrey Parker, Marshall Van Alstyne, and Sangeet Paul Choudary
+- Hamilton Helmer, *7 Powers*
+- Michael Porter, *Competitive Strategy*
+- Geoffrey Parker, Marshall Van Alstyne, and Sangeet Paul Choudary, *Platform Revolution*
 
 ---
 
 ## Flashcards
 
-**Front:** Why is a current market advantage not automatically a competitive moat?
-**Back:** A moat requires structural difficulty of replication, even for well-resourced competitors, not merely an unchallenged lead that hasn't yet been seriously tested.
-**Difficulty:** Easy
-**Tags:** #moats #core-concept
+**Card 1**
+- Front: ** Why is a current market advantage not automatically a competitive moat?
+- Back: ** A moat requires structural difficulty of replication, even for well-resourced competitors, not merely an unchallenged lead that hasn't yet been seriously tested.
+- Difficulty: 2
+- Tags: **, moats, core-concept
 
-**Front:** What are the two dimensions of the Moat Durability Matrix?
-**Back:** Replication difficulty and natural erosion risk.
-**Difficulty:** Easy
-**Tags:** #moat-durability-matrix
+**Card 2**
+- Front: ** What are the two dimensions of the Moat Durability Matrix?
+- Back: ** Replication difficulty and natural erosion risk.
+- Difficulty: 2
+- Tags: **, moat-durability-matrix
 
-**Front:** Name the five common moat categories.
-**Back:** Network effects, switching costs, economies of scale, brand and trust, proprietary assets.
-**Difficulty:** Medium
-**Tags:** #moat-categories
+**Card 3**
+- Front: ** Name the five common moat categories.
+- Back: ** Network effects, switching costs, economies of scale, brand and trust, proprietary assets.
+- Difficulty: 2
+- Tags: **, moat-categories
 
-**Front:** Why are network effects more fragile than commonly assumed?
-**Back:** Multi-homing allows participants to use a competing platform with minimal cost, undermining the "must join the biggest network" logic network effects rely on.
-**Difficulty:** Hard
-**Tags:** #multi-homing #network-effects
+**Card 4**
+- Front: ** Why are network effects more fragile than commonly assumed?
+- Back: ** Multi-homing allows participants to use a competing platform with minimal cost, undermining the "must join the biggest network" logic network effects rely on.
+- Difficulty: 2
+- Tags: **, multi-homing, network-effects
 
-**Front:** What went wrong in the Multi-Homed Marketplace case study?
-**Back:** The incumbent assumed its network effect was a permanent, high-difficulty moat, but low-cost multi-homing allowed a competitor to capture valuable participants without fully displacing the incumbent.
-**Difficulty:** Hard
-**Tags:** #case-study #multi-homing
+**Card 5**
+- Front: ** What went wrong in the Multi-Homed Marketplace case study?
+- Back: ** The incumbent assumed its network effect was a permanent, high-difficulty moat, but low-cost multi-homing allowed a competitor to capture valuable participants without fully displacing the incumbent.
+- Difficulty: 2
+- Tags: **, case-study, multi-homing
 
-**Front:** Why should switching costs be evaluated from the customer's perspective rather than the vendor's?
-**Back:** A switching cost that feels significant to the vendor may feel much smaller to a genuinely dissatisfied customer, especially if a competitor offers migration assistance.
-**Difficulty:** Medium
-**Tags:** #switching-costs
+**Card 6**
+- Front: ** Why should switching costs be evaluated from the customer's perspective rather than the vendor's?
+- Back: ** A switching cost that feels significant to the vendor may feel much smaller to a genuinely dissatisfied customer, especially if a competitor offers migration assistance.
+- Difficulty: 2
+- Tags: **, switching-costs
 
-**Front:** Why is brand recognition distinct from brand trust as a moat?
-**Back:** Awareness of a brand does not guarantee the deep customer confidence needed to resist a comparable competitor's offer; only genuine trust functions as a real moat.
-**Difficulty:** Medium
-**Tags:** #brand-trust
+**Card 7**
+- Front: ** Why is brand recognition distinct from brand trust as a moat?
+- Back: ** Awareness of a brand does not guarantee the deep customer confidence needed to resist a comparable competitor's offer; only genuine trust functions as a real moat.
+- Difficulty: 2
+- Tags: **, brand-trust
 
----
 
 ## Reflection Exercise
 

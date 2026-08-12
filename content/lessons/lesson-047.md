@@ -86,22 +86,28 @@ A recurring, high-stakes stakeholder management situation deserves specific trea
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating every stakeholder identically, regardless of their actual power and interest.**
+**Mistake 1: Treating every stakeholder identically, regardless of their actual power and interest**
+
 As covered in Theory, an executive sponsor and a peripheral, low-interest observer warrant genuinely different communication approaches — a uniform approach either overwhelms low-interest stakeholders or under-serves high-power ones.
 
-**Mistake 2: Treating whatever customer feedback reaches you through sales or support as representative of the whole user base.**
+**Mistake 2: Treating whatever customer feedback reaches you through sales or support as representative of the whole user base**
+
 This is the exact structural bias Lesson 5 and this lesson both address — feedback that reaches a PM through internal channels is filtered by access and volume, not representativeness, and must be actively supplemented with broader research rather than trusted at face value.
 
-**Mistake 3: Telling stakeholders what they want to hear rather than what's actually true.**
+**Mistake 3: Telling stakeholders what they want to hear rather than what's actually true**
+
 This produces short-term comfort at the cost of long-term trust — a stakeholder who discovers, eventually, that they were told a comforting but inaccurate story will trust future communications far less, echoing Lesson 37's Trust Ladder principle that honest communication builds durable trust while its absence erodes it quickly.
 
-**Mistake 4: Delaying difficult news in hopes the situation will resolve itself before a conversation becomes necessary.**
+**Mistake 4: Delaying difficult news in hopes the situation will resolve itself before a conversation becomes necessary**
+
 As covered in Theory, this typically only compounds the damage, since the stakeholder loses valuable time to adjust and may reasonably question how long the information was known before being shared.
 
-**Mistake 5: Defending a decision abstractly without acknowledging its specific impact on the stakeholder receiving the news.**
+**Mistake 5: Defending a decision abstractly without acknowledging its specific impact on the stakeholder receiving the news**
+
 A stakeholder who feels their specific situation wasn't genuinely considered, even if the underlying decision was sound, is far more likely to feel dismissed and less likely to trust future communications, regardless of how well-reasoned the decision actually was.
 
 ---
+
 
 ## Mental Model: The Signal Amplification Map
 
@@ -131,7 +137,7 @@ The underlying principle connects directly to this lesson's Theory: deliberately
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Stakeholder Management at Different Company Stages
 
 **At a startup:**
 Stakeholder management is often informal, with a small number of stakeholders (perhaps a handful of co-founders and early customers) who interact directly and frequently. Structural bias toward customer-channel signal is still a real risk even here — early customers who are unusually vocal or well-connected to the founding team can disproportionately shape early product direction, even in a small, seemingly close-knit environment.
@@ -222,7 +228,7 @@ Stakeholder management is the discipline of navigating relationships and communi
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Power/interest grid | A 2x2 framework classifying stakeholders by influence and engagement level, guiding communication approach | Stakeholder mapping | 1 |
 | Structural bias toward customer-channel signal | The tendency for feedback reaching a PM through sales/support channels to over-represent loud, well-connected customers rather than the broader user base | Signal Amplification Map | 2 |
@@ -242,42 +248,41 @@ Stakeholder management is the discipline of navigating relationships and communi
 ## Flashcards
 
 **Card 1**
-Front: What are the four quadrants of the power/interest grid?
-Back: Manage Closely (high power, high interest), Keep Satisfied (high power, low interest), Keep Informed (low power, high interest), Monitor (low power, low interest).
-Difficulty: 1
-Tags: power-interest-grid
+- Front: What are the four quadrants of the power/interest grid?
+- Back: Manage Closely (high power, high interest), Keep Satisfied (high power, low interest), Keep Informed (low power, high interest), Monitor (low power, low interest).
+- Difficulty: 1
+- Tags: power-interest-grid
 
 **Card 2**
-Front: What is structural bias toward customer-channel signal?
-Back: The tendency for feedback reaching a PM through sales/support channels to over-represent loud, well-connected customers, filtered by access and persistence rather than actual representativeness of the broader user base.
-Difficulty: 2
-Tags: structural-bias
+- Front: What is structural bias toward customer-channel signal?
+- Back: The tendency for feedback reaching a PM through sales/support channels to over-represent loud, well-connected customers, filtered by access and persistence rather than actual representativeness of the broader user base.
+- Difficulty: 2
+- Tags: structural-bias
 
 **Card 3**
-Front: How should a PM counter structural bias toward customer-channel signal, without discarding channel feedback entirely?
-Back: Deliberately supplement it with broader, structured research — surveys, usage data, representative sampling — rather than treating channel-amplified requests as sufficient evidence of broad demand on their own.
-Difficulty: 2
-Tags: countering-bias
+- Front: How should a PM counter structural bias toward customer-channel signal, without discarding channel feedback entirely?
+- Back: Deliberately supplement it with broader, structured research — surveys, usage data, representative sampling — rather than treating channel-amplified requests as sufficient evidence of broad demand on their own.
+- Difficulty: 2
+- Tags: countering-bias
 
 **Card 4**
-Front: What is the most damaging consequence of misjudging a "Keep Satisfied" stakeholder as "Monitor"?
-Back: A high-power, low-day-to-day-interest stakeholder gets blindsided by a surprise, since their low engagement doesn't reduce their high underlying influence.
-Difficulty: 2
-Tags: quadrant-misjudgment
+- Front: What is the most damaging consequence of misjudging a "Keep Satisfied" stakeholder as "Monitor"?
+- Back: A high-power, low-day-to-day-interest stakeholder gets blindsided by a surprise, since their low engagement doesn't reduce their high underlying influence.
+- Difficulty: 2
+- Tags: quadrant-misjudgment
 
 **Card 5**
-Front: What four elements characterize delivering difficult news well, according to this lesson?
-Back: Deliver directly and promptly, explain the reasoning transparently, acknowledge the specific impact on the stakeholder, and offer a concrete alternative or next step where possible.
-Difficulty: 2
-Tags: difficult-news
+- Front: What four elements characterize delivering difficult news well, according to this lesson?
+- Back: Deliver directly and promptly, explain the reasoning transparently, acknowledge the specific impact on the stakeholder, and offer a concrete alternative or next step where possible.
+- Difficulty: 2
+- Tags: difficult-news
 
 **Card 6**
-Front: In the Detailed Case Study, why did the enterprise feature request turn out not to represent broad demand, despite arriving urgently and repeatedly?
-Back: It reached the PM forcefully because it passed through a channel (active sales conversations with a small number of vocal prospects) that amplifies such requests, regardless of how representative they actually are of the broader customer base.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, why did the enterprise feature request turn out not to represent broad demand, despite arriving urgently and repeatedly?
+- Back: It reached the PM forcefully because it passed through a channel (active sales conversations with a small number of vocal prospects) that amplifies such requests, regardless of how representative they actually are of the broader customer base.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

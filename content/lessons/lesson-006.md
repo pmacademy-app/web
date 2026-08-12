@@ -143,22 +143,28 @@ This reframing matters directly for prioritization: a feature that only makes se
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating the first stated request as the job itself.**
+**Mistake 1: Treating the first stated request as the job itself**
+
 "We need offline mode" is a solution, not a job. Stopping the analysis at the first sentence a stakeholder says is the single most common JTBD failure, and it is precisely the failure this lesson's laddering technique exists to prevent.
 
-**Mistake 2: Confusing a persona with a job.**
+**Mistake 2: Confusing a persona with a job**
+
 "Our user is a 35-year-old marketing manager" describes a demographic, not a job. The same marketing manager may be hiring your product for entirely different jobs on a Monday morning (planning a campaign calendar) versus a Friday afternoon (quickly checking whether a report is ready before a client call) — and a single persona description flattens this into one undifferentiated profile.
 
-**Mistake 3: Assuming the job is purely functional.**
+**Mistake 3: Assuming the job is purely functional**
+
 Ignoring the emotional and social dimensions of a job (how the person wants to feel or be perceived) frequently produces a functionally competent but commercially underperforming solution, especially in categories where status, confidence, or belonging matter alongside the practical task.
 
-**Mistake 4: Benchmarking only against named competitors.**
+**Mistake 4: Benchmarking only against named competitors**
+
 Focusing exclusively on feature parity with a known rival product, while ignoring the much larger population of people solving the job through an informal workaround or not solving it at all, causes teams to miss the biggest available growth opportunity — converting non-consumption.
 
-**Mistake 5: Laddering endlessly until the "why" becomes meaningless.**
+**Mistake 5: Laddering endlessly until the "why" becomes meaningless**
+
 It is possible to ladder too far — asking "why" so many times that you arrive at something so abstract ("I want to be happy") that it no longer usefully constrains solution design. The correct stopping point is the most specific level of explanation that would remain stable across multiple possible solutions, not the most abstract level imaginable.
 
 ---
+
 
 ## Mental Model: The Job Ladder
 
@@ -214,7 +220,7 @@ Use the Job Ladder as a checkpoint, not a one-time exercise: every time a stakeh
 
 ---
 
-## Real World Perspective: JTBD at Different Company Stages
+## Real World Perspective: Jobs To Be Done at Different Company Stages
 
 **At a startup:**
 JTBD is often used at its most foundational level — determining whether a job is real, painful, and currently poorly served enough to justify building a product around it at all. Early-stage teams frequently conduct direct "switch interviews" (detailed conversations about the moment someone adopted, or considered adopting, a new solution) to understand the forces that pushed them away from their old approach and pulled them toward a new one. At this stage, JTBD is a discovery tool for validating that a market exists before committing meaningful engineering time.
@@ -416,7 +422,6 @@ Jobs to Be Done reframes every stakeholder request — from users, customers, or
 - Difficulty: 3
 - Tags: laddering, stopping-point
 
----
 
 ## Reflection Exercise
 

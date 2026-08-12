@@ -86,22 +86,28 @@ A PM who only reaches out to a peer team when they need something specific — n
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Waiting to disclose bad news until it's fully resolved, hoping to present only good outcomes.**
+**Mistake 1: Waiting to disclose bad news until it's fully resolved, hoping to present only good outcomes**
+
 As covered in Theory, this risks a manager learning about the underlying problem from someone else, or learning that it existed for longer than they were told, both of which damage trust more than the original bad news itself would have.
 
-**Mistake 2: Communicating with a manager in whatever style feels most natural to the PM, rather than adapting to the manager's actual preferences.**
+**Mistake 2: Communicating with a manager in whatever style feels most natural to the PM, rather than adapting to the manager's actual preferences**
+
 A detail-oriented PM working for a manager who strongly prefers high-altitude summaries (or vice versa) creates friction that has nothing to do with the substance of the work, simply because the communication format doesn't match the manager's actual needs.
 
-**Mistake 3: Only engaging with peer teams transactionally, when something specific is needed.**
+**Mistake 3: Only engaging with peer teams transactionally, when something specific is needed**
+
 As covered in Theory, this produces a one-sided relationship pattern that peers reasonably notice, making future requests less likely to succeed than they would be with a peer relationship maintained through ongoing, non-transactional investment.
 
-**Mistake 4: Assuming a manager's working style preferences are fixed and identical to a previous manager's.**
+**Mistake 4: Assuming a manager's working style preferences are fixed and identical to a previous manager's**
+
 A PM moving to a new manager, or a manager changing roles, should actively re-assess working style preferences rather than assuming continuity — applying an old manager's preferred style to a new manager risks the exact mismatch Mistake 2 describes.
 
-**Mistake 5: Treating managing up as flattery or telling a manager only what they want to hear.**
+**Mistake 5: Treating managing up as flattery or telling a manager only what they want to hear**
+
 This confuses managing up with ingratiation — genuine managing up is about ensuring accurate, timely, well-adapted communication, including uncomfortable information, not about curating an artificially positive picture that will eventually be contradicted by reality.
 
 ---
+
 
 ## Mental Model: The Manager Operating Manual
 
@@ -130,7 +136,7 @@ The underlying principle connects directly to this lesson's Theory: publicly ava
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Managing Up and Across at Different Company Stages
 
 **At a startup:**
 Managing up is often less formal, since a PM may work in close daily proximity to their manager (frequently a founder), with natural, frequent informal communication reducing the risk of significant surprises simply through sheer contact frequency. The habits from this lesson are still valuable to build early, even if the immediate stakes feel lower at this scale.
@@ -221,7 +227,7 @@ Managing up and managing across are the ongoing, ambient relationship discipline
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | No surprises principle | Proactively disclosing risks and bad news to a manager as soon as reasonably known, rather than waiting for full resolution | Managing up | 1 |
 | Managing up | The deliberate, ongoing practice of ensuring a manager has the information and communication style they need | No surprises principle | 1 |
@@ -241,42 +247,41 @@ Managing up and managing across are the ongoing, ambient relationship discipline
 ## Flashcards
 
 **Card 1**
-Front: What is the "no surprises" principle?
-Back: Proactively disclosing risks and bad news to a manager as soon as they're known with reasonable confidence, rather than waiting until the situation is fully resolved.
-Difficulty: 1
-Tags: no-surprises
+- Front: What is the "no surprises" principle?
+- Back: Proactively disclosing risks and bad news to a manager as soon as they're known with reasonable confidence, rather than waiting until the situation is fully resolved.
+- Difficulty: 1
+- Tags: no-surprises
 
 **Card 2**
-Front: Why does a manager learning about a problem from someone else damage trust more than the bad news itself?
-Back: It signals a gap between what the PM knew and what they shared, making the manager reasonably wonder what else might be similarly withheld — the surprise itself, not the underlying news, is what erodes trust.
-Difficulty: 2
-Tags: surprise-vs-bad-news
+- Front: Why does a manager learning about a problem from someone else damage trust more than the bad news itself?
+- Back: It signals a gap between what the PM knew and what they shared, making the manager reasonably wonder what else might be similarly withheld — the surprise itself, not the underlying news, is what erodes trust.
+- Difficulty: 2
+- Tags: surprise-vs-bad-news
 
 **Card 3**
-Front: What four dimensions does the Working Styles Matrix use to assess a manager's preferences?
-Back: Detail level, format (written vs. verbal), involvement (consulted early vs. delegated), and timing (scheduled vs. ongoing).
-Difficulty: 2
-Tags: working-styles-matrix
+- Front: What four dimensions does the Working Styles Matrix use to assess a manager's preferences?
+- Back: Detail level, format (written vs. verbal), involvement (consulted early vs. delegated), and timing (scheduled vs. ongoing).
+- Difficulty: 2
+- Tags: working-styles-matrix
 
 **Card 4**
-Front: What's the difference between managing up and managing across?
-Back: Managing up is the ongoing relationship discipline with one's own manager; managing across is the ongoing, deliberate maintenance of peer relationships, independent of any specific immediate request.
-Difficulty: 1
-Tags: up-vs-across
+- Front: What's the difference between managing up and managing across?
+- Back: Managing up is the ongoing relationship discipline with one's own manager; managing across is the ongoing, deliberate maintenance of peer relationships, independent of any specific immediate request.
+- Difficulty: 1
+- Tags: up-vs-across
 
 **Card 5**
-Front: Why does purely transactional peer engagement (only reaching out when something is needed) tend to backfire?
-Back: It produces a one-sided relationship pattern peers reasonably notice, making future specific requests less likely to succeed than they would be with a relationship maintained through ongoing, non-transactional investment.
-Difficulty: 2
-Tags: transactional-engagement
+- Front: Why does purely transactional peer engagement (only reaching out when something is needed) tend to backfire?
+- Back: It produces a one-sided relationship pattern peers reasonably notice, making future specific requests less likely to succeed than they would be with a relationship maintained through ongoing, non-transactional investment.
+- Difficulty: 2
+- Tags: transactional-engagement
 
 **Card 6**
-Front: In the Detailed Case Study, what was the actual root cause of the trust damage, as opposed to the launch delay itself?
-Back: The manager learned about the delay risk from another executive in a public leadership review, rather than from the PM directly and early — the surprise, not the underlying delay (which was outside the PM's direct control), caused the trust damage.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what was the actual root cause of the trust damage, as opposed to the launch delay itself?
+- Back: The manager learned about the delay risk from another executive in a public leadership review, rather than from the PM directly and early — the surprise, not the underlying delay (which was outside the PM's direct control), caused the trust damage.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

@@ -89,22 +89,28 @@ A second, frequently overlooked factor is **viral cycle time** — how long it t
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Calling any acquisition mechanism a "growth loop" regardless of whether it actually reinvests output as new input.**
+**Mistake 1: Calling any acquisition mechanism a "growth loop" regardless of whether it actually reinvests output as new input**
+
 As covered in Theory, a mechanism without a genuine reinvestment step — output flowing back into new input — is a funnel or a one-time channel, not a loop, and analyzing it with loop-specific tools like K-factor is a category error.
 
-**Mistake 2: Believing K > 1 alone guarantees successful, sustained growth.**
+**Mistake 2: Believing K > 1 alone guarantees successful, sustained growth**
+
 A loop with K just above 1 but a very long cycle time may compound so slowly that it's practically indistinguishable from no growth at all over any reasonable planning horizon — K and cycle time must both be considered together.
 
-**Mistake 3: Ignoring retention's effect on a loop's sustainability.**
+**Mistake 3: Ignoring retention's effect on a loop's sustainability**
+
 A viral loop's new users must themselves stick around long enough (Lesson 44) to actually complete another cycle and send their own invites; a loop feeding into a product with poor retention will see its effective compounding rate collapse regardless of how the initial K-factor was calculated, since churned users can't generate the next cycle.
 
-**Mistake 4: Assuming a loop that worked well at small scale will continue to work identically at large scale.**
+**Mistake 4: Assuming a loop that worked well at small scale will continue to work identically at large scale**
+
 Viral loops frequently experience **saturation** — as a loop reaches an increasingly large share of the addressable population, the pool of not-yet-reached potential new users shrinks, mechanically reducing the effective conversion rate of invites over time, even if nothing about the loop's underlying design has changed.
 
-**Mistake 5: Optimizing K-factor through low-quality, spammy invite mechanics.**
+**Mistake 5: Optimizing K-factor through low-quality, spammy invite mechanics**
+
 An invite mechanism engineered aggressively to maximize invites-sent-per-user, without regard for genuine value to the person receiving the invite, tends to produce low invite-conversion rates and can actively damage a product's reputation — echoing Lesson 41's Goodhart's Law caution, since optimizing the K-factor formula's inputs directly, without regard for the underlying user experience, can degrade the very thing the metric was meant to represent.
 
 ---
+
 
 ## Mental Model: The Loop vs. Funnel Test
 
@@ -133,7 +139,7 @@ The underlying principle connects directly to this lesson's Theory: this is a ge
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Growth Loops & Virality at Different Company Stages
 
 **At a startup:**
 Growth loops are often aspirational rather than measured — a team may design a referral mechanism hoping it becomes viral, without yet having enough data to calculate a reliable K-factor. The risk here is Mistake 1's mirror image: treating an unproven, hoped-for loop as though its viral status were already confirmed, when in reality it may still be underperforming as a funnel-like, non-compounding channel.
@@ -224,7 +230,7 @@ A growth loop is structurally distinct from a funnel: where a funnel is linear, 
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Growth loop | A growth mechanism where the output of one cycle becomes new input to the same cycle, enabling compounding growth | Funnel (Lesson 43) | 1 |
 | Viral coefficient (K-factor) | Invites sent per user multiplied by the conversion rate of those invites into new users | Viral cycle time | 1 |
@@ -245,48 +251,47 @@ A growth loop is structurally distinct from a funnel: where a funnel is linear, 
 ## Flashcards
 
 **Card 1**
-Front: What structurally distinguishes a growth loop from a funnel?
-Back: A loop reinvests the output of one cycle as new input to the same cycle, creating compounding potential; a funnel is linear with no such reinvestment step.
-Difficulty: 1
-Tags: loop-vs-funnel
+- Front: What structurally distinguishes a growth loop from a funnel?
+- Back: A loop reinvests the output of one cycle as new input to the same cycle, creating compounding potential; a funnel is linear with no such reinvestment step.
+- Difficulty: 1
+- Tags: loop-vs-funnel
 
 **Card 2**
-Front: Name the four generic components of any growth loop.
-Back: Input, action, output, and reinvestment (output becoming new input).
-Difficulty: 1
-Tags: loop-components
+- Front: Name the four generic components of any growth loop.
+- Back: Input, action, output, and reinvestment (output becoming new input).
+- Difficulty: 1
+- Tags: loop-components
 
 **Card 3**
-Front: State the formula for the viral coefficient (K-factor).
-Back: K = (invites sent per user) × (conversion rate of invites into new users).
-Difficulty: 1
-Tags: k-factor
+- Front: State the formula for the viral coefficient (K-factor).
+- Back: K = (invites sent per user) × (conversion rate of invites into new users).
+- Difficulty: 1
+- Tags: k-factor
 
 **Card 4**
-Front: What does K > 1 indicate, and what does K < 1 indicate?
-Back: K > 1 indicates a self-sustaining, compounding loop that could grow even without external input; K < 1 indicates a loop that will decay toward zero without continued external input, though it may still add real value.
-Difficulty: 2
-Tags: k-factor-interpretation
+- Front: What does K > 1 indicate, and what does K < 1 indicate?
+- Back: K > 1 indicates a self-sustaining, compounding loop that could grow even without external input; K < 1 indicates a loop that will decay toward zero without continued external input, though it may still add real value.
+- Difficulty: 2
+- Tags: k-factor-interpretation
 
 **Card 5**
-Front: Why can two loops with identical K-factors produce very different growth outcomes?
-Back: Viral cycle time (how long one full cycle takes) also matters — a faster cycle time compounds more quickly than a slower one, even at the same K.
-Difficulty: 2
-Tags: cycle-time
+- Front: Why can two loops with identical K-factors produce very different growth outcomes?
+- Back: Viral cycle time (how long one full cycle takes) also matters — a faster cycle time compounds more quickly than a slower one, even at the same K.
+- Difficulty: 2
+- Tags: cycle-time
 
 **Card 6**
-Front: In the Detailed Case Study, what critical verification had the team skipped?
-Back: They had never measured whether referred users themselves went on to refer additional users at a meaningful rate — the reinvestment step was assumed, not verified, revealing the true multi-generational K-factor was below 1.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what critical verification had the team skipped?
+- Back: They had never measured whether referred users themselves went on to refer additional users at a meaningful rate — the reinvestment step was assumed, not verified, revealing the true multi-generational K-factor was below 1.
+- Difficulty: 2
+- Tags: case-study
 
 **Card 7**
-Front: What is loop "saturation," and why does it happen?
-Back: The mechanical reduction in a loop's effective conversion rate as it reaches an increasingly large share of the addressable population, shrinking the pool of not-yet-reached potential new users over time.
-Difficulty: 2
-Tags: saturation
+- Front: What is loop "saturation," and why does it happen?
+- Back: The mechanical reduction in a loop's effective conversion rate as it reaches an increasingly large share of the addressable population, shrinking the pool of not-yet-reached potential new users over time.
+- Difficulty: 2
+- Tags: saturation
 
----
 
 ## Reflection Exercise
 

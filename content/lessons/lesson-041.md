@@ -12,7 +12,7 @@ This lesson matters because metrics are simultaneously one of a PM's most powerf
 
 | Field | Detail |
 |---|---|
-| **Module** | 5 — Metrics, Experimentation & Growth (opening lesson) |
+| **Module** | 5 — Metrics, Experimentation & Growth |
 | **Current Lesson** | 41 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
@@ -152,22 +152,28 @@ A final, essential caution: two metrics moving together does not establish that 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Using an informal, spoken-language metric definition instead of a precise, written one.**
+**Mistake 1: Using an informal, spoken-language metric definition instead of a precise, written one**
+
 As covered in Theory, this is precisely the failure illustrated in Lesson 40's Case Study — informally "understood" definitions frequently turn out, on closer inspection, to differ meaningfully between the people who believed they agreed on them.
 
-**Mistake 2: Tracking a metric primarily because it's easy to measure and always trends upward.**
+**Mistake 2: Tracking a metric primarily because it's easy to measure and always trends upward**
+
 Cumulative totals (total signups, total downloads) are appealing because they're simple and rarely go down, but this property is exactly what makes them poor vanity metrics — their upward trend provides false reassurance regardless of underlying business health.
 
-**Mistake 3: Building a dashboard entirely of lagging indicators, with no leading indicators.**
+**Mistake 3: Building a dashboard entirely of lagging indicators, with no leading indicators**
+
 This leaves a team unable to course-correct early, since by the time a lagging indicator (like quarterly churn) moves, the underlying behavior that caused it happened weeks or months earlier and can no longer be directly addressed for that cohort.
 
-**Mistake 4: Setting a single metric as a hard target without any guardrail metrics.**
+**Mistake 4: Setting a single metric as a hard target without any guardrail metrics**
+
 As covered in Theory, this invites Goodhart's Law dynamics — optimizing the metric itself at the expense of the outcome it was meant to represent, often invisibly, unless a guardrail metric is specifically designed to catch the most likely gaming behavior.
 
-**Mistake 5: Concluding causation from a simple correlation between two metrics.**
+**Mistake 5: Concluding causation from a simple correlation between two metrics**
+
 Assuming a feature causes better retention simply because its users retain better, without considering confounding variables or reverse causation, is one of the most common and consequential reasoning errors in product metrics work.
 
 ---
+
 
 ## Mental Model: The Metric Definition Test
 
@@ -228,7 +234,7 @@ The underlying principle connects directly to this lesson's Theory: for a produc
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Product Metrics Fundamentals at Different Company Stages
 
 **At a startup:**
 Metrics discipline is often informal, and the risk of vanity metrics is especially high, since early-stage teams are often eager to show any positive trend to investors or early stakeholders — total signups and total downloads are tempting to highlight precisely because they almost always look good, even when underlying engagement is weak. The discipline this lesson teaches is arguably most valuable here, before bad metric habits become entrenched.
@@ -320,7 +326,7 @@ This lesson establishes the definitional discipline that every subsequent Module
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Vanity Metric | A metric that looks encouraging and trends upward over time (such as cumulative signups) without indicating actionable product feedback or testing a clear hypothesis. | Actionable metric | 1 |
 | Actionable metric | A metric tied to a specific behavior a team could change, whose unexpected movement suggests where to investigate | Vanity metric | 1 |
@@ -343,48 +349,47 @@ This lesson establishes the definitional discipline that every subsequent Module
 ## Flashcards
 
 **Card 1**
-Front: What three things must a precise metric definition specify?
-Back: Exactly what counts, what time window applies, and what data source is authoritative.
-Difficulty: 1
-Tags: metric-definition
+- Front: What three things must a precise metric definition specify?
+- Back: Exactly what counts, what time window applies, and what data source is authoritative.
+- Difficulty: 1
+- Tags: metric-definition
 
 **Card 2**
-Front: What is the key test for distinguishing a vanity metric from an actionable one?
-Back: If this metric moved unexpectedly, would you know roughly where to look and what decision it might inform? If no, it's likely a vanity metric.
-Difficulty: 1
-Tags: vanity-vs-actionable
+- Front: What is the key test for distinguishing a vanity metric from an actionable one?
+- Back: If this metric moved unexpectedly, would you know roughly where to look and what decision it might inform? If no, it's likely a vanity metric.
+- Difficulty: 1
+- Tags: vanity-vs-actionable
 
 **Card 3**
-Front: What's the difference between a leading and a lagging indicator?
-Back: A leading indicator measures an earlier behavior predicting future outcomes; a lagging indicator measures an outcome that has already occurred.
-Difficulty: 2
-Tags: leading-lagging
+- Front: What's the difference between a leading and a lagging indicator?
+- Back: A leading indicator measures an earlier behavior predicting future outcomes; a lagging indicator measures an outcome that has already occurred.
+- Difficulty: 2
+- Tags: leading-lagging
 
 **Card 4**
-Front: State Goodhart's Law.
-Back: When a measure becomes a target, it ceases to be a good measure — people optimize for the metric itself rather than the underlying outcome it was meant to represent.
-Difficulty: 2
-Tags: goodharts-law
+- Front: State Goodhart's Law.
+- Back: When a measure becomes a target, it ceases to be a good measure — people optimize for the metric itself rather than the underlying outcome it was meant to represent.
+- Difficulty: 2
+- Tags: goodharts-law
 
 **Card 5**
-Front: What is a guardrail metric, and why is it needed alongside a target metric?
-Back: A secondary metric tracked specifically to catch a target metric's most predictable form of gaming, defending against Goodhart's Law dynamics.
-Difficulty: 2
-Tags: guardrail-metric
+- Front: What is a guardrail metric, and why is it needed alongside a target metric?
+- Back: A secondary metric tracked specifically to catch a target metric's most predictable form of gaming, defending against Goodhart's Law dynamics.
+- Difficulty: 2
+- Tags: guardrail-metric
 
 **Card 6**
-Front: Why doesn't correlation between two metrics establish causation?
-Back: A confounding variable may independently drive both metrics (or reverse causation may be at play), creating a false appearance of direct causation that typically requires a controlled experiment to rule out.
-Difficulty: 2
-Tags: correlation-causation
+- Front: Why doesn't correlation between two metrics establish causation?
+- Back: A confounding variable may independently drive both metrics (or reverse causation may be at play), creating a false appearance of direct causation that typically requires a controlled experiment to rule out.
+- Difficulty: 2
+- Tags: correlation-causation
 
 **Card 7**
-Front: In the Detailed Case Study, what specific behavior change caused the support metric to improve while satisfaction declined?
-Back: Agents began sending quick, low-effort acknowledgment replies to satisfy the "time to first response" metric, while genuine issue resolution was frequently delayed far longer than before.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what specific behavior change caused the support metric to improve while satisfaction declined?
+- Back: Agents began sending quick, low-effort acknowledgment replies to satisfy the "time to first response" metric, while genuine issue resolution was frequently delayed far longer than before.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

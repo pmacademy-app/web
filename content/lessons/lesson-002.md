@@ -79,18 +79,23 @@ A **product** (or a product team responsible for it) is typically funded on an o
 ## Common Beginner Mistakes
 
 **Mistake 1: "The redesign project is done, so my job here is done."**
+
 A new PM ships a redesign, closes out the project plan, and moves fully on to the next initiative without measuring what the redesign actually did to user behavior. The project (the redesign) is indeed done. The product's need for that redesign to actually work is not something a completed project checklist can confirm — only outcome measurement (Module 4) can.
 
-**Mistake 2: Treating the roadmap like a fixed project plan.**
+**Mistake 2: Treating the roadmap like a fixed project plan**
+
 Some new PMs present their roadmap the way a project manager presents a Gantt chart: fixed dates, fixed scope, "we will deliver X by Q3." Because products are shaped by continuous learning (new user research, new data, new competitive moves), a roadmap that cannot flex when new evidence arrives will either be broken by reality or will be defended past the point where it still makes sense — both bad outcomes. We will return to this directly in Lesson 41 (Roadmaps).
 
 **Mistake 3: Confusing "project complete" with "problem solved."**
+
 Because a project has a clean finish line, it is emotionally satisfying to treat its completion as evidence of success. But a project can be completed exactly as scoped and still fail to solve the underlying user problem — this is precisely the risk flagged in Lesson 1's Case Study, where four features shipped (four projects completed) without moving the product's actual outcome.
 
-**Mistake 4: Believing a "project mindset" is simply wrong and should be avoided entirely.**
+**Mistake 4: Believing a "project mindset" is simply wrong and should be avoided entirely**
+
 This is an overcorrection. Projects remain a legitimate and necessary way to organize discrete chunks of work with real deadlines (a compliance deadline, a partner integration commitment, a conference launch). The mistake is not using project thinking at all — it's applying *project-style finality* to the *product itself*, rather than to the individual, bounded pieces of work that make up its ongoing life.
 
 ---
+
 
 ## Mental Model: The River and the Bridge
 
@@ -154,7 +159,7 @@ Within that single ongoing product, Amazon has run countless discrete *projects*
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Product vs. Project at Different Company Stages
 
 **At a startup:** The line between "product" and "project" is often blurry by necessity, because the entire company may be organized around a single upcoming launch (a project) that effectively *is* the product's current existence. Early-stage PMs frequently operate almost entirely in project mode — ship the MVP, ship the next milestone — because the product hasn't yet reached a stage of ongoing, multi-team parallel evolution. This is appropriate at this stage, but the PM should recognize it as a temporary condition, not the permanent shape of the job.
 
@@ -266,6 +271,8 @@ A project is a temporary endeavor with a defined scope and a genuine finish line
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - **Project:** temporary, defined scope, genuine finish line, evaluated on delivery.
 - **Product:** ongoing, evolving, no natural finish line, evaluated on outcomes over time.
 - **Relationship:** a product is delivered through a sequence of projects (River and Bridge).
@@ -327,7 +334,6 @@ A project is a temporary endeavor with a defined scope and a genuine finish line
 - Difficulty: 2
 - Tags: framework, finite-infinite
 
----
 
 ## Reflection Exercise
 

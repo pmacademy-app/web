@@ -72,14 +72,20 @@ Nobody wakes up one day and decides to stop exercising judgment. The shift this 
 
 ## Common Beginner Mistakes
 
-1. **Treating AI-generated drafts as finished outputs rather than inputs requiring human judgment.**
-2. **Shifting time toward automatable execution tasks while under-investing in irreducibly human judgment work.**
-3. **Assuming a fluent, polished AI output is automatically correct, mistaking polish for accuracy.**
-4. **Using AI tools to avoid, rather than inform, a genuinely difficult stakeholder conversation or ethical tradeoff.**
-5. **Failing to recognize that accountability for an outcome doesn't diminish just because a tool assisted in producing the artifact behind it.**
-6. **Treating a polished AI output's coherence as evidence that independent re-derivation would be redundant, when the tool never had visibility into the specific context that judgment required.**
+**Mistake 1: Treating AI-generated drafts as finished outputs rather than inputs requiring human judgment**
+
+**Mistake 2: Shifting time toward automatable execution tasks while under-investing in irreducibly human judgment work**
+
+**Mistake 3: Assuming a fluent, polished AI output is automatically correct, mistaking polish for accuracy**
+
+**Mistake 4: Using AI tools to avoid, rather than inform, a genuinely difficult stakeholder conversation or ethical tradeoff**
+
+**Mistake 5: Failing to recognize that accountability for an outcome doesn't diminish just because a tool assisted in producing the artifact behind it**
+
+**Mistake 6: Treating a polished AI output's coherence as evidence that independent re-derivation would be redundant, when the tool never had visibility into the specific context that judgment required**
 
 ---
+
 
 ## Mental Model: The PM Judgment Reserve
 
@@ -95,7 +101,7 @@ Linear's product and engineering culture, including publicized emphasis on small
 
 ---
 
-## Real World Perspective
+## Real World Perspective: The Future of Product Management at Different Company Stages
 
 **At a startup:** Early-stage PMs, often the only PM at the company, face the most acute pressure to delegate execution tasks to AI tools simply due to limited time, making deliberate protection of Judgment Reserve time especially important. Paradoxically, this is also the stage where the cost of misapplied judgment is often highest relative to the company's resources — a solo PM has no second reviewer to catch a strategic misweighting before it reaches the founders or an investor, unlike a PM embedded in a larger organization with more built-in review.
 
@@ -165,6 +171,9 @@ AI tools' growing capability at drafting and synthesis tasks doesn't eliminate t
 ---
 
 ## Cheat Sheet
+
+*A two-minute review of everything in this lesson.*
+
 - Judgment Reserve: trust-building, ethics, ambiguous prioritization — durably human.
 - AI drafts are inputs, not finished outputs. Review, don't just accept.
 - Polish ≠ correctness.
@@ -185,45 +194,50 @@ AI tools' growing capability at drafting and synthesis tasks doesn't eliminate t
 ---
 
 ## Further Reading / Resources
-1. *Empowered* by Marty Cagan and Chris Jones
-2. *The Alignment Problem* by Brian Christian
-3. *Thinking, Fast and Slow* by Daniel Kahneman
+- Marty Cagan and Chris Jones, *Empowered*
+- Brian Christian, *The Alignment Problem*
+- Daniel Kahneman, *Thinking, Fast and Slow*
 
 ---
 
 ## Flashcards
 
-**Front:** Why doesn't AI capability at drafting eliminate the need for PM judgment?
-**Back:** A tool can produce a fluent, polished draft while missing exactly the accountability and context-dependent judgment call that made the task worth doing.
-**Difficulty:** Easy
-**Tags:** #future-of-pm
+**Card 1**
+- Front: ** Why doesn't AI capability at drafting eliminate the need for PM judgment?
+- Back: ** A tool can produce a fluent, polished draft while missing exactly the accountability and context-dependent judgment call that made the task worth doing.
+- Difficulty: 2
+- Tags: **, future-of-pm
 
-**Front:** What are the four quadrants of the PM Judgment Reserve model?
-**Back:** Execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, judgment/irreducibly human.
-**Difficulty:** Medium
-**Tags:** #judgment-reserve
+**Card 2**
+- Front: ** What are the four quadrants of the PM Judgment Reserve model?
+- Back: ** Execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, judgment/irreducibly human.
+- Difficulty: 2
+- Tags: **, judgment-reserve
 
-**Front:** Why is polish not the same as correctness?
-**Back:** A fluent, well-organized AI output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment because it already looks finished.
-**Difficulty:** Medium
-**Tags:** #polish-vs-correctness
+**Card 3**
+- Front: ** Why is polish not the same as correctness?
+- Back: ** A fluent, well-organized AI output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment because it already looks finished.
+- Difficulty: 2
+- Tags: **, polish-vs-correctness
 
-**Front:** What went wrong in the Unreviewed Roadmap case study?
-**Back:** An AI-generated roadmap weighted feedback by raw frequency, missing a low-volume but high-stakes enterprise concern the PM would ordinarily have caught through direct judgment.
-**Difficulty:** Hard
-**Tags:** #case-study
+**Card 4**
+- Front: ** What went wrong in the Unreviewed Roadmap case study?
+- Back: ** An AI-generated roadmap weighted feedback by raw frequency, missing a low-volume but high-stakes enterprise concern the PM would ordinarily have caught through direct judgment.
+- Difficulty: 2
+- Tags: **, case-study
 
-**Front:** Why is judgment-reserve erosion gradual and hard to notice from the inside?
-**Back:** It happens through a series of individually reasonable, small time-saving deferrals rather than one obvious moment of abdication — the same gradual-accumulation dynamic as Lesson 88's coherence overextension.
-**Difficulty:** Hard
-**Tags:** #judgment-erosion
+**Card 5**
+- Front: ** Why is judgment-reserve erosion gradual and hard to notice from the inside?
+- Back: ** It happens through a series of individually reasonable, small time-saving deferrals rather than one obvious moment of abdication — the same gradual-accumulation dynamic as Lesson 88's coherence overextension.
+- Difficulty: 2
+- Tags: **, judgment-erosion
 
-**Front:** What is the "felt-redundancy trap" described in the Unreviewed Roadmap case study?
-**Back:** The mistaken sense that re-deriving a judgment independently is unnecessary because a tool's output already looks thorough — misleading because the tool never had visibility into the specific strategic context that judgment required.
-**Difficulty:** Hard
-**Tags:** #case-study #judgment-reserve
+**Card 6**
+- Front: ** What is the "felt-redundancy trap" described in the Unreviewed Roadmap case study?
+- Back: ** The mistaken sense that re-deriving a judgment independently is unnecessary because a tool's output already looks thorough — misleading because the tool never had visibility into the specific strategic context that judgment required.
+- Difficulty: 2
+- Tags: **, case-study, judgment-reserve
 
----
 
 ## Reflection Exercise
 

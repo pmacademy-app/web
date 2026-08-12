@@ -159,22 +159,28 @@ The most common estimation pitfall is **planning fallacy**: systematically under
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Grooming the entire backlog inside the Sprint Planning meeting itself.**
+**Mistake 1: Grooming the entire backlog inside the Sprint Planning meeting itself**
+
 As covered above, this collapses two workloads (clarifying/splitting/estimating, and forming a coherent Sprint Goal) into one meeting, reliably producing either a rushed session or one that runs far longer than intended.
 
-**Mistake 2: Writing backlog items as technical solutions instead of problems or needs.**
+**Mistake 2: Writing backlog items as technical solutions instead of problems or needs**
+
 An item like "add a Redis cache layer to the search endpoint" violates INVEST's "Negotiable" criterion — it pre-supposes the solution and removes the team's ability to propose a better one. A better-formed version states the underlying need ("search response time is causing measurable user drop-off") and lets engineering propose the technical approach, including a cache layer if that's genuinely the best fix.
 
-**Mistake 3: Committing to Sprint capacity based on optimism rather than historical velocity.**
+**Mistake 3: Committing to Sprint capacity based on optimism rather than historical velocity**
+
 Teams new to Scrum frequently plan each Sprint as if it will be the team's best Sprint ever, ignoring their own established velocity trend. This produces chronic overcommitment, and — worse — chronic overcommitment quietly erodes a team's trust in the Sprint Goal itself, since it becomes an expectation everyone privately assumes won't be met.
 
-**Mistake 4: Having a Definition of Done but no Definition of Ready.**
+**Mistake 4: Having a Definition of Done but no Definition of Ready**
+
 As covered above, this allows poorly-specified items to enter a Sprint, where their ambiguity surfaces as a mid-Sprint surprise rather than being caught during grooming, when it's far cheaper to resolve.
 
-**Mistake 5: Treating any mid-sprint change as either forbidden or trivial, with no middle-ground protocol.**
+**Mistake 5: Treating any mid-sprint change as either forbidden or trivial, with no middle-ground protocol**
+
 This is the exact failure from Lesson 31's Case Study: a PM who treats the sprint plan as untouchable regardless of new evidence. The opposite failure also exists and is just as damaging — a team that re-plans the Sprint casually every time something new comes up, never actually protecting a period of focus. The fix, covered next, is a deliberate middle path.
 
 ---
+
 
 ## Mental Model: The Readiness Gate
 
@@ -237,7 +243,7 @@ The underlying principle connects directly to this lesson's Theory: a culture th
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Sprint Planning & Backlog Grooming at Different Company Stages
 
 **At a startup:**
 Grooming is often informal and conversational — a founder-PM and a handful of engineers might clarify scope in a quick Slack thread rather than a scheduled ceremony. INVEST and a Definition of Ready are still useful as a mental checklist even without formal documentation, and are frequently the difference between a small team shipping smoothly and one that constantly discovers mid-Sprint that "simple" items were actually far more complex than assumed.
@@ -325,7 +331,7 @@ Backlog grooming and Sprint Planning are distinct activities that are frequently
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Backlog grooming (refinement) | The continuous, ongoing activity of clarifying, splitting, and estimating backlog items before they enter Sprint Planning | Definition of Ready, INVEST | 1 |
 | INVEST | A mnemonic (Independent, Negotiable, Valuable, Estimable, Small, Testable) for judging whether a backlog item is well-formed | Definition of Ready | 2 |
@@ -348,48 +354,47 @@ Backlog grooming and Sprint Planning are distinct activities that are frequently
 ## Flashcards
 
 **Card 1**
-Front: What is the key difference between backlog grooming and Sprint Planning?
-Back: Grooming is a continuous, ongoing activity of clarifying/splitting/estimating items; Sprint Planning is a discrete event that selects already-groomed items into a Sprint Backlog around a Sprint Goal.
-Difficulty: 1
-Tags: grooming, sprint-planning
+- Front: What is the key difference between backlog grooming and Sprint Planning?
+- Back: Grooming is a continuous, ongoing activity of clarifying/splitting/estimating items; Sprint Planning is a discrete event that selects already-groomed items into a Sprint Backlog around a Sprint Goal.
+- Difficulty: 1
+- Tags: grooming, sprint-planning
 
 **Card 2**
-Front: What does each letter of INVEST stand for?
-Back: Independent, Negotiable, Valuable, Estimable, Small, Testable.
-Difficulty: 1
-Tags: invest
+- Front: What does each letter of INVEST stand for?
+- Back: Independent, Negotiable, Valuable, Estimable, Small, Testable.
+- Difficulty: 1
+- Tags: invest
 
 **Card 3**
-Front: How does a Definition of Ready relate to a Definition of Done?
-Back: A Definition of Ready guards entry into a Sprint (is this item well-formed enough to plan against?); a Definition of Done guards completion out of it (is this Increment actually finished?). They are complementary, guarding opposite ends of an item's lifecycle.
-Difficulty: 2
-Tags: definition-of-ready, definition-of-done
+- Front: How does a Definition of Ready relate to a Definition of Done?
+- Back: A Definition of Ready guards entry into a Sprint (is this item well-formed enough to plan against?); a Definition of Done guards completion out of it (is this Increment actually finished?). They are complementary, guarding opposite ends of an item's lifecycle.
+- Difficulty: 2
+- Tags: definition-of-ready, definition-of-done
 
 **Card 4**
-Front: What is the recommended formula for capacity-based Sprint planning?
-Back: Sprint Capacity ≈ Historical Velocity × Focus Factor, anchored to actual past performance rather than optimistic best-case estimates.
-Difficulty: 2
-Tags: velocity, capacity
+- Front: What is the recommended formula for capacity-based Sprint planning?
+- Back: Sprint Capacity ≈ Historical Velocity × Focus Factor, anchored to actual past performance rather than optimistic best-case estimates.
+- Difficulty: 2
+- Tags: velocity, capacity
 
 **Card 5**
-Front: Why does writing a backlog item as a technical solution (rather than a problem/need) violate INVEST?
-Back: It violates the "Negotiable" criterion by pre-supposing the solution, removing the team's ability to propose a better technical approach.
-Difficulty: 2
-Tags: invest, negotiable
+- Front: Why does writing a backlog item as a technical solution (rather than a problem/need) violate INVEST?
+- Back: It violates the "Negotiable" criterion by pre-supposing the solution, removing the team's ability to propose a better technical approach.
+- Difficulty: 2
+- Tags: invest, negotiable
 
 **Card 6**
-Front: What two conditions define this lesson's mid-sprint change protocol?
-Back: (1) The new evidence must directly threaten the validity of the Sprint Goal itself, not just a preference about one item; (2) the change and its reasoning must be communicated transparently to stakeholders the same day.
-Difficulty: 2
-Tags: mid-sprint-change, case-study
+- Front: What two conditions define this lesson's mid-sprint change protocol?
+- Back: (1) The new evidence must directly threaten the validity of the Sprint Goal itself, not just a preference about one item; (2) the change and its reasoning must be communicated transparently to stakeholders the same day.
+- Difficulty: 2
+- Tags: mid-sprint-change, case-study
 
 **Card 7**
-Front: If a Sprint Planning meeting consistently runs long and feels chaotic, what is the most likely root cause according to this lesson?
-Back: Insufficient upstream backlog grooming — items are arriving un-estimated, oversized, or unclear, forcing that work to happen live during Planning itself.
-Difficulty: 2
-Tags: diagnosis
+- Front: If a Sprint Planning meeting consistently runs long and feels chaotic, what is the most likely root cause according to this lesson?
+- Back: Insufficient upstream backlog grooming — items are arriving un-estimated, oversized, or unclear, forcing that work to happen live during Planning itself.
+- Difficulty: 2
+- Tags: diagnosis
 
----
 
 ## Reflection Exercise
 

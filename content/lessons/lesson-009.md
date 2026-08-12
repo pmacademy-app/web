@@ -167,22 +167,28 @@ Notice the third branch does not automatically mean "reject the initiative" — 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Writing a vision that is really just an ambitious feature list.**
+**Mistake 1: Writing a vision that is really just an ambitious feature list**
+
 "Our vision is to add AI-powered recommendations, a mobile app, and enterprise SSO" describes a set of features, not a future state — it fails the specificity-about-outcome test, describing means rather than the end they're meant to serve.
 
-**Mistake 2: Writing a vision so generic it could belong to any company.**
+**Mistake 2: Writing a vision so generic it could belong to any company**
+
 "We will empower people to achieve their goals" could be printed on the wall of a fitness app, a productivity tool, a bank, or a shoe company. This fails the specificity test and provides no real filter for any decision.
 
-**Mistake 3: Treating every roadmap change as a sign the vision has failed.**
+**Mistake 3: Treating every roadmap change as a sign the vision has failed**
+
 Roadmaps should change frequently as discovery reveals new information; conflating this healthy, expected iteration with a failure of vision produces unnecessary anxiety and can pressure teams to stick rigidly to a plan that discovery has already shown to be wrong, purely to preserve an illusion of unwavering direction.
 
-**Mistake 4: Assuming a well-communicated, inspiring vision is itself a strategy.**
+**Mistake 4: Assuming a well-communicated, inspiring vision is itself a strategy**
+
 As covered above, a vision describes a destination; it says nothing about the sequenced path to get there. Teams that stop at an inspiring vision statement, without doing the harder work of Lesson 10's strategic sequencing, often experience either paralysis or scattered, uncoordinated activity.
 
-**Mistake 5: Never revisiting the vision at all, even when the market fundamentally changes.**
+**Mistake 5: Never revisiting the vision at all, even when the market fundamentally changes**
+
 While a vision should be more stable than a roadmap, "stable" does not mean "permanent regardless of evidence." A genuinely disruptive market shift, a fundamental new discovery about the underlying job (Lesson 6), or a repeatedly failed strategy despite good execution can be legitimate signals that the vision itself, not just the roadmap, needs to be reconsidered — treating vision as entirely beyond question can be just as damaging as changing it too casually.
 
 ---
+
 
 ## Mental Model: The Altitude Ladder
 
@@ -243,7 +249,7 @@ A large share of unproductive product debates trace back to two people arguing a
 
 ---
 
-## Real World Perspective: Vision at Different Company Stages
+## Real World Perspective: Product Vision at Different Company Stages
 
 **At a startup:**
 A vision is often still being actively discovered and refined alongside the product itself, and founders frequently articulate it more through action and early product decisions than through a single, polished written statement. The primary risk at this stage is usually not "vision without strategy" but the opposite — moving fast tactically (following whatever discovery reveals quarter to quarter) without ever pausing to articulate a stable direction at all, which can make it hard to attract long-term-committed team members or investors who need a "why" beyond the current feature list.
@@ -401,7 +407,6 @@ A product vision describes the future state a product is working toward, typical
 - Difficulty: 3
 - Tags: revisiting-vision
 
----
 
 ## Reflection Exercise
 

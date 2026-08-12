@@ -12,7 +12,7 @@ This lesson matters because PLG has become one of the most discussed, and most f
 
 | Field | Detail |
 |---|---|
-| **Module** | 5 — Metrics, Experimentation & Growth (closing lesson) |
+| **Module** | 5 — Metrics, Experimentation & Growth |
 | **Current Lesson** | 50 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 35 minutes (reading) + 15 minutes (reflection + quiz) |
@@ -98,22 +98,28 @@ graph TD
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Adopting PLG tactics (free trial, freemium tier) without the underlying product prerequisites.**
+**Mistake 1: Adopting PLG tactics (free trial, freemium tier) without the underlying product prerequisites**
+
 As covered in Theory, layering PLG-style tactics onto a product with slow time-to-value, high complexity, or no clear aha moment produces the appearance of a PLG strategy without the structural soundness needed for it to actually work.
 
-**Mistake 2: Believing PLG means eliminating sales entirely.**
+**Mistake 2: Believing PLG means eliminating sales entirely**
+
 As covered in Theory and Lesson 49, many successful PLG companies run a deliberate hybrid, using PQL scoring to direct sales capacity efficiently toward high-intent users rather than eliminating a sales function altogether.
 
-**Mistake 3: Failing to identify a specific, measurable "aha moment," and instead treating activation vaguely.**
+**Mistake 3: Failing to identify a specific, measurable "aha moment," and instead treating activation vaguely**
+
 Without a specific, identified activation signal, a team cannot optimize its funnel (Lesson 43) toward the moment that actually predicts long-term retention, and risks investing effort improving parts of the funnel that don't actually matter for downstream success.
 
-**Mistake 4: Treating PLG as purely a growth/acquisition strategy, ignoring the retention component.**
+**Mistake 4: Treating PLG as purely a growth/acquisition strategy, ignoring the retention component**
+
 A PLG flywheel depends on durable retention (Lesson 44) to sustain referral and expansion — a product driving significant free signups without genuine retention will show impressive top-of-funnel numbers while the flywheel itself fails to spin, since churned users generate neither referrals nor expansion revenue.
 
-**Mistake 5: Applying PLG uniformly across all customer segments, including ones better served by a sales-led motion.**
+**Mistake 5: Applying PLG uniformly across all customer segments, including ones better served by a sales-led motion**
+
 Echoing Lesson 49's motion-fit principle directly: even within a successful PLG company, some segments (very large enterprise accounts with complex needs) may genuinely warrant a sales-led approach, and forcing every segment through the same self-serve motion risks under-serving the customers who need more support.
 
 ---
+
 
 ## Mental Model: The PLG Flywheel
 
@@ -144,7 +150,7 @@ The underlying principle connects directly to this lesson's Theory: Notion's gro
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Product-Led Growth at Different Company Stages
 
 **At a startup:**
 PLG is often an attractive strategy precisely because it requires less upfront sales infrastructure investment, but the risk of Mistake 1 is especially high — a young company eager to grow quickly may adopt PLG tactics without first honestly assessing whether its product actually satisfies the readiness checklist's prerequisites, particularly fast time-to-value and a clear aha moment.
@@ -236,7 +242,7 @@ Product-led growth integrates the funnel discipline from Lesson 43, the retentio
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Product-led growth (PLG) | A strategy where the product itself is the primary driver of acquisition, conversion, retention, and expansion | PLG Flywheel | 1 |
 | PLG readiness checklist | Prerequisites a product must satisfy for PLG to work: fast time-to-value, low complexity, clear aha moment, natural expansion path | Product-led growth | 2 |
@@ -257,42 +263,41 @@ Product-led growth integrates the funnel discipline from Lesson 43, the retentio
 ## Flashcards
 
 **Card 1**
-Front: What three disciplines does product-led growth integrate, per this lesson?
-Back: Funnel discipline (fast, low-friction activation), retention discipline (durable engagement), and growth loop mechanics (genuine reinvestment of users into new users).
-Difficulty: 1
-Tags: plg-integration
+- Front: What three disciplines does product-led growth integrate, per this lesson?
+- Back: Funnel discipline (fast, low-friction activation), retention discipline (durable engagement), and growth loop mechanics (genuine reinvestment of users into new users).
+- Difficulty: 1
+- Tags: plg-integration
 
 **Card 2**
-Front: What are the four prerequisites in the PLG Readiness Checklist?
-Back: Fast time-to-value, low initial complexity, a clear identifiable aha moment, and a natural expansion path.
-Difficulty: 1
-Tags: plg-readiness
+- Front: What are the four prerequisites in the PLG Readiness Checklist?
+- Back: Fast time-to-value, low initial complexity, a clear identifiable aha moment, and a natural expansion path.
+- Difficulty: 1
+- Tags: plg-readiness
 
 **Card 3**
-Front: What is a product-qualified lead (PQL)?
-Back: A free or trial user whose in-product behavior (usage threshold, team invites, feature limit hit) signals strong buying intent or a natural fit for expansion.
-Difficulty: 2
-Tags: pql
+- Front: What is a product-qualified lead (PQL)?
+- Back: A free or trial user whose in-product behavior (usage threshold, team invites, feature limit hit) signals strong buying intent or a natural fit for expansion.
+- Difficulty: 2
+- Tags: pql
 
 **Card 4**
-Front: Why can't PLG tactics (free trial, freemium) fix a product that lacks the underlying readiness prerequisites?
-Back: Tactics accelerate an already-structurally-sound product; they cannot create fast time-to-value or low complexity in a product that is fundamentally complex or slow to deliver value.
-Difficulty: 2
-Tags: tactics-vs-readiness
+- Front: Why can't PLG tactics (free trial, freemium) fix a product that lacks the underlying readiness prerequisites?
+- Back: Tactics accelerate an already-structurally-sound product; they cannot create fast time-to-value or low complexity in a product that is fundamentally complex or slow to deliver value.
+- Difficulty: 2
+- Tags: tactics-vs-readiness
 
 **Card 5**
-Front: What are the five stages of the PLG Flywheel?
-Back: Acquisition, activation, retention, referral, and expansion — each stage's output feeds the next, with expansion revenue funding continued product investment that improves activation.
-Difficulty: 2
-Tags: plg-flywheel
+- Front: What are the five stages of the PLG Flywheel?
+- Back: Acquisition, activation, retention, referral, and expansion — each stage's output feeds the next, with expansion revenue funding continued product investment that improves activation.
+- Difficulty: 2
+- Tags: plg-flywheel
 
 **Card 6**
-Front: In the Detailed Case Study, why did the data-integration product's free trial fail to activate users, despite a well-designed signup flow?
-Back: The product's genuine complexity (multi-source data integration, configuration) meant it lacked fast time-to-value and low initial complexity — two PLG readiness prerequisites — which no amount of surrounding trial polish could fix.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, why did the data-integration product's free trial fail to activate users, despite a well-designed signup flow?
+- Back: The product's genuine complexity (multi-source data integration, configuration) meant it lacked fast time-to-value and low initial complexity — two PLG readiness prerequisites — which no amount of surrounding trial polish could fix.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

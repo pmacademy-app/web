@@ -86,22 +86,28 @@ Effective delegation does not mean simply handing off a decision and disengaging
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Continuing to personally make decisions that should be delegated to reports.**
+**Mistake 1: Continuing to personally make decisions that should be delegated to reports**
+
 As covered in Theory, this is faster in the short term but prevents reports from developing their own judgment and trains the team to escalate decisions rather than resolve them independently — the leader becomes a bottleneck rather than a multiplier.
 
-**Mistake 2: Choosing an organizational structure based on what's familiar or common elsewhere, rather than the specific product's actual architecture and customer base.**
+**Mistake 2: Choosing an organizational structure based on what's familiar or common elsewhere, rather than the specific product's actual architecture and customer base**
+
 As covered in Theory, no structure is universally correct — a structure copied from a well-known company without regard for genuine fit risks the exact coordination friction this lesson's Team Topologies diagnostic addresses.
 
-**Mistake 3: Treating a struggling product organization as purely a leadership/coaching problem, without checking for a structural mismatch.**
+**Mistake 3: Treating a struggling product organization as purely a leadership/coaching problem, without checking for a structural mismatch**
+
 Some organizational dysfunction is genuinely caused by individual leadership gaps, but some is caused by a poor-fit team topology that no amount of individual coaching can fully resolve — misdiagnosing one as the other wastes effort on the wrong fix.
 
-**Mistake 4: Delegating a decision without any guidance, then criticizing the outcome after the fact.**
+**Mistake 4: Delegating a decision without any guidance, then criticizing the outcome after the fact**
+
 Effective delegation requires being explicit about the level of autonomy being granted and the context needed to exercise it well — delegating silently and only providing feedback after a decision has already been made and acted upon undermines a report's ability to succeed and erodes trust.
 
-**Mistake 5: Assuming leadership skill transfers automatically from individual-contributor excellence.**
+**Mistake 5: Assuming leadership skill transfers automatically from individual-contributor excellence**
+
 Being an excellent individual-contributor PM does not automatically make someone a skilled leader of other PMs — the two roles require genuinely different, specifically developed skills, and treating the transition as automatic risks exactly the bottleneck failure this lesson's Case Study illustrates.
 
 ---
+
 
 ## Mental Model: The Leadership Shift
 
@@ -127,7 +133,7 @@ This example requires an important nuance: Spotify itself has publicly clarified
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Building and Leading Product Teams at Different Company Stages
 
 **At a startup:**
 Product organization structure is often minimal by necessity — a single PM or a very small team, with little need for the formal structural choices this lesson covers. The leadership transition covered in this lesson typically hasn't yet arrived at this stage, though the underlying coaching-versus-deciding principle is worth building as a habit even when leading just one or two people for the first time.
@@ -218,7 +224,7 @@ Moving from individual-contributor PM work to leading a team of PMs requires a g
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Stream-aligned team | A team organized around continuous delivery toward a specific customer or business outcome, with broad end-to-end autonomy | Platform team (Team Topologies) | 2 |
 | Platform team | A team providing shared, reusable capabilities that reduce the cognitive load carried by stream-aligned teams | Stream-aligned team | 2 |
@@ -238,42 +244,41 @@ Moving from individual-contributor PM work to leading a team of PMs requires a g
 ## Flashcards
 
 **Card 1**
-Front: What is the core shift required when moving from individual-contributor PM work to leading a team of PMs?
-Back: A shift from personally making decisions to coaching and enabling reports to make good decisions themselves — a leader is evaluated on the team's collective decisions and growth, not their own individual judgment.
-Difficulty: 1
-Tags: leadership-shift
+- Front: What is the core shift required when moving from individual-contributor PM work to leading a team of PMs?
+- Back: A shift from personally making decisions to coaching and enabling reports to make good decisions themselves — a leader is evaluated on the team's collective decisions and growth, not their own individual judgment.
+- Difficulty: 1
+- Tags: leadership-shift
 
 **Card 2**
-Front: What are the three common product organization structures covered in this lesson?
-Back: Functional, platform-based, and customer-segment-based.
-Difficulty: 1
-Tags: org-structures
+- Front: What are the three common product organization structures covered in this lesson?
+- Back: Functional, platform-based, and customer-segment-based.
+- Difficulty: 1
+- Tags: org-structures
 
 **Card 3**
-Front: What is the difference between a stream-aligned team and a platform team, per Team Topologies?
-Back: A stream-aligned team is organized around continuous delivery toward a specific outcome with broad autonomy; a platform team provides shared, reusable capabilities reducing other teams' cognitive load.
-Difficulty: 2
-Tags: team-topologies
+- Front: What is the difference between a stream-aligned team and a platform team, per Team Topologies?
+- Back: A stream-aligned team is organized around continuous delivery toward a specific outcome with broad autonomy; a platform team provides shared, reusable capabilities reducing other teams' cognitive load.
+- Difficulty: 2
+- Tags: team-topologies
 
 **Card 4**
-Front: What is the key coaching practice this lesson recommends when a report brings a decision to a leader?
-Back: Ask what the report themselves would recommend and why, before offering a view — coaching their judgment rather than substituting the leader's own decision.
-Difficulty: 2
-Tags: coaching-practice
+- Front: What is the key coaching practice this lesson recommends when a report brings a decision to a leader?
+- Back: Ask what the report themselves would recommend and why, before offering a view — coaching their judgment rather than substituting the leader's own decision.
+- Difficulty: 2
+- Tags: coaching-practice
 
 **Card 5**
-Front: How does the Structural vs. Individual Diagnostic distinguish the two categories of organizational dysfunction?
-Back: Widespread signals (unclear ownership, duplication across multiple teams) suggest a structural problem; signals concentrated around one specific leader or team suggest an individual leadership problem.
-Difficulty: 2
-Tags: diagnostic
+- Front: How does the Structural vs. Individual Diagnostic distinguish the two categories of organizational dysfunction?
+- Back: Widespread signals (unclear ownership, duplication across multiple teams) suggest a structural problem; signals concentrated around one specific leader or team suggest an individual leadership problem.
+- Difficulty: 2
+- Tags: diagnostic
 
 **Card 6**
-Front: In the Detailed Case Study, why did the leader's own excellent judgment make the bottleneck problem worse, not better?
-Back: Reports had genuine reason to trust the leader's consistently good decisions, reinforcing their habit of escalating rather than developing their own judgment, deepening the bottleneck over time.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, why did the leader's own excellent judgment make the bottleneck problem worse, not better?
+- Back: Reports had genuine reason to trust the leader's consistently good decisions, reinforcing their habit of escalating rather than developing their own judgment, deepening the bottleneck over time.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

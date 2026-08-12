@@ -75,13 +75,28 @@ Many modern privacy regulations grant individuals a **right to deletion** (somet
 
 ## Common Beginner Mistakes
 
-1. **Collecting data broadly on the reasoning that it might be useful for some future, currently unspecified purpose.** This directly conflicts with the data minimization principle and increases liability surface without a currently justified purpose.
-2. **Assuming a contractual data processing agreement alone is sufficient protection when sharing data with a third party.** A contract establishes legal recourse after a failure occurs; it does not technically prevent the failure itself, and additional technical safeguards are often necessary.
-3. **Using data collected for one stated purpose for an unrelated purpose later, without updating disclosure or seeking renewed consent.** This "purpose creep" violates data minimization even when the original collection was legitimate.
-4. **Failing to design a product's data architecture to support locating and deleting a specific individual's data across all systems it has propagated to.** Retrofitting right-to-deletion capability into a system not originally designed for it is considerably more difficult than building it in from the start.
-5. **Treating encryption alone as sufficient security, without also implementing access control based on least privilege.** Encrypted data accessible to anyone within an organization who has a convenient reason to view it still carries meaningful risk, since internal misuse or a compromised internal account can bypass encryption's protection.
+**Mistake 1: Collecting data broadly on the reasoning that it might be useful for some future, currently unspecified purpose**
+
+This directly conflicts with the data minimization principle and increases liability surface without a currently justified purpose.
+
+**Mistake 2: Assuming a contractual data processing agreement alone is sufficient protection when sharing data with a third party**
+
+A contract establishes legal recourse after a failure occurs; it does not technically prevent the failure itself, and additional technical safeguards are often necessary.
+
+**Mistake 3: Using data collected for one stated purpose for an unrelated purpose later, without updating disclosure or seeking renewed consent**
+
+This "purpose creep" violates data minimization even when the original collection was legitimate.
+
+**Mistake 4: Failing to design a product's data architecture to support locating and deleting a specific individual's data across all systems it has propagated to**
+
+Retrofitting right-to-deletion capability into a system not originally designed for it is considerably more difficult than building it in from the start.
+
+**Mistake 5: Treating encryption alone as sufficient security, without also implementing access control based on least privilege**
+
+Encrypted data accessible to anyone within an organization who has a convenient reason to view it still carries meaningful risk, since internal misuse or a compromised internal account can bypass encryption's protection.
 
 ---
+
 
 ## Mental Model: The Data Flow Risk Map
 
@@ -104,7 +119,7 @@ Apple's public positioning around privacy, including features like App Tracking 
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Privacy, Security, and Compliance as Product Constraints at Different Company Stages
 
 **Startup:** Early-stage companies often collect data broadly with minimal governance, reasoning that establishing formal data minimization and access control practices can wait until the company has more resources — a reasonable short-term trade-off in some cases, but one that becomes considerably more expensive to correct once a broad, ungoverned data collection practice has already accumulated significant liability surface.
 
@@ -142,7 +157,7 @@ A "no" on Third-Party Safeguards should be treated as a significant risk, given 
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you decide what data to collect when designing a new feature?"** The interviewer is evaluating whether you apply data minimization directly, collecting only what a specific, currently-active purpose requires, rather than defaulting to broad collection in case it becomes useful later.
 
@@ -172,6 +187,8 @@ Data minimization — collecting only what a specific, currently-active purpose 
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Data minimization: collect only what a current, specific purpose requires. "Might need it later" isn't sufficient justification.
 - Data Flow Risk Map: Collection → Storage → Processing → Sharing. Secure all four stages, not just one.
 - Contracts alone don't prevent third-party security failures. Add technical safeguards too.
@@ -194,50 +211,56 @@ Data minimization — collecting only what a specific, currently-active purpose 
 
 ## Further Reading / Resources
 
-1. *Privacy by Design* principles, as published by the Office of the Information and Privacy Commissioner of Ontario
-2. General Data Protection Regulation (GDPR), official text published by the European Union
-3. *Privacy Engineering* by Michelle Finneran Dennedy, Jonathan Fox, and Thomas Finneran
+- *Privacy by Design* principles, as published by the Office of the Information and Privacy Commissioner of Ontario
+- General Data Protection Regulation (GDPR), official text published by the European Union
+- Michelle Finneran Dennedy, Jonathan Fox, and Thomas Finneran, *Privacy Engineering*
 
 ---
 
 ## Flashcards
 
-**Front:** What is data minimization?
-**Back:** The principle that an organization should collect only data genuinely necessary for a specific, disclosed purpose, and retain it only as long as that purpose requires.
-**Difficulty:** Easy
-**Tags:** #privacy #core-concept
+**Card 1**
+- Front: ** What is data minimization?
+- Back: ** The principle that an organization should collect only data genuinely necessary for a specific, disclosed purpose, and retain it only as long as that purpose requires.
+- Difficulty: 2
+- Tags: **, privacy, core-concept
 
-**Front:** Name the four stages of the Data Flow Risk Map.
-**Back:** Collection, Storage, Processing, Sharing.
-**Difficulty:** Easy
-**Tags:** #data-flow-risk-map
+**Card 2**
+- Front: ** Name the four stages of the Data Flow Risk Map.
+- Back: ** Collection, Storage, Processing, Sharing.
+- Difficulty: 2
+- Tags: **, data-flow-risk-map
 
-**Front:** Why is a contractual data processing agreement insufficient protection on its own?
-**Back:** A contract establishes legal recourse after a third party's security failure but does not technically prevent that failure from occurring in the first place.
-**Difficulty:** Medium
-**Tags:** #third-party-safeguards
+**Card 3**
+- Front: ** Why is a contractual data processing agreement insufficient protection on its own?
+- Back: ** A contract establishes legal recourse after a third party's security failure but does not technically prevent that failure from occurring in the first place.
+- Difficulty: 2
+- Tags: **, third-party-safeguards
 
-**Front:** What is "purpose creep"?
-**Back:** Using data collected for one stated purpose for an unrelated purpose later, without updated disclosure or renewed consent — a minimization violation even on legitimately collected data.
-**Difficulty:** Medium
-**Tags:** #purpose-limitation
+**Card 4**
+- Front: ** What is "purpose creep"?
+- Back: ** Using data collected for one stated purpose for an unrelated purpose later, without updated disclosure or renewed consent — a minimization violation even on legitimately collected data.
+- Difficulty: 2
+- Tags: **, purpose-limitation
 
-**Front:** What went wrong in the Third-Party Data Exposure case study?
-**Back:** The company shared far more health data than its analytics purpose required, relying solely on a contractual agreement with no technical safeguards, leaving it exposed when the third party's own security failed.
-**Difficulty:** Hard
-**Tags:** #case-study #data-flow-risk-map
+**Card 5**
+- Front: ** What went wrong in the Third-Party Data Exposure case study?
+- Back: ** The company shared far more health data than its analytics purpose required, relying solely on a contractual agreement with no technical safeguards, leaving it exposed when the third party's own security failed.
+- Difficulty: 2
+- Tags: **, case-study, data-flow-risk-map
 
-**Front:** Why should right-to-deletion capability be designed in from the outset?
-**Back:** A system not originally built to track where an individual's data has propagated is far harder to retrofit with the ability to locate and delete that data later.
-**Difficulty:** Medium
-**Tags:** #right-to-deletion
+**Card 6**
+- Front: ** Why should right-to-deletion capability be designed in from the outset?
+- Back: ** A system not originally built to track where an individual's data has propagated is far harder to retrofit with the ability to locate and delete that data later.
+- Difficulty: 2
+- Tags: **, right-to-deletion
 
-**Front:** Why is encryption alone insufficient security without access control?
-**Back:** Encrypted data broadly accessible for internal convenience still carries meaningful risk from internal misuse or a compromised internal account bypassing encryption's protection.
-**Difficulty:** Medium
-**Tags:** #access-control
+**Card 7**
+- Front: ** Why is encryption alone insufficient security without access control?
+- Back: ** Encrypted data broadly accessible for internal convenience still carries meaningful risk from internal misuse or a compromised internal account bypassing encryption's protection.
+- Difficulty: 2
+- Tags: **, access-control
 
----
 
 ## Reflection Exercise
 

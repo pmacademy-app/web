@@ -146,24 +146,30 @@ Lesson 37 established that a PM's job is to convey the problem, user need, and c
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Bringing design in only at the "make it pretty" stage.**
+**Mistake 1: Bringing design in only at the "make it pretty" stage**
+
 As covered in Theory, this skips both of the Double Diamond's divergent phases, wasting design's ability to meaningfully shape problem framing and solution exploration, and reduces the relationship to a visual-polish service rather than a genuine partnership.
 
-**Mistake 2: Commissioning high-fidelity mockups before the underlying idea has been validated.**
+**Mistake 2: Commissioning high-fidelity mockups before the underlying idea has been validated**
+
 This is "premature high-fidelity" — producing a level of visual polish that creates false attachment and a false sense of finality around an idea that hasn't actually earned that level of certainty yet, covered in full in this lesson's Case Study.
 
-**Mistake 3: Dictating specific layouts or visual treatments instead of describing the user problem and constraints.**
+**Mistake 3: Dictating specific layouts or visual treatments instead of describing the user problem and constraints**
+
 This is the design-specific version of Lesson 37's Mistake 1 — substituting the PM's own visual preference for design's domain expertise, often producing a worse outcome than trusting design with full context.
 
-**Mistake 4: Treating design feedback sessions as approval checkpoints rather than genuine collaboration.**
+**Mistake 4: Treating design feedback sessions as approval checkpoints rather than genuine collaboration**
+
 A PM who shows design a nearly-finished mockup expecting only a rubber-stamp "looks good" has effectively excluded design from the actual decision-making process, even if the meeting nominally included them.
 
 **Mistake 5: Skipping user testing on a design because "the team already likes it."**
+
 Internal team enthusiasm for a design is not evidence that real users will understand or successfully use it — conflating internal consensus with user validation is a distinct and common failure, especially once a polished mockup has generated internal excitement (see Mistake 2).
 
 ---
 
-## Mental Model: The Fidelity Ladder
+
+## Mental Model: The Fidelity Ladder (Design) (Design)
 
 *(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*
 
@@ -217,7 +223,7 @@ The underlying principle connects directly to this lesson's Theory: tools that m
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Working with Design Teams at Different Company Stages
 
 **At a startup:**
 A PM may work directly with a single designer, or wear the design hat personally in the absence of a dedicated designer at all. The risk here is Mistake 3 — without a dedicated design partner to push back, a PM's own visual instincts can go unchallenged, even when they lack the training to recognize interaction or usability problems a trained designer would catch immediately.
@@ -308,7 +314,7 @@ The PM-design relationship mirrors the PM-engineering relationship covered in Le
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Double Diamond | A design process framework of two divergent-then-convergent phases: Discover/Define and Develop/Deliver | Fidelity Ladder | 1 |
 | Fidelity Ladder | A framework representing the sequence of design artifacts from low to high polish (sketch, wireframe, mockup, prototype, finished design), matching the polish level to the validation stage of the underlying idea. | Confidence Gradient (Lesson 35) | 1 |
@@ -328,42 +334,41 @@ The PM-design relationship mirrors the PM-engineering relationship covered in Le
 ## Flashcards
 
 **Card 1**
-Front: What are the four phases of the Double Diamond, in order?
-Back: Discover (diverge on problem), Define (converge on problem statement), Develop (diverge on solutions), Deliver (converge on final solution).
-Difficulty: 1
-Tags: double-diamond
+- Front: What are the four phases of the Double Diamond, in order?
+- Back: Discover (diverge on problem), Define (converge on problem statement), Develop (diverge on solutions), Deliver (converge on final solution).
+- Difficulty: 1
+- Tags: double-diamond
 
 **Card 2**
-Front: What does the Fidelity Ladder recommend about matching design polish to validation status?
-Back: Low-fidelity artifacts for unvalidated, still-exploratory ideas; high-fidelity, polished artifacts only after the underlying idea has been genuinely validated with real users.
-Difficulty: 1
-Tags: fidelity-ladder
+- Front: What does the Fidelity Ladder recommend about matching design polish to validation status?
+- Back: Low-fidelity artifacts for unvalidated, still-exploratory ideas; high-fidelity, polished artifacts only after the underlying idea has been genuinely validated with real users.
+- Difficulty: 1
+- Tags: fidelity-ladder
 
 **Card 3**
-Front: What is "premature high-fidelity," and why is it costly?
-Back: Producing polished, expensive visual design before an idea is validated; it creates false internal confidence and psychological attachment, making a later necessary pivot feel like a loss.
-Difficulty: 2
-Tags: premature-high-fidelity
+- Front: What is "premature high-fidelity," and why is it costly?
+- Back: Producing polished, expensive visual design before an idea is validated; it creates false internal confidence and psychological attachment, making a later necessary pivot feel like a loss.
+- Difficulty: 2
+- Tags: premature-high-fidelity
 
 **Card 4**
-Front: How does "give context, not commands" (Lesson 37) apply specifically to working with designers?
-Back: Specify the user problem, constraints, and success criteria precisely; trust design to own layout, visual hierarchy, and interaction pattern decisions.
-Difficulty: 2
-Tags: context-not-commands
+- Front: How does "give context, not commands" (Lesson 37) apply specifically to working with designers?
+- Back: Specify the user problem, constraints, and success criteria precisely; trust design to own layout, visual hierarchy, and interaction pattern decisions.
+- Difficulty: 2
+- Tags: context-not-commands
 
 **Card 5**
-Front: Why is internal team enthusiasm for a mockup not evidence of good design?
-Back: Polished visuals are persuasive regardless of underlying validation; team excitement reflects the artifact's polish, not confirmation that real users will understand or succeed with it.
-Difficulty: 2
-Tags: validation
+- Front: Why is internal team enthusiasm for a mockup not evidence of good design?
+- Back: Polished visuals are persuasive regardless of underlying validation; team excitement reflects the artifact's polish, not confirmation that real users will understand or succeed with it.
+- Difficulty: 2
+- Tags: validation
 
 **Card 6**
-Front: In the Detailed Case Study, what was the actual root cause of the onboarding flow's failure, and why couldn't visual polish fix it?
-Back: A structural information-architecture problem in the flow concept itself, not a visual design issue — no amount of visual polish addresses a fundamentally confusing underlying flow.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what was the actual root cause of the onboarding flow's failure, and why couldn't visual polish fix it?
+- Back: A structural information-architecture problem in the flow concept itself, not a visual design issue — no amount of visual polish addresses a fundamentally confusing underlying flow.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

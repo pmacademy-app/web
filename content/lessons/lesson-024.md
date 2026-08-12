@@ -193,22 +193,28 @@ When criteria are written retroactively, they tend to simply describe whatever w
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Writing acceptance criteria that only cover the happy path.**
+**Mistake 1: Writing acceptance criteria that only cover the happy path**
+
 This leaves edge cases and negative scenarios unspecified, echoing Lesson 15's "happy path only" warning at the level of individual story verification, and leads to inconsistent, discovered-too-late handling of real, plausible scenarios.
 
-**Mistake 2: Writing vague criteria that don't specify a concrete, observable outcome.**
+**Mistake 2: Writing vague criteria that don't specify a concrete, observable outcome**
+
 "Password reset should work" is not an acceptance criterion in the useful sense this lesson intends — it fails to specify the given context, the triggering action, and the specific expected result with enough precision to be genuinely testable.
 
-**Mistake 3: Over-specifying implementation details within acceptance criteria.**
+**Mistake 3: Over-specifying implementation details within acceptance criteria**
+
 Just as Lesson 22 warned against over-specification in a PRD, acceptance criteria should specify observable behavior and outcomes, not dictate a specific technical implementation approach — the "Then" clause should describe what should be true, not how the system should internally achieve it.
 
-**Mistake 4: Writing acceptance criteria after implementation is already complete.**
+**Mistake 4: Writing acceptance criteria after implementation is already complete**
+
 This inverts the artifact's purpose, providing the appearance of a testable definition of done without the substance of having actually forced clarity before work began, echoing Lesson 8's discovery theater concept.
 
-**Mistake 5: Treating acceptance criteria as replacing, rather than complementing, the story's "so that" clause.**
+**Mistake 5: Treating acceptance criteria as replacing, rather than complementing, the story's "so that" clause**
+
 Acceptance criteria specify the conditions for done, but the underlying benefit stated in "so that" remains important context for evaluating whether the criteria themselves are actually well-chosen and complete.
 
 ---
+
 
 ## Mental Model: The Acceptance Criteria Coverage Map
 
@@ -430,7 +436,6 @@ Acceptance criteria are the specific, testable conditions that define when a use
 - Difficulty: 2
 - Tags: qa-and-criteria
 
----
 
 ## Reflection Exercise
 

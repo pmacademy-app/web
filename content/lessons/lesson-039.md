@@ -144,22 +144,28 @@ A PM does not typically make the specific technical judgment of whether a given 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating all technical debt as uniformly bad and demanding it always be avoided.**
+**Mistake 1: Treating all technical debt as uniformly bad and demanding it always be avoided**
+
 As covered in Theory, Deliberate + Prudent debt is a legitimate and sometimes wise tool; reflexively refusing any shortcut under any circumstances can starve a team of flexibility it genuinely needs to hit a real, consequential deadline.
 
 **Mistake 2: Treating all technical debt as acceptable simply because "we'll clean it up later."**
+
 Without a credible, concrete plan and dedicated capacity, "later" routinely never arrives, and this vague deferral is often functionally identical to Deliberate + Reckless debt, regardless of the good intentions behind it.
 
-**Mistake 3: Never allocating dedicated capacity to debt paydown, treating every Sprint as 100% new-feature capacity.**
+**Mistake 3: Never allocating dedicated capacity to debt paydown, treating every Sprint as 100% new-feature capacity**
+
 This guarantees debt only ever accumulates, since paydown never happens unless it's explicitly planned for — echoing this lesson's compounding-interest dynamic.
 
-**Mistake 4: Assuming a PM should personally judge whether a specific technical shortcut constitutes "real" debt.**
+**Mistake 4: Assuming a PM should personally judge whether a specific technical shortcut constitutes "real" debt**
+
 This is squarely engineering's domain, per Lesson 37's context-not-commands principle — the PM's job is the business trade-off judgment (is this deadline worth this cost), not the technical assessment of the shortcut's actual severity.
 
-**Mistake 5: Waiting until a crisis (a "stabilization Sprint" or worse) to address debt, rather than paying it down incrementally.**
+**Mistake 5: Waiting until a crisis (a "stabilization Sprint" or worse) to address debt, rather than paying it down incrementally**
+
 Reactive, crisis-driven debt paydown is typically far more expensive and disruptive than steady, incremental paydown woven into ongoing Sprint capacity, because a crisis often requires halting new feature work entirely rather than simply allocating a modest, sustained share of capacity over time.
 
 ---
+
 
 ## Mental Model: The Debt Interest Curve
 
@@ -216,7 +222,7 @@ The underlying principle connects directly to this lesson's Theory: at sufficien
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Technical Debt & PM Trade-offs at Different Company Stages
 
 **At a startup:**
 Taking on significant technical debt is often a genuinely reasonable strategy, since validating whether an idea has any market fit at all is frequently more urgent than building a robust, scalable implementation of an idea that might get thrown away entirely. The risk is Mistake 2 — debt taken on reasonably during early validation is never revisited once the product finds traction, and the codebase's "prudent" early debt quietly becomes a serious liability as the company scales without ever having been consciously re-evaluated.
@@ -306,7 +312,7 @@ Technical debt, borrowed from finance, describes the trade-off of choosing a fas
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Technical debt | The cost of choosing a faster, expedient implementation now in exchange for eventual repayment plus ongoing extra cost | Principal, Interest | 1 |
 | Principal (technical debt) | The eventual cost of properly implementing what was shortcut | Technical debt | 2 |
@@ -328,48 +334,47 @@ Technical debt, borrowed from finance, describes the trade-off of choosing a fas
 ## Flashcards
 
 **Card 1**
-Front: What are the two cost components of technical debt, per its financial metaphor?
-Back: Principal (the eventual cost of the proper implementation) and interest (the ongoing extra cost paid on every future change touching the affected area).
-Difficulty: 1
-Tags: principal-interest
+- Front: What are the two cost components of technical debt, per its financial metaphor?
+- Back: Principal (the eventual cost of the proper implementation) and interest (the ongoing extra cost paid on every future change touching the affected area).
+- Difficulty: 1
+- Tags: principal-interest
 
 **Card 2**
-Front: What are the two axes of Martin Fowler's Technical Debt Quadrant?
-Back: Deliberate vs. inadvertent, and reckless vs. prudent.
-Difficulty: 1
-Tags: technical-debt-quadrant
+- Front: What are the two axes of Martin Fowler's Technical Debt Quadrant?
+- Back: Deliberate vs. inadvertent, and reckless vs. prudent.
+- Difficulty: 1
+- Tags: technical-debt-quadrant
 
 **Card 3**
-Front: Which quadrant of the Technical Debt Quadrant represents well-managed debt, and why?
-Back: Deliberate + Prudent — a conscious trade-off made knowingly, ideally with a credible plan for eventual repayment.
-Difficulty: 2
-Tags: deliberate-prudent
+- Front: Which quadrant of the Technical Debt Quadrant represents well-managed debt, and why?
+- Back: Deliberate + Prudent — a conscious trade-off made knowingly, ideally with a credible plan for eventual repayment.
+- Difficulty: 2
+- Tags: deliberate-prudent
 
 **Card 4**
-Front: How does unmanaged technical debt connect to Lesson 33's Little's Law?
-Back: As debt accumulates, more of each future change is spent navigating past shortcuts, increasing cycle time and degrading effective throughput at the same nominal capacity — the same compounding dynamic Little's Law describes for excessive WIP.
-Difficulty: 2
-Tags: littles-law-connection
+- Front: How does unmanaged technical debt connect to Lesson 33's Little's Law?
+- Back: As debt accumulates, more of each future change is spent navigating past shortcuts, increasing cycle time and degrading effective throughput at the same nominal capacity — the same compounding dynamic Little's Law describes for excessive WIP.
+- Difficulty: 2
+- Tags: littles-law-connection
 
 **Card 5**
-Front: Whose job is it to judge whether a specific technical shortcut constitutes "real" debt, and whose job is the trade-off decision?
-Back: Assessing technical severity is engineering's domain; the PM owns the business trade-off judgment of whether taking on or paying down debt is worth it given business context.
-Difficulty: 2
-Tags: roles
+- Front: Whose job is it to judge whether a specific technical shortcut constitutes "real" debt, and whose job is the trade-off decision?
+- Back: Assessing technical severity is engineering's domain; the PM owns the business trade-off judgment of whether taking on or paying down debt is worth it given business context.
+- Difficulty: 2
+- Tags: roles
 
 **Card 6**
-Front: In the Case Study, why did leadership initially suspect a motivation problem rather than technical debt?
-Back: No single decision along the way was ever flagged as a cause of the slowdown; the compounding interest cost was invisible in any single Sprint but glaring in aggregate over a year.
-Difficulty: 2
-Tags: case-study
+- Front: In the Case Study, why did leadership initially suspect a motivation problem rather than technical debt?
+- Back: No single decision along the way was ever flagged as a cause of the slowdown; the compounding interest cost was invisible in any single Sprint but glaring in aggregate over a year.
+- Difficulty: 2
+- Tags: case-study
 
 **Card 7**
-Front: What three factors does the Debt Paydown Prioritization Table use to rank competing debt items?
-Back: Interest rate (change frequency of the affected area), principal cost (how expensive the fix is), and business consequence of inaction.
-Difficulty: 2
-Tags: prioritization
+- Front: What three factors does the Debt Paydown Prioritization Table use to rank competing debt items?
+- Back: Interest rate (change frequency of the affected area), principal cost (how expensive the fix is), and business consequence of inaction.
+- Difficulty: 2
+- Tags: prioritization
 
----
 
 ## Reflection Exercise
 

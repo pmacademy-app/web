@@ -203,22 +203,28 @@ The corrective discipline is the same one this curriculum has applied repeatedly
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating RICE scores as precise, objective numbers rather than structured estimates.**
+**Mistake 1: Treating RICE scores as precise, objective numbers rather than structured estimates**
+
 RICE scores are only as good as the underlying reach, impact, and confidence estimates feeding into them — treating the resulting number as objectively precise, rather than as a structured, debatable estimate, overstates the framework's actual certainty.
 
-**Mistake 2: Assigning high confidence scores to vivid anecdotes or unvalidated assumptions.**
+**Mistake 2: Assigning high confidence scores to vivid anecdotes or unvalidated assumptions**
+
 This directly reintroduces Lesson 16's "vivid but rare" and "loudest voice" failure patterns under RICE's formal-looking numeric structure — confidence should genuinely reflect the strength of underlying evidence, not the persuasiveness or memorability of how a candidate was pitched.
 
-**Mistake 3: Using RICE when MoSCoW would communicate priority more clearly to a broad stakeholder audience, or vice versa.**
+**Mistake 3: Using RICE when MoSCoW would communicate priority more clearly to a broad stakeholder audience, or vice versa**
+
 These frameworks serve different purposes — RICE for ranking dissimilar candidates on a common numeric scale, MoSCoW for defining release scope and communicating clearly with less quantitatively focused stakeholders — and using the wrong one for the specific situation reduces the exercise's practical value.
 
-**Mistake 4: Defaulting to "easy wins first" purely to avoid difficult work, rather than as a deliberate, justified sequencing choice.**
+**Mistake 4: Defaulting to "easy wins first" purely to avoid difficult work, rather than as a deliberate, justified sequencing choice**
+
 Artificially easy sequencing can be a legitimate strategy in the right context, but defaulting to it simply to defer difficult, high-value work indefinitely produces the opposite of genuine prioritization discipline.
 
-**Mistake 5: Running a prioritization exercise after a decision has already effectively been made, to produce justifying numbers rather than genuine input.**
+**Mistake 5: Running a prioritization exercise after a decision has already effectively been made, to produce justifying numbers rather than genuine input**
+
 This is prioritization theater — a formal-looking exercise that could not, even in principle, have changed the outcome is not really prioritizing anything.
 
 ---
+
 
 ## Mental Model: The Prioritization Synthesis Funnel
 
@@ -275,7 +281,7 @@ Use this funnel as a synthesis discipline: when scoring a candidate's Impact for
 
 ---
 
-## Real World Perspective: Prioritization at Different Company Stages
+## Real World Perspective: Prioritization Fundamentals at Different Company Stages
 
 **At a startup:**
 Prioritization is often concentrated on an extremely small number of genuinely make-or-break decisions, and lightweight, qualitative methods (a simple ranked list, informal MoSCoW-style categorization) frequently suffice given the smaller volume of candidates and closer, more informal team collaboration — the underlying discipline (explicit criteria, genuine willingness to exclude, confidence honestly reflecting evidence quality) matters as much as at any other stage, even without a fully formalized RICE process.
@@ -432,7 +438,6 @@ Prioritization is the practice of deciding what to work on next using an explici
 - Difficulty: 2
 - Tags: synthesis-funnel
 
----
 
 ## Reflection Exercise
 

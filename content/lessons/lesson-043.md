@@ -148,22 +148,28 @@ Funnel data reliably tells a PM *where* users drop off, but rarely tells them *w
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Only looking at the overall, start-to-end conversion rate without breaking it into stages.**
+**Mistake 1: Only looking at the overall, start-to-end conversion rate without breaking it into stages**
+
 An aggregate rate tells you *that* something is wrong somewhere in the journey, but gives no guidance on *where* to focus — exactly the gap funnel decomposition into discrete stages is designed to close.
 
-**Mistake 2: Prioritizing by relative drop-off alone, ignoring absolute numbers.**
+**Mistake 2: Prioritizing by relative drop-off alone, ignoring absolute numbers**
+
 A step with a dramatic 60% relative drop-off affecting only a handful of users may matter less, in terms of total recoverable users, than a milder 20% relative drop-off at a much higher-volume step — both figures should inform prioritization, not just one.
 
-**Mistake 3: Trusting an aggregate conversion rate without checking for Simpson's Paradox-style segment variation.**
+**Mistake 3: Trusting an aggregate conversion rate without checking for Simpson's Paradox-style segment variation**
+
 As covered in Theory, a stable or improving aggregate rate can mask a serious, worsening problem in a specific segment, especially when the overall traffic mix is shifting over the same period.
 
-**Mistake 4: Assuming funnel data alone explains why users drop off.**
+**Mistake 4: Assuming funnel data alone explains why users drop off**
+
 Quantitative funnel data identifies *where* to look; it rarely explains *why* without qualitative follow-up — proposing a fix based purely on quantitative funnel data, without any qualitative investigation of the actual user experience at that step, risks solving the wrong underlying problem.
 
-**Mistake 5: Defining funnel stages inconsistently with the metric definitions established in Lesson 41.**
+**Mistake 5: Defining funnel stages inconsistently with the metric definitions established in Lesson 41**
+
 If a funnel stage's definition (what counts as "starting" the signup form, for instance) isn't as precise as Lesson 41 requires for any other metric, the resulting funnel analysis inherits the same definitional risk — comparing numbers across time or across teams that were never actually computed consistently.
 
 ---
+
 
 ## Mental Model: The Leaky Bucket
 
@@ -223,7 +229,7 @@ The underlying principle connects directly to this lesson's Theory: a multi-side
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Funnel Analysis at Different Company Stages
 
 **At a startup:**
 Funnel analysis is often informal, sometimes just a rough mental model of "people sign up, and then most of them don't come back," without precise stage-by-stage instrumentation. The risk here is Mistake 1 — without breaking the journey into discrete, measured stages, a small team can spend significant effort guessing at fixes for the wrong part of the journey.
@@ -311,7 +317,7 @@ Funnel analysis decomposes a user's journey into discrete, measurable stages, al
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Funnel | A decomposition of a user journey into discrete, sequential stages with measurable conversion between them | AARRR | 1 |
 | Relative drop-off | The percentage of users lost at a given funnel stage transition | Absolute drop-off | 1 |
@@ -333,42 +339,41 @@ Funnel analysis decomposes a user's journey into discrete, measurable stages, al
 ## Flashcards
 
 **Card 1**
-Front: What is a funnel, in the context of product metrics?
-Back: A decomposition of a user journey into discrete, sequential stages, each with a measurable conversion rate to the next stage.
-Difficulty: 1
-Tags: funnel-definition
+- Front: What is a funnel, in the context of product metrics?
+- Back: A decomposition of a user journey into discrete, sequential stages, each with a measurable conversion rate to the next stage.
+- Difficulty: 1
+- Tags: funnel-definition
 
 **Card 2**
-Front: What's the difference between relative and absolute drop-off?
-Back: Relative drop-off is the percentage of users lost at a step; absolute drop-off is the raw number of users lost — both should inform prioritization, since they can point to different priorities.
-Difficulty: 1
-Tags: relative-absolute
+- Front: What's the difference between relative and absolute drop-off?
+- Back: Relative drop-off is the percentage of users lost at a step; absolute drop-off is the raw number of users lost — both should inform prioritization, since they can point to different priorities.
+- Difficulty: 1
+- Tags: relative-absolute
 
 **Card 3**
-Front: What is Simpson's Paradox, in a funnel context?
-Back: A phenomenon where an aggregate conversion rate looks stable or misleading while masking a serious, segment-specific problem (e.g., by channel or device) hidden by the aggregation.
-Difficulty: 2
-Tags: simpsons-paradox
+- Front: What is Simpson's Paradox, in a funnel context?
+- Back: A phenomenon where an aggregate conversion rate looks stable or misleading while masking a serious, segment-specific problem (e.g., by channel or device) hidden by the aggregation.
+- Difficulty: 2
+- Tags: simpsons-paradox
 
 **Card 4**
-Front: Why does funnel data alone often fail to explain why users drop off?
-Back: Quantitative funnel data identifies where users drop off, but understanding why typically requires qualitative investigation, like session recordings or targeted user interviews.
-Difficulty: 2
-Tags: where-vs-why
+- Front: Why does funnel data alone often fail to explain why users drop off?
+- Back: Quantitative funnel data identifies where users drop off, but understanding why typically requires qualitative investigation, like session recordings or targeted user interviews.
+- Difficulty: 2
+- Tags: where-vs-why
 
 **Card 5**
-Front: In the Detailed Case Study, what did segmenting the funnel data reveal that the aggregate number hid?
-Back: Users from a specific paid marketing channel were dropping off at nearly double the rate of organic/referral users at the project setup step, due to a channel-specific expectation mismatch, not a universal UI problem.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what did segmenting the funnel data reveal that the aggregate number hid?
+- Back: Users from a specific paid marketing channel were dropping off at nearly double the rate of organic/referral users at the project setup step, due to a channel-specific expectation mismatch, not a universal UI problem.
+- Difficulty: 2
+- Tags: case-study
 
 **Card 6**
-Front: What does the Leaky Bucket mental model recommend when multiple funnel steps show drop-off?
-Back: Prioritize patching the leak that would recover the most users overall, weighing both relative severity and absolute recoverable volume, rather than intuitively fixing whichever step feels most broken.
-Difficulty: 2
-Tags: leaky-bucket
+- Front: What does the Leaky Bucket mental model recommend when multiple funnel steps show drop-off?
+- Back: Prioritize patching the leak that would recover the most users overall, weighing both relative severity and absolute recoverable volume, rather than intuitively fixing whichever step feels most broken.
+- Difficulty: 2
+- Tags: leaky-bucket
 
----
 
 ## Reflection Exercise
 

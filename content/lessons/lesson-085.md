@@ -76,14 +76,22 @@ A specific complication that trips up even well-intentioned teams: there is no s
 
 ## Common Beginner Mistakes
 
-1. **Trusting an aggregate accuracy number without measuring outcomes by subgroup.**
-2. **Treating a fairness audit as a one-time pre-launch check rather than a continuous loop.**
-3. **Adjusting output thresholds by group as a superficial fix without diagnosing root cause.**
-4. **Failing to provide a genuine appeal mechanism for AI-driven decisions, per Lesson 67's structural requirement.**
-5. **Assuming removing a protected characteristic from model inputs eliminates disparity risk, ignoring proxy variables.**
-6. **Assuming a single, universally correct mathematical definition of fairness exists.** Several reasonable fairness definitions can be mutually incompatible for the same decision, and the appropriate one must be explicitly chosen based on the real-world consequences of errors for the affected population, not assumed by default.
+**Mistake 1: Trusting an aggregate accuracy number without measuring outcomes by subgroup**
+
+**Mistake 2: Treating a fairness audit as a one-time pre-launch check rather than a continuous loop**
+
+**Mistake 3: Adjusting output thresholds by group as a superficial fix without diagnosing root cause**
+
+**Mistake 4: Failing to provide a genuine appeal mechanism for AI-driven decisions, per Lesson 67's structural requirement**
+
+**Mistake 5: Assuming removing a protected characteristic from model inputs eliminates disparity risk, ignoring proxy variables**
+
+**Mistake 6: Assuming a single, universally correct mathematical definition of fairness exists**
+
+Several reasonable fairness definitions can be mutually incompatible for the same decision, and the appropriate one must be explicitly chosen based on the real-world consequences of errors for the affected population, not assumed by default.
 
 ---
+
 
 ## Mental Model: The Fairness Audit Loop
 
@@ -99,7 +107,7 @@ IBM's publicized AI Fairness 360 toolkit and broader responsible AI research ini
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Responsible AI Product Management at Different Company Stages
 
 **At a startup:** Early-stage AI products often skip subgroup measurement entirely, not out of indifference but because small user bases genuinely make some subgroup samples too small to draw statistically meaningful conclusions from, and limited engineering resources are typically prioritized toward core product functionality rather than fairness infrastructure. This is a real and understandable tradeoff at very small scale, but it is a risk that compounds silently as the product scales — a disparity that was statistically invisible at 500 users can become a serious, measurable, and legally consequential pattern at 500,000 users, and teams that never built the measurement habit early often discover the problem only once it is large enough to cause visible harm.
 
@@ -168,6 +176,9 @@ Aggregate accuracy metrics can mask significant disparity across subgroups, and 
 ---
 
 ## Cheat Sheet
+
+*A two-minute review of everything in this lesson.*
+
 - Aggregate accuracy hides disparity. Measure by subgroup.
 - Fairness Audit Loop: Define → Measure → Diagnose → Remediate → repeat.
 - Fix the root cause, not just the symptom.
@@ -190,45 +201,50 @@ Aggregate accuracy metrics can mask significant disparity across subgroups, and 
 ---
 
 ## Further Reading / Resources
-1. *Weapons of Math Destruction* by Cathy O'Neil
-2. *The Alignment Problem* by Brian Christian
-3. IBM's published AI Fairness 360 documentation
+- Cathy O'Neil, *Weapons of Math Destruction*
+- Brian Christian, *The Alignment Problem*
+- IBM's published AI Fairness 360 documentation
 
 ---
 
 ## Flashcards
 
-**Front:** Why can aggregate accuracy mask disparity?
-**Back:** A model can perform very differently across subgroups while its overall accuracy number looks acceptable.
-**Difficulty:** Easy
-**Tags:** #responsible-ai
+**Card 1**
+- Front: ** Why can aggregate accuracy mask disparity?
+- Back: ** A model can perform very differently across subgroups while its overall accuracy number looks acceptable.
+- Difficulty: 2
+- Tags: **, responsible-ai
 
-**Front:** What are the four steps of the Fairness Audit Loop?
-**Back:** Define equity metric, measure across groups, diagnose disparity source, remediate — then repeat.
-**Difficulty:** Easy
-**Tags:** #fairness-audit-loop
+**Card 2**
+- Front: ** What are the four steps of the Fairness Audit Loop?
+- Back: ** Define equity metric, measure across groups, diagnose disparity source, remediate — then repeat.
+- Difficulty: 2
+- Tags: **, fairness-audit-loop
 
-**Front:** Why is adjusting output thresholds by group a superficial fix?
-**Back:** It doesn't address the root cause, such as biased training data, and can mask or complicate the underlying problem.
-**Difficulty:** Medium
-**Tags:** #root-cause
+**Card 3**
+- Front: ** Why is adjusting output thresholds by group a superficial fix?
+- Back: ** It doesn't address the root cause, such as biased training data, and can mask or complicate the underlying problem.
+- Difficulty: 2
+- Tags: **, root-cause
 
-**Front:** What went wrong in the Biased Hiring Screener case study?
-**Back:** Aggregate accuracy masked disparity traceable to historically biased training data, never diagnosed at its root, with no ongoing measurement or appeal process.
-**Difficulty:** Hard
-**Tags:** #case-study
+**Card 4**
+- Front: ** What went wrong in the Biased Hiring Screener case study?
+- Back: ** Aggregate accuracy masked disparity traceable to historically biased training data, never diagnosed at its root, with no ongoing measurement or appeal process.
+- Difficulty: 2
+- Tags: **, case-study
 
-**Front:** Why can't a team simply instruct engineers to "make the model fair"?
-**Back:** There is no single, universally agreed mathematical definition of fairness — demographic parity and equalized error rates can be mutually incompatible for the same decision, so the team must explicitly choose and document which definition is appropriate given the real-world consequences.
-**Difficulty:** Hard
-**Tags:** #fairness-definitions
+**Card 5**
+- Front: ** Why can't a team simply instruct engineers to "make the model fair"?
+- Back: ** There is no single, universally agreed mathematical definition of fairness — demographic parity and equalized error rates can be mutually incompatible for the same decision, so the team must explicitly choose and document which definition is appropriate given the real-world consequences.
+- Difficulty: 2
+- Tags: **, fairness-definitions
 
-**Front:** In the Biased Hiring Screener case, why was excluding gender and disability status from model inputs not sufficient?
-**Back:** University attended and employment gaps functioned as proxy variables correlated with the excluded characteristics, allowing the model to reconstruct much of the same discriminatory pattern indirectly.
-**Difficulty:** Hard
-**Tags:** #proxy-variable #case-study
+**Card 6**
+- Front: ** In the Biased Hiring Screener case, why was excluding gender and disability status from model inputs not sufficient?
+- Back: ** University attended and employment gaps functioned as proxy variables correlated with the excluded characteristics, allowing the model to reconstruct much of the same discriminatory pattern indirectly.
+- Difficulty: 2
+- Tags: **, proxy-variable, case-study
 
----
 
 ## Reflection Exercise
 

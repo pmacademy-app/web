@@ -165,22 +165,28 @@ A team that skips writing an explicit problem statement, and instead moves direc
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Including a proposed solution within the problem statement itself.**
+**Mistake 1: Including a proposed solution within the problem statement itself**
+
 Even a brief, seemingly harmless mention of a candidate solution anchors the team's thinking and forecloses genuine consideration of alternatives before discovery has even started.
 
-**Mistake 2: Writing a problem statement so broad it provides no real direction.**
+**Mistake 2: Writing a problem statement so broad it provides no real direction**
+
 "Users find this hard to use" fails to name a specific persona, pain point, or context, and could describe almost any product issue — it hasn't actually done the work of specifying a real problem.
 
-**Mistake 3: Writing what is actually a solution, disguised in problem-statement grammar.**
+**Mistake 3: Writing what is actually a solution, disguised in problem-statement grammar**
+
 "Users need a PDF export button" smuggles in a specific solution without acknowledging it as a proposal, skipping the deliberate solution-agnostic framing this lesson requires.
 
-**Mistake 4: Writing a problem statement with no cited evidence.**
+**Mistake 4: Writing a problem statement with no cited evidence**
+
 A statement built on assumption rather than laddered pain points (Lesson 16) and research findings (Lessons 12–13) is an unvalidated guess dressed up in a formal structure.
 
-**Mistake 5: Never returning to the problem statement once a solution has been proposed.**
+**Mistake 5: Never returning to the problem statement once a solution has been proposed**
+
 Without actively using the problem statement as a filter for evaluating the eventual proposed solution, the artifact loses its most important practical function and risks becoming another instance of Lesson 14's "decoration" failure pattern — well-written but never actually used.
 
 ---
+
 
 ## Mental Model: The Problem Statement Purity Test
 
@@ -393,7 +399,6 @@ A problem statement is a concise, structured articulation of a specific, validat
 - Difficulty: 2
 - Tags: problem-statement-filter
 
----
 
 ## Reflection Exercise
 

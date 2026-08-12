@@ -73,13 +73,28 @@ A land tier that is **too generous** — including capabilities properly belongi
 
 ## Common Beginner Mistakes
 
-1. **Designing packaging tiers around internal cost structure rather than natural customer expansion triggers.** Tiers organized around what's cheap or expensive for the vendor to provide, rather than around genuine points of customer growth or need, tend to feel arbitrary and create friction rather than a natural expansion path.
-2. **Making the land tier so generous that there's no compelling reason to ever upgrade.** Overly generous free or entry tiers can create a large, durable user base that never converts to a higher tier, since the packaging itself removed any natural pressure to expand.
-3. **Gating capability behind an enterprise tier that's actually needed even for Rung 1 or 2 adoption.** If basic usability requires features reserved for a much higher tier, the land motion itself may never succeed, since the Champion's team can't get sufficient value during initial adoption.
-4. **Relying on a single expansion trigger type exclusively.** Pure seat-based or pure usage-based pricing alone, without any feature-gated component tied to genuine enterprise-readiness needs, can create predictable, easily-undercut pricing or unpredictable, budget-unfriendly cost growth respectively.
-5. **Treating packaging design as a one-time decision rather than something to revisit as the Enterprise Adoption Ladder and Stakeholder Compass concepts suggest usage patterns evolve.** As accounts grow and organizational needs shift, previously well-calibrated expansion triggers can become outdated, either too easy or too difficult to reach.
+**Mistake 1: Designing packaging tiers around internal cost structure rather than natural customer expansion triggers**
+
+Tiers organized around what's cheap or expensive for the vendor to provide, rather than around genuine points of customer growth or need, tend to feel arbitrary and create friction rather than a natural expansion path.
+
+**Mistake 2: Making the land tier so generous that there's no compelling reason to ever upgrade**
+
+Overly generous free or entry tiers can create a large, durable user base that never converts to a higher tier, since the packaging itself removed any natural pressure to expand.
+
+**Mistake 3: Gating capability behind an enterprise tier that's actually needed even for Rung 1 or 2 adoption**
+
+If basic usability requires features reserved for a much higher tier, the land motion itself may never succeed, since the Champion's team can't get sufficient value during initial adoption.
+
+**Mistake 4: Relying on a single expansion trigger type exclusively**
+
+Pure seat-based or pure usage-based pricing alone, without any feature-gated component tied to genuine enterprise-readiness needs, can create predictable, easily-undercut pricing or unpredictable, budget-unfriendly cost growth respectively.
+
+**Mistake 5: Treating packaging design as a one-time decision rather than something to revisit as the Enterprise Adoption Ladder and Stakeholder Compass concepts suggest usage patterns evolve**
+
+As accounts grow and organizational needs shift, previously well-calibrated expansion triggers can become outdated, either too easy or too difficult to reach.
 
 ---
+
 
 ## Mental Model: The Expansion Wedge
 
@@ -102,7 +117,7 @@ Atlassian's packaging structure across products like Jira and Confluence, includ
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Land-and-Expand: Packaging for Enterprise Growth at Different Company Stages
 
 **Startup:** Early-stage B2B companies typically design an initial, relatively simple two-tier structure (a free or low-cost entry tier and a single paid tier) focused primarily on achieving Rung 1 and 2 success, since detailed Expansion Wedge design across many tiers can represent premature optimization before there's evidence of what natural expansion points actual customers encounter.
 
@@ -140,7 +155,7 @@ A "no" on Land Tier Restraint should be treated with particular concern given th
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you design a pricing and packaging structure to support a land-and-expand go-to-market motion?"** The interviewer is evaluating whether you propose something resembling the Expansion Wedge — a deliberately scoped land tier with genuine expansion triggers tied to natural customer growth — rather than an arbitrary set of tiers organized around internal cost or a generic sense of "premium."
 
@@ -170,6 +185,8 @@ Land-and-expand is not simply a sales strategy layered on top of arbitrary packa
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Land-and-expand needs deliberate packaging design, not just a sales script.
 - Expansion Wedge: Land Tier → Expansion Triggers → Enterprise Tier (matched to Adoption Ladder Rungs 3/4).
 - Triggers should reflect genuine customer constraints, not arbitrary withholding.
@@ -193,50 +210,56 @@ Land-and-expand is not simply a sales strategy layered on top of arbitrary packa
 
 ## Further Reading / Resources
 
-1. *Monetizing Innovation* by Madhavan Ramanujam and Georg Tacke
-2. *The SaaS Sales Method* by Winning by Design (Jacco van der Kooij and Fernando Pizarro)
-3. *Crossing the Chasm* by Geoffrey Moore
+- Madhavan Ramanujam and Georg Tacke, *Monetizing Innovation*
+- Winning by Design (Jacco van der Kooij and Fernando Pizarro), *The SaaS Sales Method*
+- Geoffrey Moore, *Crossing the Chasm*
 
 ---
 
 ## Flashcards
 
-**Front:** Why does land-and-expand require deliberate packaging design, not just a sales strategy?
-**Back:** The initial land must be low-friction and deliver genuine standalone value, while the packaging must also create natural expansion triggers — both require intentional structure, not just sales execution.
-**Difficulty:** Easy
-**Tags:** #land-and-expand #core-concept
+**Card 1**
+- Front: ** Why does land-and-expand require deliberate packaging design, not just a sales strategy?
+- Back: ** The initial land must be low-friction and deliver genuine standalone value, while the packaging must also create natural expansion triggers — both require intentional structure, not just sales execution.
+- Difficulty: 2
+- Tags: **, land-and-expand, core-concept
 
-**Front:** Name the three parts of the Expansion Wedge.
-**Back:** Land Tier, Expansion Triggers, Enterprise Tier.
-**Difficulty:** Easy
-**Tags:** #expansion-wedge
+**Card 2**
+- Front: ** Name the three parts of the Expansion Wedge.
+- Back: ** Land Tier, Expansion Triggers, Enterprise Tier.
+- Difficulty: 2
+- Tags: **, expansion-wedge
 
-**Front:** Name the three types of expansion triggers.
-**Back:** Seat-based, usage-based, and feature-gated.
-**Difficulty:** Medium
-**Tags:** #expansion-triggers
+**Card 3**
+- Front: ** Name the three types of expansion triggers.
+- Back: ** Seat-based, usage-based, and feature-gated.
+- Difficulty: 2
+- Tags: **, expansion-triggers
 
-**Front:** What risk does an overly generous Land Tier create?
-**Back:** It eliminates the natural pressure to expand, producing strong adoption metrics that mask a failing business model, as in the Land That Never Expanded case study.
-**Difficulty:** Medium
-**Tags:** #land-tier-risk
+**Card 4**
+- Front: ** What risk does an overly generous Land Tier create?
+- Back: ** It eliminates the natural pressure to expand, producing strong adoption metrics that mask a failing business model, as in the Land That Never Expanded case study.
+- Difficulty: 2
+- Tags: **, land-tier-risk
 
-**Front:** What risk does an overly restrictive Land Tier create?
-**Back:** It prevents the initial land motion from succeeding at all, since Rung 1 of the Enterprise Adoption Ladder requires genuine standalone value.
-**Difficulty:** Medium
-**Tags:** #land-tier-risk
+**Card 5**
+- Front: ** What risk does an overly restrictive Land Tier create?
+- Back: ** It prevents the initial land motion from succeeding at all, since Rung 1 of the Enterprise Adoption Ladder requires genuine standalone value.
+- Difficulty: 2
+- Tags: **, land-tier-risk
 
-**Front:** Why should Enterprise Tier capability match Rung 3/4 needs specifically, rather than an arbitrary "premium" bundle?
-**Back:** Because the Enterprise Tier must satisfy the Technical Evaluator and Economic Buyer roles from Lesson 73, whose actual needs are security, admin control, reliability, and integration.
-**Difficulty:** Hard
-**Tags:** #enterprise-tier-fit
+**Card 6**
+- Front: ** Why should Enterprise Tier capability match Rung 3/4 needs specifically, rather than an arbitrary "premium" bundle?
+- Back: ** Because the Enterprise Tier must satisfy the Technical Evaluator and Economic Buyer roles from Lesson 73, whose actual needs are security, admin control, reliability, and integration.
+- Difficulty: 2
+- Tags: **, enterprise-tier-fit
 
-**Front:** What went wrong in the Land That Never Expanded case study?
-**Back:** The free tier had unlimited seats and nearly the full feature set, eliminating every natural expansion trigger, and no genuine enterprise tier or enterprise-readiness capability had ever been built.
-**Difficulty:** Hard
-**Tags:** #case-study #expansion-wedge
+**Card 7**
+- Front: ** What went wrong in the Land That Never Expanded case study?
+- Back: ** The free tier had unlimited seats and nearly the full feature set, eliminating every natural expansion trigger, and no genuine enterprise tier or enterprise-readiness capability had ever been built.
+- Difficulty: 2
+- Tags: **, case-study, expansion-wedge
 
----
 
 ## Reflection Exercise
 
