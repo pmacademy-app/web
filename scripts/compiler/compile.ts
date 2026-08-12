@@ -166,7 +166,7 @@ export async function compileLesson(
 
       // Resolve canonical module slug based on the module number
       const modNumMatch = moduleStr.match(/^\s*(\d+)/);
-      const modNumber = modNumMatch ? parseInt(modNumMatch[1], 10) : Math.ceil(order / 10);
+      const modNumber = modNumMatch ? parseInt(modNumMatch[1], 10) : Math.ceil(globalOrder / 10);
       
       const moduleMap: Record<number, string> = {
         1: 'foundations',
