@@ -77,22 +77,28 @@ Some organizations invest deliberately in structured early-career PM development
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Assuming management is the only legitimate path to career progress.**
+**Mistake 1: Assuming management is the only legitimate path to career progress**
+
 As covered in Theory, this risks pushing genuinely excellent individual contributors into a role that doesn't match their strengths, at cost to both their fulfillment and the organization's individual-contributor talent pool.
 
-**Mistake 2: Pursuing the management track primarily for prestige or compensation signaling, rather than genuine interest in the work itself.**
+**Mistake 2: Pursuing the management track primarily for prestige or compensation signaling, rather than genuine interest in the work itself**
+
 A mismatch between the actual daily work of leading a team (coaching, delegation, organizational design, per Lesson 55) and a person's genuine interests tends to produce exactly the burnout or underperformance this lesson's Case Study describes, regardless of how appealing the title felt initially.
 
-**Mistake 3: Treating career progression as purely a title or compensation ladder, disconnected from actual scope of ownership.**
+**Mistake 3: Treating career progression as purely a title or compensation ladder, disconnected from actual scope of ownership**
+
 This framing obscures the more useful question of whether a given move genuinely expands meaningful scope and impact, versus simply changing a label without a corresponding increase in real responsibility or growth.
 
-**Mistake 4: Assuming IC-track seniority is a consolation prize for those who "couldn't" become managers.**
+**Mistake 4: Assuming IC-track seniority is a consolation prize for those who "couldn't" become managers**
+
 This mischaracterizes the IC track entirely — Staff and Principal-level IC PMs often carry organizational influence and scope comparable to management-track leaders, exercised through different mechanisms, not through a lesser or failed version of the same path.
 
-**Mistake 5: Expecting career development to happen purely through incidental experience, without deliberate structure or mentorship.**
+**Mistake 5: Expecting career development to happen purely through incidental experience, without deliberate structure or mentorship**
+
 As covered in Theory, structured programs (like APM programs) illustrate that deliberately designed development — mentorship, varied rotations, explicit skill-building — accelerates genuine judgment development more reliably than unstructured on-the-job learning alone.
 
 ---
+
 
 ## Mental Model: The Scope Ladder
 
@@ -117,7 +123,7 @@ The underlying principle connects directly to this lesson's Theory: a deliberate
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Product Management Career Paths at Different Company Stages
 
 **At a startup:**
 A formal dual-ladder structure often doesn't yet exist, since the organization may be too small to support distinct IC and management tracks with meaningfully different scope at each level. Career growth at this stage is often defined more by increasing scope of ownership within a single, small team than by a formal track choice, though the underlying self-assessment questions from this lesson remain relevant as the person considers their own longer-term direction.
@@ -208,7 +214,7 @@ Product management careers typically follow one of two legitimate tracks — a m
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Dual-ladder structure | A career framework offering both a management track and an individual-contributor track to comparable levels of seniority | Scope Ladder | 1 |
 | Individual-contributor (IC) track | A career path where seniority means taking on broader, more strategically significant product ownership without managing other PMs | Management track | 1 |
@@ -228,42 +234,41 @@ Product management careers typically follow one of two legitimate tracks — a m
 ## Flashcards
 
 **Card 1**
-Front: What is the dual-ladder career structure?
-Back: A framework offering both a management track (leading progressively larger teams) and an individual-contributor track (taking on progressively broader product ownership), both leading to comparable seniority.
-Difficulty: 1
-Tags: dual-ladder
+- Front: What is the dual-ladder career structure?
+- Back: A framework offering both a management track (leading progressively larger teams) and an individual-contributor track (taking on progressively broader product ownership), both leading to comparable seniority.
+- Difficulty: 1
+- Tags: dual-ladder
 
 **Card 2**
-Front: What does the Scope Ladder frame career progression as, rather than title alone?
-Back: Increasing scope of ownership and impact — from a single feature, to a full product, to a portfolio, to company-wide strategy.
-Difficulty: 1
-Tags: scope-ladder
+- Front: What does the Scope Ladder frame career progression as, rather than title alone?
+- Back: Increasing scope of ownership and impact — from a single feature, to a full product, to a portfolio, to company-wide strategy.
+- Difficulty: 1
+- Tags: scope-ladder
 
 **Card 3**
-Front: What key self-assessment question distinguishes genuine interest in the management track from prestige-seeking?
-Back: Is the interest in "moving up" actually about genuine attraction to coaching, delegation, and organizational work, or about prestige, compensation signaling, or an assumption that this is simply what career progress looks like?
-Difficulty: 2
-Tags: track-fit
+- Front: What key self-assessment question distinguishes genuine interest in the management track from prestige-seeking?
+- Back: Is the interest in "moving up" actually about genuine attraction to coaching, delegation, and organizational work, or about prestige, compensation signaling, or an assumption that this is simply what career progress looks like?
+- Difficulty: 2
+- Tags: track-fit
 
 **Card 4**
-Front: Why is IC-track seniority (Staff, Principal PM) not a consolation prize?
-Back: Staff and Principal-level IC PMs often carry organizational influence and scope comparable to management-track leaders, exercised through deep product ownership rather than people leadership — a genuinely different, not lesser, path.
-Difficulty: 2
-Tags: ic-track-value
+- Front: Why is IC-track seniority (Staff, Principal PM) not a consolation prize?
+- Back: Staff and Principal-level IC PMs often carry organizational influence and scope comparable to management-track leaders, exercised through deep product ownership rather than people leadership — a genuinely different, not lesser, path.
+- Difficulty: 2
+- Tags: ic-track-value
 
 **Card 5**
-Front: In the Detailed Case Study, what was the root cause of the PM's disengagement after accepting a management promotion?
-Back: The decision was based on an unexamined assumption that management was simply "the next step," rather than genuine self-assessment of fit and interest in coaching and organizational work.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what was the root cause of the PM's disengagement after accepting a management promotion?
+- Back: The decision was based on an unexamined assumption that management was simply "the next step," rather than genuine self-assessment of fit and interest in coaching and organizational work.
+- Difficulty: 2
+- Tags: case-study
 
 **Card 6**
-Front: What does Google's APM program illustrate about PM career development, according to this lesson?
-Back: That PM judgment benefits from deliberate, structured development — mentorship, varied rotations, explicit skill-building — rather than being left entirely to unstructured, incidental on-the-job experience.
-Difficulty: 2
-Tags: apm-program
+- Front: What does Google's APM program illustrate about PM career development, according to this lesson?
+- Back: That PM judgment benefits from deliberate, structured development — mentorship, varied rotations, explicit skill-building — rather than being left entirely to unstructured, incidental on-the-job experience.
+- Difficulty: 2
+- Tags: apm-program
 
----
 
 ## Reflection Exercise
 

@@ -149,22 +149,28 @@ The most reliable defense against both peeking and other, subtler forms of unint
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating a statistically significant result as proof the change definitely works and is worth shipping.**
+**Mistake 1: Treating a statistically significant result as proof the change definitely works and is worth shipping**
+
 As covered in Theory, statistical significance indicates the observed difference is unlikely to be pure chance — it says nothing about whether the effect size is practically meaningful, and a significant-but-tiny effect may not be worth the cost of shipping and maintaining the change.
 
-**Mistake 2: Running an experiment without first calculating the required sample size.**
+**Mistake 2: Running an experiment without first calculating the required sample size**
+
 As covered in Theory, this risks either wasting effort on a severely underpowered test that will very likely fail to detect a real effect, or leaving an experiment running far longer than necessary once a large, obvious effect could have been detected sooner.
 
-**Mistake 3: Peeking at results and stopping the experiment early upon seeing an appealing result.**
+**Mistake 3: Peeking at results and stopping the experiment early upon seeing an appealing result**
+
 As covered in Theory, this specific behavior systematically inflates false positives, and is one of the single most common ways a well-intentioned experimentation program produces unreliable, non-reproducible results.
 
-**Mistake 4: Checking many secondary metrics after the fact and treating whichever one moved significantly as the "real" result.**
+**Mistake 4: Checking many secondary metrics after the fact and treating whichever one moved significantly as the "real" result**
+
 This is a subtler cousin of peeking — testing enough metrics, by chance alone, some will appear significant even with no genuine underlying effect, which is precisely why pre-registering a single primary metric in advance is essential.
 
-**Mistake 5: Ignoring guardrail metrics because the primary metric improved.**
+**Mistake 5: Ignoring guardrail metrics because the primary metric improved**
+
 An experiment that improves its primary metric while quietly damaging a guardrail metric (echoing Lesson 41's Goodhart's Law caution, and Lesson 45's own version of the same principle applied to a single experiment rather than an ongoing target) should not be shipped without understanding and addressing that trade-off explicitly.
 
 ---
+
 
 ## Mental Model: The Peeking Trap
 
@@ -222,7 +228,7 @@ The underlying principle connects directly to this lesson's Theory: even a seemi
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: A/B Testing & Experimentation at Different Company Stages
 
 **At a startup:**
 Formal A/B testing is often impractical, since a startup's total user base may be too small to reach adequate statistical power within a reasonable timeframe for anything but the largest, most obvious effects. Reliance on qualitative research (Lesson 8, Lesson 38) and directional signal from smaller-scale tests is often more appropriate at this stage than expecting rigorous statistical significance on every decision.
@@ -315,7 +321,7 @@ Controlled experimentation resolves the correlation-versus-causation gap left op
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Random assignment | Randomly splitting users into control and treatment groups, ensuring the groups are statistically identical except for the tested change | Controlled experiment | 1 |
 | P-value | The probability of observing a result this extreme (or more) by chance alone, if the change genuinely had no effect | Statistical significance | 2 |
@@ -337,48 +343,47 @@ Controlled experimentation resolves the correlation-versus-causation gap left op
 ## Flashcards
 
 **Card 1**
-Front: Why does random assignment allow a controlled experiment to establish causation?
-Back: It ensures treatment and control groups are statistically identical in every respect except the change being tested, so any reliable outcome difference can be attributed specifically to that change.
-Difficulty: 1
-Tags: random-assignment
+- Front: Why does random assignment allow a controlled experiment to establish causation?
+- Back: It ensures treatment and control groups are statistically identical in every respect except the change being tested, so any reliable outcome difference can be attributed specifically to that change.
+- Difficulty: 1
+- Tags: random-assignment
 
 **Card 2**
-Front: What does a p-value actually tell you?
-Back: How unlikely it would be to observe a difference this large (or larger) by pure chance, if the change genuinely had no real effect — not the probability the change works, and not the effect's practical size.
-Difficulty: 2
-Tags: p-value
+- Front: What does a p-value actually tell you?
+- Back: How unlikely it would be to observe a difference this large (or larger) by pure chance, if the change genuinely had no real effect — not the probability the change works, and not the effect's practical size.
+- Difficulty: 2
+- Tags: p-value
 
 **Card 3**
-Front: What is statistical power, and why does it matter?
-Back: The probability an experiment will correctly detect a real effect, if one exists, at a given sample size; an underpowered experiment may fail to detect a genuine effect simply due to insufficient data.
-Difficulty: 2
-Tags: statistical-power
+- Front: What is statistical power, and why does it matter?
+- Back: The probability an experiment will correctly detect a real effect, if one exists, at a given sample size; an underpowered experiment may fail to detect a genuine effect simply due to insufficient data.
+- Difficulty: 2
+- Tags: statistical-power
 
 **Card 4**
-Front: What is "peeking," and why is it a problem?
-Back: Checking an experiment's results before its planned endpoint and stopping early on an appealing result; this systematically inflates the true false-positive rate beyond the nominal significance threshold.
-Difficulty: 2
-Tags: peeking
+- Front: What is "peeking," and why is it a problem?
+- Back: Checking an experiment's results before its planned endpoint and stopping early on an appealing result; this systematically inflates the true false-positive rate beyond the nominal significance threshold.
+- Difficulty: 2
+- Tags: peeking
 
 **Card 5**
-Front: What does pre-registration require a team to commit to before launching an experiment?
-Back: Hypothesis, primary metric, guardrail metrics, minimum detectable effect, required sample size/duration, and a single planned analysis point.
-Difficulty: 2
-Tags: pre-registration
+- Front: What does pre-registration require a team to commit to before launching an experiment?
+- Back: Hypothesis, primary metric, guardrail metrics, minimum detectable effect, required sample size/duration, and a single planned analysis point.
+- Difficulty: 2
+- Tags: pre-registration
 
 **Card 6**
-Front: In the Detailed Case Study, why did the day-four "significant" result fail to hold up over the following month?
-Back: The experiment was never pre-registered with a planned sample size; the PM peeked daily and stopped at an appealing but likely random fluctuation, rather than a genuine, lasting effect.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, why did the day-four "significant" result fail to hold up over the following month?
+- Back: The experiment was never pre-registered with a planned sample size; the PM peeked daily and stopped at an appealing but likely random fluctuation, rather than a genuine, lasting effect.
+- Difficulty: 2
+- Tags: case-study
 
 **Card 7**
-Front: Why doesn't a failed or inconclusive experiment necessarily disprove the underlying hypothesis?
-Back: It may indicate the experiment itself wasn't conducted rigorously enough (underpowered, peeked at early) to properly test the hypothesis, rather than proving the hypothesis false.
-Difficulty: 2
-Tags: interpretation
+- Front: Why doesn't a failed or inconclusive experiment necessarily disprove the underlying hypothesis?
+- Back: It may indicate the experiment itself wasn't conducted rigorously enough (underpowered, peeked at early) to properly test the hypothesis, rather than proving the hypothesis false.
+- Difficulty: 2
+- Tags: interpretation
 
----
 
 ## Reflection Exercise
 

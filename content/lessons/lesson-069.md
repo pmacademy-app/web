@@ -78,13 +78,28 @@ Concrete metrics for internal DevEx include **time-to-first-success** (how long 
 
 ## Common Beginner Mistakes
 
-1. **Assuming internal engineers will tolerate friction because they have "no choice" but to use the internal platform.** Internal teams do have a choice — building their own workaround — and that choice imposes real, often invisible, costs on the company.
-2. **Relying on the absence of complaints as evidence of a healthy internal platform.** Silence can indicate that frustrated teams have simply stopped engaging and built around the problem instead of raising it.
-3. **Treating internal platform investment as a cost center to be minimized rather than a product with real leverage.** Underinvesting in internal DevEx multiplies friction across every team that depends on the platform, a cost that scales with the size of the engineering organization.
-4. **Never measuring internal developer experience quantitatively.** Without metrics like time-to-first-success or support ticket trends, an internal platform team has no systematic way to know whether friction is improving or worsening over time.
-5. **Failing to notice shadow platforms until duplication has already become extensive.** A shadow platform that has existed quietly for a year, with its own maintenance burden and inconsistent practices, is far more expensive and disruptive to unwind than one caught early through active monitoring for duplicated effort.
+**Mistake 1: Assuming internal engineers will tolerate friction because they have "no choice" but to use the internal platform**
+
+Internal teams do have a choice — building their own workaround — and that choice imposes real, often invisible, costs on the company.
+
+**Mistake 2: Relying on the absence of complaints as evidence of a healthy internal platform**
+
+Silence can indicate that frustrated teams have simply stopped engaging and built around the problem instead of raising it.
+
+**Mistake 3: Treating internal platform investment as a cost center to be minimized rather than a product with real leverage**
+
+Underinvesting in internal DevEx multiplies friction across every team that depends on the platform, a cost that scales with the size of the engineering organization.
+
+**Mistake 4: Never measuring internal developer experience quantitatively**
+
+Without metrics like time-to-first-success or support ticket trends, an internal platform team has no systematic way to know whether friction is improving or worsening over time.
+
+**Mistake 5: Failing to notice shadow platforms until duplication has already become extensive**
+
+A shadow platform that has existed quietly for a year, with its own maintenance burden and inconsistent practices, is far more expensive and disruptive to unwind than one caught early through active monitoring for duplicated effort.
 
 ---
+
 
 ## Mental Model: The Friction Ledger
 
@@ -107,7 +122,7 @@ Microsoft's internal engineering culture, including publicly discussed investmen
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Internal Platforms and Developer Experience (DevEx) as a Product at Different Company Stages
 
 **Startup:** Early-stage companies typically have too few engineers and too little infrastructure complexity to justify a dedicated internal platform team, and informal, ad hoc tooling shared through direct communication is often an entirely reasonable substitute at this scale — though the shadow platform risk begins to emerge the moment the engineering organization grows large enough that not everyone can informally coordinate anymore.
 
@@ -147,7 +162,7 @@ A "no" on Shadow Platform Monitoring in particular should be treated as a signif
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you approach building an internal platform for other engineering teams to use?"** The interviewer is evaluating whether you treat internal engineers as genuine product customers, with friction-tracking and satisfaction measurement, rather than assuming organizational alignment alone will ensure adoption.
 
@@ -177,6 +192,8 @@ Internal platforms are structurally identical to external-facing platforms in th
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Internal platforms are still platforms. Treat internal engineers as real customers.
 - "We're all colleagues" doesn't prevent workarounds — it just makes them invisible.
 - Friction Ledger: catalog friction points, score by frequency x severity, prioritize like a backlog.
@@ -200,50 +217,56 @@ Internal platforms are structurally identical to external-facing platforms in th
 
 ## Further Reading / Resources
 
-1. *Team Topologies* by Matthew Skelton and Manuel Pais
-2. *Accelerate* by Nicole Forsgren, Jez Humble, and Gene Kim
-3. *Platform Engineering on Kubernetes* by Mauricio Salatino
+- Matthew Skelton and Manuel Pais, *Team Topologies*
+- Nicole Forsgren, Jez Humble, and Gene Kim, *Accelerate*
+- Mauricio Salatino, *Platform Engineering on Kubernetes*
 
 ---
 
 ## Flashcards
 
-**Front:** Why do internal platforms require the same product discipline as external-facing platforms?
-**Back:** Their Layer 2 Developer Surface, per the Leverage Stack, serves internal engineers just as an external platform's serves outside developers — the same promise and friction dynamics apply.
-**Difficulty:** Easy
-**Tags:** #internal-platforms #core-concept
+**Card 1**
+- Front: ** Why do internal platforms require the same product discipline as external-facing platforms?
+- Back: ** Their Layer 2 Developer Surface, per the Leverage Stack, serves internal engineers just as an external platform's serves outside developers — the same promise and friction dynamics apply.
+- Difficulty: 2
+- Tags: **, internal-platforms, core-concept
 
-**Front:** Why does the "we're all colleagues" assumption fail for internal platforms?
-**Back:** Internal engineers do have an alternative to tolerating friction — quietly building their own workaround — which imposes real, often invisible costs on the company.
-**Difficulty:** Medium
-**Tags:** #shadow-platform
+**Card 2**
+- Front: ** Why does the "we're all colleagues" assumption fail for internal platforms?
+- Back: ** Internal engineers do have an alternative to tolerating friction — quietly building their own workaround — which imposes real, often invisible costs on the company.
+- Difficulty: 2
+- Tags: **, shadow-platform
 
-**Front:** What is a shadow platform?
-**Back:** Parallel, duplicated infrastructure built by internal teams frustrated with an official internal platform's friction, usually without formally complaining first.
-**Difficulty:** Medium
-**Tags:** #shadow-platform
+**Card 3**
+- Front: ** What is a shadow platform?
+- Back: ** Parallel, duplicated infrastructure built by internal teams frustrated with an official internal platform's friction, usually without formally complaining first.
+- Difficulty: 2
+- Tags: **, shadow-platform
 
-**Front:** Why is the absence of complaints not reliable evidence of a healthy internal platform?
-**Back:** Silence can indicate that frustrated teams have quietly disengaged and built around the problem instead of raising it.
-**Difficulty:** Medium
-**Tags:** #friction-ledger
+**Card 4**
+- Front: ** Why is the absence of complaints not reliable evidence of a healthy internal platform?
+- Back: ** Silence can indicate that frustrated teams have quietly disengaged and built around the problem instead of raising it.
+- Difficulty: 2
+- Tags: **, friction-ledger
 
-**Front:** What went wrong in the Duplicated Deployment Pipeline case study?
-**Back:** Two teams independently built workaround deployment scripts due to onboarding friction, with no formal complaint, and the duplication went undetected for nearly a year until a security audit found it.
-**Difficulty:** Hard
-**Tags:** #case-study #shadow-platform
+**Card 5**
+- Front: ** What went wrong in the Duplicated Deployment Pipeline case study?
+- Back: ** Two teams independently built workaround deployment scripts due to onboarding friction, with no formal complaint, and the duplication went undetected for nearly a year until a security audit found it.
+- Difficulty: 2
+- Tags: **, case-study, shadow-platform
 
-**Front:** Name two concrete metrics for measuring internal developer experience.
-**Back:** Time-to-first-success and support ticket volume/resolution time (plus periodic satisfaction surveys).
-**Difficulty:** Medium
-**Tags:** #devex-metrics
+**Card 6**
+- Front: ** Name two concrete metrics for measuring internal developer experience.
+- Back: ** Time-to-first-success and support ticket volume/resolution time (plus periodic satisfaction surveys).
+- Difficulty: 2
+- Tags: **, devex-metrics
 
-**Front:** What should an internal platform team actively monitor for, beyond just tracking friction points?
-**Back:** The emergence of shadow platforms elsewhere in the organization, since their appearance is direct evidence of unaddressed friction.
-**Difficulty:** Hard
-**Tags:** #shadow-platform-monitoring
+**Card 7**
+- Front: ** What should an internal platform team actively monitor for, beyond just tracking friction points?
+- Back: ** The emergence of shadow platforms elsewhere in the organization, since their appearance is direct evidence of unaddressed friction.
+- Difficulty: 2
+- Tags: **, shadow-platform-monitoring
 
----
 
 ## Reflection Exercise
 

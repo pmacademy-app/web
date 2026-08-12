@@ -120,22 +120,28 @@ This lesson's central caution, directly extending Lesson 43's Leaky Bucket conce
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Relying on a total active-user trend line as the primary signal of product health.**
+**Mistake 1: Relying on a total active-user trend line as the primary signal of product health**
+
 As covered in Theory, this metric can mask deteriorating cohort-level retention entirely, as long as acquisition volume compensates — precisely the failure this lesson's Case Study illustrates in detail.
 
-**Mistake 2: Reporting a retention percentage without specifying which convention (classic, rolling, bracketed) was used.**
+**Mistake 2: Reporting a retention percentage without specifying which convention (classic, rolling, bracketed) was used**
+
 As covered in Theory, these three definitions can produce meaningfully different numbers from identical data, and omitting this detail makes retention figures silently incomparable across teams or over time.
 
-**Mistake 3: Comparing retention across cohorts of very different sizes without noting the difference.**
+**Mistake 3: Comparing retention across cohorts of very different sizes without noting the difference**
+
 A cohort of 50 early beta users retaining at 60% and a cohort of 50,000 users retaining at 40% are both meaningful data points, but drawing strong conclusions from small early cohorts as though they carry the same statistical weight as large, mature ones risks over-interpreting noisy, small-sample data.
 
-**Mistake 4: Interpreting any declining retention curve as inherently bad, without checking whether it eventually flattens.**
+**Mistake 4: Interpreting any declining retention curve as inherently bad, without checking whether it eventually flattens**
+
 Since some decline is normal and expected for any cohort, the meaningful question is whether a stable plateau eventually emerges — a curve that's still declining at the point of measurement isn't necessarily concerning if it hasn't yet had enough time to reveal whether a plateau will form.
 
-**Mistake 5: Comparing retention curves across cohorts affected by different product changes without accounting for the change.**
+**Mistake 5: Comparing retention curves across cohorts affected by different product changes without accounting for the change**
+
 If a significant feature launched between two cohorts' start dates, comparing their retention curves directly conflates the launch's effect with ordinary cohort-to-cohort variation, unless the comparison explicitly accounts for and isolates that specific change — a concern directly addressed by the controlled experimentation methods in Lesson 45.
 
 ---
+
 
 ## Mental Model: The Smile Curve
 
@@ -193,7 +199,7 @@ The underlying principle connects directly to this lesson's Theory: for a subscr
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Cohort & Retention Analysis at Different Company Stages
 
 **At a startup:**
 Cohort sizes are often small, making retention curves noisy and hard to interpret with confidence (Mistake 3) — a startup should be cautious about over-interpreting small-sample retention data, while still tracking it, since it's often the earliest genuine signal of product-market fit available, well before revenue or growth metrics would reveal anything meaningful.
@@ -284,7 +290,7 @@ Cohort analysis groups users by shared starting period and tracks each group's b
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Cohort | A group of users sharing a defining starting characteristic, most commonly their join period, tracked separately over time | Retention triangle | 1 |
 | Retention triangle | A table visualizing cohort retention, with rows as cohorts and columns as time periods since each cohort's start | Cohort | 1 |
@@ -306,42 +312,41 @@ Cohort analysis groups users by shared starting period and tracks each group's b
 ## Flashcards
 
 **Card 1**
-Front: What is a cohort, in the context of product metrics?
-Back: A group of users sharing a defining starting characteristic, most commonly their join period, tracked separately over time rather than pooled into an aggregate.
-Difficulty: 1
-Tags: cohort-definition
+- Front: What is a cohort, in the context of product metrics?
+- Back: A group of users sharing a defining starting characteristic, most commonly their join period, tracked separately over time rather than pooled into an aggregate.
+- Difficulty: 1
+- Tags: cohort-definition
 
 **Card 2**
-Front: What do you learn by reading down a retention triangle's columns versus across its rows?
-Back: Reading down columns compares the same "time since joining" across successive cohorts (improving or worsening trend); reading across rows shows how a single cohort decays or stabilizes over its own lifetime.
-Difficulty: 2
-Tags: retention-triangle
+- Front: What do you learn by reading down a retention triangle's columns versus across its rows?
+- Back: Reading down columns compares the same "time since joining" across successive cohorts (improving or worsening trend); reading across rows shows how a single cohort decays or stabilizes over its own lifetime.
+- Difficulty: 2
+- Tags: retention-triangle
 
 **Card 3**
-Front: Name the three common retention conventions.
-Back: Classic (N-day): exact day N; Rolling: day N or any day after; Bracketed: within a window around day N.
-Difficulty: 2
-Tags: retention-conventions
+- Front: Name the three common retention conventions.
+- Back: Classic (N-day): exact day N; Rolling: day N or any day after; Bracketed: within a window around day N.
+- Difficulty: 2
+- Tags: retention-conventions
 
 **Card 4**
-Front: What does a "smile" shaped retention curve indicate?
-Back: The curve flattens into a stable plateau after its initial decline, signaling that a meaningful fraction of users have found durable value — a strong signal of genuine product-market fit.
-Difficulty: 1
-Tags: smile-curve
+- Front: What does a "smile" shaped retention curve indicate?
+- Back: The curve flattens into a stable plateau after its initial decline, signaling that a meaningful fraction of users have found durable value — a strong signal of genuine product-market fit.
+- Difficulty: 1
+- Tags: smile-curve
 
 **Card 5**
-Front: How can an aggregate active-user trend mislead about a product's actual health?
-Back: It can grow steadily even while cohort-level retention is worsening, as long as increasing acquisition volume outpaces the accelerating churn rate.
-Difficulty: 2
-Tags: aggregate-vs-cohort
+- Front: How can an aggregate active-user trend mislead about a product's actual health?
+- Back: It can grow steadily even while cohort-level retention is worsening, as long as increasing acquisition volume outpaces the accelerating churn rate.
+- Difficulty: 2
+- Tags: aggregate-vs-cohort
 
 **Card 6**
-Front: In the Detailed Case Study, what did the retention triangle reveal that the aggregate active-user chart hid?
-Back: Week-4 retention had been declining steadily across six quarters of successive cohorts (38% to 19%), masked by each cohort also being larger than the last due to increased marketing spend.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what did the retention triangle reveal that the aggregate active-user chart hid?
+- Back: Week-4 retention had been declining steadily across six quarters of successive cohorts (38% to 19%), masked by each cohort also being larger than the last due to increased marketing spend.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

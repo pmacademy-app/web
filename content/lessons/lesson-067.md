@@ -77,13 +77,28 @@ Given that no detection system achieves perfect accuracy, an **appeals process**
 
 ## Common Beginner Mistakes
 
-1. **Treating enforcement as binary — allow or remove — with no intermediate steps.** This forces every moderate-confidence signal into an all-or-nothing decision, maximizing the damage of both false positives (unwarranted removal) and false negatives (no response at all to genuine concerns below the removal threshold).
-2. **Building a detection system without simultaneously designing the appeals process.** Detection alone, however accurate, guarantees some false positives, and without an appeals mechanism, those false positives have no path to correction.
-3. **Optimizing detection purely for catching bad actors, without weighing the false-positive cost to honest participants.** This mirrors the recall-oriented mistake from Lesson 65's Overzealous Churn Model — maximizing catch-rate without regard to the cost imposed on those incorrectly caught in the process.
-4. **Assuming enforcement decisions are purely a data science or trust-and-safety-team problem, with no PM ownership.** As in Lesson 65's Ownership Zones Model, the relative cost of false positives versus false negatives in enforcement is a business and ethical judgment that PM leadership must explicitly own, not delegate entirely to a detection model's default behavior.
-5. **Failing to monitor enforcement outcomes over a long time horizon.** Just as filter bubble damage from Lesson 66 is invisible on short time horizons, patterns of disproportionate or biased enforcement against specific participant segments can take considerable time to surface unless deliberately monitored for.
+**Mistake 1: Treating enforcement as binary — allow or remove — with no intermediate steps**
+
+This forces every moderate-confidence signal into an all-or-nothing decision, maximizing the damage of both false positives (unwarranted removal) and false negatives (no response at all to genuine concerns below the removal threshold).
+
+**Mistake 2: Building a detection system without simultaneously designing the appeals process**
+
+Detection alone, however accurate, guarantees some false positives, and without an appeals mechanism, those false positives have no path to correction.
+
+**Mistake 3: Optimizing detection purely for catching bad actors, without weighing the false-positive cost to honest participants**
+
+This mirrors the recall-oriented mistake from Lesson 65's Overzealous Churn Model — maximizing catch-rate without regard to the cost imposed on those incorrectly caught in the process.
+
+**Mistake 4: Assuming enforcement decisions are purely a data science or trust-and-safety-team problem, with no PM ownership**
+
+As in Lesson 65's Ownership Zones Model, the relative cost of false positives versus false negatives in enforcement is a business and ethical judgment that PM leadership must explicitly own, not delegate entirely to a detection model's default behavior.
+
+**Mistake 5: Failing to monitor enforcement outcomes over a long time horizon**
+
+Just as filter bubble damage from Lesson 66 is invisible on short time horizons, patterns of disproportionate or biased enforcement against specific participant segments can take considerable time to surface unless deliberately monitored for.
 
 ---
+
 
 ## Mental Model: The Escalation Staircase
 
@@ -106,7 +121,7 @@ Uber's trust and safety systems, including publicly discussed background check p
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Platform Governance: Trust, Safety, and Abuse Prevention at Different Company Stages
 
 **Startup:** Early-stage platforms often handle trust and safety manually, with a small team personally reviewing flagged content or accounts, which can actually make proportionate, case-by-case judgment easier than it will be later at scale — but this manual approach does not automatically transfer good judgment into a durable, documented system as the platform and its volume of flags grow.
 
@@ -146,7 +161,7 @@ A "no" on Functional Appeals Process should be treated with particular urgency �
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you design an enforcement system for detecting fraudulent accounts on a platform?"** The interviewer is evaluating whether you propose graduated, reversible response steps rather than a single detect-and-remove pipeline, and whether you mention an appeals process as a structural requirement rather than an afterthought.
 
@@ -176,6 +191,8 @@ Platform governance is fundamentally a response design problem, not merely a det
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Detection is never perfect. Governance is about designing responses, not just detecting bad actors.
 - Escalation Staircase: Soft Signal → Restriction → Suspension → Termination. Match severity to confidence.
 - Keep lower steps reversible. Reserve Termination for high-confidence or repeated violations only.
@@ -199,50 +216,56 @@ Platform governance is fundamentally a response design problem, not merely a det
 
 ## Further Reading / Resources
 
-1. *Custodians of the Internet* by Tarleton Gillespie
-2. *Behind the Screen* by Sarah T. Roberts
-3. *Weapons of Math Destruction* by Cathy O'Neil
+- Tarleton Gillespie, *Custodians of the Internet*
+- Sarah T. Roberts, *Behind the Screen*
+- Cathy O'Neil, *Weapons of Math Destruction*
 
 ---
 
 ## Flashcards
 
-**Front:** Why is "detect and remove" an insufficient governance strategy?
-**Back:** No detection system is perfectly accurate, so treating removal as the only response converts every false positive into a full, often irreversible harm to an honest participant.
-**Difficulty:** Easy
-**Tags:** #governance #core-concept
+**Card 1**
+- Front: ** Why is "detect and remove" an insufficient governance strategy?
+- Back: ** No detection system is perfectly accurate, so treating removal as the only response converts every false positive into a full, often irreversible harm to an honest participant.
+- Difficulty: 2
+- Tags: **, governance, core-concept
 
-**Front:** Name the four steps of the Escalation Staircase in order.
-**Back:** Soft Signal, Restriction, Suspension, Termination.
-**Difficulty:** Easy
-**Tags:** #escalation-staircase
+**Card 2**
+- Front: ** Name the four steps of the Escalation Staircase in order.
+- Back: ** Soft Signal, Restriction, Suspension, Termination.
+- Difficulty: 2
+- Tags: **, escalation-staircase
 
-**Front:** Why should lower escalation steps be reversible?
-**Back:** To limit the damage a false positive can cause to an honest participant, since detection confidence at lower steps is, by design, lower.
-**Difficulty:** Medium
-**Tags:** #reversibility
+**Card 3**
+- Front: ** Why should lower escalation steps be reversible?
+- Back: ** To limit the damage a false positive can cause to an honest participant, since detection confidence at lower steps is, by design, lower.
+- Difficulty: 2
+- Tags: **, reversibility
 
-**Front:** Why is an appeals process a structural requirement, not a courtesy?
-**Back:** Because any system that acknowledges its own imperfect accuracy must provide a path to correct the false positives it will inevitably produce.
-**Difficulty:** Medium
-**Tags:** #appeals-process
+**Card 4**
+- Front: ** Why is an appeals process a structural requirement, not a courtesy?
+- Back: ** Because any system that acknowledges its own imperfect accuracy must provide a path to correct the false positives it will inevitably produce.
+- Difficulty: 2
+- Tags: **, appeals-process
 
-**Front:** What went wrong in the Automated Seller Purge case study?
-**Back:** A moderate-confidence detection signal was connected directly to permanent termination with no graduated steps, paired with a non-functional appeals process, harming honest sellers and damaging marketplace liquidity.
-**Difficulty:** Hard
-**Tags:** #case-study #escalation-staircase
+**Card 5**
+- Front: ** What went wrong in the Automated Seller Purge case study?
+- Back: ** A moderate-confidence detection signal was connected directly to permanent termination with no graduated steps, paired with a non-functional appeals process, harming honest sellers and damaging marketplace liquidity.
+- Difficulty: 2
+- Tags: **, case-study, escalation-staircase
 
-**Front:** How does trust and safety enforcement relate to the precision/recall trade-off from Lesson 65?
-**Back:** It is a high-stakes application of the same trade-off — maximizing catch rate (recall) mechanically increases false positives against honest participants, a cost that must be deliberately weighed.
-**Difficulty:** Hard
-**Tags:** #precision-recall #enforcement
+**Card 6**
+- Front: ** How does trust and safety enforcement relate to the precision/recall trade-off from Lesson 65?
+- Back: ** It is a high-stakes application of the same trade-off — maximizing catch rate (recall) mechanically increases false positives against honest participants, a cost that must be deliberately weighed.
+- Difficulty: 2
+- Tags: **, precision-recall, enforcement
 
-**Front:** Why should enforcement outcomes be monitored over a long time horizon?
-**Back:** Patterns of disproportionate or biased enforcement against specific participant segments can take considerable time to surface, similar to filter bubble damage in Lesson 66.
-**Difficulty:** Medium
-**Tags:** #long-horizon-monitoring
+**Card 7**
+- Front: ** Why should enforcement outcomes be monitored over a long time horizon?
+- Back: ** Patterns of disproportionate or biased enforcement against specific participant segments can take considerable time to surface, similar to filter bubble damage in Lesson 66.
+- Difficulty: 2
+- Tags: **, long-horizon-monitoring
 
----
 
 ## Reflection Exercise
 

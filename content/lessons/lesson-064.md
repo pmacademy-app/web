@@ -74,13 +74,28 @@ A useful diagnostic for organizational metric health: count how many different d
 
 ## Common Beginner Mistakes
 
-1. **Assuming more dashboards signal a healthier data culture.** Proliferating dashboards without enforcing a single source of truth for key metrics usually signals fragmentation, not sophistication.
-2. **Treating a metric's name as sufficient documentation of its meaning.** A dashboard labeled "Retention" without a documented formula (what window? what counts as "retained"? which user segments?) invites every viewer to silently assume their own definition.
-3. **Never revisiting a metric's definition after a major product or platform change.** Metrics can drift silently out of sync with what they were originally built to represent, especially after feature launches or instrumentation migrations.
-4. **Trusting a metric because it comes from a senior stakeholder's dashboard, rather than because it has passed through Validation and Definition Consensus.** Organizational seniority is not a substitute for provenance; an executive's personally-maintained spreadsheet can be just as ungoverned as anyone else's.
-5. **Building elaborate analysis on top of an unvalidated event.** If Stage 2 (Validation) was skipped — if no one confirmed the underlying event actually represents the real-world action it claims to — everything built on top of it, however sophisticated, inherits that foundational error.
+**Mistake 1: Assuming more dashboards signal a healthier data culture**
+
+Proliferating dashboards without enforcing a single source of truth for key metrics usually signals fragmentation, not sophistication.
+
+**Mistake 2: Treating a metric's name as sufficient documentation of its meaning**
+
+A dashboard labeled "Retention" without a documented formula (what window? what counts as "retained"? which user segments?) invites every viewer to silently assume their own definition.
+
+**Mistake 3: Never revisiting a metric's definition after a major product or platform change**
+
+Metrics can drift silently out of sync with what they were originally built to represent, especially after feature launches or instrumentation migrations.
+
+**Mistake 4: Trusting a metric because it comes from a senior stakeholder's dashboard, rather than because it has passed through Validation and Definition Consensus**
+
+Organizational seniority is not a substitute for provenance; an executive's personally-maintained spreadsheet can be just as ungoverned as anyone else's.
+
+**Mistake 5: Building elaborate analysis on top of an unvalidated event**
+
+If Stage 2 (Validation) was skipped — if no one confirmed the underlying event actually represents the real-world action it claims to — everything built on top of it, however sophisticated, inherits that foundational error.
 
 ---
+
 
 ## Mental Model: The Metric Provenance Chain
 
@@ -102,7 +117,7 @@ Netflix is widely discussed in the industry as an organization with an unusually
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Data-Informed Product Management: Building a Metrics Culture at Different Company Stages
 
 **Startup:** Early-stage companies typically have very few metrics and very few people looking at them, which makes informal, undocumented definitions tolerable in the short term simply because the same one or two people who instrumented the event are also the only ones interpreting it — a luxury that disappears the moment the team, and the number of dashboards, starts to grow.
 
@@ -140,7 +155,7 @@ A "no" on Single Source of Truth in particular should be treated as an active or
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"Tell me about a time data from two sources disagreed, and how you resolved it."** The interviewer is evaluating whether you can diagnose the disagreement using something like the Metric Provenance Chain — tracing back to a missing Definition Consensus or Single Source of Truth — rather than simply picking whichever number was more convenient.
 
@@ -170,6 +185,8 @@ Organizational metric trust, not the sheer volume of available data, is the true
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Data volume isn't the constraint. Metric trust is.
 - Provenance Chain: Instrumentation → Validation → Definition Consensus → Trusted Metric → Decision.
 - A metric's name ≠ its definition. Always find the documented formula.
@@ -193,50 +210,56 @@ Organizational metric trust, not the sheer volume of available data, is the true
 
 ## Further Reading / Resources
 
-1. *Trustworthy Online Controlled Experiments* by Ron Kohavi, Diane Tang, and Ya Xu
-2. *Measure What Matters* by John Doerr
-3. *Data Science for Business* by Foster Provost and Tom Fawcett
+- Ron Kohavi, Diane Tang, and Ya Xu, *Trustworthy Online Controlled Experiments*
+- John Doerr, *Measure What Matters*
+- Foster Provost and Tom Fawcett, *Data Science for Business*
 
 ---
 
 ## Flashcards
 
-**Front:** What is the actual constraint on data-informed decision-making at scale, according to this lesson?
-**Back:** Organizational metric trust, not the volume of available data.
-**Difficulty:** Easy
-**Tags:** #metrics-culture #core-concept
+**Card 1**
+- Front: ** What is the actual constraint on data-informed decision-making at scale, according to this lesson?
+- Back: ** Organizational metric trust, not the volume of available data.
+- Difficulty: 2
+- Tags: **, metrics-culture, core-concept
 
-**Front:** Name the five stages of the Metric Provenance Chain in order.
-**Back:** Instrumentation, Validation, Definition Consensus, Trusted Metric, Decision.
-**Difficulty:** Easy
-**Tags:** #provenance-chain
+**Card 2**
+- Front: ** Name the five stages of the Metric Provenance Chain in order.
+- Back: ** Instrumentation, Validation, Definition Consensus, Trusted Metric, Decision.
+- Difficulty: 2
+- Tags: **, provenance-chain
 
-**Front:** What is metric definition drift?
-**Back:** The gradual, often silent divergence between a metric's original intended meaning and what it currently actually measures.
-**Difficulty:** Medium
-**Tags:** #drift
+**Card 3**
+- Front: ** What is metric definition drift?
+- Back: ** The gradual, often silent divergence between a metric's original intended meaning and what it currently actually measures.
+- Difficulty: 2
+- Tags: **, drift
 
-**Front:** What does dashboard fragmentation indicate about an organization?
-**Back:** That its Metric Provenance Chain is broken somewhere between Definition Consensus and Trusted Metric status.
-**Difficulty:** Medium
-**Tags:** #fragmentation
+**Card 4**
+- Front: ** What does dashboard fragmentation indicate about an organization?
+- Back: ** That its Metric Provenance Chain is broken somewhere between Definition Consensus and Trusted Metric status.
+- Difficulty: 2
+- Tags: **, fragmentation
 
-**Front:** In the Case Study, why didn't either retention dashboard get flagged as "wrong"?
-**Back:** Both were internally valid and consistently computed — the failure was the absence of company-wide Definition Consensus and a designated single source of truth, not a calculation error in either dashboard.
-**Difficulty:** Hard
-**Tags:** #case-study #provenance-chain
+**Card 5**
+- Front: ** In the Case Study, why didn't either retention dashboard get flagged as "wrong"?
+- Back: ** Both were internally valid and consistently computed — the failure was the absence of company-wide Definition Consensus and a designated single source of truth, not a calculation error in either dashboard.
+- Difficulty: 2
+- Tags: **, case-study, provenance-chain
 
-**Front:** Why is an executive's personal dashboard not automatically a Trusted Metric?
-**Back:** Organizational seniority is not a substitute for provenance — any metric must pass through Validation and Definition Consensus regardless of its source.
-**Difficulty:** Medium
-**Tags:** #metric-health
+**Card 6**
+- Front: ** Why is an executive's personal dashboard not automatically a Trusted Metric?
+- Back: ** Organizational seniority is not a substitute for provenance — any metric must pass through Validation and Definition Consensus regardless of its source.
+- Difficulty: 2
+- Tags: **, metric-health
 
-**Front:** What should a PM do if a metric fails the Single Source of Truth check?
-**Back:** Treat it as an active organizational risk — decisions may currently be resting on incompatible versions of the same nominal number.
-**Difficulty:** Hard
-**Tags:** #metric-health-checklist
+**Card 7**
+- Front: ** What should a PM do if a metric fails the Single Source of Truth check?
+- Back: ** Treat it as an active organizational risk — decisions may currently be resting on incompatible versions of the same nominal number.
+- Difficulty: 2
+- Tags: **, metric-health-checklist
 
----
 
 ## Reflection Exercise
 

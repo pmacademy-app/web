@@ -75,14 +75,20 @@ A crisis response that skips the Detect and Triage step, jumping directly to eit
 
 ## Common Beginner Mistakes
 
-1. **Treating communication as secondary to technical resolution rather than a parallel priority.**
-2. **Providing an overconfident resolution timeline before the cause is actually understood.**
-3. **Remaining silent until the incident is fully resolved, rather than acknowledging it early.**
-4. **Skipping a public post-incident report, missing an opportunity to demonstrate genuine accountability.**
-5. **Failing to distinguish, in communication, between what is known, what is suspected, and what is still unknown.**
-6. **Believing the only choice is between alarming speculation and total silence, overlooking calm, honest, symptom-level acknowledgment as a third option.**
+**Mistake 1: Treating communication as secondary to technical resolution rather than a parallel priority**
+
+**Mistake 2: Providing an overconfident resolution timeline before the cause is actually understood**
+
+**Mistake 3: Remaining silent until the incident is fully resolved, rather than acknowledging it early**
+
+**Mistake 4: Skipping a public post-incident report, missing an opportunity to demonstrate genuine accountability**
+
+**Mistake 5: Failing to distinguish, in communication, between what is known, what is suspected, and what is still unknown**
+
+**Mistake 6: Believing the only choice is between alarming speculation and total silence, overlooking calm, honest, symptom-level acknowledgment as a third option**
 
 ---
+
 
 ## Mental Model: The Crisis Response Timeline
 
@@ -98,7 +104,7 @@ Cloudflare's practice of publishing detailed, technical public postmortems after
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Crisis Management and Incident Response for PMs at Different Company Stages
 
 **At a startup:** Early-stage companies often lack a formal incident response process entirely, improvising communication in real time through whatever channel is easiest — a founder's personal social media account, a quick status page update, a direct email. This can work adequately at small scale, where the founder or a senior team member typically has full context and can communicate with genuine authority, but it leaves no institutional memory: the next incident, potentially handled by a different person, starts from the same improvisation rather than building on lessons the company has already learned the hard way once.
 
@@ -167,6 +173,9 @@ Crisis response requires treating communication and technical containment as par
 ---
 
 ## Cheat Sheet
+
+*A two-minute review of everything in this lesson.*
+
 - Communicate in parallel with containment, never sequentially after it.
 - Acknowledge fast. Don't promise a timeline you're not confident in.
 - Postmortems demonstrate accountability and rebuild trust.
@@ -187,45 +196,50 @@ Crisis response requires treating communication and technical containment as par
 ---
 
 ## Further Reading / Resources
-1. *Site Reliability Engineering* by Betsy Beyer, Chris Jones, Jennifer Petoff, and Niall Richard Murphy
-2. Published postmortem archives from major cloud infrastructure providers
-3. *The Checklist Manifesto* by Atul Gawande
+- Betsy Beyer, Chris Jones, Jennifer Petoff, and Niall Richard Murphy, *Site Reliability Engineering*
+- Published postmortem archives from major cloud infrastructure providers
+- Atul Gawande, *The Checklist Manifesto*
 
 ---
 
 ## Flashcards
 
-**Front:** Why must communication and containment proceed in parallel during a crisis?
-**Back:** Silence during a visible failure compounds user anxiety and trust erosion, so acknowledgment shouldn't wait for full technical resolution.
-**Difficulty:** Easy
-**Tags:** #crisis-management
+**Card 1**
+- Front: ** Why must communication and containment proceed in parallel during a crisis?
+- Back: ** Silence during a visible failure compounds user anxiety and trust erosion, so acknowledgment shouldn't wait for full technical resolution.
+- Difficulty: 2
+- Tags: **, crisis-management
 
-**Front:** What are the four phases of the Crisis Response Timeline?
-**Back:** Detect and Triage, Contain and Communicate (in parallel), Resolve, Postmortem and Prevent.
-**Difficulty:** Easy
-**Tags:** #crisis-response-timeline
+**Card 2**
+- Front: ** What are the four phases of the Crisis Response Timeline?
+- Back: ** Detect and Triage, Contain and Communicate (in parallel), Resolve, Postmortem and Prevent.
+- Difficulty: 2
+- Tags: **, crisis-response-timeline
 
-**Front:** Why is providing an overconfident resolution timeline risky during a crisis?
-**Back:** If missed, it creates a second, avoidable broken promise on top of the original incident, echoing the Promise Tiers discipline from Lesson 62.
-**Difficulty:** Medium
-**Tags:** #overpromising
+**Card 3**
+- Front: ** Why is providing an overconfident resolution timeline risky during a crisis?
+- Back: ** If missed, it creates a second, avoidable broken promise on top of the original incident, echoing the Promise Tiers discipline from Lesson 62.
+- Difficulty: 2
+- Tags: **, overpromising
 
-**Front:** What went wrong in the Silent Outage case study?
-**Back:** Communication was delayed for hours while engineering investigated, and the eventual update gave an overconfident timeline that was subsequently missed.
-**Difficulty:** Hard
-**Tags:** #case-study
+**Card 4**
+- Front: ** What went wrong in the Silent Outage case study?
+- Back: ** Communication was delayed for hours while engineering investigated, and the eventual update gave an overconfident timeline that was subsequently missed.
+- Difficulty: 2
+- Tags: **, case-study
 
-**Front:** Why does severity classification need to happen before communication and technical fixing begin in earnest?
-**Back:** Without it, a team can under-communicate a genuinely serious incident or over-communicate a minor one, and severity also determines who needs to be involved (legal, security, executives) from the outset.
-**Difficulty:** Hard
-**Tags:** #severity-classification
+**Card 5**
+- Front: ** Why does severity classification need to happen before communication and technical fixing begin in earnest?
+- Back: ** Without it, a team can under-communicate a genuinely serious incident or over-communicate a minor one, and severity also determines who needs to be involved (legal, security, executives) from the outset.
+- Difficulty: 2
+- Tags: **, severity-classification
 
-**Front:** What is a "narrative vacuum" and why does it matter in crisis communication?
-**Back:** The gap left by silence during a visible incident — affected users and observers will fill it with their own assumptions, usually worse than reality, before an official explanation arrives.
-**Difficulty:** Hard
-**Tags:** #crisis-management #trust
+**Card 6**
+- Front: ** What is a "narrative vacuum" and why does it matter in crisis communication?
+- Back: ** The gap left by silence during a visible incident — affected users and observers will fill it with their own assumptions, usually worse than reality, before an official explanation arrives.
+- Difficulty: 2
+- Tags: **, crisis-management, trust
 
----
 
 ## Reflection Exercise
 

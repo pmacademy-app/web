@@ -83,13 +83,28 @@ Before Zone 2 (Model Development) can proceed responsibly, the PM should supply,
 
 ## Common Beginner Mistakes
 
-1. **Handing data science a vague goal without specifying error costs.** "Build a model to predict churn" leaves the precision/recall trade-off, which is a product decision, to be made implicitly and invisibly by whoever builds the model.
-2. **Treating a model's technical metric as automatically equivalent to product success.** A model with high accuracy or AUC can still be the wrong choice if that metric doesn't reflect the actual cost structure of the product decision it feeds.
-3. **Assuming a model's output is a fact rather than a probabilistic estimate.** Treating a "churn probability of 0.7" as equivalent to "this customer will churn" collapses Zone 3's necessary interpretation step and leads to overconfident product decisions.
-4. **Deploying a model without a defined Zone 4 action plan.** Building a model before deciding what the product will actually do with its output wastes data science effort and often results in a model that sits unused because no clear decision was ever attached to it.
-5. **Never revisiting the ownership zones after deployment.** Business context, error costs, and the product decisions attached to a model's output can all shift over time, and failing to periodically revisit Zone 1 framing can leave a once-appropriate model quietly misaligned with current business needs.
+**Mistake 1: Handing data science a vague goal without specifying error costs**
+
+"Build a model to predict churn" leaves the precision/recall trade-off, which is a product decision, to be made implicitly and invisibly by whoever builds the model.
+
+**Mistake 2: Treating a model's technical metric as automatically equivalent to product success**
+
+A model with high accuracy or AUC can still be the wrong choice if that metric doesn't reflect the actual cost structure of the product decision it feeds.
+
+**Mistake 3: Assuming a model's output is a fact rather than a probabilistic estimate**
+
+Treating a "churn probability of 0.7" as equivalent to "this customer will churn" collapses Zone 3's necessary interpretation step and leads to overconfident product decisions.
+
+**Mistake 4: Deploying a model without a defined Zone 4 action plan**
+
+Building a model before deciding what the product will actually do with its output wastes data science effort and often results in a model that sits unused because no clear decision was ever attached to it.
+
+**Mistake 5: Never revisiting the ownership zones after deployment**
+
+Business context, error costs, and the product decisions attached to a model's output can all shift over time, and failing to periodically revisit Zone 1 framing can leave a once-appropriate model quietly misaligned with current business needs.
 
 ---
+
 
 ## Mental Model: The Ownership Zones Model
 
@@ -112,7 +127,7 @@ LinkedIn's "People You May Know" feature, and its broader data science culture a
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Working with Data Science & ML Teams at Different Company Stages
 
 **Startup:** Early-stage companies often have PMs and data scientists (sometimes the same person) working in extremely tight loops, which can make formal Ownership Zone documentation feel unnecessary — but even informal collaboration benefits from at least verbally agreeing on error costs before model work begins, since the failure mode described in the Case Study below can occur even in a two-person team.
 
@@ -150,7 +165,7 @@ A "no" on Error Cost Specified should be treated as a launch-blocking gap — pr
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"Tell me about a time you worked with a data science or machine learning team to ship a model-driven feature."** The interviewer is evaluating whether you can name a specific business decision, error-cost trade-off, and deployment plan you supplied, rather than describing the collaboration purely in terms of technical model performance.
 
@@ -180,6 +195,8 @@ A model can be technically excellent and still be the wrong model for a product'
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Technically excellent ≠ product-correct. The optimization target is a proxy, not the real goal.
 - Ownership Zones: Problem Framing (PM) → Model Development (DS) → Interpretation (Shared) → Decision & Deployment (PM).
 - Precision vs. recall is a business trade-off about error cost, not a purely technical choice.
@@ -203,50 +220,56 @@ A model can be technically excellent and still be the wrong model for a product'
 
 ## Further Reading / Resources
 
-1. *Designing Machine Learning Systems* by Chip Huyen
-2. *Data Science for Business* by Foster Provost and Tom Fawcett
-3. *Prediction Machines* by Ajay Agrawal, Joshua Gans, and Avi Goldfarb
+- Chip Huyen, *Designing Machine Learning Systems*
+- Foster Provost and Tom Fawcett, *Data Science for Business*
+- Ajay Agrawal, Joshua Gans, and Avi Goldfarb, *Prediction Machines*
 
 ---
 
 ## Flashcards
 
-**Front:** Why can a technically excellent model still be wrong for a product?
-**Back:** Its optimization target is a proxy for the real business outcome, and proxies can diverge from that outcome in ways invisible during model development.
-**Difficulty:** Easy
-**Tags:** #model-collaboration #core-concept
+**Card 1**
+- Front: ** Why can a technically excellent model still be wrong for a product?
+- Back: ** Its optimization target is a proxy for the real business outcome, and proxies can diverge from that outcome in ways invisible during model development.
+- Difficulty: 2
+- Tags: **, model-collaboration, core-concept
 
-**Front:** Name the four zones of the Ownership Zones Model.
-**Back:** Problem Framing (PM), Model Development (Data Science), Output Interpretation (Shared), Product Decision and Deployment (PM).
-**Difficulty:** Easy
-**Tags:** #ownership-zones
+**Card 2**
+- Front: ** Name the four zones of the Ownership Zones Model.
+- Back: ** Problem Framing (PM), Model Development (Data Science), Output Interpretation (Shared), Product Decision and Deployment (PM).
+- Difficulty: 2
+- Tags: **, ownership-zones
 
-**Front:** Why is the precision/recall trade-off a product decision, not a purely technical one?
-**Back:** It depends on the relative business cost of false positives versus false negatives, information only the PM typically has.
-**Difficulty:** Medium
-**Tags:** #precision-recall
+**Card 3**
+- Front: ** Why is the precision/recall trade-off a product decision, not a purely technical one?
+- Back: ** It depends on the relative business cost of false positives versus false negatives, information only the PM typically has.
+- Difficulty: 2
+- Tags: **, precision-recall
 
-**Front:** What is the base-rate problem, as illustrated by the churn example?
-**Back:** When the positive class (e.g., churners) is rare, a model that simply predicts "no one churns" can still score high on accuracy, making accuracy alone misleading.
-**Difficulty:** Medium
-**Tags:** #base-rate
+**Card 4**
+- Front: ** What is the base-rate problem, as illustrated by the churn example?
+- Back: ** When the positive class (e.g., churners) is rare, a model that simply predicts "no one churns" can still score high on accuracy, making accuracy alone misleading.
+- Difficulty: 2
+- Tags: **, base-rate
 
-**Front:** What went wrong in the Overzealous Churn Model case study?
-**Back:** The model was framed as recall-oriented without quantifying customer success's real outreach capacity, producing more false positives than the team could handle.
-**Difficulty:** Hard
-**Tags:** #case-study #ownership-zones
+**Card 5**
+- Front: ** What went wrong in the Overzealous Churn Model case study?
+- Back: ** The model was framed as recall-oriented without quantifying customer success's real outreach capacity, producing more false positives than the team could handle.
+- Difficulty: 2
+- Tags: **, case-study, ownership-zones
 
-**Front:** What must a PM supply before model development begins, per the Collaboration Checklist?
-**Back:** The business decision the model informs, relative error costs, capacity constraints of downstream teams, and a minimum acceptable performance threshold.
-**Difficulty:** Medium
-**Tags:** #collaboration-checklist
+**Card 6**
+- Front: ** What must a PM supply before model development begins, per the Collaboration Checklist?
+- Back: ** The business decision the model informs, relative error costs, capacity constraints of downstream teams, and a minimum acceptable performance threshold.
+- Difficulty: 2
+- Tags: **, collaboration-checklist
 
-**Front:** Why shouldn't a model's probabilistic output be treated as a fact?
-**Back:** A "churn probability of 0.7" is an estimate requiring interpretation (Zone 3), not equivalent to certainty that the customer will churn.
-**Difficulty:** Hard
-**Tags:** #interpretation
+**Card 7**
+- Front: ** Why shouldn't a model's probabilistic output be treated as a fact?
+- Back: ** A "churn probability of 0.7" is an estimate requiring interpretation (Zone 3), not equivalent to certainty that the customer will churn.
+- Difficulty: 2
+- Tags: **, interpretation
 
----
 
 ## Reflection Exercise
 

@@ -12,7 +12,7 @@ A **minimum viable product (MVP)** is the smallest version of a solution that le
 
 | Field | Detail |
 |---|---|
-| **Module** | 3 — Product Design (Opening Lesson) |
+| **Module** | 3 — Product Design |
 | **Current Lesson** | 21 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
@@ -161,22 +161,28 @@ Both patterns share the same underlying corrective: return explicitly to the ris
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Building a low-quality, broken, or embarrassing version of the eventual product and calling it minimal.**
+**Mistake 1: Building a low-quality, broken, or embarrassing version of the eventual product and calling it minimal**
+
 "Minimum" refers to scope, not to quality or craftsmanship within that scope — an MVP should be a small but genuinely complete, functioning solution to a narrowly scoped version of the problem, not a shoddy, half-working version of the full vision.
 
-**Mistake 2: Treating an MVP as "phase one" of an already-decided larger build, rather than a genuine test.**
+**Mistake 2: Treating an MVP as "phase one" of an already-decided larger build, rather than a genuine test**
+
 This is the car-wheel failure — building a fragment of a predetermined plan rather than a complete, standalone artifact capable of producing independent learning that might genuinely redirect the plan.
 
 **Mistake 3: Scoping an MVP by "what's easiest to build" rather than "what's necessary to test the riskiest assumption."**
+
 These two scoping criteria frequently diverge, and defaulting to ease of engineering effort, rather than test-relevance, risks producing something that ships quickly but doesn't actually answer the question that matters most.
 
-**Mistake 4: Allowing MVP creep — accumulating "just one more thing" until the MVP is no longer minimal.**
+**Mistake 4: Allowing MVP creep — accumulating "just one more thing" until the MVP is no longer minimal**
+
 Each individual addition may seem reasonable, but cumulative creep undermines both the speed and the discipline that make an MVP valuable in the first place.
 
-**Mistake 5: Calling something an MVP when it hasn't actually been scoped around the riskiest assumption (MVP theater).**
+**Mistake 5: Calling something an MVP when it hasn't actually been scoped around the riskiest assumption (MVP theater)**
+
 A small, quickly built feature that doesn't test the actual riskiest open question provides the appearance, without the substance, of disciplined discovery.
 
 ---
+
 
 ## Mental Model: The MVP Scoping Filter
 
@@ -234,7 +240,7 @@ Use this filter explicitly, in writing, at the start of any MVP scoping discussi
 
 ---
 
-## Real World Perspective: MVPs at Different Company Stages
+## Real World Perspective: Minimum Viable Product (MVP) at Different Company Stages
 
 **At a startup:**
 MVP thinking is often existential, testing whether the company's entire core value proposition (Lesson 7) is real at all, and startups are often forced by resource constraints into genuinely minimal scoping almost by necessity — the risk at this stage is less MVP creep (there's rarely enough resource to indulge it) and more the temptation to build a more "impressive-looking" product than necessary to attract investors or early hype, at the cost of genuine riskiest-assumption testing.
@@ -394,7 +400,6 @@ A minimum viable product is the smallest version of a solution capable of produc
 - Difficulty: 3
 - Tags: case-study
 
----
 
 ## Reflection Exercise
 

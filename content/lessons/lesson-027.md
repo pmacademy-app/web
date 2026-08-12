@@ -186,22 +186,28 @@ This distinction matters for the same reason Lesson 22 emphasized it at the leve
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Using Hick's Law to argue that fewer options are always better, regardless of the task.**
+**Mistake 1: Using Hick's Law to argue that fewer options are always better, regardless of the task**
+
 Some tasks genuinely require presenting many options; the principle concerns the cost of *unnecessary* choice proliferation, not a blanket mandate for minimalism regardless of context.
 
-**Mistake 2: Applying Fitts's Law by specifying exact pixel dimensions or coordinates, rather than raising the underlying concern.**
+**Mistake 2: Applying Fitts's Law by specifying exact pixel dimensions or coordinates, rather than raising the underlying concern**
+
 This crosses from legitimate UX evaluation into design dictation — the appropriate PM-level observation is "is this important action easy to reach and hit reliably," not a specific implementation prescription.
 
-**Mistake 3: Failing to recognize cognitive load concerns in a multi-step flow, focusing only on individual screens in isolation.**
+**Mistake 3: Failing to recognize cognitive load concerns in a multi-step flow, focusing only on individual screens in isolation**
+
 Cognitive load often accumulates across a sequence of steps (echoing Lesson 15's full-journey view), not just within any single screen — a review that only evaluates screens independently can miss load that builds up across the whole flow.
 
-**Mistake 4: Requiring users to recall information the interface could simply display again (favoring recall over recognition) without noticing the cost.**
+**Mistake 4: Requiring users to recall information the interface could simply display again (favoring recall over recognition) without noticing the cost**
+
 This is a subtle, easy-to-miss usability cost, since the interface may function correctly in a narrow technical sense while still imposing unnecessary user effort.
 
-**Mistake 5: Treating UX principle fluency as license to dictate specific visual or interaction design solutions.**
+**Mistake 5: Treating UX principle fluency as license to dictate specific visual or interaction design solutions**
+
 This is the "PM as design dictator" failure pattern — raising a genuine concern is valuable; prescribing the specific fix oversteps into design's domain of expertise.
 
 ---
+
 
 ## Mental Model: The UX Principle Review Lens
 
@@ -261,7 +267,7 @@ Use this lens consistently as a review discipline: for each question, if a genui
 
 ---
 
-## Real World Perspective: UX Principles at Different Company Stages
+## Real World Perspective: UX Principles for Product Managers at Different Company Stages
 
 **At a startup:**
 PMs often work in especially close, informal collaboration with a small design team (or, in the earliest stages, may be responsible for some design work themselves), making fluency with these principles directly useful for making faster, more confident calls in the absence of a large, formal design review process — the risk of "PM as design dictator" is often heightened at this stage precisely because informal collaboration can blur the line between raising a concern and unilaterally deciding a specific solution.
@@ -419,7 +425,6 @@ A small set of durable UX principles — Hick's Law (more choices increase decis
 - Difficulty: 3
 - Tags: case-study
 
----
 
 ## Reflection Exercise
 

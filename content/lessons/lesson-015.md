@@ -162,22 +162,28 @@ A final, important discipline is scope: a useful journey map is built for **one 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Building a journey map from the team's idealized version of the process, rather than from research.**
+**Mistake 1: Building a journey map from the team's idealized version of the process, rather than from research**
+
 This inherits the same risk as an assumption-based persona (Lesson 14) — the map reflects how the team designed the process to work, not how users actually experience it, and tends to omit uncomfortable friction points.
 
 **Mistake 2: Mapping only the "happy path."**
+
 A map excluding detours, abandoned attempts, and workarounds misrepresents the actual range of real user experience and can lead a team to underestimate how much friction genuinely exists.
 
-**Mistake 3: Recording only actions, without thoughts and emotions.**
+**Mistake 3: Recording only actions, without thoughts and emotions**
+
 An action-only map cannot distinguish between a confident, satisfied user and a confused, anxious one taking the identical sequence of steps, losing exactly the detail most likely to point toward an actionable design fix.
 
-**Mistake 4: Attempting to map "the entire user experience" in a single journey map.**
+**Mistake 4: Attempting to map "the entire user experience" in a single journey map**
+
 This produces an artifact too broad and abstracted to retain the specific, concrete detail that makes journey mapping useful — scope should be narrowed to one persona and one specific process.
 
-**Mistake 5: Treating a journey map as a one-time artifact that never needs revisiting.**
+**Mistake 5: Treating a journey map as a one-time artifact that never needs revisiting**
+
 As the underlying product, market, or user behavior changes (echoing Lesson 14's persona-updating guidance), a journey map built from research conducted long ago may no longer accurately reflect the current, real experience.
 
 ---
+
 
 ## Mental Model: The Journey Map Truth Test
 
@@ -232,7 +238,7 @@ Apply this test whenever reviewing a journey map presented to you: a map with no
 
 ---
 
-## Real World Perspective: Journey Mapping at Different Company Stages
+## Real World Perspective: User Journey Mapping at Different Company Stages
 
 **At a startup:**
 Journey maps are often built quickly and informally, based on a small number of early user observations or interviews, and are typically focused narrowly on the single most critical process for the business at that stage — frequently first-time onboarding, since early-stage products are especially vulnerable to losing new users during their very first experience with the product.
@@ -392,7 +398,6 @@ A user journey map visually represents a specific persona's stages, actions, tho
 - Difficulty: 3
 - Tags: case-study
 
----
 
 ## Reflection Exercise
 

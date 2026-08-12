@@ -158,22 +158,28 @@ This connects directly to Lesson 13's survey-validated prevalence data: a pain p
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Recording a vague complaint as if it were a specific pain point.**
+**Mistake 1: Recording a vague complaint as if it were a specific pain point**
+
 "Users find this confusing" has not yet been climbed to the level of specificity (which step, what friction, what consequence) that makes a pain point genuinely useful for prioritization or design work.
 
-**Mistake 2: Prioritizing by "loudest voice" or "most recent complaint" rather than by systematic severity/frequency analysis.**
+**Mistake 2: Prioritizing by "loudest voice" or "most recent complaint" rather than by systematic severity/frequency analysis**
+
 Both patterns substitute a proxy (forcefulness or recency) for genuine analysis, and both distort prioritization away from the pain points that actually matter most in aggregate.
 
-**Mistake 3: Fixing the surface-level, reported version of a pain point without laddering to its root cause.**
+**Mistake 3: Fixing the surface-level, reported version of a pain point without laddering to its root cause**
+
 A technically successful fix aimed at the wrong underlying cause can fail to resolve the actual pain, even though it appears to directly address the reported complaint.
 
-**Mistake 4: Over-weighting a vivid, memorable anecdote relative to its actual prevalence.**
+**Mistake 4: Over-weighting a vivid, memorable anecdote relative to its actual prevalence**
+
 A single dramatic story can dominate prioritization discussions far out of proportion to how widespread the underlying issue actually is, unless frequency is deliberately, systematically established rather than inferred from how compelling the story feels.
 
-**Mistake 5: Treating every identified pain point as equally worth fixing, without a severity/frequency comparison at all.**
+**Mistake 5: Treating every identified pain point as equally worth fixing, without a severity/frequency comparison at all**
+
 Without a comparative framework, teams often default to fixing whatever is easiest, most recently discussed, or most personally salient to whoever is making the decision, rather than the pain point that would actually deliver the most value if resolved.
 
 ---
+
 
 ## Mental Model: The Pain Point Priority Grid
 
@@ -229,7 +235,7 @@ Use this grid as a required step before any pain point is elevated to a roadmap 
 
 ---
 
-## Real World Perspective: Pain Point Prioritization at Different Company Stages
+## Real World Perspective: Pain Points at Different Company Stages
 
 **At a startup:**
 Pain point prioritization is often necessarily intuitive and fast, given limited research resources, but the core discipline of this lesson — resisting the urge to fix whatever the most recent or loudest customer complained about, and instead asking about actual severity and frequency across the broader (if still small) user base — remains just as important, since early-stage teams have the least slack to spend on the wrong problem first.
@@ -388,7 +394,6 @@ A pain point, to be genuinely useful, must be specific — naming the exact step
 - Difficulty: 2
 - Tags: severity-frequency-tradeoffs
 
----
 
 ## Reflection Exercise
 

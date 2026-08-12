@@ -76,14 +76,32 @@ Traditional software QA rests on a quiet assumption that most PMs never have to 
 
 ## Common Beginner Mistakes
 
-1. **Treating "the model is impressive in a demo" as sufficient evidence to ship at full automation.** Demos showcase capability, not reliability across the full range of real inputs.
-2. **Running evals once before launch and treating the model as permanently validated.** Model updates and prompt changes require continuous re-evaluation.
-3. **Ignoring per-inference cost until scale reveals it as a problem.** Unit economics should be modeled before launch, not discovered after.
-4. **Defaulting to full automation for any quadrant B (high capability, low reliability) task under launch-speed pressure.** This is precisely the Ownership Zones Model's Zone 4 mistake, now in an AI-specific context.
-5. **Confusing a model's stated confidence with actual reliability.** A hallucinated answer is frequently delivered with the same fluent confidence as a correct one.
-6. **Treating a feature's Capability-Reliability Matrix quadrant as permanent.** A quadrant A classification at launch can silently drift toward quadrant B as usage diversifies or the underlying model changes, which is why the classification needs periodic re-verification, not a single pre-launch determination.
+**Mistake 1: Treating "the model is impressive in a demo" as sufficient evidence to ship at full automation**
+
+Demos showcase capability, not reliability across the full range of real inputs.
+
+**Mistake 2: Running evals once before launch and treating the model as permanently validated**
+
+Model updates and prompt changes require continuous re-evaluation.
+
+**Mistake 3: Ignoring per-inference cost until scale reveals it as a problem**
+
+Unit economics should be modeled before launch, not discovered after.
+
+**Mistake 4: Defaulting to full automation for any quadrant B (high capability, low reliability) task under launch-speed pressure**
+
+This is precisely the Ownership Zones Model's Zone 4 mistake, now in an AI-specific context.
+
+**Mistake 5: Confusing a model's stated confidence with actual reliability**
+
+A hallucinated answer is frequently delivered with the same fluent confidence as a correct one.
+
+**Mistake 6: Treating a feature's Capability-Reliability Matrix quadrant as permanent**
+
+A quadrant A classification at launch can silently drift toward quadrant B as usage diversifies or the underlying model changes, which is why the classification needs periodic re-verification, not a single pre-launch determination.
 
 ---
+
 
 ## Mental Model: The Capability-Reliability Matrix
 
@@ -99,7 +117,7 @@ OpenAI's staged rollout practices for new model capabilities, including publiciz
 
 ---
 
-## Real World Perspective
+## Real World Perspective: PM in AI-Native Companies: New Skills, New Risks at Different Company Stages
 
 **At a startup:** Early AI-native startups often ship quadrant B use cases (high capability, imperfect reliability) at full automation under intense competitive pressure to demonstrate a magical, hands-off experience to investors and early users. Small teams frequently lack the dedicated headcount to build a continuous eval pipeline in parallel with feature development, so evaluation is often treated as a one-time pre-launch check performed by whoever is available, rather than an ongoing discipline. This is a specific and common early-stage mistake, and it is also where the cost of getting it wrong is highest relative to the company's resources — a single high-profile hallucination incident can disproportionately damage a young company's credibility before it has built a reputation to absorb the hit.
 
@@ -168,6 +186,9 @@ AI-native product work requires distinguishing a model's capability from its rel
 ---
 
 ## Cheat Sheet
+
+*A two-minute review of everything in this lesson.*
+
 - Capability ≠ reliability. Assess both separately.
 - Matrix: high/high = automate. high/low = human-in-loop. low/anything = don't ship yet.
 - Evals are continuous, not one-time — model behavior isn't deterministic the way traditional software is.
@@ -191,45 +212,50 @@ AI-native product work requires distinguishing a model's capability from its rel
 ---
 
 ## Further Reading / Resources
-1. *Human Compatible* by Stuart Russell
-2. *The Alignment Problem* by Brian Christian
-3. Anthropic's and OpenAI's published model system cards
+- Stuart Russell, *Human Compatible*
+- Brian Christian, *The Alignment Problem*
+- Anthropic's and OpenAI's published model system cards
 
 ---
 
 ## Flashcards
 
-**Front:** Why can't model quality be reduced to a single number?
-**Back:** Capability and reliability are distinct and can diverge sharply, requiring different product responses.
-**Difficulty:** Easy
-**Tags:** #ai-native
+**Card 1**
+- Front: ** Why can't model quality be reduced to a single number?
+- Back: ** Capability and reliability are distinct and can diverge sharply, requiring different product responses.
+- Difficulty: 2
+- Tags: **, ai-native
 
-**Front:** What does the high-capability/low-reliability quadrant call for?
-**Back:** Human-in-the-loop assist mode, not full automation.
-**Difficulty:** Medium
-**Tags:** #capability-reliability-matrix
+**Card 2**
+- Front: ** What does the high-capability/low-reliability quadrant call for?
+- Back: ** Human-in-the-loop assist mode, not full automation.
+- Difficulty: 2
+- Tags: **, capability-reliability-matrix
 
-**Front:** Why must evals run continuously?
-**Back:** Model and prompt changes shift behavior, so pre-launch evaluation alone doesn't guarantee ongoing quality.
-**Difficulty:** Medium
-**Tags:** #evals
+**Card 3**
+- Front: ** Why must evals run continuously?
+- Back: ** Model and prompt changes shift behavior, so pre-launch evaluation alone doesn't guarantee ongoing quality.
+- Difficulty: 2
+- Tags: **, evals
 
-**Front:** What went wrong in the Automated Refund Assistant case study?
-**Back:** A quadrant-B task (high capability, imperfect reliability) was shipped at full automation with no human review, leading to hallucination-driven refund errors.
-**Difficulty:** Hard
-**Tags:** #case-study
+**Card 4**
+- Front: ** What went wrong in the Automated Refund Assistant case study?
+- Back: ** A quadrant-B task (high capability, imperfect reliability) was shipped at full automation with no human review, leading to hallucination-driven refund errors.
+- Difficulty: 2
+- Tags: **, case-study
 
-**Front:** Why do traditional QA assumptions break down for generative AI products?
-**Back:** Traditional QA assumes deterministic behavior — same input, same output, forever, unless the code changes. Generative models can produce different outputs for the same input, and behavior can shift with silent provider-side updates, so a passing test suite doesn't guarantee ongoing quality the way it does for deterministic software.
-**Difficulty:** Hard
-**Tags:** #qa #evals
+**Card 5**
+- Front: ** Why do traditional QA assumptions break down for generative AI products?
+- Back: ** Traditional QA assumes deterministic behavior — same input, same output, forever, unless the code changes. Generative models can produce different outputs for the same input, and behavior can shift with silent provider-side updates, so a passing test suite doesn't guarantee ongoing quality the way it does for deterministic software.
+- Difficulty: 2
+- Tags: **, qa, evals
 
-**Front:** What is "quadrant drift" and why does it matter?
-**Back:** A feature's real capability/reliability position shifting over time — even without any deliberate product change — as usage patterns diversify or the underlying model updates. It matters because a feature correctly classified as quadrant A at launch can silently become quadrant B, which is why the AI Product Readiness Checklist should be re-run periodically, not filled out once.
-**Difficulty:** Hard
-**Tags:** #capability-reliability-matrix #evals
+**Card 6**
+- Front: ** What is "quadrant drift" and why does it matter?
+- Back: ** A feature's real capability/reliability position shifting over time — even without any deliberate product change — as usage patterns diversify or the underlying model updates. It matters because a feature correctly classified as quadrant A at launch can silently become quadrant B, which is why the AI Product Readiness Checklist should be re-run periodically, not filled out once.
+- Difficulty: 2
+- Tags: **, capability-reliability-matrix, evals
 
----
 
 ## Reflection Exercise
 

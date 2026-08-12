@@ -110,22 +110,28 @@ The specific tier boundaries vary by organization, but the underlying principle 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating every release as either maximally ceremonial or minimally so, with no tiering in between.**
+**Mistake 1: Treating every release as either maximally ceremonial or minimally so, with no tiering in between**
+
 As covered above, applying Tier 1 rigor to a minor copy change wastes organizational effort and creates launch-process fatigue; applying Tier 3 casualness to a major billing change is how large-scale incidents happen.
 
 **Mistake 2: Conflating "code is deployed" with "feature is released."**
+
 Without a feature flag decoupling these two events, a team loses the ability to control exposure independently of deployment timing — meaning any deployment-time issue (a bad deploy window, unexpected interaction with other in-flight changes) directly and immediately affects every user, rather than being contained to a small, controlled group.
 
-**Mistake 3: Believing "we'll fix it in the next release" is an acceptable rollback plan.**
+**Mistake 3: Believing "we'll fix it in the next release" is an acceptable rollback plan**
+
 For anything beyond the lowest-risk Tier 3 changes, this is not a rollback plan — it's an acknowledgment that no rollback plan exists. A genuine rollback plan specifies, in advance, exactly how to revert the change quickly (flag flip, feature toggle, code revert, database migration reversal) without waiting for a full new release cycle, since a live, actively-harming issue often cannot wait days for a properly tested fix.
 
-**Mistake 4: Launching without informing support, sales, or customer-facing teams in advance.**
+**Mistake 4: Launching without informing support, sales, or customer-facing teams in advance**
+
 A support team blindsided by a change they didn't know was launching will be unable to answer user questions, may misdiagnose the change as a bug, and will lose confidence in the product organization's coordination — entirely avoidable simply by including these teams in the launch checklist from the start.
 
-**Mistake 5: Treating a staged rollout's early stages as a formality rather than genuinely watching for signal.**
+**Mistake 5: Treating a staged rollout's early stages as a formality rather than genuinely watching for signal**
+
 A staged rollout only provides protection if its early stages are actually monitored closely enough to catch a problem before proceeding — a team that mechanically advances from 1% to 10% to 100% on a fixed schedule, without genuinely reviewing metrics at each stage, has adopted the form of a staged rollout without its actual protective function.
 
 ---
+
 
 ## Mental Model: The Blast Radius
 
@@ -184,7 +190,7 @@ The underlying principle connects directly to this lesson's Theory: for a produc
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Release Planning & Launch Management at Different Company Stages
 
 **At a startup:**
 Release processes are often minimal — a small team may deploy directly to all users, several times a day, without formal staging, largely because the total user base is small enough that the blast radius of most changes is genuinely limited, and the team can respond to a problem within minutes of it being reported. The risk here is assuming this remains true as the user base and the product's criticality to customers grow, without deliberately revisiting the process.
@@ -277,7 +283,7 @@ Release planning and launch management address the final, and often most consequ
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Big-bang release | A release shipped to all users simultaneously at a single point in time | Staged rollout | 1 |
 | Staged (progressive) rollout | A release shipped to progressively larger fractions of users, with monitoring between stages | Big-bang release, Canary release | 1 |
@@ -300,48 +306,47 @@ Release planning and launch management address the final, and often most consequ
 ## Flashcards
 
 **Card 1**
-Front: What is the core trade-off between a big-bang release and a staged rollout?
-Back: Speed versus exposure — big-bang maximizes speed but exposes all users to any problem at once; staged rollout is slower but contains a problem to a small group first.
-Difficulty: 1
-Tags: big-bang, staged-rollout
+- Front: What is the core trade-off between a big-bang release and a staged rollout?
+- Back: Speed versus exposure — big-bang maximizes speed but exposes all users to any problem at once; staged rollout is slower but contains a problem to a small group first.
+- Difficulty: 1
+- Tags: big-bang, staged-rollout
 
 **Card 2**
-Front: What does a feature flag decouple, and why does that matter?
-Back: It decouples deploying code from releasing a feature to users, enabling fast, code-independent rollback without waiting for a new release cycle.
-Difficulty: 1
-Tags: feature-flag
+- Front: What does a feature flag decouple, and why does that matter?
+- Back: It decouples deploying code from releasing a feature to users, enabling fast, code-independent rollback without waiting for a new release cycle.
+- Difficulty: 1
+- Tags: feature-flag
 
 **Card 3**
-Front: What is a canary release?
-Back: Releasing a change to a small, early-warning subset of users or infrastructure first, so a problem is detected before wider exposure.
-Difficulty: 1
-Tags: canary-release
+- Front: What is a canary release?
+- Back: Releasing a change to a small, early-warning subset of users or infrastructure first, so a problem is detected before wider exposure.
+- Difficulty: 1
+- Tags: canary-release
 
 **Card 4**
-Front: What question does the Blast Radius mental model ask first, before any other release decision?
-Back: If this release goes wrong, how many people does it affect, and how quickly can that be contained?
-Difficulty: 2
-Tags: blast-radius
+- Front: What question does the Blast Radius mental model ask first, before any other release decision?
+- Back: If this release goes wrong, how many people does it affect, and how quickly can that be contained?
+- Difficulty: 2
+- Tags: blast-radius
 
 **Card 5**
-Front: Why is "we'll fix it in the next release" not an acceptable rollback plan for most releases?
-Back: A live, actively-harming issue often cannot wait days for a properly tested fix; a genuine rollback plan specifies a fast, tested way to revert independent of the normal release cycle.
-Difficulty: 2
-Tags: rollback-plan
+- Front: Why is "we'll fix it in the next release" not an acceptable rollback plan for most releases?
+- Back: A live, actively-harming issue often cannot wait days for a properly tested fix; a genuine rollback plan specifies a fast, tested way to revert independent of the normal release cycle.
+- Difficulty: 2
+- Tags: rollback-plan
 
 **Card 6**
-Front: In the Detailed Case Study, name the three compounding failures that turned a bug into a major incident.
-Back: No staged rollout (bug hit everyone at once), no feature flag (no fast code-independent rollback), and no advance communication to support (support worsened customer confusion).
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, name the three compounding failures that turned a bug into a major incident.
+- Back: No staged rollout (bug hit everyone at once), no feature flag (no fast code-independent rollback), and no advance communication to support (support worsened customer confusion).
+- Difficulty: 2
+- Tags: case-study
 
 **Card 7**
-Front: Who must a Launch Readiness Checklist include, beyond engineering?
-Back: Rollback owner, Support/Customer Success, Sales/customer-facing teams, a monitoring owner, and Legal/Compliance where relevant.
-Difficulty: 2
-Tags: launch-checklist
+- Front: Who must a Launch Readiness Checklist include, beyond engineering?
+- Back: Rollback owner, Support/Customer Success, Sales/customer-facing teams, a monitoring owner, and Legal/Compliance where relevant.
+- Difficulty: 2
+- Tags: launch-checklist
 
----
 
 ## Reflection Exercise
 

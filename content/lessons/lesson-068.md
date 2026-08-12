@@ -77,13 +77,28 @@ A **dual-run period** — during which both the old and new capability remain si
 
 ## Common Beginner Mistakes
 
-1. **Skipping or under-resourcing the dependency inventory phase.** Assuming that documented, registered integrations represent the full universe of dependents nearly always understates the true scope of who will be affected by a migration.
-2. **Setting a migration deadline based on calendar convenience rather than dependent migration progress.** Decommissioning on a fixed date regardless of actual migration completion rates converts a planned, orderly transition into a forced, disruptive cutover for anyone who hasn't finished migrating.
-3. **Treating announcement as equivalent to active migration support.** Simply publishing a deprecation notice and expecting dependents to act on their own initiative, without direct outreach or migration tooling, tends to leave a long tail of dependents who never see or act on the announcement until the deadline arrives.
-4. **Underestimating the runway needed for the most resource-constrained dependents.** A migration timeline appropriate for large, well-resourced partners may be far too aggressive for smaller developers or long-tail integrations with less engineering capacity to respond quickly.
-5. **Failing to monitor migration progress during the dual-run period.** Without tracking how many dependents have actually migrated as the deadline approaches, a platform team has no way to know whether a planned Phase 4 decommission is actually safe to execute on schedule.
+**Mistake 1: Skipping or under-resourcing the dependency inventory phase**
+
+Assuming that documented, registered integrations represent the full universe of dependents nearly always understates the true scope of who will be affected by a migration.
+
+**Mistake 2: Setting a migration deadline based on calendar convenience rather than dependent migration progress**
+
+Decommissioning on a fixed date regardless of actual migration completion rates converts a planned, orderly transition into a forced, disruptive cutover for anyone who hasn't finished migrating.
+
+**Mistake 3: Treating announcement as equivalent to active migration support**
+
+Simply publishing a deprecation notice and expecting dependents to act on their own initiative, without direct outreach or migration tooling, tends to leave a long tail of dependents who never see or act on the announcement until the deadline arrives.
+
+**Mistake 4: Underestimating the runway needed for the most resource-constrained dependents**
+
+A migration timeline appropriate for large, well-resourced partners may be far too aggressive for smaller developers or long-tail integrations with less engineering capacity to respond quickly.
+
+**Mistake 5: Failing to monitor migration progress during the dual-run period**
+
+Without tracking how many dependents have actually migrated as the deadline approaches, a platform team has no way to know whether a planned Phase 4 decommission is actually safe to execute on schedule.
 
 ---
+
 
 ## Mental Model: The Sunset Runway
 
@@ -106,7 +121,7 @@ Google's history of deprecating and sunsetting various products and APIs, a topi
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Technical Debt at Scale: Platform Migrations and Deprecations at Different Company Stages
 
 **Startup:** Early-stage platforms typically have few enough external dependents that migrations can be coordinated through direct, informal communication with each one individually, making a formal Sunset Runway process feel like unnecessary overhead — a reasonable trade-off at small scale, but one that does not automatically transfer into good practice once the dependent base grows.
 
@@ -144,7 +159,7 @@ A "no" on Beyond Registered Integrations should be treated as a serious planning
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you plan a deprecation of a widely-used internal or external API?"** The interviewer is evaluating whether you propose a dependency-inventory-first approach and a runway that scales with the diversity of dependents uncovered, rather than jumping straight to an announcement and deadline.
 
@@ -174,6 +189,8 @@ Platform-scale technical debt differs in kind from team-level technical debt, be
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Platform debt ≠ team debt. Dependents are external, numerous, and often invisible without deliberate effort to find them.
 - Sunset Runway: Dependency Inventory → Announcement & Dual-Run → Active Migration Support → Decommission.
 - Registered integrations undercount true dependency — watch for shared keys and intermediaries.
@@ -197,50 +214,56 @@ Platform-scale technical debt differs in kind from team-level technical debt, be
 
 ## Further Reading / Resources
 
-1. *Continuous API Management* by Mehdi Medjaoui, Erik Wilde, Ronnie Mitra, and Mike Amundsen
-2. *Accelerate* by Nicole Forsgren, Jez Humble, and Gene Kim
-3. *Release It!* by Michael T. Nygard
+- Mehdi Medjaoui, Erik Wilde, Ronnie Mitra, and Mike Amundsen, *Continuous API Management*
+- Nicole Forsgren, Jez Humble, and Gene Kim, *Accelerate*
+- Michael T. Nygard, *Release It!*
 
 ---
 
 ## Flashcards
 
-**Front:** Why does platform-scale technical debt differ in kind from team-level technical debt?
-**Back:** Dependents are frequently external, numerous, and hard to fully enumerate, turning an internal trade-off into an ecosystem-wide trust obligation.
-**Difficulty:** Easy
-**Tags:** #technical-debt #core-concept
+**Card 1**
+- Front: ** Why does platform-scale technical debt differ in kind from team-level technical debt?
+- Back: ** Dependents are frequently external, numerous, and hard to fully enumerate, turning an internal trade-off into an ecosystem-wide trust obligation.
+- Difficulty: 2
+- Tags: **, technical-debt, core-concept
 
-**Front:** Name the four phases of the Sunset Runway in order.
-**Back:** Dependency Inventory, Announcement & Dual-Run, Active Migration Support, Decommission.
-**Difficulty:** Easy
-**Tags:** #sunset-runway
+**Card 2**
+- Front: ** Name the four phases of the Sunset Runway in order.
+- Back: ** Dependency Inventory, Announcement & Dual-Run, Active Migration Support, Decommission.
+- Difficulty: 2
+- Tags: **, sunset-runway
 
-**Front:** Why do registered-integration inventories often undercount true dependency?
-**Back:** They miss undocumented workarounds, third-party intermediaries, and shared-key usage patterns that don't show up as distinct, directly registered integrations.
-**Difficulty:** Medium
-**Tags:** #dependency-inventory
+**Card 3**
+- Front: ** Why do registered-integration inventories often undercount true dependency?
+- Back: ** They miss undocumented workarounds, third-party intermediaries, and shared-key usage patterns that don't show up as distinct, directly registered integrations.
+- Difficulty: 2
+- Tags: **, dependency-inventory
 
-**Front:** What is the purpose of a dual-run period?
-**Back:** To decouple the platform's readiness to retire something from each dependent's individual readiness to migrate, avoiding a forced synchronized cutover.
-**Difficulty:** Medium
-**Tags:** #dual-run
+**Card 4**
+- Front: ** What is the purpose of a dual-run period?
+- Back: ** To decouple the platform's readiness to retire something from each dependent's individual readiness to migrate, avoiding a forced synchronized cutover.
+- Difficulty: 2
+- Tags: **, dual-run
 
-**Front:** What went wrong in the Underestimated Cutover case study?
-**Back:** The dependency inventory relied only on registered API keys, missing hundreds of downstream customers behind a third-party vendor's shared integration, and decommission proceeded on calendar date regardless of their migration status.
-**Difficulty:** Hard
-**Tags:** #case-study #sunset-runway
+**Card 5**
+- Front: ** What went wrong in the Underestimated Cutover case study?
+- Back: ** The dependency inventory relied only on registered API keys, missing hundreds of downstream customers behind a third-party vendor's shared integration, and decommission proceeded on calendar date regardless of their migration status.
+- Difficulty: 2
+- Tags: **, case-study, sunset-runway
 
-**Front:** Why should Phase 4 (Decommission) be gated on migration progress rather than calendar date alone?
-**Back:** A fixed date regardless of actual completion converts a planned transition into a forced, disruptive cutover for anyone who hasn't finished migrating.
-**Difficulty:** Medium
-**Tags:** #decommission
+**Card 6**
+- Front: ** Why should Phase 4 (Decommission) be gated on migration progress rather than calendar date alone?
+- Back: ** A fixed date regardless of actual completion converts a planned transition into a forced, disruptive cutover for anyone who hasn't finished migrating.
+- Difficulty: 2
+- Tags: **, decommission
 
-**Front:** Why is Phase 3 (Active Migration Support) necessary beyond simply announcing a deprecation?
-**Back:** Passive announcement alone tends to leave a long tail of dependents unaware or unprepared until the deadline arrives.
-**Difficulty:** Hard
-**Tags:** #active-migration-support
+**Card 7**
+- Front: ** Why is Phase 3 (Active Migration Support) necessary beyond simply announcing a deprecation?
+- Back: ** Passive announcement alone tends to leave a long tail of dependents unaware or unprepared until the deadline arrives.
+- Difficulty: 2
+- Tags: **, active-migration-support
 
----
 
 ## Reflection Exercise
 

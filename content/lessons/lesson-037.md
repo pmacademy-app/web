@@ -161,22 +161,28 @@ This framing gives a PM a clean, respectful way to have a trade-off conversation
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Handing engineering a fully-specified technical solution instead of a problem and constraints.**
+**Mistake 1: Handing engineering a fully-specified technical solution instead of a problem and constraints**
+
 As covered in Theory, this substitutes the PM's judgment for engineering's in a domain where engineering typically has more relevant information, often producing a worse outcome than trusting the team with the actual problem.
 
-**Mistake 2: Second-guessing engineering estimates without new information to justify it.**
+**Mistake 2: Second-guessing engineering estimates without new information to justify it**
+
 Pushing back on an estimate simply because it's inconvenient, without offering new context that might genuinely change the estimate (a simplified scope, a different approach, new information about urgency), erodes trust and rarely produces a more accurate number — it usually just produces a falsely optimistic one.
 
-**Mistake 3: Treating every blocker as the team's to solve internally.**
+**Mistake 3: Treating every blocker as the team's to solve internally**
+
 As covered in Theory, some blockers are structural and require PM escalation; a PM who reflexively tells a blocked team to "just figure it out" when the blocker is genuinely outside the team's control leaves the team stuck and erodes trust in the PM's willingness to advocate for them.
 
-**Mistake 4: Demanding fixed scope, fixed time, and fixed quality simultaneously under deadline pressure.**
+**Mistake 4: Demanding fixed scope, fixed time, and fixed quality simultaneously under deadline pressure**
+
 This is the Iron Triangle violation described above — a request that isn't really a request for harder work, but an implicit demand that one of the three dimensions quietly gives way (usually quality, and usually invisibly, in the form of accumulating technical debt or reduced testing) without ever being named or agreed to explicitly.
 
-**Mistake 5: Conflating disagreement about the problem with disagreement about the technical solution.**
+**Mistake 5: Conflating disagreement about the problem with disagreement about the technical solution**
+
 As covered in Theory, unresolved disagreements about the underlying problem or constraints often surface, confusingly, as arguments about implementation details — resolving the wrong layer of disagreement (arguing about code architecture when the real disagreement is about which user need matters most) wastes time and rarely produces genuine alignment.
 
 ---
+
 
 ## Mental Model: The Trust Ladder
 
@@ -235,7 +241,7 @@ The underlying principle connects directly to this lesson's Theory: investing re
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Working with Engineering Teams at Different Company Stages
 
 **At a startup:**
 The PM-engineering relationship is often informal and built through constant, close daily contact — trust can form (or erode) quickly, since there's little organizational distance between the PM and the people building the product. The risk here is that informality can mask Mistake 1 (handing over solutions instead of problems) as simply "collaborative brainstorming," when in practice the PM is still substituting their own technical preference without realizing it.
@@ -326,7 +332,7 @@ The working relationship between a PM and an engineering team is one of the high
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Give context, not commands | The principle of conveying problem/constraints precisely while leaving the technical solution space to engineering | INVEST "Negotiable" (Lesson 34) | 1 |
 | Trust Ladder | This lesson's mental model: cumulative rungs of trust-building behavior between a PM and engineering | — | 2 |
@@ -347,48 +353,47 @@ The working relationship between a PM and an engineering team is one of the high
 ## Flashcards
 
 **Card 1**
-Front: What does "give context, not commands" mean, in practice?
-Back: Conveying the problem, user need, and real constraints precisely, while trusting engineering to own the technical solution space, rather than specifying a solution directly.
-Difficulty: 1
-Tags: context-not-commands
+- Front: What does "give context, not commands" mean, in practice?
+- Back: Conveying the problem, user need, and real constraints precisely, while trusting engineering to own the technical solution space, rather than specifying a solution directly.
+- Difficulty: 1
+- Tags: context-not-commands
 
 **Card 2**
-Front: Name the four rungs of the Trust Ladder in order.
-Back: Basic reliability, honest communication, respects expertise boundaries (context not commands), advocates outward (escalates structural blockers).
-Difficulty: 2
-Tags: trust-ladder
+- Front: Name the four rungs of the Trust Ladder in order.
+- Back: Basic reliability, honest communication, respects expertise boundaries (context not commands), advocates outward (escalates structural blockers).
+- Difficulty: 2
+- Tags: trust-ladder
 
 **Card 3**
-Front: What two questions should be asked, in order, when a PM and engineer disagree about technical approach?
-Back: (1) Do we agree on the problem, user need, and constraints? (2) Given that agreement, which technical approach best satisfies them — generally deferring to engineering here.
-Difficulty: 2
-Tags: technical-disagreement
+- Front: What two questions should be asked, in order, when a PM and engineer disagree about technical approach?
+- Back: (1) Do we agree on the problem, user need, and constraints? (2) Given that agreement, which technical approach best satisfies them — generally deferring to engineering here.
+- Difficulty: 2
+- Tags: technical-disagreement
 
 **Card 4**
-Front: What are the three dimensions of the Iron Triangle?
-Back: Scope, time, and quality/resources — interdependent, such that fixing any two effectively determines the third.
-Difficulty: 1
-Tags: iron-triangle
+- Front: What are the three dimensions of the Iron Triangle?
+- Back: Scope, time, and quality/resources — interdependent, such that fixing any two effectively determines the third.
+- Difficulty: 1
+- Tags: iron-triangle
 
 **Card 5**
-Front: How does this lesson distinguish a team-solvable blocker from one requiring PM escalation?
-Back: Team-solvable blockers are internal to the team's own process; escalation-worthy blockers involve another team, external dependency, or organizational resourcing decision outside the team's authority — especially if they've recurred unresolved.
-Difficulty: 2
-Tags: escalation
+- Front: How does this lesson distinguish a team-solvable blocker from one requiring PM escalation?
+- Back: Team-solvable blockers are internal to the team's own process; escalation-worthy blockers involve another team, external dependency, or organizational resourcing decision outside the team's authority — especially if they've recurred unresolved.
+- Difficulty: 2
+- Tags: escalation
 
 **Card 6**
-Front: In the Detailed Case Study, what was the PM's core mistake in writing the PRD?
-Back: Specifying a full technical solution (database schema, API structure, caching strategy) rather than clearly stating the problem and constraints, which suppressed engineers' better judgment about an unhandled edge case.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what was the PM's core mistake in writing the PRD?
+- Back: Specifying a full technical solution (database schema, API structure, caching strategy) rather than clearly stating the problem and constraints, which suppressed engineers' better judgment about an unhandled edge case.
+- Difficulty: 2
+- Tags: case-study
 
 **Card 7**
-Front: Why is demanding fixed scope, fixed time, and fixed quality simultaneously not really "asking for hard work"?
-Back: Per the Iron Triangle, these three dimensions are interdependent; demanding all three stay fixed under pressure implicitly forces one to give way invisibly (usually quality/technical debt) without ever being named or agreed to.
-Difficulty: 2
-Tags: iron-triangle, mistake
+- Front: Why is demanding fixed scope, fixed time, and fixed quality simultaneously not really "asking for hard work"?
+- Back: Per the Iron Triangle, these three dimensions are interdependent; demanding all three stay fixed under pressure implicitly forces one to give way invisibly (usually quality/technical debt) without ever being named or agreed to.
+- Difficulty: 2
+- Tags: iron-triangle, mistake
 
----
 
 ## Reflection Exercise
 

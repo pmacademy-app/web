@@ -12,7 +12,7 @@ Module 2 has built an entire research and synthesis pipeline: interviews and sur
 
 | Field | Detail |
 |---|---|
-| **Module** | 2 — Users & Research (Closing Lesson) |
+| **Module** | 2 — Users & Research |
 | **Current Lesson** | 19 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
@@ -192,22 +192,28 @@ A final, important distinction, directly echoing Lesson 10's "mistaking goals fo
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Moving directly from a single problem statement to a solution, without comparing it against alternative opportunities.**
+**Mistake 1: Moving directly from a single problem statement to a solution, without comparing it against alternative opportunities**
+
 This risks investing heavily in a real, validated problem that turns out to be smaller in impact than several other equally real problems that were never seriously considered side by side.
 
-**Mistake 2: Merging a candidate solution into the opportunity itself within an Opportunity Solution Tree.**
+**Mistake 2: Merging a candidate solution into the opportunity itself within an Opportunity Solution Tree**
+
 An opportunity should remain at the level of a validated user problem; folding a specific solution into the same node prematurely forecloses the comparison of multiple candidate solutions later, echoing Lesson 17's solution-contamination warning.
 
-**Mistake 3: Sizing an opportunity using only vivid anecdote or a single interview, without importance-satisfaction or prevalence data.**
+**Mistake 3: Sizing an opportunity using only vivid anecdote or a single interview, without importance-satisfaction or prevalence data**
+
 This repeats Lesson 16's "vivid but rare" distortion at the level of opportunity comparison, rather than pain point comparison specifically.
 
-**Mistake 4: Allowing an opportunity list to grow indefinitely without consolidation or pruning.**
+**Mistake 4: Allowing an opportunity list to grow indefinitely without consolidation or pruning**
+
 Opportunity sprawl produces an illusion of thoroughness while actually obscuring which few candidates genuinely deserve focused attention, echoing Lesson 14's "too many personas" pattern.
 
-**Mistake 5: Treating a restated business goal as if it were a genuine opportunity.**
+**Mistake 5: Treating a restated business goal as if it were a genuine opportunity**
+
 "Increase revenue" or "reduce churn" names a desired outcome, not a specific, validated user-side driver that could be sized and compared using this lesson's framework.
 
 ---
+
 
 ## Mental Model: The Opportunity Comparison Grid
 
@@ -424,7 +430,6 @@ An opportunity is a validated, sized candidate problem sitting between a raw pai
 - Difficulty: 3
 - Tags: pruning-cadence
 
----
 
 ## Reflection Exercise
 

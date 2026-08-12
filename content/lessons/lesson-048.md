@@ -79,22 +79,28 @@ This technique doesn't replace the deeper value-based pricing work of understand
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Defaulting to cost-plus pricing without considering actual customer value.**
+**Mistake 1: Defaulting to cost-plus pricing without considering actual customer value**
+
 As covered in Theory, this anchors price to an internal figure customers never see and have no reason to care about, and typically leaves significant value uncaptured for a genuinely differentiated product.
 
-**Mistake 2: Choosing a pricing model that doesn't match the actual variance in customer usage.**
+**Mistake 2: Choosing a pricing model that doesn't match the actual variance in customer usage**
+
 A flat-rate model applied to widely varying usage patterns creates the specific cross-subsidization problem covered in Theory and illustrated in this lesson's Case Study — light users overpay relative to their usage, heavy users may be undercharged relative to cost to serve.
 
-**Mistake 3: Conflating pricing and packaging decisions.**
+**Mistake 3: Conflating pricing and packaging decisions**
+
 Treating "how much" and "what's included" as a single, undifferentiated decision often produces packages that don't map cleanly to distinct customer needs, forcing customers into an awkward choice between an insufficient lower tier and an unnecessarily expensive higher one.
 
-**Mistake 4: Setting price based on internal opinion or founder intuition alone, without any structured customer input.**
+**Mistake 4: Setting price based on internal opinion or founder intuition alone, without any structured customer input**
+
 Without a technique like the Van Westendorp approach or direct value-based research, pricing decisions risk being calibrated to what feels reasonable internally rather than to what customers actually perceive as fair value, a gap that's easy to miss without deliberately measuring it.
 
-**Mistake 5: Treating a pricing change as a purely internal, low-risk decision.**
+**Mistake 5: Treating a pricing change as a purely internal, low-risk decision**
+
 Pricing is unusually visible and difficult to reverse compared to most product decisions — a poorly communicated or poorly designed pricing change can generate immediate, vocal backlash from an existing customer base, making the stakeholder communication discipline from Lesson 47 especially relevant when planning any pricing change.
 
 ---
+
 
 ## Mental Model: The Value-Price Alignment Check
 
@@ -121,7 +127,7 @@ The underlying principle connects directly to this lesson's Theory: this structu
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Pricing & Monetization Strategy at Different Company Stages
 
 **At a startup:**
 Pricing is often set with limited data, sometimes based on rough competitor benchmarking or founder intuition, and is frequently a flat-rate or simple tiered structure chosen more for implementation simplicity than rigorous value alignment. This is often reasonable at very early stages, when the priority is validating whether customers will pay anything at all, but the specific model chosen should still be revisited deliberately as usage data accumulates, rather than left unexamined by default.
@@ -213,7 +219,7 @@ Pricing should generally be anchored to value-based reasoning — what a product
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Value-based pricing | Setting price according to the value a product creates for the customer | Cost-plus pricing | 1 |
 | Cost-plus pricing | Setting price by calculating production/delivery cost and adding a margin | Value-based pricing | 1 |
@@ -235,42 +241,41 @@ Pricing should generally be anchored to value-based reasoning — what a product
 ## Flashcards
 
 **Card 1**
-Front: What's the difference between value-based and cost-plus pricing?
-Back: Value-based pricing sets price according to what a product is worth to the customer; cost-plus pricing sets price by calculating production cost and adding a margin — value-based is generally the stronger starting point for a differentiated product.
-Difficulty: 1
-Tags: value-based-vs-cost-plus
+- Front: What's the difference between value-based and cost-plus pricing?
+- Back: Value-based pricing sets price according to what a product is worth to the customer; cost-plus pricing sets price by calculating production cost and adding a margin — value-based is generally the stronger starting point for a differentiated product.
+- Difficulty: 1
+- Tags: value-based-vs-cost-plus
 
 **Card 2**
-Front: Name the five common pricing models covered in this lesson.
-Back: Flat-rate, tiered, usage-based, per-seat, freemium.
-Difficulty: 1
-Tags: pricing-models
+- Front: Name the five common pricing models covered in this lesson.
+- Back: Flat-rate, tiered, usage-based, per-seat, freemium.
+- Difficulty: 1
+- Tags: pricing-models
 
 **Card 3**
-Front: What's the difference between pricing and packaging?
-Back: Pricing is how much a customer pays; packaging is what they receive at each price point (features, limits, support) — related but distinct decisions.
-Difficulty: 1
-Tags: pricing-vs-packaging
+- Front: What's the difference between pricing and packaging?
+- Back: Pricing is how much a customer pays; packaging is what they receive at each price point (features, limits, support) — related but distinct decisions.
+- Difficulty: 1
+- Tags: pricing-vs-packaging
 
 **Card 4**
-Front: What does the Van Westendorp price sensitivity meter measure, and how?
-Back: An acceptable price range, estimated by asking customers four questions about when a price feels too cheap, a bargain, expensive, or too expensive to consider.
-Difficulty: 2
-Tags: van-westendorp
+- Front: What does the Van Westendorp price sensitivity meter measure, and how?
+- Back: An acceptable price range, estimated by asking customers four questions about when a price feels too cheap, a bargain, expensive, or too expensive to consider.
+- Difficulty: 2
+- Tags: van-westendorp
 
 **Card 5**
-Front: What is cross-subsidization in a pricing context, and when does it typically occur?
-Back: Light users effectively subsidize heavy users under a poorly-aligned pricing model, typically occurring when a flat-rate model is applied to widely varying usage patterns.
-Difficulty: 2
-Tags: cross-subsidization
+- Front: What is cross-subsidization in a pricing context, and when does it typically occur?
+- Back: Light users effectively subsidize heavy users under a poorly-aligned pricing model, typically occurring when a flat-rate model is applied to widely varying usage patterns.
+- Difficulty: 2
+- Tags: cross-subsidization
 
 **Card 6**
-Front: In the Detailed Case Study, what two problems emerged simultaneously from the flat-rate model?
-Back: Light users churned at higher rates, perceiving poor value relative to their usage, while margin eroded on the company's heaviest-usage customers, whose actual usage far exceeded what the flat fee was calibrated to cover.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what two problems emerged simultaneously from the flat-rate model?
+- Back: Light users churned at higher rates, perceiving poor value relative to their usage, while margin eroded on the company's heaviest-usage customers, whose actual usage far exceeded what the flat fee was calibrated to cover.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

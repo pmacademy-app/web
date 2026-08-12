@@ -137,22 +137,28 @@ A feature can pass a naive "is this valuable?" test while failing this filter â€
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Writing a value proposition that lists features instead of benefits.**
+**Mistake 1: Writing a value proposition that lists features instead of benefits**
+
 "Our app has push notifications, calendar sync, and offline mode" describes what the product does, not why a specific person should choose it over an alternative to accomplish a specific job. Features are means; a value proposition is about the end result the audience gets.
 
-**Mistake 2: Naming no alternative.**
+**Mistake 2: Naming no alternative**
+
 A value proposition that never says "unlike X" cannot actually be evaluated as a comparative claim, and often signals the team hasn't done the competitive or non-consumption analysis from Lesson 6 needed to write a real one.
 
-**Mistake 3: Confusing a value proposition with a company mission statement.**
+**Mistake 3: Confusing a value proposition with a company mission statement**
+
 "We believe in empowering people to do their best work" is an aspirational statement about company purpose, not a specific, falsifiable claim about audience, job, and differentiated benefit. Both can coexist, but they serve different purposes and should not be substituted for each other.
 
-**Mistake 4: Writing one value proposition when the product genuinely serves divergent user and customer audiences.**
+**Mistake 4: Writing one value proposition when the product genuinely serves divergent user and customer audiences**
+
 As shown above, a product with meaningful Alignment Spectrum divergence often needs two coherent, consistent, but distinct value propositions, not one generic statement meant to satisfy both.
 
-**Mistake 5: Treating "trying to serve everyone" as inclusive or growth-friendly, rather than as a strategic weakness.**
+**Mistake 5: Treating "trying to serve everyone" as inclusive or growth-friendly, rather than as a strategic weakness**
+
 Broadening a value proposition to avoid excluding any potential customer feels safe, but it removes the specificity that makes the proposition useful as a filter at all, and tends to produce a product that is a diluted, less-differentiated version of several other products' actual value propositions.
 
 ---
+
 
 ## Mental Model: The Value Proposition Filter
 
@@ -211,7 +217,7 @@ Use this filter as a standing discipline in roadmap reviews: any feature that ca
 
 ---
 
-## Real World Perspective: Value Propositions at Different Company Stages
+## Real World Perspective: Value Proposition at Different Company Stages
 
 **At a startup:**
 The value proposition is often still a live hypothesis rather than a settled fact, and the primary job of early product discovery (Lesson 8) is testing whether the claimed differentiated benefit is actually true and actually valued by the named audience, rather than assumed to be true because the founding team believes it. Startups frequently iterate on the exact wording and even the exact audience of their value proposition multiple times before finding one that survives contact with real customer conversations.
@@ -361,7 +367,6 @@ A value proposition is a specific, falsifiable claim that a product is the best 
 - Difficulty: 3
 - Tags: case-study, strategy
 
----
 
 ## Reflection Exercise
 

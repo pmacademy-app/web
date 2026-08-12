@@ -135,21 +135,27 @@ This creates a systematic bias: absent deliberate correction, product roadmaps t
 ## Common Beginner Mistakes
 
 **Mistake 1: "The customer wants X, so users want X."**
+
 This assumes alignment without checking it. A request from a paying customer (particularly in enterprise software) reflects that customer's priorities — which may be procurement-driven, cost-driven, or politically driven within their own organization — and is not automatically a proxy for what the people who will actually use the feature every day want or need.
 
 **Mistake 2: "User research is optional if we already talk to customers."**
+
 Sales and account management conversations are a real and valuable signal, but they are customer signal, not user signal, whenever the two differ. A PM relying exclusively on customer-facing conversations for product direction, in a product where users and customers diverge, is building on half the picture — often the half that is easier to access, not the half that is most important.
 
-**Mistake 3: Treating "the user" as a single homogeneous person.**
+**Mistake 3: Treating "the user" as a single homogeneous person**
+
 Even within "users," there are often multiple distinct roles with different needs — an admin user versus an end-user of the same enterprise tool, for instance. Lumping all of these into one undifferentiated "the user" hides exactly the kind of conflict this lesson is about to teach you to look for.
 
 **Mistake 4: Assuming misalignment means the customer is "wrong."**
+
 The correct response to discovering user-customer divergence is not automatically to side with the user. A customer's business concerns (security compliance, cost control, contractual obligations) are often entirely legitimate and can be things the user themselves would care about if they had visibility into them. The goal is not "users always win" — it is to make the trade-off explicit and deliberate, rather than accidental.
 
-**Mistake 5: Assuming this distinction is unique to B2B or enterprise products.**
+**Mistake 5: Assuming this distinction is unique to B2B or enterprise products**
+
 Ad-supported consumer products, freemium products, and products built for dependents (children, pets, elderly relatives under someone else's account) all have the exact same structural issue, often in a more extreme form, because the user in these cases frequently has no direct commercial relationship with the company at all.
 
 ---
+
 
 ## Mental Model: The Stakeholder Ledger
 
@@ -216,7 +222,7 @@ This is a direct, real-world response to the user-customer gap: instead of accep
 
 ---
 
-## Real World Perspective: Where This Gap Shows Up Most Sharply
+## Real World Perspective: Users vs. Customers at Different Company Stages
 
 **In B2B/enterprise SaaS:**
 The user-customer gap is often at its widest here. A procurement team may select a vendor based on a security questionnaire, a contract negotiation, and an RFP process that the actual daily users of the software never see or influence. PMs in this environment often maintain two parallel discovery tracks: one for buyer/admin personas (focused on cost, control, compliance) and one for end-user personas (focused on daily workflow), and treat convergence between the two — a feature that helps both — as a particularly high-value target.
@@ -379,7 +385,6 @@ Every product has both users (who interact with it) and customers (who pay for i
 - Difficulty: 3
 - Tags: dependents, divergence
 
----
 
 ## Reflection Exercise
 

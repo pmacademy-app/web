@@ -12,7 +12,7 @@ Product Operations (Product Ops) is a relatively newer discipline in most produc
 
 | Field | Detail |
 |---|---|
-| **Module** | 4 — Execution & Agile Delivery (closing lesson) |
+| **Module** | 4 — Execution & Agile Delivery |
 | **Current Lesson** | 40 of 90 |
 | **Difficulty** | 4 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
@@ -111,22 +111,28 @@ An organization at the "Informal" stage attempting to build a fully "Embedded" P
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating Product Ops as pure bureaucratic overhead with no real value.**
+**Mistake 1: Treating Product Ops as pure bureaucratic overhead with no real value**
+
 As covered in Theory, Product Ops exists to solve a genuine coordination problem that emerges predictably as organizations scale — dismissing it entirely tends to produce exactly the metric-inconsistency and process-drift failures this lesson describes, discovered painfully once the organization is large enough for them to matter.
 
-**Mistake 2: Over-investing in formal Product Ops infrastructure at a stage where informal proximity still works fine.**
+**Mistake 2: Over-investing in formal Product Ops infrastructure at a stage where informal proximity still works fine**
+
 A two-team organization building an elaborate, fully-staffed Product Ops function is very likely solving a coordination problem that doesn't yet exist at meaningful scale, at real opportunity cost to actually building product.
 
-**Mistake 3: Treating Product Ops as a substitute for individual PM judgment rather than a multiplier of it.**
+**Mistake 3: Treating Product Ops as a substitute for individual PM judgment rather than a multiplier of it**
+
 Product Ops standardizes definitions, processes, and infrastructure — it does not, and should not, make prioritization or strategic decisions on behalf of individual PMs. An organization that routes genuine product judgment calls through Product Ops has confused a support function with a decision-making one.
 
-**Mistake 4: Allowing metric definitions to drift back into inconsistency after initial standardization.**
+**Mistake 4: Allowing metric definitions to drift back into inconsistency after initial standardization**
+
 Standardizing a definition once is necessary but not sufficient; without ongoing maintenance (new teams onboarding, new metrics being introduced), definitions tend to drift back toward inconsistency over time, echoing the same "doing it once isn't enough" lesson seen with retrospective action items in Lesson 32.
 
-**Mistake 5: Assuming Product Ops responsibilities must be held by a dedicated, separately-titled team.**
+**Mistake 5: Assuming Product Ops responsibilities must be held by a dedicated, separately-titled team**
+
 In smaller or "Emerging"-stage organizations, Product Ops functions are often handled by an individual PM or a rotating responsibility rather than a dedicated team — the functional need for consistency exists at any scale beyond a single team, even before an organization formally names or staffs a Product Ops function.
 
 ---
+
 
 ## Mental Model: The Multiplier Layer
 
@@ -186,7 +192,7 @@ The underlying principle connects directly to this lesson's Theory: building sha
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Product Operations at Different Company Stages
 
 **At a startup:**
 Formal Product Ops essentially doesn't exist as a named function, and doesn't need to — with one or two teams, consistency happens naturally through proximity, exactly as the Maturity Ladder's "Informal" stage describes. The risk here is Mistake 2's mirror image not applying yet, but teams should stay alert to the point where growth starts to strain this informal consistency, rather than being caught by surprise once it does.
@@ -277,7 +283,7 @@ Product Operations exists to solve a specific, predictable organizational proble
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Product Operations (Product Ops) | The function responsible for building and maintaining shared definitions, processes, and infrastructure that let good product practices scale consistently across many teams | Multiplier Layer | 1 |
 | Multiplier Layer | This lesson's mental model: Product Ops as a layer multiplying individual teams' effectiveness, not a decision-making substitute for PM judgment | Product Ops | 2 |
@@ -297,42 +303,41 @@ Product Operations exists to solve a specific, predictable organizational proble
 ## Flashcards
 
 **Card 1**
-Front: What specific organizational problem does Product Ops exist to solve?
-Back: The informal consistency (shared definitions, processes, infrastructure) that exists naturally in a small organization breaks down as it scales to many teams and PMs, unless something actively maintains it.
-Difficulty: 1
-Tags: product-ops-purpose
+- Front: What specific organizational problem does Product Ops exist to solve?
+- Back: The informal consistency (shared definitions, processes, infrastructure) that exists naturally in a small organization breaks down as it scales to many teams and PMs, unless something actively maintains it.
+- Difficulty: 1
+- Tags: product-ops-purpose
 
 **Card 2**
-Front: Name Product Ops' typical core functional areas.
-Back: Metric definition standardization, process/ritual consistency, research operations infrastructure, launch coordination tooling, and shared analytics/roadmapping tooling.
-Difficulty: 1
-Tags: core-functions
+- Front: Name Product Ops' typical core functional areas.
+- Back: Metric definition standardization, process/ritual consistency, research operations infrastructure, launch coordination tooling, and shared analytics/roadmapping tooling.
+- Difficulty: 1
+- Tags: core-functions
 
 **Card 3**
-Front: What is the Multiplier Layer mental model's key distinction?
-Back: Product Ops should multiply the effectiveness of individual teams' good practice through shared infrastructure and definitions — it should not replace individual PM judgment on genuine prioritization or strategic decisions.
-Difficulty: 2
-Tags: multiplier-layer
+- Front: What is the Multiplier Layer mental model's key distinction?
+- Back: Product Ops should multiply the effectiveness of individual teams' good practice through shared infrastructure and definitions — it should not replace individual PM judgment on genuine prioritization or strategic decisions.
+- Difficulty: 2
+- Tags: multiplier-layer
 
 **Card 4**
-Front: What are the four stages of the Product Ops Maturity Ladder?
-Back: Informal (consistency via proximity), Emerging (shared docs/templates appear), Formalized (dedicated role/team), Embedded (proactive team-level partnership).
-Difficulty: 2
-Tags: maturity-ladder
+- Front: What are the four stages of the Product Ops Maturity Ladder?
+- Back: Informal (consistency via proximity), Emerging (shared docs/templates appear), Formalized (dedicated role/team), Embedded (proactive team-level partnership).
+- Difficulty: 2
+- Tags: maturity-ladder
 
 **Card 5**
-Front: Why are inconsistent metric definitions across teams a particularly insidious problem?
-Back: They produce numbers that look precise and comparable across teams while actually being computed under meaningfully different underlying definitions, misleading anyone reviewing them without realizing it.
-Difficulty: 2
-Tags: metric-inconsistency
+- Front: Why are inconsistent metric definitions across teams a particularly insidious problem?
+- Back: They produce numbers that look precise and comparable across teams while actually being computed under meaningfully different underlying definitions, misleading anyone reviewing them without realizing it.
+- Difficulty: 2
+- Tags: metric-inconsistency
 
 **Card 6**
-Front: In the Detailed Case Study, why couldn't some historical trends be reconciled even after standardizing a definition?
-Back: The underlying raw data needed to retroactively recompute a consistent definition had never been captured in the first place for some teams, making full retroactive reconciliation permanently impossible for that data.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, why couldn't some historical trends be reconciled even after standardizing a definition?
+- Back: The underlying raw data needed to retroactively recompute a consistent definition had never been captured in the first place for some teams, making full retroactive reconciliation permanently impossible for that data.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

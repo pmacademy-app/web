@@ -159,22 +159,28 @@ Strategic targeting segments tend to be few in number, stable over a longer time
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Segmenting primarily by demographic or firmographic convenience, without validating actual behavioral correlation.**
+**Mistake 1: Segmenting primarily by demographic or firmographic convenience, without validating actual behavioral correlation**
+
 Company size, industry, and age are easy to measure but frequently weak predictors of the actual underlying need driving product decisions, unless a genuine correlation has been validated rather than assumed.
 
-**Mistake 2: Treating a demographic correlate as if it were the underlying cause.**
+**Mistake 2: Treating a demographic correlate as if it were the underlying cause**
+
 Even when company size genuinely correlates with a specific need (e.g., compliance requirements), the size itself is not the actual driver — the underlying organizational complexity is — and conflating the two risks misapplying the segmentation when the correlation breaks down for an atypical case.
 
-**Mistake 3: Validating a segment qualitatively but never checking it quantitatively (or vice versa).**
+**Mistake 3: Validating a segment qualitatively but never checking it quantitatively (or vice versa)**
+
 A candidate distinction surfaced in a handful of interviews may not hold at meaningful scale, and a statistically detectable quantitative difference may lack the qualitative depth needed to understand why it exists or how to act on it — both steps, per Lesson 11's complementary-methods framework, are typically needed.
 
-**Mistake 4: Building a sophisticated segmentation scheme that never actually informs a real decision.**
+**Mistake 4: Building a sophisticated segmentation scheme that never actually informs a real decision**
+
 A genuinely valid segmentation that changes no messaging, prioritization, pricing, or support strategy has provided no practical value, regardless of its analytical rigor — echoing Lesson 14's persona-as-decoration failure.
 
-**Mistake 5: Using the same segment definitions for both strategic targeting and tactical personalization.**
+**Mistake 5: Using the same segment definitions for both strategic targeting and tactical personalization**
+
 Strategic segments (few, stable, broad) and tactical segments (many, dynamic, granular) generally serve different purposes and require different levels of granularity — conflating them tends to produce a poor fit for both.
 
 ---
+
 
 ## Mental Model: The Segmentation Validity Chain
 
@@ -231,7 +237,7 @@ A break at any link — a qualitative hunch never quantitatively checked, a real
 
 ---
 
-## Real World Perspective: Segmentation at Different Company Stages
+## Real World Perspective: Customer Segmentation at Different Company Stages
 
 **At a startup:**
 Segmentation is often minimal and provisional, given limited data and resources, frequently amounting to a single, sharply focused strategic target segment (echoing Lesson 10's exclusion discipline) rather than an elaborate multi-segment scheme. The primary risk at this stage is premature complexity — attempting a sophisticated segmentation exercise before the company has enough real usage data or research to validate any proposed distinction meaningfully.
@@ -392,7 +398,6 @@ Customer segmentation divides a user or customer base into meaningfully distinct
 - Difficulty: 2
 - Tags: actionability-check
 
----
 
 ## Reflection Exercise
 

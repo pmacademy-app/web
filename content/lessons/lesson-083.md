@@ -74,13 +74,28 @@ A specific and costly hardware product management mistake is applying uniform va
 
 ## Common Beginner Mistakes
 
-1. **Applying software-style "ship and iterate" thinking to genuinely physical design decisions.** A physical design flaw discovered after tooling commitment or mass production cannot be patched the way a software bug can, and treating hardware iteration as equivalent to software iteration underestimates this risk severely.
-2. **Assuming firmware update capability solves all post-shipment risk.** OTA updates can only correct flaws in embedded software, not in physical hardware components, and conflating the two creates false confidence about what can actually be fixed after shipment.
-3. **Applying uniform validation rigor throughout hardware development, rather than intensifying scrutiny as a decision approaches an irreversible commitment point.** This risks insufficient validation immediately before the most expensive, hardest-to-reverse decisions.
-4. **Underestimating the cost and timeline of re-tooling relative to a software rollback.** A hardware team accustomed to software's typically fast, cheap correction cycle can badly misjudge how long and how expensive a hardware correction genuinely is.
-5. **Failing to design firmware update capability into a physical product from the outset.** Retrofitting OTA update capability into a device not originally designed to support it is far more difficult than building it in from the start, echoing the same architectural-decision-early principle established for regulatory and privacy requirements in Lessons 81 and 82.
+**Mistake 1: Applying software-style "ship and iterate" thinking to genuinely physical design decisions**
+
+A physical design flaw discovered after tooling commitment or mass production cannot be patched the way a software bug can, and treating hardware iteration as equivalent to software iteration underestimates this risk severely.
+
+**Mistake 2: Assuming firmware update capability solves all post-shipment risk**
+
+OTA updates can only correct flaws in embedded software, not in physical hardware components, and conflating the two creates false confidence about what can actually be fixed after shipment.
+
+**Mistake 3: Applying uniform validation rigor throughout hardware development, rather than intensifying scrutiny as a decision approaches an irreversible commitment point**
+
+This risks insufficient validation immediately before the most expensive, hardest-to-reverse decisions.
+
+**Mistake 4: Underestimating the cost and timeline of re-tooling relative to a software rollback**
+
+A hardware team accustomed to software's typically fast, cheap correction cycle can badly misjudge how long and how expensive a hardware correction genuinely is.
+
+**Mistake 5: Failing to design firmware update capability into a physical product from the outset**
+
+Retrofitting OTA update capability into a device not originally designed to support it is far more difficult than building it in from the start, echoing the same architectural-decision-early principle established for regulatory and privacy requirements in Lessons 81 and 82.
 
 ---
+
 
 ## Mental Model: The Commitment Curve
 
@@ -103,7 +118,7 @@ Peloton's connected fitness hardware, combining physical exercise equipment with
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Hardware and Physical Products: PM Beyond Software at Different Company Stages
 
 **Startup:** Early-stage hardware companies typically face the most acute version of the Commitment Curve's risk, since a single tooling commitment or mass production run can represent a substantial fraction of the company's total available capital, making the validation rigor applied immediately before these commitment points genuinely existential rather than merely costly.
 
@@ -141,7 +156,7 @@ A "no" on Physical vs. Firmware Classification should be treated with particular
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you approach validating a hardware design decision before committing to tooling?"** The interviewer is evaluating whether you recognize that validation rigor should intensify as a decision approaches an irreversible commitment point, rather than remaining constant throughout development.
 
@@ -171,6 +186,8 @@ Hardware product development carries a fundamentally different risk profile than
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Software assumes "ship and iterate." Hardware has genuine irreversible commitment points. Don't confuse the two.
 - Commitment Curve: Concept → Prototype → Tooling Commitment → Mass Production → Shipped. Cost of reversal rises sharply at each stage.
 - Firmware/OTA updates preserve flexibility for software issues only — never for genuinely physical flaws.
@@ -193,50 +210,56 @@ Hardware product development carries a fundamentally different risk profile than
 
 ## Further Reading / Resources
 
-1. *The Hardware Startup* by Renee DiResta, Brady Forrest, and Ryan Vinyard
-2. *Zero to Maker* by David Lang
-3. *Product Design and Development* by Karl Ulrich and Steven Eppinger
+- Renee DiResta, Brady Forrest, and Ryan Vinyard, *The Hardware Startup*
+- David Lang, *Zero to Maker*
+- Karl Ulrich and Steven Eppinger, *Product Design and Development*
 
 ---
 
 ## Flashcards
 
-**Front:** Why does hardware development carry a fundamentally different risk profile than software?
-**Back:** Software assumes mistakes can typically be corrected through a subsequent deployment, but hardware has genuine, irreversible commitment points, like tooling and mass production, after which a flaw can no longer be simply patched.
-**Difficulty:** Easy
-**Tags:** #hardware-pm #core-concept
+**Card 1**
+- Front: ** Why does hardware development carry a fundamentally different risk profile than software?
+- Back: ** Software assumes mistakes can typically be corrected through a subsequent deployment, but hardware has genuine, irreversible commitment points, like tooling and mass production, after which a flaw can no longer be simply patched.
+- Difficulty: 2
+- Tags: **, hardware-pm, core-concept
 
-**Front:** Name the five stages of the Commitment Curve.
-**Back:** Concept, Prototype, Tooling Commitment, Mass Production, Shipped to Customers.
-**Difficulty:** Easy
-**Tags:** #commitment-curve
+**Card 2**
+- Front: ** Name the five stages of the Commitment Curve.
+- Back: ** Concept, Prototype, Tooling Commitment, Mass Production, Shipped to Customers.
+- Difficulty: 2
+- Tags: **, commitment-curve
 
-**Front:** What can OTA (over-the-air) updates correct, and what can't they correct?
-**Back:** They can correct firmware and software issues, but they cannot correct genuinely physical hardware flaws, like a defective battery or sensor.
-**Difficulty:** Medium
-**Tags:** #ota-updates
+**Card 3**
+- Front: ** What can OTA (over-the-air) updates correct, and what can't they correct?
+- Back: ** They can correct firmware and software issues, but they cannot correct genuinely physical hardware flaws, like a defective battery or sensor.
+- Difficulty: 2
+- Tags: **, ota-updates
 
-**Front:** Why should validation rigor scale with proximity to a Commitment Curve stage?
-**Back:** The cost of reversing a decision increases sharply near commitment points like tooling, so more scrutiny is needed immediately before these thresholds than earlier in development.
-**Difficulty:** Medium
-**Tags:** #validation-rigor
+**Card 4**
+- Front: ** Why should validation rigor scale with proximity to a Commitment Curve stage?
+- Back: ** The cost of reversing a decision increases sharply near commitment points like tooling, so more scrutiny is needed immediately before these thresholds than earlier in development.
+- Difficulty: 2
+- Tags: **, validation-rigor
 
-**Front:** What went wrong in the Unfixable Battery Flaw case study?
-**Back:** A physical battery design issue identified during prototype testing was assumed to be firmware-correctable and given insufficient validation before tooling commitment, but it was actually a genuine physical flaw requiring a costly recall.
-**Difficulty:** Hard
-**Tags:** #case-study #commitment-curve
+**Card 5**
+- Front: ** What went wrong in the Unfixable Battery Flaw case study?
+- Back: ** A physical battery design issue identified during prototype testing was assumed to be firmware-correctable and given insufficient validation before tooling commitment, but it was actually a genuine physical flaw requiring a costly recall.
+- Difficulty: 2
+- Tags: **, case-study, commitment-curve
 
-**Front:** Why should firmware update capability be designed into a product from the outset?
-**Back:** Retrofitting OTA update capability into a device not originally designed to support it is considerably more difficult than building it in from the start.
-**Difficulty:** Medium
-**Tags:** #ota-design
+**Card 6**
+- Front: ** Why should firmware update capability be designed into a product from the outset?
+- Back: ** Retrofitting OTA update capability into a device not originally designed to support it is considerably more difficult than building it in from the start.
+- Difficulty: 2
+- Tags: **, ota-design
 
-**Front:** What is the "Physical vs. Firmware Classification" step, and why does it matter?
-**Back:** It's the practice of determining whether an identified flaw is a genuinely physical issue or a software-correctable one — getting this wrong, as in the Case Study, can lead to a costly assumption that a problem can be fixed after shipment when it genuinely cannot.
-**Difficulty:** Hard
-**Tags:** #physical-firmware-classification
+**Card 7**
+- Front: ** What is the "Physical vs. Firmware Classification" step, and why does it matter?
+- Back: ** It's the practice of determining whether an identified flaw is a genuinely physical issue or a software-correctable one — getting this wrong, as in the Case Study, can lead to a costly assumption that a problem can be fixed after shipment when it genuinely cannot.
+- Difficulty: 2
+- Tags: **, physical-firmware-classification
 
----
 
 ## Reflection Exercise
 

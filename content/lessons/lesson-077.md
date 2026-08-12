@@ -79,13 +79,28 @@ Metric mismatch produces two distinct, opposite failure modes. **Premature cance
 
 ## Common Beginner Mistakes
 
-1. **Applying the same revenue and profit metrics to every bet in a portfolio, regardless of Horizon or validation stage.** This produces the category error described in the Theory section, killing promising early bets and providing false comfort for others.
-2. **Accepting vanity metrics as evidence of progress simply because they are readily available and always trending upward.** Vanity metrics can create a comfortable illusion of progress while providing no actual validated learning about the bet's underlying hypothesis.
-3. **Failing to explicitly place each bet on the Portfolio Health Grid, leaving its appropriate evaluation criteria ambiguous.** Without an explicit stage classification, there is no principled basis for deciding what evidence should or shouldn't count as meaningful progress.
-4. **Treating a bet's progression from one validation stage to the next as automatic rather than something that must be genuinely earned by evidence.** A bet should not advance from Prototype to Pilot status, for instance, simply because time has passed, but because specific validated learning milestones have actually been met.
-5. **Allowing organizational politics or sunk cost to substitute for validated learning evidence when deciding whether to continue or cancel a bet.** A bet's continuation should be justified by genuine evidence at the appropriate stage, not by how much has already been invested or who championed it internally.
+**Mistake 1: Applying the same revenue and profit metrics to every bet in a portfolio, regardless of Horizon or validation stage**
+
+This produces the category error described in the Theory section, killing promising early bets and providing false comfort for others.
+
+**Mistake 2: Accepting vanity metrics as evidence of progress simply because they are readily available and always trending upward**
+
+Vanity metrics can create a comfortable illusion of progress while providing no actual validated learning about the bet's underlying hypothesis.
+
+**Mistake 3: Failing to explicitly place each bet on the Portfolio Health Grid, leaving its appropriate evaluation criteria ambiguous**
+
+Without an explicit stage classification, there is no principled basis for deciding what evidence should or shouldn't count as meaningful progress.
+
+**Mistake 4: Treating a bet's progression from one validation stage to the next as automatic rather than something that must be genuinely earned by evidence**
+
+A bet should not advance from Prototype to Pilot status, for instance, simply because time has passed, but because specific validated learning milestones have actually been met.
+
+**Mistake 5: Allowing organizational politics or sunk cost to substitute for validated learning evidence when deciding whether to continue or cancel a bet**
+
+A bet's continuation should be justified by genuine evidence at the appropriate stage, not by how much has already been invested or who championed it internally.
 
 ---
+
 
 ## Mental Model: The Portfolio Health Grid
 
@@ -108,7 +123,7 @@ A portfolio evaluated through this Grid consistently is far less likely to fall 
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Innovation Accounting and Portfolio Management at Different Company Stages
 
 **Startup:** Early-stage companies typically operate with a portfolio of one or a small number of bets, all effectively Horizon 1 or 2 by necessity, since the company's survival depends on near-term validation — making the Portfolio Health Grid's full range less immediately relevant than it becomes once a company has the resources to sustain genuinely exploratory Horizon 3 work alongside its core business.
 
@@ -145,7 +160,7 @@ Using evidence one column to the right of a bet's actual stage — for instance,
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you evaluate whether an early-stage, exploratory product initiative is succeeding?"** The interviewer is evaluating whether you propose stage-appropriate validated learning metrics — per the Portfolio Health Grid — rather than defaulting to revenue or scale metrics inappropriate to an early-stage bet.
 
@@ -175,6 +190,8 @@ Applying uniform, revenue-based metrics across a portfolio of bets at genuinely 
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Don't judge every bet by the same yardstick. Match the metric to the bet's actual stage.
 - Portfolio Health Grid: Horizon (H1/H2/H3) × Validation Stage (Concept/Prototype/Pilot/Scale).
 - Validated learning tests a real hypothesis. Vanity metrics just look good and trend up.
@@ -198,50 +215,56 @@ Applying uniform, revenue-based metrics across a portfolio of bets at genuinely 
 
 ## Further Reading / Resources
 
-1. *The Lean Startup* by Eric Ries
-2. *The Corporate Startup* by Tendayi Viki, Dan Toma, and Esther Gons
-3. *The Alchemy of Growth* by Mehrdad Baghai, Stephen Coley, and David White
+- Eric Ries, *The Lean Startup*
+- Tendayi Viki, Dan Toma, and Esther Gons, *The Corporate Startup*
+- Mehrdad Baghai, Stephen Coley, and David White, *The Alchemy of Growth*
 
 ---
 
 ## Flashcards
 
-**Front:** Why does applying uniform revenue metrics across a portfolio produce a category error?
-**Back:** An early-stage Horizon 3 bet is structurally too early to demonstrate the scale evidence a mature Horizon 1 business reasonably should, making revenue comparison inappropriate at that stage.
-**Difficulty:** Easy
-**Tags:** #innovation-accounting #core-concept
+**Card 1**
+- Front: ** Why does applying uniform revenue metrics across a portfolio produce a category error?
+- Back: ** An early-stage Horizon 3 bet is structurally too early to demonstrate the scale evidence a mature Horizon 1 business reasonably should, making revenue comparison inappropriate at that stage.
+- Difficulty: 2
+- Tags: **, innovation-accounting, core-concept
 
-**Front:** Name the four validation stages on the Portfolio Health Grid.
-**Back:** Concept, Prototype, Pilot, Scale.
-**Difficulty:** Easy
-**Tags:** #portfolio-health-grid
+**Card 2**
+- Front: ** Name the four validation stages on the Portfolio Health Grid.
+- Back: ** Concept, Prototype, Pilot, Scale.
+- Difficulty: 2
+- Tags: **, portfolio-health-grid
 
-**Front:** What is the difference between validated learning and a vanity metric?
-**Back:** Validated learning tests a specific, falsifiable hypothesis and confirms or disconfirms it; a vanity metric merely looks encouraging without testing anything meaningful.
-**Difficulty:** Medium
-**Tags:** #validated-learning
+**Card 3**
+- Front: ** What is the difference between validated learning and a vanity metric?
+- Back: ** Validated learning tests a specific, falsifiable hypothesis and confirms or disconfirms it; a vanity metric merely looks encouraging without testing anything meaningful.
+- Difficulty: 2
+- Tags: **, validated-learning
 
-**Front:** What are the two failure modes caused by metric mismatch?
-**Back:** Premature cancellation of promising early bets, and prolonged survival of genuinely failing bets.
-**Difficulty:** Medium
-**Tags:** #metric-mismatch
+**Card 4**
+- Front: ** What are the two failure modes caused by metric mismatch?
+- Back: ** Premature cancellation of promising early bets, and prolonged survival of genuinely failing bets.
+- Difficulty: 2
+- Tags: **, metric-mismatch
 
-**Front:** Why was the Pilot-stage subscription initiative killed in the Prematurely Killed Experiment case study?
-**Back:** It was evaluated using a Horizon 1-appropriate absolute revenue contribution metric, a Scale-stage standard the Pilot-stage bet could not reasonably meet yet, despite genuinely earning validated learning at its actual stage.
-**Difficulty:** Hard
-**Tags:** #case-study #portfolio-health-grid
+**Card 5**
+- Front: ** Why was the Pilot-stage subscription initiative killed in the Prematurely Killed Experiment case study?
+- Back: ** It was evaluated using a Horizon 1-appropriate absolute revenue contribution metric, a Scale-stage standard the Pilot-stage bet could not reasonably meet yet, despite genuinely earning validated learning at its actual stage.
+- Difficulty: 2
+- Tags: **, case-study, portfolio-health-grid
 
-**Front:** What appropriate evidence should a Concept-stage bet be evaluated against?
-**Back:** A clearly articulated, falsifiable hypothesis and a designed initial test — not revenue or user growth targets.
-**Difficulty:** Medium
-**Tags:** #innovation-accounting-metrics
+**Card 6**
+- Front: ** What appropriate evidence should a Concept-stage bet be evaluated against?
+- Back: ** A clearly articulated, falsifiable hypothesis and a designed initial test — not revenue or user growth targets.
+- Difficulty: 2
+- Tags: **, innovation-accounting-metrics
 
-**Front:** Why should progression between validation stages be earned by evidence rather than assumed by elapsed time?
-**Back:** A bet should advance to the next stage only because specific validated learning milestones have actually been met, not simply because time has passed.
-**Difficulty:** Medium
-**Tags:** #validation-stage-progression
+**Card 7**
+- Front: ** Why should progression between validation stages be earned by evidence rather than assumed by elapsed time?
+- Back: ** A bet should advance to the next stage only because specific validated learning milestones have actually been met, not simply because time has passed.
+- Difficulty: 2
+- Tags: **, validation-stage-progression
 
----
 
 ## Reflection Exercise
 

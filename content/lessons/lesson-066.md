@@ -76,13 +76,28 @@ Recommender systems face a specific structural challenge called the **cold-start
 
 ## Common Beginner Mistakes
 
-1. **Evaluating a recommender system using only accuracy-style metrics.** High precision or click-through rate can coexist with a rapidly narrowing filter bubble, since neither metric measures diversity or novelty.
-2. **Treating "more personalization" as an unambiguous good.** Personalization pushed too far into the Known Preference Zone, at the expense of the Discovery Frontier, can actively reduce a user's long-term sense of the platform's breadth and value.
-3. **Ignoring the cold-start problem until it causes visible user complaints.** New users and new catalog items receiving poor initial recommendations is a predictable, structural issue, not an unexpected edge case, and should be planned for from the start.
-4. **Assuming filter bubble effects will show up quickly in existing metrics.** Because filter bubble narrowing degrades long-term retention rather than immediate engagement, it can go undetected for a long time using dashboards built around short-term signals, directly echoing the Smile Curve retention-analysis lesson (Lesson 44).
-5. **Treating the explore/exploit balance as a fixed, one-time setting rather than something to monitor and adjust.** User interests, catalog composition, and platform goals all shift over time, and a Discovery Frontier balance that was appropriate a year ago may no longer be appropriate today.
+**Mistake 1: Evaluating a recommender system using only accuracy-style metrics**
+
+High precision or click-through rate can coexist with a rapidly narrowing filter bubble, since neither metric measures diversity or novelty.
+
+**Mistake 2: Treating "more personalization" as an unambiguous good**
+
+Personalization pushed too far into the Known Preference Zone, at the expense of the Discovery Frontier, can actively reduce a user's long-term sense of the platform's breadth and value.
+
+**Mistake 3: Ignoring the cold-start problem until it causes visible user complaints**
+
+New users and new catalog items receiving poor initial recommendations is a predictable, structural issue, not an unexpected edge case, and should be planned for from the start.
+
+**Mistake 4: Assuming filter bubble effects will show up quickly in existing metrics**
+
+Because filter bubble narrowing degrades long-term retention rather than immediate engagement, it can go undetected for a long time using dashboards built around short-term signals, directly echoing the Smile Curve retention-analysis lesson (Lesson 44).
+
+**Mistake 5: Treating the explore/exploit balance as a fixed, one-time setting rather than something to monitor and adjust**
+
+User interests, catalog composition, and platform goals all shift over time, and a Discovery Frontier balance that was appropriate a year ago may no longer be appropriate today.
 
 ---
+
 
 ## Mental Model: The Discovery Frontier
 
@@ -104,7 +119,7 @@ Spotify's recommendation and discovery features, including features publicly dis
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Recommender Systems and Personalization for PMs at Different Company Stages
 
 **Startup:** Early-stage products with a young catalog and a young user base face the cold-start problem constantly and severely, since neither users nor items have much interaction history yet, making content-based and editorially curated fallback strategies especially important in the early stages of building a recommender system at all.
 
@@ -142,7 +157,7 @@ A "no" on Long-Horizon Monitoring in particular should be treated as a serious b
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you evaluate whether a recommender system is actually good?"** The interviewer is evaluating whether you name diversity and novelty metrics alongside accuracy metrics, rather than treating click-through rate or precision alone as sufficient evidence of success.
 
@@ -172,6 +187,8 @@ Recommender systems face a structural tension between exploiting a user's alread
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Exploit-only recommenders win short-term, lose long-term — this is Goodhart's Law applied to personalization.
 - Discovery Frontier zones: Known Preference → Discovery Frontier → Irrelevant. Deliberately allocate to the middle zone.
 - Track diversity and novelty, not just accuracy and click-through rate.
@@ -195,50 +212,56 @@ Recommender systems face a structural tension between exploiting a user's alread
 
 ## Further Reading / Resources
 
-1. *Recommender Systems: The Textbook* by Charu Aggarwal
-2. *Practical Recommender Systems* by Kim Falk
-3. *The Filter Bubble* by Eli Pariser
+- Charu Aggarwal, *Recommender Systems: The Textbook*
+- Kim Falk, *Practical Recommender Systems*
+- Eli Pariser, *The Filter Bubble*
 
 ---
 
 ## Flashcards
 
-**Front:** Why can a recommender optimized purely for short-term engagement produce a filter bubble?
-**Back:** It learns that showing more of what already worked reliably produces the next positive response, narrowing exposure over time even as short-term metrics improve.
-**Difficulty:** Easy
-**Tags:** #filter-bubble #core-concept
+**Card 1**
+- Front: ** Why can a recommender optimized purely for short-term engagement produce a filter bubble?
+- Back: ** It learns that showing more of what already worked reliably produces the next positive response, narrowing exposure over time even as short-term metrics improve.
+- Difficulty: 2
+- Tags: **, filter-bubble, core-concept
 
-**Front:** Name the three zones of the Discovery Frontier model.
-**Back:** Known Preference Zone, Discovery Frontier, Irrelevant Zone.
-**Difficulty:** Easy
-**Tags:** #discovery-frontier
+**Card 2**
+- Front: ** Name the three zones of the Discovery Frontier model.
+- Back: ** Known Preference Zone, Discovery Frontier, Irrelevant Zone.
+- Difficulty: 2
+- Tags: **, discovery-frontier
 
-**Front:** Why must diversity and novelty metrics be tracked alongside accuracy metrics?
-**Back:** Accuracy-style metrics (precision, CTR) cannot detect a narrowing filter bubble, since they only measure whether known-preference predictions were correct.
-**Difficulty:** Medium
-**Tags:** #metrics
+**Card 3**
+- Front: ** Why must diversity and novelty metrics be tracked alongside accuracy metrics?
+- Back: ** Accuracy-style metrics (precision, CTR) cannot detect a narrowing filter bubble, since they only measure whether known-preference predictions were correct.
+- Difficulty: 2
+- Tags: **, metrics
 
-**Front:** What is the cold-start problem?
-**Back:** The difficulty of generating relevant recommendations for new users or new catalog items due to insufficient interaction history.
-**Difficulty:** Medium
-**Tags:** #cold-start
+**Card 4**
+- Front: ** What is the cold-start problem?
+- Back: ** The difficulty of generating relevant recommendations for new users or new catalog items due to insufficient interaction history.
+- Difficulty: 2
+- Tags: **, cold-start
 
-**Front:** Why did skip rate improve while 90-day retention declined in the Case Study?
-**Back:** The recommender optimized for immediate skip avoidance by serving increasingly narrow, safe, already-liked content, which reduced skips short-term but bored users over a longer horizon.
-**Difficulty:** Hard
-**Tags:** #case-study #discovery-frontier
+**Card 5**
+- Front: ** Why did skip rate improve while 90-day retention declined in the Case Study?
+- Back: ** The recommender optimized for immediate skip avoidance by serving increasingly narrow, safe, already-liked content, which reduced skips short-term but bored users over a longer horizon.
+- Difficulty: 2
+- Tags: **, case-study, discovery-frontier
 
-**Front:** Name two mitigation strategies for the cold-start problem.
-**Back:** Onboarding preference surveys for explicit signal, and popularity-based or content-based fallback recommendations until behavioral data accumulates.
-**Difficulty:** Medium
-**Tags:** #cold-start-mitigation
+**Card 6**
+- Front: ** Name two mitigation strategies for the cold-start problem.
+- Back: ** Onboarding preference surveys for explicit signal, and popularity-based or content-based fallback recommendations until behavioral data accumulates.
+- Difficulty: 2
+- Tags: **, cold-start-mitigation
 
-**Front:** Why is filter bubble damage often invisible on short-term dashboards?
-**Back:** It operates on a longer retention timescale than daily engagement metrics track, requiring long-horizon monitoring like the Smile Curve to detect.
-**Difficulty:** Hard
-**Tags:** #long-horizon-monitoring
+**Card 7**
+- Front: ** Why is filter bubble damage often invisible on short-term dashboards?
+- Back: ** It operates on a longer retention timescale than daily engagement metrics track, requiring long-horizon monitoring like the Smile Curve to detect.
+- Difficulty: 2
+- Tags: **, long-horizon-monitoring
 
----
 
 ## Reflection Exercise
 

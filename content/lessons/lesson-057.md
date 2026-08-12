@@ -85,22 +85,28 @@ Extending Lesson 39's technical debt framework directly: an **ethical shortcut**
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating dark pattern-style tactics as acceptable because they produce measurable short-term metric improvements.**
+**Mistake 1: Treating dark pattern-style tactics as acceptable because they produce measurable short-term metric improvements**
+
 As covered in Theory, this mistakes a genuine improvement in the underlying product for what is often actually a Goodhart's Law-style gaming of the metric (Lesson 41) — the metric moves, but the thing it was meant to represent (genuine customer value and trust) often moves in the opposite direction.
 
-**Mistake 2: Assuming legal compliance (broad terms-of-service consent) is equivalent to genuine ethical adequacy.**
+**Mistake 2: Assuming legal compliance (broad terms-of-service consent) is equivalent to genuine ethical adequacy**
+
 As covered in Theory, legally sufficient consent and ethically robust informed consent are related but distinct standards, and the gap between them matters more as an experiment's or decision's potential for genuine harm increases.
 
-**Mistake 3: Failing to consider whether harm falls disproportionately on vulnerable users.**
+**Mistake 3: Failing to consider whether harm falls disproportionately on vulnerable users**
+
 A decision that looks ethically acceptable when evaluated only against an "average" user's experience may be seriously harmful when the actual harm concentrates on users with less resilience, resources, or capacity to resist or recover from it.
 
-**Mistake 4: Treating ethical considerations as something to address only after a decision has already been made, rather than during the design process itself.**
+**Mistake 4: Treating ethical considerations as something to address only after a decision has already been made, rather than during the design process itself**
+
 Ethical review conducted only as a final check, after significant investment has already gone into a specific implementation, faces the same sunk-cost pressure that makes genuine reconsideration difficult — ethical consideration works best when integrated into the design process from the start, not bolted on at the end.
 
-**Mistake 5: Assuming "everyone in the industry does this" is a sufficient ethical justification.**
+**Mistake 5: Assuming "everyone in the industry does this" is a sufficient ethical justification**
+
 Industry prevalence of a practice (a specific dark pattern, a particular data-use practice) doesn't establish its ethical acceptability, and regulatory and public scrutiny of common industry practices has repeatedly demonstrated that widespread adoption doesn't protect against eventual serious consequences.
 
 ---
+
 
 ## Mental Model: The Harm Radius
 
@@ -130,7 +136,7 @@ The underlying principle connects directly to this lesson's Theory: practices th
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Ethics in Product Management at Different Company Stages
 
 **At a startup:**
 Ethical review is often informal, relying on individual judgment rather than a formal process, since dedicated legal, privacy, or ethics review functions may not yet exist. The risk here is that competitive pressure and resource scarcity can make ethical shortcuts especially tempting precisely when formal safeguards are weakest — making individual PM judgment, informed by frameworks like this lesson's, especially important at this stage.
@@ -222,7 +228,7 @@ Ethics in product management extends this curriculum's foundational commitment t
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Dark pattern | An interface or interaction design deliberately structured to manipulate users into a choice they wouldn't make with full clarity | Harm Radius | 1 |
 | Harm Radius | This lesson's mental model: assessing who is harmed by a decision, how severely, and how reversibly — extending Lesson 36's Blast Radius | Blast Radius (Lesson 36) | 2 |
@@ -243,42 +249,41 @@ Ethics in product management extends this curriculum's foundational commitment t
 ## Flashcards
 
 **Card 1**
-Front: What is a dark pattern?
-Back: An interface or interaction design deliberately structured to manipulate users into a choice they wouldn't make with full, clear information.
-Difficulty: 1
-Tags: dark-patterns
+- Front: What is a dark pattern?
+- Back: An interface or interaction design deliberately structured to manipulate users into a choice they wouldn't make with full, clear information.
+- Difficulty: 1
+- Tags: dark-patterns
 
 **Card 2**
-Front: What does the Harm Radius ask, and what does it extend?
-Back: Who could be harmed by a decision, how severely, whether harm falls disproportionately on vulnerable users, and whether it's reversible — extending Lesson 36's Blast Radius model from technical risk to ethical harm.
-Difficulty: 2
-Tags: harm-radius
+- Front: What does the Harm Radius ask, and what does it extend?
+- Back: Who could be harmed by a decision, how severely, whether harm falls disproportionately on vulnerable users, and whether it's reversible — extending Lesson 36's Blast Radius model from technical risk to ethical harm.
+- Difficulty: 2
+- Tags: harm-radius
 
 **Card 3**
-Front: Why is legal compliance (broad ToS consent) not equivalent to genuine informed consent?
-Back: Legal sufficiency and ethical adequacy are related but distinct standards; the gap between them matters more as a decision's or experiment's potential for real harm increases.
-Difficulty: 2
-Tags: informed-consent
+- Front: Why is legal compliance (broad ToS consent) not equivalent to genuine informed consent?
+- Back: Legal sufficiency and ethical adequacy are related but distinct standards; the gap between them matters more as a decision's or experiment's potential for real harm increases.
+- Difficulty: 2
+- Tags: informed-consent
 
 **Card 4**
-Front: What is the sunlight test?
-Back: A heuristic asking whether a decision would survive being described accurately and in full detail in a prominent news article, with the decision-maker's name attached.
-Difficulty: 1
-Tags: sunlight-test
+- Front: What is the sunlight test?
+- Back: A heuristic asking whether a decision would survive being described accurately and in full detail in a prominent news article, with the decision-maker's name attached.
+- Difficulty: 1
+- Tags: sunlight-test
 
 **Card 5**
-Front: What key asymmetry distinguishes ethical debt from most technical debt?
-Back: Ethical debt's "interest" — compounding reputational, regulatory, and trust costs — often falls on users and society, not primarily on the company itself, unlike most technical debt.
-Difficulty: 2
-Tags: ethical-debt
+- Front: What key asymmetry distinguishes ethical debt from most technical debt?
+- Back: Ethical debt's "interest" — compounding reputational, regulatory, and trust costs — often falls on users and society, not primarily on the company itself, unlike most technical debt.
+- Difficulty: 2
+- Tags: ethical-debt
 
 **Card 6**
-Front: In the Detailed Case Study, what was the actual root cause of the cancellation flow's eventual regulatory scrutiny?
-Back: The redesign was evaluated almost entirely through a metrics lens (did churn improve?) without genuine Harm Radius consideration of the real cost to users trying to cancel, particularly those with less time or digital savvy to persist through the friction.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what was the actual root cause of the cancellation flow's eventual regulatory scrutiny?
+- Back: The redesign was evaluated almost entirely through a metrics lens (did churn improve?) without genuine Harm Radius consideration of the real cost to users trying to cancel, particularly those with less time or digital savvy to persist through the friction.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

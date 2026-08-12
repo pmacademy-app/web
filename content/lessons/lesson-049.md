@@ -88,22 +88,28 @@ Recall Lesson 36's launch tiering system, which classified releases by potential
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Writing a positioning statement so broad it could apply to almost any product.**
+**Mistake 1: Writing a positioning statement so broad it could apply to almost any product**
+
 A target market of "businesses" or a differentiator of "easy to use" fails to force the specific, falsifiable clarity this lesson's positioning framework requires, and produces downstream messaging that's equally vague and unpersuasive.
 
-**Mistake 2: Choosing a GTM motion based on organizational habit rather than product fit.**
+**Mistake 2: Choosing a GTM motion based on organizational habit rather than product fit**
+
 A company with an established enterprise sales team may default to a sales-led motion for a new, simpler, lower-priced product line simply because that's the existing organizational muscle — even when the product's actual complexity and price point would be far better served by a product-led approach.
 
-**Mistake 3: Treating every launch as warranting the same level of GTM ceremony.**
+**Mistake 3: Treating every launch as warranting the same level of GTM ceremony**
+
 Echoing Lesson 36's launch tiering caution directly: applying a full marketing-and-sales campaign to a minor update wastes organizational effort, while under-investing GTM coordination for a genuinely significant new product risks a confused, poorly-supported market entry.
 
-**Mistake 4: Assuming a GTM failure means the product itself is flawed.**
+**Mistake 4: Assuming a GTM failure means the product itself is flawed**
+
 A product can be genuinely excellent while failing commercially due to unclear positioning, a mismatched motion, or poor channel choice — diagnosing which layer actually failed (product, positioning, motion, or channel) is essential before concluding the underlying product needs to change.
 
-**Mistake 5: Designing positioning and messaging without direct input from the sales or customer-facing teams who will actually use it in conversations.**
+**Mistake 5: Designing positioning and messaging without direct input from the sales or customer-facing teams who will actually use it in conversations**
+
 Positioning developed in isolation, without testing whether it holds up in real customer conversations, risks sounding coherent internally while falling flat or generating confused reactions in actual market interactions.
 
 ---
+
 
 ## Mental Model: The Positioning Pyramid
 
@@ -130,7 +136,7 @@ The underlying principle connects directly to this lesson's Theory: Slack's earl
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Go-To-Market Strategy at Different Company Stages
 
 **At a startup:**
 GTM strategy is often simple by necessity — limited resources typically force a choice between a lightweight, product-led motion or a small, founder-led sales effort, rather than supporting multiple parallel motions. The risk here is Mistake 2's mirror image: a founding team with a sales background may default to a sales-led motion even for a product whose price point and complexity would actually be better served by product-led adoption, simply because that's the skill set already present.
@@ -221,7 +227,7 @@ Go-to-market strategy determines how a product actually reaches its intended mar
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Positioning | A specific, falsifiable claim about a product's target market, category, and differentiator relative to alternatives | Positioning Pyramid | 1 |
 | Go-to-market (GTM) motion | The primary mechanism by which a product acquires and converts customers: product-led, sales-led, or channel-led | Motion-product fit | 1 |
@@ -243,42 +249,41 @@ Go-to-market strategy determines how a product actually reaches its intended mar
 ## Flashcards
 
 **Card 1**
-Front: What four elements does this lesson's positioning framework require?
-Back: A specific target market, a category the product is understood against, the key differentiator/benefit, and the primary alternative being displaced.
-Difficulty: 1
-Tags: positioning-framework
+- Front: What four elements does this lesson's positioning framework require?
+- Back: A specific target market, a category the product is understood against, the key differentiator/benefit, and the primary alternative being displaced.
+- Difficulty: 1
+- Tags: positioning-framework
 
 **Card 2**
-Front: Name the three core GTM motions.
-Back: Product-led (PLG), sales-led, and channel/partner-led.
-Difficulty: 1
-Tags: gtm-motions
+- Front: Name the three core GTM motions.
+- Back: Product-led (PLG), sales-led, and channel/partner-led.
+- Difficulty: 1
+- Tags: gtm-motions
 
 **Card 3**
-Front: What determines which GTM motion best fits a given product?
-Back: The product's actual price point and buying complexity — low price/complexity favors product-led, high price/complexity favors sales-led, intermediary-dependent markets favor channel-led.
-Difficulty: 2
-Tags: motion-fit
+- Front: What determines which GTM motion best fits a given product?
+- Back: The product's actual price point and buying complexity — low price/complexity favors product-led, high price/complexity favors sales-led, intermediary-dependent markets favor channel-led.
+- Difficulty: 2
+- Tags: motion-fit
 
 **Card 4**
-Front: Why can a GTM motion mismatch be easily misdiagnosed as a product failure?
-Back: Friction from a mismatched motion (e.g., a simple product forced through a slow sales process) produces disappointing results that look like poor product-market fit, when the actual cause is the motion, not the product itself.
-Difficulty: 2
-Tags: misdiagnosis
+- Front: Why can a GTM motion mismatch be easily misdiagnosed as a product failure?
+- Back: Friction from a mismatched motion (e.g., a simple product forced through a slow sales process) produces disappointing results that look like poor product-market fit, when the actual cause is the motion, not the product itself.
+- Difficulty: 2
+- Tags: misdiagnosis
 
 **Card 5**
-Front: What does the Positioning Pyramid illustrate?
-Back: Positioning cascades down into messaging, then GTM motion, then specific launch tactics — confusion at a lower layer is often actually caused by unclear positioning at the top.
-Difficulty: 2
-Tags: positioning-pyramid
+- Front: What does the Positioning Pyramid illustrate?
+- Back: Positioning cascades down into messaging, then GTM motion, then specific launch tactics — confusion at a lower layer is often actually caused by unclear positioning at the top.
+- Difficulty: 2
+- Tags: positioning-pyramid
 
 **Card 6**
-Front: In the Detailed Case Study, why did routing a simple, low-price product through an enterprise sales motion fail?
-Back: Prospects expecting a fast, self-serve evaluation were frustrated by a disproportionate multi-week sales process, while the sales team, incentivized around larger deals, deprioritized the smaller opportunities.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, why did routing a simple, low-price product through an enterprise sales motion fail?
+- Back: Prospects expecting a fast, self-serve evaluation were frustrated by a disproportionate multi-week sales process, while the sales team, incentivized around larger deals, deprioritized the smaller opportunities.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

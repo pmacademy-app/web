@@ -12,7 +12,7 @@ This lesson matters because frameworks, however well-designed, are not substitut
 
 | Field | Detail |
 |---|---|
-| **Module** | 6 — Leadership, Communication & Career (closing lesson of the curriculum's foundational arc) |
+| **Module** | 6 — Leadership, Communication & Career |
 | **Current Lesson** | 60 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 40 minutes (reading) + 30 minutes (reflection exercise — this lesson's reflection is substantially longer than usual, by design) |
@@ -88,22 +88,28 @@ Directly echoing Lesson 35's Confidence Gradient and Lesson 42's guidance on rev
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating this curriculum's frameworks as a checklist to apply mechanically, without ever examining the underlying beliefs they serve.**
+**Mistake 1: Treating this curriculum's frameworks as a checklist to apply mechanically, without ever examining the underlying beliefs they serve**
+
 This produces exactly the fragility this lesson's Theory describes — competent handling of situations a framework was built for, and no real guidance the moment a situation doesn't cleanly match any single lesson.
 
-**Mistake 2: Adopting someone else's stated philosophy (a mentor's, a famous product leader's, a company's published principles) wholesale, without genuine personal examination.**
+**Mistake 2: Adopting someone else's stated philosophy (a mentor's, a famous product leader's, a company's published principles) wholesale, without genuine personal examination**
+
 A borrowed philosophy, however well-articulated by its original author, wasn't built from your own examined beliefs and experience, and tends to fail exactly when genuinely tested — under real pressure, in a situation the borrowed philosophy's author never actually faced themselves.
 
-**Mistake 3: Writing a philosophy composed entirely of confident, settled positions with no genuine open questions.**
+**Mistake 3: Writing a philosophy composed entirely of confident, settled positions with no genuine open questions**
+
 This mistakes performed certainty for genuine reflection — echoing this curriculum's repeated insistence (from Lesson 1 onward) on distinguishing validated fact from assumption, a discipline that should apply to one's own beliefs as rigorously as to any external claim.
 
-**Mistake 4: Treating a drafted philosophy as permanent and unchangeable once written.**
+**Mistake 4: Treating a drafted philosophy as permanent and unchangeable once written**
+
 As covered in Theory, this contradicts the revision discipline this curriculum has modeled throughout — a philosophy that never changes despite accumulating real experience is more likely evidence of insufficient reflection than of having gotten everything right on the first attempt.
 
-**Mistake 5: Writing a philosophy in purely abstract terms, disconnected from specific situations where it would actually apply.**
+**Mistake 5: Writing a philosophy in purely abstract terms, disconnected from specific situations where it would actually apply**
+
 A philosophy phrased so abstractly that it could justify almost any decision provides little real guidance — the most useful philosophies are specific enough to genuinely constrain and clarify behavior in concrete situations, not vague enough to accommodate whatever was already decided.
 
 ---
+
 
 ## Mental Model: The Product Philosophy Canvas
 
@@ -133,7 +139,7 @@ The underlying principle connects directly to this lesson's Theory, at an organi
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Capstone — Building Your Own Product Philosophy at Different Company Stages
 
 **At a startup:**
 An individual PM's personal philosophy often carries outsized weight, since formal organizational process and precedent are still thin — the judgment calls a founding PM makes, informed by whatever principles they've genuinely internalized, frequently become the de facto organizational culture others inherit. This makes the work of this lesson especially consequential early in a career or company, not something to defer until "later."
@@ -225,7 +231,7 @@ This capstone lesson closes the curriculum's foundational six modules by asking 
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Product philosophy | A personally examined, written set of guiding beliefs about users, evidence, trade-offs, and people, that informs judgment beyond any single framework | Product Philosophy Canvas | 1 |
 | Product Philosophy Canvas | This lesson's mental model: a structured template covering beliefs about users, evidence, trade-offs, people, non-negotiables, and open questions | Product philosophy | 1 |
@@ -244,42 +250,41 @@ This capstone lesson closes the curriculum's foundational six modules by asking 
 ## Flashcards
 
 **Card 1**
-Front: Why aren't memorized frameworks alone sufficient for good PM judgment, according to this lesson?
-Back: Real situations rarely map cleanly onto a single framework; a PM who hasn't examined the underlying beliefs those frameworks serve has no guidance when a genuinely novel situation doesn't fit any specific lesson.
-Difficulty: 1
-Tags: frameworks-vs-judgment
+- Front: Why aren't memorized frameworks alone sufficient for good PM judgment, according to this lesson?
+- Back: Real situations rarely map cleanly onto a single framework; a PM who hasn't examined the underlying beliefs those frameworks serve has no guidance when a genuinely novel situation doesn't fit any specific lesson.
+- Difficulty: 1
+- Tags: frameworks-vs-judgment
 
 **Card 2**
-Front: What three founding concepts from Lesson 1 does this lesson trace forward through the rest of the curriculum?
-Back: The Decision Chain, Output vs. Outcome, and responsibility without authority.
-Difficulty: 1
-Tags: throughline
+- Front: What three founding concepts from Lesson 1 does this lesson trace forward through the rest of the curriculum?
+- Back: The Decision Chain, Output vs. Outcome, and responsibility without authority.
+- Difficulty: 1
+- Tags: throughline
 
 **Card 3**
-Front: What six sections make up the Product Philosophy Canvas?
-Back: Beliefs about users, beliefs about evidence, beliefs about trade-offs, beliefs about people, non-negotiables, and open questions.
-Difficulty: 2
-Tags: philosophy-canvas
+- Front: What six sections make up the Product Philosophy Canvas?
+- Back: Beliefs about users, beliefs about evidence, beliefs about trade-offs, beliefs about people, non-negotiables, and open questions.
+- Difficulty: 2
+- Tags: philosophy-canvas
 
 **Card 4**
-Front: Why should a product philosophy explicitly include genuine open questions, not just confident positions?
-Back: Performed certainty is not genuine reflection; including honest uncertainty models the same epistemic honesty this curriculum has practiced throughout, distinguishing validated belief from assumption.
-Difficulty: 2
-Tags: open-questions
+- Front: Why should a product philosophy explicitly include genuine open questions, not just confident positions?
+- Back: Performed certainty is not genuine reflection; including honest uncertainty models the same epistemic honesty this curriculum has practiced throughout, distinguishing validated belief from assumption.
+- Difficulty: 2
+- Tags: open-questions
 
 **Card 5**
-Front: Why should a philosophy be treated as a living document rather than a permanent, unchangeable one?
-Back: As real experience accumulates, parts of the philosophy will be confirmed and parts will need revision — the same discipline this curriculum modeled for roadmaps (Lesson 35) and North Star Metrics (Lesson 42).
-Difficulty: 2
-Tags: living-document
+- Front: Why should a philosophy be treated as a living document rather than a permanent, unchangeable one?
+- Back: As real experience accumulates, parts of the philosophy will be confirmed and parts will need revision — the same discipline this curriculum modeled for roadmaps (Lesson 35) and North Star Metrics (Lesson 42).
+- Difficulty: 2
+- Tags: living-document
 
 **Card 6**
-Front: In the Detailed Case Study, what was the actual difference between the two PMs, given that both had access to the same frameworks?
-Back: The first PM had genuinely examined and internalized underlying principles (protect users, disclose proactively) and acted on them directly; the second PM had only technical familiarity with frameworks and hesitated without a genuinely internalized guide, despite facing an identical situation.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what was the actual difference between the two PMs, given that both had access to the same frameworks?
+- Back: The first PM had genuinely examined and internalized underlying principles (protect users, disclose proactively) and acted on them directly; the second PM had only technical familiarity with frameworks and hesitated without a genuinely internalized guide, despite facing an identical situation.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

@@ -124,22 +124,28 @@ Applied to the asynchronous-work case: the diagnosis might reveal that the bigge
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Presenting a goal as if it were a strategy.**
+**Mistake 1: Presenting a goal as if it were a strategy**
+
 "Our strategy is to double revenue this year" states an ambition with no diagnosis of the current obstacle and no guiding policy for overcoming it — it is a target, not a strategy, and stating it more forcefully or more often does not make it one.
 
-**Mistake 2: Writing a strategy document full of fluff that could apply to any company.**
+**Mistake 2: Writing a strategy document full of fluff that could apply to any company**
+
 Sophisticated-sounding language ("we will leverage synergies to drive customer-centric innovation") that states nothing falsifiable or specific to the actual situation is the clearest sign that real diagnostic work was skipped.
 
-**Mistake 3: Refusing to exclude anything.**
+**Mistake 3: Refusing to exclude anything**
+
 A "strategy" that endorses every plausible initiative as a simultaneous priority has not made a real choice, and functions more as a wish list than a plan — echoing Lesson 7's "for everyone" value proposition failure at a broader scope.
 
-**Mistake 4: Confusing strategic choices with tactical or operational ones.**
+**Mistake 4: Confusing strategic choices with tactical or operational ones**
+
 Deciding which specific bug to fix first this sprint is an operational decision; deciding which integration ecosystem to build a competitive moat around is strategic. Treating every decision as equally "strategic" dilutes the term and makes it harder to recognize when a genuinely consequential choice is actually being made.
 
-**Mistake 5: Skipping the diagnosis and jumping straight to guiding policy.**
+**Mistake 5: Skipping the diagnosis and jumping straight to guiding policy**
+
 A guiding policy chosen without an honest diagnosis of the actual obstacle tends to reflect whatever approach the team already prefers or is most comfortable with, rather than the approach that genuinely fits the situation — strategy built backward from a preferred solution, rather than forward from an honest read of reality.
 
 ---
+
 
 ## Mental Model: The Strategy Kernel
 
@@ -198,7 +204,7 @@ Use the Strategy Kernel as a filter whenever a "strategy" is presented to you, i
 
 ---
 
-## Real World Perspective: Strategy at Different Company Stages
+## Real World Perspective: Product Strategy Basics at Different Company Stages
 
 **At a startup:**
 Strategy is often concentrated almost entirely on a single, existential diagnosis: which specific segment and job (Lessons 5 and 6) represents the startup's best available path to a defensible position, given extremely limited resources — and, just as importantly, which adjacent, individually plausible markets or features the team will explicitly avoid pursuing in order to protect focus. The guiding policy at this stage is often close to "go deep and narrow before going broad," precisely because a startup rarely has the resources to pursue a grab-bag of disconnected objectives even if it wanted to.
@@ -361,7 +367,6 @@ Product strategy is a three-part structure — an honest, evidence-based diagnos
 - Difficulty: 3
 - Tags: case-study, dilution
 
----
 
 ## Reflection Exercise
 

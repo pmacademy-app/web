@@ -113,22 +113,28 @@ This example illustrates every criterion in this lesson's table simultaneously: 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Choosing an NSM that is really just a business/revenue metric restated.**
+**Mistake 1: Choosing an NSM that is really just a business/revenue metric restated**
+
 Revenue is a lagging indicator of success, not a leading indicator teams can act on directly — an NSM should sit further upstream, representing the customer value that, when delivered well, tends to produce revenue as a downstream consequence, not simply restate the downstream consequence itself.
 
-**Mistake 2: Choosing an NSM so broad that no team can identify concrete work that moves it.**
+**Mistake 2: Choosing an NSM so broad that no team can identify concrete work that moves it**
+
 A metric like "overall company success" or an overly abstract composite index fails the actionability criterion — teams need a metric specific enough to trace down into a metric tree with real, ownable input metrics.
 
-**Mistake 3: Building a metric tree with only thematically related branches, not rigorously connected ones.**
+**Mistake 3: Building a metric tree with only thematically related branches, not rigorously connected ones**
+
 As covered in Theory, this creates a false sense of alignment — a team can improve their local metric substantially while contributing little or nothing to the actual NSM above it, if the connection was never quantitatively verified.
 
-**Mistake 4: Adopting an NSM without considering how it could be gamed, echoing Lesson 41's Goodhart's Law.**
+**Mistake 4: Adopting an NSM without considering how it could be gamed, echoing Lesson 41's Goodhart's Law**
+
 YouTube's original view-count metric is the canonical illustration — an NSM that can be improved through behavior disconnected from genuine value (clickbait, in that example) will eventually produce exactly the gaming dynamic Lesson 41 warns against, at organizational scale.
 
-**Mistake 5: Treating the NSM as permanently fixed, never revisiting it as the business or product matures.**
+**Mistake 5: Treating the NSM as permanently fixed, never revisiting it as the business or product matures**
+
 An NSM appropriate for an early-stage product exploring product-market fit may become the wrong choice once the product matures and different dynamics (retention, monetization) become more central to genuine value — YouTube's own shift demonstrates that revisiting an NSM, when evidence warrants it, is a sign of good metric discipline, not instability.
 
 ---
+
 
 ## Mental Model: The Metric Tree
 
@@ -188,7 +194,7 @@ Use the Metric Tree as a standing discipline whenever a team claims their local 
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: North Star Metrics & Metric Trees at Different Company Stages
 
 **At a startup:**
 A formal NSM and metric tree are often unnecessary at very early stages, when the more urgent question is simply whether the product has found any genuine value at all (a topic closer to Lesson 8's discovery work than this lesson's metric-system design). Choosing an NSM prematurely, before the team even knows what customers value, risks locking in the wrong metric before there's enough evidence to choose well.
@@ -280,7 +286,7 @@ A North Star Metric is the single metric an organization selects to represent ge
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | North Star Metric (NSM) | The single metric an organization chooses to represent genuine customer value delivered, selected because it also predicts business success | Metric tree | 1 |
 | Metric tree | A hierarchy decomposing a North Star Metric into team-ownable input metrics | North Star Metric | 1 |
@@ -299,42 +305,41 @@ A North Star Metric is the single metric an organization selects to represent ge
 ## Flashcards
 
 **Card 1**
-Front: What is a North Star Metric?
-Back: The single metric an organization chooses to represent genuine customer value delivered, selected because it also reliably predicts long-term business success.
-Difficulty: 1
-Tags: nsm-definition
+- Front: What is a North Star Metric?
+- Back: The single metric an organization chooses to represent genuine customer value delivered, selected because it also reliably predicts long-term business success.
+- Difficulty: 1
+- Tags: nsm-definition
 
 **Card 2**
-Front: List the five criteria for a good NSM candidate.
-Back: Reflects customer value, leading indicator of business success, actionable, understandable, resistant to easy gaming.
-Difficulty: 1
-Tags: nsm-criteria
+- Front: List the five criteria for a good NSM candidate.
+- Back: Reflects customer value, leading indicator of business success, actionable, understandable, resistant to easy gaming.
+- Difficulty: 1
+- Tags: nsm-criteria
 
 **Card 3**
-Front: Why did YouTube's shift from view count to watch time matter?
-Back: View count could be improved through clickbait disconnected from genuine viewer satisfaction; watch time much more directly reflected real engagement and resisted that specific gaming vector.
-Difficulty: 2
-Tags: youtube-example
+- Front: Why did YouTube's shift from view count to watch time matter?
+- Back: View count could be improved through clickbait disconnected from genuine viewer satisfaction; watch time much more directly reflected real engagement and resisted that specific gaming vector.
+- Difficulty: 2
+- Tags: youtube-example
 
 **Card 4**
-Front: What is a metric tree, and what makes one well-built versus poorly-built?
-Back: A hierarchy decomposing an NSM into team-ownable input metrics; well-built trees have each branch rigorously, quantifiably connected to the NSM above, not just thematically related.
-Difficulty: 2
-Tags: metric-tree
+- Front: What is a metric tree, and what makes one well-built versus poorly-built?
+- Back: A hierarchy decomposing an NSM into team-ownable input metrics; well-built trees have each branch rigorously, quantifiably connected to the NSM above, not just thematically related.
+- Difficulty: 2
+- Tags: metric-tree
 
 **Card 5**
-Front: In the Detailed Case Study, why did "total registered accounts" fail as a North Star Metric despite the organization's metric tree being well-executed?
-Back: It measured exposure (signups), not genuine value, and could be improved through loosened signup friction and sales qualification without any real increase in customer value — failing both the "reflects value" and "resistant to gaming" criteria.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, why did "total registered accounts" fail as a North Star Metric despite the organization's metric tree being well-executed?
+- Back: It measured exposure (signups), not genuine value, and could be improved through loosened signup friction and sales qualification without any real increase in customer value — failing both the "reflects value" and "resistant to gaming" criteria.
+- Difficulty: 2
+- Tags: case-study
 
 **Card 6**
-Front: Why should an NSM be periodically revisited rather than treated as permanently fixed?
-Back: The right NSM for an early-stage product exploring value may not be the right NSM once the business matures and different dynamics (retention, monetization) become more central to genuine value.
-Difficulty: 2
-Tags: nsm-revision
+- Front: Why should an NSM be periodically revisited rather than treated as permanently fixed?
+- Back: The right NSM for an early-stage product exploring value may not be the right NSM once the business matures and different dynamics (retention, monetization) become more central to genuine value.
+- Difficulty: 2
+- Tags: nsm-revision
 
----
 
 ## Reflection Exercise
 

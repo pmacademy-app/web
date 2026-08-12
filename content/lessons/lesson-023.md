@@ -174,22 +174,28 @@ This does not mean technical work (refactoring, infrastructure improvements, tec
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Omitting or treating the "so that" clause as an afterthought.**
+**Mistake 1: Omitting or treating the "so that" clause as an afterthought**
+
 This clause provides the connective context that allows implementers to make good independent judgment calls on ambiguous details — omitting it removes exactly the information that would otherwise let a PM appropriately avoid over-specifying the "how."
 
 **Mistake 2: Splitting a story mechanically without checking the result against INVEST, especially "Valuable" and "Independent."**
+
 A split that produces fragments with no standalone value (echoing Lesson 21's car-wheel failure) has not actually produced genuine, smaller user stories — merely smaller, disconnected pieces of a larger plan.
 
-**Mistake 3: Writing technical tasks in user-story grammar without genuine standalone value to the named persona.**
+**Mistake 3: Writing technical tasks in user-story grammar without genuine standalone value to the named persona**
+
 "As a developer, I want to refactor X" is grammatically a story but fails the "Valuable" INVEST criterion when evaluated honestly — such work should be tracked and communicated as what it actually is.
 
-**Mistake 4: Leaving a story too large ("Small" INVEST failure) because splitting feels like unnecessary overhead.**
+**Mistake 4: Leaving a story too large ("Small" INVEST failure) because splitting feels like unnecessary overhead**
+
 A story that takes multiple weeks to complete is difficult to estimate accurately, difficult to prioritize meaningfully against other work, and delays the delivery of standalone value that a properly split version would have delivered incrementally.
 
-**Mistake 5: Over-splitting a story until individual pieces no longer deliver standalone value.**
+**Mistake 5: Over-splitting a story until individual pieces no longer deliver standalone value**
+
 Splitting too finely — down to the level of individual UI elements or database fields — produces exactly the same "fragments without standalone value" problem as mechanical, uncritical splitting, just from the opposite direction.
 
 ---
+
 
 ## Mental Model: The Story Value Test
 
@@ -402,7 +408,6 @@ A user story ("As a [role], I want [capability], so that [benefit]") breaks a la
 - Difficulty: 3
 - Tags: case-study
 
----
 
 ## Reflection Exercise
 

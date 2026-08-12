@@ -16,7 +16,7 @@ This matters because the single most common strategic mistake in product work is
 | **Current Lesson** | 4 of 90 |
 | **Difficulty** | 1 / 10 |
 | **Estimated Study Time** | 20 minutes (reading) + 10 minutes (reflection + quiz) |
-| **Prerequisites** | Lesson 1, Lesson 2, Lesson 3 |
+| **Prerequisites** | Lesson 1 (What is Product Management?), Lesson 2 (Product vs. Project), Lesson 3 (Product Thinking) |
 | **Next Lesson** | Lesson 5 — Users vs. Customers |
 | **Future Topics Unlocked** | Lesson 9 (Product Vision), Lesson 10 (Product Strategy Basics), Lesson 33 (Retention) — all depend on correctly diagnosing lifecycle stage before applying strategy |
 
@@ -80,19 +80,24 @@ Crucially, PMF is not a permanent state achieved once and then held forever — 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Assuming lifecycle stage is determined by a product's age, rather than by evidence.**
+**Mistake 1: Assuming lifecycle stage is determined by a product's age, rather than by evidence**
+
 A product that has existed for five years is not automatically in Maturity; if it has been repeatedly repositioned or has never found a clearly resonant audience, it may still be effectively in Introduction, regardless of calendar time elapsed. Lifecycle stage should be diagnosed from evidence (retention behavior, growth pattern, qualitative signals), not inferred from launch date.
 
-**Mistake 2: Applying growth tactics before Problem-Solution Fit is established.**
+**Mistake 2: Applying growth tactics before Problem-Solution Fit is established**
+
 This is the single most expensive version of stage-mismatch: spending heavily on user acquisition for a product that has not yet demonstrated it solves a real problem for real people. Acquiring more users faster does not fix an unvalidated value proposition — it simply multiplies the number of people who churn from it.
 
-**Mistake 3: Treating Maturity as a failure state.**
+**Mistake 3: Treating Maturity as a failure state**
+
 Some PMs, especially those who joined a fast-growing company, treat a shift into Maturity (slowing growth rate) as a sign that something has gone wrong. In reality, Maturity is a normal, often highly profitable stage, and the correct priorities (efficiency, defense, selective adjacent growth) are entirely different from Growth-stage priorities — not a lesser version of the same goals.
 
-**Mistake 4: Assuming an entire company is in one single lifecycle stage.**
+**Mistake 4: Assuming an entire company is in one single lifecycle stage**
+
 Large organizations typically have a portfolio of products or product lines in different stages simultaneously — a mature flagship product funding an early-stage bet still searching for Problem-Solution Fit. Treating "the company" as a single lifecycle stage, rather than diagnosing each product or product line individually, leads to applying the wrong priorities to the wrong initiative.
 
 ---
+
 
 ## Mental Model: The Seasons
 
@@ -153,7 +158,7 @@ This illustrates the Problem-Solution Fit gate directly: the team had strong, di
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Product Lifecycle at Different Company Stages
 
 **At a startup:** Nearly all attention is typically focused on the earliest stages — establishing Problem-Solution Fit and searching for Product-Market Fit. Because runway is finite (as noted in Lesson 1), the central existential question is almost always "have we actually found something people need," rather than optimization questions that only make sense once fit exists.
 
@@ -261,6 +266,8 @@ Products move through recognizable lifecycle stages — Problem-Solution Fit, In
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - **Stages:** Problem-Solution Fit → Introduction (PMF search) → Growth → Maturity → Decline.
 - **Gates:** Problem-Solution Fit (small group, real evidence of resonance) and Product-Market Fit (broader market, durable retention) must be crossed before scaling makes sense.
 - **Biggest mistake:** scaling acquisition spend before fit is validated — multiplies the cost of being wrong.
@@ -323,7 +330,6 @@ Products move through recognizable lifecycle stages — Problem-Solution Fit, In
 - Difficulty: 2
 - Tags: portfolio, multi-stage
 
----
 
 ## Reflection Exercise
 

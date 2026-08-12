@@ -110,22 +110,28 @@ It's worth being explicit about the altitude difference here, since new PMs some
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Publishing a roadmap with fixed dates for items many months out.**
+**Mistake 1: Publishing a roadmap with fixed dates for items many months out**
+
 As covered above, this manufactures false precision and reliably produces broken promises, since Lesson 31's entire premise is that far-future specifics are rarely knowable with confidence.
 
-**Mistake 2: Treating "Later" items as promises rather than exploration themes.**
+**Mistake 2: Treating "Later" items as promises rather than exploration themes**
+
 A "Later" item should read as "we believe this is an important problem area," not "we will ship exactly this feature in exactly this quarter." Stakeholders who mistake the former for the latter will, reasonably, feel misled when the eventual solution differs from what they imagined.
 
-**Mistake 3: Refusing to give any forward-looking view at all, out of excessive caution.**
+**Mistake 3: Refusing to give any forward-looking view at all, out of excessive caution**
+
 This is the mirror-image failure to Mistake 1, and was flagged already in Lesson 31 (Mistake 5): using "we can't know the future" as an excuse to withhold any useful directional information, which leaves stakeholders unable to plan around the PM's team at all.
 
-**Mistake 4: Building a roadmap with no visible connection to current Sprint work.**
+**Mistake 4: Building a roadmap with no visible connection to current Sprint work**
+
 As covered above, a roadmap that has drifted out of sync with what the team is actually building has stopped functioning as a real planning tool and become a disconnected communication artifact — often discovered only when a stakeholder asks "so is this roadmap item happening this quarter?" and no one on the team can answer confidently.
 
-**Mistake 5: Using the same roadmap format and content for every audience.**
+**Mistake 5: Using the same roadmap format and content for every audience**
+
 An engineering-facing roadmap discussion can meaningfully include more technical specificity and dependency detail than a sales-facing or customer-facing one; a roadmap shared externally with customers typically needs to be far more conservative about "Later" specifics than one shared internally with engineering leadership. Using one undifferentiated roadmap for every audience risks either overwhelming some audiences with irrelevant detail or under-informing others who need more.
 
 ---
+
 
 ## Mental Model: The Confidence Gradient
 
@@ -180,7 +186,7 @@ The underlying principle connects directly to this lesson's Theory: a public roa
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Roadmapping at Different Company Stages
 
 **At a startup:**
 Roadmaps are often informal — a simple document or slide reviewed periodically with the founding team — and may skip external publication altogether. The risk here is usually Mistake 3: because the team is small and things change fast, a founder-PM may avoid committing to any roadmap at all, leaving even close internal stakeholders (like a sales co-founder trying to set customer expectations) without useful directional information.
@@ -273,7 +279,7 @@ A product roadmap exists to give stakeholders a credible sense of direction and 
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Product roadmap | A longer-horizon (quarters-to-a-year) artifact communicating direction and sequence beyond what a single Sprint Backlog shows | Now-Next-Later | 1 |
 | Now-Next-Later | A roadmap format organizing work into three horizons with decreasing specificity and confidence | Confidence Gradient | 1 |
@@ -295,42 +301,41 @@ A product roadmap exists to give stakeholders a credible sense of direction and 
 ## Flashcards
 
 **Card 1**
-Front: What is the core failure mode of a feature-and-fixed-date roadmap?
-Back: It manufactures false certainty about far-future specifics, reliably producing broken promises since requirements and priorities inevitably shift.
-Difficulty: 1
-Tags: date-driven-roadmap
+- Front: What is the core failure mode of a feature-and-fixed-date roadmap?
+- Back: It manufactures false certainty about far-future specifics, reliably producing broken promises since requirements and priorities inevitably shift.
+- Difficulty: 1
+- Tags: date-driven-roadmap
 
 **Card 2**
-Front: What are the three horizons in a Now-Next-Later roadmap?
-Back: Now (high confidence, specific, active development), Next (medium confidence, directional), Later (low confidence, thematic/problem areas).
-Difficulty: 1
-Tags: now-next-later
+- Front: What are the three horizons in a Now-Next-Later roadmap?
+- Back: Now (high confidence, specific, active development), Next (medium confidence, directional), Later (low confidence, thematic/problem areas).
+- Difficulty: 1
+- Tags: now-next-later
 
 **Card 3**
-Front: What's the difference between a feature-based and an outcome-based roadmap row?
-Back: A feature-based row describes a specific thing to build; an outcome-based row describes a problem to solve or metric to move, leaving the solution open.
-Difficulty: 2
-Tags: feature-based, outcome-based
+- Front: What's the difference between a feature-based and an outcome-based roadmap row?
+- Back: A feature-based row describes a specific thing to build; an outcome-based row describes a problem to solve or metric to move, leaving the solution open.
+- Difficulty: 2
+- Tags: feature-based, outcome-based
 
 **Card 4**
-Front: How should a roadmap's "Now" items relate to a team's current Sprint Backlog?
-Back: They should be directly traceable — "Now" roadmap items should be visible in what the team is actually sprinting on, and Sprint Goals should trace back up into a roadmap theme.
-Difficulty: 2
-Tags: traceability
+- Front: How should a roadmap's "Now" items relate to a team's current Sprint Backlog?
+- Back: They should be directly traceable — "Now" roadmap items should be visible in what the team is actually sprinting on, and Sprint Goals should trace back up into a roadmap theme.
+- Difficulty: 2
+- Tags: traceability
 
 **Card 5**
-Front: Why is refusing to give any forward-looking roadmap a mistake, not a safe choice?
-Back: It leaves stakeholders unable to plan around the team at all, repeating Lesson 31's Mistake 5 of using uncertainty as an excuse to withhold useful direction.
-Difficulty: 2
-Tags: mistake-5, forward-visibility
+- Front: Why is refusing to give any forward-looking roadmap a mistake, not a safe choice?
+- Back: It leaves stakeholders unable to plan around the team at all, repeating Lesson 31's Mistake 5 of using uncertainty as an excuse to withhold useful direction.
+- Difficulty: 2
+- Tags: mistake-5, forward-visibility
 
 **Card 6**
-Front: In the Detailed Case Study, was the PM's prioritization judgment or the roadmap's format the primary failure?
-Back: The format — presenting a full year of specific features at specific dates manufactured false certainty, even though the underlying prioritization decisions (deprioritizing weaker ideas for better ones) were reasonable.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, was the PM's prioritization judgment or the roadmap's format the primary failure?
+- Back: The format — presenting a full year of specific features at specific dates manufactured false certainty, even though the underlying prioritization decisions (deprioritizing weaker ideas for better ones) were reasonable.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

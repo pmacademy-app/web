@@ -82,22 +82,28 @@ A critical caution, directly extending Lesson 38's premature high-fidelity conce
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Positioning the product or company as the hero of the story, rather than the customer.**
+**Mistake 1: Positioning the product or company as the hero of the story, rather than the customer**
+
 This produces a self-congratulatory narrative that audiences engage with less readily than one where they can see the customer's real problem and struggle as the central focus, with the product playing a supporting, guide role.
 
-**Mistake 2: Presenting data without any narrative framing, expecting numbers alone to persuade.**
+**Mistake 2: Presenting data without any narrative framing, expecting numbers alone to persuade**
+
 As covered in Theory, data alone is often intellectually accepted but emotionally forgettable, failing to generate the lasting buy-in genuine persuasion requires.
 
-**Mistake 3: Presenting a compelling story with no supporting data, especially to an analytically-minded audience.**
+**Mistake 3: Presenting a compelling story with no supporting data, especially to an analytically-minded audience**
+
 As covered in Theory, this risks the story being perceived as manipulation or hype rather than genuine insight, particularly with executive or technical audiences who expect evidence to back a persuasive narrative.
 
-**Mistake 4: Using storytelling techniques to generate excitement around an unvalidated idea, echoing Lesson 38's premature high-fidelity risk.**
+**Mistake 4: Using storytelling techniques to generate excitement around an unvalidated idea, echoing Lesson 38's premature high-fidelity risk**
+
 A vivid narrative about a hypothesis that hasn't actually been tested with real users risks manufacturing the same false confidence and premature attachment that a polished, unvalidated mockup does — narrative polish is just as capable of creating this risk as visual polish.
 
-**Mistake 5: Treating storytelling as a replacement for clear structure, rather than a complement to it.**
+**Mistake 5: Treating storytelling as a replacement for clear structure, rather than a complement to it**
+
 A narrative that meanders without ever reaching a clear point or ask undermines the communication discipline established in Lesson 51 — storytelling should make a structured argument more compelling, not replace the structure that makes it actionable.
 
 ---
+
 
 ## Mental Model: The Story Spine
 
@@ -125,7 +131,7 @@ The underlying principle connects directly to this lesson's Theory: mapping a cu
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Storytelling and Narrative for PMs at Different Company Stages
 
 **At a startup:**
 Storytelling is often central and instinctive — a founding narrative (why this problem, why now, why this team) frequently drives early fundraising, hiring, and customer acquisition, sometimes more than rigorous data, since early-stage data is often too sparse to be persuasive on its own. The risk here is Mistake 4's failure mode — a compelling founding story can create momentum that outpaces the evidence actually validating the underlying idea.
@@ -216,7 +222,7 @@ Storytelling is the mechanism by which clearly structured communication (Lesson 
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Customer as hero | A narrative framing positioning the customer as the protagonist and the product as a guide helping them overcome a problem | Story Spine | 1 |
 | Story Spine | This lesson's mental model: a five-part narrative arc (problem, guide, plan, call to action, stakes) for structuring product communication | Customer as hero | 1 |
@@ -235,42 +241,41 @@ Storytelling is the mechanism by which clearly structured communication (Lesson 
 ## Flashcards
 
 **Card 1**
-Front: What is the "customer as hero" narrative framing?
-Back: Positioning the customer as the protagonist facing a real problem, with the product playing the role of guide helping them overcome it, rather than positioning the product or company as the story's main character.
-Difficulty: 1
-Tags: customer-as-hero
+- Front: What is the "customer as hero" narrative framing?
+- Back: Positioning the customer as the protagonist facing a real problem, with the product playing the role of guide helping them overcome it, rather than positioning the product or company as the story's main character.
+- Difficulty: 1
+- Tags: customer-as-hero
 
 **Card 2**
-Front: Name the five elements of the Story Spine.
-Back: Problem, guide, plan, call to action, and stakes.
-Difficulty: 1
-Tags: story-spine
+- Front: Name the five elements of the Story Spine.
+- Back: Problem, guide, plan, call to action, and stakes.
+- Difficulty: 1
+- Tags: story-spine
 
 **Card 3**
-Front: Why is data alone often insufficient for durable persuasion?
-Back: Data can be intellectually accepted but emotionally forgettable, failing to generate the lasting buy-in and memorability genuine persuasion requires.
-Difficulty: 2
-Tags: data-alone
+- Front: Why is data alone often insufficient for durable persuasion?
+- Back: Data can be intellectually accepted but emotionally forgettable, failing to generate the lasting buy-in and memorability genuine persuasion requires.
+- Difficulty: 2
+- Tags: data-alone
 
 **Card 4**
-Front: Why is narrative alone often insufficient for durable persuasion, especially with analytical audiences?
-Back: A vivid story with no supporting evidence risks feeling like manipulation rather than genuine insight, and sophisticated audiences will often discount an unsupported story.
-Difficulty: 2
-Tags: narrative-alone
+- Front: Why is narrative alone often insufficient for durable persuasion, especially with analytical audiences?
+- Back: A vivid story with no supporting evidence risks feeling like manipulation rather than genuine insight, and sophisticated audiences will often discount an unsupported story.
+- Difficulty: 2
+- Tags: narrative-alone
 
 **Card 5**
-Front: How does this lesson's caution about "genuine storytelling vs. manufactured excitement" connect to Lesson 38?
-Back: A vivid, well-told story about an unvalidated idea risks producing the same false confidence and premature attachment as a polished, unvalidated mockup (Lesson 38's premature high-fidelity) — just through narrative rather than visual polish.
-Difficulty: 2
-Tags: premature-high-fidelity-connection
+- Front: How does this lesson's caution about "genuine storytelling vs. manufactured excitement" connect to Lesson 38?
+- Back: A vivid, well-told story about an unvalidated idea risks producing the same false confidence and premature attachment as a polished, unvalidated mockup (Lesson 38's premature high-fidelity) — just through narrative rather than visual polish.
+- Difficulty: 2
+- Tags: premature-high-fidelity-connection
 
 **Card 6**
-Front: In the Detailed Case Study, what specifically was missing from the roadmap presentation that caused poor recall and engagement?
-Back: A clearly articulated, evidenced problem, a "guide" framing connecting the roadmap to that problem, and stated stakes — the presentation had a "plan" (the roadmap items) but no surrounding narrative.
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what specifically was missing from the roadmap presentation that caused poor recall and engagement?
+- Back: A clearly articulated, evidenced problem, a "guide" framing connecting the roadmap to that problem, and stated stakes — the presentation had a "plan" (the roadmap items) but no surrounding narrative.
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 

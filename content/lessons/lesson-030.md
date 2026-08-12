@@ -12,7 +12,7 @@ This lesson's purpose is not to introduce new techniques you haven't seen, but t
 
 | Field | Detail |
 |---|---|
-| **Module** | 3 — Product Design (Closing Lesson) |
+| **Module** | 3 — Product Design |
 | **Current Lesson** | 30 of 90 |
 | **Difficulty** | 3 / 10 |
 | **Estimated Study Time** | 25 minutes (reading) + 15 minutes (reflection + quiz) |
@@ -109,22 +109,28 @@ A team that treats design thinking as a linear checklist will tend to push forwa
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating the five stages as a strict, one-directional sequence.**
+**Mistake 1: Treating the five stages as a strict, one-directional sequence**
+
 This is the "linear checklist" failure pattern — design thinking's defining strength is the explicit expectation of backward iteration, not adherence to a fixed forward order.
 
-**Mistake 2: Mixing idea generation and idea evaluation during brainstorming.**
+**Mistake 2: Mixing idea generation and idea evaluation during brainstorming**
+
 Allowing critique during the generation phase suppresses unconventional ideas prematurely — deferred judgment requires keeping these two activities strictly separate.
 
-**Mistake 3: Skipping "How Might We" reframing and jumping directly from a problem statement to a specific solution.**
+**Mistake 3: Skipping "How Might We" reframing and jumping directly from a problem statement to a specific solution**
+
 This risks the exact premature narrowing Lesson 17's Purity Test warns against, since a problem statement alone (however well-written) doesn't automatically invite the widest possible range of candidate solutions without a deliberate, generative reframing step.
 
-**Mistake 4: Treating a new, unrelated finding surfaced during Test as a reason to immediately derail the current project's focus.**
+**Mistake 4: Treating a new, unrelated finding surfaced during Test as a reason to immediately derail the current project's focus**
+
 Per Lesson 19's Opportunity Solution Tree discipline, new findings should be captured as candidate opportunities for future comparison, not chased immediately at the expense of the current, focused test.
 
-**Mistake 5: Assuming design thinking is a set of entirely new techniques, rather than recognizing it as an organizing frame for methods already covered throughout this curriculum.**
+**Mistake 5: Assuming design thinking is a set of entirely new techniques, rather than recognizing it as an organizing frame for methods already covered throughout this curriculum**
+
 This lesson's core value is synthesis and naming, not new content — missing this can lead to redundant relearning rather than genuine integration of prior lessons.
 
 ---
+
 
 ## Mental Model: The Design Thinking Loop
 
@@ -310,7 +316,6 @@ Design thinking organizes human-centered problem-solving into five stages — Em
 - Difficulty: 2
 - Tags: unrelated-findings
 
----
 
 ## Reflection Exercise
 

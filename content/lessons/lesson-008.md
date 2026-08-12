@@ -176,22 +176,28 @@ The corrective principle: a genuine discovery test must be designed so that a pl
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Skipping discovery for "obviously good" ideas.**
+**Mistake 1: Skipping discovery for "obviously good" ideas**
+
 An idea that feels self-evidently good to the team — often because it addresses a real pain the team itself has experienced, or because a senior stakeholder is confident in it — is exactly the kind of idea most likely to skip discovery, and exactly the kind of idea where an untested assumption can hide in plain sight because no one felt the need to question it.
 
-**Mistake 2: Treating a single successful prototype demo as complete validation.**
+**Mistake 2: Treating a single successful prototype demo as complete validation**
+
 As covered above, a demo that produces polite enthusiasm has usually only tested a shallow version of value risk (and often not even that, robustly), while usability, feasibility, and viability risk remain completely unexamined.
 
 **Mistake 3: Running discovery only at the very start of a project, then treating it as "done."**
+
 This misses the continuous nature of discovery described above — new risks emerge throughout delivery, and a one-time discovery phase leaves a team blind to them.
 
-**Mistake 4: Testing the easiest assumption instead of the riskiest one.**
+**Mistake 4: Testing the easiest assumption instead of the riskiest one**
+
 A team eager to show discovery progress may gravitate toward whichever assumption is simplest to test procedurally, rather than the assumption identified by assumption mapping as carrying the most combined uncertainty and consequence.
 
-**Mistake 5: Confusing discovery activity with discovery outcomes.**
+**Mistake 5: Confusing discovery activity with discovery outcomes**
+
 "We did five user interviews" describes an activity, not a finding. Discovery should be evaluated by what was actually learned and what decision it changed, not by the volume of research activity conducted — a team can conduct extensive research and still learn nothing decision-relevant if the research was poorly targeted.
 
 ---
+
 
 ## Mental Model: The Assumption Map
 
@@ -249,7 +255,7 @@ Use this as a repeatable checklist before any significant delivery commitment: n
 
 ---
 
-## Real World Perspective: Discovery at Different Company Stages
+## Real World Perspective: Product Discovery at Different Company Stages
 
 **At a startup:**
 Discovery is often existential rather than incremental — the central open question is frequently whether the entire product concept addresses a real, sufficiently painful job at all (value risk in its most fundamental form), and viability risk (can this ever become a sustainable business) looms especially large given limited runway. Startups often rely heavily on manual, unscalable "concierge" discovery methods precisely because building scalable infrastructure before value risk is resolved would be a poor use of extremely scarce resources.
@@ -443,7 +449,6 @@ Product discovery is the process of testing assumptions and reducing risk before
 - Difficulty: 2
 - Tags: confidence-ladder
 
----
 
 ## Reflection Exercise
 

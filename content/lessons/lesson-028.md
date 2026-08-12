@@ -231,22 +231,28 @@ As with several other artifacts covered in this module (MVP scope, prototype fid
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Organizing product navigation around internal team or organizational structure rather than user mental models.**
+**Mistake 1: Organizing product navigation around internal team or organizational structure rather than user mental models**
+
 This is the "org chart as navigation" failure — users have no visibility into internal structure and will be confused by a navigation scheme that reflects it rather than their own way of thinking about the product's content.
 
-**Mistake 2: Assuming a category structure is intuitive because it makes sense to the team that built it.**
+**Mistake 2: Assuming a category structure is intuitive because it makes sense to the team that built it**
+
 The team's familiarity with the product's internal logic and terminology is precisely what makes them poor judges of whether a structure is genuinely intuitive to someone encountering it fresh — validation (via card sorting or similar techniques) is needed rather than internal confidence alone.
 
-**Mistake 3: Using ambiguous, jargon-heavy, or internally-coined labels for user-facing categories.**
+**Mistake 3: Using ambiguous, jargon-heavy, or internally-coined labels for user-facing categories**
+
 Labels that make sense within a team's internal vocabulary may be unfamiliar or ambiguous to actual users, undermining findability regardless of how logical the underlying structure is.
 
-**Mistake 4: Treating information architecture as a one-time decision that never needs revisiting as a product grows.**
+**Mistake 4: Treating information architecture as a one-time decision that never needs revisiting as a product grows**
+
 As new features and content are added over time, an initially sensible structure can gradually become overloaded or inconsistent, echoing this curriculum's recurring theme (Lessons 14, 15, 18) that structural artifacts require periodic revalidation, not permanent, one-time construction.
 
-**Mistake 5: Over-investing in exhaustive taxonomy development for a genuinely simple product with few, clearly distinct sections.**
+**Mistake 5: Over-investing in exhaustive taxonomy development for a genuinely simple product with few, clearly distinct sections**
+
 Validation effort should be proportional to actual complexity and stakes, not applied at a fixed, maximal level regardless of the specific product's actual organizational complexity.
 
 ---
+
 
 ## Mental Model: The Mental Model Match Test
 
@@ -458,7 +464,6 @@ Information architecture is the practice of organizing, structuring, labeling, a
 - Difficulty: 2
 - Tags: proportional-validation
 
----
 
 ## Reflection Exercise
 

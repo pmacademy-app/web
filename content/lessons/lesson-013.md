@@ -140,22 +140,28 @@ Extending Lesson 11's general trustworthiness checklist to the specific case of 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Using a survey to explore an open-ended question with no prior hypothesis.**
+**Mistake 1: Using a survey to explore an open-ended question with no prior hypothesis**
+
 Surveys can only ask about what the designer already thought to ask, making them poorly suited to genuinely open-ended exploration — that work belongs to qualitative interviews (Lesson 12), with the survey following afterward to test a specific, now-formed hypothesis at scale.
 
-**Mistake 2: Writing double-barreled questions.**
+**Mistake 2: Writing double-barreled questions**
+
 Combining two distinct dimensions ("speed and ease of use") into a single question makes the resulting number impossible to interpret cleanly, since a respondent's answer conflates two potentially very different underlying sentiments.
 
-**Mistake 3: Distributing a survey only through channels that reach already-engaged users.**
+**Mistake 3: Distributing a survey only through channels that reach already-engaged users**
+
 In-app pop-ups, existing customer email lists, and community channels all systematically exclude churned users, frustrated non-adopters, and prospects — often the exact population whose perspective would be most revealing.
 
-**Mistake 4: Treating NPS or a single satisfaction number as a complete answer.**
+**Mistake 4: Treating NPS or a single satisfaction number as a complete answer**
+
 A single quantitative score can flag that something is wrong, or track directional change over time, but provides no insight into *why* — treating it as sufficient on its own skips the necessary qualitative follow-up.
 
-**Mistake 5: Over-interpreting small differences in Likert scale averages.**
+**Mistake 5: Over-interpreting small differences in Likert scale averages**
+
 Given individual variation in how respondents use rating scales (central tendency bias and similar effects), small differences between, say, a 3.8 and a 4.1 average often reflect noise rather than a meaningful, decision-worthy difference in underlying sentiment.
 
 ---
+
 
 ## Mental Model: The Survey Validity Chain
 
@@ -372,7 +378,6 @@ Surveys are the primary quantitative research instrument for answering how-many/
 - Difficulty: 2
 - Tags: quantitative-qualitative-pairing
 
----
 
 ## Reflection Exercise
 

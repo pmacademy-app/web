@@ -74,13 +74,28 @@ The Capability Sourcing Matrix is not only relevant for new capability decisions
 
 ## Common Beginner Mistakes
 
-1. **Defaulting to build without seriously evaluating whether mature external solutions already exist.** "Not invented here" syndrome causes many capabilities to be built internally by default, without a genuine market scan of available alternatives.
-2. **Evaluating a build decision using only initial development cost, ignoring ongoing maintenance and eventual retirement cost.** This systematically understates the true cost of building relative to buying or partnering.
-3. **Assuming any capability the company has built must be strategically important, simply because resources have already been invested in it.** Sunk cost should not substitute for an honest Moat Durability Matrix assessment of whether the capability is genuinely differentiating.
-4. **Treating "buy" as always cheaper and "build" as always more strategically valuable, without checking the specific quadrant a capability actually occupies.** Buying a genuinely differentiating capability from an external vendor can hand a strategic advantage to any competitor who buys the same solution; building a non-differentiating capability wastes resources with no corresponding strategic gain.
-5. **Failing to periodically revisit existing build decisions as the external market matures.** A build decision that was correct at the time it was made can become outdated as external solutions improve, and failing to revisit it wastes ongoing resources on maintaining a now-unnecessary internal capability.
+**Mistake 1: Defaulting to build without seriously evaluating whether mature external solutions already exist**
+
+"Not invented here" syndrome causes many capabilities to be built internally by default, without a genuine market scan of available alternatives.
+
+**Mistake 2: Evaluating a build decision using only initial development cost, ignoring ongoing maintenance and eventual retirement cost**
+
+This systematically understates the true cost of building relative to buying or partnering.
+
+**Mistake 3: Assuming any capability the company has built must be strategically important, simply because resources have already been invested in it**
+
+Sunk cost should not substitute for an honest Moat Durability Matrix assessment of whether the capability is genuinely differentiating.
+
+**Mistake 4: Treating "buy" as always cheaper and "build" as always more strategically valuable, without checking the specific quadrant a capability actually occupies**
+
+Buying a genuinely differentiating capability from an external vendor can hand a strategic advantage to any competitor who buys the same solution; building a non-differentiating capability wastes resources with no corresponding strategic gain.
+
+**Mistake 5: Failing to periodically revisit existing build decisions as the external market matures**
+
+A build decision that was correct at the time it was made can become outdated as external solutions improve, and failing to revisit it wastes ongoing resources on maintaining a now-unnecessary internal capability.
 
 ---
+
 
 ## Mental Model: The Capability Sourcing Matrix
 
@@ -103,7 +118,7 @@ Microsoft's approach to combining internal development, acquisition, and strateg
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Build, Buy, or Partner: Platform vs. Point Solution Decisions at Different Company Stages
 
 **Startup:** Early-stage companies typically default heavily toward buying or partnering for any non-core capability (payments processing, authentication, basic infrastructure), reserving scarce engineering resources almost entirely for the specific capability that constitutes the company's actual differentiation, since building non-differentiating infrastructure at this stage represents a particularly costly opportunity cost relative to the company's limited resources.
 
@@ -141,7 +156,7 @@ A "no" on Periodic Reassessment should be treated as a meaningful long-term risk
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you decide whether to build a new capability internally, buy an existing solution, or partner with an external provider?"** The interviewer is evaluating whether you propose something resembling the Capability Sourcing Matrix — genuinely assessing differentiation and external market maturity — rather than defaulting to build out of organizational habit or assuming buy is always cheaper.
 
@@ -171,6 +186,8 @@ Companies default to building capabilities internally more often than a genuine 
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - "Not invented here" is a real organizational bias, not just an occasional exception. Watch for it.
 - Capability Sourcing Matrix: differentiation × external market maturity → Build, Buy, Partner, or Reconsider.
 - Total cost of ownership includes ongoing maintenance (Friction Ledger) and eventual retirement (Sunset Runway) — not just initial build cost.
@@ -193,50 +210,56 @@ Companies default to building capabilities internally more often than a genuine 
 
 ## Further Reading / Resources
 
-1. *The Innovator's Dilemma* by Clayton Christensen
-2. *Wardley Maps* by Simon Wardley
-3. *Team Topologies* by Matthew Skelton and Manuel Pais
+- Clayton Christensen, *The Innovator's Dilemma*
+- Simon Wardley, *Wardley Maps*
+- Matthew Skelton and Manuel Pais, *Team Topologies*
 
 ---
 
 ## Flashcards
 
-**Front:** What is "not invented here" syndrome?
-**Back:** An organizational tendency to prefer building a capability internally over acquiring it externally, often for reasons unrelated to genuine strategic advantage.
-**Difficulty:** Easy
-**Tags:** #build-buy-partner #core-concept
+**Card 1**
+- Front: ** What is "not invented here" syndrome?
+- Back: ** An organizational tendency to prefer building a capability internally over acquiring it externally, often for reasons unrelated to genuine strategic advantage.
+- Difficulty: 2
+- Tags: **, build-buy-partner, core-concept
 
-**Front:** What are the two axes of the Capability Sourcing Matrix?
-**Back:** Genuine competitive differentiation and external market maturity.
-**Difficulty:** Easy
-**Tags:** #capability-sourcing-matrix
+**Card 2**
+- Front: ** What are the two axes of the Capability Sourcing Matrix?
+- Back: ** Genuine competitive differentiation and external market maturity.
+- Difficulty: 2
+- Tags: **, capability-sourcing-matrix
 
-**Front:** When should a capability generally be built internally?
-**Back:** When it is genuinely central to the company's moat and no mature external solution already exists.
-**Difficulty:** Medium
-**Tags:** #build-decision
+**Card 3**
+- Front: ** When should a capability generally be built internally?
+- Back: ** When it is genuinely central to the company's moat and no mature external solution already exists.
+- Difficulty: 2
+- Tags: **, build-decision
 
-**Front:** Why does evaluating a build decision on initial cost alone understate its true cost?
-**Back:** It ignores ongoing Friction Ledger maintenance burden and eventual Sunset Runway retirement cost over the capability's full lifecycle.
-**Difficulty:** Medium
-**Tags:** #total-cost-of-ownership
+**Card 4**
+- Front: ** Why does evaluating a build decision on initial cost alone understate its true cost?
+- Back: ** It ignores ongoing Friction Ledger maintenance burden and eventual Sunset Runway retirement cost over the capability's full lifecycle.
+- Difficulty: 2
+- Tags: **, total-cost-of-ownership
 
-**Front:** What went wrong in the Custom Analytics Platform case study?
-**Back:** A build decision that was reasonable when the external market was immature was never revisited as the market matured, allowing a non-differentiating internal platform to consume growing resources long after superior external alternatives existed.
-**Difficulty:** Hard
-**Tags:** #case-study #capability-sourcing-matrix
+**Card 5**
+- Front: ** What went wrong in the Custom Analytics Platform case study?
+- Back: ** A build decision that was reasonable when the external market was immature was never revisited as the market matured, allowing a non-differentiating internal platform to consume growing resources long after superior external alternatives existed.
+- Difficulty: 2
+- Tags: **, case-study, capability-sourcing-matrix
 
-**Front:** Why should existing internal builds be periodically reassessed?
-**Back:** A build decision that was genuinely correct when made can become outdated as external markets mature, and organizational discomfort with reversing prior investment shouldn't prevent honest reassessment.
-**Difficulty:** Hard
-**Tags:** #periodic-reassessment
+**Card 6**
+- Front: ** Why should existing internal builds be periodically reassessed?
+- Back: ** A build decision that was genuinely correct when made can become outdated as external markets mature, and organizational discomfort with reversing prior investment shouldn't prevent honest reassessment.
+- Difficulty: 2
+- Tags: **, periodic-reassessment
 
-**Front:** What quadrant of the Capability Sourcing Matrix calls for a Partner approach?
-**Back:** High differentiation combined with a mature external market, where integrating an external provider while retaining differentiation elsewhere is often preferable to building from scratch.
-**Difficulty:** Medium
-**Tags:** #partner-quadrant
+**Card 7**
+- Front: ** What quadrant of the Capability Sourcing Matrix calls for a Partner approach?
+- Back: ** High differentiation combined with a mature external market, where integrating an external provider while retaining differentiation elsewhere is often preferable to building from scratch.
+- Difficulty: 2
+- Tags: **, partner-quadrant
 
----
 
 ## Reflection Exercise
 

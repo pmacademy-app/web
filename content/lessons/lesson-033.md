@@ -119,21 +119,27 @@ A cumulative flow diagram (CFD) plots the number of items in each workflow stage
 ## Common Beginner Mistakes
 
 **Mistake 1: Treating Kanban as "Scrum without the meetings."**
+
 Kanban is not merely an unstructured, ceremony-free version of Scrum — it has its own explicit practices (the six above), its own discipline (WIP limits, explicit policies), and its own feedback mechanisms. A team that drops Scrum's events without adopting Kanban's actual practices in their place has adopted neither framework's discipline, only the appearance of informality.
 
-**Mistake 2: Setting WIP limits too high to avoid the discomfort of a full queue.**
+**Mistake 2: Setting WIP limits too high to avoid the discomfort of a full queue**
+
 A WIP limit only works if it's occasionally binding — if it never actually blocks anyone from starting new work, it isn't constraining behavior, it's decorative. New teams frequently set WIP limits generously enough that they're never hit, which defeats the entire mechanism described above.
 
 **Mistake 3: Measuring "team busyness" instead of "flow."**
+
 A team where every engineer is constantly occupied can still have terrible flow, if what they're occupied with is a large number of half-finished items rather than a small number of completed ones. Kanban's "manage flow" practice exists specifically to redirect attention away from individual utilization and toward whether work is actually completing and moving downstream.
 
-**Mistake 4: Confusing cycle time improvements with lead time improvements.**
+**Mistake 4: Confusing cycle time improvements with lead time improvements**
+
 As covered above, optimizing execution speed once work has started does nothing for items still waiting, unstarted, in a long backlog queue. A PM who reports "we improved cycle time by 20%" as evidence the team is now faster to deliver, without checking lead time, may be reporting a genuine but incomplete improvement — or masking a worsening backlog problem entirely.
 
-**Mistake 5: Skipping explicit process policies.**
+**Mistake 5: Skipping explicit process policies**
+
 Without an explicit, shared definition of what it means for an item to be ready to move from one column to the next (e.g., what "Ready for Review" actually requires), teams experience constant, low-grade disputes about whether something is really done with a stage — the Kanban equivalent of the Definition of Done ambiguity covered in Lesson 32.
 
 ---
+
 
 ## Mental Model: The Flow Valve
 
@@ -191,7 +197,7 @@ The underlying logic connects directly to this lesson's theory: work that arrive
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: Kanban Framework at Different Company Stages
 
 **At a startup:**
 Kanban is often adopted implicitly, even without the name — a simple "To Do / Doing / Done" board with a rough, informal sense that people shouldn't start too many things at once. Formal WIP limits and cumulative flow diagrams are less common at this stage; the team is small enough that flow problems are often visible through direct conversation rather than requiring a chart to surface them.
@@ -281,7 +287,7 @@ Kanban is the second major concrete implementation of Lesson 31's underlying Agi
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Kanban | A flow-based Agile framework built on visualizing workflow and limiting work in progress | Flow, WIP limit | 1 |
 | Work in Progress (WIP) limit | A cap on how many items may occupy a given workflow stage at once | Flow Valve, Throughput | 2 |
@@ -304,48 +310,47 @@ Kanban is the second major concrete implementation of Lesson 31's underlying Agi
 ## Flashcards
 
 **Card 1**
-Front: What are Kanban's six core practices?
-Back: Visualize the workflow, limit WIP, manage flow, make process policies explicit, implement feedback loops, improve collaboratively/evolve experimentally.
-Difficulty: 2
-Tags: practices
+- Front: What are Kanban's six core practices?
+- Back: Visualize the workflow, limit WIP, manage flow, make process policies explicit, implement feedback loops, improve collaboratively/evolve experimentally.
+- Difficulty: 2
+- Tags: practices
 
 **Card 2**
-Front: Why does limiting WIP tend to increase throughput rather than decrease it?
-Back: Because starting fewer things at once reduces costly context-switching, letting in-progress items receive full attention and finish faster, raising the overall completion rate.
-Difficulty: 2
-Tags: wip, throughput
+- Front: Why does limiting WIP tend to increase throughput rather than decrease it?
+- Back: Because starting fewer things at once reduces costly context-switching, letting in-progress items receive full attention and finish faster, raising the overall completion rate.
+- Difficulty: 2
+- Tags: wip, throughput
 
 **Card 3**
-Front: What's the difference between cycle time and lead time?
-Back: Cycle time measures speed from when work begins to delivery; lead time measures the full wait from when a request is made (entering the backlog) to delivery, including unstarted time.
-Difficulty: 2
-Tags: metrics
+- Front: What's the difference between cycle time and lead time?
+- Back: Cycle time measures speed from when work begins to delivery; lead time measures the full wait from when a request is made (entering the backlog) to delivery, including unstarted time.
+- Difficulty: 2
+- Tags: metrics
 
 **Card 4**
-Front: What does a widening band in a cumulative flow diagram indicate?
-Back: A bottleneck — work is accumulating in that stage faster than it's being cleared.
-Difficulty: 2
-Tags: cfd, bottleneck
+- Front: What does a widening band in a cumulative flow diagram indicate?
+- Back: A bottleneck — work is accumulating in that stage faster than it's being cleared.
+- Difficulty: 2
+- Tags: cfd, bottleneck
 
 **Card 5**
-Front: When is a WIP limit actually functioning as intended?
-Back: When it occasionally binds — i.e., it sometimes actually blocks new work from starting. A limit set so high it never blocks anyone is decorative.
-Difficulty: 2
-Tags: wip-limit
+- Front: When is a WIP limit actually functioning as intended?
+- Back: When it occasionally binds — i.e., it sometimes actually blocks new work from starting. A limit set so high it never blocks anyone is decorative.
+- Difficulty: 2
+- Tags: wip-limit
 
 **Card 6**
-Front: What kind of work tends to favor Kanban over Scrum?
-Back: Continuous, unpredictable work that can't be reasonably planned two-plus weeks in advance, such as incident response or inbound support requests.
-Difficulty: 1
-Tags: fit-assessment
+- Front: What kind of work tends to favor Kanban over Scrum?
+- Back: Continuous, unpredictable work that can't be reasonably planned two-plus weeks in advance, such as incident response or inbound support requests.
+- Difficulty: 1
+- Tags: fit-assessment
 
 **Card 7**
-Front: In the Case Study, why did the platform team's board look healthy while a bottleneck grew?
-Back: Because there was no WIP limit on Code Review, so engineers kept starting new "In Progress" work rather than clearing the review queue, hiding the bottleneck behind steady, busy-looking "In Progress" activity.
-Difficulty: 3
-Tags: case-study, bottleneck
+- Front: In the Case Study, why did the platform team's board look healthy while a bottleneck grew?
+- Back: Because there was no WIP limit on Code Review, so engineers kept starting new "In Progress" work rather than clearing the review queue, hiding the bottleneck behind steady, busy-looking "In Progress" activity.
+- Difficulty: 3
+- Tags: case-study, bottleneck
 
----
 
 ## Reflection Exercise
 

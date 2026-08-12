@@ -12,7 +12,7 @@ This lesson closes Module 2 by assembling everything into that single, repeatabl
 
 | Field | Detail |
 |---|---|
-| **Module** | 2 — Users & Research (Closing Lesson) |
+| **Module** | 2 — Users & Research |
 | **Current Lesson** | 20 of 90 |
 | **Difficulty** | 5 / 10 |
 | **Estimated Study Time** | 30 minutes (reading) + 15 minutes (reflection + quiz) |
@@ -160,22 +160,28 @@ The corrective principle, consistent with modern product team structure (closely
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating discovery as a one-time project that concludes once a single opportunity is validated.**
+**Mistake 1: Treating discovery as a one-time project that concludes once a single opportunity is validated**
+
 The full discovery cycle is circular — after a validated opportunity moves to delivery, the team should return to the Opportunity Solution Tree to select the next candidate, maintaining a continuously running process rather than a project with a defined endpoint.
 
-**Mistake 2: Running an intensive discovery sprint for every validation need, regardless of stakes.**
+**Mistake 2: Running an intensive discovery sprint for every validation need, regardless of stakes**
+
 Discovery sprints are resource-intensive and appropriate for genuinely high-stakes or high-uncertainty decisions; most ongoing validation needs are better served by a lighter, continuous discovery cadence.
 
-**Mistake 3: Proceeding to delivery based on a comfortable, low-consequence assumption rather than the actual riskiest one identified through assumption mapping.**
+**Mistake 3: Proceeding to delivery based on a comfortable, low-consequence assumption rather than the actual riskiest one identified through assumption mapping**
+
 This repeats Lesson 8's original warning in the context of a full process — teams should specifically confirm the riskiest assumption, not merely any assumption, has been tested before treating discovery as complete for a given opportunity.
 
-**Mistake 4: Formally "handing off" discovery findings to a separate delivery team.**
+**Mistake 4: Formally "handing off" discovery findings to a separate delivery team**
+
 This risks a loss of context and conviction, and tends to formalize a phase-based view of discovery that discourages returning to validate new assumptions that emerge during implementation.
 
-**Mistake 5: Applying a fixed, one-size-fits-all evidence bar regardless of the stakes and reversibility of the decision.**
+**Mistake 5: Applying a fixed, one-size-fits-all evidence bar regardless of the stakes and reversibility of the decision**
+
 A low-stakes, easily reversible decision can reasonably proceed on lighter evidence than a large, hard-to-reverse investment — the evidence bar should scale with the decision's stakes, not remain constant regardless of context.
 
 ---
+
 
 ## Mental Model: The Discovery Flywheel
 
@@ -234,7 +240,7 @@ Use this flywheel as a mental check on team health: is the Opportunity Solution 
 
 ---
 
-## Real World Perspective: Discovery Process at Different Company Stages
+## Real World Perspective: Product Discovery Process at Different Company Stages
 
 **At a startup:**
 The discovery process is often necessarily informal and tightly integrated with delivery by default, simply because small teams cannot afford the organizational separation the handoff failure pattern describes — the same few people conducting customer conversations are typically the same people writing code, providing a natural (if sometimes accidental) form of continuity that larger organizations must work more deliberately to preserve.
@@ -395,7 +401,6 @@ A complete, continuously operating product discovery process integrates every to
 - Difficulty: 2
 - Tags: evidence-bar-scaling
 
----
 
 ## Reflection Exercise
 

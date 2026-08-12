@@ -68,13 +68,18 @@ Lesson 60 asked you to articulate what a PM is accountable for. If Modules 7 thr
 
 ## Common Beginner Mistakes
 
-1. **Treating this capstone as a request for one more new framework rather than an integration exercise.**
-2. **Applying only the ring of the Wheel you're most comfortable with — mechanism, direction, or domain — to a problem that actually spans two or three.**
-3. **Discarding your Lesson 60 philosophy as "too simple" rather than recognizing it as the durable core the rest of the curriculum was meant to specify, not replace.**
-4. **Treating the nineteen mental models from Lessons 61–89 as a list to recite rather than a set of tools to select from deliberately.**
-5. **Assuming mastery of this curriculum means having memorized every model, rather than having built the judgment to know which few actually matter for the situation in front of you.**
+**Mistake 1: Treating this capstone as a request for one more new framework rather than an integration exercise**
+
+**Mistake 2: Applying only the ring of the Wheel you're most comfortable with — mechanism, direction, or domain — to a problem that actually spans two or three**
+
+**Mistake 3: Discarding your Lesson 60 philosophy as "too simple" rather than recognizing it as the durable core the rest of the curriculum was meant to specify, not replace**
+
+**Mistake 4: Treating the nineteen mental models from Lessons 61–89 as a list to recite rather than a set of tools to select from deliberately**
+
+**Mistake 5: Assuming mastery of this curriculum means having memorized every model, rather than having built the judgment to know which few actually matter for the situation in front of you**
 
 ---
+
 
 ## Mental Model: The Integrated Practice Wheel
 
@@ -90,7 +95,7 @@ Alphabet, spanning Google's search and advertising platform, its cloud infrastru
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Capstone: Advanced Product Philosophy at Scale at Different Company Stages
 
 **Startup:** Most of your early career will draw primarily from the Accountability Triangle and Decision Chain established in Lesson 1, with the Wheel's outer rings becoming relevant only as your product, and the situations you face, genuinely grow in complexity.
 
@@ -125,7 +130,7 @@ A genuinely difficult real-world situation will rarely announce which row of thi
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"Walk me through the single most complex product situation you've navigated, and how you approached it."** The interviewer is evaluating whether your answer demonstrates fluent movement across multiple levels of diagnosis — mechanism, strategy, and domain-specific context — rather than a story fully explained by a single framework.
 
@@ -154,6 +159,9 @@ This curriculum's ninety lessons have built roughly two dozen named mental model
 ---
 
 ## Cheat Sheet
+
+*A two-minute review of everything in this lesson.*
+
 - This lesson adds no new framework. It asks you to integrate everything.
 - Integrated Practice Wheel: Personal philosophy (center) → Platform Health Radar (mechanism) → Strategic Judgment Radar (direction) → Module 9 lenses (domain context).
 - Real situations often need more than one ring at once.
@@ -172,35 +180,38 @@ This curriculum's ninety lessons have built roughly two dozen named mental model
 ---
 
 ## Further Reading / Resources
-1. *Inspired* by Marty Cagan
-2. *The Innovator's Dilemma* by Clayton Christensen
-3. *Thinking in Systems* by Donella Meadows
+- Marty Cagan, *Inspired*
+- Clayton Christensen, *The Innovator's Dilemma*
+- Donella Meadows, *Thinking in Systems*
 
 ---
 
 ## Flashcards
 
-**Front:** What does this final lesson add to the curriculum's roster of mental models?
-**Back:** No new diagnostic model — it integrates everything already built into the Integrated Practice Wheel.
-**Difficulty:** Easy
-**Tags:** #capstone
+**Card 1**
+- Front: ** What does this final lesson add to the curriculum's roster of mental models?
+- Back: ** No new diagnostic model — it integrates everything already built into the Integrated Practice Wheel.
+- Difficulty: 2
+- Tags: **, capstone
 
-**Front:** What are the three outer rings of the Integrated Practice Wheel?
-**Back:** The Platform Health Radar (mechanism), the Strategic Judgment Radar (direction), and Module 9's specialized domain lenses (context).
-**Difficulty:** Medium
-**Tags:** #integrated-practice-wheel
+**Card 2**
+- Front: ** What are the three outer rings of the Integrated Practice Wheel?
+- Back: ** The Platform Health Radar (mechanism), the Strategic Judgment Radar (direction), and Module 9's specialized domain lenses (context).
+- Difficulty: 2
+- Tags: **, integrated-practice-wheel
 
-**Front:** What sits at the center of the Integrated Practice Wheel?
-**Back:** The personal product philosophy first articulated in Lesson 60.
-**Difficulty:** Easy
-**Tags:** #integrated-practice-wheel
+**Card 3**
+- Front: ** What sits at the center of the Integrated Practice Wheel?
+- Back: ** The personal product philosophy first articulated in Lesson 60.
+- Difficulty: 2
+- Tags: **, integrated-practice-wheel
 
-**Front:** What did the Full-Spectrum Incident case study require diagnostically?
-**Back:** Crisis communication (Lesson 87), AI reliability and fairness diagnosis (Lessons 84–85), regulatory compliance (Lesson 81), and international adaptation review (Lesson 86) — simultaneously.
-**Difficulty:** Hard
-**Tags:** #case-study
+**Card 4**
+- Front: ** What did the Full-Spectrum Incident case study require diagnostically?
+- Back: ** Crisis communication (Lesson 87), AI reliability and fairness diagnosis (Lessons 84–85), regulatory compliance (Lesson 81), and international adaptation review (Lesson 86) — simultaneously.
+- Difficulty: 2
+- Tags: **, case-study
 
----
 
 ## Reflection Exercise
 

@@ -157,22 +157,28 @@ A healthier practice treats a PRD as a starting point for structured collaborati
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Opening a PRD with functional requirements before establishing the problem statement and goals.**
+**Mistake 1: Opening a PRD with functional requirements before establishing the problem statement and goals**
+
 This invites readers to evaluate requirements against their own private assumptions about the problem, rather than a shared, explicit understanding, echoing the anchoring risks covered in earlier lessons.
 
-**Mistake 2: Under-specifying requirements, leaving genuine ambiguity that different team members resolve inconsistently.**
+**Mistake 2: Under-specifying requirements, leaving genuine ambiguity that different team members resolve inconsistently**
+
 Vague language ("handle errors gracefully," "make it fast") invites exactly the kind of divergent interpretation a PRD exists to prevent.
 
-**Mistake 3: Over-specifying implementation details that belong to engineering or design expertise.**
+**Mistake 3: Over-specifying implementation details that belong to engineering or design expertise**
+
 Dictating a specific database schema or exact pixel measurements, without inviting the relevant experts' judgment, both risks being technically wrong and unnecessarily constrains solutions that specialists might implement better.
 
-**Mistake 4: Treating a PRD as a final, unquestionable decree rather than a living, collaboratively refined document.**
+**Mistake 4: Treating a PRD as a final, unquestionable decree rather than a living, collaboratively refined document**
+
 This risks losing valuable implementation-stage insight and echoes Lesson 20's discovery-delivery handoff failure at the level of an individual specification document.
 
-**Mistake 5: Including content that belongs in a different, more granular artifact (user stories, acceptance criteria) rather than the PRD itself.**
+**Mistake 5: Including content that belongs in a different, more granular artifact (user stories, acceptance criteria) rather than the PRD itself**
+
 A PRD that attempts to specify every individual implementable unit of work in exhaustive detail duplicates, and often conflicts with, the more granular work covered in Lessons 23 and 24.
 
 ---
+
 
 ## Mental Model: The PRD Precision Dial
 
@@ -226,7 +232,7 @@ Use this dial explicitly when drafting or reviewing a requirement: is this speci
 
 ---
 
-## Real World Perspective: PRDs at Different Company Stages
+## Real World Perspective: Product Requirements Document (PRD) at Different Company Stages
 
 **At a startup:**
 PRDs are often lightweight and informal, sometimes replaced by a brief written brief or even a well-structured verbal alignment session, given small team size and close daily collaboration that reduces the risk of the divergent-mental-model problem a formal PRD exists to prevent. As teams grow beyond a size where informal alignment reliably works, the discipline of writing things down explicitly becomes increasingly valuable.
@@ -389,7 +395,6 @@ A PRD is a written specification giving engineering, design, and QA a shared, un
 - Difficulty: 2
 - Tags: collaborative-prd
 
----
 
 ## Reflection Exercise
 

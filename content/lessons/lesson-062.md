@@ -89,13 +89,28 @@ Beyond stability, good API design reduces the total cost a developer pays to int
 
 ## Common Beginner Mistakes
 
-1. **Treating "beta" as a permission slip rather than a promise about instability.** Labeling something beta doesn't reduce your obligation to developers who depend on it if you never actually communicate, monitor, or enforce that instability.
-2. **Confusing internal API discipline with external API discipline.** Practices that are fine for APIs consumed only by co-located teams (undocumented breaking changes, informal Slack notice) are actively harmful once external developers depend on the same surface.
-3. **Designing the API around your own database schema rather than the developer's mental model.** An API that mirrors internal implementation details, rather than the concepts a developer actually reasons in, forces every integrator to relearn your internal architecture just to accomplish a simple task.
-4. **Shipping inconsistent error handling across endpoints.** When different parts of an API return errors in different shapes, every developer must write custom handling logic for each endpoint, multiplying integration cost across the entire ecosystem.
-5. **Announcing a deprecation with no migration path.** Telling developers something will stop working, without a concrete alternative and enough lead time to adopt it, converts a manageable transition into a forced, disruptive scramble — and is remembered.
+**Mistake 1: Treating "beta" as a permission slip rather than a promise about instability**
+
+Labeling something beta doesn't reduce your obligation to developers who depend on it if you never actually communicate, monitor, or enforce that instability.
+
+**Mistake 2: Confusing internal API discipline with external API discipline**
+
+Practices that are fine for APIs consumed only by co-located teams (undocumented breaking changes, informal Slack notice) are actively harmful once external developers depend on the same surface.
+
+**Mistake 3: Designing the API around your own database schema rather than the developer's mental model**
+
+An API that mirrors internal implementation details, rather than the concepts a developer actually reasons in, forces every integrator to relearn your internal architecture just to accomplish a simple task.
+
+**Mistake 4: Shipping inconsistent error handling across endpoints**
+
+When different parts of an API return errors in different shapes, every developer must write custom handling logic for each endpoint, multiplying integration cost across the entire ecosystem.
+
+**Mistake 5: Announcing a deprecation with no migration path**
+
+Telling developers something will stop working, without a concrete alternative and enough lead time to adopt it, converts a manageable transition into a forced, disruptive scramble — and is remembered.
 
 ---
+
 
 ## Mental Model: The Promise Tiers
 
@@ -117,7 +132,7 @@ Stripe's API is widely cited in the developer community as an example of API-as-
 
 ---
 
-## Real World Perspective
+## Real World Perspective: APIs as Products: Designing for Developers at Different Company Stages
 
 **Startup:** Early-stage companies building their first external API often skip formal versioning entirely, reasoning that they have few enough external developers to coordinate changes manually. This is a defensible short-term trade-off, but the Case Study below shows how quickly it becomes unmanageable once developer count grows even modestly, and the fix is far more expensive after the fact than the discipline would have been from the start.
 
@@ -156,7 +171,7 @@ A "no" on the Tier Classification row in particular should block a launch outrig
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"How would you decide whether an API change is safe to ship?"** The interviewer is evaluating whether you reach for a structured model like Promise Tiers — asking which tier the surface belongs to and whether the change respects that tier's guarantee — rather than relying on engineering intuition about whether a change "feels big."
 
@@ -186,6 +201,8 @@ An API is best understood not as a technical interface but as a promise made to 
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - An API is a promise, not just an interface.
 - Promise Tiers: Stable Core (never breaks without major version + long notice) → Versioned Standard (changes with notice + migration path) → Experimental/Beta (can change anytime, clearly labeled).
 - Semantic versioning + deprecation policy = the mechanisms that make "stable" mean something.
@@ -209,50 +226,56 @@ An API is best understood not as a technical interface but as a promise made to 
 
 ## Further Reading / Resources
 
-1. *Continuous API Management* by Mehdi Medjaoui, Erik Wilde, Ronnie Mitra, and Mike Amundsen
-2. *Web API Design: The Missing Link* by Google's API design documentation team (Google Cloud publication)
-3. *Designing Web APIs* by Brenda Jin, Saurabh Sahni, and Amir Shevat
+- Mehdi Medjaoui, Erik Wilde, Ronnie Mitra, and Mike Amundsen, *Continuous API Management*
+- Google's API design documentation team (Google Cloud publication), *Web API Design: The Missing Link*
+- Brenda Jin, Saurabh Sahni, and Amir Shevat, *Designing Web APIs*
 
 ---
 
 ## Flashcards
 
-**Front:** Why should an API be understood as a promise rather than an interface?
-**Back:** Because developers build production systems assuming today's behavior will hold, without visibility into your roadmap — a broken assumption has real downstream cost.
-**Difficulty:** Easy
-**Tags:** #api-design #core-concept
+**Card 1**
+- Front: ** Why should an API be understood as a promise rather than an interface?
+- Back: ** Because developers build production systems assuming today's behavior will hold, without visibility into your roadmap — a broken assumption has real downstream cost.
+- Difficulty: 2
+- Tags: **, api-design, core-concept
 
-**Front:** Name the three Promise Tiers in order of stability.
-**Back:** Stable Core, Versioned Standard, Experimental/Beta.
-**Difficulty:** Easy
-**Tags:** #promise-tiers
+**Card 2**
+- Front: ** Name the three Promise Tiers in order of stability.
+- Back: ** Stable Core, Versioned Standard, Experimental/Beta.
+- Difficulty: 2
+- Tags: **, promise-tiers
 
-**Front:** What does semantic versioning communicate that a plain version number doesn't?
-**Back:** The size and safety of a change — patch (bug fix), minor (additive), major (breaking) — so developers know how much risk a change carries.
-**Difficulty:** Medium
-**Tags:** #versioning
+**Card 3**
+- Front: ** What does semantic versioning communicate that a plain version number doesn't?
+- Back: ** The size and safety of a change — patch (bug fix), minor (additive), major (breaking) — so developers know how much risk a change carries.
+- Difficulty: 2
+- Tags: **, versioning
 
-**Front:** Why did labeling the webhook field as "internal implementation detail" fail in the Case Study?
-**Back:** Dozens of partners had, in practice, already come to depend on it for reconciliation, so it functioned as a Tier 1 promise even though it was never classified as one.
-**Difficulty:** Hard
-**Tags:** #case-study #promise-tiers
+**Card 4**
+- Front: ** Why did labeling the webhook field as "internal implementation detail" fail in the Case Study?
+- Back: ** Dozens of partners had, in practice, already come to depend on it for reconciliation, so it functioned as a Tier 1 promise even though it was never classified as one.
+- Difficulty: 2
+- Tags: **, case-study, promise-tiers
 
-**Front:** What is idempotency and why does it matter for API design?
-**Back:** The property that repeating an operation produces the same result without unintended side effects — critical so retry logic after network failures doesn't create duplicates.
-**Difficulty:** Medium
-**Tags:** #api-design
+**Card 5**
+- Front: ** What is idempotency and why does it matter for API design?
+- Back: ** The property that repeating an operation produces the same result without unintended side effects — critical so retry logic after network failures doesn't create duplicates.
+- Difficulty: 2
+- Tags: **, api-design
 
-**Front:** What should block a launch, according to the API Design Checklist?
-**Back:** An endpoint with no explicit Promise Tier classification — an unclassified endpoint is a promise made by default without anyone deciding what it is.
-**Difficulty:** Medium
-**Tags:** #api-design-checklist
+**Card 6**
+- Front: ** What should block a launch, according to the API Design Checklist?
+- Back: ** An endpoint with no explicit Promise Tier classification — an unclassified endpoint is a promise made by default without anyone deciding what it is.
+- Difficulty: 2
+- Tags: **, api-design-checklist
 
-**Front:** What converts an abstract stability claim into an operational guarantee?
-**Back:** Semantic versioning combined with a published, enforced deprecation policy.
-**Difficulty:** Medium
-**Tags:** #versioning #deprecation
+**Card 7**
+- Front: ** What converts an abstract stability claim into an operational guarantee?
+- Back: ** Semantic versioning combined with a published, enforced deprecation policy.
+- Difficulty: 2
+- Tags: **, versioning, deprecation
 
----
 
 ## Reflection Exercise
 

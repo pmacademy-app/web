@@ -196,22 +196,28 @@ Two specific, opposite failure patterns deserve direct attention, both distortin
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Building a high-fidelity prototype when a low-fidelity one would answer the riskiest assumption just as well.**
+**Mistake 1: Building a high-fidelity prototype when a low-fidelity one would answer the riskiest assumption just as well**
+
 This is a direct instance of over-engineering — matching prototype fidelity to the specific question being tested, not to a default assumption that "more realistic is always better," is the correct discipline.
 
-**Mistake 2: Presenting a prototype to stakeholders without clarifying that it is a testing artifact, not a launch-ready product.**
+**Mistake 2: Presenting a prototype to stakeholders without clarifying that it is a testing artifact, not a launch-ready product**
+
 This risks creating false expectations about timeline, completeness, or scope, and can trigger the premature-commitment effect this lesson and Lesson 25 both warn about.
 
-**Mistake 3: Relying solely on a participant's after-the-fact summary ("it felt intuitive") rather than using a think-aloud protocol during the test itself.**
+**Mistake 3: Relying solely on a participant's after-the-fact summary ("it felt intuitive") rather than using a think-aloud protocol during the test itself**
+
 Retrospective self-report is a weaker form of evidence than in-the-moment observed behavior and commentary, per Lesson 11's stated-versus-revealed-preference distinction.
 
-**Mistake 4: Conflating usability testing with discovery interviewing, or running one when the other is actually needed.**
+**Mistake 4: Conflating usability testing with discovery interviewing, or running one when the other is actually needed**
+
 These serve genuinely different purposes — understanding existing behavior and needs (discovery) versus observing interaction with a specific built solution (usability) — and confusing them produces a session that answers neither question well.
 
-**Mistake 5: Skipping prototyping entirely and moving from a validated wireframe directly to full delivery.**
+**Mistake 5: Skipping prototyping entirely and moving from a validated wireframe directly to full delivery**
+
 This skips a specific rung on Lesson 8's confidence ladder, losing the opportunity to catch usability and interactive-experience problems before the cost of full development is incurred.
 
 ---
+
 
 ## Mental Model: The Prototype Fidelity Match
 
@@ -425,7 +431,6 @@ A prototype is an interactive representation of a solution, ranging from low-fid
 - Difficulty: 3
 - Tags: scope-of-validation
 
----
 
 ## Reflection Exercise
 

@@ -16,7 +16,7 @@ In real platform work, problems rarely announce which single model applies. A de
 | **Current Lesson** | 70 of 90 |
 | **Difficulty** | 7 / 10 |
 | **Estimated Study Time** | 45 minutes (reading) + 20 minutes (reflection + quiz) |
-| **Prerequisites** | Lessons 61–69 (all Module 7 mental models) |
+| **Prerequisites** | Lesson 61 (Platform Thinking: Products, Platforms, and Ecosystems), Lesson 62 (APIs as Products: Designing for Developers), Lesson 63 (Two-Sided Marketplaces and Network Effects), Lesson 64 (Data-Informed Product Management: Building a Metrics Culture), Lesson 65 (Working with Data Science & ML Teams), Lesson 66 (Recommender Systems and Personalization for PMs), Lesson 67 (Platform Governance: Trust, Safety, and Abuse Prevention), Lesson 68 (Technical Debt at Scale: Platform Migrations and Deprecations), Lesson 69 (Internal Platforms and Developer Experience (DevEx) as a Product) |
 | **Next Lesson** | Lesson 71 — Product Strategy Frameworks: From Vision to Bets |
 | **Future Topics Unlocked** | Lesson 78 (Build, Buy, or Partner), Lesson 84 (PM in AI-Native Companies), Lesson 85 (Responsible AI Product Management), Lesson 90 (Capstone) — all draw on this integrated Module 7 toolkit as established canon |
 
@@ -88,13 +88,28 @@ The nine models are not independent; they form a connected structure. The Levera
 
 ## Common Beginner Mistakes
 
-1. **Applying only the first model that seems to fit, without checking whether others are also relevant.** Most real platform incidents involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
-2. **Treating the eight models as an unordered checklist rather than a connected structure.** Understanding how the models depend on each other (for example, that Promise Tiers specifically governs Layer 2 of the Leverage Stack) produces faster, more accurate diagnosis than treating each model as unrelated to the others.
-3. **Skipping the Metric Provenance Chain check when diagnosing any other problem.** Any diagnosis built on untrustworthy data, regardless of how sound the reasoning about the other axes is, inherits that foundational error.
-4. **Forgetting that the Friction Ledger applies internally, not just to external developers.** A PM fluent in Leverage Stack, Promise Tiers, and Escalation Staircase for external ecosystems can still overlook that the same friction dynamics apply to the company's own engineering teams.
-5. **Assuming platform judgment is complete once all eight models are individually memorized.** Genuine platform judgment is the ability to recognize which combination applies to a novel, real situation — a skill built through practice, not memorization alone.
+**Mistake 1: Applying only the first model that seems to fit, without checking whether others are also relevant**
+
+Most real platform incidents involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
+
+**Mistake 2: Treating the eight models as an unordered checklist rather than a connected structure**
+
+Understanding how the models depend on each other (for example, that Promise Tiers specifically governs Layer 2 of the Leverage Stack) produces faster, more accurate diagnosis than treating each model as unrelated to the others.
+
+**Mistake 3: Skipping the Metric Provenance Chain check when diagnosing any other problem**
+
+Any diagnosis built on untrustworthy data, regardless of how sound the reasoning about the other axes is, inherits that foundational error.
+
+**Mistake 4: Forgetting that the Friction Ledger applies internally, not just to external developers**
+
+A PM fluent in Leverage Stack, Promise Tiers, and Escalation Staircase for external ecosystems can still overlook that the same friction dynamics apply to the company's own engineering teams.
+
+**Mistake 5: Assuming platform judgment is complete once all eight models are individually memorized**
+
+Genuine platform judgment is the ability to recognize which combination applies to a novel, real situation — a skill built through practice, not memorization alone.
 
 ---
+
 
 ## Mental Model: The Platform Health Radar
 
@@ -122,7 +137,7 @@ Amazon is a useful synthesis example precisely because its business spans multip
 
 ---
 
-## Real World Perspective
+## Real World Perspective: Module Synthesis: The Platform PM's Toolkit at Different Company Stages
 
 **Startup:** Early-stage platform teams typically encounter only one or two of these eight models as immediately relevant — usually the Leverage Stack and Promise Tiers, since the first platform decisions a startup faces tend to concern whether and how to expose a Developer Surface at all, before marketplace, governance, or migration concerns become pressing.
 
@@ -164,7 +179,7 @@ A thorough platform investigation moves through this table deliberately, ruling 
 
 ---
 
-## Interview Perspective
+## Interview Perspective: How Interviewers Think About This
 
 **"Walk me through how you'd investigate a sudden decline in third-party developer engagement on a platform you manage."** The interviewer is evaluating whether you approach this as a potentially multi-dimensional problem, checking multiple axes (broken promises, enforcement issues, metric reliability) rather than jumping to a single explanation and a single fix.
 
@@ -194,6 +209,8 @@ Module 7 introduced eight distinct mental models, plus the Friction Ledger's int
 
 ## Cheat Sheet
 
+*A two-minute review of everything in this lesson.*
+
 - Nine axes: Leverage Stack, Promise Tiers, Two-Sided Balance, Metric Provenance, Ownership Zones, Discovery Frontier, Escalation Staircase, Sunset Runway, Friction Ledger.
 - Don't stop at the first model that fits — run the full Cross-Lesson Diagnostic Protocol.
 - The models connect: Promise Tiers → Layer 2. Two-Sided Balance → Layer 3 marketplaces. Discovery Frontier → a special case of Ownership Zones. Escalation Staircase → depends on Ownership Zones' error-cost logic, applied to Layer 4.
@@ -215,50 +232,56 @@ Module 7 introduced eight distinct mental models, plus the Friction Ledger's int
 
 ## Further Reading / Resources
 
-1. *Platform Revolution* by Geoffrey Parker, Marshall Van Alstyne, and Sangeet Paul Choudary
-2. *The Business of Platforms* by Michael Cusumano, Annabelle Gawer, and David Yoffie
-3. *Thinking in Systems* by Donella Meadows
+- Geoffrey Parker, Marshall Van Alstyne, and Sangeet Paul Choudary, *Platform Revolution*
+- Michael Cusumano, Annabelle Gawer, and David Yoffie, *The Business of Platforms*
+- Donella Meadows, *Thinking in Systems*
 
 ---
 
 ## Flashcards
 
-**Front:** Name all nine Module 7 mental models in the order they were introduced.
-**Back:** Leverage Stack, Promise Tiers, Two-Sided Balance Model, Metric Provenance Chain, Ownership Zones Model, Discovery Frontier, Escalation Staircase, Sunset Runway, Friction Ledger.
-**Difficulty:** Medium
-**Tags:** #module-synthesis
+**Card 1**
+- Front: ** Name all nine Module 7 mental models in the order they were introduced.
+- Back: ** Leverage Stack, Promise Tiers, Two-Sided Balance Model, Metric Provenance Chain, Ownership Zones Model, Discovery Frontier, Escalation Staircase, Sunset Runway, Friction Ledger.
+- Difficulty: 2
+- Tags: **, module-synthesis
 
-**Front:** What is the Platform Health Radar?
-**Back:** An integrated diagnostic tool that assesses a platform across all nine Module 7 dimensions simultaneously, rather than applying one model in isolation.
-**Difficulty:** Easy
-**Tags:** #platform-health-radar
+**Card 2**
+- Front: ** What is the Platform Health Radar?
+- Back: ** An integrated diagnostic tool that assesses a platform across all nine Module 7 dimensions simultaneously, rather than applying one model in isolation.
+- Difficulty: 2
+- Tags: **, platform-health-radar
 
-**Front:** How does Promise Tiers relate to the Leverage Stack?
-**Back:** Promise Tiers specifically governs Layer 2 (Developer Surface) of the Leverage Stack, formalizing what stability commitments mean at that layer.
-**Difficulty:** Medium
-**Tags:** #model-interconnection
+**Card 3**
+- Front: ** How does Promise Tiers relate to the Leverage Stack?
+- Back: ** Promise Tiers specifically governs Layer 2 (Developer Surface) of the Leverage Stack, formalizing what stability commitments mean at that layer.
+- Difficulty: 2
+- Tags: **, model-interconnection
 
-**Front:** How does the Discovery Frontier relate to the Ownership Zones Model?
-**Back:** The Discovery Frontier is a specialized, high-stakes application of the Ownership Zones Model's error-cost logic to ranking and personalization decisions specifically.
-**Difficulty:** Hard
-**Tags:** #model-interconnection
+**Card 4**
+- Front: ** How does the Discovery Frontier relate to the Ownership Zones Model?
+- Back: ** The Discovery Frontier is a specialized, high-stakes application of the Ownership Zones Model's error-cost logic to ranking and personalization decisions specifically.
+- Difficulty: 2
+- Tags: **, model-interconnection
 
-**Front:** Why did the Multi-Front Ecosystem Decline case study require more than one model to diagnose correctly?
-**Back:** The true cause was a compounding failure across Promise Tiers (a broken API commitment), Escalation Staircase (a governance enforcement failure), and Metric Provenance Chain (a partially obscuring metric drift) simultaneously.
-**Difficulty:** Hard
-**Tags:** #case-study #multi-front-failure
+**Card 5**
+- Front: ** Why did the Multi-Front Ecosystem Decline case study require more than one model to diagnose correctly?
+- Back: ** The true cause was a compounding failure across Promise Tiers (a broken API commitment), Escalation Staircase (a governance enforcement failure), and Metric Provenance Chain (a partially obscuring metric drift) simultaneously.
+- Difficulty: 2
+- Tags: **, case-study, multi-front-failure
 
-**Front:** What is the risk of applying only the first model that seems to fit a platform symptom?
-**Back:** Most real platform incidents involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
-**Difficulty:** Medium
-**Tags:** #diagnostic-discipline
+**Card 6**
+- Front: ** What is the risk of applying only the first model that seems to fit a platform symptom?
+- Back: ** Most real platform incidents involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
+- Difficulty: 2
+- Tags: **, diagnostic-discipline
 
-**Front:** What does genuine "platform judgment" mean, per this synthesis lesson?
-**Back:** The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
-**Difficulty:** Medium
-**Tags:** #platform-judgment
+**Card 7**
+- Front: ** What does genuine "platform judgment" mean, per this synthesis lesson?
+- Back: ** The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
+- Difficulty: 2
+- Tags: **, platform-judgment
 
----
 
 ## Reflection Exercise
 

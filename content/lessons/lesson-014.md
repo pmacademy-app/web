@@ -126,22 +126,28 @@ Two specific, common failure patterns deserve direct attention:
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Building a persona primarily around demographic detail rather than job, goals, and pain points.**
+**Mistake 1: Building a persona primarily around demographic detail rather than job, goals, and pain points**
+
 As covered above, a persona whose core content evaporates once the name, photo, and biographical color are removed is a fictional character, not a genuinely useful behavior-based persona.
 
-**Mistake 2: Inventing a persona from team assumption rather than actual research.**
+**Mistake 2: Inventing a persona from team assumption rather than actual research**
+
 This inherits all the biases Lesson 11 warns about, while the polished, professional-looking persona format can make an unvalidated assumption feel more authoritative than it has earned the right to feel.
 
-**Mistake 3: Creating too many personas to capture every observed variation.**
+**Mistake 3: Creating too many personas to capture every observed variation**
+
 A large number of personas dilutes the artifact's core purpose and often indicates unfinished consolidation or prioritization work, rather than reflecting genuine product-strategic focus.
 
-**Mistake 4: Treating personas as static, one-time artifacts that never need updating.**
+**Mistake 4: Treating personas as static, one-time artifacts that never need updating**
+
 As markets, products, and user behavior change over time, a persona built from research conducted years earlier may no longer accurately reflect the current segment it claims to represent — personas should be periodically revisited against fresh research, similar to Lesson 9's guidance on revisiting a vision when the underlying evidence has genuinely shifted.
 
-**Mistake 5: Building a persona that is well-received once, then never referenced again in real decisions.**
+**Mistake 5: Building a persona that is well-received once, then never referenced again in real decisions**
+
 This is the persona-as-decoration failure — a polished artifact that never actually functions as an ongoing decision-making tool, which suggests the persona was built for a presentation moment rather than for genuine, ongoing use.
 
 ---
+
 
 ## Mental Model: The Persona Substance Test
 
@@ -359,7 +365,6 @@ A persona is a synthesized, research-based representation of a distinct user seg
 - Difficulty: 3
 - Tags: case-study, sourced-quotes
 
----
 
 ## Reflection Exercise
 

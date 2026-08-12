@@ -85,22 +85,28 @@ Not every market warrants equal localization investment simultaneously. A struct
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Treating internationalization (technical readiness) as equivalent to localization (genuine market adaptation).**
+**Mistake 1: Treating internationalization (technical readiness) as equivalent to localization (genuine market adaptation)**
+
 As covered in Theory, a technically well-internationalized product can still be poorly localized for any specific market — completing the technical infrastructure work does not automatically accomplish the deeper cultural, legal, and structural adaptation a market actually requires.
 
-**Mistake 2: Stopping localization work at text translation alone, without descending the Depth Ladder further.**
+**Mistake 2: Stopping localization work at text translation alone, without descending the Depth Ladder further**
+
 Literal, word-for-word translation frequently produces content that is technically accurate but culturally tone-deaf, confusing, or unintentionally offensive, and misses format, payment, and legal adaptations a market genuinely requires.
 
-**Mistake 3: Assuming a PM's own market-of-origin conventions and assumptions are universal defaults.**
+**Mistake 3: Assuming a PM's own market-of-origin conventions and assumptions are universal defaults**
+
 As covered in Theory, this repeats Lesson 47's structural bias error along a geographic and cultural axis — treating one market's familiar conventions as though they reflect how users everywhere naturally behave, without deliberate research validating this assumption in the new market.
 
-**Mistake 4: Prioritizing markets based purely on total addressable market size, without considering regulatory complexity or realistic execution capacity.**
+**Mistake 4: Prioritizing markets based purely on total addressable market size, without considering regulatory complexity or realistic execution capacity**
+
 A large-TAM market with regulatory or compliance requirements a company isn't genuinely prepared to meet risks either a costly compliance failure or a superficial, under-resourced entry that damages the brand's credibility in that market for future attempts.
 
-**Mistake 5: Relying on machine translation or a single translator without broader cultural review, particularly for high-visibility or emotionally significant content.**
+**Mistake 5: Relying on machine translation or a single translator without broader cultural review, particularly for high-visibility or emotionally significant content**
+
 Even skilled literal translation can miss cultural nuance, connotation, or contextual appropriateness that a broader cultural review process — involving people genuinely familiar with the target market, not just the target language — would catch before it reaches real users.
 
 ---
+
 
 ## Mental Model: The Localization Depth Ladder
 
@@ -127,7 +133,7 @@ The underlying principle connects directly to this lesson's Theory: a media prod
 
 ---
 
-## Real World Perspective: Startup vs. Mid-Size vs. Big Tech
+## Real World Perspective: International & Localization Considerations at Different Company Stages
 
 **At a startup:**
 International expansion is often deprioritized until a company has established strong product-market fit domestically, given limited resources — attempting genuine, deep localization (per the Depth Ladder) for multiple markets simultaneously at this stage risks spreading thin resources across too many markets to do any of them well, echoing this lesson's market prioritization caution.
@@ -218,7 +224,7 @@ Internationalization (the technical work of building a product capable of suppor
 
 ## Glossary
 
-| Term | Definition | Related Concepts | Difficulty (1–3) |
+| Term | Definition | Related Concepts | Difficulty |
 |---|---|---|---|
 | Internationalization (i18n) | The technical work of building a product's architecture to support multiple languages, regions, and formats | Localization | 1 |
 | Localization (l10n) | The actual, market-specific adaptation of content, format, culture, payment methods, and legal compliance for a given market | Internationalization | 1 |
@@ -238,42 +244,41 @@ Internationalization (the technical work of building a product capable of suppor
 ## Flashcards
 
 **Card 1**
-Front: What is the difference between internationalization (i18n) and localization (l10n)?
-Back: Internationalization is the technical work of building a product capable of supporting multiple languages, regions, and formats; localization is the actual, market-specific adaptation of content, culture, payment methods, and legal compliance for a given market.
-Difficulty: 1
-Tags: i18n-vs-l10n
+- Front: What is the difference between internationalization (i18n) and localization (l10n)?
+- Back: Internationalization is the technical work of building a product capable of supporting multiple languages, regions, and formats; localization is the actual, market-specific adaptation of content, culture, payment methods, and legal compliance for a given market.
+- Difficulty: 1
+- Tags: i18n-vs-l10n
 
 **Card 2**
-Front: What are the four levels of the Localization Depth Ladder?
-Back: Surface text translation, format adaptation (dates/currency/units), cultural adaptation (imagery/tone/examples), and structural adaptation (payment methods, legal compliance, UX conventions).
-Difficulty: 2
-Tags: depth-ladder
+- Front: What are the four levels of the Localization Depth Ladder?
+- Back: Surface text translation, format adaptation (dates/currency/units), cultural adaptation (imagery/tone/examples), and structural adaptation (payment methods, legal compliance, UX conventions).
+- Difficulty: 2
+- Tags: depth-ladder
 
 **Card 3**
-Front: How does this lesson extend Lesson 47's structural bias concept?
-Back: A PM's own market-of-origin assumptions about "natural" or "universal" user behavior are frequently specific artifacts of that one market, extending the channel-signal bias concept to a geographic and cultural dimension.
-Difficulty: 2
-Tags: structural-bias-geographic
+- Front: How does this lesson extend Lesson 47's structural bias concept?
+- Back: A PM's own market-of-origin assumptions about "natural" or "universal" user behavior are frequently specific artifacts of that one market, extending the channel-signal bias concept to a geographic and cultural dimension.
+- Difficulty: 2
+- Tags: structural-bias-geographic
 
 **Card 4**
-Front: What four factors does the Market Prioritization Matrix weigh?
-Back: Total addressable market (TAM), regulatory complexity, competitive intensity, and genuine execution capacity.
-Difficulty: 2
-Tags: market-prioritization
+- Front: What four factors does the Market Prioritization Matrix weigh?
+- Back: Total addressable market (TAM), regulatory complexity, competitive intensity, and genuine execution capacity.
+- Difficulty: 2
+- Tags: market-prioritization
 
 **Card 5**
-Front: Why is text translation alone frequently mistaken for complete localization?
-Back: Teams under time or resource pressure often treat accurate text translation as sufficient, without recognizing that format, cultural, and structural adaptation are separate, deeper levels of work text translation alone doesn't address.
-Difficulty: 2
-Tags: translation-only-mistake
+- Front: Why is text translation alone frequently mistaken for complete localization?
+- Back: Teams under time or resource pressure often treat accurate text translation as sufficient, without recognizing that format, cultural, and structural adaptation are separate, deeper levels of work text translation alone doesn't address.
+- Difficulty: 2
+- Tags: translation-only-mistake
 
 **Card 6**
-Front: In the Detailed Case Study, what three specific gaps caused the launch's underperformance, despite accurate text translation?
-Back: Culturally odd/confusing imagery (cultural adaptation gap), a default payment method few local users actually used (structural adaptation gap), and unreviewed data handling practices leading to a regulatory inquiry (legal compliance gap).
-Difficulty: 2
-Tags: case-study
+- Front: In the Detailed Case Study, what three specific gaps caused the launch's underperformance, despite accurate text translation?
+- Back: Culturally odd/confusing imagery (cultural adaptation gap), a default payment method few local users actually used (structural adaptation gap), and unreviewed data handling practices leading to a regulatory inquiry (legal compliance gap).
+- Difficulty: 2
+- Tags: case-study
 
----
 
 ## Reflection Exercise
 
