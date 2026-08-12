@@ -78,18 +78,23 @@ A specific complication that trips up even well-intentioned teams: there is no s
 
 **Mistake 1: Trusting an aggregate accuracy number without measuring outcomes by subgroup**
 
+A model can report 95% overall accuracy while performing at 99% for one group and 70% for another, and the single headline number will never reveal this gap. If one group dominates the training data, aggregate accuracy is dominated by that group's performance almost regardless of how poorly the model does on a smaller or underrepresented group — which is exactly the group most likely to be harmed. Subgroup measurement is not an optional addition to standard evaluation; without it, a team has built a measurement system that is structurally blind to the disparity it most needs to catch.
+
 **Mistake 2: Treating a fairness audit as a one-time pre-launch check rather than a continuous loop**
 
-**Mistake 3: Adjusting output thresholds by group as a superficial fix without diagnosing root cause**
+The Fairness Audit Loop — define equity metric, measure across groups, diagnose disparity source, remediate — never terminates, because a remediation applied once can itself introduce a new disparity elsewhere, or can decay as data and usage patterns shift over time. Teams that treat a pre-launch audit as a permanent clearance are applying a one-time-check mental model to a problem that requires ongoing monitoring. A fairness measurement that isn't re-run periodically is a snapshot of a model that no longer exists by the time real usage has diverged from the original test conditions.
+
+**Mistake 3: Adjusting output thresholds by group as a superficial fix without diagnosing root cause, including assuming that removing a protected characteristic from model inputs alone eliminates disparity risk**
+
+Changing a model's decision threshold differently by group after the fact can mask rather than resolve the underlying issue, and can itself introduce new legal and ethical complications. Genuine remediation instead investigates whether the disparity traces to biased training data, a proxy variable correlated with a protected characteristic, or a genuine difference in the underlying task — simply deleting the protected characteristic from a model's inputs does not solve this, because other correlated variables (a zip code standing in for race, a shopping pattern standing in for gender) can reproduce the same disparity through a different door. Root-cause diagnosis, not output adjustment, is the difference between a real fix and a fix that only looks like one on a dashboard.
 
 **Mistake 4: Failing to provide a genuine appeal mechanism for AI-driven decisions, per Lesson 67's structural requirement**
 
-**Mistake 5: Assuming removing a protected characteristic from model inputs eliminates disparity risk, ignoring proxy variables**
+Responsible deployment requires that people affected by a model's decision can understand, at some level, why it was made, and have a real path to contest it — directly extending the appeals requirement this curriculum established for platform governance to the specific case of AI-driven decisions. A model that denies a loan, flags an account, or rejects an application without any accessible explanation or recourse leaves the people most affected by an error with no way to correct it. Skipping this step is easy to justify under launch pressure, but it is exactly the gap that turns an isolated model error into a harm nobody can challenge.
 
-**Mistake 6: Assuming a single, universally correct mathematical definition of fairness exists**
+**Mistake 5: Assuming a single, universally correct mathematical definition of fairness exists**
 
 Several reasonable fairness definitions can be mutually incompatible for the same decision, and the appropriate one must be explicitly chosen based on the real-world consequences of errors for the affected population, not assumed by default.
-
 ---
 
 
@@ -201,6 +206,7 @@ Aggregate accuracy metrics can mask significant disparity across subgroups, and 
 ---
 
 ## Further Reading / Resources
+
 - Cathy O'Neil, *Weapons of Math Destruction*
 - Brian Christian, *The Alignment Problem*
 - IBM's published AI Fairness 360 documentation
@@ -210,45 +216,47 @@ Aggregate accuracy metrics can mask significant disparity across subgroups, and 
 ## Flashcards
 
 **Card 1**
-- Front: ** Why can aggregate accuracy mask disparity?
-- Back: ** A model can perform very differently across subgroups while its overall accuracy number looks acceptable.
+- Front: Why can aggregate accuracy mask disparity?
+- Back: A model can perform very differently across subgroups while its overall accuracy number looks acceptable.
 - Difficulty: 2
-- Tags: **, responsible-ai
+- Tags: responsible-ai
 
 **Card 2**
-- Front: ** What are the four steps of the Fairness Audit Loop?
-- Back: ** Define equity metric, measure across groups, diagnose disparity source, remediate — then repeat.
+- Front: What are the four steps of the Fairness Audit Loop?
+- Back: Define equity metric, measure across groups, diagnose disparity source, remediate — then repeat.
 - Difficulty: 2
-- Tags: **, fairness-audit-loop
+- Tags: fairness-audit-loop
 
 **Card 3**
-- Front: ** Why is adjusting output thresholds by group a superficial fix?
-- Back: ** It doesn't address the root cause, such as biased training data, and can mask or complicate the underlying problem.
+- Front: Why is adjusting output thresholds by group a superficial fix?
+- Back: It doesn't address the root cause, such as biased training data, and can mask or complicate the underlying problem.
 - Difficulty: 2
-- Tags: **, root-cause
+- Tags: root-cause
 
 **Card 4**
-- Front: ** What went wrong in the Biased Hiring Screener case study?
-- Back: ** Aggregate accuracy masked disparity traceable to historically biased training data, never diagnosed at its root, with no ongoing measurement or appeal process.
+- Front: What went wrong in the Biased Hiring Screener case study?
+- Back: Aggregate accuracy masked disparity traceable to historically biased training data, never diagnosed at its root, with no ongoing measurement or appeal process.
 - Difficulty: 2
-- Tags: **, case-study
+- Tags: case-study
 
 **Card 5**
-- Front: ** Why can't a team simply instruct engineers to "make the model fair"?
-- Back: ** There is no single, universally agreed mathematical definition of fairness — demographic parity and equalized error rates can be mutually incompatible for the same decision, so the team must explicitly choose and document which definition is appropriate given the real-world consequences.
+- Front: Why can't a team simply instruct engineers to "make the model fair"?
+- Back: There is no single, universally agreed mathematical definition of fairness — demographic parity and equalized error rates can be mutually incompatible for the same decision, so the team must explicitly choose and document which definition is appropriate given the real-world consequences.
 - Difficulty: 2
-- Tags: **, fairness-definitions
+- Tags: fairness-definitions
 
 **Card 6**
-- Front: ** In the Biased Hiring Screener case, why was excluding gender and disability status from model inputs not sufficient?
-- Back: ** University attended and employment gaps functioned as proxy variables correlated with the excluded characteristics, allowing the model to reconstruct much of the same discriminatory pattern indirectly.
+- Front: In the Biased Hiring Screener case, why was excluding gender and disability status from model inputs not sufficient?
+- Back: University attended and employment gaps functioned as proxy variables correlated with the excluded characteristics, allowing the model to reconstruct much of the same discriminatory pattern indirectly.
 - Difficulty: 2
-- Tags: **, proxy-variable, case-study
+- Tags: proxy-variable, case-study
 
 
 ## Reflection Exercise
 
 You are the PM for an AI-powered loan approval tool with strong aggregate accuracy.
+
+There is no single correct answer. Work through the following before reading further.
 
 1. What subgroup measurements would you prioritize checking first?
 2. If disparity appears, how would you distinguish a training-data cause from a proxy-variable cause?
@@ -271,6 +279,8 @@ D) Aggregate metrics are illegal to use
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
+---
+
 **2. What are the four steps of the Fairness Audit Loop?**
 A) Test, Ship, Monitor, Retire
 B) Define equity metric, measure across groups, diagnose disparity source, remediate
@@ -281,6 +291,8 @@ D) Concept, Prototype, Pilot, Scale
 *Explanation: The Fairness Audit Loop follows four steps — define equity metric, measure across groups, diagnose disparity source, and remediate — as a structured, repeatable cycle.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
+
+---
 
 **3. Why is the Fairness Audit Loop continuous rather than one-time?**
 A) Disparity can decay, re-emerge, or shift as data and usage change over time
@@ -293,6 +305,8 @@ D) Fairness never changes once established
 *Learning objective tested: #2, #5*
 *Difficulty: Easy*
 
+---
+
 **4. Why is adjusting output thresholds by group often an insufficient fix?**
 A) It always improves fairness completely
 B) It addresses the symptom, not the root cause, such as biased training data
@@ -303,6 +317,8 @@ D) It has no effect on outcomes at all
 *Explanation: Adjusting thresholds is a superficial output patch that does not address the underlying root cause, such as biased training data, and can mask the real problem or introduce new complications.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
+
+---
 
 **5. What role does an appeal mechanism play in responsible AI deployment?**
 A) It has no meaningful role
@@ -315,6 +331,8 @@ D) It is only relevant for hardware products
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
+---
+
 **6. What was the root cause of disparity in the Biased Hiring Screener case study?**
 A) The model architecture itself was flawed
 B) Historical training data reflected the company's own past biased hiring patterns
@@ -325,6 +343,8 @@ D) The screening tool had no access to any resume data
 *Explanation: The tool was trained on historical hiring data that reflected the company's own past biased patterns, encoding that bias into the model's predictions.*
 *Learning objective tested: #1, #4, #5*
 *Difficulty: Easy*
+
+---
 
 **7. Why is removing a protected characteristic from model inputs insufficient to eliminate disparity risk?**
 A) Protected characteristics are never actually correlated with other variables
@@ -337,6 +357,8 @@ D) Protected characteristics cannot be removed from any dataset
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
+---
+
 **8. According to the Responsible AI Deployment Checklist, what does skipping Subgroup Measurement risk?**
 A) Nothing significant
 B) Disparity remaining invisible despite acceptable aggregate performance
@@ -347,6 +369,8 @@ D) Guaranteed model failure
 *Explanation: Without measuring outcomes separately by group, disparity can remain completely hidden even when aggregate performance metrics look acceptable.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
+
+---
 
 **9. Why might early-stage AI products be especially likely to skip subgroup measurement, per the Real World Perspective section?**
 A) Subgroup measurement is legally prohibited for small companies
@@ -359,6 +383,8 @@ D) This is never actually a concern for early-stage products
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
+---
+
 **10. What do large organizations typically maintain regarding fairness, per the Real World Perspective section?**
 A) No formal fairness process
 B) Dedicated responsible AI teams running the Fairness Audit Loop continuously
@@ -369,6 +395,8 @@ D) Fairness checks only once at company founding
 *Explanation: Large organizations typically maintain dedicated responsible AI teams that run the Fairness Audit Loop continuously across many models, treating fairness as an ongoing practice.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
+
+---
 
 **11. (Scenario) A model shows 95% aggregate accuracy but has never been measured by subgroup. What should happen next?**
 A) Nothing; 95% accuracy is sufficient evidence of fairness
@@ -381,6 +409,8 @@ D) Aggregate accuracy alone is legally sufficient in all jurisdictions
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Medium-Hard*
 
+---
+
 **12. (Product Thinking) A team discovers disparity and proposes simply adjusting output thresholds differently by group. What is the strongest response?**
 A) Approve the fix immediately as sufficient
 B) Investigate root cause first, since a superficial threshold adjustment may mask rather than resolve the underlying issue
@@ -391,6 +421,8 @@ D) Remove the feature immediately with no further investigation
 *Explanation: A superficial threshold adjustment masks the real issue; the root cause must be diagnosed first to determine whether it stems from biased data, a proxy variable, or something else entirely.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium-Hard*
+
+---
 
 **13. (Interview Reasoning) A candidate says a model is "fair" because its aggregate accuracy is high, with no mention of subgroup analysis. What does this signal?**
 A) A strong and complete understanding of fairness
@@ -403,6 +435,8 @@ D) Nothing meaningful
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
+---
+
 **14. (Product Thinking) An AI decision system has no appeal mechanism for affected individuals. What risk does this represent?**
 A) No risk; appeal mechanisms are optional in all contexts
 B) A structural gap, since affected individuals have no recourse for a potentially wrong decision
@@ -413,6 +447,8 @@ D) Appeal mechanisms are irrelevant to fairness
 *Explanation: Without an appeal mechanism, affected individuals have no way to contest a potentially wrong AI-driven decision, creating a structural gap in recourse per Lesson 67's requirements.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
+
+---
 
 **15. (Product Thinking, Highest Difficulty) An AI hiring tool shows strong aggregate accuracy but has never been checked for subgroup disparity, and leadership is skeptical that fairness auditing is necessary given strong performance. Using only this lesson's frameworks, what is the most defensible response?**
 A) Trust the aggregate accuracy and proceed without further investigation

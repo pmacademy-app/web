@@ -221,46 +221,46 @@ Recommender systems face a structural tension between exploiting a user's alread
 ## Flashcards
 
 **Card 1**
-- Front: ** Why can a recommender optimized purely for short-term engagement produce a filter bubble?
-- Back: ** It learns that showing more of what already worked reliably produces the next positive response, narrowing exposure over time even as short-term metrics improve.
+- Front: Why can a recommender optimized purely for short-term engagement produce a filter bubble?
+- Back: It learns that showing more of what already worked reliably produces the next positive response, narrowing exposure over time even as short-term metrics improve.
 - Difficulty: 2
-- Tags: **, filter-bubble, core-concept
+- Tags: filter-bubble, core-concept
 
 **Card 2**
-- Front: ** Name the three zones of the Discovery Frontier model.
-- Back: ** Known Preference Zone, Discovery Frontier, Irrelevant Zone.
+- Front: Name the three zones of the Discovery Frontier model.
+- Back: Known Preference Zone, Discovery Frontier, Irrelevant Zone.
 - Difficulty: 2
-- Tags: **, discovery-frontier
+- Tags: discovery-frontier
 
 **Card 3**
-- Front: ** Why must diversity and novelty metrics be tracked alongside accuracy metrics?
-- Back: ** Accuracy-style metrics (precision, CTR) cannot detect a narrowing filter bubble, since they only measure whether known-preference predictions were correct.
+- Front: Why must diversity and novelty metrics be tracked alongside accuracy metrics?
+- Back: Accuracy-style metrics (precision, CTR) cannot detect a narrowing filter bubble, since they only measure whether known-preference predictions were correct.
 - Difficulty: 2
-- Tags: **, metrics
+- Tags: metrics
 
 **Card 4**
-- Front: ** What is the cold-start problem?
-- Back: ** The difficulty of generating relevant recommendations for new users or new catalog items due to insufficient interaction history.
+- Front: What is the cold-start problem?
+- Back: The difficulty of generating relevant recommendations for new users or new catalog items due to insufficient interaction history.
 - Difficulty: 2
-- Tags: **, cold-start
+- Tags: cold-start
 
 **Card 5**
-- Front: ** Why did skip rate improve while 90-day retention declined in the Case Study?
-- Back: ** The recommender optimized for immediate skip avoidance by serving increasingly narrow, safe, already-liked content, which reduced skips short-term but bored users over a longer horizon.
+- Front: Why did skip rate improve while 90-day retention declined in the Case Study?
+- Back: The recommender optimized for immediate skip avoidance by serving increasingly narrow, safe, already-liked content, which reduced skips short-term but bored users over a longer horizon.
 - Difficulty: 2
-- Tags: **, case-study, discovery-frontier
+- Tags: case-study, discovery-frontier
 
 **Card 6**
-- Front: ** Name two mitigation strategies for the cold-start problem.
-- Back: ** Onboarding preference surveys for explicit signal, and popularity-based or content-based fallback recommendations until behavioral data accumulates.
+- Front: Name two mitigation strategies for the cold-start problem.
+- Back: Onboarding preference surveys for explicit signal, and popularity-based or content-based fallback recommendations until behavioral data accumulates.
 - Difficulty: 2
-- Tags: **, cold-start-mitigation
+- Tags: cold-start-mitigation
 
 **Card 7**
-- Front: ** Why is filter bubble damage often invisible on short-term dashboards?
-- Back: ** It operates on a longer retention timescale than daily engagement metrics track, requiring long-horizon monitoring like the Smile Curve to detect.
+- Front: Why is filter bubble damage often invisible on short-term dashboards?
+- Back: It operates on a longer retention timescale than daily engagement metrics track, requiring long-horizon monitoring like the Smile Curve to detect.
 - Difficulty: 2
-- Tags: **, long-horizon-monitoring
+- Tags: long-horizon-monitoring
 
 
 ## Reflection Exercise

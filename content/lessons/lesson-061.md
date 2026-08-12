@@ -240,46 +240,46 @@ Platform products differ from feature products in a fundamental way: their value
 ## Flashcards
 
 **Card 1**
-- Front: ** What is the "who creates the value" test?
-- Back: ** Ask who built the thing that made a user's experience good — your own team (feature product) or a third party using your tools (platform).
+- Front: What is the "who creates the value" test?
+- Back: Ask who built the thing that made a user's experience good — your own team (feature product) or a third party using your tools (platform).
 - Difficulty: 2
-- Tags: **, platform-thinking, diagnostic
+- Tags: platform-thinking, diagnostic
 
 **Card 2**
-- Front: ** Name the four layers of the Leverage Stack in order.
-- Back: ** Core Product → Developer Surface → Marketplace → Ecosystem.
+- Front: Name the four layers of the Leverage Stack in order.
+- Back: Core Product → Developer Surface → Marketplace → Ecosystem.
 - Difficulty: 2
-- Tags: **, leverage-stack
+- Tags: leverage-stack
 
 **Card 3**
-- Front: ** Why can a healthy end-user engagement metric mask a decaying platform?
-- Back: ** Existing integrations keep working even as new developer investment quietly stalls, so end-user dashboards lag the real signal.
+- Front: Why can a healthy end-user engagement metric mask a decaying platform?
+- Back: Existing integrations keep working even as new developer investment quietly stalls, so end-user dashboards lag the real signal.
 - Difficulty: 2
-- Tags: **, metrics, platform-risk
+- Tags: metrics, platform-risk
 
 **Card 4**
-- Front: ** What is a cross-side network effect?
-- Back: ** A loop where growth in one population (builders or end users) increases the platform's value for the other population, and vice versa.
+- Front: What is a cross-side network effect?
+- Back: A loop where growth in one population (builders or end users) increases the platform's value for the other population, and vice versa.
 - Difficulty: 2
-- Tags: **, network-effects
+- Tags: network-effects
 
 **Card 5**
-- Front: ** What does the Platform Readiness Checklist assess?
-- Back: ** Whether a Developer Surface (Layer 2) is stable and trustworthy enough to support Marketplace or Ecosystem investment (Layers 3–4).
+- Front: What does the Platform Readiness Checklist assess?
+- Back: Whether a Developer Surface (Layer 2) is stable and trustworthy enough to support Marketplace or Ecosystem investment (Layers 3–4).
 - Difficulty: 2
-- Tags: **, platform-readiness
+- Tags: platform-readiness
 
 **Card 6**
-- Front: ** Why did the SaaS company's Marketplace fail in the Case Study?
-- Back: ** It invested in a public Layer 3 marketplace while its Layer 2 API was still unversioned and prone to undocumented breaking changes.
+- Front: Why did the SaaS company's Marketplace fail in the Case Study?
+- Back: It invested in a public Layer 3 marketplace while its Layer 2 API was still unversioned and prone to undocumented breaking changes.
 - Difficulty: 2
-- Tags: **, case-study, sequencing
+- Tags: case-study, sequencing
 
 **Card 7**
-- Front: ** Name two things that are typically in tension between developers and end users.
-- Back: ** Developers want stability and advance notice; end users often want frequent, visible change and rapid iteration.
+- Front: Name two things that are typically in tension between developers and end users.
+- Back: Developers want stability and advance notice; end users often want frequent, visible change and rapid iteration.
 - Difficulty: 2
-- Tags: **, tradeoffs
+- Tags: tradeoffs
 
 
 ## Reflection Exercise

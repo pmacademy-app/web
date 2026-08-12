@@ -218,46 +218,46 @@ M&A value is realized or destroyed primarily during the integration process that
 ## Flashcards
 
 **Card 1**
-- Front: ** Why is poor integration, rather than flawed strategy, the more common cause of M&A value destruction?
-- Back: ** An acquisition's value is realized or destroyed over the months and years of integration following the deal, not at the moment the deal closes.
+- Front: Why is poor integration, rather than flawed strategy, the more common cause of M&A value destruction?
+- Back: An acquisition's value is realized or destroyed over the months and years of integration following the deal, not at the moment the deal closes.
 - Difficulty: 2
-- Tags: **, ma-integration, core-concept
+- Tags: ma-integration, core-concept
 
 **Card 2**
-- Front: ** Name the four points on the Integration Continuum.
-- Back: ** Preserve, Selective Integration, Full Absorption, Sunset and Migrate.
+- Front: Name the four points on the Integration Continuum.
+- Back: Preserve, Selective Integration, Full Absorption, Sunset and Migrate.
 - Difficulty: 2
-- Tags: **, integration-continuum
+- Tags: integration-continuum
 
 **Card 3**
-- Front: ** Name the four common strategic rationales for an acquisition.
-- Back: ** Talent acquisition, technology acquisition, customer base acquisition, market consolidation.
+- Front: Name the four common strategic rationales for an acquisition.
+- Back: Talent acquisition, technology acquisition, customer base acquisition, market consolidation.
 - Difficulty: 2
-- Tags: **, ma-rationales
+- Tags: ma-rationales
 
 **Card 4**
-- Front: ** Why is premature Full Absorption such a common mistake?
-- Back: ** Internal stakeholders often prefer a unified codebase and structure for its own sake, regardless of whether the acquisition's actual rationale calls for full integration.
+- Front: Why is premature Full Absorption such a common mistake?
+- Back: Internal stakeholders often prefer a unified codebase and structure for its own sake, regardless of whether the acquisition's actual rationale calls for full integration.
 - Difficulty: 2
-- Tags: **, premature-integration
+- Tags: premature-integration
 
 **Card 5**
-- Front: ** What went wrong in the Rushed Absorption case study?
-- Back: ** The acquisition's rationale was customer-base retention, but leadership forced rapid Full Absorption without understanding what drove customer loyalty, causing significant churn.
+- Front: What went wrong in the Rushed Absorption case study?
+- Back: The acquisition's rationale was customer-base retention, but leadership forced rapid Full Absorption without understanding what drove customer loyalty, causing significant churn.
 - Difficulty: 2
-- Tags: **, case-study, integration-continuum
+- Tags: case-study, integration-continuum
 
 **Card 6**
-- Front: ** Why should acquired customer migration follow Sunset Runway discipline from Lesson 68?
-- Back: ** Acquired customers are genuine dependents whose loyalty drivers and workflow needs must be understood before a migration timeline is set, just like external API dependents.
+- Front: Why should acquired customer migration follow Sunset Runway discipline from Lesson 68?
+- Back: Acquired customers are genuine dependents whose loyalty drivers and workflow needs must be understood before a migration timeline is set, just like external API dependents.
 - Difficulty: 2
-- Tags: **, customer-migration
+- Tags: customer-migration
 
 **Card 7**
-- Front: ** Why does ambiguous communication with an acquired team accelerate departures?
-- Back: ** Uncertainty about which integration approach applies to them creates anxiety that can drive talent away regardless of which approach ultimately proves correct.
+- Front: Why does ambiguous communication with an acquired team accelerate departures?
+- Back: Uncertainty about which integration approach applies to them creates anxiety that can drive talent away regardless of which approach ultimately proves correct.
 - Difficulty: 2
-- Tags: **, team-communication
+- Tags: team-communication
 
 
 ## Reflection Exercise

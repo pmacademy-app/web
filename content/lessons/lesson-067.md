@@ -225,46 +225,46 @@ Platform governance is fundamentally a response design problem, not merely a det
 ## Flashcards
 
 **Card 1**
-- Front: ** Why is "detect and remove" an insufficient governance strategy?
-- Back: ** No detection system is perfectly accurate, so treating removal as the only response converts every false positive into a full, often irreversible harm to an honest participant.
+- Front: Why is "detect and remove" an insufficient governance strategy?
+- Back: No detection system is perfectly accurate, so treating removal as the only response converts every false positive into a full, often irreversible harm to an honest participant.
 - Difficulty: 2
-- Tags: **, governance, core-concept
+- Tags: governance, core-concept
 
 **Card 2**
-- Front: ** Name the four steps of the Escalation Staircase in order.
-- Back: ** Soft Signal, Restriction, Suspension, Termination.
+- Front: Name the four steps of the Escalation Staircase in order.
+- Back: Soft Signal, Restriction, Suspension, Termination.
 - Difficulty: 2
-- Tags: **, escalation-staircase
+- Tags: escalation-staircase
 
 **Card 3**
-- Front: ** Why should lower escalation steps be reversible?
-- Back: ** To limit the damage a false positive can cause to an honest participant, since detection confidence at lower steps is, by design, lower.
+- Front: Why should lower escalation steps be reversible?
+- Back: To limit the damage a false positive can cause to an honest participant, since detection confidence at lower steps is, by design, lower.
 - Difficulty: 2
-- Tags: **, reversibility
+- Tags: reversibility
 
 **Card 4**
-- Front: ** Why is an appeals process a structural requirement, not a courtesy?
-- Back: ** Because any system that acknowledges its own imperfect accuracy must provide a path to correct the false positives it will inevitably produce.
+- Front: Why is an appeals process a structural requirement, not a courtesy?
+- Back: Because any system that acknowledges its own imperfect accuracy must provide a path to correct the false positives it will inevitably produce.
 - Difficulty: 2
-- Tags: **, appeals-process
+- Tags: appeals-process
 
 **Card 5**
-- Front: ** What went wrong in the Automated Seller Purge case study?
-- Back: ** A moderate-confidence detection signal was connected directly to permanent termination with no graduated steps, paired with a non-functional appeals process, harming honest sellers and damaging marketplace liquidity.
+- Front: What went wrong in the Automated Seller Purge case study?
+- Back: A moderate-confidence detection signal was connected directly to permanent termination with no graduated steps, paired with a non-functional appeals process, harming honest sellers and damaging marketplace liquidity.
 - Difficulty: 2
-- Tags: **, case-study, escalation-staircase
+- Tags: case-study, escalation-staircase
 
 **Card 6**
-- Front: ** How does trust and safety enforcement relate to the precision/recall trade-off from Lesson 65?
-- Back: ** It is a high-stakes application of the same trade-off — maximizing catch rate (recall) mechanically increases false positives against honest participants, a cost that must be deliberately weighed.
+- Front: How does trust and safety enforcement relate to the precision/recall trade-off from Lesson 65?
+- Back: It is a high-stakes application of the same trade-off — maximizing catch rate (recall) mechanically increases false positives against honest participants, a cost that must be deliberately weighed.
 - Difficulty: 2
-- Tags: **, precision-recall, enforcement
+- Tags: precision-recall, enforcement
 
 **Card 7**
-- Front: ** Why should enforcement outcomes be monitored over a long time horizon?
-- Back: ** Patterns of disproportionate or biased enforcement against specific participant segments can take considerable time to surface, similar to filter bubble damage in Lesson 66.
+- Front: Why should enforcement outcomes be monitored over a long time horizon?
+- Back: Patterns of disproportionate or biased enforcement against specific participant segments can take considerable time to surface, similar to filter bubble damage in Lesson 66.
 - Difficulty: 2
-- Tags: **, long-horizon-monitoring
+- Tags: long-horizon-monitoring
 
 
 ## Reflection Exercise

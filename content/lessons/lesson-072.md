@@ -218,46 +218,46 @@ Enterprise and B2B products require a fundamentally different category of capabi
 ## Flashcards
 
 **Card 1**
-- Front: ** Why is enterprise readiness a distinct category from "more features"?
-- Back: ** It establishes organizational trust and control — security, administrative oversight, reliability, integration — rather than serving an individual user's core task directly.
+- Front: Why is enterprise readiness a distinct category from "more features"?
+- Back: It establishes organizational trust and control — security, administrative oversight, reliability, integration — rather than serving an individual user's core task directly.
 - Difficulty: 2
-- Tags: **, enterprise-readiness, core-concept
+- Tags: enterprise-readiness, core-concept
 
 **Card 2**
-- Front: ** Name the four rungs of the Enterprise Adoption Ladder.
-- Back: ** Pilot, Departmental Adoption, Organization-Wide Rollout, Mission-Critical Entrenchment.
+- Front: Name the four rungs of the Enterprise Adoption Ladder.
+- Back: Pilot, Departmental Adoption, Organization-Wide Rollout, Mission-Critical Entrenchment.
 - Difficulty: 2
-- Tags: **, adoption-ladder
+- Tags: adoption-ladder
 
 **Card 3**
-- Front: ** Name the four categories of enterprise readiness capability.
-- Back: ** Security and compliance, administrative control, reliability and support commitments, integration capability.
+- Front: Name the four categories of enterprise readiness capability.
+- Back: Security and compliance, administrative control, reliability and support commitments, integration capability.
 - Difficulty: 2
-- Tags: **, enterprise-readiness
+- Tags: enterprise-readiness
 
 **Card 4**
-- Front: ** Why couldn't strong user satisfaction metrics unblock the security review stall in the Case Study?
-- Back: ** Security review criteria (certifications, access control, audit logs) are entirely separate from user satisfaction, and central IT/security stakeholders were never part of the original grassroots adoption.
+- Front: Why couldn't strong user satisfaction metrics unblock the security review stall in the Case Study?
+- Back: Security review criteria (certifications, access control, audit logs) are entirely separate from user satisfaction, and central IT/security stakeholders were never part of the original grassroots adoption.
 - Difficulty: 2
-- Tags: **, case-study, adoption-ladder
+- Tags: case-study, adoption-ladder
 
 **Card 5**
-- Front: ** Why can a single missing enterprise readiness category block a deal regardless of strength elsewhere?
-- Back: ** Procurement and security review processes typically treat each category as a separate, non-negotiable gate rather than allowing compensation across categories.
+- Front: Why can a single missing enterprise readiness category block a deal regardless of strength elsewhere?
+- Back: Procurement and security review processes typically treat each category as a separate, non-negotiable gate rather than allowing compensation across categories.
 - Difficulty: 2
-- Tags: **, enterprise-readiness
+- Tags: enterprise-readiness
 
 **Card 6**
-- Front: ** Why should enterprise readiness capabilities often be built proactively rather than reactively?
-- Back: ** Certifications and related capabilities often require significant lead time to obtain, and waiting until a specific deal demands them can cause avoidable delays.
+- Front: Why should enterprise readiness capabilities often be built proactively rather than reactively?
+- Back: Certifications and related capabilities often require significant lead time to obtain, and waiting until a specific deal demands them can cause avoidable delays.
 - Difficulty: 2
-- Tags: **, enterprise-readiness-timing
+- Tags: enterprise-readiness-timing
 
 **Card 7**
-- Front: ** What distinguishes isolated enthusiasm from genuine organizational rollout progress?
-- Back: ** Isolated enthusiasm reflects Rung 1/2 success among individual users, while organizational rollout requires engagement and approval from Rung 3 gatekeepers like central IT and security, who evaluate entirely different criteria.
+- Front: What distinguishes isolated enthusiasm from genuine organizational rollout progress?
+- Back: Isolated enthusiasm reflects Rung 1/2 success among individual users, while organizational rollout requires engagement and approval from Rung 3 gatekeepers like central IT and security, who evaluate entirely different criteria.
 - Difficulty: 2
-- Tags: **, isolated-enthusiasm
+- Tags: isolated-enthusiasm
 
 
 ## Reflection Exercise

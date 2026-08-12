@@ -70,18 +70,25 @@ If overextension is this recognizable in hindsight, it's worth asking why it hap
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Adding headcount reactively without a deliberate model for dividing existing overextended ownership**
+**Mistake 1: Adding headcount reactively — including support roles under an overextended PM — without a deliberate model for dividing existing ownership**
 
-**Mistake 2: Adding support roles under an overextended PM rather than genuinely splitting ownership**
+Adding PMs reactively, as work volume grows, tends to preserve an existing PM's overall scope while adding new PMs alongside them for entirely new initiatives, rather than splitting the original PM's now-overgrown scope into more coherent, individually ownable pieces. A common variant of this mistake is adding a supporting analyst or associate PM role reporting to the overextended PM instead: support roles can help with execution capacity, but they don't solve the underlying coherence problem, since the original PM remains the single point of prioritization and decision-making judgment across an unchanged, overextended scope. Either way, the newest, smallest initiatives end up well-owned while the most established, often most important, product areas remain owned by someone whose attention is spread across far more than they can meaningfully track.
 
-**Mistake 3: Treating span of coherence as a fixed number of initiatives regardless of interdependency complexity**
+**Mistake 2: Treating span of coherence as a fixed number of initiatives regardless of interdependency complexity**
 
-**Mistake 4: Failing to notice the early signals of coherence overextension — delayed decisions, shallow engagement — before they become an acute crisis**
+A PM's span of coherence is not a fixed headcount or initiative count, since it depends heavily on how interdependent the owned initiatives are — a few tightly related initiatives may be easier to own coherently than the same number of entirely unrelated ones. Applying a flat rule ("no PM should own more than three initiatives") ignores this and can either under-support a PM juggling several tightly coupled efforts or over-correct for one managing several independent, low-interaction areas. The Coherence Span Model is meant to be applied to the actual complexity of the specific ownership in question, not to a generic count.
 
-**Mistake 5: Creating ambiguous or overlapping ownership boundaries when splitting scope, producing duplicated or competing decision rights**
+**Mistake 3: Failing to notice the early signals of coherence overextension — delayed decisions, shallow engagement — before they become an acute crisis**
 
-**Mistake 6: Treating a splitting conversation as an implicit judgment on past performance rather than scope-appropriate role design, which discourages leadership from raising it early**
+The Coherence Span Model's discipline depends on watching for specific early signals — decisions increasingly deferred or delayed, decreasing depth of engagement with any single initiative, rising complaints from teams feeling under-supported — rather than waiting for an obvious crisis to force the issue. Overextension develops gradually, one individually reasonable addition at a time, so there is rarely a single moment that triggers a structural review the way a hiring decision does. Building a periodic, scheduled review that doesn't depend on someone first noticing a crisis is what allows an organization to catch overextension while it's still a manageable adjustment.
 
+**Mistake 4: Creating ambiguous or overlapping ownership boundaries when splitting scope, producing duplicated or competing decision rights**
+
+Splitting an overextended PM's scope solves the coherence problem only if the resulting boundaries are genuinely clear; a split that leaves two PMs with overlapping or ambiguous decision rights over the same area can produce new friction — duplicated work, competing priorities, stakeholders unsure who actually owns a given call — that partially offsets the benefit of splitting in the first place. Defining explicit decision-rights boundaries at the moment of the split, not after the resulting confusion surfaces, is what makes a split actually resolve the coherence problem rather than just relabel it.
+
+**Mistake 5: Treating a splitting conversation as an implicit judgment on past performance rather than scope-appropriate role design, which discourages leadership from raising it early**
+
+Splitting a well-performing PM's ownership can feel, to both the PM and to leadership, like a demotion or a vote of no confidence, even when it is exactly the opposite — a recognition that the area has grown important enough to deserve dedicated, undivided attention. This makes leadership reluctant to initiate the conversation, and PMs reluctant to request it themselves, even once they privately recognize they're stretched thin. Framing the conversation explicitly as scope-appropriate role design, rather than a comment on the PM's competence, is what allows it to happen before overextension becomes an acute crisis rather than after.
 ---
 
 
@@ -191,6 +198,7 @@ Reactive headcount addition, without a deliberate model for dividing existing ow
 ---
 
 ## Further Reading / Resources
+
 - Matthew Skelton and Manuel Pais, *Team Topologies*
 - Will Larson, *An Elegant Puzzle*
 - Marty Cagan and Chris Jones, *Empowered*
@@ -200,45 +208,47 @@ Reactive headcount addition, without a deliberate model for dividing existing ow
 ## Flashcards
 
 **Card 1**
-- Front: ** Why does reactive headcount addition fail to solve overextended PM scope?
-- Back: ** It tends to preserve an existing PM's scope while adding new PMs only for new initiatives, leaving established areas overextended.
+- Front: Why does reactive headcount addition fail to solve overextended PM scope?
+- Back: It tends to preserve an existing PM's scope while adding new PMs only for new initiatives, leaving established areas overextended.
 - Difficulty: 2
-- Tags: **, org-scaling
+- Tags: org-scaling
 
 **Card 2**
-- Front: ** What does the Coherence Span Model track?
-- Back: ** A PM's ownership span by initiative count and interdependency complexity.
+- Front: What does the Coherence Span Model track?
+- Back: A PM's ownership span by initiative count and interdependency complexity.
 - Difficulty: 2
-- Tags: **, coherence-span-model
+- Tags: coherence-span-model
 
 **Card 3**
-- Front: ** Why is adding support insufficient for an overextended PM?
-- Back: ** Support roles don't solve the underlying coherence problem, since the original PM remains the single point of prioritization and decision-making judgment.
+- Front: Why is adding support insufficient for an overextended PM?
+- Back: Support roles don't solve the underlying coherence problem, since the original PM remains the single point of prioritization and decision-making judgment.
 - Difficulty: 2
-- Tags: **, split-vs-support
+- Tags: split-vs-support
 
 **Card 4**
-- Front: ** What went wrong in the Overextended Owner case study?
-- Back: ** A founding PM's scope grew to a dozen loosely related initiatives through reactive addition, causing delayed decisions and unsupported team decisions, never addressed until the situation became acute.
+- Front: What went wrong in the Overextended Owner case study?
+- Back: A founding PM's scope grew to a dozen loosely related initiatives through reactive addition, causing delayed decisions and unsupported team decisions, never addressed until the situation became acute.
 - Difficulty: 2
-- Tags: **, case-study
+- Tags: case-study
 
 **Card 5**
-- Front: ** Why is this overextension failure pattern so persistent across growing companies, even though it's recognizable in hindsight?
-- Back: ** Splitting ownership can feel like a demotion to both the PM and leadership, and overextension accumulates gradually with no single obvious trigger for a structural review — unlike hiring, which has a clear trigger.
+- Front: Why is this overextension failure pattern so persistent across growing companies, even though it's recognizable in hindsight?
+- Back: Splitting ownership can feel like a demotion to both the PM and leadership, and overextension accumulates gradually with no single obvious trigger for a structural review — unlike hiring, which has a clear trigger.
 - Difficulty: 2
-- Tags: **, org-scaling, reluctance
+- Tags: org-scaling, reluctance
 
 **Card 6**
-- Front: ** How did the founding PM in the Overextended Owner case study react to having their scope split?
-- Back: ** They reported relief rather than diminishment, a detail the company later used to reframe splitting conversations as scope-appropriate role design rather than a judgment on past performance.
+- Front: How did the founding PM in the Overextended Owner case study react to having their scope split?
+- Back: They reported relief rather than diminishment, a detail the company later used to reframe splitting conversations as scope-appropriate role design rather than a judgment on past performance.
 - Difficulty: 2
-- Tags: **, case-study
+- Tags: case-study
 
 
 ## Reflection Exercise
 
 You are a company's head of product, and one senior PM's ownership has grown to include five increasingly disconnected initiatives.
+
+There is no single correct answer. Work through the following before reading further.
 
 1. What signals would you look for to determine whether this PM has passed their coherence span?
 2. How would you decide whether to add support or genuinely split ownership?
@@ -261,6 +271,8 @@ D) Reactive addition always improves decision-making speed
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
+---
+
 **2. What does the Coherence Span Model track?**
 A) Revenue per PM
 B) A PM's ownership span by initiative count and interdependency complexity
@@ -271,6 +283,8 @@ D) Customer satisfaction scores
 *Explanation: The Coherence Span Model tracks a PM's ownership span by initiative count and interdependency complexity, not just a simple initiative count.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
+
+---
 
 **3. What is a signal that a PM has moved past their coherence span?**
 A) Increasingly fast decision-making
@@ -283,6 +297,8 @@ D) Increased team satisfaction
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
+---
+
 **4. Why is adding support insufficient for an overextended PM?**
 A) Support roles always fully resolve overextension
 B) The original PM remains the single point of prioritization and decision-making judgment across an unchanged scope
@@ -293,6 +309,8 @@ D) Support roles always cause additional overextension
 *Explanation: The original PM remains the single point of prioritization and decision-making judgment across an unchanged scope, so support doesn't address the underlying coherence problem.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
+
+---
 
 **5. What was the root cause of the Overextended Owner case study's problems?**
 A) The founding PM lacked sufficient technical skill
@@ -305,6 +323,8 @@ D) The founding PM refused to communicate with their team
 *Learning objective tested: #1, #5*
 *Difficulty: Easy*
 
+---
+
 **6. What specific signals were present before the Overextended Owner situation became acute?**
 A) No signals were present at all
 B) Delayed decisions and teams reporting they had to make significant decisions without adequate PM input
@@ -315,6 +335,8 @@ D) Declining company revenue
 *Explanation: Delayed decisions and teams reporting they had to make significant decisions without adequate PM input were the specific early warning signals.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
+
+---
 
 **7. What did the recovery in the Overextended Owner case study involve?**
 A) Adding a single support analyst under the founding PM
@@ -327,6 +349,8 @@ D) Consolidating even more initiatives under the founding PM
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
+---
+
 **8. According to the Product Org Scaling Checklist, what risk does skipping "Split, Not Support" create?**
 A) No risk; adding support always resolves overextension
 B) The underlying coherence problem persists despite the appearance of addressing it
@@ -337,6 +361,8 @@ D) A risk only relevant to early-stage startups
 *Explanation: The underlying coherence problem persists despite the appearance of addressing it when support is added instead of splitting ownership.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
+
+---
 
 **9. Why is span of coherence not a fixed number of initiatives?**
 A) It depends heavily on how interdependent the owned initiatives are
@@ -349,6 +375,8 @@ D) Initiative count never actually affects decision-making quality
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
+---
+
 **10. Why is a single PM owning the entire product normal at very early stages, per the Real World Perspective section?**
 A) Early-stage companies are legally required to have only one PM
 B) Initiative count and complexity are both genuinely low at this stage
@@ -359,6 +387,8 @@ D) Early-stage PMs never make any real decisions
 *Explanation: Initiative count and complexity are both genuinely low at early stages, making a single PM's coherence span sufficient.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
+
+---
 
 **11. What do large organizations typically maintain regarding ownership boundaries, per the Real World Perspective section?**
 A) No formal ownership documentation
@@ -371,6 +401,8 @@ D) Ownership boundaries only for engineering, never product
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
+---
+
 **12. (Scenario) A PM's decision requests are taking noticeably longer to resolve, and teams report making significant decisions without adequate PM input. What does this indicate?**
 A) No issue; this is normal for any product organization
 B) A likely coherence-span overextension signal requiring investigation
@@ -381,6 +413,8 @@ D) A sign that the PM should be immediately replaced with no investigation
 *Explanation: This is a likely coherence-span overextension signal requiring investigation, as delayed decisions and unguided team actions indicate the PM has exceeded their span.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
+
+---
 
 **13. (Product Thinking) A head of product wants to add a support analyst to help an overextended PM rather than splitting their scope. What is the strongest response?**
 A) Agree, since support roles always resolve overextension
@@ -393,6 +427,8 @@ D) Eliminate the PM's role entirely
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
+---
+
 **14. (Interview Reasoning) A candidate, asked how they'd decide whether to split a PM's ownership, cites only a fixed initiative count with no mention of interdependency complexity or specific signals. What does this signal?**
 A) A strong and complete understanding of organizational scaling
 B) A gap in recognizing that coherence span depends on interdependency, not just count, and specific signals matter
@@ -403,6 +439,8 @@ D) Nothing meaningful; a fixed count is always sufficient
 *Explanation: A gap in recognizing that coherence span depends on interdependency, not just count, and specific signals like delayed decisions matter for diagnosing overextension.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
+
+---
 
 **15. (Product Thinking, Highest Difficulty) A senior PM's ownership has grown to five increasingly disconnected initiatives, decisions are being delayed, and leadership is considering adding a support analyst. Using only this lesson's frameworks, what is the most defensible response?**
 A) Add the support analyst as leadership proposes

@@ -227,46 +227,46 @@ A vision statement, however inspiring, cannot on its own guide near-term executi
 ## Flashcards
 
 **Card 1**
-- Front: ** Why can't a vision statement alone guide near-term execution decisions?
-- Back: ** Its necessary abstraction and stability mean it doesn't specify what would count as evidence the organization is succeeding or failing.
+- Front: Why can't a vision statement alone guide near-term execution decisions?
+- Back: Its necessary abstraction and stability mean it doesn't specify what would count as evidence the organization is succeeding or failing.
 - Difficulty: 2
-- Tags: **, strategy-cascade, core-concept
+- Tags: strategy-cascade, core-concept
 
 **Card 2**
-- Front: ** Name the four levels of the Strategy Cascade in order.
-- Back: ** Vision, Strategic Bets, Roadmap Initiatives, Success Metrics.
+- Front: Name the four levels of the Strategy Cascade in order.
+- Back: Vision, Strategic Bets, Roadmap Initiatives, Success Metrics.
 - Difficulty: 2
-- Tags: **, strategy-cascade
+- Tags: strategy-cascade
 
 **Card 3**
-- Front: ** What three properties make a Strategic Bet genuinely falsifiable?
-- Back: ** A specific hypothesis, committed real resources, and pre-defined success criteria specified in advance.
+- Front: What three properties make a Strategic Bet genuinely falsifiable?
+- Back: A specific hypothesis, committed real resources, and pre-defined success criteria specified in advance.
 - Difficulty: 2
-- Tags: **, falsifiability
+- Tags: falsifiability
 
 **Card 4**
-- Front: ** What are the three Horizons in the Three Horizons framework?
-- Back: ** Horizon 1 (Core), Horizon 2 (Adjacent), Horizon 3 (Transformational).
+- Front: What are the three Horizons in the Three Horizons framework?
+- Back: Horizon 1 (Core), Horizon 2 (Adjacent), Horizon 3 (Transformational).
 - Difficulty: 2
-- Tags: **, three-horizons
+- Tags: three-horizons
 
 **Card 5**
-- Front: ** Why did the collaboration pivot in the Case Study become unfalsifiable?
-- Back: ** The organization skipped the Strategic Bet layer, jumping directly from vision to initiatives, so no pre-defined evidence existed to judge success or failure.
+- Front: Why did the collaboration pivot in the Case Study become unfalsifiable?
+- Back: The organization skipped the Strategic Bet layer, jumping directly from vision to initiatives, so no pre-defined evidence existed to judge success or failure.
 - Difficulty: 2
-- Tags: **, case-study, strategy-cascade
+- Tags: case-study, strategy-cascade
 
 **Card 6**
-- Front: ** What risk does an all-Horizon-1 portfolio carry?
-- Back: ** Long-term stagnation, since no adjacent or transformational bets exist to sustain growth beyond the current core business.
+- Front: What risk does an all-Horizon-1 portfolio carry?
+- Back: Long-term stagnation, since no adjacent or transformational bets exist to sustain growth beyond the current core business.
 - Difficulty: 2
-- Tags: **, three-horizons
+- Tags: three-horizons
 
 **Card 7**
-- Front: ** What risk does judging Horizon 3 bets by the same near-term metrics as Horizon 1 carry?
-- Back: ** Premature cancellation of transformational bets before they have a fair chance to prove themselves.
+- Front: What risk does judging Horizon 3 bets by the same near-term metrics as Horizon 1 carry?
+- Back: Premature cancellation of transformational bets before they have a fair chance to prove themselves.
 - Difficulty: 2
-- Tags: **, three-horizons, portfolio-risk
+- Tags: three-horizons, portfolio-risk
 
 
 ## Reflection Exercise

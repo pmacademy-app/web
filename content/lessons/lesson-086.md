@@ -71,20 +71,25 @@ Surface translation has a clear, verifiable correctness standard — a sentence 
 
 ## Common Beginner Mistakes
 
-**Mistake 1: Assuming translation-level localization is sufficient for full international expansion**
+**Mistake 1: Assuming translation-level localization is sufficient for full international expansion, including underestimating the cultural adaptation layer**
+
+Most companies handle Surface-level translation reasonably well, since the tooling is mature, but treating a fully translated product as "localized" skips the deeper Cultural, Structural, and Product layers of the Adaptation Depth Model entirely. Cultural adaptation in particular has no equivalent objective checkpoint the way translation does — a color, image, or communication style can be linguistically flawless and still be culturally inappropriate, and no translation review will catch that failure because the words themselves are correct. A team that stops at Surface adaptation has addressed the layer that was already easiest, while leaving the layers most likely to determine whether the product actually succeeds in the new market untouched.
 
 **Mistake 2: Failing to research local payment method preferences before launch**
 
+Payment infrastructure varies enormously by country — some markets are dominated by mobile wallets, others by cash-on-delivery, others by bank transfers — and a product supporting only the payment methods common in its home market can find adoption blocked entirely in a new market, even when every other aspect of localization has been done well. This is a Structural-depth requirement, not a Surface one, so it is easy for a team focused on translation quality to overlook it until launch data reveals unexpectedly low conversion. Researching local payment preferences before launch, not after adoption stalls, is the difference between anticipating this friction and discovering it the expensive way.
+
 **Mistake 3: Assuming regulatory compliance in the home market transfers automatically to a new jurisdiction**
 
-**Mistake 4: Underestimating the cultural adaptation layer, treating translation as equivalent to cultural fit**
+Regulatory requirements — data residency, financial licensing, content restrictions — vary sharply by jurisdiction, so the Regulatory Surface Map established for the home market cannot simply be assumed to hold in a new one; it must be reapplied, potentially with different answers, for every country the product enters. Treating home-market compliance as a starting assumption rather than something to be independently re-verified is a Structural-depth mistake with legal, not just product, consequences. A jurisdiction that appears similar to the home market on the surface can still differ sharply in its specific regulatory requirements, and only a fresh assessment catches that.
 
-**Mistake 5: Building a single global product structure when local market dynamics genuinely require a structural variant**
+**Mistake 4: Building a single global product structure when local market dynamics genuinely require a structural variant**
 
-**Mistake 6: Mistaking early traffic and signups in a new market as validation of Structural readiness**
+Product-level adaptation, the deepest level of the Adaptation Depth Model, is required when local market dynamics genuinely demand a different product structure entirely, not merely a localized version of the same one. Teams that stop at Cultural or Structural adaptation, assuming a single global product shape can flex to fit every market with enough translation and payment support, can find that some markets simply need a different feature set or business model to actually work. Recognizing when a market has crossed from needing deeper localization into needing a genuine structural variant is itself a judgment call this lesson's model is meant to support.
+
+**Mistake 5: Mistaking early traffic and signups in a new market as validation of Structural readiness**
 
 Early engagement can reflect only the sliver of the market whose payment methods and regulatory situation happen to already be compatible with a translation-only launch, not the broader addressable market.
-
 ---
 
 
@@ -197,6 +202,7 @@ International product scaling requires distinguishing four depths of adaptation 
 ---
 
 ## Further Reading / Resources
+
 - Erin Meyer, *The Culture Map*
 - *Global Product Management* industry practitioner resources
 - World Bank published data on payment method usage by country
@@ -206,45 +212,47 @@ International product scaling requires distinguishing four depths of adaptation 
 ## Flashcards
 
 **Card 1**
-- Front: ** Why is translation insufficient for genuine international scaling?
-- Back: ** Deeper adaptation layers — cultural fit, payment methods, regulatory requirements — are invisible from a translation-only perspective and can block adoption regardless of translation quality.
+- Front: Why is translation insufficient for genuine international scaling?
+- Back: Deeper adaptation layers — cultural fit, payment methods, regulatory requirements — are invisible from a translation-only perspective and can block adoption regardless of translation quality.
 - Difficulty: 2
-- Tags: **, international-scaling
+- Tags: international-scaling
 
 **Card 2**
-- Front: ** Name the four levels of the Adaptation Depth Model.
-- Back: ** Surface, Cultural, Structural, Product.
+- Front: Name the four levels of the Adaptation Depth Model.
+- Back: Surface, Cultural, Structural, Product.
 - Difficulty: 2
-- Tags: **, adaptation-depth-model
+- Tags: adaptation-depth-model
 
 **Card 3**
-- Front: ** Why is payment method localization commonly underestimated?
-- Back: ** Payment infrastructure varies sharply by country, and a product supporting only home-market payment methods can see adoption blocked entirely in a new market.
+- Front: Why is payment method localization commonly underestimated?
+- Back: Payment infrastructure varies sharply by country, and a product supporting only home-market payment methods can see adoption blocked entirely in a new market.
 - Difficulty: 2
-- Tags: **, payment-localization
+- Tags: payment-localization
 
 **Card 4**
-- Front: ** What went wrong in the Payment Wall case study?
-- Back: ** Excellent Surface and Cultural adaptation still failed to drive conversion because the product only supported credit card payments in a market where mobile-money and cash-on-delivery dominated.
+- Front: What went wrong in the Payment Wall case study?
+- Back: Excellent Surface and Cultural adaptation still failed to drive conversion because the product only supported credit card payments in a market where mobile-money and cash-on-delivery dominated.
 - Difficulty: 2
-- Tags: **, case-study
+- Tags: case-study
 
 **Card 5**
-- Front: ** Why is Cultural adaptation harder to verify than Surface translation?
-- Back: ** Translation has an objective correctness standard, but cultural fit (color meaning, imagery, communication style) has no equivalent checkpoint — a product can be linguistically flawless and culturally tone-deaf at the same time.
+- Front: Why is Cultural adaptation harder to verify than Surface translation?
+- Back: Translation has an objective correctness standard, but cultural fit (color meaning, imagery, communication style) has no equivalent checkpoint — a product can be linguistically flawless and culturally tone-deaf at the same time.
 - Difficulty: 2
-- Tags: **, cultural-adaptation
+- Tags: cultural-adaptation
 
 **Card 6**
-- Front: ** Why did the Payment Wall team take a long time to diagnose their conversion problem?
-- Back: ** Their funnel analytics weren't broken down by payment method, so the drop-off concentrated at the payment step was masked within an otherwise strong-looking aggregate funnel.
+- Front: Why did the Payment Wall team take a long time to diagnose their conversion problem?
+- Back: Their funnel analytics weren't broken down by payment method, so the drop-off concentrated at the payment step was masked within an otherwise strong-looking aggregate funnel.
 - Difficulty: 2
-- Tags: **, case-study, analytics
+- Tags: case-study, analytics
 
 
 ## Reflection Exercise
 
 You are the PM planning expansion into a new country for a subscription-based media product.
+
+There is no single correct answer. Work through the following before reading further.
 
 1. Using the Adaptation Depth Model, what would you investigate at each of the four levels?
 2. What local payment methods would you need to research before launch?
@@ -267,6 +275,8 @@ D) All countries have identical cultural and structural requirements
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
+---
+
 **2. What are the four levels of the Adaptation Depth Model?**
 A) Concept, Prototype, Pilot, Scale
 B) Surface, Cultural, Structural, Product
@@ -277,6 +287,8 @@ D) Land, Expand, Retain, Grow
 *Explanation: The Adaptation Depth Model defines four levels — Surface, Cultural, Structural, and Product — representing increasing depths of adaptation required for international markets.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
+
+---
 
 **3. Why is payment method localization a commonly underestimated barrier?**
 A) Payment infrastructure is identical worldwide
@@ -289,6 +301,8 @@ D) Credit cards are universally dominant in every market
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
+---
+
 **4. How does regulatory variance across countries connect to Lesson 81?**
 A) It has no connection to the Regulatory Surface Map
 B) The Regulatory Surface Map must be reapplied per jurisdiction, since requirements vary by country
@@ -299,6 +313,8 @@ D) Lesson 81 only applies to a single country
 *Explanation: The Regulatory Surface Map from Lesson 81 must be reapplied per jurisdiction because regulatory requirements like data residency and licensing vary sharply by country and do not transfer automatically.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
+
+---
 
 **5. In the Payment Wall case study, what caused the low conversion rate despite strong translation and cultural adaptation?**
 A) The product was poorly translated
@@ -311,6 +327,8 @@ D) The company never launched in the new market
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
+---
+
 **6. What does "Structural" adaptation include, per the Adaptation Depth Model?**
 A) Only language translation
 B) Payment methods, regulatory compliance, and data residency requirements
@@ -321,6 +339,8 @@ D) Only pricing changes
 *Explanation: Structural adaptation encompasses payment methods, regulatory compliance, and data residency requirements — the practical infrastructure constraints that vary by jurisdiction.*
 *Learning objective tested: #2, #3*
 *Difficulty: Easy*
+
+---
 
 **7. When is a Product-level variant, the deepest adaptation level, required?**
 A) Never; translation is always sufficient
@@ -333,6 +353,8 @@ D) Only when a company has no international presence at all
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
+---
+
 **8. According to the International Expansion Readiness Checklist, what risk does skipping Payment Method Research create?**
 A) No risk; payment methods are irrelevant to adoption
 B) Adoption blocked despite strong initial interest, as in the Payment Wall case study
@@ -343,6 +365,8 @@ D) A risk only relevant to regulatory compliance, not adoption
 *Explanation: As shown in the Payment Wall case study, skipping payment method research can block adoption despite strong initial interest, making it a critical pre-launch step.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
+
+---
 
 **9. Why might early-stage international expansion reasonably stop at Surface-level translation, per the Real World Perspective section?**
 A) Surface-level translation is always sufficient regardless of stage
@@ -355,6 +379,8 @@ D) Early-stage companies are legally prohibited from deeper adaptation
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
+---
+
 **10. What do large organizations typically maintain for international products, per the Real World Perspective section?**
 A) No dedicated regional resources
 B) Dedicated regional product teams empowered to build genuine Product-level variants where needed
@@ -365,6 +391,8 @@ D) Translation teams only, with no other regional investment
 *Explanation: Big Tech companies typically maintain dedicated regional product teams empowered to build genuine Product-level variants, since single global structures cannot address all local market needs.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
+
+---
 
 **11. Why does data residency matter for international product scaling, per this lesson's connection to Lesson 82?**
 A) Data residency requirements are identical in every country
@@ -377,6 +405,8 @@ D) Data residency only applies to hardware products
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
+---
+
 **12. (Scenario) A company launches in a new market with excellent translation but has not researched local payment preferences. What risk does this represent?**
 A) No risk, since translation quality is the only relevant factor
 B) A potential Structural-depth gap that could block adoption regardless of translation quality
@@ -387,6 +417,8 @@ D) No risk, since payment preferences are identical worldwide
 *Explanation: This is a Structural-depth gap — payment method preferences vary independently of translation quality and can block adoption even when every other localization aspect is well executed.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
+
+---
 
 **13. (Product Thinking) A team assumes success in three prior markets means a fourth market will work identically with only translation. What is the strongest response?**
 A) Agree, since prior success guarantees future success
@@ -399,6 +431,8 @@ D) Assume the fourth market requires a Product-level variant with no further res
 *Learning objective tested: #1, #2, #3, #5*
 *Difficulty: Hard*
 
+---
+
 **14. (Interview Reasoning) A candidate, asked how they'd launch in a new country, describes only translation and marketing localization. What does this signal?**
 A) A strong and complete understanding of international expansion
 B) A gap in recognizing Structural and Product-level adaptation requirements
@@ -409,6 +443,8 @@ D) Nothing meaningful; translation is the only relevant consideration
 *Explanation: Focusing only on translation and cultural fit signals a gap in recognizing Structural-depth requirements like payments and regulation, which are critical for genuine international adoption.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Hard*
+
+---
 
 **15. (Product Thinking, Highest Difficulty) A company plans to expand into a new market with excellent Surface and Cultural adaptation already prepared, but has not investigated local payment methods, regulatory requirements, or whether the market requires a different product structure. Using only this lesson's frameworks, what is the most defensible next step?**
 A) Launch as planned, trusting that Surface and Cultural readiness is sufficient

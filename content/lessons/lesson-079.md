@@ -219,46 +219,46 @@ Defaulting to a direct price discount as the first response to enterprise negoti
 ## Flashcards
 
 **Card 1**
-- Front: ** Why is a direct price discount often a poor negotiation trade?
-- Back: ** It establishes a new baseline expectation for future renewals and can become a credible anchor other customers use in their own negotiations, compounding its cost over time.
+- Front: Why is a direct price discount often a poor negotiation trade?
+- Back: It establishes a new baseline expectation for future renewals and can become a credible anchor other customers use in their own negotiations, compounding its cost over time.
 - Difficulty: 2
-- Tags: **, pricing-strategy, core-concept
+- Tags: pricing-strategy, core-concept
 
 **Card 2**
-- Front: ** What are the two dimensions of the Concession Exchange Map?
-- Back: ** Vendor cost and customer value.
+- Front: What are the two dimensions of the Concession Exchange Map?
+- Back: Vendor cost and customer value.
 - Difficulty: 2
-- Tags: **, concession-exchange-map
+- Tags: concession-exchange-map
 
 **Card 3**
-- Front: ** Name two examples of low-vendor-cost, high-customer-value concessions.
-- Back: ** Extended payment terms (e.g., net-60 or net-90) and flexible contract start dates aligned to the customer's fiscal year.
+- Front: Name two examples of low-vendor-cost, high-customer-value concessions.
+- Back: Extended payment terms (e.g., net-60 or net-90) and flexible contract start dates aligned to the customer's fiscal year.
 - Difficulty: 2
-- Tags: **, non-price-levers
+- Tags: non-price-levers
 
 **Card 4**
-- Front: ** Why might a customer's stated concern about "cost" actually be about something else?
-- Back: ** The underlying issue might be cash flow timing, contract risk, or implementation confidence rather than headline price itself, addressable through a non-price lever.
+- Front: Why might a customer's stated concern about "cost" actually be about something else?
+- Back: The underlying issue might be cash flow timing, contract risk, or implementation confidence rather than headline price itself, addressable through a non-price lever.
 - Difficulty: 2
-- Tags: **, underlying-concern
+- Tags: underlying-concern
 
 **Card 5**
-- Front: ** What went wrong in the Discount That Became the Floor case study?
-- Back: ** A large, precedent-setting price discount was granted to close a strategically significant deal without exploring non-price alternatives, and it became an expected baseline for renewals and other customers' negotiations.
+- Front: What went wrong in the Discount That Became the Floor case study?
+- Back: A large, precedent-setting price discount was granted to close a strategically significant deal without exploring non-price alternatives, and it became an expected baseline for renewals and other customers' negotiations.
 - Difficulty: 2
-- Tags: **, case-study, precedent-cost
+- Tags: case-study, precedent-cost
 
 **Card 6**
-- Front: ** Why should concessions be matched to the specific stakeholder motivating the request?
-- Back: ** A concession satisfying the Economic Buyer's concern may not address a Technical Evaluator's separate concern, per the Stakeholder Compass from Lesson 73, leaving the actual objection unresolved.
+- Front: Why should concessions be matched to the specific stakeholder motivating the request?
+- Back: A concession satisfying the Economic Buyer's concern may not address a Technical Evaluator's separate concern, per the Stakeholder Compass from Lesson 73, leaving the actual objection unresolved.
 - Difficulty: 2
-- Tags: **, stakeholder-matched-concessions
+- Tags: stakeholder-matched-concessions
 
 **Card 7**
-- Front: ** Why should precedent risk be explicitly documented before granting a significant concession?
-- Back: ** Because the compounding cost of a concession is easy to overlook in the moment, given the immediate pressure to close the specific deal in front of the negotiator.
+- Front: Why should precedent risk be explicitly documented before granting a significant concession?
+- Back: Because the compounding cost of a concession is easy to overlook in the moment, given the immediate pressure to close the specific deal in front of the negotiator.
 - Difficulty: 2
-- Tags: **, precedent-documentation
+- Tags: precedent-documentation
 
 
 ## Reflection Exercise

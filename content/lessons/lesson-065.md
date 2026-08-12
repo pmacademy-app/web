@@ -229,46 +229,46 @@ A model can be technically excellent and still be the wrong model for a product'
 ## Flashcards
 
 **Card 1**
-- Front: ** Why can a technically excellent model still be wrong for a product?
-- Back: ** Its optimization target is a proxy for the real business outcome, and proxies can diverge from that outcome in ways invisible during model development.
+- Front: Why can a technically excellent model still be wrong for a product?
+- Back: Its optimization target is a proxy for the real business outcome, and proxies can diverge from that outcome in ways invisible during model development.
 - Difficulty: 2
-- Tags: **, model-collaboration, core-concept
+- Tags: model-collaboration, core-concept
 
 **Card 2**
-- Front: ** Name the four zones of the Ownership Zones Model.
-- Back: ** Problem Framing (PM), Model Development (Data Science), Output Interpretation (Shared), Product Decision and Deployment (PM).
+- Front: Name the four zones of the Ownership Zones Model.
+- Back: Problem Framing (PM), Model Development (Data Science), Output Interpretation (Shared), Product Decision and Deployment (PM).
 - Difficulty: 2
-- Tags: **, ownership-zones
+- Tags: ownership-zones
 
 **Card 3**
-- Front: ** Why is the precision/recall trade-off a product decision, not a purely technical one?
-- Back: ** It depends on the relative business cost of false positives versus false negatives, information only the PM typically has.
+- Front: Why is the precision/recall trade-off a product decision, not a purely technical one?
+- Back: It depends on the relative business cost of false positives versus false negatives, information only the PM typically has.
 - Difficulty: 2
-- Tags: **, precision-recall
+- Tags: precision-recall
 
 **Card 4**
-- Front: ** What is the base-rate problem, as illustrated by the churn example?
-- Back: ** When the positive class (e.g., churners) is rare, a model that simply predicts "no one churns" can still score high on accuracy, making accuracy alone misleading.
+- Front: What is the base-rate problem, as illustrated by the churn example?
+- Back: When the positive class (e.g., churners) is rare, a model that simply predicts "no one churns" can still score high on accuracy, making accuracy alone misleading.
 - Difficulty: 2
-- Tags: **, base-rate
+- Tags: base-rate
 
 **Card 5**
-- Front: ** What went wrong in the Overzealous Churn Model case study?
-- Back: ** The model was framed as recall-oriented without quantifying customer success's real outreach capacity, producing more false positives than the team could handle.
+- Front: What went wrong in the Overzealous Churn Model case study?
+- Back: The model was framed as recall-oriented without quantifying customer success's real outreach capacity, producing more false positives than the team could handle.
 - Difficulty: 2
-- Tags: **, case-study, ownership-zones
+- Tags: case-study, ownership-zones
 
 **Card 6**
-- Front: ** What must a PM supply before model development begins, per the Collaboration Checklist?
-- Back: ** The business decision the model informs, relative error costs, capacity constraints of downstream teams, and a minimum acceptable performance threshold.
+- Front: What must a PM supply before model development begins, per the Collaboration Checklist?
+- Back: The business decision the model informs, relative error costs, capacity constraints of downstream teams, and a minimum acceptable performance threshold.
 - Difficulty: 2
-- Tags: **, collaboration-checklist
+- Tags: collaboration-checklist
 
 **Card 7**
-- Front: ** Why shouldn't a model's probabilistic output be treated as a fact?
-- Back: ** A "churn probability of 0.7" is an estimate requiring interpretation (Zone 3), not equivalent to certainty that the customer will churn.
+- Front: Why shouldn't a model's probabilistic output be treated as a fact?
+- Back: A "churn probability of 0.7" is an estimate requiring interpretation (Zone 3), not equivalent to certainty that the customer will churn.
 - Difficulty: 2
-- Tags: **, interpretation
+- Tags: interpretation
 
 
 ## Reflection Exercise
