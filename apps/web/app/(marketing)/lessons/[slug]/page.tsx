@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { fetchCompiledLesson, fetchCurriculumData, resolveSlugToId } from '@/lib/lesson-loader'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { BRAND } from '@/lib/brand'
+import { getLessonSchema, getBreadcrumbSchema } from '@/lib/schema'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -116,27 +117,18 @@ export default async function PublicLessonPage({ params }: PageProps) {
   const prevLesson = globalIdx > 0 ? curriculum?.lessons[globalIdx - 1] : null
   const nextLesson = globalIdx >= 0 && globalIdx < (curriculum?.lessons.length ?? 0) - 1 ? curriculum?.lessons[globalIdx + 1] : null
 
-  // LearningResource JSON-LD Schema
+  // Structured Data (LearningResource & BreadcrumbList)
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    name: `Lesson ${globalOrder}: ${lesson.title}`,
-    description: `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} — Module: ${formatModuleName(lesson.module)}.`,
-    learningResourceType: 'Lesson',
-    educationalLevel: 'Intermediate',
-    url: `${siteUrl}/lessons/${slug}`,
-    isPartOf: {
-      '@type': 'Course',
-      name: 'Prodily PM Academy Product Management Curriculum',
-      url: `${siteUrl}/curriculum`,
-      provider: {
-        '@type': 'Organization',
-        name: BRAND.fullName,
-        sameAs: siteUrl,
-      },
-    },
-  }
+  const moduleTitle = formatModuleName(lesson.module)
+  const lessonSchema = getLessonSchema(lesson, globalOrder, slug)
+
+  const breadcrumbItems = [
+    { name: 'Home', url: siteUrl },
+    { name: 'Curriculum', url: `${siteUrl}/curriculum` },
+    { name: moduleTitle, url: `${siteUrl}/curriculum#module-${lesson.module}` },
+    { name: `Lesson ${globalOrder}`, url: `${siteUrl}/lessons/${slug}` },
+  ]
+  const breadcrumbSchema = getBreadcrumbSchema(breadcrumbItems)
 
   // Slice first 8 theory-related blocks to construct a preview
   const previewBlocks = lesson.blocks
@@ -147,19 +139,55 @@ export default async function PublicLessonPage({ params }: PageProps) {
     <article className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-4xl space-y-8">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(lessonSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
       <div className="space-y-4">
+        {/* Visible Breadcrumbs */}
+        <nav aria-label="Breadcrumb" className="mb-2">
+          <ol className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            <li>
+              <Link href="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+            </li>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" aria-hidden="true" />
+            <li>
+              <Link href="/curriculum" className="hover:text-primary transition-colors">
+                Curriculum
+              </Link>
+            </li>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" aria-hidden="true" />
+            <li>
+              <Link
+                href={`/curriculum#module-${lesson.module}`}
+                className="hover:text-primary transition-colors"
+              >
+                {moduleTitle}
+              </Link>
+            </li>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" aria-hidden="true" />
+            <li>
+              <span className="font-semibold text-foreground" aria-current="page">
+                Lesson {globalOrder}
+              </span>
+            </li>
+          </ol>
+        </nav>
+
         <Link
           href="/curriculum"
-          className="inline-flex items-center gap-2 px-3.5 py-2.5 -ml-3.5 min-h-[44px] rounded-lg text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+          className="inline-flex items-center gap-2 px-3 py-1.5 -ml-3 min-h-[36px] rounded-lg text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Curriculum</span>
         </Link>
-        <div className="flex flex-wrap items-center gap-3 pt-2 text-sm text-muted-foreground">
-          <span className="font-semibold text-primary">Module: {formatModuleName(lesson.module)}</span>
+        <div className="flex flex-wrap items-center gap-3 pt-1 text-sm text-muted-foreground">
+          <span className="font-semibold text-primary">Module: {moduleTitle}</span>
           <span>•</span>
           <span>Lesson {globalOrder}</span>
           <span>•</span>

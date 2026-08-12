@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
+import { getAboutPageSchema } from '@/lib/schema'
 import { CheckCircle2, ArrowRight } from 'lucide-react'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
@@ -32,8 +33,14 @@ export const metadata: Metadata = {
 }
 
 export default function AboutPage() {
+  const aboutSchema = getAboutPageSchema()
+
   return (
     <div className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-4xl space-y-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}
+      />
       <div className="text-center space-y-4 max-w-2xl mx-auto">
         <span className="text-xs font-bold uppercase tracking-wider text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
           Our Mission &amp; Philosophy

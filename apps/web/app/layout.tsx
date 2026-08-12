@@ -112,25 +112,14 @@ const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID
 
 // ─── JSON-LD Structured Data ──────────────────────────────────────────────────
 
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: BRAND.fullName,
-  url: siteUrl,
-  description: 'A free Product Management learning platform with structured lessons, skill analytics, and portfolio projects.',
-}
-
-const websiteJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: BRAND.fullName,
-  url: siteUrl,
-  description: 'Learn Product Management free. 90 lessons, 9 modules, portfolio-ready capstones.',
-}
+import { getEducationalOrganizationSchema, getWebSiteSchema } from '@/lib/schema'
 
 // ─── Root Layout ──────────────────────────────────────────────────────────────
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const orgSchema = getEducationalOrganizationSchema()
+  const siteSchema = getWebSiteSchema()
+
   return (
     <html
       lang="en"
@@ -140,11 +129,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
         />
       </head>
       <body>
