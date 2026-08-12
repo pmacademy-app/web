@@ -221,46 +221,46 @@ B2B purchasing decisions of meaningful size typically involve multiple distinct 
 ## Flashcards
 
 **Card 1**
-- Front: ** Why do B2B purchasing decisions typically involve multiple stakeholder roles, unlike consumer purchases?
-- Back: ** In B2B, the functions of using, deciding, and paying for a product are frequently distributed across different people with different incentives, unlike a consumer purchase where one person fulfills all roles.
+- Front: Why do B2B purchasing decisions typically involve multiple stakeholder roles, unlike consumer purchases?
+- Back: In B2B, the functions of using, deciding, and paying for a product are frequently distributed across different people with different incentives, unlike a consumer purchase where one person fulfills all roles.
 - Difficulty: 2
-- Tags: **, stakeholder-compass, core-concept
+- Tags: stakeholder-compass, core-concept
 
 **Card 2**
-- Front: ** Name the four roles of the Stakeholder Compass.
-- Back: ** Champion, Economic Buyer, Technical Evaluator, End User.
+- Front: Name the four roles of the Stakeholder Compass.
+- Back: Champion, Economic Buyer, Technical Evaluator, End User.
 - Difficulty: 2
-- Tags: **, stakeholder-compass
+- Tags: stakeholder-compass
 
 **Card 3**
-- Front: ** What is the Champion-Without-Authority Trap?
-- Back: ** Over-relying on a genuinely enthusiastic Champion's account of deal progress without directly engaging the Economic Buyer or Technical Evaluator, who hold actual approval authority.
+- Front: What is the Champion-Without-Authority Trap?
+- Back: Over-relying on a genuinely enthusiastic Champion's account of deal progress without directly engaging the Economic Buyer or Technical Evaluator, who hold actual approval authority.
 - Difficulty: 2
-- Tags: **, champion-trap
+- Tags: champion-trap
 
 **Card 4**
-- Front: ** What does the Economic Buyer primarily evaluate a purchase on?
-- Back: ** Return on investment and total cost relative to alternatives, often with limited firsthand exposure to the product itself.
+- Front: What does the Economic Buyer primarily evaluate a purchase on?
+- Back: Return on investment and total cost relative to alternatives, often with limited firsthand exposure to the product itself.
 - Difficulty: 2
-- Tags: **, economic-buyer
+- Tags: economic-buyer
 
 **Card 5**
-- Front: ** Why did the Champion Who Couldn't Deliver case study's deal ultimately stall?
-- Back: ** The startup invested exclusively in the enthusiastic Champion, never directly engaging the Economic Buyer (who controlled budget) or the Technical Evaluator (who required security review), both of whom held actual approval authority.
+- Front: Why did the Champion Who Couldn't Deliver case study's deal ultimately stall?
+- Back: The startup invested exclusively in the enthusiastic Champion, never directly engaging the Economic Buyer (who controlled budget) or the Technical Evaluator (who required security review), both of whom held actual approval authority.
 - Difficulty: 2
-- Tags: **, case-study, champion-trap
+- Tags: case-study, champion-trap
 
 **Card 6**
-- Front: ** Why should the Technical Evaluator be engaged early rather than late in a B2B sales process?
-- Back: ** Given their veto-level authority, late engagement risks a costly, momentum-killing stall at exactly the point a deal seemed closest to completion.
+- Front: Why should the Technical Evaluator be engaged early rather than late in a B2B sales process?
+- Back: Given their veto-level authority, late engagement risks a costly, momentum-killing stall at exactly the point a deal seemed closest to completion.
 - Difficulty: 2
-- Tags: **, technical-evaluator
+- Tags: technical-evaluator
 
 **Card 7**
-- Front: ** Why might a single person occupy multiple Stakeholder Compass roles simultaneously?
-- Back: ** In smaller organizations, one person (e.g., a small business owner) may be Economic Buyer, Technical Evaluator, and End User all at once.
+- Front: Why might a single person occupy multiple Stakeholder Compass roles simultaneously?
+- Back: In smaller organizations, one person (e.g., a small business owner) may be Economic Buyer, Technical Evaluator, and End User all at once.
 - Difficulty: 2
-- Tags: **, stakeholder-compass-scale
+- Tags: stakeholder-compass-scale
 
 
 ## Reflection Exercise

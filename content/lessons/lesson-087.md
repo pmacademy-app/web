@@ -77,16 +77,23 @@ A crisis response that skips the Detect and Triage step, jumping directly to eit
 
 **Mistake 1: Treating communication as secondary to technical resolution rather than a parallel priority**
 
+A PM who treats communication as secondary implicitly assumes users will simply wait patiently while engineering works, but users have no direct visibility into a company's internal effort — only into its outward behavior. A company working intensely behind the scenes but saying nothing outwardly is, from the user's vantage point, functionally indistinguishable from a company that isn't working on the problem at all. The Crisis Response Timeline's Contain-and-Communicate step is explicitly parallel, not sequential, precisely because silence during a visible failure compounds the longer it persists.
+
 **Mistake 2: Providing an overconfident resolution timeline before the cause is actually understood**
 
-**Mistake 3: Remaining silent until the incident is fully resolved, rather than acknowledging it early**
+Offering a confident resolution timeline in an effort to reassure users quickly, before the actual cause is understood, feels helpful in the moment but frequently backfires: crisis timelines are commonly missed under real uncertainty, and a broken promise damages trust more than an honest "we don't yet have a firm timeline" would have. This mirrors the Promise Tiers discipline from Lesson 62 directly — an unfulfillable commitment is worse than no committed timeline at all. A PM under pressure to say something reassuring should resist the urge to commit to a specific time before the team genuinely knows enough to keep that commitment.
+
+**Mistake 3: Remaining silent until the incident is fully resolved, overlooking calm, honest, symptom-level acknowledgment as a middle option between alarming speculation and total silence**
+
+Some PMs default to silence during an unresolved incident, reasoning that saying anything before the cause is known would either alarm users or amount to speculation. This overlooks a third option: a calm, honest, symptom-level acknowledgment — "we are aware of the issue and are investigating" — that requires no speculation about cause or timeline but still meaningfully reduces the trust damage of visible silence. Acknowledgment alone, even without answers, is what the Contain-and-Communicate step calls for; withholding it until full resolution treats users as an audience to be managed rather than a group with a legitimate right to know something is being done.
 
 **Mistake 4: Skipping a public post-incident report, missing an opportunity to demonstrate genuine accountability**
 
+A public post-incident report — explaining what happened, its impact, and concrete preventive changes — demonstrates real ownership rather than a quiet, unexplained return to normal operation. Skipping this step because the incident is technically resolved treats resolution as the finish line, when the trust rebuilt through transparent accountability is often what determines whether users' confidence actually recovers. This is the same accountability discipline this curriculum has applied to periodic reassessment and appeals processes elsewhere, now applied to the aftermath of a crisis specifically.
+
 **Mistake 5: Failing to distinguish, in communication, between what is known, what is suspected, and what is still unknown**
 
-**Mistake 6: Believing the only choice is between alarming speculation and total silence, overlooking calm, honest, symptom-level acknowledgment as a third option**
-
+Crisis communication that blurs known facts, working hypotheses, and genuine unknowns into one undifferentiated update can either overstate the team's actual confidence or understate real progress, and either error erodes credibility once contradicted by events. Clearly separating these three categories in every update, even when the honest answer for a given point is "still unknown," lets users calibrate their own expectations accurately rather than reading more certainty into a message than the team actually has. This distinction becomes especially important the longer an incident runs, since early updates often shift from suspected causes to confirmed ones as the team's understanding evolves.
 ---
 
 
@@ -196,6 +203,7 @@ Crisis response requires treating communication and technical containment as par
 ---
 
 ## Further Reading / Resources
+
 - Betsy Beyer, Chris Jones, Jennifer Petoff, and Niall Richard Murphy, *Site Reliability Engineering*
 - Published postmortem archives from major cloud infrastructure providers
 - Atul Gawande, *The Checklist Manifesto*
@@ -205,45 +213,47 @@ Crisis response requires treating communication and technical containment as par
 ## Flashcards
 
 **Card 1**
-- Front: ** Why must communication and containment proceed in parallel during a crisis?
-- Back: ** Silence during a visible failure compounds user anxiety and trust erosion, so acknowledgment shouldn't wait for full technical resolution.
+- Front: Why must communication and containment proceed in parallel during a crisis?
+- Back: Silence during a visible failure compounds user anxiety and trust erosion, so acknowledgment shouldn't wait for full technical resolution.
 - Difficulty: 2
-- Tags: **, crisis-management
+- Tags: crisis-management
 
 **Card 2**
-- Front: ** What are the four phases of the Crisis Response Timeline?
-- Back: ** Detect and Triage, Contain and Communicate (in parallel), Resolve, Postmortem and Prevent.
+- Front: What are the four phases of the Crisis Response Timeline?
+- Back: Detect and Triage, Contain and Communicate (in parallel), Resolve, Postmortem and Prevent.
 - Difficulty: 2
-- Tags: **, crisis-response-timeline
+- Tags: crisis-response-timeline
 
 **Card 3**
-- Front: ** Why is providing an overconfident resolution timeline risky during a crisis?
-- Back: ** If missed, it creates a second, avoidable broken promise on top of the original incident, echoing the Promise Tiers discipline from Lesson 62.
+- Front: Why is providing an overconfident resolution timeline risky during a crisis?
+- Back: If missed, it creates a second, avoidable broken promise on top of the original incident, echoing the Promise Tiers discipline from Lesson 62.
 - Difficulty: 2
-- Tags: **, overpromising
+- Tags: overpromising
 
 **Card 4**
-- Front: ** What went wrong in the Silent Outage case study?
-- Back: ** Communication was delayed for hours while engineering investigated, and the eventual update gave an overconfident timeline that was subsequently missed.
+- Front: What went wrong in the Silent Outage case study?
+- Back: Communication was delayed for hours while engineering investigated, and the eventual update gave an overconfident timeline that was subsequently missed.
 - Difficulty: 2
-- Tags: **, case-study
+- Tags: case-study
 
 **Card 5**
-- Front: ** Why does severity classification need to happen before communication and technical fixing begin in earnest?
-- Back: ** Without it, a team can under-communicate a genuinely serious incident or over-communicate a minor one, and severity also determines who needs to be involved (legal, security, executives) from the outset.
+- Front: Why does severity classification need to happen before communication and technical fixing begin in earnest?
+- Back: Without it, a team can under-communicate a genuinely serious incident or over-communicate a minor one, and severity also determines who needs to be involved (legal, security, executives) from the outset.
 - Difficulty: 2
-- Tags: **, severity-classification
+- Tags: severity-classification
 
 **Card 6**
-- Front: ** What is a "narrative vacuum" and why does it matter in crisis communication?
-- Back: ** The gap left by silence during a visible incident — affected users and observers will fill it with their own assumptions, usually worse than reality, before an official explanation arrives.
+- Front: What is a "narrative vacuum" and why does it matter in crisis communication?
+- Back: The gap left by silence during a visible incident — affected users and observers will fill it with their own assumptions, usually worse than reality, before an official explanation arrives.
 - Difficulty: 2
-- Tags: **, crisis-management, trust
+- Tags: crisis-management, trust
 
 
 ## Reflection Exercise
 
 You are the PM on call when a major service disruption begins, and the root cause is not yet known.
+
+There is no single correct answer. Work through the following before reading further.
 
 1. What would your first communication to affected users say, given you don't yet know the cause?
 2. How would you balance supporting the engineering team's containment work with your communication responsibilities?
@@ -266,6 +276,8 @@ D) Containment is always faster when communication is delayed
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
+---
+
 **2. What are the four phases of the Crisis Response Timeline?**
 A) Ship, Iterate, Measure, Learn
 B) Detect and Triage, Contain and Communicate, Resolve, Postmortem and Prevent
@@ -276,6 +288,8 @@ D) Collection, Storage, Processing, Sharing
 *Explanation: The four phases — Detect and Triage, Contain and Communicate, Resolve, and Postmortem and Prevent — form the structured Crisis Response Timeline introduced in the Theory section.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
+
+---
 
 **3. Why is providing an overconfident resolution timeline risky?**
 A) Timelines are always accurate regardless of crisis conditions
@@ -288,6 +302,8 @@ D) There is no risk to providing a timeline early
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
+---
+
 **4. What is the value of a public post-incident transparency report?**
 A) It has no real value beyond internal record-keeping
 B) It demonstrates genuine accountability and can help rebuild user trust
@@ -298,6 +314,8 @@ D) It should never be shared publicly under any circumstances
 *Explanation: A public post-incident transparency report demonstrates genuine accountability and can help rebuild user trust after a crisis.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
+
+---
 
 **5. In the Silent Outage case study, what was the first mistake made?**
 A) Engineering began investigating too quickly
@@ -310,6 +328,8 @@ D) The company never experienced any outage at all
 *Learning objective tested: #1, #5*
 *Difficulty: Easy*
 
+---
+
 **6. What was the second mistake in the Silent Outage case study?**
 A) The eventual update was too vague
 B) The eventual update gave an overconfident, specific resolution timeline that was subsequently missed
@@ -320,6 +340,8 @@ D) The outage was resolved too quickly
 *Explanation: The eventual update gave an overconfident, specific resolution timeline that was subsequently missed, creating a second broken promise.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
+
+---
 
 **7. According to the Incident Communication Checklist, what risk does skipping Rapid Acknowledgment create?**
 A) No risk; delayed acknowledgment is always preferable
@@ -332,6 +354,8 @@ D) A risk only relevant to regulatory compliance
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
+---
+
 **8. Why should communication distinguish known facts from ongoing investigation?**
 A) This distinction is legally required in all jurisdictions
 B) Honest uncertainty avoids the overpromising trap that creates a second broken promise
@@ -342,6 +366,8 @@ D) Users never actually care about this distinction
 *Explanation: Honest uncertainty avoids the overpromising trap that creates a second broken promise, distinguishing known facts from ongoing investigation.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
+
+---
 
 **9. Why might early-stage companies lack a formal incident response process, per the Real World Perspective section?**
 A) Incident response is legally required only for large companies
@@ -354,6 +380,8 @@ D) Formal processes are always unnecessary regardless of company size
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
+---
+
 **10. What do large organizations typically maintain for incident response, per the Real World Perspective section?**
 A) No formal process at all
 B) Dedicated incident response teams with formal severity classification and pre-approved communication templates
@@ -364,6 +392,8 @@ D) Communication only after a postmortem is complete
 *Explanation: Large organizations typically maintain dedicated incident response teams with formal severity classification and pre-approved communication templates.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
+
+---
 
 **11. How does the Crisis Response Timeline's communication discipline connect to Lesson 62's Promise Tiers?**
 A) There is no meaningful connection
@@ -376,6 +406,8 @@ D) Crisis communication is entirely unrelated to trust considerations
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
+---
+
 **12. (Scenario) A company's engineering team is investigating a major outage but has no confirmed root cause after one hour. What should the company's communication do?**
 A) Remain silent until the root cause is fully understood
 B) Acknowledge the issue honestly, without committing to a specific resolution timeline they aren't confident in
@@ -386,6 +418,8 @@ D) Wait until the postmortem to communicate anything at all
 *Explanation: Acknowledging the issue honestly without committing to an unconfirmed timeline follows the parallel communication and containment principle.*
 *Learning objective tested: #1, #3, #5*
 *Difficulty: Medium-Hard*
+
+---
 
 **13. (Product Thinking) A team wants to delay any communication until they're "certain" about the root cause. What is the strongest response?**
 A) Agree, since certainty should always precede communication
@@ -398,6 +432,8 @@ D) Skip communication and proceed directly to the postmortem
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
+---
+
 **14. (Interview Reasoning) A candidate, asked how they'd handle a major outage, describes focusing entirely on engineering support with no mention of parallel communication. What does this signal?**
 A) A strong and complete understanding of crisis management
 B) A gap in recognizing that communication must run in parallel with containment
@@ -408,6 +444,8 @@ D) Nothing meaningful; engineering support is the only relevant consideration
 *Explanation: A gap in recognizing that communication must run in parallel with containment — focusing only on engineering support misses the trust erosion caused by silence.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
+
+---
 
 **15. (Product Thinking, Highest Difficulty) A major outage is underway with no confirmed root cause, and leadership wants to reassure customers with a specific resolution timeline. Using only this lesson's frameworks, what is the most defensible response?**
 A) Provide the specific timeline leadership wants, prioritizing quick reassurance

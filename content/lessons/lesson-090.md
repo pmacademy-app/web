@@ -70,14 +70,23 @@ Lesson 60 asked you to articulate what a PM is accountable for. If Modules 7 thr
 
 **Mistake 1: Treating this capstone as a request for one more new framework rather than an integration exercise**
 
+Every synthesis lesson in this curriculum — Lesson 60, Lesson 70, Lesson 80 — has followed the same principle: at the close of a body of material, the highest-value work is not learning one more thing, but recognizing how everything already learned fits together. Arriving at this final lesson expecting a tenth headline framework, on top of the roughly nineteen introduced across Lessons 61 through 89, repeats the exact mistake Lesson 70 warned against at the Module 7 boundary: mistaking addition for integration. The Integrated Practice Wheel is deliberately not one more model to memorize — it is a map of how the existing ones relate.
+
 **Mistake 2: Applying only the ring of the Wheel you're most comfortable with — mechanism, direction, or domain — to a problem that actually spans two or three**
+
+The Platform Health Radar diagnoses mechanism, the Strategic Judgment Radar diagnoses direction, and Module 9's domain lenses diagnose context — and a skilled PM moves fluidly among all three rather than defaulting to whichever one they happen to feel most comfortable in. A PM who is naturally strong on strategic judgment, for instance, can reflexively reach for the Strategic Judgment Radar even when a problem's actual bottleneck is a mechanism-level issue, like an unstable developer surface, that the Platform Health Radar was built to catch. Real situations rarely announce which ring they belong to in advance; recognizing which ring, or combination of rings, actually applies is itself part of the judgment this curriculum has been building toward.
 
 **Mistake 3: Discarding your Lesson 60 philosophy as "too simple" rather than recognizing it as the durable core the rest of the curriculum was meant to specify, not replace**
 
+Lesson 60 asked you to articulate what a PM is accountable for, in relatively simple terms. After thirty additional lessons of platform ecosystems, multi-year strategic bets, regulatory liability, and AI reliability, that original articulation can feel almost naively basic by comparison — but the goal was never to replace it with something more sophisticated-sounding. A philosophy that hasn't had to bend at all across this material was probably too vague to begin with, but a philosophy that bent so much it lost its original shape probably wasn't anchored in anything durable; the right outcome is the same core commitments from Lesson 60, now specified concretely enough to survive contact with real, hard situations.
+
 **Mistake 4: Treating the nineteen mental models from Lessons 61–89 as a list to recite rather than a set of tools to select from deliberately**
+
+Nineteen named models, each covered in its own dedicated lesson, can easily calcify into a mental inventory a PM feels obligated to run through in order, rather than a toolkit to select from based on which model actually diagnoses the situation in front of them. This is precisely the failure mode the Integrated Practice Wheel is designed to prevent: it groups the models by what level of a situation they diagnose — mechanism, direction, or context — specifically so a PM can ask "which ring does this problem live in" instead of mentally scrolling through nineteen names looking for a match. A model recited without being selected for the actual situation is trivia, not judgment.
 
 **Mistake 5: Assuming mastery of this curriculum means having memorized every model, rather than having built the judgment to know which few actually matter for the situation in front of you**
 
+The temptation, at the end of a ninety-lesson curriculum, is to treat completion as having "collected" every framework and to measure mastery by how many can be recited on demand. The actual goal, restated at every synthesis point in this curriculum, has been judgment — the ability to look at a real, messy situation and know which two or three of these many tools actually apply, rather than being able to list all of them. A PM who can recite every model but freezes when asked which one fits the situation in front of them has learned the curriculum's vocabulary without learning its point.
 ---
 
 
@@ -180,6 +189,7 @@ This curriculum's ninety lessons have built roughly two dozen named mental model
 ---
 
 ## Further Reading / Resources
+
 - Marty Cagan, *Inspired*
 - Clayton Christensen, *The Innovator's Dilemma*
 - Donella Meadows, *Thinking in Systems*
@@ -189,28 +199,28 @@ This curriculum's ninety lessons have built roughly two dozen named mental model
 ## Flashcards
 
 **Card 1**
-- Front: ** What does this final lesson add to the curriculum's roster of mental models?
-- Back: ** No new diagnostic model — it integrates everything already built into the Integrated Practice Wheel.
+- Front: What does this final lesson add to the curriculum's roster of mental models?
+- Back: No new diagnostic model — it integrates everything already built into the Integrated Practice Wheel.
 - Difficulty: 2
-- Tags: **, capstone
+- Tags: capstone
 
 **Card 2**
-- Front: ** What are the three outer rings of the Integrated Practice Wheel?
-- Back: ** The Platform Health Radar (mechanism), the Strategic Judgment Radar (direction), and Module 9's specialized domain lenses (context).
+- Front: What are the three outer rings of the Integrated Practice Wheel?
+- Back: The Platform Health Radar (mechanism), the Strategic Judgment Radar (direction), and Module 9's specialized domain lenses (context).
 - Difficulty: 2
-- Tags: **, integrated-practice-wheel
+- Tags: integrated-practice-wheel
 
 **Card 3**
-- Front: ** What sits at the center of the Integrated Practice Wheel?
-- Back: ** The personal product philosophy first articulated in Lesson 60.
+- Front: What sits at the center of the Integrated Practice Wheel?
+- Back: The personal product philosophy first articulated in Lesson 60.
 - Difficulty: 2
-- Tags: **, integrated-practice-wheel
+- Tags: integrated-practice-wheel
 
 **Card 4**
-- Front: ** What did the Full-Spectrum Incident case study require diagnostically?
-- Back: ** Crisis communication (Lesson 87), AI reliability and fairness diagnosis (Lessons 84–85), regulatory compliance (Lesson 81), and international adaptation review (Lesson 86) — simultaneously.
+- Front: What did the Full-Spectrum Incident case study require diagnostically?
+- Back: Crisis communication (Lesson 87), AI reliability and fairness diagnosis (Lessons 84–85), regulatory compliance (Lesson 81), and international adaptation review (Lesson 86) — simultaneously.
 - Difficulty: 2
-- Tags: **, case-study
+- Tags: case-study
 
 
 ## Reflection Exercise
@@ -238,6 +248,8 @@ D) Memorize every model's name in alphabetical order
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
+---
+
 **2. What are the three outer rings of the Integrated Practice Wheel?**
 A) Vision, Strategy, Execution
 B) Platform Health Radar, Strategic Judgment Radar, Module 9's specialized domain lenses
@@ -248,6 +260,8 @@ D) Concept, Prototype, Scale
 *Explanation: The three outer rings are the Platform Health Radar, Strategic Judgment Radar, and Module 9's specialized domain lenses.*
 *Learning objective tested: #1, #2*
 *Difficulty: Easy*
+
+---
 
 **3. What sits at the center of the Integrated Practice Wheel?**
 A) The Strategy Cascade from Lesson 71
@@ -260,6 +274,8 @@ D) The Concession Exchange Map from Lesson 79
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
+---
+
 **4. What does the Platform Health Radar diagnose, per the Integrated Practice Wheel?**
 A) Strategic direction
 B) Mechanism — whether a platform's underlying systems are healthy
@@ -270,6 +286,8 @@ D) Personal accountability exclusively
 *Explanation: The Platform Health Radar diagnoses mechanism — whether a platform's underlying systems are healthy.*
 *Learning objective tested: #2, #4*
 *Difficulty: Easy*
+
+---
 
 **5. What does the Strategic Judgment Radar diagnose, per the Integrated Practice Wheel?**
 A) Direction — whether bets, moats, and deals are sound
@@ -282,6 +300,8 @@ D) Only crisis communication timing
 *Learning objective tested: #2, #4*
 *Difficulty: Easy*
 
+---
+
 **6. What do Module 9's lenses diagnose, per the Integrated Practice Wheel?**
 A) Nothing; Module 9 introduced no diagnostic value
 B) Domain-specific context — regulation, AI, hardware, fairness, international scaling, crisis, and organizational structure
@@ -292,6 +312,8 @@ D) Only platform marketplace liquidity
 *Explanation: Module 9's lenses diagnose domain-specific context — regulation, AI, hardware, fairness, international scaling, crisis, and organizational structure.*
 *Learning objective tested: #2, #4*
 *Difficulty: Easy*
+
+---
 
 **7. How should a product philosophy from Lesson 60 have changed by Lesson 90, per this lesson?**
 A) It should have been entirely discarded and replaced
@@ -304,6 +326,8 @@ D) It should be forgotten entirely in favor of memorized frameworks
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
+---
+
 **8. In the Full-Spectrum Incident case study, how many rings of the Integrated Practice Wheel were genuinely required?**
 A) Only one, the Strategic Judgment Radar
 B) Multiple rings simultaneously: crisis response, AI reliability/fairness, regulatory compliance, and international adaptation
@@ -314,6 +338,8 @@ D) Only the Platform Health Radar
 *Explanation: Multiple rings were simultaneously required: crisis response, AI reliability/fairness, regulatory compliance, and international adaptation.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
+
+---
 
 **9. What would a single-lens diagnosis have missed in the Full-Spectrum Incident case study?**
 A) Nothing; a single lens would have been fully sufficient
@@ -326,6 +352,8 @@ D) Only the hardware dimension, which wasn't actually relevant
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
+---
+
 **10. What is "mastery" of this curriculum defined as, per the Key Takeaways?**
 A) The ability to recite every named model from memory
 B) The fluent judgment to select the right combination of tools for a real, ambiguous situation
@@ -336,6 +364,8 @@ D) Memorizing only the Module 9 lenses, since they are most recent
 *Explanation: Mastery is defined as the fluent judgment to select the right combination of tools for a real, ambiguous situation, not memorization.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Medium*
+
+---
 
 **11. Why does this capstone lesson introduce no new diagnostic model, unlike Lessons 61-89?**
 A) All useful models had already been exhausted by prior lessons
@@ -348,6 +378,8 @@ D) This lesson actually does introduce a new diagnostic model, contrary to the q
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
+---
+
 **12. (Scenario) A PM faces a situation involving a live technical incident, a regulatory compliance question, and an international market difference simultaneously. What does the Integrated Practice Wheel suggest?**
 A) Apply only the single framework that feels most familiar
 B) Recognize this as a multi-ring situation requiring the Crisis Response Timeline, a domain-specific regulatory lens, and the Adaptation Depth Model together
@@ -358,6 +390,8 @@ D) Apply only the Strategic Judgment Radar, since it is the most comprehensive s
 *Explanation: This is a multi-ring situation requiring the Crisis Response Timeline, a domain-specific regulatory lens, and the Adaptation Depth Model together.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Medium-Hard*
+
+---
 
 **13. (Product Thinking) A PM insists a single favorite framework from earlier in the curriculum can fully explain a genuinely complex, multi-domain situation. What is the strongest response?**
 A) Agree, since one framework is always sufficient regardless of complexity
@@ -370,6 +404,8 @@ D) Introduce an entirely new, twentieth framework to resolve the disagreement
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
 
+---
+
 **14. (Interview Reasoning) A candidate, asked about the most complex situation they've navigated, describes it entirely through a single framework with no acknowledgment of other contributing dimensions. What does this signal?**
 A) A strong and complete understanding of integrated practice
 B) A potential gap in demonstrating fluent movement across multiple levels of diagnosis
@@ -380,6 +416,8 @@ D) Nothing meaningful; single-framework explanations are always sufficient
 *Explanation: A potential gap in demonstrating fluent movement across multiple levels of diagnosis — describing a complex situation through only a single framework.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
+
+---
 
 **15. (Product Thinking, Highest Difficulty) A fintech company's AI-powered lending feature causes a sudden spike in denials in a newly-entered international market. Using the full scope of this curriculum's frameworks, what is the most defensible integrated response?**
 A) Apply only the Crisis Response Timeline and consider the incident resolved once communication has occurred

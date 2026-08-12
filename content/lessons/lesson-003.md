@@ -103,6 +103,10 @@ Some new PMs, having learned to distrust surface-level requests, overcorrect int
 
 Digging into the underlying need behind a stakeholder's request can feel, to the requester, like their judgment is being doubted. Skilled PMs frame these questions collaboratively ("I want to make sure whatever we build actually solves this for you — can you walk me through what happens right now?") rather than skeptically ("why do you think you need this?"), which preserves the relationship while still doing the underlying diagnostic work.
 
+**Mistake 5: Equating product thinking with "always basing decisions on data"**
+
+Some new PMs assume product thinking simply means never deciding anything without a dataset in hand, and feel stuck whenever data is unavailable. Product thinking is about asking the right question — what need does this serve, for whom, and why — before deciding how to answer it; data is one way to answer that question, but a well-conducted interview, an analogous case, or well-reasoned judgment can answer it too, especially in genuinely new situations where no data yet exists. Treating "no data" as a reason to skip the underlying question entirely abandons the habit at exactly the moment it matters most.
+
 ---
 
 
@@ -335,6 +339,8 @@ Product thinking is the habit of examining the underlying user and business need
 ## Reflection Exercise
 
 Recall a specific request you have received, made, or observed in any context — work, a student project, a customer support interaction, even a personal example (e.g., a friend asking you for a specific favor rather than stating their actual need).
+
+There is no single correct answer. Work through the following before reading further.
 
 1. Write the request exactly as it was originally stated.
 2. Apply the Five Whys, writing out each "why" and its answer, even if you have to make a reasonable inference for some steps.

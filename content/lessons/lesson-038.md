@@ -169,7 +169,7 @@ Internal team enthusiasm for a design is not evidence that real users will under
 ---
 
 
-## Mental Model: The Fidelity Ladder (Design) (Design)
+## Mental Model: The Fidelity Ladder (Design)
 
 *(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*
 

@@ -223,46 +223,46 @@ Platform-scale technical debt differs in kind from team-level technical debt, be
 ## Flashcards
 
 **Card 1**
-- Front: ** Why does platform-scale technical debt differ in kind from team-level technical debt?
-- Back: ** Dependents are frequently external, numerous, and hard to fully enumerate, turning an internal trade-off into an ecosystem-wide trust obligation.
+- Front: Why does platform-scale technical debt differ in kind from team-level technical debt?
+- Back: Dependents are frequently external, numerous, and hard to fully enumerate, turning an internal trade-off into an ecosystem-wide trust obligation.
 - Difficulty: 2
-- Tags: **, technical-debt, core-concept
+- Tags: technical-debt, core-concept
 
 **Card 2**
-- Front: ** Name the four phases of the Sunset Runway in order.
-- Back: ** Dependency Inventory, Announcement & Dual-Run, Active Migration Support, Decommission.
+- Front: Name the four phases of the Sunset Runway in order.
+- Back: Dependency Inventory, Announcement & Dual-Run, Active Migration Support, Decommission.
 - Difficulty: 2
-- Tags: **, sunset-runway
+- Tags: sunset-runway
 
 **Card 3**
-- Front: ** Why do registered-integration inventories often undercount true dependency?
-- Back: ** They miss undocumented workarounds, third-party intermediaries, and shared-key usage patterns that don't show up as distinct, directly registered integrations.
+- Front: Why do registered-integration inventories often undercount true dependency?
+- Back: They miss undocumented workarounds, third-party intermediaries, and shared-key usage patterns that don't show up as distinct, directly registered integrations.
 - Difficulty: 2
-- Tags: **, dependency-inventory
+- Tags: dependency-inventory
 
 **Card 4**
-- Front: ** What is the purpose of a dual-run period?
-- Back: ** To decouple the platform's readiness to retire something from each dependent's individual readiness to migrate, avoiding a forced synchronized cutover.
+- Front: What is the purpose of a dual-run period?
+- Back: To decouple the platform's readiness to retire something from each dependent's individual readiness to migrate, avoiding a forced synchronized cutover.
 - Difficulty: 2
-- Tags: **, dual-run
+- Tags: dual-run
 
 **Card 5**
-- Front: ** What went wrong in the Underestimated Cutover case study?
-- Back: ** The dependency inventory relied only on registered API keys, missing hundreds of downstream customers behind a third-party vendor's shared integration, and decommission proceeded on calendar date regardless of their migration status.
+- Front: What went wrong in the Underestimated Cutover case study?
+- Back: The dependency inventory relied only on registered API keys, missing hundreds of downstream customers behind a third-party vendor's shared integration, and decommission proceeded on calendar date regardless of their migration status.
 - Difficulty: 2
-- Tags: **, case-study, sunset-runway
+- Tags: case-study, sunset-runway
 
 **Card 6**
-- Front: ** Why should Phase 4 (Decommission) be gated on migration progress rather than calendar date alone?
-- Back: ** A fixed date regardless of actual completion converts a planned transition into a forced, disruptive cutover for anyone who hasn't finished migrating.
+- Front: Why should Phase 4 (Decommission) be gated on migration progress rather than calendar date alone?
+- Back: A fixed date regardless of actual completion converts a planned transition into a forced, disruptive cutover for anyone who hasn't finished migrating.
 - Difficulty: 2
-- Tags: **, decommission
+- Tags: decommission
 
 **Card 7**
-- Front: ** Why is Phase 3 (Active Migration Support) necessary beyond simply announcing a deprecation?
-- Back: ** Passive announcement alone tends to leave a long tail of dependents unaware or unprepared until the deadline arrives.
+- Front: Why is Phase 3 (Active Migration Support) necessary beyond simply announcing a deprecation?
+- Back: Passive announcement alone tends to leave a long tail of dependents unaware or unprepared until the deadline arrives.
 - Difficulty: 2
-- Tags: **, active-migration-support
+- Tags: active-migration-support
 
 
 ## Reflection Exercise

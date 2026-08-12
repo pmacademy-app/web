@@ -74,16 +74,23 @@ Nobody wakes up one day and decides to stop exercising judgment. The shift this 
 
 **Mistake 1: Treating AI-generated drafts as finished outputs rather than inputs requiring human judgment**
 
+An AI tool can draft a competent first-version spec, summarize a pile of user research, or generate several roadmap options quickly, but it cannot take accountability for whether the draft addresses the actual business context or captures the nuance that matters for this specific decision. A PM who accepts a draft as finished because it already looks polished and complete has stopped exercising exactly the judgment the role exists to apply. Treating every AI output as a first input to review, not a last output to ship, is the discipline this lesson is built around.
+
 **Mistake 2: Shifting time toward automatable execution tasks while under-investing in irreducibly human judgment work**
 
-**Mistake 3: Assuming a fluent, polished AI output is automatically correct, mistaking polish for accuracy**
+A PM whose time increasingly shifts toward quadrant A, delegable tasks — first-draft specs, research synthesis — is not automatically becoming more efficient; if that shift comes at the expense of quadrant D work (trust-building, ethical tradeoffs, ambiguous prioritization calls), they are quietly abdicating the part of the job that was always the actual point. The Judgment Reserve doesn't shrink as AI tools improve, because it depends on accountability, relationship, and context no tool can hold. Efficiency gains on the automatable side of the work are only a genuine win if the freed time is reinvested in the judgment side, not simply absorbed into doing more automatable tasks.
+
+**Mistake 3: Assuming a fluent, polished AI output is automatically correct, treating its coherence as evidence that independent re-derivation would be redundant**
+
+Polish is not the same as correctness, and a fluent, well-organized draft can still contain a judgment error invisible to a reviewer who has stopped actively exercising judgment because the artifact already looks finished. This is especially risky because the tool never had visibility into the specific context — internal constraints, political sensitivities, the exact history behind a decision — that genuine judgment requires; a coherent-sounding output can be coherent and wrong at the same time, with no visible signal distinguishing the two cases. Treating apparent polish as a reason to skip independent verification is precisely how a subtle, confidently-stated error makes it into a shipped decision.
 
 **Mistake 4: Using AI tools to avoid, rather than inform, a genuinely difficult stakeholder conversation or ethical tradeoff**
 
+It's tempting to let an AI-drafted message or summary stand in for a conversation a PM would rather not have directly — a difficult piece of stakeholder feedback, a tradeoff with no comfortable answer — but this substitutes a tool's fluency for the PM's own accountability in exactly the situations that most require it. Quadrant D judgment calls, by definition, involve genuine ambiguity or discomfort that a tool cannot resolve on the PM's behalf; using AI output to soften or sidestep that discomfort doesn't make the underlying tradeoff go away, it just delays the moment someone has to actually own it. AI tools can inform this kind of conversation by organizing relevant facts or surfacing options, but they cannot have it.
+
 **Mistake 5: Failing to recognize that accountability for an outcome doesn't diminish just because a tool assisted in producing the artifact behind it**
 
-**Mistake 6: Treating a polished AI output's coherence as evidence that independent re-derivation would be redundant, when the tool never had visibility into the specific context that judgment required**
-
+A PM remains accountable for a decision's outcome regardless of how much of the underlying artifact — a spec, a synthesis, a roadmap option — was produced with AI assistance. "The tool generated it" is not a defense for an error that reached a user or a stakeholder, in the same way a PM couldn't previously defend a mistake by pointing to a template or a junior team member's draft. AI assistance changes how much of the execution work a PM does personally, but it does not change who is answerable when the resulting decision turns out to be wrong.
 ---
 
 
@@ -194,6 +201,7 @@ AI tools' growing capability at drafting and synthesis tasks doesn't eliminate t
 ---
 
 ## Further Reading / Resources
+
 - Marty Cagan and Chris Jones, *Empowered*
 - Brian Christian, *The Alignment Problem*
 - Daniel Kahneman, *Thinking, Fast and Slow*
@@ -203,45 +211,47 @@ AI tools' growing capability at drafting and synthesis tasks doesn't eliminate t
 ## Flashcards
 
 **Card 1**
-- Front: ** Why doesn't AI capability at drafting eliminate the need for PM judgment?
-- Back: ** A tool can produce a fluent, polished draft while missing exactly the accountability and context-dependent judgment call that made the task worth doing.
+- Front: Why doesn't AI capability at drafting eliminate the need for PM judgment?
+- Back: A tool can produce a fluent, polished draft while missing exactly the accountability and context-dependent judgment call that made the task worth doing.
 - Difficulty: 2
-- Tags: **, future-of-pm
+- Tags: future-of-pm
 
 **Card 2**
-- Front: ** What are the four quadrants of the PM Judgment Reserve model?
-- Back: ** Execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, judgment/irreducibly human.
+- Front: What are the four quadrants of the PM Judgment Reserve model?
+- Back: Execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, judgment/irreducibly human.
 - Difficulty: 2
-- Tags: **, judgment-reserve
+- Tags: judgment-reserve
 
 **Card 3**
-- Front: ** Why is polish not the same as correctness?
-- Back: ** A fluent, well-organized AI output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment because it already looks finished.
+- Front: Why is polish not the same as correctness?
+- Back: A fluent, well-organized AI output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment because it already looks finished.
 - Difficulty: 2
-- Tags: **, polish-vs-correctness
+- Tags: polish-vs-correctness
 
 **Card 4**
-- Front: ** What went wrong in the Unreviewed Roadmap case study?
-- Back: ** An AI-generated roadmap weighted feedback by raw frequency, missing a low-volume but high-stakes enterprise concern the PM would ordinarily have caught through direct judgment.
+- Front: What went wrong in the Unreviewed Roadmap case study?
+- Back: An AI-generated roadmap weighted feedback by raw frequency, missing a low-volume but high-stakes enterprise concern the PM would ordinarily have caught through direct judgment.
 - Difficulty: 2
-- Tags: **, case-study
+- Tags: case-study
 
 **Card 5**
-- Front: ** Why is judgment-reserve erosion gradual and hard to notice from the inside?
-- Back: ** It happens through a series of individually reasonable, small time-saving deferrals rather than one obvious moment of abdication — the same gradual-accumulation dynamic as Lesson 88's coherence overextension.
+- Front: Why is judgment-reserve erosion gradual and hard to notice from the inside?
+- Back: It happens through a series of individually reasonable, small time-saving deferrals rather than one obvious moment of abdication — the same gradual-accumulation dynamic as Lesson 88's coherence overextension.
 - Difficulty: 2
-- Tags: **, judgment-erosion
+- Tags: judgment-erosion
 
 **Card 6**
-- Front: ** What is the "felt-redundancy trap" described in the Unreviewed Roadmap case study?
-- Back: ** The mistaken sense that re-deriving a judgment independently is unnecessary because a tool's output already looks thorough — misleading because the tool never had visibility into the specific strategic context that judgment required.
+- Front: What is the "felt-redundancy trap" described in the Unreviewed Roadmap case study?
+- Back: The mistaken sense that re-deriving a judgment independently is unnecessary because a tool's output already looks thorough — misleading because the tool never had visibility into the specific strategic context that judgment required.
 - Difficulty: 2
-- Tags: **, case-study, judgment-reserve
+- Tags: case-study, judgment-reserve
 
 
 ## Reflection Exercise
 
 You increasingly use AI tools to draft specs and synthesize user research.
+
+There is no single correct answer. Work through the following before reading further.
 
 1. Which of your current PM tasks fall into each of the four Judgment Reserve quadrants?
 2. What signal would tell you that you've started treating an AI draft as a finished output rather than an input?
@@ -264,6 +274,8 @@ D) AI tools always incorporate full business context automatically
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
+---
+
 **2. What are the four quadrants of the PM Judgment Reserve model?**
 A) Concept, Prototype, Pilot, Scale
 B) Execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, judgment/irreducibly human
@@ -274,6 +286,8 @@ D) Land, Expand, Retain, Grow
 *Explanation: The four quadrants are execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, and judgment/irreducibly human.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
+
+---
 
 **3. What defines the "Judgment Reserve" quadrant specifically?**
 A) Tasks that are easily automated by AI tools
@@ -286,6 +300,8 @@ D) Only tasks related to spec-writing
 *Learning objective tested: #2, #4*
 *Difficulty: Easy*
 
+---
+
 **4. Why is polish not the same as correctness?**
 A) Polished outputs are always correct by definition
 B) A fluent, well-organized output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment
@@ -296,6 +312,8 @@ D) Correctness never actually matters for PM artifacts
 *Explanation: A fluent, well-organized output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
+
+---
 
 **5. What was the root cause of the Unreviewed Roadmap case study's failure?**
 A) The AI tool refused to generate any roadmap at all
@@ -308,6 +326,8 @@ D) The roadmap was rejected immediately by leadership
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
+---
+
 **6. What specific nuance did the AI-generated roadmap miss in the case study?**
 A) A high-volume, low-importance customer concern
 B) A low-volume but high-stakes concern from the company's largest enterprise account
@@ -318,6 +338,8 @@ D) A purely cosmetic formatting issue
 *Explanation: A low-volume but high-stakes concern from the company's largest enterprise account was missed because the tool lacked visibility into strategic account importance.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
+
+---
 
 **7. Why does trust-building remain a durably human PM responsibility, per the Future-Ready PM Skills Checklist?**
 A) Trust is generatable by any sufficiently advanced AI tool
@@ -330,6 +352,8 @@ D) AI tools have already fully replaced trust-building in most organizations
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
+---
+
 **8. According to the checklist, what risk does neglecting "Judgment Under Ambiguity" create?**
 A) No risk; ambiguous decisions are always resolved automatically
 B) Decisions default to whatever an AI tool weights most heavily, missing strategic nuance
@@ -340,6 +364,8 @@ D) Ambiguity never actually occurs in real product decisions
 *Explanation: Decisions default to whatever an AI tool weights most heavily, missing strategic nuance when judgment under ambiguity is neglected.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
+
+---
 
 **9. Why might early-stage, solo PMs face especially acute pressure to over-delegate to AI tools, per the Real World Perspective section?**
 A) Early-stage PMs never use AI tools at all
@@ -352,6 +378,8 @@ D) This pressure only exists at large, mature organizations
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
+---
+
 **10. What are large organizations increasingly formalizing, per the Real World Perspective section?**
 A) A complete ban on all AI tool usage
 B) Guidance on where AI tools should assist versus where human judgment must remain primary
@@ -362,6 +390,8 @@ D) No guidance of any kind regarding AI tool use
 *Explanation: Large organizations are increasingly formalizing guidance on where AI tools should assist versus where human judgment must remain primary.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
+
+---
 
 **11. How does the PM Judgment Reserve connect to the Ownership Zones Model from Lesson 65?**
 A) There is no meaningful connection between the two
@@ -374,6 +404,8 @@ D) The PM Judgment Reserve replaces the need for the Ownership Zones Model entir
 *Learning objective tested: #1, #4*
 *Difficulty: Medium*
 
+---
+
 **12. (Scenario) A PM presents an AI-generated roadmap to leadership with only minor edits, treating it as essentially finished. What risk does this represent?**
 A) No risk; AI-generated content is always ready for immediate presentation
 B) The risk that quadrant D judgment (strategic weighting) was never actually applied, despite the artifact's polished appearance
@@ -384,6 +416,8 @@ D) No risk, since leadership will catch any errors themselves
 *Explanation: The risk is that quadrant D judgment (strategic weighting) was never actually applied, despite the artifact's polished appearance.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
+
+---
 
 **13. (Product Thinking) A PM wants to use AI tools to draft all future specs with minimal review, citing time savings. What is the strongest response?**
 A) Agree entirely, since time savings are always the top priority
@@ -396,6 +430,8 @@ D) Agree, but only for specs under a certain word count
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
+---
+
 **14. (Interview Reasoning) A candidate, asked how AI tools affect their PM work, describes using them to fully automate stakeholder prioritization decisions with no further review. What does this signal?**
 A) A strong and complete understanding of future-ready PM practice
 B) A gap in recognizing that ambiguous, stakeholder-sensitive prioritization belongs in the irreducibly human Judgment Reserve
@@ -406,6 +442,8 @@ D) Nothing meaningful; full automation of prioritization is always appropriate
 *Explanation: A gap in recognizing that ambiguous, stakeholder-sensitive prioritization belongs in the irreducibly human Judgment Reserve.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
+
+---
 
 **15. (Product Thinking, Highest Difficulty) A PM organization is adopting AI tools widely, and some PMs have begun presenting AI-drafted artifacts with minimal review, citing efficiency gains. Using only this lesson's frameworks, what is the most defensible organizational response?**
 A) Encourage full delegation to AI tools across all PM tasks to maximize efficiency

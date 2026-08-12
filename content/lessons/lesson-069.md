@@ -226,46 +226,46 @@ Internal platforms are structurally identical to external-facing platforms in th
 ## Flashcards
 
 **Card 1**
-- Front: ** Why do internal platforms require the same product discipline as external-facing platforms?
-- Back: ** Their Layer 2 Developer Surface, per the Leverage Stack, serves internal engineers just as an external platform's serves outside developers — the same promise and friction dynamics apply.
+- Front: Why do internal platforms require the same product discipline as external-facing platforms?
+- Back: Their Layer 2 Developer Surface, per the Leverage Stack, serves internal engineers just as an external platform's serves outside developers — the same promise and friction dynamics apply.
 - Difficulty: 2
-- Tags: **, internal-platforms, core-concept
+- Tags: internal-platforms, core-concept
 
 **Card 2**
-- Front: ** Why does the "we're all colleagues" assumption fail for internal platforms?
-- Back: ** Internal engineers do have an alternative to tolerating friction — quietly building their own workaround — which imposes real, often invisible costs on the company.
+- Front: Why does the "we're all colleagues" assumption fail for internal platforms?
+- Back: Internal engineers do have an alternative to tolerating friction — quietly building their own workaround — which imposes real, often invisible costs on the company.
 - Difficulty: 2
-- Tags: **, shadow-platform
+- Tags: shadow-platform
 
 **Card 3**
-- Front: ** What is a shadow platform?
-- Back: ** Parallel, duplicated infrastructure built by internal teams frustrated with an official internal platform's friction, usually without formally complaining first.
+- Front: What is a shadow platform?
+- Back: Parallel, duplicated infrastructure built by internal teams frustrated with an official internal platform's friction, usually without formally complaining first.
 - Difficulty: 2
-- Tags: **, shadow-platform
+- Tags: shadow-platform
 
 **Card 4**
-- Front: ** Why is the absence of complaints not reliable evidence of a healthy internal platform?
-- Back: ** Silence can indicate that frustrated teams have quietly disengaged and built around the problem instead of raising it.
+- Front: Why is the absence of complaints not reliable evidence of a healthy internal platform?
+- Back: Silence can indicate that frustrated teams have quietly disengaged and built around the problem instead of raising it.
 - Difficulty: 2
-- Tags: **, friction-ledger
+- Tags: friction-ledger
 
 **Card 5**
-- Front: ** What went wrong in the Duplicated Deployment Pipeline case study?
-- Back: ** Two teams independently built workaround deployment scripts due to onboarding friction, with no formal complaint, and the duplication went undetected for nearly a year until a security audit found it.
+- Front: What went wrong in the Duplicated Deployment Pipeline case study?
+- Back: Two teams independently built workaround deployment scripts due to onboarding friction, with no formal complaint, and the duplication went undetected for nearly a year until a security audit found it.
 - Difficulty: 2
-- Tags: **, case-study, shadow-platform
+- Tags: case-study, shadow-platform
 
 **Card 6**
-- Front: ** Name two concrete metrics for measuring internal developer experience.
-- Back: ** Time-to-first-success and support ticket volume/resolution time (plus periodic satisfaction surveys).
+- Front: Name two concrete metrics for measuring internal developer experience.
+- Back: Time-to-first-success and support ticket volume/resolution time (plus periodic satisfaction surveys).
 - Difficulty: 2
-- Tags: **, devex-metrics
+- Tags: devex-metrics
 
 **Card 7**
-- Front: ** What should an internal platform team actively monitor for, beyond just tracking friction points?
-- Back: ** The emergence of shadow platforms elsewhere in the organization, since their appearance is direct evidence of unaddressed friction.
+- Front: What should an internal platform team actively monitor for, beyond just tracking friction points?
+- Back: The emergence of shadow platforms elsewhere in the organization, since their appearance is direct evidence of unaddressed friction.
 - Difficulty: 2
-- Tags: **, shadow-platform-monitoring
+- Tags: shadow-platform-monitoring
 
 
 ## Reflection Exercise

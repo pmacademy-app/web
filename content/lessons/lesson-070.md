@@ -241,46 +241,46 @@ Module 7 introduced eight distinct mental models, plus the Friction Ledger's int
 ## Flashcards
 
 **Card 1**
-- Front: ** Name all nine Module 7 mental models in the order they were introduced.
-- Back: ** Leverage Stack, Promise Tiers, Two-Sided Balance Model, Metric Provenance Chain, Ownership Zones Model, Discovery Frontier, Escalation Staircase, Sunset Runway, Friction Ledger.
+- Front: Name all nine Module 7 mental models in the order they were introduced.
+- Back: Leverage Stack, Promise Tiers, Two-Sided Balance Model, Metric Provenance Chain, Ownership Zones Model, Discovery Frontier, Escalation Staircase, Sunset Runway, Friction Ledger.
 - Difficulty: 2
-- Tags: **, module-synthesis
+- Tags: module-synthesis
 
 **Card 2**
-- Front: ** What is the Platform Health Radar?
-- Back: ** An integrated diagnostic tool that assesses a platform across all nine Module 7 dimensions simultaneously, rather than applying one model in isolation.
+- Front: What is the Platform Health Radar?
+- Back: An integrated diagnostic tool that assesses a platform across all nine Module 7 dimensions simultaneously, rather than applying one model in isolation.
 - Difficulty: 2
-- Tags: **, platform-health-radar
+- Tags: platform-health-radar
 
 **Card 3**
-- Front: ** How does Promise Tiers relate to the Leverage Stack?
-- Back: ** Promise Tiers specifically governs Layer 2 (Developer Surface) of the Leverage Stack, formalizing what stability commitments mean at that layer.
+- Front: How does Promise Tiers relate to the Leverage Stack?
+- Back: Promise Tiers specifically governs Layer 2 (Developer Surface) of the Leverage Stack, formalizing what stability commitments mean at that layer.
 - Difficulty: 2
-- Tags: **, model-interconnection
+- Tags: model-interconnection
 
 **Card 4**
-- Front: ** How does the Discovery Frontier relate to the Ownership Zones Model?
-- Back: ** The Discovery Frontier is a specialized, high-stakes application of the Ownership Zones Model's error-cost logic to ranking and personalization decisions specifically.
+- Front: How does the Discovery Frontier relate to the Ownership Zones Model?
+- Back: The Discovery Frontier is a specialized, high-stakes application of the Ownership Zones Model's error-cost logic to ranking and personalization decisions specifically.
 - Difficulty: 2
-- Tags: **, model-interconnection
+- Tags: model-interconnection
 
 **Card 5**
-- Front: ** Why did the Multi-Front Ecosystem Decline case study require more than one model to diagnose correctly?
-- Back: ** The true cause was a compounding failure across Promise Tiers (a broken API commitment), Escalation Staircase (a governance enforcement failure), and Metric Provenance Chain (a partially obscuring metric drift) simultaneously.
+- Front: Why did the Multi-Front Ecosystem Decline case study require more than one model to diagnose correctly?
+- Back: The true cause was a compounding failure across Promise Tiers (a broken API commitment), Escalation Staircase (a governance enforcement failure), and Metric Provenance Chain (a partially obscuring metric drift) simultaneously.
 - Difficulty: 2
-- Tags: **, case-study, multi-front-failure
+- Tags: case-study, multi-front-failure
 
 **Card 6**
-- Front: ** What is the risk of applying only the first model that seems to fit a platform symptom?
-- Back: ** Most real platform incidents involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
+- Front: What is the risk of applying only the first model that seems to fit a platform symptom?
+- Back: Most real platform incidents involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
 - Difficulty: 2
-- Tags: **, diagnostic-discipline
+- Tags: diagnostic-discipline
 
 **Card 7**
-- Front: ** What does genuine "platform judgment" mean, per this synthesis lesson?
-- Back: ** The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
+- Front: What does genuine "platform judgment" mean, per this synthesis lesson?
+- Back: The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
 - Difficulty: 2
-- Tags: **, platform-judgment
+- Tags: platform-judgment
 
 
 ## Reflection Exercise

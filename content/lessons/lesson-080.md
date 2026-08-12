@@ -244,46 +244,46 @@ Module 8 introduced nine distinct mental models, each answering a specific strat
 ## Flashcards
 
 **Card 1**
-- Front: ** Name all nine Module 8 mental models in the order they were introduced.
-- Back: ** Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, Concession Exchange Map.
+- Front: Name all nine Module 8 mental models in the order they were introduced.
+- Back: Strategy Cascade, Enterprise Adoption Ladder, Stakeholder Compass, Expansion Wedge, Moat Durability Matrix, Integration Continuum, Portfolio Health Grid, Capability Sourcing Matrix, Concession Exchange Map.
 - Difficulty: 2
-- Tags: **, module-synthesis
+- Tags: module-synthesis
 
 **Card 2**
-- Front: ** What is the Strategic Judgment Radar?
-- Back: ** An integrated diagnostic tool assessing a strategic situation across all nine Module 8 dimensions simultaneously, rather than applying one model in isolation.
+- Front: What is the Strategic Judgment Radar?
+- Back: An integrated diagnostic tool assessing a strategic situation across all nine Module 8 dimensions simultaneously, rather than applying one model in isolation.
 - Difficulty: 2
-- Tags: **, strategic-judgment-radar
+- Tags: strategic-judgment-radar
 
 **Card 3**
-- Front: ** How does the Enterprise Adoption Ladder relate to the Stakeholder Compass?
-- Back: ** They describe the same B2B adoption process from complementary angles — rungs of organizational progress, and the specific people who gate that progress at each rung.
+- Front: How does the Enterprise Adoption Ladder relate to the Stakeholder Compass?
+- Back: They describe the same B2B adoption process from complementary angles — rungs of organizational progress, and the specific people who gate that progress at each rung.
 - Difficulty: 2
-- Tags: **, model-interconnection
+- Tags: model-interconnection
 
 **Card 4**
-- Front: ** How does the Moat Durability Matrix relate to the Capability Sourcing Matrix?
-- Back: ** Genuine competitive differentiation, assessed by the Moat Durability Matrix, is one of the two core axes the Capability Sourcing Matrix uses to recommend Build, Buy, or Partner.
+- Front: How does the Moat Durability Matrix relate to the Capability Sourcing Matrix?
+- Back: Genuine competitive differentiation, assessed by the Moat Durability Matrix, is one of the two core axes the Capability Sourcing Matrix uses to recommend Build, Buy, or Partner.
 - Difficulty: 2
-- Tags: **, model-interconnection
+- Tags: model-interconnection
 
 **Card 5**
-- Front: ** Why did the Multi-Front Strategic Stall case study require more than one model to diagnose correctly?
-- Back: ** The true cause was a shared pattern across an unmatched acquisition integration, incomplete stakeholder engagement in stalled accounts, and premature evaluation of a maturing bet — three seemingly unrelated symptoms with one underlying root cause.
+- Front: Why did the Multi-Front Strategic Stall case study require more than one model to diagnose correctly?
+- Back: The true cause was a shared pattern across an unmatched acquisition integration, incomplete stakeholder engagement in stalled accounts, and premature evaluation of a maturing bet — three seemingly unrelated symptoms with one underlying root cause.
 - Difficulty: 2
-- Tags: **, case-study, multi-front-stall
+- Tags: case-study, multi-front-stall
 
 **Card 6**
-- Front: ** What is the risk of applying only the first model that seems to fit a strategic symptom?
-- Back: ** Most significant strategic problems involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
+- Front: What is the risk of applying only the first model that seems to fit a strategic symptom?
+- Back: Most significant strategic problems involve failures across more than one axis, and stopping the diagnosis early misses compounding causes.
 - Difficulty: 2
-- Tags: **, diagnostic-discipline
+- Tags: diagnostic-discipline
 
 **Card 7**
-- Front: ** What does genuine "advanced strategic judgment" mean, per this synthesis lesson?
-- Back: ** The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
+- Front: What does genuine "advanced strategic judgment" mean, per this synthesis lesson?
+- Back: The applied skill of recognizing which combination of models fits a real, ambiguous situation — not simply memorizing each model individually.
 - Difficulty: 2
-- Tags: **, strategic-judgment
+- Tags: strategic-judgment
 
 
 ## Reflection Exercise

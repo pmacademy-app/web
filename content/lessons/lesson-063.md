@@ -228,46 +228,46 @@ A two-sided marketplace is a distinct species of product whose entire value prop
 ## Flashcards
 
 **Card 1**
-- Front: ** What makes a marketplace "two-sided" rather than just having two user types?
-- Back: ** Each population derives no value from the platform without sufficient presence of the other — the two sides are mutually dependent for the core value proposition.
+- Front: What makes a marketplace "two-sided" rather than just having two user types?
+- Back: Each population derives no value from the platform without sufficient presence of the other — the two sides are mutually dependent for the core value proposition.
 - Difficulty: 2
-- Tags: **, marketplaces, core-concept
+- Tags: marketplaces, core-concept
 
 **Card 2**
-- Front: ** What is the chicken-and-egg problem?
-- Back: ** Neither side of a marketplace wants to join until the other side is already present in sufficient numbers.
+- Front: What is the chicken-and-egg problem?
+- Back: Neither side of a marketplace wants to join until the other side is already present in sufficient numbers.
 - Difficulty: 2
-- Tags: **, chicken-and-egg
+- Tags: chicken-and-egg
 
 **Card 3**
-- Front: ** Name three strategies for solving the chicken-and-egg problem.
-- Back: ** Single-player mode, geographic/niche concentration, subsidizing the harder-to-acquire side, or seeding with owned supply/demand.
+- Front: Name three strategies for solving the chicken-and-egg problem.
+- Back: Single-player mode, geographic/niche concentration, subsidizing the harder-to-acquire side, or seeding with owned supply/demand.
 - Difficulty: 2
-- Tags: **, bootstrapping
+- Tags: bootstrapping
 
 **Card 4**
-- Front: ** Why is liquidity a better marketplace health metric than registered-user count?
-- Back: ** A marketplace can have huge registered-user counts on both sides with almost no successful matches — liquidity measures whether the core value proposition is actually being delivered.
+- Front: Why is liquidity a better marketplace health metric than registered-user count?
+- Back: A marketplace can have huge registered-user counts on both sides with almost no successful matches — liquidity measures whether the core value proposition is actually being delivered.
 - Difficulty: 2
-- Tags: **, liquidity, metrics
+- Tags: liquidity, metrics
 
 **Card 5**
-- Front: ** In the Case Study, why did tripling demand-side signups hurt the marketplace?
-- Back: ** Supply hadn't grown proportionally, so the constrained side (supply) was flooded with more demand than it could serve, worsening fill rate and client satisfaction.
+- Front: In the Case Study, why did tripling demand-side signups hurt the marketplace?
+- Back: Supply hadn't grown proportionally, so the constrained side (supply) was flooded with more demand than it could serve, worsening fill rate and client satisfaction.
 - Difficulty: 2
-- Tags: **, case-study, two-sided-balance
+- Tags: case-study, two-sided-balance
 
 **Card 6**
-- Front: ** What three questions does the Two-Sided Balance Model ask before approving a growth initiative?
-- Back: ** Which side's leading indicators are weak? Is the initiative targeted at the constrained side? Could it worsen the imbalance by growing the abundant side further?
+- Front: What three questions does the Two-Sided Balance Model ask before approving a growth initiative?
+- Back: Which side's leading indicators are weak? Is the initiative targeted at the constrained side? Could it worsen the imbalance by growing the abundant side further?
 - Difficulty: 2
-- Tags: **, two-sided-balance
+- Tags: two-sided-balance
 
 **Card 7**
-- Front: ** Why should supply-side and demand-side signals never be blended into one aggregate health score?
-- Back: ** Blending obscures which specific side actually needs attention, leading to misdirected growth investment.
+- Front: Why should supply-side and demand-side signals never be blended into one aggregate health score?
+- Back: Blending obscures which specific side actually needs attention, leading to misdirected growth investment.
 - Difficulty: 2
-- Tags: **, liquidity-diagnostic
+- Tags: liquidity-diagnostic
 
 
 ## Reflection Exercise

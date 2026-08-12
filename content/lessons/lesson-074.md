@@ -219,46 +219,46 @@ Land-and-expand is not simply a sales strategy layered on top of arbitrary packa
 ## Flashcards
 
 **Card 1**
-- Front: ** Why does land-and-expand require deliberate packaging design, not just a sales strategy?
-- Back: ** The initial land must be low-friction and deliver genuine standalone value, while the packaging must also create natural expansion triggers — both require intentional structure, not just sales execution.
+- Front: Why does land-and-expand require deliberate packaging design, not just a sales strategy?
+- Back: The initial land must be low-friction and deliver genuine standalone value, while the packaging must also create natural expansion triggers — both require intentional structure, not just sales execution.
 - Difficulty: 2
-- Tags: **, land-and-expand, core-concept
+- Tags: land-and-expand, core-concept
 
 **Card 2**
-- Front: ** Name the three parts of the Expansion Wedge.
-- Back: ** Land Tier, Expansion Triggers, Enterprise Tier.
+- Front: Name the three parts of the Expansion Wedge.
+- Back: Land Tier, Expansion Triggers, Enterprise Tier.
 - Difficulty: 2
-- Tags: **, expansion-wedge
+- Tags: expansion-wedge
 
 **Card 3**
-- Front: ** Name the three types of expansion triggers.
-- Back: ** Seat-based, usage-based, and feature-gated.
+- Front: Name the three types of expansion triggers.
+- Back: Seat-based, usage-based, and feature-gated.
 - Difficulty: 2
-- Tags: **, expansion-triggers
+- Tags: expansion-triggers
 
 **Card 4**
-- Front: ** What risk does an overly generous Land Tier create?
-- Back: ** It eliminates the natural pressure to expand, producing strong adoption metrics that mask a failing business model, as in the Land That Never Expanded case study.
+- Front: What risk does an overly generous Land Tier create?
+- Back: It eliminates the natural pressure to expand, producing strong adoption metrics that mask a failing business model, as in the Land That Never Expanded case study.
 - Difficulty: 2
-- Tags: **, land-tier-risk
+- Tags: land-tier-risk
 
 **Card 5**
-- Front: ** What risk does an overly restrictive Land Tier create?
-- Back: ** It prevents the initial land motion from succeeding at all, since Rung 1 of the Enterprise Adoption Ladder requires genuine standalone value.
+- Front: What risk does an overly restrictive Land Tier create?
+- Back: It prevents the initial land motion from succeeding at all, since Rung 1 of the Enterprise Adoption Ladder requires genuine standalone value.
 - Difficulty: 2
-- Tags: **, land-tier-risk
+- Tags: land-tier-risk
 
 **Card 6**
-- Front: ** Why should Enterprise Tier capability match Rung 3/4 needs specifically, rather than an arbitrary "premium" bundle?
-- Back: ** Because the Enterprise Tier must satisfy the Technical Evaluator and Economic Buyer roles from Lesson 73, whose actual needs are security, admin control, reliability, and integration.
+- Front: Why should Enterprise Tier capability match Rung 3/4 needs specifically, rather than an arbitrary "premium" bundle?
+- Back: Because the Enterprise Tier must satisfy the Technical Evaluator and Economic Buyer roles from Lesson 73, whose actual needs are security, admin control, reliability, and integration.
 - Difficulty: 2
-- Tags: **, enterprise-tier-fit
+- Tags: enterprise-tier-fit
 
 **Card 7**
-- Front: ** What went wrong in the Land That Never Expanded case study?
-- Back: ** The free tier had unlimited seats and nearly the full feature set, eliminating every natural expansion trigger, and no genuine enterprise tier or enterprise-readiness capability had ever been built.
+- Front: What went wrong in the Land That Never Expanded case study?
+- Back: The free tier had unlimited seats and nearly the full feature set, eliminating every natural expansion trigger, and no genuine enterprise tier or enterprise-readiness capability had ever been built.
 - Difficulty: 2
-- Tags: **, case-study, expansion-wedge
+- Tags: case-study, expansion-wedge
 
 
 ## Reflection Exercise

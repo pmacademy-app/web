@@ -221,46 +221,46 @@ Regulatory compliance in healthcare, finance, and government contexts frequently
 ## Flashcards
 
 **Card 1**
-- Front: ** Why must regulatory compliance often shape product architecture from the outset in regulated industries?
-- Back: ** Structural requirements like audit trails and mandatory human review steps are far more costly to retrofit than to design in from the beginning.
+- Front: Why must regulatory compliance often shape product architecture from the outset in regulated industries?
+- Back: Structural requirements like audit trails and mandatory human review steps are far more costly to retrofit than to design in from the beginning.
 - Difficulty: 2
-- Tags: **, regulated-industries, core-concept
+- Tags: regulated-industries, core-concept
 
 **Card 2**
-- Front: ** Name the four layers of the Regulatory Surface Map.
-- Back: ** Data, Process, Outcome, Liability.
+- Front: Name the four layers of the Regulatory Surface Map.
+- Back: Data, Process, Outcome, Liability.
 - Difficulty: 2
-- Tags: **, regulatory-surface-map
+- Tags: regulatory-surface-map
 
 **Card 3**
-- Front: ** Why can a well-documented process still fail regulatory compliance?
-- Back: ** Process Layer compliance doesn't guarantee Outcome Layer compliance — a carefully documented decision process can still produce an impermissible result, such as a discriminatory outcome.
+- Front: Why can a well-documented process still fail regulatory compliance?
+- Back: Process Layer compliance doesn't guarantee Outcome Layer compliance — a carefully documented decision process can still produce an impermissible result, such as a discriminatory outcome.
 - Difficulty: 2
-- Tags: **, outcome-layer
+- Tags: outcome-layer
 
 **Card 4**
-- Front: ** How do human-in-the-loop requirements connect to the Ownership Zones Model from Lesson 65?
-- Back: ** They formalize Zone 4's discipline — that a model's output shouldn't be treated as an automatic action — into a legal obligation rather than an optional best practice.
+- Front: How do human-in-the-loop requirements connect to the Ownership Zones Model from Lesson 65?
+- Back: They formalize Zone 4's discipline — that a model's output shouldn't be treated as an automatic action — into a legal obligation rather than an optional best practice.
 - Difficulty: 2
-- Tags: **, human-in-the-loop
+- Tags: human-in-the-loop
 
 **Card 5**
-- Front: ** What two regulatory gaps did the Undocumented Lending Decision case study reveal?
-- Back: ** A discriminatory disparity in approval rates across demographic groups (Outcome Layer), and a missing mandatory human review step for denied applications (Liability Layer) — despite thorough Process Layer documentation.
+- Front: What two regulatory gaps did the Undocumented Lending Decision case study reveal?
+- Back: A discriminatory disparity in approval rates across demographic groups (Outcome Layer), and a missing mandatory human review step for denied applications (Liability Layer) — despite thorough Process Layer documentation.
 - Difficulty: 2
-- Tags: **, case-study, regulatory-surface-map
+- Tags: case-study, regulatory-surface-map
 
 **Card 6**
-- Front: ** Why does the Liability Layer often shape a product's core architecture directly?
-- Back: ** A system that cannot reconstruct its own decision history after the fact cannot support the accountability assignment regulation frequently requires.
+- Front: Why does the Liability Layer often shape a product's core architecture directly?
+- Back: A system that cannot reconstruct its own decision history after the fact cannot support the accountability assignment regulation frequently requires.
 - Difficulty: 2
-- Tags: **, liability-layer
+- Tags: liability-layer
 
 **Card 7**
-- Front: ** Why is ongoing regulatory monitoring necessary even after a product is compliant at launch?
-- Back: ** Regulations in healthcare, finance, and government contexts change over time, and a product can drift out of compliance as rules evolve.
+- Front: Why is ongoing regulatory monitoring necessary even after a product is compliant at launch?
+- Back: Regulations in healthcare, finance, and government contexts change over time, and a product can drift out of compliance as rules evolve.
 - Difficulty: 2
-- Tags: **, ongoing-compliance
+- Tags: ongoing-compliance
 
 
 ## Reflection Exercise

@@ -96,6 +96,10 @@ Some PMs, especially those who joined a fast-growing company, treat a shift into
 
 Large organizations typically have a portfolio of products or product lines in different stages simultaneously — a mature flagship product funding an early-stage bet still searching for Problem-Solution Fit. Treating "the company" as a single lifecycle stage, rather than diagnosing each product or product line individually, leads to applying the wrong priorities to the wrong initiative.
 
+**Mistake 5: Treating Product-Market Fit as a permanent achievement rather than a state that must be periodically re-verified**
+
+Some PMs, once a product reaches PMF, treat that milestone as permanently settled and stop revisiting the question. Markets shift, competitors emerge, and user needs evolve, so a product that once had a strong fit can lose it, sliding toward Maturity's defensive posture or even Decline without anyone noticing until the trailing metrics make it obvious. Lifecycle diagnosis is something a PM should revisit periodically, not something decided once at launch and never reconsidered.
+
 ---
 
 
@@ -334,6 +338,8 @@ Products move through recognizable lifecycle stages — Problem-Solution Fit, In
 ## Reflection Exercise
 
 Pick a product or company you believe has shifted lifecycle stages at some point in its history (this can be a well-known company or a product you have personal experience with).
+
+There is no single correct answer. Work through the following before reading further.
 
 1. Using the Stage Diagnostic Checklist, identify what evidence would have indicated its stage at an earlier point in time, and what evidence indicates its current stage now.
 2. Identify the specific transition point (as best you can tell) and what changed — was it a deliberate strategic shift, a market change, competitive pressure, or something else?

@@ -220,46 +220,46 @@ Data minimization — collecting only what a specific, currently-active purpose 
 ## Flashcards
 
 **Card 1**
-- Front: ** What is data minimization?
-- Back: ** The principle that an organization should collect only data genuinely necessary for a specific, disclosed purpose, and retain it only as long as that purpose requires.
+- Front: What is data minimization?
+- Back: The principle that an organization should collect only data genuinely necessary for a specific, disclosed purpose, and retain it only as long as that purpose requires.
 - Difficulty: 2
-- Tags: **, privacy, core-concept
+- Tags: privacy, core-concept
 
 **Card 2**
-- Front: ** Name the four stages of the Data Flow Risk Map.
-- Back: ** Collection, Storage, Processing, Sharing.
+- Front: Name the four stages of the Data Flow Risk Map.
+- Back: Collection, Storage, Processing, Sharing.
 - Difficulty: 2
-- Tags: **, data-flow-risk-map
+- Tags: data-flow-risk-map
 
 **Card 3**
-- Front: ** Why is a contractual data processing agreement insufficient protection on its own?
-- Back: ** A contract establishes legal recourse after a third party's security failure but does not technically prevent that failure from occurring in the first place.
+- Front: Why is a contractual data processing agreement insufficient protection on its own?
+- Back: A contract establishes legal recourse after a third party's security failure but does not technically prevent that failure from occurring in the first place.
 - Difficulty: 2
-- Tags: **, third-party-safeguards
+- Tags: third-party-safeguards
 
 **Card 4**
-- Front: ** What is "purpose creep"?
-- Back: ** Using data collected for one stated purpose for an unrelated purpose later, without updated disclosure or renewed consent — a minimization violation even on legitimately collected data.
+- Front: What is "purpose creep"?
+- Back: Using data collected for one stated purpose for an unrelated purpose later, without updated disclosure or renewed consent — a minimization violation even on legitimately collected data.
 - Difficulty: 2
-- Tags: **, purpose-limitation
+- Tags: purpose-limitation
 
 **Card 5**
-- Front: ** What went wrong in the Third-Party Data Exposure case study?
-- Back: ** The company shared far more health data than its analytics purpose required, relying solely on a contractual agreement with no technical safeguards, leaving it exposed when the third party's own security failed.
+- Front: What went wrong in the Third-Party Data Exposure case study?
+- Back: The company shared far more health data than its analytics purpose required, relying solely on a contractual agreement with no technical safeguards, leaving it exposed when the third party's own security failed.
 - Difficulty: 2
-- Tags: **, case-study, data-flow-risk-map
+- Tags: case-study, data-flow-risk-map
 
 **Card 6**
-- Front: ** Why should right-to-deletion capability be designed in from the outset?
-- Back: ** A system not originally built to track where an individual's data has propagated is far harder to retrofit with the ability to locate and delete that data later.
+- Front: Why should right-to-deletion capability be designed in from the outset?
+- Back: A system not originally built to track where an individual's data has propagated is far harder to retrofit with the ability to locate and delete that data later.
 - Difficulty: 2
-- Tags: **, right-to-deletion
+- Tags: right-to-deletion
 
 **Card 7**
-- Front: ** Why is encryption alone insufficient security without access control?
-- Back: ** Encrypted data broadly accessible for internal convenience still carries meaningful risk from internal misuse or a compromised internal account bypassing encryption's protection.
+- Front: Why is encryption alone insufficient security without access control?
+- Back: Encrypted data broadly accessible for internal convenience still carries meaningful risk from internal misuse or a compromised internal account bypassing encryption's protection.
 - Difficulty: 2
-- Tags: **, access-control
+- Tags: access-control
 
 
 ## Reflection Exercise

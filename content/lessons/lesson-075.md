@@ -218,46 +218,46 @@ A current market advantage — leadership in usage, revenue, or brand recognitio
 ## Flashcards
 
 **Card 1**
-- Front: ** Why is a current market advantage not automatically a competitive moat?
-- Back: ** A moat requires structural difficulty of replication, even for well-resourced competitors, not merely an unchallenged lead that hasn't yet been seriously tested.
+- Front: Why is a current market advantage not automatically a competitive moat?
+- Back: A moat requires structural difficulty of replication, even for well-resourced competitors, not merely an unchallenged lead that hasn't yet been seriously tested.
 - Difficulty: 2
-- Tags: **, moats, core-concept
+- Tags: moats, core-concept
 
 **Card 2**
-- Front: ** What are the two dimensions of the Moat Durability Matrix?
-- Back: ** Replication difficulty and natural erosion risk.
+- Front: What are the two dimensions of the Moat Durability Matrix?
+- Back: Replication difficulty and natural erosion risk.
 - Difficulty: 2
-- Tags: **, moat-durability-matrix
+- Tags: moat-durability-matrix
 
 **Card 3**
-- Front: ** Name the five common moat categories.
-- Back: ** Network effects, switching costs, economies of scale, brand and trust, proprietary assets.
+- Front: Name the five common moat categories.
+- Back: Network effects, switching costs, economies of scale, brand and trust, proprietary assets.
 - Difficulty: 2
-- Tags: **, moat-categories
+- Tags: moat-categories
 
 **Card 4**
-- Front: ** Why are network effects more fragile than commonly assumed?
-- Back: ** Multi-homing allows participants to use a competing platform with minimal cost, undermining the "must join the biggest network" logic network effects rely on.
+- Front: Why are network effects more fragile than commonly assumed?
+- Back: Multi-homing allows participants to use a competing platform with minimal cost, undermining the "must join the biggest network" logic network effects rely on.
 - Difficulty: 2
-- Tags: **, multi-homing, network-effects
+- Tags: multi-homing, network-effects
 
 **Card 5**
-- Front: ** What went wrong in the Multi-Homed Marketplace case study?
-- Back: ** The incumbent assumed its network effect was a permanent, high-difficulty moat, but low-cost multi-homing allowed a competitor to capture valuable participants without fully displacing the incumbent.
+- Front: What went wrong in the Multi-Homed Marketplace case study?
+- Back: The incumbent assumed its network effect was a permanent, high-difficulty moat, but low-cost multi-homing allowed a competitor to capture valuable participants without fully displacing the incumbent.
 - Difficulty: 2
-- Tags: **, case-study, multi-homing
+- Tags: case-study, multi-homing
 
 **Card 6**
-- Front: ** Why should switching costs be evaluated from the customer's perspective rather than the vendor's?
-- Back: ** A switching cost that feels significant to the vendor may feel much smaller to a genuinely dissatisfied customer, especially if a competitor offers migration assistance.
+- Front: Why should switching costs be evaluated from the customer's perspective rather than the vendor's?
+- Back: A switching cost that feels significant to the vendor may feel much smaller to a genuinely dissatisfied customer, especially if a competitor offers migration assistance.
 - Difficulty: 2
-- Tags: **, switching-costs
+- Tags: switching-costs
 
 **Card 7**
-- Front: ** Why is brand recognition distinct from brand trust as a moat?
-- Back: ** Awareness of a brand does not guarantee the deep customer confidence needed to resist a comparable competitor's offer; only genuine trust functions as a real moat.
+- Front: Why is brand recognition distinct from brand trust as a moat?
+- Back: Awareness of a brand does not guarantee the deep customer confidence needed to resist a comparable competitor's offer; only genuine trust functions as a real moat.
 - Difficulty: 2
-- Tags: **, brand-trust
+- Tags: brand-trust
 
 
 ## Reflection Exercise

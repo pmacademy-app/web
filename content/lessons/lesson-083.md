@@ -219,46 +219,46 @@ Hardware product development carries a fundamentally different risk profile than
 ## Flashcards
 
 **Card 1**
-- Front: ** Why does hardware development carry a fundamentally different risk profile than software?
-- Back: ** Software assumes mistakes can typically be corrected through a subsequent deployment, but hardware has genuine, irreversible commitment points, like tooling and mass production, after which a flaw can no longer be simply patched.
+- Front: Why does hardware development carry a fundamentally different risk profile than software?
+- Back: Software assumes mistakes can typically be corrected through a subsequent deployment, but hardware has genuine, irreversible commitment points, like tooling and mass production, after which a flaw can no longer be simply patched.
 - Difficulty: 2
-- Tags: **, hardware-pm, core-concept
+- Tags: hardware-pm, core-concept
 
 **Card 2**
-- Front: ** Name the five stages of the Commitment Curve.
-- Back: ** Concept, Prototype, Tooling Commitment, Mass Production, Shipped to Customers.
+- Front: Name the five stages of the Commitment Curve.
+- Back: Concept, Prototype, Tooling Commitment, Mass Production, Shipped to Customers.
 - Difficulty: 2
-- Tags: **, commitment-curve
+- Tags: commitment-curve
 
 **Card 3**
-- Front: ** What can OTA (over-the-air) updates correct, and what can't they correct?
-- Back: ** They can correct firmware and software issues, but they cannot correct genuinely physical hardware flaws, like a defective battery or sensor.
+- Front: What can OTA (over-the-air) updates correct, and what can't they correct?
+- Back: They can correct firmware and software issues, but they cannot correct genuinely physical hardware flaws, like a defective battery or sensor.
 - Difficulty: 2
-- Tags: **, ota-updates
+- Tags: ota-updates
 
 **Card 4**
-- Front: ** Why should validation rigor scale with proximity to a Commitment Curve stage?
-- Back: ** The cost of reversing a decision increases sharply near commitment points like tooling, so more scrutiny is needed immediately before these thresholds than earlier in development.
+- Front: Why should validation rigor scale with proximity to a Commitment Curve stage?
+- Back: The cost of reversing a decision increases sharply near commitment points like tooling, so more scrutiny is needed immediately before these thresholds than earlier in development.
 - Difficulty: 2
-- Tags: **, validation-rigor
+- Tags: validation-rigor
 
 **Card 5**
-- Front: ** What went wrong in the Unfixable Battery Flaw case study?
-- Back: ** A physical battery design issue identified during prototype testing was assumed to be firmware-correctable and given insufficient validation before tooling commitment, but it was actually a genuine physical flaw requiring a costly recall.
+- Front: What went wrong in the Unfixable Battery Flaw case study?
+- Back: A physical battery design issue identified during prototype testing was assumed to be firmware-correctable and given insufficient validation before tooling commitment, but it was actually a genuine physical flaw requiring a costly recall.
 - Difficulty: 2
-- Tags: **, case-study, commitment-curve
+- Tags: case-study, commitment-curve
 
 **Card 6**
-- Front: ** Why should firmware update capability be designed into a product from the outset?
-- Back: ** Retrofitting OTA update capability into a device not originally designed to support it is considerably more difficult than building it in from the start.
+- Front: Why should firmware update capability be designed into a product from the outset?
+- Back: Retrofitting OTA update capability into a device not originally designed to support it is considerably more difficult than building it in from the start.
 - Difficulty: 2
-- Tags: **, ota-design
+- Tags: ota-design
 
 **Card 7**
-- Front: ** What is the "Physical vs. Firmware Classification" step, and why does it matter?
-- Back: ** It's the practice of determining whether an identified flaw is a genuinely physical issue or a software-correctable one — getting this wrong, as in the Case Study, can lead to a costly assumption that a problem can be fixed after shipment when it genuinely cannot.
+- Front: What is the "Physical vs. Firmware Classification" step, and why does it matter?
+- Back: It's the practice of determining whether an identified flaw is a genuinely physical issue or a software-correctable one — getting this wrong, as in the Case Study, can lead to a costly assumption that a problem can be fixed after shipment when it genuinely cannot.
 - Difficulty: 2
-- Tags: **, physical-firmware-classification
+- Tags: physical-firmware-classification
 
 
 ## Reflection Exercise

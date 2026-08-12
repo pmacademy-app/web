@@ -94,6 +94,10 @@ Because a project has a clean finish line, it is emotionally satisfying to treat
 
 This is an overcorrection. Projects remain a legitimate and necessary way to organize discrete chunks of work with real deadlines (a compliance deadline, a partner integration commitment, a conference launch). The mistake is not using project thinking at all — it's applying *project-style finality* to the *product itself*, rather than to the individual, bounded pieces of work that make up its ongoing life.
 
+**Mistake 5: Writing goals in project-shaped language for work that is actually product-shaped**
+
+A goal like "ship feature X" has a clear finish line and feels satisfying to check off, but it describes an output, not a direction — once shipped, the goal offers no further guidance. A goal like "improve activation rate" has no natural end point; it names a continuous direction of improvement rather than a deliverable to complete. New PMs who default to project-shaped goals for ongoing product work end up optimizing for the feeling of completion rather than for the outcome the goal was actually meant to track.
+
 ---
 
 
@@ -338,6 +342,8 @@ A project is a temporary endeavor with a defined scope and a genuine finish line
 ## Reflection Exercise
 
 Think of a product feature you have personally seen "launched with fanfare" and then never meaningfully iterated on again (this could be at a company you've worked for, or a product you use as a consumer where a feature clearly stalled after its initial release).
+
+There is no single correct answer. Work through the following before reading further.
 
 1. Using the River and Bridge mental model, was this a case of a well-built bridge with no one watching the river afterward? What evidence suggests that?
 2. If you were the PM, what single metric would you have tracked after the "project" (the launch) ended, to know whether the underlying "product" need was actually being served on an ongoing basis?

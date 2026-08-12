@@ -224,46 +224,46 @@ Applying uniform, revenue-based metrics across a portfolio of bets at genuinely 
 ## Flashcards
 
 **Card 1**
-- Front: ** Why does applying uniform revenue metrics across a portfolio produce a category error?
-- Back: ** An early-stage Horizon 3 bet is structurally too early to demonstrate the scale evidence a mature Horizon 1 business reasonably should, making revenue comparison inappropriate at that stage.
+- Front: Why does applying uniform revenue metrics across a portfolio produce a category error?
+- Back: An early-stage Horizon 3 bet is structurally too early to demonstrate the scale evidence a mature Horizon 1 business reasonably should, making revenue comparison inappropriate at that stage.
 - Difficulty: 2
-- Tags: **, innovation-accounting, core-concept
+- Tags: innovation-accounting, core-concept
 
 **Card 2**
-- Front: ** Name the four validation stages on the Portfolio Health Grid.
-- Back: ** Concept, Prototype, Pilot, Scale.
+- Front: Name the four validation stages on the Portfolio Health Grid.
+- Back: Concept, Prototype, Pilot, Scale.
 - Difficulty: 2
-- Tags: **, portfolio-health-grid
+- Tags: portfolio-health-grid
 
 **Card 3**
-- Front: ** What is the difference between validated learning and a vanity metric?
-- Back: ** Validated learning tests a specific, falsifiable hypothesis and confirms or disconfirms it; a vanity metric merely looks encouraging without testing anything meaningful.
+- Front: What is the difference between validated learning and a vanity metric?
+- Back: Validated learning tests a specific, falsifiable hypothesis and confirms or disconfirms it; a vanity metric merely looks encouraging without testing anything meaningful.
 - Difficulty: 2
-- Tags: **, validated-learning
+- Tags: validated-learning
 
 **Card 4**
-- Front: ** What are the two failure modes caused by metric mismatch?
-- Back: ** Premature cancellation of promising early bets, and prolonged survival of genuinely failing bets.
+- Front: What are the two failure modes caused by metric mismatch?
+- Back: Premature cancellation of promising early bets, and prolonged survival of genuinely failing bets.
 - Difficulty: 2
-- Tags: **, metric-mismatch
+- Tags: metric-mismatch
 
 **Card 5**
-- Front: ** Why was the Pilot-stage subscription initiative killed in the Prematurely Killed Experiment case study?
-- Back: ** It was evaluated using a Horizon 1-appropriate absolute revenue contribution metric, a Scale-stage standard the Pilot-stage bet could not reasonably meet yet, despite genuinely earning validated learning at its actual stage.
+- Front: Why was the Pilot-stage subscription initiative killed in the Prematurely Killed Experiment case study?
+- Back: It was evaluated using a Horizon 1-appropriate absolute revenue contribution metric, a Scale-stage standard the Pilot-stage bet could not reasonably meet yet, despite genuinely earning validated learning at its actual stage.
 - Difficulty: 2
-- Tags: **, case-study, portfolio-health-grid
+- Tags: case-study, portfolio-health-grid
 
 **Card 6**
-- Front: ** What appropriate evidence should a Concept-stage bet be evaluated against?
-- Back: ** A clearly articulated, falsifiable hypothesis and a designed initial test — not revenue or user growth targets.
+- Front: What appropriate evidence should a Concept-stage bet be evaluated against?
+- Back: A clearly articulated, falsifiable hypothesis and a designed initial test — not revenue or user growth targets.
 - Difficulty: 2
-- Tags: **, innovation-accounting-metrics
+- Tags: innovation-accounting-metrics
 
 **Card 7**
-- Front: ** Why should progression between validation stages be earned by evidence rather than assumed by elapsed time?
-- Back: ** A bet should advance to the next stage only because specific validated learning milestones have actually been met, not simply because time has passed.
+- Front: Why should progression between validation stages be earned by evidence rather than assumed by elapsed time?
+- Back: A bet should advance to the next stage only because specific validated learning milestones have actually been met, not simply because time has passed.
 - Difficulty: 2
-- Tags: **, validation-stage-progression
+- Tags: validation-stage-progression
 
 
 ## Reflection Exercise

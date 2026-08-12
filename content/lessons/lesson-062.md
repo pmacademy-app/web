@@ -235,46 +235,46 @@ An API is best understood not as a technical interface but as a promise made to 
 ## Flashcards
 
 **Card 1**
-- Front: ** Why should an API be understood as a promise rather than an interface?
-- Back: ** Because developers build production systems assuming today's behavior will hold, without visibility into your roadmap — a broken assumption has real downstream cost.
+- Front: Why should an API be understood as a promise rather than an interface?
+- Back: Because developers build production systems assuming today's behavior will hold, without visibility into your roadmap — a broken assumption has real downstream cost.
 - Difficulty: 2
-- Tags: **, api-design, core-concept
+- Tags: api-design, core-concept
 
 **Card 2**
-- Front: ** Name the three Promise Tiers in order of stability.
-- Back: ** Stable Core, Versioned Standard, Experimental/Beta.
+- Front: Name the three Promise Tiers in order of stability.
+- Back: Stable Core, Versioned Standard, Experimental/Beta.
 - Difficulty: 2
-- Tags: **, promise-tiers
+- Tags: promise-tiers
 
 **Card 3**
-- Front: ** What does semantic versioning communicate that a plain version number doesn't?
-- Back: ** The size and safety of a change — patch (bug fix), minor (additive), major (breaking) — so developers know how much risk a change carries.
+- Front: What does semantic versioning communicate that a plain version number doesn't?
+- Back: The size and safety of a change — patch (bug fix), minor (additive), major (breaking) — so developers know how much risk a change carries.
 - Difficulty: 2
-- Tags: **, versioning
+- Tags: versioning
 
 **Card 4**
-- Front: ** Why did labeling the webhook field as "internal implementation detail" fail in the Case Study?
-- Back: ** Dozens of partners had, in practice, already come to depend on it for reconciliation, so it functioned as a Tier 1 promise even though it was never classified as one.
+- Front: Why did labeling the webhook field as "internal implementation detail" fail in the Case Study?
+- Back: Dozens of partners had, in practice, already come to depend on it for reconciliation, so it functioned as a Tier 1 promise even though it was never classified as one.
 - Difficulty: 2
-- Tags: **, case-study, promise-tiers
+- Tags: case-study, promise-tiers
 
 **Card 5**
-- Front: ** What is idempotency and why does it matter for API design?
-- Back: ** The property that repeating an operation produces the same result without unintended side effects — critical so retry logic after network failures doesn't create duplicates.
+- Front: What is idempotency and why does it matter for API design?
+- Back: The property that repeating an operation produces the same result without unintended side effects — critical so retry logic after network failures doesn't create duplicates.
 - Difficulty: 2
-- Tags: **, api-design
+- Tags: api-design
 
 **Card 6**
-- Front: ** What should block a launch, according to the API Design Checklist?
-- Back: ** An endpoint with no explicit Promise Tier classification — an unclassified endpoint is a promise made by default without anyone deciding what it is.
+- Front: What should block a launch, according to the API Design Checklist?
+- Back: An endpoint with no explicit Promise Tier classification — an unclassified endpoint is a promise made by default without anyone deciding what it is.
 - Difficulty: 2
-- Tags: **, api-design-checklist
+- Tags: api-design-checklist
 
 **Card 7**
-- Front: ** What converts an abstract stability claim into an operational guarantee?
-- Back: ** Semantic versioning combined with a published, enforced deprecation policy.
+- Front: What converts an abstract stability claim into an operational guarantee?
+- Back: Semantic versioning combined with a published, enforced deprecation policy.
 - Difficulty: 2
-- Tags: **, versioning, deprecation
+- Tags: versioning, deprecation
 
 
 ## Reflection Exercise

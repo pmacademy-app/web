@@ -219,46 +219,46 @@ Companies default to building capabilities internally more often than a genuine 
 ## Flashcards
 
 **Card 1**
-- Front: ** What is "not invented here" syndrome?
-- Back: ** An organizational tendency to prefer building a capability internally over acquiring it externally, often for reasons unrelated to genuine strategic advantage.
+- Front: What is "not invented here" syndrome?
+- Back: An organizational tendency to prefer building a capability internally over acquiring it externally, often for reasons unrelated to genuine strategic advantage.
 - Difficulty: 2
-- Tags: **, build-buy-partner, core-concept
+- Tags: build-buy-partner, core-concept
 
 **Card 2**
-- Front: ** What are the two axes of the Capability Sourcing Matrix?
-- Back: ** Genuine competitive differentiation and external market maturity.
+- Front: What are the two axes of the Capability Sourcing Matrix?
+- Back: Genuine competitive differentiation and external market maturity.
 - Difficulty: 2
-- Tags: **, capability-sourcing-matrix
+- Tags: capability-sourcing-matrix
 
 **Card 3**
-- Front: ** When should a capability generally be built internally?
-- Back: ** When it is genuinely central to the company's moat and no mature external solution already exists.
+- Front: When should a capability generally be built internally?
+- Back: When it is genuinely central to the company's moat and no mature external solution already exists.
 - Difficulty: 2
-- Tags: **, build-decision
+- Tags: build-decision
 
 **Card 4**
-- Front: ** Why does evaluating a build decision on initial cost alone understate its true cost?
-- Back: ** It ignores ongoing Friction Ledger maintenance burden and eventual Sunset Runway retirement cost over the capability's full lifecycle.
+- Front: Why does evaluating a build decision on initial cost alone understate its true cost?
+- Back: It ignores ongoing Friction Ledger maintenance burden and eventual Sunset Runway retirement cost over the capability's full lifecycle.
 - Difficulty: 2
-- Tags: **, total-cost-of-ownership
+- Tags: total-cost-of-ownership
 
 **Card 5**
-- Front: ** What went wrong in the Custom Analytics Platform case study?
-- Back: ** A build decision that was reasonable when the external market was immature was never revisited as the market matured, allowing a non-differentiating internal platform to consume growing resources long after superior external alternatives existed.
+- Front: What went wrong in the Custom Analytics Platform case study?
+- Back: A build decision that was reasonable when the external market was immature was never revisited as the market matured, allowing a non-differentiating internal platform to consume growing resources long after superior external alternatives existed.
 - Difficulty: 2
-- Tags: **, case-study, capability-sourcing-matrix
+- Tags: case-study, capability-sourcing-matrix
 
 **Card 6**
-- Front: ** Why should existing internal builds be periodically reassessed?
-- Back: ** A build decision that was genuinely correct when made can become outdated as external markets mature, and organizational discomfort with reversing prior investment shouldn't prevent honest reassessment.
+- Front: Why should existing internal builds be periodically reassessed?
+- Back: A build decision that was genuinely correct when made can become outdated as external markets mature, and organizational discomfort with reversing prior investment shouldn't prevent honest reassessment.
 - Difficulty: 2
-- Tags: **, periodic-reassessment
+- Tags: periodic-reassessment
 
 **Card 7**
-- Front: ** What quadrant of the Capability Sourcing Matrix calls for a Partner approach?
-- Back: ** High differentiation combined with a mature external market, where integrating an external provider while retaining differentiation elsewhere is often preferable to building from scratch.
+- Front: What quadrant of the Capability Sourcing Matrix calls for a Partner approach?
+- Back: High differentiation combined with a mature external market, where integrating an external provider while retaining differentiation elsewhere is often preferable to building from scratch.
 - Difficulty: 2
-- Tags: **, partner-quadrant
+- Tags: partner-quadrant
 
 
 ## Reflection Exercise
