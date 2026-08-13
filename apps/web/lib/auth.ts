@@ -142,16 +142,13 @@ export async function getServerUser(): Promise<User | null> {
 export async function getAuthenticatedUserFromRequest(request: Request): Promise<User | null> {
   // 1. Log cookies received
   const cookieHeader = request.headers.get('cookie') || ''
-  const hasCookieHeader = Boolean(cookieHeader)
 
   let token: string | null = null
-  let tokenSource: 'authorization_header' | 'cookie' | 'none' = 'none'
 
   // Check Authorization header
   const authHeader = request.headers.get('Authorization')
   if (authHeader?.startsWith('Bearer ')) {
     token = authHeader.substring(7).trim()
-    tokenSource = 'authorization_header'
   }
 
   // Fallback: Check sb-access-token cookie
@@ -161,14 +158,12 @@ export async function getAuthenticatedUserFromRequest(request: Request): Promise
       const sbToken = cookieStore.get('sb-access-token')?.value
       if (sbToken) {
         token = sbToken
-        tokenSource = 'cookie'
       }
     } catch {
       // Manual cookie header parsing fallback if cookies() unavailable
       const match = cookieHeader.match(/sb-access-token=([^;]+)/)
       if (match && match[1]) {
         token = decodeURIComponent(match[1])
-        tokenSource = 'cookie'
       }
     }
   }

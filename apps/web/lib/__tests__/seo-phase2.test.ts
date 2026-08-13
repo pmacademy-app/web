@@ -111,7 +111,7 @@ async function executeSeoPhase2TestSuite() {
     assert.strictEqual(curriculum.lessons.length, 90)
 
     for (let i = 0; i < curriculum.lessons.length; i++) {
-      const entry: any = curriculum.lessons[i]
+      const entry = curriculum.lessons[i] as { id: string; slug: string }
       const lesson = await fetchCompiledLesson(entry.id)
       assert.ok(lesson, `Lesson ${entry.id} must compile`)
 
