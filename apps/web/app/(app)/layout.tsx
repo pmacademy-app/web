@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
+import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile } from '@/lib/auth'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
@@ -47,7 +47,7 @@ export default async function AuthenticatedLayout({
 
   // Initialize profile if not found
   if (!profile) {
-    const serviceSupabase = createServerSupabaseClient()
+    const serviceSupabase = createServiceRoleClient()
     profile = await ensureUserProfile(serviceSupabase, authUser)
     if (!profile) {
       redirect('/login')

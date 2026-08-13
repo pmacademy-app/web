@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import type { CurriculumEntry } from '@/types'
 import { BookOpen, Clock, ChevronRight, GraduationCap, Layers } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { BRAND } from '@/lib/brand'
 
@@ -109,7 +109,7 @@ export default async function AcademyPage() {
   // Fetch completed lessons for current user
   let completedSet = new Set<string>()
   if (user) {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const { data: rows } = await supabase
       .from('user_lesson_progress')
       .select('lesson_id')

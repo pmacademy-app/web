@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getCohortsData, toggleCohortMembership } from '@/lib/leaderboard-db'
 
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const cohorts = await getCohortsData(supabase, user.id)
 
     return NextResponse.json({
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Valid cohortSlug and action (join/leave) required.' }, { status: 400 })
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const result = await toggleCohortMembership(supabase, user.id, cohortSlug, action as 'join' | 'leave')
 
     return NextResponse.json({

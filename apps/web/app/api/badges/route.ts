@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getUserBadgesData, evaluateAndAwardBadges } from '@/lib/badges-db'
 
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const badgeData = await getUserBadgesData(supabase, user.id)
 
     return NextResponse.json({
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const newlyAwarded = await evaluateAndAwardBadges(supabase, user.id)
 
     return NextResponse.json({

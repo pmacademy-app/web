@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { resetProgress } from '@/lib/settings/settings-service'
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}))
     const moduleSlug = body.module_slug
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     await resetProgress(supabase, user.id, moduleSlug)
 
     return NextResponse.json({ success: true })

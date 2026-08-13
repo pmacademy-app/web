@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getFriendLeaderboard, addFriend, removeFriend } from '@/lib/leaderboard-db'
 
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const friendsEntries = await getFriendLeaderboard(supabase, user.id)
 
     return NextResponse.json({
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Username is required to add friend.' }, { status: 400 })
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const result = await addFriend(supabase, user.id, username.trim())
 
     return NextResponse.json({
@@ -78,7 +78,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'friendId parameter is required.' }, { status: 400 })
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     await removeFriend(supabase, user.id, friendId)
 
     return NextResponse.json({ success: true })

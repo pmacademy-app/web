@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 import { evaluateRateLimit } from '@/lib/rate-limit'
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'You must be logged in to submit a review.' }, { status: 401 })
     }
 
-    const rateCheck = evaluateRateLimit(`testimonial_${user.id}`, { limit: 3, windowMs: 15 * 60 * 1000 })
+    const rateCheck = await evaluateRateLimit(`testimonial_${user.id}`, { limit: 3, windowMs: 15 * 60 * 1000 })
     if (!rateCheck.success) {
       return NextResponse.json({ error: 'Too many review submissions. Please try again later.' }, { status: 429 })
     }
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     const cleanHeadline = typeof headline === 'string' ? headline.trim().substring(0, 150) : null
     const cleanRole = typeof authorRole === 'string' ? authorRole.trim().substring(0, 100) : 'PM Academy Learner'
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('testimonials' as any) as any)

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { issueCertificate } from '@/lib/certificates-db'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing targetUserId' }, { status: 400 })
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // Fetch target user profile
     const { data: user, error: userError } = await supabase

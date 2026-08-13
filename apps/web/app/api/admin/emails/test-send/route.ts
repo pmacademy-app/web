@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: authGuard.error }, { status: authGuard.statusCode || 403 })
   }
 
-  const rateCheck = evaluateRateLimit(`admin_test_email_${authGuard.userId}`, {
+  const rateCheck = await evaluateRateLimit(`admin_test_email_${authGuard.userId}`, {
     limit: 10,
     windowMs: 60 * 1000,
   })

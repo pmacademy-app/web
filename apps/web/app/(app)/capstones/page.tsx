@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { getModuleCapstonesOverview } from '@/lib/capstones-db'
 import { CapstoneCard } from '@/components/capstones/CapstoneCard'
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function CapstonesOverviewPage() {
   const user = await getServerUser()
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   const userId = user?.id ?? ''
   const overviewItems = userId ? await getModuleCapstonesOverview(supabase, userId) : []

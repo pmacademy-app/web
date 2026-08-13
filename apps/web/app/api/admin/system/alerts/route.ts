@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
 
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') || 'new'
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '30', 10)))
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase.from('system_errors' as any) as any)
@@ -80,7 +80,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Valid alertId and newStatus are required.' }, { status: 400 })
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: updateErr } = await (supabase.from('system_errors' as any) as any)
       .update({ status: newStatus, updated_at: new Date().toISOString() })

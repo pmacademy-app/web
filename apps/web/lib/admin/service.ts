@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '../supabase'
+import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
 import type {
   AdminDashboardSummary,
@@ -14,7 +14,7 @@ export class AdminConsoleService {
    * Evaluates overall system health, DB latency, and queue latency.
    */
   public static async getSystemHealth(): Promise<AdminSystemHealth> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const startTime = Date.now()
     const { error } = await supabase.from('users').select('id').limit(1)
     const latency = Date.now() - startTime
@@ -54,7 +54,7 @@ export class AdminConsoleService {
    * Aggregates real-time platform overview metrics for main Admin Dashboard.
    */
   public static async getDashboardSummary(): Promise<AdminDashboardSummary> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     const [
       usersRes,
@@ -113,7 +113,7 @@ export class AdminConsoleService {
    * Merges Supabase Auth users (auth.users) with public.users profiles to capture unverified accounts.
    */
   public static async getUsersOverview(limit = 50, search = ''): Promise<AdminUserOverview[]> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // 1. Fetch public.users profiles
     let query = supabase.from('users').select('*').order('created_at', { ascending: false }).limit(limit)
@@ -204,7 +204,7 @@ export class AdminConsoleService {
    * Fetches detailed profile breakdown for a specific user (verified or unverified).
    */
   public static async getUserDetail(userId: string): Promise<AdminUserDetail | null> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     const { data: userRow } = await supabase.from('users').select('*').eq('id', userId).maybeSingle()
 
@@ -278,7 +278,7 @@ export class AdminConsoleService {
    * Toggles the admin status of a target user.
    */
   public static async toggleUserAdminRole(targetUserId: string, makeAdmin: boolean): Promise<boolean> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
     const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
       .update({ is_admin: makeAdmin, updated_at: new Date().toISOString() })
@@ -291,7 +291,7 @@ export class AdminConsoleService {
    * Overview metrics for Curriculum Content.
    */
   public static async getContentOverview(): Promise<AdminContentOverview> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const [capstonesRes] = await Promise.all([
       supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }),
     ])
@@ -312,7 +312,7 @@ export class AdminConsoleService {
    * Overview metrics for Email Queue.
    */
   public static async getEmailQueueOverview(): Promise<AdminEmailQueueOverview> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     try {
       const [pendingRes, processingRes, deliveredRes, failedRes] = await Promise.all([
         supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'pending'),

@@ -25,5 +25,6 @@ export interface EmailAutomationsState {
   globalPause: boolean
   dailyLimit: number
   dailySentCount: number
+  resendOutboundCount: number
   automations: EmailAutomationMeta[]
 }

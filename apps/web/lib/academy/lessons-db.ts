@@ -4,7 +4,7 @@ import { verifyTheoryReadEngagement, XP_VALUES } from '../xp'
 import { updateUserStreak } from '../streaks-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../supabase'
-import { createServerSupabaseClient } from '../supabase'
+import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
 import { completeLesson } from '../lessons-completion-service'
 
@@ -23,7 +23,7 @@ export async function getUserLessonProgress(
   userId: string,
   lessonId: string
 ): Promise<UserLessonProgressRecord | null> {
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const { data, error } = await supabase
     .from('user_lesson_progress')
     .select('*')
@@ -36,7 +36,7 @@ export async function getUserLessonProgress(
 }
 
 export async function getUserCompletedLessonIds(userId: string): Promise<string[]> {
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const { data, error } = await supabase
     .from('user_lesson_progress')
     .select('lesson_id')
@@ -50,7 +50,7 @@ export async function getUserCompletedLessonIds(userId: string): Promise<string[
 export async function upsertUserLessonProgress(
   record: Partial<UserLessonProgressRecord> & { user_id: string; lesson_id: string }
 ): Promise<UserLessonProgressRecord | null> {
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const now = new Date().toISOString()
   const { data, error } = await (supabase
     .from('user_lesson_progress') as unknown as DBChain)

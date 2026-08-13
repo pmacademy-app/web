@@ -142,16 +142,13 @@ export async function getServerUser(): Promise<User | null> {
 export async function getAuthenticatedUserFromRequest(request: Request): Promise<User | null> {
   // 1. Log cookies received
   const cookieHeader = request.headers.get('cookie') || ''
-  const hasCookieHeader = Boolean(cookieHeader)
 
   let token: string | null = null
-  let tokenSource: 'authorization_header' | 'cookie' | 'none' = 'none'
 
   // Check Authorization header
   const authHeader = request.headers.get('Authorization')
   if (authHeader?.startsWith('Bearer ')) {
     token = authHeader.substring(7).trim()
-    tokenSource = 'authorization_header'
   }
 
   // Fallback: Check sb-access-token cookie
@@ -161,52 +158,28 @@ export async function getAuthenticatedUserFromRequest(request: Request): Promise
       const sbToken = cookieStore.get('sb-access-token')?.value
       if (sbToken) {
         token = sbToken
-        tokenSource = 'cookie'
       }
     } catch {
       // Manual cookie header parsing fallback if cookies() unavailable
       const match = cookieHeader.match(/sb-access-token=([^;]+)/)
       if (match && match[1]) {
         token = decodeURIComponent(match[1])
-        tokenSource = 'cookie'
       }
     }
   }
 
-  console.log('[auth-trace] Step 1 - Cookies received:', {
-    hasCookieHeader,
-    cookieHeaderSnippet: cookieHeader ? `${cookieHeader.substring(0, 40)}...` : 'none',
-  })
 
-  console.log('[auth-trace] Step 2 - Authenticated session:', {
-    tokenSource,
-    hasToken: Boolean(token),
-  })
 
   if (!token) {
-    console.warn('[auth-trace] Step 3 - Authenticated user: null (No token found in header or cookies)')
     return null
   }
-
-  // 3. Supabase client initialization & verification
-  console.log('[auth-trace] Step 4 - Supabase client initialization:', {
-    clientType: 'createAuthenticatedServerClient',
-  })
 
   const authClient = createAuthenticatedServerClient(token)
   const { data: { user }, error: userError } = await authClient.auth.getUser()
 
   if (userError || !user) {
-    console.warn('[auth-trace] Step 3 - Authenticated user: null', {
-      errorMsg: userError?.message ?? 'User not found for token',
-    })
     return null
   }
-
-  console.log('[auth-trace] Step 3 - Authenticated user: success', {
-    userId: user.id,
-    email: user.email,
-  })
 
   return user
 }

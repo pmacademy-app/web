@@ -135,9 +135,16 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-8">
           <div className="text-right">
-            <span className="text-xs text-slate-400">Today&apos;s Usage</span>
+            <span className="text-xs text-slate-400">Resend Account Outbound</span>
+            <p className="text-sm font-bold font-mono text-emerald-400">
+              {state.resendOutboundCount} / 100 limit
+            </p>
+          </div>
+          <div className="w-px h-8 bg-slate-800"></div>
+          <div className="text-right">
+            <span className="text-xs text-slate-400">Prodily Automation Quota</span>
             <p className="text-sm font-bold font-mono text-amber-400">
               {state.dailySentCount} / {state.dailyLimit} sent
             </p>

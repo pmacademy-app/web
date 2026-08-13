@@ -39,11 +39,14 @@ async function runSendEmailHookTests() {
   // 0. Canonical Sender Verification
   runTest('getFromEmail returns canonical verified domain welcome@prodily.adityagangwani.me and respects RESEND_FROM_EMAIL', () => {
     delete process.env.RESEND_FROM_EMAIL
-    assert.strictEqual(getFromEmail(), 'Prodily PM Academy <welcome@prodily.adityagangwani.me>')
+    assert.strictEqual(
+      getFromEmail(),
+      'Prodily <welcome@prodily.adityagangwani.me>'
+    )
     assert.strictEqual(BRAND.emailFromAddress, 'welcome@prodily.adityagangwani.me')
 
     process.env.RESEND_FROM_EMAIL = 'custom@prodily.adityagangwani.me'
-    assert.strictEqual(getFromEmail(), 'Prodily PM Academy <custom@prodily.adityagangwani.me>')
+    assert.strictEqual(getFromEmail(), 'Prodily <custom@prodily.adityagangwani.me>')
 
     delete process.env.RESEND_FROM_EMAIL
   })

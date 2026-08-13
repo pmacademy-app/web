@@ -1,4 +1,4 @@
-import '../../bootstrap';
+;
 import test, { describe, it } from 'node:test';
 import assert from 'node:assert';
 import path from 'node:path';

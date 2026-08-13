@@ -101,8 +101,8 @@ export class FeatureFlagService {
    */
   private async persistToDatabase(): Promise<void> {
     try {
-      const { createServerSupabaseClient } = await import('../../supabase')
-      const supabase = createServerSupabaseClient()
+      const { createServiceRoleClient } = await import('../../supabase')
+      const supabase = createServiceRoleClient()
       const flagsObj: Record<string, boolean> = {}
       for (const [k, v] of this.inMemoryCache.entries()) {
         flagsObj[k] = v.enabled

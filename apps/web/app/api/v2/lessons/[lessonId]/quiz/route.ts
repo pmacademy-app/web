@@ -11,7 +11,7 @@
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
+import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { recordQuizAttemptAction } from '@/lib/lessons-db'
 
@@ -33,7 +33,7 @@ export async function POST(
     const accessToken = cookieStore.get('sb-access-token')?.value
 
     if (!accessToken) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+      { console.warn('[auth-401-monitor] 401 Unauthorized in API v2'); return Response.json({ error: 'Unauthorized' }, { status: 401 }); }
     }
 
     const authClient = createAuthenticatedServerClient(accessToken)
@@ -49,7 +49,7 @@ export async function POST(
     }
 
     const { attempts } = parsed.data
-    const serviceSupabase = createServerSupabaseClient()
+    const serviceSupabase = createServiceRoleClient()
 
     // Pass only the necessary fields to the service action so correctness validation is strictly server-side
     const cleanAttempts = attempts.map(a => ({
