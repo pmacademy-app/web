@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import type { Database } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { getUserXpSummary } from '@/lib/xp-service'
@@ -32,7 +32,7 @@ export default async function ProgressPage() {
     redirect('/login')
   }
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   // Fetch all performance & competency data in parallel
   const [

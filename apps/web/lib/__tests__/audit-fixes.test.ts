@@ -5,6 +5,7 @@ if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
   process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock_service_role_key'
 }
 
+import { NextRequest } from 'next/server'
 import { POST as handleProductionSend } from '../../app/api/admin/emails/production-send/route'
 import { AdminConsoleService } from '../admin/service'
 
@@ -44,7 +45,7 @@ async function runAuditFixesTests() {
     }),
   })
 
-  const invalidUserRes = await handleProductionSend(invalidUserReq as unknown as Request)
+  const invalidUserRes = await handleProductionSend(invalidUserReq as unknown as NextRequest)
   if (invalidUserRes.status === 404 || invalidUserRes.status === 401) {
     console.log('  ✓ Admin Production Send with non-existent user returns 404/401 and logs system_errors record')
   } else {

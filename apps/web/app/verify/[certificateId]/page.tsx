@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { verifyCertificate } from '@/lib/certificates-db'
 import { generateCredentialJsonLd } from '@/lib/certificates'
 import { CertificateCard } from '@/components/certificates/CertificateCard'
@@ -17,7 +17,7 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { certificateId } = await params
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const cert = await verifyCertificate(supabase, certificateId, SITE_ORIGIN)
 
   if (!cert) {
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CertificateVerificationPage({ params }: PageProps) {
   const { certificateId } = await params
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const cert = await verifyCertificate(supabase, certificateId, SITE_ORIGIN)
 
   if (!cert) {

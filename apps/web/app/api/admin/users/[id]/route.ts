@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { AdminConsoleService } from '@/lib/admin/service'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { deleteAccount, resetProgress } from '@/lib/settings/settings-service'
 
 interface Context {
@@ -37,7 +37,7 @@ export async function DELETE(request: Request, { params }: Context) {
 
   try {
     const { id } = await params
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     await deleteAccount(supabase, id)
     await logAdminAction(auth.userId, auth.email, 'admin_user_deleted', 'user', id)
@@ -60,7 +60,7 @@ export async function POST(request: Request, { params }: Context) {
     const body = await request.json()
     const { action } = body
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     if (action === 'reset_progress') {
       await resetProgress(supabase, id, 'all')

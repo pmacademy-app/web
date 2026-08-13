@@ -1,6 +1,6 @@
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
 
 /** Attach the Supabase session as HTTP-only cookies on a redirect response. */
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   // ── Path 1: PKCE code exchange (OAuth / magic link) ──────────────────────
   if (code) {
     try {
-      const supabase = createServerSupabaseClient()
+      const supabase = createServiceRoleClient()
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (!error && data.user && data.session) {
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
   // calls verifyOtp() to confirm the account and create a session.
   if (token_hash && type) {
     try {
-      const supabase = createServerSupabaseClient()
+      const supabase = createServiceRoleClient()
       const { data, error } = await supabase.auth.verifyOtp({ token_hash, type })
 
       if (!error && data.user && data.session) {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   const authGuard = await requireAdminUser(request)
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const { data: events, error } = await supabase
       .from('notification_events')
       .select('*')

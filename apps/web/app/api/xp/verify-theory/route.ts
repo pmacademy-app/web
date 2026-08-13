@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { recordTheoryReadAction } from '@/lib/lessons-db'
 
 export async function POST(request: Request) {
@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const authHeader = request.headers.get('Authorization')
     const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     let userId: string | null = null
 
     if (token) {

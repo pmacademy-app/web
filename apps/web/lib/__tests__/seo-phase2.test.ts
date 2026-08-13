@@ -111,7 +111,7 @@ async function executeSeoPhase2TestSuite() {
     assert.strictEqual(curriculum.lessons.length, 90)
 
     for (let i = 0; i < curriculum.lessons.length; i++) {
-      const entry = curriculum.lessons[i]
+      const entry = curriculum.lessons[i] as { id: string; slug: string }
       const lesson = await fetchCompiledLesson(entry.id)
       assert.ok(lesson, `Lesson ${entry.id} must compile`)
 
@@ -161,7 +161,7 @@ async function executeSeoPhase2TestSuite() {
     assert.ok(personObj, 'Person entity must exist')
     assert.strictEqual(personObj.name, 'Aditya Gangwani')
     assert.strictEqual(personObj.url, 'https://adityagangwani.me')
-    assert.strictEqual(personObj.worksFor.name, BRAND.fullName)
+    assert.strictEqual(personObj.worksFor?.name, BRAND.fullName)
     assert.doesNotThrow(() => JSON.stringify(about), 'About schema must serialize cleanly')
   })
 

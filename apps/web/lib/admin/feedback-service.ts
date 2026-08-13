@@ -1,5 +1,5 @@
 import { unstable_cache, revalidateTag } from 'next/cache'
-import { createServerSupabaseClient } from '../supabase'
+import { createServiceRoleClient } from '../supabase'
 import { logAdminAction } from './guard'
 
 export interface TestimonialItem {
@@ -37,7 +37,7 @@ export class FeedbackAdminService {
     content: string,
     sourceEvent: string = 'general'
   ): Promise<TestimonialItem | null> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const cleanContent = content.trim()
     if (!cleanContent) throw new Error('Feedback content cannot be empty.')
 
@@ -79,7 +79,7 @@ export class FeedbackAdminService {
    * Fetches feedback moderation queue for Admin Console.
    */
   public static async getModerationQueue(statusFilter?: string): Promise<TestimonialItem[]> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase.from('testimonials' as any) as any).select('*').order('created_at', { ascending: false })
@@ -144,7 +144,7 @@ export class FeedbackAdminService {
     action: 'approve' | 'publish' | 'unpublish' | 'reject' | 'edit',
     updatedContent?: string
   ): Promise<boolean> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     const updatePayload: Record<string, unknown> = {
       reviewed_by: adminUserId,
@@ -203,7 +203,7 @@ export class FeedbackAdminService {
       const fetcher = unstable_cache(
         async () => {
           try {
-            const supabase = createServerSupabaseClient()
+            const supabase = createServiceRoleClient()
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data, error } = await (supabase.from('testimonials' as any) as any)
@@ -277,7 +277,7 @@ export class FeedbackAdminService {
     status: string
     createdAt: string
   }>> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('user_feedback' as any) as any)

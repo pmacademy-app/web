@@ -11,7 +11,7 @@ const rateLimitMap = new Map<string, RateLimitEntry>()
 
 // Periodic garbage collection every 5 minutes to prevent memory leaks
 if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
+  const gc = setInterval(() => {
     const now = Date.now()
     for (const [key, entry] of rateLimitMap.entries()) {
       if (now > entry.resetAt) {
@@ -19,6 +19,9 @@ if (typeof setInterval !== 'undefined') {
       }
     }
   }, 5 * 60 * 1000)
+  if (gc.unref) {
+    gc.unref()
+  }
 }
 
 export interface RateLimitOptions {
@@ -30,7 +33,7 @@ export interface RateLimitOptions {
  * Evaluates rate limit for a key (e.g. user_id or IP).
  * Returns { success: true } if under limit, or { success: false, remaining, resetInMs } if exceeded.
  */
-export function evaluateRateLimit(
+export function evaluateInMemoryRateLimit(
   key: string,
   options: RateLimitOptions = {}
 ): { success: boolean; remaining: number; resetInMs: number } {
@@ -54,6 +57,22 @@ export function evaluateRateLimit(
 }
 
 /**
+ * Hybrid Rate Limiter:
+ * Uses in-memory Map in development for speed.
+ * Uses persistent DB in production for durability across Vercel serverless functions.
+ */
+export async function evaluateRateLimit(
+  key: string,
+  options: RateLimitOptions = {}
+): Promise<{ success: boolean; remaining: number; resetInMs: number }> {
+  if (process.env.NODE_ENV === 'development') {
+    return evaluateInMemoryRateLimit(key, options)
+  }
+  return evaluatePersistentRateLimit(key, options)
+}
+
+
+/**
  * Evaluates rate limit against the persistent PostgreSQL public.rate_limits table.
  * Fallback to in-memory evaluation if database is unreachable.
  */
@@ -66,8 +85,8 @@ export async function evaluatePersistentRateLimit(
   const now = Date.now()
 
   try {
-    const { createServerSupabaseClient } = await import('@/lib/supabase')
-    const supabase = createServerSupabaseClient()
+    const { createServiceRoleClient } = await import('@/lib/supabase')
+    const supabase = createServiceRoleClient()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: existing, error: selectError } = await (supabase.from('rate_limits' as any) as any)

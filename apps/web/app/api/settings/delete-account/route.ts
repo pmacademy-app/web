@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { deleteAccount } from '@/lib/settings/settings-service'
 
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     }
 
     // Use service-role client for admin operations (bypasses RLS, has auth.admin access)
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // 1. Delete all application-owned data rows (cascades through all user tables)
     await deleteAccount(supabase, user.id)

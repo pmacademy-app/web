@@ -13,7 +13,7 @@
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
+import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
 import { evaluateRateLimit } from '@/lib/rate-limit'
 import { getAuthenticatedUser } from '@/lib/auth'
 
@@ -50,7 +50,7 @@ export async function GET(
     const accessToken = cookieStore.get('sb-access-token')?.value
 
     if (!accessToken) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+      { console.warn('[auth-401-monitor] 401 Unauthorized in API v2'); return Response.json({ error: 'Unauthorized' }, { status: 401 }); }
     }
 
     const authClient = createAuthenticatedServerClient(accessToken)
@@ -59,7 +59,7 @@ export async function GET(
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const serviceSupabase = createServerSupabaseClient()
+    const serviceSupabase = createServiceRoleClient()
     const { data: progress, error } = (await serviceSupabase
       .from('user_lesson_progress')
       .select('*')
@@ -112,7 +112,7 @@ export async function PATCH(
     }
 
     // Rate limiting (30 requests per minute per user)
-    const rl = evaluateRateLimit(`progress_${user.id}`, { limit: 30, windowMs: 60 * 1000 })
+    const rl = await evaluateRateLimit(`progress_${user.id}`, { limit: 30, windowMs: 60 * 1000 })
     if (!rl.success) {
       return Response.json({ error: 'Too many requests. Please try again shortly.' }, { status: 429 })
     }
@@ -124,7 +124,7 @@ export async function PATCH(
     }
 
     const { status } = parsed.data
-    const serviceSupabase = createServerSupabaseClient()
+    const serviceSupabase = createServiceRoleClient()
 
     // Query current status to prevent overriding a completed state with in_progress
     const { data: existing } = (await serviceSupabase

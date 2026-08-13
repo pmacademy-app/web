@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { saveDraftAction } from '@/lib/capstones-db'
 import { getCapstoneDefinition } from '@/config/capstones'
@@ -30,7 +30,7 @@ export async function POST(
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const result = await saveDraftAction(supabase, user.id, moduleSlug, content)
 
     return NextResponse.json({
