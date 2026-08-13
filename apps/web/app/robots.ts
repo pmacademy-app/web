@@ -15,6 +15,8 @@ export default function robots(): MetadataRoute.Robots {
           '/privacy',
           '/terms',
           '/curriculum',
+          '/frameworks',
+          '/glossary',
           '/lessons/',
           '/p/',
         ],
