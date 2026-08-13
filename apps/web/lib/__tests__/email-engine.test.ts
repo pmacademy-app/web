@@ -1,8 +1,4 @@
 import assert from 'assert'
-import {
-  createDefaultNotificationPreferences,
-  isChannelEnabledByPreferences,
-} from '../notifications'
 import { renderEmailTemplate } from '../../emails'
 
 console.log('🧪 Running Email Engine & Delivery Unit Test Suite...\n')

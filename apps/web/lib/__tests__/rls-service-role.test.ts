@@ -59,17 +59,17 @@ async function runAllRlsTests() {
     ]
 
     for (const table of tables) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let data = []
+      let data: unknown[] | null = []
       let error = null
       
       try {
-        const res = await (client.from(table as any) as any).select('*').limit(1)
+        const res = await client.from(table).select('*').limit(1)
         data = res.data
         error = res.error
-      } catch (e: any) {
+      } catch (e: unknown) {
         // If it throws a fetch error due to mock.supabase.co, we gracefully pass
-        if (e.message && e.message.includes('fetch failed')) {
+        const err = e as Error
+        if (err.message && err.message.includes('fetch failed')) {
           continue
         }
         throw e
