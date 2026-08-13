@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getPublicPortfolioData } from '@/lib/portfolio-db'
 import { generatePersonJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero'
@@ -19,7 +19,7 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const portfolio = await getPublicPortfolioData(supabase, username)
 
   if (!portfolio || !portfolio.user.isPortfolioPublic) {
@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicPortfolioPage({ params }: PageProps) {
   const { username } = await params
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const portfolio = await getPublicPortfolioData(supabase, username)
 
   // Private or non-existent profile state

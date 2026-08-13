@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Award, ExternalLink, ShieldCheck } from 'lucide-react'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
 import { DeveloperActionsSection } from '@/components/admin/DeveloperActionsSection'
@@ -19,7 +19,7 @@ interface CertificateRow {
 }
 
 export default async function AdminCertificatesPage() {
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const users = await AdminConsoleService.getUsersOverview(1)
 
   // Fetch certificates from certificates table

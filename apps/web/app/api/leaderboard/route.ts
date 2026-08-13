@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getWeeklyLeaderboard, toggleLeaderboardOptIn } from '@/lib/leaderboard-db'
 
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const payload = await getWeeklyLeaderboard(supabase, user.id)
 
     return NextResponse.json({
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}))
     const isOptedIn = Boolean(body.isOptedIn)
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const result = await toggleLeaderboardOptIn(supabase, user.id, isOptedIn)
 
     return NextResponse.json({

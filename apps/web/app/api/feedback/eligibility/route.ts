@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: true, eligiblePrompts: [] })
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // 1. Fetch completed/dismissed prompts for this user
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     const activeIncrementSeconds = typeof body.incrementSeconds === 'number' && body.incrementSeconds > 0 ? body.incrementSeconds : 0
 
     if (activeIncrementSeconds > 0) {
-      const supabase = createServerSupabaseClient()
+      const supabase = createServiceRoleClient()
       
       // Fetch current total_active_seconds
       const { data: userRow } = await supabase

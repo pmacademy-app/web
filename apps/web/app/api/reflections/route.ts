@@ -11,7 +11,7 @@
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
+import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { recordReflectionAction } from '@/lib/lessons-db'
 
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const serviceSupabase = createServerSupabaseClient()
+    const serviceSupabase = createServiceRoleClient()
     const { data: reflection, error } = await serviceSupabase
       .from('reflections')
       .select('*')
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { lesson_id, content, is_public } = parsed.data
-    const serviceSupabase = createServerSupabaseClient()
+    const serviceSupabase = createServiceRoleClient()
 
     const result = await recordReflectionAction(
       serviceSupabase,

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { getWeeklyLeaderboard, getFriendLeaderboard, getCohortsData } from '@/lib/leaderboard-db'
 import { LeaderboardHeader } from '@/components/leaderboard/LeaderboardHeader'
@@ -19,7 +19,7 @@ export default async function LeaderboardPage() {
     redirect('/login')
   }
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const [weeklyPayload, friendEntries, cohortsList] = await Promise.all([
     getWeeklyLeaderboard(supabase, user.id),
     getFriendLeaderboard(supabase, user.id),

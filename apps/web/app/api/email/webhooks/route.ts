@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { sendEmail } from '@/lib/email'
 
 function escapeHtml(unsafe: string): string {
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
     // Handle Outbound Resend Delivery Events (sent, delivered, failed, bounced, complained)
     if (eventType !== 'email.received' && eventType.startsWith('email.')) {
       try {
-        const supabase = createServerSupabaseClient()
+        const supabase = createServiceRoleClient()
 
         // 1. Find target queue item by resend_id
         let queueId: string | null = null
@@ -212,7 +212,7 @@ export async function POST(request: Request) {
     // 3. Persist inbound message into Supabase contact_messages table
     let insertedId: string | null = null
     try {
-      const supabase = createServerSupabaseClient()
+      const supabase = createServiceRoleClient()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: inserted, error } = await (supabase.from('contact_messages' as any) as any)
         .insert({

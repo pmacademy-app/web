@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import type { ApiSuccess, ApiError } from '@/types'
 import { ROLE_OPTIONS } from '@/types'
 import { sendWaitlistConfirmationEmail } from '@/lib/email'
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
 
   // Supabase operations
   try {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // Check for duplicate email
     const { data: existing } = await supabase

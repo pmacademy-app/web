@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   const auth = await requireAdminUser(request)
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const statusFilter = searchParams.get('status')
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query = (supabase.from('contact_messages' as any) as any)
       .select('*')
@@ -47,7 +47,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Message ID and status are required.' }, { status: 400 })
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const updatePayload: Record<string, unknown> = {
       status,
     }

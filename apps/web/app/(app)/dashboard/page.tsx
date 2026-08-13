@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import type { Database } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
@@ -28,7 +28,7 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   // 1. Fetch & ensure user profile
   const { data: dbProfile, error: dbError } = await supabase

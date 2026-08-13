@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { renderEmailTemplate } from '@/emails'
 import { logSystemError } from '@/lib/monitoring/logger'
 
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'targetUserId and templateKey are required' }, { status: 400 })
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // 1. Fetch Target Learner Account (Auth + public.users)
     const { data: userRow } = await supabase
@@ -152,6 +152,15 @@ export async function POST(request: NextRequest) {
 
     // Immediate queue processing trigger
     const processResult = await processEmailQueue(50)
+
+    if (processResult && processResult.processed === 0) {
+      return NextResponse.json({
+        success: false,
+        error: `Production email enqueued but processing failed or was skipped (processed: 0). Queue ID: ${queueId}`,
+        queueId,
+        processResult,
+      }, { status: 400 })
+    }
 
     await logAdminAction(
       adminUser.id,

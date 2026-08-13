@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
 
 export const runtime = 'nodejs'
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const {
       data: { user: sessionUser },
     } = await supabase.auth.getUser()

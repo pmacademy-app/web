@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { globalFeatureFlagService } from '@/lib/notifications/feature-flags/service'
 import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
 import type { NotificationPriorityLevel } from '@/lib/notifications/types'
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20', 10)))
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   try {
     let query = supabase
@@ -125,7 +125,7 @@ export async function PATCH(request: Request) {
   try {
     const body = await request.json()
     const { action, notificationId } = body
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     if (action === 'mark_all_read') {
       const { error } = await (supabase

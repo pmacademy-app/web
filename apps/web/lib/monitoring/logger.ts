@@ -46,8 +46,8 @@ export async function logSystemError(options: LogSystemErrorOptions): Promise<st
   )
 
   try {
-    const { createServerSupabaseClient } = await import('@/lib/supabase')
-    const supabase = createServerSupabaseClient()
+    const { createServiceRoleClient } = await import('@/lib/supabase')
+    const supabase = createServiceRoleClient()
 
     // 1. Check for duplicate incident within 15 minutes window
     const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString()

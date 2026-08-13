@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { createDefaultNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 
 interface DBChain {
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   try {
     const { data: userRow } = await supabase
@@ -56,7 +56,7 @@ export async function PATCH(request: Request) {
 
   try {
     const body = await request.json()
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     const { error } = await (supabase
       .from('user_notification_preferences') as unknown as DBChain)

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 
 interface DBChain {
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const { data: profile, error } = (await (supabase
       .from('users') as unknown as DBChain)
       .select('name, avatar_url, bio, linkedin_url, github_url, website_url, is_portfolio_public, username')
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { name, avatar_url, bio, linkedin_url, github_url, website_url } = body
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const { error } = await (supabase
       .from('users') as unknown as DBChain)
       .update({

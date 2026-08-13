@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -27,7 +27,7 @@ export async function submitOnboarding(goal: 'job_search' | 'fill_gaps' | 'explo
     }
 
     const userId = user.id
-    const dbSupabase = createServerSupabaseClient() // service role
+    const dbSupabase = createServiceRoleClient() // service role
 
     // 1. Update public.users table with chosen goal
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

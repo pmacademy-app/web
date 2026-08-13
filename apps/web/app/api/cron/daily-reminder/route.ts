@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     })
   }
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   let remindersQueued = 0
 
   try {

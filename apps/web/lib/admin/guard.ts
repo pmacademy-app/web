@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '../supabase'
+import { createServiceRoleClient } from '../supabase'
 import { getAuthenticatedUserFromRequest } from '../auth'
 import { isAdminEmail } from './authorization'
 
@@ -24,7 +24,7 @@ export async function requireAdminUser(request: Request): Promise<AdminAuthResul
     }
   }
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const { data: userRow, error } = await supabase
     .from('users')
     .select('is_admin, email')
