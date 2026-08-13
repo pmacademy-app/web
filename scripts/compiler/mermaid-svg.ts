@@ -1,4 +1,4 @@
-import '../bootstrap';
+;
 import { pathToFileURL } from 'node:url';
 import { TOKENS } from '../../apps/web/theme/tokens';
 

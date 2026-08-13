@@ -113,7 +113,8 @@ async function runAllTests() {
     assert.deepStrictEqual(provider.supportedChannels, ['email'])
 
     const health = await provider.healthCheck()
-    assert.strictEqual(health.isHealthy, true)
+    const hasKey = Boolean(process.env.RESEND_API_KEY)
+    assert.strictEqual(health.isHealthy, hasKey)
 
     const sendRes = await provider.send({
       recipient: { userId: 'u1', email: 'test@example.com' },

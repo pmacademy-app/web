@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { getUserBadgesData } from '@/lib/badges-db'
 import { BadgeCard } from '@/components/badges/BadgeCard'
@@ -18,7 +18,7 @@ export default async function BadgesGalleryPage() {
     redirect('/login')
   }
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const { totalEarned, totalAvailable, completionPercentage, allBadges, recentBadge } =
     await getUserBadgesData(supabase, user.id)
 

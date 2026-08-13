@@ -1,7 +1,7 @@
 /**
  * Supabase client factory & type-safe Database definitions.
  *
- * - createServerSupabaseClient() — uses SERVICE_ROLE_KEY (server-only, bypasses RLS)
+ * - createServiceRoleClient() — uses SERVICE_ROLE_KEY (server-only, bypasses RLS)
  *   Use ONLY in app/api/ route handlers. Never import in client components.
  *
  * - createBrowserSupabaseClient() — uses ANON_KEY (safe for browser)
@@ -420,7 +420,13 @@ export type Database = {
   }
 }
 
-export function createServerSupabaseClient() {
+/**
+ * Creates a Supabase client with the SERVICE_ROLE_KEY.
+ * This client bypasses all Row Level Security (RLS) policies.
+ * ONLY use this for backend administrative tasks or when RLS bypass is explicitly required.
+ * Do not use this to fetch data on behalf of a specific user.
+ */
+export function createServiceRoleClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -435,6 +441,8 @@ export function createServerSupabaseClient() {
     auth: { persistSession: false },
   })
 }
+
+
 
 let globalBrowserSupabaseClient: ReturnType<typeof createClient<Database>> | null = null
 
@@ -456,6 +464,11 @@ export function createBrowserSupabaseClient() {
   return globalBrowserSupabaseClient
 }
 
+/**
+ * Creates a user-scoped Supabase client that authenticates via an access token.
+ * This client respects Row Level Security (RLS) policies for the authenticated user.
+ * Use this in API routes or server actions when acting on behalf of a user.
+ */
 export function createAuthenticatedServerClient(accessToken: string) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

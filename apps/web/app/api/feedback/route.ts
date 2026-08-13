@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { evaluateRateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
   try {
     const user = await getAuthenticatedUserFromRequest(request)
-    const rateCheck = evaluateRateLimit(user ? user.id : 'anon_feedback', { limit: 5, windowMs: 60 * 1000 })
+    const rateCheck = await evaluateRateLimit(user ? user.id : 'anon_feedback', { limit: 5, windowMs: 60 * 1000 })
     if (!rateCheck.success) {
       return NextResponse.json({ error: 'Too many feedback submissions. Please wait a moment.' }, { status: 429 })
     }
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     // Handle prompt dismissal without content
     if (action === 'dismiss' && promptKey && user) {
-      const supabase = createServerSupabaseClient()
+      const supabase = createServiceRoleClient()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase.from('user_feedback_prompts' as any) as any)
         .upsert({
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const cleanRating = typeof rating === 'number' && rating >= 1 && rating <= 5 ? rating : null
     const cleanUrl = typeof pageUrl === 'string' ? pageUrl.trim().substring(0, 200) : null
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('user_feedback' as any) as any)

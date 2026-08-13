@@ -16,7 +16,7 @@ import {
   getAdjacentLessons,
   getLessonMeta,
 } from '@/lib/lesson-loader'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { isLessonUnlocked } from '@/lib/lessons-completion-service'
 import { BRAND } from '@/lib/brand'
@@ -138,7 +138,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
 
   let isLocked = false
   if (user && prevId) {
-    const serviceSupabase = createServerSupabaseClient()
+    const serviceSupabase = createServiceRoleClient()
     const unlocked = await isLessonUnlocked(serviceSupabase, user.id, lessonId, prevId)
     if (!unlocked) {
       isLocked = true

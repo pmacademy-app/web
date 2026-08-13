@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { issueCertificate, getUserCertificates } from '@/lib/certificates-db'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const certificates = await getUserCertificates(supabase, user.id)
     return NextResponse.json({ success: true, certificates })
   } catch (error: unknown) {
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const body = await request.json().catch(() => ({}))
     const type = body.type || 'full_curriculum'
     const moduleSlug = body.moduleSlug || null

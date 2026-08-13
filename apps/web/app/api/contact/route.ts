@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { evaluateRateLimit } from '@/lib/rate-limit'
 import { sendEmail } from '@/lib/email'
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   try {
     const user = await getAuthenticatedUserFromRequest(request)
     const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anon'
-    const rateCheck = evaluateRateLimit(`contact_${user ? user.id : clientIp}`, { limit: 3, windowMs: 10 * 60 * 1000 })
+    const rateCheck = await evaluateRateLimit(`contact_${user ? user.id : clientIp}`, { limit: 3, windowMs: 10 * 60 * 1000 })
 
     if (!rateCheck.success) {
       return NextResponse.json({ error: 'Too many contact messages sent. Please try again later.' }, { status: 429 })
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const cleanCategory = typeof category === 'string' ? category.trim().substring(0, 50) : 'general'
     const cleanMessage = message.trim().substring(0, 3000)
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     // 1. Persist contact message to Database (Fail-safe check)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

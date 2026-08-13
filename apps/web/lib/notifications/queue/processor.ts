@@ -5,7 +5,7 @@ import { createDefaultNotificationPreferences, isChannelEnabledByPreferences } f
 import { globalPriorityMatrix } from '../priority/matrix'
 import { globalProviderRegistry } from '../providers'
 import { renderEmailTemplate } from '../../../emails'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '../automations/service'
 import type { EmailAutomationKey } from '../automations/types'
 
@@ -31,7 +31,7 @@ export async function enqueueNotificationItem(
 ): Promise<{ success: boolean; queueId?: string; reason?: string }> {
   const priorityLevel = params.priorityLevel || 'medium'
   const priorityDef = PRIORITY_MATRIX[priorityLevel]
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
 
   // 1. Feature Flag Check
   const emailEnabled = globalFeatureFlagService.isEnabled('EMAIL_ENABLED')
@@ -142,7 +142,7 @@ export async function enqueueNotificationItem(
  * Logs an auditable skipped event to notification_events for admin diagnostics.
  */
 async function recordSkippedEvent(
-  supabase: ReturnType<typeof createServerSupabaseClient>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   params: EnqueueNotificationParams,
   skippedReason: string
 ): Promise<void> {
@@ -178,7 +178,7 @@ export async function processEmailQueue(
     return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }
   }
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   let claimedRows: Array<Record<string, unknown>> = []
 
   // 1. Atomic PostgreSQL Row Claiming via RPC (FOR UPDATE SKIP LOCKED)
@@ -338,7 +338,7 @@ export async function processEmailQueue(
 }
 
 async function updateItemSkipped(
-  supabase: ReturnType<typeof createServerSupabaseClient>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   queueId: string,
   reason: string
 ): Promise<void> {
@@ -349,7 +349,7 @@ async function updateItemSkipped(
 }
 
 async function handleRetryableFailure(
-  supabase: ReturnType<typeof createServerSupabaseClient>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   queueId: string,
   errorMessage: string,
   attemptCount: number,
@@ -376,7 +376,7 @@ async function handleRetryableFailure(
 }
 
 async function handlePermanentFailure(
-  supabase: ReturnType<typeof createServerSupabaseClient>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   queueId: string,
   userId: string,
   templateKey: string,

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createAuthenticatedServerClient, createServerSupabaseClient } from '@/lib/supabase'
+import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { recordFlashcardReview } from '@/lib/flashcards-service'
 
@@ -42,7 +42,7 @@ export async function POST(
     }
 
     const { rating } = parsed.data
-    const serviceSupabase = createServerSupabaseClient()
+    const serviceSupabase = createServiceRoleClient()
 
     const result = await recordFlashcardReview(
       serviceSupabase,

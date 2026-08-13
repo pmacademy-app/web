@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Mail, FileCode, RefreshCw, Bell, ShieldCheck, Send, MessageSquare } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
@@ -51,7 +51,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
   const queue = await AdminConsoleService.getEmailQueueOverview()
   const automationsState = await EmailAutomationsService.getState()
 
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: contactData } = await (supabase.from('contact_messages' as any) as any)
     .select('*')

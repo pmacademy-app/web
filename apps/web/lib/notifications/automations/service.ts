@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import type { EmailAutomationKey, EmailAutomationMeta, EmailAutomationsState } from './types'
 
 export const AUTOMATION_METADATA: Array<Omit<EmailAutomationMeta, 'enabled'>> = [
@@ -41,7 +41,7 @@ export class EmailAutomationsService {
    * Fetches full Email Automations state from Supabase system_settings.
    */
   public static async getState(): Promise<EmailAutomationsState> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const todayKey = `email_sent_count_${new Date().toISOString().slice(0, 10).replace(/-/g, '_')}`
 
     try {
@@ -53,7 +53,32 @@ export class EmailAutomationsService {
       let globalPause = false
       let dailyLimit = 100
       let dailySentCount = 0
+      let resendOutboundCount = 0
       let toggles: Record<string, boolean> = { ...DEFAULT_AUTOMATION_TOGGLES }
+
+      // Fetch actual Resend outbound usage
+      try {
+        const resendApiKey = process.env.RESEND_API_KEY
+        if (resendApiKey) {
+          const res = await fetch('https://api.resend.com/emails', {
+            headers: { Authorization: `Bearer ${resendApiKey}` }
+          })
+          
+          if (res.ok) {
+            // Read quota header to get the exact outbound usage for the free tier
+            const dailyQuota = res.headers.get('x-resend-daily-quota')
+            if (dailyQuota) {
+              resendOutboundCount = parseInt(dailyQuota, 10)
+            } else {
+              // Fallback if header is missing
+              const data = await res.json()
+              resendOutboundCount = Array.isArray(data?.data) ? data.data.length : 0
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[EmailAutomationsService] Failed to fetch Resend usage metrics', err)
+      }
 
       const rows = (rawRows || []) as Array<{ key: string; value: unknown }>
       for (const row of rows) {
@@ -80,6 +105,7 @@ export class EmailAutomationsService {
         globalPause,
         dailyLimit,
         dailySentCount,
+        resendOutboundCount,
         automations,
       }
     } catch {
@@ -87,6 +113,7 @@ export class EmailAutomationsService {
         globalPause: false,
         dailyLimit: 100,
         dailySentCount: 0,
+        resendOutboundCount: 0,
         automations: AUTOMATION_METADATA.map((meta) => ({ ...meta, enabled: meta.isCritical ? true : (DEFAULT_AUTOMATION_TOGGLES[meta.key] ?? false) })),
       }
     }
@@ -117,7 +144,7 @@ export class EmailAutomationsService {
     settingKey: 'toggle' | 'global_pause' | 'daily_limit',
     payload: { automationKey?: EmailAutomationKey; enabled?: boolean; limit?: number }
   ): Promise<{ success: boolean; error?: string }> {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
 
     try {
       if (settingKey === 'global_pause') {

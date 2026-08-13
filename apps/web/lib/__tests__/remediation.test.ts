@@ -30,15 +30,15 @@ test('generateQrCodeSvg creates ISO/IEC 18004 compliant QR matrix with rects', (
 })
 
 // 2. Rate Limit Evaluator
-test('evaluateRateLimit throttles repeated contact submissions', () => {
+test('evaluateRateLimit throttles repeated contact submissions', async () => {
   const key = 'test_remediation_ip_1'
-  const check1 = evaluateRateLimit(key, { limit: 2, windowMs: 1000 })
+  const check1 = await evaluateRateLimit(key, { limit: 2, windowMs: 1000 })
   assert.strictEqual(check1.success, true, 'First attempt should succeed')
 
-  const check2 = evaluateRateLimit(key, { limit: 2, windowMs: 1000 })
+  const check2 = await evaluateRateLimit(key, { limit: 2, windowMs: 1000 })
   assert.strictEqual(check2.success, true, 'Second attempt should succeed')
 
-  const check3 = evaluateRateLimit(key, { limit: 2, windowMs: 1000 })
+  const check3 = await evaluateRateLimit(key, { limit: 2, windowMs: 1000 })
   assert.strictEqual(check3.success, false, 'Third attempt should be rate limited')
 })
 

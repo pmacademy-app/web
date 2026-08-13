@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getModuleCapstonesOverview } from '@/lib/capstones-db'
 
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const overview = await getModuleCapstonesOverview(supabase, user.id)
 
     return NextResponse.json({

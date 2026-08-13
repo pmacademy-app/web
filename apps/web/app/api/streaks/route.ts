@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getUserStreakStatus, getWeeklySummary } from '@/lib/streaks-db'
 
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const [statusSummary, weeklySummary] = await Promise.all([
       getUserStreakStatus(supabase, user.id),
       getWeeklySummary(supabase, user.id),

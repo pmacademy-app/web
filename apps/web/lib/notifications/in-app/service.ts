@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { globalFeatureFlagService } from '../feature-flags/service'
 import {
   createDefaultNotificationPreferences,
@@ -57,7 +57,7 @@ export async function createInAppNotification(params: InAppNotificationWritePara
 
     const priorityNumber = PRIORITY_MATRIX[params.priority || 'medium'].numericValue
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const { data, error } = (await (supabase
       .from('in_app_notifications') as unknown as DBChain)
       .insert({

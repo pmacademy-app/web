@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { getPortfolioSettings, updatePortfolioSettings } from '@/lib/portfolio-db'
 
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const settings = await getPortfolioSettings(supabase, user.id)
     return NextResponse.json({ success: true, settings })
   } catch (error: unknown) {
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = createServerSupabaseClient()
+    const supabase = createServiceRoleClient()
     const body = await request.json()
     const result = await updatePortfolioSettings(supabase, user.id, body)
 

@@ -26,16 +26,18 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Link root node_modules for scripts
-        run: ln -s $GITHUB_WORKSPACE/apps/web/node_modules $GITHUB_WORKSPACE/node_modules
+        run: npm ci
 
       - name: Parse & validate content pipeline
         run: npm run content:build
 
       - name: Type check & Lint
-        run: npm run lint
+        run: |
+          npm run lint
+          npm run typecheck
+          
+      - name: Run Tests
+        run: npm run test
 
       - name: Brand hardening check
         run: |
