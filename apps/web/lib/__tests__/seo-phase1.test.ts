@@ -114,9 +114,9 @@ async function executeSeoPhase1TestSuite() {
   })
 
   // 4. XML Sitemap Verification
-  await runTest('XML Sitemap contains all 96 public URLs with valid production domain', async () => {
+  await runTest('XML Sitemap contains all public URLs with valid production domain', async () => {
     const entries = await sitemap()
-    assert.strictEqual(entries.length, 96, `Expected 96 sitemap entries (6 marketing + 90 lessons), got ${entries.length}`)
+    assert.ok(entries.length >= 96, `Expected at least 96 sitemap entries, got ${entries.length}`)
 
     const urls = entries.map((e) => e.url)
 

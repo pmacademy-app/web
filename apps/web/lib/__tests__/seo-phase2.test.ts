@@ -57,7 +57,7 @@ async function executeSeoPhase2TestSuite() {
     const r = robots()
     assert.strictEqual(r.sitemap, `${expectedSiteUrl}/sitemap.xml`)
     const s = await sitemap()
-    assert.strictEqual(s.length, 96)
+    assert.strictEqual(s.length, 98)
   })
 
   // ─── 2. EducationalOrganization & WebSite Schema ─────────────────────────────
