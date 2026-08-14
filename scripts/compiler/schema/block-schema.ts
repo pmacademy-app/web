@@ -58,6 +58,12 @@ const paragraphBlockSchema = z.object({
   text: z.string(),
 });
 
+const blockquoteBlockSchema = z.object({
+  ...baseBlockFields,
+  type: z.literal('blockquote'),
+  text: z.string(),
+});
+
 const listBlockSchema = z.object({
   ...baseBlockFields,
   type: z.literal('list'),
@@ -227,6 +233,7 @@ export const BlockSchema: z.ZodType<any> = z.lazy(() =>
   z.union([
     headingBlockSchema,
     paragraphBlockSchema,
+    blockquoteBlockSchema,
     listBlockSchema,
     tableBlockSchema,
     codeBlockSchema,

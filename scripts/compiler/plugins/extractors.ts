@@ -13,6 +13,9 @@ export function toMarkdown(node: any): string {
   if (node.type === 'link') return `[${(node.children || []).map(toMarkdown).join('')}](${node.url})`;
   if (node.type === 'image') return `![${node.alt || ''}](${node.url})`;
   if (node.type === 'paragraph') return (node.children || []).map(toMarkdown).join('');
+  if (node.type === 'blockquote') {
+    return (node.children || []).map(toMarkdown).join('\n\n');
+  }
   if (node.type === 'list') {
     return (node.children || []).map((item: any, idx: number) => {
       const bullet = node.ordered ? `${idx + 1}. ` : '- ';
@@ -35,12 +38,20 @@ export async function mdastToBlocks(nodes: any[], lessonId: string): Promise<any
   const blocks: any[] = [];
   for (const node of nodes) {
     if (node.type === 'heading') {
-      let text = '';
-      visitText(node, (val) => { text += val; });
+      const text = (node.children || []).map(toMarkdown).join('').trim();
       const block: any = {
         type: 'heading',
         level: node.depth,
-        text: text.trim(),
+        text,
+      };
+      block.blockId = generateBlockId(lessonId, block);
+      blocks.push(block);
+    } else if (node.type === 'blockquote') {
+      const text = (node.children || []).map(toMarkdown).join('\n\n').trim();
+      if (text.length === 0) continue;
+      const block: any = {
+        type: 'blockquote',
+        text,
       };
       block.blockId = generateBlockId(lessonId, block);
       blocks.push(block);
