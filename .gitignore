@@ -34,7 +34,6 @@ dist/
 Thumbs.db
 
 *.log
-
 # PM Academy content pipeline
 /content/.cache/
 /content/dist/
