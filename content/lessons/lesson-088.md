@@ -100,9 +100,11 @@ Ask: (1) How many initiatives does this PM currently own, and how interdependent
 
 ## Real Company Example
 
-Shopify's publicized approach to organizational structure and internal documentation around how product ownership should scale with company growth illustrates deliberate attention to avoiding the kind of reactive, ownership-preserving headcount growth this lesson warns against.
+**Netflix's own official Culture Memo**, published directly on the company's careers site, states this lesson's core warning as an explicit, named organizational principle: "People Over Process." The memo describes deliberately keeping rules and process to a minimum specifically to prevent what it calls "process creep... that typically happens when companies grow and try to dummy proof their organizations — stifling creativity and making it harder for businesses to adapt." Rather than growing headcount and layers of process reactively as the company scales, Netflix's stated approach is to maintain what it calls "talent density" — favoring fewer, more senior, more autonomous people over a larger organization requiring more coordination overhead and more process to manage — and to make decisions through direct accountability and what the memo calls "farming for dissent" (actively soliciting disagreement before a decision, rather than after) instead of decision-by-committee, which the memo states explicitly "tends to slow companies down and undermine accountability."
 
-**Assumption flagged:** specifics of Shopify's internal organizational practices are drawn from public commentary, not confirmed internal statements.
+This is a direct, company-published counter-model to the reactive scaling pattern this lesson warns against: rather than treating growing headcount as the default response to growing scope, and layering in process to manage the coordination cost that headcount growth creates, Netflix's own stated philosophy treats minimizing both headcount growth and process accumulation as the deliberate goal, accepting that this approach won't suit everyone (the memo is candid that "many people will be happier at companies that are more stable or take fewer risks").
+
+*(Source: Netflix's own official Culture Memo, published on the company's careers site.)*
 
 ---
 

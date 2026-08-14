@@ -214,7 +214,11 @@ Use the Debt Interest Curve whenever a paydown decision is being deprioritized "
 
 ## Real Company Example
 
-**LinkedIn** has been publicly associated, through its own engineering blog writing, with periods of significant investment in large-scale infrastructure rework — including well-documented efforts to re-architect core systems as the platform scaled — reflecting a broader industry pattern where companies periodically dedicate substantial, deliberate engineering capacity to paying down accumulated technical debt at scale, rather than treating it as something to address only incidentally.
+**LinkedIn**'s 2011 "Operation InVersion" is a specific, well-documented instance of this lesson's core trade-off, not just a general pattern. Shortly after LinkedIn's IPO, then-VP of Engineering Kevin Scott froze all new feature development company-wide for two months so the entire engineering organization could focus exclusively on overhauling the site's core computing architecture — including breaking apart a monolithic, failure-prone application (internally called "Leo") into smaller, independently deployable services. By Scott's own account, this was a genuinely difficult call to make so soon after going public, precisely because halting visible feature output in front of new public shareholders looked, on its face, like the wrong move.
+
+The instructive part for this lesson is the trade-off's visibility: this wasn't debt paid down quietly alongside normal feature work — it was treated with the same seriousness, planning, and organizational commitment as a major product launch, made possible only because leadership was willing to accept zero feature output for two full months in exchange for a foundation that could support the company's next phase of growth.
+
+*(Source: contemporaneous reporting, including a detailed Bloomberg Businessweek account, and later retrospective case studies of the initiative. This curriculum does not claim certainty about LinkedIn's current-day technical debt practices.)*
 
 The underlying principle connects directly to this lesson's Theory: at sufficient scale, unmanaged technical debt's compounding interest can become large enough to justify a major, deliberate, and visible paydown investment — treated with the same seriousness and planning rigor as a significant new feature initiative, rather than as an afterthought squeezed into spare capacity.
 

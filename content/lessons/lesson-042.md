@@ -186,11 +186,13 @@ Use the Metric Tree as a standing discipline whenever a team claims their local 
 
 ## Real Company Example
 
-**YouTube** is the most widely cited real-world example of a North Star Metric change driving organizational behavior. In its early years, YouTube optimized for view count — the total number of video views across the platform. This metric encouraged clickbait titles, short viral videos, and content optimized for the initial thumbnail click rather than genuine viewer satisfaction. After shifting its North Star to **watch time** (total minutes watched), the platform's recommendation algorithm, content incentives, and product decisions all realigned toward creating engaging, longer-viewed content that better served both viewers and the platform's long-term advertising model.
+**YouTube** is the most widely cited real-world example of a North Star Metric change driving organizational behavior, and it's directly confirmed by YouTube's own official blog. In its early years, YouTube's recommendation and ranking systems optimized heavily around view count — the total number of video views — which rewarded clickbait titles and thumbnails optimized for the initial click rather than genuine viewer satisfaction. On March 15, 2012, YouTube re-engineered its search-and-discovery algorithm to make **watch time** (total minutes watched), not view count, the determining factor in what got recommended — a change YouTube's own engineering blog later described explicitly, explaining that the company wanted to reward videos that kept people watching, not just videos that got people to click.
 
-- YouTube's shift from view count to watch time is the canonical example of choosing the right North Star Metric.
-- Optimizing for view count encouraged clickbait and short viral content at the expense of genuine viewer engagement.
-- Switching to watch time realigned the entire organization — algorithm, content incentives, and product decisions — toward creating more valuable viewing experiences.
+- YouTube's March 2012 shift from view count to watch time is a directly confirmed example of choosing the right North Star Metric, not just a widely repeated industry anecdote.
+- Optimizing for view count rewarded clickbait and thumbnail-driven clicks over genuine viewer engagement.
+- Switching to watch time realigned the recommendation algorithm, and consequently creator incentives, toward content that held attention rather than merely captured a click.
+
+*(Source: YouTube's own official engineering/product blog post explaining the change, corroborated by contemporaneous Business Insider reporting on the internal reasoning behind it.)*
 
 ---
 

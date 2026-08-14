@@ -102,9 +102,11 @@ Ask: (1) Which quadrant does this task actually occupy — automatable execution
 
 ## Real Company Example
 
-Linear's product and engineering culture, including publicized emphasis on small, highly-judgment-driven teams even as AI-assisted tooling has become widely available industry-wide, illustrates a deliberate emphasis on preserving human judgment and taste in product decisions rather than delegating them to automated drafting tools.
+**Linear**'s product-development culture is directly documented through on-record interviews with its own founders, not just industry reputation. CEO Karri Saarinen described the company's approach directly to Lenny's Newsletter: Linear runs with no dedicated product managers (PM duties are distributed across engineering and design), no durable cross-functional teams (small teams assemble around a specific project and disperse once it ships), no metrics-based goals beyond a single company-level North Star, and explicitly "no A/B tests" — Saarinen stated decisions are based on "taste and opinions" rather than statistical testing. Co-founder and CTO Tuomas Artman separately told The Pragmatic Engineer that this was a deliberate reaction to his own experience at Uber during its hypergrowth phase, when engineering headcount doubled or tripled annually — he explicitly said he didn't want to see that pattern repeat, and Linear has instead invested in strong internal infrastructure specifically to let a small team (fewer than 50 people, even years after founding, per Saarinen's own account) build and ship a product that competes directly with much larger incumbents.
 
-**Assumption flagged:** specifics of Linear's internal practices are drawn from public commentary, not confirmed internal statements.
+This is a genuinely distinct model from the industry default this lesson's own theory addresses, not a minor stylistic variation: Linear's founders made a considered, explicit trade — accepting slower hiring and a smaller organization — specifically to preserve the kind of concentrated human judgment (over both product decisions and code quality) that becomes harder to maintain as headcount and process both grow. Whether that trade generalizes to organizations of very different scale or market position is a separate question this lesson doesn't claim to answer — but Linear's own account of *why* they made it is a genuine, sourced data point for the tension between judgment-preserving small teams and reactive scaling that this lesson explores.
+
+*(Source: Karri Saarinen's on-record interview with Lenny's Newsletter (2023) and Tuomas Artman's on-record interview with The Pragmatic Engineer (2022).)*
 
 ---
 

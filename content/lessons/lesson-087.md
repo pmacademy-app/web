@@ -105,9 +105,11 @@ Ask: (1) Has detection and triage established actual severity? (2) Is communicat
 
 ## Real Company Example
 
-Cloudflare's practice of publishing detailed, technical public postmortems after major outages, explaining root cause and specific preventive changes, is widely discussed as an example of the transparency this lesson describes, contributing to sustained customer trust despite the underlying incidents themselves.
+**Cloudflare's own engineering blog** provides an unusually candid, and unusually well-documented, test case for this lesson's transparency argument — including a genuine repeat failure that makes the practice's real value visible. On November 2, 2023, Cloudflare published a detailed postmortem after a power failure at its Hillsboro, Oregon data center took down its control plane and analytics services; the post named the specific technical cause (generators failing to restart before UPS batteries were depleted) and listed concrete remediation commitments, including removing control-plane dependencies on core data centers and implementing more rigorous chaos testing of full data-center failures. Less than five months later, Cloudflare published a second postmortem — titled, with unusual candor, "Major data center power failure (again)" — disclosing that the *same* data center had failed again, this time from a different root cause (misconfigured circuit breaker trip settings at the facility operator). Cloudflare's own post directly compares the two incidents' outcomes: because of remediation work completed after the first outage, the second failure's control plane recovery was dramatically faster, corroborated by its own before/after account of recovery time.
 
-**Assumption flagged:** specifics of Cloudflare's internal incident response process are drawn from public commentary, not confirmed internal statements.
+This is a sharper illustration of this lesson's core claim than a general "they're transparent" description, because it shows transparency surviving a genuinely embarrassing repeat failure at the same facility — Cloudflare didn't quietly fix the second incident and let the "we learned from November" narrative stand; it published the recurrence, named it explicitly as a repeat, and used the same before/after format to show the remediation had produced a real, measurable improvement rather than merely reassuring words. Sustained trust after an incident is not primarily earned by the first honest postmortem — it's earned by remaining honest through the second one, when the story is much less flattering.
+
+*(Source: Cloudflare's own official engineering blog, both the November 4, 2023 postmortem and the follow-up postmortem for the subsequent incident at the same facility.)*
 
 ---
 

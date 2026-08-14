@@ -264,9 +264,11 @@ Use this grid whenever more than a small handful of validated problem statements
 
 ## Real Company Example
 
-**Intercom**'s widely discussed use of a structured "Jobs to Be Done" and opportunity-sizing approach in its product strategy work is a useful illustration of comparing multiple candidate opportunities before committing to a specific solution. Public product commentary from Intercom has described organizing product strategy discussions around a small number of clearly named customer outcomes, with multiple candidate opportunities (specific validated gaps between customer importance and current satisfaction) explicitly laid out and compared before any team commits significant resources to a specific feature — directly reflecting the Opportunity Solution Tree structure and the importance-satisfaction sizing technique described in this lesson, rather than allowing whichever feature idea is most recently discussed to implicitly set the roadmap.
+**Intercom** is one of the more directly documented examples of a company building its product and go-to-market strategy around Jobs to Be Done: the company has published its own methodology publicly, including a dedicated book, *Intercom on Jobs-to-be-Done*, and co-founder Des Traynor has spoken and written extensively about applying it internally. Intercom's own account emphasizes Tony Ulwick's "opportunity algorithm" — the idea that an unmet need exists specifically where a job outcome is rated both highly important and poorly satisfied by current solutions — as the sizing method for comparing candidate opportunities before committing engineering resources to any one of them.
 
-*(Assumption flagged: this reflects widely reported descriptions of Intercom's general product strategy approach rather than a claim about the company's complete internal methodology, which this curriculum does not claim certainty about.)*
+This is a useful illustration of comparing multiple candidate opportunities before committing to a specific solution, precisely the discipline this lesson's Opportunity Solution Tree and importance-satisfaction sizing technique formalize: organize strategy discussions around a small number of clearly named customer outcomes, lay out multiple candidate opportunities against those outcomes, and let the comparison — not whichever feature idea was most recently discussed in a meeting — determine what gets built next.
+
+*(Source: Intercom's own published blog and book on the topic, corroborated by public talks from co-founder Des Traynor. This curriculum does not claim certainty about the company's complete current internal prioritization process.)*
 
 ---
 

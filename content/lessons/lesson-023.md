@@ -244,9 +244,11 @@ Apply this test to every candidate story: if it were the only thing shipped this
 
 ## Real Company Example
 
-**Spotify**'s widely referenced use of small, cross-functional "squads" working from tightly scoped, independently valuable units of work is a commonly cited illustration of the INVEST discipline applied at organizational scale. Public commentary on Spotify's engineering and product practices has described a strong emphasis on shipping small, independently valuable increments frequently, rather than working toward large, multi-month feature releases delivered all at once — a practice that depends directly on the story-splitting discipline this lesson covers, since delivering value incrementally and frequently is only possible if the underlying units of work have actually been split into genuinely independent, valuable pieces rather than artificially subdivided fragments of one large release.
+**GitLab** offers a more directly documented illustration of the INVEST discipline than a general "squads ship small increments" gesture, because the company's engineering handbook is public. GitLab names "Iteration" as one of its core values, defined explicitly as doing the smallest useful thing and getting it shipped — the handbook instructs engineers to actively look for ways to split a large merge request into smaller, independently reviewable, independently valuable pieces, and even runs automated tooling that flags merge requests judged too large. The handbook is explicit that horizontal slicing (splitting by technical layer — frontend, backend, database) is often the wrong way to split work, echoing this lesson's INVEST emphasis on each split piece remaining independently *valuable*, not just independently small.
 
-*(Assumption flagged: this reflects widely reported, and since somewhat revised, public descriptions of Spotify's team practices at a particular point in the company's history, rather than a claim about its current, complete organizational model, which this curriculum does not claim certainty about.)*
+This is useful because it makes visible what "the story-splitting discipline" actually costs in practice: GitLab's own material acknowledges engineers must proactively flag scope-cutting opportunities to product management throughout planning and development, not just during a single up-front splitting exercise — splitting well is an ongoing discipline, not a one-time step.
+
+*(Source: GitLab's own public engineering handbook, which is exceptional among large companies for being openly published rather than reconstructed from secondhand reporting.)*
 
 ---
 

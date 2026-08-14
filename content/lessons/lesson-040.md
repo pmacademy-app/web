@@ -184,7 +184,11 @@ Use the Multiplier Layer as a diagnostic whenever evaluating a proposed Product 
 
 ## Real Company Example
 
-**Airbnb** has been publicly associated, through its own engineering and data blog writing, with building internal, shared experimentation and data infrastructure — including publicly discussed internal tools supporting standardized experiment reporting and metric definitions used consistently across many product teams — reflecting the kind of shared infrastructure investment this lesson describes as core to a mature Product Ops function.
+**Booking.com** is one of the most concretely documented illustrations available of shared experimentation infrastructure as Product Ops. The company runs over 1,000 controlled experiments concurrently at any given moment (an estimated 25,000+ per year), according to Harvard Business Review's case study and public statements from the company's own experimentation leadership, including former Director of Experimentation Lukas Vermeer. That scale is only possible because of centrally built, standardized infrastructure: any employee can propose and launch an experiment without needing management pre-approval, but every experiment runs through the same shared platform, the same statistical rigor, and the same standardized reporting form (recording the experiment's name, purpose, hypothesis, and prior related tests) — precisely the kind of shared tooling and consistent definitions this lesson identifies as the core value a mature Product Ops function provides.
+
+The instructive detail is what the shared infrastructure actually buys the organization: without it, "anyone can test anything" would produce chaos — inconsistent methodology, duplicated effort, and results nobody could trust or compare. With it, decentralized experimentation and centralized rigor coexist, which is the specific trade-off Product Ops is meant to resolve.
+
+*(Source: Harvard Business Review's 2020 case study "Building a Culture of Experimentation" and public talks by Booking.com's own experimentation and design leadership.)*
 
 The underlying principle connects directly to this lesson's Theory: building shared, standardized tooling and definitions once, centrally, and making them available to every team, avoids the wasteful and confusion-generating alternative of each team independently building its own version of the same underlying infrastructure with its own subtly different definitions.
 

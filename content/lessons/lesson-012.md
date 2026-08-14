@@ -205,9 +205,11 @@ Use this staircase as a discipline for noticing when a conversation has stalled 
 
 ## Real Company Example
 
-**Intuit** (maker of QuickBooks and TurboTax) has been widely reported to use an internal practice often referred to as "Follow Me Home" — accompanying real customers, with their permission, into their actual working environment to directly observe how they use the product (and its analog predecessors) in genuine context, rather than relying solely on interviews conducted in a conference room disconnected from a customer's real workflow. This reflects a related but distinct discipline from the pure interview technique covered in this lesson: pairing direct observation with interview questions, so that a respondent's account of their own past behavior can be checked against, and enriched by, what an interviewer can actually see them doing in real time.
+**Intuit** (maker of QuickBooks and TurboTax) runs a company-wide practice called "Follow Me Home," started by co-founder Scott Cook in the company's early days: an employee would wait at a retail store until a customer bought an Intuit product, then ask permission to go watch them actually use it in their own home or office. The practice has been continuously in use since — Intuit's own product blog and design-award case studies describe employees across the company, not just researchers, still conducting Follow Me Home sessions as a standard part of "Design for Delight," the company's internal innovation methodology.
 
-*(Assumption flagged: this reflects widely reported descriptions of Intuit's product research practices rather than a claim about the company's current, complete internal methodology, which this curriculum does not claim certainty about.)*
+The reason Follow Me Home is a sharper example than a standard interview is precisely the distinction this lesson draws between recalled behavior and observed behavior: Cook's stated reasoning for the practice was that customers are often unwilling or unable to accurately recall the specific friction they hit while using software, so watching them in their actual working environment — with its real interruptions, real workarounds, and real second monitor full of a different task entirely — surfaces problems a conference-room interview alone would miss. It pairs direct observation with interview questions in real time, rather than treating either alone as sufficient.
+
+*(Source: Intuit's own product blog and multiple independently reported accounts of the program's 1989 origin and continued company-wide use are consistent on these specifics. This curriculum does not claim certainty about the exact current scale or frequency of the program.)*
 
 ---
 

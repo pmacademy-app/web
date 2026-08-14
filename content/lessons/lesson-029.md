@@ -275,7 +275,7 @@ Use this funnel as a synthesis discipline: when scoring a candidate's Impact for
 
 ## Real Company Example
 
-**Intercom**'s publicly documented use of RICE (the company that originated and popularized the framework) is the most direct illustration available of this lesson's core quantitative technique. Intercom's product team has publicly described developing RICE specifically to address the challenge of comparing a large, diverse backlog of dissimilar candidate initiatives — ranging from small bug fixes to substantial new features — on a single, common, defensible scale, rather than relying on inconsistent, ad hoc comparisons or whichever initiative had the most vocal internal advocate at a given planning meeting.
+**Intercom** is the actual origin of RICE, not just a well-documented user of it: the framework was developed by Sean McBride while he was a PM on Intercom's growth team, specifically because his team needed a consistent way to compare dissimilar candidate initiatives — a small bug fix against a substantial new feature — on a single, defensible scale, rather than relying on ad hoc comparisons or whichever idea had the most vocal internal advocate at a given planning meeting. McBride has written and spoken publicly about the framework's origin, and RICE has since become one of the most widely adopted scoring frameworks in the industry.
 
 *(Assumption flagged: this reflects Intercom's own publicly shared account of developing and using RICE rather than a claim about the framework's universal applicability or Intercom's complete, current internal prioritization process, which this curriculum does not claim certainty about.)*
 

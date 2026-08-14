@@ -191,11 +191,13 @@ Use the Smile Curve as a standing discipline whenever reviewing a retention char
 
 ## Real Company Example
 
-**Netflix** has been publicly associated, through its own data science and engineering blog writing, with a strong internal emphasis on retention and engagement-based analysis — including cohort-based evaluation of how content and product changes affect member retention over time — reflecting an organizational priority on durable, ongoing engagement rather than acquisition or sign-up volume alone.
+**Adobe**'s 2013 transition from perpetual-license software (Creative Suite, a one-time purchase) to Creative Cloud (a monthly subscription) is a specific, well-documented business event that makes cohort-based retention analysis existentially necessary rather than merely useful. Announced in May 2013 and covered contemporaneously by outlets including TechCrunch, the shift was met with significant public backlash from existing customers, but it fundamentally changed what "business health" meant for Adobe: under the old perpetual-license model, a single purchase counted as success regardless of whether the customer ever opened the software again; under the subscription model, revenue depends entirely on whether cohorts of subscribers keep renewing month after month. Creative Cloud grew from zero subscribers in 2013 to tens of millions of paying subscribers within a decade — but that growth number alone reveals nothing about whether any given monthly cohort was actually sticking around, which is precisely this lesson's core caution about aggregate totals masking retention health.
+
+This is a sharper illustration than a generic "Netflix cares about retention" claim because it's a company observably built two different businesses — one where retention barely mattered to the metric that counted as success, and one where it became the central determinant of revenue — and the transition between them is exactly when cohort-based analysis stops being optional.
+
+*(Source: TechCrunch's May 2013 contemporaneous coverage of Adobe's announcement, and Adobe's own reported subscriber figures in subsequent years.)*
 
 The underlying principle connects directly to this lesson's Theory: for a subscription-based product where the business fundamentally depends on members continuing to renew month after month, cohort-level retention is a far more direct signal of business health than aggregate subscriber counts alone, which, per this lesson's central caution, can rise even while underlying retention quietly deteriorates.
-
-*(Assumption flagged: this reflects general, publicly available descriptions of retention and cohort-based analysis discussed in Netflix's own data science and engineering blog writing over time, not a confirmed, complete, or current account of Netflix's specific internal retention methodology today. Specific practices evolve continuously at any company; the durable lesson is the underlying principle — for subscription-based products, cohort-level retention is a more direct health signal than aggregate subscriber counts — rather than a claim about Netflix's exact current approach.)*
 
 ---
 

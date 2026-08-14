@@ -131,11 +131,11 @@ Use the Pyramid Principle as a standing discipline whenever drafting executive c
 
 ## Real Company Example
 
-**Amazon** has been publicly associated, through Jeff Bezos's own widely reported statements and company practice, with a distinctive internal meeting culture built around narrative, six-page memos rather than slide presentations — famously including a period of silent reading at the start of meetings, during which attendees read the memo before any discussion begins, rather than presenting it live via slides.
+**Amazon**'s six-page-memo culture is directly confirmed in Jeff Bezos's own words, not just widely reported secondhand. Bezos has described it repeatedly in public settings, including a 2018 talk at the George W. Bush Presidential Center, where he called banning PowerPoint at Amazon "the smartest thing we ever did," and in his 2017 letter to Amazon shareholders (filed publicly with the SEC), where he explained that meetings begin with roughly 30 minutes of silent, in-room reading of a six-page narrative memo before any discussion starts — and noted that, by longstanding Amazon tradition, authors' names never appear on the memo, "because the memo is from the whole team."
 
 The underlying principle connects directly to this lesson's Theory: a well-structured narrative memo, read in full by every attendee before discussion, forces exactly the kind of complete, standalone argument the Pyramid Principle requires — since a memo intended to be read silently and understood on its own terms cannot rely on a live presenter's tone or slide-by-slide pacing to carry an underspecified argument, unlike a slide deck, which can more easily hide gaps in reasoning behind a compelling verbal delivery.
 
-*(Assumption flagged: this reflects widely reported, publicly discussed accounts of Amazon's internal meeting culture and memo practices, based on public statements attributed to Jeff Bezos and other public reporting, not a confirmed, complete, or current account of Amazon's specific internal practices today, which may vary by team or have evolved. The durable lesson is the underlying principle — communication designed to be read and understood on its own, in full, tends to force more rigorous, complete argumentation than a live presentation format — rather than a claim to verify every detail of this widely retold practice.)*
+*(Source: Bezos's 2018 remarks at the George W. Bush Presidential Center's Forum on Leadership, and his 2017 letter to shareholders, filed publicly with the SEC — both direct, on-the-record statements rather than secondhand reporting.)*
 
 ---
 
