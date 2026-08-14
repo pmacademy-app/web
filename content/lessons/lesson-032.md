@@ -203,11 +203,11 @@ Use this as your standing diagnostic whenever a Scrum team feels "off." Ask, in 
 
 ## Real Company Example
 
-**Salesforce** has been publicly associated with adopting Agile and Scrum-style practices broadly across its engineering organization as the company scaled, alongside its own internally developed goal-setting methodology, V2MOM (Vision, Values, Methods, Obstacles, Measures), which Salesforce has described using to align teams on strategic direction above the level of any individual Sprint.
+**Salesforce**'s V2MOM (Vision, Values, Methods, Obstacles, Measures) is a directly sourceable example, not secondhand reporting: CEO Marc Benioff developed it personally in Salesforce's early days and has written about it in both his book *Behind the Cloud* and directly on Salesforce's own company blog, describing it as the process that lets the company "scale the process of setting priorities for tens or hundreds of thousands of employees" while keeping everyone's work traceably connected to a shared strategic direction.
 
 The pairing illustrates a useful structural point: V2MOM-style strategic goal-setting and Scrum-style sprint execution are meant to operate at different altitudes and reinforce each other. V2MOM (or an equivalent strategic framework) answers longer-horizon questions about direction; Scrum's Sprint Goals should, in a healthy team, be visibly traceable back to that longer-horizon direction, rather than existing as disconnected two-week objectives.
 
-*(Assumption flagged: this reflects general, publicly reported descriptions of Salesforce's goal-setting and Agile adoption practices over time, not a confirmed, complete, or current account of Salesforce's internal engineering processes today. Specific tools and cadences at any large company evolve continuously; the durable lesson is the structural principle — sprint-level execution should trace back to a longer-horizon strategic goal — rather than any specific named framework.)*
+*(Source: Marc Benioff's own book *Behind the Cloud* and Salesforce's official company blog. The V2MOM-Scrum pairing itself — how the two are meant to interact day to day — reflects this curriculum's structural argument rather than a specific claim about Salesforce's current internal Agile tooling, which this curriculum does not claim certainty about.)*
 
 ---
 

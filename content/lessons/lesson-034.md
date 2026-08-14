@@ -235,11 +235,11 @@ Use the Readiness Gate as a standing discipline in every grooming session: an it
 
 ## Real Company Example
 
-**Intercom** has been publicly associated, through its own engineering and product blog writing over the years, with an emphasis on small, well-scoped, independently shippable units of work and a strong internal culture around writing clear, outcome-oriented product specifications before engineering work begins — practices that map closely onto this lesson's INVEST criteria and Definition of Ready concepts.
+**Atlassian** — the company behind Jira and Confluence, and consequently one of the most public voices on Agile process itself — publishes its own Definition of Ready guidance as core material in its Agile Coach content, explicitly framing DoR as a checklist a backlog item must clear (a clear description, defined acceptance criteria, a rough estimate, identified dependencies, a validated user problem) before it is eligible for sprint planning at all, and pairs it explicitly with the INVEST criteria this lesson covers as the standard for evaluating whether a story is genuinely well-formed.
 
 The underlying principle connects directly to this lesson's Theory: a culture that insists on genuinely small, well-specified units of work — rather than large, vaguely-scoped initiatives — tends to produce far more predictable Sprint outcomes, because less ambiguity is smuggled into the Sprint undetected.
 
-*(Assumption flagged: this reflects general, publicly available descriptions of Intercom's product and engineering culture writing over time, not a confirmed, complete, or current account of Intercom's specific internal grooming or estimation practices today. Specific practices at any company evolve and vary by team; the durable lesson is the underlying principle — small, well-specified units of work produce more predictable execution — rather than a claim about Intercom's exact current process.)*
+*(Source: Atlassian's own publicly published Agile Coach material. This is one of the more directly verifiable examples in this curriculum, since it comes from the company's own official documentation rather than secondhand reporting.)*
 
 ---
 

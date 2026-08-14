@@ -89,7 +89,7 @@ graph LR
 
 The critical insight, easy to miss at a glance, is that there are *two* distinct divergent phases — one exploring the problem itself (Discover), and a separate one exploring possible solutions (Develop) — each followed by a deliberate narrowing (Define, Deliver). A PM who invites design in only at the "Deliver" stage has skipped both divergent phases entirely, asking design to visually finish a solution whose problem framing and solution exploration were never actually opened up for genuine design input. This directly parallels Lesson 8's discovery discipline: design has its own discovery process, and skipping it produces the same risk — building the wrong thing, confidently — that skipping user discovery does elsewhere in the product process.
 
-### The Fidelity Ladder
+### Fidelity as a Signal of Certainty
 
 A second, closely related concept concerns *how polished* a design artifact should be at a given stage of certainty:
 
@@ -169,9 +169,9 @@ Internal team enthusiasm for a design is not evidence that real users will under
 ---
 
 
-## Mental Model: The Fidelity Ladder (Design)
+## Mental Model: The Exploration Window
 
-*(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*
+This lesson's core takeaway tool is not about polish level (that is Lesson 25's Fidelity Ladder, applied here only as a supporting idea in Theory) — it is about *timing*: the specific point in a problem's lifecycle during which involving design still counts as exploration, versus the point after which it can only ever be decoration.
 
 ```mermaid
 %%{init: {
@@ -205,11 +205,13 @@ Internal team enthusiasm for a design is not evidence that real users will under
   }
 }}%%
 graph LR
-    A["Low Fidelity Cheap,<br/>Discardable, Invites Open Feedback"] --> B["Mid Fidelity Testable<br/>Flow, Moderate Investment"]
-    B --> C["High Fidelity Polished, Expensive,<br/>Signals Near-final Decision"]
+    A["Problem Named<br/>(window open)"] --> B["Design Explores<br/>Multiple Directions"]
+    B --> C["PM + Design Converge<br/>on a Direction (window closing)"]
+    C --> D["Solution Specified<br/>(window closed)"]
+    D -.->|"Design brought in here<br/>can only decorate, not explore"| E["Prettified Predetermined Solution"]
 ```
 
-Use the Fidelity Ladder as a standing discipline whenever a design artifact is being produced: ask explicitly, "how validated is the underlying idea this artifact represents, and does its polish level honestly reflect that?" An idea still being explored should be represented with correspondingly low fidelity, regardless of how tempting it might be to show something impressive-looking to stakeholders early — because a polished artifact, once seen, is very hard to walk back psychologically, even when the underlying idea turns out to be wrong.
+Use the Exploration Window as a standing check on your own behavior, not just design's: before looping design in, ask "have I already, even informally, decided what this should look like?" If the honest answer is yes — if you're arriving with a near-final layout in your head rather than a named problem — the window has already closed, regardless of what the calendar invite calls the meeting. Re-opening it means consciously setting your own mental picture aside and handing over the problem statement instead, per "Give Context, Not Commands" below.
 
 ---
 
@@ -586,9 +588,9 @@ D) Insist the designer copy the other product's layout exactly, citing the PM's 
 | | Lesson | Core Idea Carried Forward |
 |---|---|---|
 | **Previous Lesson** | Lesson 37 — Working with Engineering Teams | This lesson mirrors the "context, not commands" and trust-building principles from Lesson 37, applied specifically to the PM-design relationship |
-| **Current Lesson** | Lesson 38 — Working with Design Teams | Double Diamond; Fidelity Ladder; premature high-fidelity; Design Involvement Timing Table |
+| **Current Lesson** | Lesson 38 — Working with Design Teams | Double Diamond; the Exploration Window; premature high-fidelity; Design Involvement Timing Table |
 | **Next Lesson** | Lesson 39 — Technical Debt & PM Trade-offs | Extends this lesson's "build cheap before investing" sequencing principle to engineering investment decisions |
 | **Future Concepts Unlocked** | Lesson 45 (A/B Testing & Experimentation) | Depends on well-sequenced, testable design variants produced through appropriate fidelity discipline |
 | | Lesson 52 (Storytelling and Narrative for PMs) | Builds on this lesson's distinction between generating genuine excitement and manufacturing false confidence through polish |
 
-This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Double Diamond and the Fidelity Ladder with you — they will not be re-explained, only re-applied in new contexts.
+This curriculum is designed to be read as one continuous argument, not ninety independent articles. Every lesson from here forward will assume you carry the Double Diamond and the Exploration Window with you — they will not be re-explained, only re-applied in new contexts.

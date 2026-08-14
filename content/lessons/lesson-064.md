@@ -111,9 +111,11 @@ A metric that fails any of these three checks should be treated as provisional, 
 
 ## Real Company Example
 
-Netflix is widely discussed in the industry as an organization with an unusually rigorous experimentation and metrics culture, closely tied to the A/B testing discipline introduced in Lesson 45. Public accounts and industry commentary describe Netflix maintaining strict internal standards for how experiment results are validated and interpreted before being trusted to inform product decisions, including explicit statistical rigor requirements that echo the Peeking Trap concept from Lesson 45 — a direct illustration that Trusted Metric status (Stage 4 of the Provenance Chain) is treated as something that must be earned through process, not assumed by default.
+**Etsy**'s own engineering blog, "Code as Craft," runs a dedicated, ongoing "Experimentation" publication series that makes the company's statistical rigor directly inspectable rather than merely inferred. A representative post, "Mitigating the Winner's Curse in Online Experiments" (2022), addresses a specific, technical version of the Peeking Trap this lesson connects back to Lesson 45: when a team runs many experiments and reports results only for the ones that appear to win, the reported effect sizes are systematically inflated — a statistical bias, not a one-off mistake — and the post walks through Etsy's own methodology for correcting for it before trusting a result enough to ship on it. A companion post on "control variates" describes a separate technique the team adopted specifically to increase experiment accuracy and reduce the sample size (and therefore time) needed to reach a trustworthy result.
 
-**Assumption flagged:** the specifics of Netflix's internal experimentation governance and metric-validation processes described here are drawn from public commentary, engineering blog posts, and industry reporting, not confirmed internal company statements, and should be treated as illustrative rather than verified fact.
+This is a sharper illustration of "Trusted Metric status must be earned through process" (Stage 4 of this lesson's Provenance Chain) than a generic "rigorous culture" claim, because it shows the actual statistical machinery involved — correcting for winner's-curse bias, using variance-reduction techniques — rather than just asserting that rigor exists. A metrics culture, in other words, isn't a cultural attitude alone; it's implemented as specific, inspectable statistical practice.
+
+*(Source: Etsy's own public engineering blog, Code as Craft, specifically its ongoing Experimentation series.)*
 
 ---
 
@@ -159,7 +161,7 @@ A "no" on Single Source of Truth in particular should be treated as an active or
 
 **"Tell me about a time data from two sources disagreed, and how you resolved it."** The interviewer is evaluating whether you can diagnose the disagreement using something like the Metric Provenance Chain — tracing back to a missing Definition Consensus or Single Source of Truth — rather than simply picking whichever number was more convenient.
 
-**"How would you build trust in a company's metrics if teams currently don't agree on basic numbers?"** The interviewer is testing whether you propose a governance process (documented definitions, designated ownership, a single source of truth) rather than a purely technical fix, since the root problem is usually organizational, not computational.
+**"How would you build trust in a company's metrics if teams currently don't agree on basic numbers?**" The interviewer is testing whether you propose a governance process (documented definitions, designated ownership, a single source of truth) rather than a purely technical fix, since the root problem is usually organizational, not computational.
 
 **"What's the danger of adding more dashboards to a company with existing data trust issues?"** The interviewer is listening for recognition that more dashboards, without governance, typically worsens fragmentation rather than improving visibility — a direct application of the dashboard fragmentation diagnostic from this lesson.
 

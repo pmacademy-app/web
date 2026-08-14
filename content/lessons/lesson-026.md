@@ -266,9 +266,11 @@ Apply this filter to any proposed prototype investment: does testing this specif
 
 ## Real Company Example
 
-**Airbnb**'s design team has been publicly associated with extensive use of interactive prototyping before committing to full engineering builds, particularly for significant redesigns of core booking and search flows. Public design commentary from the company has described building clickable, navigable prototypes — often well before any real backend functionality is built — specifically to usability-test entire multi-step flows (such as the full search-to-booking sequence) with real users, catching navigation confusion or unexpected drop-off points at the prototype stage rather than discovering them only after a costly, fully built implementation had already launched.
+**Facebook (Meta)** offers a more concretely verifiable illustration than a general "design team uses prototypes" claim, because the company built and later open-sourced its own internal prototyping tool specifically to solve this problem. Origami Studio began as an internal tool because Facebook's designers found existing options too limiting for prototyping rich, gesture-driven, animated interactions — the kind of behavior that a static mockup genuinely cannot communicate — and needed to validate those interactions before committing engineering time to building them for real. It has been used internally to prototype flows for Facebook, Instagram, WhatsApp, and Messenger, and Meta later released it publicly as a free tool.
 
-*(Assumption flagged: this reflects publicly shared design process commentary from the company rather than a claim about its complete, current internal prototyping methodology, which this curriculum does not claim certainty about.)*
+The instructive detail for this lesson isn't the tool itself — it's *why* it was built: a company at Facebook's scale, with no shortage of engineering capacity, still judged it worthwhile to build a dedicated prototyping tool rather than validate interaction design directly in code. That is a strong, practical argument for this lesson's core claim that prototyping and engineering are genuinely different activities serving different purposes, not merely "faster" and "slower" ways of doing the same thing.
+
+*(Source: Meta's own public statements at Origami Studio's release and its continued public documentation. This curriculum does not claim certainty about which specific flows or teams currently use it.)*
 
 ---
 

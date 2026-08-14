@@ -128,11 +128,11 @@ Use the Harm Radius as a standing discipline for any product decision with genui
 
 ## Real Company Example
 
-**Uber** has been publicly associated, through extensive investigative journalism and public reporting, with several widely documented episodes raising significant ethical concerns — including the "Greyball" tool reportedly used to help identify and evade regulatory officials in certain markets, and reported internal practices around user location tracking and privacy that drew substantial public and regulatory scrutiny during a particular period in the company's history.
+**Uber**'s "Greyball" tool is a specifically documented, not just generally reported, example. New York Times reporter Mike Isaac's March 2017 investigation revealed that Uber had built and used Greyball for years to identify likely law enforcement officials attempting to hail rides in markets where the service was banned or restricted, then served those users a fake version of the app — showing ghost cars that never arrived — specifically to evade regulatory sting operations. The reporting triggered a formal U.S. Department of Justice criminal inquiry into the tool, confirmed in subsequent Times coverage two months later.
 
 The underlying principle connects directly to this lesson's Theory: practices that may have seemed locally defensible or competitively necessary within an internal decision-making context did not survive the "sunlight test" once reported publicly, generating significant reputational damage, regulatory investigation, and — consistent with the ethical debt framework — costs that compounded well beyond whatever short-term competitive advantage the underlying practices may have provided.
 
-*(Assumption flagged: this reflects extensive, widely reported investigative journalism and public reporting regarding specific historical episodes at Uber, not a confirmed, complete, or current account of Uber's present-day practices, which the company has publicly stated have changed substantially since the period most of this reporting covers, including significant leadership and governance changes. The durable lesson is the underlying principle — practices that depend on not being publicly scrutinized carry serious latent risk, precisely what the sunlight test is designed to catch in advance — rather than a claim about Uber's current practices or culture.)*
+*(Source: Mike Isaac's original March 3, 2017 New York Times investigation and the paper's subsequent May 2017 reporting on the resulting DOJ inquiry. This curriculum does not claim the practice reflects Uber's current-day operations, which the company has publicly stated have changed substantially since this period, including significant leadership and governance changes.)*
 
 ---
 

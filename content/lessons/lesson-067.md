@@ -115,9 +115,11 @@ A governance system that can answer all four questions affirmatively is far bett
 
 ## Real Company Example
 
-Uber's trust and safety systems, including publicly discussed background check processes for drivers and fraud detection systems for both riders and drivers, are frequently cited as an example of a platform managing enforcement across a large, two-sided marketplace where the cost of both false positives (wrongly restricting a driver's ability to earn income) and false negatives (allowing a genuinely unsafe or fraudulent actor to continue operating) is significant. Public reporting on Uber's approach describes graduated interventions in various contexts, such as temporary account holds pending review rather than immediate permanent deactivation for lower-severity or lower-confidence signals, reflecting the same staircase logic this lesson formalizes.
+**Uber**'s own newsroom has published a direct, first-person account of this exact trade-off, authored by Hannah Nilles, the company's Head of Safety for the Americas: drivers first pass a motor vehicle records check, then a separate criminal background check conducted by a third-party provider, and reported safety incidents are triaged by severity — the company states it deactivates drivers specifically for its most serious incident categories, where a report includes a survivor statement and no signs of fraudulent reporting, rather than applying uniform, maximum-severity consequences to every report regardless of confidence or severity. Uber's own driver-facing help documentation separately describes an account-hold-pending-investigation state, distinct from permanent deactivation, giving the company a way to pause a driver's access while a report is reviewed rather than being forced into an immediate binary choice between full reinstatement and permanent removal.
 
-**Assumption flagged:** the specifics of Uber's internal trust and safety enforcement processes and escalation criteria described here are drawn from public reporting and industry commentary, not confirmed internal company statements, and should be treated as illustrative rather than verified fact.
+This graduated structure is a direct, company-confirmed illustration of the exact trade-off this lesson formalizes: the cost of a false positive (wrongly restricting a driver's ability to earn income) and the cost of a false negative (allowing a genuinely unsafe actor to keep operating) are both real and asymmetric depending on context, and a single blunt enforcement lever — permanent ban or nothing — cannot serve both well at once.
+
+*(Source: Uber's own official newsroom post, "Understanding Uber's Background Checks and Safety Incident Response," and the company's own driver help documentation.)*
 
 ---
 

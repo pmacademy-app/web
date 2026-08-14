@@ -232,9 +232,11 @@ Apply this test whenever reviewing a journey map presented to you: a map with no
 
 ## Real Company Example
 
-**Lego**'s well-documented use of journey mapping and direct customer observation in redesigning its retail and online experience is a widely discussed illustration of grounding a journey map in real behavior rather than assumption. Public accounts of Lego's customer experience research have described observing real customers — including children and parents together — moving through both physical retail and online purchasing journeys, specifically to identify friction points (such as confusing navigation between physical and digital channels) that an idealized, assumption-based map would likely have missed, since such friction often emerges specifically from real, messy behavior rather than a clean, intended process flow.
+**The LEGO Group**'s digital customer-experience work offers a more verifiable illustration than the vague "well-known UX case study" version of this example often repeated online. In a first-person account of a LEGO.com navigation redesign, the designer leading the project described grounding the redesign in direct research across the site's three distinct primary audiences — casual shoppers, active researchers comparing sets, and "AFOLs" (Adult Fans of LEGO) — gathered through usability tests, surveys, and analytics, rather than starting from an assumed, idealized navigation structure. The friction points that surfaced (confusing entry points depending on why a visitor had actually come to the site) were specific to how each segment behaved in practice, not something an assumption-based map, built without that segmented behavioral research, would have reliably surfaced.
 
-*(Assumption flagged: this reflects widely reported descriptions of Lego's general customer experience research practices rather than a claim about the company's current, complete internal methodology, which this curriculum does not claim certainty about.)*
+This is a useful caution as much as an endorsement: a commonly circulated "LEGO customer journey map" image (sometimes called the "Experience Wheel," depicting a persona's flight itinerary) is frequently misattributed online as an official LEGO Group case study, when it appears instead to be a UX-methodology teaching example unrelated to LEGO's own retail or e-commerce work. This lesson deliberately avoids citing that widely shared but unverifiable artifact.
+
+*(Assumption flagged: the navigation-redesign account above is a single practitioner's first-person case study rather than an official LEGO Group publication, and this curriculum does not claim certainty about the company's complete, current internal research methodology.)*
 
 ---
 

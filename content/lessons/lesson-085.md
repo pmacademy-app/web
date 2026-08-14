@@ -106,9 +106,11 @@ Ask continuously: (1) What equity metric matters for this specific decision? (2)
 
 ## Real Company Example
 
-IBM's publicized AI Fairness 360 toolkit and broader responsible AI research initiatives illustrate continuous, subgroup-specific fairness measurement as an industry practice rather than a one-time compliance check.
+**IBM's AI Fairness 360 (AIF360)**, introduced directly on IBM Research's own blog in 2018 and released as an open-source toolkit, gives this lesson's subgroup-specific fairness argument a concrete, inspectable technical form rather than a general aspiration. AIF360 provides two distinct categories of tooling, confirmed in IBM's own published paper describing it: a comprehensive set of fairness *metrics* — including specific, named measures like disparate impact and statistical parity difference, each designed to detect a different kind of subgroup disadvantage a single aggregate accuracy number would hide — and a separate set of bias *mitigation algorithms* (nine in the initial release, drawn from the broader academic fairness research community) that can be applied at different stages of the machine learning pipeline: pre-processing the training data, adjusting the model during training, or post-processing its outputs after the fact. IBM's own stated design goal was explicitly to translate fairness research from academic papers into a form usable "in the actual practice of domains as wide-ranging as finance, human capital management, healthcare, and education" — the same regulated and high-stakes domains this lesson and Lesson 81 both address.
 
-**Assumption flagged:** specifics of IBM's internal practices are drawn from public commentary, not confirmed internal statements.
+The structural point worth drawing out for this lesson: IBM built separate metrics *and* separate mitigation algorithms rather than a single "fairness score," because the underlying problem is genuinely multidimensional — a model can satisfy one fairness metric (say, equal overall accuracy across groups) while badly violating another (say, equal false-positive rates), and different mitigation techniques address different points in that trade-off space. A PM treating "check for bias" as a single pass/fail gate is working with a far cruder tool than what IBM's own research organization judged the problem actually requires.
+
+*(Source: IBM Research's own official blog post introducing AIF360, and the toolkit's own published technical paper describing its metrics and mitigation algorithms.)*
 
 ---
 

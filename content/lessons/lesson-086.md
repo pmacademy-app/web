@@ -101,9 +101,11 @@ Ask, for any new market entry: (1) Has Surface translation been done well? (2) H
 
 ## Real Company Example
 
-Spotify's market-by-market international expansion, including its well-documented, often lengthy process of negotiating market-specific music licensing agreements before launching in a new country, illustrates Structural-depth adaptation — regulatory and licensing requirements that vary sharply by jurisdiction and cannot simply be translated around.
+**Uber's 2017 withdrawal from Denmark** is a specific, well-documented, and genuinely more instructive illustration of Structural-depth adaptation than a general "licensing takes a while" claim, because it shows the cost of *failing* to adapt deeply enough, not just the cost of preparation. Reuters, TechCrunch, the Guardian, and Fortune all reported consistently: in April 2017, Denmark introduced a new taxi law requiring, among other things, mandatory fare meters and seat occupancy sensors in every vehicle — hardware requirements Uber's driver fleet (ordinary personal cars, not licensed taxis) could not meet. Rather than adapt its operating model to the new requirement, Uber chose to shut down Danish operations entirely, ending a service that had operated there for under three years.
 
-**Assumption flagged:** specifics of Spotify's internal market-entry practices are drawn from public commentary, not confirmed internal statements.
+This is the sharper version of this lesson's core lesson: localization at the level of translated menus and adjusted currency formatting was never the obstacle in Denmark — the obstacle was a structural, physical requirement (specific in-vehicle hardware) baked into national law, which is exactly the category of "structural-depth" adaptation this lesson distinguishes from surface-level localization. A market can be linguistically and culturally well-localized and still be legally non-viable, because some adaptations require re-engineering the operating model itself, not just its presentation — and when a company judges that re-engineering isn't worth the market's size, full withdrawal, not incremental localization, is the rational response.
+
+*(Source: contemporaneous March 2017 reporting from Reuters, TechCrunch, the Guardian, and Fortune, consistent across all four independent outlets.)*
 
 ---
 

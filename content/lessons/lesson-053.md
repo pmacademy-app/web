@@ -122,11 +122,11 @@ Use the Interest Iceberg as a standing discipline whenever a negotiation or infl
 
 ## Real Company Example
 
-**Microsoft** has been publicly associated, through extensive public reporting and Satya Nadella's own public statements since becoming CEO, with a deliberate cultural shift away from an earlier period of internally competitive, siloed dynamics between product groups toward a more collaborative "One Microsoft" approach, emphasizing cross-group cooperation and shared incentives over the kind of internal competition that had previously made cross-team influence and resource-sharing especially difficult.
+**Microsoft**'s "One Microsoft" cultural shift under CEO Satya Nadella is directly corroborated by the company's own leadership, not just outside reporting: Kathleen Hogan, Microsoft's Chief People Officer, has described the transformation directly in on-the-record interviews, framing it as a deliberate move from a "know-it-all" culture — where individual and group status came partly from having the answer, which incentivized internal competition and made cross-group cooperation costly — to a "learn-it-all" culture, structurally reducing the silos that had previously made cross-team resource-sharing and influence especially difficult.
 
 The underlying principle connects directly to this lesson's Theory: an organizational culture and incentive structure that rewards cross-group collaboration (rather than one that implicitly pits internal teams against each other for the same recognition or resources) makes genuine, interest-based negotiation and influence without authority meaningfully easier to practice, since teams have less structural incentive to treat every cross-group request as adversarial or zero-sum by default.
 
-*(Assumption flagged: this reflects widely and publicly reported accounts of Microsoft's cultural evolution under Satya Nadella's leadership, based on extensive public reporting and Nadella's own public statements, not a confirmed, complete, or current account of Microsoft's specific internal team dynamics today, which vary across such a large organization. The durable lesson is the underlying principle — organizational incentive structures shape how easy or hard genuine cross-team influence is to practice — rather than a claim to verify every detail of this widely discussed cultural narrative.)*
+*(Source: Kathleen Hogan's on-the-record interview with i4cp and other corroborating public reporting on Nadella's cultural transformation. This curriculum does not claim certainty about how uniformly this culture is realized across every team at Microsoft's scale today.)*
 
 ---
 

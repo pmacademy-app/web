@@ -115,11 +115,11 @@ Use the Scope Ladder as a standing discipline whenever evaluating a potential ca
 
 ## Real Company Example
 
-**Google** has been publicly associated with its Associate Product Manager (APM) program, founded in the early 2000s under Marissa Mayer's leadership, designed as a structured, cohort-based, rotational program to develop early-career product management talent systematically, with publicly known alumni who went on to significant product leadership roles and, in some cases, founded or led major technology companies of their own.
+**Google's Associate Product Manager (APM) program**, founded by Marissa Mayer in 2002, has a specific, well-documented origin: according to Business Insider's reporting, Mayer started it because Google was struggling to find early-career recruits who could operate effectively in the company's unusually consensus-driven, engineer-heavy power structure, where a traditional command-and-authority manager would flounder. The program became a structured, cohort-based, rotational path for developing early-career PM judgment systematically, with a notably selective acceptance rate, and its alumni list is itself well documented — including people who went on to found or lead major technology companies of their own.
 
 The underlying principle connects directly to this lesson's Theory: a deliberately structured program — combining mentorship, varied rotations across different product areas, and explicit early exposure to core PM judgment — illustrates how foundational product skill can be developed systematically rather than left entirely to unstructured, incidental on-the-job experience, echoing this lesson's caution against Mistake 5.
 
-*(Assumption flagged: this reflects widely reported, publicly available information about Google's APM program's founding and general structure, not a confirmed, complete, or current account of the program's present-day design, which may have evolved since its founding. Specific program details and alumni outcomes are drawn from public reporting; the durable lesson is the underlying principle — deliberate, structured early-career development accelerates PM judgment more reliably than unstructured experience alone — rather than a claim to verify every detail of the program's current operation.)*
+*(Source: Business Insider's reporting on the program's founding and alumni, corroborated by Reid Hoffman's own published account of Mayer's creation of the program. This curriculum does not claim certainty about the program's exact current-day structure, which may have evolved since its founding.)*
 
 ---
 

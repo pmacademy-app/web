@@ -118,11 +118,11 @@ A marketplace PM who runs every growth proposal through this three-question chec
 
 ## Real Company Example
 
-Airbnb's early growth strategy is widely discussed as an illustration of solving the chicken-and-egg problem through concentrated, supply-side-first effort. Public accounts of Airbnb's early years describe the founders manually visiting hosts in New York to professionally photograph their listings, addressing a specific supply-side quality bottleneck (poor listing photos reducing booking conversion) before broader demand-side marketing would have been worth the investment, since abundant but low-quality supply would not have converted new demand into satisfied bookings anyway.
+**OpenTable** offers a distinct and well-documented illustration of the same chicken-and-egg problem this lesson formalizes, tackled from a different angle than a demand-generation story: Harvard Business School's Platform Digit research initiative describes OpenTable's founding strategy as deliberately focusing on the restaurant (supply) side first, reasoning that diners had little reason to adopt a reservation platform with few participating restaurants, while restaurants had a genuine standalone incentive to adopt — better table management and reduced no-shows — even before a large base of platform-driven diners existed. That standalone value to one side of the market, independent of the other side's presence yet, is precisely what let OpenTable seed initial supply without needing to solve both sides of the cold-start problem simultaneously.
 
-This illustrates the Two-Sided Balance Model directly: rather than treating growth as symmetric across both sides, the team identified that supply-side quality, not demand volume, was the binding constraint on liquidity at that stage, and concentrated resources accordingly.
+This maps directly onto the Two-Sided Balance Model: rather than treating liquidity-building as symmetric across both populations, OpenTable identified which side had a viable reason to join *first*, absent network effects, and built its early go-to-market motion around that asymmetry rather than around evenly split marketing spend.
 
-**Assumption flagged:** the specifics of Airbnb's early operational strategy described here are drawn from public accounts, interviews, and industry retrospectives, not confirmed internal company statements, and should be treated as illustrative rather than verified fact.
+*(Source: Harvard Business School's Digital Innovation and Platform Digit research initiative's published case analysis of OpenTable. This curriculum does not claim certainty about every specific tactic OpenTable's early sales team used to convert individual restaurants.)*
 
 ---
 
