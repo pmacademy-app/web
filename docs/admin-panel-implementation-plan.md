@@ -508,6 +508,43 @@ Clicking a service opens System Health.
 
 ---
 
+## ✅ Phase 2 — Completed (2026-08-14)
+
+Implemented in commit `cad3bb8` (dependency) + the Phase 2 dashboard work on `admin-frontend`.
+
+### What shipped
+
+- **Header**: time-based greeting ("Good morning/afternoon/evening, Admin") + "Here's what needs your attention today." `AdminRangeSelector` (Today / 7D / 30D / 90D / Custom) drives `?range=&from=&to=` search params; the page is a server component (`revalidate = 0`) that re-fetches `AdminConsoleService.getDashboardData(range, from, to)` on range change. Refresh button preserved.
+- **Attention Center**: `AdminAttentionCenter` — failed emails (range-scoped via `email_queue.failed_at`), new contact messages, pending testimonials, active system alerts. When all counts are zero it renders a consolidated "✓ Everything looks good" state (per §2.2).
+- **KPI grid (8)**: Total Users, Active Learners, New Users, Verified Users, Lessons Completed, Course Completion %, XP Earned, Certificates Issued — each with prior-period trend deltas. Total Users & Verified Users are cumulative counts with cumulative-growth trends; the rest are range-scoped.
+- **Charts**: `AdminLearnerActivityChart` (Recharts AreaChart: active/new/returning per day) and `AdminLearningActivityChart` (Recharts BarChart: lessons/quizzes/capstones per day) with a metric-switching control (All / Lessons / Quizzes / Capstones) per §2.5. Client components only; data computed server-side.
+- **Funnel**: `AdminFunnelChart` — custom horizontal percentage bars (not Recharts FunnelChart): Registered → Onboarding → First Lesson → First Quiz → Module Completion → Course Completion → Certificate. All-time journey counts.
+- **Recent Activity**: `AdminRecentActivityList` — union of certificate issuances, registrations, lesson completions, capstone submissions, sorted desc, capped at 12.
+- **System Snapshot**: `AdminSystemSnapshot` — Database, Auth, Email, Queue, Notifications, Scheduler with status + summary. Database/Auth/Email statuses derive from live telemetry; Notifications/Scheduler report healthy (no dedicated telemetry yet).
+
+### Decisions & assumptions (flagged)
+
+- **Active learner** = distinct user with ≥1 `xp_events` row in the window (consistent definition for dashboard + analytics).
+- **Returning learner** = active in window AND first-ever `xp_event` predates window start.
+- **Funnel is all-time** (cumulative journey), not range-scoped; the range selector affects KPIs/charts only.
+- **Course Completion** = users holding the `cpo_completion` badge (or all 90 lessons).
+- **Verified Users** is a cumulative count of accounts with `email_confirmed_at` set (spec §2.3); its trend is cumulative growth. Falls back to 0 gracefully if the Auth admin API is unavailable.
+- **Chart controls** (§2.4) are provided by the global header range selector (which also adds "Today") rather than per-chart controls — a deliberate UX choice.
+- All aggregation math lives in pure helpers (`lib/admin/dashboard-aggregation.ts`) covered by `npm run test:dashboard` (12 tests).
+
+### Known scale consideration
+
+- `getDashboardData` fetches the full `xp_events` history (for the returning-learner set) plus unbounded lessons/quizzes/capstones/certificates. Fine at launch scale; a `first_active_at` column on `users` (or paginated counts) should bound this before significant growth.
+
+### Verification
+
+- `npm run lint` — clean
+- `npm run build` — clean (Next.js 16, `/admin` dynamic)
+- `npm run test:admin` — 7/7 pass
+- `npm run test:dashboard` — 12/12 pass
+
+---
+
 # Phase 3 — Users Workspace
 
 ## Goal

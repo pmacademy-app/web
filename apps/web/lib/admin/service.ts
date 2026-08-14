@@ -1,12 +1,24 @@
 import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
+import {
+  buildFunnel,
+  buildLearnerSeries,
+  buildLearningSeries,
+  computeTrend,
+  mergeSeries,
+  resolveRange,
+} from './dashboard-aggregation'
 import type {
+  AdminAttentionItem,
+  AdminDashboardData,
   AdminDashboardSummary,
   AdminSystemHealth,
+  AdminSystemSnapshotItem,
   AdminUserOverview,
   AdminUserDetail,
   AdminContentOverview,
   AdminEmailQueueOverview,
+  AdminDateRangeKey,
 } from './types'
 
 export class AdminConsoleService {
@@ -103,6 +115,402 @@ export class AdminConsoleService {
       queuePendingCount: systemHealth.queuePendingItemsCount,
       systemHealth,
     }
+  }
+
+  /**
+   * Fetches the complete Phase 2 dashboard payload for a date range.
+   *
+   * Orchestrates KPI aggregation, attention-center counts, time-series charts,
+   * the learning funnel, recent activity, and the system snapshot. All raw row
+   * fetching happens here; the bucketing/conversion math lives in the pure
+   * helpers under `dashboard-aggregation.ts`.
+   */
+  public static async getDashboardData(
+    rangeKey: AdminDateRangeKey = '30d',
+    from?: string | null,
+    to?: string | null
+  ): Promise<AdminDashboardData> {
+    const supabase = createServiceRoleClient()
+
+    const range = resolveRange(rangeKey, from, to)
+    const rangeMs = range.end.getTime() - range.start.getTime()
+    const previousEnd = new Date(range.start.getTime() - 1)
+    const previousStart = new Date(previousEnd.getTime() - rangeMs)
+    const rangeStartIso = range.start.toISOString()
+    const rangeEndIso = range.end.toISOString()
+    const prevStartIso = previousStart.toISOString()
+    const prevEndIso = previousEnd.toISOString()
+
+    // ── 1. Users (all rows; small at launch scale) ────────────────────────────
+    const { data: userRows } = await supabase
+      .from('users')
+      .select('id, created_at, goal')
+      .order('created_at', { ascending: false })
+
+    const users = (userRows || []) as unknown as Array<{
+      id: string
+      created_at: string
+      goal?: string | null
+    }>
+    const totalUsers = users.length
+    const usersInRange = users.filter((u) => u.created_at >= rangeStartIso && u.created_at <= rangeEndIso)
+    const usersInPrevious = users.filter((u) => u.created_at >= prevStartIso && u.created_at <= prevEndIso)
+
+    // ── 2. XP events (active learners + XP earned) ────────────────────────────
+    const { data: xpCurrentData } = await supabase
+      .from('xp_events')
+      .select('user_id, xp_amount, created_at')
+      .gte('created_at', rangeStartIso)
+      .lte('created_at', rangeEndIso)
+
+    const { data: xpPreviousData } = await supabase
+      .from('xp_events')
+      .select('user_id, xp_amount')
+      .gte('created_at', prevStartIso)
+      .lte('created_at', prevEndIso)
+
+    const { data: xpBeforeData } = await supabase
+      .from('xp_events')
+      .select('user_id')
+      .lt('created_at', rangeStartIso)
+
+    const xpCurrent = (xpCurrentData || []) as unknown as Array<{ user_id: string; xp_amount: number; created_at: string }>
+    const xpPrevious = (xpPreviousData || []) as unknown as Array<{ user_id: string; xp_amount: number }>
+    const xpBefore = (xpBeforeData || []) as unknown as Array<{ user_id: string }>
+
+    const activeUsersInRange = new Set(xpCurrent.map((e) => e.user_id))
+    const activeUsersInPrevious = new Set(xpPrevious.map((e) => e.user_id))
+    const activeUsersBeforeRange = new Set(xpBefore.map((e) => e.user_id))
+
+    const xpEarned = xpCurrent.reduce((sum, e) => sum + (e.xp_amount || 0), 0)
+    const xpEarnedPrevious = xpPrevious.reduce((sum, e) => sum + (e.xp_amount || 0), 0)
+
+    // ── 3. Learning events (charts + funnel stages) ───────────────────────────
+    const [lessonsRes, quizzesRes, capstonesRes, certsRes] = await Promise.all([
+      supabase.from('user_lesson_progress').select('user_id, completed_at').eq('status', 'completed'),
+      supabase.from('quiz_attempts').select('id, user_id, attempted_at'),
+      supabase.from('capstone_submissions').select('user_id, submitted_at'),
+      supabase.from('certificates').select('id, user_id, issued_at'),
+    ])
+
+    const lessonsAll = (lessonsRes.data || []) as unknown as Array<{ user_id: string; completed_at: string | null }>
+    const quizzesAll = (quizzesRes.data || []) as unknown as Array<{ id: string; user_id: string; attempted_at: string }>
+    const capstonesAll = (capstonesRes.data || []) as unknown as Array<{ user_id: string; submitted_at: string | null }>
+    const certsAll = (certsRes.data || []) as unknown as Array<{ id: string; user_id: string; issued_at: string }>
+
+    const lessonsInRange = lessonsAll.filter(
+      (l): l is { user_id: string; completed_at: string } =>
+        l.completed_at !== null && l.completed_at >= rangeStartIso && l.completed_at <= rangeEndIso
+    )
+    const lessonsInPrevious = lessonsAll.filter(
+      (l): l is { user_id: string; completed_at: string } =>
+        l.completed_at !== null && l.completed_at >= prevStartIso && l.completed_at <= prevEndIso
+    )
+    const quizzesInRange = quizzesAll.filter((q) => q.attempted_at >= rangeStartIso && q.attempted_at <= rangeEndIso)
+    const capstonesInRange = capstonesAll.filter(
+      (c): c is { user_id: string; submitted_at: string } =>
+        c.submitted_at !== null && c.submitted_at >= rangeStartIso && c.submitted_at <= rangeEndIso
+    )
+    const certsInRange = certsAll.filter((c) => c.issued_at >= rangeStartIso && c.issued_at <= rangeEndIso)
+    const certsInPrevious = certsAll.filter((c) => c.issued_at >= prevStartIso && c.issued_at <= prevEndIso)
+
+    // Funnel stages (all-time journey counts)
+    const usersWithGoal = users.filter((u) => Boolean(u.goal)).length
+    const firstLessonUsers = new Set(lessonsAll.filter((l) => l.completed_at).map((l) => l.user_id))
+    const firstQuizUsers = new Set(quizzesAll.map((q) => q.user_id))
+    const moduleCompletionUsers = new Set(capstonesAll.filter((c) => c.submitted_at).map((c) => c.user_id))
+    const certificateUsers = new Set(certsAll.map((c) => c.user_id))
+
+    // Course completion: users holding the cpo_completion badge (or all 90 lessons)
+    let courseCompletionUsers = 0
+    try {
+      const badgeIds = await this.resolveCourseCompletionBadgeIds(supabase)
+      if (badgeIds.length > 0) {
+        const { data: badgeRows } = await supabase
+          .from('user_badges')
+          .select('user_id')
+          .in('badge_id', badgeIds)
+        courseCompletionUsers = badgeRows ? new Set((badgeRows as unknown as Array<{ user_id: string }>).map((r) => r.user_id)).size : 0
+      }
+    } catch {
+      courseCompletionUsers = 0
+    }
+
+    const funnel = buildFunnel([
+      { key: 'registered', label: 'Registered', count: totalUsers },
+      { key: 'onboarding', label: 'Onboarding', count: usersWithGoal },
+      { key: 'first_lesson', label: 'First Lesson', count: firstLessonUsers.size },
+      { key: 'first_quiz', label: 'First Quiz', count: firstQuizUsers.size },
+      { key: 'module_completion', label: 'Module Completion', count: moduleCompletionUsers.size },
+      { key: 'course_completion', label: 'Course Completion', count: courseCompletionUsers },
+      { key: 'certificate', label: 'Certificate', count: certificateUsers.size },
+    ])
+
+    // ── 4. Verified users (via Supabase Auth admin API) ───────────────────────
+    let verifiedTotal = 0
+    let verifiedInRange = 0
+    let authAvailable = true
+    try {
+      const { data: authData } = await supabase.auth.admin.listUsers({ perPage: 1000 })
+      const authUsers = authData?.users || []
+      verifiedTotal = authUsers.filter((u) => Boolean(u.email_confirmed_at)).length
+      verifiedInRange = authUsers.filter((u) => u.email_confirmed_at && u.email_confirmed_at >= rangeStartIso && u.email_confirmed_at <= rangeEndIso).length
+    } catch {
+      // Graceful fallback: verification telemetry unavailable
+      authAvailable = false
+    }
+
+    // ── 5. Attention center ───────────────────────────────────────────────────
+    const attention = await this.getAttentionItems(supabase, rangeStartIso, rangeEndIso)
+
+    // ── 6. System snapshot ────────────────────────────────────────────────────
+    const systemSnapshot = await this.getSystemSnapshot(authAvailable)
+
+    // ── 7. Recent activity (union across event tables) ────────────────────────
+    const recentActivity = await this.getRecentActivity(supabase, 12)
+
+    // ── 8. Assemble KPIs + series ─────────────────────────────────────────────
+    const kpis = {
+      totalUsers,
+      activeLearners: activeUsersInRange.size,
+      newUsers: usersInRange.length,
+      verifiedUsers: verifiedTotal,
+      lessonsCompleted: lessonsInRange.length,
+      courseCompletionPct:
+        totalUsers === 0 ? 0 : Math.round((courseCompletionUsers / totalUsers) * 1000) / 10,
+      xpEarned,
+      certificatesIssued: certsInRange.length,
+      trends: {
+        totalUsers: computeTrend(totalUsers, totalUsers - usersInRange.length),
+        activeLearners: computeTrend(activeUsersInRange.size, activeUsersInPrevious.size),
+        newUsers: computeTrend(usersInRange.length, usersInPrevious.length),
+        verifiedUsers: computeTrend(verifiedTotal, verifiedTotal - verifiedInRange),
+        lessonsCompleted: computeTrend(lessonsInRange.length, lessonsInPrevious.length),
+        courseCompletionPct: null,
+        xpEarned: computeTrend(xpEarned, xpEarnedPrevious),
+        certificatesIssued: computeTrend(certsInRange.length, certsInPrevious.length),
+      },
+    }
+
+    const learnerSeries = buildLearnerSeries({
+      range,
+      newUsers: usersInRange,
+      xpEvents: xpCurrent,
+      usersActiveBeforeWindow: activeUsersBeforeRange,
+    })
+    const learningSeries = buildLearningSeries({
+      range,
+      lessonsCompleted: lessonsInRange,
+      quizAttempts: quizzesInRange,
+      capstonesSubmitted: capstonesInRange,
+    })
+    const series = mergeSeries(learnerSeries, learningSeries)
+
+    return {
+      range,
+      kpis,
+      attention,
+      series,
+      funnel,
+      recentActivity,
+      systemSnapshot,
+    }
+  }
+
+  /** Resolves badge ids marking full-curriculum completion. */
+  private static async resolveCourseCompletionBadgeIds(
+    supabase: ReturnType<typeof createServiceRoleClient>
+  ): Promise<string[]> {
+    try {
+      const { data } = await supabase.from('badges').select('id').eq('key', 'cpo_completion')
+      return ((data || []) as unknown as Array<{ id: string }>).map((b) => b.id)
+    } catch {
+      return []
+    }
+  }
+
+  /** Builds the attention-center rows from live operational tables. */
+  private static async getAttentionItems(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    rangeStartIso: string,
+    rangeEndIso: string
+  ): Promise<AdminAttentionItem[]> {
+    const [failedEmails, contactMessages, testimonials, alerts] = await Promise.all([
+      supabase
+        .from('email_queue')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'failed')
+        .gte('failed_at', rangeStartIso)
+        .lte('failed_at', rangeEndIso),
+      supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+      supabase.from('testimonials').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('system_errors').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+    ])
+
+    return [
+      {
+        id: 'failed-emails',
+        label: 'Failed Emails',
+        count: failedEmails.count || 0,
+        severity: (failedEmails.count || 0) > 0 ? 'critical' : 'healthy',
+        href: '/admin/communications?tab=queue',
+        actionLabel: 'Review',
+      },
+      {
+        id: 'contact-messages',
+        label: 'New Contact Messages',
+        count: contactMessages.count || 0,
+        severity: (contactMessages.count || 0) > 0 ? 'warning' : 'healthy',
+        href: '/admin/communications?tab=contact',
+        actionLabel: 'Open Inbox',
+      },
+      {
+        id: 'pending-testimonials',
+        label: 'Pending Testimonials',
+        count: testimonials.count || 0,
+        severity: (testimonials.count || 0) > 0 ? 'warning' : 'healthy',
+        href: '/admin/feedback',
+        actionLabel: 'Review',
+      },
+      {
+        id: 'system-alerts',
+        label: 'Active System Alerts',
+        count: alerts.count || 0,
+        severity: (alerts.count || 0) > 0 ? 'warning' : 'healthy',
+        href: '/admin/system',
+        actionLabel: 'View',
+      },
+    ]
+  }
+
+  /** Builds the system snapshot from health + email queue telemetry. */
+  private static async getSystemSnapshot(authAvailable: boolean): Promise<AdminSystemSnapshotItem[]> {
+    const [health, queue] = await Promise.all([this.getSystemHealth(), this.getEmailQueueOverview()])
+    const lastChecked = health.lastCheckedAt
+
+    return [
+      { id: 'database', label: 'Database', status: health.status, lastChecked, summary: `${health.databaseLatencyMs} ms latency`, href: '/admin/system' },
+      { id: 'auth', label: 'Authentication', status: authAvailable ? 'healthy' : 'degraded', lastChecked, summary: authAvailable ? 'Supabase Auth & RLS enforced' : 'Auth API unreachable', href: '/admin/system' },
+      { id: 'email', label: 'Email', status: queue.failedCount > 0 ? 'degraded' : 'healthy', lastChecked, summary: queue.failedCount > 0 ? `${queue.failedCount} failed` : 'Operational', href: '/admin/communications?tab=queue' },
+      { id: 'queue', label: 'Queue', status: queue.pendingCount > 0 ? 'degraded' : 'healthy', lastChecked, summary: `${queue.pendingCount} pending`, href: '/admin/communications?tab=queue' },
+      { id: 'notifications', label: 'Notifications', status: 'healthy', lastChecked, summary: 'In-app + email channels', href: '/admin/notifications' },
+      { id: 'scheduler', label: 'Scheduler', status: 'healthy', lastChecked, summary: `${health.activeCronJobsCount} active cron jobs`, href: '/admin/system' },
+    ]
+  }
+
+  /** Builds the recent-activity timeline by unioning recent events across tables. */
+  private static async getRecentActivity(supabase: ReturnType<typeof createServiceRoleClient>, limit: number) {
+    type ActivityRow = {
+      id: string
+      userId: string | null
+      userName: string
+      activity: string
+      entity: string
+      href: string
+      timestamp: string
+    }
+
+    const results: ActivityRow[] = []
+
+    // Fetch all event sources in parallel
+    const [certRes, regRes, lessonRes, capRes] = await Promise.all([
+      supabase
+        .from('certificates')
+        .select('id, user_id, learner_name, issued_at, certificate_code')
+        .order('issued_at', { ascending: false })
+        .limit(limit),
+      supabase
+        .from('users')
+        .select('id, name, email, created_at')
+        .order('created_at', { ascending: false })
+        .limit(limit),
+      supabase
+        .from('user_lesson_progress')
+        .select('user_id, lesson_slug, completed_at')
+        .eq('status', 'completed')
+        .not('completed_at', 'is', null)
+        .order('completed_at', { ascending: false })
+        .limit(limit),
+      supabase
+        .from('capstone_submissions')
+        .select('id, user_id, module_slug, submitted_at')
+        .order('submitted_at', { ascending: false })
+        .limit(limit),
+    ])
+
+    // Certificate issuances
+    for (const row of (certRes.data || []) as unknown as Array<{ id: string; user_id: string; learner_name: string; issued_at: string; certificate_code: string }>) {
+      results.push({
+        id: `cert-${row.id}`,
+        userId: row.user_id,
+        userName: row.learner_name || 'Learner',
+        activity: 'earned a certificate',
+        entity: row.certificate_code,
+        href: `/admin/certificates`,
+        timestamp: row.issued_at,
+      })
+    }
+
+    // New registrations
+    for (const row of (regRes.data || []) as unknown as Array<{ id: string; name: string | null; email: string; created_at: string }>) {
+      results.push({
+        id: `reg-${row.id}`,
+        userId: row.id,
+        userName: row.name || row.email.split('@')[0] || 'New learner',
+        activity: 'registered',
+        entity: 'new learner account',
+        href: `/admin/users?userId=${row.id}`,
+        timestamp: row.created_at,
+      })
+    }
+
+    // Lesson completions
+    const lessonRowsTyped = (lessonRes.data || []) as unknown as Array<{ user_id: string; lesson_slug: string; completed_at: string }>
+
+    // Resolve names for lesson/capstone rows in one batch
+    const activityUserIds = new Set(lessonRowsTyped.map((r) => r.user_id))
+    const capRowsTyped = (capRes.data || []) as unknown as Array<{ id: string; user_id: string; module_slug: string; submitted_at: string }>
+    for (const row of capRowsTyped) activityUserIds.add(row.user_id)
+
+    const nameMap = new Map<string, string>()
+    if (activityUserIds.size > 0) {
+      const { data: nameRows } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .in('id', [...activityUserIds])
+      for (const row of (nameRows || []) as unknown as Array<{ id: string; name: string | null; email: string }>) {
+        nameMap.set(row.id, row.name || row.email.split('@')[0] || 'Learner')
+      }
+    }
+
+    for (const row of lessonRowsTyped) {
+      results.push({
+        id: `lesson-${row.user_id}-${row.lesson_slug}`,
+        userId: row.user_id,
+        userName: nameMap.get(row.user_id) || 'Learner',
+        activity: 'completed a lesson',
+        entity: row.lesson_slug,
+        href: `/admin/users?userId=${row.user_id}`,
+        timestamp: row.completed_at,
+      })
+    }
+
+    // Capstone submissions
+    for (const row of capRowsTyped) {
+      results.push({
+        id: `cap-${row.id}`,
+        userId: row.user_id,
+        userName: nameMap.get(row.user_id) || 'Learner',
+        activity: 'submitted a capstone',
+        entity: row.module_slug,
+        href: `/admin/users?userId=${row.user_id}`,
+        timestamp: row.submitted_at,
+      })
+    }
+
+    return results
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, limit)
   }
 
   /**

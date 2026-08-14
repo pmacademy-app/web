@@ -14,6 +14,7 @@
 |---|---|---|---|
 | **Framework** | Next.js 16.2.12 App Router (Turbopack) | Server Components, Route Handlers, Proxy Middleware | 🟢 Verified in Production |
 | **Frontend UI** | React 19, Vanilla CSS Design System | Responsive layout, dark mode, glassmorphic themes | 🟢 Verified in Production |
+| **Admin Charts** | Recharts 3.x (MIT, free) | Admin Panel dashboard time-series & funnel visualizations (client-side) | ✅ Done (Phase 2) |
 | **State & Cache** | Server Component Data Fetching + Client State | SWR / React State for local component state | 🟢 Verified in Production |
 | **Content Pipeline** | Build-time Markdown Compiler (Compiler v2) | Markdown → Static JSON in `content/dist/lessons` | 🟢 Verified in Production |
 | **Diagram Engine** | Build-time Mermaid v11 SVG Renderer | Node.js + JSDOM SVG compilation (0 client JS) | 🟢 Verified in Production |

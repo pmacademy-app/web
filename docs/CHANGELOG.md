@@ -4,6 +4,16 @@ All notable changes to **Prodily PM Academy** (`pmacademy-app/web`) are document
 
 ---
 
+## [`cad3bb8`] — 2026-08-14
+### Added
+- Admin Panel Phase 2 (Dashboard / Operations Center): added `recharts` 3.x dependency (MIT, free) for dashboard time-series visualizations.
+- Rebuilt `/admin` dashboard: date-range selector (Today/7D/30D/90D/Custom via `?range=` search params), Attention Center, 8-KPI grid with prior-period trends, Learner Activity + Learning Activity Recharts, all-time Learning Funnel, Recent Activity timeline, and System Snapshot.
+- Added pure aggregation helpers in `lib/admin/dashboard-aggregation.ts` with `npm run test:dashboard` (12 unit tests).
+- Documented Recharts in `docs/ARCHITECTURE.md` §1 tech stack table and Phase 2 completion in `docs/admin-panel-implementation-plan.md`.
+- Post-review hardening: fixed Active Learners trend (previous-period query now selects `user_id`), added time-based header greeting, added Learning Activity metric switching, made Total Users & Verified Users cumulative with growth trends, derived System Snapshot Database/Auth/Email status from live telemetry, guarded empty badge-id query, parallelized recent-activity queries, and added a consolidated healthy Attention Center zero-state.
+
+---
+
 ## [`490fea3`] — 2026-08-10
 ### Fixed
 - Fixed ESLint `prefer-const` error in `/api/admin/emails/production-send/route.ts`.

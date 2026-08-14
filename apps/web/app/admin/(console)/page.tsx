@@ -1,139 +1,172 @@
-import React from 'react'
-import Link from 'next/link'
+import React, { Suspense } from 'react'
 import {
   Users,
+  UserCheck,
+  UserPlus,
+  ShieldCheck,
   BookOpen,
-  Mail,
+  GraduationCap,
+  Zap,
   Award,
   Activity,
-  Zap,
-  TrendingUp,
-  ShieldCheck,
 } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminDashboardRefreshButton } from '@/components/admin/AdminDashboardRefreshButton'
-import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
+import { AdminRangeSelector } from '@/components/admin/AdminRangeSelector'
+import { AdminAttentionCenter } from '@/components/admin/AdminAttentionCenter'
+import { AdminLearnerActivityChart } from '@/components/admin/AdminLearnerActivityChart'
+import { AdminLearningActivityChart } from '@/components/admin/AdminLearningActivityChart'
+import { AdminFunnelChart } from '@/components/admin/AdminFunnelChart'
+import { AdminRecentActivityList } from '@/components/admin/AdminRecentActivityList'
+import { AdminSystemSnapshot } from '@/components/admin/AdminSystemSnapshot'
+import type { AdminDateRangeKey } from '@/lib/admin/types'
 
 export const revalidate = 0
 
-export default async function AdminDashboardPage() {
-  const summary = await AdminConsoleService.getDashboardSummary()
-  const health = await AdminConsoleService.getSystemHealth()
+interface AdminDashboardPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function AdminDashboardPage({ searchParams }: AdminDashboardPageProps) {
+  const params = await searchParams
+  const range = (params.range as AdminDateRangeKey) || '30d'
+  const from = typeof params.from === 'string' ? params.from : null
+  const to = typeof params.to === 'string' ? params.to : null
+
+  const data = await AdminConsoleService.getDashboardData(range, from, to)
+  const { kpis } = data
+
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+
+  const trend = (value: number | null, positiveIsGood = true) => {
+    if (value === null) return undefined
+    const isPositive = value >= 0
+    const good = positiveIsGood ? isPositive : !isPositive
+    return { value: `${isPositive ? '+' : ''}${value}%`, positive: good }
+  }
 
   return (
     <div className="space-y-8">
-      {/* Standard Header */}
       <AdminPageHeader
-        title="Operations Control Center"
-        description="Real-time operational metrics, platform health, user activity, and system queue monitoring."
+        title={`${greeting}, Admin`}
+        description="Here's what needs your attention today."
         icon={Activity}
         actions={
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-admin-fg-muted font-mono hidden sm:inline">
-              Last Refreshed: {new Date().toLocaleTimeString()}
-            </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <Suspense fallback={<div className="h-9 w-56 rounded-lg bg-admin-surface border border-admin-border" />}>
+              <AdminRangeSelector />
+            </Suspense>
             <AdminDashboardRefreshButton />
           </div>
         }
       />
 
-      {/* KPI Cards Grid */}
+      {/* Attention Center */}
+      <AdminAttentionCenter items={data.attention} />
+
+      {/* KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminKpiCard
-          title="Total Registered Users"
-          value={summary.totalUsers}
-          subtitle={`+${summary.newSignups24h} new in last 24h`}
+          title="Total Users"
+          value={kpis.totalUsers.toLocaleString()}
+          subtitle="Registered accounts"
           icon={Users}
-          trend={{ value: `+${summary.newSignups24h}`, positive: true }}
+          trend={trend(kpis.trends.totalUsers)}
+        />
+        <AdminKpiCard
+          title="Active Learners"
+          value={kpis.activeLearners.toLocaleString()}
+          subtitle="Earned XP in selected range"
+          icon={UserCheck}
+          iconColor="text-admin-success"
+          trend={trend(kpis.trends.activeLearners)}
+        />
+        <AdminKpiCard
+          title="New Users"
+          value={kpis.newUsers.toLocaleString()}
+          subtitle="Registered in selected range"
+          icon={UserPlus}
+          iconColor="text-admin-info"
+          trend={trend(kpis.trends.newUsers)}
+        />
+        <AdminKpiCard
+          title="Verified Users"
+          value={kpis.verifiedUsers.toLocaleString()}
+          subtitle="Accounts with confirmed email"
+          icon={ShieldCheck}
+          iconColor="text-admin-success"
+          trend={trend(kpis.trends.verifiedUsers)}
         />
         <AdminKpiCard
           title="Lessons Completed"
-          value={summary.totalLessonsCompleted}
-          subtitle="90 compiled curriculum lessons"
+          value={kpis.lessonsCompleted.toLocaleString()}
+          subtitle="Completed lessons in range"
           icon={BookOpen}
-          iconColor="text-admin-success"
+          iconColor="text-admin-accent"
+          trend={trend(kpis.trends.lessonsCompleted)}
         />
         <AdminKpiCard
-          title="Total XP Awarded"
-          value={summary.totalXpAwarded.toLocaleString()}
-          subtitle="Platform-wide learner XP"
+          title="Course Completion"
+          value={`${kpis.courseCompletionPct}%`}
+          subtitle="Learners who finished the curriculum"
+          icon={GraduationCap}
+          iconColor="text-admin-warning"
+          trend={trend(kpis.trends.courseCompletionPct)}
+        />
+        <AdminKpiCard
+          title="XP Earned"
+          value={kpis.xpEarned.toLocaleString()}
+          subtitle="Total XP awarded in range"
           icon={Zap}
           iconColor="text-admin-info"
+          trend={trend(kpis.trends.xpEarned)}
         />
         <AdminKpiCard
-          title="Email Queue Pending"
-          value={summary.queuePendingCount}
-          subtitle="Awaiting dispatcher pickup"
-          icon={Mail}
-          iconColor="text-admin-warning"
-          badgeText={summary.queuePendingCount === 0 ? 'Clear' : 'Active'}
+          title="Certificates Issued"
+          value={kpis.certificatesIssued.toLocaleString()}
+          subtitle="Certificates in range"
+          icon={Award}
+          iconColor="text-admin-success"
+          trend={trend(kpis.trends.certificatesIssued)}
         />
       </div>
 
-      {/* Main Grid: Secondary Metrics & Operations Checklist */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Operations Activity Summary */}
-        <div className="lg:col-span-2 p-6 rounded-xl bg-admin-surface border border-admin-border space-y-5 shadow-xl">
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
           <div className="flex items-center justify-between border-b border-admin-border pb-4">
             <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-admin-accent" />
-              Platform Milestone Summary
+              <Users className="w-4 h-4 text-admin-accent" />
+              Learner Activity
             </h2>
-            <Link
-              href="/admin/analytics"
-              className="text-xs font-semibold text-admin-accent hover:underline"
-            >
-              View Analytics →
-            </Link>
+            <span className="text-[11px] font-mono text-admin-fg-muted">Daily</span>
           </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border space-y-1">
-              <span className="text-[11px] font-medium text-admin-fg-muted uppercase">Certificates Issued</span>
-              <p className="text-2xl font-bold text-admin-fg flex items-center gap-2">
-                <Award className="w-4 h-4 text-admin-accent" />
-                {summary.totalCertificatesIssued}
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border space-y-1">
-              <span className="text-[11px] font-medium text-admin-fg-muted uppercase">Public Portfolios</span>
-              <p className="text-2xl font-bold text-admin-fg">{summary.totalPublicPortfolios}</p>
-            </div>
-            <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border space-y-1">
-              <span className="text-[11px] font-medium text-admin-fg-muted uppercase">System Latency</span>
-              <p className="text-2xl font-bold text-admin-success">{health.databaseLatencyMs} ms</p>
-            </div>
-          </div>
+          <AdminLearnerActivityChart data={data.series} />
         </div>
 
-        {/* System Health Checklist */}
-        <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-5 shadow-xl">
+        <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
           <div className="flex items-center justify-between border-b border-admin-border pb-4">
             <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-admin-success" />
-              System Status
+              <BookOpen className="w-4 h-4 text-admin-accent" />
+              Learning Activity
             </h2>
-            <AdminStatusBadge status={health.status} />
+            <span className="text-[11px] font-mono text-admin-fg-muted">Daily</span>
           </div>
-
-          <div className="space-y-3 text-xs">
-            <div className="p-3 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-              <span className="text-admin-fg-muted font-medium">Supabase Auth & RLS</span>
-              <AdminStatusBadge status="healthy" label="Enforced" />
-            </div>
-            <div className="p-3 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-              <span className="text-admin-fg-muted font-medium">Scheduler Workflow</span>
-              <AdminStatusBadge status="healthy" label="Active" />
-            </div>
-            <div className="p-3 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-              <span className="text-admin-fg-muted font-medium">Resend Email API</span>
-              <AdminStatusBadge status="healthy" label="Ready" />
-            </div>
-          </div>
+          <AdminLearningActivityChart data={data.series} />
         </div>
       </div>
+
+      {/* Funnel + Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AdminFunnelChart stages={data.funnel} />
+        <AdminRecentActivityList items={data.recentActivity} />
+      </div>
+
+      {/* System Snapshot */}
+      <AdminSystemSnapshot items={data.systemSnapshot} />
     </div>
   )
 }
