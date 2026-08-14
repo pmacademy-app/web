@@ -7,7 +7,8 @@ import { BlockProps } from '../../renderer/registry';
 function HeadingBlock({ level, text }: { level: number; text: string }) {
   // Page header already renders the primary <h1> title.
   // Demote level 1 headings inside the content body to <h2> to enforce a single <h1> per page.
-  const effectiveLevel = level === 1 ? 2 : level;
+  const effectiveLevel = level === 1 ? 2 : Math.min(Math.max(level, 2), 6);
+  const Tag = `h${effectiveLevel}` as 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   const className = (() => {
     switch (effectiveLevel) {
       case 2: return 'text-2xl font-bold font-serif text-foreground mt-8 mb-3 leading-snug';
@@ -19,9 +20,11 @@ function HeadingBlock({ level, text }: { level: number; text: string }) {
     }
   })();
 
-  // Render heading with MarkdownRenderer to support bold/italic in headings
-  const headingMarkdown = '#'.repeat(effectiveLevel) + ' ' + text;
-  return <MarkdownRenderer content={headingMarkdown} className={className} />;
+  return (
+    <Tag className={className}>
+      <MarkdownRenderer content={text} className="inline [&>p]:inline [&>p]:m-0" />
+    </Tag>
+  );
 }
 
 // ─── NativeTable ──────────────────────────────────────────────────────────────

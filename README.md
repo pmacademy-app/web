@@ -58,7 +58,6 @@ pm-academy/
 └── supabase/
     └── migrations/         # Timestamped SQL database migrations
 ```
-
 ---
 
 ## 3. Tech Stack (Locked)

@@ -326,5 +326,173 @@ describe('PM Academy Content Compiler Test Suite', () => {
       assert.ok(yB - yA > 150, `expected rank separation > 150px between rect A and diamond B, got ${yB - yA}px`);
     });
   });
+
+  describe('Markdown -> JSON Pipeline Regressions & Formatting Preservation', () => {
+    it('extracts and preserves blockquote nodes', async () => {
+      const mockBlockquoteNode = {
+        type: 'blockquote',
+        children: [
+          {
+            type: 'paragraph',
+            children: [
+              {
+                type: 'text',
+                value: 'A PM is accountable for outcomes that no single other function can be accountable for alone.',
+              },
+            ],
+          },
+        ],
+      };
+
+      const blocks = await mdastToBlocks([mockBlockquoteNode], 'les_test');
+      assert.strictEqual(blocks.length, 1);
+      assert.strictEqual(blocks[0].type, 'blockquote');
+      assert.strictEqual(
+        blocks[0].text,
+        'A PM is accountable for outcomes that no single other function can be accountable for alone.'
+      );
+      assert.ok(blocks[0].blockId.startsWith('blk_'));
+    });
+
+    it('preserves inline formatting (bold, italic, code) inside blockquotes', async () => {
+      const mockFormattedBlockquote = {
+        type: 'blockquote',
+        children: [
+          {
+            type: 'paragraph',
+            children: [
+              { type: 'text', value: 'For ' },
+              {
+                type: 'strong',
+                children: [{ type: 'text', value: '[target audience]' }],
+              },
+              { type: 'text', value: ', who ' },
+              {
+                type: 'emphasis',
+                children: [{ type: 'text', value: '[statement of problem]' }],
+              },
+            ],
+          },
+        ],
+      };
+
+      const blocks = await mdastToBlocks([mockFormattedBlockquote], 'les_test');
+      assert.strictEqual(blocks.length, 1);
+      assert.strictEqual(blocks[0].type, 'blockquote');
+      assert.strictEqual(
+        blocks[0].text,
+        'For **[target audience]**, who *[statement of problem]*'
+      );
+    });
+
+    it('preserves inline formatting (bold, italic, code) inside headings', async () => {
+      const mockHeadingNode = {
+        type: 'heading',
+        depth: 3,
+        children: [
+          { type: 'text', value: 'The ' },
+          {
+            type: 'strong',
+            children: [{ type: 'text', value: 'Core' }],
+          },
+          { type: 'text', value: ' Definition and ' },
+          {
+            type: 'inlineCode',
+            value: 'PM',
+          },
+        ],
+      };
+
+      const blocks = await mdastToBlocks([mockHeadingNode], 'les_test');
+      assert.strictEqual(blocks.length, 1);
+      assert.strictEqual(blocks[0].type, 'heading');
+      assert.strictEqual(blocks[0].level, 3);
+      assert.strictEqual(blocks[0].text, 'The **Core** Definition and `PM`');
+    });
+
+    it('distinguishes bold paragraphs from headings', async () => {
+      const mockBoldParagraph = {
+        type: 'paragraph',
+        children: [
+          {
+            type: 'strong',
+            children: [
+              {
+                type: 'text',
+                value: 'A quadrant A classification at launch means high viability and high desirability.',
+              },
+            ],
+          },
+        ],
+      };
+
+      const blocks = await mdastToBlocks([mockBoldParagraph], 'les_test');
+      assert.strictEqual(blocks.length, 1);
+      assert.strictEqual(blocks[0].type, 'paragraph');
+      assert.strictEqual(
+        blocks[0].text,
+        '**A quadrant A classification at launch means high viability and high desirability.**'
+      );
+    });
+
+    it('compiles lesson-001.md and verifies the famous blockquote is preserved', async () => {
+      const rootDir = path.resolve(__dirname, '../../..');
+      const filePath = path.join(rootDir, 'content/lessons/lesson-001.md');
+      const { lesson } = await compileLesson(filePath, { [filePath]: 'les_001test' }, {});
+
+      const theoryBlock = lesson.blocks.find((b: any) => b.type === 'theory');
+      assert.ok(theoryBlock, 'lesson-001 must have a theory block');
+      assert.ok(theoryBlock.children && theoryBlock.children.length > 0);
+
+      const blockquote = theoryBlock.children.find((b: any) => b.type === 'blockquote');
+      assert.ok(blockquote, 'lesson-001 theory block must contain the blockquote');
+      assert.strictEqual(
+        blockquote.text,
+        'A PM is accountable for outcomes that no single other function can be accountable for alone.'
+      );
+    });
+
+    it('validates that all lessons with blockquotes in source markdown retain blockquote blocks in JSON', async () => {
+      const rootDir = path.resolve(__dirname, '../../..');
+      const lessonsDir = path.join(rootDir, 'content/lessons');
+      const fs = await import('fs');
+      const files = fs.readdirSync(lessonsDir).filter((f) => f.endsWith('.md'));
+
+      let totalBlockquotesFound = 0;
+
+      for (const file of files) {
+        const fullPath = path.join(lessonsDir, file);
+        const mdSource = fs.readFileSync(fullPath, 'utf-8');
+
+        // Check if file contains markdown blockquote lines (lines starting with '>')
+        const hasBlockquoteInSource = /^>\s+/m.test(mdSource);
+        if (hasBlockquoteInSource) {
+          const { lesson } = await compileLesson(fullPath, { [fullPath]: `les_${file}` }, {});
+          
+          // Function to recursively search for blockquote blocks
+          const findBlockquotes = (blocks: any[]): any[] => {
+            const found: any[] = [];
+            for (const b of blocks) {
+              if (b.type === 'blockquote') found.push(b);
+              if (b.children) found.push(...findBlockquotes(b.children));
+            }
+            return found;
+          };
+
+          const blockquotesInJson = findBlockquotes(lesson.blocks);
+          assert.ok(
+            blockquotesInJson.length > 0,
+            `Lesson ${file} has blockquotes in markdown source but none in compiled blocks!`
+          );
+          totalBlockquotesFound += blockquotesInJson.length;
+        }
+      }
+
+      assert.ok(
+        totalBlockquotesFound >= 10,
+        `Expected at least 10 blockquotes across the corpus, found ${totalBlockquotesFound}`
+      );
+    });
+  });
 });
 
