@@ -34,19 +34,19 @@ export default async function AdminCertificatesPage() {
   const columns: Column<CertificateRow>[] = [
     {
       header: 'Certificate Code',
-      cell: (cert) => <span className="font-mono font-bold text-amber-400">{cert.certificate_code}</span>,
+      cell: (cert) => <span className="font-mono font-bold text-admin-accent">{cert.certificate_code}</span>,
     },
     {
       header: 'Learner',
-      cell: (cert) => <span className="text-white font-semibold">{cert.learner_name || 'Learner'}</span>,
+      cell: (cert) => <span className="text-admin-fg font-semibold">{cert.learner_name || 'Learner'}</span>,
     },
     {
       header: 'Credential Type',
-      cell: (cert) => <span className="text-slate-300 capitalize">{(cert.type || 'Full Curriculum').replace('_', ' ')}</span>,
+      cell: (cert) => <span className="text-admin-fg-muted capitalize">{(cert.type || 'Full Curriculum').replace('_', ' ')}</span>,
     },
     {
       header: 'Issued Date',
-      cell: (cert) => <span className="text-slate-400 font-mono text-[11px]">{new Date(cert.issued_at).toLocaleDateString()}</span>,
+      cell: (cert) => <span className="text-admin-fg-muted font-mono text-[11px]">{new Date(cert.issued_at).toLocaleDateString()}</span>,
     },
     {
       header: 'Verification Link',
@@ -56,7 +56,7 @@ export default async function AdminCertificatesPage() {
         <Link
           href={`/verify/${encodeURIComponent(cert.certificate_code)}`}
           target="_blank"
-          className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-mono"
+          className="inline-flex items-center gap-1 text-xs text-admin-info hover:text-admin-info/80 font-mono"
         >
           Verify <ExternalLink className="w-3 h-3" />
         </Link>
@@ -70,7 +70,6 @@ export default async function AdminCertificatesPage() {
         title="Certificate Audit & Verification"
         description="Inspect issued certificates, verify credential integrity, and test public verification lookups."
         icon={Award}
-        iconColor="text-amber-400"
       />
 
       {/* Certificates Data Table */}
@@ -86,8 +85,8 @@ export default async function AdminCertificatesPage() {
       {users.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Dev Certificate Tools</h2>
+            <ShieldCheck className="w-4 h-4 text-admin-success" />
+            <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Dev Certificate Tools</h2>
           </div>
           <DeveloperActionsSection
             targetUserId={users[0].id}

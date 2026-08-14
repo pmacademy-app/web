@@ -61,16 +61,16 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
         disabled={loading}
         className={`px-2.5 py-1 rounded text-[11px] font-semibold border transition-all inline-flex items-center gap-1 ${
           isAdmin
-            ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
-            : 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border-purple-500/30'
+            ? 'bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted border-admin-border'
+            : 'bg-admin-info-soft hover:bg-admin-info/20 text-admin-info border-admin-info/25'
         }`}
       >
         {loading ? (
-          <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
+          <Loader2 className="w-3 h-3 animate-spin text-admin-accent" />
         ) : success ? (
-          <Check className="w-3 h-3 text-emerald-400" />
+          <Check className="w-3 h-3 text-admin-success" />
         ) : (
-          <Shield className="w-3 h-3 text-amber-400" />
+          <Shield className="w-3 h-3 text-admin-accent" />
         )}
         <span>{isAdmin ? 'Demote to Learner' : 'Make Admin'}</span>
       </button>

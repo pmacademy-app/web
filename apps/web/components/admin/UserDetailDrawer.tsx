@@ -21,23 +21,23 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
     <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-admin-bg/70 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Slide-over Drawer Panel */}
-      <div className="relative w-full max-w-2xl bg-slate-900 border-l border-slate-800 text-slate-100 shadow-2xl h-full overflow-y-auto z-10 flex flex-col p-6 space-y-6 animate-in slide-in-from-right duration-200">
+      <div className="relative w-full max-w-2xl bg-admin-surface border-l border-admin-border text-admin-fg shadow-2xl h-full overflow-y-auto z-10 flex flex-col p-6 space-y-6 animate-in slide-in-from-right duration-200">
         {/* Drawer Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="flex items-center justify-between border-b border-admin-border pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+            <div className="w-10 h-10 rounded-full bg-admin-accent-soft border border-admin-accent/25 text-admin-accent flex items-center justify-center font-bold text-lg">
               {user.fullName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <h2 className="text-base font-bold text-admin-fg flex items-center gap-2">
                 {user.fullName}
               </h2>
-              <p className="text-xs text-slate-400 font-mono">{user.email}</p>
+              <p className="text-xs text-admin-fg-muted font-mono">{user.email}</p>
             </div>
           </div>
 
@@ -49,7 +49,7 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
             />
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+              className="p-1.5 rounded-lg bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted hover:text-admin-fg transition-colors"
               aria-label="Close drawer"
             >
               <X className="w-5 h-5" />
@@ -64,47 +64,47 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
             value={`Lvl ${user.level}`}
             subtitle={`${user.totalXp.toLocaleString()} Total XP`}
             icon={Zap}
-            iconColor="text-purple-400"
+            iconColor="text-admin-info"
           />
           <AdminKpiCard
             title="Active Streak"
             value={`${user.streakDays}d`}
             subtitle="Current streak days"
             icon={Flame}
-            iconColor="text-amber-400"
+            iconColor="text-admin-accent"
           />
           <AdminKpiCard
             title="Lessons Completed"
             value={user.lessonsCompleted}
             subtitle="Curriculum lessons"
             icon={BookOpen}
-            iconColor="text-emerald-400"
+            iconColor="text-admin-success"
           />
           <AdminKpiCard
             title="Certificates Issued"
             value={user.certificatesCount}
             subtitle="Signed credentials"
             icon={Award}
-            iconColor="text-blue-400"
+            iconColor="text-admin-info"
           />
         </div>
 
         {/* Account Details Breakdown */}
-        <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+        <div className="p-4 rounded-xl bg-admin-bg/60 border border-admin-border space-y-3">
+          <h3 className="text-xs font-bold text-admin-fg-muted uppercase tracking-wider">
             Account Profile & Metadata
           </h3>
           <div className="space-y-2 text-xs">
-            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
-              <span className="text-slate-400">User ID</span>
-              <span className="font-mono text-slate-200 text-[11px] select-all">{user.id}</span>
+            <div className="p-2.5 rounded bg-admin-surface border border-admin-border flex justify-between items-center">
+              <span className="text-admin-fg-muted">User ID</span>
+              <span className="font-mono text-admin-fg text-[11px] select-all">{user.id}</span>
             </div>
-            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
-              <span className="text-slate-400">Account Goal</span>
-              <span className="text-slate-200">{user.goal || 'General Skill Upgrade'}</span>
+            <div className="p-2.5 rounded bg-admin-surface border border-admin-border flex justify-between items-center">
+              <span className="text-admin-fg-muted">Account Goal</span>
+              <span className="text-admin-fg">{user.goal || 'General Skill Upgrade'}</span>
             </div>
-            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
-              <span className="text-slate-400">Public Portfolio</span>
+            <div className="p-2.5 rounded bg-admin-surface border border-admin-border flex justify-between items-center">
+              <span className="text-admin-fg-muted">Public Portfolio</span>
               <div className="flex items-center gap-2">
                 <AdminStatusBadge
                   status={user.hasPublicPortfolio ? 'published' : 'archived'}
@@ -115,7 +115,7 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
                     href={`/p/${user.username || user.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline font-bold"
+                    className="inline-flex items-center gap-1 text-xs text-admin-success hover:underline font-bold"
                   >
                     <span>View</span>
                     <ExternalLink className="w-3 h-3" />
@@ -123,8 +123,8 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
                 )}
               </div>
             </div>
-            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
-              <span className="text-slate-400">Email Verification</span>
+            <div className="p-2.5 rounded bg-admin-surface border border-admin-border flex justify-between items-center">
+              <span className="text-admin-fg-muted">Email Verification</span>
               <div className="flex items-center gap-2">
                 <AdminStatusBadge
                   status={user.isVerified ? 'published' : 'archived'}
@@ -132,9 +132,9 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
                 />
               </div>
             </div>
-            <div className="p-2.5 rounded bg-slate-900 border border-slate-800/80 flex justify-between items-center">
-              <span className="text-slate-400">Joined Date</span>
-              <span className="font-mono text-slate-200">
+            <div className="p-2.5 rounded bg-admin-surface border border-admin-border flex justify-between items-center">
+              <span className="text-admin-fg-muted">Joined Date</span>
+              <span className="font-mono text-admin-fg">
                 {new Date(user.createdAt).toLocaleString()}
               </span>
             </div>
@@ -142,8 +142,8 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
         </div>
 
         {/* Admin Operational Controls: Progress Reset & Controlled User Deletion */}
-        <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+        <div className="p-4 rounded-xl bg-admin-bg/60 border border-admin-border space-y-3">
+          <h3 className="text-xs font-bold text-admin-fg-muted uppercase tracking-wider">
             Admin Controlled User Management
           </h3>
           <div className="flex flex-wrap gap-2 text-xs">
@@ -170,7 +170,7 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
                   alert('Network error resending verification email.')
                 }
               }}
-              className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold hover:bg-blue-500/20 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-admin-info-soft text-admin-info border border-admin-info/25 font-bold hover:bg-admin-info/20 transition-colors cursor-pointer"
             >
               Resend Verification Email
             </button>
@@ -197,7 +197,7 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
                   }
                 }
               }}
-              className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold hover:bg-amber-500/20 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-admin-warning-soft text-admin-warning border border-admin-warning/25 font-bold hover:bg-admin-warning/20 transition-colors cursor-pointer"
             >
               Reset User Progress
             </button>
@@ -222,7 +222,7 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
                   }
                 }
               }}
-              className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 font-bold hover:bg-rose-500/20 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-admin-danger-soft text-admin-danger border border-admin-danger/25 font-bold hover:bg-admin-danger/20 transition-colors cursor-pointer"
             >
               Delete User Account
             </button>
@@ -232,7 +232,7 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
                 href={`/p/${user.username || user.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold hover:bg-emerald-500/20 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-admin-success-soft text-admin-success border border-admin-success/25 font-bold hover:bg-admin-success/20 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>View Portfolio</span>

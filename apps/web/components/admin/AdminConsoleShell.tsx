@@ -1,21 +1,38 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { AdminSidebar } from './AdminSidebar'
 import { AdminHeader } from './AdminHeader'
+import { AdminShellProvider } from './admin-shell-context'
 
-export function AdminConsoleShell({ children }: { children: React.ReactNode }) {
+export interface AdminConsoleUser {
+  name: string | null
+  email: string
+}
+
+interface AdminConsoleShellProps {
+  children: React.ReactNode
+  user?: AdminConsoleUser
+}
+
+export function AdminConsoleShell({ children, user }: AdminConsoleShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const shellRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex font-sans antialiased selection:bg-amber-500/30 selection:text-amber-200">
-      <AdminSidebar mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <AdminHeader onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)} />
-        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8 overflow-y-auto">
-          {children}
-        </main>
+    <AdminShellProvider shellRef={shellRef}>
+      <div
+        ref={shellRef}
+        className="admin-console min-h-screen bg-admin-bg text-admin-fg flex font-sans antialiased selection:bg-admin-accent/30 selection:text-admin-accent"
+      >
+        <AdminSidebar mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} user={user} />
+        <div className="flex-1 flex flex-col min-w-0">
+          <AdminHeader onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)} user={user} />
+          <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8 overflow-y-auto">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </AdminShellProvider>
   )
 }

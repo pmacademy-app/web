@@ -47,14 +47,14 @@ export function SendTestEmailButton({ templateKey, templateName }: SendTestEmail
     <button
       onClick={handleSendTest}
       disabled={loading}
-      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold border border-slate-700 transition-colors inline-flex items-center gap-1.5 disabled:opacity-50"
+      className="px-2.5 py-1 rounded bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg text-[11px] font-semibold border border-admin-border transition-colors inline-flex items-center gap-1.5 disabled:opacity-50"
     >
       {loading ? (
-        <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
+        <Loader2 className="w-3 h-3 animate-spin text-admin-accent" />
       ) : success ? (
-        <Check className="w-3 h-3 text-emerald-400" />
+        <Check className="w-3 h-3 text-admin-success" />
       ) : (
-        <Send className="w-3 h-3 text-amber-400" />
+        <Send className="w-3 h-3 text-admin-accent" />
       )}
       <span>{success ? 'Sent!' : 'Send Test'}</span>
     </button>

@@ -75,20 +75,20 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
   const templateColumns: Column<TemplateItem>[] = [
     {
       header: 'Template Key',
-      cell: (tpl) => <span className="font-mono text-amber-400 font-semibold">{tpl.key}</span>,
+      cell: (tpl) => <span className="font-mono text-admin-accent font-semibold">{tpl.key}</span>,
     },
     {
       header: 'Template Name',
-      cell: (tpl) => <span className="text-white font-bold">{tpl.name}</span>,
+      cell: (tpl) => <span className="text-admin-fg font-bold">{tpl.name}</span>,
     },
     {
       header: 'Category',
-      cell: (tpl) => <span className="text-slate-400">{tpl.category}</span>,
+      cell: (tpl) => <span className="text-admin-fg-muted">{tpl.category}</span>,
     },
     {
       header: 'Priority',
       cell: (tpl) => (
-        <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px] border border-slate-700">
+        <span className="px-2 py-0.5 rounded bg-admin-surface-raised text-admin-fg-muted font-mono text-[10px] border border-admin-border">
           {tpl.priority}
         </span>
       ),
@@ -110,11 +110,11 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
   const queueColumns: Column<EmailLogItem>[] = [
     {
       header: 'Recipient',
-      cell: (item) => <span className="font-mono text-white font-semibold">{item.toEmail}</span>,
+      cell: (item) => <span className="font-mono text-admin-fg font-semibold">{item.toEmail}</span>,
     },
     {
       header: 'Template Key',
-      cell: (item) => <span className="font-mono text-amber-400 font-bold">{item.templateKey}</span>,
+      cell: (item) => <span className="font-mono text-admin-accent font-bold">{item.templateKey}</span>,
     },
     {
       header: 'Delivery Status',
@@ -123,7 +123,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
     {
       header: 'Created At',
       cell: (item) => (
-        <span className="text-slate-400 font-mono text-[11px]">
+        <span className="text-admin-fg-muted font-mono text-[11px]">
           {new Date(item.createdAt).toLocaleString()}
         </span>
       ),
@@ -136,18 +136,17 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
         title="Communications & Notifications"
         description="Unified management of contact inquiries, email automations, transactional queue, and templates."
         icon={Mail}
-        iconColor="text-blue-400"
         actions={<ProcessEmailQueueButton />}
       />
 
       {/* Sub-navigation Tabs */}
-      <div className="border-b border-slate-800 flex gap-6 text-xs font-semibold overflow-x-auto scrollbar-none">
+      <div className="border-b border-admin-border flex gap-6 text-xs font-semibold overflow-x-auto scrollbar-none">
         <Link
           href="/admin/communications?tab=automations"
           className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
             tab === 'automations'
-              ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-admin-accent text-admin-accent'
+              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
           }`}
         >
           <Bell className="w-4 h-4" /> Email Automations
@@ -156,8 +155,8 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
           href="/admin/communications?tab=contact"
           className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
             tab === 'contact'
-              ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-admin-accent text-admin-accent'
+              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
           }`}
         >
           <MessageSquare className="w-4 h-4" /> Contact Queries ({contactMessages.length})
@@ -166,8 +165,8 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
           href="/admin/communications?tab=templates"
           className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
             tab === 'templates'
-              ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-admin-accent text-admin-accent'
+              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
           }`}
         >
           <FileCode className="w-4 h-4" /> Email Templates
@@ -176,8 +175,8 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
           href="/admin/communications?tab=queue"
           className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
             tab === 'queue'
-              ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-admin-accent text-admin-accent'
+              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
           }`}
         >
           <RefreshCw className="w-4 h-4" /> Queue &amp; Health
@@ -186,8 +185,8 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
           href="/admin/communications?tab=broadcasts"
           className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
             tab === 'broadcasts'
-              ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-admin-accent text-admin-accent'
+              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
           }`}
         >
           <Send className="w-4 h-4" /> Broadcasts &amp; Test Sends
@@ -219,27 +218,27 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
       {tab === 'queue' && (
         <div className="space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <AdminKpiCard title="Pending Queue" value={queue.pendingCount} subtitle="Awaiting worker pickup" icon={Mail} iconColor="text-amber-400" />
-            <AdminKpiCard title="Processing" value={queue.processingCount} subtitle="Currently dispatching" icon={RefreshCw} iconColor="text-blue-400" />
-            <AdminKpiCard title="Delivered (24h)" value={queue.deliveredCount} subtitle="Successfully delivered" icon={Mail} iconColor="text-emerald-400" />
-            <AdminKpiCard title="Failed / Bounced" value={queue.failedCount} subtitle="Delivery failures" icon={Mail} iconColor="text-rose-400" />
+            <AdminKpiCard title="Pending Queue" value={queue.pendingCount} subtitle="Awaiting worker pickup" icon={Mail} iconColor="text-admin-warning" />
+            <AdminKpiCard title="Processing" value={queue.processingCount} subtitle="Currently dispatching" icon={RefreshCw} iconColor="text-admin-info" />
+            <AdminKpiCard title="Delivered (24h)" value={queue.deliveredCount} subtitle="Successfully delivered" icon={Mail} iconColor="text-admin-success" />
+            <AdminKpiCard title="Failed / Bounced" value={queue.failedCount} subtitle="Delivery failures" icon={Mail} iconColor="text-admin-danger" />
           </div>
 
-          <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4 shadow-xl">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Event Routing Matrix</h2>
+          <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
+            <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Event Routing Matrix</h2>
             <div className="space-y-3 text-xs">
-              <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+              <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-white">Daily Learning Events (`lesson.completed`, `streak.updated`, `badge.earned`)</p>
-                  <p className="text-slate-400">Routed exclusively to In-App Notification Center.</p>
+                  <p className="font-bold text-admin-fg">Daily Learning Events (`lesson.completed`, `streak.updated`, `badge.earned`)</p>
+                  <p className="text-admin-fg-muted">Routed exclusively to In-App Notification Center.</p>
                 </div>
                 <AdminStatusBadge status="published" label="In-App Only" />
               </div>
 
-              <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+              <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-white">Major Milestones (`module.completed`, `certificate.generated`, `weekly_recap`)</p>
-                  <p className="text-slate-400">Routed to both In-App and Email Queue (respecting user preferences).</p>
+                  <p className="font-bold text-admin-fg">Major Milestones (`module.completed`, `certificate.generated`, `weekly_recap`)</p>
+                  <p className="text-admin-fg-muted">Routed to both In-App and Email Queue (respecting user preferences).</p>
                 </div>
                 <AdminStatusBadge status="healthy" label="In-App + Email" />
               </div>
@@ -260,14 +259,14 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
       {tab === 'broadcasts' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AdminKpiCard title="Primary Channel" value="In-App" subtitle="Real-time drawer notifications" icon={Bell} iconColor="text-amber-400" />
-            <AdminKpiCard title="Secondary Channel" value="Email Engine" subtitle="Auth, Milestones & Weekly Recap" icon={Mail} iconColor="text-blue-400" />
-            <AdminKpiCard title="Dispatcher Status" value="Active" subtitle="Event-driven notification platform" icon={ShieldCheck} iconColor="text-emerald-400" />
+            <AdminKpiCard title="Primary Channel" value="In-App" subtitle="Real-time drawer notifications" icon={Bell} iconColor="text-admin-accent" />
+            <AdminKpiCard title="Secondary Channel" value="Email Engine" subtitle="Auth, Milestones & Weekly Recap" icon={Mail} iconColor="text-admin-info" />
+            <AdminKpiCard title="Dispatcher Status" value="Active" subtitle="Event-driven notification platform" icon={ShieldCheck} iconColor="text-admin-success" />
           </div>
 
-          <div className="p-6 rounded-xl bg-slate-900/60 border border-slate-800 space-y-4 shadow-xl">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Send Test Email & Manual Triggers</h2>
-            <p className="text-xs text-slate-400">
+          <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
+            <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Send Test Email & Manual Triggers</h2>
+            <p className="text-xs text-admin-fg-muted">
               Trigger instant transactional email dispatches to verify Resend API integration, HTML templates, and unsubscribe link generation.
             </p>
             <div className="flex flex-wrap gap-4 pt-2">

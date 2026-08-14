@@ -41,8 +41,13 @@ export default async function AdminConsoleLayout({ children }: { children: React
     redirect('/admin/access-denied')
   }
 
+  const adminUser = {
+    name: String(user.user_metadata?.full_name || user.user_metadata?.name || '') || null,
+    email: user.email || '',
+  }
+
   return (
-    <AdminConsoleShell>
+    <AdminConsoleShell user={adminUser}>
       {children}
     </AdminConsoleShell>
   )
