@@ -1,5 +1,11 @@
 # Admin Console Specification & Audit — Prodily PM Academy
 
+> **SUPERSEDED (August 14, 2026):** This document describes the legacy 12-tab Admin
+> Console. The Admin Panel is being redesigned per `docs/admin-panel-ui-ux-spec.md`
+> (final frontend/UI-UX spec) and `docs/admin-panel-implementation-plan.md`
+> (10-phase frontend implementation plan). This document is retained as a
+> historical record of the current implementation baseline.
+
 **Repository:** `pmacademy-app/web`  
 **Current Baseline HEAD:** `875f6ba`  
 **Last Updated:** August 11, 2026  

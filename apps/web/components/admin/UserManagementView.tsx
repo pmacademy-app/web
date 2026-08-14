@@ -33,12 +33,12 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
       header: 'Learner / User',
       cell: (user) => (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-amber-400">
+          <div className="w-8 h-8 rounded-full bg-admin-surface-raised border border-admin-border flex items-center justify-center font-bold text-admin-accent">
             {user.fullName.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="font-semibold text-white">{user.fullName}</p>
-            <p className="text-[11px] text-slate-400 font-mono">{user.email}</p>
+            <p className="font-semibold text-admin-fg">{user.fullName}</p>
+            <p className="text-[11px] text-admin-fg-muted font-mono">{user.email}</p>
           </div>
         </div>
       ),
@@ -46,7 +46,7 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
     {
       header: 'Role',
       cell: (user) => (
-        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${user.isAdmin ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
+        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${user.isAdmin ? 'bg-admin-accent-soft text-admin-accent border border-admin-accent/25' : 'bg-admin-surface-raised text-admin-fg-muted border border-admin-border'}`}>
           {user.isAdmin ? 'Admin' : 'Learner'}
         </span>
       ),
@@ -54,7 +54,7 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
     {
       header: 'Status',
       cell: (user) => (
-        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${user.isVerified ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
+        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${user.isVerified ? 'bg-admin-success-soft text-admin-success border border-admin-success/25' : 'bg-admin-warning-soft text-admin-warning border border-admin-warning/25'}`}>
           {user.isVerified ? 'Verified' : 'Unverified'}
         </span>
       ),
@@ -63,11 +63,11 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
       header: 'Level & XP',
       cell: (user) => (
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 font-bold text-[10px] border border-purple-500/20">
+          <span className="px-2 py-0.5 rounded bg-admin-info-soft text-admin-info font-bold text-[10px] border border-admin-info/25">
             Lvl {user.level}
           </span>
-          <span className="text-slate-300 font-mono flex items-center gap-1">
-            <Zap className="w-3 h-3 text-purple-400" />
+          <span className="text-admin-fg-muted font-mono flex items-center gap-1">
+            <Zap className="w-3 h-3 text-admin-info" />
             {user.totalXp.toLocaleString()} XP
           </span>
         </div>
@@ -76,8 +76,8 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
     {
       header: 'Streak',
       cell: (user) => (
-        <div className="flex items-center gap-1.5 text-amber-400 font-bold">
-          <Flame className="w-3.5 h-3.5 fill-amber-400/20" />
+        <div className="flex items-center gap-1.5 text-admin-accent font-bold">
+          <Flame className="w-3.5 h-3.5 fill-admin-accent/20" />
           <span>{user.streakDays}d</span>
         </div>
       ),
@@ -85,7 +85,7 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
     {
       header: 'Joined Date',
       cell: (user) => (
-        <span className="text-slate-400 font-mono text-[11px]">
+        <span className="text-admin-fg-muted font-mono text-[11px]">
           {new Date(user.createdAt).toLocaleDateString()}
         </span>
       ),
@@ -101,7 +101,7 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
               href={`/p/${user.username || user.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[11px] font-semibold border border-emerald-500/20 transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-admin-success-soft hover:bg-admin-success/20 text-admin-success text-[11px] font-semibold border border-admin-success/25 transition-colors"
               title={`View ${user.fullName}'s public portfolio in a new tab`}
             >
               <ExternalLink className="w-3 h-3" />
@@ -110,7 +110,7 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
           ) : null}
           <button
             onClick={() => handleInspectUser(user.id)}
-            className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold border border-slate-700 transition-colors"
+            className="px-2.5 py-1 rounded bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted hover:text-admin-fg text-[11px] font-semibold border border-admin-border transition-colors"
           >
             Inspect Profile
           </button>
@@ -144,31 +144,30 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
         title="User Management"
         description="Search registered learners, inspect level/XP velocity, and manage access roles."
         icon={Users}
-        iconColor="text-amber-400"
       />
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-900 border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-xl bg-admin-surface border border-admin-border">
         <div className="relative flex-1">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search learners by name or email..."
-            className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500/50"
+            className="w-full px-3 py-2 rounded-lg bg-admin-bg border border-admin-border text-xs text-admin-fg placeholder-admin-fg-subtle focus:outline-none focus:border-admin-accent/50"
           />
         </div>
         <div className="flex items-center gap-2">
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as 'all' | 'admin' | 'learner')}
-            className="px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+            className="px-3 py-2 rounded-lg bg-admin-bg border border-admin-border text-xs text-admin-fg-muted focus:outline-none focus:border-admin-accent/50"
           >
             <option value="all">All Roles</option>
             <option value="learner">Learners Only</option>
             <option value="admin">Admins Only</option>
           </select>
-          <span className="text-xs text-slate-500 font-mono">
+          <span className="text-xs text-admin-fg-subtle font-mono">
             {filteredUsers.length} of {initialUsers.length}
           </span>
         </div>

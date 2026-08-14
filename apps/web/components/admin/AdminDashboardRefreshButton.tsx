@@ -22,9 +22,9 @@ export function AdminDashboardRefreshButton() {
       onClick={handleRefresh}
       disabled={refreshing}
       aria-label="Refresh operational metrics"
-      className="p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+      className="p-2 rounded-lg bg-admin-surface border border-admin-border hover:border-admin-border-strong text-admin-fg-muted hover:text-admin-fg transition-colors cursor-pointer disabled:opacity-50"
     >
-      <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-amber-400' : ''}`} />
+      <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-admin-accent' : ''}`} />
     </button>
   )
 }

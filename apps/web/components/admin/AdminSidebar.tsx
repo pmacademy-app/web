@@ -1,97 +1,211 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import {
-  LayoutDashboard,
-  Users,
-  BookOpen,
-  Mail,
-  Award,
-  Briefcase,
-  Activity,
-  ExternalLink,
-} from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink, LogOut, PanelsTopLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
-
-export interface NavItem {
-  name: string
-  href: string
-  icon: React.ElementType
-  badge?: string
-}
-
-const ADMIN_NAV_ITEMS: NavItem[] = [
-  { name: 'Overview', href: '/admin', icon: LayoutDashboard },
-  { name: 'Content', href: '/admin/content', icon: BookOpen },
-  { name: 'Users', href: '/admin/users', icon: Users },
-  { name: 'Communications', href: '/admin/communications', icon: Mail },
-  { name: 'Certificates', href: '/admin/certificates', icon: Award },
-  { name: 'Feedback', href: '/admin/feedback', icon: Briefcase },
-  { name: 'System', href: '/admin/system', icon: Activity },
-]
+import { signOutAdmin } from '@/lib/admin/session'
+import type { AdminConsoleUser } from './AdminConsoleShell'
+import {
+  ADMIN_NAV_BUILT,
+  isAdminNavItemActive,
+} from '@/lib/admin/navigation'
 
 export interface AdminSidebarProps {
   mobileOpen?: boolean
   onMobileClose?: () => void
+  user?: AdminConsoleUser
 }
 
-export function AdminSidebar({ mobileOpen, onMobileClose }: AdminSidebarProps = {}) {
+export function AdminSidebar({ mobileOpen, onMobileClose, user }: AdminSidebarProps = {}) {
   const pathname = usePathname()
+  const router = useRouter()
+  const [collapsed, setCollapsed] = useState(false)
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
+
+  const displayName = user?.name || user?.email.split('@')[0] || 'Admin'
+  const handleSignOut = () => signOutAdmin(router)
+
+  const toggleGroup = (label: string) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev)
+      if (next.has(label)) {
+        next.delete(label)
+      } else {
+        next.add(label)
+      }
+      return next
+    })
+  }
 
   const content = (
-    <div className="w-64 bg-slate-900 border-r border-slate-800 text-slate-200 flex flex-col h-full">
+    <div
+      className={cn(
+        'bg-admin-surface border-r border-admin-border text-admin-fg flex flex-col h-full transition-[width] duration-200',
+        collapsed ? 'w-[68px]' : 'w-64'
+      )}
+    >
       {/* Brand Header */}
-      <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-        <Link href="/admin" onClick={onMobileClose} className="flex items-center gap-2 focus:outline-none rounded">
-          <BrandMarkProdily size="sm" badgeText="Admin" onDark />
-        </Link>
-        <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-slate-400 border border-slate-700">
-          v0.3.0
-        </span>
+      <div
+        className={cn(
+          'flex items-center justify-between gap-2 p-4 border-b border-admin-border',
+          collapsed && 'justify-center px-2'
+        )}
+      >
+        {collapsed ? (
+          <PanelsTopLeft className="w-6 h-6 text-admin-accent shrink-0" />
+        ) : (
+          <>
+            <Link
+              href="/admin"
+              onClick={onMobileClose}
+              className="flex items-center gap-2 focus:outline-none rounded shrink-0"
+            >
+              <BrandMarkProdily size="sm" badgeText="Admin" onDark />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setCollapsed(true)}
+              aria-label="Collapse sidebar"
+              className="hidden lg:flex p-1.5 rounded-lg text-admin-fg-subtle hover:text-admin-fg hover:bg-admin-surface-raised transition-colors"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+          </>
+        )}
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin scrollbar-thumb-slate-800">
-        <div className="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-          Operations Center
-        </div>
-        {ADMIN_NAV_ITEMS.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto p-3 space-y-4 scrollbar-thin scrollbar-thumb-admin-border">
+        {ADMIN_NAV_BUILT.map((group) => {
+          const groupCollapsed = collapsedGroups.has(group.label)
+          const groupHasActive = group.items.some((item) => isAdminNavItemActive(item, pathname))
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onMobileClose}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 text-xs font-medium rounded-lg transition-colors relative group',
-                isActive
-                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            <div key={group.label}>
+              {!collapsed ? (
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.label)}
+                  aria-expanded={!groupCollapsed}
+                  aria-label={`${group.label} section`}
+                  className="w-full flex items-center justify-between px-2 pb-1.5 text-[10px] font-bold text-admin-fg-subtle uppercase tracking-wider hover:text-admin-fg transition-colors cursor-pointer"
+                >
+                  <span className={cn(groupHasActive && !groupCollapsed && 'text-admin-accent')}>{group.label}</span>
+                  <ChevronDown
+                    className={cn(
+                      'w-3 h-3 transition-transform duration-150',
+                      groupCollapsed && '-rotate-90'
+                    )}
+                  />
+                </button>
+              ) : (
+                <div className="h-4" aria-hidden="true" />
               )}
-            >
-              <Icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-amber-400' : 'text-slate-400 group-hover:text-slate-200')} />
-              <span className="truncate">{item.name}</span>
-            </Link>
+              {!groupCollapsed && (
+                <div className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const Icon = item.icon
+                    const isActive = isAdminNavItemActive(item, pathname)
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={onMobileClose}
+                        title={collapsed ? item.name : undefined}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={cn(
+                          'flex items-center gap-3 px-3 py-2.5 text-xs font-medium rounded-lg transition-colors relative group',
+                          collapsed && 'justify-center px-2',
+                          isActive
+                            ? 'bg-admin-accent-soft text-admin-accent border border-admin-accent/25 font-semibold'
+                            : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised'
+                        )}
+                      >
+                        <Icon
+                          className={cn(
+                            'w-4 h-4 shrink-0',
+                            isActive ? 'text-admin-accent' : 'text-admin-fg-subtle group-hover:text-admin-fg'
+                          )}
+                        />
+                        {!collapsed && (
+                          <>
+                            <span className="truncate">{item.name}</span>
+                            {item.badge && (
+                              <span className="ml-auto px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-admin-warning-soft text-admin-warning">
+                                {item.badge}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           )
         })}
+
+        {/* Expand control when collapsed */}
+        {collapsed && (
+          <button
+            type="button"
+            onClick={() => setCollapsed(false)}
+            aria-label="Expand sidebar"
+            className="flex w-full items-center justify-center p-2 rounded-lg text-admin-fg-subtle hover:text-admin-fg hover:bg-admin-surface-raised transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
       </nav>
 
-      {/* Footer / Switch View */}
-      <div className="p-3 border-t border-slate-800 bg-slate-950/40">
+      {/* Footer / Admin identity & view switch */}
+      <div className="p-3 border-t border-admin-border bg-admin-surface-raised/40 space-y-2">
+        {user && !collapsed && (
+          <div className="flex items-center gap-2.5 px-2 py-1.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-admin-accent-soft text-admin-accent text-xs font-bold uppercase border border-admin-accent/25">
+              {displayName.slice(0, 2)}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-admin-fg truncate">{displayName}</p>
+              <p className="text-[10px] text-admin-fg-subtle truncate">{user.email}</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              aria-label="Sign out of Admin Console"
+              title="Sign out"
+              className="p-1.5 rounded-lg text-admin-fg-subtle hover:text-admin-danger hover:bg-admin-danger-soft transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         <Link
           href="/dashboard"
           onClick={onMobileClose}
-          className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-slate-400 hover:text-white bg-slate-800/40 hover:bg-slate-800 rounded-lg border border-slate-700/50 transition-colors"
+          className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-admin-fg-muted hover:text-admin-fg bg-admin-surface hover:bg-admin-surface-raised rounded-lg border border-admin-border transition-colors"
         >
           <span className="flex items-center gap-2">
-            <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+            <ExternalLink className="w-3.5 h-3.5" />
             Switch to Learner View
           </span>
         </Link>
+
+        {collapsed && user && (
+          <button
+            type="button"
+            onClick={handleSignOut}
+            aria-label="Sign out of Admin Console"
+            title="Sign out"
+            className="flex w-full items-center justify-center p-2 rounded-lg text-admin-fg-subtle hover:text-admin-danger hover:bg-admin-danger-soft transition-colors cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
   )
@@ -99,7 +213,7 @@ export function AdminSidebar({ mobileOpen, onMobileClose }: AdminSidebarProps = 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 h-screen sticky top-0 flex-shrink-0 z-30">
+      <aside className="hidden md:flex h-screen sticky top-0 flex-shrink-0 z-30">
         {content}
       </aside>
 
@@ -111,7 +225,7 @@ export function AdminSidebar({ mobileOpen, onMobileClose }: AdminSidebarProps = 
             onClick={onMobileClose}
             aria-hidden="true"
           />
-          <div className="relative flex flex-col w-64 max-w-xs h-full bg-slate-900 animate-in slide-in-from-left duration-200">
+          <div className="relative flex flex-col h-full animate-in slide-in-from-left duration-200">
             {content}
           </div>
         </div>

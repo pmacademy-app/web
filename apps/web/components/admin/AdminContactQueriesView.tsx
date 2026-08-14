@@ -80,17 +80,17 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
       header: 'Submitter',
       cell: (msg) => (
         <div>
-          <p className="font-bold text-white text-xs">{msg.name}</p>
-          <a href={`mailto:${msg.email}`} className="text-[11px] text-blue-400 font-mono hover:underline">
+          <p className="font-bold text-admin-fg text-xs">{msg.name}</p>
+          <a href={`mailto:${msg.email}`} className="text-[11px] text-admin-info font-mono hover:underline">
             {msg.email}
           </a>
-          <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-400">
+          <div className="flex items-center gap-1 mt-1 text-[10px] text-admin-fg-muted">
             {msg.user_id ? (
-              <span className="flex items-center gap-1 text-emerald-400 font-medium">
+              <span className="flex items-center gap-1 text-admin-success font-medium">
                 <UserCheck className="w-3 h-3" /> Authenticated
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-slate-400">
+              <span className="flex items-center gap-1 text-admin-fg-muted">
                 <UserX className="w-3 h-3" /> Anonymous Visitor
               </span>
             )}
@@ -102,10 +102,10 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
       header: 'Topic & Subject',
       cell: (msg) => (
         <div className="max-w-xs space-y-1">
-          <span className="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-mono text-[10px] border border-slate-700 uppercase tracking-wider">
+          <span className="px-2 py-0.5 rounded bg-admin-surface-raised text-admin-accent font-mono text-[10px] border border-admin-border uppercase tracking-wider">
             {msg.category}
           </span>
-          <p className="text-xs font-semibold text-slate-200 truncate">{msg.subject}</p>
+          <p className="text-xs font-semibold text-admin-fg truncate">{msg.subject}</p>
         </div>
       ),
     },
@@ -113,7 +113,7 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
       header: 'Message Preview',
       cell: (msg) => (
         <div className="max-w-md">
-          <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed font-sans">
+          <p className="text-xs text-admin-fg-muted line-clamp-2 leading-relaxed font-sans">
             {msg.message}
           </p>
           <button
@@ -122,7 +122,7 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
               setViewingMessage(msg)
               setAdminNotesText(msg.admin_notes || '')
             }}
-            className="text-[11px] font-bold text-amber-400 hover:underline mt-1 inline-flex items-center gap-1 cursor-pointer"
+            className="text-[11px] font-bold text-admin-accent hover:underline mt-1 inline-flex items-center gap-1 cursor-pointer"
           >
             <FileText className="w-3 h-3" /> Read Full Message
           </button>
@@ -133,10 +133,10 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
       header: 'Source & Date',
       cell: (msg) => (
         <div className="space-y-1">
-          <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px] border border-slate-700">
+          <span className="px-2 py-0.5 rounded bg-admin-surface-raised text-admin-fg-muted font-mono text-[10px] border border-admin-border">
             {msg.source === 'inbound_email' ? 'Direct Email' : 'Web Form'}
           </span>
-          <p className="text-[10px] text-slate-400 font-mono">
+          <p className="text-[10px] text-admin-fg-muted font-mono">
             {new Date(msg.created_at).toLocaleString()}
           </p>
         </div>
@@ -173,7 +173,7 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
                 onClick={() => handleUpdateStatus(msg.id, 'replied')}
                 disabled={isLoading}
                 title="Mark as Replied"
-                className="px-2.5 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/20 flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
+                className="px-2.5 py-1 rounded bg-admin-success-soft hover:bg-admin-success/20 text-admin-success text-[10px] font-bold border border-admin-success/25 flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
                 <span>Replied</span>
@@ -186,7 +186,7 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
                 onClick={() => handleUpdateStatus(msg.id, 'in_progress')}
                 disabled={isLoading}
                 title="Mark In Progress"
-                className="px-2.5 py-1 rounded bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-[10px] font-bold border border-blue-500/20 flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
+                className="px-2.5 py-1 rounded bg-admin-info-soft hover:bg-admin-info/20 text-admin-info text-[10px] font-bold border border-admin-info/25 flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Clock className="w-3 h-3" />
                 <span>In Progress</span>
@@ -199,7 +199,7 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
                 onClick={() => handleUpdateStatus(msg.id, 'archived')}
                 disabled={isLoading}
                 title="Archive Query"
-                className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 transition-colors cursor-pointer disabled:opacity-50"
+                className="p-1.5 rounded bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted hover:text-admin-fg border border-admin-border transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Archive className="w-3.5 h-3.5" />
               </button>
@@ -213,7 +213,7 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
   return (
     <div className="space-y-6">
       {errorMsg && (
-        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">
+        <div className="p-3 rounded-xl bg-admin-danger-soft border border-admin-danger/25 text-admin-danger text-xs font-semibold">
           {errorMsg}
         </div>
       )}
@@ -227,8 +227,8 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
             onClick={() => setStatusFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
               statusFilter === f
-                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                ? 'bg-admin-accent-soft text-admin-accent border border-admin-accent/25'
+                : 'bg-admin-surface text-admin-fg-muted hover:text-admin-fg border border-admin-border'
             }`}
           >
             {f.replace('_', ' ')}
@@ -251,57 +251,57 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 relative text-slate-200">
+          <div className="w-full max-w-2xl bg-admin-surface border border-admin-border rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 relative text-admin-fg">
             <button
               type="button"
               onClick={() => setViewingMessage(null)}
-              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 text-admin-fg-muted hover:text-admin-fg rounded-lg transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-3 border-b border-admin-border pb-4">
+              <div className="w-10 h-10 rounded-xl bg-admin-accent-soft text-admin-accent flex items-center justify-center shrink-0">
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white font-serif">{viewingMessage.subject}</h3>
-                <p className="text-xs text-slate-400">
+                <h3 className="text-base font-bold text-admin-fg font-serif">{viewingMessage.subject}</h3>
+                <p className="text-xs text-admin-fg-muted">
                   From: <strong>{viewingMessage.name}</strong> ({viewingMessage.email}) • {new Date(viewingMessage.created_at).toLocaleString()}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-xs bg-slate-950 p-3 rounded-xl border border-slate-800">
+            <div className="grid grid-cols-2 gap-3 text-xs bg-admin-bg p-3 rounded-xl border border-admin-border">
               <div>
-                <span className="text-slate-400">Topic Category:</span>{' '}
-                <span className="font-bold text-amber-400 uppercase">{viewingMessage.category}</span>
+                <span className="text-admin-fg-muted">Topic Category:</span>{' '}
+                <span className="font-bold text-admin-accent uppercase">{viewingMessage.category}</span>
               </div>
               <div>
-                <span className="text-slate-400">Submitter Type:</span>{' '}
-                <span className="font-bold text-slate-200">
+                <span className="text-admin-fg-muted">Submitter Type:</span>{' '}
+                <span className="font-bold text-admin-fg">
                   {viewingMessage.user_id ? `Authenticated (${viewingMessage.user_id})` : 'Anonymous Visitor'}
                 </span>
               </div>
               <div>
-                <span className="text-slate-400">Submission Source:</span>{' '}
-                <span className="font-bold text-slate-200">{viewingMessage.source}</span>
+                <span className="text-admin-fg-muted">Submission Source:</span>{' '}
+                <span className="font-bold text-admin-fg">{viewingMessage.source}</span>
               </div>
               <div>
-                <span className="text-slate-400">Current Status:</span>{' '}
-                <span className="font-bold text-emerald-400 uppercase">{viewingMessage.status}</span>
+                <span className="text-admin-fg-muted">Current Status:</span>{' '}
+                <span className="font-bold text-admin-success uppercase">{viewingMessage.status}</span>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-white uppercase tracking-wider">Message Content</label>
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs leading-relaxed text-slate-200 font-sans whitespace-pre-wrap">
+              <label className="text-xs font-bold text-admin-fg uppercase tracking-wider">Message Content</label>
+              <div className="p-4 rounded-xl bg-admin-bg border border-admin-border text-xs leading-relaxed text-admin-fg font-sans whitespace-pre-wrap">
                 {viewingMessage.message}
               </div>
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-slate-800">
-              <label htmlFor="admin-notes" className="text-xs font-bold text-white uppercase tracking-wider">
+            <div className="space-y-2 pt-2 border-t border-admin-border">
+              <label htmlFor="admin-notes" className="text-xs font-bold text-admin-fg uppercase tracking-wider">
                 Admin Operational Notes
               </label>
               <textarea
@@ -310,7 +310,7 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
                 value={adminNotesText}
                 onChange={(e) => setAdminNotesText(e.target.value)}
                 placeholder="Add private operational notes or email response status..."
-                className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-amber-400"
+                className="w-full p-3 rounded-xl bg-admin-bg border border-admin-border text-xs text-admin-fg focus:outline-none focus:border-admin-accent"
               />
             </div>
 
@@ -319,14 +319,14 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
                 <button
                   type="button"
                   onClick={() => handleUpdateStatus(viewingMessage.id, 'replied', adminNotesText)}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-admin-success hover:bg-admin-success/90 text-admin-fg text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-3.5 h-3.5" /> Save & Mark Replied
                 </button>
                 <button
                   type="button"
                   onClick={() => handleUpdateStatus(viewingMessage.id, 'archived', adminNotesText)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   <Archive className="w-3.5 h-3.5" /> Archive
                 </button>
@@ -335,7 +335,7 @@ export function AdminContactQueriesView({ initialMessages }: AdminContactQueries
               <button
                 type="button"
                 onClick={() => setViewingMessage(null)}
-                className="px-4 py-1.5 rounded-xl border border-slate-700 text-xs font-semibold text-slate-400 hover:text-white cursor-pointer"
+                className="px-4 py-1.5 rounded-xl border border-admin-border text-xs font-semibold text-admin-fg-muted hover:text-admin-fg cursor-pointer"
               >
                 Close
               </button>

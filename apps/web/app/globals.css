@@ -186,6 +186,43 @@
   --sidebar-ring:        oklch(0.556 0 0);
 }
 
+/* ─── Admin Panel Brand Tokens (Phase 1) ─────────────────────────────────────
+   Premium dark SaaS palette scoped to the Admin Panel shell (.admin-console).
+   Values are brand-derived: navy foundation (#011229 family) + green accent
+   (#019E75). This namespace is intentionally separate from the learner /
+   marketing theme — nothing leaks outside the admin subtree.
+---------------------------------------------------------------------------- */
+
+.admin-console {
+  /* Foundation */
+  --admin-bg:               #050B14;
+  --admin-surface:          #0A1426;
+  --admin-surface-raised:   #0F1C33;
+  --admin-border:           rgba(255, 255, 255, 0.08);
+  --admin-border-strong:    rgba(255, 255, 255, 0.14);
+
+  /* Text */
+  --admin-fg:               #F3F4F6;
+  --admin-fg-muted:         #9CA3AF;
+  --admin-fg-subtle:        #6B7684;
+
+  /* Accent (brand green) */
+  --admin-accent:           #019E75;
+  --admin-accent-fg:        #FFFFFF;
+  --admin-accent-soft:      rgba(1, 158, 117, 0.12);
+
+  /* Semantic */
+  --admin-success:          #4ADE80;
+  --admin-success-soft:     rgba(74, 222, 128, 0.12);
+  --admin-warning:          #FACC15;
+  --admin-warning-soft:     rgba(250, 204, 21, 0.12);
+  --admin-danger:           #FB7185;
+  --admin-danger-soft:      rgba(251, 113, 133, 0.12);
+  --admin-info:             #60A5FA;
+  --admin-info-soft:        rgba(96, 165, 250, 0.12);
+  --admin-neutral:          #94A3B8;
+}
+
 /* ─── Tailwind v4 Theme ──────────────────────────────────────────────────────
    Maps every CSS variable to a Tailwind utility class.
    Usage: bg-background, text-primary, border-border-strong, etc.
@@ -195,6 +232,28 @@
   /* Fonts */
   --font-sans:        var(--font-sans);
   --font-display: var(--font-fraunces);
+
+  /* Admin Panel (scoped: values live on .admin-console) */
+  --color-admin-bg:              var(--admin-bg);
+  --color-admin-surface:         var(--admin-surface);
+  --color-admin-surface-raised:  var(--admin-surface-raised);
+  --color-admin-border:          var(--admin-border);
+  --color-admin-border-strong:   var(--admin-border-strong);
+  --color-admin-fg:              var(--admin-fg);
+  --color-admin-fg-muted:        var(--admin-fg-muted);
+  --color-admin-fg-subtle:       var(--admin-fg-subtle);
+  --color-admin-accent:          var(--admin-accent);
+  --color-admin-accent-fg:       var(--admin-accent-fg);
+  --color-admin-accent-soft:     var(--admin-accent-soft);
+  --color-admin-success:         var(--admin-success);
+  --color-admin-success-soft:    var(--admin-success-soft);
+  --color-admin-warning:         var(--admin-warning);
+  --color-admin-warning-soft:    var(--admin-warning-soft);
+  --color-admin-danger:          var(--admin-danger);
+  --color-admin-danger-soft:     var(--admin-danger-soft);
+  --color-admin-info:            var(--admin-info);
+  --color-admin-info-soft:       var(--admin-info-soft);
+  --color-admin-neutral:         var(--admin-neutral);
 
   /* Colors — Core */
   --color-background:        var(--color-background);

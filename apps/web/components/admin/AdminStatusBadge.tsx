@@ -27,8 +27,8 @@ export interface AdminStatusBadgeProps extends React.HTMLAttributes<HTMLSpanElem
 export function AdminStatusBadge({ status, label, dot = true, className, ...props }: AdminStatusBadgeProps) {
   const normalizedStatus = status.toLowerCase() as AdminStatusVariant
 
-  let badgeStyle = 'bg-slate-800 text-slate-300 border-slate-700'
-  let dotStyle = 'bg-slate-400'
+  let badgeStyle = 'bg-admin-surface-raised text-admin-fg-muted border-admin-border'
+  let dotStyle = 'bg-admin-neutral'
   let displayLabel = label || status
 
   switch (normalizedStatus) {
@@ -36,43 +36,43 @@ export function AdminStatusBadge({ status, label, dot = true, className, ...prop
     case 'published':
     case 'healthy':
     case 'delivered':
-      badgeStyle = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25'
-      dotStyle = 'bg-emerald-400'
+      badgeStyle = 'bg-admin-success-soft text-admin-success border-admin-success/25'
+      dotStyle = 'bg-admin-success'
       displayLabel = label || (normalizedStatus === 'healthy' ? 'Healthy' : normalizedStatus === 'published' ? 'Published' : 'Active')
       break
     case 'warning':
     case 'pending':
     case 'processing':
-      badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/25'
-      dotStyle = 'bg-amber-400 animate-pulse'
+      badgeStyle = 'bg-admin-warning-soft text-admin-warning border-admin-warning/25'
+      dotStyle = 'bg-admin-warning animate-pulse'
       displayLabel = label || (normalizedStatus === 'pending' ? 'Pending' : 'Warning')
       break
     case 'danger':
     case 'unhealthy':
     case 'failed':
-      badgeStyle = 'bg-rose-500/10 text-rose-400 border-rose-500/25'
-      dotStyle = 'bg-rose-400'
+      badgeStyle = 'bg-admin-danger-soft text-admin-danger border-admin-danger/25'
+      dotStyle = 'bg-admin-danger'
       displayLabel = label || (normalizedStatus === 'unhealthy' ? 'Unhealthy' : 'Failed')
       break
     case 'info':
     case 'draft':
-      badgeStyle = 'bg-blue-500/10 text-blue-400 border-blue-500/25'
-      dotStyle = 'bg-blue-400'
+      badgeStyle = 'bg-admin-info-soft text-admin-info border-admin-info/25'
+      dotStyle = 'bg-admin-info'
       displayLabel = label || (normalizedStatus === 'draft' ? 'Draft' : 'Info')
       break
     case 'archived':
-      badgeStyle = 'bg-slate-800 text-slate-400 border-slate-700'
-      dotStyle = 'bg-slate-500'
+      badgeStyle = 'bg-admin-surface-raised text-admin-fg-subtle border-admin-border'
+      dotStyle = 'bg-admin-neutral'
       displayLabel = label || 'Archived'
       break
     case 'admin':
-      badgeStyle = 'bg-purple-500/10 text-purple-400 border-purple-500/25'
-      dotStyle = 'bg-purple-400'
+      badgeStyle = 'bg-admin-accent-soft text-admin-accent border-admin-accent/25'
+      dotStyle = 'bg-admin-accent'
       displayLabel = label || 'Admin'
       break
     case 'learner':
-      badgeStyle = 'bg-slate-800/80 text-slate-300 border-slate-700'
-      dotStyle = 'bg-slate-400'
+      badgeStyle = 'bg-admin-surface-raised text-admin-fg-muted border-admin-border'
+      dotStyle = 'bg-admin-neutral'
       displayLabel = label || 'Learner'
       break
   }

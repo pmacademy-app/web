@@ -35,10 +35,10 @@ export function AdminDataTable<T>({
 }: AdminDataTableProps<T>) {
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden shadow-xl backdrop-blur">
+      <div className="bg-admin-surface border border-admin-border rounded-xl overflow-hidden shadow-xl backdrop-blur">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[10px] font-bold border-b border-slate-800 sticky top-0 z-10 backdrop-blur">
+          <table className="w-full text-left text-xs text-admin-fg-muted">
+            <thead className="bg-admin-surface-raised text-admin-fg-subtle uppercase tracking-wider text-[10px] font-bold border-b border-admin-border sticky top-0 z-10 backdrop-blur">
               <tr>
                 {columns.map((col, idx) => (
                   <th key={idx} className={cn('px-5 py-3.5', col.headerClassName)}>
@@ -47,20 +47,20 @@ export function AdminDataTable<T>({
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-medium">
+            <tbody className="divide-y divide-admin-border font-medium">
               {data.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-5 py-12 text-center text-slate-400">
+                  <td colSpan={columns.length} className="px-5 py-12 text-center text-admin-fg-muted">
                     <div className="max-w-sm mx-auto space-y-2">
-                      <Inbox className="w-8 h-8 text-slate-600 mx-auto stroke-[1.5]" />
-                      <p className="text-sm font-bold text-white">{emptyTitle}</p>
-                      <p className="text-xs text-slate-400">{emptyDescription}</p>
+                      <Inbox className="w-8 h-8 text-admin-fg-subtle mx-auto stroke-[1.5]" />
+                      <p className="text-sm font-bold text-admin-fg">{emptyTitle}</p>
+                      <p className="text-xs text-admin-fg-muted">{emptyDescription}</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 data.map((item) => (
-                  <tr key={keyExtractor(item)} className="hover:bg-slate-800/40 transition-colors group">
+                  <tr key={keyExtractor(item)} className="hover:bg-admin-surface-raised/60 transition-colors group">
                     {columns.map((col, idx) => (
                       <td key={idx} className={cn('px-5 py-4', col.className)}>
                         {col.cell
