@@ -35,6 +35,7 @@ function runTest(name: string, fn: () => void | Promise<void>) {
 
 async function runSendEmailHookTests() {
   const siteUrl = 'https://prodily.adityagangwani.me'
+  const initialHookSecret = process.env.SEND_EMAIL_HOOK_SECRET
 
   // 0. Canonical Sender Verification
   runTest('getFromEmail returns canonical verified domain welcome@prodily.adityagangwani.me and respects RESEND_FROM_EMAIL', () => {
@@ -76,23 +77,28 @@ async function runSendEmailHookTests() {
 
   // 2. Payload Validation
   await runTest('POST /api/auth/send-email-hook rejects invalid JSON or missing fields', async () => {
-    const badReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
-      method: 'POST',
-      body: 'invalid-json',
-    })
-    const res = await POST(badReq)
-    assert.strictEqual(res.status, 400)
-    const data = await parseRes(res)
-    assert.ok(data.error?.includes('Invalid JSON'))
+    delete process.env.SEND_EMAIL_HOOK_SECRET
+    try {
+      const badReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
+        method: 'POST',
+        body: 'invalid-json',
+      })
+      const res = await POST(badReq)
+      assert.strictEqual(res.status, 400)
+      const data = await parseRes(res)
+      assert.ok(data.error?.includes('Invalid JSON'))
 
-    const missingUserReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
-      method: 'POST',
-      body: JSON.stringify({ user: {}, email_data: { email_action_type: 'signup' } }),
-    })
-    const res2 = await POST(missingUserReq)
-    assert.strictEqual(res2.status, 400)
-    const data2 = await parseRes(res2)
-    assert.ok(data2.error?.includes('Missing user email'))
+      const missingUserReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
+        method: 'POST',
+        body: JSON.stringify({ user: {}, email_data: { email_action_type: 'signup' } }),
+      })
+      const res2 = await POST(missingUserReq)
+      assert.strictEqual(res2.status, 400)
+      const data2 = await parseRes(res2)
+      assert.ok(data2.error?.includes('Missing user email'))
+    } finally {
+      if (initialHookSecret) process.env.SEND_EMAIL_HOOK_SECRET = initialHookSecret
+    }
   })
 
   // 3. Secret Verification (Bearer Token & Custom Headers)
@@ -122,7 +128,8 @@ async function runSendEmailHookTests() {
     assert.strictEqual(res2.status, 200)
 
     // Clean up env
-    delete process.env.SEND_EMAIL_HOOK_SECRET
+    if (initialHookSecret) process.env.SEND_EMAIL_HOOK_SECRET = initialHookSecret
+    else delete process.env.SEND_EMAIL_HOOK_SECRET
   })
 
   // 4. HMAC SHA-256 Signature Verification
@@ -145,7 +152,8 @@ async function runSendEmailHookTests() {
     const res = await POST(hmacReq)
     assert.strictEqual(res.status, 200)
 
-    delete process.env.SEND_EMAIL_HOOK_SECRET
+    if (initialHookSecret) process.env.SEND_EMAIL_HOOK_SECRET = initialHookSecret
+    else delete process.env.SEND_EMAIL_HOOK_SECRET
   })
 
   // 5. v1,whsec_... Secret Format Verification
@@ -177,46 +185,55 @@ async function runSendEmailHookTests() {
     const res = await POST(whsecReq)
     assert.strictEqual(res.status, 200)
 
-    delete process.env.SEND_EMAIL_HOOK_SECRET
+    if (initialHookSecret) process.env.SEND_EMAIL_HOOK_SECRET = initialHookSecret
+    else delete process.env.SEND_EMAIL_HOOK_SECRET
   })
 
-  // 5. Auth Actions (Signup, Password Reset, Email Change, Invite) Execution
+  // 6. Auth Actions (Signup, Password Reset, Email Change, Invite) Execution
   await runTest('POST /api/auth/send-email-hook executes signup & recovery email templates successfully', async () => {
-    const signupPayload = {
-      user: { id: 'usr-signup', email: 'newuser@example.com', user_metadata: { full_name: 'Alice Builder' } },
-      email_data: {
-        email_action_type: 'signup',
-        token_hash: 'hash_signup_111',
-        redirect_to: `${BRAND.siteUrl}/api/auth/callback?next=/verified`,
-      },
+    delete process.env.SEND_EMAIL_HOOK_SECRET
+    try {
+      const signupPayload = {
+        user: { id: 'usr-signup', email: 'newuser@example.com', user_metadata: { full_name: 'Alice Builder' } },
+        email_data: {
+          email_action_type: 'signup',
+          token_hash: 'hash_signup_111',
+          redirect_to: `${BRAND.siteUrl}/api/auth/callback?next=/verified`,
+        },
+      }
+
+      const signupReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
+        method: 'POST',
+        body: JSON.stringify(signupPayload),
+      })
+      const signupRes = await POST(signupReq)
+      assert.strictEqual(signupRes.status, 200)
+      const signupData = await parseRes(signupRes)
+      assert.strictEqual(signupData.success, true)
+
+      const recoveryPayload = {
+        user: { id: 'usr-rec', email: 'reset@example.com', user_metadata: { full_name: 'Bob Reset' } },
+        email_data: {
+          email_action_type: 'recovery',
+          token_hash: 'hash_rec_222',
+        },
+      }
+
+      const recoveryReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
+        method: 'POST',
+        body: JSON.stringify(recoveryPayload),
+      })
+      const recoveryRes = await POST(recoveryReq)
+      assert.strictEqual(recoveryRes.status, 200)
+      const recoveryData = await parseRes(recoveryRes)
+      assert.strictEqual(recoveryData.success, true)
+    } finally {
+      if (initialHookSecret) process.env.SEND_EMAIL_HOOK_SECRET = initialHookSecret
     }
-
-    const signupReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
-      method: 'POST',
-      body: JSON.stringify(signupPayload),
-    })
-    const signupRes = await POST(signupReq)
-    assert.strictEqual(signupRes.status, 200)
-    const signupData = await parseRes(signupRes)
-    assert.strictEqual(signupData.success, true)
-
-    const recoveryPayload = {
-      user: { id: 'usr-rec', email: 'reset@example.com', user_metadata: { full_name: 'Bob Reset' } },
-      email_data: {
-        email_action_type: 'recovery',
-        token_hash: 'hash_rec_222',
-      },
-    }
-
-    const recoveryReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
-      method: 'POST',
-      body: JSON.stringify(recoveryPayload),
-    })
-    const recoveryRes = await POST(recoveryReq)
-    assert.strictEqual(recoveryRes.status, 200)
-    const recoveryData = await parseRes(recoveryRes)
-    assert.strictEqual(recoveryData.success, true)
   })
+
+  if (initialHookSecret) process.env.SEND_EMAIL_HOOK_SECRET = initialHookSecret
+  else delete process.env.SEND_EMAIL_HOOK_SECRET
 
   console.log(`\n✅ All ${passedTests} Supabase Send Email Hook Unit Tests Passed Successfully!\n`)
 }
