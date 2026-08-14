@@ -65,7 +65,7 @@ export async function evaluateRateLimit(
   key: string,
   options: RateLimitOptions = {}
 ): Promise<{ success: boolean; remaining: number; resetInMs: number }> {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     return evaluateInMemoryRateLimit(key, options)
   }
   return evaluatePersistentRateLimit(key, options)
@@ -141,6 +141,6 @@ export async function evaluatePersistentRateLimit(
     }
   } catch (err) {
     console.warn('[rate-limit] Persistent rate limit DB query failed, falling back to memory:', err)
-    return evaluateRateLimit(key, { limit, windowMs })
+    return evaluateInMemoryRateLimit(key, { limit, windowMs })
   }
 }
