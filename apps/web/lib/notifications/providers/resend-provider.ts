@@ -24,7 +24,8 @@ export class ResendProvider implements NotificationProvider {
     }
 
     const apiKey = process.env.RESEND_API_KEY
-    if (!apiKey) {
+    const isTest = process.env.NODE_ENV === 'test' || process.env.RESEND_SIMULATE === 'true'
+    if (!apiKey || isTest) {
       console.log(`[ResendProvider:simulation] Simulating email send to ${recipientEmail} for template '${payload.templateKey}'`)
       return {
         success: true,

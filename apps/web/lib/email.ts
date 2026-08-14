@@ -37,9 +37,10 @@ export async function sendEmail({
 }): Promise<{ success: boolean; id?: string; error?: string }> {
   const fromEmail = getFromEmail()
   const apiKey = process.env.RESEND_API_KEY
+  const isTest = process.env.NODE_ENV === 'test' || process.env.RESEND_SIMULATE === 'true'
 
-  if (!apiKey) {
-    console.log(`[email] RESEND_API_KEY missing. Simulating send to ${to}: "${subject}" from "${fromEmail}"`)
+  if (!apiKey || isTest) {
+    console.log(`[email] RESEND_API_KEY missing or test environment. Simulating send to ${to}: "${subject}" from "${fromEmail}"`)
     return { success: true, id: 'simulated-dev-id' }
   }
 
