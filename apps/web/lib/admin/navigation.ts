@@ -67,7 +67,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   },
   {
     label: 'System',
-    items: [{ name: 'Health & Alerts', href: '/admin/system', icon: Activity, built: true }],
+    items: [{ name: 'System', href: '/admin/system', icon: Activity, built: true }],
   },
   {
     label: 'Settings',

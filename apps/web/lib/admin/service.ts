@@ -897,8 +897,10 @@ export class AdminConsoleService {
         failedCount: failedRes.count || 0,
         deadLetterCount: 0,
         recentLogs,
+        failed: false,
       }
-    } catch {
+    } catch (err) {
+      console.warn('[AdminConsoleService] getEmailQueueOverview failed:', err)
       return {
         pendingCount: 0,
         processingCount: 0,
@@ -906,6 +908,7 @@ export class AdminConsoleService {
         failedCount: 0,
         deadLetterCount: 0,
         recentLogs: [],
+        failed: true,
       }
     }
   }

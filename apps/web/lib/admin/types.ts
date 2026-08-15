@@ -252,6 +252,8 @@ export interface AdminEmailQueueOverview {
     status: string
     createdAt: string
   }>
+  /** True when the underlying queue queries failed and counts are unavailable. */
+  failed?: boolean
 }
 
 /* ─── Phase 2 — Dashboard / Operations Center ─────────────────────────────── */
@@ -446,6 +448,118 @@ export interface AdminCurriculumOverview {
 export interface AdminStreakBucket {
   bucket: string
   count: number
+}
+
+/* ─── Phase 7 — System Workspace ─────────────────────────────────────────── */
+
+/** One service in the System Health workspace (spec §44). */
+export interface AdminSystemServiceStatus {
+  id: 'database' | 'auth' | 'email' | 'notifications' | 'queue' | 'scheduler'
+  label: string
+  /** `unknown` = no telemetry source wired up (rendered as neutral, not healthy). */
+  status: 'healthy' | 'degraded' | 'down' | 'unknown'
+  lastChecked: string
+  summary: string
+  detail: string
+}
+
+/** One external platform integration row in the operational diagnostics panel. */
+export interface AdminSystemIntegration {
+  id: string
+  name: string
+  description: string
+  configured: boolean
+  monitored: boolean
+  /** Whether the integration is currently healthy (live check passed). */
+  healthy: boolean
+}
+
+/** One configured cron job (scheduler run telemetry is not available). */
+export interface AdminCronJob {
+  name: string
+  path: string
+}
+
+/** Complete payload for the System Health tab (spec §44). */
+export interface AdminSystemHealthOverview {
+  overallStatus: 'healthy' | 'degraded' | 'down' | 'unknown'
+  environment: string
+  nextVersion: string
+  lastCheckedAt: string
+  databaseLatencyMs: number | null
+  services: AdminSystemServiceStatus[]
+  cronJobs: AdminCronJob[]
+  integrations: AdminSystemIntegration[]
+  /** True when the underlying queries failed and the payload is a fallback. */
+  failed?: boolean
+}
+
+/** One recent error row shown in a service detail drawer (spec §7.3). */
+export interface AdminSystemRecentError {
+  id: string
+  timestamp: string
+  severity: string
+  operation: string
+  message: string
+}
+
+/** Detail payload for one service (spec §7.3). */
+export interface AdminSystemServiceDetail {
+  id: AdminSystemServiceStatus['id']
+  label: string
+  status: AdminSystemServiceStatus['status']
+  lastChecked: string
+  summary: string
+  metrics: Array<{ label: string; value: string }>
+  recentErrors: AdminSystemRecentError[]
+  note?: string
+}
+
+/** One grouped error row in the Errors tab (spec §46 / §7.5). */
+export interface AdminErrorGroup {
+  fingerprint: string
+  severity: 'critical' | 'error' | 'warning'
+  category: string
+  operation: string
+  message: string
+  status: 'new' | 'acknowledged' | 'resolved'
+  firstSeen: string
+  lastSeen: string
+  occurrences: number
+}
+
+/** Paginated result of the Errors tab query. */
+export interface AdminErrorGroupResult {
+  groups: AdminErrorGroup[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  /** True when the query failed and the result is an empty fallback. */
+  failed?: boolean
+}
+
+/** One row in the Audit Log tab (spec §47 / §7.6). */
+export interface AdminAuditEntry {
+  id: string
+  adminId: string | null
+  adminEmail: string
+  action: string
+  targetResource: string
+  targetId: string | null
+  details: Record<string, unknown> | null
+  createdAt: string
+}
+
+/** Paginated result of the Audit Log tab query. */
+export interface AdminAuditLogResult {
+  entries: AdminAuditEntry[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+  /** True when the query failed and the result is an empty fallback. */
+  failed?: boolean
 }
 
 /** Complete payload for the learning analytics page (spec §4.7). */

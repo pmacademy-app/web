@@ -1,163 +1,118 @@
 import React from 'react'
-import { Activity, Database, Server, CheckCircle, ShieldCheck, Flag, Play } from 'lucide-react'
+import Link from 'next/link'
+import { Activity, ShieldAlert, AlertTriangle, ScrollText, Flag } from 'lucide-react'
+import { SystemService } from '@/lib/admin/system-service'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
-import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
+import { AdminSection } from '@/components/admin/AdminSection'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { ProcessEmailQueueButton } from '@/components/admin/ProcessEmailQueueButton'
+import { AdminSystemHealthWorkspace } from '@/components/admin/AdminSystemHealthWorkspace'
 import { AdminSystemAlertsView } from '@/components/admin/AdminSystemAlertsView'
+import { AdminSystemErrorsView } from '@/components/admin/AdminSystemErrorsView'
+import { AdminSystemAuditView } from '@/components/admin/AdminSystemAuditView'
+import type { AdminErrorGroupResult, AdminAuditLogResult } from '@/lib/admin/types'
 
 export const revalidate = 0
 
-export default async function AdminSystemPage() {
-  const health = await AdminConsoleService.getSystemHealth()
-  const flags = AdminConsoleService.getFeatureFlags()
+interface PageProps {
+  searchParams: Promise<{ tab?: string }>
+}
 
-  const hasResendKey = Boolean(process.env.RESEND_API_KEY)
-  const hasCronSecret = Boolean(process.env.CRON_SECRET)
-  const hasVercelToken = Boolean(process.env.VERCEL_API_TOKEN)
-  const hasSupabaseMgmt = Boolean(process.env.SUPABASE_MANAGEMENT_API_KEY)
+const TABS = [
+  { key: 'health', label: 'Health', icon: Activity },
+  { key: 'alerts', label: 'Alerts', icon: ShieldAlert },
+  { key: 'errors', label: 'Errors', icon: AlertTriangle },
+  { key: 'audit', label: 'Audit Log', icon: ScrollText },
+] as const
+
+const EMPTY_ERROR_RESULT: AdminErrorGroupResult = {
+  groups: [],
+  total: 0,
+  page: 1,
+  pageSize: 25,
+  totalPages: 1,
+}
+
+const EMPTY_AUDIT_RESULT: AdminAuditLogResult = {
+  entries: [],
+  total: 0,
+  page: 1,
+  pageSize: 25,
+  totalPages: 1,
+}
+
+/**
+ * System Workspace (Phase 7): Health, Alerts, Errors and Audit Log tabs.
+ * Health + service details are always fetched (default tab); the Errors and
+ * Audit Log datasets are only fetched when their tab is active to avoid
+ * unnecessary queries. Each tab view handles its own loading/empty/error
+ * states and refetches client-side on filter changes.
+ */
+export default async function AdminSystemPage({ searchParams }: PageProps) {
+  const params = await searchParams
+  const tab = TABS.some((t) => t.key === params.tab) ? params.tab! : 'health'
+
+  const [overview, serviceDetails, flags] = await Promise.all([
+    SystemService.getHealthOverview(),
+    SystemService.getServiceDetails(),
+    AdminConsoleService.getFeatureFlags(),
+  ])
+
+  const errorGroups =
+    tab === 'errors' ? await SystemService.getErrorGroups({ page: 1, pageSize: 25 }) : EMPTY_ERROR_RESULT
+  const auditEntries =
+    tab === 'audit' ? await SystemService.getAuditLog({ page: 1, pageSize: 25 }) : EMPTY_AUDIT_RESULT
 
   return (
     <div className="space-y-8">
       <AdminPageHeader
-        title="System Diagnostics & Infrastructure"
-        description="Database query latency, application health, system alerts log, and cron scheduler triggers."
+        title="System"
+        description="Operational health, alerts, errors and audit history for the Prodily platform."
         icon={Activity}
         actions={<ProcessEmailQueueButton />}
       />
 
-      {/* System Health KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AdminKpiCard
-          title="Database Query Latency"
-          value={`${health.databaseLatencyMs} ms`}
-          subtitle="Supabase PostgreSQL Connection"
-          icon={Database}
-          iconColor="text-admin-success"
-        />
-        <AdminKpiCard
-          title="Application Status"
-          value={health.status.toUpperCase()}
-          subtitle={`Last checked: ${new Date(health.lastCheckedAt).toLocaleTimeString()}`}
-          icon={CheckCircle}
-          iconColor="text-admin-success"
-        />
-        <AdminKpiCard
-          title="Environment"
-          value={health.environment}
-          subtitle={health.nextVersion}
-          icon={Server}
-          iconColor="text-admin-info"
-        />
-      </div>
+      {/* Secondary navigation tabs */}
+      <nav aria-label="System sections" className="border-b border-admin-border flex gap-6 text-xs font-semibold overflow-x-auto">
+        {TABS.map(({ key, label, icon: Icon }) => (
+          <Link
+            key={key}
+            href={`/admin/system?tab=${key}`}
+            aria-current={tab === key ? 'page' : undefined}
+            className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+              tab === key
+                ? 'border-admin-accent text-admin-accent'
+                : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
+            }`}
+          >
+            <Icon className="w-4 h-4" /> {label}
+          </Link>
+        ))}
+      </nav>
 
-      {/* System Errors & Alerts Section */}
-      <AdminSystemAlertsView />
-
-      {/* External Platform Infrastructure Integration Status */}
-      <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
-        <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-admin-success" />
-          External Platform Integration & Telemetry Status
-        </h2>
-        <div className="space-y-3 text-xs">
-          <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-            <div>
-              <span className="text-admin-fg-muted font-medium block">Supabase PostgreSQL Database</span>
-              <span className="text-[11px] text-admin-fg-subtle">
-                Live SQL ping latency query ({health.databaseLatencyMs} ms)
-              </span>
+      {tab === 'health' && (
+        <>
+          <AdminSystemHealthWorkspace overview={overview} serviceDetails={serviceDetails} />
+          {/* Feature Flags Diagnostic (read-only) */}
+          <AdminSection title="Feature Flags Diagnostic" icon={Flag} meta="Runtime feature flag state">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              {flags.map((flag) => (
+                <div key={flag.key} className="p-3 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
+                  <span className="font-mono text-admin-accent font-semibold">{flag.key}</span>
+                  <AdminStatusBadge
+                    status={flag.enabled ? 'healthy' : 'archived'}
+                    label={flag.enabled ? 'ENABLED' : 'DISABLED'}
+                  />
+                </div>
+              ))}
             </div>
-            <AdminStatusBadge
-              status="healthy"
-              label="Connected & Monitored (Live Ping)"
-            />
-          </div>
-
-          <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-            <div>
-              <span className="text-admin-fg-muted font-medium block">Resend Transactional Email REST API</span>
-              <span className="text-[11px] text-admin-fg-subtle">
-                {hasResendKey ? 'RESEND_API_KEY present — Outbound error logger instrumented' : 'Requires RESEND_API_KEY in environment'}
-              </span>
-            </div>
-            <AdminStatusBadge
-              status={hasResendKey ? 'degraded' : 'archived'}
-              label={hasResendKey ? 'API Key Present (No Status Monitored)' : 'Not Configured'}
-            />
-          </div>
-
-          <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-            <div>
-              <span className="text-admin-fg-muted font-medium block">GitHub Actions Cron Scheduler</span>
-              <span className="text-[11px] text-admin-fg-subtle">
-                {hasCronSecret ? 'CRON_SECRET present — Authorization instrumented' : 'Requires CRON_SECRET in repository secrets'}
-              </span>
-            </div>
-            <AdminStatusBadge
-              status={hasCronSecret ? 'degraded' : 'archived'}
-              label={hasCronSecret ? 'Secret Present (No Telemetry Polled)' : 'Not Configured'}
-            />
-          </div>
-
-          <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-            <div>
-              <span className="text-admin-fg-muted font-medium block">Vercel Deployment Platform</span>
-              <span className="text-[11px] text-admin-fg-subtle">
-                {hasVercelToken ? 'VERCEL_API_TOKEN present' : 'Requires VERCEL_API_TOKEN for Vercel REST telemetry'}
-              </span>
-            </div>
-            <AdminStatusBadge
-              status={hasVercelToken ? 'degraded' : 'archived'}
-              label={hasVercelToken ? 'Token Present (No Logs Polled)' : 'Not Configured'}
-            />
-          </div>
-
-          <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-            <div>
-              <span className="text-admin-fg-muted font-medium block">Supabase Management API</span>
-              <span className="text-[11px] text-admin-fg-subtle">
-                {hasSupabaseMgmt ? 'SUPABASE_MANAGEMENT_API_KEY present' : 'Requires SUPABASE_MANAGEMENT_API_KEY'}
-              </span>
-            </div>
-            <AdminStatusBadge
-              status={hasSupabaseMgmt ? 'degraded' : 'archived'}
-              label={hasSupabaseMgmt ? 'Key Present (No Management API Polled)' : 'Not Connected'}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Read-Only Feature Flags State (Diagnostic Display) */}
-      <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
-        <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-          <Flag className="w-4 h-4 text-admin-accent" />
-          Read-Only Feature Flag Diagnostic State
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          {flags.map((flag) => (
-            <div key={flag.key} className="p-3 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
-              <span className="font-mono text-admin-accent font-semibold">{flag.key}</span>
-              <AdminStatusBadge
-                status={flag.enabled ? 'healthy' : 'archived'}
-                label={flag.enabled ? 'ENABLED' : 'DISABLED'}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Manual Queue & Cron Trigger Section */}
-      <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
-        <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-          <Play className="w-4 h-4 text-admin-info" />
-          Manual System Triggers
-        </h2>
-        <div className="flex flex-wrap gap-4 text-xs">
-          <ProcessEmailQueueButton />
-        </div>
-      </div>
+          </AdminSection>
+        </>
+      )}
+      {tab === 'alerts' && <AdminSystemAlertsView />}
+      {tab === 'errors' && <AdminSystemErrorsView initial={errorGroups} />}
+      {tab === 'audit' && <AdminSystemAuditView initial={auditEntries} />}
     </div>
   )
 }
