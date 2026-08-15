@@ -1,64 +1,82 @@
 import React from 'react'
 import Link from 'next/link'
-import { Mail, FileCode, RefreshCw, Bell, ShieldCheck, Send, MessageSquare } from 'lucide-react'
+import {
+  Mail,
+  FileCode,
+  RefreshCw,
+  Bell,
+  MessageSquare,
+  LayoutDashboard,
+  Zap,
+  Star,
+} from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
-import { createServiceRoleClient } from '@/lib/supabase'
+import { CommunicationsService } from '@/lib/admin/communications-service'
+import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
-import { AdminDataTable, Column } from '@/components/admin/AdminDataTable'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { ProcessEmailQueueButton } from '@/components/admin/ProcessEmailQueueButton'
-import { SendTestEmailButton } from '@/components/admin/SendTestEmailButton'
-import { AdminContactQueriesView, type ContactMessageItem } from '@/components/admin/AdminContactQueriesView'
-import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { AdminEmailAutomationsView } from '@/components/admin/AdminEmailAutomationsView'
+import { AdminCommunicationsOverview } from '@/components/admin/AdminCommunicationsOverview'
+import { AdminEmailDashboard } from '@/components/admin/AdminEmailDashboard'
+import { AdminTemplateList } from '@/components/admin/AdminTemplateList'
+import { AdminQueueView } from '@/components/admin/AdminQueueView'
+import { AdminContactInbox, type ContactMessageItem } from '@/components/admin/AdminContactInbox'
+import { AdminNotificationListView } from '@/components/admin/AdminNotificationListView'
 
 export const revalidate = 0
 
 interface PageProps {
-  searchParams: Promise<{ tab?: string }>
+  searchParams: Promise<{
+    tab?: string
+    status?: string
+    page?: string
+    q?: string
+    category?: string
+    tq?: string
+  }>
 }
 
-interface EmailLogItem {
-  id: string
-  toEmail: string
-  templateKey: string
-  status: string
-  createdAt: string
-}
-
-interface TemplateItem {
-  id: string
-  key: string
-  name: string
-  category: string
-  priority: string
-}
-
-const EMAIL_TEMPLATES: TemplateItem[] = [
-  { id: 'tpl-1', key: 'auth.welcome', name: 'Welcome & Getting Started', category: 'Auth / Transactional', priority: 'High (2)' },
-  { id: 'tpl-2', key: 'auth.verify_email', name: 'Verify Email Address', category: 'Auth / Security', priority: 'Critical (1)' },
-  { id: 'tpl-3', key: 'auth.password_reset', name: 'Password Reset Request', category: 'Auth / Security', priority: 'Critical (1)' },
-  { id: 'tpl-4', key: 'learning.module_complete', name: 'Module Completion Award', category: 'Major Milestone', priority: 'High (2)' },
-  { id: 'tpl-5', key: 'certificate.generated', name: 'Certificate Signed & Issued', category: 'Major Milestone', priority: 'High (2)' },
-  { id: 'tpl-6', key: 'portfolio.published', name: 'Portfolio Published Alert', category: 'Major Milestone', priority: 'High (2)' },
-  { id: 'tpl-7', key: 'system.weekly_recap', name: 'Weekly Learning Summary', category: 'Scheduled Digest', priority: 'Medium (5)' },
-  { id: 'tpl-8', key: 'system.product_announcement', name: 'Admin Product Announcement', category: 'Admin Broadcast', priority: 'Bulk (10)' },
+const TABS: Array<{ key: string; label: string; icon: React.ElementType; href?: string }> = [
+  { key: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { key: 'email', label: 'Email', icon: Mail },
+  { key: 'automations', label: 'Automations', icon: Zap },
+  { key: 'templates', label: 'Templates', icon: FileCode },
+  { key: 'queue', label: 'Queue', icon: RefreshCw },
+  { key: 'notifications', label: 'Notifications', icon: Bell },
+  { key: 'contact', label: 'Contact', icon: MessageSquare },
+  { key: 'testimonials', label: 'Testimonials', icon: Star, href: '/admin/moderation?tab=testimonials' },
+  { key: 'feedback', label: 'Feedback', icon: MessageSquare, href: '/admin/moderation?tab=feedback' },
 ]
 
 export default async function AdminCommunicationsPage({ searchParams }: PageProps) {
-  const { tab = 'automations' } = await searchParams
+  const params = await searchParams
+  const tab = params.tab || 'overview'
+
+  // Always fetch queue overview (header action + queue tab + email KPIs).
   const queue = await AdminConsoleService.getEmailQueueOverview()
-  const automationsState = await EmailAutomationsService.getState()
 
-  const supabase = createServiceRoleClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: contactData } = await (supabase.from('contact_messages' as any) as any)
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100)
+  // Fetch per-tab data in parallel; each service degrades to empty fallbacks.
+  const [overview, emailHistory, volumeSeries, automationsState, templates, notificationEvents, contactMessages] =
+    await Promise.all([
+      tab === 'overview' ? CommunicationsService.getCommunicationsOverview() : Promise.resolve(null),
+      tab === 'email' || tab === 'queue'
+        ? CommunicationsService.getEmailHistory({
+            status: params.status,
+            search: params.q,
+            page: Number(params.page) || 1,
+            pageSize: 25,
+          })
+        : Promise.resolve(null),
+      tab === 'email' ? CommunicationsService.getEmailVolumeSeries(14) : Promise.resolve([]),
+      tab === 'automations' ? EmailAutomationsService.getState() : Promise.resolve(null),
+      tab === 'templates' ? Promise.resolve(CommunicationsService.getTemplateList()) : Promise.resolve([]),
+      tab === 'notifications' ? CommunicationsService.getNotificationEvents(50) : Promise.resolve([]),
+      tab === 'contact' ? CommunicationsService.getContactMessages(100) : Promise.resolve([]),
+    ])
 
-  const contactMessages: ContactMessageItem[] = (contactData || []).map((c: Record<string, unknown>) => ({
+  const contactMessagesTyped: ContactMessageItem[] = (contactMessages || []).map((c) => ({
     id: String(c.id),
     user_id: c.user_id ? String(c.user_id) : null,
     name: String(c.name || 'Anonymous'),
@@ -72,149 +90,71 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
     created_at: String(c.created_at || new Date().toISOString()),
   }))
 
-  const templateColumns: Column<TemplateItem>[] = [
-    {
-      header: 'Template Key',
-      cell: (tpl) => <span className="font-mono text-admin-accent font-semibold">{tpl.key}</span>,
-    },
-    {
-      header: 'Template Name',
-      cell: (tpl) => <span className="text-admin-fg font-bold">{tpl.name}</span>,
-    },
-    {
-      header: 'Category',
-      cell: (tpl) => <span className="text-admin-fg-muted">{tpl.category}</span>,
-    },
-    {
-      header: 'Priority',
-      cell: (tpl) => (
-        <span className="px-2 py-0.5 rounded bg-admin-surface-raised text-admin-fg-muted font-mono text-[10px] border border-admin-border">
-          {tpl.priority}
-        </span>
-      ),
-    },
-    {
-      header: 'Status',
-      cell: () => <AdminStatusBadge status="published" label="Active (v1)" />,
-    },
-    {
-      header: 'Actions',
-      headerClassName: 'text-right',
-      className: 'text-right',
-      cell: (tpl) => (
-        <SendTestEmailButton templateKey={tpl.key} templateName={tpl.name} />
-      ),
-    },
-  ]
-
-  const queueColumns: Column<EmailLogItem>[] = [
-    {
-      header: 'Recipient',
-      cell: (item) => <span className="font-mono text-admin-fg font-semibold">{item.toEmail}</span>,
-    },
-    {
-      header: 'Template Key',
-      cell: (item) => <span className="font-mono text-admin-accent font-bold">{item.templateKey}</span>,
-    },
-    {
-      header: 'Delivery Status',
-      cell: (item) => <AdminStatusBadge status={item.status} />,
-    },
-    {
-      header: 'Created At',
-      cell: (item) => (
-        <span className="text-admin-fg-muted font-mono text-[11px]">
-          {new Date(item.createdAt).toLocaleString()}
-        </span>
-      ),
-    },
-  ]
+  // Template list filtering (server-driven via searchParams).
+  const categoryFilter = params.category || 'all'
+  const templateSearch = params.tq || ''
+  const filteredTemplates = (templates || []).filter((tpl) => {
+    if (categoryFilter !== 'all' && tpl.category !== categoryFilter) return false
+    if (templateSearch.trim()) {
+      const q = templateSearch.trim().toLowerCase()
+      if (!`${tpl.name} ${tpl.key} ${tpl.trigger}`.toLowerCase().includes(q)) return false
+    }
+    return true
+  })
 
   return (
     <div className="space-y-8">
       <AdminPageHeader
-        title="Communications & Notifications"
-        description="Unified management of contact inquiries, email automations, transactional queue, and templates."
+        title="Communications"
+        description="Unified management of email, templates, automations, notifications and contact inquiries."
         icon={Mail}
         actions={<ProcessEmailQueueButton />}
       />
 
-      {/* Sub-navigation Tabs */}
-      <div className="border-b border-admin-border flex gap-6 text-xs font-semibold overflow-x-auto scrollbar-none">
-        <Link
-          href="/admin/communications?tab=automations"
-          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
-            tab === 'automations'
-              ? 'border-admin-accent text-admin-accent'
-              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
-          }`}
-        >
-          <Bell className="w-4 h-4" /> Email Automations
-        </Link>
-        <Link
-          href="/admin/communications?tab=contact"
-          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
-            tab === 'contact'
-              ? 'border-admin-accent text-admin-accent'
-              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
-          }`}
-        >
-          <MessageSquare className="w-4 h-4" /> Contact Queries ({contactMessages.length})
-        </Link>
-        <Link
-          href="/admin/communications?tab=templates"
-          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
-            tab === 'templates'
-              ? 'border-admin-accent text-admin-accent'
-              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
-          }`}
-        >
-          <FileCode className="w-4 h-4" /> Email Templates
-        </Link>
-        <Link
-          href="/admin/communications?tab=queue"
-          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
-            tab === 'queue'
-              ? 'border-admin-accent text-admin-accent'
-              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
-          }`}
-        >
-          <RefreshCw className="w-4 h-4" /> Queue &amp; Health
-        </Link>
-        <Link
-          href="/admin/communications?tab=broadcasts"
-          className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
-            tab === 'broadcasts'
-              ? 'border-admin-accent text-admin-accent'
-              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
-          }`}
-        >
-          <Send className="w-4 h-4" /> Broadcasts &amp; Test Sends
-        </Link>
-      </div>
+      {/* Secondary navigation tabs */}
+      <nav aria-label="Communications sections" className="border-b border-admin-border flex gap-6 text-xs font-semibold overflow-x-auto scrollbar-none">
+        {TABS.map(({ key, label, icon: Icon, href }) => (
+          <Link
+            key={key}
+            href={href || `/admin/communications?tab=${key}`}
+            aria-current={tab === key ? 'page' : undefined}
+            className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+              tab === key
+                ? 'border-admin-accent text-admin-accent'
+                : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
+            }`}
+          >
+            <Icon className="w-4 h-4" /> {label}
+          </Link>
+        ))}
+      </nav>
 
-      {/* Tab 0: Email Automations Control Center */}
-      {tab === 'automations' && (
-        <AdminEmailAutomationsView initialState={automationsState} />
+      {/* Overview */}
+      {tab === 'overview' && overview && <AdminCommunicationsOverview data={overview} />}
+
+      {/* Email */}
+      {tab === 'email' && emailHistory && (
+        <AdminEmailDashboard
+          history={emailHistory}
+          volumeSeries={volumeSeries || []}
+          queueCounts={{
+            pending: queue.pendingCount,
+            delivered: queue.deliveredCount,
+            failed: queue.failedCount,
+            deadLetter: queue.deadLetterCount,
+          }}
+        />
       )}
 
-      {/* Tab 1: Contact Queries */}
-      {tab === 'contact' && (
-        <AdminContactQueriesView initialMessages={contactMessages} />
-      )}
+      {/* Automations */}
+      {tab === 'automations' && automationsState && <AdminEmailAutomationsView initialState={automationsState} />}
 
-      {/* Tab 2: Email Templates */}
+      {/* Templates */}
       {tab === 'templates' && (
-        <div className="space-y-6">
-          <AdminDataTable
-            columns={templateColumns}
-            data={EMAIL_TEMPLATES}
-            keyExtractor={(tpl) => tpl.id}
-          />
-        </div>
+        <AdminTemplateList templates={filteredTemplates} category={categoryFilter} search={templateSearch} />
       )}
 
-      {/* Tab 3: Queue & Health */}
+      {/* Queue & Health */}
       {tab === 'queue' && (
         <div className="space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -229,54 +169,39 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
             <div className="space-y-3 text-xs">
               <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-admin-fg">Daily Learning Events (`lesson.completed`, `streak.updated`, `badge.earned`)</p>
-                  <p className="text-admin-fg-muted">Routed exclusively to In-App Notification Center.</p>
+                  <p className="font-bold text-admin-fg">In-App Only (`lesson.completed`, `streak.updated`, `quiz.completed`, `review.completed`, `srs.review_due`, `capstone.submitted`)</p>
+                  <p className="text-admin-fg-muted">Routed exclusively to the In-App Notification Center.</p>
                 </div>
                 <AdminStatusBadge status="published" label="In-App Only" />
               </div>
 
               <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-admin-fg">Major Milestones (`module.completed`, `certificate.generated`, `weekly_recap`)</p>
-                  <p className="text-admin-fg-muted">Routed to both In-App and Email Queue (respecting user preferences).</p>
+                  <p className="font-bold text-admin-fg">In-App + Email (`user.registered`, `user.verified`, `password.reset_requested`, `module.completed`, `badge.earned`, `xp.level_up`, `certificate.generated`, `portfolio.published`)</p>
+                  <p className="text-admin-fg-muted">Routed to both In-App and the Email Queue (respecting user preferences and automation toggles).</p>
                 </div>
                 <AdminStatusBadge status="healthy" label="In-App + Email" />
+              </div>
+
+              <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-admin-fg">Scheduled Automations (`learning.weekly_recap`, `learning.daily_reminder`, `inactive.resume_learning`)</p>
+                  <p className="text-admin-fg-muted">Not events — dispatched by the scheduler on a cadence, not by learner activity.</p>
+                </div>
+                <AdminStatusBadge status="info" label="Scheduled" />
               </div>
             </div>
           </div>
 
-          <AdminDataTable
-            columns={queueColumns}
-            data={queue.recentLogs as EmailLogItem[]}
-            keyExtractor={(item) => item.id}
-            emptyTitle="No email logs available"
-            emptyDescription="The outgoing email queue is currently empty."
-          />
+          {emailHistory && <AdminQueueView history={emailHistory} />}
         </div>
       )}
 
-      {/* Tab 4: Broadcasts & Test Sends */}
-      {tab === 'broadcasts' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AdminKpiCard title="Primary Channel" value="In-App" subtitle="Real-time drawer notifications" icon={Bell} iconColor="text-admin-accent" />
-            <AdminKpiCard title="Secondary Channel" value="Email Engine" subtitle="Auth, Milestones & Weekly Recap" icon={Mail} iconColor="text-admin-info" />
-            <AdminKpiCard title="Dispatcher Status" value="Active" subtitle="Event-driven notification platform" icon={ShieldCheck} iconColor="text-admin-success" />
-          </div>
+      {/* Notifications */}
+      {tab === 'notifications' && <AdminNotificationListView events={notificationEvents || []} />}
 
-          <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
-            <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Send Test Email & Manual Triggers</h2>
-            <p className="text-xs text-admin-fg-muted">
-              Trigger instant transactional email dispatches to verify Resend API integration, HTML templates, and unsubscribe link generation.
-            </p>
-            <div className="flex flex-wrap gap-4 pt-2">
-              <SendTestEmailButton templateKey="auth.welcome" templateName="Send Test Welcome Email" />
-              <SendTestEmailButton templateKey="certificate.generated" templateName="Send Test Certificate Email" />
-              <SendTestEmailButton templateKey="system.weekly_recap" templateName="Send Test Weekly Recap Email" />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Contact inbox */}
+      {tab === 'contact' && <AdminContactInbox initialMessages={contactMessagesTyped} />}
     </div>
   )
 }

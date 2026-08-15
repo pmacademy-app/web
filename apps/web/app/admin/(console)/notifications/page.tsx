@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
 export default function LegacyNotificationsPage() {
-  redirect('/admin/communications?tab=broadcasts')
+  redirect('/admin/communications?tab=notifications')
 }
