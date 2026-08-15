@@ -16,6 +16,14 @@ import {
  *
  * `built` marks routes that exist today. Unbuilt sections stay hidden in the
  * sidebar until their phase lands (no dead links / redirect stubs in nav).
+ *
+ * Phase 5 navigation decision (spec §5.1 vs §5.7): the UI/UX spec lists
+ * Capstones and Portfolios under the Achievements section, while the
+ * implementation plan §5.7 places them as Moderation workspace tabs. The
+ * implementation follows §5.7 — Capstones and Portfolios are reviewed inside
+ * `/admin/moderation` (where the review workflows live), and the Achievements
+ * overview tiles link out to them. They are intentionally NOT duplicated as
+ * sidebar entries to avoid two routes to the same review surface.
  */
 export interface AdminNavItem {
   name: string
@@ -40,7 +48,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { name: 'Users', href: '/admin/users', icon: Users, built: true },
       { name: 'Communications', href: '/admin/communications', icon: MessagesSquare, built: true },
-      { name: 'Moderation', href: '/admin/feedback', icon: ShieldAlert, built: true },
+      { name: 'Moderation', href: '/admin/moderation', icon: ShieldAlert, built: true },
     ],
   },
   {
@@ -48,12 +56,14 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { name: 'Curriculum', href: '/admin/curriculum', icon: BookOpen, built: true },
       { name: 'Analytics', href: '/admin/analytics', icon: Gauge, built: true },
-      { name: 'Certificates', href: '/admin/certificates', icon: Award, built: true },
     ],
   },
   {
     label: 'Achievements',
-    items: [{ name: 'Achievements', href: '/admin/achievements', icon: Award, built: false }],
+    items: [
+      { name: 'Achievements', href: '/admin/achievements', icon: Award, built: true },
+      { name: 'Certificates', href: '/admin/achievements/certificates', icon: Award, built: true },
+    ],
   },
   {
     label: 'System',

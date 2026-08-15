@@ -28,6 +28,8 @@ export interface AdminConsoleShellContext {
     pendingTestimonials: number
     systemErrors: number
     failedEmails: number
+    pendingCapstones: number
+    newFeedback: number
   }
   /** Total actionable items across all attention sources. */
   attentionTotal: number
@@ -88,21 +90,31 @@ export class AdminConsoleService {
     const { error } = await supabase.from('users').select('id').limit(1)
     const latency = Date.now() - startTime
 
-    const [contactMessages, pendingTestimonials, systemErrors, failedEmails] = await Promise.all([
-      supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-      supabase.from('testimonials').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-      supabase.from('system_errors').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-      supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'failed'),
-    ])
+    const [contactMessages, pendingTestimonials, systemErrors, failedEmails, pendingCapstones, newFeedback] =
+      await Promise.all([
+        supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+        supabase.from('testimonials').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('system_errors').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+        supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'failed'),
+        supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }).eq('status', 'submitted'),
+        supabase.from('user_feedback').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+      ])
 
     const attention = {
       contactMessages: contactMessages.count || 0,
       pendingTestimonials: pendingTestimonials.count || 0,
       systemErrors: systemErrors.count || 0,
       failedEmails: failedEmails.count || 0,
+      pendingCapstones: pendingCapstones.count || 0,
+      newFeedback: newFeedback.count || 0,
     }
     const attentionTotal =
-      attention.contactMessages + attention.pendingTestimonials + attention.systemErrors + attention.failedEmails
+      attention.contactMessages +
+      attention.pendingTestimonials +
+      attention.systemErrors +
+      attention.failedEmails +
+      attention.pendingCapstones +
+      attention.newFeedback
 
     return {
       attention,

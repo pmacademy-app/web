@@ -27,6 +27,7 @@
     "test:admin": "npx tsx lib/__tests__/admin-console.test.ts",
     "test:users": "npx tsx lib/__tests__/users-aggregation.test.ts",
     "test:curriculum": "npx tsx lib/__tests__/curriculum-aggregation.test.ts",
+    "test:achievements": "npx tsx lib/__tests__/achievements-aggregation.test.ts",
     "test:analytics": "npx tsx lib/__tests__/analytics-aggregation.test.ts",
     "test:dashboard": "npx tsx lib/__tests__/dashboard.test.ts",
     "test:dev-cert": "npx tsx lib/__tests__/dev-certificate.test.ts",

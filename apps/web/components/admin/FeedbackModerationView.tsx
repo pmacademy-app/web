@@ -9,9 +9,16 @@ import type { TestimonialItem } from '@/lib/admin/feedback-service'
 
 interface FeedbackModerationViewProps {
   initialQueue: TestimonialItem[]
+  /** When embedded in a parent workspace (e.g. Moderation tabs), hide the page header. */
+  embedded?: boolean
 }
 
-export function FeedbackModerationView({ initialQueue }: FeedbackModerationViewProps) {
+export function FeedbackModerationView({ initialQueue, embedded = false }: FeedbackModerationViewProps) {
+  // Schema note (spec §5.8 "Featured" display/action): testimonials have no
+  // `featured` column — the schema only supports `is_published`. The spec's
+  // "Featured" concept is mapped to the published state: the "Published on
+  // Site" chip + Publish/Unpublish actions below are the accurate equivalent.
+  // No "Feature" action is offered because the data model cannot represent it.
   const [queue, setQueue] = useState<TestimonialItem[]>(initialQueue)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -146,6 +153,14 @@ export function FeedbackModerationView({ initialQueue }: FeedbackModerationViewP
       ),
     },
     {
+      header: 'Submitted',
+      cell: (item) => (
+        <span className="text-admin-fg-muted font-mono text-[11px]">
+          {new Date(item.createdAt).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
       header: 'Actions',
       headerClassName: 'text-right',
       className: 'text-right',
@@ -221,11 +236,13 @@ export function FeedbackModerationView({ initialQueue }: FeedbackModerationViewP
 
   return (
     <div className="space-y-8">
-      <AdminPageHeader
-        title="Feedback & Testimonial Moderation"
-        description="Review student testimonials, approve submissions, edit text, and publish to the public marketing site."
-        icon={MessageSquare}
-      />
+      {!embedded && (
+        <AdminPageHeader
+          title="Feedback & Testimonial Moderation"
+          description="Review student testimonials, approve submissions, edit text, and publish to the public marketing site."
+          icon={MessageSquare}
+        />
+      )}
 
       {/* Filter Tabs */}
       <div className="flex items-center gap-2">

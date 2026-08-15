@@ -1081,6 +1081,25 @@ Product feedback is private/internal, unlike testimonials.
 
 ---
 
+# 5.10 Phase 5 Schema Limitations (documented decisions)
+
+The following spec items are intentionally **not** implemented because the current
+data model cannot represent them. The UI preserves accurate existing behavior and
+does not imply unsupported states or actions. No backend/database changes were made.
+
+| Spec item | Schema limitation | Implementation |
+|---|---|---|
+| Portfolios "Submitted" column (§5.6) | No `portfolios` table; portfolios are derived from `users.is_portfolio_public`. Only `users.created_at` (account join date) exists — no portfolio submission date. | Column labeled **"Joined"** (accurate) instead of "Submitted". |
+| Achievements nav grouping for Capstones/Portfolios (§5.1 vs §5.7) | Docs conflict: §5.1 lists them under Achievements, §5.7 under Moderation tabs. | Follows **§5.7**: Capstones/Portfolios are reviewed inside `/admin/moderation` tabs; Achievements overview tiles link out. Not duplicated in the sidebar. Decision documented in `apps/web/lib/admin/navigation.ts`. |
+| Testimonials "Featured" display/action (§5.8) | No `featured` column; schema only supports `is_published`. | Spec "Featured" maps to the **published** state: "Published on Site" chip + Publish/Unpublish actions. No "Feature" action offered. |
+| Certificates "Recently Verified" KPI (§5.2/§28) | No verification tracking (no `verified_at` / verification event log). | Replaced by **"Credential Types"** (real, computable KPI). "Recently Issued" (30-day window) covers the issuance side. |
+| Moderation "In Review" status (§5.7) | No in-review state; submissions are `submitted` or `reviewed`. | No "In Review" filter/badge offered. |
+| Capstone "Rejected" status (§5.7) | No `rejected` status; rejection is stored as `reviewed` + `is_public: false`. | Renders as neutral **"archived"** badge + "Private" visibility + "kept private" note in the review drawer. |
+| Product Feedback approve/reject (§5.9) | No moderation status column on feedback. | Read-only list with an always-visible note explaining why actions are absent. |
+| In-memory badge/certificate aggregation | Full SQL-pushed pagination would be a larger refactor. | Consistent with the Phase 4 service pattern (dashboard/curriculum); kept for Phase 5. |
+
+---
+
 # Phase 6 — Communications Workspace
 
 ## Goal
