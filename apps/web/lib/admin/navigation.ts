@@ -55,14 +55,13 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: 'Learning',
     items: [
       { name: 'Curriculum', href: '/admin/curriculum', icon: BookOpen, built: true },
-      { name: 'Analytics', href: '/admin/analytics', icon: Gauge, built: true },
+      { name: 'Achievements', href: '/admin/achievements', icon: Award, built: true },
     ],
   },
   {
-    label: 'Achievements',
+    label: 'Insights',
     items: [
-      { name: 'Achievements', href: '/admin/achievements', icon: Award, built: true },
-      { name: 'Certificates', href: '/admin/achievements/certificates', icon: Award, built: true },
+      { name: 'Analytics', href: '/admin/analytics', icon: Gauge, built: true },
     ],
   },
   {
@@ -74,6 +73,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [{ name: 'Settings', href: '/admin/settings', icon: Settings, built: true }],
   },
 ]
+
 
 /** Only navigation entries backed by a real page today. */
 export const ADMIN_NAV_BUILT = ADMIN_NAV.map((group) => ({

@@ -665,3 +665,116 @@ export interface SettingsResponse<T> {
   error?: string
   failed?: boolean
 }
+
+/* ─── Phase 9 — Analytics & Insights Workspace ────────────────────────────── */
+
+export type AdminAnalyticsTab = 'overview' | 'learners' | 'learning' | 'engagement' | 'outcomes'
+
+export interface AdminXpSourceDistribution {
+  source: string
+  label: string
+  xp: number
+  percentage: number
+}
+
+export interface AdminLevelDistribution {
+  level: number
+  label: string
+  count: number
+  percentage: number
+}
+
+export interface AdminScoreBucket {
+  range: string
+  count: number
+}
+
+export interface AdminQuizPerformanceStats {
+  totalAttempts: number
+  passedAttempts: number
+  passRatePct: number
+  avgScorePct: number | null
+  scoreDistribution: AdminScoreBucket[]
+}
+
+export interface AdminModuleDropOff {
+  slug: string
+  title: string
+  order: number
+  lessonCount: number
+  learnersStarted: number
+  learnersCompleted: number
+  completionPct: number
+  dropOffPct: number
+}
+
+export interface AdminDailyXpPoint {
+  date: string
+  label: string
+  xp: number
+}
+
+export interface AdminDailyCertificatePoint {
+  date: string
+  label: string
+  count: number
+}
+
+export interface AdminLearnerDemographics {
+  dau: number
+  wau: number
+  mau: number
+  newLearners: number
+  returningLearners: number
+  activeLearners: number
+  totalUsers: number
+  verifiedUsers: number
+  levelDistribution: AdminLevelDistribution[]
+  streakDistribution: AdminStreakBucket[]
+  growthSeries: AdminTimeSeriesPoint[]
+}
+
+export interface AdminLearningDeepAnalytics {
+  totalLessonsCompleted: number
+  courseCompletionPct: number
+  moduleCompletionPct: number
+  quizStats: AdminQuizPerformanceStats
+  moduleDropOffs: AdminModuleDropOff[]
+  learningSeries: AdminTimeSeriesPoint[]
+}
+
+export interface AdminEngagementAnalytics {
+  streakDistribution: AdminStreakBucket[]
+  xpEarned: number
+  xpBySource: AdminXpSourceDistribution[]
+  srsReviews: number
+  activeFlashcardLearners: number
+  dailyXpSeries: AdminDailyXpPoint[]
+}
+
+export interface AdminOutcomesAnalytics {
+  certificatesIssued: number
+  capstonesSubmitted: number
+  capstonesReviewed: number
+  badgesAwarded: number
+  publicPortfolios: number
+  certificateSeries: AdminDailyCertificatePoint[]
+}
+
+export interface AdminExecutiveOverview {
+  kpis: AdminDashboardKpis
+  funnel: AdminFunnelStage[]
+  consolidatedSeries: AdminTimeSeriesPoint[]
+}
+
+export interface AdminAnalyticsWorkspaceData {
+  range: AdminDateRange
+  tab: AdminAnalyticsTab
+  overview: AdminExecutiveOverview
+  learners: AdminLearnerDemographics
+  learning: AdminLearningDeepAnalytics
+  engagement: AdminEngagementAnalytics
+  outcomes: AdminOutcomesAnalytics
+  failed?: boolean
+}
+
