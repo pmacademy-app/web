@@ -15,6 +15,7 @@ export type AdminStatusVariant =
   | 'archived'
   | 'healthy'
   | 'unhealthy'
+  | 'unmonitored'
   | 'admin'
   | 'learner'
 
@@ -64,6 +65,11 @@ export function AdminStatusBadge({ status, label, dot = true, className, ...prop
       badgeStyle = 'bg-admin-surface-raised text-admin-fg-subtle border-admin-border'
       dotStyle = 'bg-admin-neutral'
       displayLabel = label || 'Archived'
+      break
+    case 'unmonitored':
+      badgeStyle = 'bg-admin-surface-raised text-admin-fg-muted border-admin-border'
+      dotStyle = 'bg-admin-neutral'
+      displayLabel = label || 'Unmonitored'
       break
     case 'admin':
       badgeStyle = 'bg-admin-accent-soft text-admin-accent border-admin-accent/25'

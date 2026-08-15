@@ -120,6 +120,8 @@ export interface AdminDateRange {
   key: AdminDateRangeKey
   start: Date
   end: Date
+  /** Timezone the window and day buckets are expressed in. */
+  timeZone: string
 }
 
 /** One actionable item in the dashboard Attention Center. */
@@ -193,7 +195,8 @@ export interface AdminRecentActivityItem {
 export interface AdminSystemSnapshotItem {
   id: string
   label: string
-  status: 'healthy' | 'degraded' | 'down'
+  /** `unknown` = no telemetry source wired up yet (rendered as neutral, not degraded). */
+  status: 'healthy' | 'degraded' | 'down' | 'unknown'
   lastChecked: string
   summary: string
   href: string

@@ -1,11 +1,14 @@
 'use client'
 
-import React from 'react'
-import { X, Zap, Flame, Award, BookOpen, ExternalLink } from 'lucide-react'
+import React, { useState } from 'react'
+import { Zap, Flame, Award, BookOpen, ExternalLink, Loader2 } from 'lucide-react'
 import { AdminKpiCard } from './AdminKpiCard'
 import { AdminStatusBadge } from './AdminStatusBadge'
+import { AdminDrawer } from './AdminDrawer'
+import { AdminConfirmDialog } from './AdminConfirmDialog'
 import { UserRoleToggle } from './UserRoleToggle'
 import { DeveloperActionsSection } from './DeveloperActionsSection'
+import { useAdminToast } from './admin-toast'
 import type { AdminUserDetail } from '@/lib/admin/types'
 
 interface UserDetailDrawerProps {
@@ -14,47 +17,84 @@ interface UserDetailDrawerProps {
   onClose: () => void
 }
 
+type ConfirmAction = 'reset' | 'delete' | null
+
 export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProps) {
-  if (!isOpen || !user) return null
+  const { toast } = useAdminToast()
+  const [pendingAction, setPendingAction] = useState<ConfirmAction>(null)
+  const [busy, setBusy] = useState<ConfirmAction>(null)
+
+  if (!user) return null
+
+  const runAction = async (action: 'reset' | 'delete') => {
+    setPendingAction(null)
+    setBusy(action)
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, {
+        method: action === 'delete' ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: action === 'reset' ? JSON.stringify({ action: 'reset_progress' }) : undefined,
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast(
+          action === 'delete'
+            ? `Deleted user account for ${user.email}.`
+            : `Reset progress for ${user.email}.`,
+          'success'
+        )
+        onClose()
+      } else {
+        toast(data.error || (action === 'delete' ? 'Failed to delete account.' : 'Failed to reset progress.'), 'error')
+      }
+    } catch {
+      toast(action === 'delete' ? 'Network error deleting account.' : 'Network error resetting progress.', 'error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const resendVerification = async () => {
+    try {
+      const res = await fetch('/api/admin/emails/production-send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetUserId: user.id,
+          templateKey: 'auth.verify_email',
+          confirmProductionSend: true,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast(`Verification email resent to ${user.email}.`, 'success')
+      } else {
+        toast(data.error || 'Failed to resend verification email.', 'error')
+      }
+    } catch {
+      toast('Network error resending verification email.', 'error')
+    }
+  }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-admin-bg/70 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Slide-over Drawer Panel */}
-      <div className="relative w-full max-w-2xl bg-admin-surface border-l border-admin-border text-admin-fg shadow-2xl h-full overflow-y-auto z-10 flex flex-col p-6 space-y-6 animate-in slide-in-from-right duration-200">
-        {/* Drawer Header */}
-        <div className="flex items-center justify-between border-b border-admin-border pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-admin-accent-soft border border-admin-accent/25 text-admin-accent flex items-center justify-center font-bold text-lg">
-              {user.fullName.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-admin-fg flex items-center gap-2">
-                {user.fullName}
-              </h2>
-              <p className="text-xs text-admin-fg-muted font-mono">{user.email}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <UserRoleToggle
-              userId={user.id}
-              initialIsAdmin={user.isAdmin}
-              userEmail={user.email}
-            />
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg bg-admin-surface-raised hover:bg-admin-surface-raised/80 text-admin-fg-muted hover:text-admin-fg transition-colors"
-              aria-label="Close drawer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+    <>
+      <AdminDrawer
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) onClose()
+        }}
+        title={user.fullName}
+        description={user.email}
+        size="lg"
+      >
+        {/* Role + quick stats */}
+        <div className="flex items-center justify-between gap-3 pb-4 border-b border-admin-border">
+          <UserRoleToggle
+            userId={user.id}
+            initialIsAdmin={user.isAdmin}
+            userEmail={user.email}
+          />
+          <AdminStatusBadge status={user.isVerified ? 'published' : 'archived'} label={user.isVerified ? 'Verified' : 'Unverified'} />
         </div>
 
         {/* KPI Metrics */}
@@ -124,15 +164,6 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
               </div>
             </div>
             <div className="p-2.5 rounded bg-admin-surface border border-admin-border flex justify-between items-center">
-              <span className="text-admin-fg-muted">Email Verification</span>
-              <div className="flex items-center gap-2">
-                <AdminStatusBadge
-                  status={user.isVerified ? 'published' : 'archived'}
-                  label={user.isVerified ? 'Verified' : 'Unverified'}
-                />
-              </div>
-            </div>
-            <div className="p-2.5 rounded bg-admin-surface border border-admin-border flex justify-between items-center">
               <span className="text-admin-fg-muted">Joined Date</span>
               <span className="font-mono text-admin-fg">
                 {new Date(user.createdAt).toLocaleString()}
@@ -141,7 +172,7 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
           </div>
         </div>
 
-        {/* Admin Operational Controls: Progress Reset & Controlled User Deletion */}
+        {/* Admin Operational Controls */}
         <div className="p-4 rounded-xl bg-admin-bg/60 border border-admin-border space-y-3">
           <h3 className="text-xs font-bold text-admin-fg-muted uppercase tracking-wider">
             Admin Controlled User Management
@@ -149,80 +180,27 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
           <div className="flex flex-wrap gap-2 text-xs">
             <button
               type="button"
-              onClick={async () => {
-                try {
-                  const res = await fetch('/api/admin/emails/production-send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      targetUserId: user.id,
-                      templateKey: 'auth.verify_email',
-                      confirmProductionSend: true,
-                    }),
-                  })
-                  const data = await res.json()
-                  if (res.ok && data.success) {
-                    alert(`Verification email resent successfully to ${user.email}.`)
-                  } else {
-                    alert(data.error || 'Failed to resend verification email.')
-                  }
-                } catch {
-                  alert('Network error resending verification email.')
-                }
-              }}
-              className="px-3 py-1.5 rounded-lg bg-admin-info-soft text-admin-info border border-admin-info/25 font-bold hover:bg-admin-info/20 transition-colors cursor-pointer"
+              onClick={resendVerification}
+              disabled={busy !== null}
+              className="px-3 py-1.5 rounded-lg bg-admin-info-soft text-admin-info border border-admin-info/25 font-bold hover:bg-admin-info/20 transition-colors cursor-pointer disabled:opacity-50"
             >
               Resend Verification Email
             </button>
 
             <button
               type="button"
-              onClick={async () => {
-                if (confirm(`Reset all curriculum progress, XP, and streak data for ${user.email}? This action cannot be undone.`)) {
-                  try {
-                    const res = await fetch(`/api/admin/users/${user.id}`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ action: 'reset_progress' }),
-                    })
-                    const data = await res.json()
-                    if (res.ok && data.success) {
-                      alert(`Successfully reset user progress for ${user.email}.`)
-                      onClose()
-                    } else {
-                      alert(data.error || 'Failed to reset progress.')
-                    }
-                  } catch {
-                    alert('Network error resetting progress.')
-                  }
-                }
-              }}
-              className="px-3 py-1.5 rounded-lg bg-admin-warning-soft text-admin-warning border border-admin-warning/25 font-bold hover:bg-admin-warning/20 transition-colors cursor-pointer"
+              onClick={() => setPendingAction('reset')}
+              disabled={busy !== null}
+              className="px-3 py-1.5 rounded-lg bg-admin-warning-soft text-admin-warning border border-admin-warning/25 font-bold hover:bg-admin-warning/20 transition-colors cursor-pointer disabled:opacity-50"
             >
               Reset User Progress
             </button>
 
             <button
               type="button"
-              onClick={async () => {
-                if (confirm(`DANGER: Delete user account for ${user.email}? This will permanently remove all account data, progress, and certificates.`)) {
-                  try {
-                    const res = await fetch(`/api/admin/users/${user.id}`, {
-                      method: 'DELETE',
-                    })
-                    const data = await res.json()
-                    if (res.ok && data.success) {
-                      alert(`Successfully deleted user account for ${user.email}.`)
-                      onClose()
-                    } else {
-                      alert(data.error || 'Failed to delete account.')
-                    }
-                  } catch {
-                    alert('Network error deleting user account.')
-                  }
-                }
-              }}
-              className="px-3 py-1.5 rounded-lg bg-admin-danger-soft text-admin-danger border border-admin-danger/25 font-bold hover:bg-admin-danger/20 transition-colors cursor-pointer"
+              onClick={() => setPendingAction('delete')}
+              disabled={busy !== null}
+              className="px-3 py-1.5 rounded-lg bg-admin-danger-soft text-admin-danger border border-admin-danger/25 font-bold hover:bg-admin-danger/20 transition-colors cursor-pointer disabled:opacity-50"
             >
               Delete User Account
             </button>
@@ -239,6 +217,12 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
               </a>
             ) : null}
           </div>
+          {busy && (
+            <p className="flex items-center gap-1.5 text-[11px] text-admin-fg-muted">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              {busy === 'delete' ? 'Deleting account…' : 'Resetting progress…'}
+            </p>
+          )}
         </div>
 
         {/* Developer / Admin Operational Actions */}
@@ -248,7 +232,35 @@ export function UserDetailDrawer({ user, isOpen, onClose }: UserDetailDrawerProp
             targetUserEmail={user.email}
           />
         </div>
-      </div>
-    </div>
+      </AdminDrawer>
+
+      {/* Reset confirmation */}
+      <AdminConfirmDialog
+        open={pendingAction === 'reset'}
+        onOpenChange={(open) => {
+          if (!open) setPendingAction(null)
+        }}
+        title="Reset user progress?"
+        description={`This will reset all curriculum progress, XP, and streak data for ${user.email}. This action cannot be undone.`}
+        confirmLabel="Reset Progress"
+        destructive
+        onConfirm={() => runAction('reset')}
+        onCancel={() => setPendingAction(null)}
+      />
+
+      {/* Delete confirmation */}
+      <AdminConfirmDialog
+        open={pendingAction === 'delete'}
+        onOpenChange={(open) => {
+          if (!open) setPendingAction(null)
+        }}
+        title="Delete user account?"
+        description={`DANGER: This will permanently remove all account data, progress, and certificates for ${user.email}.`}
+        confirmLabel="Delete Account"
+        destructive
+        onConfirm={() => runAction('delete')}
+        onCancel={() => setPendingAction(null)}
+      />
+    </>
   )
 }

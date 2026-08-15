@@ -2,15 +2,18 @@
 
 import React from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { LogOut, Menu, Search, Bell } from 'lucide-react'
+import { LogOut, Menu, Bell } from 'lucide-react'
 import { getAdminSectionLabel } from '@/lib/admin/navigation'
 import { signOutAdmin } from '@/lib/admin/session'
 import type { AdminConsoleUser } from './AdminConsoleShell'
 
 interface AdminHeaderProps {
   onToggleMobileMenu?: () => void
-  onOpenSearch?: () => void
   user?: AdminConsoleUser
+  /** Total actionable items across attention sources (drives the bell dot). */
+  attentionTotal?: number
+  /** Whether the database is reachable (drives the status chip). */
+  systemOnline?: boolean
 }
 
 const TITLES: Record<string, string> = {
@@ -21,18 +24,26 @@ const TITLES: Record<string, string> = {
   '/admin/content': 'Curriculum',
   '/admin/certificates': 'Certificates',
   '/admin/system': 'Health & Alerts',
+  '/admin/analytics': 'Analytics',
+  '/admin/settings': 'Settings',
+  '/admin/feature-flags': 'Feature Flags',
+  '/admin/emails': 'Emails',
+  '/admin/templates': 'Email Templates',
+  '/admin/notifications': 'Notifications',
+  '/admin/portfolios': 'Portfolios',
 }
 
-export function AdminHeader({ onToggleMobileMenu, onOpenSearch, user }: AdminHeaderProps = {}) {
+export function AdminHeader({ onToggleMobileMenu, user, attentionTotal = 0, systemOnline = true }: AdminHeaderProps = {}) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const title = TITLES[pathname] ?? 'Admin'
+  const title = TITLES[pathname] ?? (pathname.startsWith('/admin/users/') ? 'User Profile' : 'Admin')
   const section = getAdminSectionLabel(pathname)
 
   const handleSignOut = () => signOutAdmin(router)
 
   const displayName = user?.name || user?.email.split('@')[0] || 'Admin'
+  const hasAttention = attentionTotal > 0
 
   return (
     <header className="h-16 bg-admin-surface/80 backdrop-blur border-b border-admin-border px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
@@ -61,37 +72,37 @@ export function AdminHeader({ onToggleMobileMenu, onOpenSearch, user }: AdminHea
       </div>
 
       <div className="flex items-center gap-2.5">
-        {/* Search trigger */}
+        {/* Alerts bell — dot only when there is something to act on */}
         <button
           type="button"
-          onClick={onOpenSearch}
-          aria-label="Search admin console (Command K)"
-          className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-admin-border bg-admin-surface-raised text-xs text-admin-fg-subtle hover:text-admin-fg transition-colors"
-        >
-          <Search className="w-3.5 h-3.5" />
-          <span>Search…</span>
-          <kbd className="ml-2 px-1.5 py-0.5 rounded bg-admin-surface text-[10px] font-mono border border-admin-border">
-            ⌘K
-          </kbd>
-        </button>
-
-        {/* Alerts bell */}
-        <button
-          type="button"
-          aria-label="System alerts"
+          aria-label={hasAttention ? `${attentionTotal} items need attention` : 'No items need attention'}
           className="relative p-2 rounded-lg text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors"
         >
           <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-admin-danger ring-2 ring-admin-surface" />
+          {hasAttention && (
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-admin-danger ring-2 ring-admin-surface" />
+          )}
         </button>
 
-        {/* System status */}
-        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-admin-surface-raised border border-admin-border text-xs text-admin-fg-muted">
+        {/* System status — reflects real DB reachability, not a hardcoded "online" */}
+        <div
+          className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-admin-surface-raised border text-xs ${
+            systemOnline ? 'border-admin-border text-admin-fg-muted' : 'border-admin-danger/25 text-admin-danger'
+          }`}
+        >
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-admin-success opacity-60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-admin-success" />
+            {systemOnline ? (
+              <>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-admin-success opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-admin-success" />
+              </>
+            ) : (
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-admin-danger" />
+            )}
           </span>
-          <span className="font-semibold text-admin-success">System Online</span>
+          <span className={`font-semibold ${systemOnline ? 'text-admin-success' : 'text-admin-danger'}`}>
+            {systemOnline ? 'System Online' : 'System Unreachable'}
+          </span>
         </div>
 
         {/* Admin profile chip */}

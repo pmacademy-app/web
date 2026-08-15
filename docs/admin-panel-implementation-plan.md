@@ -530,18 +530,21 @@ Implemented in commit `cad3bb8` (dependency) + the Phase 2 dashboard work on `ad
 - **Course Completion** = users holding the `cpo_completion` badge (or all 90 lessons).
 - **Verified Users** is a cumulative count of accounts with `email_confirmed_at` set (spec §2.3); its trend is cumulative growth. Falls back to 0 gracefully if the Auth admin API is unavailable.
 - **Chart controls** (§2.4) are provided by the global header range selector (which also adds "Today") rather than per-chart controls — a deliberate UX choice.
-- All aggregation math lives in pure helpers (`lib/admin/dashboard-aggregation.ts`) covered by `npm run test:dashboard` (12 tests).
+- All aggregation math lives in pure helpers (`lib/admin/dashboard-aggregation.ts`) covered by `npm run test:dashboard` (18 tests).
 
 ### Known scale consideration
 
-- `getDashboardData` fetches the full `xp_events` history (for the returning-learner set) plus unbounded lessons/quizzes/capstones/certificates. Fine at launch scale; a `first_active_at` column on `users` (or paginated counts) should bound this before significant growth.
+- `getDashboardData` and `getDashboardSummary` walk Supabase's 1,000-row page limit via `DashboardService.fetchAllRows` (`.range()` pagination), so range-scoped aggregates no longer silently truncate at the cap. The funnel's all-time distinct-user sets and the returning-learner set still load full tables into memory (paginated), which is fine at launch scale but should move to SQL-side aggregation before significant growth:
+  - Add a `first_active_at` column on `users` (set on first `xp_event`) so the returning-learner set becomes a single indexed range query instead of a full `xp_events` scan.
+  - Replace the all-time funnel stage sets with `count('exact', { head: true })` + `distinct on (user_id)` queries (or a Postgres RPC) once the tables exceed ~10k rows.
+  - `verifiedUsers` uses `auth.admin.listUsers({ perPage: 1000 })` — paginate with `page`/`perPage` if the auth user pool grows past 1,000.
 
 ### Verification
 
 - `npm run lint` — clean
 - `npm run build` — clean (Next.js 16, `/admin` dynamic)
 - `npm run test:admin` — 7/7 pass
-- `npm run test:dashboard` — 12/12 pass
+- `npm run test:dashboard` — 18/18 pass
 
 ---
 

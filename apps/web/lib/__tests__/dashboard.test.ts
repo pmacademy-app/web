@@ -15,6 +15,15 @@ import {
   computeTrend,
 } from '../admin/dashboard-aggregation'
 
+/**
+ * All date assertions run against an explicit timezone so the suite is
+ * deterministic on any machine (CI, dev laptops, Vercel). The dashboard
+ * previously mixed local-time windows with UTC bucketing, which silently
+ * dropped the last day of custom ranges and broke the "Today" preset for
+ * non-UTC admins — these tests pin that behavior down.
+ */
+const TZ = 'UTC'
+
 function runTest(name: string, fn: () => void) {
   try {
     fn()
@@ -29,30 +38,63 @@ function runTest(name: string, fn: () => void) {
 console.log('🧪 Running Dashboard Aggregation Unit Test Suite...\n')
 
 runTest('resolveRange resolves 7d to a 7-day inclusive window', () => {
-  const range = resolveRange('7d')
+  const range = resolveRange('7d', null, null, TZ)
   assert.strictEqual(range.key, '7d')
   assert.strictEqual(eachDay(range).length, 7)
 })
 
 runTest('resolveRange resolves today to a single-day window', () => {
-  const range = resolveRange('today')
+  const range = resolveRange('today', null, null, TZ)
   assert.strictEqual(eachDay(range).length, 1)
+  // "today" starts at local midnight and ends at "now" — never in the future.
+  assert.ok(range.start.getTime() <= range.end.getTime())
 })
 
 runTest('resolveRange resolves 30d and 90d windows', () => {
-  assert.strictEqual(eachDay(resolveRange('30d')).length, 30)
-  assert.strictEqual(eachDay(resolveRange('90d')).length, 90)
+  assert.strictEqual(eachDay(resolveRange('30d', null, null, TZ)).length, 30)
+  assert.strictEqual(eachDay(resolveRange('90d', null, null, TZ)).length, 90)
 })
 
 runTest('resolveRange custom uses provided bounds', () => {
-  const range = resolveRange('custom', '2026-08-01', '2026-08-05')
+  const range = resolveRange('custom', '2026-08-01', '2026-08-05', TZ)
   assert.strictEqual(eachDay(range).length, 5)
-  assert.strictEqual(toDateKey(range.start), '2026-08-01')
-  assert.strictEqual(toDateKey(range.end), '2026-08-05')
+  assert.strictEqual(toDateKey(range.start, TZ), '2026-08-01')
+  assert.strictEqual(toDateKey(range.end, TZ), '2026-08-05')
+})
+
+runTest('resolveRange custom end is inclusive of the full last day', () => {
+  // Regression: the old implementation set `end = new Date('2026-08-05')`
+  // which is 00:00 UTC — the entire last day was excluded from the window.
+  const range = resolveRange('custom', '2026-08-01', '2026-08-05', TZ)
+  assert.strictEqual(range.end.toISOString(), '2026-08-05T23:59:59.999Z')
+  // A row at 23:59 on the last day must fall inside the window.
+  const rows = [{ at: '2026-08-05T23:59:00Z' }]
+  const counts = countByDay(rows, (r) => r.at, range)
+  assert.strictEqual(counts.get('2026-08-05'), 1)
+})
+
+runTest('resolveRange custom normalizes an inverted range (from > to)', () => {
+  const range = resolveRange('custom', '2026-08-10', '2026-08-01', TZ)
+  assert.strictEqual(toDateKey(range.start, TZ), '2026-08-01')
+  assert.strictEqual(toDateKey(range.end, TZ), '2026-08-10')
+  assert.strictEqual(eachDay(range).length, 10)
+  // Regression: the swap must happen BEFORE endOfDay so the ISO bounds cover
+  // both full days (previously the first/last day were truncated to ~1ms).
+  assert.strictEqual(range.start.toISOString(), '2026-08-01T00:00:00.000Z')
+  assert.strictEqual(range.end.toISOString(), '2026-08-10T23:59:59.999Z')
+  // A row at 23:59 on the last day must fall inside the window.
+  const rows = [{ at: '2026-08-10T23:59:00Z' }]
+  const counts = countByDay(rows, (r) => r.at, range)
+  assert.strictEqual(counts.get('2026-08-10'), 1)
+})
+
+runTest('resolveRange custom falls back to 30d when bounds are missing', () => {
+  const range = resolveRange('custom', null, null, TZ)
+  assert.strictEqual(eachDay(range).length, 30)
 })
 
 runTest('countByDay buckets rows into calendar days', () => {
-  const range = resolveRange('custom', '2026-08-01', '2026-08-03')
+  const range = resolveRange('custom', '2026-08-01', '2026-08-03', TZ)
   const rows = [
     { at: '2026-08-01T10:00:00Z' },
     { at: '2026-08-01T22:00:00Z' },
@@ -65,8 +107,17 @@ runTest('countByDay buckets rows into calendar days', () => {
   assert.strictEqual(counts.get('2026-08-03'), 0)
 })
 
+runTest('countByDay buckets by the range timezone, not UTC', () => {
+  // 23:30 UTC on Aug 1 is already Aug 2 in UTC+2 — must bucket to Aug 2.
+  const range = resolveRange('custom', '2026-08-01', '2026-08-02', 'Europe/Paris')
+  const rows = [{ at: '2026-08-01T23:30:00Z' }]
+  const counts = countByDay(rows, (r) => r.at, range)
+  assert.strictEqual(counts.get('2026-08-01'), 0)
+  assert.strictEqual(counts.get('2026-08-02'), 1)
+})
+
 runTest('countDistinctByDay counts unique values per day', () => {
-  const range = resolveRange('custom', '2026-08-01', '2026-08-02')
+  const range = resolveRange('custom', '2026-08-01', '2026-08-02', TZ)
   const rows = [
     { user_id: 'a', at: '2026-08-01T10:00:00Z' },
     { user_id: 'a', at: '2026-08-01T12:00:00Z' },
@@ -79,7 +130,7 @@ runTest('countDistinctByDay counts unique values per day', () => {
 })
 
 runTest('buildLearnerSeries computes new/active/returning per day', () => {
-  const range = resolveRange('custom', '2026-08-01', '2026-08-02')
+  const range = resolveRange('custom', '2026-08-01', '2026-08-02', TZ)
   const series = buildLearnerSeries({
     range,
     newUsers: [{ created_at: '2026-08-01T09:00:00Z' }, { created_at: '2026-08-02T09:00:00Z' }],
@@ -103,7 +154,7 @@ runTest('buildLearnerSeries computes new/active/returning per day', () => {
 })
 
 runTest('buildLearningSeries buckets lessons/quizzes/capstones', () => {
-  const range = resolveRange('custom', '2026-08-01', '2026-08-01')
+  const range = resolveRange('custom', '2026-08-01', '2026-08-01', TZ)
   const series = buildLearningSeries({
     range,
     lessonsCompleted: [{ completed_at: '2026-08-01T10:00:00Z' }, { completed_at: '2026-08-01T11:00:00Z' }],
@@ -115,8 +166,41 @@ runTest('buildLearningSeries buckets lessons/quizzes/capstones', () => {
   assert.strictEqual(series[0].capstonesSubmitted, 1)
 })
 
+runTest('buildLearnerSeries keys series by the range timezone, not the module default', () => {
+  // 23:30 UTC on Aug 1 is already Aug 2 in UTC+2 — the series must bucket to Aug 2.
+  const range = resolveRange('custom', '2026-08-01', '2026-08-02', 'Europe/Paris')
+  const series = buildLearnerSeries({
+    range,
+    newUsers: [{ created_at: '2026-08-01T23:30:00Z' }],
+    xpEvents: [{ user_id: 'a', created_at: '2026-08-01T23:30:00Z' }],
+    usersActiveBeforeWindow: new Set(),
+  })
+  assert.strictEqual(series.length, 2)
+  assert.strictEqual(series[0].date, '2026-08-01')
+  assert.strictEqual(series[0].newUsers, 0)
+  assert.strictEqual(series[0].activeLearners, 0)
+  assert.strictEqual(series[1].date, '2026-08-02')
+  assert.strictEqual(series[1].newUsers, 1)
+  assert.strictEqual(series[1].activeLearners, 1)
+})
+
+runTest('buildLearningSeries keys series by the range timezone, not the module default', () => {
+  const range = resolveRange('custom', '2026-08-01', '2026-08-02', 'Europe/Paris')
+  const series = buildLearningSeries({
+    range,
+    lessonsCompleted: [{ completed_at: '2026-08-01T23:30:00Z' }],
+    quizAttempts: [],
+    capstonesSubmitted: [],
+  })
+  assert.strictEqual(series.length, 2)
+  assert.strictEqual(series[0].date, '2026-08-01')
+  assert.strictEqual(series[0].lessonsCompleted, 0)
+  assert.strictEqual(series[1].date, '2026-08-02')
+  assert.strictEqual(series[1].lessonsCompleted, 1)
+})
+
 runTest('mergeSeries combines learner and learning series by date', () => {
-  const range = resolveRange('custom', '2026-08-01', '2026-08-01')
+  const range = resolveRange('custom', '2026-08-01', '2026-08-01', TZ)
   const learner = buildLearnerSeries({
     range,
     newUsers: [{ created_at: '2026-08-01T09:00:00Z' }],

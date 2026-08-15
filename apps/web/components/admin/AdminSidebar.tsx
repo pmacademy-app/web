@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink, LogOut, PanelsTopLeft } from 'lucide-react'
@@ -17,16 +17,42 @@ export interface AdminSidebarProps {
   mobileOpen?: boolean
   onMobileClose?: () => void
   user?: AdminConsoleUser
+  /** Live attention counts keyed by nav href (drives the badge dots). */
+  attention?: Record<string, number>
 }
 
-export function AdminSidebar({ mobileOpen, onMobileClose, user }: AdminSidebarProps = {}) {
+/** Maps a nav href to its live attention count (0 = no badge). */
+function badgeForHref(href: string, attention: Record<string, number> | undefined): number {
+  if (!attention) return 0
+  return attention[href] || 0
+}
+
+export function AdminSidebar({ mobileOpen, onMobileClose, user, attention }: AdminSidebarProps = {}) {
   const pathname = usePathname()
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   const displayName = user?.name || user?.email.split('@')[0] || 'Admin'
   const handleSignOut = () => signOutAdmin(router)
+
+  // Focus the close button when the mobile drawer opens; restore on close.
+  useEffect(() => {
+    if (mobileOpen) {
+      closeButtonRef.current?.focus()
+    }
+  }, [mobileOpen])
+
+  // Close on Escape for the mobile drawer.
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onMobileClose?.()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [mobileOpen, onMobileClose])
 
   const toggleGroup = (label: string) => {
     setCollapsedGroups((prev) => {
@@ -108,6 +134,7 @@ export function AdminSidebar({ mobileOpen, onMobileClose, user }: AdminSidebarPr
                   {group.items.map((item) => {
                     const Icon = item.icon
                     const isActive = isAdminNavItemActive(item, pathname)
+                    const liveCount = badgeForHref(item.href, attention)
                     return (
                       <Link
                         key={item.href}
@@ -132,9 +159,9 @@ export function AdminSidebar({ mobileOpen, onMobileClose, user }: AdminSidebarPr
                         {!collapsed && (
                           <>
                             <span className="truncate">{item.name}</span>
-                            {item.badge && (
+                            {liveCount > 0 && (
                               <span className="ml-auto px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-admin-warning-soft text-admin-warning">
-                                {item.badge}
+                                {liveCount}
                               </span>
                             )}
                           </>
@@ -225,7 +252,21 @@ export function AdminSidebar({ mobileOpen, onMobileClose, user }: AdminSidebarPr
             onClick={onMobileClose}
             aria-hidden="true"
           />
-          <div className="relative flex flex-col h-full animate-in slide-in-from-left duration-200">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Admin navigation"
+            className="relative flex flex-col h-full animate-in slide-in-from-left duration-200"
+          >
+            <button
+              ref={closeButtonRef}
+              type="button"
+              onClick={onMobileClose}
+              aria-label="Close admin navigation menu"
+              className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg-muted hover:text-admin-fg transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
             {content}
           </div>
         </div>

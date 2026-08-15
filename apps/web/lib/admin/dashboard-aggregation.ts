@@ -16,52 +16,156 @@ import type {
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
-/** Formats a Date as a UTC calendar date key (YYYY-MM-DD). */
-export function toDateKey(date: Date): string {
-  return date.toISOString().slice(0, 10)
+/**
+ * Timezone used for dashboard date windows and day bucketing.
+ *
+ * Windows and buckets must agree on the same calendar days — mixing local-time
+ * windows with UTC bucketing silently drops/duplicates data around midnight.
+ * Defaults to the server's local timezone (overridable via ADMIN_TIMEZONE).
+ */
+export const DASHBOARD_TIME_ZONE: string =
+  process.env.ADMIN_TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+
+interface TzParts {
+  year: number
+  month: number
+  day: number
+  hour: number
+  minute: number
+  second: number
 }
 
-/** Resolves a range preset (plus optional custom bounds) into an inclusive window. */
+/** Wall-clock fields of a Date instant in `timeZone`. */
+function tzPartsOf(date: Date, timeZone: string): TzParts {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(date)
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0)
+  let hour = get('hour')
+  if (hour === 24) hour = 0 // some engines emit '24' for midnight with hour12:false
+  return { year: get('year'), month: get('month'), day: get('day'), hour, minute: get('minute'), second: get('second') }
+}
+
+/** Builds the Date instant whose wall clock in `timeZone` equals `p` (iterative convergence). */
+function instantFromTzParts(p: TzParts, timeZone: string): Date {
+  let guess = new Date(Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second))
+  for (let i = 0; i < 3; i++) {
+    const wall = tzPartsOf(guess, timeZone)
+    const deltaMs =
+      (p.year - wall.year) * 365 * DAY_MS +
+      (p.month - wall.month) * 31 * DAY_MS +
+      (p.day - wall.day) * DAY_MS +
+      (p.hour - wall.hour) * 3600_000 +
+      (p.minute - wall.minute) * 60_000 +
+      (p.second - wall.second) * 1000
+    if (deltaMs === 0) break
+    guess = new Date(guess.getTime() + deltaMs)
+  }
+  return guess
+}
+
+/** Formats a Date as a calendar date key (YYYY-MM-DD) in `timeZone`. */
+export function toDateKey(date: Date, timeZone: string = DASHBOARD_TIME_ZONE): string {
+  const { year, month, day } = tzPartsOf(date, timeZone)
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+/** Local start of the calendar day containing `date`, in `timeZone`. */
+export function startOfDay(date: Date, timeZone: string = DASHBOARD_TIME_ZONE): Date {
+  const p = tzPartsOf(date, timeZone)
+  return instantFromTzParts({ ...p, hour: 0, minute: 0, second: 0 }, timeZone)
+}
+
+/** Local end of the calendar day containing `date` (23:59:59.999), in `timeZone`. */
+export function endOfDay(date: Date, timeZone: string = DASHBOARD_TIME_ZONE): Date {
+  return new Date(startOfDay(addDays(date, 1), timeZone).getTime() - 1)
+}
+
+/** Adds whole days to a Date instant (DST-safe for calendar-key purposes). */
+export function addDays(date: Date, days: number): Date {
+  return new Date(date.getTime() + days * DAY_MS)
+}
+
+/** Parses a YYYY-MM-DD key as local midnight in `timeZone`. */
+export function parseLocalDateKey(key: string, timeZone: string = DASHBOARD_TIME_ZONE): Date {
+  const [year, month, day] = key.split('-').map(Number)
+  return instantFromTzParts({ year, month, day, hour: 0, minute: 0, second: 0 }, timeZone)
+}
+
+/**
+ * Resolves a range preset (plus optional custom bounds) into an inclusive window.
+ *
+ * Windows are computed in `timeZone` calendar days and are end-inclusive:
+ * `custom` from=2026-08-01 to=2026-08-05 covers the entire local day of Aug 5,
+ * and an inverted custom range (from > to) is normalized by swapping bounds.
+ */
 export function resolveRange(
   key: AdminDateRangeKey,
   from?: string | null,
-  to?: string | null
+  to?: string | null,
+  timeZone: string = DASHBOARD_TIME_ZONE
 ): AdminDateRange {
   const now = new Date()
-  const end = to ? new Date(to) : now
 
   let start: Date
+  let end: Date
+
   switch (key) {
     case 'today':
-      start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+      start = startOfDay(now, timeZone)
+      end = now
       break
     case '7d':
-      start = new Date(now.getTime() - 6 * DAY_MS)
-      break
     case '30d':
-      start = new Date(now.getTime() - 29 * DAY_MS)
+    case '90d': {
+      const days = key === '7d' ? 7 : key === '30d' ? 30 : 90
+      end = now
+      start = addDays(startOfDay(now, timeZone), -(days - 1))
       break
-    case '90d':
-      start = new Date(now.getTime() - 89 * DAY_MS)
-      break
+    }
     case 'custom':
-    default:
-      start = from ? new Date(from) : new Date(now.getTime() - 29 * DAY_MS)
+    default: {
+      if (from && to) {
+        // Parse both bounds as local midnights, then normalize the order so the
+        // window always runs from the earlier day to the later day — an inverted
+        // range (from > to) is a user error we silently correct. endOfDay is
+        // applied AFTER the swap so the ISO bounds cover both full days.
+        const fromDay = parseLocalDateKey(from, timeZone)
+        const toDay = parseLocalDateKey(to, timeZone)
+        const earlier = fromDay.getTime() <= toDay.getTime() ? fromDay : toDay
+        const later = fromDay.getTime() <= toDay.getTime() ? toDay : fromDay
+        start = earlier
+        end = endOfDay(later, timeZone)
+      } else {
+        // Missing/invalid custom bounds → fall back to the last 30 calendar days.
+        end = now
+        start = addDays(startOfDay(now, timeZone), -29)
+      }
       break
+    }
   }
 
-  return { key, start, end }
+  return { key, start, end, timeZone }
 }
 
-/** Iterates every calendar day in the range (inclusive), oldest first. */
+/** Iterates every calendar day in the range (inclusive), oldest first, in the range's timezone. */
 export function eachDay(range: AdminDateRange): Date[] {
   const days: Date[] = []
-  const cursor = new Date(Date.UTC(range.start.getUTCFullYear(), range.start.getUTCMonth(), range.start.getUTCDate()))
-  const endKey = toDateKey(range.end)
+  let cursor = startOfDay(range.start, range.timeZone)
+  const endKey = toDateKey(range.end, range.timeZone)
   let guard = 0
-  while (toDateKey(cursor) <= endKey && guard < 1000) {
+  while (toDateKey(cursor, range.timeZone) <= endKey && guard < 1000) {
     days.push(new Date(cursor))
-    cursor.setUTCDate(cursor.getUTCDate() + 1)
+    const next = addDays(cursor, 1)
+    // DST guard: advance until the calendar key actually changes.
+    cursor = toDateKey(next, range.timeZone) === toDateKey(cursor, range.timeZone) ? addDays(next, 1) : next
     guard++
   }
   return days
@@ -74,11 +178,11 @@ export function countByDay<T>(
   range: AdminDateRange
 ): Map<string, number> {
   const counts = new Map<string, number>()
-  for (const day of eachDay(range)) counts.set(toDateKey(day), 0)
+  for (const day of eachDay(range)) counts.set(toDateKey(day, range.timeZone), 0)
   for (const row of rows) {
     const raw = getDate(row)
     if (!raw) continue
-    const key = toDateKey(new Date(raw))
+    const key = toDateKey(new Date(raw), range.timeZone)
     if (counts.has(key)) counts.set(key, (counts.get(key) || 0) + 1)
   }
   return counts
@@ -92,11 +196,11 @@ export function countDistinctByDay<T>(
   range: AdminDateRange
 ): Map<string, Set<string>> {
   const sets = new Map<string, Set<string>>()
-  for (const day of eachDay(range)) sets.set(toDateKey(day), new Set())
+  for (const day of eachDay(range)) sets.set(toDateKey(day, range.timeZone), new Set())
   for (const row of rows) {
     const raw = getDate(row)
     if (!raw) continue
-    const key = toDateKey(new Date(raw))
+    const key = toDateKey(new Date(raw), range.timeZone)
     const set = sets.get(key)
     if (set) set.add(getValue(row))
   }
@@ -116,7 +220,7 @@ export function buildLearnerSeries(params: {
   const activeByDay = countDistinctByDay(params.xpEvents, (r) => r.created_at, (r) => r.user_id, range)
 
   return eachDay(range).map((day) => {
-    const key = toDateKey(day)
+    const key = toDateKey(day, range.timeZone)
     const activeSet = activeByDay.get(key) || new Set<string>()
     let returning = 0
     for (const userId of activeSet) {
@@ -148,7 +252,7 @@ export function buildLearningSeries(params: {
   const capstonesByDay = countByDay(params.capstonesSubmitted, (r) => r.submitted_at, range)
 
   return eachDay(range).map((day) => {
-    const key = toDateKey(day)
+    const key = toDateKey(day, range.timeZone)
     return {
       date: key,
       label: key.slice(5),

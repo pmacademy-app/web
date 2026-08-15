@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
-import { AdminConsoleService } from '@/lib/admin/service'
+import { DashboardService } from '@/lib/admin/dashboard-service'
 
 export async function GET(request: Request) {
   const authGuard = await requireAdminUser(request)
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const summary = await AdminConsoleService.getDashboardSummary()
+    const summary = await DashboardService.getDashboardSummary()
     return NextResponse.json({ success: true, summary })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to load dashboard summary'
