@@ -10,6 +10,8 @@ export interface AdminPageShellProps {
   actions?: React.ReactNode
   /** KPI cards row (usually AdminKpiCard[]). */
   kpis?: React.ReactNode
+  /** Overrides the default KPI grid columns (e.g. 5 cards → `lg:grid-cols-5`). */
+  kpiGridClassName?: string
   /** Search + filters toolbar rendered above the content. */
   toolbar?: React.ReactNode
   /** Main content — table, panels, etc. */
@@ -28,6 +30,7 @@ export function AdminPageShell({
   iconColor,
   actions,
   kpis,
+  kpiGridClassName,
   toolbar,
   children,
   className,
@@ -43,7 +46,7 @@ export function AdminPageShell({
       />
 
       {kpis && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={cn('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4', kpiGridClassName)}>
           {kpis}
         </div>
       )}

@@ -14,6 +14,8 @@ interface Block {
 interface BlockTreeRendererProps {
   blocks: Block[];
   lessonId: string;
+  /** Read-only preview mode — blocks must not persist progress or award XP. */
+  previewMode?: boolean;
 }
 
 class BlockErrorBoundary extends React.Component<{
@@ -59,29 +61,29 @@ class BlockErrorBoundary extends React.Component<{
   }
 }
 
-export const BlockTreeRenderer = React.memo(function BlockTreeRenderer({ blocks, lessonId }: BlockTreeRendererProps) {
+export const BlockTreeRenderer = React.memo(function BlockTreeRenderer({ blocks, lessonId, previewMode }: BlockTreeRendererProps) {
   if (!blocks || !Array.isArray(blocks)) return null;
   return (
     <>
       {blocks.map((block) => (
         <BlockErrorBoundary key={block.blockId} block={block} lessonId={lessonId}>
-          <BlockRenderer block={block} lessonId={lessonId} />
+          <BlockRenderer block={block} lessonId={lessonId} previewMode={previewMode} />
         </BlockErrorBoundary>
       ))}
     </>
   );
 });
 
-const BlockRenderer = React.memo(function BlockRenderer({ block, lessonId }: { block: Block; lessonId: string }) {
+const BlockRenderer = React.memo(function BlockRenderer({ block, lessonId, previewMode }: { block: Block; lessonId: string; previewMode?: boolean }) {
   const component = useBlockComponent(block.type);
 
   if (block.children && Array.isArray(block.children) && block.children.length > 0) {
     return React.createElement(
       component,
-      { block, lessonId },
-      React.createElement(BlockTreeRenderer, { blocks: block.children, lessonId })
+      { block, lessonId, previewMode },
+      React.createElement(BlockTreeRenderer, { blocks: block.children, lessonId, previewMode })
     );
   }
 
-  return React.createElement(component, { block, lessonId });
+  return React.createElement(component, { block, lessonId, previewMode });
 });

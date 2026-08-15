@@ -356,3 +356,128 @@ export interface AdminDashboardData {
   recentActivity: AdminRecentActivityItem[]
   systemSnapshot: AdminSystemSnapshotItem[]
 }
+
+/* ─── Phase 4 — Learning Workspace ─────────────────────────────────────────── */
+
+/** Content types a lesson contains (mirrors the learner tab shell). */
+export type AdminLessonType = 'theory' | 'quiz' | 'flashcards' | 'reflection'
+
+/** One module in the curriculum overview (module card). */
+export interface AdminModuleOverview {
+  slug: string
+  number: number
+  name: string
+  description: string
+  icon: string
+  lessonCount: number
+  /** Distinct learners who completed at least one lesson in this module. */
+  learnersStarted: number
+  /** Average per-lesson completion % among learners who started the module. */
+  avgCompletionPct: number
+  status: 'published'
+}
+
+/** One lesson row in the module detail lesson table. */
+export interface AdminLessonOverview {
+  id: string
+  slug: string
+  title: string
+  order: number
+  difficulty: number
+  estimatedReadingTime: number
+  estimatedCompletionTime: number
+  types: AdminLessonType[]
+  /** Distinct learners who completed this lesson. */
+  completions: number
+  /** Completion % of the module's started learners. */
+  completionPct: number
+  status: 'published'
+}
+
+/** Complete payload for the module detail page. */
+export interface AdminModuleDetail extends AdminModuleOverview {
+  lessons: AdminLessonOverview[]
+}
+
+/** Complete payload for the lesson detail page. */
+export interface AdminLessonDetail {
+  id: string
+  slug: string
+  title: string
+  module: string
+  moduleName: string
+  moduleNumber: number
+  order: number
+  globalOrder: number
+  difficulty: number
+  estimatedReadingTime: number
+  estimatedCompletionTime: number
+  prerequisites: string[]
+  types: AdminLessonType[]
+  completions: number
+  completionPct: number
+  quizAttempts: number
+  quizAvgScore: number | null
+  status: 'published'
+  /** Compiled block tree — rendered by the learner-facing preview. */
+  blocks: Array<Record<string, unknown>>
+}
+
+/** Curriculum overview KPI values (spec §4.2). */
+export interface AdminCurriculumKpis {
+  modules: number
+  lessons: number
+  quizzes: number
+  flashcards: number
+  capstones: number
+}
+
+/** Complete payload for the curriculum overview page. */
+export interface AdminCurriculumOverview {
+  kpis: AdminCurriculumKpis
+  modules: AdminModuleOverview[]
+  /** Distinct learners with at least one completed lesson (completion denominator). */
+  totalLearners: number
+  /** Total completed-lesson events across the curriculum. */
+  totalLessonsCompleted: number
+}
+
+/** One bucket in the streak-distribution histogram. */
+export interface AdminStreakBucket {
+  bucket: string
+  count: number
+}
+
+/** Complete payload for the learning analytics page (spec §4.7). */
+export interface AdminLearningAnalytics {
+  range: AdminDateRange
+  learners: {
+    dau: number
+    wau: number
+    mau: number
+    newLearners: number
+    returningLearners: number
+    activeLearners: number
+  }
+  learning: {
+    lessonsCompleted: number
+    moduleCompletionPct: number
+    courseCompletionPct: number
+    quizAttempts: number
+    quizAvgScore: number | null
+    /** Average per-module completion % across learners with progress. */
+    modules: Array<{ slug: string; title: string; completedPct: number }>
+  }
+  engagement: {
+    streakDistribution: AdminStreakBucket[]
+    xpEarned: number
+    srsReviews: number
+    activeFlashcardLearners: number
+  }
+  outcomes: {
+    certificatesIssued: number
+    capstonesSubmitted: number
+    publicPortfolios: number
+  }
+  series: AdminTimeSeriesPoint[]
+}
