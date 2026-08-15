@@ -8,7 +8,7 @@
 
 ## 1. Documentation Structure & Map
 
-All project documentation lives directly under `docs/`. The documentation suite consists of 24 canonical documents:
+All project documentation lives directly under `docs/`. The documentation suite consists of 23 canonical documents:
 
 | Category | Canonical Document | Purpose / Owning Topic | Status |
 |---|---|---|---|
@@ -17,9 +17,7 @@ All project documentation lives directly under `docs/`. The documentation suite 
 | **Engineering Rules** | [`RULES.md`](RULES.md) | Engineering guidelines, secret safety, documentation authority rule | 🟢 Verified |
 | **Project Memory** | [`MEMORY.md`](MEMORY.md) | Core invariants, locked tech decisions, immutable data contracts | 🟢 Verified |
 | **Issue Register** | [`ISSUES_KNOWN.md`](ISSUES_KNOWN.md) | Active issue register, production gaps, known observability issues | 🟢 Verified |
-| **Admin Console** | [`ADMIN_PANEL.md`](ADMIN_PANEL.md) | Specification of all 12 Admin tabs, actions, modal flows, and APIs | 🟢 Verified |
-| **Admin Panel UI/UX Spec** | [`admin-panel-ui-ux-spec.md`](admin-panel-ui-ux-spec.md) | Final frontend & UI/UX specification for the redesigned Admin Panel | 🟢 Verified |
-| **Admin Panel Implementation Plan** | [`admin-panel-implementation-plan.md`](admin-panel-implementation-plan.md) | 10-phase frontend implementation plan for the redesigned Admin Panel | 🟢 Verified |
+| **Admin Console** | [`ADMIN_PANEL.md`](ADMIN_PANEL.md) | Primary Admin Panel reference: workspace structure, feature status, remaining backend work | 🟢 Current |
 | **Notifications** | [`NOTIFICATIONS.md`](NOTIFICATIONS.md) | In-app notification center, mobile viewport positioning, delivery logs | 🟢 Verified |
 | **Email Infrastructure**| [`EMAIL_SYSTEM.md`](EMAIL_SYSTEM.md) | Auth Hook, email queue, queue processor, Resend delivery, templates | 🟢 Verified |
 | **Authentication** | [`AUTHENTICATION.md`](AUTHENTICATION.md) | Supabase Auth, signup flow, 60s rate limit, unverified user discovery | 🟢 Verified |
