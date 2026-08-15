@@ -1398,6 +1398,19 @@ Filters:
 
 ---
 
+# 6.11 Phase 6 Schema Limitations (documented decisions)
+
+| Spec item | Schema limitation | Implementation |
+|---|---|---|
+| Notification management actions — Create/Schedule/Send/Cancel (§39 / §6.9) | No notification-management API or schema; the platform dispatches events automatically from learning activity. | Read-only events table with an always-visible note explaining why actions are absent. Management actions deferred to a phase with a notification-management API. |
+| Template "Last updated" column (§36 / §6.6) | Templates are source-controlled React components in `apps/web/emails/templates`; no `updated_at` exists in the registry. | Subject column shown instead (real, useful metadata). "Last updated" would require registry/git metadata and is not fabricated. |
+| Testimonials & Feedback tabs (§33 / §6.2) | Content lives in the Moderation workspace. | Communications tabs link out to `/admin/moderation?tab=testimonials` and `?tab=feedback`; the Pending Testimonials KPI links to the same surface. |
+| Production Send flow (§6.4) | Existing `SendProductionEmailModal` + `/api/admin/emails/production-send` already implement the flow. | Surfaced in the Templates tab via a recipient-search picker. Test sends (§6.5) remain a separate flow per RULES.md #5. |
+| Contact Read/unread filter (§40 / §6.10) | No `read`/`read_at` column on `contact_messages`. | "Unread" maps to `status = 'new'`; the filter is applied client-side over the loaded set. |
+| Queue status tabs + Retry column (§38) | `email_queue` has no separate retry table. | Status tabs + pagination backed by `getEmailHistory`; Retry column shows `attempt_count/max_attempts`. |
+
+---
+
 # Phase 7 — System Workspace
 
 ## Goal
