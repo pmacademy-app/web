@@ -110,7 +110,7 @@ export function AnalyticsWorkspace({ data }: AnalyticsWorkspaceProps) {
                 key={key}
                 href={`${pathname}?${params.toString()}`}
                 aria-current={isActive ? 'page' : undefined}
-                className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+                className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap rounded-t focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50 ${
                   isActive
                     ? 'border-admin-accent text-admin-accent font-bold'
                     : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
@@ -132,7 +132,7 @@ export function AnalyticsWorkspace({ data }: AnalyticsWorkspaceProps) {
           <button
             type="button"
             onClick={handleExportCsv}
-            className="h-9 px-3 rounded-lg bg-admin-surface border border-admin-border hover:bg-admin-surface-raised text-admin-fg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+            className="h-9 px-3 rounded-lg bg-admin-surface border border-admin-border hover:bg-admin-surface-raised text-admin-fg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
             title="Export CSV summary of current metrics"
           >
             <Download className="w-3.5 h-3.5 text-admin-fg-muted" />

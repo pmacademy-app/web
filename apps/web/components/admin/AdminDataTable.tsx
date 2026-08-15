@@ -77,7 +77,7 @@ export function AdminDataTable<T>({
           <button
             type="button"
             onClick={() => handleSort(col)}
-            className="inline-flex items-center gap-1.5 uppercase tracking-wider text-[10px] font-bold text-admin-fg-subtle transition-colors hover:text-admin-fg cursor-pointer"
+            className="inline-flex items-center gap-1.5 uppercase tracking-wider text-[10px] font-bold text-admin-fg-subtle transition-colors hover:text-admin-fg cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
           >
             {col.header}
             {active ? (

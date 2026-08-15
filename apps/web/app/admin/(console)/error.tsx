@@ -9,15 +9,22 @@ import { AlertTriangle } from 'lucide-react'
  */
 export default function AdminConsoleError({
   error,
+  reset,
   unstable_retry,
 }: {
   error: Error & { digest?: string }
-  unstable_retry: () => void
+  reset?: () => void
+  unstable_retry?: () => void
 }) {
   useEffect(() => {
     // Log to the configured error reporting service.
     console.error(error)
   }, [error])
+
+  const handleRetry = () => {
+    if (reset) reset()
+    else if (unstable_retry) unstable_retry()
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-admin-danger/25 bg-admin-danger-soft/40 px-6 py-16 text-center">
@@ -37,8 +44,8 @@ export default function AdminConsoleError({
       </div>
       <button
         type="button"
-        onClick={unstable_retry}
-        className="mt-1 rounded-lg border border-admin-border bg-admin-surface px-4 py-1.5 text-xs font-semibold text-admin-fg transition-colors hover:bg-admin-surface-raised"
+        onClick={handleRetry}
+        className="mt-1 rounded-lg border border-admin-border bg-admin-surface px-4 py-1.5 text-xs font-semibold text-admin-fg transition-colors hover:bg-admin-surface-raised cursor-pointer focus-visible:ring-2 focus-visible:ring-admin-accent/50"
       >
         Try again
       </button>

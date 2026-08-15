@@ -22,6 +22,7 @@ const TITLES: Record<string, string> = {
   '/admin/communications': 'Communications',
   '/admin/feedback': 'Moderation',
   '/admin/moderation': 'Moderation',
+  '/admin/curriculum': 'Curriculum',
   '/admin/content': 'Curriculum',
   '/admin/certificates': 'Certificates',
   '/admin/achievements': 'Achievements',
@@ -41,7 +42,19 @@ export function AdminHeader({ onToggleMobileMenu, user, attentionTotal = 0, syst
   const router = useRouter()
   const pathname = usePathname()
 
-  const title = TITLES[pathname] ?? (pathname.startsWith('/admin/users/') ? 'User Profile' : 'Admin')
+  let title = TITLES[pathname]
+  if (!title) {
+    if (pathname.startsWith('/admin/users/')) {
+      title = 'User Profile'
+    } else if (pathname.startsWith('/admin/curriculum/')) {
+      const parts = pathname.split('/').filter(Boolean)
+      title = parts.length >= 4 ? 'Lesson Detail' : 'Module Detail'
+    } else if (pathname.startsWith('/admin/communications/templates/')) {
+      title = 'Template Editor'
+    } else {
+      title = 'Admin'
+    }
+  }
   const section = getAdminSectionLabel(pathname)
 
   const handleSignOut = () => signOutAdmin(router)
