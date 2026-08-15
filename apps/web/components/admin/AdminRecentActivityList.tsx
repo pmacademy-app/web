@@ -1,6 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { Activity } from 'lucide-react'
+import { AdminSection } from './AdminSection'
+import { AdminEmptyState } from './AdminEmptyState'
 import type { AdminRecentActivityItem } from '@/lib/admin/types'
 
 interface AdminRecentActivityListProps {
@@ -20,17 +22,14 @@ function timeAgo(iso: string): string {
 
 export function AdminRecentActivityList({ items }: AdminRecentActivityListProps) {
   return (
-    <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
-      <div className="flex items-center justify-between border-b border-admin-border pb-4">
-        <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-          <Activity className="w-4 h-4 text-admin-accent" />
-          Recent Activity
-        </h2>
-        <span className="text-[11px] font-mono text-admin-fg-muted">{items.length} events</span>
-      </div>
-
+    <AdminSection title="Recent Activity" icon={Activity} meta={`${items.length} events`}>
       {items.length === 0 ? (
-        <p className="text-xs text-admin-fg-muted">No recent activity.</p>
+        <AdminEmptyState
+          icon={Activity}
+          title="No recent activity"
+          description="Recent registrations, lesson completions, capstones and certificates will appear here."
+          className="py-10"
+        />
       ) : (
         <ol className="relative space-y-4 before:absolute before:left-[5px] before:top-1 before:bottom-1 before:w-px before:bg-admin-border">
           {items.map((item) => (
@@ -45,7 +44,10 @@ export function AdminRecentActivityList({ items }: AdminRecentActivityListProps)
                 <span className="text-[10px] font-mono text-admin-fg-muted shrink-0">{timeAgo(item.timestamp)}</span>
               </div>
               {item.href && (
-                <Link href={item.href} className="text-[11px] font-semibold text-admin-accent hover:underline">
+                <Link
+                  href={item.href}
+                  className="inline-block mt-0.5 text-[11px] font-semibold text-admin-accent hover:underline"
+                >
                   View →
                 </Link>
               )}
@@ -53,6 +55,6 @@ export function AdminRecentActivityList({ items }: AdminRecentActivityListProps)
           ))}
         </ol>
       )}
-    </div>
+    </AdminSection>
   )
 }

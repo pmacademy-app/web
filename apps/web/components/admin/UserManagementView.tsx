@@ -3,8 +3,9 @@
 import React from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Users, Flame, Zap, ExternalLink } from 'lucide-react'
-import { AdminPageHeader } from './AdminPageHeader'
+import { AdminPageShell } from './AdminPageShell'
 import { AdminDataTable, Column } from './AdminDataTable'
+import { AdminSearchInput } from './AdminSearchInput'
 import { UserDetailDrawer } from './UserDetailDrawer'
 import type { AdminUserOverview, AdminUserDetail } from '@/lib/admin/types'
 
@@ -139,40 +140,36 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
   }, [initialUsers, searchQuery, roleFilter])
 
   return (
-    <div className="space-y-8">
-      <AdminPageHeader
-        title="User Management"
-        description="Search registered learners, inspect level/XP velocity, and manage access roles."
-        icon={Users}
-      />
-
-      {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-xl bg-admin-surface border border-admin-border">
-        <div className="relative flex-1">
-          <input
-            type="text"
+    <AdminPageShell
+      title="User Management"
+      description="Search registered learners, inspect level/XP velocity, and manage access roles."
+      icon={Users}
+      toolbar={
+        <>
+          <AdminSearchInput
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onValueChange={setSearchQuery}
             placeholder="Search learners by name or email..."
-            className="w-full px-3 py-2 rounded-lg bg-admin-bg border border-admin-border text-xs text-admin-fg placeholder-admin-fg-subtle focus:outline-none focus:border-admin-accent/50"
+            aria-label="Search learners"
+            className="flex-1"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value as 'all' | 'admin' | 'learner')}
-            className="px-3 py-2 rounded-lg bg-admin-bg border border-admin-border text-xs text-admin-fg-muted focus:outline-none focus:border-admin-accent/50"
-          >
-            <option value="all">All Roles</option>
-            <option value="learner">Learners Only</option>
-            <option value="admin">Admins Only</option>
-          </select>
-          <span className="text-xs text-admin-fg-subtle font-mono">
-            {filteredUsers.length} of {initialUsers.length}
-          </span>
-        </div>
-      </div>
-
+          <div className="flex items-center gap-2">
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value as 'all' | 'admin' | 'learner')}
+              className="px-3 py-2 rounded-lg bg-admin-bg border border-admin-border text-xs text-admin-fg-muted focus:outline-none focus:border-admin-accent/50"
+            >
+              <option value="all">All Roles</option>
+              <option value="learner">Learners Only</option>
+              <option value="admin">Admins Only</option>
+            </select>
+            <span className="text-xs text-admin-fg-subtle font-mono">
+              {filteredUsers.length} of {initialUsers.length}
+            </span>
+          </div>
+        </>
+      }
+    >
       <AdminDataTable
         columns={columns}
         data={filteredUsers}
@@ -187,6 +184,6 @@ export function UserManagementView({ initialUsers, initialSelectedUser }: UserMa
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}
       />
-    </div>
+    </AdminPageShell>
   )
 }

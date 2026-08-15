@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { createAuthenticatedServerClient } from '@/lib/supabase'
 import { isAdminUser } from '@/lib/admin/authorization'
+import { AdminConsoleService } from '@/lib/admin/service'
 import { AdminConsoleShell } from '@/components/admin/AdminConsoleShell'
 
 export const metadata = {
@@ -46,8 +47,30 @@ export default async function AdminConsoleLayout({ children }: { children: React
     email: user.email || '',
   }
 
+  // Live shell context: sidebar attention badges + header status chip.
+  let attention: Record<string, number> | undefined
+  let attentionTotal = 0
+  let systemOnline = true
+  try {
+    const ctx = await AdminConsoleService.getConsoleShellContext()
+    attention = {
+      '/admin/communications': ctx.attention.contactMessages + ctx.attention.failedEmails,
+      '/admin/feedback': ctx.attention.pendingTestimonials,
+      '/admin/system': ctx.attention.systemErrors,
+    }
+    attentionTotal = ctx.attentionTotal
+    systemOnline = ctx.systemOnline
+  } catch {
+    // Shell context is best-effort; fall back to no badges / online.
+  }
+
   return (
-    <AdminConsoleShell user={adminUser}>
+    <AdminConsoleShell
+      user={adminUser}
+      attention={attention}
+      attentionTotal={attentionTotal}
+      systemOnline={systemOnline}
+    >
       {children}
     </AdminConsoleShell>
   )

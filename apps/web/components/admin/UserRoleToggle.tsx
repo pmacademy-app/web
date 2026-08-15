@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import { Shield, Loader2, Check } from 'lucide-react'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
+import { AdminConfirmDialog } from '@/components/admin/AdminConfirmDialog'
+import { useAdminToast } from '@/components/admin/admin-toast'
 
 export interface UserRoleToggleProps {
   userId: string
@@ -11,17 +13,17 @@ export interface UserRoleToggleProps {
 }
 
 export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleToggleProps) {
+  const { toast } = useAdminToast()
   const [isAdmin, setIsAdmin] = useState(initialIsAdmin)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const nextRole = !isAdmin
+  const actionLabel = nextRole ? 'promote to ADMIN' : 'demote to LEARNER'
 
   const handleToggleRole = async () => {
-    const nextRole = !isAdmin
-    const actionLabel = nextRole ? 'promote to ADMIN' : 'demote to LEARNER'
-    if (!confirm(`Are you sure you want to ${actionLabel} for user ${userEmail}?`)) {
-      return
-    }
-
+    setConfirmOpen(false)
     setLoading(true)
     setSuccess(false)
 
@@ -39,12 +41,13 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
       if (res.ok && data.success) {
         setIsAdmin(nextRole)
         setSuccess(true)
+        toast(`User ${userEmail} is now ${nextRole ? 'an Admin' : 'a Learner'}.`, 'success')
         setTimeout(() => setSuccess(false), 3000)
       } else {
-        alert(data.error || 'Failed to update user role.')
+        toast(data.error || 'Failed to update user role.', 'error')
       }
     } catch {
-      alert('Network error updating user role.')
+      toast('Network error updating user role.', 'error')
     } finally {
       setLoading(false)
     }
@@ -57,7 +60,7 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
         label={isAdmin ? 'Admin' : 'Learner'}
       />
       <button
-        onClick={handleToggleRole}
+        onClick={() => setConfirmOpen(true)}
         disabled={loading}
         className={`px-2.5 py-1 rounded text-[11px] font-semibold border transition-all inline-flex items-center gap-1 ${
           isAdmin
@@ -74,6 +77,17 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
         )}
         <span>{isAdmin ? 'Demote to Learner' : 'Make Admin'}</span>
       </button>
+
+      <AdminConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title={`${nextRole ? 'Promote' : 'Demote'} ${userEmail}?`}
+        description={`Are you sure you want to ${actionLabel}? This changes their access level in the console.`}
+        confirmLabel={nextRole ? 'Make Admin' : 'Demote to Learner'}
+        destructive={!nextRole}
+        onConfirm={handleToggleRole}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   )
 }

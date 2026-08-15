@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Send, Loader2, Check } from 'lucide-react'
+import { useAdminToast } from '@/components/admin/admin-toast'
 
 export interface SendTestEmailButtonProps {
   templateKey: string
@@ -9,6 +10,7 @@ export interface SendTestEmailButtonProps {
 }
 
 export function SendTestEmailButton({ templateKey, templateName }: SendTestEmailButtonProps) {
+  const { toast } = useAdminToast()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
@@ -32,12 +34,13 @@ export function SendTestEmailButton({ templateKey, templateName }: SendTestEmail
       const data = await res.json()
       if (res.ok && data.success) {
         setSuccess(true)
+        toast(`Test email sent to ${testEmail}.`, 'success')
         setTimeout(() => setSuccess(false), 3000)
       } else {
-        alert(data.error || 'Failed to send test email.')
+        toast(data.error || 'Failed to send test email.', 'error')
       }
     } catch {
-      alert('Network error sending test email.')
+      toast('Network error sending test email.', 'error')
     } finally {
       setLoading(false)
     }

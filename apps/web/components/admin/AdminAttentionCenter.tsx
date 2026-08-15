@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { BellRing, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { AdminSection } from './AdminSection'
 import type { AdminAttentionItem } from '@/lib/admin/types'
 
 interface AdminAttentionCenterProps {
@@ -15,20 +16,16 @@ const SEVERITY_STYLES: Record<AdminAttentionItem['severity'], { dot: string; bad
 }
 
 export function AdminAttentionCenter({ items }: AdminAttentionCenterProps) {
-  const hasAction = items.some((item) => item.count > 0)
+  // Only surface items that actually need action — zero-count rows are noise.
+  const actionable = items.filter((item) => item.count > 0)
+  const hasAction = actionable.length > 0
 
   return (
-    <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
-      <div className="flex items-center justify-between border-b border-admin-border pb-4">
-        <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-          <BellRing className="w-4 h-4 text-admin-accent" />
-          Attention Center
-        </h2>
-        <span className="text-[11px] font-mono text-admin-fg-muted">
-          {items.filter((i) => i.count > 0).length} of {items.length} need review
-        </span>
-      </div>
-
+    <AdminSection
+      title="Needs Attention"
+      icon={BellRing}
+      meta={hasAction ? `${actionable.length} of ${items.length} need review` : 'All clear'}
+    >
       {!hasAction ? (
         <div className="p-4 rounded-lg bg-admin-success-soft border border-admin-success/25 flex items-center gap-3">
           <span className="w-2 h-2 rounded-full bg-admin-success shrink-0" />
@@ -41,7 +38,7 @@ export function AdminAttentionCenter({ items }: AdminAttentionCenterProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {items.map((item) => {
+          {actionable.map((item) => {
             const styles = SEVERITY_STYLES[item.severity]
             return (
               <div
@@ -59,21 +56,19 @@ export function AdminAttentionCenter({ items }: AdminAttentionCenterProps) {
                   <span className={cn('px-2 py-0.5 rounded-full text-[10px] font-bold border', styles.badge)}>
                     {item.count}
                   </span>
-                  {item.count > 0 && (
-                    <Link
-                      href={item.href}
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-admin-accent hover:underline"
-                    >
-                      {item.actionLabel}
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  )}
+                  <Link
+                    href={item.href}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-admin-accent hover:underline"
+                  >
+                    {item.actionLabel}
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
                 </div>
               </div>
             )
           })}
         </div>
       )}
-    </div>
+    </AdminSection>
   )
 }

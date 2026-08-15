@@ -18,6 +18,7 @@ function AdminDrawer({
   description,
   children,
   side = 'right',
+  size = 'md',
   className,
 }: {
   open: boolean
@@ -26,10 +27,12 @@ function AdminDrawer({
   description?: string
   children: React.ReactNode
   side?: 'left' | 'right'
+  size?: 'sm' | 'md' | 'lg'
   className?: string
 }) {
   const sideClass =
     side === 'right' ? 'right-0 top-0 h-full' : 'left-0 top-0 h-full'
+  const sizeClass = size === 'sm' ? 'max-w-sm' : size === 'lg' ? 'max-w-2xl' : 'max-w-md'
   const shellRef = useAdminShell()
 
   return (
@@ -38,7 +41,8 @@ function AdminDrawer({
         <DrawerPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] data-closed:animate-out data-closed:fade-out-0 data-open:animate-in data-open:fade-in-0" />
         <DrawerPrimitive.Popup
           className={cn(
-            'fixed z-50 flex w-full max-w-md flex-col gap-4 bg-admin-surface p-5 text-admin-fg shadow-2xl outline-none ring-1 ring-admin-border duration-200 data-closed:animate-out data-open:animate-in',
+            'fixed z-50 flex w-full flex-col gap-4 bg-admin-surface p-5 text-admin-fg shadow-2xl outline-none ring-1 ring-admin-border duration-200 data-closed:animate-out data-open:animate-in',
+            sizeClass,
             side === 'right'
               ? 'data-closed:slide-out-to-right data-open:slide-in-from-right'
               : 'data-closed:slide-out-to-left data-open:slide-in-from-left',

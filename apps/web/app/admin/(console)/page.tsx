@@ -10,7 +10,7 @@ import {
   Award,
   Activity,
 } from 'lucide-react'
-import { AdminConsoleService } from '@/lib/admin/service'
+import { DashboardService } from '@/lib/admin/dashboard-service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminDashboardRefreshButton } from '@/components/admin/AdminDashboardRefreshButton'
@@ -35,21 +35,21 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
   const from = typeof params.from === 'string' ? params.from : null
   const to = typeof params.to === 'string' ? params.to : null
 
-  const data = await AdminConsoleService.getDashboardData(range, from, to)
+  const data = await DashboardService.getDashboardData(range, from, to)
   const { kpis } = data
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 
   const trend = (value: number | null, positiveIsGood = true) => {
-    if (value === null) return undefined
-    const isPositive = value >= 0
+    if (value === null || value === 0) return undefined
+    const isPositive = value > 0
     const good = positiveIsGood ? isPositive : !isPositive
     return { value: `${isPositive ? '+' : ''}${value}%`, positive: good }
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageHeader
         title={`${greeting}, Admin`}
         description="Here's what needs your attention today."
@@ -64,7 +64,7 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
         }
       />
 
-      {/* Attention Center */}
+      {/* Needs Attention */}
       <AdminAttentionCenter items={data.attention} />
 
       {/* KPI Grid */}
@@ -72,7 +72,7 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
         <AdminKpiCard
           title="Total Users"
           value={kpis.totalUsers.toLocaleString()}
-          subtitle="Registered accounts"
+          subtitle="All-time registered accounts"
           icon={Users}
           trend={trend(kpis.trends.totalUsers)}
         />
@@ -95,7 +95,7 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
         <AdminKpiCard
           title="Verified Users"
           value={kpis.verifiedUsers.toLocaleString()}
-          subtitle="Accounts with confirmed email"
+          subtitle="All-time verified accounts"
           icon={ShieldCheck}
           iconColor="text-admin-success"
           trend={trend(kpis.trends.verifiedUsers)}
@@ -136,27 +136,8 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
-          <div className="flex items-center justify-between border-b border-admin-border pb-4">
-            <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-              <Users className="w-4 h-4 text-admin-accent" />
-              Learner Activity
-            </h2>
-            <span className="text-[11px] font-mono text-admin-fg-muted">Daily</span>
-          </div>
-          <AdminLearnerActivityChart data={data.series} />
-        </div>
-
-        <div className="p-6 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-xl">
-          <div className="flex items-center justify-between border-b border-admin-border pb-4">
-            <h2 className="text-sm font-bold text-admin-fg uppercase tracking-wider flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-admin-accent" />
-              Learning Activity
-            </h2>
-            <span className="text-[11px] font-mono text-admin-fg-muted">Daily</span>
-          </div>
-          <AdminLearningActivityChart data={data.series} />
-        </div>
+        <AdminLearnerActivityChart data={data.series} />
+        <AdminLearningActivityChart data={data.series} />
       </div>
 
       {/* Funnel + Recent Activity */}

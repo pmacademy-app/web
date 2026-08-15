@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useAdminToast } from '@/components/admin/admin-toast'
 
 export interface FeatureFlagToggleProps {
   flagKey: string
@@ -9,6 +10,7 @@ export interface FeatureFlagToggleProps {
 }
 
 export function FeatureFlagToggle({ flagKey, initialEnabled }: FeatureFlagToggleProps) {
+  const { toast } = useAdminToast()
   const [enabled, setEnabled] = useState(initialEnabled)
   const [loading, setLoading] = useState(false)
 
@@ -29,11 +31,12 @@ export function FeatureFlagToggle({ flagKey, initialEnabled }: FeatureFlagToggle
       const data = await res.json()
       if (res.ok && data.success) {
         setEnabled(nextState)
+        toast(`Feature flag "${flagKey}" ${nextState ? 'enabled' : 'disabled'}.`, 'success')
       } else {
-        alert(data.error || 'Failed to toggle feature flag.')
+        toast(data.error || 'Failed to toggle feature flag.', 'error')
       }
     } catch {
-      alert('Network error toggling feature flag.')
+      toast('Network error toggling feature flag.', 'error')
     } finally {
       setLoading(false)
     }
