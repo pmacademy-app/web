@@ -42,9 +42,9 @@ export function AdminPagination({
       onClick={() => onPageChange(page)}
       aria-current={page === currentPage ? 'page' : undefined}
       className={cn(
-        'min-w-8 h-8 px-2 rounded-lg text-xs font-semibold transition-colors',
+        'min-w-8 h-8 px-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50',
         page === currentPage
-          ? 'bg-admin-accent text-admin-accent-fg'
+          ? 'bg-admin-accent text-admin-accent-fg font-bold'
           : 'text-admin-fg-muted hover:bg-admin-surface-raised hover:text-admin-fg'
       )}
     >
@@ -69,7 +69,7 @@ export function AdminPagination({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
           aria-label="Previous page"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
         >
           <ChevronLeftIcon className="w-4 h-4" />
         </button>
@@ -81,7 +81,7 @@ export function AdminPagination({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
           aria-label="Next page"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-admin-fg-muted transition-colors hover:bg-admin-surface-raised hover:text-admin-fg disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/50"
         >
           <ChevronRightIcon className="w-4 h-4" />
         </button>
