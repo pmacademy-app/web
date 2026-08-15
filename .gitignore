@@ -37,3 +37,6 @@ Thumbs.db
 # PM Academy content pipeline
 /content/.cache/
 /content/dist/
+
+opencode.json
+.tokencap/

@@ -47,6 +47,36 @@ This lesson assumes the cumulative content of the entire curriculum to this poin
 This curriculum has given you a genuinely large toolkit: prioritization logic (Lesson 29), the Iteration Loop and its concrete implementations in Scrum and Kanban (Lessons 31–33), a full metrics and experimentation discipline (Lessons 41–45), growth mechanics (Lesson 46), stakeholder and communication frameworks (Lessons 47, 51–54), leadership and ethical reasoning (Lessons 55, 57). Each was built to be genuinely useful in the specific situation it addresses. But real product work rarely arrives labeled with which lesson applies — a genuinely novel situation often requires blending several frameworks, recognizing that none quite fits and adapting one, or falling back on something more fundamental than any single named model: a set of actual beliefs about what matters and why.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Specific frameworks:<br/>Iteration Loop, Metric Definition Test,<br/>Trust Ladder, Harm Radius...] --> B[Applied correctly to<br/>situations they were built for]
     C[Novel situation with<br/>no clean framework match] --> D{What actually<br/>guides the decision?}
@@ -116,6 +146,36 @@ A philosophy phrased so abstractly that it could justify almost any decision pro
 *(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention — and, fittingly, the final new mental model this curriculum's foundational arc introduces.)*
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Beliefs about users] --> F[Your Product Philosophy]
     B[Beliefs about evidence] --> F

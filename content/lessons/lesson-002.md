@@ -78,7 +78,7 @@ A **product** (or a product team responsible for it) is typically funded on an o
 
 ## Common Beginner Mistakes
 
-**Mistake 1: "The redesign project is done, so my job here is done."**
+**Mistake 1: Treating a completed redesign project as proof the underlying product problem is solved**
 
 A new PM ships a redesign, closes out the project plan, and moves fully on to the next initiative without measuring what the redesign actually did to user behavior. The project (the redesign) is indeed done. The product's need for that redesign to actually work is not something a completed project checklist can confirm — only outcome measurement (Module 4) can.
 

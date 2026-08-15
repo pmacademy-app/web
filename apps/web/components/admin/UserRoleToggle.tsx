@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Shield, Loader2, Check } from 'lucide-react'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminConfirmDialog } from '@/components/admin/AdminConfirmDialog'
@@ -14,6 +15,7 @@ export interface UserRoleToggleProps {
 
 export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleToggleProps) {
   const { toast } = useAdminToast()
+  const router = useRouter()
   const [isAdmin, setIsAdmin] = useState(initialIsAdmin)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -43,6 +45,8 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
         setSuccess(true)
         toast(`User ${userEmail} is now ${nextRole ? 'an Admin' : 'a Learner'}.`, 'success')
         setTimeout(() => setSuccess(false), 3000)
+        // Re-fetch the server-rendered list so the table's role badge stays in sync.
+        router.refresh()
       } else {
         toast(data.error || 'Failed to update user role.', 'error')
       }

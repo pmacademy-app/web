@@ -47,6 +47,36 @@ This lesson assumes **Lesson 1's** foundational framing of the PM's responsibili
 A foundational distinction from negotiation theory, most closely associated with Roger Fisher and William Ury's *Getting to Yes*: a **position** is what someone says they want ("I need your team to prioritize this integration next Sprint"); an **interest** is the underlying reason they want it (a genuine business need, a personal incentive, a concern about risk). Negotiating over positions tends to produce adversarial, zero-sum dynamics — if two positions directly conflict, one side must "win" and the other "lose." Negotiating over interests frequently reveals that two seemingly conflicting positions are actually compatible, or that a creative solution exists serving both parties' underlying interests better than either party's original stated position.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Visible: Positions<br/>(what each side says they want)"] --> B["Hidden: Interests<br/>(why they actually want it)"]
     B --> C{Do the underlying<br/>interests actually conflict,<br/>or just the stated positions?}
@@ -111,6 +141,36 @@ Some PMs, anticipating conflict, approach every request defensively, missing opp
 This lesson's core takeaway tool visualizes the relationship between visible positions and hidden interests as an iceberg, where most of what actually determines a negotiation's outcome lies beneath the surface:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Visible above water:<br/>Stated Position<br/>('I need X prioritized')"] --> B["Hidden beneath the surface:<br/>Actual Interests<br/>(career incentives, risk concerns,<br/>competing pressures, genuine goals)"]
     B --> C{Explore the hidden<br/>interests before<br/>responding to the position}

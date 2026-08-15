@@ -28,10 +28,10 @@ async function runAuditFixesTests() {
 
   // 2. Verify Admin getUsersOverview discovers and marks unverified accounts
   const usersOverview = await AdminConsoleService.getUsersOverview(10)
-  if (Array.isArray(usersOverview)) {
-    console.log(`  ✓ AdminConsoleService.getUsersOverview successfully fetched ${usersOverview.length} merged accounts with isVerified flags`)
+  if (usersOverview && Array.isArray(usersOverview.users) && typeof usersOverview.total === 'number') {
+    console.log(`  ✓ AdminConsoleService.getUsersOverview returned ${usersOverview.users.length} merged accounts (total: ${usersOverview.total}) with isVerified flags`)
   } else {
-    throw new Error('AdminConsoleService.getUsersOverview failed to return an array')
+    throw new Error('AdminConsoleService.getUsersOverview failed to return { users, total }')
   }
 
   // 3. Verify Admin Production Email for missing/invalid target user logs system error

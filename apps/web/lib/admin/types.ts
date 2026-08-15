@@ -29,8 +29,112 @@ export interface AdminUserOverview {
   level: number
   streakDays: number
   hasPublicPortfolio?: boolean
+  /** Curriculum completion percentage (0–100). */
+  progressPct: number
   createdAt: string
   lastActiveAt: string | null
+}
+
+/** Server-side filter set for the Users workspace (Phase 3). */
+export interface AdminUserFilters {
+  verification?: 'verified' | 'unverified'
+  role?: 'admin' | 'learner'
+  /** `active` = earned XP within the last 30 days. */
+  activity?: 'active' | 'inactive'
+  /** `none` = 0 lessons, `started` = 1–99%, `completed` = 100%. */
+  progress?: 'none' | 'started' | 'completed'
+  /** Minimum level (inclusive). */
+  minLevel?: number
+  /** YYYY-MM-DD bounds on the signup date. */
+  joinedFrom?: string
+  joinedTo?: string
+  /** YYYY-MM-DD bounds on the last-active date. */
+  activeFrom?: string
+  activeTo?: string
+  sort?: 'createdAt' | 'lastActiveAt' | 'totalXp' | 'level' | 'streakDays' | 'progressPct'
+  sortDir?: 'asc' | 'desc'
+}
+
+/** Paginated result of the Users workspace list query. */
+export interface AdminUserListResult {
+  users: AdminUserOverview[]
+  total: number
+  /** True when the query failed and `users`/`total` are empty fallbacks. */
+  failed?: boolean
+}
+
+/** Per-module progress row for the Learning tab. */
+export interface AdminUserModuleProgress {
+  slug: string
+  title: string
+  lessonsCompleted: number
+  lessonsTotal: number
+  completedPct: number
+}
+
+export type AdminUserActivityType =
+  | 'lesson_completed'
+  | 'quiz_attempted'
+  | 'badge_earned'
+  | 'certificate_issued'
+  | 'reflection_created'
+  | 'capstone_submitted'
+
+/** One row in the user Activity timeline. */
+export interface AdminUserActivityItem {
+  id: string
+  type: AdminUserActivityType
+  label: string
+  detail: string
+  timestamp: string
+}
+
+export interface AdminUserBadge {
+  id: string
+  key: string
+  name: string
+  description: string
+  icon: string
+  earnedAt: string
+}
+
+export interface AdminUserCertificate {
+  id: string
+  code: string
+  type: string
+  issuedAt: string
+}
+
+export interface AdminUserCapstone {
+  id: string
+  moduleSlug: string
+  moduleTitle: string
+  status: string
+  isPublic: boolean
+  submittedAt: string
+}
+
+export interface AdminUserEmail {
+  id: string
+  templateKey: string
+  status: string
+  createdAt: string
+}
+
+export interface AdminUserNotification {
+  id: string
+  title: string
+  category: string
+  isRead: boolean
+  createdAt: string
+}
+
+export interface AdminUserContact {
+  id: string
+  subject: string
+  category: string
+  status: string
+  createdAt: string
 }
 
 export interface AdminUserDetail extends AdminUserOverview {
@@ -45,6 +149,46 @@ export interface AdminUserDetail extends AdminUserOverview {
     allEmail: boolean
     allInApp: boolean
     timezone: string
+  }
+  /* ─── Phase 3 — User detail tabs ─────────────────────────────────────── */
+  kpis: {
+    level: number
+    xp: number
+    streakDays: number
+    courseProgressPct: number
+  }
+  learning: {
+    courseProgressPct: number
+    lessonsCompleted: number
+    lessonsTotal: number
+    quizAttempts: number
+    quizAvgScore: number | null
+    srsReviews: number
+    modules: AdminUserModuleProgress[]
+  }
+  activity: AdminUserActivityItem[]
+  achievements: {
+    badges: AdminUserBadge[]
+    certificates: AdminUserCertificate[]
+    capstone: AdminUserCapstone | null
+    portfolio: { hasPortfolio: boolean; url: string | null; isPublic: boolean }
+  }
+  communications: {
+    emails: AdminUserEmail[]
+    notifications: AdminUserNotification[]
+    contacts: AdminUserContact[]
+  }
+  account: {
+    email: string
+    verified: boolean
+    emailConfirmedAt: string | null
+    createdAt: string
+    lastActiveAt: string | null
+    role: string
+    isAdmin: boolean
+    goal: string | null
+    timezone: string | null
+    authProvider: string | null
   }
 }
 

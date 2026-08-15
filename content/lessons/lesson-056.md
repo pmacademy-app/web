@@ -47,6 +47,36 @@ This lesson assumes **Lesson 55's** treatment of the individual-contributor-to-l
 Many mature product organizations maintain two parallel career ladders: a **management track** (Associate PM → PM → Senior PM → Group PM/Director → VP of Product), where increasing seniority means leading larger teams of other PMs, and an **individual-contributor (IC) track** (PM → Senior PM → Staff PM → Principal PM → Distinguished/Fellow-level PM), where increasing seniority means taking on broader, more strategically significant individual product ownership without directly managing other PMs. Both tracks can lead to comparable compensation, influence, and organizational seniority — the distinction is not "management is the real career path and IC is a consolation prize," but rather two genuinely different ways of adding increasing value as a PM's career progresses.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[PM] --> B["Management Track:<br/>Senior PM → Group PM/Director → VP<br/>(leads increasingly large teams of PMs)"]
     A --> C["IC Track:<br/>Senior PM → Staff PM → Principal PM<br/>(owns increasingly broad/complex<br/>product scope directly)"]
@@ -59,6 +89,36 @@ An organization or individual that treats the management track as the only legit
 Career progression, on either track, is best understood as an increase in the **scope** of ownership and impact a PM is responsible for, rather than simply a title change:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Single feature<br/>within a product"] --> B["A full product<br/>or product line"] --> C["A portfolio of<br/>related products"] --> D["Company-wide<br/>product strategy"]
 ```
@@ -105,6 +165,36 @@ As covered in Theory, structured programs (like APM programs) illustrate that de
 *(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Feature scope] --> B[Product scope] --> C[Portfolio scope] --> D[Company strategy scope]
 ```

@@ -53,6 +53,36 @@ A model can score well against the metric it was optimized for and still fail th
 This lesson introduces the **Ownership Zones Model**, dividing the path from a business problem to a shipped model-driven product decision into four zones:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Zone 1: Problem Framing<br/>(PM owns)"] --> B["Zone 2: Model Development<br/>(Data Science owns)"]
     B --> C["Zone 3: Output Interpretation<br/>(Shared)"]
@@ -68,6 +98,36 @@ The most common and costly failure in PM/data-science collaboration is a breakdo
 **Precision** measures, of everything the model flagged as positive (for example, "will churn"), what fraction actually was positive. **Recall** measures, of everything that actually was positive, what fraction the model successfully flagged. These two properties trade off against each other, and which one to prioritize is fundamentally a **product decision about the relative cost of two different kinds of errors**, not a purely technical one.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     E["False Positive<br/>(model wrongly flags a loyal customer as churn risk)"] -->|"Cost: wasted retention offer,<br/>possible annoyance"| Cost1[Business Cost]
     F["False Negative<br/>(model misses an actual churn risk)"] -->|"Cost: lost customer,<br/>no intervention attempted"| Cost2[Business Cost]

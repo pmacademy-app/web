@@ -16,7 +16,7 @@ export async function GET(request: Request, { params }: Context) {
 
   try {
     const { id } = await params
-    const userDetail = await AdminConsoleService.getUserDetail(id)
+    const userDetail = await AdminConsoleService.getUserDetailData(id)
 
     if (!userDetail) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })

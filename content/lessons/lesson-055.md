@@ -47,6 +47,36 @@ This lesson assumes **Lesson 37's** discussion of team boundaries and the refere
 The central adjustment required when moving from individual-contributor PM work to leading a team of PMs is a shift from personally making decisions to enabling other people to make good decisions. This is a genuinely different skill, not simply "the same job at a larger scale." An individual-contributor PM is evaluated on the quality of their own prioritization, their own stakeholder relationships, their own product judgment. A PM leader is evaluated on whether the PMs they lead are making consistently good decisions, building trust with their own stakeholders, and growing in their own judgment over time — outcomes a leader achieves primarily through coaching, structure, and delegation, not through personally re-deciding everything their reports bring to them.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Individual contributor:<br/>evaluated on own decisions<br/>and outcomes"] --> B["Leadership transition"]
     B --> C["Team leader:<br/>evaluated on team's<br/>collective decisions and growth"]
@@ -71,6 +101,36 @@ No structure is universally correct; the right choice depends on the product's a
 Extending Lesson 37's brief reference to *Team Topologies* by Matthew Skelton and Manuel Pais: a useful diagnostic distinguishes **stream-aligned teams** (organized around a continuous flow of work toward a specific customer or business outcome, with broad autonomy to deliver it end-to-end) from **platform teams** (providing shared, reusable capabilities that reduce the cognitive load stream-aligned teams would otherwise carry). A product organization experiencing significant coordination overhead or duplicated effort across teams often has a topology mismatch — too many stream-aligned teams independently rebuilding similar underlying capabilities (suggesting an under-invested platform layer), or an over-centralized platform team that has become a bottleneck every stream-aligned team must wait on (suggesting the platform has taken on too much, or coordination with it has become too heavy).
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Multiple teams experiencing<br/>friction or duplication] --> B{Are teams independently<br/>rebuilding similar<br/>underlying capabilities?}
     B -->|Yes| C[Under-invested platform layer —<br/>consider consolidating<br/>shared capability]
@@ -114,6 +174,36 @@ Being an excellent individual-contributor PM does not automatically make someone
 This lesson's core takeaway tool visualizes the specific behavioral change required at the individual-contributor-to-leader transition, framed as a shift in where judgment is exercised:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["IC habit:<br/>'I make the decision'"] --> B["Leadership shift"]
     B --> C["Leader habit:<br/>'I coach toward a good decision,<br/>made by the person closest to it'"]

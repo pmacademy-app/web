@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { AdminConsoleService } from '@/lib/admin/service'
+import { parseUserFilters } from '@/lib/admin/users-aggregation'
 
 export async function GET(request: Request) {
   const authGuard = await requireAdminUser(request)
@@ -10,11 +11,16 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const search = searchParams.get('search') || ''
-  const limit = parseInt(searchParams.get('limit') || '50', 10)
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '25', 10) || 25))
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1)
+  const filters = parseUserFilters(Object.fromEntries(searchParams.entries()))
 
   try {
-    const users = await AdminConsoleService.getUsersOverview(limit, search)
-    return NextResponse.json({ success: true, count: users.length, users })
+    const { users, total, failed } = await AdminConsoleService.getUsersOverview(limit, search, filters, page)
+    if (failed) {
+      return NextResponse.json({ success: false, error: 'Failed to fetch users' }, { status: 500 })
+    }
+    return NextResponse.json({ success: true, count: users.length, total, users })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch users'
     return NextResponse.json({ success: false, error: message }, { status: 500 })

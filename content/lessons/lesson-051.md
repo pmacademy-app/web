@@ -50,6 +50,36 @@ This lesson also assumes the reader is picking up mid-curriculum, following the 
 The single most important structural shift for executive communication, relative to more detailed peer or team communication, is leading with the conclusion rather than building up to it. **BLUF** means stating the recommendation, decision, or key finding in the very first sentence or two, before any supporting context or reasoning follows. This inverts the natural instinct many people have to build a case chronologically — background, then analysis, then conclusion — which works reasonably well for an audience with time to follow the full argument, but frequently fails with an executive audience, who may only have attention for the first thirty seconds of a document or the first minute of a conversation before needing to move to a decision or the next topic.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Natural instinct:<br/>Background → Analysis → Conclusion"]
     B["BLUF:<br/>Conclusion → Supporting reasoning → Detail (as needed)"]
@@ -60,6 +90,36 @@ graph LR
 A closely related, more formalized framework, developed by Barbara Minto for structuring persuasive business communication, organizes an argument as a pyramid: the main conclusion sits at the top, a small number of key supporting arguments sit beneath it, and detailed evidence for each supporting argument sits at the base, accessible if needed but not required reading for the top-level conclusion to make sense. The key discipline the Pyramid Principle enforces is that each level should be a complete, standalone answer at its own level of detail — an executive should be able to read only the top line and understand the recommendation, read the top line plus the supporting arguments and understand *why*, and only descend to the base level of detailed evidence if they want to verify or challenge a specific claim.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Top: Main conclusion/recommendation"]
     A --> B["Supporting argument 1"]
@@ -75,6 +135,36 @@ graph TD
 Extending Lesson 47's power/interest grid: communication with an executive typically needs to operate at a higher **altitude** — a higher level of abstraction, focused on decisions, trade-offs, and outcomes rather than implementation detail — than communication with a peer or a detailed stakeholder. This does not mean detail is unimportant; it means detail should be available on request (echoing the Pyramid Principle's base layer) rather than presented by default. A PM who presents the same level of granular, Sprint-level detail to an executive that they would appropriately share with an engineering team has miscalibrated the Altitude Dial — not because the detail is wrong, but because it's pitched at the wrong level for that specific audience's actual decision-making needs.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Low altitude:<br/>Sprint tickets, code detail<br/>(appropriate for eng team)"] --> B["Medium altitude:<br/>Feature status, timelines<br/>(appropriate for cross-functional stakeholders)"] --> C["High altitude:<br/>Strategic trade-offs, decisions needed,<br/>business impact<br/>(appropriate for executives)"]
 ```
@@ -115,6 +205,36 @@ An update that shares information without clarifying what decision or action is 
 *(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Conclusion/Recommendation<br/>(readable alone)"]
     A --> B["Why #1"]

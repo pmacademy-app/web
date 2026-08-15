@@ -47,6 +47,36 @@ This lesson assumes **Lesson 45's** experimentation rigor, since evaluating AI f
 Traditional software, given the same input, reliably produces the same output — a bug, once fixed, stays fixed; a feature, once verified working, generally continues working the same way. Many AI systems, particularly large language models, are fundamentally **probabilistic**: the same prompt can produce meaningfully different outputs across different invocations, and a system's overall quality is better described as a distribution of possible outputs than a single, fixed behavior. This has a direct, practical consequence for product evaluation: testing an AI feature with a handful of manual examples, the way a PM might sanity-check a traditional feature before launch, provides far weaker assurance of genuine quality than the same practice would for deterministic software, since a handful of good outputs doesn't rule out a meaningfully high rate of poor ones elsewhere in the distribution.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Traditional software:<br/>same input → same output<br/>(deterministic)"] --> B[Manual spot-check<br/>provides strong assurance]
     C["AI feature:<br/>same input → distribution<br/>of possible outputs"] --> D[Manual spot-check provides<br/>weak assurance —<br/>systematic evaluation needed]
@@ -61,6 +91,36 @@ The primary tool for addressing this gap is an **evaluation set (eval set)**: a 
 A specific new design challenge AI features introduce: helping users form **calibrated trust** — confidence in the system's outputs that accurately reflects the system's actual reliability, neither more nor less. **Over-trust** occurs when users treat AI outputs as more reliable than they actually are, acting on incorrect information without verification, a specific risk given that AI-generated text is often fluent and confident-sounding regardless of its actual accuracy. **Under-trust** occurs when users, burned by an early bad experience or general skepticism, discount genuinely useful and accurate AI outputs, failing to realize the value the feature could provide.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[AI feature output] --> B{Does the user's trust<br/>match the output's<br/>actual reliability?}
     B -->|Over-trust| C[User acts on incorrect<br/>output without verification —<br/>risk of real harm]
@@ -106,6 +166,36 @@ Extending Lesson 57's ethical framework directly: a PM shipping an AI feature be
 This lesson's core takeaway tool visualizes the relationship a well-designed AI feature should maintain between a system's actual reliability and the trust users place in it:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Low actual reliability<br/>(e.g., novel, ambiguous requests)"] --> B["Low user trust:<br/>heavy verification,<br/>clear low-confidence signaling"]
     C["High actual reliability<br/>(e.g., well-tested, common cases)"] --> D["Higher user trust:<br/>lighter-touch verification,<br/>appropriate confidence"]
