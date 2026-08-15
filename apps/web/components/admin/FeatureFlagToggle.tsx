@@ -7,14 +7,16 @@ import { useAdminToast } from '@/components/admin/admin-toast'
 export interface FeatureFlagToggleProps {
   flagKey: string
   initialEnabled: boolean
+  disabled?: boolean
 }
 
-export function FeatureFlagToggle({ flagKey, initialEnabled }: FeatureFlagToggleProps) {
+export function FeatureFlagToggle({ flagKey, initialEnabled, disabled = false }: FeatureFlagToggleProps) {
   const { toast } = useAdminToast()
   const [enabled, setEnabled] = useState(initialEnabled)
   const [loading, setLoading] = useState(false)
 
   const handleToggle = async () => {
+    if (disabled) return
     const nextState = !enabled
     setLoading(true)
 
@@ -45,9 +47,11 @@ export function FeatureFlagToggle({ flagKey, initialEnabled }: FeatureFlagToggle
   return (
     <button
       onClick={handleToggle}
-      disabled={loading}
+      disabled={loading || disabled}
       className={`px-3 py-1 rounded text-[11px] font-bold border transition-colors inline-flex items-center gap-1.5 ${
-        enabled
+        disabled
+          ? 'opacity-50 cursor-not-allowed'
+          : enabled
           ? 'bg-admin-danger-soft hover:bg-admin-danger/20 text-admin-danger border-admin-danger/25'
           : 'bg-admin-success-soft hover:bg-admin-success/20 text-admin-success border-admin-success/25'
       }`}

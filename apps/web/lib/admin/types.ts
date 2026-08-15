@@ -595,3 +595,73 @@ export interface AdminLearningAnalytics {
   }
   series: AdminTimeSeriesPoint[]
 }
+
+/* ─── Phase 8 — Settings & Configuration ───────────────────────────────────── */
+
+export type SettingsSectionKey = 'product' | 'learning' | 'email' | 'notifications' | 'feature-flags'
+
+export interface ProductSettings {
+  // General
+  siteName: string
+  siteDescription: string
+  contactEmail: string
+  // Platform Behavior
+  maintenanceMode: boolean
+  allowSignups: boolean
+  requireEmailVerification: boolean
+  sessionTimeoutMinutes: number
+}
+
+export interface LearningSettings {
+  // XP
+  xpPerLessonComplete: number
+  xpPerQuizPass: number
+  xpPerFlashcardReview: number
+  xpPerReflection: number
+  // Streaks
+  streakFreezeEnabled: boolean
+  streakFreezeCostXp: number
+  // Certificates
+  certificateAutoIssue: boolean
+  certificateExpiryDays: number | null
+  // Learning Behavior
+  lessonCompletionRequiredForProgress: boolean
+  quizPassThreshold: number
+}
+
+export interface EmailSettings {
+  // Sending
+  fromName: string
+  fromEmail: string
+  replyToEmail: string
+  // Limits
+  dailySendLimit: number
+  hourlySendLimit: number
+  // Sender (read-only from env)
+  resendApiKeyConfigured: boolean
+  // Automation
+  retryFailedEmails: boolean
+  maxRetryAttempts: number
+  retryDelayMinutes: number
+}
+
+export interface NotificationSettings {
+  // Reminders
+  dailyReminderEnabled: boolean
+  dailyReminderTime: string // HH:MM
+  inactivityReminderDays: number
+  // Weekly Recap
+  weeklyRecapEnabled: boolean
+  weeklyRecapDay: number // 0-6 (Sunday=0)
+  weeklyRecapTime: string // HH:MM
+  // Defaults
+  defaultInAppEnabled: boolean
+  defaultEmailEnabled: boolean
+}
+
+export interface SettingsResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+  failed?: boolean
+}
