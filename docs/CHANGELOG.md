@@ -4,6 +4,26 @@ All notable changes to **Prodily PM Academy** (`pmacademy-app/web`) are document
 
 ---
 
+## [Post-Phase 10 Consolidation] — 2026-08-16
+### Changed
+- **Documentation**: Deleted `docs/admin-panel-ui-ux-spec.md` and `docs/admin-panel-implementation-plan.md` (planning documents, fully superseded by implementation). `docs/ADMIN_PANEL.md` rewritten as the primary, current Admin Panel reference.
+- **`docs/INDEX.md`**: Removed entries for the two deleted planning documents; updated `ADMIN_PANEL.md` description.
+- **`/admin/feature-flags`**: Fixed legacy redirect from `/admin/content` → `/admin/settings?section=feature-flags` (the correct location per final IA).
+- **`/admin/content`**: Replaced legacy content page with a redirect to `/admin/curriculum` (curriculum metrics) since the old page mixed curriculum stats + feature flags — both now have proper homes in the new IA.
+
+---
+
+## [`87b8b5a`] — 2026-08-16
+### Changed (Phase 10 — Final Production UI/UX Polish)
+- `AdminHeader`: Added `/admin/curriculum` to TITLES map; extended dynamic title derivation to cover nested curriculum, lesson and template editor routes.
+- `error.tsx` (admin console error boundary): Accepts both `reset` (Next.js standard) and `unstable_retry` (legacy); added `cursor-pointer` and `focus-visible` ring to the Try Again button.
+- `AdminDataTable`: Added `focus-visible:ring-2` to sortable column header buttons (previously had no keyboard focus indicator).
+- `AdminPagination`: Added `focus-visible` rings + `cursor-pointer` to all page buttons; added `font-bold` to active page for stronger non-colour distinction.
+- `AdminRangeSelector`: Added `focus-visible` rings to preset buttons and date inputs; added `px-2` padding to custom date range container.
+- `AnalyticsWorkspace`: Added `focus-visible` rings and `cursor-pointer` to tab nav links and Export button.
+
+---
+
 ## [`cad3bb8`] — 2026-08-14
 ### Added
 - Admin Panel Phase 2 (Dashboard / Operations Center): added `recharts` 3.x dependency (MIT, free) for dashboard time-series visualizations.
