@@ -27,7 +27,7 @@ const TITLES: Record<string, string> = {
   '/admin/achievements': 'Achievements',
   '/admin/achievements/badges': 'Badges',
   '/admin/achievements/certificates': 'Certificates',
-  '/admin/system': 'Health & Alerts',
+  '/admin/system': 'System',
   '/admin/analytics': 'Analytics',
   '/admin/settings': 'Settings',
   '/admin/feature-flags': 'Feature Flags',
