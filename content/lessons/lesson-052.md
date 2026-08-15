@@ -47,6 +47,36 @@ This lesson assumes **Lesson 51's** structural communication discipline, since s
 A widely used narrative reframing, popularized in business communication contexts by Donald Miller's StoryBrand framework, inverts a common instinct: rather than positioning a company or product as the hero of its own story, position the *customer* as the hero, and the product as the **guide** that helps the hero overcome an obstacle. This reframing matters because audiences — whether customers, executives, or internal teams — engage far more readily with a story where they can see themselves (or the people they're building for) as the protagonist facing a real problem, rather than a story that centers the product or company as the main character.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Customer<br/>(the Hero)"] --> B["faces a Problem"]
     B --> C["meets a Guide<br/>(the Product)"]
@@ -66,6 +96,36 @@ A simple, adaptable arc structures most effective product storytelling: **proble
 Neither data nor narrative alone reliably produces durable persuasion. Data without narrative is often forgettable and fails to generate genuine emotional investment — an audience can accept a statistic intellectually without it changing how they feel about a decision's urgency or importance. Narrative without data is memorable but not credible — a vivid story with no supporting evidence risks feeling like manipulation rather than genuine insight, and a sophisticated audience (particularly the executive audience from Lesson 51) will often discount an unsupported story specifically because it lacks the rigor their decision-making requires.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Data alone:<br/>credible but forgettable"] --> C[Weak persuasion]
     B["Narrative alone:<br/>memorable but not credible"] --> C
@@ -110,6 +170,36 @@ A narrative that meanders without ever reaching a clear point or ask undermines 
 This lesson's core takeaway tool visualizes the narrative arc as a spine that any product communication can be built around, regardless of format (a written memo, a live presentation, a roadmap review):
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Problem<br/>real, specific, evidenced] --> B[Guide<br/>the product/solution]
     B --> C[Plan<br/>specific proposed steps]

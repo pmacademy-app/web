@@ -47,6 +47,36 @@ This lesson assumes **Lesson 5's** original discussion of structural bias toward
 Not every stakeholder needs the same relationship or communication cadence. A widely used tool, the **power/interest grid**, classifies stakeholders along two dimensions — how much influence or authority they hold over the product's success, and how actively interested they are in its day-to-day details:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     subgraph High Power
     A["High Power, High Interest:<br/>Manage Closely<br/>(e.g., your direct exec sponsor)"]
@@ -65,6 +95,36 @@ A stakeholder in the "Manage Closely" quadrant warrants frequent, detailed, two-
 Recall Lesson 5's original framing: customer feedback that reaches a PM through internal channels — a sales team relaying a prospect's specific request, a support team escalating a vocal customer's complaint, a single large account's account manager pushing for a feature — is not a representative sample of the broader user base. It is filtered by who has the loudest voice, the most organizational access, or the most squeaky-wheel persistence, not by who represents the most common or most valuable underlying need.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Broad user base] --> B{Which users' voices<br/>actually reach the PM?}
     B --> C["Loud, well-connected,<br/>high-access customers<br/>(via sales/support channels)"]
@@ -114,6 +174,36 @@ A stakeholder who feels their specific situation wasn't genuinely considered, ev
 This lesson's core takeaway tool visualizes structural bias toward customer-channel signal as a filtering process, making the invisible amplification explicit so a PM can consciously counteract it:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[All users/customers] --> B[Amplification filter:<br/>sales access, support escalation,<br/>account size, persistence]
     B --> C[Signal that naturally<br/>reaches the PM]

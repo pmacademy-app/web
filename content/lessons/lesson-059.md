@@ -47,6 +47,36 @@ This lesson assumes **Lesson 47's** structural bias concept, since this lesson d
 **Internationalization (i18n)** refers to the technical work of building a product's underlying architecture to support multiple languages, regions, and formats — externalizing text strings rather than hardcoding them, supporting different date, currency, and number formats, accommodating text that expands or contracts significantly when translated, and supporting right-to-left languages where relevant. **Localization (l10n)** refers to the actual adaptation of a product for a specific market — translating and culturally adapting content, adjusting imagery and color choices, integrating locally relevant payment methods, and complying with local legal and regulatory requirements.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Internationalization (i18n):<br/>technical readiness —<br/>can the product support<br/>multiple markets at all?"] --> B["Localization (l10n):<br/>actual market-specific<br/>adaptation for a given market"]
 ```
@@ -58,6 +88,36 @@ A common and costly mistake conflates these two: a product can be genuinely well
 Localization work varies significantly in depth, and a common failure pattern is stopping at a shallower level than a market genuinely requires:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Surface: Text translation<br/>(words converted, literally)"] --> B["Formats: dates, currency,<br/>numbers, units"]
     B --> C["Cultural adaptation:<br/>imagery, color symbolism,<br/>tone, examples used"]
@@ -71,6 +131,36 @@ Text translation alone — converting words from one language to another without
 Directly extending Lesson 47's concept: a PM's own assumptions about "how users behave" or "what feels natural" are frequently not universal defaults, but specific artifacts of the market where the PM has spent the most time building and testing product. Decisions about navigation patterns, form field ordering, acceptable levels of directness in error messaging, or even which payment method feels like the obvious default are often silently shaped by a single market's conventions, and treating them as universal — without deliberate research into how genuinely different they may be elsewhere — repeats the same amplification-without-representativeness error Lesson 47 warned against, now operating along a geographic and cultural axis rather than a customer-channel one.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["PM's market-of-origin<br/>assumptions"] --> B{Deliberately researched<br/>and validated against<br/>the target market?}
     B -->|No| C[Risk: assumptions treated<br/>as universal defaults,<br/>silently mismatched to<br/>the new market's actual needs]
@@ -113,6 +203,36 @@ Even skilled literal translation can miss cultural nuance, connotation, or conte
 *(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Surface: text translation] --> B[Formats: dates, currency, units]
     B --> C[Cultural adaptation:<br/>imagery, tone, examples]

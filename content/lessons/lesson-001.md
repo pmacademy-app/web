@@ -122,23 +122,23 @@ This is not a flaw in how companies are organized; it is a deliberate design cho
 
 ## Common Beginner Mistakes
 
-**Mistake 1: "PMs manage engineers."**
+**Mistake 1: Believing the "manager" in the title means managing engineers directly**
 
 This is the single most common misconception, usually inherited from the word "manager" in the title. PMs do not sit in engineers' reporting lines, do not conduct their performance reviews, and cannot assign work by fiat. What a PM does is set *priority and direction* — the engineering manager and the engineers themselves retain authority over *how* the work gets done. Confusing these two leads new PMs to behave in ways that damage trust with engineering partners almost immediately.
 
-**Mistake 2: "Shipping more features means the product is succeeding."**
+**Mistake 2: Treating shipped features as evidence the product is succeeding**
 
 This is the output/outcome confusion described above, and it is worth restating directly because it is so persistent: a shipped feature is an *attempt* at an outcome, not the outcome itself. A PM who reports "we shipped X" as if it were an achievement, without reference to what changed for users or the business, has not yet separated their evaluation criteria from an engineer's.
 
-**Mistake 3: "As the PM, I have final authority."**
+**Mistake 3: Assuming the PM title carries final decision-making authority**
 
 Some new PMs, especially those coming from more hierarchical prior roles, assume the title implies command authority similar to a general manager. It does not, in the vast majority of modern tech organizations. The PM's power comes from the quality of their reasoning and the trust they've built, not their position on an org chart.
 
-**Mistake 4: "My job is to solve the solution the stakeholder asked for."**
+**Mistake 4: Taking a stakeholder's proposed solution at face value instead of probing the underlying problem**
 
 A stakeholder (often a sales leader, an executive, or a customer) will frequently arrive with a specific solution already in mind: "We need a dark mode." "We need an export-to-Excel button." A common beginner mistake is to take this request at face value and route it directly to engineering. A more mature response is to ask *what problem the requested solution is meant to solve*, because the requester's proposed solution is frequently not the best — or even a correct — answer to their actual underlying problem. This single habit, more than any other, separates order-takers from Product Managers. We will build a dedicated framework for this in Lesson 6 (Jobs to Be Done).
 
-**Mistake 5: "The PM Venn diagram is the whole job."**
+**Mistake 5: Treating the PM Venn diagram (business, tech, design) as the whole job**
 
 As covered in the Theory section: describing the PM as "a generalist who knows business, tech, and design" describes proximity to disciplines, not the accountability that actually defines the role. Beginners who over-index on this model tend to spend their energy trying to sound credible in every domain, rather than developing the judgment to make hard trade-off calls between desirability, feasibility, and viability.
 

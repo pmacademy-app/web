@@ -20,7 +20,7 @@ interface CertificateRow {
 
 export default async function AdminCertificatesPage() {
   const supabase = createServiceRoleClient()
-  const users = await AdminConsoleService.getUsersOverview(1)
+  const { users } = await AdminConsoleService.getUsersOverview(1)
 
   // Fetch certificates from certificates table
   const { data: certs } = await supabase

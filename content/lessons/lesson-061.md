@@ -60,6 +60,36 @@ Most successful products migrate from the first category toward the second over 
 This lesson introduces the **Leverage Stack**, a four-layer model for reasoning about where a platform decision actually operates:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Layer 4: Ecosystem<br/>Independent businesses built on top of you] --> B[Layer 3: Marketplace<br/>Discovery, distribution, monetization for builders]
     B --> C[Layer 2: Developer Surface<br/>APIs, SDKs, extensions, webhooks]
@@ -75,6 +105,36 @@ The Leverage Stack is useful precisely because it forces you to locate a propose
 Lesson 46 introduced growth loops and the K-factor for user-to-user virality. Platforms introduce a related but distinct phenomenon: **network effects across two different populations** — builders and end users — where growth in one population increases the value of the platform for the other.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     U[More End Users] -->|makes platform worth building for| B[More Builders]
     B -->|more integrations, apps, content| U

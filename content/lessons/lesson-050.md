@@ -47,6 +47,36 @@ This lesson assumes fluency with **Lesson 43's** funnel and activation concepts,
 **Product-led growth** describes a strategy where the product itself — not a sales team, not a marketing campaign — is the primary driver of customer acquisition, conversion, retention, and expansion. This definition is deliberately broader than "offering a free trial" or "having a freemium tier," which are common PLG *tactics* but not PLG itself. A product genuinely practicing PLG integrates several disciplines this module has already covered:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Funnel discipline<br/>(Lesson 43):<br/>fast, low-friction<br/>activation"] --> D[Product-Led Growth]
     B["Retention discipline<br/>(Lesson 44):<br/>durable, self-sustaining<br/>engagement"] --> D
@@ -73,6 +103,36 @@ A product failing several of these checks — particularly one requiring signifi
 In a traditional sales-led motion, a **marketing-qualified lead (MQL)** is someone who has engaged with marketing content, and a **sales-qualified lead (SQL)** is someone a sales team has vetted as a genuine prospect. A **product-qualified lead (PQL)** is a specific, PLG-native concept: a free or trial user whose in-product behavior signals strong buying intent or a natural fit for expansion — reaching a certain usage threshold, inviting several teammates, or hitting a feature limit that a paid tier would remove. PQL scoring allows a hybrid PLG-plus-sales motion (introduced in Lesson 49) to work efficiently: rather than a sales team cold-prospecting broadly, it can focus its limited capacity on free users whose actual in-product behavior already indicates strong intent and fit, dramatically improving the efficiency of that sales capacity compared to undifferentiated outbound effort.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Free/trial user] --> B{In-product behavior<br/>signals strong intent?<br/>e.g., usage threshold,<br/>team invites, feature limit hit}
     B -->|Yes| C[Product-Qualified Lead:<br/>route to sales for<br/>expansion conversation]
@@ -84,6 +144,36 @@ graph LR
 Integrating this module's components into a single system: a genuine PLG flywheel connects acquisition (often through a growth loop, Lesson 46), fast activation (Lesson 43's funnel discipline applied to a specific, identified aha moment), durable retention (Lesson 44), and both referral and expansion, with each stage's output feeding the next — new activated users generate referral loop input (per Lesson 46's reinvestment principle) and, over time, generate expansion revenue as their usage or team grows, which in turn funds continued product investment that improves activation and retention further, closing the loop.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Acquisition<br/>via growth loop] --> B[Fast activation<br/>at the aha moment]
     B --> C[Durable retention]
@@ -126,6 +216,36 @@ Echoing Lesson 49's motion-fit principle directly: even within a successful PLG 
 *(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Acquisition] --> B[Activation]
     B --> C[Retention]

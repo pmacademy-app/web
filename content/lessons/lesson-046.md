@@ -47,6 +47,36 @@ This lesson assumes **Lesson 43's** funnel vocabulary, since a loop is best unde
 A **funnel** (Lesson 43) is linear: users enter at the top and progress through a sequence of stages, with each stage's output simply being fewer users reaching the next stage. A **growth loop**, by contrast, is circular: the output of one cycle becomes the input to the next cycle, so that a successful cycle doesn't just convert existing users further down a path — it generates *new* entrants into the very beginning of the same process, creating the possibility of compounding growth rather than a fixed, one-time conversion.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Funnel: linear]
     A1[Awareness] --> A2[Signup] --> A3[Activation] --> A4[Conversion]
@@ -76,6 +106,36 @@ For viral loops specifically, the standard measurement is the **viral coefficien
 If K is greater than 1, each existing user generates, on average, more than one new user through the loop, meaning the loop is theoretically self-sustaining and would continue growing even with zero additional external acquisition — genuine, compounding virality. If K is less than 1, each cycle generates fewer new users than it started with, meaning the loop will eventually decay toward zero without continued external input — the loop still provides real value (often meaningfully supplementing other acquisition channels), but it is not, by itself, self-sustaining.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["100 users"] --> B["K > 1:<br/>generates 150+ new users<br/>→ compounding growth"]
     A --> C["K < 1:<br/>generates 60 new users<br/>→ decaying, needs external input"]
@@ -117,6 +177,36 @@ An invite mechanism engineered aggressively to maximize invites-sent-per-user, w
 This lesson's core takeaway tool is a simple diagnostic question to apply to any claimed "growth loop" before analyzing it with loop-specific tools:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Claimed growth mechanism] --> B{Does the output of<br/>one cycle become new<br/>input to the same cycle?}
     B -->|No| C[This is a funnel or a<br/>one-time channel —<br/>use funnel analysis tools]

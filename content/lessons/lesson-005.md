@@ -134,11 +134,11 @@ This creates a systematic bias: absent deliberate correction, product roadmaps t
 
 ## Common Beginner Mistakes
 
-**Mistake 1: "The customer wants X, so users want X."**
+**Mistake 1: Assuming a paying customer's request reflects what end users actually want**
 
 This assumes alignment without checking it. A request from a paying customer (particularly in enterprise software) reflects that customer's priorities — which may be procurement-driven, cost-driven, or politically driven within their own organization — and is not automatically a proxy for what the people who will actually use the feature every day want or need.
 
-**Mistake 2: "User research is optional if we already talk to customers."**
+**Mistake 2: Treating customer-facing conversations as a substitute for user research**
 
 Sales and account management conversations are a real and valuable signal, but they are customer signal, not user signal, whenever the two differ. A PM relying exclusively on customer-facing conversations for product direction, in a product where users and customers diverge, is building on half the picture — often the half that is easier to access, not the half that is most important.
 

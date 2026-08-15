@@ -47,6 +47,36 @@ This lesson assumes **Lesson 36's** Blast Radius model, since this lesson's cent
 A **dark pattern** is a user interface or interaction design deliberately structured to manipulate users into a choice they wouldn't make with full, clear information — a subscription cancellation flow requiring many more steps than the signup flow, a pre-checked box adding an unwanted charge, confusing language designed to make "decline" harder to locate than "accept." Dark patterns often produce genuine, measurable short-term metric improvements — reduced churn, increased conversion — which is precisely what makes them tempting and why they recur across the industry despite widespread ethical and, increasingly, legal criticism.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Dark pattern implemented] --> B[Short-term metric improvement:<br/>reduced churn, higher conversion]
     B --> C[Users eventually recognize<br/>the manipulation]
@@ -60,6 +90,36 @@ The core ethical problem with dark patterns is not merely that they're persuasiv
 Extending Lesson 36's Blast Radius model directly: where Blast Radius asked "if this release goes wrong technically, how many people are affected and how containable is it," the **Harm Radius** asks the parallel ethical question: "if this decision causes harm, who is affected, how severe is that harm, and how reversible is it?"
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Proposed product decision] --> B{Who could be harmed,<br/>and how severely?}
     B --> C{Is the harm easily<br/>reversible, or does it<br/>compound/persist?}
@@ -113,6 +173,36 @@ Industry prevalence of a practice (a specific dark pattern, a particular data-us
 *(Introduced above in the Theory section; restated here as this lesson's standalone takeaway tool, per curriculum convention.)*
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Proposed decision] --> B{Who is affected,<br/>and how severely?}
     B --> C{Does harm fall<br/>disproportionately on<br/>vulnerable users?}

@@ -1,12 +1,25 @@
 import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
+import { fetchCurriculumData } from '../lesson-loader'
+import { getCapstoneDefinition } from '@/config/capstones'
+import {
+  buildModuleProgress,
+  buildUserActivityTimeline,
+  clampPct,
+  computeProgressPct,
+  computeQuizAvgScore,
+  TOTAL_LESSONS,
+} from './users-aggregation'
 import type {
   AdminSystemHealth,
   AdminUserOverview,
   AdminUserDetail,
+  AdminUserFilters,
+  AdminUserListResult,
   AdminContentOverview,
   AdminEmailQueueOverview,
 } from './types'
+import type { CurriculumEntry } from '@/types'
 
 /** Live counts surfaced to the console shell (sidebar badges + header status). */
 export interface AdminConsoleShellContext {
@@ -100,65 +113,72 @@ export class AdminConsoleService {
   }
 
   /**
-   * Fetches paginated user list with role & activity status.
-   */
-  /**
    * Fetches paginated user list with role, activity status, and verification status.
    * Merges Supabase Auth users (auth.users) with public.users profiles to capture unverified accounts.
+   *
+   * Filtering, sorting, and pagination are applied in memory over the merged set
+   * (the auth-users merge prevents SQL-side pagination across both sources).
+   * At launch scale this is fine; revisit with SQL-side aggregation before
+   * significant growth (see Phase 2 dashboard notes).
    */
-  public static async getUsersOverview(limit = 50, search = ''): Promise<AdminUserOverview[]> {
+  public static async getUsersOverview(
+    limit = 50,
+    search = '',
+    filters: AdminUserFilters = {},
+    page = 1
+  ): Promise<AdminUserListResult> {
     const supabase = createServiceRoleClient()
 
-    // 1. Fetch public.users profiles
-    let query = supabase.from('users').select('*').order('created_at', { ascending: false }).limit(limit)
-    if (search) {
-      query = query.or(`email.ilike.%${search}%,name.ilike.%${search}%`)
-    }
-    const { data: publicData } = await query
+    try {
+      // 1. All public.users profiles (paginated past Supabase's 1,000-row cap).
+      const publicRows = await this.fetchAllRows<{
+        id: string
+        email: string
+        name?: string
+        username?: string
+        is_admin?: boolean
+        total_xp?: number
+        level?: number
+        current_streak?: number
+        is_portfolio_public?: boolean
+        created_at: string
+        updated_at?: string
+      }>((from, to) =>
+        supabase.from('users').select('*').order('created_at', { ascending: false }).range(from, to)
+      )
 
-    const publicRows = (publicData || []) as unknown as Array<{
-      id: string
-      email: string
-      name?: string
-      username?: string
-      is_admin?: boolean
-      total_xp?: number
-      level?: number
-      current_streak?: number
-      is_portfolio_public?: boolean
-      created_at: string
-      updated_at?: string
-    }>
+    // 2. All Supabase Auth users (paginated) — includes unverified accounts.
+    const authUsers = await this.fetchAllAuthUsers()
+
+    // 3. Completed lesson counts per user (drives progressPct + progress filter).
+    const completedRows = await this.fetchAllRows<{ user_id: string }>((from, to) =>
+      supabase.from('user_lesson_progress').select('user_id').eq('status', 'completed').range(from, to)
+    )
+    const completedCounts = new Map<string, number>()
+    for (const row of completedRows) {
+      completedCounts.set(row.user_id, (completedCounts.get(row.user_id) || 0) + 1)
+    }
+
+    // 4. Active user ids (earned XP within the last 30 days).
+    const activeSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    const activeRows = await this.fetchAllRows<{ user_id: string }>((from, to) =>
+      supabase.from('xp_events').select('user_id').gte('created_at', activeSince).range(from, to)
+    )
+    const activeUserIds = new Set(activeRows.map((r) => r.user_id))
+
+    // 5. Course-completion badge holders (progressPct fallback to 100%).
+    const completionBadgeUserIds = await this.resolveCompletionBadgeUserIds(supabase)
 
     const publicMap = new Map(publicRows.map((r) => [r.id, r]))
-
-    // 2. Fetch Supabase Auth users via service role client (includes unverified users)
-    let authUsers: Array<{
-      id: string
-      email?: string
-      email_confirmed_at?: string | null
-      created_at: string
-      user_metadata?: { full_name?: string; name?: string }
-    }> = []
-
-    try {
-      const { data: authUsersData } = await supabase.auth.admin.listUsers({ perPage: 1000 })
-      if (authUsersData?.users) {
-        authUsers = authUsersData.users as typeof authUsers
-      }
-    } catch (err) {
-      console.warn('[AdminConsoleService] Service role listUsers fallback:', err)
-    }
-
-    // Merge Auth users and Public users
-    const allUserIds = new Set([
-      ...publicRows.map((r) => r.id),
-      ...authUsers.map((a) => a.id),
-    ])
-
     const authMap = new Map(authUsers.map((a) => [a.id, a]))
-    const result: AdminUserOverview[] = []
+    const allUserIds = new Set([...publicMap.keys(), ...authMap.keys()])
 
+    // 6. Last-active timestamps (newest xp_event per user). The `users` table
+    //    has no `updated_at` column, so "Last Active" must come from real
+    //    activity rather than the profile row.
+    const lastActiveByUser = await this.fetchLastActiveByUser(supabase, allUserIds)
+
+    const rows: AdminUserOverview[] = []
     for (const userId of allUserIds) {
       const pub = publicMap.get(userId)
       const auth = authMap.get(userId)
@@ -166,14 +186,11 @@ export class AdminConsoleService {
       const email = pub?.email || auth?.email || ''
       if (!email) continue
 
-      if (search && !email.toLowerCase().includes(search.toLowerCase()) && !pub?.name?.toLowerCase().includes(search.toLowerCase())) {
-        continue
-      }
-
       const emailConfirmedAt = auth?.email_confirmed_at || (pub ? pub.created_at : null)
       const isVerified = Boolean(emailConfirmedAt)
+      const completed = completedCounts.get(userId) || 0
 
-      result.push({
+      rows.push({
         id: userId,
         email,
         fullName: pub?.name || auth?.user_metadata?.full_name || auth?.user_metadata?.name || email.split('@')[0],
@@ -186,18 +203,142 @@ export class AdminConsoleService {
         level: pub?.level || 1,
         streakDays: pub?.current_streak || 0,
         hasPublicPortfolio: Boolean(pub?.is_portfolio_public),
+        progressPct: computeProgressPct(completed, completionBadgeUserIds.has(userId)),
         createdAt: pub?.created_at || auth?.created_at || new Date().toISOString(),
-        lastActiveAt: pub?.updated_at || auth?.created_at || null,
+        lastActiveAt: lastActiveByUser.get(userId) || null,
       })
     }
 
-    return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, limit)
+    // ── Search + filters (in memory over the merged set) ─────────────────────
+    let filtered = rows
+    if (search) {
+      const q = search.toLowerCase()
+      filtered = filtered.filter(
+        (u) => u.fullName.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+      )
+    }
+    if (filters.verification) {
+      filtered = filtered.filter((u) => (filters.verification === 'verified' ? u.isVerified : !u.isVerified))
+    }
+    if (filters.role) {
+      filtered = filtered.filter((u) => (filters.role === 'admin' ? u.isAdmin : !u.isAdmin))
+    }
+    if (filters.activity) {
+      filtered = filtered.filter((u) =>
+        filters.activity === 'active' ? activeUserIds.has(u.id) : !activeUserIds.has(u.id)
+      )
+    }
+    if (filters.progress) {
+      filtered = filtered.filter((u) => {
+        if (filters.progress === 'none') return u.progressPct === 0
+        if (filters.progress === 'completed') return u.progressPct >= 100
+        return u.progressPct > 0 && u.progressPct < 100
+      })
+    }
+    if (filters.minLevel !== undefined) {
+      filtered = filtered.filter((u) => u.level >= (filters.minLevel as number))
+    }
+    if (filters.joinedFrom) {
+      filtered = filtered.filter((u) => u.createdAt.slice(0, 10) >= (filters.joinedFrom as string))
+    }
+    if (filters.joinedTo) {
+      filtered = filtered.filter((u) => u.createdAt.slice(0, 10) <= (filters.joinedTo as string))
+    }
+    if (filters.activeFrom) {
+      filtered = filtered.filter((u) => Boolean(u.lastActiveAt && u.lastActiveAt.slice(0, 10) >= (filters.activeFrom as string)))
+    }
+    if (filters.activeTo) {
+      filtered = filtered.filter((u) => Boolean(u.lastActiveAt && u.lastActiveAt.slice(0, 10) <= (filters.activeTo as string)))
+    }
+
+    // ── Sort ─────────────────────────────────────────────────────────────────
+    const sortKey: keyof AdminUserOverview = filters.sort || 'createdAt'
+    const sortDir = filters.sortDir === 'asc' ? 1 : -1
+    filtered.sort((a, b) => {
+      const av = a[sortKey]
+      const bv = b[sortKey]
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sortDir
+      return String(av ?? '').localeCompare(String(bv ?? '')) * sortDir
+    })
+
+    const total = filtered.length
+    const start = (page - 1) * limit
+    const users = filtered.slice(start, start + limit)
+
+    return { users, total }
+    } catch (err) {
+      // DB unreachable → degrade to an empty result rather than crashing the
+      // workspace (matches the pre-Phase-3 behavior where query errors were
+      // silently ignored). `failed` lets the UI distinguish a real empty set
+      // from a load failure (spec §63 error states).
+      console.warn('[AdminConsoleService] getUsersOverview failed:', err)
+      return { users: [], total: 0, failed: true }
+    }
   }
 
   /**
-   * Fetches detailed profile breakdown for a specific user (verified or unverified).
+   * KPI summary for the Users workspace header: total accounts, active
+   * learners (30d), new signups (24h) and average course progress.
    */
-  public static async getUserDetail(userId: string): Promise<AdminUserDetail | null> {
+  public static async getUsersKpis(): Promise<{
+    totalUsers: number
+    activeLearners30d: number
+    newSignups24h: number
+    avgCourseProgressPct: number
+  }> {
+    const supabase = createServiceRoleClient()
+
+    try {
+      const activeSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+      const signupsSince = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+
+      const [totalRes, activeRows, signupsRes, completedRows] = await Promise.all([
+        supabase.from('users').select('id', { count: 'exact', head: true }),
+        this.fetchAllRows<{ user_id: string }>((from, to) =>
+          supabase.from('xp_events').select('user_id').gte('created_at', activeSince).range(from, to)
+        ),
+        supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', signupsSince),
+        this.fetchAllRows<{ user_id: string }>((from, to) =>
+          supabase.from('user_lesson_progress').select('user_id').eq('status', 'completed').range(from, to)
+        ),
+      ])
+
+      const totalUsers = totalRes.count || 0
+      const activeLearners30d = new Set(activeRows.map((r) => r.user_id)).size
+      const newSignups24h = signupsRes.count || 0
+      const totalCompleted = completedRows.length
+      // Average progress among learners who have completed at least one lesson.
+      // Unverified / never-started accounts would otherwise dilute the KPI
+      // toward zero and misrepresent the "Avg Course Progress" label.
+      const startedUsers = new Set(completedRows.map((r) => r.user_id)).size
+      const avgCourseProgressPct =
+        startedUsers > 0 ? clampPct((totalCompleted / (startedUsers * TOTAL_LESSONS)) * 100) : 0
+
+      return { totalUsers, activeLearners30d, newSignups24h, avgCourseProgressPct }
+    } catch (err) {
+      // DB unreachable → degrade to zeroed KPIs rather than crashing the
+      // workspace (consistent with getUsersOverview).
+      console.warn('[AdminConsoleService] getUsersKpis failed:', err)
+      return { totalUsers: 0, activeLearners30d: 0, newSignups24h: 0, avgCourseProgressPct: 0 }
+    }
+  }
+
+  /**
+   * Fetches the complete Phase 3 user detail payload (KPI summary + all six
+   * tab datasets) in a single pass. Returns null when the user does not exist
+   * or the query fails (DB unreachable → the drawer degrades to its skeleton /
+   * not-found state instead of crashing the page).
+   */
+  public static async getUserDetailData(userId: string): Promise<AdminUserDetail | null> {
+    try {
+      return await this.getUserDetailDataUnsafe(userId)
+    } catch (err) {
+      console.warn('[AdminConsoleService] getUserDetailData failed:', err)
+      return null
+    }
+  }
+
+  private static async getUserDetailDataUnsafe(userId: string): Promise<AdminUserDetail | null> {
     const supabase = createServiceRoleClient()
 
     const { data: userRow } = await supabase.from('users').select('*').eq('id', userId).maybeSingle()
@@ -206,7 +347,7 @@ export class AdminConsoleService {
       email?: string
       email_confirmed_at?: string | null
       created_at: string
-      user_metadata?: { full_name?: string }
+      user_metadata?: { full_name?: string; name?: string }
     }
 
     let authUser: AuthUserDetailRecord | null = null
@@ -230,52 +371,452 @@ export class AdminConsoleService {
       current_streak?: number
       is_portfolio_public?: boolean
       goal?: string
+      timezone?: string
+      auth_provider?: string
       created_at: string
       updated_at?: string
     } | null
 
-    const [lessonsRes, quizzesRes, capstonesRes, certsRes] = await Promise.all([
-      supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'completed'),
-      supabase.from('quiz_attempts').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-      supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-      supabase.from('certificates').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+    const email = u?.email || authUser?.email || ''
+    const emailConfirmedAt = authUser?.email_confirmed_at || (u ? u.created_at : null)
+    const isVerified = Boolean(emailConfirmedAt)
+
+    // Curriculum metadata (module bucketing + lesson titles).
+    let curriculum: CurriculumEntry[] = []
+    try {
+      const data = await fetchCurriculumData()
+      curriculum = data?.lessons || []
+    } catch {
+      // Fallback to empty curriculum — module progress degrades gracefully.
+    }
+    const lessonTitleById = new Map(curriculum.map((l) => [l.id, l.title]))
+
+    // ── Parallel data fetches for every tab ──────────────────────────────────
+    const [
+      lessonRes,
+      quizRows,
+      capstoneRes,
+      certRes,
+      badgeRes,
+      reflectionRes,
+      srsCountRes,
+      emailRes,
+      notifRes,
+      contactRes,
+      lastActiveRes,
+    ] = await Promise.all([
+      supabase
+        .from('user_lesson_progress')
+        .select('lesson_id, status, completed_at')
+        .eq('user_id', userId),
+      this.fetchAllRows<{ lesson_id: string; is_correct: boolean; attempted_at: string }>((from, to) =>
+        supabase
+          .from('quiz_attempts')
+          .select('lesson_id, is_correct, attempted_at')
+          .eq('user_id', userId)
+          .range(from, to)
+      ),
+      supabase
+        .from('capstone_submissions')
+        .select('id, module_slug, status, is_public, submitted_at')
+        .eq('user_id', userId)
+        .order('submitted_at', { ascending: false }),
+      supabase
+        .from('certificates')
+        .select('id, certificate_code, type, issued_at')
+        .eq('user_id', userId)
+        .order('issued_at', { ascending: false }),
+      supabase
+        .from('user_badges')
+        .select('badge_id, earned_at')
+        .eq('user_id', userId)
+        .order('earned_at', { ascending: false }),
+      supabase
+        .from('reflections')
+        .select('id, lesson_id, created_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50),
+      supabase
+        .from('user_flashcard_srs')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId),
+      supabase
+        .from('email_queue')
+        .select('id, template_key, status, created_at')
+        .eq('to_email', email)
+        .order('created_at', { ascending: false })
+        .limit(20),
+      supabase
+        .from('in_app_notifications')
+        .select('id, title, category, is_read, created_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20),
+      supabase
+        .from('contact_messages')
+        .select('id, subject, category, status, created_at')
+        .or(`user_id.eq.${userId},email.eq.${email}`)
+        .order('created_at', { ascending: false })
+        .limit(20),
+      // Most recent xp_event — real "Last Active" (the users table has no
+      // updated_at column to fall back on).
+      supabase
+        .from('xp_events')
+        .select('created_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ])
 
-    const targetAuthUser = authUser as AuthUserDetailRecord | null
-    const email = u?.email || targetAuthUser?.email || ''
-    const emailConfirmedAt = targetAuthUser?.email_confirmed_at || (u ? u.created_at : null)
+    const lessonRows = (lessonRes.data || []) as unknown as Array<{
+      lesson_id: string
+      status: string
+      completed_at: string | null
+    }>
+    const completedLessonIds = new Set(
+      lessonRows.filter((l) => l.status === 'completed').map((l) => l.lesson_id)
+    )
+    const completedCount = completedLessonIds.size
+
+    // Badge metadata (names/descriptions for Achievements + timeline).
+    const badgeRows = (badgeRes.data || []) as unknown as Array<{ badge_id: string; earned_at: string }>
+    const badgeIds = badgeRows.map((b) => b.badge_id)
+    let badgeMeta: Array<{ id: string; key: string; name: string; description: string; icon: string }> = []
+    if (badgeIds.length > 0) {
+      const { data: badgeMetaRes } = await supabase
+        .from('badges')
+        .select('id, key, name, description, icon')
+        .in('id', badgeIds)
+      badgeMeta = (badgeMetaRes || []) as unknown as typeof badgeMeta
+    }
+    const badgeMetaById = new Map(badgeMeta.map((b) => [b.id, b]))
+    const hasCompletionBadge = badgeMeta.some((b) => b.key === 'cpo_completion')
+
+    const capstoneRows = (capstoneRes.data || []) as unknown as Array<{
+      id: string
+      module_slug: string
+      status: string
+      is_public: boolean
+      submitted_at: string
+    }>
+    const certRows = (certRes.data || []) as unknown as Array<{
+      id: string
+      certificate_code: string
+      type: string
+      issued_at: string
+    }>
+    const reflectionRows = (reflectionRes.data || []) as unknown as Array<{
+      id: string
+      lesson_id: string
+      created_at: string
+    }>
+
+    // ── Activity timeline (union across event tables) ────────────────────────
+    const activity = buildUserActivityTimeline([
+      ...lessonRows
+        .filter((l) => l.status === 'completed' && l.completed_at)
+        .map((l) => ({
+          type: 'lesson_completed' as const,
+          label: 'Completed lesson',
+          detail: lessonTitleById.get(l.lesson_id) || l.lesson_id,
+          timestamp: l.completed_at,
+        })),
+      ...quizRows.map((q) => ({
+        type: 'quiz_attempted' as const,
+        label: 'Attempted quiz',
+        detail: lessonTitleById.get(q.lesson_id) || q.lesson_id,
+        timestamp: q.attempted_at,
+      })),
+      ...badgeRows.map((b) => ({
+        type: 'badge_earned' as const,
+        label: 'Earned badge',
+        detail: badgeMetaById.get(b.badge_id)?.name || b.badge_id,
+        timestamp: b.earned_at,
+      })),
+      ...certRows.map((c) => ({
+        type: 'certificate_issued' as const,
+        label: 'Certificate issued',
+        detail: c.certificate_code,
+        timestamp: c.issued_at,
+      })),
+      ...reflectionRows.map((r) => ({
+        type: 'reflection_created' as const,
+        label: 'Created reflection',
+        detail: lessonTitleById.get(r.lesson_id) || r.lesson_id,
+        timestamp: r.created_at,
+      })),
+      ...capstoneRows.map((c) => ({
+        type: 'capstone_submitted' as const,
+        label: 'Submitted capstone',
+        detail: getCapstoneDefinition(c.module_slug)?.moduleTitle || c.module_slug,
+        timestamp: c.submitted_at,
+      })),
+    ])
+
+    const courseProgressPct = computeProgressPct(completedCount, hasCompletionBadge)
+    const portfolioUrl = u?.is_portfolio_public && u?.username ? `/p/${u.username}` : null
+    const lastActiveRow = lastActiveRes.data as unknown as { created_at: string } | null
+    const lastActiveAt = lastActiveRow?.created_at || null
 
     return {
       id: userId,
       email,
-      fullName: u?.name || targetAuthUser?.user_metadata?.full_name || email.split('@')[0],
+      fullName: u?.name || authUser?.user_metadata?.full_name || authUser?.user_metadata?.name || email.split('@')[0],
       username: u?.username || null,
       role: u?.is_admin ? 'Admin' : 'Learner',
       isAdmin: Boolean(u?.is_admin),
-      isVerified: Boolean(emailConfirmedAt),
+      isVerified,
       emailConfirmedAt,
       totalXp: u?.total_xp || 0,
       level: u?.level || 1,
       streakDays: u?.current_streak || 0,
-      createdAt: u?.created_at || targetAuthUser?.created_at || new Date().toISOString(),
-      lastActiveAt: u?.updated_at || targetAuthUser?.created_at || null,
-      lessonsCompleted: lessonsRes.count || 0,
-      quizzesCompleted: quizzesRes.count || 0,
-      capstonesSubmitted: capstonesRes.count || 0,
-      certificatesCount: certsRes.count || 0,
       hasPublicPortfolio: Boolean(u?.is_portfolio_public),
+      progressPct: courseProgressPct,
+      createdAt: u?.created_at || authUser?.created_at || new Date().toISOString(),
+      lastActiveAt,
+      lessonsCompleted: completedCount,
+      quizzesCompleted: quizRows.length,
+      capstonesSubmitted: capstoneRows.length,
+      certificatesCount: certRows.length,
       goal: u?.goal,
+      kpis: {
+        level: u?.level || 1,
+        xp: u?.total_xp || 0,
+        streakDays: u?.current_streak || 0,
+        courseProgressPct,
+      },
+      learning: {
+        courseProgressPct,
+        lessonsCompleted: completedCount,
+        lessonsTotal: curriculum.length || 90,
+        quizAttempts: quizRows.length,
+        quizAvgScore: computeQuizAvgScore(quizRows),
+        srsReviews: srsCountRes.count || 0,
+        modules: buildModuleProgress(completedLessonIds, curriculum),
+      },
+      activity,
+      achievements: {
+        badges: badgeRows.map((b) => {
+          const meta = badgeMetaById.get(b.badge_id)
+          return {
+            id: b.badge_id,
+            key: meta?.key || b.badge_id,
+            name: meta?.name || b.badge_id,
+            description: meta?.description || '',
+            icon: meta?.icon || 'Award',
+            earnedAt: b.earned_at,
+          }
+        }),
+        certificates: certRows.map((c) => ({
+          id: c.id,
+          code: c.certificate_code,
+          type: c.type,
+          issuedAt: c.issued_at,
+        })),
+        capstone: capstoneRows[0]
+          ? {
+              id: capstoneRows[0].id,
+              moduleSlug: capstoneRows[0].module_slug,
+              moduleTitle: getCapstoneDefinition(capstoneRows[0].module_slug)?.moduleTitle || capstoneRows[0].module_slug,
+              status: capstoneRows[0].status,
+              isPublic: capstoneRows[0].is_public,
+              submittedAt: capstoneRows[0].submitted_at,
+            }
+          : null,
+        portfolio: {
+          hasPortfolio: Boolean(u?.is_portfolio_public),
+          url: portfolioUrl,
+          isPublic: Boolean(u?.is_portfolio_public),
+        },
+      },
+      communications: {
+        emails: ((emailRes.data || []) as unknown as Array<{
+          id: string
+          template_key: string
+          status: string
+          created_at: string
+        }>).map((e) => ({
+          id: e.id,
+          templateKey: e.template_key,
+          status: e.status,
+          createdAt: e.created_at,
+        })),
+        notifications: ((notifRes.data || []) as unknown as Array<{
+          id: string
+          title: string
+          category: string
+          is_read: boolean
+          created_at: string
+        }>).map((n) => ({
+          id: n.id,
+          title: n.title,
+          category: n.category,
+          isRead: Boolean(n.is_read),
+          createdAt: n.created_at,
+        })),
+        contacts: ((contactRes.data || []) as unknown as Array<{
+          id: string
+          subject: string
+          category: string
+          status: string
+          created_at: string
+        }>).map((c) => ({
+          id: c.id,
+          subject: c.subject,
+          category: c.category,
+          status: c.status,
+          createdAt: c.created_at,
+        })),
+      },
+      account: {
+        email,
+        verified: isVerified,
+        emailConfirmedAt,
+        createdAt: u?.created_at || authUser?.created_at || new Date().toISOString(),
+        lastActiveAt,
+        role: u?.is_admin ? 'Admin' : 'Learner',
+        isAdmin: Boolean(u?.is_admin),
+        goal: u?.goal || null,
+        timezone: u?.timezone || null,
+        authProvider: u?.auth_provider || null,
+      },
+    }
+  }
+
+  /** Fetches every auth user (paginated past the 1,000-row perPage cap). */
+  private static async fetchAllAuthUsers(): Promise<
+    Array<{
+      id: string
+      email?: string
+      email_confirmed_at?: string | null
+      created_at: string
+      user_metadata?: { full_name?: string; name?: string }
+    }>
+  > {
+    const supabase = createServiceRoleClient()
+    const users: Array<{
+      id: string
+      email?: string
+      email_confirmed_at?: string | null
+      created_at: string
+      user_metadata?: { full_name?: string; name?: string }
+    }> = []
+    const perPage = 1000
+    let page = 1
+    try {
+      for (let guard = 0; guard < 100; guard++) {
+        const { data } = await supabase.auth.admin.listUsers({ page, perPage })
+        if (!data?.users || data.users.length === 0) break
+        users.push(...(data.users as typeof users))
+        if (data.users.length < perPage) break
+        page += 1
+      }
+    } catch (err) {
+      console.warn('[AdminConsoleService] Service role listUsers fallback:', err)
+    }
+    return users
+  }
+
+  /** Fetches every row matching a builder, walking Supabase's 1,000-row page limit. */
+  private static async fetchAllRows<T>(
+    buildPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>
+  ): Promise<T[]> {
+    const pageSize = 1000
+    const rows: T[] = []
+    let start = 0
+    // Guard against runaway loops (1M rows is far beyond launch scale).
+    while (start < 1_000_000) {
+      let page: { data: T[] | null; error: { message: string } | null }
+      try {
+        page = await buildPage(start, start + pageSize - 1)
+      } catch (err) {
+        // Network-level failures (e.g. unreachable DB) degrade to empty rows
+        // rather than crashing the whole workspace — matches the pre-Phase-3
+        // behavior where query errors were ignored.
+        console.warn('[AdminConsoleService] fetchAllRows network failure:', err)
+        break
+      }
+      if (page.error) throw new Error(page.error.message)
+      if (!page.data || page.data.length === 0) break
+      rows.push(...page.data)
+      if (page.data.length < pageSize) break
+      start += pageSize
+    }
+    return rows
+  }
+
+  /**
+   * Resolves the most recent `xp_events.created_at` per user id.
+   *
+   * Walks `xp_events` newest-first and stops early once every known account
+   * has a timestamp, so "Last Active" reflects real learner activity rather
+   * than a profile column. Users with no XP events are absent from the result.
+   * Best-effort: any failure degrades to an empty map.
+   */
+  private static async fetchLastActiveByUser(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    userIds: Set<string>
+  ): Promise<Map<string, string>> {
+    const lastActive = new Map<string, string>()
+    if (userIds.size === 0) return lastActive
+    const remaining = new Set(userIds)
+    const pageSize = 1000
+    let start = 0
+    try {
+      while (start < 1_000_000 && remaining.size > 0) {
+        const { data, error } = await supabase
+          .from('xp_events')
+          .select('user_id, created_at')
+          .order('created_at', { ascending: false })
+          .range(start, start + pageSize - 1)
+        if (error) throw new Error(error.message)
+        if (!data || data.length === 0) break
+        for (const row of data as unknown as Array<{ user_id: string; created_at: string }>) {
+          if (remaining.has(row.user_id) && !lastActive.has(row.user_id)) {
+            lastActive.set(row.user_id, row.created_at)
+            remaining.delete(row.user_id)
+          }
+        }
+        if (data.length < pageSize) break
+        start += pageSize
+      }
+    } catch (err) {
+      // Best-effort enrichment — never let last-active fail the whole workspace.
+      console.warn('[AdminConsoleService] fetchLastActiveByUser failed:', err)
+    }
+    return lastActive
+  }
+
+  /** Resolves user ids holding the full-curriculum completion badge. */
+  private static async resolveCompletionBadgeUserIds(
+    supabase: ReturnType<typeof createServiceRoleClient>
+  ): Promise<Set<string>> {
+    try {
+      const { data: badgeRows } = await supabase.from('badges').select('id').eq('key', 'cpo_completion')
+      const badgeIds = ((badgeRows || []) as unknown as Array<{ id: string }>).map((b) => b.id)
+      if (badgeIds.length === 0) return new Set()
+      const userRows = await this.fetchAllRows<{ user_id: string }>((from, to) =>
+        supabase.from('user_badges').select('user_id').in('badge_id', badgeIds).range(from, to)
+      )
+      return new Set(userRows.map((r) => r.user_id))
+    } catch {
+      return new Set()
     }
   }
 
   /**
    * Toggles the admin status of a target user.
+   *
+   * Note: the `users` table has no `updated_at` column, so the update payload
+   * only touches `is_admin` (writing `updated_at` would fail the whole update).
    */
   public static async toggleUserAdminRole(targetUserId: string, makeAdmin: boolean): Promise<boolean> {
     const supabase = createServiceRoleClient()
     type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
     const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
-      .update({ is_admin: makeAdmin, updated_at: new Date().toISOString() })
+      .update({ is_admin: makeAdmin })
       .eq('id', targetUserId)
 
     return !error

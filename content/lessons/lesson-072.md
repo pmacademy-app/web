@@ -53,6 +53,36 @@ A common misconception is that enterprise readiness simply means adding more fea
 This lesson introduces the **Enterprise Adoption Ladder**, a four-rung model describing the stages a B2B product typically passes through as it moves from an individual's initial interest to genuine organizational entrenchment:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Rung 1: Pilot<br/>(an individual or small team tries the product)"] --> B["Rung 2: Departmental Adoption<br/>(a team or department adopts it as a standard tool)"]
     B --> C["Rung 3: Organization-Wide Rollout<br/>(the product spans multiple departments, requiring central IT/security sign-off)"]

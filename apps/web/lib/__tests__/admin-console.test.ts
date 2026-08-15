@@ -48,11 +48,13 @@ runTest('AdminConsoleService.getContentOverview returns 90 compiled lessons stat
 
 runTest('AdminConsoleService.getUsersOverview maps is_portfolio_public to hasPublicPortfolio', async () => {
   // Verifies data mapping contract for Admin Users tab
-  const users = await AdminConsoleService.getUsersOverview(10)
+  const { users, total } = await AdminConsoleService.getUsersOverview(10)
   assert(Array.isArray(users))
+  assert.strictEqual(typeof total, 'number')
   if (users.length > 0) {
     const user = users[0]
     assert.strictEqual(typeof user.hasPublicPortfolio, 'boolean')
+    assert.strictEqual(typeof user.progressPct, 'number')
   }
 })
 

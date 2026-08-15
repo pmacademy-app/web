@@ -69,6 +69,36 @@ A critical, frequently conflated distinction: **pricing** is how much a customer
 A widely used, structured technique for estimating an acceptable price range directly from customer input, developed by Peter van Westendorp, asks each customer four questions about a specific product: at what price would this be so cheap you'd question its quality? At what price would this be a bargain? At what price would this start to feel expensive? At what price would this be so expensive you wouldn't consider it? Plotting the aggregated responses across a sample of customers reveals a range bounded by these four curves, typically converging on an "acceptable price range" and an "optimal price point" where the trade-off between perceived value and affordability is best balanced.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A["Too cheap<br/>(quality doubt)"] --> B["Bargain<br/>threshold"] --> C["Acceptable<br/>price range"] --> D["Getting expensive<br/>threshold"] --> E["Too expensive<br/>(rejection)"]
 ```
@@ -107,6 +137,36 @@ Pricing is unusually visible and difficult to reverse compared to most product d
 This lesson's core takeaway tool is a simple diagnostic for evaluating whether a chosen pricing model actually aligns with how value is delivered:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Proposed pricing model] --> B{Does the pricing<br/>dimension scale with<br/>actual customer usage<br/>and derived value?}
     B -->|Yes, closely aligned| C[Model likely sustainable —<br/>light and heavy users<br/>pay proportionally]

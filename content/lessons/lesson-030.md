@@ -53,6 +53,36 @@ Design thinking, most closely associated with Stanford's d.school and the design
 - **Test**: gathering feedback on prototypes from real users, and using that feedback to refine, iterate, or return to an earlier stage entirely — directly corresponding to Lesson 26's usability testing discipline and Lesson 8's genuine discovery test principle.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Empathize<br/>Module 2, Lessons 11-20] --> B[Define<br/>Lesson 17]
     B --> C[Ideate<br/>this lesson's<br/>structured techniques]
@@ -76,6 +106,36 @@ Specific, common triggers for looping backward include:
 - **Prototype testing reveals an entirely new, unanticipated pain point**: echoing Lesson 21's guidance on handling new findings during MVP testing, a prototype test can surface information relevant to the Empathize or Define stages of an entirely different, adjacent problem, which should be captured (per Lesson 19's Opportunity Solution Tree) rather than either ignored or immediately chased at the expense of the current test's focus.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Test Reveals a Gap] --> B{What kind of gap?}
     B -->|Problem was misdefined| C[Loop back to Define,<br/>possibly Empathize]
@@ -91,6 +151,36 @@ The Ideate stage benefits from specific, structured techniques designed to count
 - **"How Might We" (HMW) reframing**: taking a validated problem statement (Lesson 17) and reframing it as an open-ended, optimistic question beginning with "How might we..." — for example, transforming "Users abandon the checkout flow due to unexpected shipping costs" into "How might we help users feel confident about total cost before they commit to checkout?" This reframing technique deliberately opens up a wider solution space than the original problem statement alone might suggest, inviting a broader range of candidate ideas without yet committing to any particular solution direction — directly extending Lesson 17's Purity Test principle (multiple genuinely different solutions should remain consistent with the framing) into a generative, rather than merely evaluative, tool.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Validated Problem<br/>Statement, Lesson 17] --> B["How Might We"<br/>Reframing]
     B --> C[Open-Ended, Optimistic<br/>Question Inviting a<br/>Wide Solution Space]
@@ -137,6 +227,36 @@ This lesson's core value is synthesis and naming, not new content — missing th
 This lesson's mental model is the **Design Thinking Loop** — the five-stage diagram from Theory, explicitly redrawn to emphasize its non-linear, loop-permitting structure as the central takeaway.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Empathize] <--> B[Define]
     B <--> C[Ideate]

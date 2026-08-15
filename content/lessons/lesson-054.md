@@ -47,6 +47,36 @@ This lesson assumes **Lesson 47's** power/interest grid and **Lesson 51's** Alti
 The single most consequential practice in managing up is ensuring a manager never learns significant bad news about your work from someone else, or later than they reasonably should have. The **no surprises principle** means proactively surfacing problems, risks, and setbacks to your manager as soon as they're known with reasonable confidence, rather than waiting until a problem is fully resolved (hoping to present only good news) or until someone else raises it first. A manager who consistently learns about problems from a PM directly and early develops confidence in that PM's judgment and transparency; a manager who learns about the same category of problem from someone else, or well after the PM already knew, reasonably begins to wonder what else might be similarly withheld.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Problem becomes known<br/>with reasonable confidence] --> B{Disclosed to manager<br/>promptly and directly?}
     B -->|Yes| C[Trust preserved or<br/>strengthened, even if<br/>the news itself is bad]
@@ -73,6 +103,36 @@ Adapting to a manager's actual preferences along these dimensions — rather tha
 **Managing across** refers to the deliberate, ongoing maintenance of relationships with peers — other PMs, cross-functional partners, adjacent team leads — independent of any specific, immediate request. This extends Lesson 53's currencies of exchange model from a single negotiation into a sustained practice: a PM who regularly checks in with peer teams, offers help proactively, and maintains visibility into their priorities and pressures — even when nothing specific is currently needed from them — builds a reserve of goodwill and mutual understanding that makes any future specific request (exactly the kind of negotiation Lesson 53 covers) far more likely to succeed.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Ongoing peer investment:<br/>regular check-ins, proactive help,<br/>mutual visibility into priorities"] --> B["Accumulated trust<br/>and goodwill"]
     B --> C["When a specific request<br/>eventually arises (Lesson 53),<br/>it's received far more favorably"]
@@ -114,6 +174,36 @@ This confuses managing up with ingratiation — genuine managing up is about ens
 This lesson's core takeaway tool is a structured practice for documenting and applying a specific manager's actual working preferences, rather than relying on assumption or a generic default approach:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A[Observe and ask directly<br/>about working preferences] --> B["Document:<br/>detail level, format,<br/>involvement, timing preferences"]
     B --> C[Apply consistently<br/>in ongoing communication]

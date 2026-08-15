@@ -47,6 +47,36 @@ This lesson assumes **Lesson 36's** launch tiering and Launch Readiness Checklis
 Before deciding how to launch something, a team needs to agree on what it actually *is*, relative to the market — this is **positioning**. A widely used positioning framework (adapted from Geoffrey Moore's work) structures this as a small number of specific claims:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["For [target market]"] --> B["who [statement of need/opportunity]"]
     B --> C["[Product] is a [category]"]
@@ -73,6 +103,36 @@ These motions are not mutually exclusive — many mature companies run a hybrid,
 The core risk this lesson addresses: applying the wrong motion to a given product creates friction on both sides of the transaction. A low-price, simple product forced through a slow, high-touch sales process frustrates prospects who expected (and whose price point justifies) a fast, self-serve path, while consuming expensive sales capacity on deals too small to justify the effort. A complex, high-price product pushed through a self-serve motion, with no direct human guidance, leaves prospects who need customization, security review, or stakeholder buy-in — support a self-serve flow can't provide — struggling to navigate a purchase decision the product's own complexity demands more structure for.
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph LR
     A[Product complexity<br/>and price point] --> B{Does the chosen<br/>GTM motion match<br/>this complexity?}
     B -->|PLG for simple,<br/>low-price product| C[Good fit]
@@ -116,6 +176,36 @@ Positioning developed in isolation, without testing whether it holds up in real 
 This lesson's core takeaway tool visualizes how a foundational positioning claim should cascade down into progressively more specific, tactical GTM decisions — each layer depending on the one above it being genuinely clear:
 
 ```mermaid
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#0b0b0c",
+    "primaryColor": "#1f1f23",
+    "primaryTextColor": "#ffffff",
+    "primaryBorderColor": "#8b5cf6",
+    "lineColor": "#d1d5db",
+    "secondaryColor": "#18181b",
+    "tertiaryColor": "#111111",
+    "mainBkg": "#1f1f23",
+    "nodeBorder": "#8b5cf6",
+    "clusterBkg": "#000000",
+    "clusterBorder": "#27272a",
+    "titleColor": "#ffffff",
+    "edgeLabelBackground": "#0b0b0c",
+    "nodeTextColor": "#ffffff",
+    "edgeLabelColor": "#ffffff",
+    "actorBorder": "#8b5cf6",
+    "actorBkg": "#1f1f23",
+    "actorTextColor": "#ffffff",
+    "sequenceNumberColor": "#ffffff",
+    "signalColor": "#8b5cf6",
+    "signalTextColor": "#ffffff",
+    "textColor": "#ffffff",
+    "classText": "#ffffff",
+    "classBorder": "#8b5cf6",
+    "classBkg": "#1f1f23"
+  }
+}}%%
 graph TD
     A["Positioning<br/>(target market, category, differentiator)"] --> B["Messaging<br/>(value propositions, proof points)"]
     B --> C["GTM motion<br/>(PLG, sales-led, channel-led)"]
