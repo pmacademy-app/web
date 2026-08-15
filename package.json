@@ -1,7 +1,0 @@
-{
-  "name": "pmacademy",
-  "private": true,
-  "workspaces": [
-    "apps/web"
-  ]
-}
