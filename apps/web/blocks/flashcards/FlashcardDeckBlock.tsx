@@ -14,7 +14,7 @@ interface Flashcard {
   tags?: string[];
 }
 
-export default function FlashcardDeckBlock({ block }: BlockProps) {
+export default function FlashcardDeckBlock({ block, previewMode }: BlockProps) {
   const cards: Flashcard[] = block.cards || [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionXp, setSessionXp] = useState(0);
@@ -36,16 +36,20 @@ export default function FlashcardDeckBlock({ block }: BlockProps) {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`/api/flashcards/${card.id}/review`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ rating }),
-      });
+      // Read-only previews (e.g. the admin lesson preview) must never record
+      // real SRS reviews or award XP — advance the deck locally instead.
+      if (!previewMode) {
+        const res = await fetch(`/api/flashcards/${card.id}/review`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ rating }),
+        });
 
-      if (!res.ok) {
-        throw new Error('Failed to record flashcard review');
+        if (!res.ok) {
+          throw new Error('Failed to record flashcard review');
+        }
       }
 
       // Increment session XP count locally by 2 XP (XP_VALUES.FLASHCARD_REVIEW)

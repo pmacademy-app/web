@@ -46,14 +46,14 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   {
     label: 'Learning',
     items: [
-      { name: 'Curriculum', href: '/admin/content', icon: BookOpen, built: true },
+      { name: 'Curriculum', href: '/admin/curriculum', icon: BookOpen, built: true },
+      { name: 'Analytics', href: '/admin/analytics', icon: Gauge, built: true },
       { name: 'Certificates', href: '/admin/certificates', icon: Award, built: true },
-      { name: 'Achievements', href: '/admin/achievements', icon: Award, built: false },
     ],
   },
   {
-    label: 'Insights',
-    items: [{ name: 'Analytics', href: '/admin/analytics', icon: Gauge, built: false }],
+    label: 'Achievements',
+    items: [{ name: 'Achievements', href: '/admin/achievements', icon: Award, built: false }],
   },
   {
     label: 'System',

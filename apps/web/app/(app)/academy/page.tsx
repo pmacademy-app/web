@@ -209,7 +209,8 @@ export default async function AcademyPage() {
           return (
             <details
               key={moduleSlug}
-              className={`rounded-xl border-l-4 ${meta?.accentBorder ?? 'border-l-border'} border border-border bg-card shadow-sm group open:shadow-md transition-shadow`}
+              id={moduleSlug}
+              className={`rounded-xl border-l-4 ${meta?.accentBorder ?? 'border-l-border'} border border-border bg-card shadow-sm group open:shadow-md transition-shadow scroll-mt-6`}
             >
               <summary
                 className="flex items-center justify-between p-5 cursor-pointer list-none select-none hover:bg-accent/20 transition-colors rounded-xl"
