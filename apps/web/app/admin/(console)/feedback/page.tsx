@@ -1,11 +1,11 @@
-import React from 'react'
-import { FeedbackAdminService } from '@/lib/admin/feedback-service'
-import { FeedbackModerationView } from '@/components/admin/FeedbackModerationView'
+import { redirect } from 'next/navigation'
 
 export const revalidate = 0
 
-export default async function AdminFeedbackPage() {
-  const queue = await FeedbackAdminService.getModerationQueue('all')
-
-  return <FeedbackModerationView initialQueue={queue} />
+/**
+ * Legacy moderation entry point — superseded by the Moderation workspace
+ * (Phase 5). Preserves old bookmarks by redirecting to the testimonials tab.
+ */
+export default async function AdminFeedbackRedirectPage() {
+  redirect('/admin/moderation?tab=testimonials')
 }

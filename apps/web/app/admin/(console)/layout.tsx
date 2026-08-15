@@ -55,7 +55,8 @@ export default async function AdminConsoleLayout({ children }: { children: React
     const ctx = await AdminConsoleService.getConsoleShellContext()
     attention = {
       '/admin/communications': ctx.attention.contactMessages + ctx.attention.failedEmails,
-      '/admin/feedback': ctx.attention.pendingTestimonials,
+      '/admin/moderation':
+        ctx.attention.pendingTestimonials + ctx.attention.pendingCapstones + ctx.attention.newFeedback,
       '/admin/system': ctx.attention.systemErrors,
     }
     attentionTotal = ctx.attentionTotal
