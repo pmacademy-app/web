@@ -24,6 +24,7 @@ export interface VerifiedCertificatePayload {
   moduleSlug: string | null
   learnerName: string
   username: string
+  avatarUrl: string | null
   levelInfo: LevelInfo
   totalXp: number
   lessonsCompleted: number
@@ -138,15 +139,16 @@ export async function verifyCertificate(
     return null
   }
 
-  // 2. Fetch associated user profile for username
+  // 2. Resolve user info
   const { data: user } = (await (supabase
     .from('users') as unknown as DBChain)
-    .select('username, name')
+    .select('username, name, avatar_url')
     .eq('id', cert.user_id)
-    .single()) as unknown as { data: { username: string | null; name: string | null } | null }
+    .single()) as unknown as { data: { username: string | null; name: string | null; avatar_url: string | null } | null }
 
   const username = user?.username || `user_${cert.user_id.substring(0, 8)}`
   const learnerName = user?.name || cert.learner_name
+  const avatarUrl = user?.avatar_url || null
   const levelInfo = calculateLevel(cert.total_xp)
 
   const origin = siteOrigin.replace(/\/$/, '')
@@ -158,6 +160,7 @@ export async function verifyCertificate(
     moduleSlug: cert.module_slug,
     learnerName,
     username,
+    avatarUrl,
     levelInfo: {
       level: cert.level,
       title: cert.career_title,

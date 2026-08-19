@@ -18,7 +18,7 @@ import {
 } from '@/lib/lesson-loader'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
-import { isLessonUnlocked } from '@/lib/lessons-completion-service'
+import { isLessonUnlocked, getFirstLockedLessonIndex } from '@/lib/lessons-completion-service'
 import { BRAND } from '@/lib/brand'
 import LessonPageContent from './lesson-content'
 
@@ -137,12 +137,34 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   const moduleNum = Math.ceil(globalOrder / 10)
 
   let isLocked = false
+  let lowestLockedLessonMeta: typeof prevMeta | null = null
+  let lowestLockedGlobalOrder: number | null = null
+  let lowestLockedLessonUrl: string | null = null
+
   if (user && prevId) {
     const serviceSupabase = createServiceRoleClient()
     const unlocked = await isLessonUnlocked(serviceSupabase, user.id, lessonId, prevId)
     if (!unlocked) {
       isLocked = true
+      
+      const curriculumIds = lessons.map(l => l.id)
+      const lowestLockedIndex = await getFirstLockedLessonIndex(serviceSupabase, user.id, curriculumIds)
+      
+      if (lowestLockedIndex !== -1 && lowestLockedIndex < globalIndex) {
+        const actualLockedLesson = lessons[lowestLockedIndex]
+        if (actualLockedLesson) {
+          lowestLockedLessonMeta = await getLessonMeta(actualLockedLesson.id)
+          lowestLockedGlobalOrder = lowestLockedIndex + 1
+          lowestLockedLessonUrl = lowestLockedLessonMeta ? `/academy/${lowestLockedLessonMeta.module}/${lowestLockedLessonMeta.id}` : null
+        }
+      }
     }
+  }
+
+  if (isLocked && !lowestLockedLessonMeta) {
+    lowestLockedLessonMeta = prevMeta
+    lowestLockedGlobalOrder = prevGlobalOrder
+    lowestLockedLessonUrl = prevLessonUrl
   }
 
   // 5. Render locked screen if prerequisite is unmet
@@ -158,27 +180,47 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         <div className="space-y-3">
           <h1 className="text-2xl font-bold font-serif text-foreground">Lesson Locked</h1>
           <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
-            You must complete{' '}
-            {prevMeta && prevGlobalOrder && (
-              <span className="font-semibold text-foreground">
-                Lesson {prevGlobalOrder}: {prevMeta.title}
-              </span>
-            )}{' '}
-            before you can unlock{' '}
-            <span className="font-semibold text-foreground">
-              Lesson {globalOrder}: {lesson.title}
-            </span>
-            .
+            {lowestLockedGlobalOrder && prevGlobalOrder && lowestLockedGlobalOrder < prevGlobalOrder ? (
+              <>
+                You must complete{' '}
+                <span className="font-semibold text-foreground">
+                  Lesson {lowestLockedGlobalOrder}
+                </span>{' '}
+                through{' '}
+                <span className="font-semibold text-foreground">
+                  Lesson {prevGlobalOrder}
+                </span>{' '}
+                before you can unlock{' '}
+                <span className="font-semibold text-foreground">
+                  Lesson {globalOrder}: {lesson.title}
+                </span>
+                .
+              </>
+            ) : (
+              <>
+                You must complete{' '}
+                {prevMeta && prevGlobalOrder && (
+                  <span className="font-semibold text-foreground">
+                    Lesson {prevGlobalOrder}: {prevMeta.title}
+                  </span>
+                )}{' '}
+                before you can unlock{' '}
+                <span className="font-semibold text-foreground">
+                  Lesson {globalOrder}: {lesson.title}
+                </span>
+                .
+              </>
+            )}
           </p>
         </div>
 
         <div className="flex flex-col gap-3">
-          {prevLessonUrl && prevMeta && prevGlobalOrder && (
+          {lowestLockedLessonUrl && lowestLockedLessonMeta && lowestLockedGlobalOrder && (
             <Link
-              href={prevLessonUrl}
+              href={lowestLockedLessonUrl}
               className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all"
             >
-              Complete Lesson {prevGlobalOrder}: {prevMeta.title} →
+              Start Lesson {lowestLockedGlobalOrder}: {lowestLockedLessonMeta.title} →
             </Link>
           )}
           <Link

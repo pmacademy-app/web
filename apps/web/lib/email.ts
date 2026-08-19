@@ -63,7 +63,44 @@ export async function sendEmail({
     const data = await res.json()
 
     if (!res.ok) {
-      console.error('[email] Resend API error:', data)
+      console.warn('[email] Resend API error:', data)
+      
+      const brevoApiKey = process.env.BREVO_API_KEY
+      if (brevoApiKey) {
+        console.log('[email] Attempting fallback to Brevo...')
+        try {
+          const senderName = fromEmail.split('<')[0].trim() || BRAND.emailFromName
+          const senderEmailMatch = fromEmail.match(/<([^>]+)>/)
+          const senderEmail = senderEmailMatch ? senderEmailMatch[1] : fromEmail
+
+          const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'api-key': brevoApiKey,
+              'accept': 'application/json'
+            },
+            body: JSON.stringify({
+              sender: { name: senderName, email: senderEmail },
+              to: [{ email: to }],
+              subject,
+              htmlContent: html,
+              textContent: text,
+            }),
+          })
+          
+          const brevoData = await brevoRes.json()
+          if (!brevoRes.ok) {
+            console.error('[email] Brevo API fallback error:', brevoData)
+            return { success: false, error: brevoData.message ?? data.message ?? 'Email send failed on both providers' }
+          }
+          return { success: true, id: brevoData.messageId }
+        } catch (fallbackErr) {
+          console.error('[email] Exception during Brevo fallback:', fallbackErr)
+          return { success: false, error: fallbackErr instanceof Error ? fallbackErr.message : 'Unknown fallback error' }
+        }
+      }
+      
       return { success: false, error: data.message ?? 'Email send failed' }
     }
 
