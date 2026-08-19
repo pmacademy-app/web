@@ -140,3 +140,52 @@ export async function isLessonUnlockedByOrderNumber(
 
   return !!prevProgress && prevProgress.status === 'completed'
 }
+
+/**
+ * Returns the index of the first locked lesson for a user.
+ * The user is allowed to access any lesson with an index strictly less than this returned index.
+ * If all lessons are unlocked (or if the curriculum override is on), returns -1.
+ * 
+ * @param supabase - Server-side Supabase client
+ * @param userId - Authenticated user's UUID
+ * @param curriculumLessonIds - Array of stable les_XXXXXX IDs in the correct global order
+ */
+export async function getFirstLockedLessonIndex(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  curriculumLessonIds: string[]
+): Promise<number> {
+  // Check if user has curriculum_access_override set to true
+  const { data: user } = (await (supabase
+    .from('users') as unknown as DBChain)
+    .select('curriculum_access_override')
+    .eq('id', userId)
+    .maybeSingle()) as unknown as { data: { curriculum_access_override?: boolean } | null; error: unknown }
+
+  if (user?.curriculum_access_override) return -1 // All unlocked
+
+  // Fetch all completed lessons for user
+  const { data: progress } = (await (supabase
+    .from('user_lesson_progress') as unknown as DBChain)
+    .select('lesson_id')
+    .eq('user_id', userId)
+    .eq('status', 'completed')) as unknown as { data: { lesson_id: string }[] | null; error: unknown }
+
+  const completedIds = new Set(progress?.map((p) => p.lesson_id) || [])
+
+  // Find first lesson in curriculum that is NOT completed
+  let firstUncompletedIndex = -1
+  for (let i = 0; i < curriculumLessonIds.length; i++) {
+    if (!completedIds.has(curriculumLessonIds[i])) {
+      firstUncompletedIndex = i
+      break
+    }
+  }
+
+  // If all completed, return -1
+  if (firstUncompletedIndex === -1) return -1
+
+  // The user can access `firstUncompletedIndex` since it's the next in line.
+  // The first LOCKED index is the one immediately after that.
+  return firstUncompletedIndex + 1
+}
