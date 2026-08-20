@@ -35,13 +35,15 @@ export function HeroSection() {
         overflow-hidden
       "
     >
-      {/* Subtle background gradient */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-b from-surface-muted/60 to-transparent pointer-events-none"
-      />
+      {/* Rich Premium Background Gradient Mesh */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full mix-blend-multiply opacity-70 animate-pulse" />
+        <div className="absolute top-[10%] -right-[10%] w-[40%] h-[60%] bg-blue-500/10 blur-[120px] rounded-full mix-blend-multiply opacity-50" />
+        <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] bg-purple-500/10 blur-[120px] rounded-full mix-blend-multiply opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-surface-muted/40 via-transparent to-background" />
+      </div>
 
-      <div className="relative max-w-[1120px] mx-auto px-5 lg:px-8">
+      <div className="relative max-w-[1120px] mx-auto px-5 lg:px-8 z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-12 lg:gap-16 items-center">
 
           {/* ── Left: Content ──────────────────────────────────────────────── */}
@@ -58,26 +60,25 @@ export function HeroSection() {
             {/* Badge */}
             <motion.div variants={prefersReducedMotion ? undefined : FADE_UP}>
               <span className="
-                inline-flex items-center gap-1.5 px-3 py-1
-                bg-primary/10 text-primary border border-primary/20
-                rounded-full text-body-sm font-medium
+                inline-flex items-center gap-1.5 px-3 py-1.5
+                bg-primary/5 text-primary border border-primary/20
+                rounded-full text-sm font-semibold backdrop-blur-md shadow-sm
               ">
                 <GraduationCap size={14} aria-hidden="true" />
                 90 lessons. Free forever.
               </span>
             </motion.div>
 
-            {/* H1 */}
             <motion.h1
               id="hero-heading"
               variants={prefersReducedMotion ? undefined : FADE_UP}
               className="
-                font-display text-h1 lg:text-display-lg xl:text-display-xl
-                font-semibold text-foreground leading-tight tracking-tight
+                font-display text-4xl sm:text-5xl lg:text-7xl
+                font-extrabold text-foreground leading-[1.1] tracking-tight drop-shadow-sm
               "
             >
-              Learn Product Management.{' '}
-              <span className="text-primary">Build real products.</span>{' '}
+              Learn Product Management.<br className="hidden lg:block" />{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">Build real products.</span>{' '}
               Completely free.
             </motion.h1>
 
@@ -98,12 +99,12 @@ export function HeroSection() {
                 href="/signup"
                 onClick={() => trackHeroCTAClick('hero')}
                 className="
-                  inline-flex items-center gap-2 px-6 py-3
-                  bg-primary text-primary-foreground
-                  text-body-sm font-semibold rounded-sm
-                  shadow-xs hover:shadow-sm
-                  hover:opacity-90 active:scale-[0.98]
-                  transition-all duration-[120ms]
+                  inline-flex items-center justify-center gap-2 px-8 py-3.5
+                  bg-gradient-to-r from-primary to-blue-600 text-primary-foreground
+                  text-sm font-bold rounded-full
+                  shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30
+                  hover:opacity-95 active:scale-[0.98] hover:-translate-y-0.5
+                  transition-all duration-200
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
                 "
               >
@@ -112,12 +113,11 @@ export function HeroSection() {
               <Link
                 href="/curriculum"
                 className="
-                  inline-flex items-center gap-2 px-6 py-3
-                  bg-transparent text-foreground
-                  border border-border hover:border-border-strong
-                  text-body-sm font-semibold rounded-sm
-                  hover:bg-surface-muted
-                  transition-all duration-[120ms]
+                  inline-flex items-center justify-center gap-2 px-8 py-3.5
+                  bg-surface-muted/50 text-foreground backdrop-blur-sm
+                  border border-border hover:border-border-strong hover:bg-surface-muted
+                  text-sm font-bold rounded-full
+                  transition-all duration-200
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
                 "
               >

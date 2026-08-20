@@ -5,6 +5,7 @@ import type {
   LearningSettings,
   EmailSettings,
   NotificationSettings,
+  OnboardingSettings,
   SettingsSectionKey,
 } from './types'
 import type { FeatureFlagRecord } from '../notifications/feature-flags/types'
@@ -23,6 +24,7 @@ const SETTINGS_KEYS: Record<SettingsSectionKey, string> = {
   email: 'email_settings',
   notifications: 'notification_settings',
   'feature-flags': 'feature_flags',
+  onboarding: 'onboarding_settings',
 }
 
 // Default values for each section (used when no DB record exists)
@@ -72,6 +74,24 @@ const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
   defaultEmailEnabled: false,
 }
 
+const DEFAULT_ONBOARDING_SETTINGS: OnboardingSettings = {
+  enabled: true,
+  steps: [
+    {
+      id: 'step_goal',
+      title: 'What is your main goal?',
+      description: 'Help us personalize your curriculum.',
+      requiredFields: ['goal']
+    },
+    {
+      id: 'step_profile',
+      title: 'Complete your profile',
+      description: 'Add your details to get started.',
+      requiredFields: ['role', 'experience']
+    }
+  ]
+}
+
 function getDefaultSettings<T>(section: SettingsSectionKey): T {
   switch (section) {
     case 'product':
@@ -82,6 +102,8 @@ function getDefaultSettings<T>(section: SettingsSectionKey): T {
       return DEFAULT_EMAIL_SETTINGS as T
     case 'notifications':
       return DEFAULT_NOTIFICATION_SETTINGS as T
+    case 'onboarding':
+      return DEFAULT_ONBOARDING_SETTINGS as T
     default:
       return {} as T
   }
@@ -168,6 +190,10 @@ export class SettingsService {
     return this.getSettings<NotificationSettings>('notifications')
   }
 
+  public static async getOnboardingSettings(): Promise<OnboardingSettings> {
+    return this.getSettings<OnboardingSettings>('onboarding')
+  }
+
   public static async getFeatureFlags(): Promise<FeatureFlagRecord[]> {
     return globalFeatureFlagService.getAll()
   }
@@ -207,6 +233,14 @@ export class SettingsService {
     return this.upsertSettings('notifications', updated)
   }
 
+  public static async updateOnboardingSettings(
+    partial: Partial<OnboardingSettings>
+  ): Promise<OnboardingSettings> {
+    const current = await this.getOnboardingSettings()
+    const updated = { ...current, ...partial }
+    return this.upsertSettings('onboarding', updated)
+  }
+
   /**
    * Get all settings at once (for initial page load).
    */
@@ -215,15 +249,17 @@ export class SettingsService {
     learning: LearningSettings
     email: EmailSettings
     notifications: NotificationSettings
+    onboarding: OnboardingSettings
     featureFlags: FeatureFlagRecord[]
   }> {
-    const [product, learning, email, notifications, featureFlags] = await Promise.all([
+    const [product, learning, email, notifications, onboarding, featureFlags] = await Promise.all([
       this.getProductSettings(),
       this.getLearningSettings(),
       this.getEmailSettings(),
       this.getNotificationSettings(),
+      this.getOnboardingSettings(),
       this.getFeatureFlags(),
     ])
-    return { product, learning, email, notifications, featureFlags }
+    return { product, learning, email, notifications, onboarding, featureFlags }
   }
 }

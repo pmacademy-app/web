@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "content:compile": "npx tsx ../../scripts/compiler/compile.ts",
+    "content:compile": "cross-env NODE_PATH=./node_modules npx tsx ../../scripts/compiler/compile.ts",
     "content:validate": "npx tsx ../../scripts/compiler/compile.ts --validate-only",
     "content:migrate": "npx tsx ../../scripts/compiler/migrate.ts",
     "content:build": "npm run content:compile",
@@ -89,6 +89,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "jsdom": "^29.1.1",
