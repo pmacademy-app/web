@@ -294,7 +294,7 @@ export async function getSkillRadarSummary(
     console.error('[skillRadar] Error fetching user_lesson_progress for skill radar:', error)
   }
 
-  let lessonModuleMap = new Map<string, string>()
+  const lessonModuleMap = new Map<string, string>()
   try {
     if (typeof window === 'undefined') {
       const fs = await import('fs/promises')
@@ -306,7 +306,7 @@ export async function getSkillRadarSummary(
         lessonModuleMap.set(l.id, l.module)
       }
     }
-  } catch (e) {
+  } catch {
     console.warn('[skillRadar] Could not load curriculum.json for lesson mapping')
   }
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { resetProgress } from '@/lib/settings/settings-service'
@@ -19,6 +20,12 @@ export async function POST(request: Request) {
 
     const supabase = createServiceRoleClient()
     await resetProgress(supabase, user.id, moduleSlug)
+
+    // Clear next.js data cache for academy pages so they accurately reflect locked state
+    revalidatePath('/academy', 'layout')
+    revalidatePath('/dashboard', 'layout')
+    revalidatePath('/progress', 'layout')
+    revalidatePath('/capstones', 'layout')
 
     return NextResponse.json({ success: true })
   } catch (error: unknown) {

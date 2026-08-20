@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Image from 'next/image'
 import { ShieldCheck, Award, CheckCircle2 } from 'lucide-react'
 import type { VerifiedCertificatePayload } from '@/lib/certificates-db'
 import { generateQrCodeSvg } from '@/lib/certificates'
@@ -90,11 +91,13 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
         </div>
 
         {certificate.avatarUrl && (
-          <div className="flex justify-center mb-4">
-            <img 
+          <div className="flex justify-center mb-4 relative h-20 w-20 mx-auto">
+            <Image 
               src={certificate.avatarUrl} 
               alt={learnerName} 
-              className="w-20 h-20 rounded-full border-4 border-card shadow-sm object-cover" 
+              fill
+              className="rounded-full border-4 border-card shadow-sm object-cover"
+              unoptimized
             />
           </div>
         )}

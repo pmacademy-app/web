@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
+import Image from 'next/image'
 import { Camera, Loader2, Upload, User } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
@@ -59,8 +60,12 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadSuccess }: Avat
       if (onUploadSuccess) {
         onUploadSuccess(publicUrl)
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during upload.')
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('An error occurred during upload.')
+      }
     } finally {
       setIsUploading(false)
     }
@@ -70,7 +75,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadSuccess }: Avat
     <div className="flex flex-col items-center gap-4">
       <div className="relative group w-24 h-24 rounded-full border-2 border-brand-border bg-brand-surface overflow-hidden flex items-center justify-center">
         {avatarUrl ? (
-          <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+          <Image src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" width={96} height={96} unoptimized />
         ) : (
           <User className="w-10 h-10 text-brand-fg-subtle" />
         )}

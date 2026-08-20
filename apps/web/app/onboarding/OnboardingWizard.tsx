@@ -10,9 +10,25 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
+interface OnboardingUser {
+  user_metadata?: {
+    full_name?: string
+    avatar_url?: string
+  }
+}
+
+interface OnboardingProfile {
+  name?: string
+  username?: string
+  avatar_url?: string
+  career_role?: string
+  goal?: string
+  learning_purpose?: string
+}
+
 interface OnboardingWizardProps {
-  user: any
-  profile: any
+  user: OnboardingUser
+  profile: OnboardingProfile | null
 }
 
 export default function OnboardingWizard({ user, profile }: OnboardingWizardProps) {
@@ -141,7 +157,7 @@ export default function OnboardingWizard({ user, profile }: OnboardingWizardProp
 
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none" htmlFor="goal">Primary Goal *</label>
-                <Select value={formData.goal} onValueChange={(val: any) => updateForm('goal', val)}>
+                <Select value={formData.goal} onValueChange={(val: string) => updateForm('goal', val)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a goal..." />
                   </SelectTrigger>

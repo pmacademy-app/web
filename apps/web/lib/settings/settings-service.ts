@@ -24,6 +24,15 @@ export async function resetProgress(
       .ilike('lesson_id', `%${moduleSlug}%`)
 
     if (pErr) console.warn('[settings-service] Reset module progress warning:', pErr)
+
+    // Delete capstones for this module specifically
+    const { error: cErr } = await (supabase
+      .from('capstone_submissions') as unknown as DBChain)
+      .delete()
+      .eq('user_id', userId)
+      .eq('module_slug', moduleSlug)
+      
+    if (cErr) console.warn('[settings-service] Reset module capstones warning:', cErr)
   } else {
     // Delete all lesson progress and quiz attempts for full reset
     const { error: pErr } = await (supabase
@@ -39,6 +48,27 @@ export async function resetProgress(
       .eq('user_id', userId)
 
     if (qErr) console.warn('[settings-service] Reset quiz attempts warning:', qErr)
+
+    const { error: cErr } = await (supabase
+      .from('capstone_submissions') as unknown as DBChain)
+      .delete()
+      .eq('user_id', userId)
+
+    if (cErr) console.warn('[settings-service] Reset capstones warning:', cErr)
+
+    const { error: fErr } = await (supabase
+      .from('user_flashcard_srs') as unknown as DBChain)
+      .delete()
+      .eq('user_id', userId)
+
+    if (fErr) console.warn('[settings-service] Reset flashcards warning:', fErr)
+
+    const { error: rErr } = await (supabase
+      .from('lesson_reflections') as unknown as DBChain)
+      .delete()
+      .eq('user_id', userId)
+      
+    if (rErr) console.warn('[settings-service] Reset reflections warning:', rErr)
   }
 }
 
