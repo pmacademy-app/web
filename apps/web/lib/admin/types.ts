@@ -598,7 +598,7 @@ export interface AdminLearningAnalytics {
 
 /* ─── Phase 8 — Settings & Configuration ───────────────────────────────────── */
 
-export type SettingsSectionKey = 'product' | 'learning' | 'email' | 'notifications' | 'feature-flags'
+export type SettingsSectionKey = 'product' | 'learning' | 'email' | 'notifications' | 'feature-flags' | 'onboarding'
 
 export interface ProductSettings {
   // General
@@ -657,6 +657,18 @@ export interface NotificationSettings {
   // Defaults
   defaultInAppEnabled: boolean
   defaultEmailEnabled: boolean
+}
+
+export interface OnboardingStepConfig {
+  id: string
+  title: string
+  description: string
+  requiredFields: string[]
+}
+
+export interface OnboardingSettings {
+  enabled: boolean
+  steps: OnboardingStepConfig[]
 }
 
 export interface SettingsResponse<T> {

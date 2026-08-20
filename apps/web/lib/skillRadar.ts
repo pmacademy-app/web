@@ -294,8 +294,25 @@ export async function getSkillRadarSummary(
     console.error('[skillRadar] Error fetching user_lesson_progress for skill radar:', error)
   }
 
+  let lessonModuleMap = new Map<string, string>()
+  try {
+    if (typeof window === 'undefined') {
+      const fs = await import('fs/promises')
+      const path = await import('path')
+      const curriculumPath = path.default.resolve(process.cwd(), '..', '..', 'content', 'dist', 'curriculum.json')
+      const raw = await fs.readFile(curriculumPath, 'utf-8')
+      const curriculum = JSON.parse(raw)
+      for (const l of curriculum.lessons) {
+        lessonModuleMap.set(l.id, l.module)
+      }
+    }
+  } catch (e) {
+    console.warn('[skillRadar] Could not load curriculum.json for lesson mapping')
+  }
+
   const userProgressList: LessonProgressInput[] = (progressRows || []).map((row) => ({
     lessonId: row.lesson_id,
+    moduleSlug: lessonModuleMap.get(row.lesson_id),
     status: row.status,
     quizScore: row.quiz_score,
     quizAttempts: row.quiz_attempts,

@@ -10,12 +10,14 @@ import { LearningSettingsSection } from './LearningSettingsSection'
 import { EmailSettingsSection } from './EmailSettingsSection'
 import { NotificationSettingsSection } from './NotificationSettingsSection'
 import { FeatureFlagsSection } from './FeatureFlagsSection'
+import { OnboardingSettingsSection } from './OnboardingSettingsSection'
 import type {
   SettingsSectionKey,
   ProductSettings,
   LearningSettings,
   EmailSettings,
   NotificationSettings,
+  OnboardingSettings,
 } from '@/lib/admin/types'
 import type { FeatureFlagRecord } from '@/lib/notifications/feature-flags/types'
 
@@ -24,6 +26,7 @@ export interface SettingsDataMap {
   learning: LearningSettings
   email: EmailSettings
   notifications: NotificationSettings
+  onboarding: OnboardingSettings
   'feature-flags': FeatureFlagRecord[]
 }
 
@@ -37,8 +40,20 @@ const SECTIONS: Array<{ key: SettingsSectionKey; label: string; icon: React.Reac
   { key: 'learning', label: 'Learning', icon: <BookOpenIcon /> },
   { key: 'email', label: 'Email', icon: <MailIcon /> },
   { key: 'notifications', label: 'Notifications', icon: <BellIcon /> },
+  { key: 'onboarding', label: 'Onboarding', icon: <UsersIcon /> },
   { key: 'feature-flags', label: 'Feature Flags', icon: <FlagIcon /> },
 ]
+
+function UsersIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  )
+}
 
 function SettingsIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -166,6 +181,17 @@ export function SettingsWorkspace({
         notifications: { ...prev.notifications, ...partial },
       }))
       markDirty('notifications')
+    },
+    [markDirty]
+  )
+
+  const updateOnboardingData = useCallback(
+    (partial: Partial<OnboardingSettings>) => {
+      setSectionData((prev) => ({
+        ...prev,
+        onboarding: { ...prev.onboarding, ...partial },
+      }))
+      markDirty('onboarding')
     },
     [markDirty]
   )
@@ -320,6 +346,18 @@ export function SettingsWorkspace({
             isDirty={dirtySections.has('notifications')}
             isSaving={savingSection === 'notifications'}
             initialData={initialData.notifications}
+          />
+        )}
+        {activeSection === 'onboarding' && (
+          <OnboardingSettingsSection
+            sectionKey="onboarding"
+            data={sectionData.onboarding}
+            onChange={updateOnboardingData}
+            onSave={() => handleSave('onboarding')}
+            onReset={() => handleReset('onboarding')}
+            isDirty={dirtySections.has('onboarding')}
+            isSaving={savingSection === 'onboarding'}
+            initialData={initialData.onboarding}
           />
         )}
         {activeSection === 'feature-flags' && (

@@ -14,6 +14,7 @@ const VALID_SECTIONS: SettingsSectionKey[] = [
   'email',
   'notifications',
   'feature-flags',
+  'onboarding',
 ]
 
 export default async function AdminSettingsPage({ searchParams }: PageProps) {
@@ -23,15 +24,16 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
     : 'product'
 
   // Fetch all settings in parallel for the initial load
-  const [product, learning, email, notifications, featureFlags] = await Promise.all([
+  const [product, learning, email, notifications, featureFlags, onboarding] = await Promise.all([
     SettingsService.getProductSettings(),
     SettingsService.getLearningSettings(),
     SettingsService.getEmailSettings(),
     SettingsService.getNotificationSettings(),
     SettingsService.getFeatureFlags(),
+    SettingsService.getOnboardingSettings(),
   ])
 
-  const initialData = { product, learning, email, notifications, 'feature-flags': featureFlags }
+  const initialData = { product, learning, email, notifications, 'feature-flags': featureFlags, onboarding }
 
   return (
     <SettingsWorkspace
