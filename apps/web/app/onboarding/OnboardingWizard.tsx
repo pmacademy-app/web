@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface OnboardingUser {
+  id: string
   user_metadata?: {
     full_name?: string
     avatar_url?: string
@@ -22,8 +23,10 @@ interface OnboardingProfile {
   username?: string
   avatar_url?: string
   career_role?: string
-  goal?: string
+  goal?: 'job_search' | 'fill_gaps' | 'exploring'
   learning_purpose?: string
+  linkedin_url?: string
+  website_url?: string
 }
 
 interface OnboardingWizardProps {
@@ -114,11 +117,7 @@ export default function OnboardingWizard({ user, profile }: OnboardingWizardProp
         <div className="space-y-6 bg-card p-6 rounded-2xl border shadow-sm">
           {step === 1 && (
             <div className="space-y-4">
-              <AvatarUpload 
-                userId={user.id} 
-                currentAvatarUrl={formData.avatar_url} 
-                onUploadSuccess={(url) => updateForm('avatar_url', url)} 
-              />
+              <AvatarUpload userId={user.id} currentAvatarUrl={formData.avatar_url || undefined} onUploadSuccess={(url) => updateForm('avatar_url', url)} />
               
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none" htmlFor="name">Full Name *</label>
@@ -157,7 +156,7 @@ export default function OnboardingWizard({ user, profile }: OnboardingWizardProp
 
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none" htmlFor="goal">Primary Goal *</label>
-                <Select value={formData.goal} onValueChange={(val: string) => updateForm('goal', val)}>
+                <Select value={formData.goal} onValueChange={(val) => updateForm('goal', val as any)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a goal..." />
                   </SelectTrigger>
