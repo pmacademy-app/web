@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Trophy, ArrowRight, RotateCcw, Zap, CheckCircle2, Check, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import QuizOption from '@/components/quiz/QuizOption';
@@ -32,7 +32,22 @@ export default function QuizBlock({ block }: BlockProps) {
   const [quizFinished, setQuizFinished] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const currentQuestion = questions[currentIndex];
+  const shuffledQuestions = useMemo(() => {
+    return questions.map(q => {
+      const optionsWithOriginalIndices = q.options.map((text, idx) => ({ text, originalIndex: idx }));
+      // Fisher-Yates shuffle
+      for (let i = optionsWithOriginalIndices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [optionsWithOriginalIndices[i], optionsWithOriginalIndices[j]] = [optionsWithOriginalIndices[j], optionsWithOriginalIndices[i]];
+      }
+      return {
+        ...q,
+        shuffledOptions: optionsWithOriginalIndices
+      };
+    });
+  }, [questions]);
+
+  const currentQuestion = shuffledQuestions[currentIndex];
 
   const handleReset = () => {
     setCurrentIndex(0);
@@ -52,14 +67,15 @@ export default function QuizBlock({ block }: BlockProps) {
   const handleConfirm = useCallback(() => {
     if (selectedOption === null || isConfirmed || !currentQuestion) return;
 
-    const isCorrect = selectedOption === currentQuestion.correctAnswer;
+    const chosenOriginalIndex = currentQuestion.shuffledOptions[selectedOption].originalIndex;
+    const isCorrect = chosenOriginalIndex === currentQuestion.correctAnswer;
     if (isCorrect) {
       setCorrectCount((c) => c + 1);
     }
 
     const newAttempt = {
       question_id: currentQuestion.id,
-      selected_option: selectedOption,
+      selected_option: chosenOriginalIndex,
       is_correct: isCorrect,
     };
 
@@ -101,7 +117,7 @@ export default function QuizBlock({ block }: BlockProps) {
       // Hotkeys: '1', '2', '3', '4' for options
       if (!isConfirmed && ['1', '2', '3', '4'].includes(e.key)) {
         const idx = parseInt(e.key, 10) - 1;
-        if (idx < currentQuestion.options.length) {
+        if (idx < currentQuestion.shuffledOptions.length) {
           setSelectedOption(idx);
         }
       }
@@ -110,7 +126,7 @@ export default function QuizBlock({ block }: BlockProps) {
       if (!isConfirmed) {
         if (e.key === 'ArrowDown') {
           setSelectedOption((prev) =>
-            prev === null ? 0 : Math.min(currentQuestion.options.length - 1, prev + 1)
+            prev === null ? 0 : Math.min(currentQuestion.shuffledOptions.length - 1, prev + 1)
           );
         } else if (e.key === 'ArrowUp') {
           setSelectedOption((prev) =>
@@ -248,12 +264,12 @@ export default function QuizBlock({ block }: BlockProps) {
 
         {/* Options grid */}
         <div className="grid grid-cols-1 gap-3" role="radiogroup" aria-label="Answer Options">
-          {currentQuestion.options.map((option, idx) => {
+          {currentQuestion.shuffledOptions.map((optionObj, idx) => {
             const letter = optionLetters[idx] || 'A';
             let optionState: 'default' | 'selected' | 'correct' | 'incorrect' | 'disabled' = 'default';
 
             if (isConfirmed) {
-              if (idx === currentQuestion.correctAnswer) {
+              if (optionObj.originalIndex === currentQuestion.correctAnswer) {
                 optionState = 'correct';
               } else if (idx === selectedOption) {
                 optionState = 'incorrect';
@@ -268,7 +284,7 @@ export default function QuizBlock({ block }: BlockProps) {
               <QuizOption
                 key={idx}
                 letter={letter}
-                text={option}
+                text={optionObj.text}
                 state={optionState}
                 disabled={isConfirmed}
                 onClick={() => handleOptionClick(idx)}
@@ -310,7 +326,7 @@ export default function QuizBlock({ block }: BlockProps) {
           {isConfirmed && currentQuestion.explanation && (
             <div className="p-5 rounded-xl border border-border bg-muted/30 space-y-2 animate-slide-down">
               <div className="flex items-center gap-2 text-sm font-bold">
-                {selectedOption === currentQuestion.correctAnswer ? (
+                {currentQuestion.shuffledOptions[selectedOption!]?.originalIndex === currentQuestion.correctAnswer ? (
                   <>
                     <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
                       <Check className="h-3 w-3" />

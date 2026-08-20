@@ -47,6 +47,7 @@ function toVerifiedPayload(cert: AdminCertificateDetail): VerifiedCertificatePay
     issuedAt: cert.issuedAt,
     isValid: true,
     verificationUrl: cert.verificationUrl,
+    avatarUrl: null,
     portfolioUrl: '',
   }
 }
