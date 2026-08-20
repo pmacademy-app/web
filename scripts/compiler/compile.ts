@@ -256,6 +256,7 @@ export async function compileLesson(
       
       const mermaidNode = segment.nodes.find((n) => n.type === 'code' && n.lang === 'mermaid');
       let diagram: any = undefined;
+      let mBlockToPush: any = null;
       if (mermaidNode) {
         diagram = {
           blockId: `mer-${lessonId}`,
@@ -277,7 +278,7 @@ export async function compileLesson(
         mBlock.blockId = getOrCreateBlockId(lessonId, mBlock);
         mBlock.id = mBlock.blockId;
         diagram.blockId = mBlock.blockId;
-        blocks.push(mBlock);
+        mBlockToPush = mBlock;
       }
 
       const block: any = {
@@ -288,6 +289,9 @@ export async function compileLesson(
       };
       block.blockId = getOrCreateBlockId(lessonId, block);
       blocks.push(block);
+      if (mBlockToPush) {
+        blocks.push(mBlockToPush);
+      }
       searchableTextParts.push(mmTitle);
       collectSearchableText(children, searchableTextParts);
     } else if (headingLower.includes('company example') || headingLower.includes('real company example')) {
@@ -351,6 +355,7 @@ export async function compileLesson(
 
       const mermaidNode = segment.nodes.find((n) => n.type === 'code' && n.lang === 'mermaid');
       let diagram: any = undefined;
+      let mBlockToPush: any = null;
       if (mermaidNode) {
         diagram = {
           blockId: `mer-fw-${lessonId}`,
@@ -370,7 +375,7 @@ export async function compileLesson(
         mBlock.blockId = getOrCreateBlockId(lessonId, mBlock);
         mBlock.id = mBlock.blockId;
         diagram.blockId = mBlock.blockId;
-        blocks.push(mBlock);
+        mBlockToPush = mBlock;
       }
 
       const block: any = {
@@ -381,6 +386,9 @@ export async function compileLesson(
       };
       block.blockId = getOrCreateBlockId(lessonId, block);
       blocks.push(block);
+      if (mBlockToPush) {
+        blocks.push(mBlockToPush);
+      }
       searchableTextParts.push(fwTitle);
       collectSearchableText(children, searchableTextParts);
     } else if (headingLower.includes('interview perspective')) {

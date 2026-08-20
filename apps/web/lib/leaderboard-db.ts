@@ -91,30 +91,39 @@ export async function getWeeklyLeaderboard(
   const weekStart = targetWeekStart || calculateWeekStart()
   const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
 
-  // 1. Fetch opted-in users
-  const { data: optedInRows } = (await (supabase
-    .from('user_leaderboard_settings') as unknown as DBChain)
-    .select('user_id')
-    .eq('is_opted_in', true)) as unknown as { data: { user_id: string }[] | null }
-
-  const optedInUserIds = new Set<string>((optedInRows || []).map((r) => r.user_id))
-  // Always include current user in their personal view even if opted out
-  optedInUserIds.add(userId)
-
-  const userIdsArray = Array.from(optedInUserIds)
-  if (userIdsArray.length === 0) {
-    return { weekStart, isOptedIn, entries: [], personalEntry: null }
-  }
-
-  // 2. Fetch users metadata
+  // 1. Fetch users with total_xp > 0
   const { data: users } = (await (supabase
     .from('users') as unknown as DBChain)
     .select('id, username, name, avatar_url, total_xp, current_streak, level')
-    .in('id', userIdsArray)) as unknown as { data: UserRow[] | null }
+    .gt('total_xp', 0)) as unknown as { data: UserRow[] | null }
 
-  if (!users || users.length === 0) {
+  let userIdsArray = (users || []).map((u) => u.id)
+
+  // Always ensure the current user is fetched even if their total_xp is 0
+  if (!userIdsArray.includes(userId)) {
+    const { data: currentUser } = (await (supabase
+      .from('users') as unknown as DBChain)
+      .select('id, username, name, avatar_url, total_xp, current_streak, level')
+      .eq('id', userId)
+      .maybeSingle()) as unknown as { data: UserRow | null }
+      
+    if (currentUser) {
+      users?.push(currentUser)
+      userIdsArray.push(currentUser.id)
+    }
+  }
+
+  if (userIdsArray.length === 0 || !users) {
     return { weekStart, isOptedIn, entries: [], personalEntry: null }
   }
+
+  // 2. Fetch opted-out users so we can exclude them
+  const { data: optedOutRows } = (await (supabase
+    .from('user_leaderboard_settings') as unknown as DBChain)
+    .select('user_id')
+    .eq('is_opted_in', false)) as unknown as { data: { user_id: string }[] | null }
+
+  const optedOutUserIds = new Set<string>((optedOutRows || []).map((r) => r.user_id))
 
   // 3. Fetch lesson progress in current week for consistency metric
   const weekStartDate = new Date(weekStart)
@@ -172,7 +181,7 @@ export async function getWeeklyLeaderboard(
 
   // Calculate final rankings
   const rankedEntries = calculateRankings(rawMetrics, userId)
-  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || optedInUserIds.has(e.userId))
+  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !optedOutUserIds.has(e.userId))
   const personalEntry = rankedEntries.find((e) => e.isCurrentUser) ?? null
 
   return {

@@ -240,13 +240,13 @@ export function AdminSidebar({ mobileOpen, onMobileClose, user, attention }: Adm
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex h-screen sticky top-0 flex-shrink-0 z-30">
+      <aside className="no-print hidden md:flex h-screen sticky top-0 flex-shrink-0 z-30">
         {content}
       </aside>
 
       {/* Mobile Drawer Overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex">
+        <div className="no-print fixed inset-0 z-50 md:hidden flex">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={onMobileClose}

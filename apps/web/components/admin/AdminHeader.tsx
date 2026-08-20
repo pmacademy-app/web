@@ -63,7 +63,7 @@ export function AdminHeader({ onToggleMobileMenu, user, attentionTotal = 0, syst
   const hasAttention = attentionTotal > 0
 
   return (
-    <header className="h-16 bg-admin-surface/80 backdrop-blur border-b border-admin-border px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
+    <header className="no-print h-16 bg-admin-surface/80 backdrop-blur border-b border-admin-border px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center gap-3 min-w-0">
         {onToggleMobileMenu && (
           <button
