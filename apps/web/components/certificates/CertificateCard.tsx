@@ -89,6 +89,16 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
           </p>
         </div>
 
+        {certificate.avatarUrl && (
+          <div className="flex justify-center mb-4">
+            <img 
+              src={certificate.avatarUrl} 
+              alt={learnerName} 
+              className="w-20 h-20 rounded-full border-4 border-card shadow-sm object-cover" 
+            />
+          </div>
+        )}
+
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground tracking-tight leading-tight break-words">
           {learnerName}
         </h1>
