@@ -97,7 +97,7 @@ export async function getWeeklyLeaderboard(
     .select('id, username, name, avatar_url, total_xp, current_streak, level')
     .gt('total_xp', 0)) as unknown as { data: UserRow[] | null }
 
-  let userIdsArray = (users || []).map((u) => u.id)
+  const userIdsArray = (users || []).map((u) => u.id)
 
   // Always ensure the current user is fetched even if their total_xp is 0
   if (!userIdsArray.includes(userId)) {
