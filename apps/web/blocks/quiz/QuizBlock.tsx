@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Trophy, ArrowRight, RotateCcw, Zap, CheckCircle2, Check, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import QuizOption from '@/components/quiz/QuizOption';
@@ -18,8 +18,7 @@ interface QuizQuestion {
 }
 
 export default function QuizBlock({ block }: BlockProps) {
-  const questions: QuizQuestion[] = block.questions || [];
-  const totalQuestions = questions.length;
+  const totalQuestions = (block.questions || []).length;
   const lessonCtx = useLessonContextSafe();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,7 +31,8 @@ export default function QuizBlock({ block }: BlockProps) {
   const [quizFinished, setQuizFinished] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const shuffledQuestions = useMemo(() => {
+  const [shuffledQuestions] = useState<(QuizQuestion & { shuffledOptions: { text: string; originalIndex: number }[] })[]>(() => {
+    const questions = block.questions || [];
     return questions.map(q => {
       const optionsWithOriginalIndices = q.options.map((text, idx) => ({ text, originalIndex: idx }));
       // Fisher-Yates shuffle
@@ -45,7 +45,7 @@ export default function QuizBlock({ block }: BlockProps) {
         shuffledOptions: optionsWithOriginalIndices
       };
     });
-  }, [questions]);
+  });
 
   const currentQuestion = shuffledQuestions[currentIndex];
 
@@ -157,6 +157,7 @@ export default function QuizBlock({ block }: BlockProps) {
       </div>
     );
   }
+  if (shuffledQuestions.length === 0) return null; // Wait for shuffle on mount
 
   // Summary screen
   if (quizFinished) {
