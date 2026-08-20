@@ -9,6 +9,7 @@ const VALID_SECTIONS: SettingsSectionKey[] = [
   'email',
   'notifications',
   'feature-flags',
+  'onboarding',
 ]
 
 function getSectionFromRequest(request: NextRequest): SettingsSectionKey | null {
@@ -46,6 +47,9 @@ export async function GET(request: NextRequest) {
           break
         case 'notifications':
           data = await SettingsService.getNotificationSettings()
+          break
+        case 'onboarding':
+          data = await SettingsService.getOnboardingSettings()
           break
         case 'feature-flags':
           data = await SettingsService.getFeatureFlags()
@@ -101,6 +105,10 @@ export async function PATCH(request: NextRequest) {
       case 'notifications':
         updated = await SettingsService.updateNotificationSettings(body)
         action = 'update_notification_settings'
+        break
+      case 'onboarding':
+        updated = await SettingsService.updateOnboardingSettings(body)
+        action = 'update_onboarding_settings'
         break
       case 'feature-flags':
         // Feature flags are handled by their own API

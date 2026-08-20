@@ -55,7 +55,7 @@ export default async function AuthenticatedLayout({
   }
 
   const isOnboardingComplete = Boolean(
-    authUser.user_metadata?.onboarding_complete || profile?.onboarding_completed || profile?.goal || profile?.curriculum_access_override
+    authUser.user_metadata?.onboarding_complete || profile?.goal || profile?.curriculum_access_override
   )
 
   if (!isOnboardingComplete) {
