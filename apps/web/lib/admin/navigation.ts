@@ -70,7 +70,10 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   },
   {
     label: 'Settings',
-    items: [{ name: 'Settings', href: '/admin/settings', icon: Settings, built: true }],
+    items: [
+      { name: 'Settings', href: '/admin/settings', icon: Settings, built: true },
+      { name: 'Onboarding', href: '/admin/settings?section=onboarding', icon: Users, built: true }
+    ],
   },
 ]
 
