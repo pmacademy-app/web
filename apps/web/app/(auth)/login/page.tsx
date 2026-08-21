@@ -55,7 +55,7 @@ function LoginForm() {
     startTransition(async () => {
       try {
         const supabase = createBrowserSupabaseClient()
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: values.email,
           password: values.password,
         })
@@ -63,6 +63,27 @@ function LoginForm() {
         if (error) {
           setErrorMsg(error.message)
           return
+        }
+
+        // Explicitly sync session to HTTP-only cookies BEFORE navigating.
+        // This eliminates the race condition where the server renders /dashboard
+        // before AuthStateListener writes the cookie.
+        if (data?.session) {
+          try {
+            const syncRes = await fetch('/api/auth/session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ session: data.session }),
+            })
+            if (!syncRes.ok) {
+              setErrorMsg('Session initialization failed. Please try logging in again.')
+              return
+            }
+          } catch (syncErr) {
+            console.error('[login] Session sync network error:', syncErr)
+            setErrorMsg('Unable to synchronize login session. Please check your network and try again.')
+            return
+          }
         }
 
         router.push('/dashboard')
