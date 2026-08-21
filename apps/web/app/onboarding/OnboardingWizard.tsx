@@ -156,7 +156,7 @@ export default function OnboardingWizard({ user, profile }: OnboardingWizardProp
 
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none" htmlFor="goal">Primary Goal *</label>
-                <Select value={formData.goal} onValueChange={(val) => updateForm('goal', val as any)}>
+                <Select value={formData.goal} onValueChange={(val) => updateForm('goal', val as 'job_search' | 'fill_gaps' | 'exploring')}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a goal..." />
                   </SelectTrigger>
