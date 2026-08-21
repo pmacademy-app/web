@@ -276,28 +276,30 @@ vitest run update-password
 
 ---
 
-## 6. Middleware
+## 6. Request Interception & Proxy
 
-### 6.1 middleware.ts is the registered Next.js middleware
-**Criterion:** The file at `apps/web/middleware.ts` exports a function named `middleware` and a `config.matcher`.
+### 6.1 proxy.ts is implemented with @supabase/ssr
+**Criterion:** The file at `apps/web/proxy.ts` exports `export async function proxy(request: NextRequest)` and `config.matcher`, using `@supabase/ssr` `createServerClient` to synchronize cookies and validate sessions.
 
 **Verification:**
 ```bash
-cat apps/web/middleware.ts | grep "export.*function middleware" | wc -l  # must be 1
-cat apps/web/middleware.ts | grep "export const config" | wc -l  # must be 1
+cat apps/web/proxy.ts | grep "export.*function proxy" | wc -l  # must be 1
+cat apps/web/proxy.ts | grep "export const config" | wc -l  # must be 1
+cat apps/web/proxy.ts | grep "@supabase/ssr" | wc -l        # must be >= 1
 ```
-**Pass condition:** Both exist.
+**Pass condition:** All 3 exist and verify true.
 
 ---
 
-### 6.2 proxy.ts is deleted
-**Criterion:** `proxy.ts` no longer exists.
+### 6.2 Session bridge endpoint and listener deleted
+**Criterion:** `/api/auth/session` route and `AuthStateListener` no longer exist.
 
 **Verification:**
 ```bash
-test -f apps/web/proxy.ts && echo "EXISTS" || echo "DELETED"
+test -f apps/web/app/api/auth/session/route.ts && echo "EXISTS" || echo "DELETED"
+test -f apps/web/components/layout/AuthStateListener.tsx && echo "EXISTS" || echo "DELETED"
 ```
-**Pass condition:** DELETED.
+**Pass condition:** Both are DELETED.
 
 ---
 
@@ -421,7 +423,7 @@ AUTHENTICATION
 [ ] 1.1 Signup: E2E test passes, exactly one welcome email
 [ ] 1.2 Email verification: session created on link click
 [ ] 1.3 Login: E2E test passes
-[ ] 1.4 Token refresh: expired token auto-refreshed via middleware
+[ ] 1.4 Token refresh: expired token auto-refreshed via proxy.ts
 [ ] 1.5 Session persistence: works across browser restart
 [ ] 1.6 Logout: E2E test passes, protected routes redirect
 [ ] 1.7 Password reset: E2E test passes, new password works
@@ -448,9 +450,9 @@ API SECURITY
 [ ] 5.2 Admin endpoints: 401/403 for non-admin users
 [ ] 5.3 Password update: CSRF protection verified
 
-MIDDLEWARE
-[ ] 6.1 middleware.ts registered with correct export
-[ ] 6.2 proxy.ts deleted
+REQUEST INTERCEPTION & PROXY
+[ ] 6.1 proxy.ts implemented using @supabase/ssr createServerClient
+[ ] 6.2 /api/auth/session and AuthStateListener deleted
 
 ERROR HANDLING
 [ ] 7.1 Failures logged to system_errors

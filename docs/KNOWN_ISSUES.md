@@ -8,13 +8,13 @@
 ## AUTH — Authentication Issues
 
 ### AUTH-001
-- **Severity:** CRITICAL
-- **Area:** Authentication / Session Management
-- **Problem:** No Next.js middleware exists. Route protection is implemented entirely via server-side layout components. A request to a protected page makes a full round-trip to the server before auth is evaluated.
-- **Evidence:** `find . -name "middleware.ts"` returns nothing. `apps/web/app/(app)/layout.tsx` reads cookies and redirects. `apps/web/app/admin/(console)/layout.tsx` does the same.
-- **Impact:** No edge-level interception. Token expiry is not caught until a server component renders. An expired token causes a flash of the protected page before redirect in some rendering scenarios.
-- **Root Cause:** @supabase/ssr was never adopted. The codebase was built with a custom cookie bridge instead.
-- **Recommendation:** CREATE middleware.ts using @supabase/ssr that intercepts all /app/* and /admin/* routes, refreshes tokens, and redirects unauthenticated users.
+- **Severity:** HIGH
+- **Area:** Authentication / Request Interception & Proxy
+- **Problem:** `apps/web/proxy.ts` implements Next.js 16 request interception, but uses raw `@supabase/supabase-js` `createClient` and custom `httpOnly: true` cookies instead of the official `@supabase/ssr` `createServerClient` pattern.
+- **Evidence:** `apps/web/proxy.ts` manually manages `sb-access-token` cookies with `httpOnly: true` and queries the database inside the proxy, desynchronizing server state from browser SDK.
+- **Impact:** Client-side SDK cannot read session tokens directly; requires fragile `/api/auth/session` bridge and `AuthStateListener` to sync tokens.
+- **Root Cause:** `@supabase/ssr` was never integrated into `proxy.ts`.
+- **Recommendation:** REWRITE `proxy.ts` to use `@supabase/ssr` `createServerClient` with `getAll()` and `setAll()` cookie synchronization.
 - **Status:** REWRITE
 
 ---
