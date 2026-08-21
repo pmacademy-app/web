@@ -3,9 +3,6 @@ import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminEmail } from '@/lib/admin/authorization'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
 const AUTH_PAGE_TARGET_LEARNER = '/dashboard'
 const AUTH_PAGE_TARGET_ADMIN = '/admin'
 const ADMIN_LOGIN_PAGE = '/admin/login'
@@ -39,6 +36,8 @@ function withSessionCookies(
 
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co'
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key'
 
   // Route classification ----------------------------------------------------
   // Auth pages are public and route authenticated users away.
@@ -121,7 +120,6 @@ export async function proxy(request: NextRequest) {
   async function isAdmin(): Promise<boolean> {
     if (!user) return false
     if (isAdminEmail(user.email)) return true
-    if (user.user_metadata?.is_admin) return true
 
     try {
       const { data } = await authorizedClient

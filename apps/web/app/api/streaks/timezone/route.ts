@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -7,32 +8,16 @@ interface DBChain {
 
 export async function POST(request: Request) {
   try {
-    const authHeader = request.headers.get('Authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
-
-    const supabase = createServiceRoleClient()
-    let userId: string | null = null
-
-    if (token) {
-      const { data: { user }, error: userError } = await supabase.auth.getUser(token)
-      if (!userError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (!authError && user) {
-        userId = user.id
-      }
-    }
-
-    if (!userId) {
+    const user = await getAuthenticatedUserFromRequest(request)
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
       )
     }
+
+    const userId = user.id
+    const supabase = createServiceRoleClient()
 
     const body = await request.json()
     const { timezone } = body

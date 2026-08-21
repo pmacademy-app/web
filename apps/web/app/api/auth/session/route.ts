@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { ApiSuccess, ApiError } from '@/types'
 import { logSystemError } from '@/lib/monitoring/logger'
 
+import { createAuthenticatedServerClient } from '@/lib/supabase'
+
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<ApiSuccess | ApiError>> {
@@ -16,6 +18,24 @@ export async function POST(
 
     if (session) {
       const { access_token, refresh_token, expires_in } = session
+
+      if (!access_token || typeof access_token !== 'string') {
+        return NextResponse.json(
+          { error: 'Invalid session payload. Access token required.', code: 'VALIDATION' },
+          { status: 400 }
+        )
+      }
+
+      // Verify token authenticity against Supabase Auth before setting cookies
+      const authClient = createAuthenticatedServerClient(access_token)
+      const { data: { user }, error: userError } = await authClient.auth.getUser()
+
+      if (userError || !user) {
+        return NextResponse.json(
+          { error: 'Invalid or expired access token.', code: 'VALIDATION' },
+          { status: 401 }
+        )
+      }
 
       // Set access token cookie (HTTP-only)
       response.cookies.set('sb-access-token', access_token, {
