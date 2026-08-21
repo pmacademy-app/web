@@ -21,11 +21,13 @@ ON CONFLICT (id) DO UPDATE SET public = true;
 
 -- 3. Storage RLS Policies
 -- Allow anyone to read avatars
+DROP POLICY IF EXISTS "Public can view avatars" ON storage.objects;
 CREATE POLICY "Public can view avatars" ON storage.objects
   FOR SELECT
   USING (bucket_id = 'avatars');
 
 -- Allow authenticated users to insert their own avatars
+DROP POLICY IF EXISTS "Authenticated users can upload avatars" ON storage.objects;
 CREATE POLICY "Authenticated users can upload avatars" ON storage.objects
   FOR INSERT
   WITH CHECK (
@@ -37,6 +39,7 @@ CREATE POLICY "Authenticated users can upload avatars" ON storage.objects
   );
 
 -- Allow authenticated users to update their own avatars
+DROP POLICY IF EXISTS "Authenticated users can update avatars" ON storage.objects;
 CREATE POLICY "Authenticated users can update avatars" ON storage.objects
   FOR UPDATE
   USING (
@@ -46,6 +49,7 @@ CREATE POLICY "Authenticated users can update avatars" ON storage.objects
   );
 
 -- Allow authenticated users to delete their own avatars
+DROP POLICY IF EXISTS "Authenticated users can delete avatars" ON storage.objects;
 CREATE POLICY "Authenticated users can delete avatars" ON storage.objects
   FOR DELETE
   USING (
