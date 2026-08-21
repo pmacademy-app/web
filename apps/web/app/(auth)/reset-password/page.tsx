@@ -2,7 +2,7 @@
 
 import { useState, useTransition, Suspense } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -75,24 +75,35 @@ function ResetPasswordFormContent() {
     })
   }
 
+  const router = useRouter()
+
   const handlePasswordUpdate = (values: UpdateFormValues) => {
     setErrorMsg(null)
     setMessage(null)
 
     startTransition(async () => {
       try {
-        const supabase = createBrowserSupabaseClient()
-        const { error } = await supabase.auth.updateUser({
-          password: values.newPassword,
+        const res = await fetch('/api/auth/update-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ newPassword: values.newPassword }),
         })
 
-        if (error) {
-          setErrorMsg(error.message)
+        const data = await res.json()
+
+        if (!res.ok || !data.success) {
+          setErrorMsg(data.error || 'Failed to update password. Please try again.')
           return
         }
 
-        setMessage('Password updated successfully! You can now log in.')
+        setMessage('Password updated successfully! Redirecting to login...')
         updateForm.reset()
+
+        setTimeout(() => {
+          router.push('/login')
+        }, 2500)
       } catch (err) {
         console.error('[reset-password] Update error:', err)
         setErrorMsg('An unexpected error occurred. Please try again.')
