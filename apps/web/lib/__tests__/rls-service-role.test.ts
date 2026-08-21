@@ -63,7 +63,8 @@ async function runAllRlsTests() {
       let error = null
       
       try {
-        const res = await client.from(table).select('*').limit(1)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const res = await client.from(table as any).select('*').limit(1)
         data = res.data
         error = res.error
       } catch (e: unknown) {

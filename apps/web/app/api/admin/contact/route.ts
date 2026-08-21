@@ -13,8 +13,7 @@ export async function GET(request: Request) {
     const statusFilter = searchParams.get('status')
 
     const supabase = createServiceRoleClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('contact_messages' as any) as any)
+    let query = supabase.from('contact_messages')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100)
@@ -55,9 +54,8 @@ export async function PATCH(request: Request) {
       updatePayload.admin_notes = adminNotes.trim()
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('contact_messages' as any) as any)
-      .update(updatePayload)
+    const { error } = await supabase.from('contact_messages')
+      .update(updatePayload as import('@/lib/supabase').TablesUpdate<'contact_messages'>)
       .eq('id', messageId)
 
     if (error) {

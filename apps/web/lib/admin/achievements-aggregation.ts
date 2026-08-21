@@ -35,7 +35,7 @@ export interface AdminCertificateRow {
 
 export interface AdminCapstoneRow {
   id: string
-  userId: string
+  userId: string | null
   learnerName: string
   moduleSlug: string
   moduleTitle: string

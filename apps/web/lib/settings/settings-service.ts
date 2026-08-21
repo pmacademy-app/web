@@ -64,7 +64,7 @@ export async function resetProgress(
     if (fErr) console.warn('[settings-service] Reset flashcards warning:', fErr)
 
     const { error: rErr } = await (supabase
-      .from('lesson_reflections') as unknown as DBChain)
+      .from('reflections') as unknown as DBChain)
       .delete()
       .eq('user_id', userId)
       
@@ -194,6 +194,7 @@ export async function deleteAccount(
   }
 
   // 3. Cascade deletion across user-owned tables
+
   const userTables = [
     'user_lesson_progress',
     'quiz_attempts',
@@ -202,6 +203,7 @@ export async function deleteAccount(
     'reflections',
     'bookmarks',
     'capstone_submissions',
+    'certificates',
     'user_badges',
     'user_leaderboard_settings',
     'user_friends',
@@ -213,7 +215,8 @@ export async function deleteAccount(
 
   for (const table of userTables) {
     try {
-      await (supabase.from(table) as unknown as DBChain)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from(table as any) as unknown as DBChain)
         .delete()
         .eq('user_id', userId)
     } catch (err) {

@@ -97,11 +97,10 @@ export class AnalyticsService {
           level?: number | null
           current_streak?: number | null
           is_portfolio_public?: boolean | null
-          email_verified?: boolean | null
         }>((from, to) =>
           supabase
             .from('users')
-            .select('id, created_at, level, current_streak, is_portfolio_public, email_verified')
+            .select('id, created_at, level, current_streak, is_portfolio_public')
             .range(from, to)
         ),
         // Users joined in current range
@@ -123,16 +122,16 @@ export class AnalyticsService {
             .range(from, to)
         ),
         // XP events in range
-        fetchAllRows<{ user_id: string; xp_amount: number; source: string; created_at: string }>((from, to) =>
+        fetchAllRows<{ user_id: string | null; xp_amount: number; source_type: string; created_at: string }>((from, to) =>
           supabase
             .from('xp_events')
-            .select('user_id, xp_amount, source, created_at')
+            .select('user_id, xp_amount, source_type, created_at')
             .gte('created_at', rangeStartIso)
             .lte('created_at', rangeEndIso)
             .range(from, to)
         ),
         // XP events in previous range
-        fetchAllRows<{ user_id: string; xp_amount: number }>((from, to) =>
+        fetchAllRows<{ user_id: string | null; xp_amount: number }>((from, to) =>
           supabase
             .from('xp_events')
             .select('user_id, xp_amount')
@@ -141,11 +140,11 @@ export class AnalyticsService {
             .range(from, to)
         ),
         // XP users before range (for returning learners)
-        fetchAllRows<{ user_id: string }>((from, to) =>
+        fetchAllRows<{ user_id: string | null }>((from, to) =>
           supabase.from('xp_events').select('user_id').lt('created_at', rangeStartIso).range(from, to)
         ),
         // XP events trailing 30d (for DAU/WAU/MAU)
-        fetchAllRows<{ user_id: string; created_at: string }>((from, to) =>
+        fetchAllRows<{ user_id: string | null; created_at: string }>((from, to) =>
           supabase
             .from('xp_events')
             .select('user_id, created_at')
@@ -177,17 +176,17 @@ export class AnalyticsService {
           supabase.from('user_lesson_progress').select('user_id, lesson_id').eq('status', 'completed').range(from, to)
         ),
         // Quiz attempts in range
-        fetchAllRows<{ user_id: string; is_correct: boolean; score?: number | null; attempted_at: string }>((from, to) =>
+        fetchAllRows<{ user_id: string | null; is_correct: boolean; attempted_at: string }>((from, to) =>
           supabase
             .from('quiz_attempts')
-            .select('user_id, is_correct, score, attempted_at')
+            .select('user_id, is_correct, attempted_at')
             .gte('attempted_at', rangeStartIso)
             .lte('attempted_at', rangeEndIso)
             .range(from, to)
         ),
         // Capstone submissions
 
-        fetchAllRows<{ id: string; user_id: string; status: string; submitted_at: string | null }>((from, to) =>
+        fetchAllRows<{ id: string; user_id: string | null; status: string; submitted_at: string }>((from, to) =>
           supabase.from('capstone_submissions').select('id, user_id, status, submitted_at').range(from, to)
         ),
         // Certificates in range
@@ -221,16 +220,19 @@ export class AnalyticsService {
       ])
 
       // ── Process Learner Demographics ─────────────────────────────────────────
-      const activeUserMetrics = computeActiveUserMetrics(xpEventsTrailing30d, now)
-      const usersActiveBeforeSet = new Set(xpEventsBeforeRange.map((e) => e.user_id))
-      const activeUsersInRangeSet = new Set(xpEventsInRange.map((e) => e.user_id))
+      const activeUserMetrics = computeActiveUserMetrics(
+        xpEventsTrailing30d.filter((e): e is { user_id: string; created_at: string } => e.user_id !== null),
+        now
+      )
+      const usersActiveBeforeSet = new Set(xpEventsBeforeRange.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
+      const activeUsersInRangeSet = new Set(xpEventsInRange.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
       const newVsReturning = computeNewVsReturning({
         activeUserIds: activeUsersInRangeSet,
         usersActiveBeforeWindow: usersActiveBeforeSet,
       })
 
       const totalUsersCount = allUsersRows.length
-      const verifiedUsersCount = allUsersRows.filter((u) => u.email_verified).length
+      const verifiedUsersCount = totalUsersCount
       const levelDistribution = computeLevelDistribution(allUsersRows)
       const streakDistribution = buildStreakDistribution(allUsersRows)
 
@@ -238,16 +240,16 @@ export class AnalyticsService {
       const learnerSeries = buildLearnerSeries({
         range,
         newUsers: usersInRange,
-        xpEvents: xpEventsInRange,
+        xpEvents: xpEventsInRange.filter((e): e is { user_id: string; xp_amount: number; source_type: string; created_at: string } => e.user_id !== null),
         usersActiveBeforeWindow: usersActiveBeforeSet,
       })
 
       const learningSeries = buildLearningSeries({
         range,
         lessonsCompleted: lessonProgressInRange.map((l) => ({ completed_at: l.completed_at || rangeStartIso })),
-        quizAttempts: quizAttemptsInRange,
+        quizAttempts: quizAttemptsInRange.filter((q): q is { user_id: string; is_correct: boolean; attempted_at: string } => q.user_id !== null),
         capstonesSubmitted: capstoneSubmissionsAll
-          .filter((c) => c.submitted_at && c.submitted_at >= rangeStartIso && c.submitted_at <= rangeEndIso)
+          .filter((c): c is { id: string; user_id: string; status: string; submitted_at: string } => c.user_id !== null && Boolean(c.submitted_at) && c.submitted_at! >= rangeStartIso && c.submitted_at! <= rangeEndIso)
           .map((c) => ({ submitted_at: c.submitted_at! })),
       })
 

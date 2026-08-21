@@ -314,8 +314,8 @@ export class SystemService {
 
     try {
       const rows = await fetchAllRows<SystemErrorRow>((from, to) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let query = (supabase.from('system_errors' as any) as any)
+        let query = supabase
+          .from('system_errors')
           .select('id, fingerprint, severity, category, operation, message, status, timestamp')
           .order('timestamp', { ascending: false })
           .range(from, to)
@@ -388,8 +388,8 @@ export class SystemService {
     const to = params.to || null
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query = (supabase.from('admin_audit_logs' as any) as any)
+      let query = supabase
+        .from('admin_audit_logs')
         .select('id, admin_user_id, admin_email, action, target_resource, target_id, metadata, created_at', {
           count: 'exact',
         })
@@ -484,8 +484,8 @@ export class SystemService {
     limit: number
   ): Promise<AdminSystemRecentError[]> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.from('system_errors' as any) as any)
+      const { data, error } = await supabase
+        .from('system_errors')
         .select('id, timestamp, severity, operation, message')
         .in('category', categories)
         .order('timestamp', { ascending: false })

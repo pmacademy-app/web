@@ -18,7 +18,7 @@ import type { AdminCapstoneRow, AdminPortfolioRow } from './achievements-aggrega
 
 interface CapstoneSubmissionRow {
   id: string
-  user_id: string
+  user_id: string | null
   module_slug: string
   content: string
   status: string
@@ -80,11 +80,11 @@ export class ModerationService {
 
       const userMap = await this.fetchUsersByIds(
         supabase,
-        submissions.map((s) => s.user_id)
+        submissions.map((s) => s.user_id).filter((id): id is string => Boolean(id))
       )
 
       const all: AdminCapstoneRow[] = submissions.map((s) => {
-        const user = userMap.get(s.user_id)
+        const user = s.user_id ? userMap.get(s.user_id) : undefined
         const definition = getCapstoneDefinition(s.module_slug)
         return {
           id: s.id,

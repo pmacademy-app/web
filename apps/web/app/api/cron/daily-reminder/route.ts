@@ -35,8 +35,8 @@ export async function POST(request: Request) {
   let remindersQueued = 0
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: rawUsers, error: queryErr } = await (supabase.from('users' as any) as any)
+    const { data: rawUsers, error: queryErr } = await supabase
+      .from('users')
       .select('id, email, name, current_streak')
       .gt('current_streak', 0)
       .not('email', 'is', null)

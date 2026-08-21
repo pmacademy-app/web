@@ -51,8 +51,8 @@ export async function logSystemError(options: LogSystemErrorOptions): Promise<st
 
     // 1. Check for duplicate incident within 15 minutes window
     const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing } = await (supabase.from('system_errors' as any) as any)
+    const { data: existing } = await supabase
+      .from('system_errors')
       .select('id, timestamp')
       .eq('fingerprint', fingerprint)
       .gte('timestamp', fifteenMinsAgo)
@@ -60,16 +60,16 @@ export async function logSystemError(options: LogSystemErrorOptions): Promise<st
 
     if (existing) {
       // Update existing incident timestamp instead of inserting duplicate alert row
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('system_errors' as any) as any)
+      await supabase
+        .from('system_errors')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', existing.id)
       return existing.id
     }
 
     // 2. Insert fresh error record
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: inserted, error: insertErr } = await (supabase.from('system_errors' as any) as any)
+    const { data: inserted, error: insertErr } = await supabase
+      .from('system_errors')
       .insert({
         severity: options.severity,
         category: options.category,
@@ -81,7 +81,7 @@ export async function logSystemError(options: LogSystemErrorOptions): Promise<st
         user_id: options.userId || null,
         fingerprint,
         status: 'new',
-        details: options.details || {},
+        details: (options.details as unknown as import('@/lib/supabase').Json) || null,
       })
       .select('id')
       .maybeSingle()

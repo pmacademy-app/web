@@ -306,7 +306,7 @@ export class CurriculumService {
           .lte('created_at', rangeEndIso)
           .range(from, to)
       ),
-      this.fetchAllRows<{ user_id: string; xp_amount: number; created_at: string }>((from, to) =>
+      this.fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((from, to) =>
         supabase
           .from('xp_events')
           .select('user_id, xp_amount, created_at')
@@ -314,10 +314,10 @@ export class CurriculumService {
           .lte('created_at', rangeEndIso)
           .range(from, to)
       ),
-      this.fetchAllRows<{ user_id: string }>((from, to) =>
+      this.fetchAllRows<{ user_id: string | null }>((from, to) =>
         supabase.from('xp_events').select('user_id').lt('created_at', rangeStartIso).range(from, to)
       ),
-      this.fetchAllRows<{ user_id: string; created_at: string }>((from, to) =>
+      this.fetchAllRows<{ user_id: string | null; created_at: string }>((from, to) =>
         supabase
           .from('xp_events')
           .select('user_id, created_at')
@@ -336,7 +336,7 @@ export class CurriculumService {
       this.fetchAllRows<{ lesson_id: string; user_id: string }>((from, to) =>
         supabase.from('user_lesson_progress').select('lesson_id, user_id').eq('status', 'completed').range(from, to)
       ),
-      this.fetchAllRows<{ user_id: string; is_correct: boolean; attempted_at: string }>((from, to) =>
+      this.fetchAllRows<{ user_id: string | null; is_correct: boolean; attempted_at: string }>((from, to) =>
         supabase
           .from('quiz_attempts')
           .select('user_id, is_correct, attempted_at')
@@ -344,7 +344,7 @@ export class CurriculumService {
           .lte('attempted_at', rangeEndIso)
           .range(from, to)
       ),
-      this.fetchAllRows<{ user_id: string; submitted_at: string | null }>((from, to) =>
+      this.fetchAllRows<{ user_id: string | null; submitted_at: string }>((from, to) =>
         supabase
           .from('capstone_submissions')
           .select('user_id, submitted_at')
@@ -368,13 +368,16 @@ export class CurriculumService {
     ])
 
     // ── Learners ──────────────────────────────────────────────────────────────
-    const activeUserIds = new Set(xpInRange.map((e) => e.user_id))
-    const usersActiveBeforeWindow = new Set(xpBeforeRange.map((r) => r.user_id))
+    const activeUserIds = new Set(xpInRange.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
+    const usersActiveBeforeWindow = new Set(xpBeforeRange.map((r) => r.user_id).filter((id): id is string => Boolean(id)))
     const { newLearners, returningLearners } = computeNewVsReturning({
       activeUserIds,
       usersActiveBeforeWindow,
     })
-    const { dau, wau, mau } = computeActiveUserMetrics(xpTrailing30d, now)
+    const { dau, wau, mau } = computeActiveUserMetrics(
+      xpTrailing30d.filter((e): e is { user_id: string; created_at: string } => e.user_id !== null),
+      now
+    )
 
     // ── Learning ──────────────────────────────────────────────────────────────
     const lessonsCompleted = lessonsInRange.filter((l) => l.completed_at).length
@@ -457,7 +460,7 @@ export class CurriculumService {
     const learnerSeries = buildLearnerSeries({
       range,
       newUsers: usersInRange,
-      xpEvents: xpInRange,
+      xpEvents: xpInRange.filter((e): e is { user_id: string; xp_amount: number; created_at: string } => e.user_id !== null),
       usersActiveBeforeWindow,
     })
     const learningSeries = buildLearningSeries({
@@ -465,9 +468,9 @@ export class CurriculumService {
       lessonsCompleted: lessonsInRange.filter(
         (l): l is { user_id: string; completed_at: string } => l.completed_at !== null
       ),
-      quizAttempts: quizRows,
+      quizAttempts: quizRows.filter((q): q is { user_id: string; is_correct: boolean; attempted_at: string } => q.user_id !== null),
       capstonesSubmitted: capstonesInRange.filter(
-        (c): c is { user_id: string; submitted_at: string } => c.submitted_at !== null
+        (c): c is { user_id: string; submitted_at: string } => c.user_id !== null && c.submitted_at !== null
       ),
     })
     const series = mergeSeries(learnerSeries, learningSeries)

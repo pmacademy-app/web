@@ -70,8 +70,8 @@ export async function enqueueNotificationItem(
   // 4. Idempotency / Duplicate Prevention Check
   if (params.eventId) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: rawExisting } = await (supabase.from('email_queue' as any) as any)
+      const { data: rawExisting } = await supabase
+        .from('email_queue')
         .select('id')
         .eq('user_id', params.userId)
         .eq('template_key', params.templateKey)
@@ -92,14 +92,14 @@ export async function enqueueNotificationItem(
   // 5. Insert into Supabase email_queue Table
   const now = new Date().toISOString()
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: inserted, error } = await (supabase.from('email_queue' as any) as any)
+    const { data: inserted, error } = await supabase
+      .from('email_queue')
       .insert({
         user_id: params.userId,
         to_email: params.toEmail,
         to_name: params.toName || null,
         template_key: params.templateKey,
-        template_variables: params.templateVariables,
+        template_variables: (params.templateVariables as unknown as import('@/lib/supabase').Json),
         event_id: (params.eventId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(params.eventId)) ? params.eventId : null,
         event_type: params.eventType,
         priority: priorityDef.numericValue,
@@ -147,8 +147,7 @@ async function recordSkippedEvent(
   skippedReason: string
 ): Promise<void> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('notification_events' as any) as any).insert({
+    await supabase.from('notification_events').insert({
       event_type: params.eventType,
       user_id: params.userId,
       payload: {
@@ -183,13 +182,12 @@ export async function processEmailQueue(
 
   // 1. Atomic PostgreSQL Row Claiming via RPC (FOR UPDATE SKIP LOCKED)
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.rpc as any)('claim_email_queue_items', { p_batch_size: batchSize })
+    const { data, error } = await supabase.rpc('claim_email_queue_items', { p_batch_size: batchSize })
     if (error || !data) {
       console.warn('[processEmailQueue] RPC claim_email_queue_items warning/fallback:', error?.message)
       // Fallback: SELECT + UPDATE for environments where RPC migration is pending
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: rawRows } = await (supabase.from('email_queue' as any) as any)
+      const { data: rawRows } = await supabase
+        .from('email_queue')
         .select('*')
         .in('status', ['pending', 'retrying'])
         .lte('scheduled_at', new Date().toISOString())
@@ -199,8 +197,8 @@ export async function processEmailQueue(
 
       if (rawRows && rawRows.length > 0) {
         const ids = rawRows.map((r: Record<string, unknown>) => String(r.id))
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from('email_queue' as any) as any)
+        await supabase
+          .from('email_queue')
           .update({ status: 'processing', processing_at: new Date().toISOString(), updated_at: new Date().toISOString() })
           .in('id', ids)
 
@@ -254,11 +252,9 @@ export async function processEmailQueue(
     }
 
     // C. Check Suppression
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: suppression } = await (supabase.from('email_suppressions' as any) as any).select('id').eq('email', toEmail).maybeSingle()
+    const { data: suppression } = await supabase.from('email_suppressions').select('id').eq('email', toEmail).maybeSingle()
     if (suppression) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('email_queue' as any) as any).update({ status: 'suppressed', skipped_reason: 'email_suppressed', updated_at: new Date().toISOString() }).eq('id', queueId)
+      await supabase.from('email_queue').update({ status: 'suppressed', skipped_reason: 'email_suppressed', updated_at: new Date().toISOString() }).eq('id', queueId)
       suppressedCount++
       continue
     }
@@ -304,15 +300,13 @@ export async function processEmailQueue(
       // F. Post-Resend Acceptance: Increment Daily Quota ONLY on Successful Resend Acceptance
       if (!isCritical) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase.rpc as any)('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
+          await supabase.rpc('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
         } catch {
           // Non-fatal quota logging warning
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('email_queue' as any) as any)
+      await supabase.from('email_queue')
         .update({
           status: 'delivered',
           delivered_at: new Date().toISOString(),
@@ -342,8 +336,7 @@ async function updateItemSkipped(
   queueId: string,
   reason: string
 ): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (supabase.from('email_queue' as any) as any)
+  await supabase.from('email_queue')
     .update({ status: 'skipped', skipped_reason: reason, updated_at: new Date().toISOString() })
     .eq('id', queueId)
 }
@@ -362,8 +355,7 @@ async function handleRetryableFailure(
   if (attemptCount >= maxAttempts) {
     await handlePermanentFailure(supabase, queueId, '', '', {}, `Max retries (${maxAttempts}) exceeded. Last error: ${errorMessage}`, attemptCount)
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('email_queue' as any) as any)
+    await supabase.from('email_queue')
       .update({
         status: 'retrying',
         error_message: errorMessage,
@@ -385,8 +377,7 @@ async function handlePermanentFailure(
   attemptCount: number
 ): Promise<void> {
   const now = new Date().toISOString()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (supabase.from('email_queue' as any) as any)
+  await supabase.from('email_queue')
     .update({ status: 'dead_letter', error_message: failureReason, failed_at: now, updated_at: now })
     .eq('id', queueId)
 
@@ -406,14 +397,13 @@ async function handlePermanentFailure(
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('email_dead_letter' as any) as any).insert({
+    await supabase.from('email_dead_letter').insert({
       original_queue_id: queueId,
       user_id: userId || null,
       template_key: templateKey || 'unknown',
-      template_variables: templateVariables || {},
+      template_variables: ((templateVariables || {}) as unknown as import('@/lib/supabase').Json),
       failure_reason: failureReason,
-      all_errors: [{ attempt: attemptCount, error: failureReason, timestamp: now }],
+      all_errors: ([{ attempt: attemptCount, error: failureReason, timestamp: now }] as unknown as import('@/lib/supabase').Json),
       created_at: now,
     })
   } catch {

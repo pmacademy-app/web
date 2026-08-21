@@ -88,8 +88,8 @@ export async function evaluatePersistentRateLimit(
     const { createServiceRoleClient } = await import('@/lib/supabase')
     const supabase = createServiceRoleClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing, error: selectError } = await (supabase.from('rate_limits' as any) as any)
+    const { data: existing, error: selectError } = await supabase
+      .from('rate_limits')
       .select('key, last_requested_at, count')
       .eq('key', key)
       .maybeSingle()
@@ -112,8 +112,8 @@ export async function evaluatePersistentRateLimit(
         }
         
         const newCount = existing.count + 1
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from('rate_limits' as any) as any)
+        await supabase
+          .from('rate_limits')
           .update({ count: newCount, updated_at: new Date().toISOString() })
           .eq('key', key)
 
@@ -126,8 +126,7 @@ export async function evaluatePersistentRateLimit(
     }
 
     // Upsert fresh record
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('rate_limits' as any) as any).upsert({
+    await supabase.from('rate_limits').upsert({
       key,
       last_requested_at: new Date(now).toISOString(),
       count: 1,

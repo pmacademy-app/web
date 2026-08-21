@@ -106,8 +106,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
     }
 
     // Insert new waitlist entry
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: insertError } = await (supabase.from('waitlist') as any).insert({
+    const { error: insertError } = await supabase.from('waitlist').insert({
       name,
       email,
       career_position,

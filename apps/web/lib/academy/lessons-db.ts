@@ -41,7 +41,7 @@ export async function getUserCompletedLessonIds(userId: string): Promise<string[
     .from('user_lesson_progress')
     .select('lesson_id')
     .eq('user_id', userId)
-    .eq('completed', true)
+    .eq('status', 'completed')
 
   if (error || !data) return []
   return (data as unknown as { lesson_id: string }[]).map((r) => r.lesson_id)

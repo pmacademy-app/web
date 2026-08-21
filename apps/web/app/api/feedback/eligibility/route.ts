@@ -12,8 +12,8 @@ export async function GET(request: Request) {
     const supabase = createServiceRoleClient()
 
     // 1. Fetch completed/dismissed prompts for this user
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: promptsData } = await (supabase.from('user_feedback_prompts' as any) as any)
+    const { data: promptsData } = await supabase
+      .from('user_feedback_prompts')
       .select('prompt_key')
       .eq('user_id', user.id)
 

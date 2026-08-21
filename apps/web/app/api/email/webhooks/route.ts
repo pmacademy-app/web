@@ -132,8 +132,8 @@ export async function POST(request: Request) {
         // 1. Find target queue item by resend_id
         let queueId: string | null = null
         if (emailId) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: queueItem } = await (supabase.from('email_queue' as any) as any)
+          const { data: queueItem } = await supabase
+            .from('email_queue')
             .select('id')
             .eq('resend_id', emailId)
             .maybeSingle()
@@ -141,25 +141,24 @@ export async function POST(request: Request) {
         }
 
         // 2. Insert into email_delivery_events log
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from('email_delivery_events' as any) as any).insert({
+        await supabase.from('email_delivery_events').insert({
           email_queue_id: queueId,
           resend_id: emailId || null,
           event_type: eventType,
-          metadata: data,
+          metadata: (data as unknown as import('@/lib/supabase').Json),
           occurred_at: new Date().toISOString(),
         })
 
         // 3. Update queue item status if matched
         if (queueId) {
           if (eventType === 'email.delivered') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (supabase.from('email_queue' as any) as any)
+            await supabase
+              .from('email_queue')
               .update({ status: 'delivered', delivered_at: new Date().toISOString(), updated_at: new Date().toISOString() })
               .eq('id', queueId)
           } else if (eventType === 'email.failed' || eventType === 'email.bounced') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (supabase.from('email_queue' as any) as any)
+            await supabase
+              .from('email_queue')
               .update({ status: 'failed', error_message: `Resend event: ${eventType}`, failed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
               .eq('id', queueId)
           }
@@ -169,8 +168,8 @@ export async function POST(request: Request) {
         if (eventType === 'email.complained') {
           const recipientEmail = String(data.to || data.recipient || '')
           if (recipientEmail) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (supabase.from('email_suppressions' as any) as any)
+            await supabase
+              .from('email_suppressions')
               .upsert({ email: recipientEmail, reason: 'spam_complaint', suppressed_at: new Date().toISOString() })
           }
         }
@@ -213,8 +212,8 @@ export async function POST(request: Request) {
     let insertedId: string | null = null
     try {
       const supabase = createServiceRoleClient()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: inserted, error } = await (supabase.from('contact_messages' as any) as any)
+      const { data: inserted, error } = await supabase
+        .from('contact_messages')
         .insert({
           user_id: null,
           name: senderName.substring(0, 100) || senderEmail,

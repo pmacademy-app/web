@@ -41,8 +41,8 @@ export class FeedbackAdminService {
     const cleanContent = content.trim()
     if (!cleanContent) throw new Error('Feedback content cannot be empty.')
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from('testimonials' as any) as any)
+    const { data, error } = await supabase
+      .from('testimonials')
       .insert({
         user_id: userId,
         content: cleanContent,
@@ -81,8 +81,7 @@ export class FeedbackAdminService {
   public static async getModerationQueue(statusFilter?: string): Promise<TestimonialItem[]> {
     const supabase = createServiceRoleClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('testimonials' as any) as any).select('*').order('created_at', { ascending: false })
+    let query = supabase.from('testimonials').select('*').order('created_at', { ascending: false })
 
     if (statusFilter && statusFilter !== 'all') {
       query = query.eq('status', statusFilter)
@@ -167,9 +166,9 @@ export class FeedbackAdminService {
       updatePayload.content = updatedContent.trim()
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('testimonials' as any) as any)
-      .update(updatePayload)
+    const { error } = await supabase
+      .from('testimonials')
+      .update(updatePayload as import('@/lib/supabase').TablesUpdate<'testimonials'>)
       .eq('id', testimonialId)
 
     if (error) {
@@ -205,8 +204,8 @@ export class FeedbackAdminService {
           try {
             const supabase = createServiceRoleClient()
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { data, error } = await (supabase.from('testimonials' as any) as any)
+            const { data, error } = await supabase
+              .from('testimonials')
               .select('id, user_id, author_name, author_role, headline, rating, content, created_at')
               .eq('is_published', true)
               .eq('status', 'approved')
@@ -279,8 +278,8 @@ export class FeedbackAdminService {
   }>> {
     const supabase = createServiceRoleClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from('user_feedback' as any) as any)
+    const { data, error } = await supabase
+      .from('user_feedback')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100)
