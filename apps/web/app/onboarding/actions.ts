@@ -41,8 +41,7 @@ export async function submitOnboarding(data: OnboardingData) {
     const dbSupabase = createServiceRoleClient() // service role
 
     // 1. Update public.users table with chosen fields
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: dbError } = await (dbSupabase.from('users') as any).update({ 
+    const { error: dbError } = await dbSupabase.from('users').update({ 
       name: data.name,
       username: data.username,
       avatar_url: data.avatar_url,

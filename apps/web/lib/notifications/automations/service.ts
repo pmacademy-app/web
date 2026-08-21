@@ -45,8 +45,8 @@ export class EmailAutomationsService {
     const todayKey = `email_sent_count_${new Date().toISOString().slice(0, 10).replace(/-/g, '_')}`
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: rawRows } = await (supabase.from('system_settings' as any) as any)
+      const { data: rawRows } = await supabase
+        .from('system_settings')
         .select('key, value')
         .in('key', ['email_global_pause', 'email_daily_send_limit', 'email_automations', todayKey])
 
@@ -148,14 +148,14 @@ export class EmailAutomationsService {
 
     try {
       if (settingKey === 'global_pause') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase.from('system_settings' as any) as any)
+        const { error } = await supabase
+          .from('system_settings')
           .upsert({ key: 'email_global_pause', value: { enabled: Boolean(payload.enabled) }, updated_at: new Date().toISOString() })
         if (error) return { success: false, error: error.message }
       } else if (settingKey === 'daily_limit') {
         const limitVal = Math.max(10, Math.min(1000, Number(payload.limit) || 100))
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase.from('system_settings' as any) as any)
+        const { error } = await supabase
+          .from('system_settings')
           .upsert({ key: 'email_daily_send_limit', value: { limit: limitVal }, updated_at: new Date().toISOString() })
         if (error) return { success: false, error: error.message }
       } else if (settingKey === 'toggle' && payload.automationKey) {
@@ -168,8 +168,8 @@ export class EmailAutomationsService {
           updatedToggles[a.key] = a.key === payload.automationKey ? Boolean(payload.enabled) : a.enabled
         })
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase.from('system_settings' as any) as any)
+        const { error } = await supabase
+          .from('system_settings')
           .upsert({ key: 'email_automations', value: updatedToggles, updated_at: new Date().toISOString() })
         if (error) return { success: false, error: error.message }
       }

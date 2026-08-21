@@ -159,7 +159,7 @@ export class AchievementsService {
     try {
       const [keyMap, userBadges] = await Promise.all([
         this.fetchBadgeKeyMap(supabase),
-        fetchAllRows<UserBadgeRow>((from, to) =>
+        fetchAllRows<{ user_id: string; badge_id: string }>((from, to) =>
           supabase.from('user_badges').select('user_id, badge_id').range(from, to)
         ),
       ])

@@ -112,7 +112,7 @@ export function CapstoneReviewDrawer({ capstoneId, capstone, isOpen, onClose }: 
                 </div>
               </div>
               <Link
-                href={`/admin/users?userId=${encodeURIComponent(capstone.userId)}`}
+                href={`/admin/users?userId=${encodeURIComponent(capstone.userId || '')}`}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-admin-surface hover:bg-admin-surface-raised text-admin-fg-muted hover:text-admin-fg text-[11px] font-semibold border border-admin-border transition-colors shrink-0"
               >
                 <User className="w-3 h-3" /> View learner

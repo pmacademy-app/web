@@ -191,8 +191,7 @@ export class CommunicationsService {
     const search = params.search?.trim() || null
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query = (supabase.from('email_queue' as any) as any).select(
+      let query = supabase.from('email_queue').select(
         'id, to_email, to_name, template_key, status, created_at, updated_at, attempt_count, max_attempts, error_message',
         { count: 'exact' }
       )
@@ -253,8 +252,8 @@ export class CommunicationsService {
     start.setUTCDate(start.getUTCDate() - (days - 1))
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.from('email_queue' as any) as any)
+      const { data, error } = await supabase
+        .from('email_queue')
         .select('status, created_at')
         .gte('created_at', start.toISOString())
 
@@ -360,8 +359,8 @@ export class CommunicationsService {
   public static async getContactMessages(limit = 100) {
     const supabase = createServiceRoleClient()
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.from('contact_messages' as any) as any)
+      const { data, error } = await supabase
+        .from('contact_messages')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(limit)
@@ -378,8 +377,8 @@ export class CommunicationsService {
   public static async getNotificationEvents(limit = 50): Promise<AdminNotificationEventItem[]> {
     const supabase = createServiceRoleClient()
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.from('notification_events' as any) as any)
+      const { data, error } = await supabase
+        .from('notification_events')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(limit)

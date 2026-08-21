@@ -142,20 +142,7 @@ export class AdminConsoleService {
     const supabase = createServiceRoleClient()
 
     try {
-      // 1. All public.users profiles (paginated past Supabase's 1,000-row cap).
-      const publicRows = await this.fetchAllRows<{
-        id: string
-        email: string
-        name?: string
-        username?: string
-        is_admin?: boolean
-        total_xp?: number
-        level?: number
-        current_streak?: number
-        is_portfolio_public?: boolean
-        created_at: string
-        updated_at?: string
-      }>((from, to) =>
+      const publicRows = await this.fetchAllRows<import('../supabase').Tables<'users'>>((from, to) =>
         supabase.from('users').select('*').order('created_at', { ascending: false }).range(from, to)
       )
 
@@ -173,10 +160,10 @@ export class AdminConsoleService {
 
     // 4. Active user ids (earned XP within the last 30 days).
     const activeSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-    const activeRows = await this.fetchAllRows<{ user_id: string }>((from, to) =>
+    const activeRows = await this.fetchAllRows<{ user_id: string | null }>((from, to) =>
       supabase.from('xp_events').select('user_id').gte('created_at', activeSince).range(from, to)
     )
-    const activeUserIds = new Set(activeRows.map((r) => r.user_id))
+    const activeUserIds = new Set(activeRows.map((r) => r.user_id).filter((id): id is string => Boolean(id)))
 
     // 5. Course-completion badge holders (progressPct fallback to 100%).
     const completionBadgeUserIds = await this.resolveCompletionBadgeUserIds(supabase)
@@ -306,7 +293,7 @@ export class AdminConsoleService {
 
       const [totalRes, activeRows, signupsRes, completedRows] = await Promise.all([
         supabase.from('users').select('id', { count: 'exact', head: true }),
-        this.fetchAllRows<{ user_id: string }>((from, to) =>
+        this.fetchAllRows<{ user_id: string | null }>((from, to) =>
           supabase.from('xp_events').select('user_id').gte('created_at', activeSince).range(from, to)
         ),
         supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', signupsSince),
@@ -316,7 +303,7 @@ export class AdminConsoleService {
       ])
 
       const totalUsers = totalRes.count || 0
-      const activeLearners30d = new Set(activeRows.map((r) => r.user_id)).size
+      const activeLearners30d = new Set(activeRows.map((r) => r.user_id).filter((id): id is string => Boolean(id))).size
       const newSignups24h = signupsRes.count || 0
       const totalCompleted = completedRows.length
       // Average progress among learners who have completed at least one lesson.

@@ -22,8 +22,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceRoleClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('system_errors' as any) as any)
+    let query = supabase.from('system_errors')
       .select('*')
       .order('timestamp', { ascending: false })
       .limit(limit)
@@ -46,8 +45,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Also get unacknowledged critical alert count
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { count: unackCritical } = await (supabase.from('system_errors' as any) as any)
+    const { count: unackCritical } = await supabase.from('system_errors')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'new')
       .eq('severity', 'critical')
@@ -81,8 +79,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const supabase = createServiceRoleClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: updateErr } = await (supabase.from('system_errors' as any) as any)
+    const { error: updateErr } = await supabase.from('system_errors')
       .update({ status: newStatus, updated_at: new Date().toISOString() })
       .eq('id', alertId)
 

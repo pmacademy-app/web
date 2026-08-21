@@ -32,5 +32,5 @@ export default async function OnboardingPage() {
     .eq('id', user.id)
     .single()
 
-  return <OnboardingWizard user={user} profile={profile} />
+  return <OnboardingWizard user={user} profile={profile as unknown as Record<string, unknown>} />
 }

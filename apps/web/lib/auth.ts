@@ -32,8 +32,8 @@ export async function ensureUserProfile(
   const provider = extra?.provider ?? user.app_metadata?.provider ?? 'email'
   const timezone = extra?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC'
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: inserted, error } = await (supabase.from('users') as any)
+  const { data: inserted, error } = await supabase
+    .from('users')
     .insert({
       id: user.id,
       email: user.email ?? '',

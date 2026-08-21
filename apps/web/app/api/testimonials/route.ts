@@ -49,8 +49,8 @@ export async function POST(request: Request) {
 
     const supabase = createServiceRoleClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from('testimonials' as any) as any)
+    const { data, error } = await supabase
+      .from('testimonials')
       .insert({
         user_id: user.id,
         source_event: 'user_submitted',

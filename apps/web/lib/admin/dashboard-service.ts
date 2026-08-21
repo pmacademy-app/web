@@ -77,7 +77,7 @@ export class DashboardService {
       this.fetchAllRows<{ xp_amount?: number }>((from, to) =>
         supabase.from('xp_events').select('xp_amount').range(from, to)
       ),
-      this.fetchAllRows<{ user_id: string }>((from, to) =>
+      this.fetchAllRows<{ user_id: string | null }>((from, to) =>
         supabase.from('xp_events').select('user_id').gte('created_at', past7d.toISOString()).range(from, to)
       ),
       AdminConsoleService.getSystemHealth(),
@@ -88,7 +88,7 @@ export class DashboardService {
     const totalXpAwarded = xpRows.reduce((acc, row) => acc + (row.xp_amount || 0), 0)
 
     // Distinct learners who earned XP in the last 7 days (not total users).
-    const activeLearners7d = new Set(active7dRows.map((r) => r.user_id)).size
+    const activeLearners7d = new Set(active7dRows.map((r) => r.user_id).filter((id): id is string => Boolean(id))).size
 
     return {
       totalUsers,
@@ -151,7 +151,7 @@ export class DashboardService {
     const usersWithGoal = usersWithGoalRes?.count ?? 0
 
     // ── 2. XP events (active learners + XP earned) ────────────────────────────
-    const xpCurrent = await this.fetchAllRows<{ user_id: string; xp_amount: number; created_at: string }>((from, to) =>
+    const xpCurrent = await this.fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((from, to) =>
       supabase
         .from('xp_events')
         .select('user_id, xp_amount, created_at')
@@ -160,7 +160,7 @@ export class DashboardService {
         .range(from, to)
     )
 
-    const xpPrevious = await this.fetchAllRows<{ user_id: string; xp_amount: number }>((from, to) =>
+    const xpPrevious = await this.fetchAllRows<{ user_id: string | null; xp_amount: number }>((from, to) =>
       supabase
         .from('xp_events')
         .select('user_id, xp_amount')
@@ -169,13 +169,13 @@ export class DashboardService {
         .range(from, to)
     )
 
-    const xpBefore = await this.fetchAllRows<{ user_id: string }>((from, to) =>
+    const xpBefore = await this.fetchAllRows<{ user_id: string | null }>((from, to) =>
       supabase.from('xp_events').select('user_id').lt('created_at', rangeStartIso).range(from, to)
     )
 
-    const activeUsersInRange = new Set(xpCurrent.map((e) => e.user_id))
-    const activeUsersInPrevious = new Set(xpPrevious.map((e) => e.user_id))
-    const activeUsersBeforeRange = new Set(xpBefore.map((e) => e.user_id))
+    const activeUsersInRange = new Set(xpCurrent.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
+    const activeUsersInPrevious = new Set(xpPrevious.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
+    const activeUsersBeforeRange = new Set(xpBefore.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
 
     const xpEarned = xpCurrent.reduce((sum, e) => sum + (e.xp_amount || 0), 0)
     const xpEarnedPrevious = xpPrevious.reduce((sum, e) => sum + (e.xp_amount || 0), 0)
@@ -198,7 +198,7 @@ export class DashboardService {
           .eq('status', 'completed')
           .gte('completed_at', prevStartIso)
           .lte('completed_at', prevEndIso),
-        this.fetchAllRows<{ id: string; user_id: string; attempted_at: string }>((from, to) =>
+        this.fetchAllRows<{ id: string; user_id: string | null; attempted_at: string }>((from, to) =>
           supabase
             .from('quiz_attempts')
             .select('id, user_id, attempted_at')
@@ -206,7 +206,7 @@ export class DashboardService {
             .lte('attempted_at', rangeEndIso)
             .range(from, to)
         ),
-        this.fetchAllRows<{ user_id: string; submitted_at: string | null }>((from, to) =>
+        this.fetchAllRows<{ user_id: string | null; submitted_at: string }>((from, to) =>
           supabase
             .from('capstone_submissions')
             .select('user_id, submitted_at')
@@ -237,10 +237,10 @@ export class DashboardService {
       this.fetchAllRows<{ user_id: string }>((from, to) =>
         supabase.from('user_lesson_progress').select('user_id').eq('status', 'completed').range(from, to)
       ),
-      this.fetchAllRows<{ user_id: string }>((from, to) =>
+      this.fetchAllRows<{ user_id: string | null }>((from, to) =>
         supabase.from('quiz_attempts').select('user_id').range(from, to)
       ),
-      this.fetchAllRows<{ user_id: string }>((from, to) =>
+      this.fetchAllRows<{ user_id: string | null }>((from, to) =>
         supabase.from('capstone_submissions').select('user_id').not('submitted_at', 'is', null).range(from, to)
       ),
       this.fetchAllRows<{ user_id: string }>((from, to) =>
@@ -248,8 +248,8 @@ export class DashboardService {
       ),
     ])
     const firstLessonUsers = new Set(firstLessonRows.map((r) => r.user_id))
-    const firstQuizUsers = new Set(firstQuizRows.map((r) => r.user_id))
-    const moduleCompletionUsers = new Set(moduleCompletionRows.map((r) => r.user_id))
+    const firstQuizUsers = new Set(firstQuizRows.map((r) => r.user_id).filter((id): id is string => Boolean(id)))
+    const moduleCompletionUsers = new Set(moduleCompletionRows.map((r) => r.user_id).filter((id): id is string => Boolean(id)))
     const certificateUsers = new Set(certificateRows.map((r) => r.user_id))
 
     // Course completion: users holding the cpo_completion badge (or all 90 lessons)
@@ -325,7 +325,7 @@ export class DashboardService {
     const learnerSeries = buildLearnerSeries({
       range,
       newUsers: usersInRange,
-      xpEvents: xpCurrent,
+      xpEvents: xpCurrent.filter((e): e is { user_id: string; xp_amount: number; created_at: string } => e.user_id !== null),
       usersActiveBeforeWindow: activeUsersBeforeRange,
     })
     const learningSeries = buildLearningSeries({

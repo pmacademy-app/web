@@ -304,7 +304,7 @@ export async function getCohortsData(
 
   return (cohortsList || []).map((c) => ({
     id: c.id,
-    slug: c.slug,
+    slug: c.slug || c.id,
     name: c.name,
     description: c.description,
     memberCount: countMap.get(c.id) || 0,

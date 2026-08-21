@@ -17,8 +17,7 @@ export async function POST(request: Request) {
     // Handle prompt dismissal without content
     if (action === 'dismiss' && promptKey && user) {
       const supabase = createServiceRoleClient()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('user_feedback_prompts' as any) as any)
+      await supabase.from('user_feedback_prompts')
         .upsert({
           user_id: user.id,
           prompt_key: String(promptKey),
@@ -40,8 +39,8 @@ export async function POST(request: Request) {
 
     const supabase = createServiceRoleClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from('user_feedback' as any) as any)
+    const { data, error } = await supabase
+      .from('user_feedback')
       .insert({
         user_id: user ? user.id : null,
         category: cleanCategory,
@@ -61,8 +60,7 @@ export async function POST(request: Request) {
 
     // Record prompt key submission if prompted
     if (promptKey && user) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('user_feedback_prompts' as any) as any)
+      await supabase.from('user_feedback_prompts')
         .upsert({
           user_id: user.id,
           prompt_key: String(promptKey),

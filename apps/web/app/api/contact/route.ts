@@ -48,8 +48,8 @@ export async function POST(request: Request) {
     const supabase = createServiceRoleClient()
 
     // 1. Persist contact message to Database (Fail-safe check)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from('contact_messages' as any) as any)
+    const { data, error } = await supabase
+      .from('contact_messages')
       .insert({
         user_id: user ? user.id : null,
         name: cleanName,

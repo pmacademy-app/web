@@ -36,8 +36,8 @@ export async function POST(request: Request) {
 
   try {
     // Fetch active users with email from users table
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: rawUsers, error: queryErr } = await (supabase.from('users' as any) as any)
+    const { data: rawUsers, error: queryErr } = await supabase
+      .from('users')
       .select('id, email, name, total_xp, current_streak')
       .not('email', 'is', null)
       .limit(100)
