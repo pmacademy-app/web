@@ -110,7 +110,21 @@ BEGIN
 END $$;
 
 -- Apply CHECK constraints to ensure this doesn't recur
-ALTER TABLE user_lesson_progress ADD CONSTRAINT user_lesson_progress_lesson_id_check CHECK (lesson_id LIKE 'les_%');
-ALTER TABLE quiz_attempts ADD CONSTRAINT quiz_attempts_lesson_id_check CHECK (lesson_id LIKE 'les_%');
-ALTER TABLE reflections ADD CONSTRAINT reflections_lesson_id_check CHECK (lesson_id LIKE 'les_%');
-ALTER TABLE bookmarks ADD CONSTRAINT bookmarks_lesson_id_check CHECK (lesson_id LIKE 'les_%');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'user_lesson_progress_lesson_id_check') THEN
+        ALTER TABLE user_lesson_progress ADD CONSTRAINT user_lesson_progress_lesson_id_check CHECK (lesson_id LIKE 'les_%');
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'quiz_attempts_lesson_id_check') THEN
+        ALTER TABLE quiz_attempts ADD CONSTRAINT quiz_attempts_lesson_id_check CHECK (lesson_id LIKE 'les_%');
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'reflections_lesson_id_check') THEN
+        ALTER TABLE reflections ADD CONSTRAINT reflections_lesson_id_check CHECK (lesson_id LIKE 'les_%');
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'bookmarks_lesson_id_check') THEN
+        ALTER TABLE bookmarks ADD CONSTRAINT bookmarks_lesson_id_check CHECK (lesson_id LIKE 'les_%');
+    END IF;
+END $$;
