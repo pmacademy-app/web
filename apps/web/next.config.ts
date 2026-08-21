@@ -12,7 +12,7 @@ const nextConfig = {
 
   // Use absolute path to silence "turbopack.root should be absolute" warning
   turbopack: {
-    root: path.resolve(process.cwd(), '../../'),
+    root: path.resolve(process.cwd(), process.cwd().includes('apps') ? '../..' : '.'),
   },
 
   // Security headers & static asset CORS rules
