@@ -50,6 +50,14 @@ export default async function AuthenticatedLayout({
     const serviceSupabase = createServiceRoleClient()
     profile = await ensureUserProfile(serviceSupabase, authUser)
     if (!profile) {
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'critical',
+        category: 'auth',
+        operation: 'ensure_user_profile_failed',
+        message: `Failed to initialize DB profile for authenticated user ${authUser.id}`,
+        userId: authUser.id,
+      })
       redirect('/login')
     }
   }
