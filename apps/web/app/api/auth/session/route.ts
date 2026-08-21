@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { ApiSuccess, ApiError } from '@/types'
+import { logSystemError } from '@/lib/monitoring/logger'
 
 export async function POST(
   request: NextRequest
@@ -53,6 +54,18 @@ export async function POST(
 
     return response
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown session error'
+    void logSystemError({
+      severity: 'error',
+      category: 'auth',
+      operation: 'session_cookie_sync_failure',
+      message: errorMsg,
+      details: {
+        stage: 'api_auth_session',
+        userAgent: request.headers.get('user-agent')?.slice(0, 100),
+      },
+    })
+
     console.error('[api/auth/session] Error setting session cookies:', error)
     return NextResponse.json(
       { error: 'Failed to sync authentication session.', code: 'SERVER_ERROR' },
