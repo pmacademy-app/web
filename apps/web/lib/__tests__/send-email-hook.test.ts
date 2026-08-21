@@ -1,7 +1,8 @@
 import assert from 'assert'
 import { NextRequest } from 'next/server'
 import crypto from 'crypto'
-import { buildAuthCallbackUrl, POST } from '../../app/api/auth/send-email-hook/route'
+import { POST } from '../../app/api/auth/send-email-hook/route'
+import { buildAuthCallbackUrl } from '@/lib/auth-url'
 import { getFromEmail } from '../../lib/email'
 import { BRAND } from '@/lib/brand'
 
