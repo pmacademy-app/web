@@ -10,8 +10,5 @@
     "typecheck": "npm --prefix apps/web run typecheck",
     "test": "npm --prefix apps/web run test",
     "content:build": "npm --prefix apps/web run content:build"
-  },
-  "dependencies": {
-    "recharts": "^3.10.1"
   }
 }
