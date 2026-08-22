@@ -1,8 +1,8 @@
 # Known Issues & Production Verification Tracker — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `7158925`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `21cc985`  
+**Last Updated:** August 23, 2026  
 
 ---
 
@@ -10,16 +10,16 @@
 
 - 🟢 **Verified in Production**: Feature fully verified in live production runtime.
 - 🟡 **Implemented — Production Verification Required**: Code is fully implemented and tested, but live behavior depends on production environment configuration (credentials, secrets, DNS).
-- 🟠 **Partially Verified / Known Production Failure**: Functionality is implemented and executed, but an unresolved failure or gap occurs in live production requiring forensic investigation.
+- 🟠 **Partially Verified / Known Production Failure**: Functionality is implemented and executed, but an unresolved failure or gap occurs in live production requiring investigation.
 - 🔴 **Confirmed Code-Level Broken**: Verified functional bugs in codebase logic.
-- ⚪ **Not Implemented**: Planned features not yet implemented in code.
+- ⚪ **Not Implemented / Known Architectural Debt**: Planned architecture migrations or features not yet implemented.
 
 ---
 
 ## 2. Active Issue Register
 
 ### 🔴 Confirmed Code-Level Broken
-*None identified.* All 183 static App Router pages compile cleanly with 0 TypeScript errors, and all unit test suites pass.
+*None identified.* All static App Router pages compile cleanly with 0 TypeScript errors, and all unit/integration test suites pass.
 
 ---
 
@@ -41,20 +41,10 @@
   - No corresponding email record appeared in the Resend Dashboard.
   - `public.admin_audit_logs` recorded the `SEND_PRODUCTION_EMAIL` event despite zero emails being processed or delivered.
 - **Observability Concern**: The Admin audit log and response payload record the action as successful, creating the misleading impression that delivery occurred when zero emails were handed to Resend.
-- **Root Cause Status**: **UNRESOLVED / UNDER INVESTIGATION**. The failure occurs prior to a successful Resend API call, but the exact root cause has not been confirmed.
+- **Root Cause Status**: **UNRESOLVED / UNDER INVESTIGATION**. The failure occurs prior to a successful Resend API call.
 - **Required Investigation Scope for Future Fix**:
   Trace the execution path:
   `Admin Production Email` → `production-send API` → `recipient lookup` → `template validation/rendering` → `email_queue insertion` → `queue claiming` → `processEmailQueue()` → `ResendProvider` → `Resend API` → `delivery webhook` → `Admin logs/system alerts`.
-
-  **Specific Questions to Determine**:
-  1. Is a row actually created in `public.email_queue`?
-  2. Why does the handler return `queueId: 'unknown'`?
-  3. Why does `processEmailQueue()` report `processed: 0`?
-  4. Is the item skipped due to automation settings (`email_automations_enabled`), global pause (`email_global_pause`), daily quota limit, suppression, status mismatch, or idempotency checks?
-  5. Why does no email record appear in Resend?
-  6. Does `public.system_errors` capture the failure?
-  7. Does the same issue affect other production templates (e.g. `learning.daily_reminder`, `achievement.certificate`)?
-  8. Does the Admin audit log incorrectly record success when delivery did not occur?
 
 ---
 
@@ -72,7 +62,7 @@
 
 #### ISSUE-03: GitHub Actions Production Cron Execution
 - **Status**: ⚠️ Production Behavior / Integration Requiring Real-World Verification
-- **Description**: Schedulers (`.github/workflows/email-cron.yml` and `notification-scheduler.yml`) run background cron triggers.
+- **Description**: Background scheduler (`.github/workflows/notification-scheduler.yml`) runs queue processing and maintenance cron triggers.
 - **Required Verification**: Requires setting `CRON_SECRET` and `APP_URL` in GitHub Repository Secrets.
 
 ---
@@ -86,6 +76,16 @@
   - `daily_email_quota_count` tracks **Optional Automation Queue Sends** (`auth.welcome`, `learning.daily_reminder`, etc.). It deliberately excludes critical Auth emails (`auth.verify_email`, `auth.password_reset`), contact form forwards (`/api/contact`), webhook alerts (`/api/email/webhooks`), and test sends.
   - Resend Dashboard tracks **ALL outbound HTTPS API requests** across the entire account.
 - **UX Limitation**: The Admin Panel label `"Daily Email Quota Usage"` risks making these two distinct metrics appear equivalent.
-- **Recommended Resolution**: Future UI update should expose two clearly distinct metric cards:
+- **Recommended Resolution**: Expose two distinct metric cards:
   1. **Resend Account Outbound Usage** (Telemetry/API count)
   2. **Prodily Automation Quota** (Internal Queue Throttling Limit)
+
+---
+
+### ⚪ Known Architectural Debt & Migration Gaps
+
+#### ISSUE-06: Custom Session Bridge vs. `@supabase/ssr`
+- **Status**: ⚪ Known Architectural Debt
+- **Description**: Current auth session synchronization uses custom cookies (`sb-access-token`, `sb-refresh-token`) via `proxy.ts`, `AuthStateListener.tsx`, and `/api/auth/session`.
+- **Impact**: Server components cannot refresh expired tokens automatically (1-hour session expiry risk); slight race condition on initial sign-in.
+- **Planned Resolution**: Migrate to official `@supabase/ssr` package (`createServerClient`), delete `/api/auth/session` route and `AuthStateListener.tsx`.

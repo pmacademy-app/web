@@ -1,8 +1,8 @@
 # Security Threat Model & Access Control — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `21cc985`  
+**Last Updated:** August 23, 2026  
 
 ---
 
@@ -11,7 +11,7 @@
 Access to administrative features and Route Handlers (`/admin`, `/api/admin/*`) is governed by dual-layer authorization:
 
 1. **Proxy Middleware Protection (`apps/web/proxy.ts`)**: Intercepts requests to `/admin` routes. Checks authenticated Supabase JWT session.
-2. **Server-Side RBAC Engine (`lib/admin/rbac.ts`)**: Evaluates `isUserAdmin(user)`:
+2. **Server-Side RBAC Engine (`lib/admin/authorization.ts`)**: Evaluates `isAdminEmail(user.email)` or `users.is_admin === true` in PostgreSQL:
    - **Environment Override**: Checks if `user.email` matches `ADMIN_EMAILS` environment variable (comma-separated list).
    - **Database Role Check**: Checks if `users.is_admin === true` in PostgreSQL.
 

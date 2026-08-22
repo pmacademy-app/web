@@ -1,133 +1,91 @@
-# PM Academy — Web Application
+# Prodily PM Academy — Web Application (`apps/web`)
 
-A production-quality Next.js application implementing the full PM Academy curriculum, learning loops, dashboard, and marketing landing pages. Built with a static-first architecture for the curriculum content, integrated with a lightweight user state database and waitlist system powered by Supabase.
-
----
-
-## Technical Stack
-
-- **Framework**: Next.js 16 (App Router) & React 19
-- **Language**: TypeScript (Strict Mode)
-- **Styling**: TailwindCSS v4
-- **UI Components**: @base-ui/react primitives via shadcn/ui
-- **Animation**: Framer Motion
-- **Database**: Supabase
-- **Analytics**: Google Analytics 4 (GA4) with Google Tag Manager support
-
+This directory contains the Next.js 16 web application for **Prodily PM Academy**, the flagship interactive learning platform for product managers.
 
 ---
 
-## Folder Structure
+## 1. Overview & Architecture
+
+Built with a static-first curriculum architecture and a lightweight Supabase PostgreSQL state engine:
+- **Next.js 16.2.12 App Router**: Server Components for zero-bundle-size data fetching and Route Handlers for backend APIs.
+- **Turbopack Build Engine**: Fast compile times and optimized static page generation.
+- **Design Tokens**: Glassmorphic design system configured in `theme/tokens.ts` and `lib/brand.ts`.
+- **Database Model**: PostgreSQL persistence for user state, XP events, streaks, badges, certificates, notification queues, and system error telemetry.
+
+---
+
+## 2. Directory Layout
 
 ```
 apps/web/
-├── app/                     # Next.js app directory (App Router)
-│   ├── (marketing)/         # Marketing routes group (Navbar + Footer layout wrapper)
-│   │   ├── layout.tsx
-│   │   └── page.tsx         # Marketing landing page (all 12 sections)
-│   ├── api/
-│   │   └── waitlist/
-│   │       └── route.ts     # POST waitlist endpoint (Zod, RLS, IP rate limit)
-│   ├── layout.tsx           # Global root layout (Fonts, GA4/GTM script loader, Metadata)
-│   ├── sitemap.ts           # Dynamic XML sitemap generator
-│   └── robots.ts            # Dynamic robots.txt generator
-├── components/
-│   ├── ui/                  # Extended shadcn primitives (CVA customized variants)
-│   ├── layout/              # Shared structure: Topbar (Search | Feedback | Bell | Profile), Sidebar
-│   ├── auth/                # Auth components: ResendVerificationCard, AuthHelpCard
-│   ├── feedback/            # Learner feedback: LearnerFeedbackProvider, ContextualFeedbackModal
-│   ├── marketing/
-│   │   ├── sections/        # Homepage section components (Hero, Why, Curriculum, etc.)
-│   │   └── product-mockup/  # Visual UI mockup mockups (SkillRadar, AIChat, cards)
-│   └── forms/               # Form logic: WaitlistForm (3-field React Hook Form)
-├── hooks/                   # Custom utility hooks (useScrolled, useReducedMotion)
-├── lib/
-│   ├── utils.ts             # Tailwind class merger (cn helper)
-│   ├── analytics.ts         # Centralised GA4 event tracking wrappers
-│   ├── supabase.ts          # Server & browser Supabase client factories
-│   └── design/
-│       └── tokens.ts        # Shared typed design constants (colors, margins)
-├── styles/
-│   └── globals.css          # Tailwind base, import, and custom @theme config
-├── config/
-│   ├── content.ts           # Single source of truth for marketing copy (Sprint 3)
-│   └── navigation.ts        # Link definitions for headers and footers
-├── types/
-│   └── index.ts             # Global TypeScript type definitions
-└── supabase/
-    └── migrations/
-        └── 001_waitlist.sql # Supabase waitlist SQL migration
+├── app/                        # Next.js App Router
+│   ├── (auth)/                 # Public auth pages (login, signup, reset-password, verified)
+│   ├── academy/                # 90-lesson curriculum browser & lesson viewer
+│   ├── admin/                  # Admin Console operations center (9 workspaces)
+│   ├── api/                    # Serverless API routes (cron, admin, auth, settings, etc.)
+│   ├── badges/                 # Learner badge showcase
+│   ├── capstones/              # Capstone project submission & showcase
+│   ├── dashboard/              # Learner dashboard, streak tracker, activity heatmap
+│   ├── leaderboard/            # Cohort/Friend leaderboard rankings
+│   ├── notifications/          # In-app notification center
+│   ├── p/[username]/           # Public learner portfolio
+│   ├── profile/                # Profile & account settings
+│   └── verify/[id]/            # Public certificate authenticity verification
+├── blocks/                     # Custom lesson block components
+├── components/                 # React UI primitives, Admin, Layout, Auth, and Feedback
+├── contexts/                   # React Contexts (auth session, breadcrumbs)
+├── e2e/                        # Playwright E2E browser tests (`e2e/auth/`)
+├── emails/                     # React Email templates & rendering components
+├── hooks/                      # Custom client hooks
+├── lib/                        # Core backend services, DB client, aggregations
+│   └── __tests__/              # Vitest unit and integration test suites (44 files)
+├── theme/                      # Design system tokens (`theme/tokens.ts`)
+├── types/                      # TypeScript definitions & auto-generated `database.ts`
+├── proxy.ts                    # Next.js 16 request interceptor & auth proxy
+├── vitest.config.mts           # Vitest configuration
+├── playwright.config.ts        # Playwright E2E configuration
+└── vercel.json                 # Vercel deployment configuration (`{ "framework": "nextjs" }`)
 ```
 
 ---
 
-## Design System Integration (Tailwind v4)
+## 3. Key Commands
 
-Design tokens defined in Sprint 1 are managed entirely inside `app/globals.css` in the `@theme` block.
+Run these scripts from within `apps/web/`:
 
-```css
-@theme inline {
-  --font-sans:    var(--font-inter);
-  --font-display: var(--font-fraunces);
+```bash
+# Development
+npm run dev                 # Start Turbopack dev server at http://localhost:3000
 
-  --color-background:        var(--color-background);
-  --color-foreground:        var(--color-foreground);
-  --color-primary:           var(--color-primary);
-  --color-accent:            var(--color-accent);
-  --color-skill-execution:   var(--color-skill-execution);
-  /* ... etc. */
-}
+# Content Compilation
+npm run content:compile     # Compile Markdown lessons & Mermaid diagrams to static JSON
+npm run content:validate    # Validate lesson integrity, IDs, and quiz structure
+
+# Testing & Quality
+npm test                    # Run all Vitest unit and integration test suites
+npm run test:watch          # Run Vitest in interactive watch mode
+npx playwright test         # Run Playwright E2E browser tests
+npm run lint                # Run ESLint checks
+
+# Production Build
+npm run build               # Compile content and build Next.js production bundle
+npm run start               # Start production server locally
 ```
 
-Components use semantic tailwind helper classes (`bg-background`, `text-primary`, `font-display`) and must never use hardcoded hex values.
+---
 
-### Dark Mode
-CSS variables inside the `.dark` class block are defined in `globals.css` but dark-mode switching and QA are deferred to a future sprint.
+## 4. Environment Variables
+
+Create `.env.local` in `apps/web/` using `.env.example` as a template. See [`../../docs/DEPLOYMENT.md`](../../docs/DEPLOYMENT.md) for full variable descriptions.
 
 ---
 
-## waitlist Integration
+## 5. Documentation References
 
-Waitlist registrations are verified client-side (Zod + React Hook Form) and sent to `POST /api/waitlist` containing:
-- `name` (Full Name)
-- `email` (Email address)
-- `career_position` (Role dropdown select)
-- `utm_*` (Source, medium, campaign) automatically captured client-side
-- `referrer` header automatically parsed server-side
-
-### Supabase Table Setup
-Run the SQL migration in `supabase/migrations/001_waitlist.sql` using the Supabase SQL editor. It enables Row Level Security (RLS) to permit `anon` inserts while blocking all read actions.
-
----
-
-## Google Analytics 4 Events
-
-All events are wrapped inside `lib/analytics.ts`:
-- `waitlist_signup` — Fired on successful waitlist submission.
-- `hero_cta_click` — Fired on clicking CTA buttons (`location` param).
-- `curriculum_view` — Fired when Curriculum section is visible.
-- `portfolio_view` — Fired when Portfolio section is visible.
-- `faq_expand` — Fired on expanding Accordion items (`question_index` param).
-- `scroll_90_percent` — Fired on reaching 90% scroll depth.
-
----
-
-## Setup & Running
-
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
-
-2. **Setup Env Variables**:
-   Copy `.env.example` to `.env.local` and fill in your Supabase tokens and GA4 credentials.
-
-3. **Run Dev Server**:
-   ```bash
-   npm run dev
-   ```
-
-4. **Verify Build**:
-   ```bash
-   npm run build
-   ```
+For full architectural and engineering documentation, refer to the [`docs/`](../../docs/) directory:
+- [`docs/INDEX.md`](../../docs/INDEX.md) — Documentation index and reading map
+- [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) — System architecture & technical debt
+- [`docs/DATABASE.md`](../../docs/DATABASE.md) — Database schema & 30 migrations
+- [`docs/TESTING.md`](../../docs/TESTING.md) — Testing strategy & suite inventory
+- [`docs/ADMIN_PANEL.md`](../../docs/ADMIN_PANEL.md) — Admin Console reference
+- [`docs/AUTHENTICATION.md`](../../docs/AUTHENTICATION.md) — Auth flow & session bridge

@@ -1,8 +1,7 @@
 # Deployment & Infrastructure Guide — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Repository:** `pmacademy-app/web`
+**Last Updated:** August 23, 2026
 
 ---
 
@@ -11,12 +10,14 @@
 - **Hosting Platform**: Vercel Serverless Platform.
 - **Framework & Runtime**: Next.js 16.2.12 App Router (Node.js runtime for API Route Handlers).
 - **Build Engine**: Next.js Turbopack compiler engine.
+- **Vercel Root Directory**: `apps/web` (configured in Vercel Dashboard).
+- **Vercel Config**: Single `apps/web/vercel.json` (`{ "framework": "nextjs" }`). No root-level `vercel.json`.
 - **Build Pipeline (`npm run build`)**:
   1. Compiles 90 Markdown lessons (`npm run content:compile`).
   2. Compiles embedded Mermaid diagrams to static SVGs via Node.js + JSDOM.
   3. Pre-builds FlexSearch index (`content/dist/search-index.json`).
   4. Runs TypeScript type checking across all App Router routes and components.
-  5. Renders 183 static App Router pages.
+  5. Renders static App Router pages.
 
 ---
 
@@ -43,5 +44,6 @@
 |---|---|
 | **Vercel Production Hosting** | 🟢 Verified in Production |
 | **Next.js 16 Build Engine** | 🟢 Verified in Production |
-| **Static Page Pre-Rendering (183 Pages)** | 🟢 Verified in Production |
+| **Static Page Pre-Rendering** | 🟢 Verified in Production |
 | **Environment Variable Security** | 🟢 Verified in Production |
+| **Single `vercel.json` at `apps/web/`** | 🟢 Verified — root vercel.json deleted |

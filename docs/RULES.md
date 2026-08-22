@@ -1,8 +1,8 @@
 # Engineering Rules & Guidelines — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `21cc985`  
+**Last Updated:** August 23, 2026  
 
 ---
 
@@ -34,15 +34,13 @@
 Before declaring any work complete or committing to `main`:
 
 ```bash
-# 1. Run targeted unit test suite
-npm run test:audit-fixes
-npm run test:monitoring
-npm run test:admin
-npm run test:send-email-hook
-npm run test:automations
+# From apps/web/
 
-# 2. Run targeted ESLint check on changed files
-npx eslint app/api/admin/emails/production-send/route.ts lib/__tests__/audit-fixes.test.ts
+# 1. Run all unit & integration test suites via Vitest
+npm test
+
+# 2. Run ESLint check
+npm run lint
 
 # 3. Run production build (includes TypeScript type checking & static page rendering)
 npm run build

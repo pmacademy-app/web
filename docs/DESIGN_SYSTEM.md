@@ -1,8 +1,8 @@
 # Design System & Visual Identity — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `875f6ba`  
-**Last Updated:** August 11, 2026  
+**Current Baseline HEAD:** `21cc985`  
+**Last Updated:** August 23, 2026  
 
 ---
 
@@ -68,4 +68,3 @@ Right-hand controls follow the strict visual hierarchy:
    - **Private Feedback**: Posts to `/api/feedback` (persisted in `public.user_feedback`).
    - **Public Review**: Posts to `/api/testimonials` (persisted in `public.testimonials` for admin moderation).
 5. **Authentication Context**: Automatically inherits logged-in Supabase session headers without requiring manual user ID entry.
-

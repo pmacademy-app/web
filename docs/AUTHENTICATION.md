@@ -1,18 +1,23 @@
 # Authentication Infrastructure & User State Sync — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `875f6ba`  
-**Last Updated:** August 11, 2026  
+**Repository:** `pmacademy-app/web`
+**Last Updated:** August 23, 2026
 
 ---
 
-## 1. Overview & Supabase Auth Architecture
+## 1. Overview & Current Auth Architecture
 
 Authentication is powered by Supabase Auth with PKCE flow and custom email rendering via the Send Email Hook.
 
-- **Client Session Management**: `createClientSupabaseClient()` (`lib/supabase.ts`) handles browser session persistence and token refresh.
-- **Server Session Validation**: `createServerSupabaseClient()` extracts JWT tokens from cookies or `Authorization: Bearer` headers.
+The current implementation uses `@supabase/supabase-js` (browser SDK) with a **custom session bridge** for server-side token synchronization:
+
+- **Client Session Management**: `createBrowserSupabaseClient()` (`lib/supabase.ts`) handles browser session persistence and token refresh.
+- **Server Session Bridge**: After sign-in, the browser POSTs the session to `/api/auth/session`, which sets HTTP-only `sb-access-token` and `sb-refresh-token` cookies.
+- **Server Session Validation**: `createServerSupabaseClient()` reads the `sb-access-token` cookie and creates a server-scoped client.
 - **Service-Role Operations**: `createAdminSupabaseClient()` bypasses RLS for administrative user lookups and account verification checks.
+- **Request Interception**: `proxy.ts` (Next.js 16 convention) intercepts all requests, validates the `sb-access-token` cookie, and enforces route protection.
+
+> **Known Issue**: This custom bridge has a 1-hour session expiry limitation (no automatic server-side token refresh) and a race condition window on login. Migrating to `@supabase/ssr` is a planned architectural improvement. See `ARCHITECTURE.md` § Known Architectural Debt.
 
 ---
 
@@ -31,23 +36,23 @@ Authentication is powered by Supabase Auth with PKCE flow and custom email rende
 
 ### B. Resend Verification & Wrong-Email Recovery Flow
 - **Resend Integration**: Reuses `ResendVerificationCard` (`components/auth/ResendVerificationCard.tsx`), which calls `/api/auth/resend-verification` and enforces a persistent 60-second rate-limit cooldown.
-- **Typo Recovery Option**: Includes an *"Entered the wrong email? Sign up again with a different address →"* trigger allowing learners to reset form state and re-submit with the corrected address immediately if a typo occurred during registration.
+- **Typo Recovery Option**: Includes an *"Entered the wrong email? Sign up again with a different address →"* trigger allowing learners to reset form state and re-submit with the corrected address.
 
 ### C. Asynchronous Email Bounce & Mailbox Validation Limits
-- **Synchronous Mailbox Validation Limitation**: Resend accepts confirmation emails for delivery synchronously (returning HTTP 200 with message ID) and performs SMTP delivery out-of-band. Therefore, synchronous verification of whether an email address inbox actually exists at the exact moment of clicking "Create Account" is technically impossible in modern email infrastructure.
-- **Asynchronous Bounce Handling**: If a confirmation email bounces due to a non-existent or invalid address, Resend posts an `email.bounced` webhook event to `/api/email/webhooks`, which persists the bounce event to `public.email_delivery_events`.
+- **Synchronous Mailbox Validation Limitation**: Resend accepts confirmation emails for delivery synchronously (returning HTTP 200 with message ID) and performs SMTP delivery out-of-band. Synchronous inbox-existence verification is technically impossible.
+- **Asynchronous Bounce Handling**: If a confirmation email bounces, Resend posts an `email.bounced` webhook event to `/api/email/webhooks`, which persists the bounce event to `public.email_delivery_events`.
 - **Verification Invariant**: The UI never claims "Account created" or "Account ready" while email confirmation remains unverified.
 
 ---
 
 ## 3. Persistent 60-Second Cooldown Rate Limiting
 
-To prevent mail bombing and API abuse, user-facing verification resend requests (`/api/auth/resend-verification`) enforce a persistent 60-second cooldown rate limit.
+User-facing verification resend requests (`/api/auth/resend-verification`) enforce a persistent 60-second cooldown rate limit.
 
 - **Database Table**: `public.rate_limits`
 - **Rate Limit Key**: `verify_resend:${email}`
 - **Behavior**: Stores window start timestamp and hit counter. Rejects duplicate requests within 60 seconds with `429 Too Many Requests`.
-- **Serverless Resilience**: In the event of temporary database latency or offline mock testing, `evaluatePersistentRateLimit()` falls back to a memory-backed LRU map while maintaining explicit rate limit constraints.
+- **Serverless Resilience**: In the event of temporary database latency, `evaluatePersistentRateLimit()` falls back to a memory-backed LRU map while maintaining explicit rate limit constraints.
 
 ---
 
@@ -61,7 +66,30 @@ When a learner creates an account:
 
 ---
 
-## 5. Status Summary
+## 5. Admin Authorization
+
+Admin authorization uses a dual-gate approach:
+1. `ADMIN_EMAILS` environment variable — OR
+2. `users.is_admin` database flag
+
+This correctly prevents a compromised admin email from being the only gate. Implemented in `lib/admin/authorization.ts`.
+
+---
+
+## 6. Environment Variables Required
+
+```
+NEXT_PUBLIC_SUPABASE_URL        ← Supabase project URL (public)
+NEXT_PUBLIC_SUPABASE_ANON_KEY   ← Supabase anon key (public)
+SUPABASE_SERVICE_ROLE_KEY       ← Service role key (server-only, NEVER public)
+SEND_EMAIL_HOOK_SECRET          ← Hook signature verification (REQUIRED in production)
+ADMIN_EMAILS                    ← Comma-separated admin email list
+NEXT_PUBLIC_SITE_URL            ← Canonical app URL for email links
+```
+
+---
+
+## 7. Status Summary
 
 | Authentication Flow | Location | Status |
 |---|---|---|
@@ -74,4 +102,4 @@ When a learner creates an account:
 | **Persistent 60s Rate Limiter** | `lib/rate-limit.ts`, `public.rate_limits` | 🟢 Verified in Production |
 | **Unverified User Discovery** | `lib/admin/service.ts` | 🟢 Verified in Production |
 | **Supabase Auth Hook Integration** | `app/api/auth/send-email-hook/route.ts` | 🟢 Verified in Production |
-
+| **Server-Side Token Refresh** | Not implemented (`@supabase/ssr` pending) | ⚠️ Known Gap |

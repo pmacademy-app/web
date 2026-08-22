@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD) — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `21cc985`  
+**Last Updated:** August 23, 2026  
 
 ---
 
@@ -20,7 +20,7 @@
 
 1. **Aspiring PMs**: Complete 9 structured modules (90 lessons), complete capstones, publish public portfolios (`/p/[username]`), and share verified certificates on LinkedIn.
 2. **Practicing PMs**: Refresh frameworks (RICE, Kano, North Star, Working Backwards) via search index and SM-2 flashcard spaced repetition.
-3. **Platform Administrators**: Manage learners, monitor system errors, review capstones, manage content, and dispatch communications via the 12-tab Admin Console (`/admin`).
+3. **Platform Administrators**: Manage learners, monitor system errors, review capstones, manage content, and dispatch communications via the Admin Console (`/admin`).
 
 ---
 
@@ -45,6 +45,6 @@ The following feature prohibitions are frozen in product policy:
 | **XP & Streak Engine** | Daily streak tracking, timezone-aware check-ins | 🟢 Verified in Production | `app/api/streaks/route.ts`, `public.user_streaks` |
 | **Certificates v2** | Verified certificate rendering + LinkedIn sharing | 🟢 Verified in Production | `app/verify/[certificateId]/page.tsx` |
 | **Public Portfolio** | Shareable learner portfolio URL (`/p/[username]`) | 🟢 Verified in Production | `app/p/[username]/page.tsx` |
-| **Admin Console** | 12-tab administrative platform | 🟢 Verified in Production | `app/admin/page.tsx`, `components/admin/` |
+| **Admin Console** | Multi-workspace administrative platform | 🟢 Verified in Production | `app/admin/page.tsx`, `components/admin/` |
 | **Send Email Hook** | Supabase Auth branded email hook | 🟡 Implemented — Verification Required | `app/api/auth/send-email-hook/route.ts` |
-| **GitHub Actions Cron** | Automated email queue & reminder jobs | 🟡 Implemented — Verification Required | `.github/workflows/email-cron.yml` |
+| **GitHub Actions Cron** | Automated email queue & reminder jobs | 🟡 Implemented — Verification Required | `.github/workflows/notification-scheduler.yml` |
