@@ -1,8 +1,7 @@
 # Background Schedulers & Cron Architecture — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Repository:** `pmacademy-app/web`
+**Last Updated:** August 23, 2026
 
 ---
 
@@ -17,22 +16,19 @@ Background jobs, queue processing, and periodic maintenance are executed via **G
 
 ## 2. GitHub Actions Workflows
 
-### 1. `email-cron.yml` (`.github/workflows/email-cron.yml`)
-- **Queue Processing Job** (`process-email-queue`):
-  - Schedule: `*/5 * * * *` (Every 5 minutes).
-  - Target: `POST /api/cron/process-email-queue`.
-- **Daily Reminders Job** (`daily-reminder`):
-  - Schedule: `0 9 * * *` (Daily at 09:00 UTC).
-  - Target: `POST /api/cron/daily-reminder`.
-- **Weekly Recaps Job** (`weekly-recap`):
-  - Schedule: `0 9 * * 1` (Mondays at 09:00 UTC).
-  - Target: `POST /api/cron/weekly-recap`.
+There are two active workflow files:
+
+### 1. `ci.yml` (`.github/workflows/ci.yml`)
+- **Trigger**: Every push and pull request to `main`.
+- **Jobs**: content build → lint → typecheck → vitest → brand check → Next.js build → Supabase migrations (main only).
 
 ### 2. `notification-scheduler.yml` (`.github/workflows/notification-scheduler.yml`)
-- **Process Email Queue**: `*/15 * * * *` (Fallback 15-minute queue check).
-- **Retry Failed Emails**: `0 * * * *` (Hourly retry trigger to `/api/cron/retry-failed`).
-- **Weekly Recap**: `0 18 * * 0` (Sunday recap check to `/api/cron/weekly-recap`).
-- **Cleanup Timeline & Logs**: `0 2 * * *` (Daily cleanup to `/api/cron/cleanup`).
+- **Process Email Queue**: `*/15 * * * *` (Fallback 15-minute queue check → `/api/cron/process-email-queue`).
+- **Retry Failed Emails**: `0 * * * *` (Hourly retry → `/api/cron/retry-failed`).
+- **Weekly Recap**: `0 18 * * 0` (Sunday recap check → `/api/cron/weekly-recap`).
+- **Cleanup Timeline & Logs**: `0 2 * * *` (Daily cleanup → `/api/cron/cleanup`).
+
+> **Note**: A previous `email-cron.yml` workflow (with 5-minute queue processing, daily reminders at 09:00 UTC, and weekly recaps on Mondays) has been removed. The `notification-scheduler.yml` now handles queue processing and recap scheduling.
 
 ---
 

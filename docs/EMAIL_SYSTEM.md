@@ -1,8 +1,8 @@
 # Email Infrastructure & Delivery Pipeline — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `875f6ba`  
-**Last Updated:** August 11, 2026  
+**Current Baseline HEAD:** `21cc985`  
+**Last Updated:** August 23, 2026  
 
 ---
 
@@ -17,9 +17,9 @@ Outbound email delivery is split into distinct, specialized execution paths:
 | **User Verification Resend** | Learner click on `/login` or signup page | `/api/auth/resend-verification` | NO (Direct via Auth Hook) | NO | Critical Auth | 🟢 Verified in Production |
 | **Admin Production Verification** | Admin click in `/admin/users` | `/api/admin/emails/production-send` | YES (`email_queue`) | NO | Critical Auth | 🟢 Verified in Production |
 | **Welcome Email** | Triggered on new signup | `/api/auth/send-email-hook` | YES (`email_queue`) | YES | Optional Automation | 🟢 Verified in Production |
-| **Daily Reminders** | GitHub Actions Cron (09:00 UTC) | `/api/cron/daily-reminder` | YES (`email_queue`) | YES | Optional Automation | 🟡 Implemented — Verification Required |
-| **Weekly Recaps** | GitHub Actions Cron (Mondays) | `/api/cron/weekly-recap` | YES (`email_queue`) | YES | Optional Automation | 🟡 Implemented — Verification Required |
-| **Admin Production Send** | Admin click in `/admin/emails` | `/api/admin/emails/production-send` | YES (`email_queue`) | YES (if non-critical) | Optional Automation | 🟠 Known Production Failure (`ISSUE-05`) |
+| **Daily Reminders** | GitHub Actions Cron | `/api/cron/daily-reminder` | YES (`email_queue`) | YES | Optional Automation | 🟡 Implemented — Verification Required |
+| **Weekly Recaps** | GitHub Actions Cron | `/api/cron/weekly-recap` | YES (`email_queue`) | YES | Optional Automation | 🟡 Implemented — Verification Required |
+| **Admin Production Send** | Admin click in `/admin/communications` | `/api/admin/emails/production-send` | YES (`email_queue`) | YES (if non-critical) | Optional Automation | 🟠 Known Production Failure (`ISSUE-05`) |
 | **Admin Test Send** | Admin click "Send Test Email" | `/api/admin/emails/test-send` | NO (Direct send) | NO | Test / Diagnostic | 🟢 Verified in Production |
 | **Contact Form Inquiry Forwarding**| User submit `/contact` | `/api/contact` | NO (Direct send) | NO | Administrative Inquiry | 🟢 Verified in Production |
 | **Webhook Bounce Alert** | Resend bounce event webhook | `/api/email/webhooks` | NO (Direct alert send) | NO | System Alert | 🟢 Verified in Production |
@@ -92,4 +92,3 @@ One-time email campaigns (such as `reengagement_aug_2026`) adhere to strict safe
 - **Observed Production Evidence**: Sending optional templates (such as `auth.welcome`) from `/api/admin/emails/production-send` resulted in `processResult: { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }` and `queueId: 'unknown'`.
 - **Impact**: Zero emails were submitted to Resend, yet `public.admin_audit_logs` recorded the action as successful.
 - **Cross-Reference**: Detailed investigation scope documented in `docs/ISSUES_KNOWN.md#issue-05-admin-production-email-zero-processed-delivery-gap`.
-

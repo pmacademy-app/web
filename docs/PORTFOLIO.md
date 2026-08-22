@@ -1,8 +1,8 @@
 # Learner Portfolio & Certificate Verification — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `21cc985`  
+**Last Updated:** August 23, 2026  
 
 ---
 

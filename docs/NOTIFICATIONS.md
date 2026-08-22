@@ -1,8 +1,8 @@
 # Notification Platform Specification — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `490fea37ea08813aa582fc5ebbc3896ee4eb070c`  
-**Last Updated:** August 10, 2026  
+**Current Baseline HEAD:** `21cc985`  
+**Last Updated:** August 23, 2026  
 
 ---
 
@@ -13,6 +13,7 @@ The Notification Platform provides multi-channel notifications across in-app Not
 - **In-App Notifications**: Stored in `public.notifications` table.
 - **In-App Notification Preferences**: Configured per user in `public.notification_preferences`.
 - **Delivery Event Log**: Every delivery attempt is logged in `public.notification_delivery_events`.
+- **Idempotency**: Notification events enforce unique deduplication keys to prevent duplicate notifications (`20260823000001_notification_idempotency_and_avatar_cleanup.sql`).
 
 ---
 
@@ -67,3 +68,4 @@ CREATE TABLE public.notification_delivery_events (
 | **In-App Unread Counter** | `app/api/notifications/route.ts` | 🟢 Verified in Production |
 | **Delivery Event Logging** | `lib/notifications/queue/processor.ts` | 🟢 Verified in Production |
 | **Admin Broadcast Dispatch** | `app/api/admin/notifications/route.ts` | 🟢 Verified in Production |
+| **Notification Idempotency** | Migration `20260823000001_*.sql` | 🟢 Verified in Production |
