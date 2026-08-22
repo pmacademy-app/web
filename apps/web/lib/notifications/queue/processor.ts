@@ -251,9 +251,9 @@ export async function processEmailQueue(
       }
     }
 
-    // C. Check Suppression
+    // C. Check Suppression (Optional emails only — critical auth emails bypass suppression)
     const { data: suppression } = await supabase.from('email_suppressions').select('id').eq('email', toEmail).maybeSingle()
-    if (suppression) {
+    if (suppression && !isCritical) {
       await supabase.from('email_queue').update({ status: 'suppressed', skipped_reason: 'email_suppressed', updated_at: new Date().toISOString() }).eq('id', queueId)
       suppressedCount++
       continue
