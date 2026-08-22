@@ -50,14 +50,69 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
     }
   }
 
+  const [isSaving, setIsSaving] = useState(false)
+  const [isTogglingPause, setIsTogglingPause] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
+
   const handleReset = () => {
     setSubject(detail.subjectLine)
     setBody(detail.bodyHtml)
     toast('Restored the original template source.', 'info')
   }
 
-  const handleSave = () => {
-    toast('Templates are managed in code (apps/web/emails/templates). Edits here are preview-only.', 'info')
+  const handleSave = async () => {
+    setIsSaving(true)
+    try {
+      const res = await fetch(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjectLine: subject,
+          bodyHtml: body,
+          bodyText: body.replace(/<[^>]+>/g, ''),
+        }),
+      })
+
+      const json = await res.json()
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to save template')
+      }
+
+      toast(json.message || 'Template version saved successfully.', 'success')
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Save failed', 'error')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleTogglePause = async () => {
+    if (detail.isCritical) {
+      toast('Critical authentication templates cannot be paused.', 'error')
+      return
+    }
+
+    setIsTogglingPause(true)
+    try {
+      const targetPause = !isPaused
+      const res = await fetch(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}/toggle-pause`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paused: targetPause }),
+      })
+
+      const json = await res.json()
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to update template state')
+      }
+
+      setIsPaused(targetPause)
+      toast(json.message || `Template ${targetPause ? 'paused' : 'resumed'}.`, 'success')
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Failed to update pause state', 'error')
+    } finally {
+      setIsTogglingPause(false)
+    }
   }
 
   return (
@@ -82,7 +137,9 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
             <span className="px-2 py-0.5 rounded bg-admin-surface-raised text-admin-fg-muted font-mono text-[10px] border border-admin-border uppercase tracking-wider">
               {detail.category}
             </span>
-            {detail.isDeferred ? (
+            {isPaused ? (
+              <AdminStatusBadge status="archived" label="Paused" />
+            ) : detail.isDeferred ? (
               <AdminStatusBadge status="archived" label="Deferred" />
             ) : detail.isCritical ? (
               <AdminStatusBadge status="healthy" label="Always On" />
@@ -92,6 +149,16 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {!detail.isCritical && (
+            <button
+              type="button"
+              disabled={isTogglingPause}
+              onClick={handleTogglePause}
+              className="px-3 py-2 rounded-lg border border-admin-border text-xs font-semibold text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              {isPaused ? 'Resume Notification' : 'Pause Notification'}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleReset}
@@ -108,10 +175,11 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
           </button>
           <button
             type="button"
+            disabled={isSaving}
             onClick={handleSave}
-            className="px-3.5 py-2 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-lg cursor-pointer"
+            className="px-3.5 py-2 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50"
           >
-            <Save className="w-3.5 h-3.5" /> Save
+            <Save className="w-3.5 h-3.5" /> {isSaving ? 'Saving…' : 'Save Version'}
           </button>
         </div>
       </div>

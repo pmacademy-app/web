@@ -1,4 +1,14 @@
-export const XP_VALUES = {
+export interface XpValuesConfig {
+  THEORY_READ: number
+  QUIZ_CORRECT: number
+  QUIZ_PERFECT_BONUS: number
+  FLASHCARD_REVIEW: number
+  REFLECTION_SUBMITTED: number
+  CAPSTONE_SUBMITTED: number
+  DAILY_STREAK_BASE: number
+}
+
+export const XP_VALUES: XpValuesConfig = {
   THEORY_READ: 10,
   QUIZ_CORRECT: 5,
   QUIZ_PERFECT_BONUS: 25,
@@ -6,39 +16,83 @@ export const XP_VALUES = {
   REFLECTION_SUBMITTED: 15,
   CAPSTONE_SUBMITTED: 150,
   DAILY_STREAK_BASE: 5,
-} as const
+}
+
+let cachedSettings: XpValuesConfig | null = null
+let cacheTimestamp = 0
+const CACHE_TTL_MS = 30_000
 
 /**
  * Loads dynamic XP settings configured by admins in system_settings,
- * falling back safely to static XP_VALUES defaults.
+ * falling back safely to static XP_VALUES defaults with a 30s cache TTL.
  */
-export async function getRuntimeXpValues(supabaseClient?: unknown): Promise<typeof XP_VALUES> {
-  if (!supabaseClient) return XP_VALUES
+export async function getRuntimeXpValues(
+  supabaseClient?: unknown,
+  forceFresh = false
+): Promise<XpValuesConfig> {
+  const now = Date.now()
+  if (!forceFresh && cachedSettings && (now - cacheTimestamp < CACHE_TTL_MS)) {
+    return cachedSettings
+  }
+
+  if (!supabaseClient) return cachedSettings || XP_VALUES
+
   try {
-    const client = supabaseClient as { from: (table: string) => { select: (col: string) => { eq: (k: string, v: string) => { maybeSingle: () => Promise<{ data: { value?: Record<string, unknown> } | null }> } } } }
-    const { data } = await client
+    const client = supabaseClient as {
+      from: (table: string) => {
+        select: (col: string) => {
+          eq: (k: string, v: string) => {
+            maybeSingle: () => Promise<{ data: { value?: Record<string, unknown> } | null; error?: unknown }>
+          }
+        }
+      }
+    }
+    const { data, error } = await client
       .from('system_settings')
       .select('value')
       .eq('key', 'learning')
       .maybeSingle()
 
-    if (data?.value && typeof data.value === 'object') {
+    if (!error && data?.value && typeof data.value === 'object') {
       const v = data.value
-      return {
-        THEORY_READ: typeof v.xpPerLessonComplete === 'number' ? v.xpPerLessonComplete : XP_VALUES.THEORY_READ,
-        QUIZ_CORRECT: typeof v.xpPerQuizCorrect === 'number' ? v.xpPerQuizCorrect : XP_VALUES.QUIZ_CORRECT,
-        QUIZ_PERFECT_BONUS: typeof v.xpQuizPerfectBonus === 'number' ? v.xpQuizPerfectBonus : XP_VALUES.QUIZ_PERFECT_BONUS,
-        FLASHCARD_REVIEW: typeof v.xpPerFlashcardReview === 'number' ? v.xpPerFlashcardReview : XP_VALUES.FLASHCARD_REVIEW,
-        REFLECTION_SUBMITTED: typeof v.xpPerReflection === 'number' ? v.xpPerReflection : XP_VALUES.REFLECTION_SUBMITTED,
-        CAPSTONE_SUBMITTED: typeof v.xpPerCapstoneSubmitted === 'number' ? v.xpPerCapstoneSubmitted : XP_VALUES.CAPSTONE_SUBMITTED,
-        DAILY_STREAK_BASE: typeof v.xpStreakBaseReward === 'number' ? v.xpStreakBaseReward : XP_VALUES.DAILY_STREAK_BASE,
+      const resolved: XpValuesConfig = {
+        THEORY_READ: typeof v.xpPerLessonComplete === 'number' && v.xpPerLessonComplete > 0
+          ? v.xpPerLessonComplete
+          : XP_VALUES.THEORY_READ,
+        QUIZ_CORRECT: typeof v.xpPerQuizPass === 'number' && v.xpPerQuizPass > 0
+          ? v.xpPerQuizPass
+          : typeof v.xpPerQuizCorrect === 'number' && v.xpPerQuizCorrect > 0
+          ? v.xpPerQuizCorrect
+          : XP_VALUES.QUIZ_CORRECT,
+        QUIZ_PERFECT_BONUS: typeof v.xpQuizPerfectBonus === 'number' && v.xpQuizPerfectBonus >= 0
+          ? v.xpQuizPerfectBonus
+          : XP_VALUES.QUIZ_PERFECT_BONUS,
+        FLASHCARD_REVIEW: typeof v.xpPerFlashcardReview === 'number' && v.xpPerFlashcardReview > 0
+          ? v.xpPerFlashcardReview
+          : XP_VALUES.FLASHCARD_REVIEW,
+        REFLECTION_SUBMITTED: typeof v.xpPerReflection === 'number' && v.xpPerReflection > 0
+          ? v.xpPerReflection
+          : XP_VALUES.REFLECTION_SUBMITTED,
+        CAPSTONE_SUBMITTED: typeof v.xpPerCapstoneSubmitted === 'number' && v.xpPerCapstoneSubmitted > 0
+          ? v.xpPerCapstoneSubmitted
+          : XP_VALUES.CAPSTONE_SUBMITTED,
+        DAILY_STREAK_BASE: typeof v.xpStreakBaseReward === 'number' && v.xpStreakBaseReward > 0
+          ? v.xpStreakBaseReward
+          : XP_VALUES.DAILY_STREAK_BASE,
       }
+      cachedSettings = resolved
+      cacheTimestamp = now
+      return resolved
     }
-  } catch {
-    // Safe static fallback
+  } catch (err) {
+    console.warn('[getRuntimeXpValues] Fallback to static XP defaults:', err)
   }
+
+  cachedSettings = XP_VALUES
+  cacheTimestamp = now
   return XP_VALUES
 }
+
 
 export type XpSourceType =
   | 'theory_read'
@@ -139,23 +193,25 @@ export function getLevelTitle(level: number): string {
 
 export function getXpAmountForSource(
   sourceType: XpSourceType,
-  payload?: { correctCount?: number; isPerfect?: boolean }
+  payload?: { correctCount?: number; isPerfect?: boolean },
+  config?: typeof XP_VALUES
 ): number {
+  const values = config || XP_VALUES
   switch (sourceType) {
     case 'theory_read':
-      return XP_VALUES.THEORY_READ
+      return values.THEORY_READ
     case 'quiz_correct':
-      return (payload?.correctCount ?? 1) * XP_VALUES.QUIZ_CORRECT
+      return (payload?.correctCount ?? 1) * values.QUIZ_CORRECT
     case 'quiz_bonus':
-      return XP_VALUES.QUIZ_PERFECT_BONUS
+      return values.QUIZ_PERFECT_BONUS
     case 'flashcard':
-      return XP_VALUES.FLASHCARD_REVIEW
+      return values.FLASHCARD_REVIEW
     case 'reflection':
-      return XP_VALUES.REFLECTION_SUBMITTED
+      return values.REFLECTION_SUBMITTED
     case 'capstone':
-      return XP_VALUES.CAPSTONE_SUBMITTED
+      return values.CAPSTONE_SUBMITTED
     case 'streak':
-      return XP_VALUES.DAILY_STREAK_BASE
+      return values.DAILY_STREAK_BASE
     default:
       return 0
   }
@@ -165,14 +221,16 @@ export function calculateQuizXp(
   correctCount: number,
   totalQuestions: number,
   isFirstAttempt: boolean,
-  alreadyAwardedQuizXp: number = 0
+  alreadyAwardedQuizXp: number = 0,
+  config?: typeof XP_VALUES
 ): { incrementalQuizXp: number; perfectBonusXp: number; totalXp: number } {
-  const maxPossibleQuizXp = Math.max(0, correctCount) * XP_VALUES.QUIZ_CORRECT
+  const values = config || XP_VALUES
+  const maxPossibleQuizXp = Math.max(0, correctCount) * values.QUIZ_CORRECT
   const incrementalQuizXp = Math.max(0, maxPossibleQuizXp - alreadyAwardedQuizXp)
 
   let perfectBonusXp = 0
   if (isFirstAttempt && totalQuestions > 0 && correctCount === totalQuestions) {
-    perfectBonusXp = XP_VALUES.QUIZ_PERFECT_BONUS
+    perfectBonusXp = values.QUIZ_PERFECT_BONUS
   }
 
   return {

@@ -10,7 +10,7 @@ import {
   calculateReviewStats,
 } from '@/lib/srs'
 import { awardXp } from '@/lib/xp-service'
-import { XP_VALUES } from '@/lib/xp'
+import { XP_VALUES, getRuntimeXpValues } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
 import { getLocalDateString } from '@/lib/streaks'
 import { fetchCurriculumData, fetchCompiledLesson } from '@/lib/lesson-loader'
@@ -188,11 +188,12 @@ export async function recordFlashcardReview(
     }) ?? false
 
     if (!hasAwardedToday) {
+      const xpConfig = await getRuntimeXpValues(supabase)
       await awardXp(
         supabase,
         userId,
         'flashcard',
-        XP_VALUES.FLASHCARD_REVIEW,
+        xpConfig.FLASHCARD_REVIEW,
         flashcardId
       )
     }

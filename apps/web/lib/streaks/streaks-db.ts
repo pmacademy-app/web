@@ -7,7 +7,7 @@ import {
   StreakData,
   StreakStatusSummary,
 } from './streaks'
-import { XP_VALUES } from '../xp'
+import { XP_VALUES, getRuntimeXpValues } from '../xp'
 import { awardXp, hasXpEvent } from '../xp-service'
 
 interface DBChain {
@@ -102,12 +102,13 @@ export async function updateUserStreak(
         const alreadyAwardedToday = await hasXpEvent(supabase, userId, 'streak', streakSourceId)
 
         if (!alreadyAwardedToday) {
+          const xpConfig = await getRuntimeXpValues(supabase)
           try {
             await awardXp(
               supabase,
               userId,
               'streak',
-              XP_VALUES.DAILY_STREAK_BASE,
+              xpConfig.DAILY_STREAK_BASE,
               streakSourceId
             )
           } catch (xpError) {

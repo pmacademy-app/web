@@ -2,6 +2,10 @@ import { unstable_cache, revalidateTag } from 'next/cache'
 import { createServiceRoleClient } from '../supabase'
 import { logAdminAction } from './guard'
 
+interface DBChain {
+  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
+}
+
 export interface TestimonialItem {
   id: string
   userId: string | null
