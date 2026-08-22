@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useId } from 'react'
-import { X, Send, AlertTriangle, Users, Bell, Mail, ShieldAlert } from 'lucide-react'
+import React, { useState } from 'react'
+import { X, Send, AlertTriangle, ShieldAlert } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
 
 interface AdminBroadcastModalProps {
@@ -11,7 +11,6 @@ interface AdminBroadcastModalProps {
 
 export function AdminBroadcastModal({ open, onClose }: AdminBroadcastModalProps) {
   const { toast } = useAdminToast()
-  const randomSuffix = useId().replace(/:/g, '')
 
   const [audience, setAudience] = useState<'all' | 'individual' | 'cohort'>('individual')
   const [targetUserId, setTargetUserId] = useState('')

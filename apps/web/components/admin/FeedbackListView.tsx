@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Star, MessageSquare, Check, Clock, Lightbulb, CheckCircle2, XCircle, Mail, User } from 'lucide-react'
+import { Star, MessageSquare, Clock, Lightbulb, CheckCircle2, XCircle, Mail, User } from 'lucide-react'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminDrawer } from './AdminDrawer'
 import { AdminEmptyState } from './AdminEmptyState'

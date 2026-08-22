@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { EmailAutomationsService } from '@/lib/notifications/automations/service'
-import type { EmailAutomationKey } from '@/lib/notifications/automations/types'
 import { revalidatePath } from 'next/cache'
 
 export const runtime = 'nodejs'

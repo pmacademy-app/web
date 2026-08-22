@@ -10,7 +10,7 @@ import {
   calculateReviewStats,
 } from '@/lib/srs'
 import { awardXp } from '@/lib/xp-service'
-import { XP_VALUES, getRuntimeXpValues } from '@/lib/xp'
+import { getRuntimeXpValues } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
 import { getLocalDateString } from '@/lib/streaks'
 import { fetchCurriculumData, fetchCompiledLesson } from '@/lib/lesson-loader'

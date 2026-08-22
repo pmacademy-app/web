@@ -7,7 +7,7 @@ import {
   StreakData,
   StreakStatusSummary,
 } from './streaks'
-import { XP_VALUES, getRuntimeXpValues } from '../xp'
+import { getRuntimeXpValues } from '../xp'
 import { awardXp, hasXpEvent } from '../xp-service'
 
 interface DBChain {

@@ -9,10 +9,12 @@ import {
   LayoutDashboard,
   Zap,
   Star,
+  Megaphone,
 } from 'lucide-react'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { CommunicationsService } from '@/lib/admin/communications-service'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
+import { AnnouncementsService } from '@/lib/admin/announcements-service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
@@ -24,6 +26,7 @@ import { AdminTemplateList } from '@/components/admin/AdminTemplateList'
 import { AdminQueueView } from '@/components/admin/AdminQueueView'
 import { AdminContactInbox, type ContactMessageItem } from '@/components/admin/AdminContactInbox'
 import { AdminNotificationListView } from '@/components/admin/AdminNotificationListView'
+import { AdminAnnouncementsView } from '@/components/admin/AdminAnnouncementsView'
 
 export const revalidate = 0
 
@@ -40,6 +43,7 @@ interface PageProps {
 
 const TABS: Array<{ key: string; label: string; icon: React.ElementType; href?: string }> = [
   { key: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { key: 'announcements', label: 'Announcements', icon: Megaphone },
   { key: 'email', label: 'Email', icon: Mail },
   { key: 'automations', label: 'Automations', icon: Zap },
   { key: 'templates', label: 'Templates', icon: FileCode },
@@ -58,7 +62,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
   const queue = await AdminConsoleService.getEmailQueueOverview()
 
   // Fetch per-tab data in parallel; each service degrades to empty fallbacks.
-  const [overview, emailHistory, volumeSeries, automationsState, templates, notificationEvents, contactMessages] =
+  const [overview, emailHistory, volumeSeries, automationsState, templates, notificationEvents, contactMessages, announcementsData] =
     await Promise.all([
       tab === 'overview' ? CommunicationsService.getCommunicationsOverview() : Promise.resolve(null),
       tab === 'email' || tab === 'queue'
@@ -74,6 +78,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
       tab === 'templates' ? Promise.resolve(CommunicationsService.getTemplateList()) : Promise.resolve([]),
       tab === 'notifications' ? CommunicationsService.getNotificationEvents(50) : Promise.resolve([]),
       tab === 'contact' ? CommunicationsService.getContactMessages(100) : Promise.resolve([]),
+      tab === 'announcements' ? AnnouncementsService.getAnnouncements({ limit: 100 }) : Promise.resolve({ announcements: [] }),
     ])
 
   const contactMessagesTyped: ContactMessageItem[] = (contactMessages || []).map((c) => ({
@@ -131,6 +136,11 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
 
       {/* Overview */}
       {tab === 'overview' && overview && <AdminCommunicationsOverview data={overview} />}
+
+      {/* Announcements */}
+      {tab === 'announcements' && (
+        <AdminAnnouncementsView initialAnnouncements={announcementsData.announcements} />
+      )}
 
       {/* Email */}
       {tab === 'email' && emailHistory && (

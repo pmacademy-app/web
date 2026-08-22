@@ -11,7 +11,7 @@ import type { Database } from '@/lib/supabase'
 import { getAllCapstoneDefinitions } from '@/config/capstones'
 import { deriveCapstoneStatus, validateCapstoneSubmission, type CapstoneStatus } from '@/lib/capstones'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'
-import { XP_VALUES, getRuntimeXpValues } from '@/lib/xp'
+import { getRuntimeXpValues } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
 
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'

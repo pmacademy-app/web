@@ -72,8 +72,37 @@ export class AdminFoundationService implements NotificationAdminServices {
         supabase.from('email_dead_letter').select('id', { count: 'exact', head: true }),
       ])
 
+      const rawItems = (itemsRes.data as Array<Record<string, unknown>>) || []
+      const items = rawItems.map((r) => ({
+        id: String(r.id || ''),
+        userId: String(r.user_id || ''),
+        toEmail: r.recipient_email ? String(r.recipient_email) : undefined,
+        toName: r.recipient_name ? String(r.recipient_name) : undefined,
+        channel: 'email' as const,
+        templateKey: String(r.template_key || ''),
+        templateVariables: (r.template_data as Record<string, unknown>) || {},
+        eventType: String(r.event_type || 'custom'),
+        priority: typeof r.priority === 'number' ? r.priority : 5,
+        priorityLevel: 'medium' as const,
+        status: (r.status as any) || 'pending',
+        retry: {
+          attemptCount: Number(r.attempt_count || 0),
+          maxAttempts: Number(r.max_attempts || 3),
+          nextRetryAt: r.next_retry_at ? String(r.next_retry_at) : undefined,
+          lastError: r.last_error ? String(r.last_error) : undefined,
+        },
+        scheduledAt: String(r.scheduled_at || r.created_at || new Date().toISOString()),
+        processingAt: r.processing_at ? String(r.processing_at) : undefined,
+        deliveredAt: r.delivered_at ? String(r.delivered_at) : undefined,
+        failedAt: r.failed_at ? String(r.failed_at) : undefined,
+        resendId: r.resend_id ? String(r.resend_id) : undefined,
+        errorMessage: r.last_error ? String(r.last_error) : undefined,
+        createdAt: String(r.created_at || new Date().toISOString()),
+        updatedAt: String(r.updated_at || new Date().toISOString()),
+      }))
+
       return {
-        items: (itemsRes.data as any[]) || [],
+        items,
         totalPending: pendingRes.count ?? 0,
         totalProcessing: procRes.count ?? 0,
         totalFailed: failedRes.count ?? 0,
