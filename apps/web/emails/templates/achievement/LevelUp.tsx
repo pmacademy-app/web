@@ -25,7 +25,7 @@ export const LevelUpEmail: React.FC<LevelUpEmailProps> = ({
     <EmailWrapper previewText={`You unlocked Level ${newLevel}: ${levelTitle}!`} unsubscribeToken={unsubscribeToken}>
       <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Level Up Unlocked! 🚀</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        Congratulations, {userName}! Your consistency has pushed your total XP to <strong>{totalXp} XP</strong> and unlocked a new career rank in Prodily PM Academy.
+        Congratulations, {userName}! Your consistency has pushed your total XP to <strong>{totalXp} XP</strong> and unlocked a new career rank in Prodily.
       </p>
 
       <StatCard label={`Level ${newLevel}`} value={levelTitle} subtitle={`${totalXp} Cumulative XP`} />

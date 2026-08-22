@@ -15,8 +15,8 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText="Welcome to Prodily PM Academy! Start your product management journey today." unsubscribeToken={unsubscribeToken}>
-      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Welcome to Prodily PM Academy, {userName}! 🎉</h2>
+    <EmailWrapper previewText="Welcome to Prodily! Start your product management journey today." unsubscribeToken={unsubscribeToken}>
+      <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Welcome to Prodily, {userName}! 🎉</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
         You&apos;ve unlocked full access to a structured, 90-lesson product management curriculum designed to build real product judgment through daily habit learning.
       </p>

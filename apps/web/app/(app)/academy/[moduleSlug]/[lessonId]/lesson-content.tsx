@@ -38,6 +38,8 @@ import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
+import type { LessonProgressV2 } from '@/hooks/use-lesson-progress-v2'
+
 interface LessonPageContentProps {
   lesson: CompiledLesson
   prevLessonUrl: string | null
@@ -45,6 +47,7 @@ interface LessonPageContentProps {
   globalOrder: number       // 1-indexed global curriculum position (1..90)
   moduleNumber: number      // 1-indexed module number (1..9)
   moduleName: string        // formatted module display name
+  initialProgress?: LessonProgressV2 | null
 }
 
 type TabType = 'theory' | 'quiz' | 'flashcards' | 'reflection'
@@ -297,6 +300,7 @@ export default function LessonPageContent({
   globalOrder,
   moduleNumber,
   moduleName,
+  initialProgress,
 }: LessonPageContentProps) {
   const {
     progress,
@@ -305,7 +309,7 @@ export default function LessonPageContent({
     markInProgress,
     recordTheoryRead,
     recordQuizAttempt,
-  } = useLessonProgressV2(lesson.id)
+  } = useLessonProgressV2(lesson.id, initialProgress)
 
   const [activeTab, setActiveTab] = useState<TabType>('theory')
   const [completedThisSession, setCompletedThisSession] = useState(false)
@@ -606,6 +610,7 @@ export default function LessonPageContent({
             <LessonContextProvider
               lessonId={lesson.id}
               onQuizComplete={handleQuizComplete}
+              onAdvanceTab={(tab) => setActiveTab(tab)}
             >
               <BlockTreeRenderer
                 blocks={getBlocksForTab(lesson.blocks, 'theory')}
@@ -626,6 +631,7 @@ export default function LessonPageContent({
             <LessonContextProvider
               lessonId={lesson.id}
               onQuizComplete={handleQuizComplete}
+              onAdvanceTab={(tab) => setActiveTab(tab)}
             >
               <BlockTreeRenderer
                 blocks={getBlocksForTab(lesson.blocks, 'quiz')}

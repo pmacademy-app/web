@@ -16,7 +16,7 @@ export interface BadgeEarnedEmailProps {
 export const BadgeEarnedEmail: React.FC<BadgeEarnedEmailProps> = ({
   userName = 'Learner',
   badgeName = 'First Step',
-  badgeDescription = 'Completed your very first PM Academy lesson',
+  badgeDescription = 'Completed your very first Prodily lesson',
   badgeIcon = '🏅',
   appUrl = BRAND.siteUrl,
   unsubscribeToken,
@@ -25,7 +25,7 @@ export const BadgeEarnedEmail: React.FC<BadgeEarnedEmailProps> = ({
     <EmailWrapper previewText={`Congratulations! You earned the "${badgeName}" badge.`} unsubscribeToken={unsubscribeToken}>
       <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>New Badge Unlocked! 🎉</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        Awesome work, {userName}! You&apos;ve reached a new achievement milestone in Prodily PM Academy.
+        Awesome work, {userName}! You&apos;ve reached a new achievement milestone in Prodily.
       </p>
 
       <BadgeDisplay badgeName={badgeName} badgeDescription={badgeDescription} badgeIcon={badgeIcon} />

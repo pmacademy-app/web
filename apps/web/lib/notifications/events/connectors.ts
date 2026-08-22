@@ -40,6 +40,7 @@ export function initializeNotificationConnectors(force: boolean = false): void {
         await createInAppNotification({
           userId: event.userId,
           eventId: event.id,
+          idempotencyKey: event.id,
           category: event.category,
           title: content.title,
           body: content.body,

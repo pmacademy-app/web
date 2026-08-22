@@ -551,6 +551,7 @@ export type Database = {
           event_id: string | null
           expires_at: string
           id: string
+          idempotency_key: string | null
           is_read: boolean
           priority: number
           read_at: string | null
@@ -565,6 +566,7 @@ export type Database = {
           event_id?: string | null
           expires_at?: string
           id?: string
+          idempotency_key?: string | null
           is_read?: boolean
           priority?: number
           read_at?: string | null
@@ -579,6 +581,7 @@ export type Database = {
           event_id?: string | null
           expires_at?: string
           id?: string
+          idempotency_key?: string | null
           is_read?: boolean
           priority?: number
           read_at?: string | null

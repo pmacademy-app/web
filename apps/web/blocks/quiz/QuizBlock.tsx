@@ -221,6 +221,15 @@ export default function QuizBlock({ block }: BlockProps) {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          {lessonCtx?.onAdvanceTab && (
+            <Button
+              onClick={() => lessonCtx.onAdvanceTab?.('flashcards')}
+              size="lg"
+              className="w-full sm:w-auto font-bold px-8 shadow-sm"
+            >
+              Continue to Flashcards →
+            </Button>
+          )}
           <Button onClick={handleReset} variant="outline" size="lg" className="w-full sm:w-auto font-medium">
             <RotateCcw className="h-4 w-4 mr-2" />
             Retry Quiz

@@ -19,13 +19,13 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   },
   'auth.password_reset': {
     component: PasswordReset,
-    subjectLine: `Reset your ${BRAND.shortName} password`,
+    subjectLine: `Reset your ${BRAND.company} password`,
   },
 
   // Optional Transactional Automations
   'auth.welcome': {
     component: WelcomeEmail,
-    subjectLine: `Welcome to ${BRAND.shortName}!`,
+    subjectLine: `Welcome to ${BRAND.company}!`,
   },
   'learning.module_complete': {
     component: ModuleCompletedEmail,
@@ -41,7 +41,7 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   },
   'achievement.certificate': {
     component: CertificateEarned,
-    subjectLine: `Your ${BRAND.shortName} Certificate is Ready!`,
+    subjectLine: `Your ${BRAND.company} Certificate is Ready!`,
   },
   'achievement.portfolio_published': {
     component: PortfolioPublished,
@@ -51,11 +51,11 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   // Scheduled Digests & Reminders
   'learning.weekly_recap': {
     component: WeeklyRecap,
-    subjectLine: `Your Week in ${BRAND.shortName}`,
+    subjectLine: `Your Week in ${BRAND.company}`,
   },
   'system.weekly_recap': {
     component: WeeklyRecap,
-    subjectLine: `Your Week in ${BRAND.shortName}`,
+    subjectLine: `Your Week in ${BRAND.company}`,
   },
   'learning.daily_reminder': {
     component: DailyReminder,
