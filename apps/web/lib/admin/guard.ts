@@ -66,6 +66,8 @@ export async function requireAdminUser(request: Request): Promise<AdminAuthResul
 
 /**
  * Audit log helper for administrative actions.
+ * Persists record to `admin_audit_logs` table via service-role client.
+ * Non-blocking: failures are logged without throwing or failing the primary mutation.
  */
 export async function logAdminAction(
   adminId: string,
@@ -75,6 +77,18 @@ export async function logAdminAction(
   targetId?: string,
   details?: Record<string, unknown>
 ): Promise<void> {
-  console.log(`[AdminAuditLog] Admin ${adminEmail} (${adminId}): ${action} on ${targetType} ${targetId || ''}`, details || {})
-  // In production, persists row to admin_audit_logs table via Supabase if table exists
+  try {
+    const supabase = createServiceRoleClient()
+    await (supabase.from('admin_audit_logs') as unknown as { insert: (row: Record<string, unknown>) => Promise<{ error: unknown }> }).insert({
+      admin_user_id: adminId,
+      admin_email: adminEmail,
+      action,
+      target_resource: targetType,
+      target_id: targetId || null,
+      metadata: details || {},
+    })
+  } catch (error) {
+    console.error(`[AdminAuditLog] Failed to persist audit log for ${action} by ${adminEmail}:`, error)
+  }
 }
+

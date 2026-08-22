@@ -705,7 +705,7 @@ export class AdminConsoleService {
     const perPage = 1000
     let page = 1
     try {
-      for (let guard = 0; guard < 100; guard++) {
+      for (let guard = 0; guard < 20; guard++) {
         const { data } = await supabase.auth.admin.listUsers({ page, perPage })
         if (!data?.users || data.users.length === 0) break
         users.push(...(data.users as typeof users))
@@ -718,22 +718,20 @@ export class AdminConsoleService {
     return users
   }
 
-  /** Fetches every row matching a builder, walking Supabase's 1,000-row page limit. */
+  /** Fetches every row matching a builder, walking Supabase's 1,000-row page limit up to safe bound. */
   private static async fetchAllRows<T>(
     buildPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>
   ): Promise<T[]> {
     const pageSize = 1000
     const rows: T[] = []
     let start = 0
-    // Guard against runaway loops (1M rows is far beyond launch scale).
-    while (start < 1_000_000) {
+    // Guard against runaway loops with a 50k row limit
+    while (start < 50_000) {
       let page: { data: T[] | null; error: { message: string } | null }
       try {
         page = await buildPage(start, start + pageSize - 1)
       } catch (err) {
-        // Network-level failures (e.g. unreachable DB) degrade to empty rows
-        // rather than crashing the whole workspace — matches the pre-Phase-3
-        // behavior where query errors were ignored.
+        // Network-level failures degrade gracefully to empty rows
         console.warn('[AdminConsoleService] fetchAllRows network failure:', err)
         break
       }

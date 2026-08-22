@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/admin/guard'
+import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const authResult = await requireAdminUser(request)
-    if (!authResult.authorized) {
+    if (!authResult.authorized || !authResult.userId || !authResult.email) {
       return NextResponse.json(
         { error: authResult.error || 'Unauthorized' },
         { status: authResult.statusCode || 403 }
@@ -87,9 +87,12 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: updateErr.message }, { status: 400 })
     }
 
+    await logAdminAction(authResult.userId, authResult.email, `system_alert_${newStatus}`, 'system_error', alertId, { newStatus })
+
     return NextResponse.json({ success: true, message: `Alert status updated to ${newStatus}` })
   } catch (err) {
     console.error('[AdminSystemAlerts] Exception updating alert status:', err)
     return NextResponse.json({ error: 'Internal server error while updating alert.' }, { status: 500 })
   }
 }
+

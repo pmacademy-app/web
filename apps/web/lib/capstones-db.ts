@@ -14,6 +14,8 @@ import { awardXp, hasXpEvent } from '@/lib/xp-service'
 import { XP_VALUES } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
 
+import { getLessonIdsForModule } from '@/lib/curriculum-registry'
+
 type CapstoneSubmissionRow = Database['public']['Tables']['capstone_submissions']['Row']
 type ReflectionRow = Database['public']['Tables']['reflections']['Row']
 
@@ -37,6 +39,7 @@ export interface ModuleCapstoneOverviewItem {
 
 /**
  * Fetches the overview status of capstones across all 9 modules for a user.
+ * Evaluates completion and unlock states from authoritative per-module lesson progress.
  */
 export async function getModuleCapstonesOverview(
   supabase: SupabaseClient<Database>,
@@ -77,35 +80,24 @@ export async function getModuleCapstonesOverview(
     }
   }
 
-  // Count completed lessons per module by matching lesson prefix or IDs
-  // (Assuming 10 lessons per module, Foundations=lessons 1-10, etc.)
-  const completedCountMap = new Map<string, number>()
-  if (progressRows) {
-    // Total completed lessons count as baseline
-    const totalCompleted = progressRows.length
-    
-    // For Module 1 (Foundations), unlock if totalCompleted >= 0
-    // We can distribute progress across modules
-    for (const def of definitions) {
-      // Module 1 is always unlocked for trying capstone; subsequent modules unlock as lessons complete
-      const moduleCompleted = Math.min(10, Math.floor(totalCompleted / Math.max(1, def.moduleNumber - 1)))
-      completedCountMap.set(def.moduleSlug, moduleCompleted)
-    }
-  }
+  // Set of completed lesson IDs for exact matching
+  const completedLessonIds = new Set(progressRows?.map((p) => p.lesson_id) || [])
 
   return definitions.map((def, idx) => {
     const sub = submissionMap.get(def.moduleSlug) ?? null
-    // Module 1 capstone is always unlocked; subsequent modules require at least 8 completed lessons or previous capstone submitted
-    const isModule1 = idx === 0
     const prevSub = idx > 0 ? submissionMap.get(definitions[idx - 1].moduleSlug) : null
     const prevCompleted = prevSub?.status === 'submitted' || prevSub?.status === 'reviewed'
     
-    const lessonsCompleted = completedCountMap.get(def.moduleSlug) ?? (isModule1 ? 10 : 0)
+    const moduleLessonIds = getLessonIdsForModule(def.moduleSlug)
+    const totalLessons = moduleLessonIds.length > 0 ? moduleLessonIds.length : 10
+    const lessonsCompleted = moduleLessonIds.length > 0
+      ? moduleLessonIds.filter((id) => completedLessonIds.has(id)).length
+      : 0
     
     let status: CapstoneStatus = 'locked'
     if (sub) {
       status = deriveCapstoneStatus(sub.status, lessonsCompleted)
-    } else if (isModule1 || prevCompleted || lessonsCompleted >= 8) {
+    } else if (lessonsCompleted >= 8 || prevCompleted) {
       status = 'unlocked'
     } else {
       status = 'locked'
@@ -121,7 +113,7 @@ export async function getModuleCapstonesOverview(
       status,
       submission: sub,
       lessonsCompleted,
-      totalLessons: 10,
+      totalLessons,
       unlocked: status !== 'locked',
     }
   })
