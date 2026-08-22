@@ -102,8 +102,29 @@ async function runSendEmailHookTests() {
     }
   })
 
-  // 3. Secret Verification (Bearer Token & Custom Headers)
-  await runTest('POST /api/auth/send-email-hook enforces SEND_EMAIL_HOOK_SECRET when configured', async () => {
+  // 3. Secret Verification (Bearer Token & Custom Headers & Production Fail-Closed)
+  await runTest('POST /api/auth/send-email-hook enforces SEND_EMAIL_HOOK_SECRET when configured or in production mode', async () => {
+    const initialNodeEnv = process.env.NODE_ENV
+    delete process.env.SEND_EMAIL_HOOK_SECRET
+
+    // 3a. In production mode, missing secret MUST fail closed with 401 Unauthorized
+    ;(process.env as { NODE_ENV?: string }).NODE_ENV = 'production'
+    const prodUnsetSecretReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {
+      method: 'POST',
+      body: JSON.stringify({
+        user: { id: 'usr-prod-fail', email: 'prodfail@example.com' },
+        email_data: { email_action_type: 'signup', token_hash: 'th_prod_123' },
+      }),
+    })
+    const prodRes = await POST(prodUnsetSecretReq)
+    assert.strictEqual(prodRes.status, 401)
+    const prodData = await parseRes(prodRes)
+    assert.ok(prodData.error?.includes('Missing hook secret configuration'))
+
+    // Restore NODE_ENV
+    ;(process.env as { NODE_ENV?: string }).NODE_ENV = initialNodeEnv
+
+    // 3b. When secret configured, unauthenticated request fails
     process.env.SEND_EMAIL_HOOK_SECRET = 'test_secret_key_123'
 
     const unauthReq = new NextRequest('http://localhost:3000/api/auth/send-email-hook', {

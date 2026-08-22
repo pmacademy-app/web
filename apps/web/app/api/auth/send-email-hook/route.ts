@@ -180,8 +180,23 @@ export async function POST(request: NextRequest) {
   const rawBody = await request.text()
   const secret = process.env.SEND_EMAIL_HOOK_SECRET
 
-  // 1. Verify hook secret if configured in environment
-  if (secret) {
+  // 1. Verify hook secret if configured in environment (fail closed in production)
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[send-email-hook] Unauthorized request: SEND_EMAIL_HOOK_SECRET is not configured in production.')
+      try {
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'error',
+          category: 'auth',
+          operation: 'send_email_hook_auth',
+          message: 'Unauthorized request: SEND_EMAIL_HOOK_SECRET environment variable missing in production',
+        })
+      } catch {}
+      return jsonResponse({ error: 'Unauthorized: Missing hook secret configuration' }, 401)
+    }
+    console.warn('[send-email-hook] Warning: SEND_EMAIL_HOOK_SECRET is not configured in environment. Proceeding in non-production mode.')
+  } else {
     const isValid = verifyHookSecret(request, rawBody, secret)
     if (!isValid) {
       console.warn('[send-email-hook] Unauthorized request: signature/secret verification failed.')
@@ -196,8 +211,6 @@ export async function POST(request: NextRequest) {
       } catch {}
       return jsonResponse({ error: 'Unauthorized: Invalid hook signature or secret' }, 401)
     }
-  } else {
-    console.warn('[send-email-hook] Warning: SEND_EMAIL_HOOK_SECRET is not configured in environment. Proceeding without signature check.')
   }
 
   // 2. Parse JSON payload
@@ -317,29 +330,6 @@ export async function POST(request: NextRequest) {
     return jsonResponse({ error: `Email delivery failure: ${sendResult.error}` }, 500)
   }
 
-  // 6. Enqueue Welcome Email for new account registration (high priority, idempotent)
-  if (actionType === 'signup') {
-    try {
-      const { enqueueNotificationItem } = await import('@/lib/notifications/queue/processor')
-      enqueueNotificationItem({
-        userId: user.id,
-        toEmail,
-        toName: userName,
-        channel: 'email',
-        templateKey: 'auth.welcome',
-        templateVariables: { userName },
-        eventId: `welcome-${user.id}`,
-        eventType: 'user.registered',
-        category: 'security',
-        priorityLevel: 'high',
-      }).catch((err) => {
-        console.warn('[send-email-hook] Non-fatal welcome email enqueue warning:', err)
-      })
-    } catch (err) {
-      console.warn('[send-email-hook] Non-fatal welcome email enqueue error:', err)
-    }
-  }
-
-  // 7. Return HTTP 200 to Supabase Auth Hook
+  // 6. Return HTTP 200 to Supabase Auth Hook
   return jsonResponse({ success: true, message: 'Email sent successfully', id: sendResult.id }, 200)
 }
