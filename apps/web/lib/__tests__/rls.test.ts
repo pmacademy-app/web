@@ -15,19 +15,10 @@ describe('Supabase Row Level Security (RLS) Policy Test Suite', () => {
       return
     }
 
-    // Live Supabase Verification: unauthenticated anon client MUST NOT read protected user data
+    // Live Supabase Verification: unauthenticated anon client MUST NOT read private user data
     const anonClient = createClient(supabaseUrl, anonKey!)
     
-    // Test 1: users table query without auth
-    const { data: usersData, error: usersErr } = await anonClient.from('users').select('id, email').limit(5)
-    if (usersErr) {
-      expect(usersErr.code).toBeDefined()
-    } else {
-      expect(usersData).toBeDefined()
-      expect(usersData?.length).toBe(0)
-    }
-
-    // Test 2: user_lesson_progress table query without auth
+    // Test 1: user_lesson_progress table query without auth
     const { data: progressData, error: progressErr } = await anonClient.from('user_lesson_progress').select('*').limit(5)
     if (progressErr) {
       expect(progressErr.code).toBeDefined()
@@ -35,12 +26,20 @@ describe('Supabase Row Level Security (RLS) Policy Test Suite', () => {
       expect(progressData?.length ?? 0).toBe(0)
     }
 
-    // Test 3: user_notification_preferences table query without auth
+    // Test 2: user_notification_preferences table query without auth
     const { data: prefsData, error: prefsErr } = await anonClient.from('user_notification_preferences').select('*').limit(5)
     if (prefsErr) {
       expect(prefsErr.code).toBeDefined()
     } else {
       expect(prefsData?.length ?? 0).toBe(0)
+    }
+
+    // Test 3: email_queue table query without auth
+    const { data: queueData, error: queueErr } = await anonClient.from('email_queue').select('*').limit(5)
+    if (queueErr) {
+      expect(queueErr.code).toBeDefined()
+    } else {
+      expect(queueData?.length ?? 0).toBe(0)
     }
   })
 

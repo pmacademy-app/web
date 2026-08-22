@@ -1,7 +1,39 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 import { proxy } from '../../proxy'
 import { getAuthenticatedUserFromRequest } from '../auth'
+
+vi.mock('@supabase/supabase-js', () => {
+  return {
+    createClient: () => ({
+      auth: {
+        getUser: vi.fn(async (token: string) => {
+          if (token === 'mock-user-token') {
+            return {
+              data: {
+                user: {
+                  id: 'mock-user-id',
+                  email: 'user@example.com',
+                  user_metadata: { is_admin: true },
+                },
+              },
+              error: null,
+            }
+          }
+          return { data: { user: null }, error: new Error('Invalid token') }
+        }),
+        refreshSession: vi.fn(async () => ({ data: { session: null, user: null }, error: null })),
+      },
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            maybeSingle: async () => ({ data: { is_admin: false, curriculum_access_override: false }, error: null }),
+          }),
+        }),
+      }),
+    }),
+  }
+})
 
 describe('Phase 2 Middleware & Auth Security Test Suite', () => {
   it('1. Privilege Escalation Guard (FIND-01): Reject spoofed user_metadata.is_admin', async () => {
