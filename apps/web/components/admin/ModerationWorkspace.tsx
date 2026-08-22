@@ -10,6 +10,7 @@ import { FeedbackListView } from './FeedbackListView'
 import { CapstonesView } from './CapstonesView'
 import { PortfoliosView } from './PortfoliosView'
 import type { TestimonialItem } from '@/lib/admin/feedback-service'
+import type { AdminFeedbackItem } from './FeedbackListView'
 import type { AdminCapstoneRow, AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
 
 export type ModerationTab = 'testimonials' | 'feedback' | 'capstones' | 'portfolios'
@@ -17,17 +18,7 @@ export type ModerationTab = 'testimonials' | 'feedback' | 'capstones' | 'portfol
 interface ModerationWorkspaceProps {
   initialTab: string
   initialTestimonials: TestimonialItem[]
-  initialFeedback: Array<{
-    id: string
-    userId: string | null
-    authorName: string
-    category: string
-    sourceEvent: string
-    content: string
-    rating: number | null
-    status: string
-    createdAt: string
-  }>
+  initialFeedback: AdminFeedbackItem[]
   initialCapstones: AdminCapstoneRow[]
   capstonesLoadFailed: boolean
   initialPortfolios: AdminPortfolioRow[]

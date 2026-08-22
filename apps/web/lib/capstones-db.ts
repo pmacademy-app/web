@@ -11,7 +11,7 @@ import type { Database } from '@/lib/supabase'
 import { getAllCapstoneDefinitions } from '@/config/capstones'
 import { deriveCapstoneStatus, validateCapstoneSubmission, type CapstoneStatus } from '@/lib/capstones'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'
-import { XP_VALUES } from '@/lib/xp'
+import { XP_VALUES, getRuntimeXpValues } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
 
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'
@@ -324,12 +324,13 @@ export async function submitCapstoneAction(
     }
   }
 
-  // 4. Award 150 XP idempotently via xp_events ledger
+  // 4. Award capstone XP idempotently via xp_events ledger
   const alreadyAwarded = await hasXpEvent(supabase, userId, 'capstone', moduleSlug)
+  const xpConfig = await getRuntimeXpValues(supabase)
   let xpEarned = 0
 
   if (!alreadyAwarded) {
-    xpEarned = XP_VALUES.CAPSTONE_SUBMITTED
+    xpEarned = xpConfig.CAPSTONE_SUBMITTED
     try {
       await awardXp(supabase, userId, 'capstone', xpEarned, moduleSlug)
     } catch (xpErr) {
@@ -344,6 +345,6 @@ export async function submitCapstoneAction(
     success: true,
     submission: result,
     xpEarned,
-    message: alreadyAwarded ? 'Capstone submitted (XP previously awarded).' : 'Capstone submitted! 150 XP awarded.',
+    message: alreadyAwarded ? 'Capstone submitted (XP previously awarded).' : `Capstone submitted! ${xpEarned} XP awarded.`,
   }
 }
