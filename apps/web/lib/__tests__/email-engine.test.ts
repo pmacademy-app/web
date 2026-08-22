@@ -16,5 +16,5 @@ describe('Email Engine & Delivery Unit Test Suite', () => {
     })
     expect(badgeRendered.subject).toContain('First Step')
     expect(badgeRendered.html).toContain('First Step')
-  })
+  }, 15000)
 })

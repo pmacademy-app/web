@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
-import { verifyTheoryReadEngagement, XP_VALUES, getRuntimeXpValues } from '../xp'
+import { verifyTheoryReadEngagement, getRuntimeXpValues } from '../xp'
 import { updateUserStreak } from '../streaks-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../supabase'

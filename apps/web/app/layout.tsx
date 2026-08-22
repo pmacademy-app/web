@@ -6,6 +6,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AuthStateListener from '@/components/layout/AuthStateListener'
+import { SystemAnnouncementBanner } from '@/components/layout/SystemAnnouncementBanner'
 import { BRAND } from '@/lib/brand'
 import '@/app/globals.css'
 
@@ -139,6 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <TooltipProvider>
           <AuthStateListener />
+          <SystemAnnouncementBanner />
           {children}
         </TooltipProvider>
 

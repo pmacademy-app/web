@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, ArrowRight, ArrowLeft, Check, Target, Compass, Sparkles, User, Briefcase, Globe, CheckCircle2 } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
@@ -62,42 +62,55 @@ const DRAFT_STORAGE_KEY = 'prodily_onboarding_draft'
 
 export default function OnboardingWizard({ user, profile }: OnboardingWizardProps) {
   const router = useRouter()
-  const [step, setStep] = useState(1)
   const [isPending, startTransition] = useTransition()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  const [formData, setFormData] = useState<OnboardingData>({
-    name: profile?.name || user?.user_metadata?.full_name || '',
-    username: profile?.username || '',
-    avatar_url: profile?.avatar_url || user?.user_metadata?.avatar_url || null,
-    career_role: profile?.career_role || '',
-    goal: profile?.goal || undefined,
-    learning_purpose: profile?.learning_purpose || '',
-    linkedin_url: profile?.linkedin_url || '',
-    website_url: profile?.website_url || '',
-  })
-
-  // Restore draft from localStorage on mount
-  useEffect(() => {
+  const [step, setStep] = useState<number>(() => {
+    if (typeof window === 'undefined') return 1
     try {
       const saved = localStorage.getItem(DRAFT_STORAGE_KEY)
       if (saved) {
         const parsed = JSON.parse(saved)
-        setFormData((prev) => ({
-          ...prev,
-          ...parsed,
-          // Preserve avatar and name from profile if not in draft
-          name: parsed.name || prev.name,
-          avatar_url: parsed.avatar_url || prev.avatar_url,
-        }))
         if (parsed._savedStep && parsed._savedStep >= 1 && parsed._savedStep <= 3) {
-          setStep(parsed._savedStep)
+          return parsed._savedStep
         }
       }
     } catch {
       // Ignore storage error
     }
-  }, [])
+    return 1
+  })
+
+  const [formData, setFormData] = useState<OnboardingData>(() => {
+    const base: OnboardingData = {
+      name: profile?.name || user?.user_metadata?.full_name || '',
+      username: profile?.username || '',
+      avatar_url: profile?.avatar_url || user?.user_metadata?.avatar_url || null,
+      career_role: profile?.career_role || '',
+      goal: profile?.goal || undefined,
+      learning_purpose: profile?.learning_purpose || '',
+      linkedin_url: profile?.linkedin_url || '',
+      website_url: profile?.website_url || '',
+    }
+
+    if (typeof window === 'undefined') return base
+
+    try {
+      const saved = localStorage.getItem(DRAFT_STORAGE_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        return {
+          ...base,
+          ...parsed,
+          name: parsed.name || base.name,
+          avatar_url: parsed.avatar_url || base.avatar_url,
+        }
+      }
+    } catch {
+      // Ignore storage error
+    }
+    return base
+  })
 
   const updateForm = (key: keyof OnboardingData, value: string | null) => {
     setFormData((prev) => {

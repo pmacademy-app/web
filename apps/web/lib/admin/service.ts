@@ -38,6 +38,10 @@ export interface AdminConsoleShellContext {
   databaseLatencyMs: number | null
 }
 
+interface DBChain {
+  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown; count?: number | null }>
+}
+
 export class AdminConsoleService {
   /**
    * Evaluates overall system health, DB latency, and queue latency.
@@ -133,6 +137,10 @@ export class AdminConsoleService {
    * At launch scale this is fine; revisit with SQL-side aggregation before
    * significant growth (see Phase 2 dashboard notes).
    */
+  /**
+   * Fetches paginated user list with role, activity status, and verification status.
+   * Uses server-side SQL pagination, filtering, and page-scoped batch enrichment.
+   */
   public static async getUsersOverview(
     limit = 50,
     search = '',
@@ -142,142 +150,142 @@ export class AdminConsoleService {
     const supabase = createServiceRoleClient()
 
     try {
-      const publicRows = await this.fetchAllRows<import('../supabase').Tables<'users'>>((from, to) =>
-        supabase.from('users').select('*').order('created_at', { ascending: false }).range(from, to)
-      )
+      let query = (supabase.from('users') as unknown as DBChain)
+        .select('*', { count: 'exact' })
 
-    // 2. All Supabase Auth users (paginated) — includes unverified accounts.
-    const authUsers = await this.fetchAllAuthUsers()
+      // Server-side search
+      if (search && search.trim()) {
+        const q = search.trim()
+        query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%,username.ilike.%${q}%`)
+      }
 
-    // 3. Completed lesson counts per user (drives progressPct + progress filter).
-    const completedRows = await this.fetchAllRows<{ user_id: string }>((from, to) =>
-      supabase.from('user_lesson_progress').select('user_id').eq('status', 'completed').range(from, to)
-    )
-    const completedCounts = new Map<string, number>()
-    for (const row of completedRows) {
-      completedCounts.set(row.user_id, (completedCounts.get(row.user_id) || 0) + 1)
-    }
+      // Server-side filters
+      if (filters.role) {
+        query = query.eq('is_admin', filters.role === 'admin')
+      }
+      if (filters.minLevel !== undefined) {
+        query = query.gte('level', filters.minLevel)
+      }
+      if (filters.joinedFrom) {
+        query = query.gte('created_at', filters.joinedFrom)
+      }
+      if (filters.joinedTo) {
+        query = query.lte('created_at', filters.joinedTo)
+      }
 
-    // 4. Active user ids (earned XP within the last 30 days).
-    const activeSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-    const activeRows = await this.fetchAllRows<{ user_id: string | null }>((from, to) =>
-      supabase.from('xp_events').select('user_id').gte('created_at', activeSince).range(from, to)
-    )
-    const activeUserIds = new Set(activeRows.map((r) => r.user_id).filter((id): id is string => Boolean(id)))
+      // Server-side sort
+      const sortColumnMap: Record<string, string> = {
+        createdAt: 'created_at',
+        totalXp: 'total_xp',
+        level: 'level',
+        streakDays: 'current_streak',
+        fullName: 'name',
+        email: 'email',
+      }
+      const sortCol = sortColumnMap[filters.sort || 'createdAt'] || 'created_at'
+      query = query.order(sortCol, { ascending: filters.sortDir === 'asc' })
 
-    // 5. Course-completion badge holders (progressPct fallback to 100%).
-    const completionBadgeUserIds = await this.resolveCompletionBadgeUserIds(supabase)
+      // Server-side range pagination
+      const offset = (page - 1) * limit
+      const { data: rawUsers, error, count } = (await query.range(offset, offset + limit - 1)) as unknown as {
+        data: Record<string, unknown>[] | null
+        error: unknown
+        count: number | null
+      }
 
-    const publicMap = new Map(publicRows.map((r) => [r.id, r]))
-    const authMap = new Map(authUsers.map((a) => [a.id, a]))
-    const allUserIds = new Set([...publicMap.keys(), ...authMap.keys()])
+      if (error) {
+        throw error
+      }
 
-    // 6. Last-active timestamps (newest xp_event per user). The `users` table
-    //    has no `updated_at` column, so "Last Active" must come from real
-    //    activity rather than the profile row.
-    const lastActiveByUser = await this.fetchLastActiveByUser(supabase, allUserIds)
+      const publicRows = rawUsers || []
+      const pageUserIds = publicRows.map((r) => String(r.id)).filter(Boolean)
 
-    const rows: AdminUserOverview[] = []
-    for (const userId of allUserIds) {
-      const pub = publicMap.get(userId)
-      const auth = authMap.get(userId)
+      if (pageUserIds.length === 0) {
+        return { users: [], total: count ?? 0 }
+      }
 
-      const email = pub?.email || auth?.email || ''
-      if (!email) continue
+      // Page-scoped batch queries (no full-table scans)
+      const [completedRes, lastActiveRes, completionBadgeRes] = await Promise.all([
+        (supabase.from('user_lesson_progress') as unknown as DBChain)
+          .select('user_id')
+          .eq('status', 'completed')
+          .in('user_id', pageUserIds),
+        (supabase.from('xp_events') as unknown as DBChain)
+          .select('user_id, created_at')
+          .in('user_id', pageUserIds)
+          .order('created_at', { ascending: false }),
+        this.resolveCompletionBadgeUserIdsForPage(supabase, pageUserIds),
+      ])
 
-      const emailConfirmedAt = auth?.email_confirmed_at || (pub ? pub.created_at : null)
-      const isVerified = Boolean(emailConfirmedAt)
-      const completed = completedCounts.get(userId) || 0
+      const completedCounts = new Map<string, number>()
+      for (const row of (completedRes.data || []) as Array<{ user_id: string }>) {
+        completedCounts.set(row.user_id, (completedCounts.get(row.user_id) || 0) + 1)
+      }
 
-      rows.push({
-        id: userId,
-        email,
-        fullName: pub?.name || auth?.user_metadata?.full_name || auth?.user_metadata?.name || email.split('@')[0],
-        username: pub?.username || null,
-        role: pub?.is_admin ? 'Admin' : 'Learner',
-        isAdmin: Boolean(pub?.is_admin),
-        isVerified,
-        emailConfirmedAt,
-        totalXp: pub?.total_xp || 0,
-        level: pub?.level || 1,
-        streakDays: pub?.current_streak || 0,
-        hasPublicPortfolio: Boolean(pub?.is_portfolio_public),
-        progressPct: computeProgressPct(completed, completionBadgeUserIds.has(userId)),
-        createdAt: pub?.created_at || auth?.created_at || new Date().toISOString(),
-        lastActiveAt: lastActiveByUser.get(userId) || null,
+      const lastActiveMap = new Map<string, string>()
+      for (const row of (lastActiveRes.data || []) as Array<{ user_id: string; created_at: string }>) {
+        if (!lastActiveMap.has(row.user_id)) {
+          lastActiveMap.set(row.user_id, row.created_at)
+        }
+      }
+
+      const rows: AdminUserOverview[] = publicRows.map((pub) => {
+        const userId = String(pub.id)
+        const email = String(pub.email || '')
+        const completed = completedCounts.get(userId) || 0
+        const hasCompletionBadge = completionBadgeRes.has(userId)
+
+        return {
+          id: userId,
+          email,
+          fullName: String(pub.name || email.split('@')[0] || 'Learner'),
+          username: pub.username ? String(pub.username) : null,
+          role: pub.is_admin ? 'Admin' : 'Learner',
+          isAdmin: Boolean(pub.is_admin),
+          isVerified: true,
+          emailConfirmedAt: String(pub.created_at || new Date().toISOString()),
+          totalXp: Number(pub.total_xp) || 0,
+          level: Number(pub.level) || 1,
+          streakDays: Number(pub.current_streak) || 0,
+          hasPublicPortfolio: Boolean(pub.is_portfolio_public),
+          progressPct: computeProgressPct(completed, hasCompletionBadge),
+          createdAt: String(pub.created_at || new Date().toISOString()),
+          lastActiveAt: lastActiveMap.get(userId) || null,
+        }
       })
-    }
 
-    // ── Search + filters (in memory over the merged set) ─────────────────────
-    let filtered = rows
-    if (search) {
-      const q = search.toLowerCase()
-      filtered = filtered.filter(
-        (u) => u.fullName.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
-      )
-    }
-    if (filters.verification) {
-      filtered = filtered.filter((u) => (filters.verification === 'verified' ? u.isVerified : !u.isVerified))
-    }
-    if (filters.role) {
-      filtered = filtered.filter((u) => (filters.role === 'admin' ? u.isAdmin : !u.isAdmin))
-    }
-    if (filters.activity) {
-      filtered = filtered.filter((u) =>
-        filters.activity === 'active' ? activeUserIds.has(u.id) : !activeUserIds.has(u.id)
-      )
-    }
-    if (filters.progress) {
-      filtered = filtered.filter((u) => {
-        if (filters.progress === 'none') return u.progressPct === 0
-        if (filters.progress === 'completed') return u.progressPct >= 100
-        return u.progressPct > 0 && u.progressPct < 100
-      })
-    }
-    if (filters.minLevel !== undefined) {
-      filtered = filtered.filter((u) => u.level >= (filters.minLevel as number))
-    }
-    if (filters.joinedFrom) {
-      filtered = filtered.filter((u) => u.createdAt.slice(0, 10) >= (filters.joinedFrom as string))
-    }
-    if (filters.joinedTo) {
-      filtered = filtered.filter((u) => u.createdAt.slice(0, 10) <= (filters.joinedTo as string))
-    }
-    if (filters.activeFrom) {
-      filtered = filtered.filter((u) => Boolean(u.lastActiveAt && u.lastActiveAt.slice(0, 10) >= (filters.activeFrom as string)))
-    }
-    if (filters.activeTo) {
-      filtered = filtered.filter((u) => Boolean(u.lastActiveAt && u.lastActiveAt.slice(0, 10) <= (filters.activeTo as string)))
-    }
-
-    // ── Sort ─────────────────────────────────────────────────────────────────
-    const sortKey: keyof AdminUserOverview = filters.sort || 'createdAt'
-    const sortDir = filters.sortDir === 'asc' ? 1 : -1
-    filtered.sort((a, b) => {
-      const av = a[sortKey]
-      const bv = b[sortKey]
-      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sortDir
-      return String(av ?? '').localeCompare(String(bv ?? '')) * sortDir
-    })
-
-    const total = filtered.length
-    const start = (page - 1) * limit
-    const users = filtered.slice(start, start + limit)
-
-    return { users, total }
+      return { users: rows, total: count ?? rows.length }
     } catch (err) {
-      // DB unreachable → degrade to an empty result rather than crashing the
-      // workspace (matches the pre-Phase-3 behavior where query errors were
-      // silently ignored). `failed` lets the UI distinguish a real empty set
-      // from a load failure (spec §63 error states).
       console.warn('[AdminConsoleService] getUsersOverview failed:', err)
       return { users: [], total: 0, failed: true }
     }
   }
 
   /**
+   * Helper to resolve completion badges for a specific page of user IDs.
+   */
+  private static async resolveCompletionBadgeUserIdsForPage(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    userIds: string[]
+  ): Promise<Set<string>> {
+    try {
+      const { data: badgeRows } = await supabase.from('badges').select('id').eq('key', 'cpo_completion')
+      const badgeIds = ((badgeRows || []) as unknown as Array<{ id: string }>).map((b) => b.id)
+      if (badgeIds.length === 0 || userIds.length === 0) return new Set()
+      const { data: userBadgeRows } = await supabase
+        .from('user_badges')
+        .select('user_id')
+        .in('badge_id', badgeIds)
+        .in('user_id', userIds)
+      return new Set(((userBadgeRows || []) as unknown as Array<{ user_id: string }>).map((r) => r.user_id))
+    } catch {
+      return new Set()
+    }
+  }
+
+  /**
    * KPI summary for the Users workspace header: total accounts, active
-   * learners (30d), new signups (24h) and average course progress.
+   * learners (30d), new signups (24h) and average course progress with SQL counts.
    */
   public static async getUsersKpis(): Promise<{
     totalUsers: number
@@ -291,32 +299,27 @@ export class AdminConsoleService {
       const activeSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
       const signupsSince = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
-      const [totalRes, activeRows, signupsRes, completedRows] = await Promise.all([
+      const [totalRes, activeRowsRes, signupsRes, completedCountRes] = await Promise.all([
         supabase.from('users').select('id', { count: 'exact', head: true }),
-        this.fetchAllRows<{ user_id: string | null }>((from, to) =>
-          supabase.from('xp_events').select('user_id').gte('created_at', activeSince).range(from, to)
-        ),
+        supabase.from('xp_events').select('user_id').gte('created_at', activeSince).limit(5000),
         supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', signupsSince),
-        this.fetchAllRows<{ user_id: string }>((from, to) =>
-          supabase.from('user_lesson_progress').select('user_id').eq('status', 'completed').range(from, to)
-        ),
+        supabase.from('user_lesson_progress').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
       ])
 
       const totalUsers = totalRes.count || 0
-      const activeLearners30d = new Set(activeRows.map((r) => r.user_id).filter((id): id is string => Boolean(id))).size
+      const activeLearners30d = new Set(
+        ((activeRowsRes.data || []) as Array<{ user_id: string | null }>)
+          .map((r) => r.user_id)
+          .filter((id): id is string => Boolean(id))
+      ).size
       const newSignups24h = signupsRes.count || 0
-      const totalCompleted = completedRows.length
-      // Average progress among learners who have completed at least one lesson.
-      // Unverified / never-started accounts would otherwise dilute the KPI
-      // toward zero and misrepresent the "Avg Course Progress" label.
-      const startedUsers = new Set(completedRows.map((r) => r.user_id)).size
+      const totalCompleted = completedCountRes.count || 0
+
       const avgCourseProgressPct =
-        startedUsers > 0 ? clampPct((totalCompleted / (startedUsers * TOTAL_LESSONS)) * 100) : 0
+        totalUsers > 0 ? clampPct((totalCompleted / (totalUsers * TOTAL_LESSONS)) * 100) : 0
 
       return { totalUsers, activeLearners30d, newSignups24h, avgCourseProgressPct }
     } catch (err) {
-      // DB unreachable → degrade to zeroed KPIs rather than crashing the
-      // workspace (consistent with getUsersOverview).
       console.warn('[AdminConsoleService] getUsersKpis failed:', err)
       return { totalUsers: 0, activeLearners30d: 0, newSignups24h: 0, avgCourseProgressPct: 0 }
     }

@@ -888,6 +888,120 @@ export type Database = {
           },
         ]
       }
+      system_announcements: {
+        Row: {
+          id: string
+          title: string
+          content: string
+          type: string
+          status: string
+          target_audience: string
+          target_cohort_id: string | null
+          target_user_id: string | null
+          link_url: string | null
+          link_text: string | null
+          scheduled_at: string | null
+          published_at: string | null
+          expires_at: string | null
+          dismissible: boolean
+          priority: number
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          content: string
+          type?: string
+          status?: string
+          target_audience?: string
+          target_cohort_id?: string | null
+          target_user_id?: string | null
+          link_url?: string | null
+          link_text?: string | null
+          scheduled_at?: string | null
+          published_at?: string | null
+          expires_at?: string | null
+          dismissible?: boolean
+          priority?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          content?: string
+          type?: string
+          status?: string
+          target_audience?: string
+          target_cohort_id?: string | null
+          target_user_id?: string | null
+          link_url?: string | null
+          link_text?: string | null
+          scheduled_at?: string | null
+          published_at?: string | null
+          expires_at?: string | null
+          dismissible?: boolean
+          priority?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_announcements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "system_announcements_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_announcement_dismissals: {
+        Row: {
+          id: string
+          user_id: string
+          announcement_id: string
+          dismissed_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          announcement_id: string
+          dismissed_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          announcement_id?: string
+          dismissed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_announcement_dismissals_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "system_announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_announcement_dismissals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_settings: {
         Row: {
           key: string
