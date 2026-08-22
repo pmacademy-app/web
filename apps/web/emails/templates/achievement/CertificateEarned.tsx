@@ -18,10 +18,10 @@ export const CertificateEarned: React.FC<CertificateEarnedProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText="Your official Prodily PM Academy Certificate is ready!" unsubscribeToken={unsubscribeToken}>
+    <EmailWrapper previewText="Your official Prodily Certificate is ready!" unsubscribeToken={unsubscribeToken}>
       <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Certificate Issued! 🎓</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        Congratulations, {userName}! You have earned your official Prodily PM Academy Credential.
+        Congratulations, {userName}! You have earned your official Prodily Credential.
       </p>
 
       <div

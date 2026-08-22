@@ -20,6 +20,7 @@ export interface InAppNotificationResult {
 export interface InAppNotificationWriteParams {
   userId: string
   eventId?: string
+  idempotencyKey?: string
   category: string
   title: string
   body: string
@@ -34,7 +35,8 @@ export interface InAppNotificationWriteParams {
  * channel for learning lifecycle events. This write-path:
  *  1. Checks the IN_APP_NOTIFICATIONS_ENABLED feature flag.
  *  2. Evaluates the user's per-category in-app preferences.
- *  3. Inserts a row into the `in_app_notifications` table (RLS-scoped, service role bypasses RLS).
+ *  3. Verifies idempotency key to prevent duplicate notification creation.
+ *  4. Inserts a row into the `in_app_notifications` table (RLS-scoped, service role bypasses RLS).
  *
  * Gracefully no-ops when Supabase env vars are not configured (e.g. unit tests).
  */
@@ -56,13 +58,30 @@ export async function createInAppNotification(params: InAppNotificationWritePara
     }
 
     const priorityNumber = PRIORITY_MATRIX[params.priority || 'medium'].numericValue
+    const idempotencyKey = params.idempotencyKey || params.eventId || null
 
     const supabase = createServiceRoleClient()
+
+    // 3. Idempotency verification: avoid creating duplicate in-app rows
+    if (idempotencyKey) {
+      const { data: existing } = (await (supabase
+        .from('in_app_notifications') as unknown as DBChain)
+        .select('id')
+        .eq('user_id', params.userId)
+        .eq('idempotency_key', idempotencyKey)
+        .maybeSingle()) as unknown as { data: { id: string } | null }
+
+      if (existing && existing.id) {
+        return { success: true, id: existing.id, reason: 'duplicate_idempotent' }
+      }
+    }
+
     const { data, error } = (await (supabase
       .from('in_app_notifications') as unknown as DBChain)
       .insert({
         user_id: params.userId,
         event_id: (params.eventId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(params.eventId)) ? params.eventId : null,
+        idempotency_key: idempotencyKey,
         category: params.category,
         title: params.title,
         body: params.body,
@@ -132,7 +151,7 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       return { title: 'Capstone submitted', body: `Your ${String(payload.moduleTitle || 'module')} capstone has been submitted for review.`, actionUrl: '/capstones' }
     }
     case 'user.registered': {
-      return { title: 'Welcome to PM Academy', body: `Thanks for joining, ${userName || 'learner'}! Start your first lesson now.`, actionUrl: '/academy' }
+      return { title: 'Welcome to Prodily', body: `Thanks for joining, ${userName || 'learner'}! Start your first lesson now.`, actionUrl: '/academy' }
     }
     case 'user.verified': {
       return { title: 'Email verified', body: 'Your email address has been confirmed. Your account is fully active.', actionUrl: '/dashboard' }
@@ -144,6 +163,6 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       return { title: 'Flashcards due for review', body: 'Your spaced-repetition queue has cards ready. Keep your memory fresh!', actionUrl: '/review' }
     }
     default:
-      return { title: 'PM Academy update', body: 'You have a new update in your notification center.', actionUrl: '/dashboard' }
+      return { title: 'Prodily update', body: 'You have a new update in your notification center.', actionUrl: '/dashboard' }
   }
 }

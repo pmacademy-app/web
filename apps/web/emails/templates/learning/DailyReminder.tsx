@@ -20,10 +20,10 @@ export const DailyReminder: React.FC<DailyReminderProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText={`Daily Reminder: Keep your ${currentStreak}-day streak alive on Prodily PM Academy!`} unsubscribeToken={unsubscribeToken}>
+    <EmailWrapper previewText={`Daily Reminder: Keep your ${currentStreak}-day streak alive on Prodily!`} unsubscribeToken={unsubscribeToken}>
       <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Daily Learning &amp; Review Reminder 🔥</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        Hi {userName}, your daily flashcard reviews and learning streak are waiting for you today in Prodily PM Academy.
+        Hi {userName}, your daily flashcard reviews and learning streak are waiting for you today in Prodily.
       </p>
 
       <table role="presentation" width="100%" border={0} cellPadding={0} cellSpacing={0}>

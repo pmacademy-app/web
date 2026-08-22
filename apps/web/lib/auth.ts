@@ -23,9 +23,7 @@ export async function ensureUserProfile(
     .maybeSingle()
 
   if (existing) {
-    const profile = existing as unknown as UserProfile
-    await dispatchWelcomeEmailIfNeeded(supabase, user, profile.name, profile.timezone)
-    return profile
+    return existing as unknown as UserProfile
   }
 
   const name = extra?.name ?? user.user_metadata?.full_name ?? user.user_metadata?.name ?? null

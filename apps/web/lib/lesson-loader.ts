@@ -21,9 +21,13 @@ import type { CompiledLesson, CurriculumData, CurriculumEntry } from '@/types'
 // The content/dist/ folder lives at the monorepo root: ../../content/dist
 const DIST_DIR = path.resolve(process.cwd(), '..', '..', 'content', 'dist')
 
+// In-memory process-level caches to eliminate repeated filesystem I/O across server renders
+const lessonMemoryCache = new Map<string, CompiledLesson>()
+let curriculumMemoryCache: CurriculumData | null = null
+
 /**
  * Fetch a single compiled lesson by its stable ID (les_XXXXXX).
- * Results are cached per render pass via React cache().
+ * Results are cached in memory and deduplicated per render pass via React cache().
  */
 export const fetchCompiledLesson = cache(
   async (lessonId: string): Promise<CompiledLesson | null> => {
@@ -33,10 +37,16 @@ export const fetchCompiledLesson = cache(
       return null
     }
 
+    if (lessonMemoryCache.has(lessonId)) {
+      return lessonMemoryCache.get(lessonId)!
+    }
+
     const filePath = path.join(DIST_DIR, 'lessons', `${lessonId}.json`)
     try {
       const raw = await readFile(filePath, 'utf-8')
-      return JSON.parse(raw) as CompiledLesson
+      const parsed = JSON.parse(raw) as CompiledLesson
+      lessonMemoryCache.set(lessonId, parsed)
+      return parsed
     } catch (err: unknown) {
       if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
         console.error(`[lesson-loader] Error reading lesson ${lessonId}:`, err)
@@ -48,14 +58,19 @@ export const fetchCompiledLesson = cache(
 
 /**
  * Fetch the full curriculum data (all 90 lessons minimal metadata).
- * Used by the /academy layout to render the sidebar navigation.
- * Cached per render pass.
+ * Cached in memory to eliminate repeated disk reads.
  */
 export const fetchCurriculumData = cache(async (): Promise<CurriculumData | null> => {
+  if (curriculumMemoryCache) {
+    return curriculumMemoryCache
+  }
+
   const filePath = path.join(DIST_DIR, 'curriculum.json')
   try {
     const raw = await readFile(filePath, 'utf-8')
-    return JSON.parse(raw) as CurriculumData
+    const parsed = JSON.parse(raw) as CurriculumData
+    curriculumMemoryCache = parsed
+    return parsed
   } catch (err) {
     console.error('[lesson-loader] Error reading curriculum.json:', err)
     return null

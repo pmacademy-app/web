@@ -141,22 +141,63 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   let lowestLockedGlobalOrder: number | null = null
   let lowestLockedLessonUrl: string | null = null
 
-  if (user && prevId) {
+  let initialProgress: {
+    status: 'not_started' | 'in_progress' | 'completed'
+    theory_read_at: string | null
+    quiz_score: number | null
+    quiz_attempts: number
+    xp_earned: number
+    completed_at: string | null
+  } | null = null
+
+  if (user) {
     const serviceSupabase = createServiceRoleClient()
-    const unlocked = await isLessonUnlocked(serviceSupabase, user.id, lessonId, prevId)
+    const [unlocked, progressResult] = await Promise.all([
+      prevId ? isLessonUnlocked(serviceSupabase, user.id, lessonId, prevId) : true,
+      serviceSupabase
+        .from('user_lesson_progress')
+        .select('status, theory_read_at, quiz_score, quiz_attempts, xp_earned, completed_at')
+        .eq('user_id', user.id)
+        .eq('lesson_id', lessonId)
+        .maybeSingle(),
+    ])
+
     if (!unlocked) {
       isLocked = true
-      
-      const curriculumIds = lessons.map(l => l.id)
+
+      const curriculumIds = lessons.map((l) => l.id)
       const lowestLockedIndex = await getFirstLockedLessonIndex(serviceSupabase, user.id, curriculumIds)
-      
+
       if (lowestLockedIndex !== -1 && lowestLockedIndex < globalIndex) {
         const actualLockedLesson = lessons[lowestLockedIndex]
         if (actualLockedLesson) {
           lowestLockedLessonMeta = await getLessonMeta(actualLockedLesson.id)
           lowestLockedGlobalOrder = lowestLockedIndex + 1
-          lowestLockedLessonUrl = lowestLockedLessonMeta ? `/academy/${lowestLockedLessonMeta.module}/${lowestLockedLessonMeta.id}` : null
+          lowestLockedLessonUrl = lowestLockedLessonMeta
+            ? `/academy/${lowestLockedLessonMeta.module}/${lowestLockedLessonMeta.id}`
+            : null
         }
+      }
+    }
+
+    if (progressResult?.data) {
+      const row = progressResult.data as {
+        status: 'not_started' | 'in_progress' | 'completed'
+        theory_read_at: string | null
+        quiz_score: number | null
+        quiz_attempts: number
+        xp_earned: number
+        completed_at: string | null
+      }
+      initialProgress = row
+    } else {
+      initialProgress = {
+        status: 'not_started',
+        theory_read_at: null,
+        quiz_score: null,
+        quiz_attempts: 0,
+        xp_earned: 0,
+        completed_at: null,
       }
     }
   }
@@ -282,6 +323,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         globalOrder={globalOrder}
         moduleNumber={moduleNum}
         moduleName={moduleName}
+        initialProgress={initialProgress}
       />
     </>
   )

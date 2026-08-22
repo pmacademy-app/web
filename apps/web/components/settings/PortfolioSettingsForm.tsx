@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import type { PortfolioSettingsData } from '@/lib/portfolio-db'
+import { AvatarUpload } from '@/components/profile/AvatarUpload'
 
 function LinkedInIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   return (
@@ -219,18 +220,15 @@ export function PortfolioSettingsForm() {
           />
         </div>
 
-        {/* Avatar URL */}
-        <div className="space-y-1.5">
-          <label htmlFor="setting-avatar" className="text-xs font-bold text-foreground block">
-            Avatar Image URL
+        {/* Avatar Upload */}
+        <div className="p-4 rounded-xl border border-border bg-card/40 space-y-3">
+          <label className="text-xs font-bold text-foreground block uppercase tracking-wider">
+            Profile Photo
           </label>
-          <input
-            id="setting-avatar"
-            type="url"
-            value={formData.avatarUrl}
-            onChange={(e) => handleChange('avatarUrl', e.target.value)}
-            placeholder="https://example.com/avatar.jpg"
-            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
+          <AvatarUpload
+            currentAvatarUrl={formData.avatarUrl}
+            onUploadSuccess={(url) => handleChange('avatarUrl', url)}
+            onRemove={() => handleChange('avatarUrl', '')}
           />
         </div>
       </div>

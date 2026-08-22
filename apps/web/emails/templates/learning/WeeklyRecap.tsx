@@ -24,10 +24,10 @@ export const WeeklyRecap: React.FC<WeeklyRecapProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText={`Your weekly Prodily PM Academy recap: ${lessonsCompletedThisWeek} lessons, ${xpEarnedThisWeek} XP!`} unsubscribeToken={unsubscribeToken}>
+    <EmailWrapper previewText={`Your weekly Prodily recap: ${lessonsCompletedThisWeek} lessons, ${xpEarnedThisWeek} XP!`} unsubscribeToken={unsubscribeToken}>
       <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Your Weekly Progress Recap 📊</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        Hi {userName}, here is a look at your learning progress in Prodily PM Academy over the past week:
+        Hi {userName}, here is a look at your learning progress in Prodily over the past week:
       </p>
 
       <table role="presentation" width="100%" border={0} cellPadding={0} cellSpacing={0}>

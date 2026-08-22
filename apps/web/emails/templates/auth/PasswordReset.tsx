@@ -13,10 +13,10 @@ export const PasswordReset: React.FC<PasswordResetProps> = ({
   resetUrl = `${BRAND.siteUrl}/auth/reset-password`,
 }) => {
   return (
-    <EmailWrapper previewText="Reset your Prodily PM Academy account password." isCriticalAuth={true}>
+    <EmailWrapper previewText="Reset your Prodily account password." isCriticalAuth={true}>
       <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Reset your password</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        Hi {userName}, we received a request to reset your password for your Prodily PM Academy account.
+        Hi {userName}, we received a request to reset your password for your Prodily account.
       </p>
       <Button href={resetUrl}>Reset Password</Button>
       <p style={{ fontSize: '12px', color: '#9EA59D', marginTop: '20px' }}>

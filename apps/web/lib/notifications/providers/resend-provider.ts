@@ -39,7 +39,7 @@ export class ResendProvider implements NotificationProvider {
       const bodyPayload: Record<string, unknown> = {
         from: this.defaultFrom,
         to: [recipientEmail],
-        subject: (payload.variables.subject as string) || 'PM Academy Notification',
+        subject: (payload.variables.subject as string) || 'Prodily Notification',
         html: payload.variables.html as string,
         text: payload.variables.text as string,
         headers: {

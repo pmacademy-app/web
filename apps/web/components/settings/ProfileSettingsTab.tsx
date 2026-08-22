@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { User, Globe, Save, Loader2, CheckCircle2, Sparkles } from 'lucide-react'
 import { useQuickStart } from '@/components/quick-start/QuickStartContext'
+import { AvatarUpload } from '@/components/profile/AvatarUpload'
 
 function LinkedInIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   return (
@@ -120,33 +121,30 @@ export function ProfileSettingsTab() {
           </div>
         </div>
 
-        {/* Name & Avatar */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-foreground">
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g. Alex Morgan"
-              className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
+        {/* Avatar Upload */}
+        <div className="p-4 rounded-xl border border-border bg-card/40 space-y-3">
+          <label className="block text-xs font-bold text-foreground uppercase tracking-wider">
+            Profile Photo
+          </label>
+          <AvatarUpload
+            currentAvatarUrl={formData.avatarUrl}
+            onUploadSuccess={(url) => setFormData((prev) => ({ ...prev, avatarUrl: url }))}
+            onRemove={() => setFormData((prev) => ({ ...prev, avatarUrl: '' }))}
+          />
+        </div>
 
-          <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-foreground">
-              Avatar Image URL
-            </label>
-            <input
-              type="url"
-              value={formData.avatarUrl}
-              onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
-              placeholder="https://example.com/avatar.png"
-              className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
+        {/* Full Name */}
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-foreground">
+            Full Name
+          </label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="e.g. Alex Morgan"
+            className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
         </div>
 
         {/* Bio */}

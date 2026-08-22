@@ -16,10 +16,10 @@ export const PortfolioPublished: React.FC<PortfolioPublishedProps> = ({
   unsubscribeToken,
 }) => {
   return (
-    <EmailWrapper previewText="Your Prodily PM Academy Public Portfolio is live!" unsubscribeToken={unsubscribeToken}>
+    <EmailWrapper previewText="Your Prodily Public Portfolio is live!" unsubscribeToken={unsubscribeToken}>
       <h2 style={{ fontSize: '20px', color: '#171A17', marginTop: 0, fontWeight: 700 }}>Your Portfolio is Live! 🌐</h2>
       <p style={{ fontSize: '14px', color: '#70685A' }}>
-        Hi {userName}, your public Prodily PM Academy portfolio is active and accessible to hiring managers, peers, and recruiters.
+        Hi {userName}, your public Prodily portfolio is active and accessible to hiring managers, peers, and recruiters.
       </p>
 
       <div
