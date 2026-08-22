@@ -129,7 +129,7 @@ function OverviewTab({ user }: { user: AdminUserDetail }) {
 
 /* ─── Learning ─────────────────────────────────────────────────────────── */
 
-function LearningTab({ user }: { user: AdminUserDetail }) {
+function LearningTab({ user, onResetModule }: { user: AdminUserDetail; onResetModule?: (moduleSlug: string, moduleTitle: string) => void }) {
   return (
     <div className="space-y-4">
       <AdminSection title="Course Progress" icon={BookOpen} iconColor="text-admin-success">
@@ -165,12 +165,23 @@ function LearningTab({ user }: { user: AdminUserDetail }) {
         ) : (
           <div className="space-y-3">
             {user.learning.modules.map((mod) => (
-              <div key={mod.slug} className="space-y-1">
+              <div key={mod.slug} className="p-2.5 rounded-lg bg-admin-surface-raised border border-admin-border space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs font-semibold text-admin-fg capitalize truncate">{mod.title.replace(/-/g, ' ')}</p>
-                  <span className="text-[11px] font-mono text-admin-fg-subtle shrink-0">
-                    {mod.lessonsCompleted}/{mod.lessonsTotal}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-mono text-admin-fg-subtle shrink-0">
+                      {mod.lessonsCompleted}/{mod.lessonsTotal}
+                    </span>
+                    {onResetModule && mod.lessonsCompleted > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => onResetModule(mod.slug, mod.title)}
+                        className="px-2 py-0.5 text-[10px] font-medium rounded bg-admin-warning-soft text-admin-warning border border-admin-warning/20 hover:bg-admin-warning/20 transition-colors cursor-pointer"
+                      >
+                        Reset Module
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <AdminProgressBar value={mod.completedPct} showValue={false} />
               </div>
@@ -397,12 +408,20 @@ export const USER_DETAIL_TABS = [
 
 export type UserDetailTabKey = (typeof USER_DETAIL_TABS)[number]['key']
 
-export function UserTabPanels({ user, activeTab }: { user: AdminUserDetail; activeTab: UserDetailTabKey }) {
+export function UserTabPanels({
+  user,
+  activeTab,
+  onResetModule,
+}: {
+  user: AdminUserDetail
+  activeTab: UserDetailTabKey
+  onResetModule?: (moduleSlug: string, moduleTitle: string) => void
+}) {
   switch (activeTab) {
     case 'overview':
       return <OverviewTab user={user} />
     case 'learning':
-      return <LearningTab user={user} />
+      return <LearningTab user={user} onResetModule={onResetModule} />
     case 'activity':
       return <ActivityTab user={user} />
     case 'achievements':
