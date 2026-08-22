@@ -365,6 +365,37 @@ export class SystemService {
   }
 
   /**
+   * Update the status of system error rows matching a fingerprint.
+   */
+  public static async updateErrorGroupStatus(fingerprint: string, newStatus: 'new' | 'acknowledged' | 'resolved'): Promise<{ success: boolean; updatedCount: number }> {
+    const supabase = createServiceRoleClient()
+    try {
+      const { data, error } = await supabase
+        .from('system_errors')
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('fingerprint', fingerprint)
+        .select('id')
+
+      if (error) {
+        // Fallback: try matching on id
+        const { data: idData, error: idError } = await supabase
+          .from('system_errors')
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq('id', fingerprint)
+          .select('id')
+
+        if (idError) throw new Error(idError.message)
+        return { success: true, updatedCount: idData?.length || 0 }
+      }
+
+      return { success: true, updatedCount: data?.length || 0 }
+    } catch (err) {
+      console.error('[SystemService] updateErrorGroupStatus failed:', err)
+      throw err
+    }
+  }
+
+  /**
    * Paginated audit log from `admin_audit_logs` with admin/action/target/date
    * filters. Note: writes are not yet wired (see `logAdminAction`), so the
    * table is expected to be empty until persistence is enabled.

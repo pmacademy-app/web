@@ -69,7 +69,7 @@ export async function POST(request: Request, { params }: Context) {
 
     if (action === 'reset_progress') {
       await resetProgress(supabase, id, 'all')
-      await logAdminAction(auth.userId, auth.email, 'admin_reset_progress', 'user', id)
+      await logAdminAction(auth.userId, auth.email, 'admin_reset_progress', 'user', id, { scope: 'all' })
 
       revalidatePath('/admin/users')
       revalidatePath('/academy', 'layout')
@@ -77,7 +77,25 @@ export async function POST(request: Request, { params }: Context) {
       revalidatePath('/progress', 'layout')
       revalidatePath('/capstones', 'layout')
 
-      return NextResponse.json({ success: true, resetUserId: id })
+      return NextResponse.json({ success: true, resetUserId: id, scope: 'all' })
+    }
+
+    if (action === 'reset_module') {
+      const moduleSlug = body.moduleSlug || body.module
+      if (!moduleSlug) {
+        return NextResponse.json({ error: 'moduleSlug is required for reset_module action.' }, { status: 400 })
+      }
+
+      await resetProgress(supabase, id, moduleSlug)
+      await logAdminAction(auth.userId, auth.email, 'admin_reset_module', 'user', id, { moduleSlug })
+
+      revalidatePath('/admin/users')
+      revalidatePath('/academy', 'layout')
+      revalidatePath('/dashboard', 'layout')
+      revalidatePath('/progress', 'layout')
+      revalidatePath('/capstones', 'layout')
+
+      return NextResponse.json({ success: true, resetUserId: id, moduleSlug })
     }
 
     return NextResponse.json({ error: 'Invalid admin action' }, { status: 400 })

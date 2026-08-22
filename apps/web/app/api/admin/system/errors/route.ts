@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/admin/guard'
+import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { SystemService } from '@/lib/admin/system-service'
 
 export const runtime = 'nodejs'
@@ -32,3 +32,40 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  const authResult = await requireAdminUser(request)
+  if (!authResult.authorized || !authResult.userId || !authResult.email) {
+    return NextResponse.json(
+      { error: authResult.error || 'Unauthorized' },
+      { status: authResult.statusCode || 403 }
+    )
+  }
+
+  try {
+    const body = await request.json()
+    const { fingerprint, newStatus } = body
+
+    if (!fingerprint || !['new', 'acknowledged', 'resolved'].includes(newStatus)) {
+      return NextResponse.json(
+        { error: 'Valid fingerprint and newStatus are required.' },
+        { status: 400 }
+      )
+    }
+
+    const result = await SystemService.updateErrorGroupStatus(fingerprint, newStatus)
+    await logAdminAction(
+      authResult.userId,
+      authResult.email,
+      `system_error_${newStatus}`,
+      'system_error',
+      fingerprint,
+      { newStatus, updatedCount: result.updatedCount }
+    )
+
+    return NextResponse.json({ ...result })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to update system error'
+    return NextResponse.json({ success: false, error: message }, { status: 500 })
+  }
+}

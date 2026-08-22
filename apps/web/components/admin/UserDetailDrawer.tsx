@@ -121,6 +121,33 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
     }
   }
 
+  const [resetModuleTarget, setResetModuleTarget] = useState<{ slug: string; title: string } | null>(null)
+
+  const handleResetModule = async (moduleSlug: string) => {
+    if (!user) return
+    setResetModuleTarget(null)
+    setBusy('reset')
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset_module', moduleSlug }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast(`Reset progress for module "${moduleSlug}" for ${user.email}.`, 'success')
+        onClose()
+        router.refresh()
+      } else {
+        toast(data.error || 'Failed to reset module progress.', 'error')
+      }
+    } catch {
+      toast('Network error resetting module progress.', 'error')
+    } finally {
+      setBusy(null)
+    }
+  }
+
   return (
     <>
       <AdminDrawer
@@ -214,7 +241,13 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
 
               {USER_DETAIL_TABS.map((tab) => (
                 <TabsContent key={tab.key} value={tab.key} className="pt-4">
-                  {activeTab === tab.key && <UserTabPanels user={user!} activeTab={tab.key} />}
+                  {activeTab === tab.key && (
+                    <UserTabPanels
+                      user={user!}
+                      activeTab={tab.key}
+                      onResetModule={(slug, title) => setResetModuleTarget({ slug, title })}
+                    />
+                  )}
                 </TabsContent>
               ))}
             </Tabs>
@@ -283,6 +316,20 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
           </>
         )}
       </AdminDrawer>
+
+      {/* Reset module confirmation */}
+      <AdminConfirmDialog
+        open={resetModuleTarget !== null && dataReady}
+        onOpenChange={(open) => {
+          if (!open) setResetModuleTarget(null)
+        }}
+        title="Reset module progress?"
+        description={`This will reset lesson progress, quiz attempts, and reflections for "${resetModuleTarget?.title}" for ${user?.email}.`}
+        confirmLabel="Reset Module"
+        destructive
+        onConfirm={() => resetModuleTarget && handleResetModule(resetModuleTarget.slug)}
+        onCancel={() => setResetModuleTarget(null)}
+      />
 
       {/* Reset confirmation */}
       <AdminConfirmDialog

@@ -7,6 +7,7 @@ import type { FeatureFlagRecord } from '../feature-flags/types'
 import type { TemplateMetadata } from '../templates/types'
 import type { UserNotificationTimelineRecord } from '../timeline/types'
 import type { UserNotificationPreferences } from '../preferences/types'
+import type { QueueStatus } from '../queue/types'
 
 import { globalFeatureFlagService } from '../feature-flags/service'
 import { globalTemplateRegistry } from '../templates/registry'
@@ -84,7 +85,7 @@ export class AdminFoundationService implements NotificationAdminServices {
         eventType: String(r.event_type || 'custom'),
         priority: typeof r.priority === 'number' ? r.priority : 5,
         priorityLevel: 'medium' as const,
-        status: (r.status as any) || 'pending',
+        status: (r.status as QueueStatus) || 'pending',
         retry: {
           attemptCount: Number(r.attempt_count || 0),
           maxAttempts: Number(r.max_attempts || 3),

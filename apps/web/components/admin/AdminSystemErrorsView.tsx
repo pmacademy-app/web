@@ -229,6 +229,9 @@ export function AdminSystemErrorsView({ initial }: AdminSystemErrorsViewProps) {
         onOpenChange={(open) => {
           if (!open) setSelected(null)
         }}
+        onStatusChange={() => {
+          refresh()
+        }}
         group={selected}
       />
     </div>
