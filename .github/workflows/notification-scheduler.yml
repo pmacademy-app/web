@@ -1,52 +1,111 @@
-name: Notification Scheduler
+name: Production Notification & Email Automation Scheduler
 
 on:
   schedule:
-    # Process email queue every 15 minutes
-    - cron: '*/15 * * * *'
-    # Retry failed emails every hour
+    # 1. Process email queue every 5 minutes
+    - cron: '*/5 * * * *'
+    # 2. Retry failed emails every hour
     - cron: '0 * * * *'
-    # Weekly recap every Sunday at 18:00 UTC
-    - cron: '0 18 * * 0'
-    # Queue / log cleanup daily at 02:00 UTC
+    # 3. Daily reminder at 09:00 UTC
+    - cron: '0 9 * * *'
+    # 4. Weekly recap every Monday at 09:00 UTC
+    - cron: '0 9 * * 1'
+    # 5. Queue / timeline / delivery log cleanup daily at 02:00 UTC
     - cron: '0 2 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      job_to_run:
+        description: 'Specific job to trigger (queue, retry, daily, weekly, cleanup, all)'
+        required: false
+        default: 'all'
+
+permissions: {}
 
 jobs:
-  run-scheduled-tasks:
+  process-email-queue:
+    name: Process Email Queue
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '*/5 * * * *' ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'queue')
     runs-on: ubuntu-latest
-    env:
-      # Origin of the deployed app. `APP_URL` is a required GitHub Actions
-      # secret (Repository Settings → Secrets and variables → Actions); the
-      # fallback is the canonical production origin used across the app
-      # (lib/brand.ts BRAND.siteUrl) so a missing secret fails loudly on the
-      # endpoint instead of producing a malformed URL.
-      CRON_ORIGIN: ${{ secrets.APP_URL || 'https://prodily.adityagangwani.me' }}
+    timeout-minutes: 5
+    concurrency:
+      group: email-queue-runner
+      cancel-in-progress: false
     steps:
-      - name: Process Email Queue
-        if: github.event.schedule == '*/15 * * * *' || github.event_name == 'workflow_dispatch'
+      - name: Trigger Process Queue Endpoint
         run: |
-          curl --fail-with-body -X POST "$CRON_ORIGIN/api/cron/process-email-queue" \
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/process-email-queue" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
-      - name: Retry Failed Emails
-        if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
+  retry-failed-emails:
+    name: Retry Failed Emails
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '0 * * * *' ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'retry')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Retry Failed Endpoint
         run: |
-          curl --fail-with-body -X POST "$CRON_ORIGIN/api/cron/retry-failed" \
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/retry-failed" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
-      - name: Weekly Recap
-        if: github.event.schedule == '0 18 * * 0' || github.event_name == 'workflow_dispatch'
+  daily-reminder:
+    name: Queue Daily Reminders
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '0 9 * * *' ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'daily')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Daily Reminder Endpoint
         run: |
-          curl --fail-with-body -X POST "$CRON_ORIGIN/api/cron/weekly-recap" \
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/daily-reminder" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
-      - name: Cleanup Timeline & Logs
-        if: github.event.schedule == '0 2 * * *' || github.event_name == 'workflow_dispatch'
+  weekly-recap:
+    name: Queue Weekly Recaps
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '0 9 * * 1' ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'weekly')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Weekly Recap Endpoint
         run: |
-          curl --fail-with-body -X POST "$CRON_ORIGIN/api/cron/cleanup" \
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/weekly-recap" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+  cleanup-logs:
+    name: Cleanup Timeline & Delivery Logs
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '0 2 * * *' ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'cleanup')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Cleanup Endpoint
+        run: |
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/cleanup" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"

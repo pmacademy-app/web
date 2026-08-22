@@ -5,7 +5,14 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: # Allows manual triggering from the GitHub actions UI
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build-and-validate:
@@ -55,8 +62,8 @@ jobs:
         run: |
           npm run lint
           npm run typecheck
-          
-      - name: Run Tests
+
+      - name: Run Unit & Integration Tests
         run: npm run test
 
       - name: Brand hardening check
@@ -89,10 +96,18 @@ jobs:
       - name: Next.js Production Build
         run: npm run build
 
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E Tests
+        run: npm run test:e2e
+
   deploy-supabase:
     needs: build-and-validate
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -102,13 +117,11 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Link Project
-        run: npx supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}" --password "${{ secrets.SUPABASE_DB_PASSWORD }}" --yes
+      - name: Link Project & Deploy Migrations
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != ''
+        run: |
+          npx supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}" --password "${{ secrets.SUPABASE_DB_PASSWORD }}" --yes
+          npx supabase db push --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
-      - name: Deploy Migrations
-        run: npx supabase db push --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
