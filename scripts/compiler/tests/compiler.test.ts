@@ -13,7 +13,7 @@ describe('PM Academy Content Compiler Test Suite', () => {
   
   describe('Stable ID Generator', () => {
     it('generates consistent lesson ID for path', () => {
-      const rootDir = path.resolve(__dirname, '../../..');
+      const rootDir = path.resolve(import.meta.dirname, '../../..');
       const path1 = path.join(rootDir, 'content/lessons/lesson-001.md');
       const path2 = path.join(rootDir, 'content/lessons/lesson-001.md');
       
@@ -67,7 +67,7 @@ describe('PM Academy Content Compiler Test Suite', () => {
     });
 
     it('compiles top-level mental model / framework mermaid blocks to static SVG', async () => {
-      const rootDir = path.resolve(__dirname, '../../..');
+      const rootDir = path.resolve(import.meta.dirname, '../../..');
       const filePath = path.join(rootDir, 'content/lessons/lesson-004.md');
       const { lesson } = await compileLesson(filePath, { [filePath]: 'les_abc123' }, {});
 
@@ -436,7 +436,7 @@ describe('PM Academy Content Compiler Test Suite', () => {
     });
 
     it('compiles lesson-001.md and verifies the famous blockquote is preserved', async () => {
-      const rootDir = path.resolve(__dirname, '../../..');
+      const rootDir = path.resolve(import.meta.dirname, '../../..');
       const filePath = path.join(rootDir, 'content/lessons/lesson-001.md');
       const { lesson } = await compileLesson(filePath, { [filePath]: 'les_001test' }, {});
 
@@ -453,7 +453,7 @@ describe('PM Academy Content Compiler Test Suite', () => {
     });
 
     it('validates that all lessons with blockquotes in source markdown retain blockquote blocks in JSON', async () => {
-      const rootDir = path.resolve(__dirname, '../../..');
+      const rootDir = path.resolve(import.meta.dirname, '../../..');
       const lessonsDir = path.join(rootDir, 'content/lessons');
       const fs = await import('fs');
       const files = fs.readdirSync(lessonsDir).filter((f) => f.endsWith('.md'));

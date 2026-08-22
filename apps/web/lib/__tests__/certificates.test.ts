@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { describe, it, expect } from 'vitest'
 import {
   generateCertificateCode,
   generateCredentialJsonLd,
@@ -6,88 +6,76 @@ import {
 } from '../certificates'
 import { buildLinkedInCertificationUrl } from '../certificates/linkedin-url'
 
-console.log('🧪 Running Certificates & Credentials System 2.0 Unit Test Suite...\n')
+describe('Certificates & Credentials System 2.0 Unit Test Suite', () => {
+  describe('Certificate Code Generation', () => {
+    it('generateCertificateCode formats clean code with PMA prefix and year', () => {
+      const code = generateCertificateCode('user-123-abc', 'full_curriculum')
+      const year = new Date().getFullYear()
 
-let passedTests = 0
+      expect(code.startsWith(`PMA-${year}-`)).toBe(true)
+      expect(code.length).toBe(17)
+    })
 
-function runTest(name: string, fn: () => void) {
-  try {
-    fn()
-    passedTests++
-    console.log(`  ✓ ${name}`)
-  } catch (err) {
-    console.error(`  ✕ ${name}`)
-    console.error(err)
-    process.exit(1)
-  }
-}
+    it('generateCertificateCode is deterministic for identical inputs', () => {
+      const code1 = generateCertificateCode('user-999', 'full_curriculum')
+      const code2 = generateCertificateCode('user-999', 'full_curriculum')
 
-// 1. Certificate Code Generation
-runTest('generateCertificateCode formats clean code with PMA prefix and year', () => {
-  const code = generateCertificateCode('user-123-abc', 'full_curriculum')
-  const year = new Date().getFullYear()
-
-  assert.ok(code.startsWith(`PMA-${year}-`), `Expected code to start with PMA-${year}-, got ${code}`)
-  assert.strictEqual(code.length, 17, `Expected 17 character code (PMA-YYYY-8HEX), got length ${code.length}`)
-})
-
-runTest('generateCertificateCode is deterministic for identical inputs', () => {
-  const code1 = generateCertificateCode('user-999', 'full_curriculum')
-  const code2 = generateCertificateCode('user-999', 'full_curriculum')
-
-  assert.strictEqual(code1, code2, 'Certificate codes should be deterministic for identical user and type')
-})
-
-// 2. Credential JSON-LD Schema
-runTest('generateCredentialJsonLd generates valid schema.org EducationalOccupationalCredential', () => {
-  const jsonLd = generateCredentialJsonLd({
-    certificateCode: 'PMA-2026-A1B2C3D4',
-    learnerName: 'Sarah Connor',
-    careerTitle: 'Senior Product Manager',
-    issuedAt: '2026-08-05T00:00:00Z',
-    verificationUrl: 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4',
-    portfolioUrl: 'https://prodily.adityagangwani.me/p/sconnor',
-    siteOrigin: 'https://prodily.adityagangwani.me',
+      expect(code1).toBe(code2)
+    })
   })
 
-  assert.strictEqual(jsonLd['@context'], 'https://schema.org')
-  assert.strictEqual(jsonLd['@type'], 'EducationalOccupationalCredential')
-  assert.strictEqual(jsonLd.identifier, 'PMA-2026-A1B2C3D4')
-  assert.strictEqual((jsonLd.grantee as { name: string }).name, 'Sarah Connor')
-  assert.strictEqual(jsonLd.url, 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4')
-})
+  describe('Credential JSON-LD Schema', () => {
+    it('generateCredentialJsonLd generates valid schema.org EducationalOccupationalCredential', () => {
+      const jsonLd = generateCredentialJsonLd({
+        certificateCode: 'PMA-2026-A1B2C3D4',
+        learnerName: 'Sarah Connor',
+        careerTitle: 'Senior Product Manager',
+        issuedAt: '2026-08-05T00:00:00Z',
+        verificationUrl: 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4',
+        portfolioUrl: 'https://prodily.adityagangwani.me/p/sconnor',
+        siteOrigin: 'https://prodily.adityagangwani.me',
+      })
 
-// 3. QR Code SVG Generator
-runTest('generateQrCodeSvg outputs clean SVG vector markup containing rectangles for verification URL', () => {
-  const verifyUrl = 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4'
-  const svg = generateQrCodeSvg(verifyUrl, 100)
-
-  assert.ok(svg.includes('<svg'), 'Output should contain <svg element')
-  assert.ok(svg.includes('<rect'), 'Output should contain <rect elements')
-  assert.ok(svg.includes('viewBox="0 0'), 'Output should have valid QR viewBox matrix')
-})
-
-// 4. LinkedIn Certification Add-to-Profile URL Builder (Sprint 7.3)
-runTest('buildLinkedInCertificationUrl constructs valid LinkedIn add-to-profile URL with full parameters', () => {
-  const certCode = 'PMA-2026-B87F129C'
-  const verifyUrl = 'https://prodily.adityagangwani.me/verify/PMA-2026-B87F129C'
-  const issuedAt = '2026-08-08T00:00:00.000Z'
-
-  const linkedinUrl = buildLinkedInCertificationUrl({
-    certificateCode: certCode,
-    careerTitle: 'Principal Product Manager',
-    type: 'full_curriculum',
-    issuedAt,
-    verificationUrl: verifyUrl,
+      expect(jsonLd['@context']).toBe('https://schema.org')
+      expect(jsonLd['@type']).toBe('EducationalOccupationalCredential')
+      expect(jsonLd.identifier).toBe('PMA-2026-A1B2C3D4')
+      expect((jsonLd.grantee as { name: string }).name).toBe('Sarah Connor')
+      expect(jsonLd.url).toBe('https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4')
+    })
   })
 
-  assert.ok(linkedinUrl.startsWith('https://www.linkedin.com/profile/add'), 'Must start with LinkedIn profile add endpoint')
-  assert.ok(linkedinUrl.includes('startTask=CERTIFICATION_NAME'), 'Must specify CERTIFICATION_NAME task')
-  assert.ok(linkedinUrl.includes('organizationName=Prodily'), 'Must set issuing organization to Prodily')
-  assert.ok(linkedinUrl.includes('certId=PMA-2026-B87F129C'), 'Must include exact credential ID')
-  assert.ok(linkedinUrl.includes('issueYear=2026'), 'Must set issue year correctly')
-  assert.ok(linkedinUrl.includes('issueMonth=8'), 'Must set issue month correctly')
-  assert.ok(linkedinUrl.includes(encodeURIComponent(verifyUrl)), 'Must URL-encode verification link parameter')
-})
+  describe('QR Code SVG Generator', () => {
+    it('generateQrCodeSvg outputs clean SVG vector markup containing rectangles for verification URL', () => {
+      const verifyUrl = 'https://prodily.adityagangwani.me/verify/PMA-2026-A1B2C3D4'
+      const svg = generateQrCodeSvg(verifyUrl, 100)
 
-console.log(`\n✅ All ${passedTests} Certificates 2.0 Unit Tests Passed Successfully!\n`)
+      expect(svg).toContain('<svg')
+      expect(svg).toContain('<rect')
+      expect(svg).toContain('viewBox="0 0')
+    })
+  })
+
+  describe('LinkedIn Certification Add-to-Profile URL Builder', () => {
+    it('buildLinkedInCertificationUrl constructs valid LinkedIn add-to-profile URL with full parameters', () => {
+      const certCode = 'PMA-2026-B87F129C'
+      const verifyUrl = 'https://prodily.adityagangwani.me/verify/PMA-2026-B87F129C'
+      const issuedAt = '2026-08-08T00:00:00.000Z'
+
+      const linkedinUrl = buildLinkedInCertificationUrl({
+        certificateCode: certCode,
+        careerTitle: 'Principal Product Manager',
+        type: 'full_curriculum',
+        issuedAt,
+        verificationUrl: verifyUrl,
+      })
+
+      expect(linkedinUrl.startsWith('https://www.linkedin.com/profile/add')).toBe(true)
+      expect(linkedinUrl).toContain('startTask=CERTIFICATION_NAME')
+      expect(linkedinUrl).toContain('organizationName=Prodily')
+      expect(linkedinUrl).toContain('certId=PMA-2026-B87F129C')
+      expect(linkedinUrl).toContain('issueYear=2026')
+      expect(linkedinUrl).toContain('issueMonth=8')
+      expect(linkedinUrl).toContain(encodeURIComponent(verifyUrl))
+    })
+  })
+})

@@ -1,57 +1,25 @@
-import assert from 'assert'
+import { describe, it, expect } from 'vitest'
 import {
   globalFeatureFlagService,
   createDefaultNotificationPreferences,
   isChannelEnabledByPreferences,
 } from '../notifications'
 
-console.log('🧪 Running In-App Notification System Unit Test Suite...\n')
-
-let passedTests = 0
-
-function runTest(name: string, fn: () => void | Promise<void>) {
-  try {
-    const result = fn()
-    if (result && typeof result.then === 'function') {
-      return result
-        .then(() => {
-          passedTests++
-          console.log(`  ✓ ${name}`)
-        })
-        .catch((err) => {
-          console.error(`  ✕ ${name}`)
-          console.error(err)
-          process.exit(1)
-        })
-    }
-    passedTests++
-    console.log(`  ✓ ${name}`)
-  } catch (err) {
-    console.error(`  ✕ ${name}`)
-    console.error(err)
-    process.exit(1)
-  }
-}
-
-async function runAllInAppNotificationTests() {
-  // 1. Feature Flag Evaluation
-  runTest('Feature flag IN_APP_NOTIFICATIONS_ENABLED is active by default', () => {
+describe('In-App Notification System Unit Test Suite', () => {
+  it('Feature flag IN_APP_NOTIFICATIONS_ENABLED is active by default', () => {
     const isEnabled = globalFeatureFlagService.isEnabled('IN_APP_NOTIFICATIONS_ENABLED')
-    assert.strictEqual(isEnabled, true)
+    expect(isEnabled).toBe(true)
   })
 
-  // 2. Category Channel Preference Evaluation
-  runTest('User notification preferences accurately reflect in-app category permissions', () => {
+  it('User notification preferences accurately reflect in-app category permissions', () => {
     const prefs = createDefaultNotificationPreferences('usr-test-01')
-    
-    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'learning', 'in_app'), true)
-    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'achievements', 'in_app'), true)
-    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'security', 'in_app'), true)
-    assert.strictEqual(isChannelEnabledByPreferences(prefs, 'marketing', 'in_app'), false)
+    expect(isChannelEnabledByPreferences(prefs, 'learning', 'in_app')).toBe(true)
+    expect(isChannelEnabledByPreferences(prefs, 'achievements', 'in_app')).toBe(true)
+    expect(isChannelEnabledByPreferences(prefs, 'security', 'in_app')).toBe(true)
+    expect(isChannelEnabledByPreferences(prefs, 'marketing', 'in_app')).toBe(false)
   })
 
-  // 3. Deep Link Resolution Logic
-  runTest('Deep link mapping routes correctly per event type', () => {
+  it('Deep link mapping routes correctly per event type', () => {
     const getDeepLink = (eventType: string, meta?: Record<string, unknown>) => {
       switch (eventType) {
         case 'lesson.completed':
@@ -72,22 +40,19 @@ async function runAllInAppNotificationTests() {
       }
     }
 
-    assert.strictEqual(getDeepLink('badge.earned'), '/badges')
-    assert.strictEqual(getDeepLink('lesson.completed'), '/academy')
-    assert.strictEqual(getDeepLink('srs.review_due'), '/review')
-    assert.strictEqual(getDeepLink('certificate.generated', { certificateCode: 'PMA-123' }), '/verify/PMA-123')
-    assert.strictEqual(getDeepLink('portfolio.published', { username: 'alex' }), '/p/alex')
+    expect(getDeepLink('badge.earned')).toBe('/badges')
+    expect(getDeepLink('lesson.completed')).toBe('/academy')
+    expect(getDeepLink('srs.review_due')).toBe('/review')
+    expect(getDeepLink('certificate.generated', { certificateCode: 'PMA-123' })).toBe('/verify/PMA-123')
+    expect(getDeepLink('portfolio.published', { username: 'alex' })).toBe('/p/alex')
   })
 
-  // 4. Date Grouping Logic
-  runTest('Notification date grouping categorizes items by relative time', () => {
+  it('Notification date grouping categorizes items by relative time', () => {
     const now = new Date()
     const todayIso = now.toISOString()
-    
     const yesterday = new Date(now)
     yesterday.setDate(yesterday.getDate() - 1)
     const yesterdayIso = yesterday.toISOString()
-
     const fiveDaysAgo = new Date(now)
     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5)
     const fiveDaysAgoIso = fiveDaysAgo.toISOString()
@@ -123,12 +88,8 @@ async function runAllInAppNotificationTests() {
     }
 
     const res = groupNotificationsByDate(mockItems)
-    assert.strictEqual(res.today.length, 1)
-    assert.strictEqual(res.yesterday.length, 1)
-    assert.strictEqual(res.thisWeek.length, 1)
+    expect(res.today.length).toBe(1)
+    expect(res.yesterday.length).toBe(1)
+    expect(res.thisWeek.length).toBe(1)
   })
-
-  console.log(`\n✅ All ${passedTests} In-App Notification System Unit Tests Passed Successfully!\n`)
-}
-
-runAllInAppNotificationTests()
+})

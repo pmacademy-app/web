@@ -90,7 +90,15 @@ async function getMermaid() {
 
   (global as any).window = window;
   (global as any).document = document;
-  (global as any).navigator = window.navigator;
+  try {
+    (global as any).navigator = window.navigator;
+  } catch {
+    Object.defineProperty(global, 'navigator', {
+      value: window.navigator,
+      configurable: true,
+      writable: true,
+    });
+  }
   (global as any).HTMLElement = window.HTMLElement;
   (global as any).SVGElement = window.SVGElement;
   (global as any).Element = window.Element;
