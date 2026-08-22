@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
+import { describe, it, expect } from 'vitest'
 import {
   calculateSkillRadarScores,
   calculateOverallCompetency,
@@ -14,44 +13,42 @@ import {
 describe('PM Academy Skill Radar Engine Test Suite', () => {
   describe('Lesson Contribution Scoring Formula', () => {
     it('returns 0 points for not_started lessons', () => {
-      assert.strictEqual(getLessonContribution('not_started'), 0)
+      expect(getLessonContribution('not_started')).toBe(0)
     })
 
     it('returns 20 points for in_progress lessons', () => {
-      assert.strictEqual(getLessonContribution('in_progress'), 20)
+      expect(getLessonContribution('in_progress')).toBe(20)
     })
 
     it('returns 80 points for completed lesson with 80% quiz score (non-first-attempt)', () => {
-      // 40 (theory) + 40 (50% of 80) = 80 points
       const points = getLessonContribution('completed', 80, 2)
-      assert.strictEqual(points, 80)
+      expect(points).toBe(80)
     })
 
     it('returns full 100 points for first-attempt 100% perfect quiz score', () => {
-      // 40 (theory) + 50 (quiz 100%) + 10 (perfect first-attempt bonus) = 100 points
       const points = getLessonContribution('completed', 100, 1)
-      assert.strictEqual(points, 100)
+      expect(points).toBe(100)
     })
 
     it('clamps quiz score input safely between 0 and 100', () => {
       const pointsHigh = getLessonContribution('completed', 150, 2)
-      assert.strictEqual(pointsHigh, 90) // 40 + 50 = 90
+      expect(pointsHigh).toBe(90)
     })
   })
 
   describe('Score Normalization & Levels', () => {
     it('clamps scores strictly between 0 and 100', () => {
-      assert.strictEqual(normalizeScore(-20), 0)
-      assert.strictEqual(normalizeScore(150), 100)
-      assert.strictEqual(normalizeScore(74.4), 74)
-      assert.strictEqual(normalizeScore(NaN), 0)
+      expect(normalizeScore(-20)).toBe(0)
+      expect(normalizeScore(150)).toBe(100)
+      expect(normalizeScore(74.4)).toBe(74)
+      expect(normalizeScore(NaN)).toBe(0)
     })
 
     it('returns correct proficiency levels', () => {
-      assert.strictEqual(getProficiencyLevel(15), 'Beginner')
-      assert.strictEqual(getProficiencyLevel(45), 'Intermediate')
-      assert.strictEqual(getProficiencyLevel(75), 'Advanced')
-      assert.strictEqual(getProficiencyLevel(90), 'Master')
+      expect(getProficiencyLevel(15)).toBe('Beginner')
+      expect(getProficiencyLevel(45)).toBe('Intermediate')
+      expect(getProficiencyLevel(75)).toBe('Advanced')
+      expect(getProficiencyLevel(90)).toBe('Master')
     })
   })
 
@@ -59,9 +56,9 @@ describe('PM Academy Skill Radar Engine Test Suite', () => {
     it('returns 0 for all 7 clusters when user has no progress', () => {
       const scores = calculateSkillRadarScores([])
       for (const cluster of SKILL_CLUSTER_IDS) {
-        assert.strictEqual(scores[cluster], 0)
+        expect(scores[cluster]).toBe(0)
       }
-      assert.strictEqual(calculateOverallCompetency(scores), 0)
+      expect(calculateOverallCompetency(scores)).toBe(0)
     })
 
     it('accurately calculates scores for mapped module lessons', () => {
@@ -71,14 +68,13 @@ describe('PM Academy Skill Radar Engine Test Suite', () => {
           moduleSlug: 'discovery-and-research',
           status: 'completed',
           quizScore: 100,
-          quizAttempts: 1, // 100 points
+          quizAttempts: 1,
         },
       ]
 
       const scores = calculateSkillRadarScores(userProgress)
-      // Discovery cluster maxPoints = 10 * 100 = 1000 points. 100 points earned = 10%
-      assert.strictEqual(scores.discovery, 10)
-      assert.strictEqual(scores.strategy, 0)
+      expect(scores.discovery).toBe(10)
+      expect(scores.strategy).toBe(0)
     })
 
     it('calculates overall competency score correctly', () => {
@@ -92,25 +88,24 @@ describe('PM Academy Skill Radar Engine Test Suite', () => {
         technical: 30,
       }
 
-      // Sum = 420 / 7 = 60
-      assert.strictEqual(calculateOverallCompetency(mockScores), 60)
+      expect(calculateOverallCompetency(mockScores)).toBe(60)
     })
   })
 
   describe('Competency Breakdown Details', () => {
     it('returns enriched breakdown array for all 7 clusters', () => {
       const breakdown = getCompetencyBreakdown([])
-      assert.strictEqual(breakdown.length, 7)
+      expect(breakdown.length).toBe(7)
 
       const clusterIds = breakdown.map((b) => b.id)
-      assert.deepStrictEqual(clusterIds, SKILL_CLUSTER_IDS)
+      expect(clusterIds).toEqual(SKILL_CLUSTER_IDS)
 
       for (const item of breakdown) {
-        assert.strictEqual(typeof item.label, 'string')
-        assert.strictEqual(typeof item.score, 'number')
-        assert.strictEqual(typeof item.level, 'string')
-        assert.strictEqual(item.score, 0)
-        assert.strictEqual(item.level, 'Beginner')
+        expect(typeof item.label).toBe('string')
+        expect(typeof item.score).toBe('number')
+        expect(typeof item.level).toBe('string')
+        expect(item.score).toBe(0)
+        expect(item.level).toBe('Beginner')
       }
     })
   })

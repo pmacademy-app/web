@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { describe, it, expect } from 'vitest'
 import {
   validateUsername,
   validateOptionalUrl,
@@ -6,73 +6,61 @@ import {
   formatPortfolioShareUrl,
 } from '../portfolio'
 
-console.log('🧪 Running Public Portfolio Unit Test Suite...\n')
+describe('Public Portfolio Unit Test Suite', () => {
+  describe('Username Validation', () => {
+    it('validateUsername accepts valid usernames', () => {
+      expect(validateUsername('johndoe').isValid).toBe(true)
+      expect(validateUsername('john_doe_99').isValid).toBe(true)
+      expect(validateUsername('pm-leader').isValid).toBe(true)
+    })
 
-let passedTests = 0
-
-function runTest(name: string, fn: () => void) {
-  try {
-    fn()
-    passedTests++
-    console.log(`  ✓ ${name}`)
-  } catch (err) {
-    console.error(`  ✕ ${name}`)
-    console.error(err)
-    process.exit(1)
-  }
-}
-
-// 1. Username Validation
-runTest('validateUsername accepts valid usernames', () => {
-  assert.strictEqual(validateUsername('johndoe').isValid, true)
-  assert.strictEqual(validateUsername('john_doe_99').isValid, true)
-  assert.strictEqual(validateUsername('pm-leader').isValid, true)
-})
-
-runTest('validateUsername rejects invalid or short/long usernames', () => {
-  assert.strictEqual(validateUsername('ab').isValid, false, 'Should reject < 3 chars')
-  assert.strictEqual(validateUsername('a'.repeat(35)).isValid, false, 'Should reject > 30 chars')
-  assert.strictEqual(validateUsername('john@doe!').isValid, false, 'Should reject special chars')
-  assert.strictEqual(validateUsername('admin').isValid, false, 'Should reject reserved word admin')
-  assert.strictEqual(validateUsername('settings').isValid, false, 'Should reject reserved word settings')
-})
-
-// 2. URL Validation
-runTest('validateOptionalUrl validates HTTP and HTTPS URLs', () => {
-  assert.strictEqual(validateOptionalUrl('https://linkedin.com/in/johndoe'), true)
-  assert.strictEqual(validateOptionalUrl('http://mywebsite.com'), true)
-  assert.strictEqual(validateOptionalUrl(''), true, 'Empty string should be valid (optional)')
-  assert.strictEqual(validateOptionalUrl(null), true)
-  assert.strictEqual(validateOptionalUrl('ftp://invalid-protocol.com'), false)
-  assert.strictEqual(validateOptionalUrl('not-a-url'), false)
-})
-
-// 3. Person Schema JSON-LD Generation
-runTest('generatePersonJsonLd generates valid schema.org Person structured data', () => {
-  const jsonLd = generatePersonJsonLd({
-    name: 'Alex Rivera',
-    username: 'arivera',
-    title: 'Senior PM',
-    bio: 'Product Manager building SaaS platforms.',
-    avatarUrl: 'https://example.com/avatar.jpg',
-    linkedinUrl: 'https://linkedin.com/in/arivera',
-    githubUrl: 'https://github.com/arivera',
-    siteOrigin: 'https://prodily.adityagangwani.me',
+    it('validateUsername rejects invalid or short/long usernames', () => {
+      expect(validateUsername('ab').isValid).toBe(false)
+      expect(validateUsername('a'.repeat(35)).isValid).toBe(false)
+      expect(validateUsername('john@doe!').isValid).toBe(false)
+      expect(validateUsername('admin').isValid).toBe(false)
+      expect(validateUsername('settings').isValid).toBe(false)
+    })
   })
 
-  assert.strictEqual(jsonLd['@context'], 'https://schema.org')
-  assert.strictEqual(jsonLd['@type'], 'Person')
-  assert.strictEqual(jsonLd.name, 'Alex Rivera')
-  assert.strictEqual(jsonLd.jobTitle, 'Senior PM')
-  assert.strictEqual(jsonLd.url, 'https://prodily.adityagangwani.me/p/arivera')
-  assert.ok(Array.isArray(jsonLd.sameAs))
-  assert.strictEqual((jsonLd.sameAs as string[]).length, 2)
-})
+  describe('URL Validation', () => {
+    it('validateOptionalUrl validates HTTP and HTTPS URLs', () => {
+      expect(validateOptionalUrl('https://linkedin.com/in/johndoe')).toBe(true)
+      expect(validateOptionalUrl('http://mywebsite.com')).toBe(true)
+      expect(validateOptionalUrl('')).toBe(true)
+      expect(validateOptionalUrl(null)).toBe(true)
+      expect(validateOptionalUrl('ftp://invalid-protocol.com')).toBe(false)
+      expect(validateOptionalUrl('not-a-url')).toBe(false)
+    })
+  })
 
-// 4. Share URL Formatting
-runTest('formatPortfolioShareUrl returns clean canonical URL', () => {
-  const url = formatPortfolioShareUrl('https://prodily.adityagangwani.me/', 'arivera')
-  assert.strictEqual(url, 'https://prodily.adityagangwani.me/p/arivera')
-})
+  describe('Person Schema JSON-LD Generation', () => {
+    it('generatePersonJsonLd generates valid schema.org Person structured data', () => {
+      const jsonLd = generatePersonJsonLd({
+        name: 'Alex Rivera',
+        username: 'arivera',
+        title: 'Senior PM',
+        bio: 'Product Manager building SaaS platforms.',
+        avatarUrl: 'https://example.com/avatar.jpg',
+        linkedinUrl: 'https://linkedin.com/in/arivera',
+        githubUrl: 'https://github.com/arivera',
+        siteOrigin: 'https://prodily.adityagangwani.me',
+      })
 
-console.log(`\n✅ All ${passedTests} Portfolio Unit Tests Passed Successfully!\n`)
+      expect(jsonLd['@context']).toBe('https://schema.org')
+      expect(jsonLd['@type']).toBe('Person')
+      expect(jsonLd.name).toBe('Alex Rivera')
+      expect(jsonLd.jobTitle).toBe('Senior PM')
+      expect(jsonLd.url).toBe('https://prodily.adityagangwani.me/p/arivera')
+      expect(Array.isArray(jsonLd.sameAs)).toBe(true)
+      expect((jsonLd.sameAs as string[]).length).toBe(2)
+    })
+  })
+
+  describe('Share URL Formatting', () => {
+    it('formatPortfolioShareUrl returns clean canonical URL', () => {
+      const url = formatPortfolioShareUrl('https://prodily.adityagangwani.me/', 'arivera')
+      expect(url).toBe('https://prodily.adityagangwani.me/p/arivera')
+    })
+  })
+})

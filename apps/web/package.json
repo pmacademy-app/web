@@ -54,7 +54,10 @@
     "test:middleware-auth": "npx tsx lib/__tests__/middleware-auth.test.ts",
     "benchmark": "npx tsx ../../scripts/benchmark-concurrency.ts",
     "typecheck": "tsc --noEmit",
-    "test": "npm run test:compiler && npm run test:parity && npm run test:xp && npm run test:streaks && npm run test:radar && npm run test:srs && npm run test:capstones && npm run test:portfolio && npm run test:certificates && npm run test:badges && npm run test:leaderboard && npm run test:notifications && npm run test:email && npm run test:in-app && npm run test:recap && npm run test:admin && npm run test:admin-settings && npm run test:users && npm run test:curriculum && npm run test:analytics && npm run test:dashboard && npm run test:dev-cert && npm run test:settings && npm run test:send-email-hook && npm run test:update-password && npm run test:remediation && npm run test:contact && npm run test:admin-email && npm run test:automations && npm run test:monitoring && npm run test:quick-start && npm run test:curriculum-override && npm run test:audit-fixes && npm run test:seo && npm run test:seo-phase2 && npm run test:seo-phase3 && npm run test:rls && npm run test:middleware-auth",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage",
     "build": "npm run content:build && next build",
     "start": "next start",
     "lint": "eslint"
@@ -93,12 +96,14 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/jsdom": "^28.0.3",
     "@types/mdast": "^4.0.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.11",
     "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
@@ -108,6 +113,7 @@
     "sharp": "^0.35.3",
     "tailwindcss": "^4",
     "tsx": "^4.19.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   }
 }

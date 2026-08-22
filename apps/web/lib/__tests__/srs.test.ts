@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert'
+import { describe, it, expect } from 'vitest'
 import {
   calculateSM2,
   updateEaseFactor,
@@ -15,56 +14,55 @@ describe('PM Academy SM-2 Spaced Repetition Engine Test Suite', () => {
   describe('Ease Factor Calculations', () => {
     it('increases ease factor on perfect recall (rating 5)', () => {
       const newEf = updateEaseFactor(2.5, 5)
-      assert.strictEqual(newEf, 2.6)
+      expect(newEf).toBe(2.6)
     })
 
     it('decreases ease factor on failed recall (rating 0)', () => {
       const newEf = updateEaseFactor(2.5, 0)
-      assert.strictEqual(newEf, 1.7)
+      expect(newEf).toBe(1.7)
     })
 
     it('strictly clamps ease factor floor at 1.3', () => {
       let ef = 1.4
       ef = updateEaseFactor(ef, 0)
-      assert.strictEqual(ef, 1.3)
+      expect(ef).toBe(1.3)
 
-      // Multiple bad ratings should stay at 1.3 minimum
       ef = updateEaseFactor(ef, 0)
-      assert.strictEqual(ef, 1.3)
+      expect(ef).toBe(1.3)
     })
   })
 
   describe('SM-2 Interval & Repetition Progression', () => {
     it('schedules 1-day interval on first successful review (rep 0 -> 1)', () => {
       const intervalRes = calculateInterval(0, 2.5, 4)
-      assert.strictEqual(intervalRes.newRepetitions, 1)
-      assert.strictEqual(intervalRes.newIntervalDays, 1)
+      expect(intervalRes.newRepetitions).toBe(1)
+      expect(intervalRes.newIntervalDays).toBe(1)
 
       const result = calculateSM2(4, { repetitions: 0, intervalDays: 0, easeFactor: 2.5 })
-      assert.strictEqual(result.repetitions, 1)
-      assert.strictEqual(result.intervalDays, 1)
-      assert.strictEqual(result.isPassed, true)
+      expect(result.repetitions).toBe(1)
+      expect(result.intervalDays).toBe(1)
+      expect(result.isPassed).toBe(true)
     })
 
     it('schedules 6-day interval on second successful review (rep 1 -> 2)', () => {
       const result = calculateSM2(4, { repetitions: 1, intervalDays: 1, easeFactor: 2.5 })
-      assert.strictEqual(result.repetitions, 2)
-      assert.strictEqual(result.intervalDays, 6)
-      assert.strictEqual(result.isPassed, true)
+      expect(result.repetitions).toBe(2)
+      expect(result.intervalDays).toBe(6)
+      expect(result.isPassed).toBe(true)
     })
 
     it('multiplies interval by ease factor on third successful review (rep 2 -> 3)', () => {
       const result = calculateSM2(4, { repetitions: 2, intervalDays: 6, easeFactor: 2.5 })
-      assert.strictEqual(result.repetitions, 3)
-      assert.strictEqual(result.intervalDays, 15) // Math.round(6 * 2.5) = 15
-      assert.strictEqual(result.isPassed, true)
+      expect(result.repetitions).toBe(3)
+      expect(result.intervalDays).toBe(15)
+      expect(result.isPassed).toBe(true)
     })
 
     it('resets repetitions to 0 and interval to 1 on failed recall (rating < 3)', () => {
       const resultFail = calculateSM2(1, { repetitions: 4, intervalDays: 30, easeFactor: 2.5 })
-      assert.strictEqual(resultFail.repetitions, 0)
-      assert.strictEqual(resultFail.intervalDays, 1)
-      assert.strictEqual(resultFail.isPassed, false)
+      expect(resultFail.repetitions).toBe(0)
+      expect(resultFail.intervalDays).toBe(1)
+      expect(resultFail.isPassed).toBe(false)
     })
   })
 
@@ -79,7 +77,7 @@ describe('PM Academy SM-2 Spaced Repetition Engine Test Suite', () => {
       const srsMap = new Map<string, UserFlashcardSRSRow>()
       const due = getDueCards(mockUnlockedCards, srsMap, new Date())
 
-      assert.strictEqual(due.length, 3)
+      expect(due.length).toBe(3)
     })
 
     it('filters out future-scheduled cards from due queue', () => {
@@ -93,12 +91,12 @@ describe('PM Academy SM-2 Spaced Repetition Engine Test Suite', () => {
       ])
 
       const due = getDueCards(mockUnlockedCards, srsMap, now)
-      assert.strictEqual(due.length, 2) // card_1 (past due) + card_3 (new/unreviewed)
-      assert.strictEqual(due[0].id, 'card_1')
-      assert.strictEqual(due[1].id, 'card_3')
+      expect(due.length).toBe(2)
+      expect(due[0].id).toBe('card_1')
+      expect(due[1].id).toBe('card_3')
 
       const upcomingCount = getUpcomingReviewsCount(mockUnlockedCards, srsMap, now)
-      assert.strictEqual(upcomingCount, 1) // card_2 is scheduled in the future
+      expect(upcomingCount).toBe(1)
     })
   })
 
@@ -115,9 +113,9 @@ describe('PM Academy SM-2 Spaced Repetition Engine Test Suite', () => {
 
       const stats = calculateReviewStats(mockUnlockedCards, srsMap, 5, new Date('2026-08-05T00:00:00Z'))
 
-      assert.strictEqual(stats.totalUnlockedCount, 2)
-      assert.strictEqual(stats.completedTodayCount, 5)
-      assert.strictEqual(stats.averageRecallQuality, 2.7)
+      expect(stats.totalUnlockedCount).toBe(2)
+      expect(stats.completedTodayCount).toBe(5)
+      expect(stats.averageRecallQuality).toBe(2.7)
     })
   })
 })

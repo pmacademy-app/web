@@ -1,4 +1,4 @@
-import assert from 'assert'
+import { describe, it, expect } from 'vitest'
 import {
   getAllCapstoneDefinitions,
   getCapstoneDefinition,
@@ -10,69 +10,56 @@ import {
 } from '../capstones'
 import { XP_VALUES } from '../xp'
 
-console.log('🧪 Running Capstones Unit Test Suite...\n')
+describe('Capstones Unit Test Suite', () => {
+  describe('Capstone Definitions', () => {
+    it('All 9 module capstone definitions exist and are ordered', () => {
+      const definitions = getAllCapstoneDefinitions()
+      expect(definitions.length).toBe(9)
+      expect(definitions[0].moduleSlug).toBe('foundations')
+      expect(definitions[8].moduleSlug).toBe('capstone')
 
-let passedTests = 0
+      for (let i = 0; i < definitions.length; i++) {
+        expect(definitions[i].moduleNumber).toBe(i + 1)
+        expect(definitions[i].minWordCount).toBeGreaterThanOrEqual(250)
+      }
+    })
 
-function runTest(name: string, fn: () => void) {
-  try {
-    fn()
-    passedTests++
-    console.log(`  ✓ ${name}`)
-  } catch (err) {
-    console.error(`  ✕ ${name}`)
-    console.error(err)
-    process.exit(1)
-  }
-}
+    it('getCapstoneDefinition retrieves correct definition by slug', () => {
+      const foundations = getCapstoneDefinition('foundations')
+      expect(foundations).not.toBeNull()
+      expect(foundations?.title).toBe('Product Opportunity Brief & Problem Definition')
 
-// 1. Capstone Definitions
-runTest('All 9 module capstone definitions exist and are ordered', () => {
-  const definitions = getAllCapstoneDefinitions()
-  assert.strictEqual(definitions.length, 9, 'Should have exactly 9 capstone definitions')
-  assert.strictEqual(definitions[0].moduleSlug, 'foundations')
-  assert.strictEqual(definitions[8].moduleSlug, 'capstone')
-  
-  for (let i = 0; i < definitions.length; i++) {
-    assert.strictEqual(definitions[i].moduleNumber, i + 1)
-    assert.ok(definitions[i].minWordCount >= 250, 'Minimum word count should be >= 250')
-  }
-})
+      const invalid = getCapstoneDefinition('invalid-module-slug')
+      expect(invalid).toBeNull()
+    })
+  })
 
-runTest('getCapstoneDefinition retrieves correct definition by slug', () => {
-  const foundations = getCapstoneDefinition('foundations')
-  assert.ok(foundations)
-  assert.strictEqual(foundations?.title, 'Product Opportunity Brief & Problem Definition')
+  describe('Word Count Utility', () => {
+    it('calculateCapstoneWordCount calculates words and strips markdown formatting', () => {
+      const markdownText = `# Header Title\n\nThis is a **bold** paragraph with *italic* text and a [link](https://example.com).\n\n> Blockquote here.`
+      const { wordCount, characterCount } = calculateCapstoneWordCount(markdownText)
 
-  const invalid = getCapstoneDefinition('invalid-module-slug')
-  assert.strictEqual(invalid, null)
-})
+      expect(wordCount).toBeGreaterThan(10)
+      expect(characterCount).toBe(markdownText.length)
 
-// 2. Word Count Utility
-runTest('calculateCapstoneWordCount calculates words and strips markdown formatting', () => {
-  const markdownText = `# Header Title\n\nThis is a **bold** paragraph with *italic* text and a [link](https://example.com).\n\n> Blockquote here.`
-  const { wordCount, characterCount } = calculateCapstoneWordCount(markdownText)
+      const emptyResult = calculateCapstoneWordCount('')
+      expect(emptyResult.wordCount).toBe(0)
+      expect(emptyResult.characterCount).toBe(0)
+    })
+  })
 
-  assert.ok(wordCount > 10, `Expected word count > 10, got ${wordCount}`)
-  assert.strictEqual(characterCount, markdownText.length)
+  describe('Submission Validation', () => {
+    it('validateCapstoneSubmission flags submissions below minimum word count', () => {
+      const shortText = 'Short submission text with only a few words.'
+      const validation = validateCapstoneSubmission('foundations', shortText)
 
-  const emptyResult = calculateCapstoneWordCount('')
-  assert.strictEqual(emptyResult.wordCount, 0)
-  assert.strictEqual(emptyResult.characterCount, 0)
-})
+      expect(validation.isValid).toBe(false)
+      expect(validation.missingRequirements.length).toBeGreaterThan(0)
+      expect(validation.reason).toContain('Minimum 250 words required')
+    })
 
-// 3. Submission Validation
-runTest('validateCapstoneSubmission flags submissions below minimum word count', () => {
-  const shortText = 'Short submission text with only a few words.'
-  const validation = validateCapstoneSubmission('foundations', shortText)
-
-  assert.strictEqual(validation.isValid, false)
-  assert.ok(validation.missingRequirements.length > 0)
-  assert.ok(validation.reason?.includes('Minimum 250 words required'))
-})
-
-runTest('validateCapstoneSubmission passes valid submission meeting word count and sections', () => {
-  const validText = `
+    it('validateCapstoneSubmission passes valid submission meeting word count and sections', () => {
+      const validText = `
 # Product Opportunity Brief: Customer Onboarding Improvement
 
 ## 1. Problem Statement
@@ -92,27 +79,29 @@ Our primary target user persona is the Early Career Product Manager trying to qu
 
 ## 5. Key Risks & Hypotheses
 We hypothesize that replacing raw forms with an interactive step-by-step checklist will increase activation by reducing cognitive overload.
-`.repeat(2) // duplicate to guarantee word count > 250
+`.repeat(2)
 
-  const validation = validateCapstoneSubmission('foundations', validText)
+      const validation = validateCapstoneSubmission('foundations', validText)
 
-  assert.strictEqual(validation.isValid, true)
-  assert.strictEqual(validation.missingRequirements.length, 0)
-  assert.ok(validation.wordCount >= 250)
+      expect(validation.isValid).toBe(true)
+      expect(validation.missingRequirements.length).toBe(0)
+      expect(validation.wordCount).toBeGreaterThanOrEqual(250)
+    })
+  })
+
+  describe('Status Derivation Logic', () => {
+    it('deriveCapstoneStatus returns appropriate status based on submission and progress', () => {
+      expect(deriveCapstoneStatus('submitted')).toBe('submitted')
+      expect(deriveCapstoneStatus('reviewed')).toBe('reviewed')
+      expect(deriveCapstoneStatus('draft')).toBe('draft')
+      expect(deriveCapstoneStatus(null, 8)).toBe('unlocked')
+      expect(deriveCapstoneStatus(null, 2)).toBe('locked')
+    })
+  })
+
+  describe('XP Constant Verification', () => {
+    it('Capstone XP constant is set to 150', () => {
+      expect(XP_VALUES.CAPSTONE_SUBMITTED).toBe(150)
+    })
+  })
 })
-
-// 4. Status Derivation Logic
-runTest('deriveCapstoneStatus returns appropriate status based on submission and progress', () => {
-  assert.strictEqual(deriveCapstoneStatus('submitted'), 'submitted')
-  assert.strictEqual(deriveCapstoneStatus('reviewed'), 'reviewed')
-  assert.strictEqual(deriveCapstoneStatus('draft'), 'draft')
-  assert.strictEqual(deriveCapstoneStatus(null, 8), 'unlocked')
-  assert.strictEqual(deriveCapstoneStatus(null, 2), 'locked')
-})
-
-// 5. XP Constant Verification
-runTest('Capstone XP constant is set to 150', () => {
-  assert.strictEqual(XP_VALUES.CAPSTONE_SUBMITTED, 150, 'Capstone submission should award 150 XP')
-})
-
-console.log(`\n✅ All ${passedTests} Capstones Unit Tests Passed Successfully!\n`)
