@@ -8,6 +8,38 @@ export const XP_VALUES = {
   DAILY_STREAK_BASE: 5,
 } as const
 
+/**
+ * Loads dynamic XP settings configured by admins in system_settings,
+ * falling back safely to static XP_VALUES defaults.
+ */
+export async function getRuntimeXpValues(supabaseClient?: unknown): Promise<typeof XP_VALUES> {
+  if (!supabaseClient) return XP_VALUES
+  try {
+    const client = supabaseClient as { from: (table: string) => { select: (col: string) => { eq: (k: string, v: string) => { maybeSingle: () => Promise<{ data: { value?: Record<string, unknown> } | null }> } } } }
+    const { data } = await client
+      .from('system_settings')
+      .select('value')
+      .eq('key', 'learning')
+      .maybeSingle()
+
+    if (data?.value && typeof data.value === 'object') {
+      const v = data.value
+      return {
+        THEORY_READ: typeof v.xpPerLessonComplete === 'number' ? v.xpPerLessonComplete : XP_VALUES.THEORY_READ,
+        QUIZ_CORRECT: typeof v.xpPerQuizCorrect === 'number' ? v.xpPerQuizCorrect : XP_VALUES.QUIZ_CORRECT,
+        QUIZ_PERFECT_BONUS: typeof v.xpQuizPerfectBonus === 'number' ? v.xpQuizPerfectBonus : XP_VALUES.QUIZ_PERFECT_BONUS,
+        FLASHCARD_REVIEW: typeof v.xpPerFlashcardReview === 'number' ? v.xpPerFlashcardReview : XP_VALUES.FLASHCARD_REVIEW,
+        REFLECTION_SUBMITTED: typeof v.xpPerReflection === 'number' ? v.xpPerReflection : XP_VALUES.REFLECTION_SUBMITTED,
+        CAPSTONE_SUBMITTED: typeof v.xpPerCapstoneSubmitted === 'number' ? v.xpPerCapstoneSubmitted : XP_VALUES.CAPSTONE_SUBMITTED,
+        DAILY_STREAK_BASE: typeof v.xpStreakBaseReward === 'number' ? v.xpStreakBaseReward : XP_VALUES.DAILY_STREAK_BASE,
+      }
+    }
+  } catch {
+    // Safe static fallback
+  }
+  return XP_VALUES
+}
+
 export type XpSourceType =
   | 'theory_read'
   | 'quiz_correct'
@@ -18,6 +50,7 @@ export type XpSourceType =
   | 'streak'
   | 'user_reset'
   | 'admin_reset'
+
 
 export interface LevelThreshold {
   level: number

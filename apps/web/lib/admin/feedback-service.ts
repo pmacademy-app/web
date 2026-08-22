@@ -263,12 +263,14 @@ export class FeedbackAdminService {
   }
 
   /**
-   * Fetches private product feedback items for Admin Console.
+   * Fetches private product feedback items for Admin Console with author email resolution.
    */
   public static async getPrivateFeedbackList(): Promise<Array<{
     id: string
     userId: string | null
     authorName: string
+    authorEmail: string | null
+    userExists: boolean
     category: string
     sourceEvent: string
     content: string
@@ -299,32 +301,65 @@ export class FeedbackAdminService {
 
     const rows = data as FeedbackRow[]
     const userIds = rows.map((f) => f.user_id).filter(Boolean) as string[]
-    const userMap = new Map<string, string>()
+    const userMap = new Map<string, { name: string; email: string }>()
 
     if (userIds.length > 0) {
       const { data: usersData } = await supabase
         .from('users')
-        .select('id, full_name, username, email')
+        .select('id, name, full_name, username, email')
         .in('id', userIds)
 
       if (usersData) {
-        const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
+        const uList = usersData as unknown as Array<{ id: string; name?: string; full_name?: string; username?: string; email: string }>
         uList.forEach((u) => {
-          userMap.set(u.id, u.full_name || u.username || u.email.split('@')[0])
+          userMap.set(u.id, {
+            name: u.name || u.full_name || u.username || u.email.split('@')[0],
+            email: u.email,
+          })
         })
       }
     }
 
-    return rows.map((f) => ({
-      id: f.id,
-      userId: f.user_id,
-      authorName: (f.user_id ? userMap.get(f.user_id) : null) || 'Anonymous Learner',
-      category: f.category,
-      sourceEvent: f.source_event,
-      content: f.content,
-      rating: f.rating,
-      status: f.status,
-      createdAt: f.created_at,
-    }))
+    return rows.map((f) => {
+      const userInfo = f.user_id ? userMap.get(f.user_id) : null
+      return {
+        id: f.id,
+        userId: f.user_id,
+        authorName: userInfo ? userInfo.name : (f.user_id ? 'Deleted Learner' : 'Anonymous Learner'),
+        authorEmail: userInfo ? userInfo.email : null,
+        userExists: Boolean(userInfo),
+        category: f.category,
+        sourceEvent: f.source_event,
+        content: f.content,
+        rating: f.rating,
+        status: f.status,
+        createdAt: f.created_at,
+      }
+    })
+  }
+
+  /**
+   * Updates feedback status and records an audit log.
+   */
+  public static async updateFeedbackStatus(
+    adminUserId: string,
+    adminEmail: string,
+    feedbackId: string,
+    status: string
+  ): Promise<{ success: boolean; error?: string }> {
+    const supabase = createServiceRoleClient()
+    const { error } = await (supabase
+      .from('user_feedback') as unknown as DBChain)
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', feedbackId)
+
+    if (error) {
+      console.error('[FeedbackAdminService] Error updating feedback status:', error)
+      return { success: false, error: 'Failed to update feedback status.' }
+    }
+
+    await logAdminAction(adminUserId, adminEmail, `feedback_status_${status}`, 'feedback', feedbackId, { status })
+    return { success: true }
   }
 }
+

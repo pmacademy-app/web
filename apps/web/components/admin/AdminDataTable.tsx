@@ -103,8 +103,8 @@ export function AdminDataTable<T>({
   return (
     <div className={cn('space-y-4', className)}>
       <div className="bg-admin-surface border border-admin-border rounded-xl overflow-hidden shadow-xl backdrop-blur">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-admin-fg-muted">
+        <div className="overflow-x-auto scrollbar-thin">
+          <table className="w-full text-left text-xs text-admin-fg-muted min-w-[640px]">
             <thead className="bg-admin-surface-raised text-admin-fg-subtle uppercase tracking-wider text-[10px] font-bold border-b border-admin-border sticky top-0 z-10 backdrop-blur">
               <tr>
                 {columns.map((col, idx) => renderHeader(col, idx))}

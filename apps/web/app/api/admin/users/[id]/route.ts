@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -42,6 +43,10 @@ export async function DELETE(request: Request, { params }: Context) {
     await deleteAccount(supabase, id)
     await logAdminAction(auth.userId, auth.email, 'admin_user_deleted', 'user', id)
 
+    revalidatePath('/admin/users')
+    revalidatePath('/academy', 'layout')
+    revalidatePath('/dashboard', 'layout')
+
     return NextResponse.json({ success: true, deletedUserId: id })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to delete user account.'
@@ -65,6 +70,13 @@ export async function POST(request: Request, { params }: Context) {
     if (action === 'reset_progress') {
       await resetProgress(supabase, id, 'all')
       await logAdminAction(auth.userId, auth.email, 'admin_reset_progress', 'user', id)
+
+      revalidatePath('/admin/users')
+      revalidatePath('/academy', 'layout')
+      revalidatePath('/dashboard', 'layout')
+      revalidatePath('/progress', 'layout')
+      revalidatePath('/capstones', 'layout')
+
       return NextResponse.json({ success: true, resetUserId: id })
     }
 

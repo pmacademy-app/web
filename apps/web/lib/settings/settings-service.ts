@@ -1,14 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../supabase'
 import { getTotalXp } from '../xp/xp-service'
+import { getLessonIdsForModule } from '../curriculum-registry'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
 }
 
 /**
- * Resets user lesson progress and quiz attempts.
- * If moduleSlug is provided (and not 'all'), resets progress for lessons in that module.
+ * Resets user lesson progress, quiz attempts, flashcard SRS, reflections, and capstone submissions.
+ * If moduleSlug is provided (and not 'all'), resets progress for canonical lessons in that module.
  */
 export async function resetProgress(
   supabase: SupabaseClient<Database>,
@@ -16,16 +17,52 @@ export async function resetProgress(
   moduleSlug?: string
 ): Promise<void> {
   if (moduleSlug && moduleSlug !== 'all') {
-    // Delete lesson progress for specific module
-    const { error: pErr } = await (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
-      .delete()
-      .eq('user_id', userId)
-      .ilike('lesson_id', `%${moduleSlug}%`)
+    const lessonIds = getLessonIdsForModule(moduleSlug)
 
-    if (pErr) console.warn('[settings-service] Reset module progress warning:', pErr)
+    // 1. Delete lesson progress for canonical lesson IDs in this module
+    if (lessonIds.length > 0) {
+      const { error: pErr } = await (supabase
+        .from('user_lesson_progress') as unknown as DBChain)
+        .delete()
+        .eq('user_id', userId)
+        .in('lesson_id', lessonIds)
 
-    // Delete capstones for this module specifically
+      if (pErr) console.warn('[settings-service] Reset module progress warning:', pErr)
+
+      const { error: qErr } = await (supabase
+        .from('quiz_attempts') as unknown as DBChain)
+        .delete()
+        .eq('user_id', userId)
+        .in('lesson_id', lessonIds)
+
+      if (qErr) console.warn('[settings-service] Reset module quiz attempts warning:', qErr)
+
+      const { error: fErr } = await (supabase
+        .from('user_flashcard_srs') as unknown as DBChain)
+        .delete()
+        .eq('user_id', userId)
+        .in('lesson_id', lessonIds)
+
+      if (fErr) console.warn('[settings-service] Reset module flashcards warning:', fErr)
+
+      const reflectionKeys = [...lessonIds, `capstone-${moduleSlug}`]
+      const { error: rErr } = await (supabase
+        .from('reflections') as unknown as DBChain)
+        .delete()
+        .eq('user_id', userId)
+        .in('lesson_id', reflectionKeys)
+
+      if (rErr) console.warn('[settings-service] Reset module reflections warning:', rErr)
+    } else {
+      // Fallback for legacy slug pattern
+      await (supabase
+        .from('user_lesson_progress') as unknown as DBChain)
+        .delete()
+        .eq('user_id', userId)
+        .ilike('lesson_id', `%${moduleSlug}%`)
+    }
+
+    // 2. Delete capstone submissions for this module specifically
     const { error: cErr } = await (supabase
       .from('capstone_submissions') as unknown as DBChain)
       .delete()
