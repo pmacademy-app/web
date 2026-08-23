@@ -11,6 +11,7 @@ import { BRAND } from '@/lib/brand'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
+import { classifyAuthError, type ClassifiedAuthError } from '@/lib/auth/errors'
 
 const loginSchema = z.object({
   email: z
@@ -32,8 +33,15 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const authErrorParam = searchParams.get('error')
 
-  const [errorMsg, setErrorMsg] = useState<string | null>(
-    authErrorParam === 'auth_failed' ? 'Authentication failed. Please try again.' : null
+  const [authError, setAuthError] = useState<ClassifiedAuthError | null>(
+    authErrorParam === 'auth_failed'
+      ? {
+          code: 'AUTH_INVALID_CREDENTIALS',
+          message: 'Authentication failed. Please try again.',
+          retryable: true,
+          isNetworkError: false,
+        }
+      : null
   )
   const [isPending, startTransition] = useTransition()
 
@@ -50,7 +58,7 @@ function LoginForm() {
   })
 
   const handleEmailLogin = (values: LoginFormValues) => {
-    setErrorMsg(null)
+    setAuthError(null)
 
     startTransition(async () => {
       try {
@@ -61,7 +69,8 @@ function LoginForm() {
         })
 
         if (error) {
-          setErrorMsg(error.message)
+          const classified = classifyAuthError(error, 'login')
+          setAuthError(classified)
           return
         }
 
@@ -76,12 +85,14 @@ function LoginForm() {
               body: JSON.stringify({ session: data.session }),
             })
             if (!syncRes.ok) {
-              setErrorMsg('Session initialization failed. Please try logging in again.')
+              const syncError = classifyAuthError(new Error('Session initialization failed'), 'session_sync')
+              setAuthError(syncError)
               return
             }
           } catch (syncErr) {
             console.error('[login] Session sync network error:', syncErr)
-            setErrorMsg('Unable to synchronize login session. Please check your network and try again.')
+            const syncError = classifyAuthError(syncErr, 'session_sync')
+            setAuthError(syncError)
             return
           }
         }
@@ -90,7 +101,8 @@ function LoginForm() {
         router.refresh()
       } catch (err) {
         console.error('[login] Error logging in:', err)
-        setErrorMsg('An unexpected error occurred. Please try again.')
+        const classified = classifyAuthError(err, 'login')
+        setAuthError(classified)
       }
     })
   }
@@ -100,15 +112,15 @@ function LoginForm() {
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
 
-      {errorMsg && (
+      {authError && (
         <div className="space-y-3">
           <div
             className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
             role="alert"
           >
-            {errorMsg}
+            {authError.message}
           </div>
-          {(errorMsg.toLowerCase().includes('email not confirmed') || errorMsg.toLowerCase().includes('verify')) && (
+          {authError.code === 'AUTH_EMAIL_NOT_CONFIRMED' && (
             <ResendVerificationCard />
           )}
         </div>

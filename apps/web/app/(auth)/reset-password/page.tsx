@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
+import { classifyAuthError } from '@/lib/auth/errors'
 
 const requestSchema = z.object({
   email: z
@@ -62,7 +63,8 @@ function ResetPasswordFormContent() {
         })
 
         if (error) {
-          setErrorMsg(error.message)
+          const classified = classifyAuthError(error)
+          setErrorMsg(classified.message)
           return
         }
 
@@ -70,7 +72,8 @@ function ResetPasswordFormContent() {
         requestForm.reset()
       } catch (err) {
         console.error('[reset-password] Request error:', err)
-        setErrorMsg('An unexpected error occurred. Please try again.')
+        const classified = classifyAuthError(err)
+        setErrorMsg(classified.message)
       }
     })
   }
@@ -94,7 +97,8 @@ function ResetPasswordFormContent() {
         const data = await res.json()
 
         if (!res.ok || !data.success) {
-          setErrorMsg(data.error || 'Failed to update password. Please try again.')
+          const classified = classifyAuthError(data.error || 'Failed to update password. Please try again.')
+          setErrorMsg(classified.message)
           return
         }
 
@@ -106,7 +110,8 @@ function ResetPasswordFormContent() {
         }, 2500)
       } catch (err) {
         console.error('[reset-password] Update error:', err)
-        setErrorMsg('An unexpected error occurred. Please try again.')
+        const classified = classifyAuthError(err)
+        setErrorMsg(classified.message)
       }
     })
   }
