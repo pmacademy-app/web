@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { submitCapstoneAction } from '@/lib/capstones-db'
@@ -39,6 +40,16 @@ export async function POST(
       typeof reflectionContent === 'string' ? reflectionContent : '',
       Boolean(reflectionIsPublic)
     )
+
+    try {
+      revalidatePath('/capstones')
+      revalidatePath(`/capstones/${moduleSlug}`)
+      revalidatePath('/progress')
+      revalidatePath('/dashboard')
+      revalidatePath('/admin/moderation')
+    } catch {
+      // Revalidation warning is non-fatal
+    }
 
     return NextResponse.json({
       success: true,

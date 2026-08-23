@@ -103,3 +103,74 @@ export function deriveCapstoneStatus(
 
   return 'locked'
 }
+
+export interface CapstoneTransitionResult {
+  allowed: boolean
+  reason?: string
+}
+
+/**
+ * Validates whether a capstone status transition is permitted for a given actor.
+ * Prevents illegal state transitions such as reverting submitted capstones to draft
+ * or non-admins marking submissions as reviewed.
+ */
+export function validateCapstoneTransition(
+  currentStatus: string | null | undefined,
+  targetStatus: string,
+  actor: 'learner' | 'admin'
+): CapstoneTransitionResult {
+  const normCurrent = currentStatus ? currentStatus.toLowerCase().trim() : 'unlocked'
+  const normTarget = targetStatus.toLowerCase().trim()
+
+  if (actor === 'learner') {
+    // Learners can only move to 'draft' or 'submitted'
+    if (normTarget === 'draft') {
+      if (normCurrent === 'submitted' || normCurrent === 'reviewed') {
+        return {
+          allowed: false,
+          reason: 'Cannot revert a submitted or reviewed capstone back to draft.',
+        }
+      }
+      return { allowed: true }
+    }
+
+    if (normTarget === 'submitted') {
+      if (normCurrent === 'reviewed') {
+        return {
+          allowed: false,
+          reason: 'Cannot resubmit an already reviewed capstone.',
+        }
+      }
+      return { allowed: true }
+    }
+
+    return {
+      allowed: false,
+      reason: `Learners cannot transition capstone to "${targetStatus}".`,
+    }
+  }
+
+  if (actor === 'admin') {
+    if (normTarget === 'reviewed') {
+      if (normCurrent === 'draft') {
+        return {
+          allowed: false,
+          reason: 'Cannot review a draft capstone that has not been submitted.',
+        }
+      }
+      return { allowed: true }
+    }
+
+    if (normTarget === 'draft') {
+      // Admin can reset a submission back to draft for learner revisions
+      return { allowed: true }
+    }
+
+    return {
+      allowed: false,
+      reason: `Admins cannot transition capstone to "${targetStatus}".`,
+    }
+  }
+
+  return { allowed: false, reason: 'Invalid actor specified.' }
+}
