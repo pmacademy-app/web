@@ -187,6 +187,12 @@ vi.mock('../supabase', () => {
                 ],
               },
             }),
+            getUserById: vi.fn().mockImplementation((id: string) =>
+              Promise.resolve({
+                data: { user: { id, email_confirmed_at: '2026-08-01T00:00:00Z' } },
+                error: null,
+              })
+            ),
           },
         },
       }

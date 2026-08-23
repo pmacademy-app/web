@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { createServiceRoleClient } from '../supabase'
 import { fetchCompiledLesson, fetchCurriculumData } from '../lesson-loader'
 import { getAllCapstoneDefinitions } from '@/config/capstones'
@@ -102,37 +103,50 @@ export class CurriculumService {
    * content and are always accurate; completion stats degrade to zero when the
    * database is unreachable (`failed` lets the workspace render an error state).
    */
-  public static async getCurriculumOverview(): Promise<{
+  public static async getCurriculumOverview(forceFresh = false): Promise<{
     overview: AdminCurriculumOverview
     failed: boolean
   }> {
-    const curriculum = await fetchCurriculumData()
-    const lessons = curriculum?.lessons || []
-    const supabase = createServiceRoleClient()
+    const fetcher = async () => {
+      const curriculum = await fetchCurriculumData()
+      const lessons = curriculum?.lessons || []
+      const supabase = createServiceRoleClient()
 
-    const [compiledLessons, completed] = await Promise.all([
-      this.fetchAllCompiledLessons(lessons),
-      this.fetchCompletedRows(supabase),
-    ])
-    const { rows: completedRows, failed } = completed
+      const [compiledLessons, completed] = await Promise.all([
+        this.fetchAllCompiledLessons(lessons),
+        this.fetchCompletedRows(supabase),
+      ])
+      const { rows: completedRows, failed } = completed
 
-    const stats = buildModuleCompletionStats(lessons, completedRows)
-    const modules = buildModuleOverviews(lessons, stats, CURRICULUM_MODULE_META)
-    const kpis = buildCurriculumKpis({
-      lessons,
-      compiledLessons,
-      capstoneCount: getAllCapstoneDefinitions().length,
+      const stats = buildModuleCompletionStats(lessons, completedRows)
+      const modules = buildModuleOverviews(lessons, stats, CURRICULUM_MODULE_META)
+      const kpis = buildCurriculumKpis({
+        lessons,
+        compiledLessons,
+        capstoneCount: getAllCapstoneDefinitions().length,
+      })
+
+      return {
+        overview: {
+          kpis,
+          modules,
+          totalLearners: new Set(completedRows.map((r) => r.user_id)).size,
+          totalLessonsCompleted: completedRows.length,
+        },
+        failed,
+      }
+    }
+
+    if (forceFresh) {
+      return fetcher()
+    }
+
+    const getCached = unstable_cache(fetcher, ['admin-curriculum-overview'], {
+      revalidate: 60,
+      tags: ['admin-curriculum'],
     })
 
-    return {
-      overview: {
-        kpis,
-        modules,
-        totalLearners: new Set(completedRows.map((r) => r.user_id)).size,
-        totalLessonsCompleted: completedRows.length,
-      },
-      failed,
-    }
+    return getCached()
   }
 
   /**
