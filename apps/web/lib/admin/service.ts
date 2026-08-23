@@ -177,9 +177,9 @@ export class AdminConsoleService {
     search = '',
     filters: AdminUserFilters = {},
     page = 1,
-    supabaseClient?: any
+    supabaseClient?: unknown
   ): Promise<AdminUserListResult> {
-    const supabase = supabaseClient || createServiceRoleClient()
+    const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
 
     try {
       let query = (supabase.from('users') as unknown as DBChain)

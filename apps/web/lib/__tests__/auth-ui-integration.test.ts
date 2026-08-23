@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { classifyAuthError } from '@/lib/auth/errors'
 
 describe('Phase 4 — Auth UI Error Handling Integration', () => {

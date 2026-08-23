@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { MODULE_LESSON_MAP, getLessonIdsForModule, getModuleSlugForLessonId } from '../curriculum-registry'
+import { getLessonIdsForModule, getModuleSlugForLessonId } from '../curriculum-registry'
 import { getAllCapstoneDefinitions } from '../../config/capstones'
 
 describe('Curriculum Registry & Capstone Integrity Suite', () => {

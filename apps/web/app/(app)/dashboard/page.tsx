@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import type { Database } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getUserStreakStatus } from '@/lib/streaks-db'

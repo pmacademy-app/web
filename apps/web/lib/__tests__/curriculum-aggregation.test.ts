@@ -3,7 +3,6 @@ import {
   buildCurriculumKpis,
   buildLessonOverviews,
   buildModuleCompletionStats,
-  buildModuleOverviews,
   computeLessonCompletionPct,
   countFlashcards,
   countQuizQuestions,
@@ -11,7 +10,6 @@ import {
   getOrderedModuleSlugs,
   groupLessonsByModule,
 } from '../admin/curriculum-aggregation'
-import { CURRICULUM_MODULE_META } from '../admin/curriculum-meta'
 import type { CompiledLesson, CurriculumEntry } from '@/types'
 
 const lesson = (

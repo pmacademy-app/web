@@ -55,7 +55,7 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
           if (table === 'users') {
             return {
               update: (row: Record<string, unknown>) => ({
-                eq: (_col: string, _val: string) => {
+                eq: () => {
                   updatedUserRow = row
                   return Promise.resolve({ data: null, error: null })
                 },

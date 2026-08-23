@@ -45,9 +45,12 @@ vi.mock('next/server', () => {
     constructor(input: string | URL, init?: RequestInit) {
       super(input, init)
       this.nextUrl = new URL(String(input))
+      const headersRecord = (init?.headers && typeof init.headers === 'object' && !(init.headers instanceof Headers))
+        ? (init.headers as Record<string, string | undefined>)
+        : null
       const cookieHeader =
-        (init?.headers as any)?.cookie ||
-        (init?.headers as any)?.Cookie ||
+        headersRecord?.cookie ||
+        headersRecord?.Cookie ||
         (init?.headers instanceof Headers ? init.headers.get('cookie') : '') ||
         ''
       const cookieMap = new Map<string, string>()
@@ -128,11 +131,11 @@ vi.mock('next/cache', () => ({
 }))
 
 vi.mock('next/link', () => ({
-  default: vi.fn(({ href, children, ...props }) => children),
+  default: vi.fn(({ children }) => children),
 }))
 
 vi.mock('next/image', () => ({
-  default: vi.fn((props) => null),
+  default: vi.fn(() => null),
 }))
 
 vi.mock('next/dynamic', () => ({

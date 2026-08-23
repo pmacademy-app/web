@@ -29,7 +29,7 @@ export interface UploadAvatarParams {
   fileBuffer: Uint8Array | Buffer
   mimeType: string
   fileName?: string
-  supabaseClient?: any
+  supabaseClient?: unknown
 }
 
 export interface UploadAvatarResult {
@@ -218,13 +218,13 @@ export class AvatarService {
    */
   public static async removeUserAvatar(
     userId: string,
-    supabaseClient?: any
+    supabaseClient?: unknown
   ): Promise<{ success: boolean }> {
     if (!userId || !userId.trim()) {
       throw new Error('User ID is required.')
     }
 
-    const supabase = supabaseClient || createServiceRoleClient()
+    const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
 
     // 1. Fetch current avatar URL
     const { data: currentUser } = (await supabase
@@ -273,9 +273,9 @@ export class AvatarService {
   }: {
     dryRun?: boolean
     minAgeHours?: number
-    supabaseClient?: any
+    supabaseClient?: unknown
   } = {}): Promise<StorageCleanupResult> {
-    const supabase = supabaseClient || createServiceRoleClient()
+    const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
     const cutoffDate = new Date(Date.now() - minAgeHours * 60 * 60 * 1000)
 
     // 1. Fetch all active avatar_url paths referenced in the users table
