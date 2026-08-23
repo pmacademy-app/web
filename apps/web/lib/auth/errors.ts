@@ -78,13 +78,22 @@ export function isNetworkFailure(error: unknown): boolean {
   return false
 }
 
+export type AuthErrorContext =
+  | 'login'
+  | 'signup'
+  | 'admin_login'
+  | 'session_sync'
+  | 'reset_password'
+  | 'resend_verification'
+  | 'verify'
+
 /**
  * Classifies any auth error (from Supabase Auth, browser fetch, or session sync)
  * into a typed ClassifiedAuthError.
  */
 export function classifyAuthError(
   error: unknown,
-  context?: 'login' | 'signup' | 'admin_login' | 'session_sync'
+  context?: AuthErrorContext | string
 ): ClassifiedAuthError {
   if (!error) {
     return {
