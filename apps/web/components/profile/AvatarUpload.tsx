@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Camera, Loader2, Upload, Trash2, User } from 'lucide-react'
-import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 
 interface AvatarUploadProps {
@@ -31,7 +30,8 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadSuccess, onRemo
 
     const file = e.target.files[0]
     // Validate file type & size
-    if (!file.type.startsWith('image/')) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
       setError('Please select a valid image file (PNG, JPG, WebP).')
       return
     }
@@ -42,30 +42,25 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadSuccess, onRemo
 
     setIsUploading(true)
     setError(null)
-    const supabase = createBrowserSupabaseClient()
 
     try {
-      const fileExt = file.name.split('.').pop() || 'jpg'
-      const targetUserId = userId || 'anonymous'
-      const filePath = `${targetUserId}/avatar-${Date.now()}.${fileExt}`
+      const formData = new FormData()
+      formData.append('file', file)
 
-      // Upload to 'avatars' bucket
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true })
+      const res = await fetch('/api/user/avatar', {
+        method: 'POST',
+        body: formData,
+      })
 
-      if (uploadError) {
-        throw uploadError
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'An error occurred during avatar upload.')
       }
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath)
-
-      setAvatarUrl(publicUrl)
+      setAvatarUrl(data.avatarUrl)
       if (onUploadSuccess) {
-        onUploadSuccess(publicUrl)
+        onUploadSuccess(data.avatarUrl)
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -75,17 +70,38 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadSuccess, onRemo
       }
     } finally {
       setIsUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 
-  const handleRemoveAvatar = () => {
-    setAvatarUrl(null)
+  const handleRemoveAvatar = async () => {
+    setIsUploading(true)
     setError(null)
-    if (onRemove) {
-      onRemove()
-    }
-    if (onUploadSuccess) {
-      onUploadSuccess('')
+
+    try {
+      const res = await fetch('/api/user/avatar', {
+        method: 'DELETE',
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to remove avatar.')
+      }
+
+      setAvatarUrl(null)
+      if (onRemove) {
+        onRemove()
+      }
+      if (onUploadSuccess) {
+        onUploadSuccess('')
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to remove avatar.')
+    } finally {
+      setIsUploading(false)
     }
   }
 
