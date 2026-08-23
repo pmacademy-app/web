@@ -186,7 +186,7 @@ export class FeedbackAdminService {
     })
 
     try {
-      revalidateTag('testimonials', 'default')
+      revalidateTag('testimonials')
     } catch {
       // Ignored outside request context
     }
