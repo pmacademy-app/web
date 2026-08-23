@@ -9,6 +9,7 @@ import * as z from 'zod'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { classifyAuthError } from '@/lib/auth/errors'
+import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 
 const requestSchema = z.object({
   email: z
@@ -63,8 +64,9 @@ function ResetPasswordFormContent() {
         })
 
         if (error) {
-          const classified = classifyAuthError(error)
+          const classified = classifyAuthError(error, 'reset_password')
           setErrorMsg(classified.message)
+          recordAuthTelemetry(classified, 'reset_password')
           return
         }
 
@@ -72,8 +74,9 @@ function ResetPasswordFormContent() {
         requestForm.reset()
       } catch (err) {
         console.error('[reset-password] Request error:', err)
-        const classified = classifyAuthError(err)
+        const classified = classifyAuthError(err, 'reset_password')
         setErrorMsg(classified.message)
+        recordAuthTelemetry(classified, 'reset_password')
       }
     })
   }
@@ -97,8 +100,9 @@ function ResetPasswordFormContent() {
         const data = await res.json()
 
         if (!res.ok || !data.success) {
-          const classified = classifyAuthError(data.error || 'Failed to update password. Please try again.')
+          const classified = classifyAuthError(data.error || 'Failed to update password. Please try again.', 'reset_password')
           setErrorMsg(classified.message)
+          recordAuthTelemetry(classified, 'reset_password')
           return
         }
 
@@ -110,8 +114,9 @@ function ResetPasswordFormContent() {
         }, 2500)
       } catch (err) {
         console.error('[reset-password] Update error:', err)
-        const classified = classifyAuthError(err)
+        const classified = classifyAuthError(err, 'reset_password')
         setErrorMsg(classified.message)
+        recordAuthTelemetry(classified, 'reset_password')
       }
     })
   }

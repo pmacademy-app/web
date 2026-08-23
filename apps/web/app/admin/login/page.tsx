@@ -43,6 +43,7 @@ export default function AdminLoginPage() {
       if (authError || !data.session) {
         const classified = classifyAuthError(authError || new Error('Invalid credentials'), 'admin_login')
         setError(classified.message)
+        recordAuthTelemetry(classified, 'login')
         setLoading(false)
         return
       }
@@ -58,6 +59,7 @@ export default function AdminLoginPage() {
       if (!syncRes.ok) {
         const syncError = classifyAuthError(new Error('Session sync failed'), 'session_sync')
         setError(syncError.message)
+        recordAuthTelemetry(syncError, 'session_sync')
         setLoading(false)
         return
       }
@@ -79,6 +81,7 @@ export default function AdminLoginPage() {
     } catch (err) {
       const classified = classifyAuthError(err, 'admin_login')
       setError(classified.message)
+      recordAuthTelemetry(classified, 'login')
       setLoading(false)
     }
   }

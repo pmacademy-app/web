@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { Mail, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
+import { classifyAuthError } from '@/lib/auth/errors'
+import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 
 interface ResendVerificationCardProps {
   email?: string
@@ -46,14 +48,18 @@ export function ResendVerificationCard({
         onSuccess?.()
       } else {
         const errorText = data.error || 'Failed to send verification email.'
-        setStatusMessage({ type: 'error', text: errorText })
+        const classified = classifyAuthError(errorText, 'resend_verification')
+        recordAuthTelemetry(classified, 'resend_verification')
+        setStatusMessage({ type: 'error', text: classified.message })
         if (data.resetInMs) {
           setCooldown(Math.ceil(data.resetInMs / 1000))
         }
       }
     } catch (err) {
       console.error('[ResendVerificationCard] Network error:', err)
-      setStatusMessage({ type: 'error', text: 'Network connection issue. Please check your internet and try again.' })
+      const classified = classifyAuthError(err, 'resend_verification')
+      recordAuthTelemetry(classified, 'resend_verification')
+      setStatusMessage({ type: 'error', text: classified.message })
     } finally {
       setLoading(false)
     }

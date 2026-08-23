@@ -515,6 +515,19 @@ export interface AdminSystemServiceDetail {
   note?: string
 }
 
+/** Authentication health telemetry summary for Admin System observability (Phase 6). */
+export interface AdminAuthHealthTelemetry {
+  status: 'healthy' | 'degraded' | 'critical'
+  failures24h: number
+  failures7d: number
+  providerFailures24h: number
+  networkFailures24h: number
+  isSpikeDetected: boolean
+  topCategories: Array<{ category: string; count: number }>
+  recentFailures: AdminSystemRecentError[]
+  lastCheckedAt: string
+}
+
 /** One grouped error row in the Errors tab (spec §46 / §7.5). */
 export interface AdminErrorGroup {
   fingerprint: string

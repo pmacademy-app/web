@@ -12,6 +12,7 @@ import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { classifyAuthError, type ClassifiedAuthError } from '@/lib/auth/errors'
+import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 
 const loginSchema = z.object({
   email: z
@@ -71,6 +72,7 @@ function LoginForm() {
         if (error) {
           const classified = classifyAuthError(error, 'login')
           setAuthError(classified)
+          recordAuthTelemetry(classified, 'login')
           return
         }
 
@@ -87,12 +89,14 @@ function LoginForm() {
             if (!syncRes.ok) {
               const syncError = classifyAuthError(new Error('Session initialization failed'), 'session_sync')
               setAuthError(syncError)
+              recordAuthTelemetry(syncError, 'session_sync')
               return
             }
           } catch (syncErr) {
             console.error('[login] Session sync network error:', syncErr)
             const syncError = classifyAuthError(syncErr, 'session_sync')
             setAuthError(syncError)
+            recordAuthTelemetry(syncError, 'session_sync')
             return
           }
         }
@@ -103,6 +107,7 @@ function LoginForm() {
         console.error('[login] Error logging in:', err)
         const classified = classifyAuthError(err, 'login')
         setAuthError(classified)
+        recordAuthTelemetry(classified, 'login')
       }
     })
   }

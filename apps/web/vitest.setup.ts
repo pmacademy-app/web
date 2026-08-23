@@ -23,6 +23,137 @@ global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
   return originalFetch(input, init)
 }) as typeof global.fetch
 
+vi.mock('next/headers', () => ({
+  cookies: vi.fn(() => ({
+    get: vi.fn(),
+    set: vi.fn(),
+    delete: vi.fn(),
+  })),
+  headers: vi.fn(() => new Headers()),
+}))
+
+vi.mock('next/server', () => {
+  class MockNextRequest extends Request {
+    public nextUrl: URL
+    public cookies: {
+      get: (name: string) => { name: string; value: string } | undefined
+      getAll: () => Array<{ name: string; value: string }>
+      set: (name: string, value: string) => void
+      delete: (name: string) => void
+    }
+
+    constructor(input: string | URL, init?: RequestInit) {
+      super(input, init)
+      this.nextUrl = new URL(String(input))
+      const cookieHeader =
+        (init?.headers as any)?.cookie ||
+        (init?.headers as any)?.Cookie ||
+        (init?.headers instanceof Headers ? init.headers.get('cookie') : '') ||
+        ''
+      const cookieMap = new Map<string, string>()
+      if (cookieHeader) {
+        cookieHeader.split(';').forEach((part: string) => {
+          const [k, v] = part.trim().split('=')
+          if (k) cookieMap.set(k.trim(), v ? v.trim() : '')
+        })
+      }
+
+      this.cookies = {
+        get: (name: string) => {
+          const val = cookieMap.get(name)
+          return val !== undefined ? { name, value: val } : undefined
+        },
+        getAll: () => Array.from(cookieMap.entries()).map(([name, value]) => ({ name, value })),
+        set: (name: string, value: string) => cookieMap.set(name, value),
+        delete: (name: string) => cookieMap.delete(name),
+      }
+    }
+  }
+
+  class MockNextResponse extends Response {
+    public cookies: {
+      get: (name: string) => { name: string; value: string } | undefined
+      getAll: () => Array<{ name: string; value: string }>
+      set: (name: string, value: string) => void
+      delete: (name: string) => void
+    }
+
+    constructor(body?: BodyInit | null, init?: ResponseInit) {
+      super(body, init)
+      const cookieMap = new Map<string, string>()
+      this.cookies = {
+        get: (name: string) => {
+          const val = cookieMap.get(name)
+          return val !== undefined ? { name, value: val } : undefined
+        },
+        getAll: () => Array.from(cookieMap.entries()).map(([name, value]) => ({ name, value })),
+        set: (name: string, value: string) => cookieMap.set(name, value),
+        delete: (name: string) => cookieMap.delete(name),
+      }
+    }
+
+    public static json(data: unknown, init?: ResponseInit) {
+      return new MockNextResponse(JSON.stringify(data), {
+        ...init,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(init?.headers || {}),
+        },
+      })
+    }
+
+    public static redirect(url: string | URL, init?: number | ResponseInit) {
+      const status = typeof init === 'number' ? init : (init?.status || 307)
+      return new MockNextResponse(null, {
+        status,
+        headers: { Location: String(url) },
+      })
+    }
+
+    public static next() {
+      return new MockNextResponse(null, { status: 200 })
+    }
+  }
+
+  return {
+    NextRequest: MockNextRequest,
+    NextResponse: MockNextResponse,
+  }
+})
+
+vi.mock('next/cache', () => ({
+  unstable_cache: vi.fn((fn) => fn),
+  revalidateTag: vi.fn(),
+  revalidatePath: vi.fn(),
+}))
+
+vi.mock('next/link', () => ({
+  default: vi.fn(({ href, children, ...props }) => children),
+}))
+
+vi.mock('next/image', () => ({
+  default: vi.fn((props) => null),
+}))
+
+vi.mock('next/dynamic', () => ({
+  default: vi.fn(() => () => null),
+}))
+
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    refresh: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+  })),
+  usePathname: vi.fn(() => '/'),
+  useSearchParams: vi.fn(() => new URLSearchParams()),
+  useParams: vi.fn(() => ({})),
+  redirect: vi.fn(),
+  notFound: vi.fn(),
+}))
+
 afterEach(() => {
   vi.clearAllMocks()
 })

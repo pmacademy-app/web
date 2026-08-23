@@ -53,10 +53,11 @@ export default async function AdminSystemPage({ searchParams }: PageProps) {
   const params = await searchParams
   const tab = TABS.some((t) => t.key === params.tab) ? params.tab! : 'health'
 
-  const [overview, serviceDetails, flags] = await Promise.all([
+  const [overview, serviceDetails, flags, authHealth] = await Promise.all([
     SystemService.getHealthOverview(),
     SystemService.getServiceDetails(),
     AdminConsoleService.getFeatureFlags(),
+    SystemService.getAuthHealthTelemetry(),
   ])
 
   const errorGroups =
@@ -93,7 +94,7 @@ export default async function AdminSystemPage({ searchParams }: PageProps) {
 
       {tab === 'health' && (
         <>
-          <AdminSystemHealthWorkspace overview={overview} serviceDetails={serviceDetails} />
+          <AdminSystemHealthWorkspace overview={overview} serviceDetails={serviceDetails} authHealth={authHealth} />
           {/* Feature Flags Diagnostic (read-only) */}
           <AdminSection title="Feature Flags Diagnostic" icon={Flag} meta="Runtime feature flag state">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">

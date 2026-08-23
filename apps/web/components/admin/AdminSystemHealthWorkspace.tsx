@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Activity, Server, ShieldCheck, Play, ChevronRight } from 'lucide-react'
+import { Activity, Server, ShieldCheck, Play, ChevronRight, Lock, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminSystemStatusBadge } from './AdminSystemStatusBadge'
 import { AdminStatusBadge } from './AdminStatusBadge'
@@ -11,19 +11,20 @@ import { AdminAlert } from './AdminAlert'
 import { AdminEmptyState } from './AdminEmptyState'
 import { AdminDashboardRefreshButton } from './AdminDashboardRefreshButton'
 import { ProcessEmailQueueButton } from './ProcessEmailQueueButton'
-import type { AdminSystemHealthOverview, AdminSystemServiceDetail } from '@/lib/admin/types'
+import type { AdminSystemHealthOverview, AdminSystemServiceDetail, AdminAuthHealthTelemetry } from '@/lib/admin/types'
 
 interface AdminSystemHealthWorkspaceProps {
   overview: AdminSystemHealthOverview
   serviceDetails: Record<string, AdminSystemServiceDetail>
+  authHealth?: AdminAuthHealthTelemetry
 }
 
 /**
  * Health tab (spec §7.1–§7.3): overall status, per-service cards, operational
- * diagnostics and manual triggers. Service cards open a detail drawer with
+ * diagnostics, auth health telemetry, and manual triggers. Service cards open a detail drawer with
  * server-computed metrics and recent failures.
  */
-export function AdminSystemHealthWorkspace({ overview, serviceDetails }: AdminSystemHealthWorkspaceProps) {
+export function AdminSystemHealthWorkspace({ overview, serviceDetails, authHealth }: AdminSystemHealthWorkspaceProps) {
   const [selected, setSelected] = useState<string | null>(null)
   const selectedDetail = selected ? serviceDetails[selected] : null
 
@@ -96,6 +97,71 @@ export function AdminSystemHealthWorkspace({ overview, serviceDetails }: AdminSy
             </button>
           ))}
         </div>
+      )}
+
+      {/* Authentication Observability & Health (Phase 6) */}
+      {authHealth && (
+        <AdminSection
+          title="Authentication Observability"
+          icon={Lock}
+          meta="Client-side failure telemetry & provider health"
+        >
+          <div className="space-y-4">
+            {authHealth.isSpikeDetected && (
+              <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/30 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <h4 className="text-xs font-bold text-destructive">Authentication Outage / Spike Detected</h4>
+                  <p className="text-[11px] text-destructive/80 mt-0.5">
+                    More than 5 critical authentication or provider failures were recorded within the last 15 minutes.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-xl bg-admin-bg/60 border border-admin-border">
+                <p className="text-[11px] font-semibold text-admin-fg-muted">Failures (24h)</p>
+                <p className="text-xl font-extrabold text-admin-fg mt-1">{authHealth.failures24h}</p>
+              </div>
+              <div className="p-3.5 rounded-xl bg-admin-bg/60 border border-admin-border">
+                <p className="text-[11px] font-semibold text-admin-fg-muted">Failures (7d)</p>
+                <p className="text-xl font-extrabold text-admin-fg mt-1">{authHealth.failures7d}</p>
+              </div>
+              <div className="p-3.5 rounded-xl bg-admin-bg/60 border border-admin-border">
+                <p className="text-[11px] font-semibold text-admin-fg-muted">Provider Outages (24h)</p>
+                <p className={`text-xl font-extrabold mt-1 ${authHealth.providerFailures24h > 0 ? 'text-destructive' : 'text-admin-fg'}`}>
+                  {authHealth.providerFailures24h}
+                </p>
+              </div>
+              <div className="p-3.5 rounded-xl bg-admin-bg/60 border border-admin-border">
+                <p className="text-[11px] font-semibold text-admin-fg-muted">Network Errors (24h)</p>
+                <p className={`text-xl font-extrabold mt-1 ${authHealth.networkFailures24h > 5 ? 'text-amber-500' : 'text-admin-fg'}`}>
+                  {authHealth.networkFailures24h}
+                </p>
+              </div>
+            </div>
+
+            {authHealth.topCategories.length > 0 ? (
+              <div className="p-4 rounded-xl bg-admin-bg/60 border border-admin-border space-y-2">
+                <p className="text-xs font-semibold text-admin-fg">Top Failure Classifications (24h)</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  {authHealth.topCategories.slice(0, 6).map((cat) => (
+                    <div key={cat.category} className="flex items-center justify-between p-2 rounded-lg bg-admin-surface border border-admin-border">
+                      <span className="font-mono text-[11px] text-admin-accent">{cat.category}</span>
+                      <span className="font-bold text-admin-fg">{cat.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl bg-admin-bg/60 border border-admin-border flex items-center gap-2 text-xs text-admin-fg-muted">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <span>Zero authentication anomalies recorded in the last 24 hours.</span>
+              </div>
+            )}
+          </div>
+        </AdminSection>
       )}
 
       {/* Operational diagnostics */}

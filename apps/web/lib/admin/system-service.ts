@@ -10,6 +10,7 @@ import type {
   AdminErrorGroupResult,
   AdminAuditEntry,
   AdminAuditLogResult,
+  AdminAuthHealthTelemetry,
 } from './types'
 
 /**
@@ -505,6 +506,111 @@ export class SystemService {
       return count || 0
     } catch {
       return 0
+    }
+  }
+
+  /**
+   * Aggregates authentication error telemetry for the Admin System Observability tab (Phase 6).
+   */
+  public static async getAuthHealthTelemetry(): Promise<AdminAuthHealthTelemetry> {
+    const fallback: AdminAuthHealthTelemetry = {
+      status: 'healthy',
+      failures24h: 0,
+      failures7d: 0,
+      providerFailures24h: 0,
+      networkFailures24h: 0,
+      isSpikeDetected: false,
+      topCategories: [],
+      recentFailures: [],
+      lastCheckedAt: new Date().toISOString(),
+    }
+
+    try {
+      const supabase = createServiceRoleClient()
+      const now = new Date()
+      const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString()
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      const fifteenMinsAgo = new Date(now.getTime() - 15 * 60 * 1000).toISOString()
+
+      const [recentErrors, weekErrors, recentSpikeErrors] = await Promise.all([
+        supabase
+          .from('system_errors')
+          .select('id, timestamp, severity, operation, message, details')
+          .eq('category', 'auth')
+          .gte('timestamp', oneDayAgo)
+          .order('timestamp', { ascending: false }),
+        supabase
+          .from('system_errors')
+          .select('id', { count: 'exact', head: true })
+          .eq('category', 'auth')
+          .gte('timestamp', sevenDaysAgo),
+        supabase
+          .from('system_errors')
+          .select('id', { count: 'exact', head: true })
+          .eq('category', 'auth')
+          .in('severity', ['critical', 'error'])
+          .gte('timestamp', fifteenMinsAgo),
+      ])
+
+      const rows = (recentErrors.data || []) as unknown as Array<{
+        id: string
+        timestamp: string
+        severity: string
+        operation: string
+        message: string
+        details?: Record<string, unknown>
+      }>
+
+      const categoryMap = new Map<string, number>()
+      let providerFailures24h = 0
+      let networkFailures24h = 0
+
+      for (const row of rows) {
+        const code = (row.details?.errorCode as string) || row.operation || 'AUTH_UNKNOWN_ERROR'
+        categoryMap.set(code, (categoryMap.get(code) || 0) + 1)
+
+        if (code === 'AUTH_PROVIDER_UNAVAILABLE' || row.severity === 'critical') {
+          providerFailures24h += 1
+        }
+        if (code === 'AUTH_NETWORK_ERROR') {
+          networkFailures24h += 1
+        }
+      }
+
+      const topCategories = Array.from(categoryMap.entries())
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count)
+
+      const spikeCount = recentSpikeErrors.count || 0
+      const isSpikeDetected = spikeCount >= 5
+
+      let status: 'healthy' | 'degraded' | 'critical' = 'healthy'
+      if (isSpikeDetected || providerFailures24h >= 10) {
+        status = 'critical'
+      } else if (rows.length > 20 || providerFailures24h > 0 || networkFailures24h > 15) {
+        status = 'degraded'
+      }
+
+      return {
+        status,
+        failures24h: rows.length,
+        failures7d: weekErrors.count || rows.length,
+        providerFailures24h,
+        networkFailures24h,
+        isSpikeDetected,
+        topCategories,
+        recentFailures: rows.slice(0, 10).map((r) => ({
+          id: String(r.id),
+          timestamp: String(r.timestamp),
+          severity: String(r.severity),
+          operation: String(r.operation),
+          message: String(r.message),
+        })),
+        lastCheckedAt: now.toISOString(),
+      }
+    } catch (err) {
+      console.warn('[SystemService] getAuthHealthTelemetry failed:', err)
+      return fallback
     }
   }
 
