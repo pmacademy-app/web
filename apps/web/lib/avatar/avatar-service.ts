@@ -7,6 +7,10 @@
 
 import { createServiceRoleClient } from '@/lib/supabase'
 
+interface DBChain {
+  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
+}
+
 export const AVATAR_BUCKET = 'avatars'
 export const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024 // 2MB
 
@@ -138,11 +142,10 @@ export class AvatarService {
       throw new Error('Image file size exceeds maximum limit of 2MB.')
     }
 
-    const supabase = supabaseClient || createServiceRoleClient()
+    const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
 
     // 2. Fetch current avatar URL from DB to prepare for cleanup
-    const { data: currentUser } = (await supabase
-      .from('users')
+    const { data: currentUser } = (await (supabase.from('users') as unknown as DBChain)
       .select('avatar_url')
       .eq('id', userId)
       .maybeSingle()) as unknown as { data: { avatar_url: string | null } | null }
@@ -172,11 +175,9 @@ export class AvatarService {
       .getPublicUrl(newStoragePath)
 
     // 6. Update user profile reference in database
-    const { error: dbError } = await supabase
-      .from('users')
+    const { error: dbError } = await (supabase.from('users') as unknown as DBChain)
       .update({
         avatar_url: publicUrl,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', userId)
 
@@ -227,8 +228,7 @@ export class AvatarService {
     const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
 
     // 1. Fetch current avatar URL
-    const { data: currentUser } = (await supabase
-      .from('users')
+    const { data: currentUser } = (await (supabase.from('users') as unknown as DBChain)
       .select('avatar_url')
       .eq('id', userId)
       .maybeSingle()) as unknown as { data: { avatar_url: string | null } | null }
@@ -236,11 +236,9 @@ export class AvatarService {
     const oldAvatarPath = extractAvatarStoragePath(currentUser?.avatar_url)
 
     // 2. Clear database reference
-    const { error: dbError } = await supabase
-      .from('users')
+    const { error: dbError } = await (supabase.from('users') as unknown as DBChain)
       .update({
         avatar_url: null,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', userId)
 
@@ -279,8 +277,7 @@ export class AvatarService {
     const cutoffDate = new Date(Date.now() - minAgeHours * 60 * 60 * 1000)
 
     // 1. Fetch all active avatar_url paths referenced in the users table
-    const { data: usersData, error: usersErr } = await supabase
-      .from('users')
+    const { data: usersData, error: usersErr } = await (supabase.from('users') as unknown as DBChain)
       .select('avatar_url')
       .not('avatar_url', 'is', null)
 

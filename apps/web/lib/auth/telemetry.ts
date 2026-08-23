@@ -10,6 +10,7 @@ import type { AuthErrorCode, ClassifiedAuthError } from './errors'
 
 export type AuthTelemetryAction =
   | 'login'
+  | 'admin_login'
   | 'signup'
   | 'verify'
   | 'reset_password'
