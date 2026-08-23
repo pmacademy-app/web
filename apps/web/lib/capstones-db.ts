@@ -9,7 +9,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { getAllCapstoneDefinitions } from '@/config/capstones'
-import { deriveCapstoneStatus, validateCapstoneSubmission, type CapstoneStatus } from '@/lib/capstones'
+import {
+  deriveCapstoneStatus,
+  validateCapstoneSubmission,
+  validateCapstoneTransition,
+  type CapstoneStatus,
+} from '@/lib/capstones'
 import { awardXp, hasXpEvent } from '@/lib/xp-service'
 import { getRuntimeXpValues } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
@@ -180,13 +185,18 @@ export async function saveDraftAction(
     .select('*')
     .eq('user_id', userId)
     .eq('module_slug', moduleSlug)
+    .order('submitted_at', { ascending: false })
     .limit(1)) as unknown as { data: CapstoneSubmissionRow[] | null }
 
   const existing = existingList && existingList.length > 0 ? existingList[0] : null
 
-  // Cannot modify if already submitted or reviewed
-  if (existing && (existing.status === 'submitted' || existing.status === 'reviewed')) {
-    return { success: true, submission: existing }
+  // Validate state transition
+  const transition = validateCapstoneTransition(existing?.status, 'draft', 'learner')
+  if (!transition.allowed) {
+    if (existing) {
+      return { success: true, submission: existing }
+    }
+    throw new Error(transition.reason || 'Cannot modify capstone in current state.')
   }
 
   const now = new Date().toISOString()
@@ -256,9 +266,27 @@ export async function submitCapstoneAction(
     .select('*')
     .eq('user_id', userId)
     .eq('module_slug', moduleSlug)
+    .order('submitted_at', { ascending: false })
     .limit(1)) as unknown as { data: CapstoneSubmissionRow[] | null }
 
   const existing = existingList && existingList.length > 0 ? existingList[0] : null
+
+  // 3. Idempotent duplicate submission protection
+  if (existing && existing.status === 'submitted') {
+    return {
+      success: true,
+      submission: existing,
+      xpEarned: 0,
+      message: 'Capstone already submitted.',
+    }
+  }
+
+  // 4. Validate transition
+  const transition = validateCapstoneTransition(existing?.status, 'submitted', 'learner')
+  if (!transition.allowed) {
+    throw new Error(transition.reason || 'Cannot submit capstone in current state.')
+  }
+
   const now = new Date().toISOString()
   let result: CapstoneSubmissionRow
 
@@ -294,7 +322,7 @@ export async function submitCapstoneAction(
     result = inserted!
   }
 
-  // 3. Save associated reflection if provided
+  // 5. Save associated reflection if provided
   if (reflectionContent && reflectionContent.trim().length > 0) {
     const reflectionKey = `capstone-${moduleSlug}`
     const { data: existingRef } = (await (supabase
@@ -324,7 +352,7 @@ export async function submitCapstoneAction(
     }
   }
 
-  // 4. Award capstone XP idempotently via xp_events ledger
+  // 6. Award capstone XP idempotently via xp_events ledger
   const alreadyAwarded = await hasXpEvent(supabase, userId, 'capstone', moduleSlug)
   const xpConfig = await getRuntimeXpValues(supabase)
   let xpEarned = 0
@@ -338,7 +366,7 @@ export async function submitCapstoneAction(
     }
   }
 
-  // 5. Update streak
+  // 7. Update streak
   await updateUserStreak(supabase, userId)
 
   return {

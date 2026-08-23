@@ -123,9 +123,10 @@ export class ModerationService {
     adminUserId: string,
     adminEmail: string,
     submissionId: string,
-    action: 'approve' | 'reject'
+    action: 'approve' | 'reject',
+    supabaseClient?: any
   ): Promise<boolean> {
-    const supabase = createServiceRoleClient()
+    const supabase = supabaseClient || createServiceRoleClient()
     try {
       const { data, error } = await (supabase.from('capstone_submissions') as unknown as DBChain)
         .update({
@@ -150,6 +151,15 @@ export class ModerationService {
       await logAdminAction(adminUserId, adminEmail, `capstone_${action}`, 'capstone_submission', submissionId, {
         action,
       })
+
+      try {
+        const { revalidatePath } = await import('next/cache')
+        revalidatePath('/admin/moderation')
+        revalidatePath('/capstones')
+        revalidatePath('/progress')
+      } catch {
+        // Revalidation error is non-fatal
+      }
 
       return true
     } catch (err) {
