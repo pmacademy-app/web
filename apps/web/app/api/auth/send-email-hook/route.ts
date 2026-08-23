@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import crypto from 'crypto'
 import { BRAND } from '@/lib/brand'
 import { renderEmailTemplate } from '@/emails'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, maskEmail } from '@/lib/email'
 import { buildAuthCallbackUrl } from '@/lib/auth-url'
 
 export const runtime = 'nodejs'
@@ -326,8 +326,21 @@ export async function POST(request: NextRequest) {
   })
 
   if (!sendResult.success) {
-    console.error('[send-email-hook] Email send failed via Resend:', sendResult.error)
-    return jsonResponse({ error: `Email delivery failure: ${sendResult.error}` }, 500)
+    const masked = maskEmail(toEmail)
+    console.error(`[send-email-hook] Email delivery failed for action="${actionType}" recipient="${masked}":`, sendResult.error)
+
+    let status = 500
+    if (sendResult.statusCode === 429) {
+      status = 429
+    } else if (sendResult.statusCode === 401 || sendResult.statusCode === 403) {
+      status = 502
+    } else if (sendResult.statusCode === 504) {
+      status = 504
+    } else if (sendResult.statusCode && sendResult.statusCode >= 500) {
+      status = 503
+    }
+
+    return jsonResponse({ error: 'Email delivery failed' }, status)
   }
 
   // 6. Return HTTP 200 to Supabase Auth Hook
