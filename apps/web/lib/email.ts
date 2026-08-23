@@ -24,6 +24,21 @@ export function getFromEmail(): string {
   return `${BRAND.emailFromName} <${BRAND.emailFromAddress}>`
 }
 
+export interface SendEmailResult {
+  success: boolean
+  id?: string
+  error?: string
+  statusCode?: number
+  provider?: 'resend' | 'brevo' | 'simulated'
+}
+
+export function maskEmail(email: string): string {
+  if (!email || !email.includes('@')) return '***'
+  const [local, domain] = email.split('@')
+  if (local.length <= 2) return `*@${domain}`
+  return `${local[0]}***${local[local.length - 1]}@${domain}`
+}
+
 export async function sendEmail({
   to,
   subject,
@@ -34,14 +49,14 @@ export async function sendEmail({
   subject: string
   html: string
   text: string
-}): Promise<{ success: boolean; id?: string; error?: string }> {
+}): Promise<SendEmailResult> {
   const fromEmail = getFromEmail()
   const apiKey = process.env.RESEND_API_KEY
   const isTest = process.env.NODE_ENV === 'test' || process.env.RESEND_SIMULATE === 'true'
 
   if (!apiKey || isTest) {
-    console.log(`[email] RESEND_API_KEY missing or test environment. Simulating send to ${to}: "${subject}" from "${fromEmail}"`)
-    return { success: true, id: 'simulated-dev-id' }
+    console.log(`[email] RESEND_API_KEY missing or test environment. Simulating send to ${maskEmail(to)}: "${subject}" from "${fromEmail}"`)
+    return { success: true, id: 'simulated-dev-id', provider: 'simulated', statusCode: 200 }
   }
 
   try {
@@ -58,12 +73,13 @@ export async function sendEmail({
         html,
         text,
       }),
+      signal: AbortSignal.timeout(8000),
     })
 
-    const data = await res.json()
+    const data = (await res.json().catch(() => ({}))) as { id?: string; message?: string; name?: string }
 
     if (!res.ok) {
-      console.warn('[email] Resend API error:', data)
+      console.warn(`[email] Resend API error (status ${res.status}):`, data.message || data.name || res.statusText)
       
       const brevoApiKey = process.env.BREVO_API_KEY
       if (brevoApiKey) {
@@ -78,7 +94,7 @@ export async function sendEmail({
             headers: {
               'Content-Type': 'application/json',
               'api-key': brevoApiKey,
-              'accept': 'application/json'
+              'accept': 'application/json',
             },
             body: JSON.stringify({
               sender: { name: senderName, email: senderEmail },
@@ -87,27 +103,49 @@ export async function sendEmail({
               htmlContent: html,
               textContent: text,
             }),
+            signal: AbortSignal.timeout(8000),
           })
           
-          const brevoData = await brevoRes.json()
+          const brevoData = (await brevoRes.json().catch(() => ({}))) as { messageId?: string; message?: string }
           if (!brevoRes.ok) {
-            console.error('[email] Brevo API fallback error:', brevoData)
-            return { success: false, error: brevoData.message ?? data.message ?? 'Email send failed on both providers' }
+            console.error(`[email] Brevo API fallback error (status ${brevoRes.status}):`, brevoData.message || brevoRes.statusText)
+            return {
+              success: false,
+              error: brevoData.message ?? data.message ?? 'Email send failed on primary and fallback providers',
+              statusCode: brevoRes.status,
+              provider: 'brevo',
+            }
           }
-          return { success: true, id: brevoData.messageId }
+          return { success: true, id: brevoData.messageId, provider: 'brevo', statusCode: 200 }
         } catch (fallbackErr) {
-          console.error('[email] Exception during Brevo fallback:', fallbackErr)
-          return { success: false, error: fallbackErr instanceof Error ? fallbackErr.message : 'Unknown fallback error' }
+          console.error('[email] Exception during Brevo fallback:', fallbackErr instanceof Error ? fallbackErr.message : 'Unknown')
+          return {
+            success: false,
+            error: fallbackErr instanceof Error ? fallbackErr.message : 'Brevo fallback timeout/error',
+            statusCode: 503,
+            provider: 'brevo',
+          }
         }
       }
       
-      return { success: false, error: data.message ?? 'Email send failed' }
+      return {
+        success: false,
+        error: data.message ?? `Resend error (${res.status})`,
+        statusCode: res.status,
+        provider: 'resend',
+      }
     }
 
-    return { success: true, id: data.id }
+    return { success: true, id: data.id, provider: 'resend', statusCode: 200 }
   } catch (err) {
-    console.error('[email] Exception sending email:', err)
-    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' }
+    const isTimeout = err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError')
+    console.error('[email] Exception sending email:', isTimeout ? 'Request timed out after 8s' : (err instanceof Error ? err.message : 'Unknown'))
+    return {
+      success: false,
+      error: isTimeout ? 'Email provider request timed out' : (err instanceof Error ? err.message : 'Unknown network failure'),
+      statusCode: isTimeout ? 504 : 503,
+      provider: 'resend',
+    }
   }
 }
 
