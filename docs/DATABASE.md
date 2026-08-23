@@ -9,14 +9,14 @@
 
 Database persistence is powered by PostgreSQL hosted on Supabase. Schema changes are managed exclusively through versioned SQL DDL migration files in `supabase/migrations/`.
 
-- **Migration Total**: 30 SQL files.
+- **Migration Total**: 31 SQL files.
 - **RLS Policy**: Row Level Security (RLS) is enabled on 100% of user-owned tables.
 - **Service Role Bypass**: Server-side admin routes use `createAdminSupabaseClient()` to access system tables with service-role permissions.
 - **Type Safety**: Complete TypeScript schema generated from Supabase and maintained in `apps/web/types/database.ts`. All table interactions are fully typed via `lib/supabase.ts`, which re-exports from `types/database`.
 
 ---
 
-## 2. PostgreSQL Migration History (30 Versioned Files)
+## 2. PostgreSQL Migration History (31 Versioned Files)
 
 | Timestamp Migration File | Target Schema / Tables Created or Modified | Status |
 |---|---|---|
@@ -50,6 +50,7 @@ Database persistence is powered by PostgreSQL hosted on Supabase. Schema changes
 | `20260819000001_phase3_onboarding_storage.sql` | Onboarding storage additions | 🟢 Applied |
 | `20260822000001_system_announcements_and_perf.sql` | System announcements table + performance indexes | 🟢 Applied |
 | `20260823000001_notification_idempotency_and_avatar_cleanup.sql` | Notification idempotency keys + avatar cleanup | 🟢 Applied |
+| `20260824000001_phase9_perf_indexes.sql` | XP idempotency, badge lookup & public portfolio indexes | 🟢 Ready to Apply |
 
 ---
 

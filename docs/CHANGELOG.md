@@ -2,6 +2,52 @@
 
 All notable changes to **Prodily PM Academy** (`pmacademy-app/web`) are documented in this file.
 
+## [Phases 1–10 Hardening & Production Rebuild] — 2026-08-24
+### Phase 1: Repository Baseline, Audit Reconciliation & Production Data Integrity
+- Standardized lesson progress IDs to `les_` format across production database (137/137 rows reconciled).
+- Verified remote Supabase database migration state across all tables.
+
+### Phase 2: Critical Admin Moderation & Data Mapping Fixes
+- Resolved `users.full_name` vs `users.name` schema mismatch across admin services.
+- Corrected feedback and testimonial moderation queries and mappings.
+
+### Phase 3: Cache Invalidation, Verification State & Admin Correctness
+- Added `revalidateTag('testimonials')` to testimonial approval/rejection mutations.
+- Linked admin verification status to authoritative Supabase Auth `email_confirmed_at` timestamps.
+- Hardened dashboard error handling against service-role connection failures.
+
+### Phase 4: Authentication Error Classification & User Experience
+- Built centralized `classifyAuthError` helper in `lib/auth/errors.ts` mapping raw Supabase/browser exceptions into safe, user-friendly error categories.
+- Eliminated raw SDK/JSON error leaks on login, signup, forgot password, and admin authentication flows.
+
+### Phase 5: Authentication Reliability, Ghost Accounts & Email Hook Hardening
+- Hardened Supabase Send Email Hook (`/api/auth/send-email-hook`) with 8-second bounded execution timeouts (`AbortSignal.timeout(8000)`).
+- Implemented HTTP status code mapping (429, 502, 503, 504), Brevo provider fallback, and masked email PII logging.
+
+### Phase 6: Client Authentication Telemetry & Admin Observability
+- Added client-side telemetry endpoint (`/api/auth/telemetry`) with rate-limiting and PII sanitization.
+- Built real-time admin authentication observability dashboard (`/api/admin/system/auth-health`).
+
+### Phase 7: Avatar Upload Reliability, Storage Consistency & Cleanup
+- Created transactional `AvatarService` in `lib/avatar/avatar-service.ts` with safe replacement ordering and DB failure rollbacks.
+- Built storage orphan cleanup scanner in `/api/admin/system/storage-cleanup`.
+
+### Phase 8: Capstone State Consistency, Progress Integrity & Submission Reliability
+- Built `validateCapstoneTransition` state transition validator in `lib/capstones.ts`.
+- Implemented duplicate submission idempotency protection and atomic XP/streak updates in `lib/capstones-db.ts`.
+- Added bidirectional cache revalidation for learner and admin moderation queues.
+
+### Phase 9: Database, Query & Application Performance Optimization
+- Eliminated unbounded `auth.admin.listUsers` scans; used page-scoped lookups and bounded health probes.
+- Added lean column projections (`select('lesson_id, status')`) on learner dashboard and progress queries.
+- Added tagged `unstable_cache` for curriculum overviews (`admin-curriculum`).
+- Created migration `20260824000001_phase9_perf_indexes.sql` with targeted composite indexes.
+
+### Phase 10: Final Admin/UI Hardening, Accessibility, Cleanup & Production Readiness
+- Fixed component library resolution with native React Accordion.
+- Verified 100% test pass rate across 52 test suites (405 tests).
+- Verified RLS, environment variable hygiene, and accessibility focus management.
+
 ---
 
 ## [Documentation Cleanup] — 2026-08-23
