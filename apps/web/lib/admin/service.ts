@@ -47,39 +47,53 @@ export class AdminConsoleService {
    * Evaluates overall system health, DB latency, and queue latency.
    */
   public static async getSystemHealth(): Promise<AdminSystemHealth> {
-    const supabase = createServiceRoleClient()
-    const startTime = Date.now()
-    const { error } = await supabase.from('users').select('id').limit(1)
-    const latency = Date.now() - startTime
-
-    // Fetch queue statistics
-    let pendingQueueCount = 0
-    let failedCount24h = 0
     try {
-      const { count: pendingCount } = await supabase
-        .from('email_queue')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'pending')
-      pendingQueueCount = pendingCount || 0
+      const supabase = createServiceRoleClient()
+      const startTime = Date.now()
+      const { error } = await supabase.from('users').select('id').limit(1)
+      const latency = Date.now() - startTime
 
-      const { count: failedCount } = await supabase
-        .from('email_queue')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'failed')
-      failedCount24h = failedCount || 0
-    } catch {
-      // Graceful fallback if queue tables aren't queryable
-    }
+      // Fetch queue statistics
+      let pendingQueueCount = 0
+      let failedCount24h = 0
+      try {
+        const { count: pendingCount } = await supabase
+          .from('email_queue')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'pending')
+        pendingQueueCount = pendingCount || 0
 
-    return {
-      status: error ? 'degraded' : 'healthy',
-      databaseLatencyMs: latency,
-      activeCronJobsCount: 0,
-      queuePendingItemsCount: pendingQueueCount,
-      failedNotifications24h: failedCount24h,
-      lastCheckedAt: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      nextVersion: 'Next.js 16.2.12 (Turbopack)',
+        const { count: failedCount } = await supabase
+          .from('email_queue')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'failed')
+        failedCount24h = failedCount || 0
+      } catch {
+        // Graceful fallback if queue tables aren't queryable
+      }
+
+      return {
+        status: error ? 'degraded' : 'healthy',
+        databaseLatencyMs: latency,
+        activeCronJobsCount: 0,
+        queuePendingItemsCount: pendingQueueCount,
+        failedNotifications24h: failedCount24h,
+        lastCheckedAt: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        nextVersion: 'Next.js 16.2.12 (Turbopack)',
+      }
+    } catch (err) {
+      console.warn('[AdminConsoleService] getSystemHealth failed:', err)
+      return {
+        status: 'down',
+        databaseLatencyMs: -1,
+        activeCronJobsCount: 0,
+        queuePendingItemsCount: 0,
+        failedNotifications24h: 0,
+        lastCheckedAt: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        nextVersion: 'Next.js 16.2.12 (Turbopack)',
+      }
     }
   }
 
@@ -88,43 +102,60 @@ export class AdminConsoleService {
    * badges and the header system-status chip. Runs once per layout render.
    */
   public static async getConsoleShellContext(): Promise<AdminConsoleShellContext> {
-    const supabase = createServiceRoleClient()
+    try {
+      const supabase = createServiceRoleClient()
 
-    const startTime = Date.now()
-    const { error } = await supabase.from('users').select('id').limit(1)
-    const latency = Date.now() - startTime
+      const startTime = Date.now()
+      const { error } = await supabase.from('users').select('id').limit(1)
+      const latency = Date.now() - startTime
 
-    const [contactMessages, pendingTestimonials, systemErrors, failedEmails, pendingCapstones, newFeedback] =
-      await Promise.all([
-        supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-        supabase.from('testimonials').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('system_errors').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-        supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'failed'),
-        supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }).eq('status', 'submitted'),
-        supabase.from('user_feedback').select('id', { count: 'exact', head: true }).eq('status', 'new'),
-      ])
+      const [contactMessages, pendingTestimonials, systemErrors, failedEmails, pendingCapstones, newFeedback] =
+        await Promise.all([
+          supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+          supabase.from('testimonials').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+          supabase.from('system_errors').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+          supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('status', 'failed'),
+          supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }).eq('status', 'submitted'),
+          supabase.from('user_feedback').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+        ])
 
-    const attention = {
-      contactMessages: contactMessages.count || 0,
-      pendingTestimonials: pendingTestimonials.count || 0,
-      systemErrors: systemErrors.count || 0,
-      failedEmails: failedEmails.count || 0,
-      pendingCapstones: pendingCapstones.count || 0,
-      newFeedback: newFeedback.count || 0,
-    }
-    const attentionTotal =
-      attention.contactMessages +
-      attention.pendingTestimonials +
-      attention.systemErrors +
-      attention.failedEmails +
-      attention.pendingCapstones +
-      attention.newFeedback
+      const attention = {
+        contactMessages: contactMessages.count || 0,
+        pendingTestimonials: pendingTestimonials.count || 0,
+        systemErrors: systemErrors.count || 0,
+        failedEmails: failedEmails.count || 0,
+        pendingCapstones: pendingCapstones.count || 0,
+        newFeedback: newFeedback.count || 0,
+      }
+      const attentionTotal =
+        attention.contactMessages +
+        attention.pendingTestimonials +
+        attention.systemErrors +
+        attention.failedEmails +
+        attention.pendingCapstones +
+        attention.newFeedback
 
-    return {
-      attention,
-      attentionTotal,
-      systemOnline: !error,
-      databaseLatencyMs: error ? null : latency,
+      return {
+        attention,
+        attentionTotal,
+        systemOnline: !error,
+        databaseLatencyMs: error ? null : latency,
+      }
+    } catch (err) {
+      console.warn('[AdminConsoleService] getConsoleShellContext failed:', err)
+      return {
+        attention: {
+          contactMessages: 0,
+          pendingTestimonials: 0,
+          systemErrors: 0,
+          failedEmails: 0,
+          pendingCapstones: 0,
+          newFeedback: 0,
+        },
+        attentionTotal: 0,
+        systemOnline: false,
+        databaseLatencyMs: null,
+      }
     }
   }
 
@@ -205,7 +236,7 @@ export class AdminConsoleService {
       }
 
       // Page-scoped batch queries (no full-table scans)
-      const [completedRes, lastActiveRes, completionBadgeRes] = await Promise.all([
+      const [completedRes, lastActiveRes, completionBadgeRes, authLookups] = await Promise.all([
         (supabase.from('user_lesson_progress') as unknown as DBChain)
           .select('user_id')
           .eq('status', 'completed')
@@ -215,6 +246,7 @@ export class AdminConsoleService {
           .in('user_id', pageUserIds)
           .order('created_at', { ascending: false }),
         this.resolveCompletionBadgeUserIdsForPage(supabase, pageUserIds),
+        Promise.allSettled(pageUserIds.map((id) => supabase.auth.admin.getUserById(id))),
       ])
 
       const completedCounts = new Map<string, number>()
@@ -229,11 +261,24 @@ export class AdminConsoleService {
         }
       }
 
+      const authVerificationMap = new Map<string, { email_confirmed_at: string | null }>()
+      authLookups.forEach((res, idx) => {
+        if (res.status === 'fulfilled' && res.value.data?.user) {
+          const authUser = res.value.data.user
+          authVerificationMap.set(pageUserIds[idx], {
+            email_confirmed_at: authUser.email_confirmed_at || null,
+          })
+        }
+      })
+
       const rows: AdminUserOverview[] = publicRows.map((pub) => {
         const userId = String(pub.id)
         const email = String(pub.email || '')
         const completed = completedCounts.get(userId) || 0
         const hasCompletionBadge = completionBadgeRes.has(userId)
+        const authData = authVerificationMap.get(userId)
+        const emailConfirmedAt = authData?.email_confirmed_at || null
+        const isVerified = Boolean(emailConfirmedAt)
 
         return {
           id: userId,
@@ -242,8 +287,8 @@ export class AdminConsoleService {
           username: pub.username ? String(pub.username) : null,
           role: pub.is_admin ? 'Admin' : 'Learner',
           isAdmin: Boolean(pub.is_admin),
-          isVerified: true,
-          emailConfirmedAt: String(pub.created_at || new Date().toISOString()),
+          isVerified,
+          emailConfirmedAt,
           totalXp: Number(pub.total_xp) || 0,
           level: Number(pub.level) || 1,
           streakDays: Number(pub.current_streak) || 0,
@@ -380,7 +425,7 @@ export class AdminConsoleService {
     } | null
 
     const email = u?.email || authUser?.email || ''
-    const emailConfirmedAt = authUser?.email_confirmed_at || (u ? u.created_at : null)
+    const emailConfirmedAt = authUser?.email_confirmed_at || null
     const isVerified = Boolean(emailConfirmedAt)
 
     // Curriculum metadata (module bucketing + lesson titles).

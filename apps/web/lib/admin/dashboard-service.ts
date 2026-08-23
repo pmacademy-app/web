@@ -48,88 +48,115 @@ export class DashboardService {
    */
   public static async getDashboardSummary(forceFresh = false): Promise<AdminDashboardSummary> {
     const fetcher = async (): Promise<AdminDashboardSummary> => {
-      const supabase = createServiceRoleClient()
-
-      // Attempt PostgreSQL RPC aggregation first
       try {
-        const { data: rpcData, error: rpcError } = (await (supabase as unknown as {
-          rpc: (fn: string) => Promise<{ data: Record<string, unknown> | null; error: unknown }>
-        }).rpc('get_admin_dashboard_summary'))
+        const supabase = createServiceRoleClient()
 
-        if (!rpcError && rpcData) {
-          const systemHealth = await AdminConsoleService.getSystemHealth()
-          return {
-            totalUsers: Number(rpcData.totalUsers || 0),
-            activeLearners7d: Number(rpcData.activeLearners7d || 0),
-            newSignups24h: Number(rpcData.newSignups24h || 0),
-            totalLessonsCompleted: Number(rpcData.totalLessonsCompleted || 0),
-            totalCapstonesSubmitted: Number(rpcData.totalCapstonesSubmitted || 0),
-            totalCertificatesIssued: Number(rpcData.totalCertificatesIssued || 0),
-            totalPublicPortfolios: Number(rpcData.totalPublicPortfolios || 0),
-            totalXpAwarded: Number(rpcData.totalXpAwarded || 0),
-            notificationsSent24h: 0,
-            queuePendingCount: systemHealth.queuePendingItemsCount,
-            systemHealth,
+        // Attempt PostgreSQL RPC aggregation first
+        try {
+          const { data: rpcData, error: rpcError } = (await (supabase as unknown as {
+            rpc: (fn: string) => Promise<{ data: Record<string, unknown> | null; error: unknown }>
+          }).rpc('get_admin_dashboard_summary'))
+
+          if (!rpcError && rpcData) {
+            const systemHealth = await AdminConsoleService.getSystemHealth()
+            return {
+              totalUsers: Number(rpcData.totalUsers || 0),
+              activeLearners7d: Number(rpcData.activeLearners7d || 0),
+              newSignups24h: Number(rpcData.newSignups24h || 0),
+              totalLessonsCompleted: Number(rpcData.totalLessonsCompleted || 0),
+              totalCapstonesSubmitted: Number(rpcData.totalCapstonesSubmitted || 0),
+              totalCertificatesIssued: Number(rpcData.totalCertificatesIssued || 0),
+              totalPublicPortfolios: Number(rpcData.totalPublicPortfolios || 0),
+              totalXpAwarded: Number(rpcData.totalXpAwarded || 0),
+              notificationsSent24h: 0,
+              queuePendingCount: systemHealth.queuePendingItemsCount,
+              systemHealth,
+            }
           }
+        } catch {
+          // Fall back to direct queries if RPC is not yet created
         }
-      } catch {
-        // Fall back to direct queries if RPC is not yet created
-      }
 
-      // Fast fallback using direct count queries and users table total_xp
-      const now = new Date()
-      const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-      const past7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        // Fast fallback using direct count queries and users table total_xp
+        const now = new Date()
+        const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        const past7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
 
-      const [
-        totalUsersRes,
-        newSignups24hRes,
-        lessonsRes,
-        capstonesRes,
-        certsRes,
-        portfoliosRes,
-        usersXpRes,
-        active7dRows,
-        systemHealth,
-      ] = await Promise.all([
-        supabase.from('users').select('id', { count: 'exact', head: true }),
-        supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', past24h.toISOString()),
-        supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('status', 'completed'),
-        supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }),
-        supabase.from('certificates').select('id', { count: 'exact', head: true }),
-        supabase.from('users').select('id', { count: 'exact', head: true }).eq('is_portfolio_public', true),
-        supabase.from('users').select('total_xp'),
-        supabase
-          .from('xp_events')
-          .select('user_id')
-          .gte('created_at', past7d.toISOString())
-          .limit(5000),
-        AdminConsoleService.getSystemHealth(),
-      ])
+        const [
+          totalUsersRes,
+          newSignups24hRes,
+          lessonsRes,
+          capstonesRes,
+          certsRes,
+          portfoliosRes,
+          usersXpRes,
+          active7dRows,
+          systemHealth,
+        ] = await Promise.all([
+          supabase.from('users').select('id', { count: 'exact', head: true }),
+          supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', past24h.toISOString()),
+          supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('status', 'completed'),
+          supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }),
+          supabase.from('certificates').select('id', { count: 'exact', head: true }),
+          supabase.from('users').select('id', { count: 'exact', head: true }).eq('is_portfolio_public', true),
+          supabase.from('users').select('total_xp'),
+          supabase
+            .from('xp_events')
+            .select('user_id')
+            .gte('created_at', past7d.toISOString())
+            .limit(5000),
+          AdminConsoleService.getSystemHealth(),
+        ])
 
-      const totalUsers = totalUsersRes?.count ?? 0
-      const newSignups24h = newSignups24hRes?.count ?? 0
-      const totalXpAwarded = (usersXpRes.data || []).reduce(
-        (acc: number, u: { total_xp?: number | null }) => acc + (u.total_xp || 0),
-        0
-      )
+        const totalUsers = totalUsersRes?.count ?? 0
+        const newSignups24h = newSignups24hRes?.count ?? 0
+        const totalXpAwarded = (usersXpRes.data || []).reduce(
+          (acc: number, u: { total_xp?: number | null }) => acc + (u.total_xp || 0),
+          0
+        )
 
-      const activeLearners7d = new Set(
-        (active7dRows.data || []).map((r: { user_id: string | null }) => r.user_id).filter((id): id is string => Boolean(id))
-      ).size
+        const activeLearners7d = new Set(
+          (active7dRows.data || []).map((r: { user_id: string | null }) => r.user_id).filter((id): id is string => Boolean(id))
+        ).size
 
-      return {
-        totalUsers,
-        activeLearners7d,
-        newSignups24h,
-        totalLessonsCompleted: lessonsRes?.count ?? 0,
-        totalCapstonesSubmitted: capstonesRes?.count ?? 0,
-        totalCertificatesIssued: certsRes?.count ?? 0,
-        totalPublicPortfolios: portfoliosRes?.count ?? 0,
-        totalXpAwarded,
-        notificationsSent24h: 0,
-        queuePendingCount: systemHealth.queuePendingItemsCount,
-        systemHealth,
+        return {
+          totalUsers,
+          activeLearners7d,
+          newSignups24h,
+          totalLessonsCompleted: lessonsRes?.count ?? 0,
+          totalCapstonesSubmitted: capstonesRes?.count ?? 0,
+          totalCertificatesIssued: certsRes?.count ?? 0,
+          totalPublicPortfolios: portfoliosRes?.count ?? 0,
+          totalXpAwarded,
+          notificationsSent24h: 0,
+          queuePendingCount: systemHealth.queuePendingItemsCount,
+          systemHealth,
+        }
+      } catch (err) {
+        console.warn('[DashboardService] getDashboardSummary failed:', err)
+        const systemHealth = await AdminConsoleService.getSystemHealth().catch(() => ({
+          status: 'down' as const,
+          databaseLatencyMs: -1,
+          activeCronJobsCount: 0,
+          queuePendingItemsCount: 0,
+          failedNotifications24h: 0,
+          lastCheckedAt: new Date().toISOString(),
+          environment: process.env.NODE_ENV || 'development',
+          nextVersion: 'Next.js 16.2.12 (Turbopack)',
+        }))
+        return {
+          totalUsers: 0,
+          activeLearners7d: 0,
+          newSignups24h: 0,
+          totalLessonsCompleted: 0,
+          totalCapstonesSubmitted: 0,
+          totalCertificatesIssued: 0,
+          totalPublicPortfolios: 0,
+          totalXpAwarded: 0,
+          notificationsSent24h: 0,
+          queuePendingCount: systemHealth.queuePendingItemsCount,
+          systemHealth,
+        }
       }
     }
 
@@ -155,215 +182,248 @@ export class DashboardService {
     forceFresh = false
   ): Promise<AdminDashboardData> {
     const fetcher = async (): Promise<AdminDashboardData> => {
-      const supabase = createServiceRoleClient()
-
       const range = resolveRange(rangeKey, from, to)
-      const rangeMs = range.end.getTime() - range.start.getTime()
-      const previousEnd = new Date(range.start.getTime() - 1)
-      const previousStart = new Date(previousEnd.getTime() - rangeMs)
-      const rangeStartIso = range.start.toISOString()
-      const rangeEndIso = range.end.toISOString()
-      const prevStartIso = previousStart.toISOString()
-      const prevEndIso = previousEnd.toISOString()
+      try {
+        const supabase = createServiceRoleClient()
 
-      // ── 1. Users (counts + range-scoped rows) ─────────────────────────────────
-      const [totalUsersRes, usersInRangeRes, usersInPreviousRes, usersWithGoalRes] = await Promise.all([
-        supabase.from('users').select('id', { count: 'exact', head: true }),
-        supabase
-          .from('users')
-          .select('id, created_at')
-          .gte('created_at', rangeStartIso)
-          .lte('created_at', rangeEndIso)
-          .limit(5000),
-        supabase
-          .from('users')
-          .select('id', { count: 'exact', head: true })
-          .gte('created_at', prevStartIso)
-          .lte('created_at', prevEndIso),
-        supabase.from('users').select('id', { count: 'exact', head: true }).not('goal', 'is', null),
-      ])
+        const rangeMs = range.end.getTime() - range.start.getTime()
+        const previousEnd = new Date(range.start.getTime() - 1)
+        const previousStart = new Date(previousEnd.getTime() - rangeMs)
+        const rangeStartIso = range.start.toISOString()
+        const rangeEndIso = range.end.toISOString()
+        const prevStartIso = previousStart.toISOString()
+        const prevEndIso = previousEnd.toISOString()
 
-      const totalUsers = totalUsersRes?.count ?? 0
-      const usersInRange = (usersInRangeRes.data || []) as Array<{ id: string; created_at: string }>
-      const usersInPrevious = usersInPreviousRes?.count ?? 0
-      const usersWithGoal = usersWithGoalRes?.count ?? 0
-
-      // ── 2. XP events (active learners + XP earned within range) ───────────────
-      const [xpCurrentRes, xpPreviousRes, activeBeforeRes] = await Promise.all([
-        supabase
-          .from('xp_events')
-          .select('user_id, xp_amount, created_at')
-          .gte('created_at', rangeStartIso)
-          .lte('created_at', rangeEndIso)
-          .limit(5000),
-        supabase
-          .from('xp_events')
-          .select('user_id, xp_amount')
-          .gte('created_at', prevStartIso)
-          .lte('created_at', prevEndIso)
-          .limit(5000),
-        supabase
-          .from('xp_events')
-          .select('user_id')
-          .lt('created_at', rangeStartIso)
-          .limit(2000),
-      ])
-
-      const xpCurrent = (xpCurrentRes.data || []) as Array<{ user_id: string | null; xp_amount: number; created_at: string }>
-      const xpPrevious = (xpPreviousRes.data || []) as Array<{ user_id: string | null; xp_amount: number }>
-      const xpBefore = (activeBeforeRes.data || []) as Array<{ user_id: string | null }>
-
-      const activeUsersInRange = new Set(xpCurrent.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
-      const activeUsersInPrevious = new Set(xpPrevious.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
-      const activeUsersBeforeRange = new Set(xpBefore.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
-
-      const xpEarned = xpCurrent.reduce((sum, e) => sum + (e.xp_amount || 0), 0)
-      const xpEarnedPrevious = xpPrevious.reduce((sum, e) => sum + (e.xp_amount || 0), 0)
-
-      // ── 3. Learning events (charts + range counts) ───────────────────────────
-      const [lessonsInRangeRes, lessonsInPreviousRes, quizzesInRangeRes, capstonesInRangeRes, certsInRangeRes, certsInPreviousRes] =
-        await Promise.all([
+        // ── 1. Users (counts + range-scoped rows) ─────────────────────────────────
+        const [totalUsersRes, usersInRangeRes, usersInPreviousRes, usersWithGoalRes] = await Promise.all([
+          supabase.from('users').select('id', { count: 'exact', head: true }),
           supabase
-            .from('user_lesson_progress')
-            .select('user_id, completed_at')
-            .eq('status', 'completed')
-            .gte('completed_at', rangeStartIso)
-            .lte('completed_at', rangeEndIso)
+            .from('users')
+            .select('id, created_at')
+            .gte('created_at', rangeStartIso)
+            .lte('created_at', rangeEndIso)
             .limit(5000),
           supabase
-            .from('user_lesson_progress')
+            .from('users')
             .select('id', { count: 'exact', head: true })
-            .eq('status', 'completed')
-            .gte('completed_at', prevStartIso)
-            .lte('completed_at', prevEndIso),
-          supabase
-            .from('quiz_attempts')
-            .select('id, user_id, attempted_at')
-            .gte('attempted_at', rangeStartIso)
-            .lte('attempted_at', rangeEndIso)
-            .limit(5000),
-          supabase
-            .from('capstone_submissions')
-            .select('user_id, submitted_at')
-            .gte('submitted_at', rangeStartIso)
-            .lte('submitted_at', rangeEndIso)
-            .limit(5000),
-          supabase
-            .from('certificates')
-            .select('id, user_id, issued_at')
-            .gte('issued_at', rangeStartIso)
-            .lte('issued_at', rangeEndIso)
-            .limit(5000),
-          supabase
-            .from('certificates')
-            .select('id', { count: 'exact', head: true })
-            .gte('issued_at', prevStartIso)
-            .lte('issued_at', prevEndIso),
+            .gte('created_at', prevStartIso)
+            .lte('created_at', prevEndIso),
+          supabase.from('users').select('id', { count: 'exact', head: true }).not('goal', 'is', null),
         ])
 
-      const lessonsInRange = (lessonsInRangeRes.data || []) as Array<{ user_id: string; completed_at: string | null }>
-      const lessonsInPrevious = lessonsInPreviousRes?.count ?? 0
-      const quizzesInRange = (quizzesInRangeRes.data || []) as Array<{ id: string; user_id: string | null; attempted_at: string }>
-      const capstonesInRange = (capstonesInRangeRes.data || []) as Array<{ user_id: string | null; submitted_at: string }>
-      const certsInRange = (certsInRangeRes.data || []) as Array<{ id: string; user_id: string; issued_at: string }>
-      const certsInPrevious = certsInPreviousRes?.count ?? 0
+        const totalUsers = totalUsersRes?.count ?? 0
+        const usersInRange = (usersInRangeRes.data || []) as Array<{ id: string; created_at: string }>
+        const usersInPrevious = usersInPreviousRes?.count ?? 0
+        const usersWithGoal = usersWithGoalRes?.count ?? 0
 
-      // ── 4. Funnel stages (SQL-side fast count queries) ────────────────────────
-      const [firstLessonCountRes, firstQuizCountRes, moduleCompletionCountRes, certificateCountRes] = await Promise.all([
-        supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('status', 'completed'),
-        supabase.from('quiz_attempts').select('user_id', { count: 'exact', head: true }),
-        supabase.from('capstone_submissions').select('user_id', { count: 'exact', head: true }).not('submitted_at', 'is', null),
-        supabase.from('certificates').select('user_id', { count: 'exact', head: true }),
-      ])
+        // ── 2. XP events (active learners + XP earned within range) ───────────────
+        const [xpCurrentRes, xpPreviousRes, activeBeforeRes] = await Promise.all([
+          supabase
+            .from('xp_events')
+            .select('user_id, xp_amount, created_at')
+            .gte('created_at', rangeStartIso)
+            .lte('created_at', rangeEndIso)
+            .limit(5000),
+          supabase
+            .from('xp_events')
+            .select('user_id, xp_amount')
+            .gte('created_at', prevStartIso)
+            .lte('created_at', prevEndIso)
+            .limit(5000),
+          supabase
+            .from('xp_events')
+            .select('user_id')
+            .lt('created_at', rangeStartIso)
+            .limit(2000),
+        ])
 
-      let courseCompletionUsers = 0
-      try {
-        const badgeIds = await this.resolveCourseCompletionBadgeIds(supabase)
-        if (badgeIds.length > 0) {
-          const { count } = await supabase.from('user_badges').select('user_id', { count: 'exact', head: true }).in('badge_id', badgeIds)
-          courseCompletionUsers = count || 0
+        const xpCurrent = (xpCurrentRes.data || []) as Array<{ user_id: string | null; xp_amount: number; created_at: string }>
+        const xpPrevious = (xpPreviousRes.data || []) as Array<{ user_id: string | null; xp_amount: number }>
+        const xpBefore = (activeBeforeRes.data || []) as Array<{ user_id: string | null }>
+
+        const activeUsersInRange = new Set(xpCurrent.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
+        const activeUsersInPrevious = new Set(xpPrevious.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
+        const activeUsersBeforeRange = new Set(xpBefore.map((e) => e.user_id).filter((id): id is string => Boolean(id)))
+
+        const xpEarned = xpCurrent.reduce((sum, e) => sum + (e.xp_amount || 0), 0)
+        const xpEarnedPrevious = xpPrevious.reduce((sum, e) => sum + (e.xp_amount || 0), 0)
+
+        // ── 3. Learning events (charts + range counts) ───────────────────────────
+        const [lessonsInRangeRes, lessonsInPreviousRes, quizzesInRangeRes, capstonesInRangeRes, certsInRangeRes, certsInPreviousRes] =
+          await Promise.all([
+            supabase
+              .from('user_lesson_progress')
+              .select('user_id, completed_at')
+              .eq('status', 'completed')
+              .gte('completed_at', rangeStartIso)
+              .lte('completed_at', rangeEndIso)
+              .limit(5000),
+            supabase
+              .from('user_lesson_progress')
+              .select('id', { count: 'exact', head: true })
+              .eq('status', 'completed')
+              .gte('completed_at', prevStartIso)
+              .lte('completed_at', prevEndIso),
+            supabase
+              .from('quiz_attempts')
+              .select('id, user_id, attempted_at')
+              .gte('attempted_at', rangeStartIso)
+              .lte('attempted_at', rangeEndIso)
+              .limit(5000),
+            supabase
+              .from('capstone_submissions')
+              .select('user_id, submitted_at')
+              .gte('submitted_at', rangeStartIso)
+              .lte('submitted_at', rangeEndIso)
+              .limit(5000),
+            supabase
+              .from('certificates')
+              .select('id, user_id, issued_at')
+              .gte('issued_at', rangeStartIso)
+              .lte('issued_at', rangeEndIso)
+              .limit(5000),
+            supabase
+              .from('certificates')
+              .select('id', { count: 'exact', head: true })
+              .gte('issued_at', prevStartIso)
+              .lte('issued_at', prevEndIso),
+          ])
+
+        const lessonsInRange = (lessonsInRangeRes.data || []) as Array<{ user_id: string; completed_at: string | null }>
+        const lessonsInPrevious = lessonsInPreviousRes?.count ?? 0
+        const quizzesInRange = (quizzesInRangeRes.data || []) as Array<{ id: string; user_id: string | null; attempted_at: string }>
+        const capstonesInRange = (capstonesInRangeRes.data || []) as Array<{ user_id: string | null; submitted_at: string }>
+        const certsInRange = (certsInRangeRes.data || []) as Array<{ id: string; user_id: string; issued_at: string }>
+        const certsInPrevious = certsInPreviousRes?.count ?? 0
+
+        // ── 4. Funnel stages (SQL-side fast count queries) ────────────────────────
+        const [firstLessonCountRes, firstQuizCountRes, moduleCompletionCountRes, certificateCountRes] = await Promise.all([
+          supabase.from('user_lesson_progress').select('user_id', { count: 'exact', head: true }).eq('status', 'completed'),
+          supabase.from('quiz_attempts').select('user_id', { count: 'exact', head: true }),
+          supabase.from('capstone_submissions').select('user_id', { count: 'exact', head: true }).not('submitted_at', 'is', null),
+          supabase.from('certificates').select('user_id', { count: 'exact', head: true }),
+        ])
+
+        let courseCompletionUsers = 0
+        try {
+          const badgeIds = await this.resolveCourseCompletionBadgeIds(supabase)
+          if (badgeIds.length > 0) {
+            const { count } = await supabase.from('user_badges').select('user_id', { count: 'exact', head: true }).in('badge_id', badgeIds)
+            courseCompletionUsers = count || 0
+          }
+        } catch {
+          courseCompletionUsers = 0
         }
-      } catch {
-        courseCompletionUsers = 0
-      }
 
-      const funnel = buildFunnel([
-        { key: 'registered', label: 'Registered', count: totalUsers },
-        { key: 'onboarding', label: 'Onboarding', count: usersWithGoal },
-        { key: 'first_lesson', label: 'First Lesson', count: firstLessonCountRes?.count ?? 0 },
-        { key: 'first_quiz', label: 'First Quiz', count: firstQuizCountRes?.count ?? 0 },
-        { key: 'module_completion', label: 'Module Completion', count: moduleCompletionCountRes?.count ?? 0 },
-        { key: 'course_completion', label: 'Course Completion', count: courseCompletionUsers },
-        { key: 'certificate', label: 'Certificate', count: certificateCountRes?.count ?? 0 },
-      ])
+        const funnel = buildFunnel([
+          { key: 'registered', label: 'Registered', count: totalUsers },
+          { key: 'onboarding', label: 'Onboarding', count: usersWithGoal },
+          { key: 'first_lesson', label: 'First Lesson', count: firstLessonCountRes?.count ?? 0 },
+          { key: 'first_quiz', label: 'First Quiz', count: firstQuizCountRes?.count ?? 0 },
+          { key: 'module_completion', label: 'Module Completion', count: moduleCompletionCountRes?.count ?? 0 },
+          { key: 'course_completion', label: 'Course Completion', count: courseCompletionUsers },
+          { key: 'certificate', label: 'Certificate', count: certificateCountRes?.count ?? 0 },
+        ])
 
-      // ── 5. Verified users ─────────────────────────────────────────────────────
-      let verifiedTotal = 0
-      let verifiedInRange = 0
-      let authAvailable = true
-      try {
-        const { data: authData } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 })
-        const authUsers = authData?.users || []
-        verifiedTotal = authUsers.filter((u) => Boolean(u.email_confirmed_at)).length
-        verifiedInRange = authUsers.filter(
-          (u) => u.email_confirmed_at && u.email_confirmed_at >= rangeStartIso && u.email_confirmed_at <= rangeEndIso
-        ).length
-      } catch {
-        authAvailable = false
-      }
+        // ── 5. Verified users ─────────────────────────────────────────────────────
+        let verifiedTotal = 0
+        let verifiedInRange = 0
+        let authAvailable = true
+        try {
+          const { data: authData } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 })
+          const authUsers = authData?.users || []
+          verifiedTotal = authUsers.filter((u) => Boolean(u.email_confirmed_at)).length
+          verifiedInRange = authUsers.filter(
+            (u) => u.email_confirmed_at && u.email_confirmed_at >= rangeStartIso && u.email_confirmed_at <= rangeEndIso
+          ).length
+        } catch {
+          authAvailable = false
+        }
 
-      // ── 6. Attention center & System Snapshot ────────────────────────────────
-      const [attention, systemSnapshot, recentActivity] = await Promise.all([
-        this.getAttentionItems(supabase, rangeStartIso, rangeEndIso),
-        this.getSystemSnapshot(authAvailable),
-        this.getRecentActivity(supabase, 12),
-      ])
+        // ── 6. Attention center & System Snapshot ────────────────────────────────
+        const [attention, systemSnapshot, recentActivity] = await Promise.all([
+          this.getAttentionItems(supabase, rangeStartIso, rangeEndIso),
+          this.getSystemSnapshot(authAvailable),
+          this.getRecentActivity(supabase, 12),
+        ])
 
-      // ── 7. Assemble KPIs & Series ─────────────────────────────────────────────
-      const kpis = {
-        totalUsers,
-        activeLearners: activeUsersInRange.size,
-        newUsers: usersInRange.length,
-        verifiedUsers: verifiedTotal,
-        lessonsCompleted: lessonsInRange.filter((l) => l.completed_at).length,
-        courseCompletionPct:
-          totalUsers === 0 ? 0 : Math.round((courseCompletionUsers / totalUsers) * 1000) / 10,
-        xpEarned,
-        certificatesIssued: certsInRange.length,
-        trends: {
-          totalUsers: computeTrend(totalUsers, totalUsers - usersInRange.length),
-          activeLearners: computeTrend(activeUsersInRange.size, activeUsersInPrevious.size),
-          newUsers: computeTrend(usersInRange.length, usersInPrevious),
-          verifiedUsers: computeTrend(verifiedTotal, verifiedTotal - verifiedInRange),
-          lessonsCompleted: computeTrend(lessonsInRange.filter((l) => l.completed_at).length, lessonsInPrevious),
-          courseCompletionPct: null,
-          xpEarned: computeTrend(xpEarned, xpEarnedPrevious),
-          certificatesIssued: computeTrend(certsInRange.length, certsInPrevious),
-        },
-      }
+        // ── 7. Assemble KPIs & Series ─────────────────────────────────────────────
+        const kpis = {
+          totalUsers,
+          activeLearners: activeUsersInRange.size,
+          newUsers: usersInRange.length,
+          verifiedUsers: verifiedTotal,
+          lessonsCompleted: lessonsInRange.filter((l) => l.completed_at).length,
+          courseCompletionPct:
+            totalUsers === 0 ? 0 : Math.round((courseCompletionUsers / totalUsers) * 1000) / 10,
+          xpEarned,
+          certificatesIssued: certsInRange.length,
+          trends: {
+            totalUsers: computeTrend(totalUsers, totalUsers - usersInRange.length),
+            activeLearners: computeTrend(activeUsersInRange.size, activeUsersInPrevious.size),
+            newUsers: computeTrend(usersInRange.length, usersInPrevious),
+            verifiedUsers: computeTrend(verifiedTotal, verifiedTotal - verifiedInRange),
+            lessonsCompleted: computeTrend(lessonsInRange.filter((l) => l.completed_at).length, lessonsInPrevious),
+            courseCompletionPct: null,
+            xpEarned: computeTrend(xpEarned, xpEarnedPrevious),
+            certificatesIssued: computeTrend(certsInRange.length, certsInPrevious),
+          },
+        }
 
-      const learnerSeries = buildLearnerSeries({
-        range,
-        newUsers: usersInRange,
-        xpEvents: xpCurrent.filter((e): e is { user_id: string; xp_amount: number; created_at: string } => e.user_id !== null),
-        usersActiveBeforeWindow: activeUsersBeforeRange,
-      })
-      const learningSeries = buildLearningSeries({
-        range,
-        lessonsCompleted: lessonsInRange.filter((l): l is { user_id: string; completed_at: string } => l.completed_at !== null),
-        quizAttempts: quizzesInRange,
-        capstonesSubmitted: capstonesInRange.filter((c): c is { user_id: string; submitted_at: string } => c.submitted_at !== null),
-      })
-      const series = mergeSeries(learnerSeries, learningSeries)
+        const learnerSeries = buildLearnerSeries({
+          range,
+          newUsers: usersInRange,
+          xpEvents: xpCurrent.filter((e): e is { user_id: string; xp_amount: number; created_at: string } => e.user_id !== null),
+          usersActiveBeforeWindow: activeUsersBeforeRange,
+        })
+        const learningSeries = buildLearningSeries({
+          range,
+          lessonsCompleted: lessonsInRange.filter((l): l is { user_id: string; completed_at: string } => l.completed_at !== null),
+          quizAttempts: quizzesInRange,
+          capstonesSubmitted: capstonesInRange.filter((c): c is { user_id: string; submitted_at: string } => c.submitted_at !== null),
+        })
+        const series = mergeSeries(learnerSeries, learningSeries)
 
-      return {
-        range,
-        kpis,
-        attention,
-        series,
-        funnel,
-        recentActivity,
-        systemSnapshot,
+        return {
+          range,
+          kpis,
+          attention,
+          series,
+          funnel,
+          recentActivity,
+          systemSnapshot,
+        }
+      } catch (err) {
+        console.warn('[DashboardService] getDashboardData failed:', err)
+        const systemSnapshot = await this.getSystemSnapshot(false).catch(() => [])
+        return {
+          range,
+          kpis: {
+            totalUsers: 0,
+            activeLearners: 0,
+            newUsers: 0,
+            verifiedUsers: 0,
+            lessonsCompleted: 0,
+            courseCompletionPct: 0,
+            xpEarned: 0,
+            certificatesIssued: 0,
+            trends: {
+              totalUsers: null,
+              activeLearners: null,
+              newUsers: null,
+              verifiedUsers: null,
+              lessonsCompleted: null,
+              courseCompletionPct: null,
+              xpEarned: null,
+              certificatesIssued: null,
+            },
+          },
+          attention: [],
+          series: [],
+          funnel: [],
+          recentActivity: [],
+          systemSnapshot,
+        }
       }
     }
 
