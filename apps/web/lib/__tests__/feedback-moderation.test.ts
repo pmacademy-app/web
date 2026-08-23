@@ -15,7 +15,7 @@ const createChain = (table: string) => {
       }
       return chain
     }),
-    eq: vi.fn((field: string, val: any) => {
+    eq: vi.fn((field: string, _val: any) => {
       if (table === 'testimonials' && field === 'status') {
         // filter status
       }

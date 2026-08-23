@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { POST as telemetryRouteHandler } from '../../app/api/auth/telemetry/route'
 import { GET as adminAuthHealthHandler } from '../../app/api/admin/system/auth-health/route'
-import { recordAuthTelemetry, type AuthTelemetryAction } from '@/lib/auth/telemetry'
+import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { classifyAuthError } from '@/lib/auth/errors'
 import { SystemService } from '@/lib/admin/system-service'
 

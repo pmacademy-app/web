@@ -124,9 +124,9 @@ export class ModerationService {
     adminEmail: string,
     submissionId: string,
     action: 'approve' | 'reject',
-    supabaseClient?: any
+    supabaseClient?: unknown
   ): Promise<boolean> {
-    const supabase = supabaseClient || createServiceRoleClient()
+    const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
     try {
       const { data, error } = await (supabase.from('capstone_submissions') as unknown as DBChain)
         .update({
