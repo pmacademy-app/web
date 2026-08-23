@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ShieldCheck, Lock, Mail, Loader2, ArrowRight } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
+import { classifyAuthError } from '@/lib/auth/errors'
 
 /**
  * Admin Console login.
@@ -40,7 +41,8 @@ export default function AdminLoginPage() {
       })
 
       if (authError || !data.session) {
-        setError(authError?.message || 'Invalid admin credentials')
+        const classified = classifyAuthError(authError || new Error('Invalid credentials'), 'admin_login')
+        setError(classified.message)
         setLoading(false)
         return
       }
@@ -54,7 +56,8 @@ export default function AdminLoginPage() {
       })
 
       if (!syncRes.ok) {
-        setError('Failed to persist your session. Please try again.')
+        const syncError = classifyAuthError(new Error('Session sync failed'), 'session_sync')
+        setError(syncError.message)
         setLoading(false)
         return
       }
@@ -73,8 +76,9 @@ export default function AdminLoginPage() {
 
       router.push(authorized ? '/admin' : '/admin/access-denied')
       router.refresh()
-    } catch {
-      setError('An error occurred during authentication')
+    } catch (err) {
+      const classified = classifyAuthError(err, 'admin_login')
+      setError(classified.message)
       setLoading(false)
     }
   }

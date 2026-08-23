@@ -11,6 +11,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
+import { classifyAuthError, type ClassifiedAuthError } from '@/lib/auth/errors'
 
 const signupSchema = z.object({
   name: z
@@ -35,7 +36,7 @@ type SignupFormValues = z.infer<typeof signupSchema>
 
 export default function SignupPage() {
   const router = useRouter()
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [authError, setAuthError] = useState<ClassifiedAuthError | null>(null)
   const [submittedEmail, setSubmittedEmail] = useState<string>('')
   const [verificationPending, setVerificationPending] = useState<boolean>(false)
   const [isPending, startTransition] = useTransition()
@@ -54,7 +55,7 @@ export default function SignupPage() {
   })
 
   const handleSignup = (values: SignupFormValues) => {
-    setErrorMsg(null)
+    setAuthError(null)
 
     startTransition(async () => {
       try {
@@ -80,17 +81,14 @@ export default function SignupPage() {
           Boolean(data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
 
         if (isExistingAccountError) {
-          setErrorMsg('An account already exists with this email address. Please log in instead.')
+          const classified = classifyAuthError(new Error('User already registered'), 'signup')
+          setAuthError(classified)
           return
         }
 
         if (error) {
-          const raw = error.message?.trim()
-          const msg =
-            !raw || raw === '{}' || raw === 'null'
-              ? 'Could not create account. Please check your credentials or try logging in.'
-              : raw
-          setErrorMsg(msg)
+          const classified = classifyAuthError(error, 'signup')
+          setAuthError(classified)
           return
         }
 
@@ -104,7 +102,8 @@ export default function SignupPage() {
         }
       } catch (err) {
         console.error('[signup] Error registering:', err)
-        setErrorMsg('An unexpected error occurred. Please try again.')
+        const classified = classifyAuthError(err, 'signup')
+        setAuthError(classified)
       }
     })
   }
@@ -190,13 +189,13 @@ export default function SignupPage() {
         </div>
       ) : (
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
-          {errorMsg && (
+          {authError && (
             <div
               className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium flex flex-col gap-1.5"
               role="alert"
             >
-              <span>{errorMsg}</span>
-              {errorMsg.includes('already exists') && (
+              <span>{authError.message}</span>
+              {(authError.code === 'AUTH_USER_ALREADY_EXISTS' || authError.requiresAction === 'login') && (
                 <Link
                   href="/login"
                   className="inline-flex items-center gap-1 font-bold underline hover:opacity-80 text-primary w-fit"
