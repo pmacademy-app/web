@@ -103,15 +103,15 @@ export class FeedbackAdminService {
     if (userIds.length > 0) {
       const { data: usersData } = await supabase
         .from('users')
-        .select('id, full_name, username, email')
+        .select('id, name, username, email')
         .in('id', userIds)
 
       if (usersData) {
-        const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
+        const uList = usersData as unknown as Array<{ id: string; name?: string | null; username?: string | null; email?: string | null }>
         uList.forEach((u) => {
           userMap.set(u.id, {
-            name: u.full_name || u.username || u.email.split('@')[0],
-            username: u.username || `user_${u.id.substring(0, 6)}`,
+            name: u.name?.trim() || u.username?.trim() || (u.email ? u.email.split('@')[0] : '') || 'Learner',
+            username: u.username?.trim() || `user_${u.id.substring(0, 6)}`,
           })
         })
       }
@@ -123,7 +123,7 @@ export class FeedbackAdminService {
       return {
         id: item.id,
         userId: item.user_id,
-        authorName: itemExt.author_name || userMeta?.name || 'PM Academy Learner',
+        authorName: itemExt.author_name || userMeta?.name || (item.user_id ? 'Deleted Learner' : 'PM Academy Learner'),
         authorRole: itemExt.author_role || 'PM Academy Learner',
         sourceEvent: item.source_event,
         content: item.content,
@@ -234,13 +234,13 @@ export class FeedbackAdminService {
             if (userIds.length > 0) {
               const { data: usersData } = await supabase
                 .from('users')
-                .select('id, full_name, username, email')
+                .select('id, name, username, email')
                 .in('id', userIds)
 
               if (usersData) {
-                const uList = usersData as unknown as Array<{ id: string; full_name?: string; username?: string; email: string }>
+                const uList = usersData as unknown as Array<{ id: string; name?: string | null; username?: string | null; email?: string | null }>
                 uList.forEach((u) => {
-                  userMap.set(u.id, u.full_name || u.username || 'Learner')
+                  userMap.set(u.id, u.name?.trim() || u.username?.trim() || (u.email ? u.email.split('@')[0] : '') || 'Learner')
                 })
               }
             }
@@ -310,15 +310,15 @@ export class FeedbackAdminService {
     if (userIds.length > 0) {
       const { data: usersData } = await supabase
         .from('users')
-        .select('id, name, full_name, username, email')
+        .select('id, name, username, email')
         .in('id', userIds)
 
       if (usersData) {
-        const uList = usersData as unknown as Array<{ id: string; name?: string; full_name?: string; username?: string; email: string }>
+        const uList = usersData as unknown as Array<{ id: string; name?: string | null; username?: string | null; email?: string | null }>
         uList.forEach((u) => {
           userMap.set(u.id, {
-            name: u.name || u.full_name || u.username || u.email.split('@')[0],
-            email: u.email,
+            name: u.name?.trim() || u.username?.trim() || (u.email ? u.email.split('@')[0] : '') || 'Learner',
+            email: u.email || '',
           })
         })
       }

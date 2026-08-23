@@ -30,7 +30,7 @@ vi.mock('@/lib/supabase', () => ({
           resolve({
             data: [
               { id: 'user-1', name: 'Alice Test', email: 'alice@test.com' },
-              { id: 'user-2', full_name: 'Bob Test', email: 'bob@test.com' },
+              { id: 'user-2', name: 'Bob Test', email: 'bob@test.com' },
             ],
             error: null,
           })
