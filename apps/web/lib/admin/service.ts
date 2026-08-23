@@ -176,16 +176,17 @@ export class AdminConsoleService {
     limit = 50,
     search = '',
     filters: AdminUserFilters = {},
-    page = 1
+    page = 1,
+    supabaseClient?: any
   ): Promise<AdminUserListResult> {
-    const supabase = createServiceRoleClient()
+    const supabase = supabaseClient || createServiceRoleClient()
 
     try {
       let query = (supabase.from('users') as unknown as DBChain)
         .select('*', { count: 'exact' })
 
       // Server-side search
-      if (search && search.trim()) {
+      if (search && typeof search === 'string' && search.trim()) {
         const q = search.trim()
         query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%,username.ilike.%${q}%`)
       }

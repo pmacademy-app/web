@@ -34,7 +34,7 @@ export default async function ProgressPage() {
 
   const supabase = createServiceRoleClient()
 
-  // Fetch all performance & competency data in parallel
+  // Fetch all performance & competency data in parallel with lean column projection
   const [
     { data: progressRows },
     xpSummary,
@@ -44,22 +44,22 @@ export default async function ProgressPage() {
     { data: capstoneRows },
     userCertificates,
   ] = await Promise.all([
-    supabase
-      .from('user_lesson_progress')
-      .select('*')
-      .eq('user_id', user.id) as unknown as {
-      data: Database['public']['Tables']['user_lesson_progress']['Row'][] | null
-    },
+    (supabase
+      .from('user_lesson_progress') as unknown as DBChain)
+      .select('lesson_id, status')
+      .eq('user_id', user.id) as unknown as Promise<{
+      data: Array<{ lesson_id: string; status: string }> | null
+    }>,
     getUserXpSummary(supabase, user.id),
     getUserStreakStatus(supabase, user.id),
     getSkillRadarSummary(supabase, user.id),
     getUserBadgesData(supabase, user.id),
     (supabase
       .from('capstone_submissions') as unknown as DBChain)
-      .select('*')
-      .eq('user_id', user.id) as unknown as {
-      data: Database['public']['Tables']['capstone_submissions']['Row'][] | null
-    },
+      .select('module_slug, status')
+      .eq('user_id', user.id) as unknown as Promise<{
+      data: Array<{ module_slug: string; status: string }> | null
+    }>,
     getUserCertificates(supabase, user.id),
   ])
 

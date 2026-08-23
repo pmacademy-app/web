@@ -50,7 +50,7 @@ export default async function DashboardPage() {
     }
   }
 
-  // 2. Parallel data fetching
+  // 2. Parallel data fetching with lean column projection
   const [
     { data: progressRows },
     curriculum,
@@ -59,29 +59,29 @@ export default async function DashboardPage() {
     { data: capstoneRows },
     { data: recentXpEvents },
   ] = await Promise.all([
-    supabase
-      .from('user_lesson_progress')
-      .select('*')
-      .eq('user_id', authUser.id) as unknown as {
-      data: Database['public']['Tables']['user_lesson_progress']['Row'][] | null
-    },
+    (supabase
+      .from('user_lesson_progress') as unknown as DBChain)
+      .select('lesson_id, status')
+      .eq('user_id', authUser.id) as unknown as Promise<{
+      data: Array<{ lesson_id: string; status: string }> | null
+    }>,
     fetchCurriculumData(),
     getUserStreakStatus(supabase, authUser.id),
     getReviewQueueData(supabase, authUser.id),
     (supabase
       .from('capstone_submissions') as unknown as DBChain)
-      .select('*')
-      .eq('user_id', authUser.id) as unknown as {
-      data: Database['public']['Tables']['capstone_submissions']['Row'][] | null
-    },
+      .select('module_slug, status')
+      .eq('user_id', authUser.id) as unknown as Promise<{
+      data: Array<{ module_slug: string; status: string }> | null
+    }>,
     (supabase
       .from('xp_events') as unknown as DBChain)
-      .select('*')
+      .select('id, source_type, xp_amount, source_id, created_at')
       .eq('user_id', authUser.id)
       .order('created_at', { ascending: false })
-      .limit(5) as unknown as {
-      data: { id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }[] | null
-    },
+      .limit(5) as unknown as Promise<{
+      data: Array<{ id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }> | null
+    }>,
   ])
 
   const curriculumLessons = curriculum?.lessons ?? []
