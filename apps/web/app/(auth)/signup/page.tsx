@@ -12,6 +12,7 @@ import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 import { classifyAuthError, type ClassifiedAuthError } from '@/lib/auth/errors'
+import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 
 const signupSchema = z.object({
   name: z
@@ -83,12 +84,14 @@ export default function SignupPage() {
         if (isExistingAccountError) {
           const classified = classifyAuthError(new Error('User already registered'), 'signup')
           setAuthError(classified)
+          recordAuthTelemetry(classified, 'signup')
           return
         }
 
         if (error) {
           const classified = classifyAuthError(error, 'signup')
           setAuthError(classified)
+          recordAuthTelemetry(classified, 'signup')
           return
         }
 
@@ -104,6 +107,7 @@ export default function SignupPage() {
         console.error('[signup] Error registering:', err)
         const classified = classifyAuthError(err, 'signup')
         setAuthError(classified)
+        recordAuthTelemetry(classified, 'signup')
       }
     })
   }
