@@ -72,22 +72,30 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { alertId, newStatus } = body
+    const { alertId, fingerprint, newStatus } = body
 
-    if (!alertId || !['new', 'acknowledged', 'resolved'].includes(newStatus)) {
-      return NextResponse.json({ error: 'Valid alertId and newStatus are required.' }, { status: 400 })
+    if ((!alertId && !fingerprint) || !['new', 'acknowledged', 'resolved'].includes(newStatus)) {
+      return NextResponse.json({ error: 'Valid alertId or fingerprint and newStatus are required.' }, { status: 400 })
     }
 
     const supabase = createServiceRoleClient()
-    const { error: updateErr } = await supabase.from('system_errors')
+    let query = supabase.from('system_errors')
       .update({ status: newStatus, updated_at: new Date().toISOString() })
-      .eq('id', alertId)
+
+    if (alertId) {
+      query = query.eq('id', alertId)
+    } else if (fingerprint) {
+      query = query.eq('fingerprint', fingerprint)
+    }
+
+    const { error: updateErr } = await query
 
     if (updateErr) {
       return NextResponse.json({ error: updateErr.message }, { status: 400 })
     }
 
-    await logAdminAction(authResult.userId, authResult.email, `system_alert_${newStatus}`, 'system_error', alertId, { newStatus })
+    const targetId = alertId || fingerprint || 'group'
+    await logAdminAction(authResult.userId, authResult.email, `system_alert_${newStatus}`, 'system_error', targetId, { newStatus, alertId, fingerprint })
 
     return NextResponse.json({ success: true, message: `Alert status updated to ${newStatus}` })
   } catch (err) {

@@ -3,22 +3,22 @@ import { AdminConsoleService } from '../admin/service'
 import { isAdminEmail, isAdminUser } from '../admin/authorization'
 
 describe('Admin Console Unit Test Suite', () => {
-  it('AdminConsoleService.getFeatureFlags returns all feature flags', () => {
-    const flags = AdminConsoleService.getFeatureFlags()
+  it('AdminConsoleService.getFeatureFlags returns all feature flags', async () => {
+    const flags = await AdminConsoleService.getFeatureFlags()
     expect(Array.isArray(flags)).toBe(true)
     expect(flags.length).toBeGreaterThanOrEqual(5)
     const schedulerFlag = flags.find((f) => f.key === 'SCHEDULER_ENABLED')
     expect(schedulerFlag?.enabled).toBe(true)
   })
 
-  it('AdminConsoleService.toggleFeatureFlag toggles runtime flag state', () => {
+  it('AdminConsoleService.toggleFeatureFlag toggles runtime flag state', async () => {
     AdminConsoleService.toggleFeatureFlag('MARKETING_EMAILS_ENABLED', true)
-    let flags = AdminConsoleService.getFeatureFlags()
+    let flags = await AdminConsoleService.getFeatureFlags()
     let marketingFlag = flags.find((f) => f.key === 'MARKETING_EMAILS_ENABLED')
     expect(marketingFlag?.enabled).toBe(true)
 
     AdminConsoleService.toggleFeatureFlag('MARKETING_EMAILS_ENABLED', false)
-    flags = AdminConsoleService.getFeatureFlags()
+    flags = await AdminConsoleService.getFeatureFlags()
     marketingFlag = flags.find((f) => f.key === 'MARKETING_EMAILS_ENABLED')
     expect(marketingFlag?.enabled).toBe(false)
   })

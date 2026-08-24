@@ -60,7 +60,7 @@ export function AdminSystemAuditView({ initial }: AdminSystemAuditViewProps) {
           page: String(page),
           pageSize: '25',
         })
-        const res = await fetch(`/api/admin/audit?${query.toString()}`)
+        const res = await fetch(`/api/admin/system/audit?${query.toString()}`)
         const json = await res.json()
         if (!isMounted) return
         if (json.success) {

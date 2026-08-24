@@ -1,4 +1,3 @@
-import { unstable_cache } from 'next/cache'
 import { createServiceRoleClient } from '../supabase'
 import {
   buildFunnel,
@@ -44,9 +43,9 @@ export class DashboardService {
   }
 
   /**
-   * Aggregates real-time platform overview metrics for the summary API with SQL RPC and cache.
+   * Aggregates real-time platform overview metrics for the summary API with SQL RPC.
    */
-  public static async getDashboardSummary(forceFresh = false): Promise<AdminDashboardSummary> {
+  public static async getDashboardSummary(): Promise<AdminDashboardSummary> {
     const fetcher = async (): Promise<AdminDashboardSummary> => {
       try {
         const supabase = createServiceRoleClient()
@@ -160,16 +159,7 @@ export class DashboardService {
       }
     }
 
-    if (forceFresh) {
-      return fetcher()
-    }
-
-    const getCached = unstable_cache(fetcher, ['admin-summary-cache'], {
-      revalidate: 30,
-      tags: ['admin-summary'],
-    })
-
-    return getCached()
+    return fetcher()
   }
 
   /**
@@ -178,8 +168,7 @@ export class DashboardService {
   public static async getDashboardData(
     rangeKey: AdminDateRangeKey = '30d',
     from?: string | null,
-    to?: string | null,
-    forceFresh = false
+    to?: string | null
   ): Promise<AdminDashboardData> {
     const fetcher = async (): Promise<AdminDashboardData> => {
       const range = resolveRange(rangeKey, from, to)
@@ -427,17 +416,7 @@ export class DashboardService {
       }
     }
 
-    if (forceFresh) {
-      return fetcher()
-    }
-
-    const cacheKey = `admin-dashboard-data-${rangeKey}-${from || ''}-${to || ''}`
-    const getCached = unstable_cache(fetcher, [cacheKey], {
-      revalidate: 60,
-      tags: ['admin-dashboard-data'],
-    })
-
-    return getCached()
+    return fetcher()
   }
 
   /** Resolves badge ids marking full-curriculum completion. */
