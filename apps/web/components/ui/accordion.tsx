@@ -14,19 +14,22 @@ export function Accordion({
   className,
   children,
   type = 'single',
+  multiple,
   defaultValue,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   type?: 'single' | 'multiple'
+  multiple?: boolean
   defaultValue?: string | string[]
 }) {
+  const actualType = multiple ? 'multiple' : type
   const [value, setValue] = React.useState<string | string[]>(
-    defaultValue || (type === 'multiple' ? [] : '')
+    defaultValue || (actualType === 'multiple' ? [] : '')
   )
 
   const onValueChange = React.useCallback(
     (itemVal: string) => {
-      if (type === 'multiple') {
+      if (actualType === 'multiple') {
         setValue((prev) => {
           const arr = Array.isArray(prev) ? prev : []
           return arr.includes(itemVal) ? arr.filter((v) => v !== itemVal) : [...arr, itemVal]
@@ -35,11 +38,11 @@ export function Accordion({
         setValue((prev) => (prev === itemVal ? '' : itemVal))
       }
     },
-    [type]
+    [actualType]
   )
 
   return (
-    <AccordionContext.Provider value={{ value, onValueChange, type }}>
+    <AccordionContext.Provider value={{ value, onValueChange, type: actualType }}>
       <div data-slot="accordion" className={cn("flex w-full flex-col", className)} {...props}>
         {children}
       </div>

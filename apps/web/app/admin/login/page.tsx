@@ -7,6 +7,7 @@ import { ShieldCheck, Lock, Mail, Loader2, ArrowRight } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
 import { classifyAuthError } from '@/lib/auth/errors'
+import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 
 /**
  * Admin Console login.

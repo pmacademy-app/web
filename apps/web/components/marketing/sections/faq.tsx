@@ -59,7 +59,7 @@ export function FAQSection() {
               </h2>
             </motion.div>
 
-            <Accordion multiple className="w-full space-y-4">
+            <Accordion type="multiple" className="w-full space-y-4">
               {FAQ_ITEMS.map((item, index) => (
                 <AccordionItem
                   key={index}
