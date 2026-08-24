@@ -162,26 +162,25 @@ export async function isFreshOptOut(supabase: SupabaseClient, userId: string): P
 // ── Email Template Builder ───────────────────────────────────────────────────
 
 export function buildEmailContent(firstName: string, ctaUrl: string, siteUrl: string) {
-  const subject = 'Your PM journey doesn’t have to stop here'
-  const previewText = 'Pick up where you left off and keep building toward becoming the PM you want to be.'
+  const subject = 'You left something unfinished'
+  const previewText = 'Your progress is still there. If you’ve got 10 minutes today, come back and pick up where you left off.'
   const greeting = `Hey ${firstName},`
 
   const text = `${greeting}
 
-You started your PM journey with Prodily — don’t let it stop there.
+You started learning PM with Prodily — and I noticed you haven’t been back in a while.
 
-Whether you’re learning the fundamentals, sharpening your product thinking, or building your PM portfolio, there’s always another step you can take.
+Your progress is still there.
 
-Pick up where you left off and keep building.
+If you’ve got 10 minutes today, come back and pick up where you left off. There’s always one more concept, lesson, or idea that can make you a better product manager.
 
-→ Continue learning on Prodily: ${ctaUrl}
+Continue where you left off → ${ctaUrl}
 
-No pressure. No deadline. Just one more step toward becoming the PM you want to be.
+No big commitment. Just 10 minutes.
 
-See you inside,
-Team Prodily
+— Aditya
+Founder, Prodily
 
-${BRAND.fullName} · ${BRAND.positioning}
 Manage Preferences / Unsubscribe: ${siteUrl}/settings?tab=notifications`
 
   const html = `<!DOCTYPE html>
@@ -194,59 +193,22 @@ Manage Preferences / Unsubscribe: ${siteUrl}/settings?tab=notifications`
       ${previewText}
     </div>
   </head>
-  <body style="margin:0; padding:32px 16px; background-color:#FBFAF6; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#171A17; line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellPadding="0" cellSpacing="0" style="width:100%; max-width:560px; margin:0 auto;">
+  <body style="margin:0; padding:24px 16px; background-color:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size:15px; color:#171A17; line-height:1.6;">
+    <div style="max-width:560px; margin:0 auto;">
+      <p style="margin:0 0 16px 0; font-size:15px; color:#171A17; line-height:1.6;">${greeting}</p>
+      <p style="margin:0 0 16px 0; font-size:15px; color:#171A17; line-height:1.6;">You started learning PM with Prodily — and I noticed you haven’t been back in a while.</p>
+      <p style="margin:0 0 16px 0; font-size:15px; color:#171A17; line-height:1.6;">Your progress is still there.</p>
+      <p style="margin:0 0 16px 0; font-size:15px; color:#171A17; line-height:1.6;">If you’ve got 10 minutes today, come back and pick up where you left off. There’s always one more concept, lesson, or idea that can make you a better product manager.</p>
+      <p style="margin:24px 0; font-size:15px; line-height:1.6;">
+        <a href="${ctaUrl}" style="color:#1F6B4E; font-weight:600; text-decoration:underline;">Continue where you left off →</a>
+      </p>
+      <p style="margin:0 0 24px 0; font-size:15px; color:#171A17; line-height:1.6;">No big commitment. Just 10 minutes.</p>
+      <p style="margin:0 0 4px 0; font-size:15px; color:#171A17; line-height:1.6;">— Aditya<br /><span style="color:#70685A; font-size:14px;">Founder, Prodily</span></p>
 
-      <!-- Header -->
-      <tr>
-        <td style="padding-bottom:24px; text-align:left;">
-          <table role="presentation" border="0" cellPadding="0" cellSpacing="0">
-            <tr>
-              <td style="vertical-align:middle; padding-right:12px;">
-                <img src="${siteUrl}${BRAND.assets.logoMarkPng}" alt="${BRAND.company}" height="36" style="display:block; border:none; border-radius:6px; width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px; font-weight:bold; color:#1F6B4E; letter-spacing:-0.02em; display:block; line-height:1.2;">${BRAND.company}</span>
-                <span style="font-size:11px; font-weight:600; color:#70685A; text-transform:uppercase; letter-spacing:0.05em; display:block;">${BRAND.product}</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF; border-radius:16px; padding:36px 32px; border:1px solid #DED8CB; box-shadow:0 2px 8px rgba(31, 107, 78, 0.04);">
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">${greeting}</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You started your PM journey with Prodily — don’t let it stop there.</p>
-          <p style="margin:0 0 20px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Whether you’re learning the fundamentals, sharpening your product thinking, or building your PM portfolio, there’s always another step you can take.</p>
-          <p style="margin:0 0 24px 0; font-size:16px; font-weight:700; color:#171A17; line-height:1.5;">Pick up where you left off and keep building.</p>
-
-          <!-- CTA Button -->
-          <div style="margin:28px 0;">
-            <a href="${ctaUrl}" target="_blank" style="display:inline-block; background-color:#1F6B4E; color:#ffffff !important; font-weight:700; font-size:15px; padding:12px 24px; border-radius:8px; text-decoration:none; text-align:center;">→ Continue learning on Prodily</a>
-          </div>
-
-          <p style="margin:0 0 20px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">No pressure. No deadline. Just one more step toward becoming the PM you want to be.</p>
-          <p style="margin:0 0 4px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">See you inside,</p>
-          <p style="margin:0; font-size:15px; font-weight:700; color:#171A17; line-height:1.6;">Team Prodily</p>
-        </td>
-      </tr>
-
-      <!-- Footer -->
-      <tr>
-        <td style="padding-top:28px; text-align:center; font-size:12px; color:#70685A; line-height:1.5;">
-          <p style="margin:0 0 8px 0; font-weight:600; color:#171A17;">${BRAND.fullName} · ${BRAND.positioning}</p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#1F6B4E; text-decoration:none; font-weight:600; margin-right:10px;">Manage Preferences</a>
-            ·
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#70685A; text-decoration:underline; margin-left:10px;">Unsubscribe</a>
-          </p>
-          <p style="margin:12px 0 0 0; color:#9EA59D; font-size:11px;">© ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.</p>
-        </td>
-      </tr>
-
-    </table>
+      <div style="margin-top:36px; padding-top:16px; border-top:1px solid #EAE6DF; font-size:12px; color:#8C8578; line-height:1.5;">
+        <a href="${siteUrl}/settings?tab=notifications" style="color:#8C8578; text-decoration:underline;">Manage Preferences</a> · <a href="${siteUrl}/settings?tab=notifications" style="color:#8C8578; text-decoration:underline;">Unsubscribe</a>
+      </div>
+    </div>
   </body>
 </html>`
 
