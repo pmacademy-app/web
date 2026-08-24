@@ -43,6 +43,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local-only marketing campaign scripts and logs (never commit)
-scripts/local-campaigns/
+# Marketing campaign logs (never commit)
+scripts/local-campaigns/**/logs/
 scripts/logs/
