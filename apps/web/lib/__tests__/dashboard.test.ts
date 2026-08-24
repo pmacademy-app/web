@@ -183,4 +183,28 @@ describe('Dashboard Aggregation Unit Test Suite', () => {
       expect(computeTrend(100, null)).toBeNull()
     })
   })
+
+  describe('DashboardService Integration', () => {
+    it('DashboardService.getDashboardSummary executes cleanly without cache invariant crashes', async () => {
+      const { DashboardService } = await import('../admin/dashboard-service')
+      const summary = await DashboardService.getDashboardSummary()
+      expect(summary).toBeDefined()
+      expect(typeof summary.totalUsers).toBe('number')
+      expect(typeof summary.totalXpAwarded).toBe('number')
+      expect(typeof summary.activeLearners7d).toBe('number')
+    })
+
+    it('DashboardService.getDashboardData returns full KPI and series structure', async () => {
+      const { DashboardService } = await import('../admin/dashboard-service')
+      const data = await DashboardService.getDashboardData('30d', null, null)
+      expect(data).toBeDefined()
+      expect(data.kpis).toBeDefined()
+      expect(typeof data.kpis.totalUsers).toBe('number')
+      expect(typeof data.kpis.activeLearners).toBe('number')
+      expect(Array.isArray(data.series)).toBe(true)
+      expect(Array.isArray(data.funnel)).toBe(true)
+      expect(Array.isArray(data.recentActivity)).toBe(true)
+      expect(Array.isArray(data.systemSnapshot)).toBe(true)
+    })
+  })
 })

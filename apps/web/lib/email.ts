@@ -52,11 +52,12 @@ export async function sendEmail({
 }): Promise<SendEmailResult> {
   const fromEmail = getFromEmail()
   const apiKey = process.env.RESEND_API_KEY
-  const isTest = process.env.NODE_ENV === 'test' || process.env.RESEND_SIMULATE === 'true'
+  const isTest = process.env.NODE_ENV === 'test' && process.env.ALLOW_TEST_NETWORK_EMAILS !== 'true'
+  const isSimulated = process.env.RESEND_SIMULATE === 'true'
 
-  if (!apiKey || isTest) {
-    console.log(`[email] RESEND_API_KEY missing or test environment. Simulating send to ${maskEmail(to)}: "${subject}" from "${fromEmail}"`)
-    return { success: true, id: 'simulated-dev-id', provider: 'simulated', statusCode: 200 }
+  if (!apiKey || isSimulated || isTest) {
+    console.log(`[email] Email sending simulated (isTest=${isTest}, simulate=${isSimulated}, hasApiKey=${Boolean(apiKey)}) to ${maskEmail(to)}: "${subject}" from "${fromEmail}"`)
+    return { success: true, id: `simulated-email-${Date.now()}`, provider: 'simulated', statusCode: 200 }
   }
 
   try {

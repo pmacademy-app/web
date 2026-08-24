@@ -49,4 +49,28 @@ describe('System Monitoring & Error Instrumentation Unit Test Suite', () => {
     expect(cronRes3.status).toBe(401)
     expect(cronRes4.status).toBe(401)
   })
+
+  it('GET /api/admin/system/alerts rejects unauthorized requests with 401 or 403', async () => {
+    const { NextRequest } = await import('next/server')
+    const { GET: handleSystemAlerts } = await import('../../app/api/admin/system/alerts/route')
+    const req = new NextRequest('http://localhost:3000/api/admin/system/alerts')
+    const res = await handleSystemAlerts(req)
+    expect([401, 403].includes(res.status)).toBe(true)
+  })
+
+  it('GET /api/admin/system/audit rejects unauthorized requests with 401 or 403', async () => {
+    const { NextRequest } = await import('next/server')
+    const { GET: handleSystemAudit } = await import('../../app/api/admin/system/audit/route')
+    const req = new NextRequest('http://localhost:3000/api/admin/system/audit')
+    const res = await handleSystemAudit(req)
+    expect([401, 403].includes(res.status)).toBe(true)
+  })
+
+  it('SystemService.getHealthOverview returns valid telemetry overview', async () => {
+    const { SystemService } = await import('../admin/system-service')
+    const overview = await SystemService.getHealthOverview()
+    expect(overview).toBeDefined()
+    expect(['healthy', 'degraded', 'down'].includes(overview.overallStatus)).toBe(true)
+    expect(typeof overview.databaseLatencyMs).toBe('number')
+  })
 })
