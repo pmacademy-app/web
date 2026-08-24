@@ -40,3 +40,7 @@ Thumbs.db
 
 opencode.json
 .tokencap/
+
+# Local-only marketing campaign scripts and logs (never commit)
+apps/web/scripts/local-campaigns/
+apps/web/scripts/logs/
