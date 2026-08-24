@@ -107,11 +107,34 @@ describe('Phase 7 — Avatar Upload Reliability, Storage Consistency & Cleanup',
 
   describe('3. Transactional Upload & Safe Replacement Ordering', () => {
     it('successfully uploads new avatar and returns public URL', async () => {
+      const mockStorage = {
+        upload: vi.fn().mockResolvedValue({ error: null }),
+        getPublicUrl: vi.fn().mockReturnValue({
+          data: { publicUrl: 'https://mock.supabase.co/storage/v1/object/public/avatars/usr-valid-1/avatar-1700000000.png' },
+        }),
+        remove: vi.fn().mockResolvedValue({ data: [], error: null }),
+      }
+
+      const mockClient = {
+        from: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          maybeSingle: vi.fn().mockResolvedValue({ data: { avatar_url: null } }),
+          update: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ error: null }),
+          }),
+        }),
+        storage: {
+          from: vi.fn().mockReturnValue(mockStorage),
+        },
+      }
+
       const dummyBuffer = Buffer.from('valid png data')
       const result = await AvatarService.uploadAndSetUserAvatar({
         userId: 'usr-valid-1',
         fileBuffer: dummyBuffer,
         mimeType: 'image/png',
+        supabaseClient: mockClient,
       })
 
       expect(result.success).toBe(true)
