@@ -48,7 +48,7 @@ describe('Prodily PM Journey Re-engagement Marketing Campaign Suite', () => {
     it('generates exact subject and personalized greeting for identified learner', () => {
       const { subject, text, html } = buildEmailContent('Sarah', ctaUrl, siteUrl)
 
-      expect(subject).toBe('Your PM journey doesn’t have to stop here')
+      expect(subject).toBe('You left something unfinished')
       expect(text).toContain('Hey Sarah,')
       expect(html).toContain('Hey Sarah,')
     })
@@ -64,13 +64,13 @@ describe('Prodily PM Journey Re-engagement Marketing Campaign Suite', () => {
       const { text, html } = buildEmailContent('Alex', ctaUrl, siteUrl)
 
       const requiredPhrases = [
-        'You started your PM journey with Prodily — don’t let it stop there.',
-        'Whether you’re learning the fundamentals, sharpening your product thinking, or building your PM portfolio, there’s always another step you can take.',
-        'Pick up where you left off and keep building.',
-        '→ Continue learning on Prodily',
-        'No pressure. No deadline. Just one more step toward becoming the PM you want to be.',
-        'See you inside,',
-        'Team Prodily',
+        'You started learning PM with Prodily — and I noticed you haven’t been back in a while.',
+        'Your progress is still there.',
+        'If you’ve got 10 minutes today, come back and pick up where you left off.',
+        'Continue where you left off →',
+        'No big commitment. Just 10 minutes.',
+        '— Aditya',
+        'Founder, Prodily',
       ]
 
       for (const phrase of requiredPhrases) {
@@ -79,7 +79,7 @@ describe('Prodily PM Journey Re-engagement Marketing Campaign Suite', () => {
       }
     })
 
-    it('includes valid CTA button pointing to academy URL and unsubscribe links', () => {
+    it('includes single primary text CTA pointing to academy URL and clean unsubscribe link', () => {
       const { html, text } = buildEmailContent('Alex', ctaUrl, siteUrl)
 
       expect(html).toContain(`href="${ctaUrl}"`)
