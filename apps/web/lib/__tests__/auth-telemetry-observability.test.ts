@@ -6,6 +6,14 @@ import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { classifyAuthError } from '@/lib/auth/errors'
 import { SystemService } from '@/lib/admin/system-service'
 
+vi.mock('@/lib/monitoring/logger', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/monitoring/logger')>()
+  return {
+    ...actual,
+    logSystemError: vi.fn().mockResolvedValue('mock-telemetry-error-id'),
+  }
+})
+
 function createMockRequest(url: string, options: {
   method?: string
   headers?: Record<string, string>
@@ -224,9 +232,8 @@ describe('Phase 6 — Client Authentication Telemetry & Admin Observability', ()
     })
 
     it('handles database errors gracefully and returns fallback without crashing', async () => {
-      const { createServiceRoleClient } = await import('@/lib/supabase')
-      const mockClient = createServiceRoleClient()
-      vi.spyOn(mockClient, 'from').mockImplementationOnce(() => {
+      const supabaseModule = await import('@/lib/supabase')
+      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockImplementationOnce(() => {
         throw new Error('Database connection timeout')
       })
 

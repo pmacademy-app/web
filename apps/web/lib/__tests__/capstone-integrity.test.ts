@@ -189,6 +189,7 @@ We hypothesize that replacing raw forms with an interactive step-by-step checkli
             return {
               select: vi.fn().mockReturnThis(),
               eq: vi.fn().mockReturnThis(),
+              order: vi.fn().mockReturnThis(),
               limit: vi.fn().mockReturnThis(),
               maybeSingle: vi.fn().mockResolvedValue({ data: null }),
               insert: vi.fn().mockResolvedValue({ data: [], error: null }),
