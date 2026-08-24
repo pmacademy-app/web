@@ -3,7 +3,7 @@ import { SystemService } from '@/lib/admin/system-service'
 
 export const runtime = 'nodejs'
 
-export async function GET(request?: Request) {
+export async function GET(request: Request) {
   const auth = await requireAdminUser(request)
   if (!auth.authorized) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })

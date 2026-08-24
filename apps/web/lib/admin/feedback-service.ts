@@ -186,7 +186,7 @@ export class FeedbackAdminService {
     })
 
     try {
-      revalidateTag('testimonials')
+      (revalidateTag as unknown as (tag: string) => void)('testimonials')
     } catch {
       // Ignored outside request context
     }

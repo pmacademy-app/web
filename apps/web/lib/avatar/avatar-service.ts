@@ -99,6 +99,15 @@ export function getInitialsFromName(name?: string | null): string {
     .toUpperCase() || '?'
 }
 
+function formatErrorMessage(err: unknown, fallback: string): string {
+  if (!err) return fallback
+  if (typeof err === 'object' && err !== null && 'message' in err && typeof (err as { message: unknown }).message === 'string') {
+    return (err as { message: string }).message
+  }
+  if (typeof err === 'string') return err
+  return fallback
+}
+
 export class AvatarService {
   /**
    * Resolves avatar metadata including fallback initials safely.
@@ -166,7 +175,7 @@ export class AvatarService {
 
     if (uploadError) {
       console.error('[AvatarService] Storage upload failed:', uploadError)
-      throw new Error(`Failed to upload avatar image: ${uploadError.message}`)
+      throw new Error(`Failed to upload avatar image: ${formatErrorMessage(uploadError, 'Upload failed')}`)
     }
 
     // 5. Compute public URL
@@ -192,7 +201,7 @@ export class AvatarService {
           console.warn('[AvatarService] Non-fatal rollback cleanup error:', rollbackErr)
         })
 
-      throw new Error(`Failed to save avatar reference to profile: ${dbError.message}`)
+      throw new Error(`Failed to save avatar reference to profile: ${formatErrorMessage(dbError, 'Database update failed')}`)
     }
 
     // 8. Safe Cleanup of old avatar object (non-blocking / non-fatal)
@@ -243,7 +252,7 @@ export class AvatarService {
       .eq('id', userId)
 
     if (dbError) {
-      throw new Error(`Failed to remove avatar from profile: ${dbError.message}`)
+      throw new Error(`Failed to remove avatar from profile: ${formatErrorMessage(dbError, 'Database removal failed')}`)
     }
 
     // 3. Remove storage object if owned by this user
@@ -282,7 +291,7 @@ export class AvatarService {
       .not('avatar_url', 'is', null)
 
     if (usersErr) {
-      throw new Error(`Failed to fetch active avatar references: ${usersErr.message}`)
+      throw new Error(`Failed to fetch active avatar references: ${formatErrorMessage(usersErr, 'Query failed')}`)
     }
 
     const activePaths = new Set<string>()
@@ -297,7 +306,7 @@ export class AvatarService {
       .list('', { limit: 1000 })
 
     if (listErr) {
-      throw new Error(`Failed to list avatars bucket: ${listErr.message}`)
+      throw new Error(`Failed to list avatars bucket: ${formatErrorMessage(listErr, 'List bucket failed')}`)
     }
 
     let totalScanned = 0
