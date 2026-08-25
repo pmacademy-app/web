@@ -356,7 +356,41 @@ export class SettingsService {
   }
 
   public static async getOnboardingSettings(): Promise<OnboardingSettings> {
-    return this.getSettings<OnboardingSettings>('onboarding')
+    const settings = await this.getSettings<OnboardingSettings>('onboarding')
+
+    // Ensure all 4 canonical steps exist and are valid. If legacy (<4 steps) or invalid step config exists in DB, use defaults:
+    const hasValid4Steps =
+      Array.isArray(settings.steps) &&
+      settings.steps.length === 4 &&
+      settings.steps.every((s) => s && s.id && typeof s.title === 'string')
+
+    const steps = hasValid4Steps ? settings.steps : DEFAULT_ONBOARDING_STEPS
+
+    const fieldOptions = {
+      goal:
+        settings.fieldOptions?.goal && settings.fieldOptions.goal.length > 0
+          ? settings.fieldOptions.goal
+          : DEFAULT_GOAL_OPTIONS,
+      experience_level:
+        settings.fieldOptions?.experience_level && settings.fieldOptions.experience_level.length > 0
+          ? settings.fieldOptions.experience_level
+          : DEFAULT_EXPERIENCE_OPTIONS,
+      topics:
+        settings.fieldOptions?.topics && settings.fieldOptions.topics.length > 0
+          ? settings.fieldOptions.topics
+          : DEFAULT_TOPIC_OPTIONS,
+      learning_preference:
+        settings.fieldOptions?.learning_preference && settings.fieldOptions.learning_preference.length > 0
+          ? settings.fieldOptions.learning_preference
+          : DEFAULT_PREFERENCE_OPTIONS,
+      ...settings.fieldOptions,
+    }
+
+    return {
+      ...settings,
+      steps,
+      fieldOptions,
+    }
   }
 
   public static async getFeatureFlags(): Promise<FeatureFlagRecord[]> {
