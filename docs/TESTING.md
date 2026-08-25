@@ -18,7 +18,7 @@ The top-level `npm test` in `apps/web` runs `vitest run`.
 
 ---
 
-## 2. Test Suite Inventory (52 Unit/Integration Files)
+## 2. Test Suite Inventory (54 Unit/Integration Files, 439 Tests)
 
 ### High-Value Domain & Pure Logic Tests
 | Test File | Domain / Purpose | Status |
@@ -61,6 +61,8 @@ The top-level `npm test` in `apps/web` runs `vitest run`.
 | `system-announcements.test.ts` | System announcements & KPI aggregations | 🟢 Passing |
 | `admin-console.test.ts` | Feature flags, RBAC, user overview | 🟢 Passing |
 | `admin-settings.test.ts` | Admin settings persistence & email quotas | 🟢 Passing |
+| `admin-production-email.test.ts` | Direct production email dispatch & template validation | 🟢 Passing |
+| `admin-security-audit.test.ts` | RBAC route authorization & guard enforcement | 🟢 Passing |
 | `admin-cache-verification.test.ts` | Cache revalidation & verified email mapping | 🟢 Passing |
 | `feedback-moderation.test.ts` | Learner feedback submission & moderation | 🟢 Passing |
 | `testimonial-moderation-integrity.test.ts` | Testimonial publishing & author attribution | 🟢 Passing |

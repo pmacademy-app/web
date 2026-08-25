@@ -32,7 +32,7 @@ All project documentation lives directly under `docs/`. The documentation suite 
 | **Portfolio & Certs** | [`PORTFOLIO.md`](PORTFOLIO.md) | Public portfolio (`/p/[username]`), Certificate v2, LinkedIn sharing | 🟢 Current |
 | **External Services** | [`INTEGRATIONS.md`](INTEGRATIONS.md) | External service matrix (Supabase, Resend, GitHub Actions), test mocks | 🟢 Current |
 | **Deployment & Hosting**| [`DEPLOYMENT.md`](DEPLOYMENT.md) | Vercel deployment, Next.js build config, environment variable reference | 🟢 Current |
-| **Testing & CI/CD** | [`TESTING.md`](TESTING.md) | Vitest unit/integration suites (44 files), Playwright E2E, verification commands, CI | 🟢 Current |
+| **Testing & CI/CD** | [`TESTING.md`](TESTING.md) | Vitest unit/integration suites (54 files, 439 tests), Playwright E2E, verification commands, CI | 🟢 Current |
 | **Changelog History** | [`CHANGELOG.md`](CHANGELOG.md) | Chronological commit and release history | 🟢 Current |
 
 ---

@@ -80,11 +80,11 @@ function CTAButton({
         href="/signup"
         onClick={handleClick}
         className={cn(
-          'inline-flex items-center justify-center font-medium rounded-sm min-h-[44px]',
-          'bg-primary text-primary-foreground',
+          'inline-flex items-center justify-center font-semibold rounded-sm min-h-[44px]',
+          'bg-primary text-white hover:text-white',
           'hover:opacity-90 active:scale-[0.98]',
           'transition-all duration-[120ms]',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white',
           size === 'md' && 'px-4 py-2.5 text-body-sm',
           size === 'sm' && 'px-3 py-2 text-body-sm',
         )}

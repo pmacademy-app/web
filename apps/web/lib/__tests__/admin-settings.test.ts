@@ -115,14 +115,20 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(typeof emailFlag?.enabled).toBe('boolean')
   })
 
-  it('SettingsService.getOnboardingSettings returns valid enabled flag and default steps array', async () => {
+  it('SettingsService.getOnboardingSettings returns 4 default steps and 4 option sets', async () => {
     const onboarding = await SettingsService.getOnboardingSettings()
     expect(typeof onboarding.enabled).toBe('boolean')
     expect(Array.isArray(onboarding.steps)).toBe(true)
-    expect(onboarding.steps.length).toBeGreaterThanOrEqual(1)
-    expect(onboarding.steps[0].id).toBeDefined()
-    expect(onboarding.steps[0].title).toBeDefined()
-    expect(Array.isArray(onboarding.steps[0].requiredFields)).toBe(true)
+    expect(onboarding.steps.length).toBe(4)
+    expect(onboarding.steps[0].id).toBe('step_profile')
+    expect(onboarding.steps[1].id).toBe('step_background')
+    expect(onboarding.steps[2].id).toBe('step_interests')
+    expect(onboarding.steps[3].id).toBe('step_path')
+
+    expect(onboarding.fieldOptions?.goal?.length).toBeGreaterThanOrEqual(5)
+    expect(onboarding.fieldOptions?.experience_level?.length).toBeGreaterThanOrEqual(4)
+    expect(onboarding.fieldOptions?.topics?.length).toBeGreaterThanOrEqual(10)
+    expect(onboarding.fieldOptions?.learning_preference?.length).toBeGreaterThanOrEqual(5)
   })
 
   it('SettingsService.getAllSettings returns all 6 workspace domains in parallel', async () => {
@@ -205,7 +211,7 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(updated.steps[1].requiredFields).toEqual(['linkedin_url', 'website_url'])
   })
 
-  it('SettingsService supports configuring custom field options for selectable onboarding fields', async () => {
+  it('SettingsService supports configuring custom field options across all 4 onboarding categories', async () => {
     const customGoalOptions = [
       {
         id: 'executive_track',
@@ -214,11 +220,33 @@ describe('Admin Settings Unit Test Suite', () => {
         badge: 'Executive',
         enabled: true,
       },
+    ]
+
+    const customExpOptions = [
       {
-        id: 'ai_pm',
-        label: 'AI & Machine Learning Product Specialization',
-        description: 'LLM product development, prompt engineering, and model evaluation.',
-        badge: 'AI Focus',
+        id: 'student',
+        label: 'University Student',
+        description: 'Undergraduate or graduate student exploring tech careers.',
+        badge: 'Student',
+        enabled: true,
+      },
+    ]
+
+    const customTopics = [
+      {
+        id: 'ai_product',
+        label: 'AI Product Management',
+        badge: 'AI',
+        enabled: true,
+      },
+    ]
+
+    const customPreferences = [
+      {
+        id: 'cohort',
+        label: 'Cohort-based sprint',
+        description: 'Weekly peer assignments and live reviews.',
+        badge: 'Live',
         enabled: true,
       },
     ]
@@ -226,17 +254,21 @@ describe('Admin Settings Unit Test Suite', () => {
     const updated = await SettingsService.updateOnboardingSettings({
       fieldOptions: {
         goal: customGoalOptions,
+        experience_level: customExpOptions,
+        topics: customTopics,
+        learning_preference: customPreferences,
       },
     })
 
-    expect(updated.fieldOptions?.goal).toBeDefined()
-    expect(updated.fieldOptions?.goal?.length).toBe(2)
-    expect(updated.fieldOptions?.goal?.[0].id).toBe('executive_track')
-    expect(updated.fieldOptions?.goal?.[0].badge).toBe('Executive')
-    expect(updated.fieldOptions?.goal?.[1].id).toBe('ai_pm')
+    expect(updated.fieldOptions?.goal?.length).toBe(1)
+    expect(updated.fieldOptions?.experience_level?.length).toBe(1)
+    expect(updated.fieldOptions?.topics?.length).toBe(1)
+    expect(updated.fieldOptions?.learning_preference?.length).toBe(1)
 
     const reloaded = await SettingsService.getOnboardingSettings()
-    expect(reloaded.fieldOptions?.goal?.length).toBe(2)
     expect(reloaded.fieldOptions?.goal?.[0].label).toBe('Director / VP of Product Transition')
+    expect(reloaded.fieldOptions?.experience_level?.[0].label).toBe('University Student')
+    expect(reloaded.fieldOptions?.topics?.[0].label).toBe('AI Product Management')
+    expect(reloaded.fieldOptions?.learning_preference?.[0].label).toBe('Cohort-based sprint')
   })
 })

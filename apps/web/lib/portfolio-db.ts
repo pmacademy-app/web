@@ -13,6 +13,7 @@ import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { getSkillRadarSummary, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { validateUsername, validateOptionalUrl } from '@/lib/portfolio'
+import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 
@@ -177,7 +178,7 @@ export async function getPublicPortfolioData(
       username: user.username || username,
       name: user.name || user.username || 'PM Academy Learner',
       bio: user.bio ?? null,
-      avatarUrl: user.avatar_url ?? null,
+      avatarUrl: resolveAvatarPublicUrl(user.avatar_url) ?? null,
       linkedinUrl: user.linkedin_url ?? null,
       githubUrl: user.github_url ?? null,
       websiteUrl: user.website_url ?? null,

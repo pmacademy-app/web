@@ -62,6 +62,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
                 src={avatarUrl}
                 alt={`${name}'s avatar`}
                 fill
+                unoptimized
                 className="object-cover"
                 sizes="(max-width: 768px) 80px, 96px"
               />
