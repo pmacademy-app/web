@@ -117,16 +117,16 @@ export default async function AdminSystemPage({ searchParams }: PageProps) {
       />
 
       {/* Secondary navigation tabs */}
-      <nav aria-label="System sections" className="border-b border-admin-border flex gap-6 text-xs font-semibold overflow-x-auto">
+      <nav aria-label="System sections" className="border-b border-admin-border flex gap-1 overflow-x-auto scrollbar-thin scrollbar-thumb-admin-border">
         {TABS.map(({ key, label, icon: Icon }) => (
           <Link
             key={key}
             href={`/admin/system?tab=${key}`}
             aria-current={tab === key ? 'page' : undefined}
-            className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap rounded-t-lg transition-colors border-b-2 -mb-px ${
               tab === key
-                ? 'border-admin-accent text-admin-accent'
-                : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
+                ? 'border-admin-accent text-admin-accent bg-admin-accent-soft/50 font-semibold'
+                : 'border-transparent text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised/50'
             }`}
           >
             <Icon className="w-4 h-4" /> {label}

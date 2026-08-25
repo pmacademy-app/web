@@ -1,8 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Flag, Mail, Bell, Zap, Globe, Shield } from 'lucide-react'
-import { AdminPageHeader } from './AdminPageHeader'
+import { Flag, Mail, Bell, Zap, Globe, Shield, Calendar } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
@@ -19,17 +18,6 @@ const FLAG_CATEGORIES: Record<string, { label: string; icon: React.ElementType; 
   MARKETING_EMAILS_ENABLED: { label: 'Marketing', icon: Globe, color: 'text-admin-purple' },
   QUEUE_PROCESSING_ENABLED: { label: 'Infrastructure', icon: Zap, color: 'text-admin-success' },
   SCHEDULER_ENABLED: { label: 'Infrastructure', icon: Shield, color: 'text-admin-success' },
-}
-
-function Calendar({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  )
 }
 
 export interface FeatureFlagsSectionProps {
@@ -102,13 +90,6 @@ export function FeatureFlagsSection({
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title="Feature Flags"
-        description="Runtime feature toggles. Changes take effect immediately across the platform."
-        icon={Flag}
-        iconColor="text-admin-accent"
-      />
-
       {categoryOrder.map((category) => {
         const flags = groupedFlags[category]
         if (!flags || flags.length === 0) return null
