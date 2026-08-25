@@ -99,12 +99,12 @@ export function HeroSection() {
                 onClick={() => trackHeroCTAClick('hero')}
                 className="
                   inline-flex items-center gap-2 px-6 py-3
-                  bg-primary text-primary-foreground
+                  bg-primary text-white hover:text-white
                   text-body-sm font-semibold rounded-sm
                   shadow-xs hover:shadow-sm
                   hover:opacity-90 active:scale-[0.98]
                   transition-all duration-[120ms]
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white
                 "
               >
                 Start Learning Free <ArrowRight size={16} aria-hidden="true" />

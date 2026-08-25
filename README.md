@@ -109,7 +109,42 @@ ADMIN_EMAILS=admin@example.com
 
 ---
 
-## 5. Local Setup & Quickstart
+## 5. Admin Panel (Operations Center)
+
+The **Prodily Admin Panel** is a centralized operational control center located at `/admin`.
+
+### Access & Authentication
+- **URL**: `http://localhost:3000/admin` (Login: `/admin/login`)
+- **Access Guard (RBAC)**: Access is protected at multiple layers:
+  1. **Proxy Middleware (`proxy.ts`)**: Rejects unauthenticated requests and redirects non-admins to `/admin/login` or `/admin/access-denied`.
+  2. **Server-Side Layout Guard (`app/admin/(console)/layout.tsx`)**: Re-verifies active session authorization via `isAdminUser()` before rendering the shell.
+  3. **Server-Side API Guard (`requireAdminUser()`)**: Enforces admin authorization on 100% of `/api/admin/**` route handlers before executing database queries or mutations.
+- **Authorization Criteria**: A user is granted admin access if:
+  - Their email is listed in the comma-separated `ADMIN_EMAILS` environment variable; **OR**
+  - Their account has `is_admin = true` in the `public.users` PostgreSQL table.
+
+### Core Workspaces & Capabilities
+| Workspace | Route | Capabilities |
+|---|---|---|
+| **Dashboard** | `/admin` | Real-time KPI metrics, daily learner & learning charts, conversion funnel, recent activity stream, system snapshot, and custom date range filters (`Today`, `7D`, `30D`, `90D`, `Custom`). |
+| **Global Search & Attention** | Header (`Cmd+K` / `Ctrl+K`) | Multi-entity global search across learners, curriculum, certificates, and inquiries. Header Attention Bell displays live counts and links for failed emails, contact messages, and feedback. |
+| **Users** | `/admin/users` | Learner directory with search, filtering, detailed user drawers, progress reset, account deletion, and custom individual production email dispatching. |
+| **Communications** | `/admin/communications` | Email queue status, failed email retries, transactional template previews & test sends, system announcements broadcast, and contact message inbox. |
+| **Moderation** | `/admin/moderation` | Review and publish/reject learner testimonials, capstone project deliverables, and product feedback. |
+| **Curriculum** | `/admin/curriculum` | Visual 9-module / 90-lesson browser, lesson metadata inspection, publish/unpublish toggles, and live previews. |
+| **Achievements** | `/admin/achievements` | Issued certificate registry with verification links, badge catalog, and credential issuance logs. |
+| **Analytics** | `/admin/analytics` | Active learner metrics (DAU/WAU/MAU), lesson completion drop-off funnels, quiz pass rates, XP velocity, and SRS retention habits. |
+| **System** | `/admin/system` | Platform health monitoring, database latency, grouped error tracking with stack traces, severity-based alerts, and searchable `admin_audit_logs`. |
+| **Settings** | `/admin/settings` | Product settings, runtime XP values, notification defaults, feature flag toggles, and dynamic onboarding goal option management. |
+
+### Configuration & Security Considerations
+- **Environment**: Ensure `ADMIN_EMAILS` is configured with authorized administrator email addresses.
+- **Audit Logging**: All administrative actions (user role changes, progress resets, deletions, settings modifications, feature flag toggles, broadcasts, and email sends) automatically record structured metadata in `admin_audit_logs`.
+- **Search Engine Isolation**: The entire `/admin` route tree is marked with `robots: { index: false, follow: false }` to prevent indexing.
+
+---
+
+## 6. Local Setup & Quickstart
 
 ### Step 1: Install Dependencies
 From the repository root:
@@ -138,7 +173,7 @@ npm run dev
 
 ---
 
-## 6. Content Compilation Pipeline
+## 7. Content Compilation Pipeline
 
 The content compiler (`scripts/compiler/compile.ts`) runs at build time:
 
@@ -149,12 +184,12 @@ The content compiler (`scripts/compiler/compile.ts`) runs at build time:
 
 ---
 
-## 7. Testing & Quality Verification
+## 8. Testing & Quality Verification
 
 All automated tests are executed from `apps/web/`:
 
 ```bash
-# Run all unit and integration test suites via Vitest
+# Run all 54 unit and integration test suites via Vitest
 npm test                    # alias: npx vitest run
 
 # Run tests in watch mode
@@ -166,13 +201,16 @@ npx playwright test
 # Run ESLint linting
 npm run lint
 
-# Run full production build & TypeScript type check
+# Run TypeScript type check
+npm run typecheck
+
+# Run full production build (content compilation + Next.js build)
 npm run build
 ```
 
 ---
 
-## 8. Schedulers & Background Jobs
+## 9. Schedulers & Background Jobs
 
 Background jobs and queue processing are managed by GitHub Actions:
 - **`ci.yml`**: Runs lint, type check, unit tests, brand check, content compile, and Next.js build on every PR and push to `main`.
@@ -184,17 +222,17 @@ Background jobs and queue processing are managed by GitHub Actions:
 
 ---
 
-## 9. Canonical Documentation Suite
+## 10. Canonical Documentation Suite
 
 All system documentation lives directly under `docs/`:
 
 | Document | Purpose |
 |---|---|
 | [`docs/INDEX.md`](docs/INDEX.md) | Canonical documentation entry point and reading map |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | High-level system architecture & known debt |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | High-level system architecture & technical invariants |
+| [`docs/ADMIN_PANEL.md`](docs/ADMIN_PANEL.md) | Comprehensive Admin Console guide (workspaces, APIs, security) |
 | [`docs/DATABASE.md`](docs/DATABASE.md) | PostgreSQL schema, 30 migration files, table definitions |
-| [`docs/TESTING.md`](docs/TESTING.md) | Vitest test suite inventory (44 files) & Playwright E2E |
-| [`docs/ADMIN_PANEL.md`](docs/ADMIN_PANEL.md) | Admin Console operations center (9 workspaces) |
+| [`docs/TESTING.md`](docs/TESTING.md) | Vitest test suite inventory (54 files, 439 tests) & Playwright E2E |
 | [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md) | PKCE Auth, session bridge, signup verification lifecycle |
 | [`docs/EMAIL_SYSTEM.md`](docs/EMAIL_SYSTEM.md) | Supabase Auth Send Email Hook, email queue, Resend delivery |
 | [`docs/CRON_AND_SCHEDULING.md`](docs/CRON_AND_SCHEDULING.md) | GitHub Actions workflows & cron endpoints |

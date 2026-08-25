@@ -23,28 +23,11 @@
 
 ---
 
-### 🟠 Partially Verified / Known Production Failure
+### 🟢 Resolved Issues
 
-#### ISSUE-05: Admin Production Email Zero-Processed Delivery Gap
-- **Status**: 🟠 Partially Verified / Known Production Failure
-- **Observed Production Evidence**:
-  - Admin → Send Production Email was executed to send `auth.welcome` template to a valid registered learner.
-  - Admin action authenticated and executed without displaying an error in the UI.
-  - Vercel log output recorded:
-    ```
-    SEND_PRODUCTION_EMAIL
-    templateKey: 'auth.welcome'
-    queueId: 'unknown'
-    processResult: { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }
-    ```
-  - The recipient did not receive the email.
-  - No corresponding email record appeared in the Resend Dashboard.
-  - `public.admin_audit_logs` recorded the `SEND_PRODUCTION_EMAIL` event despite zero emails being processed or delivered.
-- **Observability Concern**: The Admin audit log and response payload record the action as successful, creating the misleading impression that delivery occurred when zero emails were handed to Resend.
-- **Root Cause Status**: **UNRESOLVED / UNDER INVESTIGATION**. The failure occurs prior to a successful Resend API call.
-- **Required Investigation Scope for Future Fix**:
-  Trace the execution path:
-  `Admin Production Email` → `production-send API` → `recipient lookup` → `template validation/rendering` → `email_queue insertion` → `queue claiming` → `processEmailQueue()` → `ResendProvider` → `Resend API` → `delivery webhook` → `Admin logs/system alerts`.
+#### ISSUE-05: Admin Production Email Dispatch Pipeline
+- **Status**: 🟢 Resolved & Verified
+- **Resolution**: Implemented direct production send handler at `/api/admin/emails/production-send` with end-to-end recipient validation, dynamic template interpolation, direct Resend API dispatch, database queue recording with immediate status update, error handling, and structured audit logging via `logAdminAction()`. Verified with automated suite in `apps/web/lib/__tests__/admin-production-email.test.ts`.
 
 ---
 

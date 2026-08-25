@@ -8,14 +8,58 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export interface OnboardingData {
-  name?: string
-  username?: string
+  name: string
+  username: string
   avatar_url?: string | null
-  career_role?: string
-  goal?: 'job_search' | 'fill_gaps' | 'exploring' | string
-  learning_purpose?: string
+  bio?: string
+  career_role?: string // Experience level / Role
+  goal?: string // Primary goal
+  topics?: string[] // Multiple selected interests
+  learning_preference?: string // Preferred learning style
   linkedin_url?: string
+  twitter_url?: string
+  github_url?: string
   website_url?: string
+}
+
+export async function checkUsernameAvailability(rawUsername: string, currentUserId?: string): Promise<{ available: boolean; error?: string }> {
+  try {
+    const username = rawUsername.trim().toLowerCase()
+    if (!username) {
+      return { available: false, error: 'Username is required.' }
+    }
+    if (username.length < 3) {
+      return { available: false, error: 'Username must be at least 3 characters.' }
+    }
+    if (username.length > 24) {
+      return { available: false, error: 'Username must be at most 24 characters.' }
+    }
+    if (!/^[a-z0-9_]+$/.test(username)) {
+      return { available: false, error: 'Username can only contain lowercase letters, numbers, and underscores.' }
+    }
+
+    const dbSupabase = createServiceRoleClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (dbSupabase.from('users') as any).select('id').eq('username', username)
+    if (currentUserId) {
+      query = query.neq('id', currentUserId)
+    }
+
+    const { data, error } = await query.maybeSingle()
+    if (error) {
+      console.error('[checkUsernameAvailability] DB query error:', error.message)
+      return { available: true } // Non-blocking on query error
+    }
+
+    if (data) {
+      return { available: false, error: 'This username is already taken. Please choose another.' }
+    }
+
+    return { available: true }
+  } catch (err) {
+    console.error('[checkUsernameAvailability] Exception:', err)
+    return { available: true }
+  }
 }
 
 export async function submitOnboarding(data: OnboardingData) {
@@ -38,38 +82,70 @@ export async function submitOnboarding(data: OnboardingData) {
     }
 
     const userId = user.id
-    const dbSupabase = createServiceRoleClient() // service role
+
+    // Server-side validation
+    const username = (data.username || '').trim().toLowerCase()
+    if (!username) {
+      return { error: 'Username is required.' }
+    }
+    if (username.length < 3 || username.length > 24 || !/^[a-z0-9_]+$/.test(username)) {
+      return { error: 'Username must be 3–24 characters and only contain letters, numbers, and underscores.' }
+    }
+
+    const name = (data.name || '').trim()
+    if (!name) {
+      return { error: 'Display name is required.' }
+    }
+
+    const dbSupabase = createServiceRoleClient()
+
+    // Assemble learning purpose composite
+    const topicsStr = Array.isArray(data.topics) && data.topics.length > 0 ? data.topics.join(', ') : ''
+    const prefStr = data.learning_preference ? `Preference: ${data.learning_preference}` : ''
+    const compositeLearningPurpose = [
+      topicsStr ? `Interests: ${topicsStr}` : '',
+      prefStr,
+    ].filter(Boolean).join(' | ') || null
+
+    // Normalize website / portfolio / social URL
+    const websiteUrl = data.website_url?.trim() || (data.twitter_url ? `https://x.com/${data.twitter_url.replace(/^@/, '').replace(/^https?:\/\/(www\.)?(twitter|x)\.com\//, '')}` : null)
 
     // 1. Update public.users table with chosen fields
-    const { error: dbError } = await dbSupabase.from('users').update({ 
-      name: data.name,
-      username: data.username,
-      avatar_url: data.avatar_url,
-      career_role: data.career_role,
-      learning_purpose: data.learning_purpose,
-      goal: data.goal,
-      linkedin_url: data.linkedin_url,
-      website_url: data.website_url,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: dbError } = await (dbSupabase.from('users') as any).update({ 
+      name,
+      username,
+      avatar_url: data.avatar_url?.trim() || null,
+      bio: data.bio?.trim() || null,
+      career_role: data.career_role?.trim() || null,
+      goal: data.goal?.trim() || null,
+      learning_purpose: compositeLearningPurpose,
+      linkedin_url: data.linkedin_url?.trim() || null,
+      github_url: data.github_url?.trim() || null,
+      website_url: websiteUrl,
       onboarding_completed: true 
     }).eq('id', userId)
 
     if (dbError) {
       console.error('[onboarding/actions] Database update error:', dbError.message)
-      // Check if unique constraint on username failed
       if (dbError.message.includes('unique constraint') || dbError.code === '23505') {
         return { error: 'Username is already taken. Please choose another.' }
       }
-      return { error: 'Failed to save profile information.' }
+      return { error: 'Failed to save profile information. Please try again.' }
     }
 
-    // 2. Update auth metadata so middleware can read onboarding_complete from JWT
+    // 2. Update auth metadata so middleware and JWT reflect onboarding_complete
     const { error: metaError } = await dbSupabase.auth.admin.updateUserById(userId, {
-      user_metadata: { onboarding_complete: true },
+      user_metadata: {
+        full_name: name,
+        username,
+        avatar_url: data.avatar_url || undefined,
+        onboarding_complete: true,
+      },
     })
 
     if (metaError) {
       console.error('[onboarding/actions] Metadata update error:', metaError.message)
-      return { error: 'Failed to update user profile metadata.' }
     }
 
     return { success: true }

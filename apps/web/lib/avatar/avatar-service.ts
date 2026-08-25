@@ -85,6 +85,40 @@ export function extractAvatarStoragePath(urlOrPath: string | null | undefined): 
 }
 
 /**
+ * Normalizes an avatar URL or storage path to an absolute public URL.
+ * Handles:
+ * - null/undefined/empty string -> null
+ * - Absolute URLs (https://..., http://..., data:...) -> returned as-is
+ * - Relative Supabase storage paths (e.g. "usr-123/avatar-123.jpg" or "avatars/usr-123/avatar-123.jpg") -> converted to full Supabase storage public URL
+ */
+export function resolveAvatarPublicUrl(
+  urlOrPath?: string | null,
+  supabaseUrl: string = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+): string | null {
+  if (!urlOrPath) return null
+  const cleaned = urlOrPath.trim()
+  if (!cleaned) return null
+
+  // If already absolute URL or data URL
+  if (
+    cleaned.startsWith('http://') ||
+    cleaned.startsWith('https://') ||
+    cleaned.startsWith('data:')
+  ) {
+    return cleaned
+  }
+
+  // If relative storage path (e.g. "usr-123/avatar-123.jpg" or "/avatars/usr-123/avatar-123.jpg")
+  const path = extractAvatarStoragePath(cleaned) || cleaned.replace(/^\/+/, '').replace(/^avatars\//, '')
+  if (supabaseUrl && path) {
+    const base = supabaseUrl.replace(/\/+$/, '')
+    return `${base}/storage/v1/object/public/${AVATAR_BUCKET}/${path}`
+  }
+
+  return cleaned
+}
+
+/**
  * Generates initials fallback from a user display name.
  */
 export function getInitialsFromName(name?: string | null): string {
@@ -113,9 +147,10 @@ export class AvatarService {
    * Resolves avatar metadata including fallback initials safely.
    */
   public static resolveAvatar(avatarUrl?: string | null, name?: string | null): ResolvedAvatar {
-    const hasCustomAvatar = Boolean(avatarUrl && avatarUrl.trim().length > 0)
+    const resolvedUrl = resolveAvatarPublicUrl(avatarUrl)
+    const hasCustomAvatar = Boolean(resolvedUrl && resolvedUrl.trim().length > 0)
     return {
-      url: hasCustomAvatar ? avatarUrl!.trim() : null,
+      url: hasCustomAvatar ? resolvedUrl : null,
       initials: getInitialsFromName(name),
       hasCustomAvatar,
     }

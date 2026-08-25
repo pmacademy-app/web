@@ -4,6 +4,7 @@ import {
   AvatarService,
   extractAvatarStoragePath,
   getInitialsFromName,
+  resolveAvatarPublicUrl,
   MAX_AVATAR_SIZE_BYTES,
 } from '@/lib/avatar/avatar-service'
 import { POST as avatarPostHandler, DELETE as avatarDeleteHandler } from '../../app/api/user/avatar/route'
@@ -68,6 +69,23 @@ describe('Phase 7 — Avatar Upload Reliability, Storage Consistency & Cleanup',
       expect(resolvedWithoutAvatar.hasCustomAvatar).toBe(false)
       expect(resolvedWithoutAvatar.url).toBeNull()
       expect(resolvedWithoutAvatar.initials).toBe('TS')
+    })
+
+    it('resolveAvatarPublicUrl returns null for empty/null values', () => {
+      expect(resolveAvatarPublicUrl(null)).toBeNull()
+      expect(resolveAvatarPublicUrl(undefined)).toBeNull()
+      expect(resolveAvatarPublicUrl('')).toBeNull()
+    })
+
+    it('resolveAvatarPublicUrl passes through absolute https:// URLs unchanged', () => {
+      const absoluteUrl = 'https://abc.supabase.co/storage/v1/object/public/avatars/usr-123/avatar-1.jpg'
+      expect(resolveAvatarPublicUrl(absoluteUrl)).toBe(absoluteUrl)
+    })
+
+    it('resolveAvatarPublicUrl converts relative storage path to absolute URL when supabaseUrl is provided', () => {
+      const relativePath = 'usr-123/avatar-1700000000.jpg'
+      const result = resolveAvatarPublicUrl(relativePath, 'https://abc.supabase.co')
+      expect(result).toBe('https://abc.supabase.co/storage/v1/object/public/avatars/usr-123/avatar-1700000000.jpg')
     })
   })
 

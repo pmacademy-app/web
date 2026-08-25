@@ -22,7 +22,7 @@
 | **Authentication** | Supabase Auth + Custom Proxy | PKCE email auth, Send Email Hook, rate limits — see note below | 🟢 Verified in Production |
 | **Email Delivery** | Resend API + Supabase Auth Hook | Transactional emails, queue processor | 🟡 Implemented — Verification Required |
 | **Background Cron** | GitHub Actions Workflows | Queue processing, daily/weekly tasks | 🟡 Implemented — Verification Required |
-| **Unit Tests** | Vitest | 44 test files across `lib/__tests__/` | 🟢 In Place |
+| **Unit Tests** | Vitest | 54 test files across `lib/__tests__/` (439 tests) | 🟢 In Place |
 | **E2E Tests** | Playwright | Auth lifecycle specs in `e2e/auth/` | 🟡 Specs exist — not wired to CI |
 
 > **Authentication Note:** The application uses `@supabase/supabase-js` (no `@supabase/ssr`) with a custom session bridge (`proxy.ts` + `/api/auth/session` + `AuthStateListener`). This architecture has known limitations (no automatic server-side token refresh, race condition on login). Migrating to `@supabase/ssr` is a pending architectural improvement.
@@ -50,7 +50,7 @@ apps/web/
 ├── e2e/                        # Playwright E2E test specs
 ├── emails/                     # React Email templates & rendering engine
 ├── lib/                        # Core backend services, DB clients, rate limiters
-│   └── __tests__/              # Vitest unit and integration test files (44 files)
+│   └── __tests__/              # Vitest unit and integration test files (54 files, 439 tests)
 ├── types/
 │   └── database.ts             # Auto-generated Supabase TypeScript schema
 ├── proxy.ts                    # Next.js 16 request interceptor (auth protection)

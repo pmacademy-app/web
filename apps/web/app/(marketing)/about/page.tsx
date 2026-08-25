@@ -135,7 +135,7 @@ export default function AboutPage() {
 
             <Link
               href="/signup"
-              className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-all flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-xl bg-primary text-white hover:text-white font-bold text-xs hover:bg-primary/90 transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white"
             >
               <span>Start Learning Free</span>
               <ArrowRight className="w-3.5 h-3.5" />

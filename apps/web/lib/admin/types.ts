@@ -681,6 +681,7 @@ export interface OnboardingFieldOption {
   badge?: string
   icon?: string
   enabled?: boolean
+  recommendedModule?: string
 }
 
 export interface OnboardingStepConfig {
@@ -694,7 +695,13 @@ export interface OnboardingStepConfig {
 export interface OnboardingSettings {
   enabled: boolean
   steps: OnboardingStepConfig[]
-  fieldOptions?: Record<string, OnboardingFieldOption[]>
+  fieldOptions?: {
+    goal?: OnboardingFieldOption[]
+    experience_level?: OnboardingFieldOption[]
+    topics?: OnboardingFieldOption[]
+    learning_preference?: OnboardingFieldOption[]
+    [key: string]: OnboardingFieldOption[] | undefined
+  }
 }
 
 export interface SettingsResponse<T> {

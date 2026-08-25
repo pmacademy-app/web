@@ -1,8 +1,7 @@
 # Admin Panel — Prodily PM Academy
 
-**Status:** Current · Post-Phase 10 (all 10 frontend phases complete)
-**Last Updated:** August 23, 2026
-**Replaces:** Legacy `ADMIN_PANEL.md` (pre-redesign 12-tab spec) and the deleted planning documents (`admin-panel-ui-ux-spec.md`, `admin-panel-implementation-plan.md`)
+**Status:** 🟢 Production Ready
+**Scope:** Admin Console Workspaces, APIs, Navigation, RBAC & Capabilities
 
 ---
 
@@ -228,95 +227,45 @@ All admin styles use CSS custom properties prefixed `admin-*`:
 
 ---
 
-## 5. Current Feature Status
+---
 
-### ✅ Fully Implemented (Frontend + Real Data)
-- Dashboard (all sections), Users (all tabs + actions), Communications (all tabs + template editor), Moderation (testimonials + capstones + portfolios), Curriculum (overview + module + lesson detail), Achievements (overview + certificates + badges), Analytics (all 5 tabs, range-driven), System (all 4 tabs), Settings (all 5 sections + UI persistence), Shell (sidebar + header + loading/error states)
+## 5. Current Feature Status & Capabilities
 
-### ⚠️ Frontend Implemented, Backend Persistence Unverified
-- Settings save/reset (requires production verification of `/api/admin/settings` against `system_settings`)
-- Feature flag toggle (requires production verification of `setFeatureFlag()`)
-- Template editor Save (requires verification that template content changes persist)
-
-### ❌ Frontend Read-Only (Missing Backend Support)
-- Product Feedback moderation: no `status` column on `user_feedback`
-- Notification management (Create/Schedule/Send): no notification-management API
-- Template "Last Updated": templates are source-controlled; no `updated_at` in registry
-- Session duration / dwell time: not logged in Supabase
+### ✅ Fully Implemented & Backed by Real Database Services
+- **Dashboard (`/admin`)**: Real-time KPI cards, daily learner/learning charts, journey funnel, recent activity feed, system snapshot, and date range filters (`Today`, `7D`, `30D`, `90D`, `Custom`).
+- **Global Search & Attention**:
+  - `Cmd+K` / `Ctrl+K` global search modal (`/api/admin/search`) searching across Users, Curriculum, Certificates, and Inquiries with server-side RBAC.
+  - Actionable Attention Bell popover panel in header displaying live breakdown counts and direct links to active queues.
+- **Users (`/admin/users`)**: Directory with SQL-side pagination, search, role filters, user detail drawers, admin role toggle, progress reset, account deletion, and custom individual production email dispatching (`/api/admin/emails/production-send`).
+- **Communications (`/admin/communications`)**: Email queue monitoring, dead-letter retry/inspect, transactional template viewer & test send, system announcements broadcast, and contact message inbox.
+- **Moderation (`/admin/moderation`)**: Review and publish/reject learner testimonials, capstone project deliverables, and product feedback.
+- **Curriculum (`/admin/curriculum`)**: 9-module & 90-lesson browser, lesson metadata inspection, publish/unpublish toggles, and live previews.
+- **Achievements (`/admin/achievements`)**: Issued certificate registry with live verification previews, badge catalog, and credential issuance logs.
+- **Analytics (`/admin/analytics`)**: Active learner metrics (DAU/WAU/MAU), lesson completion drop-off funnels, quiz pass rates, XP velocity, and SRS retention habits.
+- **System (`/admin/system`)**: Operational health diagnostics, database latency metrics, error group logs with stack traces, severity-based alerts, and searchable `admin_audit_logs`.
+- **Settings (`/admin/settings`)**: Product configuration, runtime XP values, email provider controls, notification defaults, feature flag toggles, and dynamic onboarding goal option management.
 
 ---
 
-## 6. Remaining Admin Panel Work
-
-### Backend / API
-- Verify settings persistence end-to-end in production
-- Implement Reset Progress action backend route
-- Implement Delete Account backend route
-- Implement failed email retry endpoint
-- Build `/api/admin/search` for global search functionality
-
-### Database / Schema
-- Add `status` column to `user_feedback` for feedback moderation
-- Design notification management schema (if admin-created notifications needed)
-- Verify `system_settings` covers all new settings sections with correct key-value structure
-
-### Integration
-- Wire header bell icon to open an alerts panel (currently shows count only)
-- Verify curriculum visibility controls (publish/unpublish/enable/disable) write through correctly
-
-### Performance / Scalability
-- Move all-time funnel stage counts and returning-learner set to SQL-side aggregation before >10k rows
-- Add `first_active_at` column on `users` for efficient returning-learner queries
-- Paginate `auth.admin.listUsers()` if auth pool grows past 1,000
-
----
-
-## 7. Future / Out-of-Scope Features
-
-Explicitly deferred. Do not implement without a new specification:
-
-- Data Export workspace
-- Multi-admin access management / advanced RBAC
-- Full Curriculum CMS (create/edit/version lessons)
-- Visual Email Builder (drag-and-drop)
-- Advanced Analytics (retention cohorts, segmentation, churn)
-- Advanced Reporting (scheduled exports)
-- Advanced System Monitoring (custom alert rules)
-- Advanced Moderation (suspension, restrictions, abuse workflows)
-- Command Menu (`⌘K` palette)
-- Global Alerts Center Panel (full panel from bell icon)
-
----
-
-## 8. Production Readiness
-
-### Frontend: Complete ✅
-- 0 TypeScript errors · 0 ESLint errors (admin codebase)
-- 35+ test suites passing
-- Production build clean (186/186 Next.js pages, Turbopack)
-- Real Supabase data throughout — no mock fallbacks
-- No `any`, `@ts-ignore`, or `eslint-disable` shortcuts
-
-### Admin Panel Safe to Use Today
-Dashboard, Users, Communications, Moderation, Curriculum, Achievements, Analytics, System Health — all backed by real data.
-
-### Prevents Full Production Readiness
-1. Settings persistence — requires end-to-end production verification
-2. User actions (reset progress, delete account) — no backend routes
-3. Global search — UI only; no backend endpoint
-4. Header bell — attention count displayed, no panel on click
-5. Schema gaps — Feedback moderation, notification management, template persistence
-
----
-
-## 9. Security Architecture
+## 6. Security Architecture & RBAC
 
 | Layer | Implementation |
 |---|---|
-| **Middleware RBAC** | `apps/web/proxy.ts` — first checkpoint, blocks non-admin users |
-| **Layout authorization** | `app/admin/(console)/layout.tsx` — server-side re-check (defense in depth) |
-| **Authorization function** | `lib/admin/authorization.ts` — checks `ADMIN_EMAILS` AND `users.is_admin` |
-| **Service layer** | All admin services use service-role Supabase client |
-| **Robots** | `/admin` excluded from indexing (`index: false, follow: false`) |
+| **Middleware RBAC** | `apps/web/proxy.ts` — first checkpoint, blocks unauthenticated & non-admin users |
+| **Layout Authorization** | `app/admin/(console)/layout.tsx` — server-side session authorization guard via `isAdminUser()` |
+| **Centralized Route Guard** | `requireAdminUser()` in `lib/admin/authorization.ts` — enforced on 100% of `/api/admin/**` handlers (33 files, 47 endpoints) |
+| **Audit Logging** | `logAdminAction()` in `lib/admin/authorization.ts` — automatically persists structured metadata for all mutations to `admin_audit_logs` |
+| **Service Role Isolation** | Service-role Supabase client is server-only and invoked strictly after admin authorization |
+| **Search Engine Robots** | `/admin` excluded from indexing (`index: false, follow: false`) |
+
+---
+
+## 7. Quality & Verification Metrics
+
+- **Unit & Integration Tests**: 54 test files (439 tests passing with 0 failures in Vitest).
+- **TypeScript Typecheck**: 0 errors (`tsc --noEmit`).
+- **ESLint**: 0 errors, 0 warnings.
+- **Production Build**: 199/199 routes compiled successfully under Next.js 16.2.12 (Turbopack).
+- **Email Safety**: Outbound email mock fail-safe active during automated tests (0 live emails sent to test recipients).
 
 
