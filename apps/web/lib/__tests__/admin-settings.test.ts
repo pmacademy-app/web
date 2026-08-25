@@ -204,4 +204,39 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(updated.steps[0].requiredFields).toEqual(['name', 'goal', 'career_role'])
     expect(updated.steps[1].requiredFields).toEqual(['linkedin_url', 'website_url'])
   })
+
+  it('SettingsService supports configuring custom field options for selectable onboarding fields', async () => {
+    const customGoalOptions = [
+      {
+        id: 'executive_track',
+        label: 'Director / VP of Product Transition',
+        description: 'Executive strategy, portfolio management, and organizational scaling.',
+        badge: 'Executive',
+        enabled: true,
+      },
+      {
+        id: 'ai_pm',
+        label: 'AI & Machine Learning Product Specialization',
+        description: 'LLM product development, prompt engineering, and model evaluation.',
+        badge: 'AI Focus',
+        enabled: true,
+      },
+    ]
+
+    const updated = await SettingsService.updateOnboardingSettings({
+      fieldOptions: {
+        goal: customGoalOptions,
+      },
+    })
+
+    expect(updated.fieldOptions?.goal).toBeDefined()
+    expect(updated.fieldOptions?.goal?.length).toBe(2)
+    expect(updated.fieldOptions?.goal?.[0].id).toBe('executive_track')
+    expect(updated.fieldOptions?.goal?.[0].badge).toBe('Executive')
+    expect(updated.fieldOptions?.goal?.[1].id).toBe('ai_pm')
+
+    const reloaded = await SettingsService.getOnboardingSettings()
+    expect(reloaded.fieldOptions?.goal?.length).toBe(2)
+    expect(reloaded.fieldOptions?.goal?.[0].label).toBe('Director / VP of Product Transition')
+  })
 })

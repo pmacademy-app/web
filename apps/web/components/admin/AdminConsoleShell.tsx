@@ -49,6 +49,7 @@ export function AdminConsoleShell({
             <AdminHeader
               onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
               user={user}
+              attention={attention}
               attentionTotal={attentionTotal}
               systemOnline={systemOnline}
             />
