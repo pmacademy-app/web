@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { AdminConsoleService } from '../admin/service'
 import { isAdminEmail, isAdminUser } from '../admin/authorization'
+import { ADMIN_NAV, ADMIN_NAV_BUILT, isAdminNavItemActive, getAdminSectionLabel, type AdminNavItem } from '../admin/navigation'
+import { LayoutDashboard, Users } from 'lucide-react'
 
 describe('Admin Console Unit Test Suite', () => {
   it('AdminConsoleService.getFeatureFlags returns all feature flags', async () => {
@@ -101,5 +103,38 @@ describe('Admin Console Unit Test Suite', () => {
     expect(dbCalled).toBe(false)
 
     process.env.ADMIN_EMAILS = originalEnv
+  })
+
+  it('ADMIN_NAV contains all primary workspaces with unique valid icons and built routes', () => {
+    expect(Array.isArray(ADMIN_NAV)).toBe(true)
+    expect(ADMIN_NAV.length).toBeGreaterThanOrEqual(6)
+
+    const allBuiltItems = ADMIN_NAV_BUILT.flatMap((g) => g.items)
+    expect(allBuiltItems.length).toBeGreaterThanOrEqual(8)
+
+    const dashboard = allBuiltItems.find((i) => i.href === '/admin')
+    const users = allBuiltItems.find((i) => i.href === '/admin/users')
+    const settings = allBuiltItems.find((i) => i.href === '/admin/settings')
+    const onboarding = allBuiltItems.find((i) => i.href.includes('onboarding'))
+
+    expect(dashboard).toBeDefined()
+    expect(users).toBeDefined()
+    expect(settings).toBeDefined()
+    expect(onboarding).toBeDefined()
+  })
+
+  it('isAdminNavItemActive correctly resolves root dashboard, sub-routes, and parameter variants', () => {
+    const dashboardItem: AdminNavItem = { name: 'Dashboard', href: '/admin', built: true, icon: LayoutDashboard }
+    const usersItem: AdminNavItem = { name: 'Users', href: '/admin/users', built: true, icon: Users }
+
+    expect(isAdminNavItemActive(dashboardItem, '/admin')).toBe(true)
+    expect(isAdminNavItemActive(dashboardItem, '/admin/users')).toBe(false)
+    expect(isAdminNavItemActive(usersItem, '/admin/users')).toBe(true)
+    expect(isAdminNavItemActive(usersItem, '/admin/users/usr-123')).toBe(true)
+
+    expect(getAdminSectionLabel('/admin/users')).toBe('Operations')
+    expect(getAdminSectionLabel('/admin/curriculum')).toBe('Learning')
+    expect(getAdminSectionLabel('/admin/system')).toBe('System')
+    expect(getAdminSectionLabel('/admin/settings')).toBe('Settings')
   })
 })

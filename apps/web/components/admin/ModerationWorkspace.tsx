@@ -85,7 +85,11 @@ export function ModerationWorkspace({
       icon={ShieldAlert}
     >
       {/* Tab bar */}
-      <div role="tablist" aria-label="Moderation sections" className="flex flex-wrap items-center gap-1.5">
+      <nav
+        role="tablist"
+        aria-label="Moderation sections"
+        className="border-b border-admin-border flex gap-1 overflow-x-auto scrollbar-thin scrollbar-thumb-admin-border"
+      >
         {TABS.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
@@ -102,18 +106,18 @@ export function ModerationWorkspace({
               tabIndex={isActive ? 0 : -1}
               onClick={() => handleTabChange(tab.id)}
               onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap rounded-t-lg transition-colors border-b-2 -mb-px ${
                 isActive
-                  ? 'bg-admin-accent-soft text-admin-accent border border-admin-accent/25'
-                  : 'bg-admin-surface text-admin-fg-muted hover:text-admin-fg border border-admin-border'
+                  ? 'border-admin-accent text-admin-accent bg-admin-accent-soft/50 font-semibold'
+                  : 'border-transparent text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised/50'
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
+              <Icon className="w-4 h-4" />
               {tab.label}
             </button>
           )
         })}
-      </div>
+      </nav>
 
       <div
         role="tabpanel"
