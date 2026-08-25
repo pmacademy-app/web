@@ -10,7 +10,7 @@ interface AdminFunnelChartProps {
 }
 
 export function AdminFunnelChart({ stages }: AdminFunnelChartProps) {
-  const maxCount = stages[0]?.count || 1
+  const maxCount = stages.length > 0 && stages[0]?.count > 0 ? stages[0].count : (stages.find((s) => s.count > 0)?.count || 1)
   const hasData = stages.some((s) => s.count > 0)
 
   return (

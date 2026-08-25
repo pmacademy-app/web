@@ -9,6 +9,7 @@ import { AdminErrorState } from './AdminErrorState'
 import { AdminSearchInput } from './AdminSearchInput'
 import { AdminDatePicker } from './AdminDatePicker'
 import { AdminAuditEntryDrawer } from './AdminAuditEntryDrawer'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import type { AdminAuditEntry, AdminAuditLogResult } from '@/lib/admin/types'
 
 interface AdminSystemAuditViewProps {
@@ -33,8 +34,18 @@ export function AdminSystemAuditView({ initial }: AdminSystemAuditViewProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<AdminAuditEntry | null>(null)
+  const mounted = useIsMounted()
 
   const refresh = useCallback(() => setRequestId((n) => n + 1), [])
+
+  const formatDateTime = (iso: string) => {
+    if (!mounted || !iso) return ''
+    try {
+      return new Date(iso).toLocaleString()
+    } catch {
+      return iso
+    }
+  }
 
   // Convert local date string (YYYY-MM-DD) to UTC ISO range for API.
   // The AdminDatePicker returns local dates; we convert to UTC midnight boundaries.
@@ -83,7 +94,7 @@ export function AdminSystemAuditView({ initial }: AdminSystemAuditViewProps) {
   const columns: Column<AdminAuditEntry>[] = [
     {
       header: 'Time',
-      cell: (e) => <span className="font-mono text-[11px] text-admin-fg-muted">{new Date(e.createdAt).toLocaleString()}</span>,
+      cell: (e) => <span className="font-mono text-[11px] text-admin-fg-muted">{formatDateTime(e.createdAt)}</span>,
     },
     {
       header: 'Admin',

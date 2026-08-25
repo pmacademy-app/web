@@ -21,6 +21,7 @@ import { AdminLearningActivityChart } from '@/components/admin/AdminLearningActi
 import { AdminFunnelChart } from '@/components/admin/AdminFunnelChart'
 import { AdminRecentActivityList } from '@/components/admin/AdminRecentActivityList'
 import { AdminSystemSnapshot } from '@/components/admin/AdminSystemSnapshot'
+import { AdminLoadWarning } from '@/components/admin/AdminLoadWarning'
 import type { AdminDateRangeKey } from '@/lib/admin/types'
 
 export const revalidate = 0
@@ -63,6 +64,10 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
           </div>
         }
       />
+
+      {data.failed && (
+        <AdminLoadWarning message="Live database metrics could not be fully loaded. Showing fallback metrics." />
+      )}
 
       {/* Needs Attention */}
       <AdminAttentionCenter items={data.attention} />

@@ -7,6 +7,7 @@ import { AdminPagination } from './AdminPagination'
 import { AdminErrorState } from './AdminErrorState'
 import { AdminErrorSeverityBadge, AdminErrorStatusBadge } from './AdminErrorBadges'
 import { AdminErrorDetailDrawer } from './AdminErrorDetailDrawer'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import type { AdminErrorGroup, AdminErrorGroupResult } from '@/lib/admin/types'
 import type { ErrorCategory } from '@/lib/monitoring/logger'
 
@@ -33,9 +34,19 @@ export function AdminSystemErrorsView({ initial }: AdminSystemErrorsViewProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<AdminErrorGroup | null>(null)
+  const mounted = useIsMounted()
   const isFirstRender = useRef(true)
 
   const refresh = useCallback(() => setRequestId((n) => n + 1), [])
+
+  const formatDateTime = (iso: string) => {
+    if (!mounted || !iso) return ''
+    try {
+      return new Date(iso).toLocaleString()
+    } catch {
+      return iso
+    }
+  }
 
   useEffect(() => {
     // Skip the initial fetch on mount since we have server-rendered initial data.
@@ -104,13 +115,13 @@ export function AdminSystemErrorsView({ initial }: AdminSystemErrorsViewProps) {
     {
       header: 'First Seen',
       cell: (g) => (
-        <span className="font-mono text-[11px] text-admin-fg-muted">{new Date(g.firstSeen).toLocaleString()}</span>
+        <span className="font-mono text-[11px] text-admin-fg-muted">{formatDateTime(g.firstSeen)}</span>
       ),
     },
     {
       header: 'Last Seen',
       cell: (g) => (
-        <span className="font-mono text-[11px] text-admin-fg-muted">{new Date(g.lastSeen).toLocaleString()}</span>
+        <span className="font-mono text-[11px] text-admin-fg-muted">{formatDateTime(g.lastSeen)}</span>
       ),
     },
     {

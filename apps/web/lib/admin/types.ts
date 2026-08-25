@@ -357,6 +357,7 @@ export interface AdminDashboardData {
   funnel: AdminFunnelStage[]
   recentActivity: AdminRecentActivityItem[]
   systemSnapshot: AdminSystemSnapshotItem[]
+  failed?: boolean
 }
 
 /* ─── Phase 4 — Learning Workspace ─────────────────────────────────────────── */
