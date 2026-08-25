@@ -124,6 +124,8 @@ export function OnboardingSettingsSection({
   const [activeOptionGroup, setActiveOptionGroup] = useState<OptionGroupKey>('goal')
   const [selectedPreviewGoal, setSelectedPreviewGoal] = useState<string>('become_pm')
   const [selectedPreviewExp, setSelectedPreviewExp] = useState<string>('beginner')
+  const [selectedPreviewTopics, setSelectedPreviewTopics] = useState<string[]>(['discovery', 'strategy'])
+  const [selectedPreviewPref, setSelectedPreviewPref] = useState<string>('structured')
 
   const fieldOptions = data.fieldOptions || {
     goal: DEFAULT_GOAL_OPTIONS,
@@ -798,6 +800,83 @@ export function OnboardingSettingsSection({
                                       >
                                         <span className="text-xs truncate">{option.label}</span>
                                         {isSelected && <Check className="w-3 h-3 text-admin-accent shrink-0" />}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )
+                          }
+
+                          if (fieldKey === 'topics') {
+                            const topics = (fieldOptions.topics || DEFAULT_TOPIC_OPTIONS).filter((o) => o.enabled !== false)
+                            return (
+                              <div key={fieldKey} className="space-y-1.5">
+                                <label className="text-xs font-medium text-admin-fg capitalize flex items-center justify-between">
+                                  <span>{label}</span>
+                                  <span className="text-[10px] text-admin-accent font-mono">Multi-select ({selectedPreviewTopics.length})</span>
+                                </label>
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  {topics.map((option) => {
+                                    const isSelected = selectedPreviewTopics.includes(option.id)
+                                    return (
+                                      <button
+                                        key={option.id}
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedPreviewTopics((prev) =>
+                                            prev.includes(option.id)
+                                              ? prev.filter((t) => t !== option.id)
+                                              : [...prev, option.id]
+                                          )
+                                        }}
+                                        className={cn(
+                                          'p-2 rounded-lg border text-left flex items-center justify-between gap-1 transition-all',
+                                          isSelected
+                                            ? 'border-admin-accent bg-admin-accent-soft text-admin-fg font-semibold'
+                                            : 'border-admin-border bg-admin-surface text-admin-fg-muted'
+                                        )}
+                                      >
+                                        <span className="text-xs truncate">{option.label}</span>
+                                        {isSelected && <Check className="w-3 h-3 text-admin-accent shrink-0" />}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )
+                          }
+
+                          if (fieldKey === 'learning_preference') {
+                            const prefs = (fieldOptions.learning_preference || DEFAULT_PREFERENCE_OPTIONS).filter((o) => o.enabled !== false)
+                            return (
+                              <div key={fieldKey} className="space-y-1.5">
+                                <label className="text-xs font-medium text-admin-fg capitalize flex items-center justify-between">
+                                  <span>{label}</span>
+                                  <span className="text-[10px] text-admin-accent font-mono">Required</span>
+                                </label>
+                                <div className="space-y-1.5">
+                                  {prefs.map((option) => {
+                                    const isSelected = selectedPreviewPref === option.id
+                                    return (
+                                      <button
+                                        key={option.id}
+                                        type="button"
+                                        onClick={() => setSelectedPreviewPref(option.id)}
+                                        className={cn(
+                                          'w-full p-2 rounded-lg border text-left flex items-center justify-between gap-2 transition-all',
+                                          isSelected
+                                            ? 'border-admin-accent bg-admin-accent-soft text-admin-fg font-semibold'
+                                            : 'border-admin-border bg-admin-surface text-admin-fg-muted'
+                                        )}
+                                      >
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-xs font-bold text-admin-fg">{option.label}</p>
+                                          {option.description && (
+                                            <p className="text-[10px] text-admin-fg-muted truncate">{option.description}</p>
+                                          )}
+                                        </div>
+                                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-admin-accent shrink-0" />}
                                       </button>
                                     )
                                   })}

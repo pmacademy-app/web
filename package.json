@@ -12,6 +12,7 @@
     "lint": "npm --prefix apps/web run lint",
     "typecheck": "npm --prefix apps/web run typecheck",
     "test": "npm --prefix apps/web run test",
+    "tests": "npm --prefix apps/web run test",
     "content:build": "npm --prefix apps/web run content:build"
   }
 }
