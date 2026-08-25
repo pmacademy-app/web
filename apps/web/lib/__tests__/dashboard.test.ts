@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { describe, it, expect, vi } from 'vitest'
 import {
   resolveRange,
   eachDay,
@@ -13,6 +14,94 @@ import {
 } from '../admin/dashboard-aggregation'
 
 const TZ = 'UTC'
+
+const createMockChain = (table: string) => {
+  const chain: any = {
+    select: vi.fn(() => chain),
+    eq: vi.fn(() => chain),
+    in: vi.fn(() => chain),
+    gte: vi.fn(() => chain),
+    lte: vi.fn(() => chain),
+    lt: vi.fn(() => chain),
+    not: vi.fn(() => chain),
+    order: vi.fn(() => chain),
+    limit: vi.fn(() => chain),
+    maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    then: (resolve: any) => {
+      if (table === 'users') {
+        resolve({
+          data: [
+            { id: 'user-1', name: 'Alice PM', email: 'alice@example.com', total_xp: 150, created_at: new Date().toISOString() },
+            { id: 'user-2', name: 'Bob PM', email: 'bob@example.com', total_xp: 200, created_at: new Date().toISOString() },
+          ],
+          count: 2,
+          error: null,
+        })
+      } else if (table === 'xp_events') {
+        resolve({
+          data: [
+            { user_id: 'user-1', xp_amount: 50, created_at: new Date().toISOString() },
+          ],
+          count: 1,
+          error: null,
+        })
+      } else if (table === 'user_lesson_progress') {
+        resolve({
+          data: [
+            { user_id: 'user-1', lesson_id: 'les_foundations_01', completed_at: new Date().toISOString() },
+          ],
+          count: 1,
+          error: null,
+        })
+      } else if (table === 'quiz_attempts') {
+        resolve({
+          data: [{ id: 'q-1', user_id: 'user-1', attempted_at: new Date().toISOString() }],
+          count: 1,
+          error: null,
+        })
+      } else if (table === 'capstone_submissions') {
+        resolve({
+          data: [{ id: 'c-1', user_id: 'user-1', module_slug: 'foundations', submitted_at: new Date().toISOString() }],
+          count: 1,
+          error: null,
+        })
+      } else if (table === 'certificates') {
+        resolve({
+          data: [{ id: 'cert-1', user_id: 'user-1', learner_name: 'Alice', issued_at: new Date().toISOString(), certificate_code: 'CERT-001' }],
+          count: 1,
+          error: null,
+        })
+      } else {
+        resolve({ data: [], count: 0, error: null })
+      }
+    },
+  }
+  return chain
+}
+
+vi.mock('../supabase', () => ({
+  createServiceRoleClient: vi.fn(() => ({
+    from: vi.fn((table: string) => createMockChain(table)),
+    rpc: vi.fn(() => Promise.resolve({ data: null, error: { message: 'RPC not found' } })),
+    auth: {
+      admin: {
+        listUsers: vi.fn(() =>
+          Promise.resolve({
+            data: {
+              users: [
+                { id: 'user-1', email: 'alice@example.com', email_confirmed_at: new Date().toISOString() },
+              ],
+            },
+            error: null,
+          })
+        ),
+      },
+    },
+  })),
+  createBrowserSupabaseClient: vi.fn(),
+  createAuthenticatedServerClient: vi.fn(),
+}))
 
 describe('Dashboard Aggregation Unit Test Suite', () => {
   describe('Range Resolution', () => {
