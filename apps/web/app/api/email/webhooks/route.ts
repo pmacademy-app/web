@@ -91,13 +91,14 @@ export async function POST(request: Request) {
     if (secret) {
       const isValid = verifyResendWebhookSignature(request, rawBody, secret)
       if (!isValid) {
+        const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id') || 'unknown'
         console.warn('[ResendWebhook] Unauthorized webhook request: Svix signature verification failed.')
         const { logSystemError } = await import('@/lib/monitoring/logger')
         void logSystemError({
           severity: 'warning',
           category: 'webhook',
           operation: 'resend_webhook_auth',
-          message: 'Unauthorized request: Svix signature or secret verification failed',
+          message: `Unauthorized request: Svix signature or secret verification failed (svix-id: ${svixId})`,
         })
         return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
       }

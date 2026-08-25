@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { classifyAuthError } from '@/lib/auth/errors'
 
 export const runtime = 'nodejs'
 
@@ -65,21 +66,34 @@ export async function POST(request: NextRequest) {
     })
 
     if (resendError) {
+      const classified = classifyAuthError(resendError, 'resend_verification')
+
       void logSystemError({
         severity: 'warning',
         category: 'verification',
         operation: 'resend_verification',
         message: resendError.message,
-        details: { targetEmail },
+        details: { authErrorCode: classified.code, rawCode: classified.rawCode },
       })
 
-      // Check if error is already-verified or rate limit
+      // Check if error is already-verified
       if (resendError.message.toLowerCase().includes('already confirmed')) {
         return NextResponse.json({
           success: true,
           message: 'Your email address is already verified.',
           alreadyVerified: true,
         })
+      }
+
+      // Propagate Supabase-side rate limit as 429 so callers can back off correctly
+      if (classified.code === 'AUTH_RATE_LIMITED') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Too many verification requests. Please wait a moment before trying again.',
+          },
+          { status: 429 }
+        )
       }
 
       return NextResponse.json(

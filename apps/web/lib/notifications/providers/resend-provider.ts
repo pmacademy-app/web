@@ -62,6 +62,7 @@ export class ResendProvider implements NotificationProvider {
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify(bodyPayload),
+        signal: AbortSignal.timeout(8000),
       })
 
       const data = await res.json()
@@ -99,17 +100,40 @@ export class ResendProvider implements NotificationProvider {
         timestamp: new Date().toISOString(),
       }
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Unknown network exception in ResendProvider'
-      console.error('[ResendProvider] Exception calling Resend API:', err)
-      
+      // Distinguish timeout / abort from generic network failures for actionable diagnostics.
+      // Node 18+ fetch errors carry a `cause` property with the underlying syscall error.
+      const isTimeout =
+        err instanceof Error &&
+        (err.name === 'TimeoutError' || err.name === 'AbortError' ||
+          (err.cause instanceof Error && (err.cause.name === 'TimeoutError' || err.cause.name === 'AbortError')))
+
+      const isDns =
+        err instanceof Error &&
+        (err.message.includes('ENOTFOUND') || err.message.includes('ECONNREFUSED') ||
+          (err.cause instanceof Error && (err.cause.message?.includes('ENOTFOUND') || err.cause.message?.includes('ECONNREFUSED'))))
+
+      let friendlyMsg: string
+      if (isTimeout) {
+        friendlyMsg = `Resend API request timed out after 8 s (template: ${payload.templateKey})`
+      } else if (isDns) {
+        const underlying = (err instanceof Error && err.cause instanceof Error) ? err.cause.message : (err instanceof Error ? err.message : 'DNS failure')
+        friendlyMsg = `Resend API unreachable — DNS/connection failure: ${underlying}`
+      } else {
+        const cause = err instanceof Error && err.cause instanceof Error ? ` — cause: ${err.cause.message}` : ''
+        friendlyMsg = `Network exception calling Resend API: ${err instanceof Error ? err.name + ': ' + err.message : String(err)}${cause}`
+      }
+
+      console.error('[ResendProvider] Exception calling Resend API:', friendlyMsg)
+
       try {
         const { logSystemError } = await import('@/lib/monitoring/logger')
         void logSystemError({
           severity: 'critical',
           category: 'resend',
           operation: 'send_email',
-          message: errorMsg,
+          message: friendlyMsg,
           templateKey: payload.templateKey,
+          details: { errorName: err instanceof Error ? err.name : 'unknown', isTimeout, isDns },
         })
       } catch {
         // Non-fatal logger fallback
@@ -118,7 +142,7 @@ export class ResendProvider implements NotificationProvider {
       return {
         success: false,
         providerName: this.name,
-        error: errorMsg,
+        error: friendlyMsg,
         timestamp: new Date().toISOString(),
       }
     }
