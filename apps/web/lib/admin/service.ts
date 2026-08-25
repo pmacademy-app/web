@@ -673,6 +673,14 @@ export class AdminConsoleService {
               submittedAt: capstoneRows[0].submitted_at,
             }
           : null,
+        capstones: capstoneRows.map((c) => ({
+          id: c.id,
+          moduleSlug: c.module_slug,
+          moduleTitle: getCapstoneDefinition(c.module_slug)?.moduleTitle || c.module_slug,
+          status: c.status,
+          isPublic: c.is_public,
+          submittedAt: c.submitted_at,
+        })),
         portfolio: {
           hasPortfolio: Boolean(u?.is_portfolio_public),
           url: portfolioUrl,

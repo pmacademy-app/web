@@ -171,6 +171,7 @@ export interface AdminUserDetail extends AdminUserOverview {
     badges: AdminUserBadge[]
     certificates: AdminUserCertificate[]
     capstone: AdminUserCapstone | null
+    capstones?: AdminUserCapstone[]
     portfolio: { hasPortfolio: boolean; url: string | null; isPublic: boolean }
   }
   communications: {
