@@ -15,6 +15,7 @@ import { BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { AdminSection } from './AdminSection'
 import { AdminEmptyState } from './AdminEmptyState'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import type { AdminTimeSeriesPoint } from '@/lib/admin/types'
 
 interface AdminLearningActivityChartProps {
@@ -37,6 +38,7 @@ const BAR_CONFIG: Record<string, { name: string; fill: string }> = {
 }
 
 export function AdminLearningActivityChart({ data }: AdminLearningActivityChartProps) {
+  const mounted = useIsMounted()
   const [metric, setMetric] = useState<MetricKey>('all')
   const active = METRICS.find((m) => m.key === metric) || METRICS[0]
 
@@ -81,45 +83,49 @@ export function AdminLearningActivityChart({ data }: AdminLearningActivityChartP
           role="img"
           aria-label="Daily learning activity chart showing lessons, quizzes and capstone submissions over the selected range"
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }} barGap={2}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" vertical={false} />
-              <XAxis
-                dataKey="label"
-                tick={{ fill: 'var(--admin-fg-muted)', fontSize: 11 }}
-                tickLine={false}
-                axisLine={{ stroke: 'var(--admin-border)' }}
-                minTickGap={24}
-              />
-              <YAxis
-                tick={{ fill: 'var(--admin-fg-muted)', fontSize: 11 }}
-                tickLine={false}
-                axisLine={false}
-                allowDecimals={false}
-              />
-              <Tooltip
-                cursor={{ fill: 'var(--admin-accent-soft)' }}
-                contentStyle={{
-                  background: 'var(--admin-surface-raised)',
-                  border: '1px solid var(--admin-border)',
-                  borderRadius: 8,
-                  fontSize: 12,
-                  color: 'var(--admin-fg)',
-                }}
-                labelStyle={{ color: 'var(--admin-fg-muted)', fontWeight: 600 }}
-              />
-              {metric === 'all' && <Legend wrapperStyle={{ fontSize: 12, color: 'var(--admin-fg-muted)' }} />}
-              {active.bars.map((bar) => (
-                <Bar
-                  key={bar}
-                  dataKey={bar}
-                  name={BAR_CONFIG[bar].name}
-                  fill={BAR_CONFIG[bar].fill}
-                  radius={[3, 3, 0, 0]}
+          {mounted ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }} barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" vertical={false} />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fill: 'var(--admin-fg-muted)', fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={{ stroke: 'var(--admin-border)' }}
+                  minTickGap={24}
                 />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
+                <YAxis
+                  tick={{ fill: 'var(--admin-fg-muted)', fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={false}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  cursor={{ fill: 'var(--admin-accent-soft)' }}
+                  contentStyle={{
+                    background: 'var(--admin-surface-raised)',
+                    border: '1px solid var(--admin-border)',
+                    borderRadius: 8,
+                    fontSize: 12,
+                    color: 'var(--admin-fg)',
+                  }}
+                  labelStyle={{ color: 'var(--admin-fg-muted)', fontWeight: 600 }}
+                />
+                {metric === 'all' && <Legend wrapperStyle={{ fontSize: 12, color: 'var(--admin-fg-muted)' }} />}
+                {active.bars.map((bar) => (
+                  <Bar
+                    key={bar}
+                    dataKey={bar}
+                    name={BAR_CONFIG[bar].name}
+                    fill={BAR_CONFIG[bar].fill}
+                    radius={[3, 3, 0, 0]}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="w-full h-full rounded-xl bg-admin-surface/20 animate-pulse" />
+          )}
         </div>
       )}
     </AdminSection>

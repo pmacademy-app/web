@@ -352,7 +352,7 @@ describe('Phase 3 — Cache Invalidation, Verification State & Admin Correctness
       }
 
       const { DashboardService } = await import('@/lib/admin/dashboard-service')
-      const summary = await DashboardService.getDashboardSummary(true)
+      const summary = await DashboardService.getDashboardSummary()
 
       expect(summary.totalUsers).toBe(150)
       expect(summary.activeLearners7d).toBe(42)
@@ -369,7 +369,7 @@ describe('Phase 3 — Cache Invalidation, Verification State & Admin Correctness
       ]
 
       const { DashboardService } = await import('@/lib/admin/dashboard-service')
-      const summary = await DashboardService.getDashboardSummary(true)
+      const summary = await DashboardService.getDashboardSummary()
 
       expect(summary.totalUsers).toBe(2)
       expect(summary.systemHealth.status).toBe('healthy')
@@ -379,7 +379,7 @@ describe('Phase 3 — Cache Invalidation, Verification State & Admin Correctness
       mockClientThrow = true
 
       const { DashboardService } = await import('@/lib/admin/dashboard-service')
-      const summary = await DashboardService.getDashboardSummary(true)
+      const summary = await DashboardService.getDashboardSummary()
 
       expect(summary).toBeDefined()
       expect(summary.totalUsers).toBe(0)
@@ -390,7 +390,7 @@ describe('Phase 3 — Cache Invalidation, Verification State & Admin Correctness
       mockClientThrow = true
 
       const { DashboardService } = await import('@/lib/admin/dashboard-service')
-      const data = await DashboardService.getDashboardData('30d', null, null, true)
+      const data = await DashboardService.getDashboardData('30d', null, null)
 
       expect(data).toBeDefined()
       expect(data.kpis.totalUsers).toBe(0)

@@ -11,6 +11,7 @@ import { AdminAlert } from './AdminAlert'
 import { AdminEmptyState } from './AdminEmptyState'
 import { AdminDashboardRefreshButton } from './AdminDashboardRefreshButton'
 import { ProcessEmailQueueButton } from './ProcessEmailQueueButton'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import type { AdminSystemHealthOverview, AdminSystemServiceDetail, AdminAuthHealthTelemetry } from '@/lib/admin/types'
 
 interface AdminSystemHealthWorkspaceProps {
@@ -26,7 +27,26 @@ interface AdminSystemHealthWorkspaceProps {
  */
 export function AdminSystemHealthWorkspace({ overview, serviceDetails, authHealth }: AdminSystemHealthWorkspaceProps) {
   const [selected, setSelected] = useState<string | null>(null)
+  const mounted = useIsMounted()
   const selectedDetail = selected ? serviceDetails[selected] : null
+
+  const formatTime = (iso: string) => {
+    if (!mounted || !iso) return ''
+    try {
+      return new Date(iso).toLocaleTimeString()
+    } catch {
+      return ''
+    }
+  }
+
+  const formatDateTime = (iso: string) => {
+    if (!mounted || !iso) return ''
+    try {
+      return new Date(iso).toLocaleString()
+    } catch {
+      return ''
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -46,8 +66,7 @@ export function AdminSystemHealthWorkspace({ overview, serviceDetails, authHealt
               <AdminSystemStatusBadge status={overview.overallStatus} />
             </div>
             <p className="text-xs text-admin-fg-muted mt-0.5">
-              {overview.environment} environment · Last checked{' '}
-              {new Date(overview.lastCheckedAt).toLocaleString()}
+              {overview.environment} environment{mounted && overview.lastCheckedAt ? ` · Last checked ${formatDateTime(overview.lastCheckedAt)}` : ''}
               {overview.nextVersion ? ` · ${overview.nextVersion}` : ''}
             </p>
           </div>
@@ -88,7 +107,7 @@ export function AdminSystemHealthWorkspace({ overview, serviceDetails, authHealt
               <p className="text-[11px] text-admin-fg-muted mt-1">{service.detail}</p>
               <div className="flex items-center justify-between mt-4 pt-3 border-t border-admin-border">
                 <span className="text-[10px] font-mono text-admin-fg-subtle">
-                  Checked {new Date(service.lastChecked).toLocaleTimeString()}
+                  {mounted && service.lastChecked ? `Checked ${formatTime(service.lastChecked)}` : 'Live telemetry'}
                 </span>
                 <span className="text-[11px] font-semibold text-admin-accent inline-flex items-center gap-0.5 group-hover:gap-1 transition-all">
                   View Details <ChevronRight className="w-3 h-3" />
