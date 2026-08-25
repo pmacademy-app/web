@@ -674,16 +674,27 @@ export interface NotificationSettings {
   defaultEmailEnabled: boolean
 }
 
+export interface OnboardingFieldOption {
+  id: string
+  label: string
+  description?: string
+  badge?: string
+  icon?: string
+  enabled?: boolean
+}
+
 export interface OnboardingStepConfig {
   id: string
   title: string
   description: string
   requiredFields: string[]
+  fieldOptions?: Record<string, OnboardingFieldOption[]>
 }
 
 export interface OnboardingSettings {
   enabled: boolean
   steps: OnboardingStepConfig[]
+  fieldOptions?: Record<string, OnboardingFieldOption[]>
 }
 
 export interface SettingsResponse<T> {

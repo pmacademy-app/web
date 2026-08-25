@@ -27,22 +27,27 @@ export function SettingRow({
   controlClassName,
 }: SettingRowProps) {
   return (
-    <div className={cn('flex items-start gap-4 py-3', className)}>
-      <label
-        className={cn(
-          'flex-1 min-w-0 pt-0.5 text-sm font-medium text-admin-fg',
-          labelClassName
-        )}
-      >
-        <span className="flex items-center gap-1.5">
+    <div
+      className={cn(
+        'flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 py-3.5 border-b border-admin-border/60 last:border-b-0',
+        className
+      )}
+    >
+      <div className={cn('flex-1 min-w-0', labelClassName)}>
+        <span className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-admin-fg">
           {label}
           {required && <span className="text-admin-danger" aria-hidden="true">*</span>}
         </span>
         {description && (
-          <p className="mt-0.5 text-xs text-admin-fg-muted">{description}</p>
+          <p className="mt-0.5 text-xs text-admin-fg-muted leading-relaxed">{description}</p>
         )}
-      </label>
-      <div className={cn('shrink-0 w-full max-w-[320px]', controlClassName)}>
+      </div>
+      <div
+        className={cn(
+          'shrink-0 w-full sm:w-auto sm:max-w-[320px] flex items-center justify-start sm:justify-end',
+          controlClassName
+        )}
+      >
         {children}
       </div>
     </div>

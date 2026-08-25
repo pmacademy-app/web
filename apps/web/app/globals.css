@@ -186,41 +186,40 @@
   --sidebar-ring:        oklch(0.556 0 0);
 }
 
-/* ─── Admin Panel Brand Tokens (Phase 1) ─────────────────────────────────────
-   Premium dark SaaS palette scoped to the Admin Panel shell (.admin-console).
-   Values are brand-derived: navy foundation (#011229 family) + green accent
-   (#019E75). This namespace is intentionally separate from the learner /
-   marketing theme — nothing leaks outside the admin subtree.
+/* ─── Admin Panel Brand Tokens ───────────────────────────────────────────────
+   Clean, modern Prodily SaaS palette scoped to the Admin Panel shell (.admin-console).
+   Aligns directly with the core Prodily identity: clean light canvas (#F8FAFC / #FFFFFF),
+   crisp neutral borders (#E2E8F0), slate typography (#0F172A), and Prodily green (#019E75).
 ---------------------------------------------------------------------------- */
 
 .admin-console {
   /* Foundation */
-  --admin-bg:               #050B14;
-  --admin-surface:          #0A1426;
-  --admin-surface-raised:   #0F1C33;
-  --admin-border:           rgba(255, 255, 255, 0.08);
-  --admin-border-strong:    rgba(255, 255, 255, 0.14);
+  --admin-bg:               #F8FAFC;
+  --admin-surface:          #FFFFFF;
+  --admin-surface-raised:   #F1F5F9;
+  --admin-border:           #E2E8F0;
+  --admin-border-strong:    #CBD5E1;
 
   /* Text */
-  --admin-fg:               #F3F4F6;
-  --admin-fg-muted:         #9CA3AF;
-  --admin-fg-subtle:        #6B7684;
+  --admin-fg:               #0F172A;
+  --admin-fg-muted:         #475569;
+  --admin-fg-subtle:        #94A3B8;
 
-  /* Accent (brand green) */
+  /* Accent (Prodily brand green) */
   --admin-accent:           #019E75;
   --admin-accent-fg:        #FFFFFF;
-  --admin-accent-soft:      rgba(1, 158, 117, 0.12);
+  --admin-accent-soft:      rgba(1, 158, 117, 0.08);
 
   /* Semantic */
-  --admin-success:          #4ADE80;
-  --admin-success-soft:     rgba(74, 222, 128, 0.12);
-  --admin-warning:          #FACC15;
-  --admin-warning-soft:     rgba(250, 204, 21, 0.12);
-  --admin-danger:           #FB7185;
-  --admin-danger-soft:      rgba(251, 113, 133, 0.12);
-  --admin-info:             #60A5FA;
-  --admin-info-soft:        rgba(96, 165, 250, 0.12);
-  --admin-neutral:          #94A3B8;
+  --admin-success:          #16A34A;
+  --admin-success-soft:     rgba(22, 163, 74, 0.1);
+  --admin-warning:          #D97706;
+  --admin-warning-soft:     rgba(217, 119, 6, 0.1);
+  --admin-danger:           #DC2626;
+  --admin-danger-soft:      rgba(220, 38, 38, 0.1);
+  --admin-info:             #2563EB;
+  --admin-info-soft:        rgba(37, 99, 235, 0.1);
+  --admin-neutral:          #64748B;
 }
 
 /* ─── Tailwind v4 Theme ──────────────────────────────────────────────────────
