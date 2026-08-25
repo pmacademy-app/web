@@ -130,7 +130,7 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(typeof emailFlag?.enabled).toBe('boolean')
   })
 
-  it('SettingsService.getOnboardingSettings returns 4 default steps and 4 option sets', async () => {
+  it('SettingsService.getOnboardingSettings returns 4 default steps and exact option sets', async () => {
     const onboarding = await SettingsService.getOnboardingSettings()
     expect(typeof onboarding.enabled).toBe('boolean')
     expect(Array.isArray(onboarding.steps)).toBe(true)
@@ -140,10 +140,49 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(onboarding.steps[2].id).toBe('step_interests')
     expect(onboarding.steps[3].id).toBe('step_path')
 
-    expect(onboarding.fieldOptions?.goal?.length).toBeGreaterThanOrEqual(5)
-    expect(onboarding.fieldOptions?.experience_level?.length).toBeGreaterThanOrEqual(4)
-    expect(onboarding.fieldOptions?.topics?.length).toBeGreaterThanOrEqual(10)
-    expect(onboarding.fieldOptions?.learning_preference?.length).toBeGreaterThanOrEqual(5)
+    // 4 Experience Level options
+    expect(onboarding.fieldOptions?.experience_level?.length).toBe(4)
+    expect(onboarding.fieldOptions?.experience_level?.map((e) => e.label)).toEqual([
+      'Beginner',
+      'Learning Product Management',
+      'Working in Product',
+      'Experienced Product Manager',
+    ])
+
+    // 5 Primary Goal options
+    expect(onboarding.fieldOptions?.goal?.length).toBe(5)
+    expect(onboarding.fieldOptions?.goal?.map((g) => g.label)).toEqual([
+      'Become a Product Manager',
+      'Transition into Product Management',
+      'Grow in my PM career',
+      'Build practical PM skills',
+      'Explore Product Management',
+    ])
+
+    // 10 Interest options
+    expect(onboarding.fieldOptions?.topics?.length).toBe(10)
+    expect(onboarding.fieldOptions?.topics?.map((t) => t.label)).toEqual([
+      'Product Discovery',
+      'User Research',
+      'Product Strategy',
+      'Product Roadmapping',
+      'Prioritization',
+      'Metrics & Analytics',
+      'PRDs & Documentation',
+      'Agile & Execution',
+      'Stakeholder Management',
+      'Product Launch',
+    ])
+
+    // 5 Learning Preference options
+    expect(onboarding.fieldOptions?.learning_preference?.length).toBe(5)
+    expect(onboarding.fieldOptions?.learning_preference?.map((p) => p.label)).toEqual([
+      'Structured learning',
+      'Hands-on practice',
+      'Case studies',
+      'Quick lessons',
+      'A mix of everything',
+    ])
   })
 
   it('SettingsService.getAllSettings returns all 6 workspace domains in parallel', async () => {
