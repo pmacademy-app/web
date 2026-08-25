@@ -1,14 +1,11 @@
 'use client'
 
 import React from 'react'
-import { Info, Shield, Globe } from 'lucide-react'
-import { AdminPageHeader } from './AdminPageHeader'
+import { Shield, Globe, RotateCcw, Save } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminToggle } from './AdminToggle'
 import { SettingRow } from './SettingRow'
 import { NumberInput } from './NumberInput'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import type { ProductSettings } from '@/lib/admin/types'
 import type { SettingsSectionKey } from '@/lib/admin/types'
 
@@ -37,24 +34,19 @@ export function ProductSettingsSection({
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title="Product Settings"
-        description="General product identity and platform behavior configuration."
-        icon={Info}
-        iconColor="text-admin-info"
-      />
-
       {/* General Group */}
       <AdminSection title="General" icon={Globe} meta="Core product identity">
         <SettingRow
           label="Site Name"
           description="Displayed in emails, browser title, and learner-facing pages."
         >
-          <Input
+          <input
+            type="text"
             value={data.siteName}
             onChange={(e) => handleInputChange('siteName', e.target.value)}
             placeholder="Prodily"
             disabled={isSaving}
+            className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent disabled:opacity-50 disabled:cursor-not-allowed hover:border-admin-border-strong transition-colors"
           />
         </SettingRow>
 
@@ -62,11 +54,13 @@ export function ProductSettingsSection({
           label="Site Description"
           description="Brief description shown in meta tags and social previews."
         >
-          <Input
+          <input
+            type="text"
             value={data.siteDescription}
             onChange={(e) => handleInputChange('siteDescription', e.target.value)}
             placeholder="Product Management Academy"
             disabled={isSaving}
+            className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent disabled:opacity-50 disabled:cursor-not-allowed hover:border-admin-border-strong transition-colors"
           />
         </SettingRow>
 
@@ -74,12 +68,13 @@ export function ProductSettingsSection({
           label="Contact Email"
           description="Support email shown to learners in help sections and automated emails."
         >
-          <Input
+          <input
             type="email"
             value={data.contactEmail}
             onChange={(e) => handleInputChange('contactEmail', e.target.value)}
             placeholder="support@prodily.app"
             disabled={isSaving}
+            className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent disabled:opacity-50 disabled:cursor-not-allowed hover:border-admin-border-strong transition-colors"
           />
         </SettingRow>
       </AdminSection>
@@ -140,17 +135,24 @@ export function ProductSettingsSection({
 
       {/* Actions */}
       <div className="flex items-center justify-end gap-3 border-t border-admin-border pt-4">
-        <Button
-          variant="outline"
+        <button
+          type="button"
           onClick={onReset}
           disabled={!isDirty || isSaving}
-          aria-disabled={!isDirty || isSaving}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg border border-admin-border bg-admin-surface text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
+          <RotateCcw className="w-3.5 h-3.5" />
           Reset
-        </Button>
-        <Button onClick={onSave} disabled={!isDirty || isSaving} aria-disabled={!isDirty || isSaving}>
+        </button>
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={!isDirty || isSaving}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-admin-accent text-admin-bg hover:bg-admin-accent/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+        >
+          <Save className="w-3.5 h-3.5" />
           {isSaving ? 'Saving…' : 'Save Changes'}
-        </Button>
+        </button>
       </div>
     </div>
   )

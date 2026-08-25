@@ -171,6 +171,7 @@ export interface AdminUserDetail extends AdminUserOverview {
     badges: AdminUserBadge[]
     certificates: AdminUserCertificate[]
     capstone: AdminUserCapstone | null
+    capstones?: AdminUserCapstone[]
     portfolio: { hasPortfolio: boolean; url: string | null; isPublic: boolean }
   }
   communications: {
@@ -357,6 +358,7 @@ export interface AdminDashboardData {
   funnel: AdminFunnelStage[]
   recentActivity: AdminRecentActivityItem[]
   systemSnapshot: AdminSystemSnapshotItem[]
+  failed?: boolean
 }
 
 /* ─── Phase 4 — Learning Workspace ─────────────────────────────────────────── */
@@ -672,16 +674,27 @@ export interface NotificationSettings {
   defaultEmailEnabled: boolean
 }
 
+export interface OnboardingFieldOption {
+  id: string
+  label: string
+  description?: string
+  badge?: string
+  icon?: string
+  enabled?: boolean
+}
+
 export interface OnboardingStepConfig {
   id: string
   title: string
   description: string
   requiredFields: string[]
+  fieldOptions?: Record<string, OnboardingFieldOption[]>
 }
 
 export interface OnboardingSettings {
   enabled: boolean
   steps: OnboardingStepConfig[]
+  fieldOptions?: Record<string, OnboardingFieldOption[]>
 }
 
 export interface SettingsResponse<T> {

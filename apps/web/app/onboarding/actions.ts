@@ -12,7 +12,7 @@ export interface OnboardingData {
   username?: string
   avatar_url?: string | null
   career_role?: string
-  goal?: 'job_search' | 'fill_gaps' | 'exploring'
+  goal?: 'job_search' | 'fill_gaps' | 'exploring' | string
   learning_purpose?: string
   linkedin_url?: string
   website_url?: string

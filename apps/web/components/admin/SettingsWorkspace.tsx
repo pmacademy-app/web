@@ -2,7 +2,17 @@
 
 import React, { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+  Settings,
+  Sliders,
+  BookOpen,
+  Mail,
+  Bell,
+  UserCheck,
+  Flag,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { AdminPageHeader } from './AdminPageHeader'
 import { AdminConfirmDialog } from './AdminConfirmDialog'
 import { useAdminToast } from './admin-toast'
 import { ProductSettingsSection } from './ProductSettingsSection'
@@ -35,70 +45,14 @@ export interface SettingsWorkspaceProps {
   initialData: SettingsDataMap
 }
 
-const SECTIONS: Array<{ key: SettingsSectionKey; label: string; icon: React.ReactNode }> = [
-  { key: 'product', label: 'Product', icon: <SettingsIcon /> },
-  { key: 'learning', label: 'Learning', icon: <BookOpenIcon /> },
-  { key: 'email', label: 'Email', icon: <MailIcon /> },
-  { key: 'notifications', label: 'Notifications', icon: <BellIcon /> },
-  { key: 'onboarding', label: 'Onboarding', icon: <UsersIcon /> },
-  { key: 'feature-flags', label: 'Feature Flags', icon: <FlagIcon /> },
+const SECTIONS: Array<{ key: SettingsSectionKey; label: string; icon: React.ComponentType<{ className?: string }> }> = [
+  { key: 'product', label: 'Product', icon: Sliders },
+  { key: 'learning', label: 'Learning', icon: BookOpen },
+  { key: 'email', label: 'Email', icon: Mail },
+  { key: 'notifications', label: 'Notifications', icon: Bell },
+  { key: 'onboarding', label: 'Onboarding', icon: UserCheck },
+  { key: 'feature-flags', label: 'Feature Flags', icon: Flag },
 ]
-
-function UsersIcon({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  )
-}
-
-function SettingsIcon({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-    </svg>
-  )
-}
-
-function BookOpenIcon({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-    </svg>
-  )
-}
-
-function MailIcon({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-      <polyline points="22,6 12,13 2,6" />
-    </svg>
-  )
-}
-
-function BellIcon({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  )
-}
-
-function FlagIcon({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-      <line x1="4" x2="4" y1="22" y2="15" />
-    </svg>
-  )
-}
 
 export function SettingsWorkspace({
   initialSection,
@@ -260,13 +214,21 @@ export function SettingsWorkspace({
 
   return (
     <div className="space-y-6">
-      {/* Section Tabs */}
+      {/* Top Single Header for Entire Settings Workspace */}
+      <AdminPageHeader
+        title="Platform Settings"
+        description="Configure platform identity, learning parameters, email routing, notification policies, onboarding flow, and runtime feature flags."
+        icon={Settings}
+        iconColor="text-admin-accent"
+      />
+
+      {/* Section Sub-Navigation Tabs */}
       <nav
         aria-label="Settings sections"
         className="border-b border-admin-border flex gap-1 overflow-x-auto scrollbar-thin scrollbar-thumb-admin-border"
         role="tablist"
       >
-        {SECTIONS.map(({ key, label, icon }) => (
+        {SECTIONS.map(({ key, label, icon: IconComponent }) => (
           <button
             key={key}
             role="tab"
@@ -282,7 +244,7 @@ export function SettingsWorkspace({
                 : 'border-transparent text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised/50'
             )}
           >
-            {icon}
+            <IconComponent className="w-4 h-4" />
             {label}
             {dirtySections.has(key) && (
               <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-admin-warning-soft text-admin-warning">

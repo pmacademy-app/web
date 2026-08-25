@@ -6,6 +6,7 @@ import { AdminDrawer } from './AdminDrawer'
 import { AdminSystemStatusBadge } from './AdminSystemStatusBadge'
 import { AdminEmptyState } from './AdminEmptyState'
 import { AdminDetailItem } from './AdminDetailItem'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import type { AdminSystemServiceDetail } from '@/lib/admin/types'
 
 interface AdminServiceDetailDrawerProps {
@@ -20,6 +21,17 @@ interface AdminServiceDetailDrawerProps {
  * opens instantly with no fetch.
  */
 export function AdminServiceDetailDrawer({ detail, open, onOpenChange }: AdminServiceDetailDrawerProps) {
+  const mounted = useIsMounted()
+
+  const formatDateTime = (iso: string) => {
+    if (!mounted || !iso) return ''
+    try {
+      return new Date(iso).toLocaleString()
+    } catch {
+      return iso
+    }
+  }
+
   return (
     <AdminDrawer
       open={open}
@@ -35,7 +47,7 @@ export function AdminServiceDetailDrawer({ detail, open, onOpenChange }: AdminSe
             <div className="min-w-0">
               <p className="text-[10px] font-bold text-admin-fg-subtle uppercase tracking-wider">Current Status</p>
               <p className="text-xs text-admin-fg-muted mt-1">
-                Last checked {new Date(detail.lastChecked).toLocaleString()}
+                Last checked {formatDateTime(detail.lastChecked)}
               </p>
             </div>
             <AdminSystemStatusBadge status={detail.status} />
@@ -71,7 +83,7 @@ export function AdminServiceDetailDrawer({ detail, open, onOpenChange }: AdminSe
                         <AlertTriangle className="w-3 h-3" /> {err.severity}
                       </span>
                       <span className="text-[10px] font-mono text-admin-fg-muted">
-                        {new Date(err.timestamp).toLocaleString()}
+                        {formatDateTime(err.timestamp)}
                       </span>
                     </div>
                     <p className="text-xs font-semibold text-admin-fg mt-1.5 font-mono">{err.operation}</p>

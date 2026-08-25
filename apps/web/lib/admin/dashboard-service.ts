@@ -1,5 +1,5 @@
-import { unstable_cache } from 'next/cache'
 import { createServiceRoleClient } from '../supabase'
+import { fetchCurriculumData } from '../lesson-loader'
 import {
   buildFunnel,
   buildLearnerSeries,
@@ -44,9 +44,9 @@ export class DashboardService {
   }
 
   /**
-   * Aggregates real-time platform overview metrics for the summary API with SQL RPC and cache.
+   * Aggregates real-time platform overview metrics for the summary API with SQL RPC.
    */
-  public static async getDashboardSummary(forceFresh = false): Promise<AdminDashboardSummary> {
+  public static async getDashboardSummary(): Promise<AdminDashboardSummary> {
     const fetcher = async (): Promise<AdminDashboardSummary> => {
       try {
         const supabase = createServiceRoleClient()
@@ -160,16 +160,7 @@ export class DashboardService {
       }
     }
 
-    if (forceFresh) {
-      return fetcher()
-    }
-
-    const getCached = unstable_cache(fetcher, ['admin-summary-cache'], {
-      revalidate: 30,
-      tags: ['admin-summary'],
-    })
-
-    return getCached()
+    return fetcher()
   }
 
   /**
@@ -178,12 +169,18 @@ export class DashboardService {
   public static async getDashboardData(
     rangeKey: AdminDateRangeKey = '30d',
     from?: string | null,
-    to?: string | null,
-    forceFresh = false
+    to?: string | null
   ): Promise<AdminDashboardData> {
     const fetcher = async (): Promise<AdminDashboardData> => {
-      const range = resolveRange(rangeKey, from, to)
+      let range = resolveRange('30d')
       try {
+        try {
+          range = resolveRange(rangeKey, from, to)
+        } catch (rangeErr) {
+          console.warn('[DashboardService] resolveRange fallback:', rangeErr)
+          range = resolveRange('30d')
+        }
+
         const supabase = createServiceRoleClient()
 
         const rangeMs = range.end.getTime() - range.start.getTime()
@@ -423,21 +420,12 @@ export class DashboardService {
           funnel: [],
           recentActivity: [],
           systemSnapshot,
+          failed: true,
         }
       }
     }
 
-    if (forceFresh) {
-      return fetcher()
-    }
-
-    const cacheKey = `admin-dashboard-data-${rangeKey}-${from || ''}-${to || ''}`
-    const getCached = unstable_cache(fetcher, [cacheKey], {
-      revalidate: 60,
-      tags: ['admin-dashboard-data'],
-    })
-
-    return getCached()
+    return fetcher()
   }
 
   /** Resolves badge ids marking full-curriculum completion. */
@@ -535,7 +523,7 @@ export class DashboardService {
 
     const results: ActivityRow[] = []
 
-    const [certRes, regRes, lessonRes, capRes] = await Promise.all([
+    const [certRes, regRes, lessonRes, capRes, curriculumData] = await Promise.all([
       supabase
         .from('certificates')
         .select('id, user_id, learner_name, issued_at, certificate_code')
@@ -548,7 +536,7 @@ export class DashboardService {
         .limit(limit),
       supabase
         .from('user_lesson_progress')
-        .select('user_id, lesson_slug, completed_at')
+        .select('user_id, lesson_id, completed_at')
         .eq('status', 'completed')
         .not('completed_at', 'is', null)
         .order('completed_at', { ascending: false })
@@ -558,7 +546,15 @@ export class DashboardService {
         .select('id, user_id, module_slug, submitted_at')
         .order('submitted_at', { ascending: false })
         .limit(limit),
+      fetchCurriculumData().catch(() => null),
     ])
+
+    const lessonTitleMap = new Map<string, string>()
+    if (curriculumData?.lessons) {
+      for (const lesson of curriculumData.lessons) {
+        lessonTitleMap.set(lesson.id, lesson.title || lesson.slug || lesson.id)
+      }
+    }
 
     for (const row of (certRes.data || []) as unknown as Array<{ id: string; user_id: string; learner_name: string; issued_at: string; certificate_code: string }>) {
       results.push({
@@ -584,7 +580,7 @@ export class DashboardService {
       })
     }
 
-    const lessonRowsTyped = (lessonRes.data || []) as unknown as Array<{ user_id: string; lesson_slug: string; completed_at: string }>
+    const lessonRowsTyped = (lessonRes.data || []) as unknown as Array<{ user_id: string; lesson_id: string; completed_at: string }>
     const activityUserIds = new Set(lessonRowsTyped.map((r) => r.user_id))
     const capRowsTyped = (capRes.data || []) as unknown as Array<{ id: string; user_id: string; module_slug: string; submitted_at: string }>
     for (const row of capRowsTyped) activityUserIds.add(row.user_id)
@@ -601,12 +597,13 @@ export class DashboardService {
     }
 
     for (const row of lessonRowsTyped) {
+      const lessonTitle = lessonTitleMap.get(row.lesson_id) || row.lesson_id
       results.push({
-        id: `lesson-${row.user_id}-${row.lesson_slug}`,
+        id: `lesson-${row.user_id}-${row.lesson_id}`,
         userId: row.user_id,
         userName: nameMap.get(row.user_id) || 'Learner',
         activity: 'completed a lesson',
-        entity: row.lesson_slug,
+        entity: lessonTitle,
         href: `/admin/users?userId=${row.user_id}`,
         timestamp: row.completed_at,
       })

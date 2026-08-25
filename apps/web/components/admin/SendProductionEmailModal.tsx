@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Send, AlertTriangle, CheckCircle2, X, ShieldAlert } from 'lucide-react'
+import { Send, AlertTriangle, CheckCircle2, X, ShieldAlert, Mail } from 'lucide-react'
 
 export interface TargetUser {
   id: string
@@ -20,6 +20,7 @@ interface SendProductionEmailModalProps {
 const PRODUCTION_TEMPLATES = [
   { key: 'auth.verify_email', label: 'Verification Email (auth.verify_email)', isCritical: true },
   { key: 'auth.welcome', label: 'Welcome Email (auth.welcome)', isCritical: false },
+  { key: 'admin.direct_message', label: 'Custom Direct Message (admin.direct_message)', isCritical: false },
   { key: 'achievement.badge_earned', label: 'Badge Earned (achievement.badge_earned)', isCritical: false },
   { key: 'achievement.certificate', label: 'Certificate Issued (achievement.certificate)', isCritical: false },
   { key: 'achievement.level_up', label: 'Level Up (achievement.level_up)', isCritical: false },
@@ -35,6 +36,10 @@ export function SendProductionEmailModal({
   onSuccess,
 }: SendProductionEmailModalProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('auth.verify_email')
+  const [customSubject, setCustomSubject] = useState<string>('')
+  const [customMessageBody, setCustomMessageBody] = useState<string>('')
+  const [customActionLabel, setCustomActionLabel] = useState<string>('')
+  const [customActionUrl, setCustomActionUrl] = useState<string>('')
   const [confirmed, setConfirmed] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [resultMessage, setResultMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -43,19 +48,30 @@ export function SendProductionEmailModal({
 
   const isVerified = Boolean(targetUser.email_confirmed_at)
   const selectedTemplateObj = PRODUCTION_TEMPLATES.find((t) => t.key === selectedTemplate)
+  const isDirectMessage = selectedTemplate === 'admin.direct_message'
+  const isDirectMessageValid = !isDirectMessage || (Boolean(customSubject.trim()) && Boolean(customMessageBody.trim()))
 
   const handleSend = async () => {
-    if (!confirmed || loading) return
+    if (!confirmed || loading || !isDirectMessageValid) return
     setLoading(true)
     setResultMessage(null)
 
     try {
+      const customVariables: Record<string, unknown> = {}
+      if (isDirectMessage) {
+        customVariables.subject = customSubject.trim()
+        customVariables.messageBody = customMessageBody.trim()
+        if (customActionLabel.trim()) customVariables.actionLabel = customActionLabel.trim()
+        if (customActionUrl.trim()) customVariables.actionUrl = customActionUrl.trim()
+      }
+
       const res = await fetch('/api/admin/emails/production-send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           targetUserId: targetUser.id,
           templateKey: selectedTemplate,
+          customVariables: Object.keys(customVariables).length > 0 ? customVariables : undefined,
         }),
       })
 
@@ -77,7 +93,7 @@ export function SendProductionEmailModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
-      <div className="bg-admin-surface border border-admin-border rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 relative">
+      <div className="bg-admin-surface border border-admin-border rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-5 relative">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-admin-border pb-4">
           <div className="flex items-center gap-2.5">
@@ -148,6 +164,69 @@ export function SendProductionEmailModal({
           )}
         </div>
 
+        {/* Custom Direct Message Inputs */}
+        {isDirectMessage && (
+          <div className="space-y-3 p-3.5 rounded-xl bg-admin-bg/60 border border-admin-border animate-in fade-in duration-150">
+            <div className="flex items-center gap-1.5 text-admin-accent text-xs font-bold uppercase tracking-wider">
+              <Mail className="w-3.5 h-3.5" />
+              Custom Message Content
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[11px] font-semibold text-admin-fg">
+                Subject Line <span className="text-admin-danger">*</span>
+              </label>
+              <input
+                type="text"
+                value={customSubject}
+                onChange={(e) => setCustomSubject(e.target.value)}
+                placeholder="e.g. Important update regarding your Prodily course"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-[11px] font-semibold text-admin-fg">
+                Message Body <span className="text-admin-danger">*</span>
+              </label>
+              <textarea
+                value={customMessageBody}
+                onChange={(e) => setCustomMessageBody(e.target.value)}
+                rows={4}
+                placeholder="Write your direct administrative message to the learner. Separate paragraphs with double newlines."
+                className="w-full px-3 py-2 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent resize-y"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-admin-fg">
+                  Action Button Label <span className="text-admin-fg-subtle text-[10px]">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={customActionLabel}
+                  onChange={(e) => setCustomActionLabel(e.target.value)}
+                  placeholder="e.g. Go to Dashboard"
+                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-admin-fg">
+                  Action URL <span className="text-admin-fg-subtle text-[10px]">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={customActionUrl}
+                  onChange={(e) => setCustomActionUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Confirmation Checkbox */}
         <label className="flex items-start gap-2.5 text-xs text-admin-fg cursor-pointer select-none">
           <input
@@ -191,7 +270,7 @@ export function SendProductionEmailModal({
           <button
             type="button"
             onClick={handleSend}
-            disabled={!confirmed || loading}
+            disabled={!confirmed || loading || !isDirectMessageValid}
             className="px-4 py-2 text-xs font-bold rounded-xl bg-admin-success text-admin-fg hover:bg-admin-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 cursor-pointer"
           >
             <Send className="w-3.5 h-3.5" />

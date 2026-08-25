@@ -14,6 +14,7 @@ import {
 import { Users } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminEmptyState } from './AdminEmptyState'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import type { AdminTimeSeriesPoint } from '@/lib/admin/types'
 
 interface AdminLearnerActivityChartProps {
@@ -21,6 +22,7 @@ interface AdminLearnerActivityChartProps {
 }
 
 export function AdminLearnerActivityChart({ data }: AdminLearnerActivityChartProps) {
+  const mounted = useIsMounted()
   const hasData = data.some((d) => d.activeLearners > 0 || d.newUsers > 0 || d.returningLearners > 0)
 
   return (
@@ -43,8 +45,9 @@ export function AdminLearnerActivityChart({ data }: AdminLearnerActivityChartPro
           role="img"
           aria-label="Daily learner activity chart showing new, active and returning learners over the selected range"
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+          {mounted ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
               <defs>
                 <linearGradient id="gradActive" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="var(--admin-accent)" stopOpacity={0.35} />
@@ -107,6 +110,9 @@ export function AdminLearnerActivityChart({ data }: AdminLearnerActivityChartPro
               />
             </AreaChart>
           </ResponsiveContainer>
+        ) : (
+          <div className="w-full h-full rounded-xl bg-admin-surface/20 animate-pulse" />
+        )}
         </div>
       )}
     </AdminSection>

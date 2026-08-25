@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Target,
   BookOpen,
@@ -17,12 +17,14 @@ import {
   Globe,
   CheckCircle2,
   XCircle,
+  Send,
 } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminEmptyState } from './AdminEmptyState'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { AdminProgressBar } from './AdminProgressBar'
 import { UserActivityTimeline } from './UserActivityTimeline'
+import { SendProductionEmailModal } from './SendProductionEmailModal'
 import type { AdminUserDetail } from '@/lib/admin/types'
 import { cn } from '@/lib/utils'
 
@@ -250,19 +252,45 @@ function AchievementsTab({ user }: { user: AdminUserDetail }) {
         )}
       </AdminSection>
 
-      <AdminSection title="Capstone" icon={FolderCheck} iconColor="text-admin-success">
-        {user.achievements.capstone ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-bold text-admin-fg capitalize truncate">
-                {user.achievements.capstone.moduleTitle.replace(/-/g, ' ')}
-              </p>
-              <AdminStatusBadge status={user.achievements.capstone.status} />
-            </div>
-            <p className="text-[11px] text-admin-fg-muted">Submitted {formatDateShort(user.achievements.capstone.submittedAt)}</p>
-          </div>
+      <AdminSection
+        title="Capstones"
+        icon={FolderCheck}
+        iconColor="text-admin-success"
+        meta={`${(user.achievements.capstones?.length || (user.achievements.capstone ? 1 : 0))} submitted`}
+      >
+        {(!user.achievements.capstones || user.achievements.capstones.length === 0) && !user.achievements.capstone ? (
+          <AdminEmptyState icon={FolderCheck} title="No capstones submitted" className="py-8" />
         ) : (
-          <AdminEmptyState icon={FolderCheck} title="No capstone submitted" className="py-8" />
+          <div className="space-y-2">
+            {(user.achievements.capstones && user.achievements.capstones.length > 0
+              ? user.achievements.capstones
+              : user.achievements.capstone
+                ? [user.achievements.capstone]
+                : []
+            ).map((c) => (
+              <div
+                key={c.id}
+                className="p-3 rounded-lg bg-admin-surface-raised border border-admin-border flex items-center justify-between gap-2"
+              >
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-admin-fg capitalize truncate">
+                    {c.moduleTitle.replace(/-/g, ' ')}
+                  </p>
+                  <p className="text-[10px] text-admin-fg-muted">
+                    Submitted {formatDateShort(c.submittedAt)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <AdminStatusBadge status={c.status} />
+                  {c.isPublic && (
+                    <span className="text-[10px] font-bold text-admin-success uppercase tracking-wider">
+                      Public
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </AdminSection>
     </div>
@@ -272,8 +300,22 @@ function AchievementsTab({ user }: { user: AdminUserDetail }) {
 /* ─── Communications ───────────────────────────────────────────────────── */
 
 function CommunicationsTab({ user }: { user: AdminUserDetail }) {
+  const [modalOpen, setModalOpen] = useState(false)
+
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-bold text-admin-fg uppercase tracking-wider">Learner Communications</h3>
+        <button
+          type="button"
+          onClick={() => setModalOpen(true)}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-admin-success-soft text-admin-success border border-admin-success/25 text-xs font-bold hover:bg-admin-success/20 transition-colors cursor-pointer"
+        >
+          <Send className="w-3.5 h-3.5" />
+          <span>Send Production Email</span>
+        </button>
+      </div>
+
       <AdminSection title="Emails" icon={Mail} iconColor="text-admin-info" meta={`${user.communications.emails.length} sent`}>
         {user.communications.emails.length === 0 ? (
           <AdminEmptyState icon={Mail} title="No emails sent" className="py-8" />
@@ -291,6 +333,12 @@ function CommunicationsTab({ user }: { user: AdminUserDetail }) {
           </div>
         )}
       </AdminSection>
+
+      <SendProductionEmailModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        targetUser={{ id: user.id, name: user.fullName || user.email.split('@')[0], email: user.email }}
+      />
 
       <AdminSection title="Notifications" icon={Bell} iconColor="text-admin-accent" meta={`${user.communications.notifications.length} total`}>
         {user.communications.notifications.length === 0 ? (

@@ -54,16 +54,58 @@ export default async function AdminSystemPage({ searchParams }: PageProps) {
   const tab = TABS.some((t) => t.key === params.tab) ? params.tab! : 'health'
 
   const [overview, serviceDetails, flags, authHealth] = await Promise.all([
-    SystemService.getHealthOverview(),
-    SystemService.getServiceDetails(),
-    AdminConsoleService.getFeatureFlags(),
-    SystemService.getAuthHealthTelemetry(),
+    SystemService.getHealthOverview().catch((err) => {
+      console.error('[AdminSystemPage] getHealthOverview failed:', err)
+      return {
+        overallStatus: 'unknown' as const,
+        environment: process.env.NODE_ENV || 'development',
+        nextVersion: '',
+        lastCheckedAt: new Date().toISOString(),
+        databaseLatencyMs: null,
+        services: [],
+        cronJobs: [],
+        integrations: [],
+        failed: true,
+      }
+    }),
+    SystemService.getServiceDetails().catch((err) => {
+      console.error('[AdminSystemPage] getServiceDetails failed:', err)
+      return {}
+    }),
+    AdminConsoleService.getFeatureFlags().catch((err) => {
+      console.error('[AdminSystemPage] getFeatureFlags failed:', err)
+      return []
+    }),
+    SystemService.getAuthHealthTelemetry().catch((err) => {
+      console.error('[AdminSystemPage] getAuthHealthTelemetry failed:', err)
+      return {
+        status: 'degraded' as const,
+        failures24h: 0,
+        failures7d: 0,
+        providerFailures24h: 0,
+        networkFailures24h: 0,
+        isSpikeDetected: false,
+        topCategories: [],
+        recentFailures: [],
+        lastCheckedAt: new Date().toISOString(),
+      }
+    }),
   ])
 
   const errorGroups =
-    tab === 'errors' ? await SystemService.getErrorGroups({ page: 1, pageSize: 25 }) : EMPTY_ERROR_RESULT
+    tab === 'errors'
+      ? await SystemService.getErrorGroups({ page: 1, pageSize: 25 }).catch((err) => {
+          console.error('[AdminSystemPage] getErrorGroups failed:', err)
+          return { ...EMPTY_ERROR_RESULT, failed: true }
+        })
+      : EMPTY_ERROR_RESULT
   const auditEntries =
-    tab === 'audit' ? await SystemService.getAuditLog({ page: 1, pageSize: 25 }) : EMPTY_AUDIT_RESULT
+    tab === 'audit'
+      ? await SystemService.getAuditLog({ page: 1, pageSize: 25 }).catch((err) => {
+          console.error('[AdminSystemPage] getAuditLog failed:', err)
+          return { ...EMPTY_AUDIT_RESULT, failed: true }
+        })
+      : EMPTY_AUDIT_RESULT
 
   return (
     <div className="space-y-8">
@@ -75,16 +117,16 @@ export default async function AdminSystemPage({ searchParams }: PageProps) {
       />
 
       {/* Secondary navigation tabs */}
-      <nav aria-label="System sections" className="border-b border-admin-border flex gap-6 text-xs font-semibold overflow-x-auto">
+      <nav aria-label="System sections" className="border-b border-admin-border flex gap-1 overflow-x-auto scrollbar-thin scrollbar-thumb-admin-border">
         {TABS.map(({ key, label, icon: Icon }) => (
           <Link
             key={key}
             href={`/admin/system?tab=${key}`}
             aria-current={tab === key ? 'page' : undefined}
-            className={`pb-3 border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap rounded-t-lg transition-colors border-b-2 -mb-px ${
               tab === key
-                ? 'border-admin-accent text-admin-accent'
-                : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
+                ? 'border-admin-accent text-admin-accent bg-admin-accent-soft/50 font-semibold'
+                : 'border-transparent text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised/50'
             }`}
           >
             <Icon className="w-4 h-4" /> {label}

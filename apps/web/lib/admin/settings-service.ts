@@ -6,6 +6,7 @@ import type {
   EmailSettings,
   NotificationSettings,
   OnboardingSettings,
+  OnboardingFieldOption,
   SettingsSectionKey,
 } from './types'
 import type { FeatureFlagRecord } from '../notifications/feature-flags/types'
@@ -74,6 +75,33 @@ const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
   defaultEmailEnabled: false,
 }
 
+export const DEFAULT_GOAL_OPTIONS: OnboardingFieldOption[] = [
+  {
+    id: 'job_search',
+    label: 'Landing a PM Role',
+    description: 'Preparing for interviews, case studies, and breaking into product management.',
+    badge: 'Career Focus',
+    icon: 'Target',
+    enabled: true,
+  },
+  {
+    id: 'fill_gaps',
+    label: 'Filling Knowledge Gaps',
+    description: 'Leveling up specific competencies in discovery, design, metrics, and strategy.',
+    badge: 'Skill Growth',
+    icon: 'Sparkles',
+    enabled: true,
+  },
+  {
+    id: 'exploring',
+    label: 'Exploring Product Management',
+    description: 'Evaluating PM methodologies, frameworks, and career trajectories.',
+    badge: 'Foundations',
+    icon: 'Compass',
+    enabled: true,
+  },
+]
+
 const DEFAULT_ONBOARDING_SETTINGS: OnboardingSettings = {
   enabled: true,
   steps: [
@@ -81,15 +109,18 @@ const DEFAULT_ONBOARDING_SETTINGS: OnboardingSettings = {
       id: 'step_goal',
       title: 'What is your main goal?',
       description: 'Help us personalize your curriculum.',
-      requiredFields: ['goal']
+      requiredFields: ['goal'],
     },
     {
       id: 'step_profile',
       title: 'Complete your profile',
       description: 'Add your details to get started.',
-      requiredFields: ['role', 'experience']
-    }
-  ]
+      requiredFields: ['role', 'experience'],
+    },
+  ],
+  fieldOptions: {
+    goal: DEFAULT_GOAL_OPTIONS,
+  },
 }
 
 function getDefaultSettings<T>(section: SettingsSectionKey): T {
