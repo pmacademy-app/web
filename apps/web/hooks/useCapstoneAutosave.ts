@@ -39,6 +39,7 @@ export function useCapstoneAutosave({
     return initialContent
   })
 
+  const [prevInitialContent, setPrevInitialContent] = useState<string>(initialContent)
   const [status, setStatus] = useState<AutosaveStatus>('idle')
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -53,12 +54,21 @@ export function useCapstoneAutosave({
     contentRef.current = content
   }, [content])
 
-  // Synchronize when remote initialContent finishes loading
+  // Synchronize last saved ref on initialContent change
   useEffect(() => {
-    if (initialContent && !lastSavedContentRef.current) {
-      lastSavedContentRef.current = initialContent
-    }
+    lastSavedContentRef.current = initialContent
   }, [initialContent])
+
+  // Synchronize state when remote initialContent finishes loading (React-standard render adjustment)
+  if (initialContent !== prevInitialContent) {
+    setPrevInitialContent(initialContent)
+    if (isLocked || !content || content.trim() === '' || (initialContent.trim().length > 0 && content.trim().length === 0)) {
+      setContentState(initialContent)
+      if (initialContent.trim().length > 0) {
+        setLastSavedAt(new Date())
+      }
+    }
+  }
 
   // Perform API Save
   const performSave = useCallback(async (textToSave: string): Promise<boolean> => {
