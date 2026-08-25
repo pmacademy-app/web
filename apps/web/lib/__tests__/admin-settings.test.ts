@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { SettingsService } from '../admin/settings-service'
 import type {
   ProductSettings,
@@ -41,6 +41,15 @@ global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
 }) as typeof global.fetch
 
 describe('Admin Settings Unit Test Suite', () => {
+  // Reset the shared in-memory mock storage before each test to prevent
+  // state bleed (e.g. the updateOnboardingSettings test saving a 2-step
+  // array that then pollutes the getOnboardingSettings defaults test).
+  beforeEach(() => {
+    for (const key of Object.keys(mockStorage)) {
+      delete mockStorage[key]
+    }
+  })
+
   it('SettingsService.getProductSettings returns complete default values on unconfigured state', async () => {
     const settings: ProductSettings = await SettingsService.getProductSettings()
     expect(typeof settings.siteName).toBe('string')
