@@ -134,12 +134,16 @@ export async function submitOnboarding(data: OnboardingData) {
       return { error: 'Failed to save profile information. Please try again.' }
     }
 
-    // 2. Update auth metadata so middleware and JWT reflect onboarding_complete
+    // 2. Update auth metadata so middleware and JWT reflect onboarding_complete and preferences
     const { error: metaError } = await dbSupabase.auth.admin.updateUserById(userId, {
       user_metadata: {
         full_name: name,
         username,
         avatar_url: data.avatar_url || undefined,
+        career_role: data.career_role || undefined,
+        goal: data.goal || undefined,
+        topics: data.topics || undefined,
+        learning_preference: data.learning_preference || undefined,
         onboarding_complete: true,
       },
     })

@@ -180,14 +180,21 @@ export default function OnboardingWizard({ user, profile, onboardingSettings }: 
   const websiteInputId = useId()
 
   // Resolve active configured options or fall back to rich defaults
+  const activeGoalList = onboardingSettings?.fieldOptions?.goal?.filter((o) => o.enabled !== false)
   const goalOptions: OnboardingFieldOption[] =
-    onboardingSettings?.fieldOptions?.goal?.filter((o) => o.enabled !== false) || DEFAULT_GOAL_OPTIONS
+    activeGoalList && activeGoalList.length > 0 ? activeGoalList : DEFAULT_GOAL_OPTIONS
+
+  const activeExpList = onboardingSettings?.fieldOptions?.experience_level?.filter((o) => o.enabled !== false)
   const experienceOptions: OnboardingFieldOption[] =
-    onboardingSettings?.fieldOptions?.experience_level?.filter((o) => o.enabled !== false) || DEFAULT_EXPERIENCE_OPTIONS
+    activeExpList && activeExpList.length > 0 ? activeExpList : DEFAULT_EXPERIENCE_OPTIONS
+
+  const activeTopicList = onboardingSettings?.fieldOptions?.topics?.filter((o) => o.enabled !== false)
   const topicOptions: OnboardingFieldOption[] =
-    onboardingSettings?.fieldOptions?.topics?.filter((o) => o.enabled !== false) || DEFAULT_TOPIC_OPTIONS
+    activeTopicList && activeTopicList.length > 0 ? activeTopicList : DEFAULT_TOPIC_OPTIONS
+
+  const activePrefList = onboardingSettings?.fieldOptions?.learning_preference?.filter((o) => o.enabled !== false)
   const preferenceOptions: OnboardingFieldOption[] =
-    onboardingSettings?.fieldOptions?.learning_preference?.filter((o) => o.enabled !== false) || DEFAULT_PREFERENCE_OPTIONS
+    activePrefList && activePrefList.length > 0 ? activePrefList : DEFAULT_PREFERENCE_OPTIONS
   const stepsConfig = onboardingSettings?.steps && onboardingSettings.steps.length === 4
     ? onboardingSettings.steps
     : DEFAULT_ONBOARDING_STEPS
@@ -453,9 +460,8 @@ export default function OnboardingWizard({ user, profile, onboardingSettings }: 
       <div className="max-w-2xl w-full space-y-6 relative z-10">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center space-y-2">
-          <div className="flex items-center gap-2 mb-1">
-            <BrandMarkProdily className="w-8 h-8 text-primary" />
-            <span className="font-serif text-xl font-bold tracking-tight text-foreground">Prodily</span>
+          <div className="mb-1">
+            <BrandMarkProdily size="md" priority />
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-serif font-bold text-foreground tracking-tight">

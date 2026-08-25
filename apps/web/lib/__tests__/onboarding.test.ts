@@ -20,11 +20,52 @@ describe('Onboarding Architecture & Recommendation Engine', () => {
       ])
     })
 
-    it('defines rich option sets for experience, goals, topics, and preferences', () => {
-      expect(DEFAULT_EXPERIENCE_OPTIONS.length).toBeGreaterThanOrEqual(4)
-      expect(DEFAULT_GOAL_OPTIONS.length).toBeGreaterThanOrEqual(5)
-      expect(DEFAULT_TOPIC_OPTIONS.length).toBeGreaterThanOrEqual(10)
-      expect(DEFAULT_PREFERENCE_OPTIONS.length).toBeGreaterThanOrEqual(5)
+    it('defines the exact 4 Step 2 Experience Level options with stable IDs', () => {
+      expect(DEFAULT_EXPERIENCE_OPTIONS).toHaveLength(4)
+      expect(DEFAULT_EXPERIENCE_OPTIONS.map((e) => ({ id: e.id, label: e.label }))).toEqual([
+        { id: 'beginner', label: 'Beginner' },
+        { id: 'learning', label: 'Learning Product Management' },
+        { id: 'working', label: 'Working in Product' },
+        { id: 'experienced', label: 'Experienced Product Manager' },
+      ])
+    })
+
+    it('defines the exact 5 Step 2 Primary Goal options with stable IDs', () => {
+      expect(DEFAULT_GOAL_OPTIONS).toHaveLength(5)
+      expect(DEFAULT_GOAL_OPTIONS.map((g) => ({ id: g.id, label: g.label }))).toEqual([
+        { id: 'become_pm', label: 'Become a Product Manager' },
+        { id: 'transition_pm', label: 'Transition into Product Management' },
+        { id: 'grow_career', label: 'Grow in my PM career' },
+        { id: 'build_skills', label: 'Build practical PM skills' },
+        { id: 'explore_pm', label: 'Explore Product Management' },
+      ])
+    })
+
+    it('defines the exact 10 Step 3 Interest options supporting multi-select with stable IDs', () => {
+      expect(DEFAULT_TOPIC_OPTIONS).toHaveLength(10)
+      expect(DEFAULT_TOPIC_OPTIONS.map((t) => ({ id: t.id, label: t.label }))).toEqual([
+        { id: 'discovery', label: 'Product Discovery' },
+        { id: 'user_research', label: 'User Research' },
+        { id: 'strategy', label: 'Product Strategy' },
+        { id: 'roadmapping', label: 'Product Roadmapping' },
+        { id: 'prioritization', label: 'Prioritization' },
+        { id: 'metrics', label: 'Metrics & Analytics' },
+        { id: 'prds', label: 'PRDs & Documentation' },
+        { id: 'agile', label: 'Agile & Execution' },
+        { id: 'stakeholders', label: 'Stakeholder Management' },
+        { id: 'launch', label: 'Product Launch' },
+      ])
+    })
+
+    it('defines the exact 5 Step 3 Learning Preference options with stable IDs', () => {
+      expect(DEFAULT_PREFERENCE_OPTIONS).toHaveLength(5)
+      expect(DEFAULT_PREFERENCE_OPTIONS.map((p) => ({ id: p.id, label: p.label }))).toEqual([
+        { id: 'structured', label: 'Structured learning' },
+        { id: 'hands_on', label: 'Hands-on practice' },
+        { id: 'case_studies', label: 'Case studies' },
+        { id: 'quick_lessons', label: 'Quick lessons' },
+        { id: 'mix', label: 'A mix of everything' },
+      ])
     })
 
     it('each goal option has an id, label, description, badge, and recommended module', () => {
