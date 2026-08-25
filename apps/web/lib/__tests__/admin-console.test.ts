@@ -1,8 +1,95 @@
-import { describe, it, expect } from 'vitest'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { describe, it, expect, vi } from 'vitest'
 import { AdminConsoleService } from '../admin/service'
 import { isAdminEmail, isAdminUser } from '../admin/authorization'
 import { ADMIN_NAV, ADMIN_NAV_BUILT, isAdminNavItemActive, getAdminSectionLabel, type AdminNavItem } from '../admin/navigation'
 import { LayoutDashboard, Users } from 'lucide-react'
+
+const createMockChain = (table: string) => {
+  const chain: any = {
+    select: vi.fn(() => chain),
+    eq: vi.fn(() => chain),
+    in: vi.fn(() => chain),
+    gte: vi.fn(() => chain),
+    lte: vi.fn(() => chain),
+    or: vi.fn(() => chain),
+    order: vi.fn(() => chain),
+    range: vi.fn(() =>
+      Promise.resolve({
+        data: [
+          {
+            id: 'usr-1',
+            name: 'Alice Learner',
+            email: 'alice@example.com',
+            total_xp: 350,
+            level: 2,
+            current_streak: 3,
+            is_admin: false,
+            is_portfolio_public: true,
+            created_at: new Date().toISOString(),
+          },
+        ],
+        count: 1,
+        error: null,
+      })
+    ),
+    limit: vi.fn(() => chain),
+    maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    then: (resolve: any) => {
+      if (table === 'users') {
+        resolve({
+          data: [
+            {
+              id: 'usr-1',
+              name: 'Alice Learner',
+              email: 'alice@example.com',
+              total_xp: 350,
+              level: 2,
+              current_streak: 3,
+              is_admin: false,
+              is_portfolio_public: true,
+              created_at: new Date().toISOString(),
+            },
+          ],
+          count: 1,
+          error: null,
+        })
+      } else if (table === 'user_lesson_progress') {
+        resolve({ data: [{ user_id: 'usr-1', status: 'completed' }], count: 1, error: null })
+      } else if (table === 'xp_events') {
+        resolve({ data: [{ user_id: 'usr-1', created_at: new Date().toISOString() }], count: 1, error: null })
+      } else {
+        resolve({ data: [], count: 0, error: null })
+      }
+    },
+  }
+  return chain
+}
+
+vi.mock('../supabase', () => ({
+  createServiceRoleClient: vi.fn(() => ({
+    from: vi.fn((table: string) => createMockChain(table)),
+    auth: {
+      admin: {
+        getUserById: vi.fn((id: string) =>
+          Promise.resolve({
+            data: {
+              user: {
+                id,
+                email: 'alice@example.com',
+                email_confirmed_at: new Date().toISOString(),
+              },
+            },
+            error: null,
+          })
+        ),
+      },
+    },
+  })),
+  createBrowserSupabaseClient: vi.fn(),
+  createAuthenticatedServerClient: vi.fn(),
+}))
 
 describe('Admin Console Unit Test Suite', () => {
   it('AdminConsoleService.getFeatureFlags returns all feature flags', async () => {

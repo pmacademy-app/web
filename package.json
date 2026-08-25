@@ -2,6 +2,9 @@
   "name": "prodily-monorepo",
   "version": "0.2.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "npm --prefix apps/web run dev",
     "build": "npm --prefix apps/web run build",
