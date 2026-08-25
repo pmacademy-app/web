@@ -11,7 +11,13 @@ const mockStorage: Record<string, unknown> = {}
 const originalFetch = global.fetch
 global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
   const urlStr = String(input)
-  if (urlStr.includes('mock.supabase.co')) {
+  const isSupabaseCall =
+    urlStr.includes('supabase.co') ||
+    urlStr.includes('mock.supabase.co') ||
+    urlStr.includes('/rest/v1/') ||
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && urlStr.includes(process.env.NEXT_PUBLIC_SUPABASE_URL))
+
+  if (isSupabaseCall) {
     if (init?.method === 'POST' || init?.method === 'PATCH' || init?.method === 'PUT') {
       try {
         const body = JSON.parse(String(init.body))
@@ -195,16 +201,28 @@ describe('Admin Settings Unit Test Suite', () => {
   it('SettingsService.updateOnboardingSettings saves customized steps and required fields', async () => {
     const customSteps = [
       {
-        id: 'step_welcome',
-        title: 'Welcome to Prodily PM Cohort',
-        description: 'Tell us your background and primary learning goal.',
-        requiredFields: ['name', 'goal', 'career_role'],
+        id: 'step_profile',
+        title: 'Custom Profile & Portfolio',
+        description: 'Personalize your learner identity and shareable public portfolio.',
+        requiredFields: ['username', 'name'],
       },
       {
-        id: 'step_links',
-        title: 'Portfolio & Professional Profile',
-        description: 'Connect your LinkedIn and portfolio.',
-        requiredFields: ['linkedin_url', 'website_url'],
+        id: 'step_background',
+        title: 'Custom Background & Career Track',
+        description: 'Help us calibrate your starting point and customized recommendations.',
+        requiredFields: ['experience_level', 'goal'],
+      },
+      {
+        id: 'step_interests',
+        title: 'Custom Skill Focus & Learning Style',
+        description: 'Select your focus areas and preferred learning format.',
+        requiredFields: ['topics', 'learning_preference'],
+      },
+      {
+        id: 'step_path',
+        title: 'Your Calibrated Curriculum',
+        description: 'Your personalized learning plan is ready to launch.',
+        requiredFields: [],
       },
     ]
 
@@ -214,10 +232,11 @@ describe('Admin Settings Unit Test Suite', () => {
     })
 
     expect(updated.enabled).toBe(false)
-    expect(updated.steps.length).toBe(2)
-    expect(updated.steps[0].title).toBe('Welcome to Prodily PM Cohort')
-    expect(updated.steps[0].requiredFields).toEqual(['name', 'goal', 'career_role'])
-    expect(updated.steps[1].requiredFields).toEqual(['linkedin_url', 'website_url'])
+    expect(updated.steps.length).toBe(4)
+    expect(updated.steps[0].title).toBe('Custom Profile & Portfolio')
+    expect(updated.steps[0].requiredFields).toEqual(['username', 'name'])
+    expect(updated.steps[1].requiredFields).toEqual(['experience_level', 'goal'])
+    expect(updated.steps[2].requiredFields).toEqual(['topics', 'learning_preference'])
   })
 
   it('SettingsService supports configuring custom field options across all 4 onboarding categories', async () => {
