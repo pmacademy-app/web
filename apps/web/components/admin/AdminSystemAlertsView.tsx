@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { AlertCircle, AlertTriangle, CheckCircle2, ShieldAlert, Filter, RefreshCw, Clock } from 'lucide-react'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 
 export interface SystemErrorAlert {
   id: string
@@ -25,6 +26,16 @@ export function AdminSystemAlertsView() {
   const [severityFilter, setSeverityFilter] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [unackCriticalCount, setUnackCriticalCount] = useState<number>(0)
+  const mounted = useIsMounted()
+
+  const formatDateTime = (iso: string) => {
+    if (!mounted || !iso) return ''
+    try {
+      return new Date(iso).toLocaleString()
+    } catch {
+      return iso
+    }
+  }
 
   const loadAlerts = React.useCallback(async () => {
     setLoading(true)
@@ -245,7 +256,7 @@ export function AdminSystemAlertsView() {
 
                         <span className="text-[11px] text-admin-fg-muted flex items-center gap-1 ml-auto sm:ml-0">
                           <Clock className="w-3 h-3" />
-                          {new Date(alert.timestamp).toLocaleString()}
+                          {formatDateTime(alert.timestamp)}
                         </span>
                       </div>
 

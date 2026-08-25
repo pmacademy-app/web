@@ -1,8 +1,11 @@
+'use client'
+
 import React from 'react'
 import Link from 'next/link'
 import { Server } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { AdminSection } from './AdminSection'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import type { AdminSystemSnapshotItem } from '@/lib/admin/types'
 
 interface AdminSystemSnapshotProps {
@@ -18,11 +21,17 @@ const STATUS_STYLES: Record<AdminSystemSnapshotItem['status'], { dot: string; la
 }
 
 export function AdminSystemSnapshot({ items }: AdminSystemSnapshotProps) {
+  const mounted = useIsMounted()
+
+  const metaText = mounted && items[0]?.lastChecked
+    ? `Checked ${new Date(items[0].lastChecked).toLocaleTimeString()}`
+    : 'Live telemetry'
+
   return (
     <AdminSection
       title="System Snapshot"
       icon={Server}
-      meta={items[0]?.lastChecked ? `Checked ${new Date(items[0].lastChecked).toLocaleTimeString()}` : ''}
+      meta={metaText}
     >
       <div className="space-y-2">
         {items.map((item) => {

@@ -13,6 +13,7 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Lock,
 } from 'lucide-react'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { validateCapstoneSubmission, type CapstoneStatus } from '@/lib/capstones'
@@ -55,6 +56,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
             setSubmittedAt(data.submission.submitted_at || null)
           } else {
             setServerInitialContent(capstoneDef?.starterTemplate || '')
+            setSubmissionStatus(data.status || 'locked')
           }
           if (data.reflection) {
             setReflectionContent(data.reflection.content || '')
@@ -129,6 +131,41 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         <Link href="/capstones" className="inline-flex items-center gap-2 text-xs font-bold text-primary">
           <ArrowLeft className="w-4 h-4" /> Return to Capstones Overview
         </Link>
+      </div>
+    )
+  }
+
+  if (submissionStatus === 'locked') {
+    return (
+      <div className="container mx-auto px-4 py-16 max-w-lg text-center space-y-5">
+        <div className="w-14 h-14 rounded-2xl bg-muted border border-border flex items-center justify-center mx-auto text-muted-foreground shadow-sm">
+          <Lock className="w-7 h-7" />
+        </div>
+        <div className="space-y-2">
+          <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+            Module {String(capstoneDef.moduleNumber).padStart(2, '0')} Capstone
+          </span>
+          <h1 className="text-2xl font-bold font-serif text-foreground">
+            {capstoneDef.title} is Locked
+          </h1>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            To unlock this capstone workspace and submit your deliverable, you must complete at least 8 lessons in {capstoneDef.moduleTitle}.
+          </p>
+        </div>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <Link
+            href="/capstones"
+            className="px-4 py-2 text-xs font-semibold rounded-lg border border-border bg-card text-foreground hover:bg-secondary transition-colors"
+          >
+            All Capstones
+          </Link>
+          <Link
+            href="/learn"
+            className="px-4 py-2 text-xs font-bold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Continue Learning
+          </Link>
+        </div>
       </div>
     )
   }

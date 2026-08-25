@@ -89,7 +89,7 @@ export function AdminSidebar({ mobileOpen, onMobileClose, user, attention }: Adm
               onClick={onMobileClose}
               className="flex items-center gap-2 focus:outline-none rounded shrink-0"
             >
-              <BrandMarkProdily size="sm" badgeText="Admin" onDark />
+              <BrandMarkProdily size="sm" badgeText="Admin" onDark={false} />
             </Link>
             <button
               type="button"

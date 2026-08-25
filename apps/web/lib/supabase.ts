@@ -35,6 +35,15 @@ export function createServiceRoleClient() {
     )
   }
 
+  if (
+    (process.env.NODE_ENV === 'test' || process.env.VITEST === 'true') &&
+    process.env.ALLOW_TEST_DB_ACCESS !== 'true'
+  ) {
+    console.warn(
+      '[supabase] WARNING: createServiceRoleClient initialized in test environment with live credentials. Ensure database calls are properly mocked in unit tests.'
+    )
+  }
+
   return createClient<Database>(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
   })

@@ -1,14 +1,11 @@
 'use client'
 
 import React from 'react'
-import { Bell, Clock, Calendar, MessageSquare } from 'lucide-react'
-import { AdminPageHeader } from './AdminPageHeader'
+import { Clock, Calendar, MessageSquare, RotateCcw, Save } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminToggle } from './AdminToggle'
 import { SettingRow } from './SettingRow'
 import { NumberInput } from './NumberInput'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { NotificationSettings } from '@/lib/admin/types'
 import type { SettingsSectionKey } from '@/lib/admin/types'
@@ -55,13 +52,6 @@ export function NotificationSettingsSection({
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title="Notification Settings"
-        description="Configure reminders, weekly recaps, and default notification preferences."
-        icon={Bell}
-        iconColor="text-admin-warning"
-      />
-
       {/* Reminders Group */}
       <AdminSection title="Reminders" icon={Clock} meta="Automated learner reminders">
         <SettingRow
@@ -80,12 +70,13 @@ export function NotificationSettingsSection({
           label="Daily Reminder Time"
           description="Time of day to send daily reminders (24-hour format, UTC)."
         >
-          <Input
+          <input
             type="time"
             value={data.dailyReminderTime}
             onChange={(e) => handleTimeChange('dailyReminderTime', e.target.value)}
             disabled={isSaving || !data.dailyReminderEnabled}
             aria-disabled={isSaving || !data.dailyReminderEnabled}
+            className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent disabled:opacity-50 disabled:cursor-not-allowed hover:border-admin-border-strong transition-colors"
           />
         </SettingRow>
 
@@ -131,10 +122,10 @@ export function NotificationSettingsSection({
             }}
             disabled={isSaving || !data.weeklyRecapEnabled}
           >
-            <SelectTrigger aria-label="Select weekly recap day">
+            <SelectTrigger aria-label="Select weekly recap day" className="bg-admin-surface border-admin-border text-admin-fg">
               <SelectValue placeholder="Select day" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-admin-surface-raised border-admin-border text-admin-fg">
               {DAYS_OF_WEEK.map((day) => (
                 <SelectItem key={day.value} value={String(day.value)}>
                   {day.label}
@@ -148,12 +139,13 @@ export function NotificationSettingsSection({
           label="Weekly Recap Time"
           description="Time of day to send the weekly recap (24-hour format, UTC)."
         >
-          <Input
+          <input
             type="time"
             value={data.weeklyRecapTime}
             onChange={(e) => handleTimeChange('weeklyRecapTime', e.target.value)}
             disabled={isSaving || !data.weeklyRecapEnabled}
             aria-disabled={isSaving || !data.weeklyRecapEnabled}
+            className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent disabled:opacity-50 disabled:cursor-not-allowed hover:border-admin-border-strong transition-colors"
           />
         </SettingRow>
       </AdminSection>
@@ -187,17 +179,24 @@ export function NotificationSettingsSection({
 
       {/* Actions */}
       <div className="flex items-center justify-end gap-3 border-t border-admin-border pt-4">
-        <Button
-          variant="outline"
+        <button
+          type="button"
           onClick={onReset}
           disabled={!isDirty || isSaving}
-          aria-disabled={!isDirty || isSaving}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg border border-admin-border bg-admin-surface text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
+          <RotateCcw className="w-3.5 h-3.5" />
           Reset
-        </Button>
-        <Button onClick={onSave} disabled={!isDirty || isSaving} aria-disabled={!isDirty || isSaving}>
+        </button>
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={!isDirty || isSaving}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-admin-accent text-admin-bg hover:bg-admin-accent/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+        >
+          <Save className="w-3.5 h-3.5" />
           {isSaving ? 'Saving…' : 'Save Changes'}
-        </Button>
+        </button>
       </div>
     </div>
   )

@@ -88,10 +88,8 @@ export async function getModuleCapstonesOverview(
   // Set of completed lesson IDs for exact matching
   const completedLessonIds = new Set(progressRows?.map((p) => p.lesson_id) || [])
 
-  return definitions.map((def, idx) => {
+  return definitions.map((def) => {
     const sub = submissionMap.get(def.moduleSlug) ?? null
-    const prevSub = idx > 0 ? submissionMap.get(definitions[idx - 1].moduleSlug) : null
-    const prevCompleted = prevSub?.status === 'submitted' || prevSub?.status === 'reviewed'
     
     const moduleLessonIds = getLessonIdsForModule(def.moduleSlug)
     const totalLessons = moduleLessonIds.length > 0 ? moduleLessonIds.length : 10
@@ -102,7 +100,7 @@ export async function getModuleCapstonesOverview(
     let status: CapstoneStatus = 'locked'
     if (sub) {
       status = deriveCapstoneStatus(sub.status, lessonsCompleted)
-    } else if (lessonsCompleted >= 8 || prevCompleted) {
+    } else if (lessonsCompleted >= 8) {
       status = 'unlocked'
     } else {
       status = 'locked'
@@ -161,12 +159,26 @@ export async function loadCapstoneSubmission(
   }
 
   const reflection = reflections && reflections.length > 0 ? reflections[0] : null
-  const status = deriveCapstoneStatus(submission?.status ?? null)
+
+  // Authoritatively derive capstone status based on module lesson completion
+  const moduleLessonIds = getLessonIdsForModule(moduleSlug)
+  let lessonsCompleted = 0
+  if (moduleLessonIds.length > 0) {
+    const { data: progressRows } = (await (supabase
+      .from('user_lesson_progress') as unknown as DBChain)
+      .select('lesson_id, status')
+      .eq('user_id', userId)
+      .eq('status', 'completed')
+      .in('lesson_id', moduleLessonIds)) as unknown as { data: { lesson_id: string }[] | null }
+    lessonsCompleted = progressRows?.length ?? 0
+  }
+
+  const status = deriveCapstoneStatus(submission?.status ?? null, lessonsCompleted)
 
   return {
     submission,
     reflection,
-    status: status === 'locked' ? 'unlocked' : status, // Default to unlocked if accessing page
+    status,
   }
 }
 
@@ -189,6 +201,24 @@ export async function saveDraftAction(
     .limit(1)) as unknown as { data: CapstoneSubmissionRow[] | null }
 
   const existing = existingList && existingList.length > 0 ? existingList[0] : null
+
+  // If creating new draft (no existing row), ensure module is unlocked (>= 8 lessons completed)
+  if (!existing) {
+    const moduleLessonIds = getLessonIdsForModule(moduleSlug)
+    let lessonsCompleted = 0
+    if (moduleLessonIds.length > 0) {
+      const { data: progressRows } = (await (supabase
+        .from('user_lesson_progress') as unknown as DBChain)
+        .select('lesson_id, status')
+        .eq('user_id', userId)
+        .eq('status', 'completed')
+        .in('lesson_id', moduleLessonIds)) as unknown as { data: { lesson_id: string }[] | null }
+      lessonsCompleted = progressRows?.length ?? 0
+    }
+    if (lessonsCompleted < 8) {
+      throw new Error(`Cannot save draft. Capstone is locked until at least 8 lessons in this module are completed (currently ${lessonsCompleted}/10 completed).`)
+    }
+  }
 
   // Validate state transition
   const transition = validateCapstoneTransition(existing?.status, 'draft', 'learner')
@@ -254,13 +284,7 @@ export async function submitCapstoneAction(
   xpEarned: number
   message?: string
 }> {
-  // 1. Validate submission content
-  const validation = validateCapstoneSubmission(moduleSlug, content)
-  if (!validation.isValid) {
-    throw new Error(validation.reason || 'Submission requirements not met.')
-  }
-
-  // 2. Fetch existing row to preserve or update
+  // 1. Fetch existing row to preserve or update
   const { data: existingList } = (await (supabase
     .from('capstone_submissions') as unknown as DBChain)
     .select('*')
@@ -271,7 +295,7 @@ export async function submitCapstoneAction(
 
   const existing = existingList && existingList.length > 0 ? existingList[0] : null
 
-  // 3. Idempotent duplicate submission protection
+  // 2. Idempotent duplicate submission protection
   if (existing && existing.status === 'submitted') {
     return {
       success: true,
@@ -279,6 +303,30 @@ export async function submitCapstoneAction(
       xpEarned: 0,
       message: 'Capstone already submitted.',
     }
+  }
+
+  // 3. If creating new submission, ensure module is unlocked (>= 8 lessons completed)
+  if (!existing) {
+    const moduleLessonIds = getLessonIdsForModule(moduleSlug)
+    let lessonsCompleted = 0
+    if (moduleLessonIds.length > 0) {
+      const { data: progressRows } = (await (supabase
+        .from('user_lesson_progress') as unknown as DBChain)
+        .select('lesson_id, status')
+        .eq('user_id', userId)
+        .eq('status', 'completed')
+        .in('lesson_id', moduleLessonIds)) as unknown as { data: { lesson_id: string }[] | null }
+      lessonsCompleted = progressRows?.length ?? 0
+    }
+    if (lessonsCompleted < 8) {
+      throw new Error(`Cannot submit capstone. You must complete at least 8 lessons in this module first (currently ${lessonsCompleted}/10 completed).`)
+    }
+  }
+
+  // 4. Validate submission content
+  const validation = validateCapstoneSubmission(moduleSlug, content)
+  if (!validation.isValid) {
+    throw new Error(validation.reason || 'Submission requirements not met.')
   }
 
   // 4. Validate transition

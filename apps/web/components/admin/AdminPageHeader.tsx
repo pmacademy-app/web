@@ -32,7 +32,11 @@ export function AdminPageHeader({
         {description && <p className="text-sm text-admin-fg-muted">{description}</p>}
       </div>
 
-      {actions && <div className="flex items-center gap-3 shrink-0">{actions}</div>}
+      {actions && (
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-start md:self-auto">
+          {actions}
+        </div>
+      )}
     </div>
   )
 }

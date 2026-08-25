@@ -1,38 +1,80 @@
+'use client'
+
 import * as React from 'react'
-import { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
 import { cn } from '@/lib/utils'
 
-/**
- * Admin toggle — two-state button (Base UI Toggle).
- */
-function AdminToggle({
-  pressed,
-  defaultPressed,
-  onPressedChange,
-  disabled,
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof TogglePrimitive> & {
+export interface AdminToggleProps {
   pressed?: boolean
   defaultPressed?: boolean
   onPressedChange?: (pressed: boolean) => void
-}) {
-  return (
-    <TogglePrimitive
-      pressed={pressed}
-      defaultPressed={defaultPressed}
-      onPressedChange={onPressedChange}
-      disabled={disabled}
-      className={cn(
-        'inline-flex items-center justify-center gap-1.5 rounded-lg border border-admin-border bg-admin-surface px-3 py-1.5 text-sm font-medium text-admin-fg-muted transition-colors outline-none select-none hover:bg-admin-surface-raised hover:text-admin-fg focus-visible:ring-2 focus-visible:ring-admin-accent/50 data-pressed:border-admin-accent/40 data-pressed:bg-admin-accent-soft data-pressed:text-admin-accent disabled:cursor-not-allowed disabled:opacity-50',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </TogglePrimitive>
-  )
+  disabled?: boolean
+  className?: string
+  'aria-label'?: string
 }
 
-export { AdminToggle }
+/**
+ * Accessible SaaS switch toggle component.
+ * Features:
+ * - Proper role="switch" & aria-checked
+ * - Distinct ON (Prodily Green) / OFF (Neutral Slate) states
+ * - Smooth animated sliding thumb
+ * - Hover, focus-visible ring and disabled states
+ */
+export function AdminToggle({
+  pressed = false,
+  defaultPressed,
+  onPressedChange,
+  disabled = false,
+  className,
+  'aria-label': ariaLabel = 'Toggle setting',
+}: AdminToggleProps) {
+  const [internalPressed, setInternalPressed] = React.useState<boolean>(
+    defaultPressed ?? pressed
+  )
+
+  const isControlled = pressed !== undefined
+  const isChecked = isControlled ? pressed : internalPressed
+
+  const handleToggle = () => {
+    if (disabled) return
+    const next = !isChecked
+    if (!isControlled) {
+      setInternalPressed(next)
+    }
+    onPressedChange?.(next)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault()
+      handleToggle()
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={isChecked}
+      aria-label={ariaLabel}
+      disabled={disabled}
+      onClick={handleToggle}
+      onKeyDown={handleKeyDown}
+      className={cn(
+        'group relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent focus-visible:ring-offset-2 focus-visible:ring-offset-admin-surface',
+        isChecked ? 'bg-admin-accent' : 'bg-slate-300 dark:bg-slate-700',
+        disabled && 'cursor-not-allowed opacity-50',
+        className
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out',
+          isChecked ? 'translate-x-5' : 'translate-x-0'
+        )}
+      />
+    </button>
+  )
+}

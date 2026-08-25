@@ -1,14 +1,32 @@
 'use client'
 
-import React from 'react'
-import { Users, LayoutList } from 'lucide-react'
-import { AdminPageHeader } from './AdminPageHeader'
+import React, { useState } from 'react'
+import {
+  Users,
+  LayoutList,
+  Plus,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+  Sparkles,
+  Eye,
+  EyeOff,
+  RotateCcw,
+  Save,
+  Tag,
+  X,
+  Check,
+  ArrowRight,
+  ArrowLeft,
+  ListOrdered,
+  CheckCircle2,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { AdminSection } from './AdminSection'
 import { AdminToggle } from './AdminToggle'
 import { SettingRow } from './SettingRow'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import type { OnboardingSettings, SettingsSectionKey } from '@/lib/admin/types'
+import { DEFAULT_GOAL_OPTIONS } from '@/lib/admin/settings-service'
+import type { OnboardingSettings, OnboardingStepConfig, OnboardingFieldOption, SettingsSectionKey } from '@/lib/admin/types'
 
 interface OnboardingSettingsSectionProps {
   sectionKey: SettingsSectionKey
@@ -21,6 +39,17 @@ interface OnboardingSettingsSectionProps {
   initialData: OnboardingSettings
 }
 
+// Preset recommended profile attributes
+const PRESET_FIELDS: Array<{ key: string; label: string; description: string; hasOptions?: boolean }> = [
+  { key: 'goal', label: 'Primary Goal', description: 'Career path or study objective (selectable options)', hasOptions: true },
+  { key: 'career_role', label: 'Target PM Role', description: 'Current or aspiring product role title' },
+  { key: 'learning_purpose', label: 'Learning Purpose', description: 'Personal motivation and outcome expectations' },
+  { key: 'name', label: 'Full Name', description: 'Learner display name on certificates and profile' },
+  { key: 'username', label: 'Unique Username', description: 'Handle used for public portfolio URL' },
+  { key: 'linkedin_url', label: 'LinkedIn Profile', description: 'URL to learner professional network profile' },
+  { key: 'website_url', label: 'Portfolio Website', description: 'URL to personal product portfolio or resume' },
+]
+
 export function OnboardingSettingsSection({
   data,
   onChange,
@@ -29,116 +58,699 @@ export function OnboardingSettingsSection({
   isDirty,
   isSaving,
 }: OnboardingSettingsSectionProps) {
+  const [showPreview, setShowPreview] = useState<boolean>(true)
+  const [previewStepIndex, setPreviewStepIndex] = useState<number>(0)
+  const [customTagInput, setCustomTagInput] = useState<{ [stepId: string]: string }>({})
+  const [selectedPreviewGoal, setSelectedPreviewGoal] = useState<string>('job_search')
+  const editingFieldOptions = 'goal'
+
+  const fieldOptions = data.fieldOptions || { goal: DEFAULT_GOAL_OPTIONS }
+  const goalOptions: OnboardingFieldOption[] = fieldOptions.goal || DEFAULT_GOAL_OPTIONS
+
   const handleToggleEnabled = (enabled: boolean) => {
     onChange({ enabled })
   }
 
-  const handleStepChange = (index: number, field: string, value: string) => {
+  const handleStepChange = (index: number, field: keyof OnboardingStepConfig, value: unknown) => {
     const newSteps = [...data.steps]
     newSteps[index] = { ...newSteps[index], [field]: value }
     onChange({ steps: newSteps })
   }
 
+  const handleToggleRequiredField = (stepIndex: number, fieldKey: string) => {
+    const currentStep = data.steps[stepIndex]
+    if (!currentStep) return
+
+    const exists = currentStep.requiredFields.includes(fieldKey)
+    const nextFields = exists
+      ? currentStep.requiredFields.filter((f) => f !== fieldKey)
+      : [...currentStep.requiredFields, fieldKey]
+
+    handleStepChange(stepIndex, 'requiredFields', nextFields)
+  }
+
+  const handleAddCustomTag = (stepIndex: number) => {
+    const step = data.steps[stepIndex]
+    if (!step) return
+    const inputVal = (customTagInput[step.id] || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_')
+    if (!inputVal) return
+
+    if (!step.requiredFields.includes(inputVal)) {
+      handleStepChange(stepIndex, 'requiredFields', [...step.requiredFields, inputVal])
+    }
+    setCustomTagInput((prev) => ({ ...prev, [step.id]: '' }))
+  }
+
   const addStep = () => {
-    onChange({
-      steps: [
-        ...data.steps,
-        {
-          id: `step_${Date.now()}`,
-          title: 'New Step',
-          description: 'Description here',
-          requiredFields: []
-        }
-      ]
-    })
+    const newId = `step_${Date.now().toString(36)}`
+    const newSteps: OnboardingStepConfig[] = [
+      ...data.steps,
+      {
+        id: newId,
+        title: 'New Onboarding Step',
+        description: 'Provide clear instructions for the learner at this step.',
+        requiredFields: [],
+      },
+    ]
+    onChange({ steps: newSteps })
+    if (previewStepIndex >= newSteps.length) {
+      setPreviewStepIndex(newSteps.length - 1)
+    }
   }
 
   const removeStep = (index: number) => {
+    const newSteps = data.steps.filter((_, i) => i !== index)
+    onChange({ steps: newSteps })
+    if (previewStepIndex >= newSteps.length && newSteps.length > 0) {
+      setPreviewStepIndex(newSteps.length - 1)
+    }
+  }
+
+  const moveStep = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return
+    if (direction === 'down' && index === data.steps.length - 1) return
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
     const newSteps = [...data.steps]
-    newSteps.splice(index, 1)
+    const temp = newSteps[index]
+    newSteps[index] = newSteps[targetIndex]
+    newSteps[targetIndex] = temp
     onChange({ steps: newSteps })
   }
 
+  // Manage Field Options (e.g. goal choices)
+  const updateFieldOptions = (fieldKey: string, newOptions: OnboardingFieldOption[]) => {
+    onChange({
+      fieldOptions: {
+        ...fieldOptions,
+        [fieldKey]: newOptions,
+      },
+    })
+  }
+
+  const handleAddOption = (fieldKey: string) => {
+    const currentList = fieldOptions[fieldKey] || []
+    const newOption: OnboardingFieldOption = {
+      id: `option_${Date.now().toString(36)}`,
+      label: 'New Choice Option',
+      description: 'Describe what this choice represents for the learner.',
+      badge: 'Custom',
+      enabled: true,
+    }
+    updateFieldOptions(fieldKey, [...currentList, newOption])
+  }
+
+  const handleUpdateOption = (
+    fieldKey: string,
+    index: number,
+    patch: Partial<OnboardingFieldOption>
+  ) => {
+    const currentList = [...(fieldOptions[fieldKey] || [])]
+    currentList[index] = { ...currentList[index], ...patch }
+    updateFieldOptions(fieldKey, currentList)
+  }
+
+  const handleDeleteOption = (fieldKey: string, index: number) => {
+    const currentList = (fieldOptions[fieldKey] || []).filter((_, i) => i !== index)
+    updateFieldOptions(fieldKey, currentList)
+  }
+
+  const handleMoveOption = (fieldKey: string, index: number, direction: 'up' | 'down') => {
+    const currentList = [...(fieldOptions[fieldKey] || [])]
+    if (direction === 'up' && index === 0) return
+    if (direction === 'down' && index === currentList.length - 1) return
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    const temp = currentList[index]
+    currentList[index] = currentList[targetIndex]
+    currentList[targetIndex] = temp
+    updateFieldOptions(fieldKey, currentList)
+  }
+
+  const activePreviewStep = data.steps[previewStepIndex] || data.steps[0]
+  const enabledGoalOptions = goalOptions.filter((o) => o.enabled !== false)
+
   return (
     <div className="space-y-6">
-      <AdminPageHeader
-        title="Onboarding Settings"
-        description="Configure the new user onboarding flow, including steps and required fields."
+      {/* General Controls */}
+      <AdminSection
+        title="Onboarding Status"
         icon={Users}
         iconColor="text-admin-accent"
-      />
-
-      <AdminSection title="General" icon={LayoutList} meta="Enable or disable onboarding">
+        meta="Global learner onboarding activation"
+      >
         <SettingRow
-          label="Enable Onboarding"
-          description="If enabled, new users will go through the onboarding flow after signup."
+          label="Enable Onboarding Flow"
+          description="When enabled, newly registered users are guided through the multi-step profile builder before unlocking the curriculum."
         >
           <AdminToggle
             pressed={data.enabled}
             onPressedChange={handleToggleEnabled}
             disabled={isSaving}
+            aria-label="Toggle onboarding flow"
           />
         </SettingRow>
       </AdminSection>
 
-      <AdminSection title="Steps Configuration" icon={LayoutList} meta="Define the onboarding sequence">
-        {data.steps.map((step, index) => (
-          <div key={step.id} className="p-4 border border-border rounded-xl space-y-4 mb-4 bg-card">
-            <div className="flex justify-between items-center">
-              <h4 className="font-bold text-sm">Step {index + 1}</h4>
-              <Button variant="destructive" size="sm" onClick={() => removeStep(index)} disabled={isSaving}>
-                Remove
-              </Button>
+      {/* Step Configuration and Preview Split View */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column: Step Management */}
+        <div className={cn(showPreview ? 'lg:col-span-7' : 'lg:col-span-12', 'space-y-6')}>
+          {/* Steps Sequence */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="text-sm font-bold text-admin-fg flex items-center gap-2">
+                  <LayoutList className="w-4 h-4 text-admin-accent" />
+                  Configured Sequence ({data.steps.length} {data.steps.length === 1 ? 'Step' : 'Steps'})
+                </h3>
+                <p className="text-xs text-admin-fg-muted mt-0.5">
+                  Define and order the sequence of questions shown to new students.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPreview(!showPreview)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-admin-border bg-admin-surface text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors self-start sm:self-auto"
+              >
+                {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                {showPreview ? 'Hide Preview' : 'Show Live Preview'}
+              </button>
             </div>
-            
-            <SettingRow label="Title" description="The main heading for this step.">
-              <Input
-                value={step.title}
-                onChange={(e) => handleStepChange(index, 'title', e.target.value)}
-                disabled={isSaving}
-              />
-            </SettingRow>
-            
-            <SettingRow label="Description" description="Subtitle or description text.">
-              <Input
-                value={step.description}
-                onChange={(e) => handleStepChange(index, 'description', e.target.value)}
-                disabled={isSaving}
-              />
-            </SettingRow>
-            
-            <SettingRow label="Required Fields" description="Comma separated list of required fields (e.g. goal, role).">
-              <Input
-                value={step.requiredFields.join(', ')}
-                onChange={(e) => {
-                  const fields = e.target.value.split(',').map(s => s.trim()).filter(Boolean)
-                  const newSteps = [...data.steps]
-                  newSteps[index] = { ...newSteps[index], requiredFields: fields }
-                  onChange({ steps: newSteps })
-                }}
-                disabled={isSaving}
-              />
-            </SettingRow>
-          </div>
-        ))}
-        
-        <Button variant="outline" onClick={addStep} disabled={isSaving}>
-          + Add Step
-        </Button>
-      </AdminSection>
 
-      {/* Actions */}
+            {data.steps.length === 0 ? (
+              <div className="p-8 text-center rounded-xl border border-dashed border-admin-border bg-admin-surface-raised/30 space-y-3">
+                <p className="text-xs text-admin-fg-muted">No onboarding steps configured.</p>
+                <button
+                  type="button"
+                  onClick={addStep}
+                  disabled={isSaving}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90 transition-colors shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add First Step
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {data.steps.map((step, index) => (
+                  <div
+                    key={step.id}
+                    className="p-4 sm:p-5 rounded-xl border border-admin-border bg-admin-surface hover:border-admin-border-strong transition-all space-y-4 shadow-sm"
+                  >
+                    {/* Step Card Header */}
+                    <div className="flex items-center justify-between border-b border-admin-border pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-admin-accent-soft text-admin-accent border border-admin-accent/25">
+                          Step {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="text-[11px] font-mono text-admin-fg-muted">
+                          ID: {step.id}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveStep(index, 'up')}
+                          disabled={index === 0 || isSaving}
+                          title="Move Up"
+                          className="p-1.5 rounded-lg text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => moveStep(index, 'down')}
+                          disabled={index === data.steps.length - 1 || isSaving}
+                          title="Move Down"
+                          className="p-1.5 rounded-lg text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => removeStep(index)}
+                          disabled={isSaving}
+                          title="Delete Step"
+                          className="p-1.5 rounded-lg text-admin-danger hover:bg-admin-danger-soft transition-colors ml-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Title & Description Inputs */}
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <label className="font-medium text-admin-fg">Step Title</label>
+                          <span className="text-[10px] text-admin-fg-muted font-mono">
+                            {step.title.length}/80
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          maxLength={80}
+                          value={step.title}
+                          onChange={(e) => handleStepChange(index, 'title', e.target.value)}
+                          disabled={isSaving}
+                          placeholder="e.g. What is your primary career goal?"
+                          className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface-raised border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent transition-colors"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <label className="font-medium text-admin-fg">Step Description</label>
+                          <span className="text-[10px] text-admin-fg-muted font-mono">
+                            {step.description.length}/160
+                          </span>
+                        </div>
+                        <textarea
+                          rows={2}
+                          maxLength={160}
+                          value={step.description}
+                          onChange={(e) => handleStepChange(index, 'description', e.target.value)}
+                          disabled={isSaving}
+                          placeholder="e.g. This helps us customize your cohort recommendations and curriculum pace."
+                          className="w-full px-3 py-2 text-xs text-admin-fg bg-admin-surface-raised border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent transition-colors resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Required Fields Tag Selector */}
+                    <div className="pt-2 border-t border-admin-border space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-admin-fg flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5 text-admin-accent" />
+                          Required Profile Fields at this Step:
+                        </label>
+                        <span className="text-[10px] text-admin-fg-muted font-mono">
+                          {step.requiredFields.length} selected
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {PRESET_FIELDS.map((preset) => {
+                          const isSelected = step.requiredFields.includes(preset.key)
+                          return (
+                            <button
+                              key={preset.key}
+                              type="button"
+                              onClick={() => handleToggleRequiredField(index, preset.key)}
+                              disabled={isSaving}
+                              title={preset.description}
+                              className={cn(
+                                'inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg border font-medium transition-all',
+                                isSelected
+                                  ? 'bg-admin-accent-soft border-admin-accent/30 text-admin-accent shadow-xs'
+                                  : 'bg-admin-surface-raised border-admin-border text-admin-fg-muted hover:text-admin-fg hover:border-admin-border-strong'
+                              )}
+                            >
+                              {isSelected ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3 opacity-60" />}
+                              {preset.label}
+                            </button>
+                          )
+                        })}
+
+                        {/* Custom Added Tags */}
+                        {step.requiredFields
+                          .filter((f) => !PRESET_FIELDS.some((p) => p.key === f))
+                          .map((customField) => (
+                            <span
+                              key={customField}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg border bg-admin-accent-soft border-admin-accent/25 text-admin-accent font-mono"
+                            >
+                              {customField}
+                              <button
+                                type="button"
+                                onClick={() => handleToggleRequiredField(index, customField)}
+                                disabled={isSaving}
+                                className="hover:opacity-75"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          ))}
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-1.5">
+                        <input
+                          type="text"
+                          value={customTagInput[step.id] || ''}
+                          onChange={(e) =>
+                            setCustomTagInput((prev) => ({ ...prev, [step.id]: e.target.value }))
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              handleAddCustomTag(index)
+                            }
+                          }}
+                          placeholder="Add custom metadata key..."
+                          disabled={isSaving}
+                          className="px-2.5 py-1 text-xs text-admin-fg bg-admin-surface-raised border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-1 focus:ring-admin-accent max-w-[200px]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddCustomTag(index)}
+                          disabled={!customTagInput[step.id]?.trim() || isSaving}
+                          className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg-muted hover:text-admin-fg hover:border-admin-border-strong disabled:opacity-40"
+                        >
+                          Add Tag
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addStep}
+                  disabled={isSaving}
+                  className="w-full py-3 rounded-xl border border-dashed border-admin-border text-admin-fg-muted hover:text-admin-accent hover:border-admin-accent/50 bg-admin-surface-raised/40 hover:bg-admin-accent-soft/30 flex items-center justify-center gap-2 text-xs font-bold transition-all"
+                >
+                  <Plus className="w-4 h-4" /> Add Step to Onboarding Sequence
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Configurable Field Choices Editor */}
+          <div className="p-5 rounded-xl border border-admin-border bg-admin-surface shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-admin-border pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-admin-fg flex items-center gap-2">
+                  <ListOrdered className="w-4 h-4 text-admin-accent" />
+                  Configurable Field Options ({editingFieldOptions === 'goal' ? 'Primary Goal Choices' : editingFieldOptions})
+                </h3>
+                <p className="text-xs text-admin-fg-muted mt-0.5">
+                  Customize the selectable cards, descriptions, and badges presented to learners.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleAddOption('goal')}
+                disabled={isSaving}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90 transition-colors shadow-sm self-start sm:self-auto"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Goal Option
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {goalOptions.map((opt, optIndex) => (
+                <div
+                  key={opt.id}
+                  className={cn(
+                    'p-3.5 rounded-lg border transition-all space-y-2.5',
+                    opt.enabled !== false
+                      ? 'border-admin-border bg-admin-surface-raised/40'
+                      : 'border-admin-border/50 bg-admin-surface-raised/20 opacity-60'
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-admin-surface border border-admin-border text-admin-fg-muted shrink-0">
+                        #{optIndex + 1}
+                      </span>
+                      <span className="text-xs font-mono font-semibold text-admin-accent truncate">
+                        ID: {opt.id}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-1 mr-1">
+                        <span className="text-[10px] text-admin-fg-muted">Active:</span>
+                        <AdminToggle
+                          pressed={opt.enabled !== false}
+                          onPressedChange={(enabled) =>
+                            handleUpdateOption('goal', optIndex, { enabled })
+                          }
+                          disabled={isSaving}
+                          aria-label={`Toggle option ${opt.label}`}
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleMoveOption('goal', optIndex, 'up')}
+                        disabled={optIndex === 0 || isSaving}
+                        className="p-1 rounded text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface disabled:opacity-30"
+                        title="Move option up"
+                      >
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleMoveOption('goal', optIndex, 'down')}
+                        disabled={optIndex === goalOptions.length - 1 || isSaving}
+                        className="p-1 rounded text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface disabled:opacity-30"
+                        title="Move option down"
+                      >
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteOption('goal', optIndex)}
+                        disabled={goalOptions.length <= 1 || isSaving}
+                        className="p-1 rounded text-admin-danger hover:bg-admin-danger-soft disabled:opacity-30"
+                        title="Delete option"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <label className="text-[11px] font-medium text-admin-fg block mb-0.5">Title / Option Label</label>
+                      <input
+                        type="text"
+                        value={opt.label}
+                        onChange={(e) =>
+                          handleUpdateOption('goal', optIndex, { label: e.target.value })
+                        }
+                        disabled={isSaving}
+                        placeholder="Option Title"
+                        className="w-full px-2.5 py-1.5 text-xs text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-1 focus:ring-admin-accent"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-medium text-admin-fg block mb-0.5">Badge Text</label>
+                      <input
+                        type="text"
+                        value={opt.badge || ''}
+                        onChange={(e) =>
+                          handleUpdateOption('goal', optIndex, { badge: e.target.value })
+                        }
+                        disabled={isSaving}
+                        placeholder="e.g. Career Focus"
+                        className="w-full px-2.5 py-1.5 text-xs text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-1 focus:ring-admin-accent"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-medium text-admin-fg block mb-0.5">Description Subtitle</label>
+                    <input
+                      type="text"
+                      value={opt.description || ''}
+                      onChange={(e) =>
+                        handleUpdateOption('goal', optIndex, { description: e.target.value })
+                      }
+                      disabled={isSaving}
+                      placeholder="Describe what the student achieves with this path..."
+                      className="w-full px-2.5 py-1.5 text-xs text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-1 focus:ring-admin-accent"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Live Onboarding Flow Preview */}
+        {showPreview && (
+          <div className="lg:col-span-5 space-y-3">
+            <div className="sticky top-6">
+              <div className="flex items-center justify-between px-1 mb-2">
+                <span className="text-xs font-bold text-admin-fg flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-admin-accent" />
+                  Learner Onboarding Simulator
+                </span>
+                <span className="text-[10px] font-mono text-admin-fg-muted">
+                  Live Preview
+                </span>
+              </div>
+
+              {/* Preview Container Mocking /onboarding Screen */}
+              <div className="rounded-2xl border border-admin-border bg-admin-bg p-5 shadow-md space-y-5">
+                {/* Stepper Progress */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-admin-fg-muted">
+                    <span>Step {previewStepIndex + 1} of {data.steps.length || 1}</span>
+                    <span className="text-admin-accent font-semibold">
+                      {Math.round(((previewStepIndex + 1) / (data.steps.length || 1)) * 100)}% Complete
+                    </span>
+                  </div>
+                  <div className="h-1.5 w-full bg-admin-surface-raised rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-admin-accent transition-all duration-300 rounded-full"
+                      style={{
+                        width: `${((previewStepIndex + 1) / (data.steps.length || 1)) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {activePreviewStep ? (
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <h4 className="text-base font-bold text-admin-fg font-serif">
+                        {activePreviewStep.title || 'Untitled Step'}
+                      </h4>
+                      <p className="text-xs text-admin-fg-muted leading-relaxed">
+                        {activePreviewStep.description || 'No description configured.'}
+                      </p>
+                    </div>
+
+                    {/* Render Form Preview Fields */}
+                    <div className="space-y-3 pt-2">
+                      {activePreviewStep.requiredFields.length === 0 ? (
+                        <div className="p-4 rounded-lg bg-admin-surface-raised/40 text-center text-xs text-admin-fg-muted italic">
+                          No required input fields at this step.
+                        </div>
+                      ) : (
+                        activePreviewStep.requiredFields.map((fieldKey) => {
+                          const preset = PRESET_FIELDS.find((p) => p.key === fieldKey)
+                          const label = preset ? preset.label : fieldKey.replace(/_/g, ' ')
+
+                          return (
+                            <div key={fieldKey} className="space-y-1.5">
+                              <label className="text-xs font-medium text-admin-fg capitalize flex items-center justify-between">
+                                <span>{label}</span>
+                                <span className="text-[10px] text-admin-accent font-mono">Required</span>
+                              </label>
+
+                              {fieldKey === 'goal' ? (
+                                <div className="space-y-2">
+                                  {enabledGoalOptions.map((option) => {
+                                    const isSelected = selectedPreviewGoal === option.id
+                                    return (
+                                      <button
+                                        key={option.id}
+                                        type="button"
+                                        onClick={() => setSelectedPreviewGoal(option.id)}
+                                        className={cn(
+                                          'w-full p-3 rounded-xl border text-left flex items-start gap-3 transition-all',
+                                          isSelected
+                                            ? 'border-admin-accent bg-admin-accent-soft text-admin-fg ring-1 ring-admin-accent/30 shadow-xs'
+                                            : 'border-admin-border bg-admin-surface text-admin-fg-muted hover:border-admin-border-strong'
+                                        )}
+                                      >
+                                        <div className="flex-1 min-w-0">
+                                          <div className="flex items-center justify-between gap-2">
+                                            <p className="text-xs font-bold text-admin-fg">{option.label}</p>
+                                            {option.badge && (
+                                              <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-admin-surface-raised text-admin-fg-muted border border-admin-border">
+                                                {option.badge}
+                                              </span>
+                                            )}
+                                          </div>
+                                          {option.description && (
+                                            <p className="text-[11px] text-admin-fg-muted mt-0.5 leading-snug">
+                                              {option.description}
+                                            </p>
+                                          )}
+                                        </div>
+                                        {isSelected && (
+                                          <CheckCircle2 className="w-4 h-4 text-admin-accent shrink-0 mt-0.5" />
+                                        )}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+                              ) : (
+                                <div className="p-2.5 text-xs rounded-lg border border-admin-border bg-admin-surface text-admin-fg-subtle">
+                                  Enter {label.toLowerCase()}...
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
+
+                    {/* Preview Stepper Navigation Controls */}
+                    <div className="flex items-center justify-between pt-4 border-t border-admin-border">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewStepIndex((p) => Math.max(0, p - 1))}
+                        disabled={previewStepIndex === 0}
+                        className="inline-flex items-center gap-1 text-xs text-admin-fg-muted hover:text-admin-fg disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" /> Back
+                      </button>
+
+                      <div className="flex gap-1">
+                        {data.steps.map((_, sIdx) => (
+                          <button
+                            key={sIdx}
+                            type="button"
+                            onClick={() => setPreviewStepIndex(sIdx)}
+                            className={cn(
+                              'w-2 h-2 rounded-full transition-all',
+                              previewStepIndex === sIdx ? 'w-5 bg-admin-accent' : 'bg-admin-surface-raised'
+                            )}
+                            aria-label={`Jump to step ${sIdx + 1}`}
+                          />
+                        ))}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setPreviewStepIndex((p) => Math.min(data.steps.length - 1, p + 1))}
+                        disabled={previewStepIndex >= data.steps.length - 1}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-admin-accent hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        {previewStepIndex === data.steps.length - 1 ? 'Finish' : 'Next'} <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-xs text-admin-fg-muted">
+                    Add steps to see preview.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Action Bar */}
       <div className="flex items-center justify-end gap-3 border-t border-admin-border pt-4">
-        <Button
-          variant="outline"
+        <button
+          type="button"
           onClick={onReset}
           disabled={!isDirty || isSaving}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg border border-admin-border bg-admin-surface text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
+          <RotateCcw className="w-3.5 h-3.5" />
           Reset
-        </Button>
-        <Button onClick={onSave} disabled={!isDirty || isSaving}>
+        </button>
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={!isDirty || isSaving}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+        >
+          <Save className="w-3.5 h-3.5" />
           {isSaving ? 'Saving…' : 'Save Changes'}
-        </Button>
+        </button>
       </div>
     </div>
   )

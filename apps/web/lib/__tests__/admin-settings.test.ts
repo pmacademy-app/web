@@ -115,12 +115,23 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(typeof emailFlag?.enabled).toBe('boolean')
   })
 
-  it('SettingsService.getAllSettings returns all 5 workspace domains in parallel', async () => {
+  it('SettingsService.getOnboardingSettings returns valid enabled flag and default steps array', async () => {
+    const onboarding = await SettingsService.getOnboardingSettings()
+    expect(typeof onboarding.enabled).toBe('boolean')
+    expect(Array.isArray(onboarding.steps)).toBe(true)
+    expect(onboarding.steps.length).toBeGreaterThanOrEqual(1)
+    expect(onboarding.steps[0].id).toBeDefined()
+    expect(onboarding.steps[0].title).toBeDefined()
+    expect(Array.isArray(onboarding.steps[0].requiredFields)).toBe(true)
+  })
+
+  it('SettingsService.getAllSettings returns all 6 workspace domains in parallel', async () => {
     const all = await SettingsService.getAllSettings()
     expect(all.product).toBeDefined()
     expect(all.learning).toBeDefined()
     expect(all.email).toBeDefined()
     expect(all.notifications).toBeDefined()
+    expect(all.onboarding).toBeDefined()
     expect(Array.isArray(all.featureFlags)).toBe(true)
   })
 
@@ -164,5 +175,68 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(updated.dailyReminderEnabled).toBe(true)
     expect(updated.dailyReminderTime).toBe('10:30')
     expect(updated.weeklyRecapDay).toBe(5)
+  })
+
+  it('SettingsService.updateOnboardingSettings saves customized steps and required fields', async () => {
+    const customSteps = [
+      {
+        id: 'step_welcome',
+        title: 'Welcome to Prodily PM Cohort',
+        description: 'Tell us your background and primary learning goal.',
+        requiredFields: ['name', 'goal', 'career_role'],
+      },
+      {
+        id: 'step_links',
+        title: 'Portfolio & Professional Profile',
+        description: 'Connect your LinkedIn and portfolio.',
+        requiredFields: ['linkedin_url', 'website_url'],
+      },
+    ]
+
+    const updated = await SettingsService.updateOnboardingSettings({
+      enabled: false,
+      steps: customSteps,
+    })
+
+    expect(updated.enabled).toBe(false)
+    expect(updated.steps.length).toBe(2)
+    expect(updated.steps[0].title).toBe('Welcome to Prodily PM Cohort')
+    expect(updated.steps[0].requiredFields).toEqual(['name', 'goal', 'career_role'])
+    expect(updated.steps[1].requiredFields).toEqual(['linkedin_url', 'website_url'])
+  })
+
+  it('SettingsService supports configuring custom field options for selectable onboarding fields', async () => {
+    const customGoalOptions = [
+      {
+        id: 'executive_track',
+        label: 'Director / VP of Product Transition',
+        description: 'Executive strategy, portfolio management, and organizational scaling.',
+        badge: 'Executive',
+        enabled: true,
+      },
+      {
+        id: 'ai_pm',
+        label: 'AI & Machine Learning Product Specialization',
+        description: 'LLM product development, prompt engineering, and model evaluation.',
+        badge: 'AI Focus',
+        enabled: true,
+      },
+    ]
+
+    const updated = await SettingsService.updateOnboardingSettings({
+      fieldOptions: {
+        goal: customGoalOptions,
+      },
+    })
+
+    expect(updated.fieldOptions?.goal).toBeDefined()
+    expect(updated.fieldOptions?.goal?.length).toBe(2)
+    expect(updated.fieldOptions?.goal?.[0].id).toBe('executive_track')
+    expect(updated.fieldOptions?.goal?.[0].badge).toBe('Executive')
+    expect(updated.fieldOptions?.goal?.[1].id).toBe('ai_pm')
+
+    const reloaded = await SettingsService.getOnboardingSettings()
+    expect(reloaded.fieldOptions?.goal?.length).toBe(2)
+    expect(reloaded.fieldOptions?.goal?.[0].label).toBe('Director / VP of Product Transition')
   })
 })

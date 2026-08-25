@@ -300,14 +300,14 @@ describe('Phase 2 — System Announcements & Dashboard Performance', () => {
 
   describe('Dashboard & Performance Aggregations', () => {
     it('executes getDashboardSummary with fast aggregation RPC / query', async () => {
-      const summary = await DashboardService.getDashboardSummary(true)
+      const summary = await DashboardService.getDashboardSummary()
       expect(summary.totalUsers).toBeGreaterThanOrEqual(2)
       expect(summary.totalXpAwarded).toBeGreaterThanOrEqual(150)
       expect(summary.activeLearners7d).toBeGreaterThanOrEqual(1)
     })
 
     it('executes getDashboardData without unbounded table scans', async () => {
-      const data = await DashboardService.getDashboardData('30d', null, null, true)
+      const data = await DashboardService.getDashboardData('30d', null, null)
       expect(data.kpis).toBeDefined()
       expect(data.kpis.totalUsers).toBeGreaterThanOrEqual(2)
       expect(data.funnel).toBeDefined()

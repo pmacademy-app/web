@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 
+import type { OnboardingSettings } from '@/lib/admin/types'
+
 interface OnboardingUser {
   id: string
   user_metadata?: {
@@ -23,7 +25,7 @@ interface OnboardingProfile {
   username?: string
   avatar_url?: string
   career_role?: string
-  goal?: 'job_search' | 'fill_gaps' | 'exploring'
+  goal?: 'job_search' | 'fill_gaps' | 'exploring' | string
   learning_purpose?: string
   linkedin_url?: string
   website_url?: string
@@ -32,25 +34,26 @@ interface OnboardingProfile {
 interface OnboardingWizardProps {
   user: OnboardingUser
   profile: OnboardingProfile | null
+  onboardingSettings?: OnboardingSettings
 }
 
-const GOALS = [
+const DEFAULT_GOALS = [
   {
-    id: 'job_search' as const,
+    id: 'job_search',
     title: 'Landing a PM Role',
     description: 'Preparing for interviews, case studies, and breaking into product management.',
     icon: Target,
     badge: 'Career Focus',
   },
   {
-    id: 'fill_gaps' as const,
+    id: 'fill_gaps',
     title: 'Filling Knowledge Gaps',
     description: 'Leveling up specific competencies in discovery, design, metrics, and strategy.',
     icon: Sparkles,
     badge: 'Skill Growth',
   },
   {
-    id: 'exploring' as const,
+    id: 'exploring',
     title: 'Exploring Product Management',
     description: 'Evaluating PM methodologies, frameworks, and career trajectories.',
     icon: Compass,
@@ -60,9 +63,21 @@ const GOALS = [
 
 const DRAFT_STORAGE_KEY = 'prodily_onboarding_draft'
 
-export default function OnboardingWizard({ user, profile }: OnboardingWizardProps) {
+export default function OnboardingWizard({ user, profile, onboardingSettings }: OnboardingWizardProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+
+  const configuredGoalOptions = onboardingSettings?.fieldOptions?.goal
+    ?.filter((opt) => opt.enabled !== false)
+    ?.map((opt) => ({
+      id: opt.id,
+      title: opt.label,
+      description: opt.description || '',
+      badge: opt.badge || 'Goal',
+      icon: Target,
+    }))
+
+  const activeGoals = configuredGoalOptions && configuredGoalOptions.length > 0 ? configuredGoalOptions : DEFAULT_GOALS
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   const [step, setStep] = useState<number>(() => {
@@ -303,7 +318,7 @@ export default function OnboardingWizard({ user, profile }: OnboardingWizardProp
                   Select your primary objective <span className="text-primary">*</span>
                 </label>
                 <div className="grid grid-cols-1 gap-2.5">
-                  {GOALS.map((g) => {
+                  {activeGoals.map((g) => {
                     const isSelected = formData.goal === g.id
                     const Icon = g.icon
                     return (

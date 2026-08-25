@@ -1,8 +1,11 @@
+'use client'
+
 import React from 'react'
 import Link from 'next/link'
 import { Activity } from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminEmptyState } from './AdminEmptyState'
+import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import type { AdminRecentActivityItem } from '@/lib/admin/types'
 
 interface AdminRecentActivityListProps {
@@ -21,6 +24,8 @@ function timeAgo(iso: string): string {
 }
 
 export function AdminRecentActivityList({ items }: AdminRecentActivityListProps) {
+  const mounted = useIsMounted()
+
   return (
     <AdminSection title="Recent Activity" icon={Activity} meta={`${items.length} events`}>
       {items.length === 0 ? (
@@ -41,7 +46,9 @@ export function AdminRecentActivityList({ items }: AdminRecentActivityListProps)
                   <span className="text-admin-fg-muted">{item.activity}</span>{' '}
                   <span className="font-mono text-admin-accent">{item.entity}</span>
                 </p>
-                <span className="text-[10px] font-mono text-admin-fg-muted shrink-0">{timeAgo(item.timestamp)}</span>
+                <span className="text-[10px] font-mono text-admin-fg-muted shrink-0">
+                  {mounted ? timeAgo(item.timestamp) : ''}
+                </span>
               </div>
               {item.href && (
                 <Link

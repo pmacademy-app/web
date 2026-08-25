@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { AdminToggle } from './AdminToggle'
 import { useAdminToast } from '@/components/admin/admin-toast'
 
 export interface FeatureFlagToggleProps {
@@ -15,9 +16,8 @@ export function FeatureFlagToggle({ flagKey, initialEnabled, disabled = false }:
   const [enabled, setEnabled] = useState(initialEnabled)
   const [loading, setLoading] = useState(false)
 
-  const handleToggle = async () => {
-    if (disabled) return
-    const nextState = !enabled
+  const handleToggle = async (nextState: boolean) => {
+    if (disabled || loading) return
     setLoading(true)
 
     try {
@@ -45,19 +45,14 @@ export function FeatureFlagToggle({ flagKey, initialEnabled, disabled = false }:
   }
 
   return (
-    <button
-      onClick={handleToggle}
-      disabled={loading || disabled}
-      className={`px-3 py-1 rounded text-[11px] font-bold border transition-colors inline-flex items-center gap-1.5 ${
-        disabled
-          ? 'opacity-50 cursor-not-allowed'
-          : enabled
-          ? 'bg-admin-danger-soft hover:bg-admin-danger/20 text-admin-danger border-admin-danger/25'
-          : 'bg-admin-success-soft hover:bg-admin-success/20 text-admin-success border-admin-success/25'
-      }`}
-    >
-      {loading && <Loader2 className="w-3 h-3 animate-spin" />}
-      <span>{enabled ? 'Disable Flag' : 'Enable Flag'}</span>
-    </button>
+    <div className="inline-flex items-center gap-2">
+      {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-admin-accent" />}
+      <AdminToggle
+        pressed={enabled}
+        onPressedChange={handleToggle}
+        disabled={loading || disabled}
+        aria-label={`Toggle feature flag ${flagKey}`}
+      />
+    </div>
   )
 }

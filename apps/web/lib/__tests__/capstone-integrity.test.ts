@@ -38,6 +38,28 @@ function createMockRequest(url: string, options: {
   } as any
 }
 
+const validLongContent = `
+# Product Opportunity Brief: Customer Onboarding Improvement
+
+## 1. Problem Statement
+The user onboarding dropoff rate is currently 42% within the first 14 days. Customers report feeling overwhelmed by excessive initial configuration steps and unclear value propositions.
+
+## 2. Target Persona & User Segment
+Our primary target user persona is the Early Career Product Manager trying to quickly set up their workspace. Their main constraint is limited time during work hours.
+
+## 3. Jobs-To-Be-Done (JTBD)
+- **Core Job:** When I first sign up for the platform, I want a guided setup wizard so that I can reach my first value milestone in under 5 minutes.
+- **Emotional Job:** Feel confident and competent using the tool.
+
+## 4. Business Impact & Success Metrics
+- **Primary Metric:** 14-day onboarding activation rate increase from 58% to 75%.
+- **Secondary Metrics:** Time to first active project creation reduced from 20 minutes to 5 minutes.
+- **Guardrail Metric:** User support ticket volume should not increase by more than 5%.
+
+## 5. Key Risks & Hypotheses
+We hypothesize that replacing raw forms with an interactive step-by-step checklist will increase activation by reducing cognitive overload.
+`.repeat(2)
+
 describe('Phase 8 — Capstone State Consistency, Progress Integrity & Submission Reliability', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
@@ -88,19 +110,31 @@ describe('Phase 8 — Capstone State Consistency, Progress Integrity & Submissio
   describe('3. Draft Mutation Integrity (saveDraftAction)', () => {
     it('saves a new draft for an unlocked module', async () => {
       const mockSupabase = {
-        from: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockReturnThis(),
-          order: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue({ data: [] }),
-          insert: vi.fn().mockReturnValue({
-            select: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({
-                data: { id: 'cap-1', user_id: 'usr-1', module_slug: 'foundations', status: 'draft', content: 'Draft content' },
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === 'user_lesson_progress') {
+            return {
+              select: vi.fn().mockReturnThis(),
+              eq: vi.fn().mockReturnThis(),
+              in: vi.fn().mockResolvedValue({
+                data: Array.from({ length: 8 }, (_, i) => ({ lesson_id: `les_found_${i}`, status: 'completed' })),
                 error: null,
               }),
+            }
+          }
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            order: vi.fn().mockReturnThis(),
+            limit: vi.fn().mockResolvedValue({ data: [] }),
+            insert: vi.fn().mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({
+                  data: { id: 'cap-1', user_id: 'usr-1', module_slug: 'foundations', status: 'draft', content: 'Draft content' },
+                  error: null,
+                }),
+              }),
             }),
-          }),
+          }
         }),
       } as any
 
@@ -129,28 +163,6 @@ describe('Phase 8 — Capstone State Consistency, Progress Integrity & Submissio
   })
 
   describe('4. Submission Reliability & Duplicate Protection (submitCapstoneAction)', () => {
-    const validLongContent = `
-# Product Opportunity Brief: Customer Onboarding Improvement
-
-## 1. Problem Statement
-The user onboarding dropoff rate is currently 42% within the first 14 days. Customers report feeling overwhelmed by excessive initial configuration steps and unclear value propositions.
-
-## 2. Target Persona & User Segment
-Our primary target user persona is the Early Career Product Manager trying to quickly set up their workspace. Their main constraint is limited time during work hours.
-
-## 3. Jobs-To-Be-Done (JTBD)
-- **Core Job:** When I first sign up for the platform, I want a guided setup wizard so that I can reach my first value milestone in under 5 minutes.
-- **Emotional Job:** Feel confident and competent using the tool.
-
-## 4. Business Impact & Success Metrics
-- **Primary Metric:** 14-day onboarding activation rate increase from 58% to 75%.
-- **Secondary Metrics:** Time to first active project creation reduced from 20 minutes to 5 minutes.
-- **Guardrail Metric:** User support ticket volume should not increase by more than 5%.
-
-## 5. Key Risks & Hypotheses
-We hypothesize that replacing raw forms with an interactive step-by-step checklist will increase activation by reducing cognitive overload.
-`.repeat(2)
-
     it('submits capstone, updates status to submitted, awards 150 XP, and records reflection', async () => {
       const mockSupabase = {
         from: vi.fn().mockImplementation((table: string) => {
@@ -203,6 +215,16 @@ We hypothesize that replacing raw forms with an interactive step-by-step checkli
               maybeSingle: vi.fn().mockResolvedValue({ data: { total_xp: 500 } }),
               update: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+              }),
+            }
+          }
+          if (table === 'user_lesson_progress') {
+            return {
+              select: vi.fn().mockReturnThis(),
+              eq: vi.fn().mockReturnThis(),
+              in: vi.fn().mockResolvedValue({
+                data: Array.from({ length: 8 }, (_, i) => ({ lesson_id: `les_found_${i}`, status: 'completed' })),
+                error: null,
               }),
             }
           }
@@ -306,8 +328,20 @@ We hypothesize that replacing raw forms with an interactive step-by-step checkli
             return {
               select: vi.fn().mockReturnThis(),
               eq: vi.fn().mockReturnThis(),
-              // Returns 8 completed lessons
-              then: (resolve: any) => resolve({ data: Array.from({ length: 8 }, (_, i) => ({ lesson_id: `les_0${i + 1}`, status: 'completed' })), error: null }),
+              // Returns 8 completed lessons for foundations
+              then: (resolve: any) => resolve({
+                data: [
+                  { lesson_id: 'les_zoyq8a', status: 'completed' },
+                  { lesson_id: 'les_prrl23', status: 'completed' },
+                  { lesson_id: 'les_0q4aih', status: 'completed' },
+                  { lesson_id: 'les_04ix6b', status: 'completed' },
+                  { lesson_id: 'les_aovj2y', status: 'completed' },
+                  { lesson_id: 'les_8trb62', status: 'completed' },
+                  { lesson_id: 'les_5rbthl', status: 'completed' },
+                  { lesson_id: 'les_8psivf', status: 'completed' },
+                ],
+                error: null,
+              }),
             }
           }
           return { select: vi.fn().mockReturnThis() }
@@ -318,6 +352,79 @@ We hypothesize that replacing raw forms with an interactive step-by-step checkli
       expect(items.length).toBe(9)
       expect(items[0].status).toBe('submitted')
       expect(items[0].unlocked).toBe(true)
+      // Module 2 (discovery) has 0 lessons completed, must be locked!
+      expect(items[1].status).toBe('locked')
+      expect(items[1].unlocked).toBe(false)
+    })
+
+    it('ensures Module 3 remains locked when Module 1 and 2 are submitted but Module 3 has 0 lessons', async () => {
+      const mockSupabase = {
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === 'capstone_submissions') {
+            return {
+              select: vi.fn().mockReturnThis(),
+              eq: vi.fn().mockResolvedValue({
+                data: [
+                  { id: 'sub-1', module_slug: 'foundations', status: 'submitted', submitted_at: '2026-08-01T00:00:00Z' },
+                  { id: 'sub-2', module_slug: 'discovery', status: 'submitted', submitted_at: '2026-08-02T00:00:00Z' },
+                ],
+                error: null,
+              }),
+            }
+          }
+          if (table === 'user_lesson_progress') {
+            return {
+              select: vi.fn().mockReturnThis(),
+              eq: vi.fn().mockReturnThis(),
+              // 0 completed lessons for Module 3 (design)
+              then: (resolve: any) => resolve({ data: [], error: null }),
+            }
+          }
+          return { select: vi.fn().mockReturnThis() }
+        }),
+      } as any
+
+      const items = await getModuleCapstonesOverview(mockSupabase, 'usr-aditya')
+      expect(items[0].status).toBe('submitted') // Module 1
+      expect(items[1].status).toBe('submitted') // Module 2
+      expect(items[2].status).toBe('locked')    // Module 3 (design) MUST BE LOCKED
+      expect(items[2].unlocked).toBe(false)
+    })
+
+    it('rejects new draft or submission creation when module has fewer than 8 completed lessons', async () => {
+      const mockSupabase = {
+        from: vi.fn().mockImplementation((table: string) => {
+          if (table === 'capstone_submissions') {
+            return {
+              select: vi.fn().mockReturnThis(),
+              eq: vi.fn().mockReturnThis(),
+              order: vi.fn().mockReturnThis(),
+              limit: vi.fn().mockResolvedValue({ data: [] }),
+            }
+          }
+          if (table === 'user_lesson_progress') {
+            return {
+              select: vi.fn().mockReturnThis(),
+              eq: vi.fn().mockReturnThis(),
+              in: vi.fn().mockResolvedValue({
+                data: [
+                  { lesson_id: 'les_bhb1lc', status: 'completed' }, // Only 1 lesson completed in design
+                ],
+                error: null,
+              }),
+            }
+          }
+          return { select: vi.fn().mockReturnThis() }
+        }),
+      } as any
+
+      await expect(
+        saveDraftAction(mockSupabase, 'usr-aditya', 'design', 'Some draft text')
+      ).rejects.toThrow('Capstone is locked until at least 8 lessons in this module are completed')
+
+      await expect(
+        submitCapstoneAction(mockSupabase, 'usr-aditya', 'design', validLongContent)
+      ).rejects.toThrow('You must complete at least 8 lessons in this module first')
     })
   })
 

@@ -673,6 +673,14 @@ export class AdminConsoleService {
               submittedAt: capstoneRows[0].submitted_at,
             }
           : null,
+        capstones: capstoneRows.map((c) => ({
+          id: c.id,
+          moduleSlug: c.module_slug,
+          moduleTitle: getCapstoneDefinition(c.module_slug)?.moduleTitle || c.module_slug,
+          status: c.status,
+          isPublic: c.is_public,
+          submittedAt: c.submitted_at,
+        })),
         portfolio: {
           hasPortfolio: Boolean(u?.is_portfolio_public),
           url: portfolioUrl,
@@ -948,9 +956,29 @@ export class AdminConsoleService {
   }
 
   /**
-   * Fetches feature flags list for admin controls.
+   * Fetches feature flags list for admin controls with database hydration.
    */
-  public static getFeatureFlags() {
+  public static async getFeatureFlags() {
+    try {
+      const supabase = createServiceRoleClient()
+      const { data } = await supabase
+        .from('system_settings')
+        .select('value')
+        .eq('key', 'feature_flags')
+        .maybeSingle()
+
+      if (data?.value && typeof data.value === 'object') {
+        const flagValues = data.value as Record<string, boolean>
+        const records = Object.entries(flagValues).map(([key, enabled]) => ({
+          key,
+          enabled: Boolean(enabled),
+          updatedAt: new Date().toISOString(),
+        }))
+        globalFeatureFlagService.hydrate(records)
+      }
+    } catch {
+      // Gracefully fall back to in-memory defaults
+    }
     return globalFeatureFlagService.getAll()
   }
 
