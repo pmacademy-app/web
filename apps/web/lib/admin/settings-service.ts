@@ -367,6 +367,7 @@ export class SettingsService {
     const steps = hasValid4Steps ? settings.steps : DEFAULT_ONBOARDING_STEPS
 
     const fieldOptions = {
+      ...settings.fieldOptions,
       goal:
         settings.fieldOptions?.goal && settings.fieldOptions.goal.length > 0
           ? settings.fieldOptions.goal
@@ -383,7 +384,6 @@ export class SettingsService {
         settings.fieldOptions?.learning_preference && settings.fieldOptions.learning_preference.length > 0
           ? settings.fieldOptions.learning_preference
           : DEFAULT_PREFERENCE_OPTIONS,
-      ...settings.fieldOptions,
     }
 
     return {
