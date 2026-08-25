@@ -9,6 +9,7 @@ import { BadgeEarnedEmail } from './templates/achievement/BadgeEarned'
 import { LevelUpEmail } from './templates/achievement/LevelUp'
 import { CertificateEarned } from './templates/achievement/CertificateEarned'
 import { PortfolioPublished } from './templates/achievement/PortfolioPublished'
+import { DirectMessageEmail } from './templates/admin/DirectMessage'
 import { BRAND } from '@/lib/brand'
 
 export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType<Record<string, unknown>>; subjectLine: string }> = {
@@ -20,6 +21,12 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
   'auth.password_reset': {
     component: PasswordReset,
     subjectLine: `Reset your ${BRAND.company} password`,
+  },
+
+  // Direct Admin Messages
+  'admin.direct_message': {
+    component: DirectMessageEmail,
+    subjectLine: '{{subject}}',
   },
 
   // Optional Transactional Automations

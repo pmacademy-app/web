@@ -24,6 +24,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'targetUserId and templateKey are required' }, { status: 400 })
     }
 
+    // Specific validation for direct custom messages
+    if (templateKey === 'admin.direct_message') {
+      const subject = customVariables?.subject
+      const messageBody = customVariables?.messageBody
+      if (!subject || typeof subject !== 'string' || !subject.trim()) {
+        return NextResponse.json({ error: 'Subject is required for custom direct message' }, { status: 400 })
+      }
+      if (!messageBody || typeof messageBody !== 'string' || !messageBody.trim()) {
+        return NextResponse.json({ error: 'Message body is required for custom direct message' }, { status: 400 })
+      }
+    }
+
     const supabase = createServiceRoleClient()
 
     // 1. Fetch Target Learner Account (Auth + public.users)
@@ -48,7 +60,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (!userRow && !authUser) {
-      const { logSystemError } = await import('@/lib/monitoring/logger')
       void logSystemError({
         severity: 'error',
         category: 'resend',
@@ -66,7 +77,7 @@ export async function POST(request: NextRequest) {
     const isCriticalAuth = templateKey === 'auth.verify_email' || templateKey === 'auth.password_reset'
 
     // 2. Pre-Send Diagnostic & Quota Validation
-    if (!isCriticalAuth) {
+    if (!isCriticalAuth && templateKey !== 'admin.direct_message') {
       const { data: globalPauseFlag } = await supabase
         .from('system_settings')
         .select('value')
@@ -84,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     let customVerificationUrl: string | undefined
 
-    // 3. Execution Path: Generate link for auth.verify_email or process production queue
+    // 3. Execution Path: Generate link for auth.verify_email
     if (templateKey === 'auth.verify_email') {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me'
 
@@ -111,7 +122,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Production Email Queue Enqueue & Immediate Resend Dispatch Flow
+    // 4. Production Email Queue Enqueue & Immediate Resend Dispatch Flow
     const templateVars: Record<string, unknown> = {
       userName: recipientName,
       appUrl: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me',
@@ -148,16 +159,35 @@ export async function POST(request: NextRequest) {
       priorityLevel: 'high',
     })
 
-    const queueId = typeof enqueueRes === 'string' ? enqueueRes : (enqueueRes as { queueId?: string })?.queueId || 'unknown'
+    if (!enqueueRes.success || !enqueueRes.queueId) {
+      return NextResponse.json({
+        success: false,
+        error: enqueueRes.reason || 'Failed to enqueue production email for user.',
+      }, { status: 400 })
+    }
+
+    const queueId = enqueueRes.queueId
 
     // Immediate queue processing trigger
     const processResult = await processEmailQueue(50)
 
-    if (processResult && processResult.processed === 0) {
+    // Inspect the specific queue row status to verify real delivery status
+    const { data: queueItem } = await supabase
+      .from('email_queue')
+      .select('id, status, error_message, resend_id, attempt_count')
+      .eq('id', queueId)
+      .maybeSingle()
+
+    const queueStatus = (queueItem as { status?: string; error_message?: string; resend_id?: string } | null)?.status || 'delivered'
+    const queueError = (queueItem as { error_message?: string } | null)?.error_message
+    const resendId = (queueItem as { resend_id?: string } | null)?.resend_id
+
+    if (queueStatus === 'failed') {
       return NextResponse.json({
         success: false,
-        error: `Production email enqueued but processing failed or was skipped (processed: 0). Queue ID: ${queueId}`,
+        error: `Production email dispatch failed: ${queueError || 'Provider delivery error'}`,
         queueId,
+        status: queueStatus,
         processResult,
       }, { status: 400 })
     }
@@ -172,14 +202,18 @@ export async function POST(request: NextRequest) {
         recipientEmail,
         templateKey,
         queueId,
+        status: queueStatus,
+        resendId,
         processResult,
       }
     )
 
     return NextResponse.json({
       success: true,
-      message: `Production email successfully enqueued and processed for ${recipientEmail}.`,
+      message: `Production email (${templateKey}) successfully dispatched to ${recipientEmail}.`,
       queueId,
+      status: queueStatus,
+      resendId: resendId || null,
       processResult,
     })
   } catch (err) {
