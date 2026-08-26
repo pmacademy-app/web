@@ -219,7 +219,7 @@ describe('Phase 2 — System Announcements & Dashboard Performance', () => {
     mockStore.auditLogs = []
   })
 
-  describe('AnnouncementsService Lifecycle', () => {
+  describe('AnnouncementsService Lifecycle & Audience Targeting', () => {
     it('creates a draft announcement and records audit log', async () => {
       const input: AnnouncementCreateInput = {
         title: 'Platform Maintenance Notice',
@@ -268,33 +268,134 @@ describe('Phase 2 — System Announcements & Dashboard Performance', () => {
       expect(resumed.status).toBe('active')
     })
 
-    it('filters active announcements by audience, cohort, and dismissal', async () => {
-      // 1. Sitewide active announcement
+    it('strictly enforces lifecycle states: draft, scheduled, expired, and paused are hidden', async () => {
+      const now = new Date()
+      const futureDate = new Date(now.getTime() + 86400000).toISOString() // +1 day
+      const pastDate = new Date(now.getTime() - 86400000).toISOString() // -1 day
+
+      // 1. Draft announcement
       await AnnouncementsService.createAnnouncement(
-        { title: 'Sitewide News', content: 'Welcome to Prodily', status: 'active', targetAudience: 'all' },
+        { title: 'Draft Announcement', content: 'Not published yet', status: 'draft', targetAudience: 'all' },
+        'admin-1',
+        'admin@prodily.app'
+      )
+      // 2. Future scheduled announcement
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Future Scheduled', content: 'Starts tomorrow', status: 'scheduled', scheduledAt: futureDate, targetAudience: 'all' },
+        'admin-1',
+        'admin@prodily.app'
+      )
+      // 3. Expired announcement
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Expired Promo', content: 'Ended yesterday', status: 'active', expiresAt: pastDate, targetAudience: 'all' },
+        'admin-1',
+        'admin@prodily.app'
+      )
+      // 4. Paused announcement
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Paused Announcement', content: 'Temporarily paused', status: 'paused', targetAudience: 'all' },
+        'admin-1',
+        'admin@prodily.app'
+      )
+      // 5. Active announcement within window
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Welcome to Prodily 🚀', content: 'Start learning product management', status: 'active', targetAudience: 'all', linkUrl: '/academy' },
+        'admin-1',
+        'admin@prodily.app'
+      )
+
+      const activeAnnouncements = await AnnouncementsService.getActiveAnnouncementsForUser('u-1')
+      expect(activeAnnouncements.length).toBe(1)
+      expect(activeAnnouncements[0].title).toBe('Welcome to Prodily 🚀')
+      expect(activeAnnouncements[0].linkUrl).toBe('/academy')
+    })
+
+    it('enforces targeted audiences: individual user vs cohort vs all learners', async () => {
+      // 1. All Learners announcement
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Welcome to Prodily 🚀', content: 'All learners announcement', status: 'active', targetAudience: 'all' },
         'admin-1',
         'admin@prodily.app'
       )
       // 2. Cohort specific announcement
       await AnnouncementsService.createAnnouncement(
-        { title: 'Cohort 2026A Meetup', content: 'Office hours at 5pm', status: 'active', targetAudience: 'cohort', targetCohortId: 'cohort-2026a' },
+        { title: 'Cohort 2026A Exclusive', content: 'Meetup tomorrow', status: 'active', targetAudience: 'cohort', targetCohortId: 'cohort-2026a' },
+        'admin-1',
+        'admin@prodily.app'
+      )
+      // 3. Individual user announcement
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Special Welcome for Alice', content: '1-on-1 mentor session available', status: 'active', targetAudience: 'individual', targetUserId: 'u-1' },
+        'admin-1',
+        'admin@prodily.app'
+      )
+      // 4. Individual user announcement for someone else
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Private Notice for Bob', content: 'Admin message', status: 'active', targetAudience: 'individual', targetUserId: 'u-2' },
         'admin-1',
         'admin@prodily.app'
       )
 
-      // Query for user in cohort-2026a
-      const userAnnouncements = await AnnouncementsService.getActiveAnnouncementsForUser('u-1', 'cohort-2026a')
-      expect(userAnnouncements.length).toBe(2)
+      // Alice (u-1 in cohort-2026a) should see: All + Cohort + Alice's Private (3 announcements)
+      const aliceList = await AnnouncementsService.getActiveAnnouncementsForUser('u-1', 'cohort-2026a')
+      expect(aliceList.length).toBe(3)
+      const aliceTitles = aliceList.map((a) => a.title)
+      expect(aliceTitles).toContain('Welcome to Prodily 🚀')
+      expect(aliceTitles).toContain('Cohort 2026A Exclusive')
+      expect(aliceTitles).toContain('Special Welcome for Alice')
+      expect(aliceTitles).not.toContain('Private Notice for Bob')
 
-      // Query for user in different cohort
-      const otherCohortAnnouncements = await AnnouncementsService.getActiveAnnouncementsForUser('u-1', 'cohort-2026b')
-      expect(otherCohortAnnouncements.length).toBe(1)
-      expect(otherCohortAnnouncements[0].title).toBe('Sitewide News')
+      // Bob (u-2 in cohort-2026b) should see: All + Bob's Private (2 announcements)
+      const bobList = await AnnouncementsService.getActiveAnnouncementsForUser('u-2', 'cohort-2026b')
+      expect(bobList.length).toBe(2)
+      const bobTitles = bobList.map((a) => a.title)
+      expect(bobTitles).toContain('Welcome to Prodily 🚀')
+      expect(bobTitles).toContain('Private Notice for Bob')
+      expect(bobTitles).not.toContain('Cohort 2026A Exclusive')
+      expect(bobTitles).not.toContain('Special Welcome for Alice')
+    })
 
-      // Dismiss announcement
-      await AnnouncementsService.dismissAnnouncement(userAnnouncements[0].id, 'u-1')
-      const afterDismiss = await AnnouncementsService.getActiveAnnouncementsForUser('u-1', 'cohort-2026a')
-      expect(afterDismiss.length).toBe(1)
+    it('persists dismissals independently per user', async () => {
+      const a1 = await AnnouncementsService.createAnnouncement(
+        { title: 'Announcement 1', content: 'Dismissible notice 1', status: 'active', targetAudience: 'all', dismissible: true },
+        'admin-1',
+        'admin@prodily.app'
+      )
+      const a2 = await AnnouncementsService.createAnnouncement(
+        { title: 'Announcement 2', content: 'Dismissible notice 2', status: 'active', targetAudience: 'all', dismissible: true },
+        'admin-1',
+        'admin@prodily.app'
+      )
+
+      // Alice dismisses announcement 1
+      await AnnouncementsService.dismissAnnouncement(a1.id, 'u-1')
+
+      // Alice sees only announcement 2
+      const aliceList = await AnnouncementsService.getActiveAnnouncementsForUser('u-1')
+      expect(aliceList.length).toBe(1)
+      expect(aliceList[0].id).toBe(a2.id)
+
+      // Bob still sees BOTH announcement 1 and 2
+      const bobList = await AnnouncementsService.getActiveAnnouncementsForUser('u-2')
+      expect(bobList.length).toBe(2)
+    })
+
+    it('orders multiple announcements by priority descending', async () => {
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Normal Announcement', content: 'Priority 1', status: 'active', targetAudience: 'all', priority: 1 },
+        'admin-1',
+        'admin@prodily.app'
+      )
+      await AnnouncementsService.createAnnouncement(
+        { title: 'Urgent Announcement', content: 'Priority 10', status: 'active', targetAudience: 'all', priority: 10 },
+        'admin-1',
+        'admin@prodily.app'
+      )
+
+      const list = await AnnouncementsService.getActiveAnnouncementsForUser('u-1')
+      expect(list.length).toBe(2)
+      expect(list[0].title).toBe('Urgent Announcement')
+      expect(list[1].title).toBe('Normal Announcement')
     })
   })
 

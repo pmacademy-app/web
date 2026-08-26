@@ -333,8 +333,13 @@ export class AnnouncementsService {
 
     if (error || !rawList) return []
 
-    // 2. Filter audience targeting
+    // 2. Filter audience targeting & strictly enforce date bounds in-memory
+    const now = new Date()
     const candidates = rawList.filter((r) => {
+      if (r.status !== 'active') return false
+      if (r.scheduled_at && new Date(String(r.scheduled_at)) > now) return false
+      if (r.expires_at && new Date(String(r.expires_at)) <= now) return false
+
       const audience = r.target_audience
       if (audience === 'all') return true
       if (audience === 'cohort' && cohortId && r.target_cohort_id === cohortId) return true
@@ -355,10 +360,20 @@ export class AnnouncementsService {
       }
 
       const dismissedSet = new Set((dismissals || []).map((d) => d.announcement_id))
-      return candidates.filter((c) => !dismissedSet.has(String(c.id))).map(mapRowToItem)
+      const items = candidates.filter((c) => !dismissedSet.has(String(c.id))).map(mapRowToItem)
+      items.sort((a, b) => {
+        if (b.priority !== a.priority) return b.priority - a.priority
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      })
+      return items
     }
 
-    return candidates.map(mapRowToItem)
+    const items = candidates.map(mapRowToItem)
+    items.sort((a, b) => {
+      if (b.priority !== a.priority) return b.priority - a.priority
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
+    return items
   }
 
   /**

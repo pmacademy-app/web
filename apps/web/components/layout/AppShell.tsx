@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
+import { SystemAnnouncementBanner } from './SystemAnnouncementBanner'
 import { SearchOverlayProvider } from '@/components/search/SearchOverlayProvider'
 import { SearchOverlay } from '@/components/search/SearchOverlay'
 import { LearnerFeedbackProvider } from '@/components/feedback/LearnerFeedbackProvider'
@@ -10,9 +11,11 @@ import { LearnerFeedbackProvider } from '@/components/feedback/LearnerFeedbackPr
 interface AppShellProps {
   children: React.ReactNode
   userProfile: {
+    id?: string
     name: string | null
     email: string
     level: number
+    cohort_id?: string | null
   }
 }
 
@@ -27,6 +30,9 @@ export default function AppShell({ children, userProfile }: AppShellProps) {
 
         {/* Main Content Pane */}
         <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+          {/* System Announcement Banner — only in authenticated learner app context */}
+          <SystemAnnouncementBanner userId={userProfile.id} cohortId={userProfile.cohort_id} />
+
           {/* Top Header Navigation */}
           <Topbar onMenuOpen={() => setIsSidebarOpen(true)} userProfile={userProfile} />
 

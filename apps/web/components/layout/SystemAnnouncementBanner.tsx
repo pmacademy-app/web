@@ -118,10 +118,10 @@ export function SystemAnnouncementBanner({
               style.bg
             )}
           >
-            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <Icon className={cn('w-4 h-4 shrink-0', style.iconColor)} />
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0 text-xs">
+            <div className="max-w-7xl mx-auto flex items-start sm:items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                <Icon className={cn('w-4 h-4 shrink-0 mt-0.5 sm:mt-0', style.iconColor)} />
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0 text-xs leading-relaxed">
                   <span className="font-bold tracking-tight">{announcement.title}</span>
                   <span className="opacity-90">{announcement.content}</span>
                   {announcement.linkUrl && (
@@ -141,7 +141,7 @@ export function SystemAnnouncementBanner({
                   type="button"
                   onClick={() => handleDismiss(announcement.id)}
                   aria-label="Dismiss announcement"
-                  className="p-1 rounded-md hover:bg-white/10 text-white/70 hover:text-white transition-colors shrink-0 cursor-pointer"
+                  className="p-1.5 -mr-1 rounded-md hover:bg-white/15 text-white/75 hover:text-white transition-colors shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/40"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

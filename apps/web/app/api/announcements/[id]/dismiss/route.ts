@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { AnnouncementsService } from '@/lib/admin/announcements-service'
+import { createAuthenticatedServerClient } from '@/lib/supabase'
 
 export async function POST(
   request: Request,
@@ -8,7 +10,23 @@ export async function POST(
   try {
     const { id } = await params
     const body = await request.json().catch(() => ({}))
-    const userId = body.userId
+    let userId = body.userId
+
+    if (!userId) {
+      const cookieStore = await cookies()
+      const token = cookieStore.get('sb-access-token')?.value
+      if (token) {
+        try {
+          const authSupabase = createAuthenticatedServerClient(token)
+          const { data: { user } } = await authSupabase.auth.getUser()
+          if (user) {
+            userId = user.id
+          }
+        } catch {
+          // Token invalid or expired
+        }
+      }
+    }
 
     if (!userId) {
       return NextResponse.json({ success: true, message: 'Client-only dismissal noted' })
