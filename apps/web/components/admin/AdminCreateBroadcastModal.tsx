@@ -1,10 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import {
   X,
   Send,
-  Users,
   Eye,
   CheckCircle2,
   Calendar,
@@ -129,21 +128,14 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
     }
   }
 
-  // Update recipient count when reaching step 3
-  useEffect(() => {
-    if (step === 3) {
-      calculateRecipients()
-    }
-  }, [step])
-
-  const calculateRecipients = async () => {
+  const calculateRecipients = useCallback(async (customFilters?: AdminUserFilters) => {
     setCalculating(true)
     setErrorMsg(null)
     try {
       const res = await fetch('/api/admin/emails/broadcasts/recipient-count', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filters }),
+        body: JSON.stringify({ filters: customFilters ?? filters }),
       })
       const json = await res.json()
       if (json.success) {
@@ -156,7 +148,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
     } finally {
       setCalculating(false)
     }
-  }
+  }, [filters])
 
   const fetchSample = async () => {
     setLoadingSample(true)
@@ -674,7 +666,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                       onChange={(e) => setFilters({ ...filters, excludeIfReceivedTemplate: e.target.value || undefined })}
                       className={cn(selectClass, 'w-full')}
                     >
-                      <option value="">None (Don't exclude by template)</option>
+                      <option value="">None (Don&apos;t exclude by template)</option>
                       {TEMPLATE_OPTIONS.map((t) => (
                         <option key={t.key} value={t.key}>{t.label}</option>
                       ))}
@@ -704,7 +696,17 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
             <div className="space-y-6">
               <div className="p-5 rounded-xl border border-admin-border bg-admin-bg/60 flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-admin-fg">Estimated Recipients</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-admin-fg">Estimated Recipients</h3>
+                    <button
+                      type="button"
+                      onClick={() => void calculateRecipients(filters)}
+                      disabled={calculating}
+                      className="text-[11px] font-semibold text-admin-accent hover:underline cursor-pointer"
+                    >
+                      (Recalculate)
+                    </button>
+                  </div>
                   <p className="text-xs text-admin-fg-muted">Calculated server-side using your applied filters snapshot.</p>
                 </div>
                 <div className="text-right">
@@ -954,6 +956,9 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                     return
                   }
                   setErrorMsg(null)
+                  if (step === 2) {
+                    void calculateRecipients(filters)
+                  }
                   setStep((s) => (s + 1) as 1 | 2 | 3 | 4)
                 }}
                 className="inline-flex items-center gap-1.5 h-9 px-5 rounded-lg bg-admin-accent text-admin-accent-fg text-xs font-bold hover:bg-admin-accent/90 transition-colors cursor-pointer"

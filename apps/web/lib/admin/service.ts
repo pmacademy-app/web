@@ -10,7 +10,7 @@ import {
   computeQuizAvgScore,
   TOTAL_LESSONS,
 } from './users-aggregation'
-import { applyUserFilters, resolveFilteredUserIds } from './user-filter-query'
+import { resolveFilteredUserIds } from './user-filter-query'
 import type {
   AdminSystemHealth,
   AdminUserOverview,
