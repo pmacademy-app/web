@@ -17,6 +17,7 @@ import { CommunicationsService } from '@/lib/admin/communications-service'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { AnnouncementsService } from '@/lib/admin/announcements-service'
 import { BroadcastService } from '@/lib/admin/broadcast-service'
+import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { AdminKpiCard } from '@/components/admin/AdminKpiCard'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
@@ -27,7 +28,7 @@ import { AdminEmailDashboard } from '@/components/admin/AdminEmailDashboard'
 import { AdminTemplateList } from '@/components/admin/AdminTemplateList'
 import { AdminQueueView } from '@/components/admin/AdminQueueView'
 import { AdminContactInbox, type ContactMessageItem } from '@/components/admin/AdminContactInbox'
-import { AdminNotificationListView } from '@/components/admin/AdminNotificationListView'
+import { AdminInAppNotificationView } from '@/components/admin/AdminInAppNotificationView'
 import { AdminAnnouncementsView } from '@/components/admin/AdminAnnouncementsView'
 import { AdminBroadcastsView } from '@/components/admin/AdminBroadcastsView'
 
@@ -48,11 +49,11 @@ const TABS: Array<{ key: string; label: string; icon: React.ElementType; href?: 
   { key: 'overview', label: 'Overview', icon: LayoutDashboard },
   { key: 'broadcasts', label: 'Broadcasts', icon: Send },
   { key: 'announcements', label: 'Announcements', icon: Megaphone },
+  { key: 'in-app', label: 'In-App', icon: Bell },
   { key: 'email', label: 'Email', icon: Mail },
   { key: 'automations', label: 'Automations', icon: Zap },
   { key: 'templates', label: 'Templates', icon: FileCode },
   { key: 'queue', label: 'Queue', icon: RefreshCw },
-  { key: 'notifications', label: 'Notifications', icon: Bell },
   { key: 'contact', label: 'Contact', icon: MessageSquare },
   { key: 'testimonials', label: 'Testimonials', icon: Star, href: '/admin/moderation?tab=testimonials' },
   { key: 'feedback', label: 'Feedback', icon: MessageSquare, href: '/admin/moderation?tab=feedback' },
@@ -60,13 +61,13 @@ const TABS: Array<{ key: string; label: string; icon: React.ElementType; href?: 
 
 export default async function AdminCommunicationsPage({ searchParams }: PageProps) {
   const params = await searchParams
-  const tab = params.tab || 'overview'
+  const tab = params.tab === 'notifications' ? 'in-app' : params.tab || 'overview'
 
   // Always fetch queue overview (header action + queue tab + email KPIs).
   const queue = await AdminConsoleService.getEmailQueueOverview()
 
   // Fetch per-tab data in parallel; each service degrades to empty fallbacks.
-  const [overview, emailHistory, volumeSeries, automationsState, templates, notificationEvents, contactMessages, announcementsData, broadcastsData] =
+  const [overview, emailHistory, volumeSeries, automationsState, templates, notificationEvents, contactMessages, announcementsData, broadcastsData, inAppData] =
     await Promise.all([
       tab === 'overview' ? CommunicationsService.getCommunicationsOverview() : Promise.resolve(null),
       tab === 'email' || tab === 'queue'
@@ -80,10 +81,11 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
       tab === 'email' ? CommunicationsService.getEmailVolumeSeries(14) : Promise.resolve([]),
       tab === 'automations' ? EmailAutomationsService.getState() : Promise.resolve(null),
       tab === 'templates' ? Promise.resolve(CommunicationsService.getTemplateList()) : Promise.resolve([]),
-      tab === 'notifications' ? CommunicationsService.getNotificationEvents(50) : Promise.resolve([]),
+      tab === 'in-app' ? CommunicationsService.getNotificationEvents(50) : Promise.resolve([]),
       tab === 'contact' ? CommunicationsService.getContactMessages(100) : Promise.resolve([]),
       tab === 'announcements' ? AnnouncementsService.getAnnouncements({ limit: 100 }) : Promise.resolve({ announcements: [] }),
       tab === 'broadcasts' ? BroadcastService.listBroadcasts(Number(params.page) || 1, 25) : Promise.resolve(null),
+      tab === 'in-app' ? InAppManagerService.listBroadcasts(Number(params.page) || 1, 25, params.status, params.q) : Promise.resolve(null),
     ])
 
   const contactMessagesTyped: ContactMessageItem[] = (contactMessages || []).map((c) => ({
@@ -217,8 +219,23 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
         </div>
       )}
 
-      {/* Notifications */}
-      {tab === 'notifications' && <AdminNotificationListView events={notificationEvents || []} />}
+      {/* In-App Notifications Manager */}
+      {tab === 'in-app' && (
+        <AdminInAppNotificationView
+          initialBroadcasts={inAppData?.broadcasts || []}
+          initialMetrics={
+            inAppData?.metrics || {
+              totalCreated: 0,
+              totalDelivered: 0,
+              totalRead: 0,
+              averageReadRate: 0,
+              scheduledCount: 0,
+              draftCount: 0,
+            }
+          }
+          diagnosticEvents={notificationEvents || []}
+        />
+      )}
 
       {/* Contact inbox */}
       {tab === 'contact' && <AdminContactInbox initialMessages={contactMessagesTyped} />}

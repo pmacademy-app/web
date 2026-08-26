@@ -611,6 +611,93 @@ export type Database = {
         }
         Relationships: []
       }
+      in_app_broadcasts: {
+        Row: {
+          action_url: string | null
+          audience: string
+          body: string
+          category: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          idempotency_key: string | null
+          priority: number
+          recipient_filters: Json
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string
+          target_cohort_id: string | null
+          target_user_id: string | null
+          title: string
+          total_delivered: number
+          total_read: number
+          total_targeted: number
+          updated_at: string
+        }
+        Insert: {
+          action_url?: string | null
+          audience?: string
+          body: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          idempotency_key?: string | null
+          priority?: number
+          recipient_filters?: Json
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          target_cohort_id?: string | null
+          target_user_id?: string | null
+          title: string
+          total_delivered?: number
+          total_read?: number
+          total_targeted?: number
+          updated_at?: string
+        }
+        Update: {
+          action_url?: string | null
+          audience?: string
+          body?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          idempotency_key?: string | null
+          priority?: number
+          recipient_filters?: Json
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          target_cohort_id?: string | null
+          target_user_id?: string | null
+          title?: string
+          total_delivered?: number
+          total_read?: number
+          total_targeted?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_app_broadcasts_target_cohort_id_fkey"
+            columns: ["target_cohort_id"]
+            isOneToOne: false
+            referencedRelation: "cohorts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "in_app_broadcasts_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       in_app_notifications: {
         Row: {
           action_url: string | null
