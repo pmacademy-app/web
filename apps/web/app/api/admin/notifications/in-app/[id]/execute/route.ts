@@ -20,13 +20,14 @@ export async function POST(
       return NextResponse.json({ error: res.error || 'Execution failed' }, { status: 400 })
     }
 
-    await logAdminAction({
-      adminUserId: auth.userId,
-      adminEmail: auth.email || '',
-      action: 'in_app_notification_executed',
-      targetId: id,
-      details: { targeted: res.targeted, delivered: res.delivered },
-    })
+    await logAdminAction(
+      auth.userId,
+      auth.email || '',
+      'in_app_notification_executed',
+      'in_app_broadcast',
+      id,
+      { targeted: res.targeted, delivered: res.delivered }
+    )
 
     return NextResponse.json({ success: true, ...res })
   } catch (err) {

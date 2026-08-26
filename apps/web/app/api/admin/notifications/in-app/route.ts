@@ -101,13 +101,14 @@ export async function POST(request: NextRequest) {
       idempotencyKey,
     })
 
-    await logAdminAction({
-      adminUserId: auth.userId,
-      adminEmail: auth.email || '',
-      action: 'in_app_notification_created',
-      targetId: item.id,
-      details: { title: item.title, audience: item.audience, status: item.status },
-    })
+    await logAdminAction(
+      auth.userId,
+      auth.email || '',
+      'in_app_notification_created',
+      'in_app_broadcast',
+      item.id,
+      { title: item.title, audience: item.audience, status: item.status }
+    )
 
     return NextResponse.json({ success: true, item }, { status: 201 })
   } catch (err) {
