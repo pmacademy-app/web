@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { BroadcastService } from '@/lib/admin/broadcast-service'
+import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
 import { requireAdminUser } from '@/lib/admin/guard'
 
 export const runtime = 'nodejs'
@@ -7,8 +8,8 @@ export const runtime = 'nodejs'
 /**
  * GET /api/cron/process-broadcasts
  *
- * Cron endpoint that finds scheduled broadcasts past their scheduled_at time
- * and executes their next batch.
+ * Cron endpoint that finds scheduled email and in-app broadcasts past their scheduled_at time
+ * and executes their delivery.
  *
  * Authentication:
  * 1. Checks Authorization header against CRON_SECRET (standard for Vercel Cron or external schedulers).
@@ -31,11 +32,21 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await BroadcastService.processScheduledBroadcasts()
+    const [emailResult, inAppResult] = await Promise.all([
+      BroadcastService.processScheduledBroadcasts(),
+      InAppManagerService.processScheduledInAppBroadcasts(),
+    ])
+
     return NextResponse.json({
       success: true,
-      processed: result.processed,
-      errors: result.errors,
+      emailBroadcasts: {
+        processed: emailResult.processed,
+        errors: emailResult.errors,
+      },
+      inAppBroadcasts: {
+        processed: inAppResult.processed,
+        errors: inAppResult.errors,
+      },
       timestamp: new Date().toISOString(),
     })
   } catch (err) {

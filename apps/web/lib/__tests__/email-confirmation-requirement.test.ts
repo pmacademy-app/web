@@ -69,8 +69,35 @@ vi.mock('@/lib/supabase', () => {
             },
           }
         }
+        if (table === 'in_app_notifications') {
+          return {
+            select: () => ({
+              eq: () => ({
+                eq: () => ({
+                  maybeSingle: () => Promise.resolve({ data: null, error: null }),
+                }),
+                maybeSingle: () => Promise.resolve({ data: null, error: null }),
+              }),
+            }),
+            insert: () => ({
+              select: () => ({
+                single: () => Promise.resolve({ data: { id: 'notif-mock-1' }, error: null }),
+              }),
+            }),
+          }
+        }
         return {
-          select: () => ({ eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }) }),
+          select: () => ({
+            eq: () => ({
+              eq: () => ({ maybeSingle: () => Promise.resolve({ data: null, error: null }) }),
+              maybeSingle: () => Promise.resolve({ data: null, error: null }),
+            }),
+          }),
+          insert: () => ({
+            select: () => ({
+              single: () => Promise.resolve({ data: { id: 'mock-id' }, error: null }),
+            }),
+          }),
         }
       },
       auth: {
