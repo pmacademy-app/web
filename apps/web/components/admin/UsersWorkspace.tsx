@@ -82,6 +82,18 @@ export function UsersWorkspace({
       'activeTo',
       'sort',
       'sortDir',
+      // Extended filter keys
+      'onboardingStatus',
+      'experienceLevels',
+      'goals',
+      'topics',
+      'learningPreference',
+      'activeLastDays',
+      'inactiveLastDays',
+      'marketingEmailOptIn',
+      'excludeIfReceivedTemplate',
+      'onlyIfReceivedTemplate',
+      'excludeBroadcastId',
     ]) {
       next.delete(key)
     }
@@ -144,8 +156,6 @@ export function UsersWorkspace({
     },
     {
       header: 'Progress',
-      sortable: true,
-      sortKey: 'progressPct',
       cell: (user) => (
         <div className="w-28">
           <AdminProgressBar value={user.progressPct} showValue={false} />

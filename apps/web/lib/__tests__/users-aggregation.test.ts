@@ -169,7 +169,79 @@ describe('Users Workspace Aggregation Unit Test Suite', () => {
     expect(chips.includes('Level 4+')).toBe(true)
   })
 
+  it('parseUserFilters handles extended broadcast and onboarding filters', () => {
+    const filters = parseUserFilters({
+      onboardingStatus: 'completed',
+      experienceLevels: 'beginner,learning',
+      goals: 'become_pm,transition_pm',
+      topics: 'discovery,strategy',
+      learningPreference: 'structured',
+      activeLastDays: '14',
+      inactiveLastDays: '60',
+      marketingEmailOptIn: 'true',
+      excludeIfReceivedTemplate: 'inactive.resume_learning',
+      onlyIfReceivedTemplate: 'auth.welcome',
+      excludeBroadcastId: 'bc-123',
+    })
+
+    expect(filters.onboardingStatus).toBe('completed')
+    expect(filters.experienceLevels).toEqual(['beginner', 'learning'])
+    expect(filters.goals).toEqual(['become_pm', 'transition_pm'])
+    expect(filters.topics).toEqual(['discovery', 'strategy'])
+    expect(filters.learningPreference).toBe('structured')
+    expect(filters.activeLastDays).toBe(14)
+    expect(filters.inactiveLastDays).toBe(60)
+    expect(filters.marketingEmailOptIn).toBe(true)
+    expect(filters.excludeIfReceivedTemplate).toBe('inactive.resume_learning')
+    expect(filters.onlyIfReceivedTemplate).toBe('auth.welcome')
+    expect(filters.excludeBroadcastId).toBe('bc-123')
+  })
+
+  it('serializeUserFilters round-trips extended filters through parseUserFilters', () => {
+    const filters = {
+      onboardingStatus: 'completed' as const,
+      experienceLevels: ['beginner', 'learning'],
+      goals: ['become_pm'],
+      topics: ['discovery', 'roadmapping'],
+      learningPreference: 'case_studies',
+      activeLastDays: 7,
+      marketingEmailOptIn: true,
+      excludeIfReceivedTemplate: 'inactive.resume_learning',
+    }
+    const serialized = serializeUserFilters(filters)
+    const reparsed = parseUserFilters(serialized)
+    expect(reparsed.onboardingStatus).toBe(filters.onboardingStatus)
+    expect(reparsed.experienceLevels).toEqual(filters.experienceLevels)
+    expect(reparsed.goals).toEqual(filters.goals)
+    expect(reparsed.topics).toEqual(filters.topics)
+    expect(reparsed.learningPreference).toBe(filters.learningPreference)
+    expect(reparsed.activeLastDays).toBe(filters.activeLastDays)
+    expect(reparsed.marketingEmailOptIn).toBe(true)
+    expect(reparsed.excludeIfReceivedTemplate).toBe(filters.excludeIfReceivedTemplate)
+  })
+
+  it('describeUserFilter includes chips for extended filters', () => {
+    const chips = describeUserFilter({
+      onboardingStatus: 'completed',
+      experienceLevels: ['beginner', 'learning'],
+      goals: ['become_pm'],
+      topics: ['discovery'],
+      learningPreference: 'structured',
+      activeLastDays: 14,
+      marketingEmailOptIn: true,
+      excludeIfReceivedTemplate: 'inactive.resume_learning',
+    })
+    expect(chips.includes('Onboarding done')).toBe(true)
+    expect(chips.includes('Experience: beginner, learning')).toBe(true)
+    expect(chips.includes('Goal: become_pm')).toBe(true)
+    expect(chips.includes('Topics: discovery')).toBe(true)
+    expect(chips.includes('Pref: structured')).toBe(true)
+    expect(chips.includes('Active in last 14d')).toBe(true)
+    expect(chips.includes('Marketing opt-in')).toBe(true)
+    expect(chips.includes('Exclude: received inactive.resume_learning')).toBe(true)
+  })
+
   it('TOTAL_LESSONS matches the curriculum denominator', () => {
     expect(TOTAL_LESSONS).toBe(90)
   })
-})
+})

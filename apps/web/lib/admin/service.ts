@@ -10,6 +10,7 @@ import {
   computeQuizAvgScore,
   TOTAL_LESSONS,
 } from './users-aggregation'
+import { applyUserFilters, resolveFilteredUserIds } from './user-filter-query'
 import type {
   AdminSystemHealth,
   AdminUserOverview,
@@ -160,17 +161,14 @@ export class AdminConsoleService {
   }
 
   /**
-   * Fetches paginated user list with role, activity status, and verification status.
-   * Merges Supabase Auth users (auth.users) with public.users profiles to capture unverified accounts.
+   * Fetches paginated user list with all filters applied server-side.
    *
-   * Filtering, sorting, and pagination are applied in memory over the merged set
-   * (the auth-users merge prevents SQL-side pagination across both sources).
-   * At launch scale this is fine; revisit with SQL-side aggregation before
-   * significant growth (see Phase 2 dashboard notes).
-   */
-  /**
-   * Fetches paginated user list with role, activity status, and verification status.
-   * Uses server-side SQL pagination, filtering, and page-scoped batch enrichment.
+   * Delegates filter resolution to the shared `applyUserFilters` layer in
+   * `user-filter-query.ts`. This ensures the Users workspace and Email Broadcasts
+   * use identical filtering logic so preview counts exactly match send lists.
+   *
+   * Search (name/email/username ilike) is applied as an additional constraint
+   * after the shared filter IDs are resolved.
    */
   public static async getUsersOverview(
     limit = 50,
@@ -182,16 +180,28 @@ export class AdminConsoleService {
     const supabase = (supabaseClient as ReturnType<typeof createServiceRoleClient>) || createServiceRoleClient()
 
     try {
+      // 1. Resolve all filter sub-queries (verification, activity, progress, etc.)
+      //    to get the constraint ID set. This is the fixed filtering layer.
+      const { ids: constraintIds } = await resolveFilteredUserIds(filters, supabase)
+
+      // 2. Build the main users query with direct column filters + constraint IDs.
       let query = (supabase.from('users') as unknown as DBChain)
         .select('*', { count: 'exact' })
 
-      // Server-side search
+      if (constraintIds !== null) {
+        if (constraintIds.size === 0) {
+          return { users: [], total: 0 }
+        }
+        query = query.in('id', [...constraintIds])
+      }
+
+      // Search (applied alongside ID constraint)
       if (search && typeof search === 'string' && search.trim()) {
         const q = search.trim()
         query = query.or(`name.ilike.%${q}%,email.ilike.%${q}%,username.ilike.%${q}%`)
       }
 
-      // Server-side filters
+      // Direct column filters (fast — applied on DB, not via sub-query)
       if (filters.role) {
         query = query.eq('is_admin', filters.role === 'admin')
       }
@@ -199,25 +209,38 @@ export class AdminConsoleService {
         query = query.gte('level', filters.minLevel)
       }
       if (filters.joinedFrom) {
-        query = query.gte('created_at', filters.joinedFrom)
+        query = query.gte('created_at', `${filters.joinedFrom}T00:00:00.000Z`)
       }
       if (filters.joinedTo) {
-        query = query.lte('created_at', filters.joinedTo)
+        query = query.lte('created_at', `${filters.joinedTo}T23:59:59.999Z`)
+      }
+      if (filters.onboardingStatus) {
+        query = query.eq('onboarding_completed', filters.onboardingStatus === 'completed')
+      }
+      if (filters.experienceLevels && filters.experienceLevels.length > 0) {
+        query = query.in('career_role', filters.experienceLevels)
+      }
+      if (filters.goals && filters.goals.length > 0) {
+        query = query.in('goal', filters.goals)
+      }
+      if (filters.topics && filters.topics.length > 0) {
+        query = query.overlaps('onboarding_topics', filters.topics)
+      }
+      if (filters.learningPreference) {
+        query = query.eq('onboarding_preference', filters.learningPreference)
       }
 
-      // Server-side sort
+      // Sort (server-sortable columns only)
       const sortColumnMap: Record<string, string> = {
         createdAt: 'created_at',
         totalXp: 'total_xp',
         level: 'level',
         streakDays: 'current_streak',
-        fullName: 'name',
-        email: 'email',
       }
       const sortCol = sortColumnMap[filters.sort || 'createdAt'] || 'created_at'
       query = query.order(sortCol, { ascending: filters.sortDir === 'asc' })
 
-      // Server-side range pagination
+      // Pagination
       const offset = (page - 1) * limit
       const { data: rawUsers, error, count } = (await query.range(offset, offset + limit - 1)) as unknown as {
         data: Record<string, unknown>[] | null
@@ -225,9 +248,7 @@ export class AdminConsoleService {
         count: number | null
       }
 
-      if (error) {
-        throw error
-      }
+      if (error) throw error
 
       const publicRows = rawUsers || []
       const pageUserIds = publicRows.map((r) => String(r.id)).filter(Boolean)
@@ -236,7 +257,7 @@ export class AdminConsoleService {
         return { users: [], total: count ?? 0 }
       }
 
-      // Page-scoped batch queries (no full-table scans)
+      // 3. Page-scoped enrichment queries (display metadata only — not used for filtering)
       const [completedRes, lastActiveRes, completionBadgeRes, authLookups] = await Promise.all([
         (supabase.from('user_lesson_progress') as unknown as DBChain)
           .select('user_id')

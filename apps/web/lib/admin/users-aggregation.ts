@@ -145,6 +145,12 @@ export function parseUserFilters(
     const value = params[key]
     return typeof value === 'string' ? value : undefined
   }
+  const getArr = (key: string): string[] | undefined => {
+    const value = params[key]
+    if (typeof value === 'string' && value.trim()) return value.split(',')
+    if (Array.isArray(value) && value.length > 0) return value as string[]
+    return undefined
+  }
 
   const verification = get('verification')
   const role = get('role')
@@ -154,6 +160,12 @@ export function parseUserFilters(
   const minLevel = minLevelRaw ? Number.parseInt(minLevelRaw, 10) : undefined
   const sort = get('sort')
   const sortDir = get('sortDir')
+  const activeLastDaysRaw = get('activeLastDays')
+  const activeLastDays = activeLastDaysRaw ? Number.parseInt(activeLastDaysRaw, 10) : undefined
+  const inactiveLastDaysRaw = get('inactiveLastDays')
+  const inactiveLastDays = inactiveLastDaysRaw ? Number.parseInt(inactiveLastDaysRaw, 10) : undefined
+  const marketingOptInRaw = get('marketingEmailOptIn')
+  const onboardingStatus = get('onboardingStatus')
 
   return {
     verification: verification === 'verified' || verification === 'unverified' ? verification : undefined,
@@ -166,10 +178,23 @@ export function parseUserFilters(
     activeFrom: validIsoDate(get('activeFrom')),
     activeTo: validIsoDate(get('activeTo')),
     sort:
-      sort === 'createdAt' || sort === 'lastActiveAt' || sort === 'totalXp' || sort === 'level' || sort === 'streakDays' || sort === 'progressPct'
+      sort === 'createdAt' || sort === 'totalXp' || sort === 'level' || sort === 'streakDays'
         ? sort
         : undefined,
     sortDir: sortDir === 'asc' || sortDir === 'desc' ? sortDir : undefined,
+    // Extended filters
+    onboardingStatus:
+      onboardingStatus === 'completed' || onboardingStatus === 'incomplete' ? onboardingStatus : undefined,
+    experienceLevels: getArr('experienceLevels'),
+    goals: getArr('goals'),
+    topics: getArr('topics'),
+    learningPreference: get('learningPreference'),
+    activeLastDays: activeLastDays && Number.isFinite(activeLastDays) && activeLastDays > 0 ? activeLastDays : undefined,
+    inactiveLastDays: inactiveLastDays && Number.isFinite(inactiveLastDays) && inactiveLastDays > 0 ? inactiveLastDays : undefined,
+    marketingEmailOptIn: marketingOptInRaw === 'true' ? true : undefined,
+    excludeIfReceivedTemplate: get('excludeIfReceivedTemplate'),
+    onlyIfReceivedTemplate: get('onlyIfReceivedTemplate'),
+    excludeBroadcastId: get('excludeBroadcastId'),
   }
 }
 
@@ -187,6 +212,18 @@ export function serializeUserFilters(filters: AdminUserFilters): Record<string, 
   if (filters.activeTo) params.activeTo = filters.activeTo
   if (filters.sort) params.sort = filters.sort
   if (filters.sortDir) params.sortDir = filters.sortDir
+  // Extended filters
+  if (filters.onboardingStatus) params.onboardingStatus = filters.onboardingStatus
+  if (filters.experienceLevels?.length) params.experienceLevels = filters.experienceLevels.join(',')
+  if (filters.goals?.length) params.goals = filters.goals.join(',')
+  if (filters.topics?.length) params.topics = filters.topics.join(',')
+  if (filters.learningPreference) params.learningPreference = filters.learningPreference
+  if (filters.activeLastDays !== undefined) params.activeLastDays = String(filters.activeLastDays)
+  if (filters.inactiveLastDays !== undefined) params.inactiveLastDays = String(filters.inactiveLastDays)
+  if (filters.marketingEmailOptIn === true) params.marketingEmailOptIn = 'true'
+  if (filters.excludeIfReceivedTemplate) params.excludeIfReceivedTemplate = filters.excludeIfReceivedTemplate
+  if (filters.onlyIfReceivedTemplate) params.onlyIfReceivedTemplate = filters.onlyIfReceivedTemplate
+  if (filters.excludeBroadcastId) params.excludeBroadcastId = filters.excludeBroadcastId
   return params
 }
 
@@ -196,6 +233,8 @@ export function describeUserFilter(filters: AdminUserFilters): string[] {
   if (filters.verification) chips.push(filters.verification === 'verified' ? 'Verified' : 'Unverified')
   if (filters.role) chips.push(filters.role === 'admin' ? 'Admins' : 'Learners')
   if (filters.activity) chips.push(filters.activity === 'active' ? 'Active (30d)' : 'Inactive (30d)')
+  if (filters.activeLastDays) chips.push(`Active in last ${filters.activeLastDays}d`)
+  if (filters.inactiveLastDays) chips.push(`Inactive for ${filters.inactiveLastDays}d`)
   if (filters.progress) {
     chips.push(
       filters.progress === 'none' ? 'No progress' : filters.progress === 'started' ? 'In progress' : 'Completed'
@@ -208,5 +247,14 @@ export function describeUserFilter(filters: AdminUserFilters): string[] {
   if (filters.activeFrom || filters.activeTo) {
     chips.push(`Active ${filters.activeFrom || '…'} → ${filters.activeTo || '…'}`)
   }
+  if (filters.onboardingStatus) chips.push(filters.onboardingStatus === 'completed' ? 'Onboarding done' : 'Onboarding incomplete')
+  if (filters.experienceLevels?.length) chips.push(`Experience: ${filters.experienceLevels.join(', ')}`)
+  if (filters.goals?.length) chips.push(`Goal: ${filters.goals.join(', ')}`)
+  if (filters.topics?.length) chips.push(`Topics: ${filters.topics.join(', ')}`)
+  if (filters.learningPreference) chips.push(`Pref: ${filters.learningPreference}`)
+  if (filters.marketingEmailOptIn) chips.push('Marketing opt-in')
+  if (filters.excludeIfReceivedTemplate) chips.push(`Exclude: received ${filters.excludeIfReceivedTemplate}`)
+  if (filters.onlyIfReceivedTemplate) chips.push(`Only: received ${filters.onlyIfReceivedTemplate}`)
+  if (filters.excludeBroadcastId) chips.push('Exclude prior broadcast')
   return chips
 }
