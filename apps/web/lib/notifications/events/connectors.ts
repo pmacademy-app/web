@@ -29,6 +29,9 @@ export function initializeNotificationConnectors(force: boolean = false): void {
     'lesson.completed',
     'srs.review_due',
     'capstone.submitted',
+    'quiz.completed',
+    'streak.updated',
+    'review.completed',
   ] as const
 
   for (const eventType of IN_APP_EVENTS) {
@@ -69,24 +72,9 @@ export function initializeNotificationConnectors(force: boolean = false): void {
     })
   })
 
-  // 2. Auth: user.verified -> auth.verify_email
-  d.registerHandler('user.verified', 'connector.auth.verify_email', async (event: EventEnvelope<Record<string, unknown>>) => {
-    await enqueueNotificationItem({
-      userId: event.userId,
-      toEmail: event.userEmail,
-      toName: event.userName,
-      channel: 'email',
-      templateKey: 'auth.verify_email',
-      templateVariables: {
-        userName: event.userName || 'Learner',
-        verificationUrl: event.payload.verificationUrl || `${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/auth/callback`,
-      },
-      eventId: event.id,
-      eventType: event.event,
-      category: 'security',
-      priorityLevel: 'high',
-    })
-  })
+  // Note: user.verified is decoupled from sending auth.verify_email (which sent a verification link).
+  // Verification emails are delivered via Supabase Auth hook (/api/auth/send-email-hook).
+  // user.verified is handled strictly as an in-app notification upon confirmation.
 
   // 3. Auth: password.reset_requested -> auth.password_reset
   d.registerHandler('password.reset_requested', 'connector.auth.password_reset', async (event: EventEnvelope<Record<string, unknown>>) => {

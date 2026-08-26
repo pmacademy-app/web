@@ -115,6 +115,39 @@ export async function updateUserStreak(
             console.error('[streaks-db] Error logging streak XP event:', xpError)
           }
         }
+
+        const milestoneDays = [3, 7, 14, 30, 60, 90, 100, 365]
+        if (milestoneDays.includes(result.currentStreak)) {
+          try {
+            const { data: userRec } = await (supabase
+              .from('users') as unknown as DBChain)
+              .select('email, name')
+              .eq('id', userId)
+              .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+
+            const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
+            const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
+            initializeNotificationConnectors()
+
+            await globalNotificationDispatcher.dispatch({
+              id: `streak-${userId}-${result.currentStreak}-${result.todayStr}`,
+              event: 'streak.updated',
+              userId,
+              userEmail: userRec?.email || '',
+              userName: userRec?.name || 'Learner',
+              userTimezone: timezone || 'UTC',
+              priority: 'low',
+              category: 'learning',
+              occurredAt: new Date().toISOString(),
+              payload: {
+                userId,
+                currentStreak: result.currentStreak,
+              },
+            })
+          } catch (notifErr) {
+            console.warn('[streaks-db] Streak updated notification dispatch warning:', notifErr)
+          }
+        }
       }
     }
   } catch (err) {
