@@ -489,6 +489,21 @@ export async function applyUserFilters(
 }
 
 /**
+ * Returns all matching user IDs (unpaginated / bulk) for a given filter set.
+ * Used for targeted broadcast and in-app execution.
+ */
+export async function queryUserIds(
+  filters: AdminUserFilters,
+  supabaseClient?: SupabaseClient
+): Promise<UserFilterResult> {
+  const result = await applyUserFilters(filters, { page: 1, pageSize: 200000, supabaseClient })
+  return {
+    userIds: result.userIds,
+    total: result.total,
+  }
+}
+
+/**
  * Returns the total count of users matching all filters.
  * Used for broadcast recipient preview ("Estimated recipients: 1,248").
  * Calls the same logic as the actual broadcast execution.
