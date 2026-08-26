@@ -128,7 +128,7 @@ export async function enqueueNotificationItem(
         scheduled_at: now,
         created_at: now,
         updated_at: now,
-        ...(params.broadcastId ? { broadcast_id: params.broadcastId } : {}),
+        broadcast_id: params.broadcastId || null,
       })
       .select('id')
       .single()
