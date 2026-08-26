@@ -59,13 +59,14 @@ export async function PATCH(
 
     const item = await InAppManagerService.updateBroadcast(id, parsed.data as never)
 
-    await logAdminAction({
-      adminUserId: auth.userId,
-      adminEmail: auth.email || '',
-      action: 'in_app_notification_updated',
-      targetId: id,
-      details: parsed.data,
-    })
+    await logAdminAction(
+      auth.userId,
+      auth.email || '',
+      'in_app_notification_updated',
+      'in_app_broadcast',
+      id,
+      parsed.data
+    )
 
     return NextResponse.json({ success: true, item })
   } catch (err) {
@@ -91,12 +92,13 @@ export async function DELETE(
     return NextResponse.json({ error: res.error || 'Delete failed' }, { status: 400 })
   }
 
-  await logAdminAction({
-    adminUserId: auth.userId,
-    adminEmail: auth.email || '',
-    action: 'in_app_notification_deleted',
-    targetId: id,
-  })
+  await logAdminAction(
+    auth.userId,
+    auth.email || '',
+    'in_app_notification_deleted',
+    'in_app_broadcast',
+    id
+  )
 
   return NextResponse.json({ success: true })
 }
