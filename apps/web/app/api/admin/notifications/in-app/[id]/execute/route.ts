@@ -29,7 +29,7 @@ export async function POST(
       { targeted: res.targeted, delivered: res.delivered }
     )
 
-    return NextResponse.json({ success: true, ...res })
+    return NextResponse.json(res)
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Execution failed' },
