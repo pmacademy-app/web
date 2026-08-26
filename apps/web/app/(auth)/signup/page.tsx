@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Mail, CheckCircle2, Clock, ShieldCheck } from 'lucide-react'
-import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
@@ -60,48 +59,27 @@ export default function SignupPage() {
 
     startTransition(async () => {
       try {
-        const supabase = createBrowserSupabaseClient()
-        const origin = window.location.origin
-
-        const { data, error } = await supabase.auth.signUp({
-          email: values.email,
-          password: values.password,
-          options: {
-            data: { full_name: values.name },
-            // token_hash + type are appended by Supabase; next= tells our callback where to redirect
-            emailRedirectTo: `${origin}/api/auth/callback?next=/verified`,
-          },
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values),
         })
 
-        const isExistingAccountError =
-          Boolean(error && (
-            error.message?.toLowerCase().includes('already registered') ||
-            error.message?.toLowerCase().includes('already in use') ||
-            error.message?.toLowerCase().includes('already exists')
-          )) ||
-          Boolean(data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
+        const json = await res.json()
 
-        if (isExistingAccountError) {
-          const classified = classifyAuthError(new Error('User already registered'), 'signup')
+        if (!res.ok || !json.success) {
+          const classified = classifyAuthError(new Error(json.error || 'Registration failed'), 'signup')
           setAuthError(classified)
           recordAuthTelemetry(classified, 'signup')
           return
         }
 
-        if (error) {
-          const classified = classifyAuthError(error, 'signup')
-          setAuthError(classified)
-          recordAuthTelemetry(classified, 'signup')
-          return
-        }
-
-        // If email confirmation is disabled, user is immediately logged in
-        if (data.session) {
-          router.push('/dashboard')
-          router.refresh()
-        } else {
+        if (json.verificationRequired) {
           setSubmittedEmail(values.email)
           setVerificationPending(true)
+        } else {
+          router.push(json.redirect || '/dashboard')
+          router.refresh()
         }
       } catch (err) {
         console.error('[signup] Error registering:', err)

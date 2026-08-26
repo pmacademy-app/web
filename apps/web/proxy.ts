@@ -195,6 +195,16 @@ export async function proxy(request: NextRequest) {
       return newSession ? withSessionCookies(response, newSession) : response
     }
 
+    // Email verification check for learner protected routes
+    if (!isAdminArea && !(await isAdmin())) {
+      const { SettingsService } = await import('@/lib/admin/settings-service')
+      const isVerificationRequired = await SettingsService.isEmailVerificationRequired()
+      if (isVerificationRequired && !user.email_confirmed_at) {
+        const response = NextResponse.redirect(new URL('/login?error=email_not_confirmed', request.url))
+        return newSession ? withSessionCookies(response, newSession) : response
+      }
+    }
+
     const isOnboardingComplete = !!user.user_metadata?.onboarding_complete
     const isOnboardingPage = path === '/onboarding'
 

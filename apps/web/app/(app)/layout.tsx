@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile, UserProfile } from '@/lib/auth'
+import { SettingsService } from '@/lib/admin/settings-service'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
 import { QuickStartProvider } from '@/components/quick-start/QuickStartContext'
@@ -34,6 +35,12 @@ export default async function AuthenticatedLayout({
   const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
   if (authError || !authUser) {
     redirect('/login')
+  }
+
+  // Enforce email verification requirement when enabled
+  const isVerificationRequired = await SettingsService.isEmailVerificationRequired()
+  if (isVerificationRequired && !authUser.email_confirmed_at) {
+    redirect('/login?error=email_not_confirmed')
   }
 
   // Fetch the public.users record

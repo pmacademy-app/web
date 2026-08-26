@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
@@ -63,45 +62,26 @@ function LoginForm() {
 
     startTransition(async () => {
       try {
-        const supabase = createBrowserSupabaseClient()
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: values.email,
-          password: values.password,
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values),
         })
 
-        if (error) {
-          const classified = classifyAuthError(error, 'login')
+        const json = await res.json()
+
+        if (!res.ok || !json.success) {
+          const classified = classifyAuthError(new Error(json.error || 'Authentication failed'), 'login')
+          if (json.requiresVerification) {
+            classified.requiresAction = 'verify_email'
+            classified.code = 'AUTH_EMAIL_NOT_CONFIRMED'
+          }
           setAuthError(classified)
           recordAuthTelemetry(classified, 'login')
           return
         }
 
-        // Explicitly sync session to HTTP-only cookies BEFORE navigating.
-        // This eliminates the race condition where the server renders /dashboard
-        // before AuthStateListener writes the cookie.
-        if (data?.session) {
-          try {
-            const syncRes = await fetch('/api/auth/session', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ session: data.session }),
-            })
-            if (!syncRes.ok) {
-              const syncError = classifyAuthError(new Error('Session initialization failed'), 'session_sync')
-              setAuthError(syncError)
-              recordAuthTelemetry(syncError, 'session_sync')
-              return
-            }
-          } catch (syncErr) {
-            console.error('[login] Session sync network error:', syncErr)
-            const syncError = classifyAuthError(syncErr, 'session_sync')
-            setAuthError(syncError)
-            recordAuthTelemetry(syncError, 'session_sync')
-            return
-          }
-        }
-
-        router.push('/dashboard')
+        router.push(json.redirect || '/dashboard')
         router.refresh()
       } catch (err) {
         console.error('[login] Error logging in:', err)
