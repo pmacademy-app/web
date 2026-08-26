@@ -42,6 +42,11 @@ type EventMap = {
   capstone_submit:          { module_slug: string; module_title?: string }
   badge_earn:               { badge_id: string; badge_name?: string }
   level_up:                 { level: number; level_title?: string }
+
+  // ─── First-Session Activation Events (Phase 2) ───────────────────────────
+  first_session_started:    { lesson_id?: string; module_slug?: string }
+  first_lesson_completed:   { lesson_id: string; xp_earned?: number }
+  first_reward_celebrated:  { lesson_id: string; xp_earned?: number }
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -153,5 +158,23 @@ export function trackBadgeEarned(badgeId: string, badgeName?: string) {
 export function trackLevelUp(level: number, levelTitle?: string) {
   trackEvent('level_up', { level, level_title: levelTitle })
 }
+
+// ─── First-Session Activation Trackers (Phase 2) ────────────────────────────
+
+/** Fired when a new learner starts their first session via the kickoff card. */
+export function trackFirstSessionStarted(params?: { lesson_id?: string; module_slug?: string }) {
+  trackEvent('first_session_started', params)
+}
+
+/** Fired when a learner completes their very first lesson. */
+export function trackFirstLessonCompleted(lessonId: string, xpEarned?: number) {
+  trackEvent('first_lesson_completed', { lesson_id: lessonId, xp_earned: xpEarned })
+}
+
+/** Fired when the first-session reward celebration modal is displayed. */
+export function trackFirstRewardCelebrated(lessonId: string, xpEarned?: number) {
+  trackEvent('first_reward_celebrated', { lesson_id: lessonId, xp_earned: xpEarned })
+}
+
 
 

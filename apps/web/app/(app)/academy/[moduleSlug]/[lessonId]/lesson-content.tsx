@@ -38,7 +38,9 @@ import {
   trackTheoryRead,
   trackQuizCompleted,
   trackLessonCompleted,
+  trackFirstLessonCompleted,
 } from '@/lib/analytics'
+import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSessionCelebrationModal'
 
 
 
@@ -320,6 +322,8 @@ export default function LessonPageContent({
   const [activeTab, setActiveTab] = useState<TabType>('theory')
   const [completedThisSession, setCompletedThisSession] = useState(false)
   const [theorySubmitting, setTheorySubmitting] = useState(false)
+  const [showFirstSessionCelebration, setShowFirstSessionCelebration] = useState(false)
+  const [celebrationXp, setCelebrationXp] = useState(50)
   const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
   const hasTrackedStartRef = useRef(false)
 
@@ -355,8 +359,30 @@ export default function LessonPageContent({
       const res = await recordQuizAttempt(attempts)
       if (res) {
         trackQuizCompleted(lesson.id, res.score)
-        if (res.isCompleted) {
+        if (res.isCompleted || res.success) {
           trackLessonCompleted(lesson.id, lesson.title, res.xpEarned)
+
+          // Check if this was the learner's very first completed lesson
+          if (res.isFirstLesson) {
+            trackFirstLessonCompleted(lesson.id, res.xpEarned)
+
+            // Deduplication lock: celebrate once per learner browser/session
+            try {
+              const alreadyCelebrated =
+                typeof window !== 'undefined' &&
+                localStorage.getItem('prodily_first_session_celebrated') === 'true'
+
+              if (!alreadyCelebrated) {
+                localStorage.setItem('prodily_first_session_celebrated', 'true')
+                setCelebrationXp(res.xpEarned || 50)
+                setShowFirstSessionCelebration(true)
+              }
+            } catch {
+              // LocalStorage unavailable - fallback to in-memory trigger
+              setCelebrationXp(res.xpEarned || 50)
+              setShowFirstSessionCelebration(true)
+            }
+          }
         }
       }
       return res
@@ -715,6 +741,14 @@ export default function LessonPageContent({
           <div className="hidden sm:block" />
         )}
       </div>
+
+      <FirstSessionCelebrationModal
+        isOpen={showFirstSessionCelebration}
+        onClose={() => setShowFirstSessionCelebration(false)}
+        lessonId={lesson.id}
+        xpEarned={celebrationXp}
+        nextLessonUrl={nextLessonUrl}
+      />
     </div>
   )
 }
