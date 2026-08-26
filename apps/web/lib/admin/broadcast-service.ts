@@ -352,11 +352,20 @@ export class BroadcastService {
       '@/lib/notifications/queue/processor'
     )
 
-    // Get the claimed page of matching user IDs using the shared filter layer
-    const { userIds, total } = await applyUserFilters(filters, {
-      page: targetBatchIndex,
-      pageSize: batchSize,
-    })
+    // Stable candidate audience: exclude already-sent recipients for this broadcast and take page 1 of remaining un-sent matching candidates
+    const { userIds, total: remainingCount } = await applyUserFilters(
+      { ...filters, excludeBroadcastId: broadcastId },
+      {
+        page: 1,
+        pageSize: batchSize,
+      }
+    )
+
+    // Calculate initial total recipients if not yet set
+    let campaignTotal = broadcast.total_recipients
+    if (campaignTotal === null || campaignTotal === undefined) {
+      campaignTotal = await countMatchingUsers(filters)
+    }
 
     // Mark broadcast as sending and set total if first batch
     if (broadcast.status !== 'sending' || broadcast.total_recipients === null) {
@@ -364,7 +373,7 @@ export class BroadcastService {
         .from('email_broadcasts')
         .update({
           status: 'sending',
-          total_recipients: total,
+          total_recipients: campaignTotal,
           started_at: broadcast.started_at || new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
@@ -446,8 +455,7 @@ export class BroadcastService {
     }
 
     const newBatchIndex = batchIndex + 1
-    const processedSoFar = newBatchIndex * batchSize
-    const isComplete = processedSoFar >= total || userIds.length < batchSize
+    const isComplete = userIds.length === 0 || remainingCount <= userIds.length
 
     const newStatus: BroadcastStatus = isComplete ? 'completed' : 'sending'
     const totalSent = broadcast.sent_count + sent
@@ -461,7 +469,7 @@ export class BroadcastService {
         failed_count: totalFailed,
         skipped_count: broadcast.skipped_count + skipped,
         last_batch_index: newBatchIndex,
-        total_recipients: total,
+        total_recipients: campaignTotal,
         completed_at: isComplete ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
       })
