@@ -420,34 +420,33 @@ export function AdminInAppNotificationView({
       {/* Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <AdminKpiCard
-          label="Total In-App Dispatches"
+          title="Total In-App Dispatches"
           value={metrics.totalCreated}
-          subtext="Admin notification campaigns"
+          subtitle="Admin notification campaigns"
           icon={Bell}
         />
         <AdminKpiCard
-          label="In-App Delivered"
+          title="In-App Delivered"
           value={metrics.totalDelivered}
-          subtext="Total inbox deliveries"
+          subtitle="Total inbox deliveries"
           icon={Send}
-          trend={metrics.totalDelivered > 0 ? 'up' : 'neutral'}
         />
         <AdminKpiCard
-          label="Total Read"
+          title="Total Read"
           value={metrics.totalRead}
-          subtext="Opened by learners"
+          subtitle="Opened by learners"
           icon={CheckCircle2}
         />
         <AdminKpiCard
-          label="Average Read Rate"
+          title="Average Read Rate"
           value={`${metrics.averageReadRate}%`}
-          subtext="Learner open engagement"
+          subtitle="Learner open engagement"
           icon={Sparkles}
         />
         <AdminKpiCard
-          label="Scheduled Alerts"
+          title="Scheduled Alerts"
           value={metrics.scheduledCount}
-          subtext="Awaiting future delivery"
+          subtitle="Awaiting future delivery"
           icon={Calendar}
         />
       </div>
@@ -456,7 +455,6 @@ export function AdminInAppNotificationView({
       <AdminSection
         title="In-App Notification Manager"
         icon={Bell}
-        description="Compose, target, schedule, and track notifications delivered directly to learner inboxes."
         actions={
           <button
             type="button"

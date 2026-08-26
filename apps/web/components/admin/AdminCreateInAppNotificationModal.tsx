@@ -62,14 +62,7 @@ export function AdminCreateInAppNotificationModal({
   const [expiresAt, setExpiresAt] = useState('')
 
   // Unified recipient filters
-  const [filters, setFilters] = useState<AdminUserFilters>({
-    verificationStatus: 'all',
-    role: 'all',
-    activity: 'all',
-    progress: 'all',
-    level: 'all',
-    onboardingStatus: 'all',
-  })
+  const [filters, setFilters] = useState<AdminUserFilters>({})
   const [showFilterPanel, setShowFilterPanel] = useState(false)
   const [recipientCount, setRecipientCount] = useState<number | null>(null)
   const [calculatingCount, setCalculatingCount] = useState(false)
@@ -410,20 +403,30 @@ export function AdminCreateInAppNotificationModal({
                       <label className="text-[10px] text-admin-fg-muted">Onboarding</label>
                       <select
                         value={filters.onboardingStatus || 'all'}
-                        onChange={(e) => setFilters({ ...filters, onboardingStatus: e.target.value as never })}
+                        onChange={(e) =>
+                          setFilters({
+                            ...filters,
+                            onboardingStatus: e.target.value === 'all' ? undefined : (e.target.value as 'completed' | 'incomplete'),
+                          })
+                        }
                         className="w-full px-2 py-1 text-[11px] bg-admin-surface-raised border border-admin-border rounded text-admin-fg"
                       >
                         <option value="all">All Statuses</option>
                         <option value="completed">Completed Onboarding</option>
-                        <option value="pending">Pending Onboarding</option>
+                        <option value="incomplete">Pending Onboarding</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="text-[10px] text-admin-fg-muted">Verification</label>
                       <select
-                        value={filters.verificationStatus || 'all'}
-                        onChange={(e) => setFilters({ ...filters, verificationStatus: e.target.value as never })}
+                        value={filters.verification || 'all'}
+                        onChange={(e) =>
+                          setFilters({
+                            ...filters,
+                            verification: e.target.value === 'all' ? undefined : (e.target.value as 'verified' | 'unverified'),
+                          })
+                        }
                         className="w-full px-2 py-1 text-[11px] bg-admin-surface-raised border border-admin-border rounded text-admin-fg"
                       >
                         <option value="all">All Learners</option>
@@ -436,7 +439,12 @@ export function AdminCreateInAppNotificationModal({
                       <label className="text-[10px] text-admin-fg-muted">Role</label>
                       <select
                         value={filters.role || 'all'}
-                        onChange={(e) => setFilters({ ...filters, role: e.target.value as never })}
+                        onChange={(e) =>
+                          setFilters({
+                            ...filters,
+                            role: e.target.value === 'all' ? undefined : (e.target.value as 'admin' | 'learner'),
+                          })
+                        }
                         className="w-full px-2 py-1 text-[11px] bg-admin-surface-raised border border-admin-border rounded text-admin-fg"
                       >
                         <option value="all">All Roles</option>
@@ -449,13 +457,17 @@ export function AdminCreateInAppNotificationModal({
                       <label className="text-[10px] text-admin-fg-muted">Activity</label>
                       <select
                         value={filters.activity || 'all'}
-                        onChange={(e) => setFilters({ ...filters, activity: e.target.value as never })}
+                        onChange={(e) =>
+                          setFilters({
+                            ...filters,
+                            activity: e.target.value === 'all' ? undefined : (e.target.value as 'active' | 'inactive'),
+                          })
+                        }
                         className="w-full px-2 py-1 text-[11px] bg-admin-surface-raised border border-admin-border rounded text-admin-fg"
                       >
                         <option value="all">Any Activity</option>
-                        <option value="active_7d">Active in last 7 days</option>
-                        <option value="active_30d">Active in last 30 days</option>
-                        <option value="inactive_30d">Inactive (30+ days)</option>
+                        <option value="active">Active (last 30d)</option>
+                        <option value="inactive">Inactive</option>
                       </select>
                     </div>
                   </div>

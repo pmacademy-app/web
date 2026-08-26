@@ -386,7 +386,7 @@ export class InAppManagerService {
 
     const { data, error } = await supabase
       .from('in_app_broadcasts')
-      .insert(payload)
+      .insert(payload as never)
       .select()
       .single()
 
@@ -446,7 +446,7 @@ export class InAppManagerService {
 
     const { data, error } = await supabase
       .from('in_app_broadcasts')
-      .update(updatePayload)
+      .update(updatePayload as never)
       .eq('id', id)
       .select()
       .single()
