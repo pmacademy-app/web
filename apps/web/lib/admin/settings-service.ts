@@ -325,11 +325,44 @@ export class SettingsService {
         value,
         updated_at: new Date().toISOString(),
       })
+      SettingsService.invalidateCache()
       return value
     } catch (err) {
       console.warn(`[SettingsService] upsertSettings(${section}) failed:`, err)
       throw new Error(`Failed to save ${section} settings`)
     }
+  }
+
+  // ─── Verification Cache & Helper ──────────────────────────────────────────
+
+  private static cachedVerificationRequired: { value: boolean; timestamp: number } | null = null
+  private static readonly CACHE_TTL_MS = 10_000 // 10 seconds TTL
+
+  /**
+   * Fast, resilient server-side check for email verification requirement.
+   * Returns true (require verification) if not explicitly set to false.
+   */
+  public static async isEmailVerificationRequired(): Promise<boolean> {
+    const now = Date.now()
+    if (this.cachedVerificationRequired && now - this.cachedVerificationRequired.timestamp < this.CACHE_TTL_MS) {
+      return this.cachedVerificationRequired.value
+    }
+
+    try {
+      const product = await this.getProductSettings()
+      const required = typeof product.requireEmailVerification === 'boolean' ? product.requireEmailVerification : true
+      this.cachedVerificationRequired = { value: required, timestamp: now }
+      return required
+    } catch {
+      return true
+    }
+  }
+
+  /**
+   * Manually invalidate settings cache (e.g. after Admin Panel save or in unit tests).
+   */
+  public static invalidateCache(): void {
+    this.cachedVerificationRequired = null
   }
 
   // ─── Public API ────────────────────────────────────────────────────────────
