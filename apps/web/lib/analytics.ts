@@ -33,6 +33,15 @@ type EventMap = {
   quick_start_completed:    Record<string, never>
   quick_start_skipped:      { at_step: number }
   quick_start_reopened:     Record<string, never>
+
+  // ─── Learning Lifecycle Events (Phase 1) ──────────────────────────────────
+  lesson_start:             { lesson_id: string; module_slug?: string }
+  theory_read:              { lesson_id: string; xp_earned?: number }
+  quiz_complete:            { lesson_id: string; score: number }
+  lesson_complete:          { lesson_id: string; lesson_title?: string; xp_earned?: number }
+  capstone_submit:          { module_slug: string; module_title?: string }
+  badge_earn:               { badge_id: string; badge_name?: string }
+  level_up:                 { level: number; level_title?: string }
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -107,4 +116,42 @@ export function trackQuickStartSkipped(atStep: number) {
 export function trackQuickStartReopened() {
   trackEvent('quick_start_reopened')
 }
+
+// ─── Learning Lifecycle Event Trackers (Phase 1) ─────────────────────────────
+
+/** Fired when a learner opens/starts a lesson. */
+export function trackLessonStarted(lessonId: string, moduleSlug?: string) {
+  trackEvent('lesson_start', { lesson_id: lessonId, module_slug: moduleSlug })
+}
+
+/** Fired when a learner completes reading the theory section. */
+export function trackTheoryRead(lessonId: string, xpEarned?: number) {
+  trackEvent('theory_read', { lesson_id: lessonId, xp_earned: xpEarned })
+}
+
+/** Fired when a learner completes a practice quiz attempt. */
+export function trackQuizCompleted(lessonId: string, score: number) {
+  trackEvent('quiz_complete', { lesson_id: lessonId, score })
+}
+
+/** Fired when a lesson status transitions to completed. */
+export function trackLessonCompleted(lessonId: string, lessonTitle?: string, xpEarned?: number) {
+  trackEvent('lesson_complete', { lesson_id: lessonId, lesson_title: lessonTitle, xp_earned: xpEarned })
+}
+
+/** Fired when a learner submits a module capstone project. */
+export function trackCapstoneSubmitted(moduleSlug: string, moduleTitle?: string) {
+  trackEvent('capstone_submit', { module_slug: moduleSlug, module_title: moduleTitle })
+}
+
+/** Fired when a learner earns an achievement badge. */
+export function trackBadgeEarned(badgeId: string, badgeName?: string) {
+  trackEvent('badge_earn', { badge_id: badgeId, badge_name: badgeName })
+}
+
+/** Fired when a learner advances to a new level. */
+export function trackLevelUp(level: number, levelTitle?: string) {
+  trackEvent('level_up', { level, level_title: levelTitle })
+}
+
 

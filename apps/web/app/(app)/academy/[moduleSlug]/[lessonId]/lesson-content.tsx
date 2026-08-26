@@ -33,6 +33,12 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
+import {
+  trackLessonStarted,
+  trackTheoryRead,
+  trackQuizCompleted,
+  trackLessonCompleted,
+} from '@/lib/analytics'
 
 
 
@@ -315,8 +321,17 @@ export default function LessonPageContent({
   const [completedThisSession, setCompletedThisSession] = useState(false)
   const [theorySubmitting, setTheorySubmitting] = useState(false)
   const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
+  const hasTrackedStartRef = useRef(false)
 
   const { setBreadcrumbs } = useBreadcrumbs()
+
+  // Track lesson start once per lesson mount
+  useEffect(() => {
+    if (!hasTrackedStartRef.current && lesson?.id) {
+      hasTrackedStartRef.current = true
+      trackLessonStarted(lesson.id, lesson.module)
+    }
+  }, [lesson.id, lesson.module])
 
   // Sync breadcrumbs with topbar — use globalOrder for correct display
   useEffect(() => {
@@ -337,9 +352,16 @@ export default function LessonPageContent({
 
   const handleQuizComplete = useCallback(
     async (attempts: { question_id: string; selected_option: number; is_correct: boolean }[]) => {
-      return await recordQuizAttempt(attempts)
+      const res = await recordQuizAttempt(attempts)
+      if (res) {
+        trackQuizCompleted(lesson.id, res.score)
+        if (res.isCompleted) {
+          trackLessonCompleted(lesson.id, lesson.title, res.xpEarned)
+        }
+      }
+      return res
     },
-    [recordQuizAttempt]
+    [lesson.id, lesson.title, recordQuizAttempt]
   )
 
   // Loading state
@@ -372,6 +394,7 @@ export default function LessonPageContent({
     setTheorySubmitting(true)
     try {
       await recordTheoryRead(activeSecondsRef.current, scrollPercentRef.current)
+      trackTheoryRead(lesson.id)
       setActiveTab('quiz')
     } catch {
       // Engagement threshold not met — still allow navigation
