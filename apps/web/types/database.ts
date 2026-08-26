@@ -39,6 +39,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      email_broadcasts: {
+        Row: {
+          batch_size: number
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          failed_count: number
+          id: string
+          last_batch_index: number
+          name: string
+          recipient_filters: Json
+          scheduled_at: string | null
+          sent_count: number
+          skipped_count: number
+          started_at: string | null
+          status: string
+          subject_override: string | null
+          template_key: string
+          total_recipients: number | null
+          updated_at: string
+        }
+        Insert: {
+          batch_size?: number
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          failed_count?: number
+          id?: string
+          last_batch_index?: number
+          name: string
+          recipient_filters?: Json
+          scheduled_at?: string | null
+          sent_count?: number
+          skipped_count?: number
+          started_at?: string | null
+          status?: string
+          subject_override?: string | null
+          template_key: string
+          total_recipients?: number | null
+          updated_at?: string
+        }
+        Update: {
+          batch_size?: number
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          failed_count?: number
+          id?: string
+          last_batch_index?: number
+          name?: string
+          recipient_filters?: Json
+          scheduled_at?: string | null
+          sent_count?: number
+          skipped_count?: number
+          started_at?: string | null
+          status?: string
+          subject_override?: string | null
+          template_key?: string
+          total_recipients?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_audit_logs: {
         Row: {
           action: string
@@ -431,6 +497,7 @@ export type Database = {
       email_queue: {
         Row: {
           attempt_count: number
+          broadcast_id: string | null
           created_at: string
           delivered_at: string | null
           error_message: string | null
@@ -455,6 +522,7 @@ export type Database = {
         }
         Insert: {
           attempt_count?: number
+          broadcast_id?: string | null
           created_at?: string
           delivered_at?: string | null
           error_message?: string | null
@@ -479,6 +547,7 @@ export type Database = {
         }
         Update: {
           attempt_count?: number
+          broadcast_id?: string | null
           created_at?: string
           delivered_at?: string | null
           error_message?: string | null

@@ -144,7 +144,7 @@ export class BroadcastService {
           subject_override: input.subject_override?.trim() || null,
           batch_size: input.batch_size ?? 100,
           status: 'draft',
-          recipient_filters: (input.recipient_filters ?? {}) as object,
+          recipient_filters: (input.recipient_filters ?? {}) as Json,
           created_by: input.created_by || null,
         })
         .select('*')
@@ -183,9 +183,9 @@ export class BroadcastService {
       if (input.template_key !== undefined) patch.template_key = input.template_key
       if (input.subject_override !== undefined) patch.subject_override = input.subject_override.trim() || null
       if (input.batch_size !== undefined) patch.batch_size = input.batch_size
-      if (input.recipient_filters !== undefined) patch.recipient_filters = input.recipient_filters as object
+      if (input.recipient_filters !== undefined) patch.recipient_filters = input.recipient_filters as unknown as Json
 
-      const { error } = await supabase.from('email_broadcasts').update(patch).eq('id', id)
+      const { error } = await supabase.from('email_broadcasts').update(patch as never).eq('id', id)
       if (error) throw error
       return { success: true }
     } catch (err) {
@@ -433,7 +433,7 @@ export class BroadcastService {
           eventId,
           eventType: 'admin.broadcast',
           category: 'learning',
-          priorityLevel: 'normal',
+          priorityLevel: 'bulk',
           broadcastId, // stored in email_queue.broadcast_id for deduplication
         })
 
@@ -454,7 +454,7 @@ export class BroadcastService {
       console.warn('[BroadcastService] processEmailQueue error (non-fatal):', err)
     }
 
-    const newBatchIndex = batchIndex + 1
+    const newBatchIndex = targetBatchIndex
     const isComplete = userIds.length === 0 || remainingCount <= userIds.length
 
     const newStatus: BroadcastStatus = isComplete ? 'completed' : 'sending'
