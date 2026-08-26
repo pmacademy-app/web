@@ -303,6 +303,8 @@ export async function recordQuizAttemptAction(
 
   await updateUserStreak(supabase, userId)
 
+  let totalCompletedLessons = 0
+
   try {
     const { data: userRec } = await (supabase
       .from('users') as unknown as DBChain)
@@ -356,9 +358,9 @@ export async function recordQuizAttemptAction(
       .select('lesson_id, status')
       .eq('user_id', userId) as unknown as { data: { lesson_id: string; status: string }[] | null }
 
-    const completedCount = userProgress?.filter((p) => p.status === 'completed').length || 0
-    if (completedCount > 0 && completedCount % 10 === 0) {
-      const moduleIndex = Math.floor(completedCount / 10)
+    totalCompletedLessons = userProgress?.filter((p) => p.status === 'completed').length || 0
+    if (totalCompletedLessons > 0 && totalCompletedLessons % 10 === 0) {
+      const moduleIndex = Math.floor(totalCompletedLessons / 10)
 
       await globalNotificationDispatcher.dispatch({
         id: `module-complete-${userId}-${moduleIndex}`,
@@ -384,6 +386,9 @@ export async function recordQuizAttemptAction(
 
   return {
     success: true,
+    isCompleted: true,
+    isFirstLesson: totalCompletedLessons === 1,
+    totalCompletedLessons,
     correctCount,
     totalQuestions,
     scorePercentage,
