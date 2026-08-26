@@ -2,13 +2,19 @@
 
 import React, { useCallback, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { RefreshCw } from 'lucide-react'
+import {
+  RefreshCw,
+  RotateCcw,
+  Play,
+  Loader2,
+} from 'lucide-react'
 import { AdminSection } from './AdminSection'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminEmailStatusBadge } from './AdminEmailStatusBadge'
 import { AdminSearchInput } from './AdminSearchInput'
 import { AdminPagination } from './AdminPagination'
 import { AdminDrawer } from './AdminDrawer'
+import { useAdminToast } from './admin-toast'
 import { cn } from '@/lib/utils'
 import type { AdminEmailHistoryItem, AdminEmailHistoryResult } from '@/lib/admin/communications-service'
 
@@ -25,21 +31,20 @@ const STATUS_TABS = [
   { key: 'dead_letter', label: 'Dead Letter' },
 ]
 
-/**
- * Operational email queue view (spec §38). Status tabs, search and pagination
- * are server-driven through the same `getEmailHistory` service used by the
- * Email dashboard, so the queue stays a real operational screen rather than a
- * static snapshot.
- */
 export function AdminQueueView({ history }: AdminQueueViewProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const { toast } = useAdminToast()
 
   const status = searchParams.get('status') || 'all'
   const q = searchParams.get('q') || ''
 
   const [selected, setSelected] = useState<AdminEmailHistoryItem | null>(null)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [isRetrying, setIsRetrying] = useState(false)
+  const [isRetryingSingle, setIsRetryingSingle] = useState(false)
 
   const createQueryString = useCallback(
     (updates: Record<string, string | null>) => {
@@ -61,18 +66,150 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
   )
 
   const handleStatusChange = (next: string) => {
+    setSelectedIds([])
     applyFilter({ status: next === 'all' ? null : next, page: null })
   }
 
   const handleSearch = (next: string) => {
+    setSelectedIds([])
     applyFilter({ q: next || null, page: null })
   }
 
   const handlePageChange = (next: number) => {
+    setSelectedIds([])
     applyFilter({ page: next === 1 ? null : String(next) })
   }
 
+  const handleToggleSelect = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    )
+  }
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === history.items.length) {
+      setSelectedIds([])
+    } else {
+      setSelectedIds(history.items.map((i) => i.id))
+    }
+  }
+
+  // 1. Process Queue Now
+  const handleProcessQueue = async () => {
+    setIsProcessing(true)
+    try {
+      const res = await fetch('/api/admin/emails/queue', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast(`Queue processed: ${data.result?.delivered || 0} delivered, ${data.result?.failed || 0} failed.`, 'success')
+        router.refresh()
+      } else {
+        toast(data.error || 'Failed to process queue', 'error')
+      }
+    } catch {
+      toast('Network error processing queue', 'error')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  // 2. Retry Single Item
+  const handleRetrySingle = async (id: string) => {
+    setIsRetryingSingle(true)
+    try {
+      const res = await fetch(`/api/admin/emails/queue/${encodeURIComponent(id)}/retry`, {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast(data.message || 'Item requeued for delivery.', 'success')
+        if (selected && selected.id === id) {
+          setSelected({ ...selected, status: 'pending', attemptCount: 0, errorMessage: null })
+        }
+        router.refresh()
+      } else {
+        toast(data.error || 'Retry failed', 'error')
+      }
+    } catch {
+      toast('Network error retrying email', 'error')
+    } finally {
+      setIsRetryingSingle(false)
+    }
+  }
+
+  // 3. Retry Selected
+  const handleRetrySelected = async () => {
+    if (selectedIds.length === 0) return
+    setIsRetrying(true)
+    try {
+      const res = await fetch('/api/admin/emails/queue/retry-selected', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast(data.message || `Requeued ${data.retried} email(s).`, 'success')
+        setSelectedIds([])
+        router.refresh()
+      } else {
+        toast(data.error || 'Batch retry failed', 'error')
+      }
+    } catch {
+      toast('Network error during batch retry', 'error')
+    } finally {
+      setIsRetrying(false)
+    }
+  }
+
+  // 4. Retry All Eligible
+  const handleRetryAll = async () => {
+    setIsRetrying(true)
+    try {
+      const res = await fetch('/api/admin/emails/queue/retry-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ statusFilter: status }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast(data.message || `Requeued ${data.retried} email(s).`, 'success')
+        router.refresh()
+      } else {
+        toast(data.error || 'Retry all failed', 'error')
+      }
+    } catch {
+      toast('Network error retrying all', 'error')
+    } finally {
+      setIsRetrying(false)
+    }
+  }
+
   const columns: Column<AdminEmailHistoryItem>[] = [
+    {
+      header: (
+        <input
+          type="checkbox"
+          checked={history.items.length > 0 && selectedIds.length === history.items.length}
+          onChange={handleSelectAll}
+          className="rounded border-admin-border bg-admin-surface text-admin-accent focus:ring-admin-accent cursor-pointer"
+          aria-label="Select all"
+        />
+      ),
+      className: 'w-8 text-center',
+      headerClassName: 'w-8 text-center',
+      cell: (item) => (
+        <input
+          type="checkbox"
+          checked={selectedIds.includes(item.id)}
+          onClick={(e) => handleToggleSelect(item.id, e)}
+          onChange={() => {}}
+          className="rounded border-admin-border bg-admin-surface text-admin-accent focus:ring-admin-accent cursor-pointer"
+          aria-label={`Select ${item.toEmail}`}
+        />
+      ),
+    },
     {
       header: 'Recipient',
       cell: (item) => (
@@ -101,7 +238,7 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
       ),
     },
     {
-      header: 'Retry',
+      header: 'Attempts',
       className: 'text-right',
       headerClassName: 'text-right',
       cell: (item) => (
@@ -110,12 +247,81 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
         </span>
       ),
     },
+    {
+      header: 'Action',
+      className: 'text-right',
+      headerClassName: 'text-right',
+      cell: (item) => {
+        const canRetry = ['failed', 'dead_letter', 'retrying', 'skipped', 'suppressed'].includes(item.status)
+        if (!canRetry) return null
+        return (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleRetrySingle(item.id)
+            }}
+            className="px-2.5 py-1 text-[11px] font-semibold rounded bg-admin-surface-raised border border-admin-border text-admin-fg hover:border-admin-accent hover:text-admin-accent transition-colors inline-flex items-center gap-1 cursor-pointer"
+          >
+            <RotateCcw className="w-3 h-3" /> Retry
+          </button>
+        )
+      },
+    },
   ]
 
   return (
     <div className="space-y-6">
+      {/* Top Operations Action Toolbar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-admin-surface border border-admin-border shadow-lg">
+        <div className="space-y-0.5">
+          <h2 className="text-sm font-bold text-admin-fg flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 text-admin-accent" /> Outbound Email Queue &amp; Recovery
+          </h2>
+          <p className="text-xs text-admin-fg-muted">
+            Atomic batch processing with automatic retry backoff, suppression filtering, and manual recovery controls.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          {selectedIds.length > 0 && (
+            <button
+              type="button"
+              disabled={isRetrying}
+              onClick={handleRetrySelected}
+              className="px-3 py-1.5 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+            >
+              {isRetrying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+              <span>Retry Selected ({selectedIds.length})</span>
+            </button>
+          )}
+
+          {['failed', 'dead_letter'].includes(status) && (
+            <button
+              type="button"
+              disabled={isRetrying}
+              onClick={handleRetryAll}
+              className="px-3 py-1.5 rounded-lg border border-admin-danger/30 bg-admin-danger-soft text-admin-danger text-xs font-bold hover:bg-admin-danger/20 transition-colors inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              {isRetrying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+              <span>Retry All {status === 'dead_letter' ? 'Dead Letter' : 'Failed'}</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            disabled={isProcessing}
+            onClick={handleProcessQueue}
+            className="px-3.5 py-1.5 rounded-lg bg-admin-surface-raised border border-admin-border text-admin-fg hover:border-admin-border-strong text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+          >
+            {isProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 text-admin-accent" />}
+            <span>Process Queue Now</span>
+          </button>
+        </div>
+      </div>
+
       <AdminSection
-        title="Email Queue"
+        title="Email Queue Ledger"
         icon={RefreshCw}
         meta={`${history.total.toLocaleString()} records`}
         bodyClassName="space-y-4"
@@ -177,7 +383,7 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
       <AdminDrawer
         open={selected !== null}
         onOpenChange={(open) => !open && setSelected(null)}
-        title="Email Details"
+        title="Email Queue Details"
         description={selected ? `${selected.templateKey} → ${selected.toEmail}` : undefined}
         size="md"
       >
@@ -217,9 +423,14 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
             </dl>
 
             {selected.errorMessage && (
-              <div className="p-3 rounded-xl bg-admin-danger-soft border border-admin-danger/25">
-                <p className="text-[11px] font-bold text-admin-danger uppercase tracking-wider mb-1">Error</p>
-                <p className="text-xs text-admin-fg font-mono break-all">{selected.errorMessage}</p>
+              <div className="p-3.5 rounded-xl bg-admin-danger-soft border border-admin-danger/25 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-bold text-admin-danger uppercase tracking-wider">Failure Diagnostic</p>
+                  <span className="text-[10px] font-mono text-admin-danger/80">Attempts exhausted</span>
+                </div>
+                <p className="text-xs text-admin-fg font-mono break-all leading-relaxed bg-admin-bg/60 p-2.5 rounded-lg border border-admin-danger/20">
+                  {selected.errorMessage}
+                </p>
               </div>
             )}
 
@@ -228,6 +439,21 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
                 <p className="text-xs text-admin-success font-semibold">
                   Delivered successfully. No delivery error recorded.
                 </p>
+              </div>
+            )}
+
+            {/* Drawer Recovery Action */}
+            {['failed', 'dead_letter', 'retrying', 'skipped', 'suppressed'].includes(selected.status) && (
+              <div className="pt-3 border-t border-admin-border flex justify-end">
+                <button
+                  type="button"
+                  disabled={isRetryingSingle}
+                  onClick={() => handleRetrySingle(selected.id)}
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90 transition-all inline-flex items-center gap-1.5 shadow-md cursor-pointer disabled:opacity-50"
+                >
+                  {isRetryingSingle ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+                  <span>Retry Delivery Now</span>
+                </button>
               </div>
             )}
           </div>

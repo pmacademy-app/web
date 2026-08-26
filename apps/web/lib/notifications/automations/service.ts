@@ -1,5 +1,26 @@
 import { createServiceRoleClient } from '@/lib/supabase'
-import type { EmailAutomationKey, EmailAutomationMeta, EmailAutomationsState } from './types'
+import type {
+  EmailAutomationKey,
+  EmailAutomationMeta,
+  EmailAutomationsState,
+  EmailDigestSchedules,
+  WeeklyRecapSchedule,
+  DailyReminderSchedule,
+} from './types'
+
+export const DEFAULT_DIGEST_SCHEDULES: EmailDigestSchedules = {
+  weeklyRecap: {
+    enabled: true,
+    dayOfWeek: 1, // Monday
+    hourUtc: 9,   // 09:00 UTC
+    lastRunAt: null,
+  },
+  dailyReminder: {
+    enabled: true,
+    hourUtc: 9,   // 09:00 UTC
+    lastRunAt: null,
+  },
+}
 
 export const AUTOMATION_METADATA: Array<Omit<EmailAutomationMeta, 'enabled'>> = [
   // Critical Auth (Always On - Non-Toggleable)
@@ -48,13 +69,17 @@ export class EmailAutomationsService {
       const { data: rawRows } = await supabase
         .from('system_settings')
         .select('key, value')
-        .in('key', ['email_global_pause', 'email_daily_send_limit', 'email_automations', todayKey])
+        .in('key', ['email_global_pause', 'email_daily_send_limit', 'email_automations', 'email_digest_schedules', todayKey])
 
       let globalPause = false
       let dailyLimit = 100
       let dailySentCount = 0
       let resendOutboundCount = 0
       let toggles: Record<string, boolean> = { ...DEFAULT_AUTOMATION_TOGGLES }
+      const digestSchedules: EmailDigestSchedules = {
+        weeklyRecap: { ...DEFAULT_DIGEST_SCHEDULES.weeklyRecap },
+        dailyReminder: { ...DEFAULT_DIGEST_SCHEDULES.dailyReminder },
+      }
 
       // Fetch actual Resend outbound usage
       try {
@@ -65,12 +90,10 @@ export class EmailAutomationsService {
           })
           
           if (res.ok) {
-            // Read quota header to get the exact outbound usage for the free tier
             const dailyQuota = res.headers.get('x-resend-daily-quota')
             if (dailyQuota) {
               resendOutboundCount = parseInt(dailyQuota, 10)
             } else {
-              // Fallback if header is missing
               const data = await res.json()
               resendOutboundCount = Array.isArray(data?.data) ? data.data.length : 0
             }
@@ -94,6 +117,15 @@ export class EmailAutomationsService {
         if (row.key === 'email_automations' && row.value && typeof row.value === 'object') {
           toggles = { ...toggles, ...(row.value as Record<string, boolean>) }
         }
+        if (row.key === 'email_digest_schedules' && row.value && typeof row.value === 'object') {
+          const rawSched = row.value as Partial<EmailDigestSchedules>
+          if (rawSched.weeklyRecap) {
+            digestSchedules.weeklyRecap = { ...digestSchedules.weeklyRecap, ...rawSched.weeklyRecap }
+          }
+          if (rawSched.dailyReminder) {
+            digestSchedules.dailyReminder = { ...digestSchedules.dailyReminder, ...rawSched.dailyReminder }
+          }
+        }
       }
 
       const automations: EmailAutomationMeta[] = AUTOMATION_METADATA.map((meta) => ({
@@ -107,6 +139,7 @@ export class EmailAutomationsService {
         dailySentCount,
         resendOutboundCount,
         automations,
+        digestSchedules,
       }
     } catch {
       return {
@@ -115,7 +148,72 @@ export class EmailAutomationsService {
         dailySentCount: 0,
         resendOutboundCount: 0,
         automations: AUTOMATION_METADATA.map((meta) => ({ ...meta, enabled: meta.isCritical ? true : (DEFAULT_AUTOMATION_TOGGLES[meta.key] ?? false) })),
+        digestSchedules: { ...DEFAULT_DIGEST_SCHEDULES },
       }
+    }
+  }
+
+  /**
+   * Fetches persisted digest schedules.
+   */
+  public static async getDigestSchedules(): Promise<EmailDigestSchedules> {
+    const state = await this.getState()
+    return state.digestSchedules
+  }
+
+  /**
+   * Updates digest schedules in system_settings.
+   */
+  public static async updateDigestSchedule(
+    updates: Partial<{ weeklyRecap: Partial<WeeklyRecapSchedule>; dailyReminder: Partial<DailyReminderSchedule> }>
+  ): Promise<{ success: boolean; error?: string }> {
+    const supabase = createServiceRoleClient()
+    try {
+      const current = await this.getDigestSchedules()
+      const updated: EmailDigestSchedules = {
+        weeklyRecap: { ...current.weeklyRecap, ...(updates.weeklyRecap || {}) },
+        dailyReminder: { ...current.dailyReminder, ...(updates.dailyReminder || {}) },
+      }
+
+      const { error } = await supabase
+        .from('system_settings')
+        .upsert({
+          key: 'email_digest_schedules',
+          value: updated as unknown as import('@/lib/supabase').Json,
+          updated_at: new Date().toISOString(),
+        })
+
+      if (error) return { success: false, error: error.message }
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : 'Database update failed' }
+    }
+  }
+
+  /**
+   * Records execution timestamp of a digest run for duplicate cron prevention.
+   */
+  public static async recordDigestRun(digestKey: 'weeklyRecap' | 'dailyReminder'): Promise<void> {
+    const supabase = createServiceRoleClient()
+    try {
+      const current = await this.getDigestSchedules()
+      const updated: EmailDigestSchedules = {
+        ...current,
+        [digestKey]: {
+          ...current[digestKey],
+          lastRunAt: new Date().toISOString(),
+        },
+      }
+
+      await supabase
+        .from('system_settings')
+        .upsert({
+          key: 'email_digest_schedules',
+          value: updated as unknown as import('@/lib/supabase').Json,
+          updated_at: new Date().toISOString(),
+        })
+    } catch (err) {
+      console.warn(`[EmailAutomationsService.recordDigestRun] Non-fatal timestamp update warning:`, err)
     }
   }
 

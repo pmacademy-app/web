@@ -20,15 +20,37 @@ export async function POST(request: Request) {
 
   const isEnabled = await EmailAutomationsService.isAutomationEnabled('learning.weekly_recap')
   const isGlobalPause = await EmailAutomationsService.isGlobalPauseActive()
+  const schedules = await EmailAutomationsService.getDigestSchedules()
+  const weeklySched = schedules.weeklyRecap
 
-  if (!isEnabled || isGlobalPause) {
+  if (!isEnabled || isGlobalPause || !weeklySched.enabled) {
     return NextResponse.json({
       success: true,
       message: 'Weekly recap disabled via Admin Automations or Global Pause',
       isEnabled,
       isGlobalPause,
+      scheduleEnabled: weeklySched.enabled,
       recapsQueued: 0,
     })
+  }
+
+  const url = new URL(request.url)
+  const isForced = url.searchParams.get('force') === 'true'
+
+  if (!isForced) {
+    const now = new Date()
+    const currentDay = now.getUTCDay()
+    const currentHour = now.getUTCHours()
+
+    if (currentDay !== weeklySched.dayOfWeek || currentHour !== weeklySched.hourUtc) {
+      return NextResponse.json({
+        success: true,
+        message: 'Skipped: Current time does not match configured schedule window.',
+        configured: { dayOfWeek: weeklySched.dayOfWeek, hourUtc: weeklySched.hourUtc },
+        current: { dayOfWeek: currentDay, hourUtc: currentHour },
+        recapsQueued: 0,
+      })
+    }
   }
 
   const supabase = createServiceRoleClient()
@@ -78,6 +100,7 @@ export async function POST(request: Request) {
         })
         if (result.success) recapsQueued++
       }
+      await EmailAutomationsService.recordDigestRun('weeklyRecap')
     }
   } catch (err) {
     console.error('[cron/weekly-recap] Failed to process weekly recaps:', err)

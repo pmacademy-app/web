@@ -21,10 +21,29 @@ export interface EmailAutomationMeta {
   enabled: boolean
 }
 
+export interface WeeklyRecapSchedule {
+  enabled: boolean
+  dayOfWeek: number // 0=Sunday, 1=Monday, ..., 6=Saturday (Default 1: Monday)
+  hourUtc: number   // 0..23 (Default 9: 09:00 UTC)
+  lastRunAt?: string | null
+}
+
+export interface DailyReminderSchedule {
+  enabled: boolean
+  hourUtc: number   // 0..23 (Default 9: 09:00 UTC)
+  lastRunAt?: string | null
+}
+
+export interface EmailDigestSchedules {
+  weeklyRecap: WeeklyRecapSchedule
+  dailyReminder: DailyReminderSchedule
+}
+
 export interface EmailAutomationsState {
   globalPause: boolean
   dailyLimit: number
   dailySentCount: number
   resendOutboundCount: number
   automations: EmailAutomationMeta[]
+  digestSchedules: EmailDigestSchedules
 }

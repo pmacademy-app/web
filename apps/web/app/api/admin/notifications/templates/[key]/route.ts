@@ -45,13 +45,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const { key } = await params
     const body = await request.json()
-    const { subjectLine, bodyHtml, bodyText } = body
+    const { subjectLine, bodyHtml, bodyText, status = 'published' } = body
 
     if (!subjectLine || typeof subjectLine !== 'string') {
       return NextResponse.json({ error: 'subjectLine is required and must be a string' }, { status: 400 })
     }
 
+    const versionStatus = status === 'draft' ? 'draft' : 'published'
     const supabase = createServiceRoleClient()
+    const now = new Date().toISOString()
 
     // 1. Check if template exists in notification_templates table
     const { data: existingTpl } = await supabase
@@ -60,7 +62,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       .eq('template_key', key)
       .maybeSingle()
 
-    const now = new Date().toISOString()
     let templateId: string
 
     if (!existingTpl) {
@@ -83,14 +84,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       templateId = createdTpl.id
     } else {
       templateId = existingTpl.id
-      // Bump version
-      await supabase
-        .from('notification_templates')
-        .update({
-          current_version: (existingTpl.current_version || 1) + 1,
-          updated_at: now,
-        })
-        .eq('id', templateId)
     }
 
     // 2. Fetch current max version to insert next version row
@@ -103,6 +96,23 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const nextVersion = (versions && versions.length > 0 ? versions[0].version : 0) + 1
 
+    // If publishing, archive previous published versions
+    if (versionStatus === 'published') {
+      await supabase
+        .from('notification_template_versions')
+        .update({ status: 'archived', updated_at: now })
+        .eq('template_id', templateId)
+        .eq('status', 'published')
+
+      await supabase
+        .from('notification_templates')
+        .update({
+          current_version: nextVersion,
+          updated_at: now,
+        })
+        .eq('id', templateId)
+    }
+
     const { data: versionRow, error: versionError } = await supabase
       .from('notification_template_versions')
       .insert({
@@ -111,7 +121,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         subject_line: subjectLine.trim(),
         body_html: (bodyHtml || '').trim(),
         body_text: (bodyText || '').trim(),
-        status: 'published',
+        status: versionStatus,
         created_at: now,
         updated_at: now,
       })
@@ -126,13 +136,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     await logAdminAction(
       authResult.userId,
       authResult.email || 'admin@prodily.me',
-      'notification_template_updated',
+      versionStatus === 'published' ? 'notification_template_published' : 'notification_template_draft_saved',
       'notification_template',
       key,
       {
         templateKey: key,
         version: nextVersion,
         subjectLine: subjectLine.trim(),
+        status: versionStatus,
       }
     )
 
@@ -141,7 +152,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({
       success: true,
-      message: `Template '${key}' updated to version ${nextVersion}`,
+      message: versionStatus === 'published'
+        ? `Template '${key}' published as active version v${nextVersion}.`
+        : `Template '${key}' draft saved as v${nextVersion}.`,
       data: versionRow,
     })
   } catch (err) {

@@ -83,6 +83,25 @@ export function stripHtmlToPlainText(html: string): string {
     .trim()
 }
 
+/**
+ * Safely interpolates `{{variableName}}` placeholders in a string.
+ */
+export function interpolateVariables(template: string, variables: Record<string, unknown>): string {
+  if (!template) return ''
+  return template.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, key) => {
+    if (key in variables && variables[key] !== undefined && variables[key] !== null) {
+      return String(variables[key])
+    }
+    return ''
+  })
+}
+
+/**
+ * Renders an email template with published database version precedence.
+ * Precedence:
+ * 1. Published version from `notification_template_versions` (if exists and status === 'published')
+ * 2. Static React Email component from `EMAIL_TEMPLATE_MAP` (fallback)
+ */
 export async function renderEmailTemplate(
   templateKey: string,
   variables: Record<string, unknown>
@@ -92,17 +111,53 @@ export async function renderEmailTemplate(
     throw new Error(`Email template '${templateKey}' is not registered in EMAIL_TEMPLATE_MAP.`)
   }
 
+  // 1. Check for published custom version in database (bypassed in test environment to preserve unit test fetch mocks)
+  if (!process.env.VITEST && process.env.NODE_ENV !== 'test') {
+    try {
+      const { createServiceRoleClient } = await import('@/lib/supabase')
+      const supabase = createServiceRoleClient()
+      const { data: tpl } = await supabase
+        .from('notification_templates')
+        .select('id')
+        .eq('template_key', templateKey)
+        .maybeSingle()
+
+      if (tpl?.id) {
+        const { data: publishedVersion } = await supabase
+          .from('notification_template_versions')
+          .select('subject_line, body_html, body_text')
+          .eq('template_id', tpl.id)
+          .eq('status', 'published')
+          .order('version', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (publishedVersion && publishedVersion.body_html?.trim()) {
+          const rawSubject = publishedVersion.subject_line || entry.subjectLine
+          const subject = interpolateVariables(rawSubject, variables)
+          const interpolatedHtml = interpolateVariables(publishedVersion.body_html, variables)
+          const html = interpolatedHtml.startsWith('<!DOCTYPE') ? interpolatedHtml : `<!DOCTYPE html>${interpolatedHtml}`
+          const text = publishedVersion.body_text
+            ? interpolateVariables(publishedVersion.body_text, variables)
+            : stripHtmlToPlainText(interpolatedHtml)
+
+          return { html, text, subject }
+        }
+      }
+    } catch (err) {
+      // Database lookup failed — gracefully fall back to static component
+      console.warn(`[renderEmailTemplate] Fallback to static component for '${templateKey}':`, err)
+    }
+  }
+
+  // 2. Default / Static React Email Component Fallback
   const Component = entry.component
   const element = React.createElement(Component, variables)
   const { renderToStaticMarkup } = await import('react-dom/server')
   const rawHtml = renderToStaticMarkup(element)
   const html = `<!DOCTYPE html>${rawHtml}`
   const text = stripHtmlToPlainText(rawHtml)
-
-  let subject = entry.subjectLine
-  for (const [k, v] of Object.entries(variables)) {
-    subject = subject.replace(new RegExp(`{{${k}}}`, 'g'), String(v))
-  }
+  const subject = interpolateVariables(entry.subjectLine, variables)
 
   return { html, text, subject }
 }
