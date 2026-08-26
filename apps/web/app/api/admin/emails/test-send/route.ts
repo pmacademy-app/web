@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { templateKey, toEmail, variables: customVars } = body
+    const { templateKey, toEmail, subjectLine, bodyHtml, bodyText, variables: customVars } = body
 
     if (!templateKey || typeof templateKey !== 'string') {
       return NextResponse.json({ error: 'Missing or invalid templateKey' }, { status: 400 })
@@ -58,13 +58,27 @@ export async function POST(request: Request) {
       ...(customVars || {}),
     }
 
-    const rendered = await renderEmailTemplate(templateKey, sampleVariables)
+    let finalSubject = ''
+    let finalHtml = ''
+    let finalText = ''
+
+    if (bodyHtml && typeof bodyHtml === 'string' && bodyHtml.trim()) {
+      const { interpolateVariables, stripHtmlToPlainText } = await import('@/emails')
+      finalSubject = interpolateVariables(subjectLine || 'Test Email', sampleVariables)
+      finalHtml = interpolateVariables(bodyHtml, sampleVariables)
+      finalText = bodyText ? interpolateVariables(bodyText, sampleVariables) : stripHtmlToPlainText(finalHtml)
+    } else {
+      const rendered = await renderEmailTemplate(templateKey, sampleVariables)
+      finalSubject = rendered.subject
+      finalHtml = rendered.html
+      finalText = rendered.text
+    }
 
     const sendResult = await sendEmail({
       to: toEmail.trim(),
-      subject: `[ADMIN TEST] ${rendered.subject}`,
-      html: rendered.html,
-      text: rendered.text,
+      subject: `[ADMIN TEST] ${finalSubject}`,
+      html: finalHtml,
+      text: finalText,
     })
 
     if (!sendResult.success) {

@@ -32,10 +32,41 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
   const [body, setBody] = useState(detail.bodyHtml)
   const [copiedVar, setCopiedVar] = useState<string | null>(null)
   const [testOpen, setTestOpen] = useState(false)
+  const [currentVersion, setCurrentVersion] = useState(detail.currentVersion || 1)
+  const [versionStatus, setVersionStatus] = useState(detail.versionStatus || 'published')
 
   const previewDoc = useMemo(() => {
-    // If the admin edited the body, preview their draft; otherwise the rendered template.
-    return body || detail.bodyHtml
+    // Interpolate sample variables for live preview
+    const rawContent = body || detail.bodyHtml || ''
+    const sampleVars: Record<string, string> = {
+      userName: 'Aditya Gangwani',
+      email: 'aditya@prodily.me',
+      streakDays: '14',
+      currentStreak: '14',
+      totalXp: '1,450',
+      newLevel: '5',
+      levelTitle: 'Senior Product Manager',
+      moduleName: 'Product Strategy & Vision',
+      badgeName: 'Visionary Strategist',
+      badgeIcon: '🏅',
+      certificateCode: 'PMA-2026-TEST01',
+      dueCount: '5',
+      lessonsCompleted: '8',
+      daysStudiedThisWeek: '5',
+      xpEarnedThisWeek: '450',
+      actionUrl: 'https://prodily.me/dashboard',
+      confirmationUrl: 'https://prodily.me/verify',
+      resetUrl: 'https://prodily.me/reset-password',
+      verificationUrl: 'https://prodily.me/verify/PMA-2026-TEST01',
+      portfolioUrl: 'https://prodily.me/p/aditya',
+      appUrl: 'https://prodily.me',
+    }
+
+    let interpolated = rawContent
+    for (const [k, v] of Object.entries(sampleVars)) {
+      interpolated = interpolated.replace(new RegExp(`\\{\\{\\s*${k}\\s*\\}\\}`, 'g'), v)
+    }
+    return interpolated
   }, [body, detail.bodyHtml])
 
   const handleCopyVariable = async (name: string) => {
@@ -51,8 +82,9 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
   }
 
   const [isSaving, setIsSaving] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
   const [isTogglingPause, setIsTogglingPause] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
+  const [isPaused, setIsPaused] = useState(Boolean(detail.isPaused))
 
   const handleReset = () => {
     setSubject(detail.subjectLine)
@@ -60,7 +92,7 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
     toast('Restored the original template source.', 'info')
   }
 
-  const handleSave = async () => {
+  const handleSaveDraft = async () => {
     setIsSaving(true)
     try {
       const res = await fetch(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}`, {
@@ -70,19 +102,51 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
           subjectLine: subject,
           bodyHtml: body,
           bodyText: body.replace(/<[^>]+>/g, ''),
+          status: 'draft',
         }),
       })
 
       const json = await res.json()
       if (!res.ok) {
-        throw new Error(json.error || 'Failed to save template')
+        throw new Error(json.error || 'Failed to save draft')
       }
 
-      toast(json.message || 'Template version saved successfully.', 'success')
+      if (json.data?.version) setCurrentVersion(json.data.version)
+      setVersionStatus('draft')
+      toast(json.message || 'Draft saved successfully.', 'success')
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Save failed', 'error')
+      toast(err instanceof Error ? err.message : 'Save draft failed', 'error')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handlePublish = async () => {
+    setIsPublishing(true)
+    try {
+      const res = await fetch(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjectLine: subject,
+          bodyHtml: body,
+          bodyText: body.replace(/<[^>]+>/g, ''),
+          status: 'published',
+        }),
+      })
+
+      const json = await res.json()
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to publish template')
+      }
+
+      if (json.data?.version) setCurrentVersion(json.data.version)
+      setVersionStatus('published')
+      toast(json.message || 'Template version published to production.', 'success')
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Publish failed', 'error')
+    } finally {
+      setIsPublishing(false)
     }
   }
 
@@ -137,6 +201,9 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
             <span className="px-2 py-0.5 rounded bg-admin-surface-raised text-admin-fg-muted font-mono text-[10px] border border-admin-border uppercase tracking-wider">
               {detail.category}
             </span>
+            <span className="px-2 py-0.5 rounded bg-admin-accent/10 text-admin-accent font-mono text-[10px] border border-admin-accent/20">
+              v{currentVersion} ({versionStatus})
+            </span>
             {isPaused ? (
               <AdminStatusBadge status="archived" label="Paused" />
             ) : detail.isDeferred ? (
@@ -148,7 +215,7 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
           {!detail.isCritical && (
             <button
               type="button"
@@ -176,10 +243,18 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
           <button
             type="button"
             disabled={isSaving}
-            onClick={handleSave}
+            onClick={handleSaveDraft}
+            className="px-3 py-2 rounded-lg border border-admin-accent/30 bg-admin-surface hover:bg-admin-surface-raised text-admin-fg text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+          >
+            <Save className="w-3.5 h-3.5 text-admin-fg-muted" /> {isSaving ? 'Saving…' : 'Save Draft'}
+          </button>
+          <button
+            type="button"
+            disabled={isPublishing}
+            onClick={handlePublish}
             className="px-3.5 py-2 rounded-lg bg-admin-accent hover:bg-admin-accent/90 text-admin-accent-fg text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-lg cursor-pointer disabled:opacity-50"
           >
-            <Save className="w-3.5 h-3.5" /> {isSaving ? 'Saving…' : 'Save Version'}
+            <Save className="w-3.5 h-3.5" /> {isPublishing ? 'Publishing…' : 'Publish Version'}
           </button>
         </div>
       </div>
@@ -270,8 +345,7 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
           <div className="p-3 rounded-xl bg-admin-info-soft border border-admin-info/25 flex items-start gap-2.5">
             <Info className="w-4 h-4 text-admin-info shrink-0 mt-0.5" />
             <p className="text-[11px] text-admin-fg leading-relaxed">
-              Templates are source-controlled React components in <code className="font-mono">apps/web/emails/templates</code>.
-              Subject and body edits here are preview-only — test sends always use the production template source.
+              Templates support <strong>Save Draft</strong> and <strong>Publish Version</strong>. Published versions become active in production delivery with variable interpolation. Test Send dispatches the exact live editor content.
             </p>
           </div>
         </div>
@@ -314,6 +388,9 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
         onClose={() => setTestOpen(false)}
         templateKey={detail.key}
         templateName={detail.name}
+        subjectLine={subject}
+        bodyHtml={body}
+        bodyText={body.replace(/<[^>]+>/g, '')}
       />
     </div>
   )

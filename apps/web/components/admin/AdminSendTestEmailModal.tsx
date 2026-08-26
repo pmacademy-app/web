@@ -10,6 +10,9 @@ export interface AdminSendTestEmailModalProps {
   onClose: () => void
   templateKey: string
   templateName: string
+  subjectLine?: string
+  bodyHtml?: string
+  bodyText?: string
 }
 
 /**
@@ -21,6 +24,9 @@ export function AdminSendTestEmailModal({
   onClose,
   templateKey,
   templateName,
+  subjectLine,
+  bodyHtml,
+  bodyText,
 }: AdminSendTestEmailModalProps) {
   const { toast } = useAdminToast()
   const [toEmail, setToEmail] = useState('')
@@ -35,7 +41,13 @@ export function AdminSendTestEmailModal({
       const res = await fetch('/api/admin/emails/test-send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateKey, toEmail: toEmail.trim() }),
+        body: JSON.stringify({
+          templateKey,
+          toEmail: toEmail.trim(),
+          subjectLine,
+          bodyHtml,
+          bodyText,
+        }),
       })
       const data = await res.json()
       if (res.ok && data.success) {

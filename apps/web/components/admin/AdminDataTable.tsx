@@ -3,7 +3,7 @@ import { Inbox, ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface Column<T> {
-  header: string
+  header: string | React.ReactNode
   accessorKey?: keyof T | string
   cell?: (row: T) => React.ReactNode
   className?: string

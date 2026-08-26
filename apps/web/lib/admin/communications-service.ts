@@ -67,10 +67,14 @@ export interface AdminTemplateDetail {
   trigger: string
   isCritical: boolean
   isDeferred?: boolean
+  isPaused?: boolean
   subjectLine: string
   variables: AdminTemplateVariable[]
   bodyHtml: string
   bodyText: string
+  currentVersion?: number
+  versionStatus?: 'draft' | 'published'
+  hasCustomVersion?: boolean
 }
 
 export interface AdminNotificationEventItem {
@@ -311,7 +315,7 @@ export class CommunicationsService {
   }
 
   /**
-   * Full template detail for the editor: metadata + rendered body with sample data.
+   * Full template detail for the editor: metadata + rendered body with sample data and database version history.
    */
   public static async getTemplateDetail(templateKey: string): Promise<AdminTemplateDetail | null> {
     const entry = EMAIL_TEMPLATE_MAP[templateKey]
@@ -321,6 +325,48 @@ export class CommunicationsService {
       AUTOMATION_METADATA.map((a) => [a.key, a])
     )
     const meta = automationByKey.get(templateKey)
+    const isCritical = Boolean(meta?.isCritical)
+
+    let isPaused = false
+    if (!isCritical) {
+      const { EmailAutomationsService } = await import('@/lib/notifications/automations/service')
+      const isEnabled = await EmailAutomationsService.isAutomationEnabled(templateKey as never)
+      isPaused = !isEnabled
+    }
+
+    const supabase = createServiceRoleClient()
+    type DbTemplateVersion = {
+      version: number
+      subject_line: string
+      body_html: string
+      body_text: string
+      status: 'draft' | 'published'
+    }
+    let dbVersion: DbTemplateVersion | null = null
+
+    try {
+      const { data: tpl } = await supabase
+        .from('notification_templates')
+        .select('id, current_version')
+        .eq('template_key', templateKey)
+        .maybeSingle()
+
+      if (tpl?.id) {
+        const { data: versions } = await supabase
+          .from('notification_template_versions')
+          .select('version, subject_line, body_html, body_text, status')
+          .eq('template_id', tpl.id)
+          .order('version', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (versions) {
+          dbVersion = versions as unknown as DbTemplateVersion
+        }
+      }
+    } catch {
+      // Non-fatal database lookup fallback
+    }
 
     try {
       const rendered = await renderEmailTemplate(templateKey, TEMPLATE_SAMPLE_VARIABLES)
@@ -329,12 +375,16 @@ export class CommunicationsService {
         name: meta?.name || templateDisplayName(templateKey),
         category: meta?.category || 'System',
         trigger: meta?.description || 'Manual / Hook',
-        isCritical: Boolean(meta?.isCritical),
+        isCritical,
         isDeferred: meta?.isDeferred,
-        subjectLine: entry.subjectLine,
+        isPaused,
+        subjectLine: dbVersion?.subject_line || entry.subjectLine,
         variables: TEMPLATE_VARIABLE_CATALOG,
-        bodyHtml: rendered.html,
-        bodyText: rendered.text,
+        bodyHtml: dbVersion?.body_html || rendered.html,
+        bodyText: dbVersion?.body_text || rendered.text,
+        currentVersion: dbVersion?.version || 1,
+        versionStatus: dbVersion?.status || 'published',
+        hasCustomVersion: Boolean(dbVersion),
       }
     } catch {
       // Rendering failure — still return metadata so the editor can explain.
@@ -343,12 +393,16 @@ export class CommunicationsService {
         name: meta?.name || templateDisplayName(templateKey),
         category: meta?.category || 'System',
         trigger: meta?.description || 'Manual / Hook',
-        isCritical: Boolean(meta?.isCritical),
+        isCritical,
         isDeferred: meta?.isDeferred,
-        subjectLine: entry.subjectLine,
+        isPaused,
+        subjectLine: dbVersion?.subject_line || entry.subjectLine,
         variables: TEMPLATE_VARIABLE_CATALOG,
-        bodyHtml: '',
-        bodyText: '',
+        bodyHtml: dbVersion?.body_html || '',
+        bodyText: dbVersion?.body_text || '',
+        currentVersion: dbVersion?.version || 1,
+        versionStatus: dbVersion?.status || 'published',
+        hasCustomVersion: Boolean(dbVersion),
       }
     }
   }

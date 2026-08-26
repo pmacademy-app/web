@@ -1,16 +1,51 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ShieldCheck, Mail, AlertTriangle, CheckCircle2, Lock, Zap, Clock } from 'lucide-react'
-import type { EmailAutomationsState, EmailAutomationMeta } from '@/lib/notifications/automations/types'
+import {
+  ShieldCheck,
+  Mail,
+  AlertTriangle,
+  Lock,
+  Zap,
+  Play,
+  Calendar,
+  Save,
+  Loader2,
+} from 'lucide-react'
+import { useAdminToast } from './admin-toast'
+import type {
+  EmailAutomationsState,
+  EmailAutomationMeta,
+  EmailDigestSchedules,
+} from '@/lib/notifications/automations/types'
 
 interface AdminEmailAutomationsViewProps {
   initialState: EmailAutomationsState
 }
 
+const DAYS_OF_WEEK = [
+  { value: 0, label: 'Sunday' },
+  { value: 1, label: 'Monday' },
+  { value: 2, label: 'Tuesday' },
+  { value: 3, label: 'Wednesday' },
+  { value: 4, label: 'Thursday' },
+  { value: 5, label: 'Friday' },
+  { value: 6, label: 'Saturday' },
+]
+
 export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomationsViewProps) {
+  const { toast } = useAdminToast()
   const [state, setState] = useState<EmailAutomationsState>(initialState)
+  const [schedules, setSchedules] = useState<EmailDigestSchedules>(
+    initialState.digestSchedules || {
+      weeklyRecap: { enabled: true, dayOfWeek: 1, hourUtc: 9, lastRunAt: null },
+      dailyReminder: { enabled: true, hourUtc: 9, lastRunAt: null },
+    }
+  )
+
   const [loadingKey, setLoadingKey] = useState<string | null>(null)
+  const [runningType, setRunningType] = useState<string | null>(null)
+  const [savingSchedule, setSavingSchedule] = useState<'weekly' | 'daily' | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleToggleGlobalPause = async () => {
@@ -26,11 +61,14 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
       const data = await res.json()
       if (res.ok && data.success) {
         setState(data.state)
+        toast(nextState ? 'Global email pause enabled.' : 'Global email pause deactivated.', 'info')
       } else {
         setError(data.error || 'Failed to update global pause.')
+        toast(data.error || 'Failed to update global pause.', 'error')
       }
     } catch {
       setError('Network error updating global pause.')
+      toast('Network error updating global pause.', 'error')
     } finally {
       setLoadingKey(null)
     }
@@ -48,11 +86,14 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
       const data = await res.json()
       if (res.ok && data.success) {
         setState(data.state)
+        toast(`Automation '${automationKey}' ${!currentEnabled ? 'enabled' : 'disabled'}.`, 'success')
       } else {
         setError(data.error || 'Failed to toggle automation.')
+        toast(data.error || 'Failed to toggle automation.', 'error')
       }
     } catch {
       setError('Network error updating automation.')
+      toast('Network error updating automation.', 'error')
     } finally {
       setLoadingKey(null)
     }
@@ -70,19 +111,67 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
       const data = await res.json()
       if (res.ok && data.success) {
         setState(data.state)
+        toast(`Daily limit updated to ${newLimit} emails.`, 'success')
       } else {
         setError(data.error || 'Failed to update daily limit.')
+        toast(data.error || 'Failed to update daily limit.', 'error')
       }
     } catch {
       setError('Network error updating daily limit.')
+      toast('Network error updating daily limit.', 'error')
     } finally {
       setLoadingKey(null)
     }
   }
 
+  const handleSaveSchedule = async (type: 'weekly' | 'daily') => {
+    setSavingSchedule(type)
+    try {
+      const res = await fetch('/api/admin/emails/automations/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weeklyRecap: type === 'weekly' ? schedules.weeklyRecap : undefined,
+          dailyReminder: type === 'daily' ? schedules.dailyReminder : undefined,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setSchedules(data.schedules)
+        toast(`${type === 'weekly' ? 'Weekly Recap' : 'Daily Reminder'} schedule updated.`, 'success')
+      } else {
+        toast(data.error || 'Failed to save schedule.', 'error')
+      }
+    } catch {
+      toast('Network error saving schedule.', 'error')
+    } finally {
+      setSavingSchedule(null)
+    }
+  }
+
+  const handleRunNow = async (type: 'weekly_recap' | 'daily_reminder') => {
+    setRunningType(type)
+    try {
+      const res = await fetch('/api/admin/emails/automations/run-now', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        toast(data.message || `Dispatched ${data.queuedCount} email(s).`, 'success')
+      } else {
+        toast(data.error || 'Manual dispatch failed.', 'error')
+      }
+    } catch {
+      toast('Network error triggering manual run.', 'error')
+    } finally {
+      setRunningType(null)
+    }
+  }
+
   const criticalAuth = state.automations.filter((a) => a.isCritical)
   const optionalTransactional = state.automations.filter((a) => !a.isCritical && a.category === 'Transactional' && !a.isDeferred)
-  const scheduledAutomations = state.automations.filter((a) => a.category === 'Scheduled')
 
   return (
     <div className="space-y-8">
@@ -138,83 +227,291 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
         <div className="flex items-center gap-8">
           <div className="text-right">
             <span className="text-xs text-admin-fg-muted">Resend Account Outbound</span>
-            <p className="text-sm font-bold font-mono text-admin-success">
-              {state.resendOutboundCount} / 100 limit
-            </p>
-          </div>
-          <div className="w-px h-8 bg-admin-border"></div>
-          <div className="text-right">
-            <span className="text-xs text-admin-fg-muted">Prodily Automation Quota</span>
-            <p className="text-sm font-bold font-mono text-admin-warning">
-              {state.dailySentCount} / {state.dailyLimit} sent
-            </p>
+            <div className="text-xl font-mono font-bold text-admin-fg">
+              {state.resendOutboundCount} <span className="text-xs text-admin-fg-muted">/ 100 max</span>
+            </div>
           </div>
 
-          <select
-            value={state.dailyLimit}
-            disabled={loadingKey === 'daily_limit'}
-            onChange={(e) => handleUpdateDailyLimit(Number(e.target.value))}
-            className="px-3 py-2 rounded-lg bg-admin-bg border border-admin-border text-xs text-admin-fg font-mono focus:outline-none focus:border-admin-accent/50 cursor-pointer"
-          >
-            <option value={50}>50 / day</option>
-            <option value={100}>100 / day (Default)</option>
-            <option value={250}>250 / day</option>
-            <option value={500}>500 / day</option>
-          </select>
+          <div className="text-right border-l border-admin-border pl-6">
+            <span className="text-xs text-admin-fg-muted">App Daily Limit</span>
+            <div className="flex items-center gap-2 mt-1">
+              <select
+                aria-label="App Daily Send Limit"
+                value={state.dailyLimit}
+                disabled={loadingKey === 'daily_limit'}
+                onChange={(e) => handleUpdateDailyLimit(Number(e.target.value))}
+                className="px-3 py-1.5 rounded-lg border border-admin-border bg-admin-bg text-admin-fg text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-admin-accent cursor-pointer"
+              >
+                <option value={50}>50 / day</option>
+                <option value={75}>75 / day</option>
+                <option value={90}>90 / day</option>
+                <option value={100}>100 / day</option>
+                <option value={200}>200 / day</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Section 1: Critical Authentication Emails (Always On) */}
+      {/* Section 1: Critical Auth Notifications */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Lock className="w-4 h-4 text-admin-success" />
-          <h3 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Critical Authentication Emails (Protected)</h3>
+          <Lock className="w-4 h-4 text-admin-accent" />
+          <h3 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Critical Auth Notifications</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {criticalAuth.map((item) => (
-            <div key={item.key} className="p-5 rounded-xl bg-admin-bg/80 border border-admin-success/25 flex items-start justify-between gap-4">
+            <div key={item.key} className="p-5 rounded-xl border border-admin-accent/20 bg-admin-accent-soft/30 flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-sm text-admin-fg">{item.name}</span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-admin-success-soft text-admin-success border border-admin-success/25">
-                    Always On
-                  </span>
+                  <span className="text-[10px] font-mono text-admin-accent font-semibold">(`{item.key}`)</span>
                 </div>
-                <p className="text-xs text-admin-fg-muted">{item.description}</p>
-                <p className="text-[10px] text-admin-fg-subtle font-mono">Bypasses queue &amp; optional global pause via Supabase Auth Hook</p>
+                <p className="text-xs text-admin-fg-muted leading-relaxed">{item.description}</p>
               </div>
-              <CheckCircle2 className="w-5 h-5 text-admin-success shrink-0 mt-0.5" />
+              <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-admin-accent/20 text-admin-accent border border-admin-accent/30 shrink-0">
+                Always Active
+              </span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Section 2: Optional Transactional Automations */}
+      {/* Section 2: Automated Digest Schedule Controls */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Mail className="w-4 h-4 text-admin-accent" />
-          <h3 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Optional Event Automations</h3>
+          <Calendar className="w-4 h-4 text-admin-accent" />
+          <h3 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Automated Digest Schedules &amp; Triggers</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {optionalTransactional.map((item) => (
-            <AutomationCard
-              key={item.key}
-              item={item}
-              loadingKey={loadingKey}
-              onToggle={() => handleToggleAutomation(item.key, item.enabled)}
-            />
-          ))}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Weekly Recap Card */}
+          <div className="p-5 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-md">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-0.5">
+                <h4 className="text-sm font-bold text-admin-fg flex items-center gap-2">
+                  <span>Weekly Recap Digest</span>
+                  <span className="text-[10px] font-mono text-admin-accent">(`learning.weekly_recap`)</span>
+                </h4>
+                <p className="text-xs text-admin-fg-muted">
+                  Sends weekly summary of XP, lessons, and streaks to active learners.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setSchedules((prev) => ({
+                    ...prev,
+                    weeklyRecap: { ...prev.weeklyRecap, enabled: !prev.weeklyRecap.enabled },
+                  }))
+                }
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                  schedules.weeklyRecap.enabled ? 'bg-admin-accent' : 'bg-admin-surface-raised'
+                }`}
+                role="switch"
+                aria-checked={schedules.weeklyRecap.enabled}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-admin-bg shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    schedules.weeklyRecap.enabled ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-admin-border">
+              <div>
+                <label className="block text-[11px] font-semibold text-admin-fg-muted mb-1">Dispatch Day (UTC)</label>
+                <select
+                  value={schedules.weeklyRecap.dayOfWeek}
+                  onChange={(e) =>
+                    setSchedules((prev) => ({
+                      ...prev,
+                      weeklyRecap: { ...prev.weeklyRecap, dayOfWeek: Number(e.target.value) },
+                    }))
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-admin-border bg-admin-bg text-admin-fg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-admin-accent"
+                >
+                  {DAYS_OF_WEEK.map((d) => (
+                    <option key={d.value} value={d.value}>
+                      {d.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-admin-fg-muted mb-1">Dispatch Time (UTC)</label>
+                <select
+                  value={schedules.weeklyRecap.hourUtc}
+                  onChange={(e) =>
+                    setSchedules((prev) => ({
+                      ...prev,
+                      weeklyRecap: { ...prev.weeklyRecap, hourUtc: Number(e.target.value) },
+                    }))
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-admin-border bg-admin-bg text-admin-fg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-admin-accent"
+                >
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <option key={i} value={i}>
+                      {String(i).padStart(2, '0')}:00 UTC
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-admin-border text-xs">
+              <span className="text-[11px] text-admin-fg-muted">
+                {schedules.weeklyRecap.lastRunAt
+                  ? `Last run: ${new Date(schedules.weeklyRecap.lastRunAt).toLocaleString()}`
+                  : 'No execution recorded yet'}
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={runningType === 'weekly_recap'}
+                  onClick={() => handleRunNow('weekly_recap')}
+                  className="px-3 py-1.5 rounded-lg border border-admin-border text-xs font-semibold text-admin-fg hover:bg-admin-surface-raised transition-colors inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {runningType === 'weekly_recap' ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Play className="w-3 h-3 text-admin-accent" />
+                  )}
+                  <span>Run Now</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={savingSchedule === 'weekly'}
+                  onClick={() => handleSaveSchedule('weekly')}
+                  className="px-3.5 py-1.5 rounded-lg bg-admin-accent text-admin-accent-fg text-xs font-bold hover:bg-admin-accent/90 transition-colors inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {savingSchedule === 'weekly' ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Save className="w-3 h-3" />
+                  )}
+                  <span>Save Schedule</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Reminder Card */}
+          <div className="p-5 rounded-xl bg-admin-surface border border-admin-border space-y-4 shadow-md">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-0.5">
+                <h4 className="text-sm font-bold text-admin-fg flex items-center gap-2">
+                  <span>Daily Study Reminder</span>
+                  <span className="text-[10px] font-mono text-admin-accent">(`learning.daily_reminder`)</span>
+                </h4>
+                <p className="text-xs text-admin-fg-muted">
+                  Sends daily SRS review reminders and streak freeze alerts to active learners.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setSchedules((prev) => ({
+                    ...prev,
+                    dailyReminder: { ...prev.dailyReminder, enabled: !prev.dailyReminder.enabled },
+                  }))
+                }
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                  schedules.dailyReminder.enabled ? 'bg-admin-accent' : 'bg-admin-surface-raised'
+                }`}
+                role="switch"
+                aria-checked={schedules.dailyReminder.enabled}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-admin-bg shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    schedules.dailyReminder.enabled ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-admin-border">
+              <div>
+                <label className="block text-[11px] font-semibold text-admin-fg-muted mb-1">Cadence</label>
+                <div className="px-3 py-2 rounded-lg border border-admin-border bg-admin-bg/60 text-admin-fg text-xs font-semibold">
+                  Every Day
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-admin-fg-muted mb-1">Dispatch Time (UTC)</label>
+                <select
+                  value={schedules.dailyReminder.hourUtc}
+                  onChange={(e) =>
+                    setSchedules((prev) => ({
+                      ...prev,
+                      dailyReminder: { ...prev.dailyReminder, hourUtc: Number(e.target.value) },
+                    }))
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-admin-border bg-admin-bg text-admin-fg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-admin-accent"
+                >
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <option key={i} value={i}>
+                      {String(i).padStart(2, '0')}:00 UTC
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-admin-border text-xs">
+              <span className="text-[11px] text-admin-fg-muted">
+                {schedules.dailyReminder.lastRunAt
+                  ? `Last run: ${new Date(schedules.dailyReminder.lastRunAt).toLocaleString()}`
+                  : 'No execution recorded yet'}
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={runningType === 'daily_reminder'}
+                  onClick={() => handleRunNow('daily_reminder')}
+                  className="px-3 py-1.5 rounded-lg border border-admin-border text-xs font-semibold text-admin-fg hover:bg-admin-surface-raised transition-colors inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {runningType === 'daily_reminder' ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Play className="w-3 h-3 text-admin-accent" />
+                  )}
+                  <span>Run Now</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={savingSchedule === 'daily'}
+                  onClick={() => handleSaveSchedule('daily')}
+                  className="px-3.5 py-1.5 rounded-lg bg-admin-accent text-admin-accent-fg text-xs font-bold hover:bg-admin-accent/90 transition-colors inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {savingSchedule === 'daily' ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Save className="w-3 h-3" />
+                  )}
+                  <span>Save Schedule</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Section 3: Scheduled Digests & Reminders */}
+      {/* Section 3: Optional Transactional Automations */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-admin-info" />
-          <h3 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Scheduled Digests &amp; Reminders</h3>
+          <Mail className="w-4 h-4 text-admin-accent" />
+          <h3 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Transactional Automations</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {scheduledAutomations.map((item) => (
+          {optionalTransactional.map((item) => (
             <AutomationCard
               key={item.key}
               item={item}

@@ -20,15 +20,36 @@ export async function POST(request: Request) {
 
   const isEnabled = await EmailAutomationsService.isAutomationEnabled('learning.daily_reminder')
   const isGlobalPause = await EmailAutomationsService.isGlobalPauseActive()
+  const schedules = await EmailAutomationsService.getDigestSchedules()
+  const dailySched = schedules.dailyReminder
 
-  if (!isEnabled || isGlobalPause) {
+  if (!isEnabled || isGlobalPause || !dailySched.enabled) {
     return NextResponse.json({
       success: true,
       message: 'Daily reminder disabled via Admin Automations or Global Pause',
       isEnabled,
       isGlobalPause,
+      scheduleEnabled: dailySched.enabled,
       remindersQueued: 0,
     })
+  }
+
+  const url = new URL(request.url)
+  const isForced = url.searchParams.get('force') === 'true'
+
+  if (!isForced) {
+    const now = new Date()
+    const currentHour = now.getUTCHours()
+
+    if (currentHour !== dailySched.hourUtc) {
+      return NextResponse.json({
+        success: true,
+        message: 'Skipped: Current time does not match configured daily schedule window.',
+        configured: { hourUtc: dailySched.hourUtc },
+        current: { hourUtc: currentHour },
+        remindersQueued: 0,
+      })
+    }
   }
 
   const supabase = createServiceRoleClient()
@@ -76,6 +97,7 @@ export async function POST(request: Request) {
         })
         if (result.success) remindersQueued++
       }
+      await EmailAutomationsService.recordDigestRun('dailyReminder')
     }
   } catch (err) {
     console.error('[cron/daily-reminder] Failed to queue daily reminders:', err)
