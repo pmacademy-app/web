@@ -120,6 +120,9 @@ export async function submitOnboarding(data: OnboardingData) {
       career_role: data.career_role?.trim() || null,
       goal: data.goal?.trim() || null,
       learning_purpose: compositeLearningPurpose,
+      // Structured columns for precise broadcast filtering
+      onboarding_topics: Array.isArray(data.topics) && data.topics.length > 0 ? data.topics : [],
+      onboarding_preference: data.learning_preference?.trim() || null,
       linkedin_url: data.linkedin_url?.trim() || null,
       github_url: data.github_url?.trim() || null,
       website_url: websiteUrl,

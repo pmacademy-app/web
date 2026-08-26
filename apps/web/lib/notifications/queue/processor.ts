@@ -20,6 +20,8 @@ export interface EnqueueNotificationParams {
   eventType: string
   category: NotificationCategory
   priorityLevel?: NotificationPriorityLevel
+  /** Optional broadcast ID — tags the email_queue row for deduplication and stats. */
+  broadcastId?: string
 }
 
 /**
@@ -68,7 +70,24 @@ export async function enqueueNotificationItem(
   }
 
   // 4. Idempotency / Duplicate Prevention Check
-  if (params.eventId) {
+  if (params.broadcastId) {
+    try {
+      const { data: rawExistingBroadcast } = await supabase
+        .from('email_queue')
+        .select('id')
+        .eq('broadcast_id', params.broadcastId)
+        .eq('user_id', params.userId)
+        .maybeSingle()
+
+      const existingB = rawExistingBroadcast as { id: string } | null
+      if (existingB && existingB.id) {
+        await recordSkippedEvent(supabase, params, 'duplicate_broadcast_user')
+        return { success: false, reason: 'Duplicate notification for broadcast already queued or delivered', queueId: existingB.id }
+      }
+    } catch {
+      // Fall through to insert
+    }
+  } else if (params.eventId) {
     try {
       const { data: rawExisting } = await supabase
         .from('email_queue')
@@ -109,12 +128,17 @@ export async function enqueueNotificationItem(
         scheduled_at: now,
         created_at: now,
         updated_at: now,
+        ...(params.broadcastId ? { broadcast_id: params.broadcastId } : {}),
       })
       .select('id')
       .single()
 
     const rawInserted = inserted as { id: string } | null
     if (error || !rawInserted) {
+      if (error?.code === '23505' || error?.message?.includes('duplicate') || error?.message?.includes('unique')) {
+        await recordSkippedEvent(supabase, params, 'duplicate_db_constraint')
+        return { success: false, reason: 'Duplicate notification prevented by database unique constraint' }
+      }
       return { success: false, reason: `Failed to insert queue record: ${error?.message || 'Unknown error'}` }
     }
 
