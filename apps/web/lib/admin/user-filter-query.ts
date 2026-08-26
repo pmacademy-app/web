@@ -153,6 +153,28 @@ async function fetchUsersReceivedTemplate(
 }
 
 /**
+ * Returns user IDs whose emails are suppressed (unsubscribed or bounced).
+ */
+async function fetchSuppressedUserIds(supabase: SupabaseClient): Promise<Set<string>> {
+  try {
+    const { data: suppRows } = await supabase.from('email_suppressions').select('email')
+    const emails = ((suppRows || []) as Array<{ email: string }>).map((s) => s.email.trim().toLowerCase())
+    if (emails.length === 0) return new Set()
+    const { data: userRows } = await supabase.from('users').select('id, email')
+    const idSet = new Set<string>()
+    const emailLookup = new Set(emails)
+    for (const u of (userRows || []) as Array<{ id: string; email: string }>) {
+      if (emailLookup.has(u.email?.trim().toLowerCase())) {
+        idSet.add(u.id)
+      }
+    }
+    return idSet
+  } catch {
+    return new Set()
+  }
+}
+
+/**
  * Returns user IDs who received email from a specific broadcast.
  */
 async function fetchUsersReceivedBroadcast(
@@ -343,6 +365,13 @@ export async function resolveFilteredUserIds(
       })
     )
   }
+
+  // --- Automatic suppression exclusion (unsubscribed / bounced) ---
+  tasks.push(
+    fetchSuppressedUserIds(supabase).then((suppressed) => {
+      for (const id of suppressed) excludeIds.add(id)
+    })
+  )
 
   // Wait for all sub-queries
   await Promise.all(tasks)
