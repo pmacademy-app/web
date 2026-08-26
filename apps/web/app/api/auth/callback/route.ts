@@ -64,6 +64,29 @@ export async function GET(request: NextRequest) {
 
       if (!error && data.user && data.session) {
         await ensureUserProfile(supabase, data.user)
+        if (type === 'signup' || type === 'email_change') {
+          try {
+            const { globalNotificationDispatcher } = await import('@/lib/notifications/dispatcher')
+            const { initializeNotificationConnectors } = await import('@/lib/notifications/events/connectors')
+            initializeNotificationConnectors()
+            await globalNotificationDispatcher.dispatch({
+              id: `user-verified-${data.user.id}`,
+              event: 'user.verified',
+              userId: data.user.id,
+              userEmail: data.user.email || '',
+              userName: data.user.user_metadata?.full_name || data.user.user_metadata?.name || 'Learner',
+              userTimezone: 'UTC',
+              priority: 'high',
+              category: 'security',
+              occurredAt: new Date().toISOString(),
+              payload: {
+                email: data.user.email,
+              },
+            })
+          } catch (notifErr) {
+            console.warn('[auth/callback] user.verified notification dispatch warning:', notifErr)
+          }
+        }
         return redirectWithSession(destination, data.session)
       }
 
