@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useTransition } from 'react'
-import { Send, Plus, Play, XCircle, Clock, CheckCircle, AlertTriangle, RotateCcw, Eye } from 'lucide-react'
+import { Send, Plus, Play, XCircle, Clock, CheckCircle, AlertTriangle, RotateCcw } from 'lucide-react'
 import { AdminCreateBroadcastModal } from './AdminCreateBroadcastModal'
 import type { BroadcastRecord, BroadcastListResult } from '@/lib/admin/broadcast-service'
 
@@ -48,7 +48,7 @@ export function AdminBroadcastsView({ initialData }: AdminBroadcastsViewProps) {
   const [total] = useState(initialData?.total ?? 0)
   const [executing, setExecuting] = useState<string | null>(null)
   const [cancelling, setCancelling] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
   const [actionMsg, setActionMsg] = useState<{ id: string; msg: string; type: 'success' | 'error' } | null>(null)
 
   const refresh = () => {

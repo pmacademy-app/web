@@ -8,6 +8,7 @@
  */
 
 import { createServiceRoleClient } from '@/lib/supabase'
+import type { Json } from '@/types/database'
 import { applyUserFilters, countMatchingUsers, sampleMatchingUsers } from './user-filter-query'
 import type { AdminUserFilters } from './types'
 

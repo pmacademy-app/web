@@ -15,6 +15,8 @@ describe('Email Broadcast Service & Filtering Unit Tests', () => {
   })
 
   it('validates broadcast status transitions and constraints', () => {
+    expect(BroadcastService).toBeDefined()
+
     // Draft can be updated and scheduled
     const draftStatus = 'draft'
     expect(['draft', 'scheduled'].includes(draftStatus)).toBe(true)

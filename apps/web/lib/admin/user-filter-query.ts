@@ -45,7 +45,6 @@ async function fetchVerifiedUserIds(supabase: SupabaseClient): Promise<Set<strin
   const verified = new Set<string>()
   let page = 1
   const perPage = 1000
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
       const { data, error } = await supabase.auth.admin.listUsers({ page, perPage })
@@ -233,17 +232,12 @@ export async function resolveFilteredUserIds(
   const tasks: Array<Promise<void>> = []
   // `null` means "no constraint from this source" (all users pass)
   let constraintIds: Set<string> | null = null
-  let excludeIds: Set<string> = new Set()
+  const excludeIds: Set<string> = new Set()
 
   // --- Verification ---
   if (filters.verification) {
     tasks.push(
       fetchVerifiedUserIds(supabase).then((verifiedIds) => {
-        const constraint =
-          filters.verification === 'verified'
-            ? verifiedIds
-            : // unverified = all users minus verified
-              null // handled as exclude below
         if (filters.verification === 'verified') {
           constraintIds = intersect(constraintIds, verifiedIds)
         } else {
