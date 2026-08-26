@@ -11,6 +11,8 @@ import { StreakCard } from '@/components/dashboard/StreakCard'
 import { RecentActivityCard, ActivityItem } from '@/components/dashboard/RecentActivityCard'
 import { FlashcardReviewPromptCard } from '@/components/dashboard/FlashcardReviewPromptCard'
 import { NextCapstonePromptCard } from '@/components/dashboard/NextCapstonePromptCard'
+import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
+import { PersonalizedGoalBanner } from '@/components/dashboard/PersonalizedGoalBanner'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -178,8 +180,22 @@ export default async function DashboardPage() {
     }
   })
 
+  // 6. Resolve Goal-Driven Personalization (Phase 3)
+  const personalizedPath = resolvePersonalizedPath(profile)
+  const recommendedMilestone = resolveNextRecommendedMilestone(
+    personalizedPath,
+    completedLessonIds,
+    curriculumLessons
+  )
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
+      {/* 0. Personalized Goal Header (Phase 3) */}
+      <PersonalizedGoalBanner
+        path={personalizedPath}
+        milestone={recommendedMilestone}
+      />
+
       {/* 1. Continue Learning Header CTA */}
       <ContinueLearningCard
         nextLesson={nextLesson}

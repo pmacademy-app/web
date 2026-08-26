@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import type { CurriculumEntry } from '@/types'
-import { BookOpen, Clock, ChevronRight, GraduationCap, Layers } from 'lucide-react'
+import { BookOpen, Clock, ChevronRight, GraduationCap, Layers, Sparkles } from 'lucide-react'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { BRAND } from '@/lib/brand'
+import { resolvePersonalizedPath } from '@/lib/personalization/path-resolver'
 
 export const metadata: Metadata = {
   title: 'Curriculum',
@@ -106,17 +107,28 @@ export default async function AcademyPage() {
   const lessons = curriculum?.lessons ?? []
   const byModule = groupByModule(lessons)
 
-  // Fetch completed lessons for current user
+  // Fetch completed lessons and personalization profile for current user
   let completedSet = new Set<string>()
+  let personalizedPath = resolvePersonalizedPath(null)
   if (user) {
     const supabase = createServiceRoleClient()
-    const { data: rows } = await supabase
-      .from('user_lesson_progress')
-      .select('lesson_id')
-      .eq('user_id', user.id)
-      .eq('status', 'completed')
+    const [{ data: rows }, { data: dbUser }] = await Promise.all([
+      supabase
+        .from('user_lesson_progress')
+        .select('lesson_id')
+        .eq('user_id', user.id)
+        .eq('status', 'completed'),
+      supabase
+        .from('users')
+        .select('goal, career_role, onboarding_topics, onboarding_preference, learning_purpose')
+        .eq('id', user.id)
+        .maybeSingle(),
+    ])
     if (rows) {
       completedSet = new Set((rows as { lesson_id: string }[]).map((r) => r.lesson_id))
+    }
+    if (dbUser) {
+      personalizedPath = resolvePersonalizedPath(dbUser as Parameters<typeof resolvePersonalizedPath>[0])
     }
   }
 
@@ -206,6 +218,9 @@ export default async function AcademyPage() {
           const hours = Math.floor(totalTime / 60)
           const mins = totalTime % 60
 
+          const isRecommended =
+            personalizedPath.isPersonalized && moduleSlug === personalizedPath.recommendedModuleSlug
+
           return (
             <details
               key={moduleSlug}
@@ -236,6 +251,15 @@ export default async function AcademyPage() {
                           ✓ Completed
                         </span>
                       )}
+                      {isRecommended && (
+                        <span
+                          data-testid="recommended-module-badge"
+                          className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary/15 text-primary border border-primary/25 inline-flex items-center gap-1"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          Recommended for Your Goal
+                        </span>
+                      )}
                     </div>
                     <h2 className="text-base font-bold font-serif text-foreground mt-1 leading-snug truncate">
                       {meta?.name ?? moduleSlug}
@@ -253,6 +277,13 @@ export default async function AcademyPage() {
               </summary>
 
               <div className="px-5 pb-5 space-y-4 border-t border-border/60 pt-4">
+                {isRecommended && (
+                  <div className="inline-flex items-center gap-1.5 text-xs text-primary font-semibold bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5">
+                    <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                    <span>Focus area for: {personalizedPath.goalLabel}</span>
+                  </div>
+                )}
+
                 {meta?.description && (
                   <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
                     {meta.description}

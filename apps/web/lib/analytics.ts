@@ -47,6 +47,9 @@ type EventMap = {
   first_session_started:    { lesson_id?: string; module_slug?: string }
   first_lesson_completed:   { lesson_id: string; xp_earned?: number }
   first_reward_celebrated:  { lesson_id: string; xp_earned?: number }
+
+  // ─── Goal-Driven Personalization Events (Phase 3) ─────────────────────────
+  goal_context_viewed:      { goal_id?: string; recommended_module?: string }
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -175,6 +178,14 @@ export function trackFirstLessonCompleted(lessonId: string, xpEarned?: number) {
 export function trackFirstRewardCelebrated(lessonId: string, xpEarned?: number) {
   trackEvent('first_reward_celebrated', { lesson_id: lessonId, xp_earned: xpEarned })
 }
+
+// ─── Goal-Driven Personalization Trackers (Phase 3) ─────────────────────────
+
+/** Fired when personalized goal context is displayed on the learner dashboard. */
+export function trackGoalContextViewed(goalId?: string, recommendedModule?: string) {
+  trackEvent('goal_context_viewed', { goal_id: goalId, recommended_module: recommendedModule })
+}
+
 
 
 
