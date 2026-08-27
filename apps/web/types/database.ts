@@ -1675,6 +1675,7 @@ export type Database = {
           current_streak: number
           curriculum_access_override: boolean
           email: string
+          featured_capstone_id: string | null
           github_url: string | null
           goal: string | null
           id: string
@@ -1689,6 +1690,8 @@ export type Database = {
           onboarding_completed: boolean
           onboarding_preference: string | null
           onboarding_topics: string[]
+          portfolio_layout: Json | null
+          portfolio_view_count: number
           streak_freezes_available: number
           timezone: string
           total_active_seconds: number
@@ -1705,6 +1708,7 @@ export type Database = {
           current_streak?: number
           curriculum_access_override?: boolean
           email: string
+          featured_capstone_id?: string | null
           github_url?: string | null
           goal?: string | null
           id: string
@@ -1719,6 +1723,8 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_preference?: string | null
           onboarding_topics?: string[]
+          portfolio_layout?: Json | null
+          portfolio_view_count?: number
           streak_freezes_available?: number
           timezone?: string
           total_active_seconds?: number
@@ -1735,6 +1741,7 @@ export type Database = {
           current_streak?: number
           curriculum_access_override?: boolean
           email?: string
+          featured_capstone_id?: string | null
           github_url?: string | null
           goal?: string | null
           id?: string
@@ -1749,6 +1756,8 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_preference?: string | null
           onboarding_topics?: string[]
+          portfolio_layout?: Json | null
+          portfolio_view_count?: number
           streak_freezes_available?: number
           timezone?: string
           total_active_seconds?: number
@@ -1756,7 +1765,15 @@ export type Database = {
           username?: string | null
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "users_featured_capstone_id_fkey"
+            columns: ["featured_capstone_id"]
+            isOneToOne: false
+            referencedRelation: "capstone_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waitlist: {
         Row: {
