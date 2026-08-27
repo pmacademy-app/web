@@ -23,6 +23,7 @@ export interface AuthTelemetryPayload {
   isNetworkError?: boolean
   browserFamily?: 'chrome' | 'firefox' | 'safari' | 'edge' | 'other'
   onlineState?: boolean
+  rawCode?: string
 }
 
 /**
@@ -57,6 +58,7 @@ export function recordAuthTelemetry(
       isNetworkError: error.isNetworkError,
       browserFamily: getNormalizedBrowserFamily(),
       onlineState: typeof navigator !== 'undefined' ? navigator.onLine : true,
+      rawCode: typeof error.rawCode === 'string' ? error.rawCode.substring(0, 60) : undefined,
     }
 
     const jsonString = JSON.stringify(payload)

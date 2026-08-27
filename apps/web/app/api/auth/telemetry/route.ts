@@ -32,6 +32,7 @@ interface ValidatedTelemetryPayload {
   isNetworkError?: boolean
   browserFamily?: 'chrome' | 'firefox' | 'safari' | 'edge' | 'other'
   onlineState?: boolean
+  rawCode?: string
 }
 
 function validateTelemetryPayload(data: unknown): ValidatedTelemetryPayload | null {
@@ -53,12 +54,18 @@ function validateTelemetryPayload(data: unknown): ValidatedTelemetryPayload | nu
       ? (obj.browserFamily as 'chrome' | 'firefox' | 'safari' | 'edge' | 'other')
       : undefined
 
+  const rawCode =
+    typeof obj.rawCode === 'string' && obj.rawCode.length <= 60
+      ? obj.rawCode.replace(/[^\w\-\.:]/g, '')
+      : undefined
+
   return {
     errorCode: obj.errorCode as AuthErrorCode,
     authAction: obj.authAction,
     isNetworkError: typeof obj.isNetworkError === 'boolean' ? obj.isNetworkError : undefined,
     browserFamily,
     onlineState: typeof obj.onlineState === 'boolean' ? obj.onlineState : undefined,
+    rawCode,
   }
 }
 
@@ -103,10 +110,10 @@ function deriveSeverity(errorCode: AuthErrorCode): ErrorSeverity {
   switch (errorCode) {
     case 'AUTH_PROVIDER_UNAVAILABLE':
       return 'critical'
-    case 'AUTH_NETWORK_ERROR':
     case 'AUTH_SESSION_SYNC_FAILED':
     case 'AUTH_UNKNOWN_ERROR':
       return 'error'
+    case 'AUTH_NETWORK_ERROR':
     case 'AUTH_RATE_LIMITED':
     case 'AUTH_USER_ALREADY_EXISTS':
     case 'AUTH_INVALID_CREDENTIALS':
@@ -141,7 +148,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Invalid telemetry payload schema' }, { status: 400 })
   }
 
-  const { errorCode, authAction, isNetworkError, browserFamily, onlineState } = payload
+  const { errorCode, authAction, isNetworkError, browserFamily, onlineState, rawCode } = payload
   const severity = deriveSeverity(errorCode)
 
   // 3. Log to system_errors infrastructure with safe sanitized metadata
@@ -154,6 +161,7 @@ export async function POST(request: Request) {
       details: {
         errorCode,
         authAction,
+        rawCode: rawCode || undefined,
         isNetworkError: Boolean(isNetworkError),
         browserFamily: browserFamily || 'other',
         onlineState: onlineState ?? true,

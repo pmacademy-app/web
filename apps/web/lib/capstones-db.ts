@@ -8,7 +8,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
-import { getAllCapstoneDefinitions } from '@/config/capstones'
+import { getAllCapstoneDefinitions, getCapstoneDefinition } from '@/config/capstones'
 import {
   deriveCapstoneStatus,
   validateCapstoneSubmission,
@@ -416,6 +416,39 @@ export async function submitCapstoneAction(
 
   // 7. Update streak
   await updateUserStreak(supabase, userId)
+
+  // 8. Dispatch capstone.submitted notification
+  try {
+    const { data: userRec } = await (supabase
+      .from('users') as unknown as DBChain)
+      .select('email, name')
+      .eq('id', userId)
+      .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+
+    const { globalNotificationDispatcher } = await import('./notifications/dispatcher')
+    const { initializeNotificationConnectors } = await import('./notifications/events/connectors')
+    initializeNotificationConnectors()
+
+    const def = getCapstoneDefinition(moduleSlug)
+    await globalNotificationDispatcher.dispatch({
+      id: `capstone-submit-${result.id}`,
+      event: 'capstone.submitted',
+      userId,
+      userEmail: userRec?.email || '',
+      userName: userRec?.name || 'Learner',
+      userTimezone: 'UTC',
+      priority: 'medium',
+      category: 'portfolio',
+      occurredAt: new Date().toISOString(),
+      payload: {
+        submissionId: result.id,
+        moduleSlug,
+        moduleTitle: def?.moduleTitle || moduleSlug,
+      },
+    })
+  } catch (notifErr) {
+    console.warn('[capstones-db] Capstone submitted notification dispatch warning:', notifErr)
+  }
 
   return {
     success: true,

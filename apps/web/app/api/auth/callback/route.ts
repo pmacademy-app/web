@@ -35,7 +35,10 @@ export async function GET(request: NextRequest) {
   const token_hash = requestUrl.searchParams.get('token_hash')
   const type = requestUrl.searchParams.get('type') as EmailOtpType | null
   const next = requestUrl.searchParams.get('next') ?? '/dashboard'
-  const destination = new URL(next, requestUrl.origin)
+  let destination = new URL(next, requestUrl.origin)
+  if (destination.origin !== requestUrl.origin) {
+    destination = new URL('/dashboard', requestUrl.origin)
+  }
 
   // ── Path 1: PKCE code exchange (OAuth / magic link) ──────────────────────
   if (code) {
@@ -64,6 +67,29 @@ export async function GET(request: NextRequest) {
 
       if (!error && data.user && data.session) {
         await ensureUserProfile(supabase, data.user)
+        if (type === 'signup' || type === 'email_change') {
+          try {
+            const { globalNotificationDispatcher } = await import('@/lib/notifications/dispatcher')
+            const { initializeNotificationConnectors } = await import('@/lib/notifications/events/connectors')
+            initializeNotificationConnectors()
+            await globalNotificationDispatcher.dispatch({
+              id: `user-verified-${data.user.id}`,
+              event: 'user.verified',
+              userId: data.user.id,
+              userEmail: data.user.email || '',
+              userName: data.user.user_metadata?.full_name || data.user.user_metadata?.name || 'Learner',
+              userTimezone: 'UTC',
+              priority: 'high',
+              category: 'security',
+              occurredAt: new Date().toISOString(),
+              payload: {
+                email: data.user.email,
+              },
+            })
+          } catch (notifErr) {
+            console.warn('[auth/callback] user.verified notification dispatch warning:', notifErr)
+          }
+        }
         return redirectWithSession(destination, data.session)
       }
 
@@ -75,6 +101,10 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // ── Fallback: both paths failed — send to login with error ────────────────
+  // ── Fallback: both paths failed — send to appropriate destination with error ──
+  if (type === 'recovery' || next.includes('reset-password')) {
+    return NextResponse.redirect(new URL('/reset-password?error=expired', requestUrl.origin))
+  }
+
   return NextResponse.redirect(new URL('/login?error=auth_failed', requestUrl.origin))
 }

@@ -1,8 +1,9 @@
 # Known Issues & Production Verification Tracker — Prodily PM Academy
 
 **Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `21cc985`  
-**Last Updated:** August 23, 2026  
+**Current Branch:** `prodily-product-evolution-plan`  
+**Current Baseline HEAD:** `2496754`  
+**Last Updated:** August 26, 2026  
 
 ---
 
@@ -65,10 +66,41 @@
 
 ---
 
-### ⚪ Known Architectural Debt & Migration Gaps
+### ⚪ Known Architectural Debt & Verified Implementation Gaps
 
 #### ISSUE-06: Custom Session Bridge vs. `@supabase/ssr`
 - **Status**: ⚪ Known Architectural Debt
 - **Description**: Current auth session synchronization uses custom cookies (`sb-access-token`, `sb-refresh-token`) via `proxy.ts`, `AuthStateListener.tsx`, and `/api/auth/session`.
 - **Impact**: Server components cannot refresh expired tokens automatically (1-hour session expiry risk); slight race condition on initial sign-in.
 - **Planned Resolution**: Migrate to official `@supabase/ssr` package (`createServerClient`), delete `/api/auth/session` route and `AuthStateListener.tsx`.
+
+#### ISSUE-07: Onboarding Recommendation Disconnected from Learning Path
+- **Status**: 🟠 Verified Product Gap (Targeted: Phase 3)
+- **Description**: Step 4 of `OnboardingWizard.tsx` calculates a recommended module preview based on user goal, experience level, and topics. However, the recommendation is not stored as an active curriculum path override. `/dashboard` and `/academy` strictly follow the hardcoded sequential order (Lessons 1..90).
+- **Evidence**: `OnboardingWizard.tsx:134-169`, `dashboard/page.tsx:96-108`.
+
+#### ISSUE-08: In-App GA4 Learning Event Instrumentation Omission
+- **Status**: 🟠 Verified Observability Gap (Targeted: Phase 1)
+- **Description**: `apps/web/lib/analytics.ts` defines and tracks 11 marketing and quick-start tour events. Core in-app learning actions (lesson starts, theory completions, quiz attempts, capstone submissions, badges, level-ups, certificates) are recorded only in PostgreSQL and Admin Console aggregations, with zero telemetry dispatched to GA4.
+- **Evidence**: `apps/web/lib/analytics.ts:24-110`.
+
+#### ISSUE-09: Undispatched Notification Platform Events
+- **Status**: 🟢 Resolved (Phase 0)
+- **Resolution**: Registered `quiz.completed`, `streak.updated`, and `review.completed` in `IN_APP_EVENTS` in `connectors.ts`. Decoupled `user.verified` from `auth.verify_email` email queue to eliminate verification email loop. Implemented runtime event dispatches for `user.verified`, `lesson.completed`, `quiz.completed`, `capstone.submitted`, `streak.updated` (milestone days), and `review.completed`. Verified with automated unit test suite `lib/__tests__/notification-dispatch-integrity.test.ts`.
+
+#### ISSUE-10: Stale Generated Database TypeScript Definitions
+- **Status**: 🟢 Resolved (Phase 0)
+- **Resolution**: Synchronized `apps/web/types/database.ts` to include `in_app_broadcasts` table definitions as well as `users` table `onboarding_topics` and `onboarding_preference` columns. Verified with automated unit test suite `lib/__tests__/db-types-alignment.test.ts`.
+
+#### ISSUE-11: Glossary Route Sitemap Redirect Anomaly
+- **Status**: 🟢 Resolved (Phase 0)
+- **Resolution**: Removed `${siteUrl}/glossary` redirecting route entry from `marketingRoutes` array in `apps/web/app/sitemap.ts`. All sitemap URLs now serve canonical 200 OK endpoints without search engine crawler redirects.
+
+#### ISSUE-12: Streak Freeze Learner UI Explanatory Copy
+- **Status**: 🟢 Resolved (Phase 0)
+- **Resolution**: Added clear explanatory copy and tooltip to `StreakCard.tsx` explaining that available streak freezes automatically protect the learner's study streak on missed days.
+
+#### ISSUE-13: Capstone Direct Submit-to-Portfolio Flow Alignment
+- **Status**: ⚪ Scope Clarification (Targeted: Phase 4)
+- **Decision**: Quality evaluation, grading rubrics, reviewer comments, and admin review queues are formally out of scope for the current 10-phase roadmap. Submitted capstones will display directly on the learner's public portfolio as submitted work, preserving platform safety moderation while removing review bottlenecks.
+- **Evidence**: Decision 2 in Planning Directive; `lib/capstones-db.ts`.

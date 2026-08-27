@@ -303,24 +303,64 @@ export async function recordQuizAttemptAction(
 
   await updateUserStreak(supabase, userId)
 
+  let totalCompletedLessons = 0
+
   try {
+    const { data: userRec } = await (supabase
+      .from('users') as unknown as DBChain)
+      .select('email, name')
+      .eq('id', userId)
+      .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+
+    const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
+    const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
+    initializeNotificationConnectors()
+
+    // Dispatch quiz.completed
+    await globalNotificationDispatcher.dispatch({
+      id: `quiz-complete-${userId}-${lessonId}-${Date.now()}`,
+      event: 'quiz.completed',
+      userId,
+      userEmail: userRec?.email || '',
+      userName: userRec?.name || 'Learner',
+      userTimezone: 'UTC',
+      priority: 'low',
+      category: 'learning',
+      occurredAt: new Date().toISOString(),
+      payload: {
+        userId,
+        lessonId,
+        score: scorePercentage,
+      },
+    })
+
+    // Dispatch lesson.completed
+    await globalNotificationDispatcher.dispatch({
+      id: `lesson-complete-${userId}-${lessonId}`,
+      event: 'lesson.completed',
+      userId,
+      userEmail: userRec?.email || '',
+      userName: userRec?.name || 'Learner',
+      userTimezone: 'UTC',
+      priority: 'medium',
+      category: 'learning',
+      occurredAt: new Date().toISOString(),
+      payload: {
+        userId,
+        lessonId,
+        lessonTitle: lesson?.title || lessonId,
+        xpEarned: totalXpToAward,
+      },
+    })
+
     const { data: userProgress } = await (supabase
       .from('user_lesson_progress') as unknown as DBChain)
       .select('lesson_id, status')
       .eq('user_id', userId) as unknown as { data: { lesson_id: string; status: string }[] | null }
 
-    const completedCount = userProgress?.filter((p) => p.status === 'completed').length || 0
-    if (completedCount > 0 && completedCount % 10 === 0) {
-      const moduleIndex = Math.floor(completedCount / 10)
-      const { data: userRec } = await (supabase
-        .from('users') as unknown as DBChain)
-        .select('email, name')
-        .eq('id', userId)
-        .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
-
-      const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
-      const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
-      initializeNotificationConnectors()
+    totalCompletedLessons = userProgress?.filter((p) => p.status === 'completed').length || 0
+    if (totalCompletedLessons > 0 && totalCompletedLessons % 10 === 0) {
+      const moduleIndex = Math.floor(totalCompletedLessons / 10)
 
       await globalNotificationDispatcher.dispatch({
         id: `module-complete-${userId}-${moduleIndex}`,
@@ -341,11 +381,14 @@ export async function recordQuizAttemptAction(
       })
     }
   } catch (modErr) {
-    console.warn('[lessons-db] Module complete notification dispatch warning:', modErr)
+    console.warn('[lessons-db] Notification dispatch warning:', modErr)
   }
 
   return {
     success: true,
+    isCompleted: true,
+    isFirstLesson: totalCompletedLessons === 1,
+    totalCompletedLessons,
     correctCount,
     totalQuestions,
     scorePercentage,

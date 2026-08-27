@@ -132,6 +132,14 @@ export function ReviewHub({
         setIsFlipped(false)
         setCurrentIndex((prev) => prev + 1)
       } else {
+        const finalReviewedCount = reviewedCount + 1
+        const finalXpEarned = xpEarned + 2
+        fetch('/api/review/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cardsReviewedCount: finalReviewedCount, xpEarned: finalXpEarned }),
+        }).catch((e) => console.warn('[ReviewHub] Failed to call review complete:', e))
+
         setDueCards([])
         setSessionCompleted(true)
         router.refresh()
