@@ -62,6 +62,11 @@ type EventMap = {
 
   // ─── Lesson Feedback Loop Events (Phase 6) ───────────────────────────────
   lesson_feedback_submitted:       { lesson_id: string; rating: number; tags_count: number; has_comment: boolean }
+
+  // ─── Sharing & Referral Events (Phase 7) ──────────────────────────────────
+  referral_link_copied:            { channel?: string }
+  referral_shared:                 { platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic' }
+  referral_signup_completed:       Record<string, never>
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -243,6 +248,24 @@ export function trackLessonFeedbackSubmitted(
     has_comment: hasComment,
   })
 }
+
+// ─── Sharing & Referral Trackers (Phase 7) ──────────────────────────────────
+
+/** Fired when a learner copies their personal referral invitation link. */
+export function trackReferralLinkCopied(channel = 'direct') {
+  trackEvent('referral_link_copied', { channel })
+}
+
+/** Fired when a learner shares their referral link to a social platform. */
+export function trackReferralShared(platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic') {
+  trackEvent('referral_shared', { platform })
+}
+
+/** Fired when a learner successfully completes registration via a referral link. */
+export function trackReferralSignupCompleted() {
+  trackEvent('referral_signup_completed')
+}
+
 
 
 
