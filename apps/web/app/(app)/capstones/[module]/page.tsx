@@ -4,6 +4,7 @@ import React, { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import {
   ArrowLeft,
+  ArrowRight,
   Award,
   CheckCircle2,
   Clock,
@@ -14,6 +15,8 @@ import {
   ChevronDown,
   ChevronUp,
   Lock,
+  ExternalLink,
+  Eye,
 } from 'lucide-react'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { validateCapstoneSubmission, type CapstoneStatus } from '@/lib/capstones'
@@ -21,6 +24,11 @@ import { useCapstoneAutosave } from '@/hooks/useCapstoneAutosave'
 import { RichEditor } from '@/components/capstones/RichEditor'
 import { CapstoneReflection } from '@/components/capstones/CapstoneReflection'
 import { SubmitConfirmationModal } from '@/components/capstones/SubmitConfirmationModal'
+import {
+  trackCapstoneSubmitted,
+  trackPortfolioArtifactCreated,
+  trackPortfolioVisitedFromCapstone,
+} from '@/lib/analytics'
 
 interface PageProps {
   params: Promise<{ module: string }>
@@ -39,6 +47,12 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [submitSuccessMsg, setSubmitSuccessMsg] = useState<string | null>(null)
   const [isInstructionsCollapsed, setIsInstructionsCollapsed] = useState<boolean>(false)
+
+  // Learner profile info for portfolio routing & privacy surface
+  const [userProfile, setUserProfile] = useState<{
+    username: string
+    isPortfolioPublic: boolean
+  } | null>(null)
 
   // Initial fetched draft content
   const [serverInitialContent, setServerInitialContent] = useState<string>('')
@@ -61,6 +75,9 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
           if (data.reflection) {
             setReflectionContent(data.reflection.content || '')
             setReflectionIsPublic(Boolean(data.reflection.is_public))
+          }
+          if (data.userProfile) {
+            setUserProfile(data.userProfile)
           }
         }
       } catch (err) {
@@ -89,8 +106,8 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
   // Calculate live validation for requirements
   const validation = validateCapstoneSubmission(moduleSlug, content)
 
-  // Handle Submission Confirm
-  const handleConfirmSubmit = async () => {
+  // Handle Submission Confirm (Phase 4 Direct-to-Portfolio)
+  const handleConfirmSubmit = async (isPublic: boolean) => {
     try {
       setIsSubmitting(true)
       await saveNow()
@@ -102,6 +119,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
           content,
           reflectionContent,
           reflectionIsPublic,
+          isPublic,
         }),
       })
 
@@ -114,6 +132,14 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
       setSubmittedAt(data.submission?.submitted_at || new Date().toISOString())
       setSubmitSuccessMsg(data.message || 'Capstone submitted successfully! 150 XP awarded.')
       setIsSubmitModalOpen(false)
+
+      // Track Phase 4 analytics events safely (non-blocking, zero-PII)
+      try {
+        trackCapstoneSubmitted(moduleSlug, capstoneDef?.moduleTitle)
+        trackPortfolioArtifactCreated(moduleSlug, isPublic)
+      } catch (analyticsErr) {
+        console.warn('Analytics tracking error:', analyticsErr)
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to submit capstone.'
       alert(msg)
@@ -160,7 +186,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
             All Capstones
           </Link>
           <Link
-            href="/learn"
+            href="/dashboard"
             className="px-4 py-2 text-xs font-bold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Continue Learning
@@ -244,11 +270,69 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Success Notification Banner */}
+      {/* Post-Submission Portfolio Showcase Card (Phase 4 Direct-to-Portfolio) */}
+      {isLocked && (
+        <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-card to-background p-6 md:p-7 shadow-xs space-y-4 animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="p-3 rounded-xl bg-emerald-500/15 text-emerald-500 shrink-0">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-base md:text-lg font-bold font-serif text-foreground">
+                    Your capstone is now part of your portfolio!
+                  </h2>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                    +150 XP Awarded
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {userProfile?.isPortfolioPublic !== false ? (
+                    <>
+                      Live and showcased on your public portfolio at{' '}
+                      <span className="font-mono text-foreground font-semibold">
+                        /p/{userProfile?.username || 'you'}#capstones
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      Saved securely to your personal portfolio. Your profile is currently set to Private in Settings.
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5 pt-1 sm:pt-0">
+              {userProfile?.username && (
+                <Link
+                  href={`/p/${userProfile.username}#capstones`}
+                  onClick={() => trackPortfolioVisitedFromCapstone(moduleSlug)}
+                  className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-all shadow-xs flex items-center gap-2"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>View Portfolio</span>
+                  <ExternalLink className="w-3 h-3 opacity-70" />
+                </Link>
+              )}
+              <Link
+                href="/dashboard"
+                className="px-4 py-2.5 rounded-xl border border-border bg-card text-foreground font-semibold text-xs hover:bg-secondary transition-colors flex items-center gap-1.5"
+              >
+                <span>Continue Learning</span>
+                <ArrowRight className="w-3 h-3 text-muted-foreground" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Notification Alert Banner (Temporary feedback if freshly submitted) */}
       {submitSuccessMsg && (
         <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex items-center justify-between text-xs text-emerald-500 animate-in fade-in duration-300">
           <div className="flex items-center gap-2.5 font-bold">
-            <Sparkles className="w-4 h-4 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{submitSuccessMsg}</span>
           </div>
           <button
@@ -367,7 +451,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         isLocked={isLocked}
       />
 
-      {/* Submit Confirmation Modal */}
+      {/* Submit Confirmation Modal (Phase 4 Direct-to-Portfolio Surface) */}
       <SubmitConfirmationModal
         isOpen={isSubmitModalOpen}
         onClose={() => setIsSubmitModalOpen(false)}
@@ -375,6 +459,7 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         validation={validation}
         isSubmitting={isSubmitting}
         moduleTitle={capstoneDef.moduleTitle}
+        userProfile={userProfile}
       />
     </div>
   )

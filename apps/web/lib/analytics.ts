@@ -50,6 +50,10 @@ type EventMap = {
 
   // ─── Goal-Driven Personalization Events (Phase 3) ─────────────────────────
   goal_context_viewed:      { goal_id?: string; recommended_module?: string }
+
+  // ─── Capstone & Proof-of-Work Events (Phase 4) ───────────────────────────
+  portfolio_artifact_created:     { module_slug: string; is_public: boolean }
+  portfolio_visited_from_capstone: { module_slug: string }
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -185,6 +189,19 @@ export function trackFirstRewardCelebrated(lessonId: string, xpEarned?: number) 
 export function trackGoalContextViewed(goalId?: string, recommendedModule?: string) {
   trackEvent('goal_context_viewed', { goal_id: goalId, recommended_module: recommendedModule })
 }
+
+// ─── Capstone & Proof-of-Work Trackers (Phase 4) ───────────────────────────
+
+/** Fired when a capstone submission creates/updates a portfolio artifact. */
+export function trackPortfolioArtifactCreated(moduleSlug: string, isPublic: boolean) {
+  trackEvent('portfolio_artifact_created', { module_slug: moduleSlug, is_public: isPublic })
+}
+
+/** Fired when a learner navigates to their portfolio directly from a capstone submission. */
+export function trackPortfolioVisitedFromCapstone(moduleSlug: string) {
+  trackEvent('portfolio_visited_from_capstone', { module_slug: moduleSlug })
+}
+
 
 
 
