@@ -34,6 +34,10 @@ export interface PublicCapstoneItem {
   deliverableType: string
   content: string
   submittedAt: string
+  wordCount: number
+  status: string
+  competencyCluster: string
+  learningObjectives: string[]
   reflection: {
     content: string
     createdAt: string
@@ -124,12 +128,13 @@ export async function getPublicPortfolioData(
   const completedModulesCount = Math.min(9, Math.floor(completedLessonsCount / 10))
   const progressPercentage = Math.min(100, Math.round((completedLessonsCount / totalLessonsCount) * 100))
 
-  // 4. Fetch public submitted capstones
+  // 4. Fetch public submitted capstones (respecting individual is_public opt-out and admin moderation unpublish)
   const { data: submissions } = (await (supabase
     .from('capstone_submissions') as unknown as DBChain)
     .select('*')
     .eq('user_id', userId)
     .in('status', ['submitted', 'reviewed'])
+    .neq('is_public', false)
     .order('submitted_at', { ascending: false })) as unknown as { data: CapstoneSubmissionRow[] | null }
 
   // 5. Fetch public reflections only
@@ -151,6 +156,7 @@ export async function getPublicPortfolioData(
     const def = getCapstoneDefinition(sub.module_slug)
     const reflectionKey = `capstone-${sub.module_slug}`
     const ref = publicReflectionMap.get(reflectionKey)
+    const wordCount = sub.content.trim().split(/\s+/).filter(Boolean).length
 
     return {
       id: sub.id,
@@ -161,6 +167,10 @@ export async function getPublicPortfolioData(
       deliverableType: def?.deliverableType ?? 'Deliverable',
       content: sub.content,
       submittedAt: sub.submitted_at,
+      wordCount,
+      status: sub.status,
+      competencyCluster: def?.competencyCluster ?? 'strategy',
+      learningObjectives: def?.learningObjectives ?? [],
       reflection: ref
         ? {
             content: ref.content,

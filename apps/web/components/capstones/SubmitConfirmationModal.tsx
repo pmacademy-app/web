@@ -1,16 +1,20 @@
 'use client'
 
-import React from 'react'
-import { AlertTriangle, Award, CheckCircle2, X } from 'lucide-react'
+import React, { useState } from 'react'
+import { AlertTriangle, Award, CheckCircle2, Globe, Lock, X } from 'lucide-react'
 import type { CapstoneValidationResult } from '@/lib/capstones'
 
 interface SubmitConfirmationModalProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
+  onConfirm: (isPublic: boolean) => void
   validation: CapstoneValidationResult
   isSubmitting: boolean
   moduleTitle: string
+  userProfile?: {
+    username?: string
+    isPortfolioPublic?: boolean
+  } | null
 }
 
 export function SubmitConfirmationModal({
@@ -20,7 +24,12 @@ export function SubmitConfirmationModal({
   validation,
   isSubmitting,
   moduleTitle,
+  userProfile,
 }: SubmitConfirmationModalProps) {
+  const defaultIsPublic = userProfile?.isPortfolioPublic ?? true
+  const [overrideIsPublic, setOverrideIsPublic] = useState<boolean | null>(null)
+  const isPublic = overrideIsPublic !== null ? overrideIsPublic : defaultIsPublic
+
   if (!isOpen) return null
 
   return (
@@ -77,9 +86,59 @@ export function SubmitConfirmationModal({
               <span>Ready for Submission ({validation.wordCount} words)</span>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Submitting will lock this capstone workspace, record your deliverable, and award{' '}
+              Submitting will record your proof-of-work deliverable and award{' '}
               <strong className="text-foreground">+150 XP</strong>.
             </p>
+          </div>
+        )}
+
+        {/* Portfolio Visibility Context (Phase 4 Direct-to-Portfolio) */}
+        {validation.isValid && (
+          <div className="rounded-xl border border-border/80 bg-background/70 p-4 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Portfolio Showcase
+              </span>
+              <span
+                className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                  userProfile?.isPortfolioPublic !== false
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                }`}
+              >
+                {userProfile?.isPortfolioPublic !== false ? (
+                  <>
+                    <Globe className="w-3 h-3" /> Public Portfolio
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-3 h-3" /> Private Portfolio
+                  </>
+                )}
+              </span>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              {userProfile?.isPortfolioPublic !== false ? (
+                <>
+                  Your portfolio at <strong className="text-foreground font-mono">/p/{userProfile?.username || 'you'}</strong> is public. This deliverable will be showcased directly as a verified proof-of-work project.
+                </>
+              ) : (
+                <>
+                  Your portfolio is currently marked <strong>Private</strong> in Settings. This deliverable will be saved securely to your personal learning record, but will remain hidden from external visitors until you enable public portfolio sharing.
+                </>
+              )}
+            </p>
+
+            <label className="flex items-center gap-2.5 pt-1 text-xs cursor-pointer select-none text-foreground font-medium">
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={(e) => setOverrideIsPublic(e.target.checked)}
+                className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+              />
+              <span>Show this deliverable in my portfolio</span>
+            </label>
           </div>
         )}
 
@@ -95,7 +154,7 @@ export function SubmitConfirmationModal({
           </button>
           <button
             type="button"
-            onClick={onConfirm}
+            onClick={() => onConfirm(isPublic)}
             disabled={!validation.isValid || isSubmitting}
             className="px-5 py-2 rounded-lg text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >

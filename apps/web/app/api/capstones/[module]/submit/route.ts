@@ -16,7 +16,7 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { content, reflectionContent, reflectionIsPublic } = body ?? {}
+    const { content, reflectionContent, reflectionIsPublic, isPublic } = body ?? {}
 
     if (typeof content !== 'string') {
       return NextResponse.json({ error: 'Content payload must be a string.' }, { status: 400 })
@@ -38,7 +38,8 @@ export async function POST(
       moduleSlug,
       content,
       typeof reflectionContent === 'string' ? reflectionContent : '',
-      Boolean(reflectionIsPublic)
+      Boolean(reflectionIsPublic),
+      typeof isPublic === 'boolean' ? isPublic : undefined
     )
 
     try {
@@ -54,6 +55,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       submission: result.submission,
+      xpEarned: result.xpEarned,
       message: result.message,
     })
   } catch (error: unknown) {
