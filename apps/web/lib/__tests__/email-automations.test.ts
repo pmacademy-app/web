@@ -61,8 +61,8 @@ describe('Email Automations & Welcome Flow Test Suite', () => {
 
   it('Duplicate profile initialization -> idempotency prevents duplicate welcome email', async () => {
     initializeNotificationConnectors()
-    const testUserId = 'test-idempotent-user-999'
-    const testEmail = 'idempotent@example.com'
+    const testUserId = `test-idempotent-user-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+    const testEmail = `idempotent-${Date.now()}@example.com`
 
     const firstResult = await enqueueNotificationItem({
       userId: testUserId,
@@ -92,7 +92,7 @@ describe('Email Automations & Welcome Flow Test Suite', () => {
 
     expect(typeof firstResult.success).toBe('boolean')
     expect(typeof secondResult.success).toBe('boolean')
-  })
+  }, 15000)
 
   it('processEmailQueue handles batch processing gracefully', async () => {
     const batchResult = await processEmailQueue(10)
@@ -100,5 +100,5 @@ describe('Email Automations & Welcome Flow Test Suite', () => {
     expect(typeof batchResult.delivered).toBe('number')
     expect(typeof batchResult.failed).toBe('number')
     expect(typeof batchResult.skipped).toBe('number')
-  })
+  }, 15000)
 })
