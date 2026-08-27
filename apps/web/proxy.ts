@@ -34,8 +34,25 @@ function withSessionCookies(
   return response
 }
 
+/**
+ * Attaches referral attribution cookie (30 days) when ?ref=CODE is detected.
+ */
+function withReferralCookie(response: NextResponse, refCode?: string | null) {
+  if (!refCode) return response
+  const isProd = process.env.NODE_ENV === 'production'
+  response.cookies.set('prodily_referrer', refCode.trim().replace(/^@/, ''), {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  })
+  return response
+}
+
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
+  const refParam = request.nextUrl.searchParams.get('ref')
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co'
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key'
 
@@ -80,12 +97,12 @@ export async function proxy(request: NextRequest) {
 
   // Maintenance page must always be reachable so learners see the correct message
   if (path === '/maintenance') {
-    return NextResponse.next()
+    return withReferralCookie(NextResponse.next(), refParam)
   }
 
   // Fast path for non-guarded public routes
   if (!isPublicPage && !isAppPage && !isProtectedLearnerApi) {
-    return NextResponse.next()
+    return withReferralCookie(NextResponse.next(), refParam)
   }
 
   const accessToken = request.cookies.get('sb-access-token')?.value
@@ -174,37 +191,40 @@ export async function proxy(request: NextRequest) {
   if (path === '/reset-password' && request.nextUrl.searchParams.get('mode') === 'update') {
     if (!user) {
       // If recovery session is missing or expired, redirect to request form
-      return NextResponse.redirect(new URL('/reset-password?error=expired', request.url))
+      return withReferralCookie(NextResponse.redirect(new URL('/reset-password?error=expired', request.url)), refParam)
     }
-    return newSession ? withSessionCookies(NextResponse.next(), newSession) : NextResponse.next()
+    const response = newSession ? withSessionCookies(NextResponse.next(), newSession) : NextResponse.next()
+    return withReferralCookie(response, refParam)
   }
 
   // ── Public auth pages (/login, /signup, /reset-password) ─────────────────
   if (isGeneralAuthPage) {
-    if (!user) return NextResponse.next()
+    if (!user) return withReferralCookie(NextResponse.next(), refParam)
 
     // Authenticated users are routed away. Admins go straight to the console;
     // learners continue to their dashboard. This prevents onboarding from
     // hijacking an admin who merely visited the learner login.
     const target = (await isAdmin()) ? AUTH_PAGE_TARGET_ADMIN : AUTH_PAGE_TARGET_LEARNER
     const response = NextResponse.redirect(new URL(target, request.url))
-    return newSession ? withSessionCookies(response, newSession) : response
+    const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+    return withReferralCookie(sessionRes, refParam)
   }
 
   // ── Admin login: guests see the form; authenticated users are routed by ──
   //    authorization (never to the learner dashboard).
   if (isAdminLoginPage) {
-    if (!user) return NextResponse.next()
+    if (!user) return withReferralCookie(NextResponse.next(), refParam)
 
     const authorized = await isAdmin()
     const target = authorized ? '/admin' : ACCESS_DENIED_PAGE
     const response = NextResponse.redirect(new URL(target, request.url))
-    return newSession ? withSessionCookies(response, newSession) : response
+    const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+    return withReferralCookie(sessionRes, refParam)
   }
 
   // ── Access denied: always renderable ─────────────────────────────────────
   if (isAccessDeniedPage) {
-    return NextResponse.next()
+    return withReferralCookie(NextResponse.next(), refParam)
   }
 
   // ── Protected learner API routes (maintenance & email verification) ─────
@@ -235,9 +255,9 @@ export async function proxy(request: NextRequest) {
     }
 
     if (newSession) {
-      return withSessionCookies(NextResponse.next(), newSession)
+      return withReferralCookie(withSessionCookies(NextResponse.next(), newSession), refParam)
     }
-    return NextResponse.next()
+    return withReferralCookie(NextResponse.next(), refParam)
   }
 
   // ── Protected application routes ─────────────────────────────────────────
@@ -247,13 +267,14 @@ export async function proxy(request: NextRequest) {
       const response = NextResponse.redirect(new URL(loginTarget, request.url))
       response.cookies.delete('sb-access-token')
       response.cookies.delete('sb-refresh-token')
-      return response
+      return withReferralCookie(response, refParam)
     }
 
     // RBAC for admin routes
     if (isAdminProtectedPage && !(await isAdmin())) {
       const response = NextResponse.redirect(new URL(ACCESS_DENIED_PAGE, request.url))
-      return newSession ? withSessionCookies(response, newSession) : response
+      const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+      return withReferralCookie(sessionRes, refParam)
     }
 
     // ── Email verification check for learner protected routes ────────────────
@@ -264,13 +285,15 @@ export async function proxy(request: NextRequest) {
       // Maintenance mode — block all non-admin learners from the app
       if (productSettings.maintenanceMode) {
         const response = NextResponse.redirect(new URL('/maintenance', request.url))
-        return newSession ? withSessionCookies(response, newSession) : response
+        const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+        return withReferralCookie(sessionRes, refParam)
       }
 
       // Email verification enforcement
       if (productSettings.requireEmailVerification && !user.email_confirmed_at) {
         const response = NextResponse.redirect(new URL('/login?error=email_not_confirmed', request.url))
-        return newSession ? withSessionCookies(response, newSession) : response
+        const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+        return withReferralCookie(sessionRes, refParam)
       }
     }
 
@@ -280,23 +303,25 @@ export async function proxy(request: NextRequest) {
     if (!isOnboardingComplete && !isOnboardingPage && !isAdminArea && !(await hasCurriculumAccessOverride())) {
       // Force onboarding goal selection for learners (admins & override users are unaffected)
       const response = NextResponse.redirect(new URL('/onboarding', request.url))
-      return newSession ? withSessionCookies(response, newSession) : response
+      const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+      return withReferralCookie(sessionRes, refParam)
     }
 
     if (isOnboardingComplete && isOnboardingPage) {
       // Skip onboarding since it is already complete
       const response = NextResponse.redirect(new URL('/dashboard', request.url))
-      return newSession ? withSessionCookies(response, newSession) : response
+      const sessionRes = newSession ? withSessionCookies(response, newSession) : response
+      return withReferralCookie(sessionRes, refParam)
     }
 
     if (newSession) {
-      return withSessionCookies(NextResponse.next(), newSession)
+      return withReferralCookie(withSessionCookies(NextResponse.next(), newSession), refParam)
     }
 
-    return NextResponse.next()
+    return withReferralCookie(NextResponse.next(), refParam)
   }
 
-  return NextResponse.next()
+  return withReferralCookie(NextResponse.next(), refParam)
 }
 
 export const config = {

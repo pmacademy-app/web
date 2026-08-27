@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { SettingsService } from '@/lib/admin/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
+import { createReferralAttribution } from '@/lib/referral/referral-service'
 
 export const runtime = 'nodejs'
 
@@ -10,6 +11,7 @@ const signupSchema = z.object({
   name: z.string().min(1, 'Full name is required.').min(2, 'Name must be at least 2 characters.').max(80).trim(),
   email: z.string().min(1, 'Email is required.').email('Please enter a valid email address.').trim().toLowerCase(),
   password: z.string().min(6, 'Password must be at least 6 characters.'),
+  refCode: z.string().optional().nullable(),
 })
 
 export async function POST(request: NextRequest) {
@@ -24,6 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, email, password } = parsed.data
+    const refCode = parsed.data.refCode || request.cookies.get('prodily_referrer')?.value || null
 
     // Check both platform behavior controls in a single DB call
     const productSettings = await SettingsService.getProductSettings()
@@ -79,6 +82,19 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      // Record referral attribution if user was registered and referred
+      if (data?.user?.id && refCode) {
+        try {
+          await ensureUserProfile(supabase, data.user, { name })
+          await createReferralAttribution(supabase, {
+            referrerCodeOrId: refCode,
+            newUserId: data.user.id,
+          })
+        } catch (refErr) {
+          console.warn('[signup] Referral attribution error in Flow A:', refErr)
+        }
+      }
+
       return NextResponse.json({
         success: true,
         verificationRequired: true,
@@ -120,8 +136,18 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // 2. Initialize public.users record
+      // 2. Initialize public.users record and record referral attribution
       await ensureUserProfile(supabase, user, { name })
+      if (refCode) {
+        try {
+          await createReferralAttribution(supabase, {
+            referrerCodeOrId: refCode,
+            newUserId: user.id,
+          })
+        } catch (refErr) {
+          console.warn('[signup] Referral attribution error in Flow B:', refErr)
+        }
+      }
 
       // 3. Generate genuine Supabase session via password login
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({

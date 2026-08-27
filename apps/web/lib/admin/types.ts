@@ -169,6 +169,7 @@ export interface AdminUserDetail extends AdminUserOverview {
   capstonesSubmitted: number
   certificatesCount: number
   hasPublicPortfolio: boolean
+  referralsCount?: number
   goal?: string
   notificationPreferences?: {
     allNotifications: boolean
