@@ -83,6 +83,16 @@ export default function SignupPage() {
         }
 
         if (!res.ok || !json.success) {
+          // SIGNUPS_DISABLED is a known platform-control response, not an auth error
+          if (res.status === 403 && ((json as { code?: string }).code === 'SIGNUPS_DISABLED' || json.error?.toLowerCase().includes('registrations are currently closed'))) {
+            setAuthError({
+              code: 'AUTH_UNKNOWN_ERROR',
+              message: json.error || 'New learner registrations are currently closed. Please check back later.',
+              retryable: false,
+              isNetworkError: false,
+            })
+            return
+          }
           const classified = classifyAuthError(new Error(json.error || 'Registration failed'), 'signup')
           setAuthError(classified)
           recordAuthTelemetry(classified, 'signup')

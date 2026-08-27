@@ -140,6 +140,25 @@ describe('Phase 4 — Authentication Error Classification & Safety', () => {
       expect(classified.requiresAction).toBe('wait')
     })
 
+    it('classifies diverse Supabase rate limit error shapes as AUTH_RATE_LIMITED without falling through', () => {
+      const cases = [
+        { status: '429', error: 'Too many requests' },
+        { statusCode: 429, message: 'rate_limit' },
+        { code: 429, message: 'Too many requests' },
+        { code: '429', msg: 'Please wait a moment' },
+        { error_code: 'over_email_send_rate_limit', message: 'Rate limit hit' },
+        { error: 'over_email_send_rate_limit' },
+        { message: 'rate_limit_exceeded' },
+        { msg: 'For security purposes, you can only request this after 25 seconds.' },
+      ]
+
+      for (const err of cases) {
+        const classified = classifyAuthError(err, 'resend_verification')
+        expect(classified.code).toBe('AUTH_RATE_LIMITED')
+        expect(classified.requiresAction).toBe('wait')
+      }
+    })
+
     it('classifies missing email validation error with clear guidance', () => {
       const errorText = 'Email address is required'
       const classified = classifyAuthError(errorText, 'resend_verification')

@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       })
 
       // Check if error is already-verified
-      if (resendError.message.toLowerCase().includes('already confirmed')) {
+      if (resendError.message?.toLowerCase().includes('already confirmed')) {
         return NextResponse.json({
           success: true,
           message: 'Your email address is already verified.',
@@ -86,13 +86,26 @@ export async function POST(request: NextRequest) {
       }
 
       // Propagate Supabase-side rate limit as 429 so callers can back off correctly
-      if (classified.code === 'AUTH_RATE_LIMITED') {
-        const secondsMatch = resendError.message.match(/(?:after|wait)\s+(\d+)\s+seconds?/i)
+      const isRateLimited =
+        classified.code === 'AUTH_RATE_LIMITED' ||
+        resendError.status === 429 ||
+        (resendError as { status?: unknown }).status === '429' ||
+        (resendError as { code?: unknown }).code === 'over_email_send_rate_limit' ||
+        (resendError as { code?: unknown }).code === '429' ||
+        (resendError as { code?: unknown }).code === 429 ||
+        resendError.message?.toLowerCase().includes('rate limit') ||
+        resendError.message?.toLowerCase().includes('over_email_send_rate_limit') ||
+        resendError.message?.toLowerCase().includes('after') ||
+        resendError.message?.toLowerCase().includes('wait')
+
+      if (isRateLimited) {
+        const secondsMatch = resendError.message?.match(/(?:after|wait|every)\s+(\d+)\s+seconds?/i)
         const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 60
         return NextResponse.json(
           {
             success: false,
             error: `Please wait ${seconds} second${seconds === 1 ? '' : 's'} before requesting another verification email.`,
+            code: 'AUTH_RATE_LIMITED',
             resetInMs: seconds * 1000,
           },
           { status: 429 }
@@ -103,6 +116,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: 'Unable to resend verification email right now. Please try again in a few minutes.',
+          code: classified.code,
         },
         { status: 400 }
       )

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
 import { createAuthenticatedServerClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
 
@@ -7,7 +8,6 @@ export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Enforce application/json Content-Type to guard against standard form submission CSRF
     const contentType = request.headers.get('content-type') || ''
     if (!contentType.includes('application/json')) {
       return NextResponse.json(
@@ -16,12 +16,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 2. Validate Origin / Referer to prevent Cross-Site Request Forgery
     const origin = request.headers.get('origin') || ''
     const referer = request.headers.get('referer') || ''
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://prodily.adityagangwani.me').replace(/\/$/, '')
     
-    // Parse host from siteUrl for origin checking
     let expectedHost = ''
     try {
       expectedHost = new URL(siteUrl).host
@@ -31,7 +29,6 @@ export async function POST(request: NextRequest) {
 
     const reqHost = request.headers.get('host') || ''
 
-    // Verify Origin or Referer host matches request host or configured site URL
     if (origin) {
       try {
         const originHost = new URL(origin).host
@@ -52,7 +49,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Read and validate newPassword from payload
     let body: { newPassword?: unknown }
     try {
       body = await request.json()
@@ -61,83 +57,112 @@ export async function POST(request: NextRequest) {
     }
 
     const { newPassword } = body
-
-    if (!newPassword || typeof newPassword !== 'string') {
-      return NextResponse.json({ success: false, error: 'Password is required.' }, { status: 400 })
-    }
-
-    if (newPassword.length < 6) {
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
       return NextResponse.json({ success: false, error: 'Password must be at least 6 characters.' }, { status: 400 })
     }
 
-    // 4. Extract recovery session token from HTTP-only cookies safely
-    let accessToken = request.cookies.get('sb-access-token')?.value
-    if (!accessToken) {
-      try {
-        const cookieStore = await cookies()
-        accessToken = cookieStore.get('sb-access-token')?.value
-      } catch {
-        const cookieHeader = request.headers.get('cookie') || ''
-        const match = cookieHeader.match(/sb-access-token=([^;]+)/)
-        if (match && match[1]) {
-          accessToken = decodeURIComponent(match[1])
-        }
-      }
-    }
+    const cookieStore = await cookies()
+    const accessToken = request.cookies.get('sb-access-token')?.value || cookieStore.get('sb-access-token')?.value
+    const refreshToken = request.cookies.get('sb-refresh-token')?.value || cookieStore.get('sb-refresh-token')?.value
 
-    if (!accessToken) {
+    // If neither token is present, recovery session is completely absent
+    if (!accessToken && !refreshToken) {
       return NextResponse.json(
-        {
-          success: false,
-          error: 'No active recovery session found. Please request a new password reset link.',
-        },
+        { success: false, error: 'No active recovery session found. Please request a new password reset link.' },
         { status: 401 }
       )
     }
 
-    // 5. Authenticate server client using the recovery token and update user password
-    const supabase = createAuthenticatedServerClient(accessToken)
-    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-    if (error) {
+    // 5. Attempt password update with the current access token.
+    //    createAuthenticatedServerClient uses anon key + Bearer header — the correct pattern
+    //    for user-scoped operations that respect the user's identity.
+    if (accessToken) {
+      const userClient = createAuthenticatedServerClient(accessToken)
+      const { error } = await userClient.auth.updateUser({ password: newPassword })
+
+      if (!error) {
+        const response = NextResponse.json({ success: true, message: 'Password updated successfully.' })
+        response.cookies.delete('sb-access-token')
+        response.cookies.delete('sb-refresh-token')
+        return response
+      }
+
+      // Detect access-token expiry — the confirmed root cause of "Auth session missing!" in production
+      const isExpiredOrMissing =
+        (error as { status?: unknown }).status === 401 ||
+        (error as { status?: unknown }).status === '401' ||
+        (error as { code?: unknown }).code === 'session_not_found' ||
+        (error as { code?: unknown }).code === 'token_expired' ||
+        (error as { code?: unknown }).code === 'bad_jwt' ||
+        error.message?.toLowerCase().includes('auth session missing') ||
+        error.message?.toLowerCase().includes('invalid jwt') ||
+        error.message?.toLowerCase().includes('jwt expired') ||
+        error.message?.toLowerCase().includes('token is expired') ||
+        error.message?.toLowerCase().includes('session expired') ||
+        error.message?.toLowerCase().includes('session not found')
+
+      if (!isExpiredOrMissing || !refreshToken) {
+        void logSystemError({ severity: 'warning', category: 'auth', operation: 'update_password_failure', message: error.message })
+        return NextResponse.json(
+          { success: false, error: error.message || 'Failed to update password. Your reset link may have expired.' },
+          { status: 400 }
+        )
+      }
+      // Access token expired but refresh token is present — fall through to refresh
+    }
+
+    // 6. Refresh-token fallback: silently exchanges the long-lived refresh token for a new
+    //    access token. This resolves the "Auth session missing!" production error: the recovery
+    //    access token (~1 h TTL) can expire between the callback redirect and form submission.
+    if (!refreshToken) {
+      return NextResponse.json(
+        { success: false, error: 'No active recovery session found. Please request a new password reset link.' },
+        { status: 401 }
+      )
+    }
+
+    const refreshClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } })
+    const { data: refreshData, error: refreshError } = await refreshClient.auth.refreshSession({
+      refresh_token: refreshToken,
+    })
+
+    if (refreshError || !refreshData?.session) {
       void logSystemError({
         severity: 'warning',
         category: 'auth',
-        operation: 'update_password_failure',
-        message: error.message,
+        operation: 'update_password_refresh_failed',
+        message: refreshError?.message || 'Refresh token exchange failed — recovery session fully expired',
       })
-
       return NextResponse.json(
-        {
-          success: false,
-          error: error.message || 'Failed to update password. Your reset link may have expired.',
-        },
+        { success: false, error: 'Your password reset link has expired. Please request a new one.' },
+        { status: 401 }
+      )
+    }
+
+    // 7. Retry with the freshly obtained access token
+    const retryClient = createAuthenticatedServerClient(refreshData.session.access_token)
+    const { error: retryError } = await retryClient.auth.updateUser({ password: newPassword })
+
+    if (retryError) {
+      void logSystemError({ severity: 'warning', category: 'auth', operation: 'update_password_failure', message: retryError.message })
+      return NextResponse.json(
+        { success: false, error: retryError.message || 'Failed to update password. Your reset link may have expired.' },
         { status: 400 }
       )
     }
 
-    const response = NextResponse.json({
-      success: true,
-      message: 'Password updated successfully.',
-    })
-
-    // Clear temporary recovery cookies so the user logs in cleanly with new credentials
+    const response = NextResponse.json({ success: true, message: 'Password updated successfully.' })
     response.cookies.delete('sb-access-token')
     response.cookies.delete('sb-refresh-token')
-
+    response.cookies.set('sb-access-token', '', { path: '/', maxAge: 0 })
+    response.cookies.set('sb-refresh-token', '', { path: '/', maxAge: 0 })
     return response
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : 'Unknown server error'
-    void logSystemError({
-      severity: 'error',
-      category: 'auth',
-      operation: 'update_password_exception',
-      message: errorMsg,
-    })
-
-    return NextResponse.json(
-      { success: false, error: 'An unexpected error occurred while updating your password.' },
-      { status: 500 }
-    )
+    void logSystemError({ severity: 'error', category: 'auth', operation: 'update_password_exception', message: errorMsg })
+    return NextResponse.json({ success: false, error: 'An unexpected error occurred.' }, { status: 500 })
   }
 }

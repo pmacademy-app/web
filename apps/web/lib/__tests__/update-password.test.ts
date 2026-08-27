@@ -45,7 +45,7 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     expect(json.error).toBe('Password must be at least 6 characters.')
   })
 
-  it('Rejects request without sb-access-token cookie with 401', async () => {
+  it('Rejects request with neither sb-access-token nor sb-refresh-token with 401', async () => {
     const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -69,16 +69,39 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     })
 
     const res = await POST(req)
-    // Even if live supabase mock returns an error or success, it either handles 200 or 400
-    // But let's verify response structure or cookie deletion if 200
+    // Even if live supabase mock returns an error or success, it either handles 200 or 400/401
     if (res.status === 200) {
       const json = await res.json()
       expect(json.success).toBe(true)
       expect(res.cookies.get('sb-access-token')?.value).toBe('')
     } else {
       // If mock rejected token, verify handled safely without crashing
-      expect([200, 400]).toContain(res.status)
+      expect([200, 400, 401]).toContain(res.status)
     }
+  })
+
+  it('Refresh-token fallback: when access token is expired, falls back to refresh token (no crash)', async () => {
+    // This test verifies the fallback path does not throw or return 500.
+    // With expired access token detection, the code should attempt a refresh.
+    // In test environment with no real Supabase, the refresh will fail gracefully.
+    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        // Only providing refresh token, no access token — exercises the fallback path
+        cookie: 'sb-refresh-token=expired-but-present-refresh-token',
+      },
+      body: JSON.stringify({ newPassword: 'newValidPassword123' }),
+    })
+    const res = await POST(req)
+    // The refresh will fail (no real Supabase in tests) but must NOT return 500
+    // It should return 401 (expired session) or 400/401 (graceful failure)
+    expect([400, 401]).toContain(res.status)
+    const json = await res.json()
+    expect(json.success).toBe(false)
+    // Must not leak internal error messages
+    expect(json.error).not.toContain('undefined')
+    expect(json.error).not.toContain('TypeError')
   })
 
   it('Redirects recovery failures to /reset-password?error=expired rather than /login?error=auth_failed', async () => {
@@ -88,5 +111,30 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     expect(res.status).toBe(307)
     expect(res.headers.get('location')).toContain('/reset-password?error=expired')
     expect(res.headers.get('location')).not.toContain('/login?error=auth_failed')
+  })
+
+  it('Email verification failure redirects to /login?error=verification_failed (not generic auth_failed)', async () => {
+    const { GET: callbackGET } = await import('../../app/api/auth/callback/route')
+    const req = new NextRequest('http://localhost:3000/api/auth/callback?type=signup&token_hash=invalid_hash')
+    const res = await callbackGET(req)
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toContain('/login?error=verification_failed')
+    expect(res.headers.get('location')).not.toContain('auth_failed')
+  })
+
+  it('Rejects untrusted Referer header with 403', async () => {
+    const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        referer: 'https://evil-attacker-site.com/attack',
+      },
+      body: JSON.stringify({ newPassword: 'newpassword123' }),
+    })
+    const res = await POST(req)
+    expect(res.status).toBe(403)
+    const json = await res.json()
+    expect(json.success).toBe(false)
+    expect(json.error).toBe('Forbidden: Untrusted Referer')
   })
 })
