@@ -7,6 +7,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { BRAND } from '@/lib/brand'
 import { resolvePersonalizedPath } from '@/lib/personalization/path-resolver'
+import { resolveModuleCtaTarget } from '@/lib/curriculum-access'
 
 export const metadata: Metadata = {
   title: 'Curriculum',
@@ -207,8 +208,8 @@ export default async function AcademyPage() {
         {orderedModules.map(([moduleSlug, moduleLessons], idx) => {
           const meta = MODULE_META[moduleSlug]
           const moduleNumber = idx + 1
-          const uncompletedLesson = moduleLessons.find((l) => !completedSet.has(l.id))
-          const targetLesson = uncompletedLesson ?? moduleLessons[0]
+          const ctaTarget = resolveModuleCtaTarget(moduleLessons, lessons, completedSet)
+          const targetLesson = ctaTarget.lesson
           const isModuleFullyCompleted = moduleLessons.length > 0 && moduleLessons.every((l) => completedSet.has(l.id))
 
           const totalTime = moduleLessons.reduce(
@@ -320,19 +321,38 @@ export default async function AcademyPage() {
                 </div>
 
                 {targetLesson && (
-                  <Link
-                    href={`/academy/${targetLesson.module}/${targetLesson.id}`}
-                    className={`inline-flex items-center justify-between w-full sm:w-auto sm:px-6 px-4 py-2.5 rounded-lg border font-bold text-xs transition-colors ${
-                      meta?.color ?? 'bg-muted text-muted-foreground border-border'
-                    } hover:opacity-80`}
-                  >
-                    <span>
-                      {isModuleFullyCompleted
-                        ? `Review Module ${moduleNumber}`
-                        : `Continue Module ${moduleNumber} → Lesson ${targetLesson.order}`}
-                    </span>
-                    <ChevronRight className="h-3.5 w-3.5 ml-2" />
-                  </Link>
+                  <>
+                    {/* When the recommended module is not yet accessible, show a prerequisite path CTA */}
+                    {isRecommended && !ctaTarget.isAccessible && ctaTarget.firstActionableLesson && (
+                      <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 text-left leading-relaxed">
+                        <span className="font-semibold">Prerequisites needed:</span> Complete the earlier
+                        lessons in sequence to reach this module.
+                      </div>
+                    )}
+                    <Link
+                      href={
+                        ctaTarget.isAccessible || isModuleFullyCompleted
+                          ? `/academy/${targetLesson.module}/${targetLesson.id}`
+                          : ctaTarget.firstActionableLesson
+                            ? `/academy/${ctaTarget.firstActionableLesson.module}/${ctaTarget.firstActionableLesson.id}`
+                            : `/academy/${targetLesson.module}/${targetLesson.id}`
+                      }
+                      className={`inline-flex items-center justify-between w-full sm:w-auto sm:px-6 px-4 py-2.5 rounded-lg border font-bold text-xs transition-colors ${
+                        meta?.color ?? 'bg-muted text-muted-foreground border-border'
+                      } hover:opacity-80`}
+                    >
+                      <span>
+                        {isModuleFullyCompleted
+                          ? `Review Module ${moduleNumber}`
+                          : ctaTarget.isAccessible
+                            ? `Continue Module ${moduleNumber} → Lesson ${targetLesson.order}`
+                            : ctaTarget.firstActionableLesson
+                              ? `Start from Lesson ${ctaTarget.firstActionableLesson.order} first →`
+                              : `Continue Module ${moduleNumber} → Lesson ${targetLesson.order}`}
+                      </span>
+                      <ChevronRight className="h-3.5 w-3.5 ml-2" />
+                    </Link>
+                  </>
                 )}
               </div>
             </details>
