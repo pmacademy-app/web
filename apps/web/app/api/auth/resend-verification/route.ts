@@ -87,10 +87,13 @@ export async function POST(request: NextRequest) {
 
       // Propagate Supabase-side rate limit as 429 so callers can back off correctly
       if (classified.code === 'AUTH_RATE_LIMITED') {
+        const secondsMatch = resendError.message.match(/(?:after|wait)\s+(\d+)\s+seconds?/i)
+        const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 60
         return NextResponse.json(
           {
             success: false,
-            error: 'Too many verification requests. Please wait a moment before trying again.',
+            error: `Please wait ${seconds} second${seconds === 1 ? '' : 's'} before requesting another verification email.`,
+            resetInMs: seconds * 1000,
           },
           { status: 429 }
         )

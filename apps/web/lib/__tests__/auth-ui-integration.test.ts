@@ -74,4 +74,47 @@ describe('Phase 4 — Auth UI Error Handling Integration', () => {
       expect(result.message).toBe('The authentication service is temporarily unavailable. Please try again in a few moments.')
     })
   })
+
+  describe('Resend Verification Flow Error Handling', () => {
+    it('translates Supabase over_email_send_rate_limit with seconds to clear wait message', () => {
+      const supabaseRateLimit = {
+        code: 'over_email_send_rate_limit',
+        message: 'For security purposes, you can only request this after 53 seconds.',
+      }
+      const result = classifyAuthError(supabaseRateLimit, 'resend_verification')
+
+      expect(result.code).toBe('AUTH_RATE_LIMITED')
+      expect(result.requiresAction).toBe('wait')
+      expect(result.retryable).toBe(true)
+      expect(result.message).toContain('53 seconds')
+      expect(result.rawCode).toBe('over_email_send_rate_limit')
+    })
+
+    it('translates 429 rate limit string to wait guidance instead of AUTH_UNKNOWN_ERROR', () => {
+      const rateLimitText = 'Please wait 48 seconds before requesting another verification email.'
+      const result = classifyAuthError(rateLimitText, 'resend_verification')
+
+      expect(result.code).toBe('AUTH_RATE_LIMITED')
+      expect(result.requiresAction).toBe('wait')
+      expect(result.message).toContain('48 seconds')
+      expect(result.code).not.toBe('AUTH_UNKNOWN_ERROR')
+    })
+
+    it('translates missing email validation into clear input guidance', () => {
+      const validationError = 'Email address is required'
+      const result = classifyAuthError(validationError, 'resend_verification')
+
+      expect(result.message).toBe('Please enter a valid email address.')
+      expect(result.rawCode).toBe('email_required')
+    })
+
+    it('translates 502/503 bad gateway to provider unavailable', () => {
+      const gatewayErr = new Error('502 Bad Gateway')
+      const result = classifyAuthError(gatewayErr, 'resend_verification')
+
+      expect(result.code).toBe('AUTH_PROVIDER_UNAVAILABLE')
+      expect(result.retryable).toBe(true)
+      expect(result.message).toContain('temporarily unavailable')
+    })
+  })
 })

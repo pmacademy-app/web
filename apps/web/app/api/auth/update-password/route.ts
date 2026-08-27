@@ -116,10 +116,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Password updated successfully.',
     })
+
+    // Clear temporary recovery cookies so the user logs in cleanly with new credentials
+    response.cookies.delete('sb-access-token')
+    response.cookies.delete('sb-refresh-token')
+
+    return response
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : 'Unknown server error'
     void logSystemError({
