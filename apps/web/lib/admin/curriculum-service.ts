@@ -20,6 +20,7 @@ import {
 } from './analytics-aggregation'
 import { buildModuleProgress, clampPct, computeQuizAvgScore } from './users-aggregation'
 import { buildLearnerSeries, buildLearningSeries, mergeSeries, resolveRange } from './dashboard-aggregation'
+import { getAllLessonsQualityMetrics, getLessonQualityMetrics } from '@/lib/feedback/lesson-feedback-service'
 import type {
   AdminCurriculumOverview,
   AdminDateRangeKey,
@@ -167,15 +168,16 @@ export class CurriculumService {
     if (moduleLessons.length === 0) return { module: null, failed: false }
 
     const supabase = createServiceRoleClient()
-    const [compiledLessons, completed] = await Promise.all([
+    const [compiledLessons, completed, qualityMetrics] = await Promise.all([
       this.fetchAllCompiledLessons(moduleLessons),
       this.fetchCompletedRows(supabase, { lessonIds: moduleLessons.map((l) => l.id) }),
+      getAllLessonsQualityMetrics(supabase),
     ])
     const { rows: completedRows, failed } = completed
 
     const stats = buildModuleCompletionStats(moduleLessons, completedRows)
     const compiledMap = new Map(compiledLessons.map((l) => [l.id, l]))
-    const lessonOverviews = buildLessonOverviews(moduleLessons, stats, compiledMap)
+    const lessonOverviews = buildLessonOverviews(moduleLessons, stats, compiledMap, qualityMetrics)
     const learnersStarted = stats.get(moduleSlug)?.learnersStarted || 0
     const avgCompletionPct =
       lessonOverviews.length > 0
@@ -223,7 +225,7 @@ export class CurriculumService {
     const supabase = createServiceRoleClient()
 
     let quizFailed = false
-    const [completed, quizRows] = await Promise.all([
+    const [completed, quizRows, qualityMetrics, recentFeedbackRows] = await Promise.all([
       this.fetchCompletedRows(supabase, { lessonIds: moduleLessons.map((l) => l.id) }),
       this.fetchAllRows<{ is_correct: boolean }>((from, to) =>
         supabase.from('quiz_attempts').select('is_correct').eq('lesson_id', lessonId).range(from, to)
@@ -231,6 +233,33 @@ export class CurriculumService {
         quizFailed = true
         return [] as Array<{ is_correct: boolean }>
       }),
+      getLessonQualityMetrics(supabase, lessonId).catch(() => null),
+      (supabase.from('user_feedback') as unknown as {
+        select: (cols: string) => {
+          eq: (col: string, val: unknown) => {
+            eq: (col: string, val: unknown) => {
+              order: (col: string, opts: unknown) => {
+                limit: (n: number) => Promise<{ data: Array<{ id: string; rating: number; tags?: string[]; content?: string; created_at: string }> | null }>
+              }
+            }
+          }
+        }
+      })
+        .select('id, rating, tags, content, created_at')
+        .eq('lesson_id', lessonId)
+        .eq('type', 'lesson_rating')
+        .order('created_at', { ascending: false })
+        .limit(10)
+        .then(({ data }) =>
+          (data || []).map((r) => ({
+            id: r.id,
+            rating: r.rating,
+            tags: Array.isArray(r.tags) ? r.tags : [],
+            comment: r.content || null,
+            createdAt: r.created_at,
+          }))
+        )
+        .catch(() => []),
     ])
     const { rows: completedRows, failed } = completed
 
@@ -267,6 +296,12 @@ export class CurriculumService {
         quizAvgScore: computeQuizAvgScore(quizRows),
         status: 'published',
         blocks: compiled.blocks as Array<Record<string, unknown>>,
+        clarityScore: qualityMetrics?.averageClarityScore ?? null,
+        clarityPct: qualityMetrics?.clarityPct ?? null,
+        feedbackCount: qualityMetrics?.totalFeedback ?? 0,
+        flaggedIssuesCount: qualityMetrics?.flaggedIssuesCount ?? 0,
+        needsReview: qualityMetrics?.needsReview ?? false,
+        recentFeedback: recentFeedbackRows,
       },
       failed: failed || quizFailed,
     }

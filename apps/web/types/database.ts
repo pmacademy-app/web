@@ -1284,10 +1284,13 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          lesson_id: string | null
           page_url: string | null
           rating: number | null
           source_event: string
           status: string
+          tags: string[] | null
+          type: string
           user_id: string | null
         }
         Insert: {
@@ -1295,10 +1298,13 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          lesson_id?: string | null
           page_url?: string | null
           rating?: number | null
           source_event: string
           status?: string
+          tags?: string[] | null
+          type?: string
           user_id?: string | null
         }
         Update: {
@@ -1306,10 +1312,13 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          lesson_id?: string | null
           page_url?: string | null
           rating?: number | null
           source_event?: string
           status?: string
+          tags?: string[] | null
+          type?: string
           user_id?: string | null
         }
         Relationships: [

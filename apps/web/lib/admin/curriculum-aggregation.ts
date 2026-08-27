@@ -216,13 +216,16 @@ export function buildModuleOverviews(
 export function buildLessonOverviews(
   lessons: CurriculumEntry[],
   stats: Map<string, ModuleCompletionStats>,
-  compiledLessons: Map<string, CompiledLesson>
+  compiledLessons: Map<string, CompiledLesson>,
+  qualityMetrics?: Map<string, { averageClarityScore: number | null; clarityPct: number | null; totalFeedback: number; flaggedIssuesCount: number; needsReview: boolean }>
 ): AdminLessonOverview[] {
   return lessons.map((lesson) => {
     const moduleStats = stats.get(lesson.module)
     const learnersStarted = moduleStats?.learnersStarted || 0
     const completions = moduleStats?.lessonCompletions.get(lesson.id) || 0
     const compiled = compiledLessons.get(lesson.id)
+    const quality = qualityMetrics?.get(lesson.id)
+
     return {
       id: lesson.id,
       slug: lesson.slug,
@@ -235,6 +238,11 @@ export function buildLessonOverviews(
       completions,
       completionPct: computeLessonCompletionPct(completions, learnersStarted),
       status: 'published',
+      clarityScore: quality ? quality.averageClarityScore : null,
+      clarityPct: quality ? quality.clarityPct : null,
+      feedbackCount: quality ? quality.totalFeedback : 0,
+      flaggedIssuesCount: quality ? quality.flaggedIssuesCount : 0,
+      needsReview: quality ? quality.needsReview : false,
     }
   })
 }

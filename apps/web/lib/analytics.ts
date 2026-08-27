@@ -59,6 +59,9 @@ type EventMap = {
   portfolio_layout_updated:        { layout: string[] }
   portfolio_featured_capstone_set: { module_slug?: string }
   portfolio_viewed:                { username: string }
+
+  // ─── Lesson Feedback Loop Events (Phase 6) ───────────────────────────────
+  lesson_feedback_submitted:       { lesson_id: string; rating: number; tags_count: number; has_comment: boolean }
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -222,6 +225,23 @@ export function trackPortfolioFeaturedCapstoneSet(moduleSlug?: string) {
 /** Fired when a public portfolio page is viewed. */
 export function trackPortfolioViewed(username: string) {
   trackEvent('portfolio_viewed', { username })
+}
+
+// ─── Lesson Feedback Loop Trackers (Phase 6) ────────────────────────────────
+
+/** Fired when a learner submits feedback or rating for a lesson. */
+export function trackLessonFeedbackSubmitted(
+  lessonId: string,
+  rating: number,
+  tagsCount: number,
+  hasComment: boolean
+) {
+  trackEvent('lesson_feedback_submitted', {
+    lesson_id: lessonId,
+    rating,
+    tags_count: tagsCount,
+    has_comment: hasComment,
+  })
 }
 
 
