@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { getPortfolioSettings, updatePortfolioSettings } from '@/lib/portfolio-db'
+import {
+  getPortfolioSettings,
+  updatePortfolioSettings,
+  getLearnerSubmittedCapstones,
+} from '@/lib/portfolio-db'
 
 export async function GET(request: Request) {
   try {
@@ -15,8 +20,12 @@ export async function GET(request: Request) {
     }
 
     const supabase = createServiceRoleClient()
-    const settings = await getPortfolioSettings(supabase, user.id)
-    return NextResponse.json({ success: true, settings })
+    const [settings, submittedCapstones] = await Promise.all([
+      getPortfolioSettings(supabase, user.id),
+      getLearnerSubmittedCapstones(supabase, user.id),
+    ])
+
+    return NextResponse.json({ success: true, settings, submittedCapstones })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to fetch portfolio settings.'
     console.error('[API GET /api/settings/portfolio] Error:', error)
@@ -38,6 +47,11 @@ export async function POST(request: Request) {
     const supabase = createServiceRoleClient()
     const body = await request.json()
     const result = await updatePortfolioSettings(supabase, user.id, body)
+
+    if (result.settings.username) {
+      revalidatePath(`/p/${result.settings.username}`)
+    }
+    revalidatePath('/settings')
 
     return NextResponse.json({ success: true, settings: result.settings })
   } catch (error: unknown) {

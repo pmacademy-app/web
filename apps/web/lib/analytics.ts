@@ -54,6 +54,11 @@ type EventMap = {
   // ─── Capstone & Proof-of-Work Events (Phase 4) ───────────────────────────
   portfolio_artifact_created:     { module_slug: string; is_public: boolean }
   portfolio_visited_from_capstone: { module_slug: string }
+
+  // ─── Portfolio Evolution Events (Phase 5) ─────────────────────────────────
+  portfolio_layout_updated:        { layout: string[] }
+  portfolio_featured_capstone_set: { module_slug?: string }
+  portfolio_viewed:                { username: string }
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -201,6 +206,24 @@ export function trackPortfolioArtifactCreated(moduleSlug: string, isPublic: bool
 export function trackPortfolioVisitedFromCapstone(moduleSlug: string) {
   trackEvent('portfolio_visited_from_capstone', { module_slug: moduleSlug })
 }
+
+// ─── Portfolio Evolution Trackers (Phase 5) ─────────────────────────────────
+
+/** Fired when a learner updates their portfolio section layout ordering. */
+export function trackPortfolioLayoutUpdated(layout: string[]) {
+  trackEvent('portfolio_layout_updated', { layout })
+}
+
+/** Fired when a learner sets or updates their featured/pinned capstone deliverable. */
+export function trackPortfolioFeaturedCapstoneSet(moduleSlug?: string) {
+  trackEvent('portfolio_featured_capstone_set', { module_slug: moduleSlug })
+}
+
+/** Fired when a public portfolio page is viewed. */
+export function trackPortfolioViewed(username: string) {
+  trackEvent('portfolio_viewed', { username })
+}
+
 
 
 
