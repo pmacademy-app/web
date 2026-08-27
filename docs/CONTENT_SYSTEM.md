@@ -39,3 +39,20 @@ The compiler script (`scripts/compiler/compile.ts`) executes at build time:
 | **Build-Time Mermaid SVG Engine** | `scripts/compiler/mermaid-svg.ts` | 🟢 Verified in Production |
 | **Static JSON Output** | `content/dist/lessons/` | 🟢 Verified in Production |
 | **FlexSearch Pre-Indexed Search** | `content/dist/search-index.json` | 🟢 Verified in Production |
+
+---
+
+## 4. Content Quality Metric Calculation (Phase 6)
+
+The curriculum quality loop enables learners to submit ratings (1–5 stars), clarity tags, and optional notes at the end of each lesson.
+
+### Metric Formulations:
+1. **Average Clarity Score**:
+   $$\text{Clarity Score} = \frac{\sum \text{ratings}}{N} \quad (\text{rounded to 1 decimal place, range: } 1.0 - 5.0)$$
+2. **Helpfulness / Clarity %**:
+   $$\text{Clarity \%} = \left(\frac{\text{Count}(\text{rating} \ge 4)}{N}\right) \times 100$$
+3. **Flagged Issue Count**:
+   Total count of feedback submissions with rating $\le 2$ or containing critical clarity tags (`too_technical`, `confusing_example`, `outdated`, `pacing_too_fast`).
+4. **Needs Review Threshold**:
+   Lessons with an Average Clarity Score $< 3.5$ are automatically flagged for review in the Admin Curriculum workspace.
+
