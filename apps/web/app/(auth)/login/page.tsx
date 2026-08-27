@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { CheckCircle2 } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
@@ -32,6 +33,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const authErrorParam = searchParams.get('error')
+  const resetSuccess = searchParams.get('reset') === 'success'
 
   const [authError, setAuthError] = useState<ClassifiedAuthError | null>(
     authErrorParam === 'auth_failed'
@@ -43,11 +45,13 @@ function LoginForm() {
         }
       : null
   )
+  const [attemptedEmail, setAttemptedEmail] = useState<string>('')
   const [isPending, startTransition] = useTransition()
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -59,6 +63,7 @@ function LoginForm() {
 
   const handleEmailLogin = (values: LoginFormValues) => {
     setAuthError(null)
+    setAttemptedEmail(values.email)
 
     startTransition(async () => {
       try {
@@ -68,7 +73,22 @@ function LoginForm() {
           body: JSON.stringify(values),
         })
 
-        const json = await res.json()
+        if (res.status >= 502 && res.status <= 504) {
+          const classified = classifyAuthError(new Error(`${res.status} Bad Gateway / Service Unavailable`), 'login')
+          setAuthError(classified)
+          recordAuthTelemetry(classified, 'login')
+          return
+        }
+
+        let json: { success?: boolean; error?: string; requiresVerification?: boolean; redirect?: string } = {}
+        try {
+          json = await res.json()
+        } catch {
+          const classified = classifyAuthError(new Error(`HTTP ${res.status}: Invalid server response`), 'login')
+          setAuthError(classified)
+          recordAuthTelemetry(classified, 'login')
+          return
+        }
 
         if (!res.ok || !json.success) {
           const classified = classifyAuthError(new Error(json.error || 'Authentication failed'), 'login')
@@ -97,6 +117,16 @@ function LoginForm() {
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
 
+      {resetSuccess && (
+        <div
+          className="p-3 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-medium flex items-center gap-2"
+          role="status"
+        >
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <span>Your password has been updated successfully! Please log in with your new password.</span>
+        </div>
+      )}
+
       {authError && (
         <div className="space-y-3">
           <div
@@ -106,7 +136,7 @@ function LoginForm() {
             {authError.message}
           </div>
           {authError.code === 'AUTH_EMAIL_NOT_CONFIRMED' && (
-            <ResendVerificationCard />
+            <ResendVerificationCard email={attemptedEmail || getValues('email')} />
           )}
         </div>
       )}

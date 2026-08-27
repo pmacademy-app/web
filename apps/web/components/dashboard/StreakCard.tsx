@@ -87,17 +87,20 @@ export function StreakCard({ streakStatus }: StreakCardProps) {
       {/* Freezes & Motivator */}
       <div className="space-y-2 border-t border-border/50 pt-3">
         <div className="flex items-center justify-between text-xs">
-          <span className="inline-flex items-center gap-1.5 text-muted-foreground font-medium">
+          <span className="inline-flex items-center gap-1.5 text-muted-foreground font-medium" title="Streak freezes automatically protect your streak on a missed day">
             <Shield className="w-3.5 h-3.5 text-sky-500" />
             Earned Streak Freezes:
           </span>
-          <span className="font-bold text-foreground font-mono">
+          <span className="font-bold text-foreground font-mono" title="Streak freezes automatically protect your streak on a missed day">
             {streakFreezesAvailable} / 2 Available
           </span>
         </div>
 
         <p className="text-xs text-muted-foreground leading-snug">
           {statusMessage}
+        </p>
+        <p className="text-[11px] text-muted-foreground/80 italic leading-tight">
+          Available freezes automatically protect your streak if you miss a day.
         </p>
       </div>
     </div>

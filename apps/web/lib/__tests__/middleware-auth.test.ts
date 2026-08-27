@@ -79,4 +79,36 @@ describe('Phase 2 Middleware & Auth Security Test Suite', () => {
     const user = await getAuthenticatedUserFromRequest(req)
     expect(user).toBeNull()
   })
+
+  it('6. Password Recovery Route: Authenticated recovery user can access /reset-password?mode=update', async () => {
+    const req = new NextRequest('https://prodily.app/reset-password?mode=update', {
+      headers: {
+        cookie: 'sb-access-token=mock-user-token',
+      },
+    })
+    const res = await proxy(req)
+    expect(res).toBeDefined()
+    expect(res.status).toBe(200)
+  })
+
+  it('7. Password Recovery Route: Unauthenticated visitor on /reset-password?mode=update redirects to expired error', async () => {
+    const req = new NextRequest('https://prodily.app/reset-password?mode=update')
+    const res = await proxy(req)
+    expect(res).toBeDefined()
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toContain('/reset-password?error=expired')
+  })
+
+  it('8. Password Recovery Route: Authenticated user visiting standard /reset-password is routed away', async () => {
+    const req = new NextRequest('https://prodily.app/reset-password', {
+      headers: {
+        cookie: 'sb-access-token=mock-user-token',
+      },
+    })
+    const res = await proxy(req)
+    expect(res).toBeDefined()
+    expect(res.status).toBe(307)
+    // Admin mock user routes to /admin
+    expect(res.headers.get('location')).toMatch(/\/(admin|dashboard)/)
+  })
 })

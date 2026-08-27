@@ -210,3 +210,46 @@ export async function recordFlashcardReview(
   }
 }
 
+/**
+ * Dispatches review.completed event when an SRS flashcard review session is finished.
+ */
+export async function recordReviewSessionCompletion(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  cardsReviewedCount: number,
+  xpEarned: number = 0
+): Promise<{ success: boolean }> {
+  try {
+    const { data: userRec } = await (supabase
+      .from('users') as unknown as DBChain)
+      .select('email, name')
+      .eq('id', userId)
+      .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+
+    const { globalNotificationDispatcher } = await import('./notifications/dispatcher')
+    const { initializeNotificationConnectors } = await import('./notifications/events/connectors')
+    initializeNotificationConnectors()
+
+    await globalNotificationDispatcher.dispatch({
+      id: `review-complete-${userId}-${Date.now()}`,
+      event: 'review.completed',
+      userId,
+      userEmail: userRec?.email || '',
+      userName: userRec?.name || 'Learner',
+      userTimezone: 'UTC',
+      priority: 'low',
+      category: 'learning',
+      occurredAt: new Date().toISOString(),
+      payload: {
+        userId,
+        cardsReviewedCount,
+        xpEarned,
+      },
+    })
+    return { success: true }
+  } catch (err) {
+    console.warn('[flashcards-service] Error dispatching review.completed:', err)
+    return { success: false }
+  }
+}
+

@@ -65,7 +65,22 @@ export default function SignupPage() {
           body: JSON.stringify(values),
         })
 
-        const json = await res.json()
+        if (res.status >= 502 && res.status <= 504) {
+          const classified = classifyAuthError(new Error(`${res.status} Bad Gateway / Service Unavailable`), 'signup')
+          setAuthError(classified)
+          recordAuthTelemetry(classified, 'signup')
+          return
+        }
+
+        let json: { success?: boolean; error?: string; verificationRequired?: boolean; redirect?: string } = {}
+        try {
+          json = await res.json()
+        } catch {
+          const classified = classifyAuthError(new Error(`HTTP ${res.status}: Invalid server response`), 'signup')
+          setAuthError(classified)
+          recordAuthTelemetry(classified, 'signup')
+          return
+        }
 
         if (!res.ok || !json.success) {
           const classified = classifyAuthError(new Error(json.error || 'Registration failed'), 'signup')

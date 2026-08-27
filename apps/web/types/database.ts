@@ -1687,6 +1687,8 @@ export type Database = {
           longest_streak: number
           name: string | null
           onboarding_completed: boolean
+          onboarding_preference: string | null
+          onboarding_topics: string[]
           streak_freezes_available: number
           timezone: string
           total_active_seconds: number
@@ -1715,6 +1717,8 @@ export type Database = {
           longest_streak?: number
           name?: string | null
           onboarding_completed?: boolean
+          onboarding_preference?: string | null
+          onboarding_topics?: string[]
           streak_freezes_available?: number
           timezone?: string
           total_active_seconds?: number
@@ -1743,6 +1747,8 @@ export type Database = {
           longest_streak?: number
           name?: string | null
           onboarding_completed?: boolean
+          onboarding_preference?: string | null
+          onboarding_topics?: string[]
           streak_freezes_available?: number
           timezone?: string
           total_active_seconds?: number

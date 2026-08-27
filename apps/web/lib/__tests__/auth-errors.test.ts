@@ -102,7 +102,50 @@ describe('Phase 4 — Authentication Error Classification & Safety', () => {
       expect(classified.code).toBe('AUTH_RATE_LIMITED')
       expect(classified.requiresAction).toBe('wait')
       expect(classified.retryable).toBe(true)
-      expect(classified.message).toContain('Too many attempts')
+      expect(classified.message).toContain('60 seconds')
+    })
+
+    it('classifies over_email_send_rate_limit from Supabase with extracted cooldown seconds', () => {
+      const error = {
+        code: 'over_email_send_rate_limit',
+        message: 'For security purposes, you can only request this after 53 seconds.',
+      }
+      const classified = classifyAuthError(error, 'resend_verification')
+
+      expect(classified.code).toBe('AUTH_RATE_LIMITED')
+      expect(classified.requiresAction).toBe('wait')
+      expect(classified.retryable).toBe(true)
+      expect(classified.message).toContain('53 seconds')
+      expect(classified.rawCode).toBe('over_email_send_rate_limit')
+    })
+
+    it('classifies HTTP 429 status object as AUTH_RATE_LIMITED', () => {
+      const error = {
+        status: 429,
+        message: 'Too many verification requests. Please wait a moment before trying again.',
+      }
+      const classified = classifyAuthError(error, 'resend_verification')
+
+      expect(classified.code).toBe('AUTH_RATE_LIMITED')
+      expect(classified.requiresAction).toBe('wait')
+      expect(classified.retryable).toBe(true)
+    })
+
+    it('classifies cooldown text string from rate-limit response as AUTH_RATE_LIMITED', () => {
+      const errorText = 'Please wait 48 seconds before requesting another verification email.'
+      const classified = classifyAuthError(errorText, 'resend_verification')
+
+      expect(classified.code).toBe('AUTH_RATE_LIMITED')
+      expect(classified.message).toContain('48 seconds')
+      expect(classified.requiresAction).toBe('wait')
+    })
+
+    it('classifies missing email validation error with clear guidance', () => {
+      const errorText = 'Email address is required'
+      const classified = classifyAuthError(errorText, 'resend_verification')
+
+      expect(classified.message).toBe('Please enter a valid email address.')
+      expect(classified.rawCode).toBe('email_required')
     })
 
     it('classifies provider/database outage (502/503/500) as provider unavailable', () => {

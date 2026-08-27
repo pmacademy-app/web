@@ -33,6 +33,23 @@ type EventMap = {
   quick_start_completed:    Record<string, never>
   quick_start_skipped:      { at_step: number }
   quick_start_reopened:     Record<string, never>
+
+  // ─── Learning Lifecycle Events (Phase 1) ──────────────────────────────────
+  lesson_start:             { lesson_id: string; module_slug?: string }
+  theory_read:              { lesson_id: string; xp_earned?: number }
+  quiz_complete:            { lesson_id: string; score: number }
+  lesson_complete:          { lesson_id: string; lesson_title?: string; xp_earned?: number }
+  capstone_submit:          { module_slug: string; module_title?: string }
+  badge_earn:               { badge_id: string; badge_name?: string }
+  level_up:                 { level: number; level_title?: string }
+
+  // ─── First-Session Activation Events (Phase 2) ───────────────────────────
+  first_session_started:    { lesson_id?: string; module_slug?: string }
+  first_lesson_completed:   { lesson_id: string; xp_earned?: number }
+  first_reward_celebrated:  { lesson_id: string; xp_earned?: number }
+
+  // ─── Goal-Driven Personalization Events (Phase 3) ─────────────────────────
+  goal_context_viewed:      { goal_id?: string; recommended_module?: string }
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -107,4 +124,68 @@ export function trackQuickStartSkipped(atStep: number) {
 export function trackQuickStartReopened() {
   trackEvent('quick_start_reopened')
 }
+
+// ─── Learning Lifecycle Event Trackers (Phase 1) ─────────────────────────────
+
+/** Fired when a learner opens/starts a lesson. */
+export function trackLessonStarted(lessonId: string, moduleSlug?: string) {
+  trackEvent('lesson_start', { lesson_id: lessonId, module_slug: moduleSlug })
+}
+
+/** Fired when a learner completes reading the theory section. */
+export function trackTheoryRead(lessonId: string, xpEarned?: number) {
+  trackEvent('theory_read', { lesson_id: lessonId, xp_earned: xpEarned })
+}
+
+/** Fired when a learner completes a practice quiz attempt. */
+export function trackQuizCompleted(lessonId: string, score: number) {
+  trackEvent('quiz_complete', { lesson_id: lessonId, score })
+}
+
+/** Fired when a lesson status transitions to completed. */
+export function trackLessonCompleted(lessonId: string, lessonTitle?: string, xpEarned?: number) {
+  trackEvent('lesson_complete', { lesson_id: lessonId, lesson_title: lessonTitle, xp_earned: xpEarned })
+}
+
+/** Fired when a learner submits a module capstone project. */
+export function trackCapstoneSubmitted(moduleSlug: string, moduleTitle?: string) {
+  trackEvent('capstone_submit', { module_slug: moduleSlug, module_title: moduleTitle })
+}
+
+/** Fired when a learner earns an achievement badge. */
+export function trackBadgeEarned(badgeId: string, badgeName?: string) {
+  trackEvent('badge_earn', { badge_id: badgeId, badge_name: badgeName })
+}
+
+/** Fired when a learner advances to a new level. */
+export function trackLevelUp(level: number, levelTitle?: string) {
+  trackEvent('level_up', { level, level_title: levelTitle })
+}
+
+// ─── First-Session Activation Trackers (Phase 2) ────────────────────────────
+
+/** Fired when a new learner starts their first session via the kickoff card. */
+export function trackFirstSessionStarted(params?: { lesson_id?: string; module_slug?: string }) {
+  trackEvent('first_session_started', params)
+}
+
+/** Fired when a learner completes their very first lesson. */
+export function trackFirstLessonCompleted(lessonId: string, xpEarned?: number) {
+  trackEvent('first_lesson_completed', { lesson_id: lessonId, xp_earned: xpEarned })
+}
+
+/** Fired when the first-session reward celebration modal is displayed. */
+export function trackFirstRewardCelebrated(lessonId: string, xpEarned?: number) {
+  trackEvent('first_reward_celebrated', { lesson_id: lessonId, xp_earned: xpEarned })
+}
+
+// ─── Goal-Driven Personalization Trackers (Phase 3) ─────────────────────────
+
+/** Fired when personalized goal context is displayed on the learner dashboard. */
+export function trackGoalContextViewed(goalId?: string, recommendedModule?: string) {
+  trackEvent('goal_context_viewed', { goal_id: goalId, recommended_module: recommendedModule })
+}
+
+
+
 

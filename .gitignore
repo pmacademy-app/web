@@ -44,3 +44,6 @@ opencode.json
 # Local-only marketing campaign scripts and logs (never commit)
 apps/web/scripts/local-campaigns/
 apps/web/scripts/logs/
+
+# Master plan document (never commit)
+PRODILY_PRODUCT_IMPLEMENTATION_MASTER_PLAN.md
