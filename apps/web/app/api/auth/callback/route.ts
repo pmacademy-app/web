@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       const supabase = createServiceRoleClient()
       const { data, error } = await supabase.auth.verifyOtp({ token_hash, type })
 
-      if (!error && data.user && data.session) {
+      if (!error && data.user) {
         await ensureUserProfile(supabase, data.user)
         if (type === 'signup' || type === 'email_change') {
           try {
@@ -90,7 +90,12 @@ export async function GET(request: NextRequest) {
             console.warn('[auth/callback] user.verified notification dispatch warning:', notifErr)
           }
         }
-        return redirectWithSession(destination, data.session)
+
+        if (data.session) {
+          return redirectWithSession(destination, data.session)
+        }
+
+        return NextResponse.redirect(new URL('/login?verified=true', requestUrl.origin))
       }
 
       if (error) {
@@ -104,6 +109,12 @@ export async function GET(request: NextRequest) {
   // ── Fallback: both paths failed — send to appropriate destination with error ──
   if (type === 'recovery' || next.includes('reset-password')) {
     return NextResponse.redirect(new URL('/reset-password?error=expired', requestUrl.origin))
+  }
+
+  // Distinguish email verification failures from generic auth failures
+  // so the login page can show a targeted message and link to the resend flow.
+  if (type === 'signup' || type === 'email') {
+    return NextResponse.redirect(new URL('/login?error=verification_failed', requestUrl.origin))
   }
 
   return NextResponse.redirect(new URL('/login?error=auth_failed', requestUrl.origin))

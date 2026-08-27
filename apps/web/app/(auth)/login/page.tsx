@@ -34,6 +34,7 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const authErrorParam = searchParams.get('error')
   const resetSuccess = searchParams.get('reset') === 'success'
+  const verifiedSuccess = searchParams.get('verified') === 'true'
 
   const [authError, setAuthError] = useState<ClassifiedAuthError | null>(
     authErrorParam === 'auth_failed'
@@ -42,6 +43,14 @@ function LoginForm() {
           message: 'Authentication failed. Please try again.',
           retryable: true,
           isNetworkError: false,
+        }
+      : authErrorParam === 'verification_failed'
+      ? {
+          code: 'AUTH_EMAIL_NOT_CONFIRMED',
+          message: 'Your verification link has expired or was already used. Please request a new one below.',
+          retryable: false,
+          isNetworkError: false,
+          requiresAction: 'verify_email',
         }
       : null
   )
@@ -116,6 +125,15 @@ function LoginForm() {
 
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
+      {verifiedSuccess && (
+        <div
+          className="p-3 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-medium flex items-center gap-2"
+          role="status"
+        >
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <span>Your email address has been verified successfully! Please log in to continue.</span>
+        </div>
+      )}
 
       {resetSuccess && (
         <div

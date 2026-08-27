@@ -24,7 +24,23 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, email, password } = parsed.data
-    const isRequired = await SettingsService.isEmailVerificationRequired()
+
+    // Check both platform behavior controls in a single DB call
+    const productSettings = await SettingsService.getProductSettings()
+
+    // Backend enforcement of Allow Signups setting.
+    // Do NOT rely only on hiding the signup form — the API must reject directly too.
+    if (!productSettings.allowSignups) {
+      return NextResponse.json(
+        {
+          error: 'New learner registrations are currently closed. Please check back later.',
+          code: 'SIGNUPS_DISABLED',
+        },
+        { status: 403 }
+      )
+    }
+
+    const isRequired = productSettings.requireEmailVerification
     const supabase = createServiceRoleClient()
     const origin = request.headers.get('origin') || request.nextUrl.origin || 'http://localhost:3000'
 

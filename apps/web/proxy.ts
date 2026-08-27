@@ -67,8 +67,24 @@ export async function proxy(request: NextRequest) {
 
   const isPublicPage = isGeneralAuthPage || isAdminLoginPage || isAccessDeniedPage
 
+  // Learner APIs that must be protected against maintenance mode & unverified bypass
+  const isApiRoute = path.startsWith('/api/')
+  const isExemptApi =
+    path.startsWith('/api/auth/') ||
+    path.startsWith('/api/admin/') ||
+    path.startsWith('/api/cron/') ||
+    path.startsWith('/api/email/') ||
+    path === '/api/waitlist' ||
+    path === '/api/contact'
+  const isProtectedLearnerApi = isApiRoute && !isExemptApi
+
+  // Maintenance page must always be reachable so learners see the correct message
+  if (path === '/maintenance') {
+    return NextResponse.next()
+  }
+
   // Fast path for non-guarded public routes
-  if (!isPublicPage && !isAppPage) {
+  if (!isPublicPage && !isAppPage && !isProtectedLearnerApi) {
     return NextResponse.next()
   }
 
@@ -191,6 +207,39 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // ── Protected learner API routes (maintenance & email verification) ─────
+  if (isProtectedLearnerApi) {
+    const { SettingsService } = await import('@/lib/admin/settings-service')
+    const productSettings = await SettingsService.getProductSettings()
+
+    // 1. Maintenance mode enforcement on APIs: 503 Service Unavailable for non-admins
+    if (productSettings.maintenanceMode && !(await isAdmin())) {
+      return NextResponse.json(
+        {
+          error: 'The platform is currently undergoing scheduled maintenance. Please check back shortly.',
+          code: 'MAINTENANCE_MODE',
+        },
+        { status: 503 }
+      )
+    }
+
+    // 2. Email verification enforcement on APIs: 403 Forbidden for unverified learners
+    if (productSettings.requireEmailVerification && user && !user.email_confirmed_at && !(await isAdmin())) {
+      return NextResponse.json(
+        {
+          error: 'Please verify your email address before accessing platform features.',
+          code: 'AUTH_EMAIL_NOT_CONFIRMED',
+        },
+        { status: 403 }
+      )
+    }
+
+    if (newSession) {
+      return withSessionCookies(NextResponse.next(), newSession)
+    }
+    return NextResponse.next()
+  }
+
   // ── Protected application routes ─────────────────────────────────────────
   if (isAppPage) {
     if (!user) {
@@ -207,11 +256,19 @@ export async function proxy(request: NextRequest) {
       return newSession ? withSessionCookies(response, newSession) : response
     }
 
-    // Email verification check for learner protected routes
+    // ── Email verification check for learner protected routes ────────────────
     if (!isAdminArea && !(await isAdmin())) {
       const { SettingsService } = await import('@/lib/admin/settings-service')
-      const isVerificationRequired = await SettingsService.isEmailVerificationRequired()
-      if (isVerificationRequired && !user.email_confirmed_at) {
+      const productSettings = await SettingsService.getProductSettings()
+
+      // Maintenance mode — block all non-admin learners from the app
+      if (productSettings.maintenanceMode) {
+        const response = NextResponse.redirect(new URL('/maintenance', request.url))
+        return newSession ? withSessionCookies(response, newSession) : response
+      }
+
+      // Email verification enforcement
+      if (productSettings.requireEmailVerification && !user.email_confirmed_at) {
         const response = NextResponse.redirect(new URL('/login?error=email_not_confirmed', request.url))
         return newSession ? withSessionCookies(response, newSession) : response
       }

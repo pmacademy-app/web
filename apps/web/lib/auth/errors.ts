@@ -206,11 +206,19 @@ export function classifyAuthError(
 
   // 7. Rate limiting & security cooldowns
   const is429 =
-    (typeof error === 'object' && error !== null && (error as { status?: unknown }).status === 429) ||
+    (typeof error === 'object' && error !== null && (
+      (error as { status?: unknown }).status === 429 ||
+      (error as { status?: unknown }).status === '429' ||
+      (error as { statusCode?: unknown }).statusCode === 429 ||
+      (error as { statusCode?: unknown }).statusCode === '429' ||
+      (error as { code?: unknown }).code === 429 ||
+      (error as { code?: unknown }).code === '429'
+    )) ||
     rawCode === '429' ||
     rawCode === 'over_email_send_rate_limit' ||
     rawCode === 'over_request_rate_limit' ||
-    rawCode === 'rate_limit'
+    rawCode === 'rate_limit' ||
+    rawCode === 'rate_limit_exceeded'
 
   const hasRateLimitText =
     rawMessage.includes('too many') ||
@@ -219,6 +227,7 @@ export function classifyAuthError(
     rawMessage.includes('over_email_send_rate_limit') ||
     rawMessage.includes('over_request_rate_limit') ||
     rawMessage.includes('security purposes') ||
+    rawMessage.includes('cooldown') ||
     (rawMessage.includes('please wait') && (rawMessage.includes('second') || rawMessage.includes('minute')))
 
   if (is429 || hasRateLimitText) {
@@ -290,9 +299,18 @@ export function classifyAuthError(
 function extractErrorMessage(error: unknown): string {
   if (typeof error === 'string') return error
   if (typeof error === 'object' && error !== null) {
-    const err = error as { message?: unknown; error_description?: unknown }
+    const err = error as {
+      message?: unknown
+      error_description?: unknown
+      error?: unknown
+      msg?: unknown
+      details?: unknown
+    }
     if (typeof err.message === 'string') return err.message
     if (typeof err.error_description === 'string') return err.error_description
+    if (typeof err.msg === 'string') return err.msg
+    if (typeof err.error === 'string') return err.error
+    if (typeof err.details === 'string') return err.details
   }
   return ''
 }
@@ -302,9 +320,20 @@ function extractErrorMessage(error: unknown): string {
  */
 function extractErrorCode(error: unknown): string | undefined {
   if (typeof error === 'object' && error !== null) {
-    const err = error as { code?: unknown; status?: unknown; name?: unknown }
+    const err = error as {
+      code?: unknown
+      status?: unknown
+      statusCode?: unknown
+      error_code?: unknown
+      name?: unknown
+    }
     if (typeof err.code === 'string') return err.code
-    if (typeof err.status === 'number' && err.status === 429) return '429'
+    if (typeof err.code === 'number') return String(err.code)
+    if (typeof err.error_code === 'string') return err.error_code
+    if (typeof err.status === 'number') return String(err.status)
+    if (typeof err.status === 'string') return err.status
+    if (typeof err.statusCode === 'number') return String(err.statusCode)
+    if (typeof err.statusCode === 'string') return err.statusCode
     if (typeof err.name === 'string' && err.name !== 'Error') return err.name
   }
   return undefined

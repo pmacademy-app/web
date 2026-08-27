@@ -54,17 +54,28 @@ export function ResendVerificationCard({
         setCooldown(60)
         onSuccess?.()
       } else {
+        const isRateLimited = res.status === 429 || data.code === 'AUTH_RATE_LIMITED'
         const errorText = data.error || 'Failed to send verification email.'
-        const classified = classifyAuthError(errorText, 'resend_verification')
+        const classified = isRateLimited
+          ? {
+              code: 'AUTH_RATE_LIMITED' as const,
+              message: errorText,
+              retryable: true,
+              isNetworkError: false,
+              requiresAction: 'wait' as const,
+            }
+          : classifyAuthError(errorText, 'resend_verification')
 
         // Expected rate limit (429) is a normal security cooldown, not an unexpected system defect
-        if (res.status !== 429 && classified.code !== 'AUTH_RATE_LIMITED') {
+        if (!isRateLimited && classified.code !== 'AUTH_RATE_LIMITED') {
           recordAuthTelemetry(classified, 'resend_verification')
         }
 
         setStatusMessage({ type: 'error', text: classified.message })
         if (data.resetInMs) {
           setCooldown(Math.ceil(data.resetInMs / 1000))
+        } else if (isRateLimited) {
+          setCooldown(60)
         }
       }
     } catch (err) {

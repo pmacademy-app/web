@@ -333,8 +333,9 @@ export class SettingsService {
     }
   }
 
-  // ─── Verification Cache & Helper ──────────────────────────────────────────
+  // ─── Settings Cache & Helpers ─────────────────────────────────────────────
 
+  private static cachedProductSettings: { value: ProductSettings; timestamp: number } | null = null
   private static cachedVerificationRequired: { value: boolean; timestamp: number } | null = null
   private static readonly CACHE_TTL_MS = 10_000 // 10 seconds TTL
 
@@ -343,16 +344,9 @@ export class SettingsService {
    * Returns true (require verification) if not explicitly set to false.
    */
   public static async isEmailVerificationRequired(): Promise<boolean> {
-    const now = Date.now()
-    if (this.cachedVerificationRequired && now - this.cachedVerificationRequired.timestamp < this.CACHE_TTL_MS) {
-      return this.cachedVerificationRequired.value
-    }
-
     try {
       const product = await this.getProductSettings()
-      const required = typeof product.requireEmailVerification === 'boolean' ? product.requireEmailVerification : true
-      this.cachedVerificationRequired = { value: required, timestamp: now }
-      return required
+      return typeof product.requireEmailVerification === 'boolean' ? product.requireEmailVerification : true
     } catch {
       return true
     }
@@ -362,13 +356,21 @@ export class SettingsService {
    * Manually invalidate settings cache (e.g. after Admin Panel save or in unit tests).
    */
   public static invalidateCache(): void {
+    this.cachedProductSettings = null
     this.cachedVerificationRequired = null
   }
 
   // ─── Public API ────────────────────────────────────────────────────────────
 
   public static async getProductSettings(): Promise<ProductSettings> {
-    return this.getSettings<ProductSettings>('product')
+    const now = Date.now()
+    if (this.cachedProductSettings && now - this.cachedProductSettings.timestamp < this.CACHE_TTL_MS) {
+      return this.cachedProductSettings.value
+    }
+
+    const settings = await this.getSettings<ProductSettings>('product')
+    this.cachedProductSettings = { value: settings, timestamp: now }
+    return settings
   }
 
   public static async getLearningSettings(): Promise<LearningSettings> {
