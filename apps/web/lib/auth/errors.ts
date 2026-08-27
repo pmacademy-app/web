@@ -204,25 +204,56 @@ export function classifyAuthError(
     }
   }
 
-  // 7. Rate limiting
-  if (
-    rawMessage.includes('too many requests') ||
+  // 7. Rate limiting & security cooldowns
+  const is429 =
+    (typeof error === 'object' && error !== null && (error as { status?: unknown }).status === 429) ||
+    rawCode === '429' ||
+    rawCode === 'over_email_send_rate_limit' ||
+    rawCode === 'over_request_rate_limit' ||
+    rawCode === 'rate_limit'
+
+  const hasRateLimitText =
+    rawMessage.includes('too many') ||
     rawMessage.includes('rate limit') ||
+    rawMessage.includes('rate_limit') ||
+    rawMessage.includes('over_email_send_rate_limit') ||
     rawMessage.includes('over_request_rate_limit') ||
-    rawMessage.includes('for security purposes') ||
-    rawMessage.includes('security purposes, you can only request')
-  ) {
+    rawMessage.includes('security purposes') ||
+    (rawMessage.includes('please wait') && (rawMessage.includes('second') || rawMessage.includes('minute')))
+
+  if (is429 || hasRateLimitText) {
+    const secondsMatch = rawMessage.match(/(?:after|wait|every)\s+(\d+)\s+seconds?/i)
+    const seconds = secondsMatch ? secondsMatch[1] : undefined
+    const message = seconds
+      ? `Please wait ${seconds} second${seconds === '1' ? '' : 's'} before trying again.`
+      : 'Too many attempts. For your security, please wait a few moments before trying again.'
+
     return {
       code: 'AUTH_RATE_LIMITED',
-      message: 'Too many attempts. For your security, please wait a few moments before trying again.',
+      message,
       retryable: true,
       isNetworkError: false,
       requiresAction: 'wait',
-      rawCode: rawCode || 'rate_limited',
+      rawCode: rawCode || (is429 ? '429' : 'rate_limited'),
     }
   }
 
-  // 8. Provider / Service unavailable (502, 503, 504, 500 database error saving new user)
+  // 8. Missing required email / input validation
+  if (
+    rawMessage.includes('email is required') ||
+    rawMessage.includes('email address is required') ||
+    rawMessage.includes('valid email address')
+  ) {
+    return {
+      code: 'AUTH_UNKNOWN_ERROR',
+      message: 'Please enter a valid email address.',
+      retryable: true,
+      isNetworkError: false,
+      rawCode: rawCode || 'email_required',
+    }
+  }
+
+  // 9. Provider / Service unavailable (502, 503, 504, 500 database error saving new user)
   if (
     rawMessage.includes('502') ||
     rawMessage.includes('503') ||
@@ -243,7 +274,7 @@ export function classifyAuthError(
     }
   }
 
-  // 9. Unknown / Unclassified error fallback
+  // 10. Unknown / Unclassified error fallback
   return {
     code: 'AUTH_UNKNOWN_ERROR',
     message: 'An unexpected authentication error occurred. Please try again.',
@@ -273,6 +304,7 @@ function extractErrorCode(error: unknown): string | undefined {
   if (typeof error === 'object' && error !== null) {
     const err = error as { code?: unknown; status?: unknown; name?: unknown }
     if (typeof err.code === 'string') return err.code
+    if (typeof err.status === 'number' && err.status === 429) return '429'
     if (typeof err.name === 'string' && err.name !== 'Error') return err.name
   }
   return undefined

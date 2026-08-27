@@ -18,6 +18,7 @@ export function ResendVerificationCard({
 }: ResendVerificationCardProps) {
   const [cooldown, setCooldown] = useState<number>(initialCooldown)
   const [loading, setLoading] = useState<boolean>(false)
+  const [inputEmail, setInputEmail] = useState<string>('')
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   useEffect(() => {
@@ -29,6 +30,12 @@ export function ResendVerificationCard({
   }, [cooldown])
 
   const handleResend = async () => {
+    const targetEmail = (email || inputEmail || '').trim()
+    if (!targetEmail) {
+      setStatusMessage({ type: 'error', text: 'Please enter your email address.' })
+      return
+    }
+
     if (cooldown > 0 || loading) return
     setLoading(true)
     setStatusMessage(null)
@@ -37,7 +44,7 @@ export function ResendVerificationCard({
       const res = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: targetEmail }),
       })
 
       const data = await res.json()
@@ -49,7 +56,12 @@ export function ResendVerificationCard({
       } else {
         const errorText = data.error || 'Failed to send verification email.'
         const classified = classifyAuthError(errorText, 'resend_verification')
-        recordAuthTelemetry(classified, 'resend_verification')
+
+        // Expected rate limit (429) is a normal security cooldown, not an unexpected system defect
+        if (res.status !== 429 && classified.code !== 'AUTH_RATE_LIMITED') {
+          recordAuthTelemetry(classified, 'resend_verification')
+        }
+
         setStatusMessage({ type: 'error', text: classified.message })
         if (data.resetInMs) {
           setCooldown(Math.ceil(data.resetInMs / 1000))
@@ -76,6 +88,23 @@ export function ResendVerificationCard({
           <p className="text-xs text-muted-foreground mt-1">
             Check your spam or junk folder, or request another link below.
           </p>
+
+          {!email && (
+            <div className="mt-3">
+              <label htmlFor="resend-email-input" className="sr-only">
+                Email Address
+              </label>
+              <input
+                id="resend-email-input"
+                type="email"
+                placeholder="Enter your email address"
+                value={inputEmail}
+                onChange={(e) => setInputEmail(e.target.value)}
+                disabled={loading || cooldown > 0}
+                className="w-full max-w-sm rounded-lg border border-input bg-background px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              />
+            </div>
+          )}
 
           {statusMessage && (
             <div

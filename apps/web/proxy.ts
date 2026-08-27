@@ -151,6 +151,18 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // ── Password Reset Update Mode (Recovery session in progress) ────────────
+  // When a user verifies their reset link, they arrive at /reset-password?mode=update
+  // with an active recovery session. They MUST be allowed to remain on this page
+  // to choose their new password.
+  if (path === '/reset-password' && request.nextUrl.searchParams.get('mode') === 'update') {
+    if (!user) {
+      // If recovery session is missing or expired, redirect to request form
+      return NextResponse.redirect(new URL('/reset-password?error=expired', request.url))
+    }
+    return newSession ? withSessionCookies(NextResponse.next(), newSession) : NextResponse.next()
+  }
+
   // ── Public auth pages (/login, /signup, /reset-password) ─────────────────
   if (isGeneralAuthPage) {
     if (!user) return NextResponse.next()
