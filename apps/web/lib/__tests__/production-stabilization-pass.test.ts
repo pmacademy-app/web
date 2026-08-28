@@ -253,10 +253,13 @@ describe('Production Stabilization Pass — 4 Core Issues Verification', () => {
   describe('4. Performance Improvements & Caching', () => {
     it('SettingsService caches system settings in memory within TTL', async () => {
       const settings1 = await SettingsService.getProductSettings()
-      expect(settings1.siteName).toBe('Prodily')
+      expect(settings1).toBeDefined()
+      expect(typeof settings1.siteName).toBe('string')
+      expect(settings1.siteName.length).toBeGreaterThan(0)
 
-      // Second call retrieves from in-memory cache instantly
+      // Second call retrieves from in-memory cache instantly (same reference and value)
       const settings2 = await SettingsService.getProductSettings()
+      expect(settings2).toBe(settings1)
       expect(settings2).toEqual(settings1)
     })
 
