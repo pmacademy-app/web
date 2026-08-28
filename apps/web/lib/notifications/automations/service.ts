@@ -12,12 +12,12 @@ export const DEFAULT_DIGEST_SCHEDULES: EmailDigestSchedules = {
   weeklyRecap: {
     enabled: true,
     dayOfWeek: 1, // Monday
-    hourUtc: 9,   // 09:00 UTC
+    hourUtc: 3,   // 03:30 UTC (09:00 AM IST)
     lastRunAt: null,
   },
   dailyReminder: {
     enabled: true,
-    hourUtc: 9,   // 09:00 UTC
+    hourUtc: 3,   // 03:30 UTC (09:00 AM IST)
     lastRunAt: null,
   },
 }
@@ -36,8 +36,8 @@ export const AUTOMATION_METADATA: Array<Omit<EmailAutomationMeta, 'enabled'>> = 
   { key: 'achievement.portfolio_published', name: 'Portfolio Published', description: 'Triggered when a user publishes their portfolio.', category: 'Transactional', isCritical: false },
 
   // Scheduled Digests
-  { key: 'learning.weekly_recap', name: 'Weekly Recap', description: 'Weekly summary email sent to active learners (Mondays 09:00 UTC).', category: 'Scheduled', isCritical: false },
-  { key: 'learning.daily_reminder', name: 'Daily Review Reminder', description: 'Daily SRS review and streak alert sent to active learners (Daily 09:00 UTC).', category: 'Scheduled', isCritical: false },
+  { key: 'learning.weekly_recap', name: 'Weekly Recap', description: 'Weekly summary email sent to active learners (Mondays 09:00 IST / 03:30 UTC).', category: 'Scheduled', isCritical: false },
+  { key: 'learning.daily_reminder', name: 'Daily Review Reminder', description: 'Daily SRS review and streak alert sent to active learners (Daily 09:00 IST / 03:30 UTC).', category: 'Scheduled', isCritical: false },
 
   // Deferred Post-Launch
   { key: 'inactive.resume_learning', name: 'Resume Learning', description: 'Re-engagement prompt for inactive learners (Deferred for launch).', category: 'Scheduled', isCritical: false, isDeferred: true },
