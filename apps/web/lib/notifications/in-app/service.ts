@@ -126,7 +126,14 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       return { title: `Module complete: ${name}`, body: `You completed the ${name} module. ${payload.xpBonusEarned || 0} bonus XP earned.`, actionUrl: '/academy' }
     }
     case 'quiz.completed': {
-      return { title: 'Quiz complete', body: `You scored ${payload.score || 0} on the ${String(payload.lessonId || 'lesson')} quiz.`, actionUrl: '/academy' }
+      const rawTitle = String(payload.lessonTitle || '')
+      // Guard against raw internal IDs like 'les_4kpbq6' leaking if passed as lessonTitle or fallback
+      const cleanTitle = rawTitle && !/^les_[a-z0-9]+$/i.test(rawTitle) ? rawTitle : 'Lesson'
+      const actionUrl =
+        payload.moduleSlug && payload.lessonId
+          ? `/academy/${String(payload.moduleSlug)}/${String(payload.lessonId)}`
+          : '/academy'
+      return { title: 'Quiz complete', body: `You scored ${payload.score || 0} on the ${cleanTitle} quiz.`, actionUrl }
     }
     case 'review.completed': {
       return { title: 'Review session finished', body: `${payload.cardsReviewedCount || 0} cards reviewed with +${payload.xpEarned || 0} XP.`, actionUrl: '/review' }

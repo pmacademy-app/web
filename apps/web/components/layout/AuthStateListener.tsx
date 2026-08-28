@@ -13,21 +13,24 @@ export default function AuthStateListener() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      try {
-        await fetch('/api/auth/session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ session }),
-        })
+      // Only sync session when an active session is provided by a sign-in or token refresh event.
+      // NEVER clear server-side HTTP-only cookies on INITIAL_SESSION or when session is null in browser localStorage.
+      if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED')) {
+        try {
+          await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ session }),
+          })
 
-        // Refresh Server Components layout/data on major auth events
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-          router.refresh()
+          if (event === 'SIGNED_IN') {
+            router.refresh()
+          }
+        } catch (err) {
+          console.error('[AuthStateListener] Error syncing session:', err)
         }
-      } catch (err) {
-        console.error('[AuthStateListener] Error syncing session:', err)
       }
     })
 

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Clock, ExternalLink, Trophy, BookOpen, Shield, Bell } from 'lucide-react'
+import { Clock, ExternalLink, Trophy, BookOpen, Shield, Bell, Check } from 'lucide-react'
 
 export interface NotificationItem {
   id: string
@@ -86,13 +86,28 @@ export function NotificationItemCard({
         </div>
       </div>
 
-      {/* Unread indicator dot */}
+      {/* Unread indicator dot & quick mark-as-read action */}
       {!item.isRead && (
-        <span
-          className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1 animate-pulse"
-          title="Unread"
-          aria-label="Unread notification"
-        />
+        <div className="flex items-center gap-1 shrink-0 mt-0.5">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleInteraction()
+            }}
+            title="Mark as read"
+            aria-label="Mark notification as read"
+            className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 hover:bg-primary/20 text-muted-foreground hover:text-primary rounded-full transition-opacity cursor-pointer"
+          >
+            <Check className="w-3 h-3" />
+          </button>
+          <span
+            className="w-2 h-2 rounded-full bg-primary animate-pulse"
+            title="Unread"
+            aria-label="Unread notification"
+          />
+        </div>
       )}
     </div>
   )

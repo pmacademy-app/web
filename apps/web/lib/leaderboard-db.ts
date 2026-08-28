@@ -197,7 +197,8 @@ export async function getWeeklyLeaderboard(
  */
 export async function getFriendLeaderboard(
   supabase: SupabaseClient<Database>,
-  userId: string
+  userId: string,
+  existingEntries?: LeaderboardEntry[]
 ): Promise<LeaderboardEntry[]> {
   const { data: friendsRows } = (await (supabase
     .from('user_friends') as unknown as DBChain)
@@ -214,7 +215,7 @@ export async function getFriendLeaderboard(
     }
   }
 
-  const { entries } = await getWeeklyLeaderboard(supabase, userId)
+  const entries = existingEntries ?? (await getWeeklyLeaderboard(supabase, userId)).entries
   return entries.filter((e) => friendIds.has(e.userId))
 }
 

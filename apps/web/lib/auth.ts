@@ -115,10 +115,30 @@ export async function getServerUser(): Promise<User | null> {
   try {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('sb-access-token')?.value
-    if (!accessToken) return null
+    const refreshToken = cookieStore.get('sb-refresh-token')?.value
+    if (!accessToken && !refreshToken) return null
 
-    const authClient = createAuthenticatedServerClient(accessToken)
-    return await getAuthenticatedUser(authClient)
+    if (accessToken) {
+      const authClient = createAuthenticatedServerClient(accessToken)
+      const user = await getAuthenticatedUser(authClient)
+      if (user) return user
+    }
+
+    // Refresh token fallback if access token is expired or missing
+    if (refreshToken) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      if (supabaseUrl && supabaseAnonKey) {
+        const { createClient } = await import('@supabase/supabase-js')
+        const anonClient = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } })
+        const { data, error } = await anonClient.auth.refreshSession({ refresh_token: refreshToken })
+        if (!error && data.user) {
+          return data.user
+        }
+      }
+    }
+
+    return null
   } catch (err) {
     const error = err as Error & { digest?: string }
     if (error && (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('Dynamic server usage'))) {
@@ -138,7 +158,6 @@ export async function getServerUser(): Promise<User | null> {
  * Logs step-by-step trace information for production debugging.
  */
 export async function getAuthenticatedUserFromRequest(request: Request): Promise<User | null> {
-  // 1. Log cookies received
   const cookieHeader = request.headers.get('cookie') || ''
 
   let token: string | null = null
@@ -150,36 +169,50 @@ export async function getAuthenticatedUserFromRequest(request: Request): Promise
   }
 
   // Fallback: Check sb-access-token cookie
+  let refreshToken: string | null = null
   if (!token) {
     try {
       const cookieStore = await cookies()
       const sbToken = cookieStore.get('sb-access-token')?.value
-      if (sbToken) {
-        token = sbToken
-      }
+      const sbRefresh = cookieStore.get('sb-refresh-token')?.value
+      if (sbToken) token = sbToken
+      if (sbRefresh) refreshToken = sbRefresh
     } catch {
       // Manual cookie header parsing fallback if cookies() unavailable
-      const match = cookieHeader.match(/sb-access-token=([^;]+)/)
-      if (match && match[1]) {
-        token = decodeURIComponent(match[1])
+      const matchAccess = cookieHeader.match(/sb-access-token=([^;]+)/)
+      if (matchAccess && matchAccess[1]) {
+        token = decodeURIComponent(matchAccess[1])
+      }
+      const matchRefresh = cookieHeader.match(/sb-refresh-token=([^;]+)/)
+      if (matchRefresh && matchRefresh[1]) {
+        refreshToken = decodeURIComponent(matchRefresh[1])
       }
     }
   }
 
-
-
-  if (!token) {
-    return null
+  if (token) {
+    const authClient = createAuthenticatedServerClient(token)
+    const { data: { user }, error: userError } = await authClient.auth.getUser()
+    if (!userError && user) {
+      return user
+    }
   }
 
-  const authClient = createAuthenticatedServerClient(token)
-  const { data: { user }, error: userError } = await authClient.auth.getUser()
-
-  if (userError || !user) {
-    return null
+  // Refresh token fallback for API requests
+  if (refreshToken) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (supabaseUrl && supabaseAnonKey) {
+      const { createClient } = await import('@supabase/supabase-js')
+      const anonClient = createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: false } })
+      const { data, error } = await anonClient.auth.refreshSession({ refresh_token: refreshToken })
+      if (!error && data.user) {
+        return data.user
+      }
+    }
   }
 
-  return user
+  return null
 }
 
 /**

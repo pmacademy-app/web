@@ -54,8 +54,8 @@ export async function POST(
         path: '/',
         maxAge: 60 * 60 * 24 * 30, // 30 days
       })
-    } else {
-      // Clear cookies on sign out
+    } else if (body.action === 'sign_out') {
+      // Clear cookies strictly on explicit sign out
       response.cookies.set('sb-access-token', '', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

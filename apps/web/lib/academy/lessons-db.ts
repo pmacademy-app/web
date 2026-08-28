@@ -330,6 +330,7 @@ export async function recordQuizAttemptAction(
       payload: {
         userId,
         lessonId,
+        lessonTitle: lesson?.title || 'Lesson',
         score: scorePercentage,
       },
     })

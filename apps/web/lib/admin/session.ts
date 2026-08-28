@@ -17,7 +17,7 @@ export async function signOutAdmin(router: { push: (href: string) => void; refre
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ session: null }),
+      body: JSON.stringify({ action: 'sign_out', session: null }),
     })
 
     router.push('/admin/login')
