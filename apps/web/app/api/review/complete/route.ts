@@ -14,8 +14,11 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json().catch(() => ({}))
-    const cardsReviewedCount = typeof body.cardsReviewedCount === 'number' ? body.cardsReviewedCount : 0
-    const xpEarned = typeof body.xpEarned === 'number' ? body.xpEarned : 0
+    const rawCards = typeof body.cardsReviewedCount === 'number' && Number.isFinite(body.cardsReviewedCount) ? Math.floor(body.cardsReviewedCount) : 0
+    const rawXp = typeof body.xpEarned === 'number' && Number.isFinite(body.xpEarned) ? Math.floor(body.xpEarned) : 0
+
+    const cardsReviewedCount = Math.min(Math.max(0, rawCards), 500)
+    const xpEarned = Math.min(Math.max(0, rawXp), 5000)
 
     const supabase = createServiceRoleClient()
     const result = await recordReviewSessionCompletion(supabase, user.id, cardsReviewedCount, xpEarned)

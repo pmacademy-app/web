@@ -261,9 +261,11 @@ describe('Phase 7: Referral & Organic Growth System', () => {
   // ─── 3. Reward Activation Upon First Lesson Completion ─────────────────────
   describe('3. First Lesson Completion Reward Activation', () => {
     it('activates referral reward and sets status to rewarded', async () => {
-      const updateMock = vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ error: null }),
-      })
+      const updateChain = {
+        eq: vi.fn().mockReturnThis(),
+        select: vi.fn().mockResolvedValue({ data: [{ id: 'ref-act-1' }], error: null }),
+      }
+      const updateMock = vi.fn().mockReturnValue(updateChain)
 
       const createQueryChain = (data: unknown = null) => {
         const chain: Record<string, unknown> = {}
@@ -356,15 +358,21 @@ describe('Phase 7: Referral & Organic Growth System', () => {
           insertedXpEvents.push(payload)
           return Promise.resolve({ error: null })
         })
-        chain.update = vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({ error: null }),
-        })
+        const updateChain = {
+          eq: vi.fn().mockReturnThis(),
+          select: vi.fn().mockResolvedValue({ data: [{ id: 'ref-row-unique-99' }], error: null }),
+        }
+        chain.update = vi.fn().mockReturnValue(updateChain)
         return chain
       }
 
       const mockSupabase = {
         from: vi.fn().mockImplementation((table: string) => {
           if (table === 'referrals') {
+            const updateChain = {
+              eq: vi.fn().mockReturnThis(),
+              select: vi.fn().mockResolvedValue({ data: [{ id: 'ref-row-unique-99' }], error: null }),
+            }
             return {
               select: vi.fn().mockReturnValue({
                 eq: vi.fn().mockReturnValue({
@@ -376,9 +384,7 @@ describe('Phase 7: Referral & Organic Growth System', () => {
                   }),
                 }),
               }),
-              update: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({ error: null }),
-              }),
+              update: vi.fn().mockReturnValue(updateChain),
             }
           }
           if (table === 'xp_events') {
