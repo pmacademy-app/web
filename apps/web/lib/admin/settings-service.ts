@@ -275,11 +275,20 @@ function getDefaultSettings<T>(section: SettingsSectionKey): T {
 }
 
 export class SettingsService {
+  private static sectionCache = new Map<string, { value: unknown; timestamp: number }>()
+  private static readonly CACHE_TTL_MS = 30_000 // 30 seconds TTL
+
   /**
-   * Generic fetch for a settings section.
+   * Generic fetch for a settings section with in-memory caching.
    * Returns defaults if no record exists or on error.
    */
   private static async getSettings<T>(section: SettingsSectionKey): Promise<T> {
+    const now = Date.now()
+    const cached = this.sectionCache.get(section)
+    if (cached && now - cached.timestamp < this.CACHE_TTL_MS) {
+      return cached.value as T
+    }
+
     const supabase = createServiceRoleClient()
     const key = SETTINGS_KEYS[section]
 
@@ -298,13 +307,15 @@ export class SettingsService {
 
       if (error) throw new Error(error.message)
 
+      let result: T = getDefaultSettings<T>(section)
       const rawValue = data?.value
       if (rawValue && typeof rawValue === 'object') {
         // Merge with defaults to ensure all keys exist
-        return { ...getDefaultSettings<T>(section), ...(rawValue as T) }
+        result = { ...getDefaultSettings<T>(section), ...(rawValue as T) }
       }
 
-      return getDefaultSettings<T>(section)
+      this.sectionCache.set(section, { value: result, timestamp: now })
+      return result
     } catch (err) {
       console.warn(`[SettingsService] getSettings(${section}) failed:`, err)
       return getDefaultSettings<T>(section)
@@ -335,10 +346,6 @@ export class SettingsService {
 
   // ─── Settings Cache & Helpers ─────────────────────────────────────────────
 
-  private static cachedProductSettings: { value: ProductSettings; timestamp: number } | null = null
-  private static cachedVerificationRequired: { value: boolean; timestamp: number } | null = null
-  private static readonly CACHE_TTL_MS = 10_000 // 10 seconds TTL
-
   /**
    * Fast, resilient server-side check for email verification requirement.
    * Returns true (require verification) if not explicitly set to false.
@@ -356,21 +363,13 @@ export class SettingsService {
    * Manually invalidate settings cache (e.g. after Admin Panel save or in unit tests).
    */
   public static invalidateCache(): void {
-    this.cachedProductSettings = null
-    this.cachedVerificationRequired = null
+    this.sectionCache.clear()
   }
 
   // ─── Public API ────────────────────────────────────────────────────────────
 
   public static async getProductSettings(): Promise<ProductSettings> {
-    const now = Date.now()
-    if (this.cachedProductSettings && now - this.cachedProductSettings.timestamp < this.CACHE_TTL_MS) {
-      return this.cachedProductSettings.value
-    }
-
-    const settings = await this.getSettings<ProductSettings>('product')
-    this.cachedProductSettings = { value: settings, timestamp: now }
-    return settings
+    return this.getSettings<ProductSettings>('product')
   }
 
   public static async getLearningSettings(): Promise<LearningSettings> {

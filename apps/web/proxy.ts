@@ -146,6 +146,25 @@ export async function proxy(request: NextRequest) {
     auth: { persistSession: false },
   })
 
+  let cachedUserData: { is_admin?: boolean; curriculum_access_override?: boolean } | null = null
+  async function loadUserProfileData() {
+    if (!user) return null
+    if (cachedUserData !== null) return cachedUserData
+    try {
+      const { data } = await authorizedClient
+        .from('users')
+        .select('is_admin, curriculum_access_override')
+        .eq('id', user.id)
+        .maybeSingle()
+      cachedUserData = (data || {}) as { is_admin?: boolean; curriculum_access_override?: boolean }
+      return cachedUserData
+    } catch (err) {
+      console.error('[proxy] User profile database check error:', err)
+      cachedUserData = {}
+      return cachedUserData
+    }
+  }
+
   /**
    * Resolves admin authorization for the current user:
    * ADMIN_EMAILS env var OR user_metadata.is_admin OR users.is_admin (DB).
@@ -153,35 +172,18 @@ export async function proxy(request: NextRequest) {
   async function isAdmin(): Promise<boolean> {
     if (!user) return false
     if (isAdminEmail(user.email)) return true
+    if (user.app_metadata?.is_admin) return true
 
-    try {
-      const { data } = await authorizedClient
-        .from('users')
-        .select('is_admin')
-        .eq('id', user.id)
-        .maybeSingle()
-      return Boolean(data?.is_admin)
-    } catch (err) {
-      console.error('[proxy] Admin database check error:', err)
-      return false
-    }
+    const profileData = await loadUserProfileData()
+    return Boolean(profileData?.is_admin)
   }
 
   async function hasCurriculumAccessOverride(): Promise<boolean> {
     if (!user) return false
-    if (user.user_metadata?.curriculum_access_override) return true
+    if (user.user_metadata?.curriculum_access_override || user.app_metadata?.curriculum_access_override) return true
 
-    try {
-      const { data } = await authorizedClient
-        .from('users')
-        .select('curriculum_access_override')
-        .eq('id', user.id)
-        .maybeSingle()
-      return Boolean(data?.curriculum_access_override)
-    } catch (err) {
-      console.error('[proxy] Curriculum access override check error:', err)
-      return false
-    }
+    const profileData = await loadUserProfileData()
+    return Boolean(profileData?.curriculum_access_override)
   }
 
   // ── Password Reset Update Mode (Recovery session in progress) ────────────

@@ -22,11 +22,11 @@ export default async function LeaderboardPage() {
   }
 
   const supabase = createServiceRoleClient()
-  const [weeklyPayload, friendEntries, cohortsList] = await Promise.all([
+  const [weeklyPayload, cohortsList] = await Promise.all([
     getWeeklyLeaderboard(supabase, user.id),
-    getFriendLeaderboard(supabase, user.id),
     getCohortsData(supabase, user.id),
   ])
+  const friendEntries = await getFriendLeaderboard(supabase, user.id, weeklyPayload.entries)
 
   const { isOptedIn, entries, personalEntry } = weeklyPayload
 

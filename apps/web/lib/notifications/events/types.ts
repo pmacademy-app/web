@@ -25,6 +25,7 @@ export interface ModuleCompletedPayload {
 
 export interface QuizCompletedPayload {
   lessonId: string
+  lessonTitle?: string
   score: number
   totalQuestions: number
   isPerfectScore: boolean

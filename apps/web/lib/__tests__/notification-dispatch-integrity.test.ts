@@ -19,9 +19,27 @@ describe('Notification Dispatch & Connector Integrity Test Suite (Phase 0)', () 
       priority: 'low',
       category: 'learning',
       occurredAt: new Date().toISOString(),
-      payload: { lessonId: 'les_test', score: 90 },
+      payload: { lessonId: 'les_4kpbq6', lessonTitle: 'User Research', score: 93 },
     })
     expect(quizContent.title).toBe('Quiz complete')
+    expect(quizContent.body).toBe('You scored 93 on the User Research quiz.')
+    expect(quizContent.body).not.toContain('les_4kpbq6')
+
+    // Leak protection test when lessonTitle contains a raw internal ID or is missing
+    const fallbackContent = buildInAppContentFromEvent({
+      id: 'evt-1b',
+      event: 'quiz.completed',
+      userId: 'usr-1',
+      userEmail: 'usr@test.com',
+      userName: 'Learner',
+      userTimezone: 'UTC',
+      priority: 'low',
+      category: 'learning',
+      occurredAt: new Date().toISOString(),
+      payload: { lessonId: 'les_4kpbq6', score: 85 },
+    })
+    expect(fallbackContent.body).toBe('You scored 85 on the Lesson quiz.')
+    expect(fallbackContent.body).not.toContain('les_4kpbq6')
 
     const streakContent = buildInAppContentFromEvent({
       id: 'evt-2',

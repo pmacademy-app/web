@@ -39,6 +39,19 @@ export function DashboardNotificationsWidget() {
     return null
   }
 
+  const handleMarkRead = async (id: string) => {
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, isRead: true } : item)))
+    try {
+      await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mark_read', notificationId: id }),
+      })
+    } catch (err) {
+      console.warn('[DashboardNotificationsWidget] Error marking read in DB:', err)
+    }
+  }
+
   return (
     <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-3">
       <div className="flex items-center justify-between">
@@ -60,7 +73,11 @@ export function DashboardNotificationsWidget() {
 
       <div className="space-y-2">
         {items.map((item) => (
-          <NotificationItemCard key={item.id} item={item} />
+          <NotificationItemCard
+            key={item.id}
+            item={item}
+            onMarkRead={handleMarkRead}
+          />
         ))}
       </div>
     </div>

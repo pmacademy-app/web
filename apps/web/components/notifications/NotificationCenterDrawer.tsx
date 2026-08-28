@@ -111,6 +111,12 @@ export function NotificationCenterDrawer({
 
   // WhatsApp-style instant auto-read: Optimistic local state update + async API patch
   const handleMarkRead = async (id: string) => {
+    // Check if item is already read to guarantee idempotency
+    const existing = items.find((i) => i.id === id)
+    if (existing && existing.isRead) {
+      return
+    }
+
     // 1. Optimistic state mutation
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, isRead: true } : item)))
     setGrouped((prev) => {

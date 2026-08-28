@@ -61,7 +61,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ session: null }),
+        body: JSON.stringify({ action: 'sign_out', session: null }),
       })
 
       router.push('/login')

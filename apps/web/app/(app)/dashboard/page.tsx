@@ -31,28 +31,9 @@ export default async function DashboardPage() {
 
   const supabase = createServiceRoleClient()
 
-  // 1. Fetch & ensure user profile
-  const { data: dbProfile, error: dbError } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', authUser.id)
-    .maybeSingle()
-
-  let profile = dbProfile as UserProfile | null
-
-  if (dbError) {
-    console.error('[dashboard] Error loading database profile:', dbError.message)
-  }
-
-  if (!profile) {
-    profile = await ensureUserProfile(supabase, authUser)
-    if (!profile) {
-      throw new Error('Failed to initialize user profile.')
-    }
-  }
-
-  // 2. Parallel data fetching with lean column projection
+  // Parallel data fetching with lean column projection
   const [
+    { data: dbProfile, error: dbError },
     { data: progressRows },
     curriculum,
     streakStatus,
@@ -60,6 +41,11 @@ export default async function DashboardPage() {
     { data: capstoneRows },
     { data: recentXpEvents },
   ] = await Promise.all([
+    (supabase
+      .from('users') as unknown as DBChain)
+      .select('*')
+      .eq('id', authUser.id)
+      .maybeSingle() as unknown as Promise<{ data: UserProfile | null; error: { message: string } | null }>,
     (supabase
       .from('user_lesson_progress') as unknown as DBChain)
       .select('lesson_id, status')
@@ -84,6 +70,19 @@ export default async function DashboardPage() {
       data: Array<{ id: string; source_type: string; xp_amount: number; source_id: string; created_at: string }> | null
     }>,
   ])
+
+  let profile = dbProfile as UserProfile | null
+
+  if (dbError) {
+    console.error('[dashboard] Error loading database profile:', dbError.message)
+  }
+
+  if (!profile) {
+    profile = await ensureUserProfile(supabase, authUser)
+    if (!profile) {
+      throw new Error('Failed to initialize user profile.')
+    }
+  }
 
   const curriculumLessons = curriculum?.lessons ?? []
   const completedLessonIds = new Set(
