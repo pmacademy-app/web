@@ -26,7 +26,19 @@ export async function GET(
     }
 
     const supabase = createServiceRoleClient()
-    const result = await loadCapstoneSubmission(supabase, user.id, moduleSlug)
+    const [result, userProfileRes] = await Promise.all([
+      loadCapstoneSubmission(supabase, user.id, moduleSlug),
+      supabase
+        .from('users')
+        .select('username, is_portfolio_public')
+        .eq('id', user.id)
+        .maybeSingle(),
+    ])
+
+    const userProfile = {
+      username: userProfileRes.data?.username || '',
+      isPortfolioPublic: userProfileRes.data?.is_portfolio_public ?? true,
+    }
 
     return NextResponse.json({
       success: true,
@@ -34,6 +46,7 @@ export async function GET(
       submission: result.submission,
       reflection: result.reflection,
       status: result.status,
+      userProfile,
     })
   } catch (error) {
     console.error('[API GET /api/capstones/[module]] Error:', error)

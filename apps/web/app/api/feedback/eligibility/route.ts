@@ -52,8 +52,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
-    const activeIncrementSeconds = typeof body.incrementSeconds === 'number' && body.incrementSeconds > 0 ? body.incrementSeconds : 0
+    const body = await request.json().catch(() => ({}))
+    const rawIncrement = typeof body.incrementSeconds === 'number' && Number.isFinite(body.incrementSeconds) && body.incrementSeconds > 0
+      ? Math.floor(body.incrementSeconds)
+      : 0
+    // Bound increment to max 300 seconds (5 minutes) per sync call to prevent spoofing
+    const activeIncrementSeconds = Math.min(rawIncrement, 300)
 
     if (activeIncrementSeconds > 0) {
       const supabase = createServiceRoleClient()

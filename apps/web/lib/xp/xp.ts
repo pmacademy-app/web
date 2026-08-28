@@ -6,6 +6,7 @@ export interface XpValuesConfig {
   REFLECTION_SUBMITTED: number
   CAPSTONE_SUBMITTED: number
   DAILY_STREAK_BASE: number
+  REFERRAL_ACTIVATION: number
 }
 
 export const XP_VALUES: XpValuesConfig = {
@@ -16,6 +17,7 @@ export const XP_VALUES: XpValuesConfig = {
   REFLECTION_SUBMITTED: 15,
   CAPSTONE_SUBMITTED: 150,
   DAILY_STREAK_BASE: 5,
+  REFERRAL_ACTIVATION: 50,
 }
 
 let cachedSettings: XpValuesConfig | null = null
@@ -79,6 +81,9 @@ export async function getRuntimeXpValues(
         DAILY_STREAK_BASE: typeof v.xpStreakBaseReward === 'number' && v.xpStreakBaseReward > 0
           ? v.xpStreakBaseReward
           : XP_VALUES.DAILY_STREAK_BASE,
+        REFERRAL_ACTIVATION: typeof v.xpReferralReward === 'number' && v.xpReferralReward > 0
+          ? v.xpReferralReward
+          : XP_VALUES.REFERRAL_ACTIVATION,
       }
       cachedSettings = resolved
       cacheTimestamp = now
@@ -102,6 +107,7 @@ export type XpSourceType =
   | 'reflection'
   | 'capstone'
   | 'streak'
+  | 'referral'
   | 'user_reset'
   | 'admin_reset'
 

@@ -2,21 +2,22 @@
 
 import React from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { User, Shield, Briefcase, Bell, AlertTriangle } from 'lucide-react'
+import { User, Shield, Briefcase, Bell, Gift, AlertTriangle } from 'lucide-react'
 import { ProfileSettingsTab } from '@/components/settings/ProfileSettingsTab'
 import { SecuritySettingsTab } from '@/components/settings/SecuritySettingsTab'
 import { PortfolioSettingsForm } from '@/components/settings/PortfolioSettingsForm'
 import { NotificationPreferencesTab } from '@/components/notifications/NotificationPreferencesTab'
+import { ReferralSettingsTab } from '@/components/settings/ReferralSettingsTab'
 import { DangerZoneTab } from '@/components/settings/DangerZoneTab'
 
-export type SettingsTabKey = 'profile' | 'security' | 'portfolio' | 'notifications' | 'danger-zone'
+export type SettingsTabKey = 'profile' | 'security' | 'portfolio' | 'notifications' | 'referrals' | 'danger-zone'
 
 export function SettingsTabs() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const tabParam = searchParams.get('tab') as SettingsTabKey | null
 
-  const validTabs: SettingsTabKey[] = ['profile', 'security', 'portfolio', 'notifications', 'danger-zone']
+  const validTabs: SettingsTabKey[] = ['profile', 'security', 'portfolio', 'notifications', 'referrals', 'danger-zone']
   const activeTab: SettingsTabKey = tabParam && validTabs.includes(tabParam) ? tabParam : 'profile'
 
   const handleTabChange = (tab: SettingsTabKey) => {
@@ -25,7 +26,7 @@ export function SettingsTabs() {
 
   return (
     <div className="space-y-6">
-      {/* 5-Tab Navigation */}
+      {/* 6-Tab Navigation */}
       <div className="flex items-center gap-1.5 border-b border-border pb-2 overflow-x-auto scrollbar-none max-w-full">
         <button
           type="button"
@@ -81,6 +82,19 @@ export function SettingsTabs() {
 
         <button
           type="button"
+          onClick={() => handleTabChange('referrals')}
+          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+            activeTab === 'referrals'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+          }`}
+        >
+          <Gift className="w-4 h-4" />
+          Referrals
+        </button>
+
+        <button
+          type="button"
           onClick={() => handleTabChange('danger-zone')}
           className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
             activeTab === 'danger-zone'
@@ -99,6 +113,7 @@ export function SettingsTabs() {
         {activeTab === 'security' && <SecuritySettingsTab />}
         {activeTab === 'portfolio' && <PortfolioSettingsForm />}
         {activeTab === 'notifications' && <NotificationPreferencesTab />}
+        {activeTab === 'referrals' && <ReferralSettingsTab />}
         {activeTab === 'danger-zone' && <DangerZoneTab />}
       </div>
     </div>

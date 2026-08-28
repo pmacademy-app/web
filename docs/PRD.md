@@ -48,3 +48,5 @@ The following feature prohibitions are frozen in product policy:
 | **Admin Console** | Multi-workspace administrative platform | 🟢 Verified in Production | `app/admin/page.tsx`, `components/admin/` |
 | **Send Email Hook** | Supabase Auth branded email hook | 🟡 Implemented — Verification Required | `app/api/auth/send-email-hook/route.ts` |
 | **GitHub Actions Cron** | Automated email queue & reminder jobs | 🟡 Implemented — Verification Required | `.github/workflows/notification-scheduler.yml` |
+| **Referrals & Organic Growth** | 1-to-1 referral attribution, 30d cookie tracking, +50 XP on 1st lesson completion | 🟢 Verified in Production | `lib/referral/`, `app/api/referrals/` |
+

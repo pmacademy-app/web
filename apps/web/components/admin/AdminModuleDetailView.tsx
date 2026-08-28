@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BookOpen, Users, TrendingUp, ArrowLeft, ExternalLink, Eye } from 'lucide-react'
 import { AdminPageHeader } from './AdminPageHeader'
@@ -24,6 +24,7 @@ interface AdminModuleDetailViewProps {
  */
 export function AdminModuleDetailView({ module, initialLoadFailed = false }: AdminModuleDetailViewProps) {
   const router = useRouter()
+  const [filterNeedsReview, setFilterNeedsReview] = useState(false)
 
   const columns: Column<AdminLessonOverview>[] = [
     {
@@ -64,10 +65,42 @@ export function AdminModuleDetailView({ module, initialLoadFailed = false }: Adm
       ),
     },
     {
+      header: 'Content Quality',
+      cell: (lesson) => {
+        if (lesson.clarityScore === null || lesson.clarityScore === undefined) {
+          return <span className="text-xs text-admin-fg-muted font-mono">—</span>
+        }
+        return (
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold text-admin-fg flex items-center gap-1">
+                <span className="text-amber-400">★</span> {lesson.clarityScore.toFixed(1)}
+              </span>
+              {lesson.clarityPct !== null && (
+                <span className="text-[10px] text-admin-fg-muted font-mono">
+                  ({lesson.clarityPct}% clear)
+                </span>
+              )}
+            </div>
+            {lesson.needsReview && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-[10px] font-semibold text-amber-500 w-fit">
+                Needs Review
+              </span>
+            )}
+          </div>
+        )
+      },
+    },
+    {
       header: 'Status',
       cell: (lesson) => <AdminStatusBadge status={lesson.status} />,
     },
   ]
+
+  const needsReviewCount = module.lessons.filter((l) => l.needsReview).length
+  const displayedLessons = filterNeedsReview
+    ? module.lessons.filter((l) => l.needsReview)
+    : module.lessons
 
   return (
     <div className="space-y-6">
@@ -126,9 +159,39 @@ export function AdminModuleDetailView({ module, initialLoadFailed = false }: Adm
         <AdminLoadWarning message="Live completion stats could not be fetched — showing the lesson list without them. Check that the database is reachable." />
       )}
 
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setFilterNeedsReview(false)}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+            !filterNeedsReview
+              ? 'bg-admin-surface-raised border-admin-border text-admin-fg shadow-sm'
+              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
+          }`}
+        >
+          All Lessons ({module.lessons.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilterNeedsReview(true)}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer flex items-center gap-1.5 ${
+            filterNeedsReview
+              ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
+              : 'border-transparent text-admin-fg-muted hover:text-admin-fg'
+          }`}
+        >
+          <span>Needs Review</span>
+          {needsReviewCount > 0 && (
+            <span className="px-1.5 py-0.2 text-[10px] font-mono rounded-full bg-amber-500/20 text-amber-400">
+              {needsReviewCount}
+            </span>
+          )}
+        </button>
+      </div>
+
       <AdminDataTable
         columns={columns}
-        data={module.lessons}
+        data={displayedLessons}
         keyExtractor={(lesson) => lesson.id}
         onRowClick={(lesson) => router.push(`/admin/curriculum/${module.slug}/${lesson.id}`)}
         rowAriaLabel={(lesson) => `Open lesson ${lesson.title}`}

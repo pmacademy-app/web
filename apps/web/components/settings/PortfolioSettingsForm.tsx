@@ -1,6 +1,17 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import type {
+  PortfolioSettingsData,
+  PortfolioSectionId,
+  LearnerSubmittedCapstoneSummary,
+} from '@/lib/portfolio-db'
+import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
+import {
+  trackPortfolioLayoutUpdated,
+  trackPortfolioFeaturedCapstoneSet,
+} from '@/lib/analytics'
+import { AvatarUpload } from '@/components/profile/AvatarUpload'
 import {
   User,
   Globe,
@@ -10,9 +21,13 @@ import {
   AlertCircle,
   Save,
   ExternalLink,
+  Layers,
+  Sparkles,
+  Eye,
+  ArrowUp,
+  ArrowDown,
+  Share2,
 } from 'lucide-react'
-import type { PortfolioSettingsData } from '@/lib/portfolio-db'
-import { AvatarUpload } from '@/components/profile/AvatarUpload'
 
 function LinkedInIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   return (
@@ -30,6 +45,25 @@ function GitHubIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   )
 }
 
+const SECTION_DESCRIPTIONS: Record<string, { label: string; description: string }> = {
+  radar: {
+    label: 'Skill Radar Overview',
+    description: 'Dynamic 6-cluster competency evaluation & score breakdown.',
+  },
+  capstones: {
+    label: 'Verified Applied Capstones',
+    description: 'Submitted proof-of-work deliverables & retrospectives.',
+  },
+  progress: {
+    label: 'Curriculum Progress',
+    description: 'Sequential completion percentage across the 90-lesson curriculum.',
+  },
+  achievements: {
+    label: 'Achievements & Badges',
+    description: 'Verified mastery badges and accredited certificate status.',
+  },
+}
+
 export function PortfolioSettingsForm() {
   const [formData, setFormData] = useState<PortfolioSettingsData>({
     username: '',
@@ -40,8 +74,12 @@ export function PortfolioSettingsForm() {
     githubUrl: '',
     websiteUrl: '',
     isPortfolioPublic: true,
+    portfolioLayout: DEFAULT_PORTFOLIO_LAYOUT,
+    featuredCapstoneId: null,
+    portfolioViewCount: 0,
   })
 
+  const [submittedCapstones, setSubmittedCapstones] = useState<LearnerSubmittedCapstoneSummary[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [saving, setSaving] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -56,7 +94,15 @@ export function PortfolioSettingsForm() {
         if (res.ok) {
           const data = await res.json()
           if (data.settings) {
-            setFormData(data.settings)
+            setFormData({
+              ...data.settings,
+              portfolioLayout: data.settings.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT,
+              featuredCapstoneId: data.settings.featuredCapstoneId || null,
+              portfolioViewCount: data.settings.portfolioViewCount || 0,
+            })
+          }
+          if (Array.isArray(data.submittedCapstones)) {
+            setSubmittedCapstones(data.submittedCapstones)
           }
         }
       } catch (err) {
@@ -73,6 +119,21 @@ export function PortfolioSettingsForm() {
     setFormData((prev) => ({ ...prev, [field]: value }))
     setErrorMsg(null)
     setSuccessMsg(null)
+  }
+
+  const moveSection = (index: number, direction: 'up' | 'down') => {
+    const activeLayout = (formData.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT).filter((s) => s !== 'hero')
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    if (targetIndex < 0 || targetIndex >= activeLayout.length) return
+
+    const newLayout = [...activeLayout]
+    const temp = newLayout[index]
+    newLayout[index] = newLayout[targetIndex]
+    newLayout[targetIndex] = temp
+
+    const fullLayout: PortfolioSectionId[] = ['hero', ...newLayout]
+    setFormData((prev) => ({ ...prev, portfolioLayout: fullLayout }))
+    trackPortfolioLayoutUpdated(fullLayout)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,8 +154,19 @@ export function PortfolioSettingsForm() {
         throw new Error(data.error || 'Failed to update portfolio settings.')
       }
 
-      setFormData(data.settings)
-      setSuccessMsg('Portfolio settings updated successfully!')
+      setFormData((prev) => ({
+        ...prev,
+        ...data.settings,
+      }))
+      setSuccessMsg('Portfolio settings and layout updated successfully!')
+
+      if (formData.featuredCapstoneId) {
+        const feat = submittedCapstones.find((c) => c.id === formData.featuredCapstoneId)
+        trackPortfolioFeaturedCapstoneSet(feat?.moduleSlug)
+      }
+      if (formData.portfolioLayout) {
+        trackPortfolioLayoutUpdated(formData.portfolioLayout)
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error updating settings.'
       setErrorMsg(msg)
@@ -283,6 +355,168 @@ export function PortfolioSettingsForm() {
               placeholder="https://yourwebsite.com"
               className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Featured Deliverable Selection */}
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+        <div className="border-b border-border pb-3 flex items-center justify-between">
+          <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-amber-500" /> Featured Deliverable Spotlight
+          </h3>
+          <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+            Proof-of-Work Pinning
+          </span>
+        </div>
+
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Feature one of your submitted module capstones in a prominent showcase card at the top of your public portfolio.
+        </p>
+
+        <div className="space-y-1.5">
+          <label htmlFor="setting-featured-capstone" className="text-xs font-bold text-foreground block">
+            Select Featured Capstone Project
+          </label>
+
+          {submittedCapstones.length > 0 ? (
+            <select
+              id="setting-featured-capstone"
+              value={formData.featuredCapstoneId || ''}
+              onChange={(e) => handleChange('featuredCapstoneId', e.target.value || null)}
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+            >
+              <option value="">None (Display standard chronological portfolio)</option>
+              {submittedCapstones.map((cap) => (
+                <option key={cap.id} value={cap.id}>
+                  Module {cap.moduleNumber.toString().padStart(2, '0')}: {cap.title} ({cap.deliverableType}) {cap.isPublic ? '' : '— [Private]'}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="p-3 rounded-lg border border-dashed border-border bg-muted/20 text-xs text-muted-foreground">
+              You haven&apos;t submitted any module capstones yet. Complete a module capstone to feature it on your portfolio.
+            </div>
+          )}
+
+          <p className="text-[11px] text-muted-foreground pt-1">
+            Privacy note: If a featured deliverable is marked private or restricted by safety moderation, it will not be displayed on your public portfolio.
+          </p>
+        </div>
+      </div>
+
+      {/* Portfolio Section Layout Ordering */}
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+        <div className="border-b border-border pb-3 flex items-center justify-between">
+          <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">
+            <Layers className="w-4 h-4 text-primary" /> Portfolio Section Ordering
+          </h3>
+          <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+            Layout Customization
+          </span>
+        </div>
+
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Customize the order of sections on your public portfolio page. The Identity Hero header is always anchored at the top.
+        </p>
+
+        <div className="space-y-2">
+          {((formData.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT).filter((s) => s !== 'hero')).map((sectionKey, index, arr) => {
+            const info = SECTION_DESCRIPTIONS[sectionKey] || {
+              label: sectionKey,
+              description: 'Portfolio content section',
+            }
+
+            return (
+              <div
+                key={sectionKey}
+                className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-card/60 gap-3"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-[11px] font-mono font-bold text-muted-foreground">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold text-foreground">{info.label}</h4>
+                    <p className="text-[11px] text-muted-foreground">{info.description}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    disabled={index === 0}
+                    onClick={() => moveSection(index, 'up')}
+                    aria-label={`Move ${info.label} up`}
+                    className="p-1.5 rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                  >
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index === arr.length - 1}
+                    onClick={() => moveSection(index, 'down')}
+                    aria-label={`Move ${info.label} down`}
+                    className="p-1.5 rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                  >
+                    <ArrowDown className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Portfolio Visitor Analytics & Social Card */}
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+        <div className="border-b border-border pb-3 flex items-center justify-between">
+          <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">
+            <Eye className="w-4 h-4 text-emerald-500" /> Visitor Engagement &amp; Social Sharing
+          </h3>
+          <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+            Public Metrics
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl border border-border bg-background space-y-1">
+            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+              Lifetime Portfolio Visitors
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold font-mono text-foreground">
+                {(formData.portfolioViewCount || 0).toLocaleString()}
+              </span>
+              <span className="text-xs text-muted-foreground">unique views</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground pt-1">
+              Counts views on your public portfolio page. Private portfolios do not increment views.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl border border-border bg-background space-y-2 flex flex-col justify-between">
+            <div>
+              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                Dynamic OpenGraph Card
+              </span>
+              <p className="text-xs text-muted-foreground leading-relaxed pt-1">
+                When you share your portfolio on LinkedIn, X, or Slack, a rich 1200x630 dynamic preview card is automatically displayed.
+              </p>
+            </div>
+
+            {formData.username && (
+              <a
+                href={`/api/og/portfolio/${formData.username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline pt-1"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Inspect Dynamic Social Preview Card</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
           </div>
         </div>
       </div>

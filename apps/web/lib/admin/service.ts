@@ -473,6 +473,7 @@ export class AdminConsoleService {
       notifRes,
       contactRes,
       lastActiveRes,
+      referralsRes,
     ] = await Promise.all([
       supabase
         .from('user_lesson_progress')
@@ -537,6 +538,10 @@ export class AdminConsoleService {
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle(),
+      supabase
+        .from('referrals')
+        .select('id', { count: 'exact', head: true })
+        .eq('referrer_id', userId),
     ])
 
     const lessonRows = (lessonRes.data || []) as unknown as Array<{
@@ -649,6 +654,7 @@ export class AdminConsoleService {
       quizzesCompleted: quizRows.length,
       capstonesSubmitted: capstoneRows.length,
       certificatesCount: certRows.length,
+      referralsCount: referralsRes?.count || 0,
       goal: u?.goal,
       kpis: {
         level: u?.level || 1,

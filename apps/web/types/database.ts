@@ -985,6 +985,48 @@ export type Database = {
           },
         ]
       }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referred_user_id: string
+          referrer_id: string
+          rewarded_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referred_user_id: string
+          referrer_id: string
+          rewarded_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referred_user_id?: string
+          referrer_id?: string
+          rewarded_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_errors: {
         Row: {
           category: string
@@ -1284,10 +1326,13 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          lesson_id: string | null
           page_url: string | null
           rating: number | null
           source_event: string
           status: string
+          tags: string[] | null
+          type: string
           user_id: string | null
         }
         Insert: {
@@ -1295,10 +1340,13 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          lesson_id?: string | null
           page_url?: string | null
           rating?: number | null
           source_event: string
           status?: string
+          tags?: string[] | null
+          type?: string
           user_id?: string | null
         }
         Update: {
@@ -1306,10 +1354,13 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          lesson_id?: string | null
           page_url?: string | null
           rating?: number | null
           source_event?: string
           status?: string
+          tags?: string[] | null
+          type?: string
           user_id?: string | null
         }
         Relationships: [
@@ -1675,6 +1726,7 @@ export type Database = {
           current_streak: number
           curriculum_access_override: boolean
           email: string
+          featured_capstone_id: string | null
           github_url: string | null
           goal: string | null
           id: string
@@ -1689,6 +1741,8 @@ export type Database = {
           onboarding_completed: boolean
           onboarding_preference: string | null
           onboarding_topics: string[]
+          portfolio_layout: Json | null
+          portfolio_view_count: number
           streak_freezes_available: number
           timezone: string
           total_active_seconds: number
@@ -1705,6 +1759,7 @@ export type Database = {
           current_streak?: number
           curriculum_access_override?: boolean
           email: string
+          featured_capstone_id?: string | null
           github_url?: string | null
           goal?: string | null
           id: string
@@ -1719,6 +1774,8 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_preference?: string | null
           onboarding_topics?: string[]
+          portfolio_layout?: Json | null
+          portfolio_view_count?: number
           streak_freezes_available?: number
           timezone?: string
           total_active_seconds?: number
@@ -1735,6 +1792,7 @@ export type Database = {
           current_streak?: number
           curriculum_access_override?: boolean
           email?: string
+          featured_capstone_id?: string | null
           github_url?: string | null
           goal?: string | null
           id?: string
@@ -1749,6 +1807,8 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_preference?: string | null
           onboarding_topics?: string[]
+          portfolio_layout?: Json | null
+          portfolio_view_count?: number
           streak_freezes_available?: number
           timezone?: string
           total_active_seconds?: number
@@ -1756,7 +1816,15 @@ export type Database = {
           username?: string | null
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "users_featured_capstone_id_fkey"
+            columns: ["featured_capstone_id"]
+            isOneToOne: false
+            referencedRelation: "capstone_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waitlist: {
         Row: {

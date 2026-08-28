@@ -11,6 +11,8 @@ import {
   Users,
   HelpCircle,
   ListOrdered,
+  Star,
+  MessageSquare,
 } from 'lucide-react'
 import { AdminPageHeader } from './AdminPageHeader'
 import { AdminSection } from './AdminSection'
@@ -101,6 +103,25 @@ export function AdminLessonDetailView({
         </span>
       ),
     },
+    {
+      label: 'Content Quality',
+      value:
+        lesson.clarityScore !== null && lesson.clarityScore !== undefined ? (
+          <div className="flex items-center gap-2">
+            <span className="text-amber-400 font-bold">★ {lesson.clarityScore.toFixed(1)}</span>
+            {lesson.clarityPct !== null && (
+              <span className="text-admin-fg-subtle text-xs">({lesson.clarityPct}% clear)</span>
+            )}
+            {lesson.needsReview && (
+              <span className="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-[10px] font-semibold text-amber-400">
+                Needs Review
+              </span>
+            )}
+          </div>
+        ) : (
+          <span className="text-admin-fg-subtle">No ratings yet</span>
+        ),
+    },
   ]
 
   return (
@@ -180,6 +201,49 @@ export function AdminLessonDetailView({
           </div>
         )}
       </AdminSection>
+
+      {/* Learner Feedback & Clarity Issues (Phase 6) */}
+      {lesson.recentFeedback && lesson.recentFeedback.length > 0 && (
+        <AdminSection title="Learner Feedback & Clarity Issues" icon={MessageSquare}>
+          <div className="space-y-3">
+            {lesson.recentFeedback.map((item) => (
+              <div
+                key={item.id}
+                className="p-3.5 rounded-xl bg-admin-surface border border-admin-border/80 space-y-2"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-amber-400 font-bold text-xs flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      {item.rating}/5
+                    </span>
+                    {item.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 ml-2">
+                        {item.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-1.5 py-0.5 rounded bg-admin-surface-raised border border-admin-border text-[10px] font-medium text-admin-fg-muted"
+                          >
+                            {tag.replace(/_/g, ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-admin-fg-subtle font-mono">
+                    {new Date(item.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                {item.comment && (
+                  <p className="text-xs text-admin-fg italic bg-admin-surface-raised/40 p-2 rounded-lg border border-admin-border/40">
+                    &ldquo;{item.comment}&rdquo;
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </AdminSection>
+      )}
 
       {initialLoadFailed && (
         <AdminLoadWarning message="Live completion stats could not be fetched — showing the lesson preview without them. Check that the database is reachable." />

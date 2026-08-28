@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getPublicPortfolioData } from '@/lib/portfolio-db'
+import { getPublicPortfolioData, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
 import { generatePersonJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero'
 import { PortfolioSkillRadar } from '@/components/portfolio/PortfolioSkillRadar'
 import { PortfolioProgress } from '@/components/portfolio/PortfolioProgress'
 import { PortfolioCapstones } from '@/components/portfolio/PortfolioCapstones'
 import { PortfolioAchievements } from '@/components/portfolio/PortfolioAchievements'
+import { FeaturedCapstoneCard } from '@/components/portfolio/FeaturedCapstoneCard'
 import { Lock, ArrowLeft } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
 
@@ -30,8 +31,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const { name, bio, levelInfo, totalXp, avatarUrl } = portfolio.user
+  const { name, bio, levelInfo, totalXp } = portfolio.user
   const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, username)
+  const ogImageUrl = `${SITE_ORIGIN}/api/og/portfolio/${username}`
 
   const metaTitle = `${name}'s PM Portfolio & Skill Radar`
   const metaDesc = bio
@@ -53,13 +55,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: metaTitle,
       description: metaDesc,
       url: shareUrl,
-      images: avatarUrl ? [{ url: avatarUrl, alt: name }] : undefined,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${name}'s Verified PM Portfolio & Skill Radar`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: metaTitle,
       description: metaDesc,
-      images: avatarUrl ? [avatarUrl] : undefined,
+      images: [ogImageUrl],
     },
   }
 }
@@ -94,7 +103,8 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
     )
   }
 
-  const { user, progress, skillRadar, capstones } = portfolio
+  const { user, progress, skillRadar, capstones, featuredCapstone } = portfolio
+  const layout = user.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT
 
   // Generate Person Schema JSON-LD
   const personJsonLd = generatePersonJsonLd({
@@ -109,6 +119,32 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
     siteOrigin: SITE_ORIGIN,
   })
 
+  // Dynamic section renderer for user-customized order
+  const renderSection = (sectionId: string) => {
+    switch (sectionId) {
+      case 'radar':
+        return <PortfolioSkillRadar key="radar" skillRadar={skillRadar} />
+      case 'progress':
+        return <PortfolioProgress key="progress" progress={progress} />
+      case 'capstones':
+        return <PortfolioCapstones key="capstones" capstones={capstones} />
+      case 'achievements':
+        return (
+          <PortfolioAchievements
+            key="achievements"
+            user={user}
+            progress={progress}
+            capstonesCount={capstones.length}
+          />
+        )
+      default:
+        return null
+    }
+  }
+
+  // Filter hero from dynamic sections so header remains anchored at top
+  const dynamicSections = layout.filter((s) => s !== 'hero')
+
   return (
     <div className="min-h-screen bg-background text-foreground py-8 md:py-12 px-4">
       {/* Schema.org Person Structured Data */}
@@ -121,17 +157,13 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
         {/* Portfolio Hero */}
         <PortfolioHero user={user} />
 
-        {/* Skill Radar Overview */}
-        <PortfolioSkillRadar skillRadar={skillRadar} />
+        {/* Featured Deliverable Spotlight Card (if set and public) */}
+        {featuredCapstone && (
+          <FeaturedCapstoneCard capstone={featuredCapstone} />
+        )}
 
-        {/* Curriculum Progress */}
-        <PortfolioProgress progress={progress} />
-
-        {/* Verified Applied Capstones */}
-        <PortfolioCapstones capstones={capstones} />
-
-        {/* Achievements & Badges */}
-        <PortfolioAchievements user={user} progress={progress} capstonesCount={capstones.length} />
+        {/* User-Configured Section Layout */}
+        {dynamicSections.map(renderSection)}
 
         {/* Verified Footer Branding */}
         <div className="text-center pt-8 border-t border-border/60 text-xs text-muted-foreground space-y-1">

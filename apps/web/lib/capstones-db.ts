@@ -277,7 +277,8 @@ export async function submitCapstoneAction(
   moduleSlug: string,
   content: string,
   reflectionContent?: string,
-  reflectionIsPublic: boolean = false
+  reflectionIsPublic: boolean = false,
+  isPublic?: boolean
 ): Promise<{
   success: boolean
   submission: CapstoneSubmissionRow
@@ -323,13 +324,57 @@ export async function submitCapstoneAction(
     }
   }
 
-  // 4. Validate submission content
+  // 4. Fetch user to check portfolio privacy setting (mock-safe fallback)
+  let userEmail = ''
+  let userName = 'Learner'
+  let isPortfolioPublic: boolean | null = null
+
+  try {
+    const userQuery = (supabase.from('users') as unknown as DBChain)
+      ?.select?.('email, name, is_portfolio_public')
+      ?.eq?.('id', userId)
+
+    interface UserRecord {
+      email: string
+      name: string | null
+      is_portfolio_public: boolean | null
+    }
+
+    let queryRes: { data: UserRecord | null } | null = null
+    if (userQuery && typeof userQuery.maybeSingle === 'function') {
+      queryRes = (await userQuery.maybeSingle()) as unknown as { data: UserRecord | null }
+    } else if (userQuery && typeof userQuery.single === 'function') {
+      queryRes = (await userQuery.single()) as unknown as { data: UserRecord | null }
+    }
+
+    if (queryRes?.data) {
+      userEmail = queryRes.data.email || ''
+      userName = queryRes.data.name || 'Learner'
+      isPortfolioPublic = queryRes.data.is_portfolio_public ?? null
+    }
+  } catch {
+    // Non-fatal if table not mocked in specific test
+  }
+
+  // Authoritatively derive is_public:
+  // 1. Master privacy gate: If user's entire portfolio is private (is_portfolio_public === false),
+  //    the artifact must NEVER be marked public under any circumstances.
+  // 2. Individual privacy control: When portfolio is public, respect learner's explicit opt-in/opt-out choice.
+  // 3. Default: True when portfolio is public.
+  let effectiveIsPublic = true
+  if (isPortfolioPublic === false) {
+    effectiveIsPublic = false
+  } else if (typeof isPublic === 'boolean') {
+    effectiveIsPublic = isPublic
+  }
+
+  // 5. Validate submission content
   const validation = validateCapstoneSubmission(moduleSlug, content)
   if (!validation.isValid) {
     throw new Error(validation.reason || 'Submission requirements not met.')
   }
 
-  // 4. Validate transition
+  // 6. Validate transition
   const transition = validateCapstoneTransition(existing?.status, 'submitted', 'learner')
   if (!transition.allowed) {
     throw new Error(transition.reason || 'Cannot submit capstone in current state.')
@@ -344,6 +389,7 @@ export async function submitCapstoneAction(
       .update({
         content,
         status: 'submitted',
+        is_public: effectiveIsPublic,
         submitted_at: now,
       })
       .eq('id', existing.id)
@@ -360,7 +406,7 @@ export async function submitCapstoneAction(
         module_slug: moduleSlug,
         content,
         status: 'submitted',
-        is_public: false,
+        is_public: effectiveIsPublic,
         submitted_at: now,
       })
       .select()
@@ -419,12 +465,6 @@ export async function submitCapstoneAction(
 
   // 8. Dispatch capstone.submitted notification
   try {
-    const { data: userRec } = await (supabase
-      .from('users') as unknown as DBChain)
-      .select('email, name')
-      .eq('id', userId)
-      .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
-
     const { globalNotificationDispatcher } = await import('./notifications/dispatcher')
     const { initializeNotificationConnectors } = await import('./notifications/events/connectors')
     initializeNotificationConnectors()
@@ -434,8 +474,8 @@ export async function submitCapstoneAction(
       id: `capstone-submit-${result.id}`,
       event: 'capstone.submitted',
       userId,
-      userEmail: userRec?.email || '',
-      userName: userRec?.name || 'Learner',
+      userEmail: userEmail || '',
+      userName: userName || 'Learner',
       userTimezone: 'UTC',
       priority: 'medium',
       category: 'portfolio',

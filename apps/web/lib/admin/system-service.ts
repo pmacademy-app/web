@@ -398,8 +398,7 @@ export class SystemService {
 
   /**
    * Paginated audit log from `admin_audit_logs` with admin/action/target/date
-   * filters. Note: writes are not yet wired (see `logAdminAction`), so the
-   * table is expected to be empty until persistence is enabled.
+   * filters. Queries persisted administrative actions recorded via `logAdminAction`.
    */
   public static async getAuditLog(params: {
     admin?: string

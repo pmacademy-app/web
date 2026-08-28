@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -10,8 +10,10 @@ import { Mail, CheckCircle2, Clock, ShieldCheck } from 'lucide-react'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
+import { ReferralBadge } from '@/components/referral/ReferralBadge'
 import { classifyAuthError, type ClassifiedAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
+import { trackReferralSignupCompleted } from '@/lib/analytics'
 
 const signupSchema = z.object({
   name: z
@@ -34,8 +36,11 @@ const signupSchema = z.object({
 
 type SignupFormValues = z.infer<typeof signupSchema>
 
-export default function SignupPage() {
+function SignupFormContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const refCode = searchParams.get('ref')
+
   const [authError, setAuthError] = useState<ClassifiedAuthError | null>(null)
   const [submittedEmail, setSubmittedEmail] = useState<string>('')
   const [verificationPending, setVerificationPending] = useState<boolean>(false)
@@ -62,7 +67,7 @@ export default function SignupPage() {
         const res = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values),
+          body: JSON.stringify({ ...values, refCode }),
         })
 
         if (res.status >= 502 && res.status <= 504) {
@@ -100,9 +105,11 @@ export default function SignupPage() {
         }
 
         if (json.verificationRequired) {
+          if (refCode) trackReferralSignupCompleted()
           setSubmittedEmail(values.email)
           setVerificationPending(true)
         } else {
+          if (refCode) trackReferralSignupCompleted()
           router.push(json.redirect || '/dashboard')
           router.refresh()
         }
@@ -134,6 +141,8 @@ export default function SignupPage() {
           90 lessons. 9 modules. Always free.
         </p>
       </div>
+
+      <ReferralBadge refCode={refCode} />
 
       {verificationPending ? (
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-5">
@@ -308,4 +317,21 @@ export default function SignupPage() {
     </div>
   )
 }
+
+export default function SignupPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-16 max-w-sm">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm text-center text-sm text-muted-foreground">
+            Loading signup...
+          </div>
+        </div>
+      }
+    >
+      <SignupFormContent />
+    </Suspense>
+  )
+}
+
 

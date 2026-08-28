@@ -18,7 +18,8 @@ import {
 } from '@/lib/lesson-loader'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
-import { isLessonUnlocked, getFirstLockedLessonIndex } from '@/lib/lessons-completion-service'
+import { isLessonUnlocked } from '@/lib/lessons-completion-service'
+import { getCanonicalPrerequisiteRange } from '@/lib/curriculum-access'
 import { BRAND } from '@/lib/brand'
 import LessonPageContent from './lesson-content'
 
@@ -137,9 +138,14 @@ export default async function AcademyLessonPage({ params }: PageProps) {
   const moduleNum = Math.ceil(globalOrder / 10)
 
   let isLocked = false
-  let lowestLockedLessonMeta: typeof prevMeta | null = null
-  let lowestLockedGlobalOrder: number | null = null
-  let lowestLockedLessonUrl: string | null = null
+
+  // Prerequisite range for the locked-screen message — computed from actual
+  // completed lesson IDs so Lesson 1 is never incorrectly omitted.
+  let firstIncompletePrereqIndex: number | null = null
+  let lastPrereqIndex: number = globalIndex - 1 // = targetIndex - 1
+  let firstIncompletePrereqMeta: typeof prevMeta | null = null
+  let firstIncompletePrereqGlobalOrder: number | null = null
+  let firstIncompletePrereqUrl: string | null = null
 
   let initialProgress: {
     status: 'not_started' | 'in_progress' | 'completed'
@@ -152,7 +158,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
 
   if (user) {
     const serviceSupabase = createServiceRoleClient()
-    const [unlocked, progressResult] = await Promise.all([
+    const [unlocked, progressResult, allProgressResult] = await Promise.all([
       prevId ? isLessonUnlocked(serviceSupabase, user.id, lessonId, prevId) : true,
       serviceSupabase
         .from('user_lesson_progress')
@@ -160,23 +166,43 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         .eq('user_id', user.id)
         .eq('lesson_id', lessonId)
         .maybeSingle(),
+      // Fetch all completed lesson IDs once to power the canonical prerequisite check
+      serviceSupabase
+        .from('user_lesson_progress')
+        .select('lesson_id')
+        .eq('user_id', user.id)
+        .eq('status', 'completed'),
     ])
 
     if (!unlocked) {
       isLocked = true
 
+      // Build the completed set from ACTUAL lesson IDs — never use a count alone
+      const completedRows = (allProgressResult?.data ?? []) as { lesson_id: string }[]
+      const completedIds = new Set(completedRows.map((r) => r.lesson_id))
       const curriculumIds = lessons.map((l) => l.id)
-      const lowestLockedIndex = await getFirstLockedLessonIndex(serviceSupabase, user.id, curriculumIds)
 
-      if (lowestLockedIndex !== -1 && lowestLockedIndex < globalIndex) {
-        const actualLockedLesson = lessons[lowestLockedIndex]
-        if (actualLockedLesson) {
-          lowestLockedLessonMeta = await getLessonMeta(actualLockedLesson.id)
-          lowestLockedGlobalOrder = lowestLockedIndex + 1
-          lowestLockedLessonUrl = lowestLockedLessonMeta
-            ? `/academy/${lowestLockedLessonMeta.module}/${lowestLockedLessonMeta.id}`
+      // Canonical prerequisite range: scans from index 0 so Lesson 1 is always
+      // included when incomplete (fixes the "Complete Lesson 2–10" bug).
+      const prereqRange = getCanonicalPrerequisiteRange(completedIds, curriculumIds, globalIndex)
+      firstIncompletePrereqIndex = prereqRange.firstIncompleteIndex
+      lastPrereqIndex = prereqRange.lastPrerequisiteIndex
+
+      // Resolve metadata for the first incomplete prerequisite lesson
+      if (firstIncompletePrereqIndex !== null) {
+        const firstIncompleteLesson = lessons[firstIncompletePrereqIndex]
+        if (firstIncompleteLesson) {
+          firstIncompletePrereqMeta = await getLessonMeta(firstIncompleteLesson.id)
+          firstIncompletePrereqGlobalOrder = firstIncompletePrereqIndex + 1
+          firstIncompletePrereqUrl = firstIncompletePrereqMeta
+            ? `/academy/${firstIncompletePrereqMeta.module}/${firstIncompletePrereqMeta.id}`
             : null
         }
+      } else {
+        // All prerequisites are complete but isLocked is true — fall back to prevMeta
+        firstIncompletePrereqMeta = prevMeta
+        firstIncompletePrereqGlobalOrder = prevGlobalOrder
+        firstIncompletePrereqUrl = prevLessonUrl
       }
     }
 
@@ -202,14 +228,15 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     }
   }
 
-  if (isLocked && !lowestLockedLessonMeta) {
-    lowestLockedLessonMeta = prevMeta
-    lowestLockedGlobalOrder = prevGlobalOrder
-    lowestLockedLessonUrl = prevLessonUrl
-  }
-
   // 5. Render locked screen if prerequisite is unmet
   if (isLocked) {
+    // Determine whether to display a range ("Lessons X–Y") or a single lesson
+    const lastPrereqGlobalOrder = lastPrereqIndex >= 0 ? lastPrereqIndex + 1 : null
+    const showRange =
+      firstIncompletePrereqGlobalOrder !== null &&
+      lastPrereqGlobalOrder !== null &&
+      firstIncompletePrereqGlobalOrder < lastPrereqGlobalOrder
+
     return (
       <div className="container mx-auto px-4 py-16 max-w-xl text-center space-y-8 animate-fade-in">
         <div className="flex justify-center">
@@ -221,15 +248,13 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         <div className="space-y-3">
           <h1 className="text-2xl font-bold font-serif text-foreground">Lesson Locked</h1>
           <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
-            {lowestLockedGlobalOrder && prevGlobalOrder && lowestLockedGlobalOrder < prevGlobalOrder ? (
+            {showRange ? (
+              // Range display: "Complete Lessons X–Y before unlocking Lesson N"
+              // This correctly shows "Lessons 1–10" for a brand-new user at Lesson 11
               <>
                 You must complete{' '}
                 <span className="font-semibold text-foreground">
-                  Lesson {lowestLockedGlobalOrder}
-                </span>{' '}
-                through{' '}
-                <span className="font-semibold text-foreground">
-                  Lesson {prevGlobalOrder}
+                  Lessons {firstIncompletePrereqGlobalOrder}–{lastPrereqGlobalOrder}
                 </span>{' '}
                 before you can unlock{' '}
                 <span className="font-semibold text-foreground">
@@ -238,11 +263,12 @@ export default async function AcademyLessonPage({ params }: PageProps) {
                 .
               </>
             ) : (
+              // Single lesson display: "Complete Lesson X: Title before unlocking Lesson N"
               <>
                 You must complete{' '}
-                {prevMeta && prevGlobalOrder && (
+                {firstIncompletePrereqMeta && firstIncompletePrereqGlobalOrder && (
                   <span className="font-semibold text-foreground">
-                    Lesson {prevGlobalOrder}: {prevMeta.title}
+                    Lesson {firstIncompletePrereqGlobalOrder}: {firstIncompletePrereqMeta.title}
                   </span>
                 )}{' '}
                 before you can unlock{' '}
@@ -256,12 +282,12 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {lowestLockedLessonUrl && lowestLockedLessonMeta && lowestLockedGlobalOrder && (
+          {firstIncompletePrereqUrl && firstIncompletePrereqMeta && firstIncompletePrereqGlobalOrder && (
             <Link
-              href={lowestLockedLessonUrl}
+              href={firstIncompletePrereqUrl}
               className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all"
             >
-              Start Lesson {lowestLockedGlobalOrder}: {lowestLockedLessonMeta.title} →
+              Start Lesson {firstIncompletePrereqGlobalOrder}: {firstIncompletePrereqMeta.title} →
             </Link>
           )}
           <Link
