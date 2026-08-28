@@ -3,19 +3,25 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 
+import { requireAdminUser } from '@/lib/admin/guard'
+
 export async function POST(request: Request) {
   const cronSecret = process.env.CRON_SECRET
-  const authHeader = request.headers.get('Authorization')
+  const authHeader = request.headers.get('Authorization') || request.headers.get('authorization')
+  const isCronAuthorized = Boolean(cronSecret && authHeader === `Bearer ${cronSecret}`)
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    const { logSystemError } = await import('@/lib/monitoring/logger')
-    void logSystemError({
-      severity: 'warning',
-      category: 'cron',
-      operation: 'cron_daily_reminder_auth',
-      message: 'Unauthorized cron request: CRON_SECRET mismatch on /api/cron/daily-reminder',
-    })
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isCronAuthorized) {
+    const adminCheck = await requireAdminUser(request)
+    if (!adminCheck.authorized) {
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'warning',
+        category: 'cron',
+        operation: 'cron_daily_reminder_auth',
+        message: 'Unauthorized cron request: CRON_SECRET or Admin session required on /api/cron/daily-reminder',
+      })
+      return NextResponse.json({ error: 'Unauthorized: Valid CRON_SECRET or Admin session required.' }, { status: 401 })
+    }
   }
 
   const isEnabled = await EmailAutomationsService.isAutomationEnabled('learning.daily_reminder')

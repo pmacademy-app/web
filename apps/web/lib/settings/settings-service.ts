@@ -248,6 +248,8 @@ export async function deleteAccount(
     'user_notification_preferences',
     'in_app_notifications',
     'user_notification_timeline',
+    'user_feedback',
+    'user_feedback_prompts',
   ]
 
   for (const table of userTables) {

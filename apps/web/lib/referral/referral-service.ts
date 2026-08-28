@@ -191,18 +191,25 @@ export async function onFirstLessonCompletedReferralCheck(
 
   const now = new Date().toISOString()
 
-  // 2. Mark referral status as rewarded / activated
-  const { error: updateError } = await (supabase
+  // 2. Mark referral status as rewarded / activated atomically
+  const { data: updatedRows, error: updateError } = (await (supabase
     .from('referrals') as unknown as DBChain)
     .update({
       status: 'rewarded',
       rewarded_at: now,
     })
     .eq('id', referral.id)
+    .eq('status', 'signed_up')
+    .select('id')) as unknown as { data: { id: string }[] | null; error: unknown }
 
   if (updateError) {
     console.error('[referral-service] Failed to update referral status:', updateError)
     return { rewarded: false, reason: 'update_failed' }
+  }
+
+  // If another concurrent request already updated this referral row
+  if (Array.isArray(updatedRows) && updatedRows.length === 0) {
+    return { rewarded: false, reason: 'already_activated' }
   }
 
   // 3. Award referral XP to referrer (idempotent with hasXpEvent check)

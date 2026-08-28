@@ -44,6 +44,13 @@ export async function POST(request: Request) {
     const newPassword = body.newPassword || body.password
     const confirmPassword = body.confirmPassword
 
+    if (!currentPassword || typeof currentPassword !== 'string' || !currentPassword.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Current password is required.' },
+        { status: 400 }
+      )
+    }
+
     if (!newPassword || typeof newPassword !== 'string') {
       return NextResponse.json(
         { success: false, error: 'New password is required.' },
@@ -65,7 +72,7 @@ export async function POST(request: Request) {
       )
     }
 
-    if (currentPassword && currentPassword === newPassword) {
+    if (currentPassword === newPassword) {
       return NextResponse.json(
         { success: false, error: 'New password must be different from current password.' },
         { status: 400 }
@@ -74,24 +81,22 @@ export async function POST(request: Request) {
 
     const supabase = createServiceRoleClient()
 
-    // 1. If current password is provided, verify it first against Supabase Auth
+    // 1. Verify current password against Supabase Auth
     let newSessionAfterAuth: { access_token: string; refresh_token: string; expires_in: number } | null = null
-    if (currentPassword) {
-      const { data: signInData, error: verifyError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword,
-      })
+    const { data: signInData, error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    })
 
-      if (verifyError) {
-        return NextResponse.json(
-          { success: false, error: 'Current password is incorrect.' },
-          { status: 400 }
-        )
-      }
+    if (verifyError) {
+      return NextResponse.json(
+        { success: false, error: 'Current password is incorrect.' },
+        { status: 400 }
+      )
+    }
 
-      if (signInData.session) {
-        newSessionAfterAuth = signInData.session
-      }
+    if (signInData.session) {
+      newSessionAfterAuth = signInData.session
     }
 
     // 2. Update user's password securely through Supabase Auth Admin API
