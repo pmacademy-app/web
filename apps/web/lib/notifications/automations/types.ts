@@ -24,13 +24,13 @@ export interface EmailAutomationMeta {
 export interface WeeklyRecapSchedule {
   enabled: boolean
   dayOfWeek: number // 0=Sunday, 1=Monday, ..., 6=Saturday (Default 1: Monday)
-  hourUtc: number   // 0..23 (Default 9: 09:00 UTC)
+  hourUtc: number   // 0..23 (Default 3: 03:30 UTC / 09:00 AM IST window)
   lastRunAt?: string | null
 }
 
 export interface DailyReminderSchedule {
   enabled: boolean
-  hourUtc: number   // 0..23 (Default 9: 09:00 UTC)
+  hourUtc: number   // 0..23 (Default 3: 03:30 UTC / 09:00 AM IST window)
   lastRunAt?: string | null
 }
 

@@ -50,6 +50,23 @@ type EventMap = {
 
   // ─── Goal-Driven Personalization Events (Phase 3) ─────────────────────────
   goal_context_viewed:      { goal_id?: string; recommended_module?: string }
+
+  // ─── Capstone & Proof-of-Work Events (Phase 4) ───────────────────────────
+  portfolio_artifact_created:     { module_slug: string; is_public: boolean }
+  portfolio_visited_from_capstone: { module_slug: string }
+
+  // ─── Portfolio Evolution Events (Phase 5) ─────────────────────────────────
+  portfolio_layout_updated:        { layout: string[] }
+  portfolio_featured_capstone_set: { module_slug?: string }
+  portfolio_viewed:                { username: string }
+
+  // ─── Lesson Feedback Loop Events (Phase 6) ───────────────────────────────
+  lesson_feedback_submitted:       { lesson_id: string; rating: number; tags_count: number; has_comment: boolean }
+
+  // ─── Sharing & Referral Events (Phase 7) ──────────────────────────────────
+  referral_link_copied:            { channel?: string }
+  referral_shared:                 { platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic' }
+  referral_signup_completed:       Record<string, never>
 }
 
 // ─── Core helper ──────────────────────────────────────────────────────────────
@@ -185,6 +202,72 @@ export function trackFirstRewardCelebrated(lessonId: string, xpEarned?: number) 
 export function trackGoalContextViewed(goalId?: string, recommendedModule?: string) {
   trackEvent('goal_context_viewed', { goal_id: goalId, recommended_module: recommendedModule })
 }
+
+// ─── Capstone & Proof-of-Work Trackers (Phase 4) ───────────────────────────
+
+/** Fired when a capstone submission creates/updates a portfolio artifact. */
+export function trackPortfolioArtifactCreated(moduleSlug: string, isPublic: boolean) {
+  trackEvent('portfolio_artifact_created', { module_slug: moduleSlug, is_public: isPublic })
+}
+
+/** Fired when a learner navigates to their portfolio directly from a capstone submission. */
+export function trackPortfolioVisitedFromCapstone(moduleSlug: string) {
+  trackEvent('portfolio_visited_from_capstone', { module_slug: moduleSlug })
+}
+
+// ─── Portfolio Evolution Trackers (Phase 5) ─────────────────────────────────
+
+/** Fired when a learner updates their portfolio section layout ordering. */
+export function trackPortfolioLayoutUpdated(layout: string[]) {
+  trackEvent('portfolio_layout_updated', { layout })
+}
+
+/** Fired when a learner sets or updates their featured/pinned capstone deliverable. */
+export function trackPortfolioFeaturedCapstoneSet(moduleSlug?: string) {
+  trackEvent('portfolio_featured_capstone_set', { module_slug: moduleSlug })
+}
+
+/** Fired when a public portfolio page is viewed. */
+export function trackPortfolioViewed(username: string) {
+  trackEvent('portfolio_viewed', { username })
+}
+
+// ─── Lesson Feedback Loop Trackers (Phase 6) ────────────────────────────────
+
+/** Fired when a learner submits feedback or rating for a lesson. */
+export function trackLessonFeedbackSubmitted(
+  lessonId: string,
+  rating: number,
+  tagsCount: number,
+  hasComment: boolean
+) {
+  trackEvent('lesson_feedback_submitted', {
+    lesson_id: lessonId,
+    rating,
+    tags_count: tagsCount,
+    has_comment: hasComment,
+  })
+}
+
+// ─── Sharing & Referral Trackers (Phase 7) ──────────────────────────────────
+
+/** Fired when a learner copies their personal referral invitation link. */
+export function trackReferralLinkCopied(channel = 'direct') {
+  trackEvent('referral_link_copied', { channel })
+}
+
+/** Fired when a learner shares their referral link to a social platform. */
+export function trackReferralShared(platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic') {
+  trackEvent('referral_shared', { platform })
+}
+
+/** Fired when a learner successfully completes registration via a referral link. */
+export function trackReferralSignupCompleted() {
+  trackEvent('referral_signup_completed')
+}
+
+
+
 
 
 

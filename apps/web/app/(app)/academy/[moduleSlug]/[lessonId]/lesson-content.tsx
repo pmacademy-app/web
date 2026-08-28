@@ -41,6 +41,7 @@ import {
   trackFirstLessonCompleted,
 } from '@/lib/analytics'
 import { FirstSessionCelebrationModal } from '@/components/celebration/FirstSessionCelebrationModal'
+import { LessonFeedbackWidget } from '@/components/feedback/LessonFeedbackWidget'
 
 
 
@@ -707,6 +708,9 @@ export default function LessonPageContent({
           </div>
         )}
       </div>
+
+      {/* Lesson Clarity Feedback Loop (Phase 6) */}
+      <LessonFeedbackWidget lessonId={lesson.id} className="mt-6" />
 
       {/* Lesson Footer Navigation */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center pt-6 border-t border-border/60 text-xs">

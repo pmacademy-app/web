@@ -239,7 +239,7 @@ All admin styles use CSS custom properties prefixed `admin-*`:
 - **Users (`/admin/users`)**: Directory with SQL-side pagination, search, role filters, user detail drawers, admin role toggle, progress reset, account deletion, and custom individual production email dispatching (`/api/admin/emails/production-send`).
 - **Communications (`/admin/communications`)**: Email queue monitoring, dead-letter retry/inspect, transactional template viewer & test send, system announcements broadcast, and contact message inbox.
 - **Moderation (`/admin/moderation`)**: Review and publish/reject learner testimonials, capstone project deliverables, and product feedback.
-- **Curriculum (`/admin/curriculum`)**: 9-module & 90-lesson browser, lesson metadata inspection, publish/unpublish toggles, and live previews.
+- **Curriculum (`/admin/curriculum`)**: 9-module & 90-lesson browser, lesson metadata inspection, publish/unpublish toggles, live previews, Content Quality clarity ratings (1–5 stars and clarity %), "Needs Review" filter (clarity < 3.5), and learner feedback inspection drawer with clarity issue tags.
 - **Achievements (`/admin/achievements`)**: Issued certificate registry with live verification previews, badge catalog, and credential issuance logs.
 - **Analytics (`/admin/analytics`)**: Active learner metrics (DAU/WAU/MAU), lesson completion drop-off funnels, quiz pass rates, XP velocity, and SRS retention habits.
 - **System (`/admin/system`)**: Operational health diagnostics, database latency metrics, error group logs with stack traces, severity-based alerts, and searchable `admin_audit_logs`.

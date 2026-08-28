@@ -359,6 +359,17 @@ export async function recordQuizAttemptAction(
       .eq('user_id', userId) as unknown as { data: { lesson_id: string; status: string }[] | null }
 
     totalCompletedLessons = userProgress?.filter((p) => p.status === 'completed').length || 0
+
+    // Phase 7: Check and activate referral reward if this is the learner's first completed lesson
+    if (totalCompletedLessons === 1) {
+      try {
+        const { onFirstLessonCompletedReferralCheck } = await import('../referral/referral-service')
+        await onFirstLessonCompletedReferralCheck(supabase, userId)
+      } catch (refErr) {
+        console.warn('[lessons-db] Referral activation check warning:', refErr)
+      }
+    }
+
     if (totalCompletedLessons > 0 && totalCompletedLessons % 10 === 0) {
       const moduleIndex = Math.floor(totalCompletedLessons / 10)
 

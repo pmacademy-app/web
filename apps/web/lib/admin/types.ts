@@ -169,6 +169,7 @@ export interface AdminUserDetail extends AdminUserOverview {
   capstonesSubmitted: number
   certificatesCount: number
   hasPublicPortfolio: boolean
+  referralsCount?: number
   goal?: string
   notificationPreferences?: {
     allNotifications: boolean
@@ -422,6 +423,12 @@ export interface AdminLessonOverview {
   /** Completion % of the module's started learners. */
   completionPct: number
   status: 'published'
+  /** Phase 6 — Content Quality Metrics */
+  clarityScore?: number | null
+  clarityPct?: number | null
+  feedbackCount?: number
+  flaggedIssuesCount?: number
+  needsReview?: boolean
 }
 
 /** Complete payload for the module detail page. */
@@ -451,6 +458,19 @@ export interface AdminLessonDetail {
   status: 'published'
   /** Compiled block tree — rendered by the learner-facing preview. */
   blocks: Array<Record<string, unknown>>
+  /** Phase 6 — Content Quality Metrics */
+  clarityScore?: number | null
+  clarityPct?: number | null
+  feedbackCount?: number
+  flaggedIssuesCount?: number
+  needsReview?: boolean
+  recentFeedback?: Array<{
+    id: string
+    rating: number
+    tags: string[]
+    comment: string | null
+    createdAt: string
+  }>
 }
 
 /** Curriculum overview KPI values (spec §4.2). */
