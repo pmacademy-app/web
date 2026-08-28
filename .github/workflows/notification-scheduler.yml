@@ -2,20 +2,20 @@ name: Production Notification & Email Automation Scheduler
 
 on:
   schedule:
-    # 1. Process email queue every 5 minutes
+    # 1. Process email queue & broadcasts every 5 minutes (24/7 continuous)
     - cron: '*/5 * * * *'
-    # 2. Retry failed emails every hour
-    - cron: '0 * * * *'
-    # 3. Daily reminder at 09:00 UTC
-    - cron: '0 9 * * *'
-    # 4. Weekly recap every Monday at 09:00 UTC
-    - cron: '0 9 * * 1'
-    # 5. Queue / timeline / delivery log cleanup daily at 02:00 UTC
-    - cron: '0 2 * * *'
+    # 2. Retry failed emails every hour at :00 IST (30 * * * * UTC)
+    - cron: '30 * * * *'
+    # 3. Daily reminder at 09:00 AM IST (03:30 UTC: 30 3 * * *)
+    - cron: '30 3 * * *'
+    # 4. Weekly recap every Monday at 09:00 AM IST (03:30 UTC: 30 3 * * 1)
+    - cron: '30 3 * * 1'
+    # 5. Queue / timeline / delivery log cleanup daily at 02:00 AM IST (20:30 UTC: 30 20 * * *)
+    - cron: '30 20 * * *'
   workflow_dispatch:
     inputs:
       job_to_run:
-        description: 'Specific job to trigger (queue, retry, daily, weekly, cleanup, all)'
+        description: 'Specific job to trigger (queue, broadcasts, retry, daily, weekly, cleanup, all)'
         required: false
         default: 'all'
 
@@ -42,10 +42,30 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
+  process-broadcasts:
+    name: Process Scheduled Broadcasts
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '*/5 * * * *' ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'broadcasts')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: broadcast-runner
+      cancel-in-progress: false
+    steps:
+      - name: Trigger Process Broadcasts Endpoint
+        run: |
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl --fail-with-body -s -S -X GET "${SITE_URL}/api/cron/process-broadcasts" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
   retry-failed-emails:
     name: Retry Failed Emails
     if: |
-      github.event_name == 'schedule' && github.event.schedule == '0 * * * *' ||
+      github.event_name == 'schedule' && github.event.schedule == '30 * * * *' ||
       github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'retry')
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -62,7 +82,7 @@ jobs:
   daily-reminder:
     name: Queue Daily Reminders
     if: |
-      github.event_name == 'schedule' && github.event.schedule == '0 9 * * *' ||
+      github.event_name == 'schedule' && github.event.schedule == '30 3 * * *' ||
       github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'daily')
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -79,7 +99,7 @@ jobs:
   weekly-recap:
     name: Queue Weekly Recaps
     if: |
-      github.event_name == 'schedule' && github.event.schedule == '0 9 * * 1' ||
+      github.event_name == 'schedule' && github.event.schedule == '30 3 * * 1' ||
       github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'weekly')
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -96,7 +116,7 @@ jobs:
   cleanup-logs:
     name: Cleanup Timeline & Delivery Logs
     if: |
-      github.event_name == 'schedule' && github.event.schedule == '0 2 * * *' ||
+      github.event_name == 'schedule' && github.event.schedule == '30 20 * * *' ||
       github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'cleanup')
     runs-on: ubuntu-latest
     timeout-minutes: 5

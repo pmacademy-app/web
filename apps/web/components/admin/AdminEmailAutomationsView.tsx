@@ -38,8 +38,8 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
   const [state, setState] = useState<EmailAutomationsState>(initialState)
   const [schedules, setSchedules] = useState<EmailDigestSchedules>(
     initialState.digestSchedules || {
-      weeklyRecap: { enabled: true, dayOfWeek: 1, hourUtc: 9, lastRunAt: null },
-      dailyReminder: { enabled: true, hourUtc: 9, lastRunAt: null },
+      weeklyRecap: { enabled: true, dayOfWeek: 1, hourUtc: 3, lastRunAt: null },
+      dailyReminder: { enabled: true, hourUtc: 3, lastRunAt: null },
     }
   )
 

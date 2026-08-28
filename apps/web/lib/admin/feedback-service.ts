@@ -354,7 +354,7 @@ export class FeedbackAdminService {
     const supabase = createServiceRoleClient()
     const { error } = await (supabase
       .from('user_feedback') as unknown as DBChain)
-      .update({ status, updated_at: new Date().toISOString() })
+      .update({ status })
       .eq('id', feedbackId)
 
     if (error) {
