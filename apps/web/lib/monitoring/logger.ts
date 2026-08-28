@@ -23,7 +23,7 @@ export function sanitizeErrorMessage(input: string): string {
   if (!input) return ''
   return input
     .replace(/Bearer\s+[A-Za-z0-9\-\._~\+\/]+=*/gi, 'Bearer [REDACTED]')
-    .replace(/(?:key|secret|token|password|auth|authorization)=['"]?[A-Za-z0-9\-\._~\+\/]+['"]?/gi, '$1=[REDACTED]')
+    .replace(/(key|secret|token|password|auth|authorization)=['"]?[A-Za-z0-9\-\._~\+\/]+['"]?/gi, '$1=[REDACTED]')
     .replace(/whsec_[A-Za-z0-9\+\/]+/gi, 'whsec_[REDACTED]')
     .replace(/re_[A-Za-z0-9_]+/gi, 're_[REDACTED]')
     .replace(/v1,[A-Za-z0-9\+\/=]+/gi, 'v1,[REDACTED]')
