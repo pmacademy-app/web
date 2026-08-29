@@ -141,15 +141,15 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
         </div>
 
         {/* Social Links */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {linkedinUrl && (
             <a
               href={linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-              title="LinkedIn Profile"
-              aria-label="LinkedIn Profile"
+              className="p-2.5 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+              title={`${name}'s LinkedIn Profile`}
+              aria-label={`${name}'s LinkedIn Profile`}
             >
               <LinkedInIcon className="w-4 h-4 text-blue-500" />
             </a>
@@ -159,9 +159,9 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
               href={githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-              title="GitHub Profile"
-              aria-label="GitHub Profile"
+              className="p-2.5 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+              title={`${name}'s GitHub Profile`}
+              aria-label={`${name}'s GitHub Profile`}
             >
               <GitHubIcon className="w-4 h-4" />
             </a>
@@ -171,9 +171,9 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
               href={websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-              title="Personal Website"
-              aria-label="Personal Website"
+              className="p-2.5 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+              title={`${name}'s Personal Website`}
+              aria-label={`${name}'s Personal Website`}
             >
               <Globe className="w-4 h-4 text-primary" />
             </a>
