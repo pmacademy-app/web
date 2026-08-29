@@ -61,12 +61,13 @@ describe('Phase 3 Information Architecture & Internal Linking Test Suite', () =>
     expect(allowList.includes('/glossary')).toBe(true)
   })
 
-  it('XML Sitemap contains 97 public URLs including /frameworks', async () => {
+  it('XML Sitemap contains at least 97 public URLs including /frameworks and public portfolios', async () => {
     const entries = await sitemap()
-    expect(entries.length).toBe(97)
+    expect(entries.length).toBeGreaterThanOrEqual(97)
 
     const urls = entries.map((e) => e.url)
     expect(urls.includes(`${expectedSiteUrl}/frameworks`)).toBe(true)
+    expect(urls.includes(`${expectedSiteUrl}/curriculum`)).toBe(true)
 
     const uniqueUrls = new Set(urls)
     expect(uniqueUrls.size).toBe(urls.length)
