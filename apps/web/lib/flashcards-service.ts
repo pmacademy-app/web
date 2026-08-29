@@ -221,7 +221,7 @@ export async function recordFlashcardReview(
     next_review_at: nextState.nextReviewAt.toISOString(),
   }
 
-  let { error: upsertError } = await (supabase
+  const { error: upsertError } = await (supabase
     .from('user_flashcard_srs') as unknown as DBChain)
     .upsert(srsPayload, { onConflict: 'user_id,lesson_id,flashcard_id' })
 

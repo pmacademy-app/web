@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   getReviewQueueData,
   recordFlashcardReview,
-  recordReviewSessionCompletion,
 } from '../flashcards-service'
-import { calculateSM2, getDueCards, calculateReviewStats } from '../srs'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../supabase'
 
@@ -86,8 +84,8 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
 
     mockSupabase = {
       from: vi.fn().mockImplementation((table: string) => {
-        let currentFilterTable = table
-        let filters: Record<string, unknown> = {}
+        const currentFilterTable = table
+        const filters: Record<string, unknown> = {}
 
         const queryBuilder = {
           select: vi.fn().mockReturnThis(),
@@ -110,15 +108,16 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
             }
             return { data: null, error: null }
           }),
-          upsert: vi.fn().mockImplementation(async (payload: any, options?: { onConflict?: string }) => {
+          upsert: vi.fn().mockImplementation(async (payload: Record<string, unknown>) => {
             if (currentFilterTable === 'user_flashcard_srs') {
+              const rowPayload = payload as (typeof mockStore.srs)[number]
               const existingIndex = mockStore.srs.findIndex(
-                (r) => r.user_id === payload.user_id && r.flashcard_id === payload.flashcard_id
+                (r) => r.user_id === rowPayload.user_id && r.flashcard_id === rowPayload.flashcard_id
               )
               if (existingIndex >= 0) {
-                mockStore.srs[existingIndex] = { ...mockStore.srs[existingIndex], ...payload }
+                mockStore.srs[existingIndex] = { ...mockStore.srs[existingIndex], ...rowPayload }
               } else {
-                mockStore.srs.push(payload)
+                mockStore.srs.push(rowPayload)
               }
               return { data: payload, error: null }
             }
@@ -129,16 +128,16 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
           update: vi.fn().mockImplementation(() => ({
             eq: vi.fn().mockResolvedValue({ data: null, error: null }),
           })),
-          insert: vi.fn().mockImplementation(async (payload: any) => {
+          insert: vi.fn().mockImplementation(async (payload: Record<string, unknown>) => {
             if (currentFilterTable === 'xp_events') {
               mockStore.xpEvents.push({
                 created_at: new Date().toISOString(),
-                ...payload,
+                ...(payload as (typeof mockStore.xpEvents)[number]),
               })
             }
             return { data: payload, error: null }
           }),
-          then: vi.fn().mockImplementation((resolve: any) => {
+          then: vi.fn().mockImplementation((resolve: (val: unknown) => void) => {
             if (currentFilterTable === 'user_lesson_progress') {
               let rows = mockStore.lessonProgress.filter((r) => r.user_id === filters.user_id)
               if (filters.status) {

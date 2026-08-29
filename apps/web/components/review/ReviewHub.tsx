@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FlashcardItem, ReviewStats as ReviewStatsType, SRSRating } from '@/lib/srs'
 import { ReviewStats } from './ReviewStats'
@@ -29,14 +29,6 @@ export function ReviewHub({
   const [isFlipped, setIsFlipped] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [sessionCompleted, setSessionCompleted] = useState(false)
-
-  // Sync state if server props update (e.g. from router.refresh() or tab navigation)
-  useEffect(() => {
-    if (!sessionCompleted && reviewedCount === 0) {
-      setDueCards(initialDueCards)
-      setStats(initialStats)
-    }
-  }, [initialDueCards, initialStats, sessionCompleted])
 
   // Tracking session results
   const [reviewedCount, setReviewedCount] = useState(0)
