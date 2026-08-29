@@ -7,6 +7,8 @@ import type {
   LearnerSubmittedCapstoneSummary,
 } from '@/lib/portfolio-db'
 import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
+import { calculatePortfolioReadiness } from '@/lib/portfolio-readiness'
+import { PortfolioReadinessCard } from '@/components/settings/PortfolioReadinessCard'
 import {
   trackPortfolioLayoutUpdated,
   trackPortfolioFeaturedCapstoneSet,
@@ -183,6 +185,19 @@ export function PortfolioSettingsForm() {
     )
   }
 
+  const publicCapstonesCount = submittedCapstones.filter((c) => c.isPublic).length
+  const readiness = calculatePortfolioReadiness({
+    name: formData.name,
+    username: formData.username,
+    bio: formData.bio,
+    avatarUrl: formData.avatarUrl,
+    linkedinUrl: formData.linkedinUrl,
+    githubUrl: formData.githubUrl,
+    websiteUrl: formData.websiteUrl,
+    isPortfolioPublic: formData.isPortfolioPublic,
+    publicCapstonesCount,
+  })
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Notifications */}
@@ -200,8 +215,15 @@ export function PortfolioSettingsForm() {
         </div>
       )}
 
+      {/* Portfolio Sharing Readiness Checklist (Owner Only) */}
+      <PortfolioReadinessCard
+        readiness={readiness}
+        username={formData.username}
+        isPublic={formData.isPortfolioPublic}
+      />
+
       {/* Public / Private Toggle */}
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+      <div id="visibility-toggle" className="rounded-2xl border border-border bg-card p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">

@@ -18,8 +18,8 @@ export function ShareButton({ username }: ShareButtonProps) {
     if (typeof navigator !== 'undefined' && 'share' in navigator && typeof navigator.share === 'function') {
       try {
         await navigator.share({
-          title: `${username}'s PM Academy Portfolio`,
-          text: `Check out ${username}'s Product Management portfolio and skill radar on PM Academy!`,
+          title: `${username}'s Product Management Portfolio`,
+          text: `Check out ${username}'s Product Management portfolio and case studies on Prodily!`,
           url: shareUrl,
         })
         return
@@ -44,8 +44,8 @@ export function ShareButton({ username }: ShareButtonProps) {
     <button
       type="button"
       onClick={handleShare}
-      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs shadow-sm transition-all active:scale-95"
-      aria-label="Share Portfolio"
+      className="inline-flex items-center justify-center min-h-[38px] gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/40"
+      aria-label={copied ? 'Portfolio link copied to clipboard' : 'Share public portfolio'}
     >
       {copied ? (
         <>
