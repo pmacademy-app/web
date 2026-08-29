@@ -35,6 +35,9 @@ interface UserRow {
   name?: string | null
   username?: string | null
   email?: string | null
+  avatar_url?: string | null
+  bio?: string | null
+  is_fellow?: boolean
   created_at?: string
 }
 
@@ -169,8 +172,8 @@ export class ModerationService {
   }
 
   /**
-   * Public portfolio directory (spec §5.6 Portfolios tab): learners with a
-   * public portfolio, newest first. Read-only this phase.
+   * Public portfolio directory & verification queue:
+   * Retrieves all users with public portfolios, enriched with project count and verification status.
    */
   public static async getPortfolios(): Promise<{ portfolios: AdminPortfolioRow[]; failed: boolean }> {
     const supabase = createServiceRoleClient()
@@ -178,18 +181,46 @@ export class ModerationService {
       const users = await fetchAllRows<UserRow>((from, to) =>
         supabase
           .from('users')
-          .select('id, name, username, email, created_at')
+          .select('id, name, username, email, avatar_url, bio, is_fellow, is_portfolio_public, created_at')
           .eq('is_portfolio_public', true)
           .order('created_at', { ascending: false })
           .range(from, to)
       )
 
+      // Query capstone counts for public portfolios
+      const userIds = users.map((u) => u.id).filter(Boolean)
+      const capstoneCountMap = new Map<string, number>()
+
+      if (userIds.length > 0) {
+        const CHUNK = 500
+        for (let i = 0; i < userIds.length; i += CHUNK) {
+          const chunk = userIds.slice(i, i + CHUNK)
+          const { data: capstoneData } = await supabase
+            .from('capstone_submissions')
+            .select('user_id')
+            .in('user_id', chunk)
+            .in('status', ['submitted', 'reviewed'])
+            .neq('is_public', false)
+
+          for (const row of (capstoneData || []) as unknown as { user_id: string }[]) {
+            if (row.user_id) {
+              capstoneCountMap.set(row.user_id, (capstoneCountMap.get(row.user_id) || 0) + 1)
+            }
+          }
+        }
+      }
+
       const portfolios: AdminPortfolioRow[] = users.map((u) => ({
         userId: u.id,
         learnerName: this.resolveLearnerName(u, 'Learner'),
+        email: u.email || '',
         username: u.username || null,
+        avatarUrl: u.avatar_url || null,
+        bio: u.bio || null,
         isPublic: true,
+        isFellow: Boolean(u.is_fellow),
         joinedAt: u.created_at || '',
+        capstoneCount: capstoneCountMap.get(u.id) || 0,
       }))
 
       return { portfolios, failed: false }

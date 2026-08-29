@@ -11,6 +11,9 @@ import {
   FileText,
   Quote,
   Calendar,
+  Clock,
+  Link2,
+  Check,
 } from 'lucide-react'
 
 interface FeaturedCapstoneCardProps {
@@ -19,17 +22,29 @@ interface FeaturedCapstoneCardProps {
 
 export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyLink = () => {
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    url.hash = `featured-project-${capstone.id}`
+    navigator.clipboard.writeText(url.toString())
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
+  }
 
   const formattedDate = new Date(capstone.submittedAt).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   })
+  const readTimeMinutes = Math.max(1, Math.ceil(capstone.wordCount / 200))
 
   return (
     <section
+      id={`featured-project-${capstone.id}`}
       aria-label="Featured Applied Project"
-      className="relative rounded-2xl border-2 border-primary/40 bg-card/80 p-6 md:p-8 backdrop-blur-xs shadow-lg space-y-6 overflow-hidden transition-all"
+      className="relative rounded-2xl border-2 border-primary/40 bg-card/80 p-6 md:p-8 backdrop-blur-xs shadow-lg space-y-6 overflow-hidden transition-all scroll-mt-24"
     >
       {/* Ambient background glow */}
       <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
@@ -42,24 +57,48 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
             Featured Artifact
           </span>
 
-          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-0.5 rounded bg-muted/60">
-            Module {capstone.moduleNumber.toString().padStart(2, '0')}
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2.5 py-0.5 rounded bg-muted/60">
+            Module {capstone.moduleNumber.toString().padStart(2, '0')} — {capstone.moduleTitle}
           </span>
 
-          <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-            {capstone.competencyCluster}
-          </span>
+          {capstone.competencyCluster && (
+            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+              {capstone.competencyCluster}
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-          <Calendar className="w-3.5 h-3.5" />
-          <span>{formattedDate}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{formattedDate}</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            aria-label="Copy direct link to featured project"
+            title="Copy direct link to this project"
+            className="p-1.5 rounded-lg border border-border hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors cursor-pointer inline-flex items-center gap-1 text-[11px]"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-emerald-500 font-bold hidden sm:inline">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Link2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Share</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 
       {/* Title & Metadata */}
       <div className="space-y-2 relative z-10">
-        <h2 className="text-xl md:text-2xl font-bold font-serif text-foreground">
+        <h2 className="text-xl md:text-2xl font-bold font-serif text-foreground leading-snug">
           {capstone.title}
         </h2>
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -68,7 +107,10 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
             {capstone.deliverableType}
           </span>
           <span>•</span>
-          <span>{capstone.wordCount} words</span>
+          <span className="inline-flex items-center gap-1 font-mono text-[11px]">
+            <Clock className="w-3 h-3 text-muted-foreground" />
+            <span>~{readTimeMinutes} min read ({capstone.wordCount} words)</span>
+          </span>
           <span>•</span>
           {capstone.status === 'reviewed' ? (
             <span className="inline-flex items-center gap-1 text-emerald-500 font-semibold">
@@ -86,24 +128,29 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
 
       {/* Learning Objectives Chips */}
       {capstone.learningObjectives && capstone.learningObjectives.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-1 relative z-10">
-          {capstone.learningObjectives.map((obj, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg bg-secondary/80 text-secondary-foreground border border-border/60"
-            >
-              <Target className="w-3 h-3 text-primary shrink-0" />
-              <span>{obj}</span>
-            </span>
-          ))}
+        <div className="space-y-1.5 relative z-10">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground block">
+            Core PM Judgment Skills Evaluated:
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {capstone.learningObjectives.map((obj, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg bg-secondary/80 text-secondary-foreground border border-border/60"
+              >
+                <Target className="w-3 h-3 text-primary shrink-0" />
+                <span>{obj}</span>
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Deliverable Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 space-y-2">
         <div
           className={`text-sm text-foreground/90 font-serif leading-relaxed whitespace-pre-line rounded-xl bg-background/50 p-5 border border-border/60 transition-all ${
-            isExpanded ? '' : 'max-h-48 overflow-hidden relative'
+            isExpanded ? '' : 'max-h-52 overflow-hidden relative'
           }`}
         >
           {capstone.content}
@@ -116,7 +163,7 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 rounded px-1"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 rounded px-1 cursor-pointer"
         >
           {isExpanded ? (
             <>
