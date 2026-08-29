@@ -130,9 +130,12 @@ describe('Flashcard Completion & Review Persistence Test Suite', () => {
           })),
           insert: vi.fn().mockImplementation(async (payload: Record<string, unknown>) => {
             if (currentFilterTable === 'xp_events') {
+              const item = payload as Partial<(typeof mockStore.xpEvents)[number]>
               mockStore.xpEvents.push({
-                created_at: new Date().toISOString(),
-                ...(payload as (typeof mockStore.xpEvents)[number]),
+                user_id: String(item.user_id || ''),
+                source_type: String(item.source_type || ''),
+                source_id: String(item.source_id || ''),
+                created_at: String(item.created_at || new Date().toISOString()),
               })
             }
             return { data: payload, error: null }
