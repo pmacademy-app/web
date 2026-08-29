@@ -95,7 +95,7 @@ export default function QuizBlock({ block }: BlockProps) {
       setQuizFinished(true);
       // Submit all attempts via lesson context (v2 route) if available.
       // Use attemptsRef which has already been updated synchronously.
-      if (lessonCtx && attemptsRef.current.length > 0) {
+      if (lessonCtx?.onQuizComplete && attemptsRef.current.length > 0) {
         setSubmitting(true);
         lessonCtx
           .onQuizComplete(attemptsRef.current)

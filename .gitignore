@@ -46,4 +46,4 @@ apps/web/scripts/local-campaigns/
 apps/web/scripts/logs/
 
 # Master plan document (never commit)
-PRODILY_PRODUCT_IMPLEMENTATION_MASTER_PLAN.md
+CONTENT_UPDATE.md 
