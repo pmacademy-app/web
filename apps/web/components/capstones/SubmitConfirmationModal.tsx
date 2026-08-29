@@ -121,7 +121,7 @@ export function SubmitConfirmationModal({
             <p className="text-[11px] text-muted-foreground leading-relaxed">
               {userProfile?.isPortfolioPublic !== false ? (
                 <>
-                  Your portfolio at <strong className="text-foreground font-mono">/p/{userProfile?.username || 'you'}</strong> is public. This deliverable will be showcased directly as a verified proof-of-work project.
+                  Your portfolio at <strong className="text-foreground font-mono">/p/{userProfile?.username || 'you'}</strong> is public. This deliverable will be showcased directly on your portfolio as an applied project.
                 </>
               ) : (
                 <>

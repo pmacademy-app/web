@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { Flame, Zap, Globe, Award, ShieldCheck } from 'lucide-react'
+import { Flame, Zap, Award, GraduationCap, Globe } from 'lucide-react'
 import type { PublicPortfolioPayload } from '@/lib/portfolio-db'
 import { ShareButton } from '@/components/portfolio/ShareButton'
 
@@ -76,8 +76,14 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
           <div className="space-y-1.5 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-                Verified PM Portfolio
+                Product Management Portfolio
               </span>
+              {user.isFellow && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
+                  <GraduationCap className="w-3 h-3" />
+                  Product Management Fellow
+                </span>
+              )}
               <span className="text-xs text-muted-foreground font-mono">@{username}</span>
             </div>
 
@@ -85,15 +91,18 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
               {name}
             </h1>
 
-            {/* PM Title & Level */}
+            {user.isFellow && (
+              <p className="text-xs md:text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                <GraduationCap className="w-4 h-4 shrink-0" />
+                Product Management Fellow at Prodily
+              </p>
+            )}
+
+            {/* Progression Level & XP */}
             <div className="flex items-center gap-2 flex-wrap text-xs md:text-sm font-semibold text-muted-foreground">
-              <span className="text-foreground">{levelInfo.title}</span>
-              <span>•</span>
               <span className="text-primary font-bold">Level {levelInfo.level}</span>
               <span>•</span>
-              <span className="flex items-center gap-1 text-emerald-500 font-bold">
-                <ShieldCheck className="w-4 h-4" /> PM Craft Verified
-              </span>
+              <span className="text-foreground">{totalXp.toLocaleString()} Total XP</span>
             </div>
           </div>
         </div>
@@ -127,7 +136,7 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
 
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-muted-foreground border border-border font-medium">
             <Award className="w-4 h-4 text-primary" />
-            <span>{levelInfo.title}</span>
+            <span>Level {levelInfo.level} Learner</span>
           </div>
         </div>
 

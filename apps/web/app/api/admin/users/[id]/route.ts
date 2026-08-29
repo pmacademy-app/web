@@ -98,6 +98,26 @@ export async function POST(request: Request, { params }: Context) {
       return NextResponse.json({ success: true, resetUserId: id, moduleSlug })
     }
 
+    if (action === 'set_fellow_status') {
+      const isFellow = typeof body.isFellow === 'boolean' ? body.isFellow : Boolean(body.makeFellow)
+      const success = await AdminConsoleService.toggleUserFellowStatus(id, isFellow)
+      if (!success) {
+        return NextResponse.json({ error: 'Failed to update fellow status.' }, { status: 500 })
+      }
+
+      await logAdminAction(
+        auth.userId,
+        auth.email,
+        isFellow ? 'grant_fellow_status' : 'revoke_fellow_status',
+        'user',
+        id,
+        { isFellow }
+      )
+
+      revalidatePath('/admin/users')
+      return NextResponse.json({ success: true, targetUserId: id, isFellow })
+    }
+
     return NextResponse.json({ error: 'Invalid admin action' }, { status: 400 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to execute admin action.'

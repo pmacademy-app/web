@@ -76,6 +76,7 @@ export interface PublicPortfolioPayload {
     longestStreak: number
     totalXp: number
     levelInfo: LevelInfo
+    isFellow: boolean
     isPortfolioPublic: boolean
     portfolioLayout: PortfolioSectionId[]
     featuredCapstoneId: string | null
@@ -260,6 +261,7 @@ export async function getPublicPortfolioData(
       longestStreak: user.longest_streak || 0,
       totalXp: user.total_xp || 0,
       levelInfo,
+      isFellow: Boolean(user.is_fellow),
       isPortfolioPublic: user.is_portfolio_public ?? true,
       portfolioLayout,
       featuredCapstoneId,
@@ -540,3 +542,46 @@ export async function updatePortfolioSettings(
     },
   }
 }
+
+export interface PublicPortfolioSitemapEntry {
+  username: string
+  updatedAt?: string | null
+  createdAt?: string | null
+}
+
+/**
+ * Queries all publicly indexable portfolio users for XML sitemap generation.
+ * Strictly filters for is_portfolio_public = true and valid, non-empty usernames.
+ * Private, unconfigured, or invalid username accounts are excluded.
+ */
+export async function getPublicPortfolioSitemapEntries(
+  supabase: SupabaseClient<Database>
+): Promise<PublicPortfolioSitemapEntry[]> {
+  try {
+    const { data: users, error } = (await (supabase
+      .from('users') as unknown as DBChain)
+      .select('username, updated_at, created_at')
+      .eq('is_portfolio_public', true)
+      .not('username', 'is', null)
+      .neq('username', '')) as unknown as {
+      data: { username: string; updated_at?: string | null; created_at?: string | null }[] | null
+      error: unknown
+    }
+
+    if (error || !users) {
+      return []
+    }
+
+    return users
+      .filter((u) => u.username && validateUsername(u.username).isValid)
+      .map((u) => ({
+        username: u.username,
+        updatedAt: u.updated_at ?? null,
+        createdAt: u.created_at ?? null,
+      }))
+  } catch (err) {
+    console.error('[portfolio-db] Error fetching public portfolio sitemap entries:', err)
+    return []
+  }
+}
+

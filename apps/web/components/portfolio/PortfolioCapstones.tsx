@@ -35,16 +35,16 @@ export function PortfolioCapstones({ capstones }: PortfolioCapstonesProps) {
           </div>
           <div>
             <h2 className="text-xl font-bold font-serif text-foreground">
-              Verified Applied Capstones
+              Applied Capstones
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Production-grade product deliverables authored during module milestones.
+              Applied product management projects and case studies authored during curriculum milestones.
             </p>
           </div>
         </div>
 
-        <span className="text-xs font-bold text-emerald-500 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 w-fit">
-          {capstones.length} Verified Deliverable{capstones.length === 1 ? '' : 's'}
+        <span className="text-xs font-bold text-primary px-3 py-1 rounded-lg bg-primary/10 border border-primary/20 w-fit">
+          {capstones.length} Applied Project{capstones.length === 1 ? '' : 's'}
         </span>
       </div>
 
@@ -79,10 +79,17 @@ export function PortfolioCapstones({ capstones }: PortfolioCapstonesProps) {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-500">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Verified Proof-of-Work</span>
-                </div>
+                {cap.status === 'reviewed' ? (
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-500">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Reviewed by Prodily</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground/60" />
+                    <span>Submitted to Prodily</span>
+                  </div>
+                )}
               </div>
 
               {/* Title & Metadata Pills */}

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import type { PublicCapstoneItem } from '@/lib/portfolio-db'
 import {
   Sparkles,
-  Award,
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
   Target,
@@ -28,7 +28,7 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
 
   return (
     <section
-      aria-label="Featured Proof-of-Work Deliverable"
+      aria-label="Featured Applied Project"
       className="relative rounded-2xl border-2 border-primary/40 bg-card/80 p-6 md:p-8 backdrop-blur-xs shadow-lg space-y-6 overflow-hidden transition-all"
     >
       {/* Ambient background glow */}
@@ -70,10 +70,17 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
           <span>•</span>
           <span>{capstone.wordCount} words</span>
           <span>•</span>
-          <span className="inline-flex items-center gap-1 text-emerald-500 font-semibold">
-            <Award className="w-3.5 h-3.5" />
-            Verified Proof-of-Work
-          </span>
+          {capstone.status === 'reviewed' ? (
+            <span className="inline-flex items-center gap-1 text-emerald-500 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Reviewed by Prodily
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-muted-foreground font-medium">
+              <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground/60" />
+              Submitted to Prodily
+            </span>
+          )}
         </div>
       </div>
 

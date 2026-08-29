@@ -1,8 +1,19 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+
+// Spy on logSystemError to verify monitoring behavior
+const mockLogSystemError = vi.fn().mockResolvedValue('mock-system-error-id')
+vi.mock('@/lib/monitoring/logger', () => ({
+  logSystemError: (options: unknown) => mockLogSystemError(options),
+}))
+
 import { POST } from '../../app/api/auth/update-password/route'
 
 describe('Password Update Endpoint Security & Functional Unit Tests', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('Rejects non-JSON Content-Type with 415', async () => {
     const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
       method: 'POST',
@@ -45,7 +56,7 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     expect(json.error).toBe('Password must be at least 6 characters.')
   })
 
-  it('Rejects request with neither sb-access-token nor sb-refresh-token with 401', async () => {
+  it('Rejects request with neither sb-access-token nor sb-refresh-token with 401 and clears cookies', async () => {
     const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -56,6 +67,10 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     const json = await res.json()
     expect(json.success).toBe(false)
     expect(json.error).toBe('No active recovery session found. Please request a new password reset link.')
+    expect(res.cookies.get('sb-access-token')?.value).toBe('')
+    expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
+    // Does not log false-positive system error alert
+    expect(mockLogSystemError).not.toHaveBeenCalled()
   })
 
   it('Successfully updates password and deletes recovery cookies', async () => {
@@ -69,39 +84,34 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     })
 
     const res = await POST(req)
-    // Even if live supabase mock returns an error or success, it either handles 200 or 400/401
     if (res.status === 200) {
       const json = await res.json()
       expect(json.success).toBe(true)
       expect(res.cookies.get('sb-access-token')?.value).toBe('')
+      expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
     } else {
-      // If mock rejected token, verify handled safely without crashing
       expect([200, 400, 401]).toContain(res.status)
     }
   })
 
-  it('Refresh-token fallback: when access token is expired, falls back to refresh token (no crash)', async () => {
-    // This test verifies the fallback path does not throw or return 500.
-    // With expired access token detection, the code should attempt a refresh.
-    // In test environment with no real Supabase, the refresh will fail gracefully.
+  it('Refresh-token fallback: when access token is expired, falls back to refresh token and suppresses false-positive system alerts on expected expiration', async () => {
     const req = new NextRequest('http://localhost:3000/api/auth/update-password', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        // Only providing refresh token, no access token — exercises the fallback path
         cookie: 'sb-refresh-token=expired-but-present-refresh-token',
       },
       body: JSON.stringify({ newPassword: 'newValidPassword123' }),
     })
     const res = await POST(req)
-    // The refresh will fail (no real Supabase in tests) but must NOT return 500
-    // It should return 401 (expired session) or 400/401 (graceful failure)
-    expect([400, 401]).toContain(res.status)
+    expect(res.status).toBe(401)
     const json = await res.json()
     expect(json.success).toBe(false)
-    // Must not leak internal error messages
-    expect(json.error).not.toContain('undefined')
-    expect(json.error).not.toContain('TypeError')
+    expect(json.error).toBe('Your password reset link has expired. Please request a new one.')
+    expect(res.cookies.get('sb-access-token')?.value).toBe('')
+    expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
+    // Critical assertion: standard expired refresh token MUST NOT log a system error alert
+    expect(mockLogSystemError).not.toHaveBeenCalled()
   })
 
   it('Redirects recovery failures to /reset-password?error=expired rather than /login?error=auth_failed', async () => {

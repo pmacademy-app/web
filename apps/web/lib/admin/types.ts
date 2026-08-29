@@ -23,6 +23,7 @@ export interface AdminUserOverview {
   username?: string | null
   role: string
   isAdmin: boolean
+  isFellow?: boolean
   isVerified: boolean
   emailConfirmedAt?: string | null
   totalXp: number

@@ -3,8 +3,66 @@ import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { createAuthenticatedServerClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { isNetworkFailure } from '@/lib/auth/errors'
 
 export const runtime = 'nodejs'
+
+/** Helper to delete recovery cookies cleanly across all response paths */
+function clearRecoveryCookies(response: NextResponse): void {
+  response.cookies.delete('sb-access-token')
+  response.cookies.delete('sb-refresh-token')
+  response.cookies.set('sb-access-token', '', { path: '/', maxAge: 0 })
+  response.cookies.set('sb-refresh-token', '', { path: '/', maxAge: 0 })
+}
+
+/** Determines if an auth error is a confirmed, expected client token/session lifecycle state */
+function isExpectedTokenInvalidation(error: unknown): boolean {
+  if (!error) return false
+  if (typeof error === 'object' && error !== null) {
+    const err = error as { status?: unknown; code?: unknown; message?: string }
+    const status = Number(err.status)
+    const code = String(err.code || '').toLowerCase()
+    const msg = String(err.message || '').toLowerCase()
+
+    if (isNetworkFailure(msg) || isNetworkFailure(error)) {
+      return false
+    }
+
+    if (
+      code === 'session_not_found' ||
+      code === 'token_expired' ||
+      code === 'bad_jwt' ||
+      code === 'invalid_grant' ||
+      code === 'refresh_token_not_found' ||
+      code === 'refresh_token_already_used' ||
+      code === 'session_expired' ||
+      code === 'user_not_found'
+    ) {
+      return true
+    }
+
+    if (
+      msg.includes('refresh token is not valid') ||
+      msg.includes('invalid refresh token') ||
+      msg.includes('token is expired') ||
+      msg.includes('jwt expired') ||
+      msg.includes('invalid jwt') ||
+      msg.includes('session not found') ||
+      msg.includes('session expired') ||
+      msg.includes('auth session missing') ||
+      msg.includes('invalid_grant') ||
+      msg.includes('refresh token not found') ||
+      msg.includes('already used')
+    ) {
+      return true
+    }
+
+    if (status === 401 || (status === 400 && (msg.includes('grant') || msg.includes('token') || msg.includes('session')))) {
+      return true
+    }
+  }
+  return false
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,61 +125,55 @@ export async function POST(request: NextRequest) {
 
     // If neither token is present, recovery session is completely absent
     if (!accessToken && !refreshToken) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'No active recovery session found. Please request a new password reset link.' },
         { status: 401 }
       )
+      clearRecoveryCookies(response)
+      return response
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
     // 5. Attempt password update with the current access token.
-    //    createAuthenticatedServerClient uses anon key + Bearer header — the correct pattern
-    //    for user-scoped operations that respect the user's identity.
     if (accessToken) {
       const userClient = createAuthenticatedServerClient(accessToken)
       const { error } = await userClient.auth.updateUser({ password: newPassword })
 
       if (!error) {
         const response = NextResponse.json({ success: true, message: 'Password updated successfully.' })
-        response.cookies.delete('sb-access-token')
-        response.cookies.delete('sb-refresh-token')
+        clearRecoveryCookies(response)
         return response
       }
 
-      // Detect access-token expiry — the confirmed root cause of "Auth session missing!" in production
-      const isExpiredOrMissing =
-        (error as { status?: unknown }).status === 401 ||
-        (error as { status?: unknown }).status === '401' ||
-        (error as { code?: unknown }).code === 'session_not_found' ||
-        (error as { code?: unknown }).code === 'token_expired' ||
-        (error as { code?: unknown }).code === 'bad_jwt' ||
-        error.message?.toLowerCase().includes('auth session missing') ||
-        error.message?.toLowerCase().includes('invalid jwt') ||
-        error.message?.toLowerCase().includes('jwt expired') ||
-        error.message?.toLowerCase().includes('token is expired') ||
-        error.message?.toLowerCase().includes('session expired') ||
-        error.message?.toLowerCase().includes('session not found')
+      const isExpiredOrInvalid = isExpectedTokenInvalidation(error)
 
-      if (!isExpiredOrMissing || !refreshToken) {
-        void logSystemError({ severity: 'warning', category: 'auth', operation: 'update_password_failure', message: error.message })
-        return NextResponse.json(
+      if (!isExpiredOrInvalid || !refreshToken) {
+        if (!isExpiredOrInvalid) {
+          // Genuine unexpected update failure
+          void logSystemError({ severity: 'warning', category: 'auth', operation: 'update_password_failure', message: error.message })
+        }
+        const response = NextResponse.json(
           { success: false, error: error.message || 'Failed to update password. Your reset link may have expired.' },
-          { status: 400 }
+          { status: isExpiredOrInvalid ? 401 : 400 }
         )
+        if (isExpiredOrInvalid) {
+          clearRecoveryCookies(response)
+        }
+        return response
       }
-      // Access token expired but refresh token is present — fall through to refresh
+      // Access token expired/invalid but refresh token is present — fall through to refresh fallback
     }
 
-    // 6. Refresh-token fallback: silently exchanges the long-lived refresh token for a new
-    //    access token. This resolves the "Auth session missing!" production error: the recovery
-    //    access token (~1 h TTL) can expire between the callback redirect and form submission.
+    // 6. Refresh-token fallback: exchange recovery refresh token for a fresh access token
     if (!refreshToken) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { success: false, error: 'No active recovery session found. Please request a new password reset link.' },
         { status: 401 }
       )
+      clearRecoveryCookies(response)
+      return response
     }
 
     const refreshClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } })
@@ -130,16 +182,24 @@ export async function POST(request: NextRequest) {
     })
 
     if (refreshError || !refreshData?.session) {
-      void logSystemError({
-        severity: 'warning',
-        category: 'auth',
-        operation: 'update_password_refresh_failed',
-        message: refreshError?.message || 'Refresh token exchange failed — recovery session fully expired',
-      })
-      return NextResponse.json(
+      const isExpected = isExpectedTokenInvalidation(refreshError)
+
+      if (!isExpected) {
+        // Log unexpected server/network failures during refresh so they remain observable
+        void logSystemError({
+          severity: 'error',
+          category: 'auth',
+          operation: 'update_password_refresh_failed',
+          message: refreshError?.message || 'Refresh token exchange failed unexpectedly',
+        })
+      }
+
+      const response = NextResponse.json(
         { success: false, error: 'Your password reset link has expired. Please request a new one.' },
         { status: 401 }
       )
+      clearRecoveryCookies(response)
+      return response
     }
 
     // 7. Retry with the freshly obtained access token
@@ -147,18 +207,22 @@ export async function POST(request: NextRequest) {
     const { error: retryError } = await retryClient.auth.updateUser({ password: newPassword })
 
     if (retryError) {
-      void logSystemError({ severity: 'warning', category: 'auth', operation: 'update_password_failure', message: retryError.message })
-      return NextResponse.json(
+      const isExpected = isExpectedTokenInvalidation(retryError)
+      if (!isExpected) {
+        void logSystemError({ severity: 'warning', category: 'auth', operation: 'update_password_failure', message: retryError.message })
+      }
+      const response = NextResponse.json(
         { success: false, error: retryError.message || 'Failed to update password. Your reset link may have expired.' },
-        { status: 400 }
+        { status: isExpected ? 401 : 400 }
       )
+      if (isExpected) {
+        clearRecoveryCookies(response)
+      }
+      return response
     }
 
     const response = NextResponse.json({ success: true, message: 'Password updated successfully.' })
-    response.cookies.delete('sb-access-token')
-    response.cookies.delete('sb-refresh-token')
-    response.cookies.set('sb-access-token', '', { path: '/', maxAge: 0 })
-    response.cookies.set('sb-refresh-token', '', { path: '/', maxAge: 0 })
+    clearRecoveryCookies(response)
     return response
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : 'Unknown server error'
