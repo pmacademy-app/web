@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
 import { fetchCurriculumData } from '../lesson-loader'
@@ -913,12 +914,48 @@ export class AdminConsoleService {
    */
   public static async toggleUserFellowStatus(targetUserId: string, isFellow: boolean): Promise<boolean> {
     const supabase = createServiceRoleClient()
+
+    // Enforce public portfolio invariant: only public portfolios can be verified
+    type UserQueryChain = {
+      select: (cols: string) => {
+        eq: (col: string, val: string) => {
+          maybeSingle: () => Promise<{ data: { id: string; username: string | null; is_portfolio_public: boolean } | null; error: unknown }>
+        }
+      }
+    }
+    const { data: userRow } = await (supabase.from('users') as unknown as UserQueryChain)
+      .select('id, username, is_portfolio_public')
+      .eq('id', targetUserId)
+      .maybeSingle()
+
+    if (!userRow) {
+      return false
+    }
+
+    if (isFellow && !userRow.is_portfolio_public) {
+      throw new Error('Cannot verify a private portfolio. The user portfolio must be public.')
+    }
+
     type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
     const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
       .update({ is_fellow: isFellow })
       .eq('id', targetUserId)
 
-    return !error
+    if (error) {
+      return false
+    }
+
+    // Proactively revalidate public portfolio and OG social preview cards
+    if (userRow.username) {
+      try {
+        revalidatePath(`/p/${userRow.username}`)
+        revalidatePath(`/api/og/portfolio/${userRow.username}`)
+      } catch {
+        // revalidatePath is best-effort in some environments
+      }
+    }
+
+    return true
   }
 
   /**

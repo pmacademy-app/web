@@ -50,9 +50,14 @@ export interface AdminCapstoneRow {
 export interface AdminPortfolioRow {
   userId: string
   learnerName: string
+  email: string
   username: string | null
+  avatarUrl: string | null
+  bio: string | null
   isPublic: boolean
+  isFellow: boolean
   joinedAt: string
+  capstoneCount: number
 }
 
 export interface AdminBadgeKpis {

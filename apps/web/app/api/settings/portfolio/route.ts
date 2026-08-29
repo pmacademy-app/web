@@ -50,6 +50,7 @@ export async function POST(request: Request) {
 
     if (result.settings.username) {
       revalidatePath(`/p/${result.settings.username}`)
+      revalidatePath(`/api/og/portfolio/${result.settings.username}`)
     }
     revalidatePath('/settings')
 

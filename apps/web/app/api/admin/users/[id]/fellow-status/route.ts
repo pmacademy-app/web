@@ -45,12 +45,15 @@ export async function POST(request: Request, { params }: Context) {
     )
 
     revalidatePath('/admin/users')
+    revalidatePath('/admin/moderation')
+    revalidatePath('/admin/portfolios')
     revalidatePath('/admin')
 
     return NextResponse.json({ success: true, targetUserId: id, isFellow })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to update fellow status'
-    return NextResponse.json({ error: message }, { status: 500 })
+    const isClientError = error instanceof Error && error.message.includes('Cannot verify a private portfolio')
+    return NextResponse.json({ error: message }, { status: isClientError ? 400 : 500 })
   }
 }
 

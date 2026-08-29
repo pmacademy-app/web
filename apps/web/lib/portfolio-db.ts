@@ -193,7 +193,7 @@ export async function getPublicPortfolioData(
     const def = getCapstoneDefinition(sub.module_slug)
     const reflectionKey = `capstone-${sub.module_slug}`
     const ref = publicReflectionMap.get(reflectionKey)
-    const wordCount = sub.content.trim().split(/\s+/).filter(Boolean).length
+    const wordCount = (sub.content || '').trim().split(/\s+/).filter(Boolean).length
 
     return {
       id: sub.id,

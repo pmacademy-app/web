@@ -32,7 +32,7 @@ const TABS: { id: ModerationTab; label: string; icon: React.ElementType }[] = [
   { id: 'testimonials', label: 'Testimonials', icon: MessageSquare },
   { id: 'feedback', label: 'Product Feedback', icon: Lightbulb },
   { id: 'capstones', label: 'Capstones', icon: FileCheck2 },
-  { id: 'portfolios', label: 'Portfolios', icon: Globe },
+  { id: 'portfolios', label: 'Portfolio Verification', icon: Globe },
 ]
 
 export function ModerationWorkspace({
