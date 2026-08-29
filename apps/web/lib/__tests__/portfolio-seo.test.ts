@@ -255,8 +255,8 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
                   not: vi.fn(() => ({
                     neq: vi.fn(async () => ({
                       data: [
-                        { username: 'fellowalex', updated_at: '2026-08-15T12:00:00Z', created_at: '2026-01-01T00:00:00Z' },
-                        { username: 'pmlearner', updated_at: null, created_at: '2026-03-01T00:00:00Z' },
+                        { username: 'fellowalex', created_at: '2026-01-01T00:00:00Z' },
+                        { username: 'pmlearner', created_at: '2026-03-01T00:00:00Z' },
                       ],
                       error: null,
                     })),
@@ -293,9 +293,9 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
                           filteredQuery += `neq(${col3},${val3})`
                           return {
                             data: [
-                              { username: 'validuser', updated_at: null, created_at: null },
-                              { username: 'admin', updated_at: null, created_at: null }, // reserved
-                              { username: 'ab', updated_at: null, created_at: null }, // too short
+                              { username: 'validuser', created_at: null },
+                              { username: 'admin', created_at: null }, // reserved
+                              { username: 'ab', created_at: null }, // too short
                             ],
                             error: null,
                           }

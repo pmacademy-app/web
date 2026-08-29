@@ -560,11 +560,11 @@ export async function getPublicPortfolioSitemapEntries(
   try {
     const { data: users, error } = (await (supabase
       .from('users') as unknown as DBChain)
-      .select('username, updated_at, created_at')
+      .select('username, created_at')
       .eq('is_portfolio_public', true)
       .not('username', 'is', null)
       .neq('username', '')) as unknown as {
-      data: { username: string; updated_at?: string | null; created_at?: string | null }[] | null
+      data: { username: string; created_at?: string | null }[] | null
       error: unknown
     }
 
@@ -576,7 +576,6 @@ export async function getPublicPortfolioSitemapEntries(
       .filter((u) => u.username && validateUsername(u.username).isValid)
       .map((u) => ({
         username: u.username,
-        updatedAt: u.updated_at ?? null,
         createdAt: u.created_at ?? null,
       }))
   } catch (err) {

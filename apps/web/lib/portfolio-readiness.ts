@@ -99,7 +99,7 @@ export function calculatePortfolioReadiness(input: PortfolioReadinessInput): Por
       description: 'At least one published case study or applied deliverable showcasing your PM craft.',
       isComplete: hasProject,
       importance: 'essential',
-      actionAnchor: 'setting-featured-capstone',
+      actionAnchor: 'featured-capstone-section',
     },
     {
       id: 'avatar',
@@ -107,6 +107,7 @@ export function calculatePortfolioReadiness(input: PortfolioReadinessInput): Por
       description: 'A clear photo or avatar for a professional first impression.',
       isComplete: hasAvatar,
       importance: 'recommended',
+      actionAnchor: 'setting-avatar-section',
     },
     {
       id: 'social',

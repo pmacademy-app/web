@@ -22,6 +22,7 @@ import {
   Check,
   AlertCircle,
   Save,
+  Loader2,
   ExternalLink,
   Layers,
   Sparkles,
@@ -50,7 +51,7 @@ function GitHubIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
 const SECTION_DESCRIPTIONS: Record<string, { label: string; description: string }> = {
   radar: {
     label: 'Skill Radar Overview',
-    description: 'Dynamic 6-cluster competency evaluation & score breakdown.',
+    description: 'Dynamic 7-cluster competency evaluation & score breakdown.',
   },
   capstones: {
     label: 'Applied Capstones',
@@ -179,8 +180,9 @@ export function PortfolioSettingsForm() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-8 text-center text-xs text-muted-foreground">
-        Loading portfolio settings...
+      <div className="rounded-2xl border border-border bg-card p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-3">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        <span className="font-medium">Loading portfolio settings &amp; sharing readiness...</span>
       </div>
     )
   }
@@ -223,7 +225,7 @@ export function PortfolioSettingsForm() {
       />
 
       {/* Public / Private Toggle */}
-      <div id="visibility-toggle" className="rounded-2xl border border-border bg-card p-6 space-y-4">
+      <div id="visibility-toggle" tabIndex={-1} className="rounded-2xl border border-border bg-card p-6 space-y-4 focus:outline-none focus:ring-2 focus:ring-primary/40">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">
@@ -243,6 +245,7 @@ export function PortfolioSettingsForm() {
 
           <label className="relative inline-flex items-center cursor-pointer">
             <input
+              id="setting-visibility-toggle"
               type="checkbox"
               checked={formData.isPortfolioPublic}
               onChange={(e) => handleChange('isPortfolioPublic', e.target.checked)}
@@ -315,7 +318,7 @@ export function PortfolioSettingsForm() {
         </div>
 
         {/* Avatar Upload */}
-        <div className="p-4 rounded-xl border border-border bg-card/40 space-y-3">
+        <div id="setting-avatar-section" tabIndex={-1} className="p-4 rounded-xl border border-border bg-card/40 space-y-3 focus:outline-none focus:ring-2 focus:ring-primary/40">
           <label className="text-xs font-bold text-foreground block uppercase tracking-wider">
             Profile Photo
           </label>
@@ -382,7 +385,7 @@ export function PortfolioSettingsForm() {
       </div>
 
       {/* Featured Deliverable Selection */}
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+      <div id="featured-capstone-section" tabIndex={-1} className="rounded-2xl border border-border bg-card p-6 space-y-4 focus:outline-none focus:ring-2 focus:ring-primary/40">
         <div className="border-b border-border pb-3 flex items-center justify-between">
           <h3 className="text-sm font-bold font-serif text-foreground flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-500" /> Featured Deliverable Spotlight
@@ -464,24 +467,24 @@ export function PortfolioSettingsForm() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     type="button"
                     disabled={index === 0}
                     onClick={() => moveSection(index, 'up')}
                     aria-label={`Move ${info.label} up`}
-                    className="p-1.5 rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                    className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                   >
-                    <ArrowUp className="w-3.5 h-3.5" />
+                    <ArrowUp className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
                     disabled={index === arr.length - 1}
                     onClick={() => moveSection(index, 'down')}
                     aria-label={`Move ${info.label} down`}
-                    className="p-1.5 rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                    className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg border border-border hover:bg-secondary text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                   >
-                    <ArrowDown className="w-3.5 h-3.5" />
+                    <ArrowDown className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -543,9 +546,9 @@ export function PortfolioSettingsForm() {
         </div>
       </div>
 
-      {/* Quick Action Links Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
-        <div className="flex items-center gap-4">
+      {/* Quick Action Links Bar & Bottom Save */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-border pt-4">
+        <div className="flex flex-wrap items-center gap-4">
           {formData.username && (
             <a
               href={`/p/${formData.username}`}
@@ -566,23 +569,37 @@ export function PortfolioSettingsForm() {
           </a>
         </div>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="ml-auto px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs shadow-sm transition-all flex items-center gap-2 disabled:opacity-50"
-        >
-          {saving ? (
-            <>
-              <span className="w-3.5 h-3.5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4" />
-              <span>Save Portfolio Settings</span>
-            </>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          {successMsg && (
+            <span className="text-xs font-bold text-emerald-500 flex items-center gap-1 animate-in fade-in-0">
+              <Check className="w-4 h-4 shrink-0" />
+              <span>Saved successfully!</span>
+            </span>
           )}
-        </button>
+          {errorMsg && (
+            <span className="text-xs font-bold text-destructive flex items-center gap-1 animate-in fade-in-0">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{errorMsg}</span>
+            </span>
+          )}
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shrink-0"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Save Portfolio Settings</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </form>
   )
