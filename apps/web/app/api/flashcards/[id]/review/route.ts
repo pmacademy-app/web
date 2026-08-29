@@ -14,6 +14,7 @@ const reviewSchema = z.object({
     z.literal(4),
     z.literal(5),
   ]),
+  lessonId: z.string().optional(),
 })
 
 export async function POST(
@@ -41,14 +42,15 @@ export async function POST(
       return Response.json({ error: parsed.error.flatten() }, { status: 400 })
     }
 
-    const { rating } = parsed.data
+    const { rating, lessonId } = parsed.data
     const serviceSupabase = createServiceRoleClient()
 
     const result = await recordFlashcardReview(
       serviceSupabase,
       user.id,
       id,
-      rating
+      rating,
+      lessonId
     )
 
     return Response.json(result)

@@ -33,25 +33,52 @@ export async function getReviewQueueData(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<ReviewQueueData> {
-  // 1. Fetch completed lessons for the user
+  // 1. Fetch all lesson progress rows for the user (completed, in_progress, started)
   const { data: progressRows } = (await (supabase
     .from('user_lesson_progress') as unknown as DBChain)
     .select('lesson_id, status')
-    .eq('user_id', userId)
-    .eq('status', 'completed')) as unknown as {
+    .eq('user_id', userId)) as unknown as {
     data: { lesson_id: string; status: string }[] | null
   }
 
-  const completedLessonIds = new Set((progressRows || []).map((p) => p.lesson_id))
+  // 2. Fetch all user SRS records
+  const { data: srsRows } = (await (supabase
+    .from('user_flashcard_srs') as unknown as DBChain)
+    .select('*')
+    .eq('user_id', userId)) as unknown as {
+    data: UserFlashcardSRSRow[] | null
+  }
 
-  // 2. Fetch curriculum and extract flashcards from completed lessons
+  const srsRecordsMap = new Map<string, UserFlashcardSRSRow>()
+  const srsLessonIds = new Set<string>()
+  for (const row of srsRows || []) {
+    srsRecordsMap.set(row.flashcard_id, row)
+    const rowLessonId = (row as { lesson_id?: string }).lesson_id
+    if (rowLessonId) {
+      srsLessonIds.add(rowLessonId)
+    }
+  }
+
+  // Unlocked lessons = completed lessons + in-progress/started lessons + any lesson with an SRS record
+  const unlockedLessonIds = new Set<string>()
+  for (const p of progressRows || []) {
+    if (p.lesson_id && (p.status === 'completed' || p.status === 'in_progress' || p.status === 'started')) {
+      unlockedLessonIds.add(p.lesson_id)
+    }
+  }
+  for (const lid of srsLessonIds) {
+    unlockedLessonIds.add(lid)
+  }
+
+  // 3. Fetch curriculum and extract flashcards from unlocked lessons
   const curriculum = await fetchCurriculumData()
   const curriculumLessons = curriculum?.lessons ?? []
-  const completedLessons = curriculumLessons.filter((l) => completedLessonIds.has(l.id))
+  const targetLessons = curriculumLessons.filter((l) => unlockedLessonIds.has(l.id))
 
   const unlockedCards: FlashcardItem[] = []
+  const cardIdsInUnlocked = new Set<string>()
 
-  for (const lessonSummary of completedLessons) {
+  for (const lessonSummary of targetLessons) {
     const lessonDetail = await fetchCompiledLesson(lessonSummary.id)
     if (!lessonDetail || !lessonDetail.blocks) continue
 
@@ -62,30 +89,50 @@ export async function getReviewQueueData(
     for (const block of flashcardBlocks) {
       if (block.cards && Array.isArray(block.cards)) {
         for (const card of block.cards) {
-          unlockedCards.push({
-            id: card.id,
-            lessonId: lessonSummary.id,
-            front: card.front,
-            back: card.back,
-            concept: card.concept || card.front,
-            module: lessonSummary.module,
-          })
+          if (!cardIdsInUnlocked.has(card.id)) {
+            cardIdsInUnlocked.add(card.id)
+            unlockedCards.push({
+              id: card.id,
+              lessonId: lessonSummary.id,
+              front: card.front,
+              back: card.back,
+              concept: card.concept || card.front,
+              module: lessonSummary.module,
+            })
+          }
         }
       }
     }
   }
 
-  // 3. Fetch user SRS records
-  const { data: srsRows } = (await (supabase
-    .from('user_flashcard_srs') as unknown as DBChain)
-    .select('*')
-    .eq('user_id', userId)) as unknown as {
-    data: UserFlashcardSRSRow[] | null
-  }
-
-  const srsRecordsMap = new Map<string, UserFlashcardSRSRow>()
-  for (const row of srsRows || []) {
-    srsRecordsMap.set(row.flashcard_id, row)
+  // Also include any card directly in srsRecordsMap that might belong to another lesson
+  if (srsRecordsMap.size > cardIdsInUnlocked.size) {
+    for (const [cardId] of srsRecordsMap.entries()) {
+      if (!cardIdsInUnlocked.has(cardId)) {
+        for (const lessonSummary of curriculumLessons) {
+          if (unlockedLessonIds.has(lessonSummary.id)) continue
+          const lessonDetail = await fetchCompiledLesson(lessonSummary.id)
+          if (!lessonDetail?.blocks) continue
+          const flashcardBlocks = (lessonDetail.blocks as { type: string; cards?: { id: string; front: string; back: string; concept?: string }[] }[]).filter(
+            (b) => b.type === 'flashcardDeck'
+          )
+          for (const block of flashcardBlocks) {
+            const foundCard = block.cards?.find((c) => c.id === cardId)
+            if (foundCard && !cardIdsInUnlocked.has(cardId)) {
+              cardIdsInUnlocked.add(cardId)
+              unlockedCards.push({
+                id: foundCard.id,
+                lessonId: lessonSummary.id,
+                front: foundCard.front,
+                back: foundCard.back,
+                concept: foundCard.concept || foundCard.front,
+                module: lessonSummary.module,
+              })
+            }
+          }
+        }
+      }
+    }
   }
 
   // 4. Calculate today's completed reviews count from xp_events
@@ -104,9 +151,11 @@ export async function getReviewQueueData(
     .eq('user_id', userId)
     .eq('source_type', 'flashcard')) as unknown as { data: { created_at: string }[] | null }
 
-  const completedTodayCount = (todayXpEvents || []).filter(
-    (e) => getLocalDateString(timezone, new Date(e.created_at)) === todayStr
-  ).length
+  const completedTodayCount = (todayXpEvents || []).filter((e) => {
+    if (!e?.created_at) return false
+    const d = new Date(e.created_at)
+    return !isNaN(d.getTime()) && getLocalDateString(timezone, d) === todayStr
+  }).length
 
   // 5. Evaluate due cards and aggregate stats
   const now = new Date()
@@ -128,7 +177,8 @@ export async function recordFlashcardReview(
   supabase: SupabaseClient<Database>,
   userId: string,
   flashcardId: string,
-  rating: number
+  rating: number,
+  explicitLessonId?: string
 ): Promise<{ nextReviewAt: Date; easeFactor: number }> {
   // 1. Fetch current SM-2 state from database
   const { data: srsData, error: srsFetchError } = (await (supabase
@@ -151,19 +201,41 @@ export async function recordFlashcardReview(
   // 2. Compute next spacing intervals using SM-2 Engine
   const nextState = calculateSM2(rating as SRSRating, prevState)
 
-  // 3. Persist SRS review state
-  const { error: upsertError } = await (supabase
-    .from('user_flashcard_srs') as unknown as DBChain)
-    .upsert({
-      user_id: userId,
-      flashcard_id: flashcardId,
-      ease_factor: nextState.easeFactor,
-      interval_days: nextState.intervalDays,
-      repetitions: nextState.repetitions,
-      next_review_at: nextState.nextReviewAt.toISOString(),
-    }, { onConflict: 'user_id,flashcard_id' })
+  // 3. Resolve lessonId (from parameter, existing SRS record, or flashcard ID prefix)
+  let lessonId = explicitLessonId || (srsData as { lesson_id?: string })?.lesson_id || ''
+  if (!lessonId) {
+    const match = flashcardId.match(/^fc-(les_[a-z0-9]+)-/i)
+    if (match) {
+      lessonId = match[1]
+    }
+  }
 
-  if (upsertError) throw upsertError
+  // 4. Persist SRS review state with composite key (user_id, lesson_id, flashcard_id)
+  const srsPayload = {
+    user_id: userId,
+    lesson_id: lessonId,
+    flashcard_id: flashcardId,
+    ease_factor: nextState.easeFactor,
+    interval_days: nextState.intervalDays,
+    repetitions: nextState.repetitions,
+    next_review_at: nextState.nextReviewAt.toISOString(),
+  }
+
+  let { error: upsertError } = await (supabase
+    .from('user_flashcard_srs') as unknown as DBChain)
+    .upsert(srsPayload, { onConflict: 'user_id,lesson_id,flashcard_id' })
+
+  if (upsertError) {
+    // Fallback if database table has primary key constraint on (user_id, flashcard_id)
+    const { error: fallbackError } = await (supabase
+      .from('user_flashcard_srs') as unknown as DBChain)
+      .upsert(srsPayload, { onConflict: 'user_id,flashcard_id' })
+
+    if (fallbackError) {
+      console.error('[flashcards-service] Failed to upsert user_flashcard_srs:', upsertError, fallbackError)
+      throw upsertError
+    }
+  }
 
   // 4. Award daily flashcard review XP via canonical XP service (deduplicated)
   try {
@@ -184,7 +256,9 @@ export async function recordFlashcardReview(
       .eq('source_id', flashcardId) as unknown as { data: { created_at: string }[] | null; error: unknown }
 
     const hasAwardedToday = existingEvents?.some((e) => {
-      return getLocalDateString(timezone, new Date(e.created_at)) === todayStr
+      if (!e?.created_at) return false
+      const d = new Date(e.created_at)
+      return !isNaN(d.getTime()) && getLocalDateString(timezone, d) === todayStr
     }) ?? false
 
     if (!hasAwardedToday) {

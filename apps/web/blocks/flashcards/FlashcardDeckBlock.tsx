@@ -44,7 +44,7 @@ export default function FlashcardDeckBlock({ block, previewMode }: BlockProps) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ rating }),
+          body: JSON.stringify({ rating, lessonId: lessonCtx?.lessonId }),
         });
 
         if (!res.ok) {

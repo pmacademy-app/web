@@ -694,10 +694,15 @@ export default function LessonPageContent({
         {/* Flashcards Panel */}
         {activeTab === 'flashcards' && (
           <div id="panel-flashcards" role="tabpanel" aria-labelledby="tab-flashcards">
-            <BlockTreeRenderer
-              blocks={getBlocksForTab(lesson.blocks, 'flashcards')}
+            <LessonContextProvider
               lessonId={lesson.id}
-            />
+              onAdvanceTab={(tab) => setActiveTab(tab)}
+            >
+              <BlockTreeRenderer
+                blocks={getBlocksForTab(lesson.blocks, 'flashcards')}
+                lessonId={lesson.id}
+              />
+            </LessonContextProvider>
           </div>
         )}
 

@@ -24,7 +24,7 @@ export interface QuizAttempt {
 
 export interface LessonContextValue {
   lessonId: string
-  onQuizComplete: (attempts: QuizAttempt[]) => Promise<unknown>
+  onQuizComplete?: (attempts: QuizAttempt[]) => Promise<unknown>
   onFlashcardsComplete?: () => void
   onReflectionComplete?: () => void
   onAdvanceTab?: (tab: 'theory' | 'quiz' | 'flashcards' | 'reflection') => void
@@ -42,7 +42,7 @@ export function LessonContextProvider({
 }: {
   children: React.ReactNode
   lessonId: string
-  onQuizComplete: (attempts: QuizAttempt[]) => Promise<unknown>
+  onQuizComplete?: (attempts: QuizAttempt[]) => Promise<unknown>
   onFlashcardsComplete?: () => void
   onReflectionComplete?: () => void
   onAdvanceTab?: (tab: 'theory' | 'quiz' | 'flashcards' | 'reflection') => void
