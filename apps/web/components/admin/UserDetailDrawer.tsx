@@ -10,6 +10,7 @@ import { AdminConfirmDialog } from './AdminConfirmDialog'
 import { AdminAvatar } from './AdminAvatar'
 import { AdminEmptyState } from './AdminEmptyState'
 import { UserRoleToggle } from './UserRoleToggle'
+import { UserFellowToggle } from './UserFellowToggle'
 import { DeveloperActionsSection } from './DeveloperActionsSection'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { USER_DETAIL_TABS, UserTabPanels, type UserDetailTabKey } from './UserTabPanels'
@@ -224,6 +225,13 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
                 iconColor="text-admin-warning"
               />
             </div>
+
+            {/* Product Management Fellow Designation Control */}
+            <UserFellowToggle
+              userId={user!.id}
+              initialIsFellow={Boolean(user!.isFellow)}
+              userEmail={user!.email}
+            />
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as UserDetailTabKey)}>

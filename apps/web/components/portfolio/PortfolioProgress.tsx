@@ -87,7 +87,7 @@ export function PortfolioProgress({ progress }: PortfolioProgressProps) {
             {progressPercentage}%
           </div>
           <p className="text-[11px] text-muted-foreground leading-tight">
-            Verified build-time AST lesson completions.
+            Tracked lesson completions across curriculum.
           </p>
         </div>
       </div>

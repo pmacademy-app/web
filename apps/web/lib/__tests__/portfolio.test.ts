@@ -35,11 +35,10 @@ describe('Public Portfolio Unit Test Suite', () => {
   })
 
   describe('Person Schema JSON-LD Generation', () => {
-    it('generatePersonJsonLd generates valid schema.org Person structured data', () => {
+    it('generatePersonJsonLd generates valid schema.org Person structured data without unsupported jobTitle or worksFor', () => {
       const jsonLd = generatePersonJsonLd({
         name: 'Alex Rivera',
         username: 'arivera',
-        title: 'Senior PM',
         bio: 'Product Manager building SaaS platforms.',
         avatarUrl: 'https://example.com/avatar.jpg',
         linkedinUrl: 'https://linkedin.com/in/arivera',
@@ -50,10 +49,25 @@ describe('Public Portfolio Unit Test Suite', () => {
       expect(jsonLd['@context']).toBe('https://schema.org')
       expect(jsonLd['@type']).toBe('Person')
       expect(jsonLd.name).toBe('Alex Rivera')
-      expect(jsonLd.jobTitle).toBe('Senior PM')
       expect(jsonLd.url).toBe('https://prodily.adityagangwani.me/p/arivera')
+      expect(jsonLd.worksFor).toBeUndefined()
+      expect(jsonLd.jobTitle).toBeUndefined()
       expect(Array.isArray(jsonLd.sameAs)).toBe(true)
       expect((jsonLd.sameAs as string[]).length).toBe(2)
+    })
+
+    it('generatePersonJsonLd uses factual fallback description without verified claims when bio is missing', () => {
+      const jsonLd = generatePersonJsonLd({
+        name: 'Jordan Lee',
+        username: 'jordanl',
+        bio: null,
+        siteOrigin: 'https://prodily.adityagangwani.me',
+      })
+
+      expect(jsonLd.description).toBe("Jordan Lee's Product Management portfolio and skill radar on Prodily PM Academy.")
+      expect((jsonLd.description as string).toLowerCase()).not.toContain('verified')
+      expect(jsonLd.worksFor).toBeUndefined()
+      expect(jsonLd.jobTitle).toBeUndefined()
     })
   })
 

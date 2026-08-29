@@ -435,6 +435,7 @@ export class AdminConsoleService {
       name?: string
       username?: string
       is_admin?: boolean
+      is_fellow?: boolean
       total_xp?: number
       level?: number
       current_streak?: number
@@ -641,6 +642,7 @@ export class AdminConsoleService {
       username: u?.username || null,
       role: u?.is_admin ? 'Admin' : 'Learner',
       isAdmin: Boolean(u?.is_admin),
+      isFellow: Boolean(u?.is_fellow),
       isVerified,
       emailConfirmedAt,
       totalXp: u?.total_xp || 0,
@@ -898,6 +900,22 @@ export class AdminConsoleService {
     type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
     const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
       .update({ is_admin: makeAdmin })
+      .eq('id', targetUserId)
+
+    return !error
+  }
+
+  /**
+   * Toggles the fellow status of a target user.
+   *
+   * Note: the `users` table has no `updated_at` column, so the update payload
+   * only touches `is_fellow`.
+   */
+  public static async toggleUserFellowStatus(targetUserId: string, isFellow: boolean): Promise<boolean> {
+    const supabase = createServiceRoleClient()
+    type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
+    const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
+      .update({ is_fellow: isFellow })
       .eq('id', targetUserId)
 
     return !error

@@ -74,7 +74,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                 lineHeight: 1.5,
               }}
             >
-              This verified Product Management learning portfolio is private or restricted.
+              This Product Management learning portfolio is private or restricted.
             </p>
             <div
               style={{
@@ -85,7 +85,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                 letterSpacing: '0.05em',
               }}
             >
-              {BRAND.product.toUpperCase()} · VERIFIED LEARNING PLATFORM
+              {BRAND.product.toUpperCase()} · LEARNING PLATFORM
             </div>
           </div>
         ),
@@ -167,16 +167,16 @@ export async function GET(request: Request, { params }: RouteProps) {
                 gap: '8px',
                 padding: '6px 14px',
                 borderRadius: '9999px',
-                backgroundColor: 'rgba(99, 102, 241, 0.15)',
-                border: '1px solid rgba(99, 102, 241, 0.35)',
-                color: '#818cf8',
+                backgroundColor: user.isFellow ? 'rgba(16, 185, 129, 0.15)' : 'rgba(99, 102, 241, 0.15)',
+                border: user.isFellow ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid rgba(99, 102, 241, 0.35)',
+                color: user.isFellow ? '#34d399' : '#818cf8',
                 fontSize: '14px',
                 fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
               }}
             >
-              ✓ Verified Proof-of-Work
+              {user.isFellow ? 'PM Fellow at Prodily' : 'Product Portfolio'}
             </div>
           </div>
 
@@ -239,6 +239,18 @@ export async function GET(request: Request, { params }: RouteProps) {
                 >
                   {user.name}
                 </h1>
+                {user.isFellow && (
+                  <div
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      color: '#34d399',
+                      marginTop: '2px',
+                    }}
+                  >
+                    Product Management Fellow at Prodily
+                  </div>
+                )}
                 <div
                   style={{
                     display: 'flex',
@@ -261,7 +273,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                       border: '1px solid rgba(168, 85, 247, 0.3)',
                     }}
                   >
-                    Level {user.levelInfo.level} · {user.levelInfo.title}
+                    Level {user.levelInfo.level} · {user.totalXp.toLocaleString()} XP
                   </span>
                 </div>
               </div>
@@ -347,7 +359,7 @@ export async function GET(request: Request, { params }: RouteProps) {
               }}
             >
               <span style={{ fontSize: '13px', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>
-                Proof-of-Work Projects
+                Applied Projects
               </span>
               <span style={{ fontSize: '26px', fontWeight: 900, color: '#10b981' }}>
                 {capstones.length} Capstones

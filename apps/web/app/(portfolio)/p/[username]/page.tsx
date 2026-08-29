@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getPublicPortfolioData, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
-import { generatePersonJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
+import { generateProfilePageJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero'
 import { PortfolioSkillRadar } from '@/components/portfolio/PortfolioSkillRadar'
 import { PortfolioProgress } from '@/components/portfolio/PortfolioProgress'
@@ -31,14 +31,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const { name, bio, levelInfo, totalXp } = portfolio.user
+  const { name, bio, isFellow } = portfolio.user
   const shareUrl = formatPortfolioShareUrl(SITE_ORIGIN, username)
   const ogImageUrl = `${SITE_ORIGIN}/api/og/portfolio/${username}`
 
-  const metaTitle = `${name}'s PM Portfolio & Skill Radar`
-  const metaDesc = bio
-    ? `${name} — ${levelInfo.title} (${totalXp} XP). ${bio}`
-    : `Explore ${name}'s verified Product Management portfolio, continuous skill radar, and applied module capstones on ${BRAND.fullName}.`
+  const metaTitle = isFellow
+    ? `${name} — Product Management Fellow at Prodily | Portfolio`
+    : `${name} — Product Portfolio`
+
+  const metaDesc = isFellow
+    ? (bio
+        ? `${name} — Product Management Fellow at Prodily. ${bio}`
+        : `${name} — Product Management Fellow at Prodily. Explore applied Product Management capstones, continuous skill radar, and case studies on ${BRAND.fullName}.`)
+    : (bio
+        ? `${name}'s Product Management portfolio and applied capstones on ${BRAND.fullName}. ${bio}`
+        : `Explore ${name}'s Product Management portfolio, continuous skill radar, and applied case studies on ${BRAND.fullName}.`)
 
   return {
     title: metaTitle,
@@ -60,7 +67,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: `${name}'s Verified PM Portfolio & Skill Radar`,
+          alt: metaTitle,
         },
       ],
     },
@@ -106,17 +113,17 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
   const { user, progress, skillRadar, capstones, featuredCapstone } = portfolio
   const layout = user.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT
 
-  // Generate Person Schema JSON-LD
-  const personJsonLd = generatePersonJsonLd({
+  // Generate ProfilePage + Person Schema JSON-LD
+  const profilePageJsonLd = generateProfilePageJsonLd({
     name: user.name,
     username: user.username,
-    title: user.levelInfo.title,
     bio: user.bio,
     avatarUrl: user.avatarUrl,
     linkedinUrl: user.linkedinUrl,
     githubUrl: user.githubUrl,
     websiteUrl: user.websiteUrl,
     siteOrigin: SITE_ORIGIN,
+    isFellow: user.isFellow,
   })
 
   // Dynamic section renderer for user-customized order
@@ -147,10 +154,10 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground py-8 md:py-12 px-4">
-      {/* Schema.org Person Structured Data */}
+      {/* Schema.org ProfilePage & Person Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}
       />
 
       <div className="max-w-5xl mx-auto space-y-8">
@@ -165,10 +172,10 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
         {/* User-Configured Section Layout */}
         {dynamicSections.map(renderSection)}
 
-        {/* Verified Footer Branding */}
+        {/* Footer Branding */}
         <div className="text-center pt-8 border-t border-border/60 text-xs text-muted-foreground space-y-1">
           <p>
-            Verified Product Management Learning Record powered by{' '}
+            Product Management Learning Record powered by{' '}
             <Link href="/" className="font-bold text-primary hover:underline">
               {BRAND.product}
             </Link>

@@ -1,18 +1,22 @@
 import type { MetadataRoute } from 'next'
 import { BRAND } from '@/lib/brand'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
+import { createServiceRoleClient } from '@/lib/supabase'
+import { getPublicPortfolioSitemapEntries } from '@/lib/portfolio-db'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl).replace(/\/$/, '')
 
 /**
- * Build-time sitemap.xml generation.
+ * Dynamic XML sitemap generation.
  *
  * Includes:
  *  - All public marketing pages
  *  - All 90 public lesson preview pages (/lessons/lesson-001 ... /lessons/lesson-090)
+ *  - All publicly accessible user portfolios (/p/[username])
  *
  * Excludes:
- *  - All authenticated app routes (/dashboard, /settings, /admin, /academy, etc.)
+ *  - All private/unconfigured user portfolios (is_portfolio_public: false)
+ *  - All authenticated/admin app routes (/dashboard, /settings, /admin, /academy, etc.)
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const marketingRoutes: MetadataRoute.Sitemap = [
@@ -68,5 +72,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [...marketingRoutes, ...lessonRoutes]
+  let portfolioRoutes: MetadataRoute.Sitemap = []
+  try {
+    const supabase = createServiceRoleClient()
+    const publicPortfolios = await getPublicPortfolioSitemapEntries(supabase)
+    portfolioRoutes = publicPortfolios.map((entry) => ({
+      url: `${siteUrl}/p/${encodeURIComponent(entry.username)}`,
+      lastModified: entry.updatedAt
+        ? new Date(entry.updatedAt)
+        : entry.createdAt
+        ? new Date(entry.createdAt)
+        : new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    }))
+  } catch (portfolioErr) {
+    console.error('[sitemap] Error generating public portfolio routes:', portfolioErr)
+  }
+
+  return [...marketingRoutes, ...lessonRoutes, ...portfolioRoutes]
 }
+

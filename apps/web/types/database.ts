@@ -1731,6 +1731,7 @@ export type Database = {
           goal: string | null
           id: string
           is_admin: boolean
+          is_fellow: boolean
           is_portfolio_public: boolean
           last_streak_date: string | null
           learning_purpose: string | null
@@ -1764,6 +1765,7 @@ export type Database = {
           goal?: string | null
           id: string
           is_admin?: boolean
+          is_fellow?: boolean
           is_portfolio_public?: boolean
           last_streak_date?: string | null
           learning_purpose?: string | null
@@ -1797,6 +1799,7 @@ export type Database = {
           goal?: string | null
           id?: string
           is_admin?: boolean
+          is_fellow?: boolean
           is_portfolio_public?: boolean
           last_streak_date?: string | null
           learning_purpose?: string | null

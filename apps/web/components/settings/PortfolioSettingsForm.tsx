@@ -51,8 +51,8 @@ const SECTION_DESCRIPTIONS: Record<string, { label: string; description: string 
     description: 'Dynamic 6-cluster competency evaluation & score breakdown.',
   },
   capstones: {
-    label: 'Verified Applied Capstones',
-    description: 'Submitted proof-of-work deliverables & retrospectives.',
+    label: 'Applied Capstones',
+    description: 'Submitted applied projects & retrospectives.',
   },
   progress: {
     label: 'Curriculum Progress',
@@ -60,7 +60,7 @@ const SECTION_DESCRIPTIONS: Record<string, { label: string; description: string 
   },
   achievements: {
     label: 'Achievements & Badges',
-    description: 'Verified mastery badges and accredited certificate status.',
+    description: 'Earned milestone badges and curriculum achievement records.',
   },
 }
 

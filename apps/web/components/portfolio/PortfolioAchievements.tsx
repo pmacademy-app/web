@@ -61,7 +61,7 @@ export function PortfolioAchievements({ user, progress, capstonesCount = 0 }: Po
               Achievements & Milestones
             </h2>
             <p className="text-xs text-muted-foreground">
-              Verified level title, study streaks, and earned milestone badges.
+              Curriculum level, study streaks, and earned milestone badges.
             </p>
           </div>
         </div>
@@ -71,10 +71,10 @@ export function PortfolioAchievements({ user, progress, capstonesCount = 0 }: Po
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">
           <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-primary" /> Career Title
+            <Shield className="w-3.5 h-3.5 text-primary" /> Curriculum Tier
           </span>
-          <div className="text-base font-bold text-foreground truncate">{levelInfo.title}</div>
-          <span className="text-[10px] text-primary font-bold">Level {levelInfo.level}</span>
+          <div className="text-base font-bold text-foreground truncate">Level {levelInfo.level} Learner</div>
+          <span className="text-[10px] text-primary font-bold">Tier {levelInfo.level}</span>
         </div>
 
         <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">
@@ -82,7 +82,7 @@ export function PortfolioAchievements({ user, progress, capstonesCount = 0 }: Po
             <Zap className="w-3.5 h-3.5 text-primary" /> Total Experience
           </span>
           <div className="text-xl font-bold text-foreground">{totalXp.toLocaleString()} XP</div>
-          <span className="text-[10px] text-muted-foreground">Ledger Verified</span>
+          <span className="text-[10px] text-muted-foreground">Activity Record</span>
         </div>
 
         <div className="rounded-xl border border-border/80 bg-card/60 p-4 space-y-1">
