@@ -207,7 +207,11 @@ describe('Unit 4: Portfolio Completeness & Sharing Readiness Test Suite', () => 
 
       const projectItem = readiness.items.find((i) => i.id === 'project')
       expect(projectItem?.isComplete).toBe(false)
-      expect(projectItem?.actionAnchor).toBe('setting-featured-capstone')
+      expect(projectItem?.actionAnchor).toBe('featured-capstone-section')
+
+      const avatarItem = readiness.items.find((i) => i.id === 'avatar')
+      expect(avatarItem?.isComplete).toBe(false)
+      expect(avatarItem?.actionAnchor).toBe('setting-avatar-section')
 
       const socialItem = readiness.items.find((i) => i.id === 'social')
       expect(socialItem?.isComplete).toBe(false)

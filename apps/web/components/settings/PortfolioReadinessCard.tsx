@@ -29,7 +29,9 @@ export function PortfolioReadinessCard({
     const el = document.getElementById(anchorId)
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      el.focus()
+      if ('focus' in el && typeof el.focus === 'function') {
+        el.focus()
+      }
     }
   }
 
@@ -108,7 +110,7 @@ export function PortfolioReadinessCard({
                       {item.label}
                     </span>
                     {item.importance === 'essential' && !item.isComplete && (
-                      <span className="text-[9px] uppercase font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
+                      <span className="text-[9px] uppercase font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
                         Required
                       </span>
                     )}
