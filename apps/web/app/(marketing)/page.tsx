@@ -50,7 +50,7 @@ export default async function MarketingPage() {
       <CommunitySection />
       <TestimonialsSection initialTestimonials={publishedTestimonials} />
       <FAQSection />
-      <FinalCTASection showTrustStrip={publishedTestimonials.length === 0} />
+      <FinalCTASection />
     </>
   )
 }
