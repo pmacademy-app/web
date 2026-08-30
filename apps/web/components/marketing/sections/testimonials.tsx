@@ -49,13 +49,6 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
     void loadTestimonials()
   }, [initialTestimonials])
 
-  // 0 testimonials: Do not render full-height section
-  if (!loading && testimonials.length === 0) {
-    return null
-  }
-
-  const isMarquee = testimonials.length >= 3
-
   return (
     <section
       id="testimonials"
@@ -71,11 +64,9 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="text-center mb-12 space-y-4"
         >
-          {isMarquee && (
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold uppercase tracking-wider">
-              <Star className="w-3.5 h-3.5 fill-current" /> Learner Stories & Reviews
-            </div>
-          )}
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold uppercase tracking-wider">
+            <Star className="w-3.5 h-3.5 fill-current" /> Learner Stories & Reviews
+          </div>
           <h2
             id="testimonials-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground"
@@ -90,6 +81,23 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
         {/* Testimonials Display */}
         {loading ? (
           <div className="py-12 text-center text-xs text-muted-foreground">Loading learner reviews...</div>
+        ) : testimonials.length === 0 ? (
+          <div className="p-8 rounded-2xl border border-dashed border-border bg-card/60 text-center max-w-xl mx-auto space-y-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+              <Star className="w-6 h-6" />
+            </div>
+            <h3 className="text-sm font-bold text-foreground">Be One of the First Learners to Submit a Review</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Complete curriculum modules, earn certificates, and share your experience with our community.
+            </p>
+            <button
+              type="button"
+              onClick={() => setModalOpen(true)}
+              className="px-4 py-2 rounded-xl bg-secondary text-foreground text-xs font-bold hover:bg-secondary/80 transition-colors cursor-pointer"
+            >
+              Write First Review
+            </button>
+          </div>
         ) : testimonials.length < 3 ? (
           /* Static Centered Display for 1–2 Reviews (No Duplication) */
           <div className="flex flex-col items-center">
