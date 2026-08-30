@@ -298,19 +298,19 @@ export function AdminInAppNotificationView({
 
         return (
           <div className="flex items-center gap-1.5">
-            {(item.status === 'draft' || item.status === 'scheduled') && (
+            {(item.status === 'draft' || item.status === 'scheduled' || item.status === 'sending' || item.status === 'failed') && (
               <button
                 type="button"
                 disabled={isLoading}
                 onClick={() => handleExecuteNow(item.id)}
                 className="p-1 rounded bg-admin-accent-soft text-admin-accent hover:bg-admin-accent hover:text-admin-accent-fg transition-colors cursor-pointer"
-                title="Send Immediately"
+                title={item.status === 'sending' || item.status === 'failed' ? 'Retry Dispatch' : 'Send Immediately'}
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
             )}
 
-            {(item.status === 'draft' || item.status === 'scheduled' || item.status === 'paused') && (
+            {(item.status === 'draft' || item.status === 'scheduled' || item.status === 'paused' || item.status === 'failed') && (
               <button
                 type="button"
                 disabled={isLoading}
@@ -346,7 +346,7 @@ export function AdminInAppNotificationView({
               </button>
             )}
 
-            {item.status === 'scheduled' && (
+            {(item.status === 'scheduled' || item.status === 'sending' || item.status === 'failed') && (
               <button
                 type="button"
                 disabled={isLoading}
@@ -358,7 +358,7 @@ export function AdminInAppNotificationView({
               </button>
             )}
 
-            {(item.status === 'draft' || item.status === 'cancelled') && (
+            {(item.status === 'draft' || item.status === 'cancelled' || item.status === 'failed') && (
               <button
                 type="button"
                 disabled={isLoading}

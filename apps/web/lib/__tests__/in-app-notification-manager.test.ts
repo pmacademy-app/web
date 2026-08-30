@@ -174,7 +174,7 @@ vi.mock('../admin/user-filter-query', () => {
   return {
     queryUserIds: vi.fn().mockImplementation((filters: any) => {
       let matching = [...mockDb.users]
-      if (filters?.verificationStatus === 'verified') {
+      if (filters?.verificationStatus === 'verified' || filters?.verification === 'verified') {
         matching = matching.filter((u) => u.is_verified)
       }
       return Promise.resolve({
@@ -184,14 +184,14 @@ vi.mock('../admin/user-filter-query', () => {
     }),
     countMatchingUsers: vi.fn().mockImplementation((filters: any) => {
       let matching = [...mockDb.users]
-      if (filters?.verificationStatus === 'verified') {
+      if (filters?.verificationStatus === 'verified' || filters?.verification === 'verified') {
         matching = matching.filter((u) => u.is_verified)
       }
       return Promise.resolve(matching.length)
     }),
     sampleMatchingUsers: vi.fn().mockImplementation((filters: any, limit: number) => {
       let matching = [...mockDb.users]
-      if (filters?.verificationStatus === 'verified') {
+      if (filters?.verificationStatus === 'verified' || filters?.verification === 'verified') {
         matching = matching.filter((u) => u.is_verified)
       }
       return Promise.resolve(matching.slice(0, limit))
@@ -306,6 +306,33 @@ describe('Phase 2 — In-App Notification Manager & Operations', () => {
   })
 
   describe('Execution, Delivery & Idempotency', () => {
+    it('creates and immediately dispatches when status is sending (Send Now flow)', async () => {
+      const broadcast = await InAppManagerService.createBroadcast({
+        title: 'Referrals Are Here: Invite Peers & Earn +50 XP 🎁',
+        body: 'You can now invite peers to Prodily using your personal referral link.',
+        category: 'announcement',
+        priority: 'medium',
+        actionUrl: '/settings?tab=referrals',
+        audience: 'all',
+        status: 'sending',
+      })
+
+      expect(broadcast.id).toBeDefined()
+      expect(broadcast.status).toBe('completed')
+      expect(broadcast.totalTargeted).toBe(3)
+      expect(broadcast.totalDelivered).toBe(3)
+
+      // Verify all 3 learners received the notification
+      expect(mockDb.inAppNotifications.length).toBe(3)
+      const u1 = mockDb.inAppNotifications.find((n) => n.user_id === 'usr-1')
+      expect(u1).toBeDefined()
+      expect(u1?.title).toBe('Referrals Are Here: Invite Peers & Earn +50 XP 🎁')
+      expect(u1?.action_url).toBe('/settings?tab=referrals')
+      expect(u1?.priority).toBe(5) // Medium numeric priority
+      expect(u1?.is_read).toBe(false)
+      expect(u1?.idempotency_key).toBe(`inapp-${broadcast.id}-usr-1`)
+    })
+
     it('executes in-app notification dispatch and creates user inbox rows', async () => {
       const broadcast = await InAppManagerService.createBroadcast({
         title: 'System Maintenance Window',
@@ -333,6 +360,101 @@ describe('Phase 2 — In-App Notification Manager & Operations', () => {
       const updated = await InAppManagerService.getBroadcast(broadcast.id)
       expect(updated?.status).toBe('completed')
       expect(updated?.totalDelivered).toBe(3)
+    })
+
+    it('allows executing and recovering a broadcast stuck in sending status', async () => {
+      // Create draft broadcast
+      const broadcast = await InAppManagerService.createBroadcast({
+        title: 'Recoverable Stalled Broadcast',
+        body: 'Recovering after temporary disruption.',
+        audience: 'all',
+      })
+
+      // Simulate a broadcast record previously left in sending status with 0 delivered
+      mockDb.broadcasts[0].status = 'sending'
+
+      // Execute to recover
+      const res = await InAppManagerService.executeBroadcast(broadcast.id)
+      expect(res.success).toBe(true)
+      expect(res.delivered).toBe(3)
+
+      const recovered = await InAppManagerService.getBroadcast(broadcast.id)
+      expect(recovered?.status).toBe('completed')
+      expect(recovered?.totalDelivered).toBe(3)
+    })
+
+    it('dispatches to individual target user correctly', async () => {
+      const broadcast = await InAppManagerService.createBroadcast({
+        title: 'Personal Welcome',
+        body: 'Welcome to your tailored curriculum.',
+        audience: 'individual',
+        targetUserId: 'usr-2',
+        status: 'sending',
+      })
+
+      expect(broadcast.status).toBe('completed')
+      expect(broadcast.totalDelivered).toBe(1)
+      expect(mockDb.inAppNotifications.length).toBe(1)
+      expect(mockDb.inAppNotifications[0].user_id).toBe('usr-2')
+    })
+
+    it('dispatches to cohort audience members correctly', async () => {
+      mockDb.cohortMembers = [
+        { cohort_id: 'coh-alpha', user_id: 'usr-1' },
+        { cohort_id: 'coh-alpha', user_id: 'usr-3' },
+      ]
+
+      const broadcast = await InAppManagerService.createBroadcast({
+        title: 'Cohort Sync Reminder',
+        body: 'Weekly cohort check-in tomorrow at 4 PM.',
+        audience: 'cohort',
+        targetCohortId: 'coh-alpha',
+        status: 'sending',
+      })
+
+      expect(broadcast.status).toBe('completed')
+      expect(broadcast.totalDelivered).toBe(2)
+      expect(mockDb.inAppNotifications.length).toBe(2)
+      expect(mockDb.inAppNotifications.map((n) => n.user_id)).toEqual(['usr-1', 'usr-3'])
+    })
+
+    it('dispatches to filtered audience correctly', async () => {
+      const broadcast = await InAppManagerService.createBroadcast({
+        title: 'Verified Learners Perk',
+        body: 'Exclusive case study template available.',
+        audience: 'filtered',
+        recipientFilters: { verification: 'verified' },
+        status: 'sending',
+      })
+
+      expect(broadcast.status).toBe('completed')
+      expect(broadcast.totalDelivered).toBe(2) // usr-1 and usr-2 are verified
+      expect(mockDb.inAppNotifications.length).toBe(2)
+      expect(mockDb.inAppNotifications.map((n) => n.user_id)).toEqual(['usr-1', 'usr-2'])
+    })
+
+    it('recalculates read rates dynamically when notifications are read', async () => {
+      const broadcast = await InAppManagerService.createBroadcast({
+        title: 'Read Rate Metric Test',
+        body: 'Testing read count aggregation.',
+        audience: 'all',
+        status: 'sending',
+      })
+
+      expect(broadcast.totalDelivered).toBe(3)
+      expect(broadcast.totalRead).toBe(0)
+      expect(broadcast.readRate).toBe(0)
+
+      // Mark 2 of the 3 notifications as read
+      mockDb.inAppNotifications[0].is_read = true
+      mockDb.inAppNotifications[1].is_read = true
+
+      // Fetch broadcast list
+      const list = await InAppManagerService.listBroadcasts(1, 10)
+      const bcastInList = list.broadcasts.find((b) => b.id === broadcast.id)
+
+      expect(bcastInList?.totalRead).toBe(2)
+      expect(bcastInList?.readRate).toBe(67) // 2/3 = 67%
     })
 
     it('prevents duplicate delivery if broadcast is executed twice', async () => {

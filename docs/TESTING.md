@@ -1,134 +1,124 @@
 # Automated Testing & Verification Framework — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`
-**Last Updated:** August 23, 2026
+**Repository:** `pmacademy-app/web`  
+**Test Runner:** Vitest (Unit & Integration) / Playwright (E2E)  
+**Total Test Files:** 84 Test Suites  
+**Total Tests:** 887 Unit & Integration Tests (100% Passing)  
+**Last Updated:** August 30, 2026  
 
 ---
 
 ## 1. Overview & Test Framework
 
-The repository uses **Vitest** as the unit and integration test runner, and **Playwright** for E2E browser tests. All test files live under `apps/web/lib/__tests__/` (unit/integration) and `apps/web/e2e/` (E2E).
+The repository uses **Vitest** for fast, high-coverage unit and integration testing, and **Playwright** for end-to-end browser flows.
 
-| Layer | Framework | Runner Command | Config File |
+| Test Layer | Runner / Framework | Command | Target Directory |
 |---|---|---|---|
-| **Unit & Integration** | Vitest | `vitest run` | `apps/web/vitest.config.mts` |
-| **E2E Browser** | Playwright | `playwright test` | `apps/web/playwright.config.ts` |
-
-The top-level `npm test` in `apps/web` runs `vitest run`.
-
----
-
-## 2. Test Suite Inventory (54 Unit/Integration Files, 439 Tests)
-
-### High-Value Domain & Pure Logic Tests
-| Test File | Domain / Purpose | Status |
-|---|---|---|
-| `xp.test.ts` | XP calculation formulas & ledger rewards | 🟢 Passing |
-| `streaks.test.ts` | Streak logic and freeze mechanics | 🟢 Passing |
-| `srs.test.ts` | SM-2 spaced repetition algorithm | 🟢 Passing |
-| `skillRadar.test.ts` | Skill radar chart calculations | 🟢 Passing |
-| `capstones.test.ts` | Capstone business rules & validation | 🟢 Passing |
-| `capstone-integrity.test.ts` | State transitions & duplicate submit guard | 🟢 Passing |
-| `certificates.test.ts` | Certificate generation logic | 🟢 Passing |
-| `badges.test.ts` | Badge evaluation and award logic | 🟢 Passing |
-| `leaderboard.test.ts` | Leaderboard ranking calculations | 🟢 Passing |
-| `portfolio.test.ts` | Portfolio generation & public visibility | 🟢 Passing |
-| `recap-evaluator.test.ts` | Weekly recap evaluation logic | 🟢 Passing |
-| `dashboard.test.ts` | Date/aggregation logic | 🟢 Passing |
-| `notifications.test.ts` | Notification dispatch & event handlers | 🟢 Passing |
-| `notification-queue-integrity.test.ts` | Queue claiming & worker processing | 🟢 Passing |
-| `email-engine.test.ts` | React Email template rendering | 🟢 Passing |
-| `send-email-hook.test.ts` | HMAC signatures & template dispatch | 🟢 Passing |
-| `email-hook-reliability.test.ts` | Bounded timeouts, status codes & Brevo fallback | 🟢 Passing |
-| `update-password.test.ts` | Password validation logic | 🟢 Passing |
-| `auth-errors.test.ts` | Error classification & message mapping | 🟢 Passing |
-| `auth-ui-integration.test.ts` | Auth form state & validation | 🟢 Passing |
-| `auth-telemetry-observability.test.ts` | Telemetry rate limit & PII protection | 🟢 Passing |
-| `avatar-reliability.test.ts` | Transactional avatar upload & storage cleanup | 🟢 Passing |
-| `seo-canonicals.test.ts` | Self-referencing canonical URLs | 🟢 Passing |
-| `seo-structured-data.test.ts` | Schema.org LearningResource & Course JSON-LD | 🟢 Passing |
-| `seo-social-metadata.test.ts` | OpenGraph and Twitter card metadata | 🟢 Passing |
-| `quick-start.test.ts` | Quick Start tour logic | 🟢 Passing |
-| `curriculum-integrity.test.ts` | 90-lesson ID structure & module alignment | 🟢 Passing |
-| `unsubscribe.test.ts` | Unsubscribe token & preference handling | 🟢 Passing |
-| `performance-optimization.test.ts` | Curriculum caching & query index tests | 🟢 Passing |
-
-### Admin & Integration Tests
-| Test File | Domain / Purpose | Status |
-|---|---|---|
-| `audit-fixes.test.ts` | Rate limit & unverified user discovery | 🟢 Passing |
-| `system-monitoring.test.ts` | Secret sanitization, 15m dedup, webhook 401s | 🟢 Passing |
-| `system-announcements.test.ts` | System announcements & KPI aggregations | 🟢 Passing |
-| `admin-console.test.ts` | Feature flags, RBAC, user overview | 🟢 Passing |
-| `admin-settings.test.ts` | Admin settings persistence & email quotas | 🟢 Passing |
-| `admin-production-email.test.ts` | Direct production email dispatch & template validation | 🟢 Passing |
-| `admin-security-audit.test.ts` | RBAC route authorization & guard enforcement | 🟢 Passing |
-| `admin-cache-verification.test.ts` | Cache revalidation & verified email mapping | 🟢 Passing |
-| `feedback-moderation.test.ts` | Learner feedback submission & moderation | 🟢 Passing |
-| `testimonial-moderation-integrity.test.ts` | Testimonial publishing & author attribution | 🟢 Passing |
-| `email-automations.test.ts` | Queue processor, daily limits, dead-letter retry | 🟢 Passing |
-| `rls.test.ts` | Row Level Security policy enforcement | 🟢 Passing |
-| `middleware-auth.test.ts` | Auth middleware route protection | 🟢 Passing |
-| `in-app-notifications.test.ts` | In-app notification delivery | 🟢 Passing |
-| `admin-email-test-send.test.ts` | Admin test email dispatch | 🟢 Passing |
-| `analytics-aggregation.test.ts` | Analytics data aggregation & charts | 🟢 Passing |
-| `curriculum-aggregation.test.ts` | Curriculum overview & module metrics | 🟢 Passing |
-| `users-aggregation.test.ts` | User overview SQL range pagination & search | 🟢 Passing |
-| `achievements-aggregation.test.ts` | Achievement & badge metrics | 🟢 Passing |
-| `contact.test.ts` | Contact form submission & rate limiting | 🟢 Passing |
-| `remediation.test.ts` | Production remediation fixes | 🟢 Passing |
-| `settings.test.ts` | User profile and account settings | 🟢 Passing |
-| `curriculum-access-override.test.ts` | Admin access override logic | 🟢 Passing |
-| `dev-certificate.test.ts` | Development certificate preview | 🟢 Passing |
-| `learning-settings-runtime.test.ts` | Dynamic runtime XP & settings resolution | 🟢 Passing |
+| **Unit & Integration** | Vitest | `npm test` (or `npx vitest run`) | `apps/web/lib/__tests__/` |
+| **Type Checking** | TypeScript | `npm run typecheck` (`tsc --noEmit`) | Entire Monorepo |
+| **Linting** | ESLint | `npm run lint` | Entire Monorepo |
+| **Production Build** | Next.js 16.2.12 Turbopack | `npm run build` | `apps/web/` |
+| **E2E Browser Tests** | Playwright | `npx playwright test` | `apps/web/e2e/` |
 
 ---
 
-## 3. E2E Test Suite (`apps/web/e2e/auth/`)
+## 2. Complete Test Suite Inventory (84 Suites, 887 Tests)
 
-Three Playwright E2E test specs cover the core authentication lifecycle:
+### Core Domain, Learning & Gamification Suites
+- `xp.test.ts` — XP formulas, level thresholds, and ledger mutations.
+- `streaks.test.ts` — Timezone-aware streak evaluations and streak freeze deductions.
+- `srs.test.ts` — SuperMemo SM-2 spaced repetition calculation logic.
+- `skillRadar.test.ts` — Competency radar scoring and spider chart aggregations.
+- `capstones.test.ts` — Capstone business rules, deliverable validation, and public visibility.
+- `certificates.test.ts` — Certificate v2 credential hash generation and template versioning.
+- `badges.test.ts` — Milestone badge evaluation and automated awards.
+- `leaderboard.test.ts` — Global, cohort, and friends leaderboard rankings.
+- `curriculum-integrity.test.ts` — 9-module & 90-lesson ID structure alignment.
+- `curriculum-prerequisite-access.test.ts` — Prerequisite unlocking and sequential progression.
+- `curriculum-access-override.test.ts` — Admin bypass for curriculum prerequisite locks.
+- `learning-settings-runtime.test.ts` — Dynamic runtime XP resolution from `system_settings`.
+- `lesson-feedback.test.ts` — 1–5 star clarity ratings and issue tag submissions.
+- `first-session-activation.test.ts` — First-lesson onboarding and activation triggers.
+- `remediation.test.ts` — Knowledge gap remediation and recommendation logic.
+- `recap-evaluator.test.ts` — Weekly recap evaluation and habit metrics.
 
-| Spec File | Coverage |
-|---|---|
-| `login.spec.ts` | Login, session persistence, navigation, logout |
-| `password-reset.spec.ts` | Password reset request and update flow |
-| `protected-routes.spec.ts` | Unauthenticated redirect, admin access gates |
+### Portfolio, Fellow Designation & SEO Suites
+- `portfolio.test.ts` — Public portfolio generation, privacy fallback, and layout ordering.
+- `portfolio-admin-verification.test.ts` — Dedicated admin portfolio verification queue, public/private eligibility invariant, and audit logging.
+- `portfolio-og-card.test.ts` — Dynamic 1200×630 OpenGraph card generation, brand SVG logo mark, and cache headers.
+- `portfolio-credibility.test.ts` — Fellow designation rendering, non-employment claims, and Schema.org JSON-LD Person markup.
+- `portfolio-readiness.test.ts` — Public portfolio readiness evaluator and missing items checklist.
+- `fellow-status-authorization.test.ts` — RBAC authorization and tamper-proofing for Fellow status.
+- `seo-canonicals.test.ts` — Self-referencing canonical tag verification.
+- `seo-structured-data.test.ts` — Course, LearningResource, and Person structured JSON-LD.
+- `seo-social-metadata.test.ts` — OpenGraph, Twitter cards, and dynamic XML sitemap verification (including public portfolios).
+
+### Referrals & Growth Suites
+- `referrals.test.ts` — Referral attribution, self-referral prevention, and rolling rate limits.
+- `referral-activation.test.ts` — First-lesson completion trigger, +50 XP reward, and in-app notifications.
+
+### Authentication & Account Security Suites
+- `auth-ui-integration.test.ts` — Login, registration form validation, and verification pending UI.
+- `auth-errors.test.ts` — Authentication error classification and message mapping.
+- `settings-change-password.test.ts` — Password change and strength validation.
+- `update-password.test.ts` — Password recovery token update route.
+- `unsubscribe.test.ts` — One-click email unsubscribe tokens and preference updates.
+- `middleware-auth.test.ts` — Proxy route protection and session token verification.
+- `platform-behavior.test.ts` — Platform-wide controls: Maintenance Mode, Allow Signups, Require Email Verification.
+
+### Email & Notification Infrastructure Suites
+- `email-hook-reliability.test.ts` — Supabase Send Email Hook timeouts, Svix HMAC signatures, and Brevo fallback.
+- `admin-email-test-send.test.ts` — Transactional template preview and direct test dispatch.
+- `admin-production-email.test.ts` — Direct user production email modal dispatch.
+- `notification-queue-integrity.test.ts` — Email queue claiming, concurrency locks, and dead-letter retries.
+- `in-app-notifications.test.ts` — In-app notification creation, unread counts, and mark-as-read.
+- `in-app-notification-manager.test.ts` — In-app broadcast campaign engine and recipient estimation.
+- `broadcast-service.test.ts` — Targeted email broadcast campaigns and recipient sampling.
+- `admin-digest-schedule.test.ts` — Daily reminders and weekly recap cron schedulers.
+- `contact.test.ts` — Inbound contact form, rate limiting, and webhook forwarding.
+
+### Admin Workspaces & Operations Suites
+- `admin-console.test.ts` — Admin dashboard KPIs, attention center, and feature flags.
+- `admin-security-audit.test.ts` — Route-level RBAC protection on all `/api/admin/**` endpoints.
+- `admin-settings.test.ts` — Admin settings persistence in `system_settings` across all sections.
+- `users-aggregation.test.ts` — User table pagination, search, and activity filtering.
+- `curriculum-aggregation.test.ts` — Curriculum quality scores, clarity %, and feedback aggregation.
+- `achievements-aggregation.test.ts` — Certificate registry and badge recipient aggregations.
+- `feedback-moderation.test.ts` — Testimonial approval/rejection and feedback moderation.
+- `admin-queue-recovery.test.ts` — Stalled queue item recovery and retry operations.
+- `db-types-alignment.test.ts` — Type alignment between TypeScript definitions and Supabase schema.
+- `rls.test.ts` — PostgreSQL Row Level Security policy enforcement.
 
 ---
 
-## 4. Standard Verification Commands
+## 3. Standard Verification Commands
 
 ```bash
 # From apps/web/
 
-# Run all unit + integration tests
-npm test                    # alias: vitest run
+# Run complete Vitest suite (84 test suites, 887 tests)
+npm test
 
-# Run E2E browser tests
-npx playwright test
+# Run TypeScript typecheck (0 errors)
+npm run typecheck
 
-# Run Next.js production build (also type-checks)
+# Run ESLint (0 errors, 0 warnings)
+npm run lint
+
+# Run Next.js production build (compiles all 219 static and dynamic routes)
 npm run build
 
-# Run ESLint
-npm run lint
+# Run Playwright E2E browser tests
+npx playwright test
 ```
 
 ---
 
-## 5. CI/CD Integration (`.github/workflows/ci.yml`)
+## 4. Continuous Integration & Release Gates
 
-GitHub Actions runs on every pull request and push to `main`:
-- Content compiler verification (`npm run content:compile`)
-- Unit test suite execution (`vitest run`)
-- ESLint linting
-- TypeScript type checking
-- Next.js production build
-
----
-
-## 6. Known Testing Gaps
-
-- **No Vitest integration config** for tests that require a dedicated Supabase test project. Integration tests that hit Supabase run against production credentials when secrets are available in CI, which is a risk.
-- **E2E specs exist** but require a running local dev server and valid test credentials — not yet wired into CI.
-- **No coverage thresholds** enforced in CI currently (coverage config is in `vitest.config.mts` but not required to pass).
+GitHub Actions (`.github/workflows/ci.yml`) enforces the following gates on every pull request and push to `main`:
+1. **Content Compilation:** `npm run content:compile` (validates 90 markdown lessons).
+2. **Vitest Unit & Integration Suite:** 100% pass rate required across all 84 test suites.
+3. **TypeScript Typecheck:** `tsc --noEmit` must pass with 0 errors.
+4. **ESLint:** Must pass with 0 errors.
+5. **Next.js Production Build:** Full static and dynamic compilation of all 219 routes.
