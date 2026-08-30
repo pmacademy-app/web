@@ -415,7 +415,9 @@ export class InAppManagerService {
   }
 
   /**
-   * Updates an existing draft or scheduled in-app notification.
+   * Updates an existing in-app notification (Draft, Scheduled, Paused, or Delivered/Completed).
+   * When modifying a delivered broadcast, changes to title/body/category/actionUrl/priority
+   * are synchronized to all matching rows in learner inboxes.
    */
   static async updateBroadcast(
     id: string,
@@ -425,8 +427,8 @@ export class InAppManagerService {
     const existing = await this.getBroadcast(id)
     if (!existing) throw new Error('In-app broadcast not found.')
 
-    if (!['draft', 'scheduled', 'paused'].includes(existing.status)) {
-      throw new Error(`Cannot modify broadcast in '${existing.status}' status.`)
+    if (existing.status === 'cancelled') {
+      throw new Error(`Cannot modify cancelled broadcast.`)
     }
 
     const updatePayload: Record<string, unknown> = {
@@ -440,10 +442,18 @@ export class InAppManagerService {
       updatePayload.priority = mapPriorityLevelToNumber(input.priority)
     }
     if (input.actionUrl !== undefined) updatePayload.action_url = input.actionUrl?.trim() || null
-    if (input.audience !== undefined) updatePayload.audience = input.audience
-    if (input.targetUserId !== undefined) updatePayload.target_user_id = input.targetUserId
-    if (input.targetCohortId !== undefined) updatePayload.target_cohort_id = input.targetCohortId
-    if (input.recipientFilters !== undefined) updatePayload.recipient_filters = input.recipientFilters
+    if (input.audience !== undefined && ['draft', 'scheduled'].includes(existing.status)) {
+      updatePayload.audience = input.audience
+    }
+    if (input.targetUserId !== undefined && ['draft', 'scheduled'].includes(existing.status)) {
+      updatePayload.target_user_id = input.targetUserId
+    }
+    if (input.targetCohortId !== undefined && ['draft', 'scheduled'].includes(existing.status)) {
+      updatePayload.target_cohort_id = input.targetCohortId
+    }
+    if (input.recipientFilters !== undefined && ['draft', 'scheduled'].includes(existing.status)) {
+      updatePayload.recipient_filters = input.recipientFilters
+    }
     if (input.scheduledAt !== undefined) {
       updatePayload.scheduled_at = input.scheduledAt
       if (input.scheduledAt && existing.status === 'draft') {
@@ -461,6 +471,25 @@ export class InAppManagerService {
 
     if (error || !data) {
       throw new Error(error?.message || 'Failed to update in-app broadcast')
+    }
+
+    // If the notification was already delivered, synchronize changes to learner inboxes
+    if (existing.totalDelivered > 0) {
+      const notifPatch: Record<string, unknown> = {}
+      if (input.title !== undefined) notifPatch.title = input.title.trim()
+      if (input.body !== undefined) notifPatch.body = input.body.trim()
+      if (input.category !== undefined) notifPatch.category = input.category
+      if (input.actionUrl !== undefined) notifPatch.action_url = input.actionUrl?.trim() || null
+      if (input.priority !== undefined) {
+        notifPatch.priority = mapPriorityLevelToNumber(input.priority)
+      }
+
+      if (Object.keys(notifPatch).length > 0) {
+        await supabase
+          .from('in_app_notifications')
+          .update(notifPatch as never)
+          .like('idempotency_key', `inapp-${id}-%`)
+      }
     }
 
     return mapRowToItem(data as unknown as Record<string, unknown>)

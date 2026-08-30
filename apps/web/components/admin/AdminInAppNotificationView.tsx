@@ -310,13 +310,13 @@ export function AdminInAppNotificationView({
               </button>
             )}
 
-            {(item.status === 'draft' || item.status === 'scheduled' || item.status === 'paused' || item.status === 'failed') && (
+            {item.status !== 'cancelled' && (
               <button
                 type="button"
                 disabled={isLoading}
                 onClick={() => setEditingBroadcast(item)}
                 className="p-1 rounded text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-raised transition-colors cursor-pointer"
-                title="Edit"
+                title="Edit Notification"
               >
                 <Edit2 className="w-3.5 h-3.5" />
               </button>
