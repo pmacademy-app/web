@@ -108,9 +108,13 @@ All optimizations have been applied directly to the codebase on the dedicated im
 
 ---
 
-## 5. Quantitative Impact Assessment
+## 5. Quantitative Impact Assessment (Estimated Frequency Reductions)
 
-| Surface / Request Stream | Baseline Frequency | Optimized Frequency | Reduction |
+> **Important Distinction:** The percentages below represent **estimated client request and serverless invocation-frequency reductions** based on code analysis and architecture changes, NOT measured Vercel Fluid Active CPU reductions.
+> 
+> *Actual Vercel invocation and Fluid Active CPU impact requires production measurement after deployment.*
+
+| Surface / Request Stream | Baseline Frequency | Optimized Frequency | Estimated Request Reduction |
 | :--- | :--- | :--- | :--- |
 | Feedback Dwell + Check | 4 req / min (30s POST + GET) | 1 req / min (60s POST only, 0 after 1hr) | **75% – 100%** |
 | Background Tab Feedback Polling | 4 req / min when tab hidden | 0 req / min (paused when hidden) | **100%** |
@@ -120,8 +124,41 @@ All optimizations have been applied directly to the codebase on the dedicated im
 
 ---
 
-## 6. Git Status & Commit Verification
+## 6. Final Verification Pass
+
+During the final verification pass, the following critical architecture paths were verified:
+
+1. **Notification Request Sequence**:
+   - Trace on opening drawer:
+     ```text
+     User opens drawer
+             ↓
+     Drawer loads displayed notifications (GET /api/notifications)
+             ↓
+     Unread displayed IDs identified
+             ↓
+     One batch mark-read request (PATCH /api/notifications { action: 'mark_read', notificationIds: [...] })
+             ↓
+     Local state and parent bell count updated via callback (onUnreadCountChange(0))
+             ↓
+     No unnecessary immediate Bell refetch or duplicate query cascade
+     ```
+   - Bell uses `drawerOpenRef` so that opening/closing the drawer does not re-trigger Bell polling or duplicate fetches.
+2. **Displayed-Only Mark-Read Scoping & Authorization**:
+   - Only notifications loaded and displayed in the drawer are marked as read.
+   - Already-read notifications are filtered out before sending.
+   - Non-displayed notifications and notifications on other pages remain unread in the database.
+   - Database mutations in `PATCH /api/notifications` strictly enforce `.eq('user_id', authUser.id)`, preventing cross-user notification updates.
+3. **Unread Count Synchronization & Graceful Error Handling**:
+   - Badge count zeroed/updated optimistically without tearing down server state on network errors.
+   - Individual item mark-read (`notificationId`) and `mark_all_read` actions are preserved.
+4. **Production Measurement Status**:
+   - All improvements are local to the codebase on `fixes/implementation-plan`. Full telemetry and CPU verification will be performed upon post-deployment staging.
+
+---
+
+## 7. Git Status & Commit Verification
 
 - **Branch**: `fixes/implementation-plan`
-- **Commit Message**: `perf: reduce client polling and duplicate requests`
 - **Push Policy**: Strict local commit only. **No remote push performed.**
+

@@ -11,6 +11,12 @@ export function NotificationBell() {
   const bellContainerRef = useRef<HTMLDivElement>(null)
   const triggerButtonRef = useRef<HTMLButtonElement>(null)
 
+  const drawerOpenRef = useRef<boolean>(false)
+
+  useEffect(() => {
+    drawerOpenRef.current = drawerOpen
+  }, [drawerOpen])
+
   const lastFetchTimeRef = useRef<number>(0)
   const isFetchingRef = useRef<boolean>(false)
 
@@ -23,7 +29,7 @@ export function NotificationBell() {
       // Skip background polling if document is hidden unless forced
       if (!force && typeof document !== 'undefined' && document.hidden) return
       // Skip if drawer is open and managing its own state
-      if (drawerOpen && !force) return
+      if (drawerOpenRef.current && !force) return
 
       isFetchingRef.current = true
       try {
@@ -53,7 +59,7 @@ export function NotificationBell() {
 
     // Visibility change handler: refresh on tab focus if > 60s since last fetch
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && !drawerOpenRef.current) {
         const elapsed = Date.now() - lastFetchTimeRef.current
         if (elapsed >= 60000) {
           void loadState(true)
@@ -69,7 +75,7 @@ export function NotificationBell() {
       clearInterval(interval)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [drawerOpen])
+  }, [])
 
   const handleCloseDrawer = () => {
     setDrawerOpen(false)
