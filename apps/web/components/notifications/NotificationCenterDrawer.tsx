@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { X, Bell, RefreshCw, Layers, Settings, AlertTriangle } from 'lucide-react'
 import { NotificationItemCard, type NotificationItem } from './NotificationItemCard'
@@ -56,43 +56,61 @@ export function NotificationCenterDrawer({
     }
   }, [isOpen, onClose, containerRef])
 
-  const fetchNotifications = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+  const markDisplayedAsRead = async (unreadItems: NotificationItem[]) => {
+    if (unreadItems.length === 0) return
+    const ids = unreadItems.map((i) => i.id)
+
     try {
-      const res = await fetch('/api/notifications')
-      const data = await res.json()
-      if (data.success) {
-        setItems(data.items || [])
-        setUnreadCount(data.unreadCount || 0)
-        onUnreadCountChange?.(data.unreadCount || 0)
-        setGrouped(data.grouped || { today: [], yesterday: [], thisWeek: [], earlier: [] })
-      } else {
-        setError(data.error || 'Failed to fetch notifications.')
+      const res = await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mark_read', notificationIds: ids }),
+      })
+      if (!res.ok) {
+        console.warn('[NotificationCenterDrawer] Non-fatal: failed to persist batch read state in DB')
       }
     } catch (err) {
-      console.error('[NotificationCenterDrawer] Error fetching notifications:', err)
-      setError('Unable to load notifications. Please try again.')
-    } finally {
-      setLoading(false)
+      console.warn('[NotificationCenterDrawer] Non-fatal error marking batch read in DB:', err)
     }
-  }, [onUnreadCountChange])
+  }
 
   useEffect(() => {
     let mounted = true
     if (isOpen) {
       const load = async () => {
-        setLoading(true)
-        setError(null)
         try {
           const res = await fetch('/api/notifications')
           const data = await res.json()
-          if (mounted && data.success) {
-            setItems(data.items || [])
-            setUnreadCount(data.unreadCount || 0)
-            onUnreadCountChange?.(data.unreadCount || 0)
-            setGrouped(data.grouped || { today: [], yesterday: [], thisWeek: [], earlier: [] })
-          } else if (mounted) {
+          if (!mounted) return
+
+          if (data.success) {
+            const rawItems: NotificationItem[] = data.items || []
+            const unreadItems = rawItems.filter((i) => !i.isRead)
+
+            // Optimistically mark displayed items as read in the drawer
+            const markedItems = rawItems.map((i) => ({ ...i, isRead: true }))
+            setItems(markedItems)
+
+            const updateGroupList = (list: NotificationItem[]) =>
+              list.map((item) => ({ ...item, isRead: true }))
+
+            const rawGrouped = data.grouped || { today: [], yesterday: [], thisWeek: [], earlier: [] }
+            setGrouped({
+              today: updateGroupList(rawGrouped.today),
+              yesterday: updateGroupList(rawGrouped.yesterday),
+              thisWeek: updateGroupList(rawGrouped.thisWeek),
+              earlier: updateGroupList(rawGrouped.earlier),
+            })
+
+            // Zero out unread count for displayed items
+            setUnreadCount(0)
+            onUnreadCountChange?.(0)
+
+            // Persist read state in DB for displayed unread items
+            if (unreadItems.length > 0) {
+              void markDisplayedAsRead(unreadItems)
+            }
+          } else {
             setError(data.error || 'Failed to fetch notifications.')
           }
         } catch (err) {
@@ -109,7 +127,48 @@ export function NotificationCenterDrawer({
     }
   }, [isOpen, onUnreadCountChange])
 
-  // WhatsApp-style instant auto-read: Optimistic local state update + async API patch
+  const refreshNotifications = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/notifications')
+      const data = await res.json()
+      if (data.success) {
+        const rawItems: NotificationItem[] = data.items || []
+        const unreadItems = rawItems.filter((i) => !i.isRead)
+
+        const markedItems = rawItems.map((i) => ({ ...i, isRead: true }))
+        setItems(markedItems)
+
+        const updateGroupList = (list: NotificationItem[]) =>
+          list.map((item) => ({ ...item, isRead: true }))
+
+        const rawGrouped = data.grouped || { today: [], yesterday: [], thisWeek: [], earlier: [] }
+        setGrouped({
+          today: updateGroupList(rawGrouped.today),
+          yesterday: updateGroupList(rawGrouped.yesterday),
+          thisWeek: updateGroupList(rawGrouped.thisWeek),
+          earlier: updateGroupList(rawGrouped.earlier),
+        })
+
+        setUnreadCount(0)
+        onUnreadCountChange?.(0)
+
+        if (unreadItems.length > 0) {
+          void markDisplayedAsRead(unreadItems)
+        }
+      } else {
+        setError(data.error || 'Failed to fetch notifications.')
+      }
+    } catch (err) {
+      console.error('[NotificationCenterDrawer] Error fetching notifications:', err)
+      setError('Unable to load notifications. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Individual instant auto-read: Optimistic local state update + async API patch
   const handleMarkRead = async (id: string) => {
     // Check if item is already read to guarantee idempotency
     const existing = items.find((i) => i.id === id)
@@ -144,11 +203,9 @@ export function NotificationCenterDrawer({
       })
       if (!res.ok) {
         console.warn('[NotificationCenterDrawer] Server failed to persist read state, resyncing')
-        void fetchNotifications()
       }
     } catch (err) {
       console.error('[NotificationCenterDrawer] Error marking read in DB:', err)
-      void fetchNotifications()
     }
   }
 
@@ -220,7 +277,7 @@ export function NotificationCenterDrawer({
             <p className="text-xs text-foreground font-medium max-w-xs">{error}</p>
             <button
               type="button"
-              onClick={() => void fetchNotifications()}
+              onClick={() => void refreshNotifications()}
               className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary font-bold text-xs hover:bg-primary/20 transition-colors cursor-pointer"
             >
               Retry
@@ -332,7 +389,7 @@ export function NotificationCenterDrawer({
 
         <button
           type="button"
-          onClick={() => void fetchNotifications()}
+          onClick={() => void refreshNotifications()}
           aria-label="Refresh notifications"
           title="Refresh notifications"
           className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-lg transition-colors cursor-pointer"
