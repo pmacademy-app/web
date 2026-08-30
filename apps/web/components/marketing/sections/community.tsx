@@ -33,8 +33,8 @@ export function CommunitySection() {
           >
             Built for consistency.
           </h2>
-          <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
-            Learn alongside others who are building product judgment. Cohort-based leaderboards, structured discussion, and peer feedback.
+          <p className="text-body-lg text-locked max-w-[640px] mx-auto leading-relaxed">
+            Structured discussion, peer review on your assignments and capstones, and opt-in cohort leaderboards focused on consistency, not competition. Community features are rolling out gradually as the learner base grows.
           </p>
         </motion.div>
 
@@ -62,17 +62,6 @@ export function CommunitySection() {
             )
           })}
         </div>
-
-        {/* Honest Framing Note */}
-        <motion.p
-          initial={prefersReducedMotion ? false : { opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.18, delay: 0.2 }}
-          className="text-center text-body-sm text-locked mt-12"
-        >
-          Leaderboards are opt-in, cohort-based, and focused on consistency. Community features will open gradually.
-        </motion.p>
       </div>
     </section>
   )

@@ -1,12 +1,19 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { PORTFOLIO_ARTIFACTS } from '@/config/content'
 import * as LucideIcons from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { User, Star } from 'lucide-react'
+import { User, Star, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+const samplePortfolioUrl =
+  process.env.NEXT_PUBLIC_SAMPLE_PORTFOLIO_URL ||
+  (process.env.NEXT_PUBLIC_SAMPLE_PORTFOLIO_USERNAME
+    ? `/p/${process.env.NEXT_PUBLIC_SAMPLE_PORTFOLIO_USERNAME}`
+    : '/signup')
 
 /**
  * Portfolio section — Sprint 2 §14 + Sprint 3 portfolio copy.
@@ -29,6 +36,9 @@ export function PortfolioSection() {
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="text-center mb-12"
         >
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-body-sm font-medium mb-4">
+            Proof, not just a certificate
+          </div>
           <h2
             id="portfolio-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
@@ -36,7 +46,7 @@ export function PortfolioSection() {
             Finish with a portfolio, not just a certificate.
           </h2>
           <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
-            Every capstone becomes a public artifact you can share with hiring managers, teammates, and future employers.
+            Every capstone becomes a real artifact — a PRD, a roadmap, a case study — published to a public profile you can share with hiring managers, teammates, or your own LinkedIn. No login required to view it.
           </p>
         </motion.div>
 
@@ -185,13 +195,37 @@ export function PortfolioSection() {
           </div>
         </motion.div>
 
+        {/* CTA */}
+        <motion.div
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.18, delay: 0.1 }}
+          className="flex justify-center mt-10"
+        >
+          <Link
+            href={samplePortfolioUrl}
+            className="
+              inline-flex items-center gap-2 px-6 py-3
+              bg-primary text-white hover:text-white
+              text-body-sm font-semibold rounded-sm
+              shadow-xs hover:shadow-sm
+              hover:opacity-90 active:scale-[0.98]
+              transition-all duration-[120ms]
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white
+            "
+          >
+            See a sample portfolio <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </motion.div>
+
         {/* Trust line */}
         <motion.p
           initial={prefersReducedMotion ? false : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: 0.18, delay: 0.2 }}
-          className="text-center text-body-sm text-locked mt-8"
+          className="text-center text-body-sm text-locked mt-4"
         >
           Portfolio artifacts are shareable public links — no login required to view them.
         </motion.p>

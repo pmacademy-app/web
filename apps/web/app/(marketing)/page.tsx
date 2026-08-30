@@ -41,12 +41,12 @@ export default async function MarketingPage() {
     <>
       <PageAnalytics />
       <HeroSection />
+      <PortfolioSection />
       <WhySection />
-      <JourneySection />
       <CurriculumSection />
       <ExperienceSection />
       <SkillRadarSection />
-      <PortfolioSection />
+      <JourneySection />
       <CommunitySection />
       <TestimonialsSection initialTestimonials={publishedTestimonials} />
       <FAQSection />

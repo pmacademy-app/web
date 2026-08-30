@@ -137,8 +137,8 @@ export const JOURNEY_STAGES: JourneyStage[] = [
   },
   {
     label: 'Career Ready',
-    description: 'Portfolio, interview practice, capstones',
-    milestones: ['Portfolio artifacts', 'Interview preparation', 'Capstone case study'],
+    description: 'Portfolio and capstone, built to walk through in an interview',
+    milestones: ['Portfolio artifacts', 'Capstone case study', 'Public profile'],
     cluster: 'growth',
   },
 ]
@@ -200,27 +200,7 @@ export const COMMUNITY_FEATURES: FeatureItem[] = [
 
 // ─── Testimonials (Sprint 2 §17, Sprint 3 §3) ────────────────────────────────
 
-// PLACEHOLDER — These are example quotes from Sprint 3. Replace with real beta quotes before launch.
-export const TESTIMONIALS: TestimonialItem[] = [
-  {
-    quote: 'The roadmap made PM feel less mysterious. I knew exactly what to study next.',
-    author: 'Placeholder', // PLACEHOLDER
-    role: 'Career Switcher',
-    category: 'career-switcher',
-  },
-  {
-    quote: 'The capstone prompts pushed me to create work I could actually discuss in interviews.',
-    author: 'Placeholder', // PLACEHOLDER
-    role: 'Aspiring PM',
-    category: 'founder',
-  },
-  {
-    quote: 'The skill radar made my gaps visible without making me feel behind.',
-    author: 'Placeholder', // PLACEHOLDER
-    role: 'Student',
-    category: 'student',
-  },
-]
+export const TESTIMONIALS: TestimonialItem[] = []
 
 // ─── FAQ (Sprint 3 §3) ────────────────────────────────────────────────────────
 
@@ -228,6 +208,10 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'Is PM Academy really free?',
     answer: 'Yes. The core curriculum is free. No fake trial, no paywalled lesson 11, and no paid unlocks for the main learning path.',
+  },
+  {
+    question: 'Do I need to already work in tech or product?',
+    answer: 'No. Prodily is built first for career switchers with no prior PM experience, plus founders, designers, engineers, and analysts who want stronger product judgment. The curriculum starts from first principles.',
   },
   {
     question: 'Who is PM Academy for?',

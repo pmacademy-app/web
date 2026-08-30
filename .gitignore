@@ -48,3 +48,4 @@ apps/web/scripts/logs/
 # Master plan document (never commit)
 CONTENT_UPDATE.md 
 PORTFOLIO_PHASE1.md
+FIXES.md

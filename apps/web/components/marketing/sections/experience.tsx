@@ -107,10 +107,10 @@ export function ExperienceSection() {
                 id="experience-heading"
                 className="font-display text-h1 lg:text-h1 font-semibold text-foreground mb-3"
               >
-                Learning that sticks.
+                Every format has a job.
               </h2>
               <p className="text-body-lg text-locked leading-relaxed mb-8">
-                Every format has a job. Lessons introduce, quizzes test, flashcards retain, assignments apply, case studies deepen.
+                Lessons introduce a concept. Quizzes test it immediately. Flashcards bring it back with spaced repetition so it sticks. Assignments make you apply it. Case studies show how it plays out in the real world.
               </p>
             </motion.div>
 
