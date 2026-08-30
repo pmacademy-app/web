@@ -9,11 +9,7 @@ import type { LucideIcon } from 'lucide-react'
 import { User, Star, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const samplePortfolioUrl =
-  process.env.NEXT_PUBLIC_SAMPLE_PORTFOLIO_URL ||
-  (process.env.NEXT_PUBLIC_SAMPLE_PORTFOLIO_USERNAME
-    ? `/p/${process.env.NEXT_PUBLIC_SAMPLE_PORTFOLIO_USERNAME}`
-    : '/signup')
+const samplePortfolioUrl = '/p/adityagangwani'
 
 /**
  * Portfolio section — Sprint 2 §14 + Sprint 3 portfolio copy.
