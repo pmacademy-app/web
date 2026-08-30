@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminEmail } from '@/lib/admin/authorization'
+import { fetchCurriculumData } from '@/lib/lesson-loader'
 
 const AUTH_PAGE_TARGET_LEARNER = '/dashboard'
 const AUTH_PAGE_TARGET_ADMIN = '/admin'
@@ -102,8 +103,31 @@ export async function proxy(request: NextRequest) {
 
   // Authenticated learners navigating to public /curriculum are routed to their interactive academy
   if (path === '/curriculum') {
-    const hasAuthToken = request.cookies.has('sb-access-token') || request.cookies.has('sb-refresh-token')
+    const hasAuthToken = Boolean(
+      request.cookies.get('sb-access-token')?.value || request.cookies.get('sb-refresh-token')?.value
+    )
     if (hasAuthToken) {
+      return withReferralCookie(NextResponse.redirect(new URL('/academy', request.url)), refParam)
+    }
+  }
+
+  // Authenticated learners navigating to public /lessons/[slug] are routed to their interactive lesson
+  if (path.startsWith('/lessons/')) {
+    const hasAuthToken = Boolean(
+      request.cookies.get('sb-access-token')?.value || request.cookies.get('sb-refresh-token')?.value
+    )
+    if (hasAuthToken) {
+      const slug = path.replace(/^\/lessons\//, '').replace(/\/.*$/, '')
+      if (slug) {
+        const curriculum = await fetchCurriculumData()
+        const match = curriculum?.lessons.find((l) => l.slug === slug)
+        if (match) {
+          return withReferralCookie(
+            NextResponse.redirect(new URL(`/academy/${match.module}/${match.id}`, request.url)),
+            refParam
+          )
+        }
+      }
       return withReferralCookie(NextResponse.redirect(new URL('/academy', request.url)), refParam)
     }
   }

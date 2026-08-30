@@ -20,6 +20,7 @@ The objective of Phase 1 is to eliminate unnecessary dynamic server rendering (`
 2. [`apps/web/app/(marketing)/lessons/[slug]/page.tsx`](file:///d:/Prodily/apps/web/app/(marketing)/lessons/[slug]/page.tsx)
 3. [`apps/web/lib/lesson-loader.ts`](file:///d:/Prodily/apps/web/lib/lesson-loader.ts)
 4. [`apps/web/proxy.ts`](file:///d:/Prodily/apps/web/proxy.ts)
+5. [`apps/web/lib/__tests__/middleware-auth.test.ts`](file:///d:/Prodily/apps/web/lib/__tests__/middleware-auth.test.ts)
 
 ---
 
@@ -50,18 +51,43 @@ In Next.js App Router, invoking `cookies()` or `headers()` inside a Server Compo
 ### 4.3 Lesson Slug Resolution Memoization ([`apps/web/lib/lesson-loader.ts`](file:///d:/Prodily/apps/web/lib/lesson-loader.ts))
 - **Added**: Module-scoped process memory cache `let registryMemoryCache: Record<string, string> | null = null`.
 - **Wrapped**: `resolveSlugToId` in React `cache()` and populated `registryMemoryCache` on first load, eliminating redundant disk reads (`readFile`) and `JSON.parse` operations for `lesson-id-registry.json` across server render passes.
+- **Safety Verification**: `registryMemoryCache` contains exclusively static, immutable mappings of lesson filenames to stable lesson IDs (`content/lessons/lesson-XXX.md -> les_XXXXXX`). It contains zero user-specific or session state, eliminating any risk of cross-user data leakage.
 
 ### 4.4 Routing / Proxy Layer ([`apps/web/proxy.ts`](file:///d:/Prodily/apps/web/proxy.ts))
-- **Added**: Upstream routing check for `/curriculum`:
+- **Preserved Authenticated Redirects in Proxy**:
   ```ts
+  // Authenticated learners navigating to public /curriculum are routed to their interactive academy
   if (path === '/curriculum') {
-    const hasAuthToken = request.cookies.has('sb-access-token') || request.cookies.has('sb-refresh-token')
+    const hasAuthToken = Boolean(
+      request.cookies.get('sb-access-token')?.value || request.cookies.get('sb-refresh-token')?.value
+    )
     if (hasAuthToken) {
       return withReferralCookie(NextResponse.redirect(new URL('/academy', request.url)), refParam)
     }
   }
+
+  // Authenticated learners navigating to public /lessons/[slug] are routed to their interactive lesson
+  if (path.startsWith('/lessons/')) {
+    const hasAuthToken = Boolean(
+      request.cookies.get('sb-access-token')?.value || request.cookies.get('sb-refresh-token')?.value
+    )
+    if (hasAuthToken) {
+      const slug = path.replace(/^\/lessons\//, '').replace(/\/.*$/, '')
+      if (slug) {
+        const curriculum = await fetchCurriculumData()
+        const match = curriculum?.lessons.find((l) => l.slug === slug)
+        if (match) {
+          return withReferralCookie(
+            NextResponse.redirect(new URL(`/academy/${match.module}/${match.id}`, request.url)),
+            refParam
+          )
+        }
+      }
+      return withReferralCookie(NextResponse.redirect(new URL('/academy', request.url)), refParam)
+    }
+  }
   ```
-- Public/unauthenticated requests continue through the lightweight fast-path (`NextResponse.next()`) with zero auth network roundtrips, serving the static/ISR page.
+- Unauthenticated requests continue through the lightweight fast-path (`NextResponse.next()`) with zero authentication network roundtrips or database calls, serving the static/ISR page directly.
 
 ---
 
@@ -90,16 +116,15 @@ Route (app)                                                Revalidate  Expire
 
 ---
 
-## 6. Authentication & Redirect Behavior Verification
+## 6. Authentication & Redirect Behavior Verification Matrix
 
-- **Unauthenticated Visitor**:
-  - Visiting `/curriculum` serves the static/ISR pre-rendered marketing curriculum page instantly with 0 ms serverless cold start and 0 DB queries.
-  - Visiting `/lessons/lesson-001` serves the static/SSG pre-rendered lesson preview with structured data and "Start Lesson Free" signup CTA.
-- **Authenticated Learner**:
-  - Visiting `/curriculum` is intercepted by `proxy.ts` (inspecting session cookies) and redirected immediately to `/academy`.
-  - Visiting `/lessons/[slug]` renders the public preview safely without leaking user data or session state, with direct navigation to the curriculum and app.
-- **Invalid Lesson Slug**:
-  - Visiting `/lessons/invalid-slug` triggers `notFound()` and renders the clean 404 template.
+| Route & Session State | Verified Behavior | Status Code & Action | Performance & CPU Impact |
+| :--- | :--- | :--- | :--- |
+| **Unauthenticated `/curriculum`** | Passes through proxy fast path; served from pre-rendered static ISR cache. | `HTTP 200 OK` (Static HTML) | 0 DB queries, 0 Auth API roundtrips; avoids per-request dynamic rendering. |
+| **Authenticated `/curriculum`** | Intercepted in proxy via session cookies; redirected to interactive learning dashboard. | `HTTP 307 Temporary Redirect` -> `/academy` | Immediate redirect; avoids executing page component. |
+| **Unauthenticated `/lessons/[slug]`** | Passes through proxy fast path; served from pre-rendered static SSG/ISR cache. | `HTTP 200 OK` (Static HTML) | Pre-rendered for all 90 lessons at build time; avoids per-request dynamic rendering. |
+| **Authenticated `/lessons/[slug]`** | Intercepted in proxy via session cookies; resolved via in-memory curriculum cache to canonical interactive lesson. | `HTTP 307 Temporary Redirect` -> `/academy/[moduleSlug]/[lessonId]` | Fast in-memory dictionary lookup; immediate redirect without page rendering. |
+| **Invalid Lesson Slug** | Unauthenticated requests pass to Next.js router where `notFound()` renders 404. | `HTTP 404 Not Found` | Handled by Next.js static 404 boundary. |
 
 ---
 
@@ -125,16 +150,12 @@ In `apps/web/lib/lesson-loader.ts`:
 
 ### 8.3 Test Suite (Vitest)
 - **Command**: `npm test`
-- **Result**: `PASS` — **84 test files passed (100%), 894 tests passed (100%), 0 failed**.
-- Includes full verification of:
-  - `curriculum-integrity.test.ts`
-  - `curriculum-aggregation.test.ts`
-  - `curriculum-prerequisite-access.test.ts`
-  - `seo-structured-data.test.ts`
-  - `seo-canonicals.test.ts`
-  - `seo-social-metadata.test.ts`
-  - `middleware-auth.test.ts`
-  - `platform-behavior.test.ts`
+- **Result**: `PASS` — **84 test files passed (100%), 898 tests passed (100%), 0 failed**.
+- Dedicated test coverage added in `apps/web/lib/__tests__/middleware-auth.test.ts` for all four routing scenarios:
+  1. Authenticated `/curriculum` -> redirects to `/academy`
+  2. Unauthenticated `/curriculum` -> passes through (status 200)
+  3. Authenticated `/lessons/lesson-001` -> redirects to `/academy/foundations/les_zoyq8a`
+  4. Unauthenticated `/lessons/lesson-001` -> passes through (status 200)
 
 ### 8.4 Production Build
 - **Command**: `npm run build`
@@ -163,30 +184,22 @@ The following domains were **STRICTLY UNTOUCHED** in Phase 1:
 
 ---
 
-## 11. Phase 1 Acceptance Criteria Checklist
+## 11. Phase 1 Final Acceptance Criteria Checklist
 
-- [x] `/lessons/[slug]` no longer has unnecessary dynamic rendering
-- [x] `/curriculum` no longer has unnecessary dynamic rendering
-- [x] Existing authentication redirect behavior is preserved
-- [x] Public lesson access works
-- [x] Public curriculum access works
-- [x] Lesson 404 behavior works
-- [x] Metadata works (OpenGraph, Twitter, Canonicals, Structured Data)
-- [x] `generateStaticParams()` behavior is preserved and verified (90 lessons pre-rendered)
-- [x] ISR/revalidation is configured appropriately (`revalidate = 3600`)
-- [x] Slug-resolution optimization is implemented safely with memory cache and React `cache()`
-- [x] No authentication architecture changes were made
-- [x] No notification changes were made
-- [x] No feedback polling changes were made
-- [x] No Brevo/email changes were made
-- [x] No portfolio verification changes were made
-- [x] No Cloudflare changes were made
+- [x] Authenticated lesson redirect behavior has been explicitly verified and preserved in `proxy.ts`
+- [x] Redirect fix is implemented without making the page dynamic (no `cookies()` in page components)
+- [x] `/curriculum` redirect behavior verified (redirects authenticated learners to `/academy`)
+- [x] `/lessons/[slug]` remains static/ISR (prerendered SSG for all 90 lessons + 1h ISR)
+- [x] `/curriculum` remains static/ISR (prerendered static + 1h ISR)
+- [x] 90 lesson paths remain pre-rendered at build time
+- [x] Slug-resolution cache is verified safe (immutable metadata, zero user state)
+- [x] No Phase 2+ work was introduced
 - [x] Lint passes (`npm run lint`)
 - [x] Typecheck passes (`npm run typecheck`)
-- [x] Relevant tests pass (`npm test` — 894/894 passed)
+- [x] Tests pass (`npm test` — 898/898 passed)
 - [x] Production build passes (`npm run build`)
-- [x] Diff reviewed and confirmed minimal
-- [x] `PHASE_1_REPORT.md` created
+- [x] Final diff reviewed and confirmed minimal
+- [x] `PHASE_1_REPORT.md` updated accurately
 
 ---
 

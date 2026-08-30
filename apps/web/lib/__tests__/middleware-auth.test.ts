@@ -111,4 +111,42 @@ describe('Phase 2 Middleware & Auth Security Test Suite', () => {
     // Admin mock user routes to /admin
     expect(res.headers.get('location')).toMatch(/\/(admin|dashboard)/)
   })
+
+  it('9. Curriculum Route: Authenticated learner visiting /curriculum is redirected to /academy', async () => {
+    const req = new NextRequest('https://prodily.app/curriculum', {
+      headers: {
+        cookie: 'sb-access-token=mock-user-token',
+      },
+    })
+    const res = await proxy(req)
+    expect(res).toBeDefined()
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toContain('/academy')
+  })
+
+  it('10. Curriculum Route: Unauthenticated visitor visiting /curriculum passes through to static page', async () => {
+    const req = new NextRequest('https://prodily.app/curriculum')
+    const res = await proxy(req)
+    expect(res).toBeDefined()
+    expect(res.status).toBe(200)
+  })
+
+  it('11. Public Lesson Route: Authenticated learner visiting /lessons/lesson-001 redirects to interactive academy lesson', async () => {
+    const req = new NextRequest('https://prodily.app/lessons/lesson-001', {
+      headers: {
+        cookie: 'sb-access-token=mock-user-token',
+      },
+    })
+    const res = await proxy(req)
+    expect(res).toBeDefined()
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toContain('/academy/foundations/les_zoyq8a')
+  })
+
+  it('12. Public Lesson Route: Unauthenticated visitor visiting /lessons/lesson-001 passes through to static page', async () => {
+    const req = new NextRequest('https://prodily.app/lessons/lesson-001')
+    const res = await proxy(req)
+    expect(res).toBeDefined()
+    expect(res.status).toBe(200)
+  })
 })
