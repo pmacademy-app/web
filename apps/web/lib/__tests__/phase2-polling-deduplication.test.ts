@@ -203,19 +203,27 @@ describe('Phase 2 — Polling & Duplicate Request Reduction Test Suite', () => {
       expect(targetUser).toBe('usr_learner_3')
     })
 
-    it('PATCH /api/notifications preserves mark_all_read action', async () => {
+    it('PATCH /api/notifications ignores IDs belonging to different users via user_id scoping', async () => {
       vi.spyOn(authLib, 'getAuthenticatedUserFromRequest').mockResolvedValue({
-        id: 'usr_learner_4',
+        id: 'legitimate_user',
       } as unknown as import('@supabase/supabase-js').User)
 
-      let markedAllUser = ''
+      let scopedUserId = ''
+      let scopedInIds: string[] = []
+
       const mockChain = {
         update: vi.fn().mockReturnThis(),
+        in: vi.fn().mockImplementation((col: string, vals: string[]) => {
+          if (col === 'id') scopedInIds = vals
+          return mockChain
+        }),
         eq: vi.fn().mockImplementation((col: string, val: string) => {
-          if (col === 'user_id') markedAllUser = val
+          if (col === 'user_id') scopedUserId = val
           return mockChain
         }),
       }
+
+      Object.assign(mockChain, Promise.resolve({ error: null }))
 
       vi.spyOn(supabaseLib, 'createServiceRoleClient').mockReturnValue({
         from: vi.fn().mockReturnValue(mockChain),
@@ -225,16 +233,35 @@ describe('Phase 2 — Polling & Duplicate Request Reduction Test Suite', () => {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'mark_all_read',
+          action: 'mark_read',
+          notificationIds: ['victim_user_notification_id'],
         }),
       })
 
       const res = await notificationsPatch(req)
       expect(res.status).toBe(200)
+      // Database query was strictly filtered with eq('user_id', 'legitimate_user')
+      expect(scopedUserId).toBe('legitimate_user')
+      expect(scopedInIds).toEqual(['victim_user_notification_id'])
+    })
 
+    it('PATCH /api/notifications returns 400 when neither notificationId nor notificationIds are provided', async () => {
+      vi.spyOn(authLib, 'getAuthenticatedUserFromRequest').mockResolvedValue({
+        id: 'usr_learner_5',
+      } as unknown as import('@supabase/supabase-js').User)
+
+      const req = new Request('https://prodily.app/api/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'mark_read',
+        }),
+      })
+
+      const res = await notificationsPatch(req)
+      expect(res.status).toBe(400)
       const json = await res.json()
-      expect(json.success).toBe(true)
-      expect(markedAllUser).toBe('usr_learner_4')
+      expect(json.error).toContain('Missing notificationId')
     })
   })
 })
