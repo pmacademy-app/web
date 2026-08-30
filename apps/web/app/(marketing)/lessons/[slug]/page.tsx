@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound, redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
+import { notFound } from 'next/navigation'
 import { fetchCompiledLesson, fetchCurriculumData, resolveSlugToId } from '@/lib/lesson-loader'
 import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { BRAND } from '@/lib/brand'
 import { getLessonSchema, getBreadcrumbSchema } from '@/lib/schema'
+
+export const revalidate = 3600
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -88,19 +89,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicLessonPage({ params }: PageProps) {
   const { slug } = await params
-
-  // Auth check - if user is authenticated, redirect to the full interactive lesson
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-  if (accessToken) {
-    const lessonId = await resolveSlugToId(slug)
-    if (lessonId) {
-      const lessonMeta = await fetchCompiledLesson(lessonId)
-      if (lessonMeta) {
-        redirect(`/academy/${lessonMeta.module}/${lessonId}`)
-      }
-    }
-  }
 
   const [lesson, curriculum] = await Promise.all([
     getLessonBySlug(slug),

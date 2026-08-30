@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
 import { MODULES } from '@/config/content'
 import { BRAND } from '@/lib/brand'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
@@ -9,6 +7,8 @@ import { getCourseSchema } from '@/lib/schema'
 import { ArrowRight, BookOpen, Clock } from 'lucide-react'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
+
+export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: 'Full Curriculum — 9 Modules, 90 Lessons — Prodily PM Academy',
@@ -49,13 +49,6 @@ function getModuleSlugByNumber(num: number): string {
 }
 
 export default async function CurriculumPage() {
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-
-  if (accessToken) {
-    redirect('/academy')
-  }
-
   const [curriculumData, courseSchema] = await Promise.all([
     fetchCurriculumData(),
     Promise.resolve(getCourseSchema()),
