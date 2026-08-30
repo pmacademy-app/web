@@ -100,6 +100,14 @@ export async function proxy(request: NextRequest) {
     return withReferralCookie(NextResponse.next(), refParam)
   }
 
+  // Authenticated learners navigating to public /curriculum are routed to their interactive academy
+  if (path === '/curriculum') {
+    const hasAuthToken = request.cookies.has('sb-access-token') || request.cookies.has('sb-refresh-token')
+    if (hasAuthToken) {
+      return withReferralCookie(NextResponse.redirect(new URL('/academy', request.url)), refParam)
+    }
+  }
+
   // Fast path for non-guarded public routes
   if (!isPublicPage && !isAppPage && !isProtectedLearnerApi) {
     return withReferralCookie(NextResponse.next(), refParam)
