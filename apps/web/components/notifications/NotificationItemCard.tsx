@@ -2,7 +2,18 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Clock, ExternalLink, Trophy, BookOpen, Shield, Bell, Check } from 'lucide-react'
+import {
+  Clock,
+  ExternalLink,
+  Trophy,
+  BookOpen,
+  Shield,
+  Bell,
+  Check,
+  Megaphone,
+  Briefcase,
+  Sparkles,
+} from 'lucide-react'
 
 export interface NotificationItem {
   id: string
@@ -29,7 +40,8 @@ export function NotificationItemCard({
   onMarkRead,
   onNavigate,
 }: NotificationItemCardProps) {
-  const isHighPriority = item.priority === 'high' || item.priority === 'critical'
+  const isUrgent = item.priority === 'critical' || item.priority === 'urgent'
+  const categoryBadge = getCategoryBadge(item.category)
   const formattedTime = getRelativeTimeString(item.createdAt)
 
   const handleInteraction = () => {
@@ -72,11 +84,19 @@ export function NotificationItemCard({
         </p>
 
         <div className="flex items-center justify-between text-[10px] pt-1">
-          {isHighPriority && (
-            <span className="text-[9px] uppercase tracking-wider font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1.5 py-0.2 rounded border border-amber-500/20">
-              Priority
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded border ${categoryBadge.className}`}
+            >
+              {categoryBadge.label}
             </span>
-          )}
+
+            {isUrgent && (
+              <span className="text-[9px] uppercase tracking-wider font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/20">
+                Urgent
+              </span>
+            )}
+          </div>
 
           {item.deepLink && (
             <span className="inline-flex items-center gap-1 font-bold text-primary hover:underline ml-auto">
@@ -150,20 +170,80 @@ export function NotificationItemCard({
   )
 }
 
+function getCategoryBadge(category?: string): { label: string; className: string } {
+  switch (category?.toLowerCase()) {
+    case 'announcement':
+    case 'announcements':
+      return {
+        label: 'Announcement',
+        className: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+      }
+    case 'achievements':
+    case 'achievement':
+      return {
+        label: 'Achievement',
+        className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+      }
+    case 'learning':
+    case 'curriculum':
+      return {
+        label: 'Learning',
+        className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+      }
+    case 'portfolio':
+      return {
+        label: 'Portfolio',
+        className: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+      }
+    case 'security':
+    case 'account':
+      return {
+        label: 'Security',
+        className: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+      }
+    case 'product_updates':
+    case 'update':
+      return {
+        label: 'Update',
+        className: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+      }
+    case 'marketing':
+      return {
+        label: 'Community',
+        className: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+      }
+    default:
+      return {
+        label: category ? category.charAt(0).toUpperCase() + category.slice(1) : 'General',
+        className: 'bg-secondary/80 text-muted-foreground border-border/80',
+      }
+  }
+}
+
 function getCategoryIcon(category?: string, customIcon?: string) {
   if (customIcon && customIcon.length > 0 && customIcon !== '🔔') {
     return <span>{customIcon}</span>
   }
   switch (category?.toLowerCase()) {
+    case 'announcement':
+    case 'announcements':
+      return <Megaphone className="w-4 h-4 text-purple-500" />
     case 'achievements':
     case 'achievement':
       return <Trophy className="w-4 h-4 text-amber-500" />
     case 'learning':
     case 'curriculum':
-      return <BookOpen className="w-4 h-4 text-primary" />
+      return <BookOpen className="w-4 h-4 text-emerald-500" />
+    case 'portfolio':
+      return <Briefcase className="w-4 h-4 text-blue-500" />
     case 'security':
     case 'account':
-      return <Shield className="w-4 h-4 text-blue-500" />
+      return <Shield className="w-4 h-4 text-rose-500" />
+    case 'product_updates':
+    case 'update':
+      return <Sparkles className="w-4 h-4 text-indigo-500" />
+    case 'marketing':
+      return <Megaphone className="w-4 h-4 text-cyan-500" />
     default:
       return <Bell className="w-4 h-4 text-primary" />
   }
