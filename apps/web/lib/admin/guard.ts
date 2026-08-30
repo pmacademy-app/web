@@ -10,11 +10,12 @@ export interface AdminAuthResult {
   statusCode?: number
 }
 
+const adminGuardCache = new WeakMap<Request, Promise<AdminAuthResult>>()
+
 /**
- * Server-side authorization guard verifying whether the requesting user is an admin.
- * Enforces Role-Based Access Control (RBAC).
+ * Internal resolver for server-side authorization guard verifying admin status.
  */
-export async function requireAdminUser(request: Request): Promise<AdminAuthResult> {
+async function resolveRequireAdminUser(request: Request): Promise<AdminAuthResult> {
   const authUser = await getAuthenticatedUserFromRequest(request)
   if (!authUser) {
     return {
@@ -62,6 +63,21 @@ export async function requireAdminUser(request: Request): Promise<AdminAuthResul
     userId: authUser.id,
     email: typedUserRow.email,
   }
+}
+
+/**
+ * Server-side authorization guard verifying whether the requesting user is an admin.
+ * Deduplicated per request instance using WeakMap.
+ */
+export async function requireAdminUser(request: Request): Promise<AdminAuthResult> {
+  const cached = adminGuardCache.get(request)
+  if (cached) {
+    return cached
+  }
+
+  const promise = resolveRequireAdminUser(request)
+  adminGuardCache.set(request, promise)
+  return promise
 }
 
 /**
