@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 
 export type ErrorSeverity = 'critical' | 'error' | 'warning'
-export type ErrorCategory = 'auth' | 'verification' | 'queue' | 'resend' | 'webhook' | 'cron' | 'system'
+export type ErrorCategory = 'auth' | 'verification' | 'queue' | 'resend' | 'brevo' | 'webhook' | 'cron' | 'system'
 
 export interface LogSystemErrorOptions {
   severity: ErrorSeverity

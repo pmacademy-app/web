@@ -119,14 +119,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
     }
 
-    const eventType = String(payload.type || 'email.received')
-    console.log('[ResendWebhook] Inbound webhook received event type:', eventType)
+    // Normalize event type across Resend (payload.type) and Brevo (payload.event)
+    let eventType = String(payload.type || '')
+    let emailId = ''
+
+    if (!eventType && typeof payload.event === 'string') {
+      const brevoEvent = payload.event.toLowerCase()
+      if (brevoEvent === 'delivered') eventType = 'email.delivered'
+      else if (brevoEvent === 'soft_bounce' || brevoEvent === 'hard_bounce' || brevoEvent === 'blocked' || brevoEvent === 'invalid_email') eventType = 'email.bounced'
+      else if (brevoEvent === 'spam' || brevoEvent === 'complaint') eventType = 'email.complained'
+      else if (brevoEvent === 'opened' || brevoEvent === 'unique_opened') eventType = 'email.opened'
+      else if (brevoEvent === 'click') eventType = 'email.clicked'
+      else eventType = `brevo.${brevoEvent}`
+
+      emailId = String(payload['message-id'] || payload.message_id || payload['messageId'] || payload.id || '')
+    } else if (!eventType) {
+      eventType = 'email.received'
+    }
 
     const data = (payload.data || payload) as Record<string, unknown>
-    const emailId = String(data.email_id || data.id || '')
+    if (!emailId) {
+      emailId = String(data.email_id || data.id || data['message-id'] || data.message_id || '')
+    }
+    console.log('[EmailWebhook] Inbound webhook received event type:', eventType, 'emailId:', emailId || 'none')
 
-    // Handle Outbound Resend Delivery Events (sent, delivered, failed, bounced, complained)
-    if (eventType !== 'email.received' && eventType.startsWith('email.')) {
+    // Handle Outbound Delivery Events (sent, delivered, failed, bounced, complained)
+    if (eventType !== 'email.received' && (eventType.startsWith('email.') || eventType.startsWith('brevo.'))) {
       try {
         const supabase = createServiceRoleClient()
 
@@ -167,7 +185,7 @@ export async function POST(request: Request) {
 
         // 4. Auto-suppress on spam complaints
         if (eventType === 'email.complained') {
-          const recipientEmail = String(data.to || data.recipient || '')
+          const recipientEmail = String(data.email || data.to || data.recipient || payload.email || '')
           if (recipientEmail) {
             await supabase
               .from('email_suppressions')
