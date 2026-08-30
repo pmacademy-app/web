@@ -59,9 +59,10 @@ export async function POST(request: Request) {
     // Bound increment to max 300 seconds (5 minutes) per sync call to prevent spoofing
     const activeIncrementSeconds = Math.min(rawIncrement, 300)
 
+    const supabase = createServiceRoleClient()
+    let newTotal = 0
+
     if (activeIncrementSeconds > 0) {
-      const supabase = createServiceRoleClient()
-      
       // Fetch current total_active_seconds
       const { data: userRow } = await supabase
         .from('users')
@@ -70,18 +71,43 @@ export async function POST(request: Request) {
         .single()
 
       const currentSec = userRow ? (userRow as unknown as { total_active_seconds?: number }).total_active_seconds || 0 : 0
-      const newTotal = currentSec + activeIncrementSeconds
+      newTotal = currentSec + activeIncrementSeconds
 
       // Update total_active_seconds
       type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
       await (supabase.from('users') as unknown as DBUpdateChain)
         .update({ total_active_seconds: newTotal })
         .eq('id', user.id)
+    } else {
+      const { data: userRow } = await supabase
+        .from('users')
+        .select('total_active_seconds')
+        .eq('id', user.id)
+        .single()
+      newTotal = userRow ? (userRow as unknown as { total_active_seconds?: number }).total_active_seconds || 0 : 0
     }
 
-    return NextResponse.json({ success: true })
+    // Evaluate 1-hour prompt eligibility directly to avoid a redundant secondary GET request
+    const { data: promptsData } = await supabase
+      .from('user_feedback_prompts')
+      .select('prompt_key')
+      .eq('user_id', user.id)
+
+    const completedKeys = new Set((promptsData || []).map((p: { prompt_key: string }) => p.prompt_key))
+    const eligiblePrompts: string[] = []
+
+    if (newTotal >= 3600 && !completedKeys.has('usage_1hr')) {
+      eligiblePrompts.push('usage_1hr')
+    }
+
+    return NextResponse.json({
+      success: true,
+      activeSeconds: newTotal,
+      eligiblePrompts,
+      completedPrompts: Array.from(completedKeys),
+    })
   } catch (err) {
     console.error('[api/feedback/eligibility] Error updating usage time:', err)
-    return NextResponse.json({ success: false }, { status: 500 })
+    return NextResponse.json({ success: false, eligiblePrompts: [] }, { status: 500 })
   }
 }
