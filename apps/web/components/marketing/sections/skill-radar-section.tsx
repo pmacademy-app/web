@@ -59,10 +59,10 @@ export function SkillRadarSection() {
               id="radar-heading"
               className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
             >
-              Know what kind of PM you are becoming.
+              Know what kind of PM you&apos;re becoming.
             </h2>
             <p className="text-body-lg text-locked leading-relaxed mb-8">
-              PM Academy tracks your progress across seven competency clusters. See where you are strong, where to focus next, and how your profile evolves as you advance.
+              Your progress is tracked across seven real competencies — discovery, strategy, execution, design, growth, leadership, and technical fluency — based on what you&apos;ve actually completed, not what you say you know.
             </p>
 
             {/* Competency legend */}

@@ -9,7 +9,7 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { trackHeroCTAClick } from '@/lib/analytics'
 import { NAV_LINKS } from '@/config/navigation'
 import { BRAND } from '@/lib/brand'
-import { BrandMarkProdily } from '@/components/brand/BrandLogo'
+import { BrandLogo } from '@/components/brand/BrandLogo'
 import { cn } from '@/lib/utils'
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
@@ -21,24 +21,34 @@ function Logo() {
       aria-label={`${BRAND.fullName} — Home`}
       className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm"
     >
-      <BrandMarkProdily size="sm" priority />
+      <BrandLogo variant="full" size="sm" priority />
     </Link>
   )
 }
 
 // ─── Desktop Nav Link ─────────────────────────────────────────────────────────
 
-function NavLink({ href, label }: { href: string; label: string }) {
+function NavLink({
+  href,
+  label,
+  weight,
+}: {
+  href: string
+  label: string
+  weight?: 'primary' | 'secondary' | 'tertiary'
+}) {
   return (
     <Link
       href={href}
-      className="
-        text-body-sm font-medium text-locked
-        hover:text-foreground
-        transition-colors duration-[120ms]
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-xs
-        px-1 py-0.5
-      "
+      className={cn(
+        'transition-colors duration-[120ms]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-xs',
+        'px-2.5 py-1',
+        weight === 'primary' && 'text-body-sm font-semibold text-foreground hover:text-primary',
+        weight === 'secondary' && 'text-body-sm font-medium text-locked hover:text-foreground',
+        weight === 'tertiary' && 'text-body-sm font-normal text-locked/80 hover:text-foreground',
+        !weight && 'text-body-sm font-medium text-locked hover:text-foreground',
+      )}
     >
       {label}
     </Link>
@@ -62,36 +72,21 @@ function CTAButton({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <Link
-        href={BRAND.social.buyMeACoffee}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={cn(
-          'hidden sm:inline-flex items-center font-medium rounded-sm border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-all',
-          size === 'md' && 'px-3 py-1.5 text-xs',
-          size === 'sm' && 'px-2.5 py-1 text-xs',
-        )}
-      >
-        ☕ Buy Me a Coffee
-      </Link>
-
-      <Link
-        href="/signup"
-        onClick={handleClick}
-        className={cn(
-          'inline-flex items-center justify-center font-semibold rounded-sm min-h-[44px]',
-          'bg-primary text-white hover:text-white',
-          'hover:opacity-90 active:scale-[0.98]',
-          'transition-all duration-[120ms]',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white',
-          size === 'md' && 'px-4 py-2.5 text-body-sm',
-          size === 'sm' && 'px-3 py-2 text-body-sm',
-        )}
-      >
-        Start Learning Free
-      </Link>
-    </div>
+    <Link
+      href="/signup"
+      onClick={handleClick}
+      className={cn(
+        'inline-flex items-center justify-center font-semibold rounded-sm min-h-[44px]',
+        'bg-primary text-white hover:text-white',
+        'hover:opacity-90 active:scale-[0.98]',
+        'transition-all duration-[120ms]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white',
+        size === 'md' && 'px-4 py-2.5 text-body-sm',
+        size === 'sm' && 'px-3 py-2 text-body-sm',
+      )}
+    >
+      Start Learning Free
+    </Link>
   )
 }
 
@@ -142,7 +137,7 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <nav aria-label="Main" className="hidden lg:flex items-center gap-1">
             {NAV_LINKS.map((link) => (
-              <NavLink key={link.href} href={link.href} label={link.label} />
+              <NavLink key={link.href} href={link.href} label={link.label} weight={link.weight} />
             ))}
           </nav>
 
@@ -230,13 +225,14 @@ export function Navbar() {
                     key={link.href}
                     href={link.href}
                     onClick={closeMenu}
-                    className="
-                      text-body font-medium text-foreground
-                      px-3 py-2.5 rounded-sm
-                      hover:bg-surface-muted
-                      transition-colors duration-[120ms]
-                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
-                    "
+                    className={cn(
+                      'px-3 py-2.5 rounded-sm transition-colors duration-[120ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+                      link.weight === 'primary' && 'text-body font-semibold text-foreground',
+                      link.weight === 'secondary' && 'text-body font-medium text-foreground',
+                      link.weight === 'tertiary' && 'text-body-sm font-normal text-locked',
+                      !link.weight && 'text-body font-medium text-foreground',
+                      'hover:bg-surface-muted',
+                    )}
                   >
                     {link.label}
                   </Link>

@@ -128,6 +128,8 @@ export interface NavLink {
   href: string
   /** Future standalone route */
   futureRoute?: string
+  /** Visual hierarchy weight for navigation rendering */
+  weight?: 'primary' | 'secondary' | 'tertiary'
 }
 
 export interface FooterLinkGroup {

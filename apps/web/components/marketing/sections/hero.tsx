@@ -63,7 +63,7 @@ export function HeroSection() {
                 rounded-full text-body-sm font-medium
               ">
                 <GraduationCap size={14} aria-hidden="true" />
-                90 lessons. Free forever.
+                Free, structured PM curriculum
               </span>
             </motion.div>
 
@@ -76,9 +76,7 @@ export function HeroSection() {
                 font-semibold text-foreground leading-tight tracking-tight
               "
             >
-              Learn Product Management.{' '}
-              <span className="text-primary">Build real products.</span>{' '}
-              Completely free.
+              The structured path from &ldquo;I want to break into PM&rdquo; to a portfolio that proves you can.
             </motion.h1>
 
             {/* Subheadline */}
@@ -86,7 +84,7 @@ export function HeroSection() {
               variants={prefersReducedMotion ? undefined : FADE_UP}
               className="text-body-lg text-locked leading-relaxed max-w-[500px]"
             >
-              A structured PM curriculum with 90 lessons, skill analytics, interactive quizzes, and portfolio artifacts. Built for people who want more than a certificate.
+              90 lessons, real capstone projects, and a public portfolio you can show a hiring manager — not just another certificate. Built for career switchers and anyone building product judgment from scratch.
             </motion.p>
 
             {/* CTAs */}
@@ -131,7 +129,7 @@ export function HeroSection() {
               className="text-body-sm text-locked font-medium flex items-center gap-2"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-              90 structured lessons • 100% Free Forever • Free account required for progress tracking
+              90 structured lessons · Free, permanently · Free account required to track progress
             </motion.p>
           </motion.div>
 

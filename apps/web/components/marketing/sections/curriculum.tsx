@@ -1,12 +1,13 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { motion, useInView } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { ModuleCard } from '@/components/marketing/module-card'
 import { MODULES } from '@/config/content'
 import { trackCurriculumView } from '@/lib/analytics'
-import { useEffect } from 'react'
+import { ArrowRight } from 'lucide-react'
 
 /**
  * Curriculum section — Sprint 2 §11 + Sprint 3 curriculum copy.
@@ -37,14 +38,17 @@ export function CurriculumSection() {
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="text-center mb-10"
         >
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-body-sm font-medium mb-4">
+            Complete learning path
+          </div>
           <h2
             id="curriculum-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
           >
-            Everything you need. Nothing you don&apos;t.
+            Nine modules. Ninety lessons. One coherent path.
           </h2>
           <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
-            Nine modules, ninety lessons, one coherent path from product thinking to portfolio-ready work.
+            From product thinking fundamentals to advanced strategic judgment — each module builds on the last and ends with a real deliverable, not a quiz score.
           </p>
         </motion.div>
 
@@ -75,7 +79,7 @@ export function CurriculumSection() {
         </motion.div>
 
         {/* Module grid */}
-        <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
           {MODULES.map((module, index) => (
             <motion.div
               key={module.number}
@@ -91,6 +95,41 @@ export function CurriculumSection() {
             </motion.div>
           ))}
         </div>
+
+        {/* CTAs */}
+        <motion.div
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.18, delay: 0.1 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center"
+        >
+          <Link
+            href="/curriculum"
+            className="
+              inline-flex items-center gap-2 px-6 py-3
+              bg-primary text-white hover:text-white
+              text-body-sm font-semibold rounded-sm
+              shadow-xs hover:shadow-sm
+              hover:opacity-90 active:scale-[0.98]
+              transition-all duration-[120ms]
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white
+            "
+          >
+            Explore Full Curriculum <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+          <Link
+            href="/lessons/lesson-001"
+            className="
+              text-body-sm font-medium text-locked hover:text-foreground
+              transition-colors duration-[120ms]
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-xs
+              px-2 py-1
+            "
+          >
+            or preview a free lesson →
+          </Link>
+        </motion.div>
       </div>
     </section>
   )

@@ -13,7 +13,7 @@ export function FinalCTASection() {
 
   return (
     <section
-      id="waitlist"
+      id="final-cta"
       aria-labelledby="cta-heading"
       className="py-20 lg:py-28 bg-surface-muted border-t border-border scroll-mt-24 lg:scroll-mt-28"
     >
@@ -23,16 +23,22 @@ export function FinalCTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.24, ease: [0, 0, 0.2, 1] }}
-          className="max-w-[560px] mx-auto text-center flex flex-col items-center gap-6"
+          className="max-w-[640px] mx-auto text-center flex flex-col items-center gap-6"
         >
+          {/* Trust Strip */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface border border-border text-caption text-locked font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+            Built for the first wave of learners — help shape what comes next.
+          </div>
+
           <h2
             id="cta-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground leading-tight tracking-tight"
           >
-            Start building product judgment before you pay for another course.
+            Start building your portfolio. Not another line on your resume that says &ldquo;took a course.&rdquo;
           </h2>
           <p className="text-body-lg text-locked leading-relaxed">
-            90 structured lessons, 9 modules, 9 portfolio capstones, and interactive spaced-repetition flashcards—100% Free Forever.
+            90 lessons, 9 capstone projects, a public portfolio. Free, permanently.
           </p>
 
           <div className="w-full bg-surface border border-border rounded-xl p-8 shadow-xs flex flex-col items-center gap-4">
@@ -40,7 +46,7 @@ export function FinalCTASection() {
               href="/signup"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-white hover:text-white font-bold text-sm rounded-lg shadow-sm hover:opacity-90 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white"
             >
-              <span>Start Learning Free Now</span>
+              <span>Start Learning Free</span>
             </Link>
             <p className="text-xs text-muted-foreground">
               No credit card required. Instant access to all 90 lessons.
