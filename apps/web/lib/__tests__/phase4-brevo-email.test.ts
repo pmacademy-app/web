@@ -242,8 +242,10 @@ describe('Phase 4 — Brevo Email Infrastructure & Transactional Email Migration
     })
   })
 
-  describe('4. Delivery Tracking & Webhook Support for Brevo', () => {
-    it('processes Brevo delivery webhook event and updates email_queue', async () => {
+  describe('4. Delivery Tracking & Webhook Support for Brevo & Resend', () => {
+    it('accepts valid Brevo webhook request with x-brevo-webhook-secret header', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'test_brevo_secret_999'
+
       let updatedStatus = ''
       let updatedQueueId = ''
       let insertedDeliveryEvent: Record<string, unknown> | null = null
@@ -295,7 +297,10 @@ describe('Phase 4 — Brevo Email Infrastructure & Transactional Email Migration
 
       const request = new Request('https://prodily.app/api/email/webhooks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-brevo-webhook-secret': 'test_brevo_secret_999',
+        },
         body: JSON.stringify(brevoWebhookPayload),
       })
 
@@ -309,7 +314,86 @@ describe('Phase 4 — Brevo Email Infrastructure & Transactional Email Migration
       expect((insertedDeliveryEvent as Record<string, unknown> | null)?.event_type).toBe('email.delivered')
     })
 
-    it('auto-suppresses recipient on Brevo spam complaint webhook', async () => {
+    it('accepts valid Brevo webhook request with Authorization Bearer header', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'bearer_brevo_token_888'
+
+      const mockSupabase = {
+        from: () => ({
+          select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }),
+          insert: async () => ({ error: null }),
+        }),
+      } as unknown as SupabaseClient<Database>
+
+      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(mockSupabase)
+
+      const request = new Request('https://prodily.app/api/email/webhooks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: 'Bearer bearer_brevo_token_888',
+        },
+        body: JSON.stringify({ event: 'delivered', email: 'test@example.com', 'message-id': '<m-1>' }),
+      })
+
+      const response = await webhookPost(request)
+      expect(response.status).toBe(200)
+    })
+
+    it('accepts valid Brevo webhook request with query parameter ?secret=', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'query_secret_777'
+
+      const mockSupabase = {
+        from: () => ({
+          select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }),
+          insert: async () => ({ error: null }),
+        }),
+      } as unknown as SupabaseClient<Database>
+
+      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(mockSupabase)
+
+      const request = new Request('https://prodily.app/api/email/webhooks?secret=query_secret_777', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'delivered', email: 'test@example.com', 'message-id': '<m-2>' }),
+      })
+
+      const response = await webhookPost(request)
+      expect(response.status).toBe(200)
+    })
+
+    it('rejects Brevo webhook with 401 when BREVO_WEBHOOK_SECRET is set but authentication is missing', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'configured_secret_123'
+
+      const request = new Request('https://prodily.app/api/email/webhooks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'delivered', email: 'test@example.com' }),
+      })
+
+      const response = await webhookPost(request)
+      expect(response.status).toBe(401)
+      const data = await response.json()
+      expect(data.error).toContain('Unauthorized')
+    })
+
+    it('rejects Brevo webhook with 401 when BREVO_WEBHOOK_SECRET is set and token is invalid', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'expected_secret'
+
+      const request = new Request('https://prodily.app/api/email/webhooks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-brevo-webhook-secret': 'wrong_secret',
+        },
+        body: JSON.stringify({ event: 'delivered', email: 'test@example.com' }),
+      })
+
+      const response = await webhookPost(request)
+      expect(response.status).toBe(401)
+    })
+
+    it('auto-suppresses recipient on authenticated Brevo spam complaint webhook', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'valid_spam_secret'
       let suppressedEmail = ''
       let suppressedReason = ''
 
@@ -349,7 +433,10 @@ describe('Phase 4 — Brevo Email Infrastructure & Transactional Email Migration
 
       const request = new Request('https://prodily.app/api/email/webhooks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-brevo-webhook-secret': 'valid_spam_secret',
+        },
         body: JSON.stringify(spamPayload),
       })
 
@@ -357,6 +444,86 @@ describe('Phase 4 — Brevo Email Infrastructure & Transactional Email Migration
       expect(response.status).toBe(200)
       expect(suppressedEmail).toBe('complainer@example.com')
       expect(suppressedReason).toBe('spam_complaint')
+    })
+
+    it('rejects unauthenticated forged spam complaint event and does not modify email_suppressions', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'production_webhook_secret'
+      let suppressionCalled = false
+
+      const mockSupabase = {
+        from: (table: string) => {
+          if (table === 'email_suppressions') {
+            return {
+              upsert: async () => {
+                suppressionCalled = true
+                return { error: null }
+              },
+            }
+          }
+          return {
+            select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }),
+            insert: async () => ({ error: null }),
+          }
+        },
+      } as unknown as SupabaseClient<Database>
+
+      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(mockSupabase)
+
+      const forgedSpamPayload = {
+        event: 'spam',
+        email: 'innocent_user@example.com',
+        'message-id': '<forged-msg-id>',
+      }
+
+      const request = new Request('https://prodily.app/api/email/webhooks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(forgedSpamPayload),
+      })
+
+      const response = await webhookPost(request)
+      expect(response.status).toBe(401)
+      expect(suppressionCalled).toBe(false)
+    })
+
+    it('rejects unauthenticated forged delivery event and does not modify email_queue', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'production_webhook_secret'
+      let queueUpdateCalled = false
+
+      const mockSupabase = {
+        from: (table: string) => {
+          if (table === 'email_queue') {
+            return {
+              select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { id: 'q_1' } }) }) }),
+              update: () => {
+                queueUpdateCalled = true
+                return { eq: () => Promise.resolve({ data: null, error: null }) }
+              },
+            }
+          }
+          return {
+            insert: async () => ({ error: null }),
+          }
+        },
+      } as unknown as SupabaseClient<Database>
+
+      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(mockSupabase)
+
+      const forgedDeliveryPayload = {
+        event: 'delivered',
+        email: 'target@example.com',
+        'message-id': '<fake-msg-id>',
+      }
+
+      const request = new Request('https://prodily.app/api/email/webhooks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(forgedDeliveryPayload),
+      })
+
+      const response = await webhookPost(request)
+      expect(response.status).toBe(401)
+      expect(queueUpdateCalled).toBe(false)
     })
   })
 })
