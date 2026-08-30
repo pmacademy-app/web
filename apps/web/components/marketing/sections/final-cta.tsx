@@ -4,11 +4,16 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
+interface FinalCTASectionProps {
+  showTrustStrip?: boolean
+}
+
 /**
  * Final CTA section — Sprint 2 §19 + Sprint 3 final CTA copy.
  * Centered layout with WaitlistForm.
+ * showTrustStrip: only shown when testimonials count is 0 (spec §7).
  */
-export function FinalCTASection() {
+export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps) {
   const prefersReducedMotion = useReducedMotion()
 
   return (
@@ -25,11 +30,13 @@ export function FinalCTASection() {
           transition={{ duration: 0.24, ease: [0, 0, 0.2, 1] }}
           className="max-w-[640px] mx-auto text-center flex flex-col items-center gap-6"
         >
-          {/* Trust Strip */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface border border-border text-caption text-locked font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-            Built for the first wave of learners — help shape what comes next.
-          </div>
+          {/* Trust Strip — only shown when 0 testimonials */}
+          {showTrustStrip && (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface border border-border text-caption text-locked font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              Built for the first wave of learners — help shape what comes next.
+            </div>
+          )}
 
           <h2
             id="cta-heading"

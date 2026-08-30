@@ -74,11 +74,20 @@ export function AccordionItem({
 export function AccordionTrigger({
   className,
   children,
+  onClick: externalOnClick,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { value, onValueChange } = React.useContext(AccordionContext)
   const { value: itemValue } = React.useContext(AccordionItemContext)
   const isOpen = Array.isArray(value) ? value.includes(itemValue) : value === itemValue
+
+  const handleClick = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      onValueChange?.(itemValue)
+      externalOnClick?.(e)
+    },
+    [onValueChange, itemValue, externalOnClick]
+  )
 
   return (
     <div className="flex">
@@ -86,7 +95,7 @@ export function AccordionTrigger({
         type="button"
         data-slot="accordion-trigger"
         aria-expanded={isOpen}
-        onClick={() => onValueChange?.(itemValue)}
+        onClick={handleClick}
         className={cn(
           "group/accordion-trigger relative flex flex-1 items-start justify-between rounded-lg py-3 text-left text-sm font-medium transition-all outline-none hover:underline",
           className
