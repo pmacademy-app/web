@@ -52,22 +52,22 @@ export function NotificationItemCard({
 
       {/* Content */}
       <div className="flex-1 min-w-0 space-y-1">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-start justify-between gap-2">
           <h4
-            className={`text-xs font-semibold truncate ${
+            className={`text-xs font-semibold break-words leading-snug ${
               item.isRead ? 'text-foreground/80 font-medium' : 'text-foreground font-bold'
             }`}
           >
             {item.title}
           </h4>
 
-          <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground shrink-0">
+          <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground shrink-0 mt-0.5">
             <Clock className="w-2.5 h-2.5" />
             {formattedTime}
           </span>
         </div>
 
-        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+        <p className="text-xs text-muted-foreground leading-relaxed break-words whitespace-pre-line">
           {item.body}
         </p>
 

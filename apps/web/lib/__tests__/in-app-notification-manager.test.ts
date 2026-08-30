@@ -133,6 +133,17 @@ vi.mock('@/lib/supabase', () => {
                 }),
               }
             },
+            update: (patch: any) => ({
+              like: (col: string, pattern: string) => {
+                const prefix = pattern.replace('%', '')
+                mockDb.inAppNotifications.forEach((n, i) => {
+                  if ((n[col] || '').startsWith(prefix)) {
+                    mockDb.inAppNotifications[i] = { ...n, ...patch }
+                  }
+                })
+                return Promise.resolve({ error: null })
+              },
+            }),
           }
         }
 
@@ -455,6 +466,33 @@ describe('Phase 2 — In-App Notification Manager & Operations', () => {
 
       expect(bcastInList?.totalRead).toBe(2)
       expect(bcastInList?.readRate).toBe(67) // 2/3 = 67%
+    })
+
+    it('updates delivered broadcast and synchronizes changes to learner inboxes', async () => {
+      const broadcast = await InAppManagerService.createBroadcast({
+        title: 'Original Title',
+        body: 'Original Body Text',
+        status: 'sending',
+        audience: 'all',
+      })
+
+      expect(mockDb.inAppNotifications.length).toBe(3)
+      expect(mockDb.inAppNotifications[0].title).toBe('Original Title')
+
+      // Edit the delivered broadcast
+      const updated = await InAppManagerService.updateBroadcast(broadcast.id, {
+        title: 'Updated Title After Delivery',
+        body: 'Updated Body Text with More Details',
+        actionUrl: '/settings?tab=referrals',
+      })
+
+      expect(updated.title).toBe('Updated Title After Delivery')
+      expect(updated.body).toBe('Updated Body Text with More Details')
+
+      // Verify all 3 learner notifications were updated
+      expect(mockDb.inAppNotifications[0].title).toBe('Updated Title After Delivery')
+      expect(mockDb.inAppNotifications[0].body).toBe('Updated Body Text with More Details')
+      expect(mockDb.inAppNotifications[0].action_url).toBe('/settings?tab=referrals')
     })
 
     it('prevents duplicate delivery if broadcast is executed twice', async () => {

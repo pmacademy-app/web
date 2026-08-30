@@ -123,6 +123,12 @@ function EditForm({
       </div>
 
       <div className="space-y-4">
+        {broadcast.totalDelivered > 0 && (
+          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/25 text-[11px] text-blue-400 leading-relaxed">
+            <strong>Delivered Broadcast ({broadcast.totalDelivered} recipients):</strong> Saving edits will update this campaign record and automatically synchronize the updated title/body/CTA to all learner inboxes.
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-admin-fg">Title</label>
           <input
