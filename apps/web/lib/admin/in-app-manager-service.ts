@@ -360,7 +360,12 @@ export class InAppManagerService {
     const idempotencyKey =
       input.idempotencyKey || `inapp-bcast-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 
-    const status = input.status || (input.scheduledAt ? 'scheduled' : 'draft')
+    const isImmediate = input.status === 'sending' || input.status === 'completed'
+    const initialStatus: InAppBroadcastStatus = input.scheduledAt
+      ? 'scheduled'
+      : isImmediate
+      ? 'draft'
+      : (input.status || 'draft')
 
     const payload = {
       title: input.title.trim(),
@@ -372,7 +377,7 @@ export class InAppManagerService {
       target_user_id: input.audience === 'individual' ? input.targetUserId || null : null,
       target_cohort_id: input.audience === 'cohort' ? input.targetCohortId || null : null,
       recipient_filters: input.recipientFilters || {},
-      status,
+      status: initialStatus,
       scheduled_at: input.scheduledAt || null,
       expires_at: input.expiresAt || null,
       total_targeted: 0,
@@ -397,8 +402,11 @@ export class InAppManagerService {
     const item = mapRowToItem(data as unknown as Record<string, unknown>)
 
     // If status is immediate execution requested, trigger dispatch right away
-    if (input.status === 'completed' || (!input.scheduledAt && input.status === 'sending')) {
-      await this.executeBroadcast(item.id)
+    if (isImmediate) {
+      const execRes = await this.executeBroadcast(item.id)
+      if (!execRes.success && execRes.error) {
+        console.error('[InAppManagerService.createBroadcast] Execution failed:', execRes.error)
+      }
       const updated = await this.getBroadcast(item.id)
       return updated || item
     }
@@ -459,15 +467,15 @@ export class InAppManagerService {
   }
 
   /**
-   * Deletes a draft or cancelled in-app broadcast.
+   * Deletes a draft, cancelled, or failed in-app broadcast.
    */
   static async deleteBroadcast(id: string): Promise<{ success: boolean; error?: string }> {
     const supabase = createServiceRoleClient()
     try {
       const existing = await this.getBroadcast(id)
       if (!existing) return { success: false, error: 'Broadcast not found.' }
-      if (!['draft', 'cancelled'].includes(existing.status)) {
-        return { success: false, error: 'Only draft or cancelled broadcasts can be deleted.' }
+      if (!['draft', 'cancelled', 'failed'].includes(existing.status)) {
+        return { success: false, error: 'Only draft, cancelled, or failed broadcasts can be deleted.' }
       }
 
       const { error } = await supabase.from('in_app_broadcasts').delete().eq('id', id)
@@ -506,14 +514,14 @@ export class InAppManagerService {
   }
 
   /**
-   * Cancels a scheduled or paused in-app notification.
+   * Cancels a scheduled, paused, or sending/failed in-app notification.
    */
   static async cancelBroadcast(id: string): Promise<{ success: boolean; error?: string }> {
     const supabase = createServiceRoleClient()
     try {
       const existing = await this.getBroadcast(id)
       if (!existing) return { success: false, error: 'Broadcast not found.' }
-      if (!['scheduled', 'draft', 'paused'].includes(existing.status)) {
+      if (!['scheduled', 'draft', 'paused', 'sending', 'failed'].includes(existing.status)) {
         return { success: false, error: `Cannot cancel broadcast in '${existing.status}' status.` }
       }
 
@@ -619,12 +627,21 @@ export class InAppManagerService {
     const broadcast = await this.getBroadcast(id)
     if (!broadcast) return { success: false, targeted: 0, delivered: 0, error: 'Broadcast not found.' }
 
-    if (['completed', 'sending'].includes(broadcast.status)) {
+    if (broadcast.status === 'completed') {
       return {
         success: false,
         targeted: broadcast.totalTargeted,
         delivered: broadcast.totalDelivered,
-        error: `Broadcast is already ${broadcast.status}.`,
+        error: 'Broadcast is already completed.',
+      }
+    }
+
+    if (broadcast.status === 'cancelled') {
+      return {
+        success: false,
+        targeted: broadcast.totalTargeted,
+        delivered: broadcast.totalDelivered,
+        error: 'Cannot execute cancelled broadcast.',
       }
     }
 

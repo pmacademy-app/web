@@ -1,28 +1,32 @@
-# Admin Panel — Prodily PM Academy
+# Admin Panel Architecture & Technical Reference — Prodily PM Academy
 
-**Status:** 🟢 Production Ready
-**Scope:** Admin Console Workspaces, APIs, Navigation, RBAC & Capabilities
+**Status:** 🟢 Production Ready  
+**Scope:** Admin Console Workspaces, APIs, Navigation, RBAC, Services, and State Architecture  
+**Last Updated:** August 30, 2026  
 
 ---
 
 ## 1. Admin Panel Overview
 
-The Admin Panel (`/admin`) is the operational control center for Prodily PM Academy administrators.
+The Admin Panel (`/admin`) is the centralized operational control center for Prodily PM Academy administrators.
 
-It is designed around three questions:
-1. **What needs my attention?** — failed emails, new contact messages, pending testimonials, system alerts
-2. **What can I manage?** — users, learning content, certificates, communications, feature flags, product settings
-3. **What is happening across Prodily?** — learner growth, learning activity, course completion, engagement, certificates
+It is structured around three core operational pillars:
+1. **Attention & Action:** Immediate visibility into items requiring human intervention — failed email deliveries, new learner contact inquiries, pending testimonials, active system alerts, and unverified public portfolios.
+2. **Operations & Management:** Granular control over learners, curriculum content, achievement credentials, multi-channel communications, feature flags, and global product settings.
+3. **Intelligence & Health:** Live analytics across learner growth, curriculum drop-off funnels, engagement velocity, and deep platform health diagnostics.
 
-**Access control**: Proxy middleware (`apps/web/proxy.ts`) and RBAC checks (`lib/admin/authorization.ts`) enforce access. A user is authorized if their `email` matches `ADMIN_EMAILS` environment variable **or** `users.is_admin === true` in PostgreSQL.
-
-**Service layer**: All data operations use `AdminConsoleService` and workspace-specific services in `lib/admin/`.
+### Access Control & Authorization
+- **Proxy Middleware Check (`apps/web/proxy.ts`):** Edge-level route protection requiring an authenticated session and admin status.
+- **Server-Side Authorization Guard (`lib/admin/authorization.ts`):** `requireAdminUser(request)` is enforced on 100% of `/api/admin/**` endpoints. A user is authorized if:
+  - Their email is in the `ADMIN_EMAILS` environment variable, **or**
+  - Their database record has `users.is_admin === true`.
+- **Immutable Audit Logging:** Mutations trigger `logAdminAction()`, persisting structured event logs into `public.admin_audit_logs`.
 
 ---
 
-## 2. Current Admin Panel Structure
+## 2. Admin Workspace Navigation Architecture
 
-### Navigation (Sidebar — Final IA)
+### Sidebar Navigation Layout (Final IA)
 
 ```
 PRODILY ADMIN
@@ -32,240 +36,134 @@ PRODILY ADMIN
 │
 ├── Operations
 │   ├── Users                   /admin/users
-│   ├── Communications          /admin/communications
-│   └── Moderation              /admin/moderation
+│   ├── Communications          /admin/communications  (tabs: Overview, Queue, Broadcasts, Automations, Templates, Notifications, Contact)
+│   └── Moderation              /admin/moderation      (tabs: Testimonials, Feedback, Capstones, Portfolio Verification)
 │
 ├── Learning
-│   ├── Curriculum              /admin/curriculum
-│   └── Achievements            /admin/achievements
+│   ├── Curriculum              /admin/curriculum      (9 Modules, 90 Lessons, Quality Ratings & Feedback)
+│   └── Achievements            /admin/achievements    (Certificates Registry & Badges Directory)
 │
 ├── Insights
-│   └── Analytics               /admin/analytics
+│   └── Analytics               /admin/analytics       (Learners, Learning Funnel, Engagement/XP, Outcomes)
 │
 ├── System
-│   └── System                  /admin/system  (tabs: Health, Alerts, Errors, Audit Log)
+│   └── System                  /admin/system          (Health Diagnostics, Severity Alerts, Error Logs, Audit Trails)
 │
 └── Settings
-    └── Settings                /admin/settings  (tabs: Product, Learning, Email, Notifications, Feature Flags)
+    └── Settings                /admin/settings        (Product, Learning, Email, Notifications, Feature Flags, Onboarding)
 ```
 
-### Legacy Routes (Preserved as Redirects)
+### Route Aliases & Backward-Compatible Redirects
 
-| Legacy Route | Redirects To |
+| Legacy Route | Modern Canonical Route |
 |---|---|
+| `/admin/portfolios` | `/admin/moderation?tab=portfolios` (Portfolio Verification Queue) |
 | `/admin/content` | `/admin/curriculum` |
 | `/admin/emails` | `/admin/communications?tab=queue` |
 | `/admin/feature-flags` | `/admin/settings?section=feature-flags` |
 | `/admin/feedback` | `/admin/moderation?tab=testimonials` |
 | `/admin/notifications` | `/admin/communications?tab=notifications` |
-| `/admin/portfolios` | `/admin/users` |
 | `/admin/templates` | `/admin/communications?tab=templates` |
 | `/admin/certificates` | `/admin/achievements/certificates` |
 
 ---
 
-## 3. Workspace Details
+## 3. Workspaces & Functional Specifications
 
 ### 3.1 Dashboard (`/admin`)
-
-**Purpose**: Operational home — "What is happening and what needs my attention?"
-
-**Sections:**
-- **Page header**: Time-based greeting + date-range selector (Today/7D/30D/90D/Custom via `?range=`); Refresh button
-- **Attention Center** (`AdminAttentionCenter`): Failed emails, new contact messages, pending testimonials, active alerts. Collapses to "Everything looks good" when all counts are zero.
-- **KPI grid** (8 cards): Total Users, Active Learners, New Users, Verified Users, Lessons Completed, Course Completion %, XP Earned, Certificates Issued — each with prior-period trend deltas
-- **Charts**: Learner Activity (AreaChart: new/active/returning per day) + Learning Activity (BarChart: lessons/quizzes/capstones per day, with metric switching)
-- **Learning Funnel** (`AdminFunnelChart`): Registered → Onboarding → First Lesson → First Quiz → Module Completion → Course Completion → Certificate (all-time cumulative)
-- **Recent Activity** (`AdminRecentActivityList`): Union of certificates, registrations, lesson completions, capstone submissions (sorted desc, capped at 12)
-- **System Snapshot** (`AdminSystemSnapshot`): Live-derived service status (Database, Auth, Email, Queue, Notifications, Scheduler)
-
-**Key decisions:**
-- Active learner = distinct user with ≥1 `xp_events` row in the selected window
-- Funnel is all-time (not range-scoped); date range affects KPIs/charts only
-- Course completion = users holding the `cpo_completion` badge (or all 90 lessons)
-
----
+- **Header & Filters:** Dynamic time-based greeting, date range selector (`Today`, `7D`, `30D`, `90D`, `Custom`), and instant data refresh.
+- **Attention Center (`AdminAttentionCenter`):** Live badge counts for failed emails, new contact messages, pending testimonials, active system alerts, and pending portfolio reviews.
+- **KPI Metrics (8 Cards):** Total Registered Users, Active Learners, New Signups, Verified Users, Lessons Completed, Overall Completion %, Total XP Earned, and Certificates Issued — with period-over-period trend deltas.
+- **Visualizations:** Learner Activity Area Chart (new vs. active learners), Learning Activity Bar Chart (lessons, quizzes, capstones), and All-Time Learner Journey Funnel (`AdminFunnelChart`).
+- **Live System Snapshot:** Real-time operational status across Database, Auth, Email Queue, Notifications, and Scheduler.
 
 ### 3.2 Users Workspace (`/admin/users`)
-
-**Purpose**: Search, inspect and manage all learners.
-
-**Filters**: Verification status, Account status, Admin status, Activity level, Progress, Level, Signup date, Last active
-
-**User table columns**: User, Status, Progress, Level, XP, Streak, Last Active, Joined
-
-**User Detail Drawer** (`UserDetailDrawer`): Full-height right drawer on desktop; full-screen page on mobile (`/admin/users/[id]`).
-
-**Drawer tabs**: Overview, Learning, Activity, Achievements, Communications, Account
-
-**User actions**: Resend verification, Role toggle, View portfolio, Reset progress (confirmation), Delete account (confirmation)
-
----
+- **Directory & Filters:** Search by name, email, or `@username`. Filter by Admin status, Verification status, Activity level, Progress, and XP tier.
+- **User Detail Drawer (`UserDetailDrawer`):** Full-height sliding panel on desktop (`/admin/users?userId=[id]`) or standalone route on mobile (`/admin/users/[id]`).
+  - **Overview Tab:** Goal, course progress bar, recent activity timeline, latest badge, latest certificate, portfolio link.
+  - **Learning Tab:** Course progress, lesson counts, quiz average score, SRS review count, and per-module breakdown with **Reset Module Progress** action.
+  - **Activity Tab:** Complete chronological activity timeline with event type icons.
+  - **Achievements Tab:** Earned badges list, issued certificates, and submitted capstones with public status.
+  - **Communications Tab:** History of sent emails, in-app notifications, contact inquiries, and **[ Send Production Email ]** modal button.
+  - **Account Tab:** Email, verification status, signup date, last active date, auth provider, timezone, and internal UUID.
+  - **Administrative Controls:**
+    - `UserRoleToggle`: Promote/demote Admin role (`is_admin`).
+    - `UserFellowToggle`: Grant/revoke Product Management Fellow designation (`is_fellow`).
+    - `DeveloperActionsSection`: Generate test certificates for verification pipeline QA (`/api/admin/dev/generate-test-certificate`).
+    - Destructive actions with confirmation dialogs: **Reset All Progress** and **Delete User Account**.
 
 ### 3.3 Communications Workspace (`/admin/communications`)
-
-**Purpose**: Unified management of all communication channels.
-
-**Tabs**: Overview, Email, Automations, Templates, Queue, Notifications, Contact, [Testimonials → Moderation], [Feedback → Moderation]
-
-**Template Editor** (`/admin/communications/templates/[templateKey]`): Subject field, email body editor (Code mode), live HTML preview, variable reference, Save and Send Test actions.
-
-**Schema limitations:**
-- Template "Last Updated" not available (source-controlled components; no `updated_at` in registry)
-- Contact Read/Unread maps to `status = 'new'` (no `read_at` column)
-- Notification management actions absent (platform dispatches automatically from learning events)
-
----
+- **Overview Tab:** Delivery health KPIs, active email provider status, and broadcast campaign summaries.
+- **Email Queue Tab:** Real-time queue inspection (`pending`, `processing`, `delivered`, `failed`), dead-letter error logs, individual message retry, and bulk retry (`/api/admin/emails/queue/retry-all`).
+- **Broadcasts Tab:** Multi-channel broadcast builder (`/api/admin/emails/broadcasts`): audience targeting, recipient estimation & sampling, scheduling, execution, and cancelation.
+- **Automations Tab:** Cron schedule inspector for daily reminders and weekly recaps with **[ Run Now ]** trigger.
+- **Templates Tab:** Transactional template registry with code editor, live HTML preview, variable substitution, and direct test-send to admin email (`/api/admin/emails/test-send`).
+- **Notifications Tab:** In-app broadcast management and in-app template testing (`/api/admin/notifications/in-app`).
+- **Contact Tab:** Inbound inquiry inbox with status categorization (`new`, `in_progress`, `resolved`, `archived`).
 
 ### 3.4 Moderation Workspace (`/admin/moderation`)
-
-**Purpose**: Review-oriented workspace for all learner-submitted content requiring human review.
-
-**Tabs**: Testimonials (approve/reject/publish), Product Feedback (read-only), Capstones (publish/keep private), Portfolios (view)
-
-**Schema limitations (documented in code):**
-- Product Feedback: no `status` column → read-only with explanatory note
-- Testimonials "Featured" = Published (no `featured` column)
-- Moderation "In Review" status: absent from DB → not shown
-- Capstone "Rejected" = `reviewed` + `is_public: false` → shown as "archived"
-
----
+- **Testimonials Tab:** Review learner reviews with ratings, approve for publishing, or reject.
+- **Product Feedback Tab:** In-depth learner feedback submitted after lessons or via feedback widgets.
+- **Capstones Tab:** Evaluate module capstone submissions, toggle public portfolio visibility, and publish/archive case studies.
+- **Portfolio Verification Queue (`PortfoliosView.tsx`):**
+  - Dedicated queue for public learner portfolios.
+  - KPI Cards: **Pending Verification**, **Verified Fellows**, and **Total Public Portfolios**.
+  - Filter tabs: **Pending Review**, **Verified Fellows**, and **All Public**.
+  - In-line **`[ Verify ]`** action granting `is_fellow = true` with live loading and toast feedback.
+  - In-line **`[ Unverify ]`** action with confirmation dialog.
+  - **Server-Side Invariant:** Direct API calls to verify private portfolios (`is_portfolio_public: false`) are rejected with HTTP 400 Bad Request.
 
 ### 3.5 Curriculum Workspace (`/admin/curriculum`)
-
-**Purpose**: Inspect and manage the learning structure.
-
-**Views:**
-- Overview: KPI cards + module grid
-- Module Detail (`/admin/curriculum/[moduleSlug]`): metadata + lesson table
-- Lesson Detail (`/admin/curriculum/[moduleSlug]/[lessonId]`): metadata + live learner-facing preview
-
-**Frontend controls**: Publish/unpublish, enable/disable, visibility toggle (all with confirmation dialogs)
-
----
+- **Curriculum Browser:** 9 modules, 90 lessons, with prerequisite mapping.
+- **Content Quality Metrics:** Average clarity rating (1–5 stars) and clarity satisfaction percentage per lesson.
+- **Needs Review Filter:** Highlights lessons with clarity ratings below 3.5/5.0.
+- **Learner Feedback Drawer:** Inspect student feedback comments and issue tags (`confusing`, `typo`, `outdated`, `broken_diagram`).
+- **Lesson Detail & Preview:** Metadata inspector, live learner-facing preview, and publish/unpublish toggles.
 
 ### 3.6 Achievements Workspace (`/admin/achievements`)
-
-**Purpose**: Learner outcome overview and navigation.
-
-**Pages:**
-- Overview: KPI cards + nav tiles to Badges, Certificates, Capstones (→ Moderation), Portfolios (→ Moderation)
-- Certificates (`/admin/achievements/certificates`): table + detail drawer with preview and verification link
-- Badges (`/admin/achievements/badges`): visual grid + badge detail drawer
-
-**Schema limitations:**
-- "Recently Verified" KPI: no verification tracking → replaced by "Credential Types"
-- Portfolios "Submitted" column: no `portfolios` table → column labeled "Joined" (account creation date)
-
----
+- **Certificates Registry (`/admin/achievements/certificates`):** Table of issued credentials, recipient lookups, template versioning, and verification drawer with live QR verification preview.
+- **Badges Directory (`/admin/achievements/badges`):** Visual catalog of all platform badges with unlock criteria and recipient counts.
 
 ### 3.7 Analytics Workspace (`/admin/analytics`)
-
-**Purpose**: Deep analytics on learner behavior, learning, engagement, and outcomes.
-
-**Tabs**: Overview, Learners (DAU/WAU/MAU, acquisition, levels, streaks), Learning (curriculum drop-offs, completion funnel, quiz performance), Engagement & XP (daily XP velocity, source breakdown, SRS habits), Outcomes (certificate velocity, capstone status, portfolio adoption)
-
-**Global controls**: Date range selector, Export CSV button
-
-**Data**: All live Supabase data; no mock fallbacks. Session duration not logged → correctly omitted.
-
----
+- **Learners:** Acquisition velocity, DAU/WAU/MAU ratios, level distribution, and streak health.
+- **Learning:** Lesson completion funnel, drop-off hotspots, and quiz first-pass rates.
+- **Engagement & XP:** Daily XP velocity, XP source attribution, and SM-2 flashcard retention habits.
+- **Outcomes:** Certificate issuance velocity and public portfolio adoption rates.
+- **Export:** One-click CSV export of analytics datasets.
 
 ### 3.8 System Workspace (`/admin/system`)
-
-**Purpose**: Operational visibility into platform health.
-
-**Tabs**: Health (service cards + feature flags diagnostic), Alerts (severity-grouped), Errors (groups table + detail drawer), Audit Log (searchable/filterable + detail drawer)
-
-**Header action**: Process Email Queue button
-
----
+- **Health Tab:** Real-time database latency, auth service health, email provider connection, queue health, and cron status.
+- **Alerts Tab:** Active system alerts grouped by severity (`critical`, `warning`, `info`).
+- **Errors Tab:** System error logs aggregated by fingerprint with 15-minute deduplication, occurrence count, and stack trace inspector.
+- **Audit Log Tab:** Searchable and filterable log of all admin mutations recorded in `public.admin_audit_logs`.
+- **Manual Trigger:** Header action button to trigger instant email queue processing (`POST /api/cron/process-email-queue`).
 
 ### 3.9 Settings Workspace (`/admin/settings`)
-
-**Purpose**: Grouped configuration for product, learning, email, notifications, and feature flags.
-
-**Sections**: Product, Learning, Email, Notifications, Feature Flags
-
-**UX**: Dirty-state tracking, unsaved-changes warning on tab switch, Save/Reset per section, `beforeunload` guard.
-
-**Persistence**: `PATCH /api/admin/settings?section=<section>` → `system_settings` table. Requires production verification.
+- **Product Settings:** Platform name, contact email, Maintenance Mode toggle, Allow Signups toggle, Require Email Verification toggle, session timeout.
+- **Learning Settings:** Runtime XP awards (lesson completion, quiz pass, flashcard review, reflection), streak freeze cost, pass thresholds.
+- **Email Settings:** Sender name/email, daily/hourly send limits, retry policies, and API key status.
+- **Notification Settings:** Daily reminder defaults, weekly recap schedule, default delivery channels.
+- **Feature Flags:** Dynamic boolean/percentage feature flags stored in `system_settings`.
+- **Onboarding Settings:** Structured goal options, recommended starting modules, and badge assignments.
 
 ---
 
-## 4. Shared Components & Design System
+## 4. Security Architecture & RBAC
 
-### Design Tokens
-All admin styles use CSS custom properties prefixed `admin-*`:
-- Surfaces: `admin-bg`, `admin-surface`, `admin-surface-raised`
-- Text: `admin-fg`, `admin-fg-muted`, `admin-fg-subtle`
-- Borders: `admin-border`, `admin-border-strong`
-- Accent: `admin-accent`, `admin-accent-soft`
-- Semantic: `admin-success`, `admin-warning`, `admin-danger`, `admin-info` + `-soft` variants
-
-### Key Shared Components
-| Component | Purpose |
+| Security Layer | Implementation Detail |
 |---|---|
-| `AdminConsoleShell` | Root shell: sidebar + header wiring |
-| `AdminSidebar` | Collapsible sidebar with group nav and attention badges |
-| `AdminHeader` | Sticky header: breadcrumbs, system status, bell, sign-out |
-| `AdminPageShell` | Standard page container (header, KPIs, children) |
-| `AdminPageHeader` | Page title, description, icon, actions bar |
-| `AdminDataTable` | Sortable table with empty/loading/error states |
-| `AdminPagination` | Page navigation with keyboard focus |
-| `AdminKpiCard` | KPI card with title, value, subtitle, icon, trend |
-| `AdminStatusBadge` | Semantic status badges |
-| `AdminModal` | Accessible modal with focus trap |
-| `AdminDrawer` | Right-panel detail drawer |
-| `AdminConfirmDialog` | Confirmation dialog for destructive actions |
-| `AdminSearchInput` | Debounced search input |
-| `AdminRangeSelector` | Date range preset selector |
-| `AdminEmptyState` | Empty state with icon, title, description |
-| `AdminErrorState` | Error state with retry |
-| `AdminLoadWarning` | Non-blocking data load warning banner |
-| `admin-toast` | Toast notification system |
+| **Edge Proxy** | `apps/web/proxy.ts` blocks unauthorized access to `/admin` and protected APIs |
+| **API Authorization** | `requireAdminUser(request)` in `lib/admin/authorization.ts` validates session & role |
+| **Audit Trail** | `logAdminAction()` records admin email, IP/user agent, action name, and JSON payload |
+| **Service Role Client** | Server-only Supabase service-role client initialized strictly inside protected Route Handlers |
+| **Secret Sanitization** | `sanitizeErrorDetails()` strips API keys, tokens, and authorization headers before logging |
+| **Search Engine Directives** | Admin routes emit `robots: { index: false, follow: false }` |
 
 ---
 
----
+## 5. Verification & Quality Metrics
 
-## 5. Current Feature Status & Capabilities
-
-### ✅ Fully Implemented & Backed by Real Database Services
-- **Dashboard (`/admin`)**: Real-time KPI cards, daily learner/learning charts, journey funnel, recent activity feed, system snapshot, and date range filters (`Today`, `7D`, `30D`, `90D`, `Custom`).
-- **Global Search & Attention**:
-  - `Cmd+K` / `Ctrl+K` global search modal (`/api/admin/search`) searching across Users, Curriculum, Certificates, and Inquiries with server-side RBAC.
-  - Actionable Attention Bell popover panel in header displaying live breakdown counts and direct links to active queues.
-- **Users (`/admin/users`)**: Directory with SQL-side pagination, search, role filters, user detail drawers, admin role toggle, progress reset, account deletion, and custom individual production email dispatching (`/api/admin/emails/production-send`).
-- **Communications (`/admin/communications`)**: Email queue monitoring, dead-letter retry/inspect, transactional template viewer & test send, system announcements broadcast, and contact message inbox.
-- **Moderation (`/admin/moderation`)**: Review and publish/reject learner testimonials, capstone project deliverables, and product feedback.
-- **Curriculum (`/admin/curriculum`)**: 9-module & 90-lesson browser, lesson metadata inspection, publish/unpublish toggles, live previews, Content Quality clarity ratings (1–5 stars and clarity %), "Needs Review" filter (clarity < 3.5), and learner feedback inspection drawer with clarity issue tags.
-- **Achievements (`/admin/achievements`)**: Issued certificate registry with live verification previews, badge catalog, and credential issuance logs.
-- **Analytics (`/admin/analytics`)**: Active learner metrics (DAU/WAU/MAU), lesson completion drop-off funnels, quiz pass rates, XP velocity, and SRS retention habits.
-- **System (`/admin/system`)**: Operational health diagnostics, database latency metrics, error group logs with stack traces, severity-based alerts, and searchable `admin_audit_logs`.
-- **Settings (`/admin/settings`)**: Product configuration, runtime XP values, email provider controls, notification defaults, feature flag toggles, and dynamic onboarding goal option management.
-
----
-
-## 6. Security Architecture & RBAC
-
-| Layer | Implementation |
-|---|---|
-| **Middleware RBAC** | `apps/web/proxy.ts` — first checkpoint, blocks unauthenticated & non-admin users |
-| **Layout Authorization** | `app/admin/(console)/layout.tsx` — server-side session authorization guard via `isAdminUser()` |
-| **Centralized Route Guard** | `requireAdminUser()` in `lib/admin/authorization.ts` — enforced on 100% of `/api/admin/**` handlers (33 files, 47 endpoints) |
-| **Audit Logging** | `logAdminAction()` in `lib/admin/authorization.ts` — automatically persists structured metadata for all mutations to `admin_audit_logs` |
-| **Service Role Isolation** | Service-role Supabase client is server-only and invoked strictly after admin authorization |
-| **Search Engine Robots** | `/admin` excluded from indexing (`index: false, follow: false`) |
-
----
-
-## 7. Quality & Verification Metrics
-
-- **Unit & Integration Tests**: 54 test files (439 tests passing with 0 failures in Vitest).
-- **TypeScript Typecheck**: 0 errors (`tsc --noEmit`).
-- **ESLint**: 0 errors, 0 warnings.
-- **Production Build**: 199/199 routes compiled successfully under Next.js 16.2.12 (Turbopack).
-- **Email Safety**: Outbound email mock fail-safe active during automated tests (0 live emails sent to test recipients).
-
-
+- **Vitest Unit & Integration Tests:** 84 test suites (887 tests passing with 0 failures).
+- **TypeScript Typecheck:** 0 errors (`tsc --noEmit`).
+- **ESLint:** 0 errors, 0 warnings.
+- **Next.js Production Build:** 219 static and dynamic routes compiled successfully under Next.js 16.2.12 Turbopack.
