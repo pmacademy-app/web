@@ -61,6 +61,64 @@ function verifyResendWebhookSignature(request: Request, rawBody: string, secret:
   return false
 }
 
+function verifyBrevoWebhookAuth(request: Request, secret: string): boolean {
+  if (!secret) return false
+  const cleanExpected = secret.trim()
+  if (!cleanExpected) return false
+  const expectedBuf = Buffer.from(cleanExpected)
+
+  // 1. Check custom headers: x-brevo-webhook-secret, x-webhook-secret
+  const headerSecret =
+    request.headers.get('x-brevo-webhook-secret') ||
+    request.headers.get('x-webhook-secret')
+
+  if (headerSecret) {
+    const providedBuf = Buffer.from(headerSecret.trim())
+    if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
+      return true
+    }
+  }
+
+  // 2. Check Authorization header: Bearer <secret> or Basic <encoded>
+  const authHeader = request.headers.get('authorization')
+  if (authHeader) {
+    if (authHeader.startsWith('Bearer ')) {
+      const bearerToken = authHeader.substring(7).trim()
+      const providedBuf = Buffer.from(bearerToken)
+      if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
+        return true
+      }
+    } else if (authHeader.startsWith('Basic ')) {
+      try {
+        const decoded = Buffer.from(authHeader.substring(6).trim(), 'base64').toString('utf-8')
+        const token = decoded.includes(':') ? decoded.split(':')[1] : decoded
+        const providedBuf = Buffer.from(token.trim())
+        if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
+          return true
+        }
+      } catch {
+        // Ignored
+      }
+    }
+  }
+
+  // 3. Check query param: ?secret= or ?token=
+  try {
+    const url = new URL(request.url)
+    const querySecret = url.searchParams.get('secret') || url.searchParams.get('token')
+    if (querySecret) {
+      const providedBuf = Buffer.from(querySecret.trim())
+      if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
+        return true
+      }
+    }
+  } catch {
+    // Ignored
+  }
+
+  return false
+}
+
 async function fetchInboundEmailBody(emailId: string): Promise<{ text?: string; html?: string }> {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey || !emailId) return {}
@@ -85,22 +143,53 @@ async function fetchInboundEmailBody(emailId: string): Promise<{ text?: string; 
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text()
-    const secret = process.env.RESEND_WEBHOOK_SECRET
+    const resendSecret = process.env.RESEND_WEBHOOK_SECRET
+    const brevoSecret = process.env.BREVO_WEBHOOK_SECRET
 
-    // 1. Verify Webhook Signature if configured in environment
-    if (secret) {
-      const isValid = verifyResendWebhookSignature(request, rawBody, secret)
-      if (!isValid) {
-        const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id') || 'unknown'
-        console.warn('[ResendWebhook] Unauthorized webhook request: Svix signature verification failed.')
-        const { logSystemError } = await import('@/lib/monitoring/logger')
-        void logSystemError({
-          severity: 'warning',
-          category: 'webhook',
-          operation: 'resend_webhook_auth',
-          message: `Unauthorized request: Svix signature or secret verification failed (svix-id: ${svixId})`,
-        })
-        return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
+    const hasSvixHeaders = Boolean(
+      request.headers.get('svix-id') ||
+      request.headers.get('webhook-id') ||
+      request.headers.get('svix-signature') ||
+      request.headers.get('webhook-signature')
+    )
+
+    // 1. Authenticate Inbound Webhook Request
+    if (hasSvixHeaders) {
+      // Path A: Resend / Svix Signature Verification
+      if (resendSecret) {
+        const isValid = verifyResendWebhookSignature(request, rawBody, resendSecret)
+        if (!isValid) {
+          const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id') || 'unknown'
+          console.warn('[ResendWebhook] Unauthorized webhook request: Svix signature verification failed.')
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'warning',
+            category: 'webhook',
+            operation: 'resend_webhook_auth',
+            message: `Unauthorized request: Svix signature or secret verification failed (svix-id: ${svixId})`,
+          })
+          return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
+        }
+      }
+    } else {
+      // Path B: Brevo Webhook Shared Secret Verification
+      if (brevoSecret) {
+        const isValid = verifyBrevoWebhookAuth(request, brevoSecret)
+        if (!isValid) {
+          console.warn('[BrevoWebhook] Unauthorized webhook request: Brevo secret verification failed.')
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'warning',
+            category: 'webhook',
+            operation: 'brevo_webhook_auth',
+            message: 'Unauthorized request: Brevo webhook secret verification failed',
+          })
+          return NextResponse.json({ error: 'Unauthorized: Invalid Brevo webhook authentication' }, { status: 401 })
+        }
+      } else if (resendSecret) {
+        // If Resend secret is configured but request lacks Svix headers and no Brevo secret is configured, reject
+        console.warn('[EmailWebhook] Unauthorized webhook request: Missing authentication headers.')
+        return NextResponse.json({ error: 'Unauthorized: Missing webhook authentication' }, { status: 401 })
       }
     }
 
