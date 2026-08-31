@@ -67,53 +67,18 @@ function verifyBrevoWebhookAuth(request: Request, secret: string): boolean {
   if (!cleanExpected) return false
   const expectedBuf = Buffer.from(cleanExpected)
 
-  // 1. Check custom headers: x-brevo-webhook-secret, x-webhook-secret
+  // Canonical header verification: x-brevo-webhook-secret (or standard x-webhook-secret)
   const headerSecret =
     request.headers.get('x-brevo-webhook-secret') ||
     request.headers.get('x-webhook-secret')
 
-  if (headerSecret) {
-    const providedBuf = Buffer.from(headerSecret.trim())
-    if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
-      return true
-    }
+  if (!headerSecret) {
+    return false
   }
 
-  // 2. Check Authorization header: Bearer <secret> or Basic <encoded>
-  const authHeader = request.headers.get('authorization')
-  if (authHeader) {
-    if (authHeader.startsWith('Bearer ')) {
-      const bearerToken = authHeader.substring(7).trim()
-      const providedBuf = Buffer.from(bearerToken)
-      if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
-        return true
-      }
-    } else if (authHeader.startsWith('Basic ')) {
-      try {
-        const decoded = Buffer.from(authHeader.substring(6).trim(), 'base64').toString('utf-8')
-        const token = decoded.includes(':') ? decoded.split(':')[1] : decoded
-        const providedBuf = Buffer.from(token.trim())
-        if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
-          return true
-        }
-      } catch {
-        // Ignored
-      }
-    }
-  }
-
-  // 3. Check query param: ?secret= or ?token=
-  try {
-    const url = new URL(request.url)
-    const querySecret = url.searchParams.get('secret') || url.searchParams.get('token')
-    if (querySecret) {
-      const providedBuf = Buffer.from(querySecret.trim())
-      if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
-        return true
-      }
-    }
-  } catch {
-    // Ignored
+  const providedBuf = Buffer.from(headerSecret.trim())
+  if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
+    return true
   }
 
   return false
