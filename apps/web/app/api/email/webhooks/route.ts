@@ -61,6 +61,29 @@ function verifyResendWebhookSignature(request: Request, rawBody: string, secret:
   return false
 }
 
+function verifyBrevoWebhookAuth(request: Request, secret: string): boolean {
+  if (!secret) return false
+  const cleanExpected = secret.trim()
+  if (!cleanExpected) return false
+  const expectedBuf = Buffer.from(cleanExpected)
+
+  // Canonical header verification: x-brevo-webhook-secret (or standard x-webhook-secret)
+  const headerSecret =
+    request.headers.get('x-brevo-webhook-secret') ||
+    request.headers.get('x-webhook-secret')
+
+  if (!headerSecret) {
+    return false
+  }
+
+  const providedBuf = Buffer.from(headerSecret.trim())
+  if (providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf)) {
+    return true
+  }
+
+  return false
+}
+
 async function fetchInboundEmailBody(emailId: string): Promise<{ text?: string; html?: string }> {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey || !emailId) return {}
@@ -85,22 +108,53 @@ async function fetchInboundEmailBody(emailId: string): Promise<{ text?: string; 
 export async function POST(request: Request) {
   try {
     const rawBody = await request.text()
-    const secret = process.env.RESEND_WEBHOOK_SECRET
+    const resendSecret = process.env.RESEND_WEBHOOK_SECRET
+    const brevoSecret = process.env.BREVO_WEBHOOK_SECRET
 
-    // 1. Verify Webhook Signature if configured in environment
-    if (secret) {
-      const isValid = verifyResendWebhookSignature(request, rawBody, secret)
-      if (!isValid) {
-        const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id') || 'unknown'
-        console.warn('[ResendWebhook] Unauthorized webhook request: Svix signature verification failed.')
-        const { logSystemError } = await import('@/lib/monitoring/logger')
-        void logSystemError({
-          severity: 'warning',
-          category: 'webhook',
-          operation: 'resend_webhook_auth',
-          message: `Unauthorized request: Svix signature or secret verification failed (svix-id: ${svixId})`,
-        })
-        return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
+    const hasSvixHeaders = Boolean(
+      request.headers.get('svix-id') ||
+      request.headers.get('webhook-id') ||
+      request.headers.get('svix-signature') ||
+      request.headers.get('webhook-signature')
+    )
+
+    // 1. Authenticate Inbound Webhook Request
+    if (hasSvixHeaders) {
+      // Path A: Resend / Svix Signature Verification
+      if (resendSecret) {
+        const isValid = verifyResendWebhookSignature(request, rawBody, resendSecret)
+        if (!isValid) {
+          const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id') || 'unknown'
+          console.warn('[ResendWebhook] Unauthorized webhook request: Svix signature verification failed.')
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'warning',
+            category: 'webhook',
+            operation: 'resend_webhook_auth',
+            message: `Unauthorized request: Svix signature or secret verification failed (svix-id: ${svixId})`,
+          })
+          return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
+        }
+      }
+    } else {
+      // Path B: Brevo Webhook Shared Secret Verification
+      if (brevoSecret) {
+        const isValid = verifyBrevoWebhookAuth(request, brevoSecret)
+        if (!isValid) {
+          console.warn('[BrevoWebhook] Unauthorized webhook request: Brevo secret verification failed.')
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'warning',
+            category: 'webhook',
+            operation: 'brevo_webhook_auth',
+            message: 'Unauthorized request: Brevo webhook secret verification failed',
+          })
+          return NextResponse.json({ error: 'Unauthorized: Invalid Brevo webhook authentication' }, { status: 401 })
+        }
+      } else if (resendSecret) {
+        // If Resend secret is configured but request lacks Svix headers and no Brevo secret is configured, reject
+        console.warn('[EmailWebhook] Unauthorized webhook request: Missing authentication headers.')
+        return NextResponse.json({ error: 'Unauthorized: Missing webhook authentication' }, { status: 401 })
       }
     }
 
@@ -119,14 +173,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
     }
 
-    const eventType = String(payload.type || 'email.received')
-    console.log('[ResendWebhook] Inbound webhook received event type:', eventType)
+    // Normalize event type across Resend (payload.type) and Brevo (payload.event)
+    let eventType = String(payload.type || '')
+    let emailId = ''
+
+    if (!eventType && typeof payload.event === 'string') {
+      const brevoEvent = payload.event.toLowerCase()
+      if (brevoEvent === 'delivered') eventType = 'email.delivered'
+      else if (brevoEvent === 'soft_bounce' || brevoEvent === 'hard_bounce' || brevoEvent === 'blocked' || brevoEvent === 'invalid_email') eventType = 'email.bounced'
+      else if (brevoEvent === 'spam' || brevoEvent === 'complaint') eventType = 'email.complained'
+      else if (brevoEvent === 'opened' || brevoEvent === 'unique_opened') eventType = 'email.opened'
+      else if (brevoEvent === 'click') eventType = 'email.clicked'
+      else eventType = `brevo.${brevoEvent}`
+
+      emailId = String(payload['message-id'] || payload.message_id || payload['messageId'] || payload.id || '')
+    } else if (!eventType) {
+      eventType = 'email.received'
+    }
 
     const data = (payload.data || payload) as Record<string, unknown>
-    const emailId = String(data.email_id || data.id || '')
+    if (!emailId) {
+      emailId = String(data.email_id || data.id || data['message-id'] || data.message_id || '')
+    }
+    console.log('[EmailWebhook] Inbound webhook received event type:', eventType, 'emailId:', emailId || 'none')
 
-    // Handle Outbound Resend Delivery Events (sent, delivered, failed, bounced, complained)
-    if (eventType !== 'email.received' && eventType.startsWith('email.')) {
+    // Handle Outbound Delivery Events (sent, delivered, failed, bounced, complained)
+    if (eventType !== 'email.received' && (eventType.startsWith('email.') || eventType.startsWith('brevo.'))) {
       try {
         const supabase = createServiceRoleClient()
 
@@ -167,7 +239,7 @@ export async function POST(request: Request) {
 
         // 4. Auto-suppress on spam complaints
         if (eventType === 'email.complained') {
-          const recipientEmail = String(data.to || data.recipient || '')
+          const recipientEmail = String(data.email || data.to || data.recipient || payload.email || '')
           if (recipientEmail) {
             await supabase
               .from('email_suppressions')

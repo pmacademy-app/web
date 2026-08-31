@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { EMAIL_TEMPLATE_MAP, interpolateVariables, stripHtmlToPlainText } from '@/emails'
 import { TEMPLATE_SAMPLE_VARIABLES } from '@/lib/admin/communications-service'
-import { globalProviderRegistry } from '@/lib/notifications/providers'
+import { globalProviderRegistry, getActiveEmailProvider } from '@/lib/notifications/providers'
 
 export const runtime = 'nodejs'
 
@@ -54,8 +54,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       text = stripHtmlToPlainText(rawHtml)
     }
 
-    // Dispatch via registered Resend provider
-    const provider = globalProviderRegistry.getProvider('resend')
+    // Dispatch via active email provider (Brevo by default)
+    const provider = getActiveEmailProvider(globalProviderRegistry)
     if (!provider) {
       return NextResponse.json({ error: 'Email provider not registered.' }, { status: 500 })
     }

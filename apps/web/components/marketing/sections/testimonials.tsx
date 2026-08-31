@@ -25,8 +25,8 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
-    // If initial server testimonials were provided, do not re-fetch on client unless empty
-    if (initialTestimonials && initialTestimonials.length > 0) {
+    // If initial server testimonials were provided (even if 0 reviews), do not re-fetch on client
+    if (initialTestimonials !== undefined) {
       return
     }
 

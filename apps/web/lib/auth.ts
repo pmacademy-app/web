@@ -107,11 +107,13 @@ export async function getAuthenticatedUser(supabase: SupabaseClient<Database>): 
   return user
 }
 
+import { cache } from 'react'
+
 /**
- * Server-side helper to verify auth session directly from request cookies.
+ * Internal resolver to verify auth session directly from request cookies.
  * Extracts sb-access-token and returns the authenticated Supabase User or null.
  */
-export async function getServerUser(): Promise<User | null> {
+async function resolveServerUser(): Promise<User | null> {
   try {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('sb-access-token')?.value
@@ -150,14 +152,17 @@ export async function getServerUser(): Promise<User | null> {
 }
 
 /**
- * Unified API route authentication helper.
- * Extracts token from either:
- * 1. `Authorization: Bearer <token>` header
- * 2. Request cookies (`sb-access-token`)
- *
- * Logs step-by-step trace information for production debugging.
+ * Server-side helper to verify auth session directly from request cookies.
+ * Memoized per server-request lifecycle using React cache().
  */
-export async function getAuthenticatedUserFromRequest(request: Request): Promise<User | null> {
+export const getServerUser = cache(resolveServerUser)
+
+const requestAuthCache = new WeakMap<Request, Promise<User | null>>()
+
+/**
+ * Internal resolver for API route authentication helper.
+ */
+async function resolveAuthenticatedUserFromRequest(request: Request): Promise<User | null> {
   const cookieHeader = request.headers.get('cookie') || ''
 
   let token: string | null = null
@@ -213,6 +218,21 @@ export async function getAuthenticatedUserFromRequest(request: Request): Promise
   }
 
   return null
+}
+
+/**
+ * Unified API route authentication helper.
+ * Extracts token from Authorization header or cookies, deduplicated per-request instance via WeakMap.
+ */
+export async function getAuthenticatedUserFromRequest(request: Request): Promise<User | null> {
+  const cached = requestAuthCache.get(request)
+  if (cached) {
+    return cached
+  }
+
+  const promise = resolveAuthenticatedUserFromRequest(request)
+  requestAuthCache.set(request, promise)
+  return promise
 }
 
 /**

@@ -123,8 +123,8 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const body = await request.json()
-    const { action, notificationId } = body
+    const body = await request.json().catch(() => ({}))
+    const { action, notificationId, notificationIds } = body
     const supabase = createServiceRoleClient()
 
     if (action === 'mark_all_read') {
@@ -141,8 +141,27 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: true, message: 'All notifications marked as read' })
     }
 
+    // Batch mark-read for displayed notifications in the drawer
+    if (Array.isArray(notificationIds) && notificationIds.length > 0) {
+      const idsToMark = notificationIds.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0)
+      if (idsToMark.length > 0) {
+        const { error } = await (supabase
+          .from('in_app_notifications') as unknown as DBChain)
+          .update({ is_read: true, read_at: new Date().toISOString() })
+          .in('id', idsToMark)
+          .eq('user_id', authUser.id)
+          .eq('is_read', false)
+
+        if (error) {
+          console.error('[API:notifications] Error marking batch read:', error)
+        }
+
+        return NextResponse.json({ success: true, markedIds: idsToMark, count: idsToMark.length })
+      }
+    }
+
     if (!notificationId) {
-      return NextResponse.json({ error: 'Missing notificationId' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing notificationId or notificationIds' }, { status: 400 })
     }
 
     const isRead = action === 'mark_read'

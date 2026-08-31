@@ -97,11 +97,36 @@ describe('Notification Platform Foundation Unit Test Suite', () => {
     expect(sendRes.externalId).toBeDefined()
   })
 
+  it('BrevoProvider scaffold healthCheck and send behavior', async () => {
+    const { BrevoProvider } = await import('../notifications')
+    const provider = new BrevoProvider()
+    expect(provider.name).toBe('brevo')
+    expect(provider.supportedChannels).toEqual(['email'])
+
+    const health = await provider.healthCheck()
+    const hasKey = Boolean(process.env.BREVO_API_KEY)
+    expect(health.isHealthy).toBe(hasKey)
+
+    const sendRes = await provider.send({
+      recipient: { userId: 'u1', email: 'test@example.com', name: 'Alex' },
+      channel: 'email',
+      templateKey: 'auth.welcome',
+      templateVersion: 1,
+      variables: { name: 'Alex', subject: 'Welcome to Prodily' },
+    })
+
+    expect(sendRes.success).toBe(true)
+    expect(sendRes.providerName).toBe('brevo')
+    expect(sendRes.externalId).toBeDefined()
+  })
+
   it('ProviderRegistry filters providers by supported channel', () => {
     const registry = new ProviderRegistry()
     const emailProviders = registry.getProvidersForChannel('email')
-    expect(emailProviders.length).toBe(1)
-    expect(emailProviders[0].name).toBe('resend')
+    expect(emailProviders.length).toBe(2)
+    const names = emailProviders.map((p) => p.name)
+    expect(names).toContain('brevo')
+    expect(names).toContain('resend')
 
     const pushProviders = registry.getProvidersForChannel('push')
     expect(pushProviders.length).toBe(0)

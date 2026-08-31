@@ -1,8 +1,9 @@
 import React from 'react'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
-import { createAuthenticatedServerClient } from '@/lib/supabase'
+import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
 import { isAdminUser } from '@/lib/admin/authorization'
+import { getServerUser } from '@/lib/auth'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { AdminConsoleShell } from '@/components/admin/AdminConsoleShell'
 
@@ -23,19 +24,14 @@ export const metadata = {
  * `users.is_admin` database flag before rendering the console shell.
  */
 export default async function AdminConsoleLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-
-  if (!accessToken) {
-    redirect('/admin/login')
-  }
-
-  const supabase = createAuthenticatedServerClient(accessToken)
-  const { data: { user } } = await supabase.auth.getUser()
-
+  const user = await getServerUser()
   if (!user) {
     redirect('/admin/login')
   }
+
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('sb-access-token')?.value
+  const supabase = accessToken ? createAuthenticatedServerClient(accessToken) : createServiceRoleClient()
 
   const authorized = await isAdminUser(supabase, user.id, user.email)
   if (!authorized) {
