@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
-import { ensureUserProfile, UserProfile } from '@/lib/auth'
+import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
 import { SettingsService } from '@/lib/admin/settings-service'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
@@ -21,21 +21,14 @@ export default async function AuthenticatedLayout({
 }: {
   children: React.ReactNode
 }) {
+  const authUser = await getServerUser()
+  if (!authUser) {
+    redirect('/login')
+  }
+
   const cookieStore = await cookies()
   const accessToken = cookieStore.get('sb-access-token')?.value
-
-  if (!accessToken) {
-    redirect('/login')
-  }
-
-  // Create an authenticated client to query data
-  const supabase = createAuthenticatedServerClient(accessToken)
-
-  // Get user from auth service
-  const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
-  if (authError || !authUser) {
-    redirect('/login')
-  }
+  const supabase = accessToken ? createAuthenticatedServerClient(accessToken) : createServiceRoleClient()
 
   // Enforce email verification requirement when enabled
   const isVerificationRequired = await SettingsService.isEmailVerificationRequired()

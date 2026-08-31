@@ -24,6 +24,7 @@ const DIST_DIR = path.resolve(process.cwd(), '..', '..', 'content', 'dist')
 // In-memory process-level caches to eliminate repeated filesystem I/O across server renders
 const lessonMemoryCache = new Map<string, CompiledLesson>()
 let curriculumMemoryCache: CurriculumData | null = null
+let registryMemoryCache: Record<string, string> | null = null
 
 /**
  * Fetch a single compiled lesson by its stable ID (les_XXXXXX).
@@ -91,8 +92,15 @@ export async function getLessonMeta(lessonId: string): Promise<CurriculumEntry |
  * Resolve a legacy numeric slug (e.g. "lesson-001") to a stable lessonId
  * by reading the lesson-id-registry.json. Used for 301 redirects and
  * backward compatibility in the v1 lesson route.
+ * Cached in memory to eliminate repeated disk reads.
  */
-export async function resolveSlugToId(slug: string): Promise<string | null> {
+export const resolveSlugToId = cache(async (slug: string): Promise<string | null> => {
+  const key = `content/lessons/${slug}.md`
+
+  if (registryMemoryCache) {
+    return registryMemoryCache[key] ?? null
+  }
+
   const registryPath = path.resolve(
     process.cwd(),
     '..', '..', 'content', '.ids', 'lesson-id-registry.json'
@@ -100,14 +108,13 @@ export async function resolveSlugToId(slug: string): Promise<string | null> {
   try {
     const raw = await readFile(registryPath, 'utf-8')
     const registry = JSON.parse(raw) as Record<string, string>
-    // Registry keys are e.g. "content/lessons/lesson-001.md"
-    const key = `content/lessons/${slug}.md`
+    registryMemoryCache = registry
     return registry[key] ?? null
   } catch (err) {
     console.error('[lesson-loader] Error reading lesson-id-registry.json:', err)
     return null
   }
-}
+})
 
 /**
  * Get the previous and next lesson IDs from the curriculum order.

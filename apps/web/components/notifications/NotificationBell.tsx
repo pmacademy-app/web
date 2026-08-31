@@ -11,34 +11,69 @@ export function NotificationBell() {
   const bellContainerRef = useRef<HTMLDivElement>(null)
   const triggerButtonRef = useRef<HTMLButtonElement>(null)
 
+  const drawerOpenRef = useRef<boolean>(false)
+
+  useEffect(() => {
+    drawerOpenRef.current = drawerOpen
+  }, [drawerOpen])
+
+  const lastFetchTimeRef = useRef<number>(0)
+  const isFetchingRef = useRef<boolean>(false)
+
   useEffect(() => {
     let mounted = true
-    const loadState = async () => {
+
+    const loadState = async (force = false) => {
+      // Avoid duplicate concurrent fetches
+      if (isFetchingRef.current) return
+      // Skip background polling if document is hidden unless forced
+      if (!force && typeof document !== 'undefined' && document.hidden) return
+      // Skip if drawer is open and managing its own state
+      if (drawerOpenRef.current && !force) return
+
+      isFetchingRef.current = true
       try {
         const res = await fetch('/api/notifications?limit=1')
         const data = await res.json()
         if (mounted && data.success) {
           setUnreadCount(data.unreadCount || 0)
+          lastFetchTimeRef.current = Date.now()
         }
       } catch (err) {
         console.warn('[NotificationBell] Error fetching notifications:', err)
+      } finally {
+        isFetchingRef.current = false
       }
     }
 
-    void loadState()
+    void loadState(true)
 
     const unsubscribe = subscribeClientNotificationEvent(() => {
-      void loadState()
+      void loadState(true)
     })
 
+    // Periodic polling: 60s when visible and drawer is closed
     const interval = setInterval(() => {
       void loadState()
     }, 60000)
+
+    // Visibility change handler: refresh on tab focus if > 60s since last fetch
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !drawerOpenRef.current) {
+        const elapsed = Date.now() - lastFetchTimeRef.current
+        if (elapsed >= 60000) {
+          void loadState(true)
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
     return () => {
       mounted = false
       unsubscribe()
       clearInterval(interval)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [])
 

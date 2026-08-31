@@ -3,7 +3,7 @@ import { PRIORITY_MATRIX } from '../constants'
 import { globalFeatureFlagService } from '../feature-flags/service'
 import { createDefaultNotificationPreferences, isChannelEnabledByPreferences } from '../preferences/defaults'
 import { globalPriorityMatrix } from '../priority/matrix'
-import { globalProviderRegistry } from '../providers'
+import { globalProviderRegistry, getActiveEmailProvider } from '../providers'
 import { renderEmailTemplate } from '../../../emails'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '../automations/service'
@@ -299,10 +299,10 @@ export async function processEmailQueue(
       continue
     }
 
-    // E. Dispatch via Resend Provider
-    const provider = globalProviderRegistry.getProvider('resend')
+    // E. Dispatch via Active Email Provider (Brevo or Resend)
+    const provider = getActiveEmailProvider(globalProviderRegistry)
     if (!provider) {
-      await handleRetryableFailure(supabase, queueId, 'Resend provider not registered', attemptCount, maxAttempts)
+      await handleRetryableFailure(supabase, queueId, 'No active email provider registered', attemptCount, maxAttempts)
       failedCount++
       continue
     }
