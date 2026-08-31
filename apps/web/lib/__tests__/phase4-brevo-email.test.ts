@@ -314,8 +314,8 @@ describe('Phase 4 — Brevo Email Infrastructure & Transactional Email Migration
       expect((insertedDeliveryEvent as Record<string, unknown> | null)?.event_type).toBe('email.delivered')
     })
 
-    it('accepts valid Brevo webhook request with Authorization Bearer header', async () => {
-      process.env.BREVO_WEBHOOK_SECRET = 'bearer_brevo_token_888'
+    it('accepts valid Brevo webhook request with alternative standard x-webhook-secret header', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'alt_header_secret_888'
 
       const mockSupabase = {
         from: () => ({
@@ -330,7 +330,7 @@ describe('Phase 4 — Brevo Email Infrastructure & Transactional Email Migration
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          authorization: 'Bearer bearer_brevo_token_888',
+          'x-webhook-secret': 'alt_header_secret_888',
         },
         body: JSON.stringify({ event: 'delivered', email: 'test@example.com', 'message-id': '<m-1>' }),
       })
@@ -339,29 +339,20 @@ describe('Phase 4 — Brevo Email Infrastructure & Transactional Email Migration
       expect(response.status).toBe(200)
     })
 
-    it('accepts valid Brevo webhook request with query parameter ?secret=', async () => {
-      process.env.BREVO_WEBHOOK_SECRET = 'query_secret_777'
+    it('rejects Brevo webhook with 401 when query-string token is attempted (enforcing header-only auth)', async () => {
+      process.env.BREVO_WEBHOOK_SECRET = 'strict_header_secret'
 
-      const mockSupabase = {
-        from: () => ({
-          select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null }) }) }),
-          insert: async () => ({ error: null }),
-        }),
-      } as unknown as SupabaseClient<Database>
-
-      vi.spyOn(supabaseModule, 'createServiceRoleClient').mockReturnValue(mockSupabase)
-
-      const request = new Request('https://prodily.app/api/email/webhooks?secret=query_secret_777', {
+      const request = new Request('https://prodily.app/api/email/webhooks?secret=strict_header_secret', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event: 'delivered', email: 'test@example.com', 'message-id': '<m-2>' }),
       })
 
       const response = await webhookPost(request)
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(401)
     })
 
-    it('rejects Brevo webhook with 401 when BREVO_WEBHOOK_SECRET is set but authentication is missing', async () => {
+    it('rejects Brevo webhook with 401 when BREVO_WEBHOOK_SECRET is set but header is missing', async () => {
       process.env.BREVO_WEBHOOK_SECRET = 'configured_secret_123'
 
       const request = new Request('https://prodily.app/api/email/webhooks', {
