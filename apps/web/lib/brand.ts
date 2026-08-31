@@ -52,6 +52,7 @@ export const BRAND = {
     logoMarkPng: '/brand/logo-mark.png',
     favicon: '/favicon.ico',
     faviconSvg: '/favicon.svg',
+    bimiSvg: '/brand/prodily-bimi.svg',
     appleTouchIcon: '/apple-touch-icon.png',
     safariPinnedTab: '/brand/safari-pinned-tab.svg',
     ogImage: '/brand/og-image.png',
