@@ -58,8 +58,8 @@ export const TOKENS = {
     },
   },
   typography: {
-    sans: 'var(--font-sans), system-ui, sans-serif',
-    display: 'var(--font-fraunces), Georgia, serif',
+    sans: 'var(--font-inter), system-ui, -apple-system, sans-serif',
+    display: 'var(--font-inter), system-ui, -apple-system, sans-serif',
   },
   borderRadius: {
     sm: '0.375rem',
