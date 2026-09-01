@@ -1,194 +1,478 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
-import { EXPERIENCE_FEATURES } from '@/config/content'
-import { ModuleCardPreview } from '@/components/marketing/product-mockup/module-card-preview'
-import * as LucideIcons from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import {
+  BookOpen,
+  CheckCircle2,
+  Layers,
+  PenTool,
+  FileText,
+  Sparkles,
+  ArrowRight,
+  RotateCw,
+  Clock,
+  Award,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const TABS = [
-  { id: 'lesson',     label: 'Lesson',     mockup: 'module' },
-  { id: 'quiz',       label: 'Quiz',       mockup: 'quiz' },
-  { id: 'flashcard',  label: 'Flashcard',  mockup: 'flashcard' },
-  { id: 'assignment', label: 'Assignment', mockup: 'assignment' },
-  { id: 'casestudy',  label: 'Case Study', mockup: 'casestudy' },
-]
-
-function MockupPanel({ type }: { type: string }) {
-  const content: Record<string, React.ReactNode> = {
-    module: <ModuleCardPreview />,
-    quiz: (
-      <div className="bg-surface border border-border rounded-lg p-5 space-y-4 w-full max-w-[320px]">
-        <p className="text-body-sm font-semibold text-foreground">Which framework best helps prioritise features when user needs conflict with business goals?</p>
-        <div className="space-y-2">
-          {['RICE', 'ICE', 'MoSCoW', 'Kano Model'].map((opt) => (
-            <div key={opt} className={cn(
-              'flex items-center gap-3 px-3 py-2.5 rounded-sm border text-body-sm cursor-pointer',
-              opt === 'MoSCoW'
-                ? 'border-primary bg-primary/5 text-primary font-medium'
-                : 'border-border text-foreground hover:border-border-strong'
-            )}>
-              <div className={cn('w-3.5 h-3.5 rounded-full border-2 flex-shrink-0',
-                opt === 'MoSCoW' ? 'border-primary bg-primary' : 'border-border'
-              )} />
-              {opt}
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-    flashcard: (
-      <div className="bg-surface border border-border rounded-lg p-5 w-full max-w-[320px] text-center space-y-3">
-        <span className="text-caption text-locked font-medium uppercase tracking-wide">Flashcard · Strategy</span>
-        <h4 className="text-h4 font-semibold text-foreground">What is a North Star Metric?</h4>
-        <div className="pt-3 border-t border-border">
-          <p className="text-body-sm text-locked">The single metric that best captures the core value your product delivers to customers.</p>
-        </div>
-      </div>
-    ),
-    assignment: (
-      <div className="bg-surface border border-border rounded-lg p-5 w-full max-w-[320px] space-y-3">
-        <span className="text-caption text-locked font-medium uppercase tracking-wide">Assignment · Module 03</span>
-        <h4 className="text-h4 font-semibold text-foreground">Write a problem statement for your chosen product.</h4>
-        <p className="text-body-sm text-locked">Use the Jobs-to-be-Done format. Include target user, context, and pain point with one behavioural signal.</p>
-        <div className="h-20 bg-surface-muted rounded-sm border border-dashed border-border flex items-center justify-center">
-          <span className="text-caption text-locked">Your response here</span>
-        </div>
-      </div>
-    ),
-    casestudy: (
-      <div className="bg-surface border border-border rounded-lg p-5 w-full max-w-[320px] space-y-3">
-        <span className="text-caption text-locked font-medium uppercase tracking-wide">Case Study · Module 02</span>
-        <h4 className="text-h4 font-semibold text-foreground">Netflix: The Qwikster Split</h4>
-        <p className="text-body-sm text-locked">How Reed Hastings navigated splitting DVD-by-mail and streaming, and what it teaches about product positioning.</p>
-        <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-primary font-semibold">
-          <span>Read analysis →</span>
-          <span className="text-locked font-normal">8 min read</span>
-        </div>
-      </div>
-    ),
-  }
-
-  return (
-    <div className="flex items-center justify-center p-4 min-h-[220px]">
-      {content[type] ?? content.module}
-    </div>
-  )
+interface FormatItem {
+  id: string
+  title: string
+  subtitle: string
+  description: string
+  badge: string
+  icon: typeof BookOpen
 }
 
-/**
- * Learning Experience section — Sprint 2 §12 + Sprint 3 experience copy.
- */
+const FORMATS: FormatItem[] = [
+  {
+    id: 'lesson',
+    title: 'Structured Lessons',
+    subtitle: 'Concept Introduction',
+    description: 'First-principles breakdowns with interactive reading, decision diagrams, and immediate reflection.',
+    badge: '90 Lessons',
+    icon: BookOpen,
+  },
+  {
+    id: 'quiz',
+    title: 'Active Recall Quizzes',
+    subtitle: 'Instant Validation',
+    description: 'Scenario-based questions testing diagnostic judgment immediately after each concept.',
+    badge: 'Instant Feedback',
+    icon: CheckCircle2,
+  },
+  {
+    id: 'flashcard',
+    title: 'Spaced Repetition',
+    subtitle: 'Long-Term Retention',
+    description: 'Algorithms schedule concept reviews at the exact moment of memory decay so mental models stick permanently.',
+    badge: 'SM-2 Algorithm',
+    icon: Layers,
+  },
+  {
+    id: 'assignment',
+    title: 'Applied Artifacts',
+    subtitle: 'Hands-on Deliverables',
+    description: 'Write real PRDs, opportunity briefs, metrics trees, and roadmap trade-off memos for your portfolio.',
+    badge: 'Portfolio Ready',
+    icon: PenTool,
+  },
+  {
+    id: 'casestudy',
+    title: 'Real-World Case Studies',
+    subtitle: 'Industry Trade-offs',
+    description: 'Deconstruct actual historical product decisions from Stripe, Netflix, and Airbnb through PM mental models.',
+    badge: 'Executive Teardowns',
+    icon: FileText,
+  },
+]
+
 export function ExperienceSection() {
-  const [activeTab, setActiveTab] = useState('lesson')
   const prefersReducedMotion = useReducedMotion()
+  const [activeFormat, setActiveFormat] = useState<string>('lesson')
+  const [isPaused, setIsPaused] = useState(false)
+  const [selectedQuizOption, setSelectedQuizOption] = useState<string | null>('MoSCoW')
+  const [flashcardFlipped, setFlashcardFlipped] = useState(false)
+
+  // Auto-cycle through formats every 3.8s when not hovered
+  useEffect(() => {
+    if (isPaused || prefersReducedMotion) return
+    const timer = setInterval(() => {
+      setActiveFormat((prev) => {
+        const currentIndex = FORMATS.findIndex((f) => f.id === prev)
+        const nextIndex = (currentIndex + 1) % FORMATS.length
+        return FORMATS[nextIndex].id
+      })
+      // Reset flashcard state on transition
+      setFlashcardFlipped(false)
+    }, 3800)
+    return () => clearInterval(timer)
+  }, [isPaused, prefersReducedMotion])
+
+  const activeIndex = FORMATS.findIndex((f) => f.id === activeFormat)
 
   return (
     <section
       id="experience"
       aria-labelledby="experience-heading"
-      className="py-20 lg:py-28 scroll-mt-24 lg:scroll-mt-28"
+      className="py-20 lg:py-28 bg-[#FBFAF6] border-t border-[#DED8CB]/80 scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-12 lg:gap-16 items-start">
+        
+        {/* ── Section Header ────────────────────────────────────────────── */}
+        <div className="max-w-3xl mb-12 space-y-3">
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
+            Learning Architecture
+          </div>
+          <h2
+            id="experience-heading"
+            className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#171A17] tracking-[-0.03em] leading-tight"
+          >
+            Every format has a job.
+          </h2>
+          <p className="text-base sm:text-lg text-[#70685A] leading-relaxed">
+            Lessons introduce a concept. Quizzes test it immediately. Flashcards bring it back with spaced repetition so it sticks. Assignments make you apply it. Case studies show how it plays out in the real world.
+          </p>
+        </div>
 
-          {/* Left: Feature list */}
-          <div>
-            <motion.div
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
-            >
-              <h2
-                id="experience-heading"
-                className="font-display text-h1 lg:text-h1 font-semibold text-foreground mb-3"
-              >
-                Every format has a job.
-              </h2>
-              <p className="text-body-lg text-locked leading-relaxed mb-8">
-                Lessons introduce a concept. Quizzes test it immediately. Flashcards bring it back with spaced repetition so it sticks. Assignments make you apply it. Case studies show how it plays out in the real world.
-              </p>
-            </motion.div>
+        {/* ── Interactive Format Grid & Live Workbench Simulator ────────── */}
+        <div
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
+        >
+          
+          {/* Left Column: 5 Interactive Format Cards */}
+          <div className="lg:col-span-5 flex flex-col gap-2.5">
+            {FORMATS.map((format, index) => {
+              const Icon = format.icon
+              const isActive = activeFormat === format.id
 
-            <div className="space-y-4">
-              {EXPERIENCE_FEATURES.map((feature, index) => {
-                const IconComponent = (LucideIcons as unknown as Record<string, LucideIcon | undefined>)[feature.icon]
-                return (
-                  <motion.div
-                    key={feature.title}
-                    initial={prefersReducedMotion ? false : { opacity: 0, x: -8 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{ duration: 0.18, delay: index * 0.05, ease: [0, 0, 0.2, 1] }}
-                    className="flex gap-3"
-                  >
-                    {IconComponent && (
-                      <div className="w-8 h-8 rounded-sm bg-surface-muted flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <IconComponent size={16} className="text-foreground" aria-hidden="true" />
-                      </div>
+              return (
+                <button
+                  key={format.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveFormat(format.id)
+                    setFlashcardFlipped(false)
+                  }}
+                  onMouseEnter={() => {
+                    setActiveFormat(format.id)
+                    setFlashcardFlipped(false)
+                  }}
+                  className={cn(
+                    'group w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-start gap-3.5 relative overflow-hidden',
+                    isActive
+                      ? 'bg-white border-[#1F6B4E] shadow-sm'
+                      : 'bg-[#FBFAF6] border-[#DED8CB]/80 hover:bg-white hover:border-[#BDB4A2]',
+                  )}
+                >
+                  {/* Left Active Indicator Bar */}
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeFormatIndicator"
+                      className="absolute left-0 top-0 bottom-0 w-1 bg-[#1F6B4E]"
+                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    />
+                  )}
+
+                  {/* Icon Box */}
+                  <div
+                    className={cn(
+                      'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors mt-0.5',
+                      isActive
+                        ? 'bg-[#EAF5EF] text-[#1F6B4E]'
+                        : 'bg-white text-[#70685A] border border-[#DED8CB] group-hover:text-[#171A17]',
                     )}
-                    <div>
-                      <p className="text-body-sm font-semibold text-foreground">{feature.title}</p>
-                      <p className="text-body-sm text-locked mt-0.5">{feature.description}</p>
+                  >
+                    <Icon size={18} />
+                  </div>
+
+                  {/* Text Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-sm font-semibold text-[#171A17]">
+                        {format.title}
+                      </h3>
+                      <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-[#F2EFE7] text-[#70685A]">
+                        {format.badge}
+                      </span>
                     </div>
-                  </motion.div>
-                )
-              })}
+                    <p className="text-xs text-[#70685A] mt-1 leading-relaxed">
+                      {format.description}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Right Column: High-Fidelity Interactive Preview Panel */}
+          <div className="lg:col-span-7 flex flex-col">
+            <div className="h-full bg-white border border-[#DED8CB] rounded-2xl p-6 sm:p-7 shadow-xs flex flex-col justify-between relative overflow-hidden">
+              
+              {/* Simulator Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-[#DED8CB]/70 mb-5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#1F6B4E] animate-pulse" />
+                  <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
+                    Interactive Sandbox · {FORMATS[activeIndex].subtitle}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-[#70685A] font-mono">
+                  <span>Stage {activeIndex + 1}/5</span>
+                </div>
+              </div>
+
+              {/* Dynamic Simulated Preview Body */}
+              <div className="flex-1 flex flex-col justify-center">
+                <AnimatePresence mode="wait">
+                  
+                  {/* PREVIEW 1: LESSON */}
+                  {activeFormat === 'lesson' && (
+                    <motion.div
+                      key="lesson-preview"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18 }}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center justify-between text-xs text-[#70685A]">
+                        <span className="font-mono bg-[#F2EFE7] text-[#171A17] px-2.5 py-0.5 rounded font-semibold">
+                          Module 03 · Lesson 14
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock size={13} /> 6 min read
+                        </span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h4 className="text-lg font-semibold text-[#171A17]">
+                          Prioritizing with the RICE Framework
+                        </h4>
+                        <p className="text-xs text-[#70685A] leading-relaxed">
+                          Reach, Impact, Confidence, and Effort combine into a single formula to score roadmapping trade-offs objectively.
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-[#FBFAF6] border border-[#DED8CB] space-y-2 text-xs">
+                        <div className="font-mono font-bold text-[#1F6B4E] text-[11px] uppercase">
+                          Formula Breakdown
+                        </div>
+                        <div className="font-mono text-[#171A17] bg-white p-2.5 rounded-lg border border-[#DED8CB]/70 font-semibold text-center">
+                          Score = (Reach × Impact × Confidence) / Effort
+                        </div>
+                        <p className="text-[11px] text-[#70685A] mt-1">
+                          Forces teams to explicitly quantify confidence before over-investing engineering time.
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* PREVIEW 2: QUIZ */}
+                  {activeFormat === 'quiz' && (
+                    <motion.div
+                      key="quiz-preview"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18 }}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-mono text-[#1F6B4E] bg-[#EAF5EF] px-2 py-0.5 rounded font-semibold">
+                          Scenario Assessment
+                        </span>
+                        <span className="text-xs font-mono text-[#70685A]">+25 XP</span>
+                      </div>
+
+                      <h4 className="text-sm sm:text-base font-semibold text-[#171A17]">
+                        Which prioritization framework best isolates hard non-negotiable scope constraints from negotiable trade-offs?
+                      </h4>
+
+                      <div className="space-y-2">
+                        {[
+                          { id: 'MoSCoW', label: 'MoSCoW Method (Must, Should, Could, Won\'t)', correct: true },
+                          { id: 'RICE', label: 'RICE Scoring Model', correct: false },
+                          { id: 'Kano', label: 'Kano Delight Matrix', correct: false },
+                        ].map((option) => {
+                          const isSelected = selectedQuizOption === option.id
+                          return (
+                            <button
+                              key={option.id}
+                              type="button"
+                              onClick={() => setSelectedQuizOption(option.id)}
+                              className={cn(
+                                'w-full text-left px-3.5 py-2.5 rounded-xl border text-xs font-medium transition-all flex items-center justify-between',
+                                isSelected
+                                  ? 'bg-[#EAF5EF] border-[#1F6B4E] text-[#1F6B4E] font-semibold'
+                                  : 'bg-[#FBFAF6] border-[#DED8CB] text-[#171A17] hover:bg-white',
+                              )}
+                            >
+                              <span>{option.label}</span>
+                              {isSelected && <span className="text-xs font-bold text-[#1F6B4E]">✓ Selected</span>}
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      {selectedQuizOption === 'MoSCoW' && (
+                        <div className="p-3 bg-[#EAF5EF]/80 border border-[#1F6B4E]/30 rounded-lg text-xs text-[#1F6B4E] leading-relaxed">
+                          <strong>Correct:</strong> MoSCoW forces stakeholders to categorize items into strictly non-negotiable &ldquo;Must Haves&rdquo; vs negotiable &ldquo;Should Haves&rdquo;.
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* PREVIEW 3: FLASHCARD */}
+                  {activeFormat === 'flashcard' && (
+                    <motion.div
+                      key="flashcard-preview"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18 }}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center justify-between text-xs text-[#70685A]">
+                        <span className="font-mono bg-[#F2EFE7] px-2 py-0.5 rounded font-semibold text-[#171A17]">
+                          Card 18 of 24 · Retention Mode
+                        </span>
+                        <span className="text-[11px] text-[#70685A]">Next review: 3 days</span>
+                      </div>
+
+                      {/* Interactive Flip Card */}
+                      <button
+                        type="button"
+                        onClick={() => setFlashcardFlipped(!flashcardFlipped)}
+                        className="w-full text-left p-5 rounded-xl border border-[#DED8CB] bg-[#FBFAF6] hover:bg-white transition-all duration-200 shadow-2xs space-y-3 cursor-pointer group"
+                      >
+                        <div className="flex items-center justify-between text-xs font-mono text-[#70685A]">
+                          <span className="text-[#1F6B4E] font-semibold">
+                            {flashcardFlipped ? 'ANSWER (FLIPPED)' : 'PROMPT'}
+                          </span>
+                          <span className="flex items-center gap-1 group-hover:text-[#171A17]">
+                            <RotateCw size={12} className="group-hover:rotate-180 transition-transform duration-300" />
+                            Click to {flashcardFlipped ? 'hide' : 'reveal'}
+                          </span>
+                        </div>
+
+                        <div className="min-h-[70px] flex items-center">
+                          {flashcardFlipped ? (
+                            <p className="text-sm font-medium text-[#171A17] leading-relaxed">
+                              The single metric that best captures the core value your product delivers to customers (e.g. Spotify: Time spent listening).
+                            </p>
+                          ) : (
+                            <h4 className="text-base font-semibold text-[#171A17]">
+                              What is a North Star Metric?
+                            </h4>
+                          )}
+                        </div>
+                      </button>
+
+                      {/* Interval Rating Buttons */}
+                      <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                        <span className="p-2 rounded-lg bg-[#F2EFE7] text-[11px] font-mono text-[#70685A]">
+                          Again · 10m
+                        </span>
+                        <span className="p-2 rounded-lg bg-[#EAF5EF] text-[11px] font-mono text-[#1F6B4E] font-semibold">
+                          Good · 3d
+                        </span>
+                        <span className="p-2 rounded-lg bg-[#F2EFE7] text-[11px] font-mono text-[#70685A]">
+                          Easy · 7d
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* PREVIEW 4: ASSIGNMENT */}
+                  {activeFormat === 'assignment' && (
+                    <motion.div
+                      key="assignment-preview"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18 }}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center justify-between text-xs text-[#70685A]">
+                        <span className="font-mono bg-[#EAF5EF] text-[#1F6B4E] px-2 py-0.5 rounded font-semibold">
+                          Capstone 03 · Execution
+                        </span>
+                        <span className="font-mono font-semibold text-[#171A17]">+150 XP</span>
+                      </div>
+
+                      <div>
+                        <h4 className="text-base font-semibold text-[#171A17]">
+                          One-Click Checkout PRD Spec
+                        </h4>
+                        <p className="text-xs text-[#70685A] mt-0.5">
+                          Problem statement, user stories, success metrics, and non-goals.
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-[#FBFAF6] border border-[#DED8CB] space-y-2 text-xs">
+                        <div className="flex items-center justify-between font-mono text-[11px] text-[#70685A]">
+                          <span>Portfolio Rubric Checklist</span>
+                          <span className="text-[#1F6B4E] font-semibold">3/3 Complete</span>
+                        </div>
+                        <div className="space-y-1.5 pt-1">
+                          <div className="flex items-center gap-2 text-[#171A17]">
+                            <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+                            <span>Measurable success metric (Conversion +4.2%)</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[#171A17]">
+                            <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+                            <span>Explicit Non-Goals defined to prevent scope creep</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[#171A17]">
+                            <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+                            <span>API dependency matrix signed off by Engineering</span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* PREVIEW 5: CASE STUDY */}
+                  {activeFormat === 'casestudy' && (
+                    <motion.div
+                      key="casestudy-preview"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18 }}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center justify-between text-xs text-[#70685A]">
+                        <span className="font-mono bg-[#F2EFE7] text-[#171A17] px-2 py-0.5 rounded font-semibold">
+                          Executive Teardown · Module 08
+                        </span>
+                        <span className="flex items-center gap-1 font-mono">
+                          <Award size={13} className="text-[#1F6B4E]" /> Diagnostic Study
+                        </span>
+                      </div>
+
+                      <div>
+                        <h4 className="text-base font-semibold text-[#171A17]">
+                          Netflix: The Qwikster Split &amp; Pivot Strategy
+                        </h4>
+                        <p className="text-xs text-[#70685A] mt-0.5">
+                          How Reed Hastings navigated splitting DVD-by-mail and streaming, and what it teaches about product positioning.
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-[#FBFAF6] border border-[#DED8CB] space-y-2 text-xs">
+                        <div className="font-mono text-[11px] font-bold text-[#1F6B4E] uppercase">
+                          Key Decision Takeaway
+                        </div>
+                        <p className="text-[#171A17] leading-relaxed">
+                          Right strategic direction executed with wrong customer communication timing will destroy user trust faster than bad technology.
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                </AnimatePresence>
+              </div>
+
+              {/* Sandbox Footer Action */}
+              <div className="pt-4 mt-5 border-t border-[#DED8CB]/70 flex items-center justify-between text-xs">
+                <span className="text-[#70685A]">
+                  Auto-advances through all 5 formats
+                </span>
+                <span className="font-semibold text-[#1F6B4E] flex items-center gap-1">
+                  <span>Hover to pause</span>
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Right: Tabbed mockup panel */}
-          <motion.div
-            initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.24, ease: [0, 0, 0.2, 1] }}
-            className="bg-surface border border-border rounded-lg overflow-hidden shadow-sm"
-          >
-            {/* Tab bar */}
-            <div className="flex border-b border-border overflow-x-auto" role="tablist" aria-label="Learning mode preview">
-              {TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  role="tab"
-                  id={`tab-${tab.id}`}
-                  aria-selected={activeTab === tab.id}
-                  aria-controls={`panel-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    'px-4 py-3 text-body-sm font-medium flex-shrink-0',
-                    'border-b-2 transition-all duration-[120ms]',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus',
-                    activeTab === tab.id
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-locked hover:text-foreground hover:border-border',
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Panel */}
-            <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTab}
-                  initial={prefersReducedMotion ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: prefersReducedMotion ? 0 : 0.18 }}
-                >
-                  <MockupPanel type={TABS.find(t => t.id === activeTab)?.mockup ?? 'module'} />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </motion.div>
         </div>
+
       </div>
     </section>
   )

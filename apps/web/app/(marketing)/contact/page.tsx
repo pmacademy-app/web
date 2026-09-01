@@ -101,14 +101,14 @@ export default function ContactPage() {
 
       {/* FAQs shortcut */}
       <div className="p-8 rounded-2xl border border-border bg-card/60 text-center space-y-3">
-        <h3 className="text-base font-bold font-serif text-foreground">
+        <h3 className="text-base font-bold text-foreground">
           Looking for quick answers?
         </h3>
         <p className="text-xs text-muted-foreground">
-          Check out our frequently asked questions on the homepage.
+          Check out our frequently asked questions directory.
         </p>
         <Link
-          href="/#faq"
+          href="/faq"
           className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
         >
           <span>View Frequently Asked Questions</span>
