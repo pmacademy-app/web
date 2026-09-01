@@ -120,7 +120,10 @@ export async function POST(request: NextRequest) {
     }
 
     const cookieStore = await cookies()
-    const accessToken = request.cookies.get('sb-access-token')?.value || cookieStore.get('sb-access-token')?.value
+    const authHeader = request.headers.get('Authorization')
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7).trim() : null
+
+    const accessToken = bearerToken || request.cookies.get('sb-access-token')?.value || cookieStore.get('sb-access-token')?.value
     const refreshToken = request.cookies.get('sb-refresh-token')?.value || cookieStore.get('sb-refresh-token')?.value
 
     // If neither token is present, recovery session is completely absent
