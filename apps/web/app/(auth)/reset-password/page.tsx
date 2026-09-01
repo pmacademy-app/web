@@ -11,6 +11,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { classifyAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
+import { updatePasswordAction } from './actions'
 
 const requestSchema = z.object({
   email: z
@@ -128,25 +129,10 @@ function ResetPasswordFormContent() {
 
     startTransition(async () => {
       try {
-        const supabase = createBrowserSupabaseClient()
-        const { data: { session } } = await supabase.auth.getSession()
+        const result = await updatePasswordAction(values.newPassword)
 
-        const res = await fetch('/api/auth/update-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
-          },
-          body: JSON.stringify({ newPassword: values.newPassword }),
-        })
-
-        const data = await res.json()
-
-        if (!res.ok || !data.success) {
-          const classified = classifyAuthError(
-            data.error || 'Failed to update password. Please request a new reset link.',
-            'reset_password'
-          )
+        if (result.error) {
+          const classified = classifyAuthError(result.error, 'reset_password')
           setErrorMsg(classified.message)
           recordAuthTelemetry(classified, 'reset_password')
           return
