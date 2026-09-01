@@ -62,7 +62,7 @@ export function SkillRadarSection() {
               Know what kind of PM you&apos;re becoming.
             </h2>
             <p className="text-body-lg text-locked leading-relaxed mb-8">
-              Your progress is tracked across seven real competencies — discovery, strategy, execution, design, growth, leadership, and technical fluency — based on what you&apos;ve actually completed, not what you say you know.
+              Your progress is tracked across seven real competencies (discovery, strategy, execution, design, growth, leadership, and technical fluency) based on what you&apos;ve actually completed, not what you say you know.
             </p>
 
             {/* Competency legend */}
@@ -100,7 +100,7 @@ export function SkillRadarSection() {
 
             {/* Trust line */}
             <p className="text-body-sm text-locked border-t border-border pt-4">
-              Skill tracking is based on completed lessons, quiz scores, and assignment submissions — not self-reporting.
+              Skill tracking is based on completed lessons, quiz scores, and assignment submissions, not self-reporting.
             </p>
           </motion.div>
         </div>

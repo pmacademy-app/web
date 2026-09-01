@@ -50,9 +50,6 @@ export function WhySection() {
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="max-w-[760px] mx-auto text-center mb-14"
         >
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-body-sm font-medium mb-4">
-            The trade-off you shouldn&apos;t have to make
-          </div>
           <h2
             id="why-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
@@ -60,7 +57,7 @@ export function WhySection() {
             Self-study is free but aimless. Bootcamps are structured but expensive. Prodily is neither trade-off.
           </h2>
           <p className="text-body-lg text-locked leading-relaxed">
-            Most people learn product management by stitching together YouTube videos, Reddit threads, and outdated blog posts — no sequence, no feedback, no proof of what they&apos;ve actually learned. Bootcamps fix the structure problem but cost $200–$2,000 and often teach the same surface-level frameworks. Prodily gives you the structure of a paid program with the applied output to prove it — for the cost of nothing.
+            Most people learn product management by stitching together YouTube videos, Reddit threads, and outdated blog posts with no sequence, no feedback, and no proof of what they&apos;ve actually learned. Bootcamps fix the structure problem but cost $200 to $2,000 and often teach the same surface-level frameworks. Prodily gives you the structure of a paid program with the applied output to prove it for the cost of nothing.
           </p>
         </motion.div>
 

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { JOURNEY_STAGES } from '@/config/content'
 import { SKILL_COLORS } from '@/lib/design/tokens'
@@ -9,14 +9,32 @@ import { TOKENS } from '@/theme/tokens'
 import { cn } from '@/lib/utils'
 
 /**
- * Learning Journey roadmap — Sprint 2 §10 + Sprint 3 journey copy.
- * Desktop: horizontal stages. Tablet: 2×3 grid. Mobile: vertical timeline.
+ * Learning Journey roadmap — dynamic auto-stepping timeline.
+ * Desktop: horizontal animated progression track.
+ * Tablet: 2×3 grid. Mobile: vertical timeline.
  */
 export function JourneySection() {
   const prefersReducedMotion = useReducedMotion()
-  const [activeStage, setActiveStage] = useState<number | null>(null)
+  const [activeStage, setActiveStage] = useState<number>(0)
+  const [isHovered, setIsHovered] = useState(false)
   const ref = useRef<HTMLOListElement>(null)
   const inView = useInView(ref, { once: true, amount: 0.2 })
+
+  // Auto-advance step progression every 2.8 seconds
+  useEffect(() => {
+    if (isHovered || prefersReducedMotion) return
+
+    const timer = setInterval(() => {
+      setActiveStage((prev) => (prev + 1) % JOURNEY_STAGES.length)
+    }, 2800)
+
+    return () => clearInterval(timer)
+  }, [isHovered, prefersReducedMotion])
+
+  const activeColor =
+    JOURNEY_STAGES[activeStage]?.cluster
+      ? SKILL_COLORS[JOURNEY_STAGES[activeStage].cluster]
+      : TOKENS.colors.primary
 
   return (
     <section
@@ -31,7 +49,7 @@ export function JourneySection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
-          className="text-center mb-12"
+          className="text-center mb-14"
         >
           <h2
             id="journey-heading"
@@ -40,103 +58,177 @@ export function JourneySection() {
             Six stages. Each one unlocks the next.
           </h2>
           <p className="text-body-lg text-locked max-w-[540px] mx-auto leading-relaxed">
-            From PM vocabulary to a capstone case study you can walk a hiring manager through — each stage builds directly on the last.
+            From PM vocabulary to a capstone case study you can walk a hiring manager through, each stage builds directly on the last.
           </p>
         </motion.div>
 
-        {/* Journey stages */}
-        <ol
-          ref={ref}
-          className="
-            grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6
-            gap-4 lg:gap-0
-            relative
-          "
-          aria-label="Learning journey stages"
+        {/* Journey interactive container */}
+        <div
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="relative"
         >
-          {/* Desktop connector line */}
-          <div
-            aria-hidden="true"
-            className="hidden lg:block absolute top-8 left-[8.33%] right-[8.33%] h-px bg-border z-0"
-          />
+          {/* Journey stages list */}
+          <ol
+            ref={ref}
+            className="
+              grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6
+              gap-6 lg:gap-0
+              relative
+            "
+            aria-label="Learning journey stages"
+          >
+            {/* Desktop Background track */}
+            <div
+              aria-hidden="true"
+              className="hidden lg:block absolute top-8 left-[8.33%] right-[8.33%] h-0.5 bg-[#E5E0D4] z-0 rounded-full"
+            />
 
-          {JOURNEY_STAGES.map((stage, index) => {
-            const cluster = stage.cluster
-            const color = cluster ? SKILL_COLORS[cluster] : TOKENS.colors.primary
-            const isActive = activeStage === index
-
-            return (
-              <motion.li
-                key={stage.label}
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-                animate={
-                  inView
-                    ? { opacity: 1, y: 0 }
-                    : { opacity: 0, y: 16 }
-                }
-                transition={{
-                  duration: prefersReducedMotion ? 0 : 0.24,
-                  delay: prefersReducedMotion ? 0 : index * 0.08,
-                  ease: [0, 0, 0.2, 1],
-                }}
-                className="relative flex flex-col items-center lg:items-center text-center z-10"
-              >
-                {/* Node */}
-                <button
-                  type="button"
-                  onClick={() => setActiveStage(isActive ? null : index)}
-                  aria-expanded={isActive}
-                  className={cn(
-                    'w-16 h-16 rounded-full border-2 flex items-center justify-center',
-                    'text-body-sm font-bold transition-all duration-[180ms]',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-                    'hover:scale-105',
-                    isActive
-                      ? 'bg-foreground border-transparent text-background shadow-md'
-                      : 'bg-surface border-border hover:border-border-strong',
-                  )}
-                  style={{ borderColor: isActive ? 'transparent' : color }}
-                >
-                  <span style={{ color: isActive ? 'white' : color }}>
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                </button>
-
-                {/* Stage label */}
-                <p className="mt-3 text-body-sm font-semibold text-foreground">
-                  {stage.label}
-                </p>
-                <p className="mt-1 text-caption text-locked leading-relaxed max-w-[120px]">
-                  {stage.description}
-                </p>
-
-                {/* Expanded milestones */}
+            {/* Desktop Dynamic Animated Progress Beam */}
+            {!prefersReducedMotion && (
+              <>
                 <motion.div
-                  initial={false}
-                  animate={
-                    isActive
-                      ? { height: 'auto', opacity: 1 }
-                      : { height: 0, opacity: 0 }
-                  }
-                  transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: [0, 0, 0.2, 1] }}
-                  className="overflow-hidden w-full"
+                  aria-hidden="true"
+                  className="hidden lg:block absolute top-8 left-[8.33%] h-0.5 z-0 rounded-full origin-left"
+                  animate={{
+                    width: `${(activeStage / (JOURNEY_STAGES.length - 1)) * 83.33}%`,
+                    backgroundColor: activeColor,
+                  }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+                />
+
+                {/* Traveling Energy Pulse Beacon */}
+                <motion.div
+                  aria-hidden="true"
+                  className="hidden lg:block absolute top-[30px] -ml-1 w-2.5 h-2.5 rounded-full z-0 shadow-sm"
+                  animate={{
+                    left: `${8.33 + (activeStage / (JOURNEY_STAGES.length - 1)) * 83.33}%`,
+                    backgroundColor: activeColor,
+                    boxShadow: `0 0 12px 2px ${activeColor}`,
+                  }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+                />
+              </>
+            )}
+
+            {JOURNEY_STAGES.map((stage, index) => {
+              const cluster = stage.cluster
+              const color = cluster ? SKILL_COLORS[cluster] : TOKENS.colors.primary
+              const isActive = activeStage === index
+              const isPassed = activeStage > index
+
+              return (
+                <motion.li
+                  key={stage.label}
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+                  animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+                  transition={{
+                    duration: prefersReducedMotion ? 0 : 0.24,
+                    delay: prefersReducedMotion ? 0 : index * 0.06,
+                    ease: [0, 0, 0.2, 1],
+                  }}
+                  className="relative flex flex-col items-center text-center z-10 px-2"
                 >
-                  <ul className="mt-3 flex flex-col gap-1 text-left px-2">
-                    {stage.milestones.map((m) => (
-                      <li key={m} className="flex items-center gap-1.5">
-                        <div
-                          className="w-1 h-1 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: color }}
-                        />
-                        <span className="text-caption text-locked">{m}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              </motion.li>
-            )
-          })}
-        </ol>
+                  {/* Node Button */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveStage(index)}
+                    onMouseEnter={() => setActiveStage(index)}
+                    aria-label={`Stage ${index + 1}: ${stage.label}`}
+                    aria-current={isActive ? 'step' : undefined}
+                    className={cn(
+                      'relative w-16 h-16 rounded-full border-2 flex items-center justify-center',
+                      'text-body-sm font-bold transition-all duration-300',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+                      isActive
+                        ? 'bg-white scale-110 shadow-lg'
+                        : isPassed
+                          ? 'bg-[#FBFAF6] hover:scale-105 shadow-2xs'
+                          : 'bg-surface hover:scale-105',
+                    )}
+                    style={{
+                      borderColor: color,
+                      boxShadow: isActive
+                        ? `0 0 0 4px ${color}20, 0 10px 25px -5px ${color}35`
+                        : undefined,
+                    }}
+                  >
+                    {/* Animated Pulsing Ring on Active Node */}
+                    {isActive && !prefersReducedMotion && (
+                      <motion.span
+                        aria-hidden="true"
+                        initial={{ scale: 0.9, opacity: 0.8 }}
+                        animate={{ scale: 1.35, opacity: 0 }}
+                        transition={{
+                          duration: 1.6,
+                          repeat: Infinity,
+                          ease: 'easeOut',
+                        }}
+                        className="absolute inset-0 rounded-full border-2 pointer-events-none"
+                        style={{ borderColor: color }}
+                      />
+                    )}
+
+                    <span
+                      className={cn(
+                        'transition-all duration-200',
+                        isActive ? 'scale-110 font-extrabold' : 'font-bold',
+                      )}
+                      style={{ color }}
+                    >
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  </button>
+
+                  {/* Stage Label */}
+                  <p
+                    className={cn(
+                      'mt-3.5 text-body-sm font-semibold transition-colors duration-200',
+                      isActive ? 'text-foreground' : 'text-foreground/90',
+                    )}
+                  >
+                    {stage.label}
+                  </p>
+
+                  {/* Stage Description */}
+                  <p
+                    className={cn(
+                      'mt-1 text-caption leading-relaxed max-w-[130px] transition-colors duration-200',
+                      isActive ? 'text-[#171A17] font-medium' : 'text-locked',
+                    )}
+                  >
+                    {stage.description}
+                  </p>
+
+                  {/* Milestone Bullet Pills for Active Stage */}
+                  <div className="min-h-[70px] w-full pt-2">
+                    <AnimatePresence mode="wait">
+                      {isActive && (
+                        <motion.ul
+                          initial={{ opacity: 0, y: 4, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -4, scale: 0.96 }}
+                          transition={{ duration: 0.18, ease: 'easeOut' }}
+                          className="flex flex-col gap-1 text-left px-1.5 py-2 bg-white/90 border border-[#DED8CB]/70 rounded-lg shadow-2xs mt-1"
+                        >
+                          {stage.milestones.map((m) => (
+                            <li key={m} className="flex items-center gap-1.5 text-[11px] text-[#70685A]">
+                              <span
+                                className="w-1.5 h-1.5 rounded-full shrink-0"
+                                style={{ backgroundColor: color }}
+                              />
+                              <span className="truncate">{m}</span>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.li>
+              )
+            })}
+          </ol>
+        </div>
       </div>
     </section>
   )

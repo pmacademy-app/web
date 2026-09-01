@@ -164,7 +164,7 @@ export const EXPERIENCE_FEATURES: FeatureItem[] = [
   {
     icon: 'PenLine',
     title: 'Assignments',
-    description: 'Practical PM tasks that produce real artifacts — not exercises you discard.',
+    description: 'Practical PM tasks that produce real artifacts, not exercises you discard.',
   },
   {
     icon: 'FileSearch',
