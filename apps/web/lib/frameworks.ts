@@ -176,7 +176,7 @@ export const FRAMEWORKS: FrameworkItem[] = [
     moduleTitle: 'Capstone & Career Portfolio',
     summary: 'Unifying 90 lessons into continuous product judgment.',
     definition:
-      'The overarching capstone synthesis uniting all 90 PM Academy lessons into a single, integrated practice—knowing which mental model to apply in ambiguous real-world situations.',
+      'The overarching capstone synthesis uniting all 90 PM Academy lessons into a single, integrated practice to know which mental model to apply in ambiguous real-world situations.',
     keyTakeaway:
       'Reflects the ultimate goal of the curriculum: building instinctual, business-school caliber product judgment.',
   },
