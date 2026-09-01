@@ -74,7 +74,7 @@ export async function proxy(request: NextRequest) {
 
   const isAppPage =
     path.startsWith('/dashboard') ||
-    path.startsWith('/review') ||
+    (path === '/review' || path.startsWith('/review/')) ||
     path.startsWith('/progress') ||
     path.startsWith('/leaderboard') ||
     path.startsWith('/settings') ||
