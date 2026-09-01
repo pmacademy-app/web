@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Coffee, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useScrolled } from '@/hooks/use-scrolled'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
@@ -76,16 +76,19 @@ function CTAButton({
       href="/signup"
       onClick={handleClick}
       className={cn(
-        'inline-flex items-center justify-center font-semibold rounded-sm min-h-[44px]',
-        'bg-primary text-white hover:text-white',
-        'hover:opacity-90 active:scale-[0.98]',
-        'transition-all duration-[120ms]',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white',
-        size === 'md' && 'px-4 py-2.5 text-body-sm',
-        size === 'sm' && 'px-3 py-2 text-body-sm',
+        'group relative inline-flex items-center justify-center gap-1.5 font-medium rounded-lg',
+        'bg-[#1F6B4E] text-white',
+        'border border-[#288461]/80',
+        'shadow-[0_1px_2px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.22)]',
+        'hover:bg-[#18553E] hover:border-[#1F6B4E] hover:shadow-[0_4px_16px_rgba(31,107,78,0.25),inset_0_1px_0_rgba(255,255,255,0.25)] hover:-translate-y-0.5',
+        'active:scale-[0.97] active:translate-y-0',
+        'transition-all duration-150',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F80ED] focus-visible:ring-offset-2',
+        size === 'md' ? 'h-9 px-4 text-xs sm:text-[13px]' : 'h-8 px-3 text-xs',
       )}
     >
-      Start Learning Free
+      <span>Start Learning Free</span>
+      <ArrowRight size={13} className="text-white/80 group-hover:text-white group-hover:translate-x-0.5 transition-transform duration-150" />
     </Link>
   )
 }
@@ -141,8 +144,26 @@ export function Navbar() {
             ))}
           </nav>
 
-          {/* Desktop CTA */}
-          <div className="hidden lg:block">
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center gap-2.5">
+            {/* Buy Me a Coffee Button */}
+            <a
+              href="https://buymeacoffee.com/prodily"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                group inline-flex items-center justify-center w-9 h-9 rounded-lg
+                bg-white/80 text-[#70685A] border border-[#DED8CB]/80
+                hover:border-[#BDB4A2] hover:bg-white hover:text-[#C2410C] hover:shadow-2xs hover:-translate-y-0.5
+                active:scale-95 transition-all duration-150
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
+              "
+              title="Buy Me a Coffee"
+              aria-label="Buy Me a Coffee"
+            >
+              <Coffee size={15} className="transition-transform duration-150 group-hover:scale-110" aria-hidden="true" />
+            </a>
+
             <CTAButton location="nav" />
           </div>
 
@@ -239,8 +260,25 @@ export function Navbar() {
                 ))}
               </nav>
 
-              {/* CTA */}
-              <div className="mt-auto">
+              {/* Support & CTA */}
+              <div className="mt-auto flex flex-col gap-2.5">
+                <a
+                  href="https://buymeacoffee.com/prodily"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMenu}
+                  className="
+                    w-full inline-flex items-center justify-center gap-2 px-4 py-2.5
+                    bg-[#FFF7ED] text-[#9A3412] font-semibold text-sm rounded-lg
+                    border border-[#FED7AA] hover:bg-[#FFEDD5]
+                    transition-all duration-150
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C]
+                  "
+                >
+                  <Coffee size={15} className="text-[#EA580C]" aria-hidden="true" />
+                  <span>Buy Me a Coffee</span>
+                </a>
+
                 <CTAButton size="md" location="nav" onClick={closeMenu} />
               </div>
             </motion.div>
