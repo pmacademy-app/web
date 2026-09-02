@@ -148,3 +148,23 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
     expect(json.error).toBe('Forbidden: Untrusted Referer')
   })
 })
+
+describe('classifyAuthError: Auth session missing regression guard', () => {
+  it('does NOT classify "Auth session missing!" as AUTH_UNKNOWN_ERROR with the generic message', async () => {
+    const { classifyAuthError } = await import('@/lib/auth/errors')
+    const result = classifyAuthError({ message: 'Auth session missing!' }, 'reset_password')
+    // Must not produce the unactionable generic message that confused users
+    expect(result.message).not.toBe('An unexpected authentication error occurred. Please try again.')
+    // Must produce the specific expired-session message
+    expect(result.message).toContain('expired')
+    expect(result.rawCode).toBe('auth_session_missing')
+  })
+
+  it('classifies "Auth session missing!" with requiresAction reset_password', async () => {
+    const { classifyAuthError } = await import('@/lib/auth/errors')
+    const result = classifyAuthError('Auth session missing!', 'reset_password')
+    expect(result.requiresAction).toBe('reset_password')
+    expect(result.retryable).toBe(false)
+  })
+})
+

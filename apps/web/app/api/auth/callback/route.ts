@@ -1,4 +1,4 @@
-import { type EmailOtpType } from '@supabase/supabase-js'
+import { type EmailOtpType, createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
@@ -62,11 +62,23 @@ export async function GET(request: NextRequest) {
   // calls verifyOtp() to confirm the account and create a session.
   if (token_hash && type) {
     try {
-      const supabase = createServiceRoleClient()
+      // Recovery OTP must use the anon client so Supabase creates a proper
+      // user-scoped session. The service role client bypasses session creation
+      // which breaks the password reset flow entirely.
+      const supabase = type === 'recovery'
+        ? createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            { auth: { persistSession: false } }
+          )
+        : createServiceRoleClient()
       const { data, error } = await supabase.auth.verifyOtp({ token_hash, type })
 
       if (!error && data.user) {
-        await ensureUserProfile(supabase, data.user)
+        // Skip ensureUserProfile for recovery — the user already exists
+        if (type !== 'recovery') {
+          await ensureUserProfile(supabase, data.user)
+        }
         if (type === 'signup' || type === 'email_change') {
           try {
             const { globalNotificationDispatcher } = await import('@/lib/notifications/dispatcher')
