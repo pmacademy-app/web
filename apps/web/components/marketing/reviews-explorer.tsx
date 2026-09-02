@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
-import { Star, CheckCircle2, MessageSquarePlus, Quote, Sparkles } from 'lucide-react'
+import { Star, CheckCircle2, MessageSquarePlus } from 'lucide-react'
 import { ContextualFeedbackModal } from '@/components/feedback/ContextualFeedbackModal'
 
 export interface PublishedTestimonial {

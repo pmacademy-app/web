@@ -9,8 +9,6 @@ import {
   Layers,
   PenTool,
   FileText,
-  Sparkles,
-  ArrowRight,
   RotateCw,
   Clock,
   Award,
@@ -126,7 +124,7 @@ export function ExperienceSection() {
           
           {/* Left Column: 5 Interactive Format Cards */}
           <div className="lg:col-span-5 flex flex-col gap-2.5">
-            {FORMATS.map((format, index) => {
+            {FORMATS.map((format) => {
               const Icon = format.icon
               const isActive = activeFormat === format.id
 

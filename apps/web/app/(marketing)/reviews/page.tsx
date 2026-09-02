@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
-import { ReviewsExplorer } from '@/components/marketing/reviews-explorer'
+import { ReviewsExplorer, type PublishedTestimonial } from '@/components/marketing/reviews-explorer'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 import { ArrowRight } from 'lucide-react'
 
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 export const revalidate = 60
 
 export default async function ReviewsPage() {
-  let initialReviews: any[] = []
+  let initialReviews: PublishedTestimonial[] = []
   try {
     initialReviews = await FeedbackAdminService.getPublishedTestimonials()
   } catch {
