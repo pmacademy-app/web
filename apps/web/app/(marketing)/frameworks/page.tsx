@@ -8,16 +8,16 @@ import { ArrowRight, BookOpen, Layers } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Original PM Frameworks & Mental Models — Prodily PM Academy',
+  title: 'Product Management Frameworks & Mental Models | Prodily',
   description:
-    "Explore Prodily PM Academy's 12 original Product Management frameworks, including the Accountability Triangle, Decision Chain, Stakeholder Ledger, and Ownership Zones Model.",
+    'Explore practical product management mental models for discovery, prioritization, strategy, execution, leadership, and product decision-making.',
   alternates: {
     canonical: `${siteUrl}/frameworks`,
   },
   openGraph: {
-    title: 'Original PM Frameworks & Mental Models — Prodily PM Academy',
+    title: 'Product Management Frameworks & Mental Models | Prodily',
     description:
-      'Master business-school caliber Product Management mental models built for real-world product judgment.',
+      'Explore practical product management mental models for discovery, prioritization, strategy, execution, leadership, and product decision-making.',
     url: `${siteUrl}/frameworks`,
     type: 'website',
     images: [
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Original PM Frameworks & Mental Models — Prodily PM Academy',
-    description: '12 original PM mental models taught across 90 free lessons.',
+    title: 'Product Management Frameworks & Mental Models | Prodily',
+    description: 'Explore practical product management mental models for decision-making.',
     images: [BRAND.assets.ogImage],
   },
 }
@@ -68,17 +68,19 @@ export default function FrameworksPage() {
         {/* ── Architectural Header ───────────────────────────────────────── */}
         <header className="space-y-4 max-w-3xl">
           <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
-            <span>Curriculum Mental Models</span>
-            <span>·</span>
-            <span>12 Diagnostic Frameworks</span>
+            <span>PRODUCT MENTAL MODELS</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-semibold text-[#171A17] tracking-[-0.03em] leading-[1.12]">
-            Original PM Frameworks &amp; Mental Models
+            The frameworks you use to think through product decisions.
           </h1>
 
           <p className="text-base sm:text-lg text-[#70685A] leading-relaxed">
-            The 90-lesson curriculum introduces specific, reusable mental models designed to replace superficial blog tips with business-school caliber product judgment.
+            Prodily&apos;s curriculum introduces reusable mental models for framing problems, making decisions, prioritizing opportunities, understanding trade-offs, and communicating product thinking.
+          </p>
+
+          <p className="text-sm sm:text-base text-[#70685A] leading-relaxed">
+            These aren&apos;t tips to memorize. They&apos;re tools to help you reason through product problems.
           </p>
         </header>
 
@@ -89,10 +91,10 @@ export default function FrameworksPage() {
         <section className="rounded-2xl border border-[#DED8CB] bg-white p-8 sm:p-12 shadow-xs space-y-6">
           <div className="max-w-2xl space-y-3">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#171A17] tracking-tight">
-              Ready to apply these mental models in real scenarios?
+              Build the thinking behind the frameworks.
             </h2>
             <p className="text-sm sm:text-base text-[#70685A] leading-relaxed">
-              Explore all 90 lessons, 9 applied module capstones, and interactive spaced repetition flashcards with complete open access.
+              Explore the full curriculum and put these mental models into practice.
             </p>
           </div>
 
@@ -108,7 +110,7 @@ export default function FrameworksPage() {
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F80ED]
               "
             >
-              <span>Explore Full 90-Lesson Curriculum</span>
+              <span>Explore Full Curriculum</span>
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
 

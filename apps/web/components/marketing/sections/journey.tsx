@@ -55,10 +55,10 @@ export function JourneySection() {
             id="journey-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
           >
-            Six stages. Each one unlocks the next.
+            Six stages. Each one builds on the last.
           </h2>
           <p className="text-body-lg text-locked max-w-[540px] mx-auto leading-relaxed">
-            From PM vocabulary to a capstone case study you can walk a hiring manager through, each stage builds directly on the last.
+            Move from first principles to increasingly complex product decisions — building the judgment, work, and portfolio evidence that accumulate throughout the journey.
           </p>
         </motion.div>
 

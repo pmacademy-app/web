@@ -8,16 +8,16 @@ import { ArrowRight, MessageCircle } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Frequently Asked Questions — Prodily PM Academy',
+  title: 'Product Management Academy FAQ | Prodily',
   description:
-    'Answers to common questions about Prodily PM Academy: free curriculum, career switcher suitability, capstone deliverables, portfolio building, and certification.',
+    "Answers about Prodily's curriculum, capstones, portfolio, access, learning experience, and who the program is designed for.",
   alternates: {
     canonical: `${siteUrl}/faq`,
   },
   openGraph: {
-    title: 'Frequently Asked Questions — Prodily PM Academy',
+    title: 'Product Management Academy FAQ | Prodily',
     description:
-      'Everything you need to know about Prodily PM Academy, 100% free product management curriculum, and career deliverables.',
+      "Answers about Prodily's curriculum, capstones, portfolio, access, learning experience, and who the program is designed for.",
     url: `${siteUrl}/faq`,
     type: 'website',
     images: [
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Frequently Asked Questions — Prodily PM Academy',
+    title: 'Product Management Academy FAQ | Prodily',
     description: 'Frequently asked questions about the free 90-lesson PM Academy curriculum.',
     images: [BRAND.assets.ogImage],
   },
@@ -63,7 +63,7 @@ export default function FAQPage() {
         {/* ── Page Header ──────────────────────────────────────────────── */}
         <header className="space-y-4">
           <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
-            Support &amp; Details
+            SUPPORT &amp; DETAILS
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-semibold text-[#171A17] tracking-[-0.03em] leading-tight">
@@ -71,7 +71,7 @@ export default function FAQPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-[#70685A] leading-relaxed max-w-2xl">
-            Everything you need to know about the 90-lesson curriculum, practical capstones, portfolio artifacts, and free access.
+            Everything you need to know about the curriculum, applied work, portfolio, and access.
           </p>
         </header>
 
@@ -85,7 +85,7 @@ export default function FAQPage() {
               Still have a question?
             </h2>
             <p className="text-sm sm:text-base text-[#70685A] leading-relaxed">
-              Can&apos;t find what you are looking for? Reach out directly or check the full curriculum syllabus.
+              Get in touch and we&apos;ll help you find the answer.
             </p>
           </div>
 

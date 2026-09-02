@@ -37,55 +37,55 @@ const ARTIFACTS: ArtifactCard[] = [
     module: 'Module 03 · Execution',
     badge: 'Capstone 01',
     color: '#1F6B4E',
-    summary: 'A complete PRD establishing problem framing, non-goals boundaries, API dependencies, and measurable metric definitions.',
+    summary: 'A structured PRD covering the problem, scope, dependencies, success metrics, and edge cases behind a product decision.',
     deliverableBullets: [
-      'Problem Statement & Customer JTBD',
-      'Non-Goals Scope Boundary',
-      'Target Success Metrics (+4.2% Conversion Lift)',
-      'Edge Cases, Latency & Error States',
+      'Problem & customer need',
+      'Clear scope boundaries',
+      'Measurable success metrics',
+      'Edge cases & constraints',
     ],
     previewSnippet: {
-      heading: 'Problem Statement & Scope',
+      heading: 'Problem & Scope',
       body: '42% of first-time mobile buyers abandon checkout at the address verification step due to redundant field validations.',
       meta: 'Authored by PM Fellow · Target: Q3 Growth Sprint',
     },
   },
   {
     id: 'roadmap',
-    title: 'Q3 Growth & Retention Bets',
+    title: 'Multi-Quarter Product Roadmap',
     type: 'Strategic Roadmap',
     module: 'Module 04 · Strategy',
     badge: 'Capstone 02',
     color: '#D97706',
-    summary: 'A prioritized quarterly roadmap balancing customer friction, technical debt, and executive OKRs using the RICE scoring model.',
+    summary: 'A prioritization and sequencing exercise that turns competing opportunities into a focused roadmap with explicit trade-offs.',
     deliverableBullets: [
-      'RICE Feature Prioritization Matrix',
-      'Milestone Sequencing & Dependencies',
-      'Engineering Tradeoff Analysis',
-      'Post-Launch Attribution Metrics',
+      'Opportunity prioritization',
+      'Strategic sequencing',
+      'Resource trade-offs',
+      'Success measures',
     ],
     previewSnippet: {
-      heading: 'RICE Prioritization Scoring',
+      heading: 'Priority & Trade-offs',
       body: 'Score = (Reach 12k × Impact 3 × Confidence 80%) / Effort 2 sprints. Ranked #1 for Q3 sprint allocation.',
       meta: 'Theme: First-Time User Activation',
     },
   },
   {
     id: 'casestudy',
-    title: 'Reducing Checkout Drop-Off Rate',
+    title: 'Mobile Shopper Research Case Study',
     type: 'Case Study & Brief',
     module: 'Module 02 · Discovery',
     badge: 'Capstone 03',
     color: '#0284C7',
-    summary: 'Quantitative user research, interview synthesis, and experiment design mapping friction points in the checkout journey.',
+    summary: 'A research-led case study connecting user evidence to opportunity areas, product hypotheses, and a recommended direction.',
     deliverableBullets: [
-      'Funnel Drop-Off Attribution',
-      'User Friction & Workaround Mapping',
-      'A/B Experiment Hypothesis Design',
-      'Statistical Significance Guardrails',
+      'Research synthesis',
+      'Problem framing',
+      'Opportunity identification',
+      'Product recommendation',
     ],
     previewSnippet: {
-      heading: 'Discovery & Friction Attribution',
+      heading: 'Research & Insight',
       body: 'Removing postal code double-check reduced address entry time from 48s to 19s in live usability testing.',
       meta: 'User Research Cohort: N=32 Mobile Shoppers',
     },
@@ -97,12 +97,12 @@ const ARTIFACTS: ArtifactCard[] = [
     module: 'Module 08 · Leadership',
     badge: 'Capstone 04',
     color: '#7C3AED',
-    summary: 'Executive strategy memo evaluating competitive moats, TAM/SAM sizing, unit economics, and launch sequencing.',
+    summary: 'An executive-style strategy memo covering market sizing, competitive positioning, business model choices, and launch sequencing.',
     deliverableBullets: [
-      'TAM & SAM Market Sizing Models',
-      'Competitive Moats & Differentiation',
-      'Pricing & Monetization Architecture',
-      'Go-To-Market Phasing Plan',
+      'Market sizing',
+      'Competitive differentiation',
+      'Business model thinking',
+      'Go-to-market sequencing',
     ],
     previewSnippet: {
       heading: 'Market Entry & Defensibility',
@@ -165,16 +165,16 @@ export function PortfolioSection() {
         {/* ── Section Header ────────────────────────────────────────────── */}
         <div className="max-w-3xl space-y-3">
           <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
-            Verified PM Deliverables
+            PROOF OF WORK
           </div>
           <h2
             id="portfolio-heading"
             className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#171A17] tracking-[-0.03em] leading-tight"
           >
-            Finish with a portfolio, not just a certificate.
+            Finish with work you can show, not just a course you completed.
           </h2>
           <p className="text-base sm:text-lg text-[#70685A] leading-relaxed">
-            Every capstone becomes a real artifact like a PRD, roadmap, or case study published to a public profile you can share with hiring managers, teammates, or on LinkedIn. No login required to view it.
+            Every applied capstone becomes a tangible product artifact — from PRDs and opportunity briefs to roadmaps, metrics work, and strategy case studies. Publish your strongest work to a public portfolio and give people something concrete to see.
           </p>
         </div>
 
@@ -313,12 +313,13 @@ export function PortfolioSection() {
 
           {/* Bottom Share Note */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 mt-6 border-t border-[#DED8CB]/60 text-xs text-[#70685A]">
+            <span>Public portfolio links can be viewed without a login.</span>
 
             <Link
               href="/signup"
               className="text-xs font-semibold text-[#1F6B4E] hover:text-[#18553E] inline-flex items-center gap-1 shrink-0"
             >
-              <span>Build Your Public Portfolio</span>
+              <span>See a Sample Portfolio</span>
               <ArrowRight size={13} />
             </Link>
           </div>

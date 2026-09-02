@@ -5,8 +5,8 @@ export const BRAND = {
   product: 'PM Academy',
   fullName: 'Prodily PM Academy',
   shortName: 'PM Academy',
-  tagline: 'The Duolingo of Product Management.',
-  positioning: '90 lessons. 9 modules. Free forever.',
+  tagline: 'Learn product. Build the work. Show the proof.',
+  positioning: '90 lessons · 9 capstones · Public portfolio · Free, permanently.',
   domain: 'prodily.adityagangwani.me',
   social: {
     linkedin: 'https://www.linkedin.com/company/prodilypmacademy',
@@ -34,11 +34,12 @@ export const BRAND = {
     background: TOKENS.colors.background,
   },
   metadata: {
-    homeTitle: 'Prodily PM Academy — Learn Product Management Free',
+    homeTitle: 'Prodily PM Academy — Learn Product Management by Building',
     titleTemplate: '%s | Prodily PM Academy',
     description:
-      'A complete, free Product Management curriculum with 90 structured lessons, interactive quizzes, skill analytics, and portfolio projects. Built for career switchers and ambitious builders.',
-    shortDescription: '90 lessons. 9 modules. One skill: product judgment. Completely free.',
+      'A structured, free path to learn product management, practice through applied capstones, and build a public portfolio that proves your product thinking.',
+    shortDescription:
+      'Learn product management through 90 structured lessons, applied capstones, and interactive practice — then turn the work you create into a public portfolio you can show.',
   },
   assets: {
     dir: '/brand',

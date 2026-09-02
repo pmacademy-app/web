@@ -20,7 +20,7 @@ export const FRAMEWORKS: FrameworkItem[] = [
     moduleNumber: 1,
     moduleSlug: 'foundations',
     moduleTitle: 'Product Thinking Foundations',
-    summary: 'Desirability, Feasibility, and Viability evaluated simultaneously.',
+    summary: 'Clarify what a PM owns, what they influence, and where accountability actually sits.',
     definition:
       'A core Product Management model stating that sound decisions require Desirability (users want it), Feasibility (engineering can build it), and Viability (makes business sense) to hold equal weight simultaneously.',
     keyTakeaway:
@@ -34,7 +34,7 @@ export const FRAMEWORKS: FrameworkItem[] = [
     moduleNumber: 1,
     moduleSlug: 'foundations',
     moduleTitle: 'Product Thinking Foundations',
-    summary: 'Problem → Understanding → Decision → Execution → Outcome.',
+    summary: 'Trace a product decision from evidence and assumptions to the choice and its consequences.',
     definition:
       'A standing diagnostic workflow for evaluating PM decisions: starting with problem framing, advancing to user understanding, making explicit choices, executing with quality, and measuring behavior outcomes.',
     keyTakeaway:
@@ -48,7 +48,7 @@ export const FRAMEWORKS: FrameworkItem[] = [
     moduleNumber: 1,
     moduleSlug: 'foundations',
     moduleTitle: 'Product Thinking Foundations',
-    summary: 'Refining Desirability by separating end-users from buyers.',
+    summary: 'Separate the person using a product from the person making the buying decision.',
     definition:
       'A framework refining Desirability by separating the person using the software from the decision-maker paying for it—crucial for B2B, enterprise, and multi-sided platforms.',
     keyTakeaway:
@@ -62,7 +62,7 @@ export const FRAMEWORKS: FrameworkItem[] = [
     moduleNumber: 1,
     moduleSlug: 'foundations',
     moduleTitle: 'Product Thinking Foundations',
-    summary: 'Structuring problem evidence before committing to solutioning.',
+    summary: 'Turn an observed problem into a clearly framed opportunity worth investigating.',
     definition:
       'A lightweight pre-PRD artifact capturing problem evidence, target persona, success metrics, and explicit non-goals before engineering resources are committed to delivery.',
     keyTakeaway:
@@ -76,7 +76,7 @@ export const FRAMEWORKS: FrameworkItem[] = [
     moduleNumber: 2,
     moduleSlug: 'discovery',
     moduleTitle: 'Users, Problems & Discovery',
-    summary: 'Cleanly specifying Who, What, Why, and Business Impact.',
+    summary: 'Separate symptoms, causes, users, and constraints before jumping to solutions.',
     definition:
       'A structured diagnostic matrix for articulating user friction: specifying the exact user segment, the friction encountered, why existing workarounds fail, and the quantifiable business impact.',
     keyTakeaway:

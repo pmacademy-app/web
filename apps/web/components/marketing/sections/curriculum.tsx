@@ -38,6 +38,9 @@ export function CurriculumSection() {
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="text-center mb-10"
         >
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E] mb-3">
+            COMPLETE LEARNING PATH
+          </div>
           <h2
             id="curriculum-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
@@ -45,7 +48,7 @@ export function CurriculumSection() {
             Nine modules. Ninety lessons. One coherent path.
           </h2>
           <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
-            From product thinking fundamentals to advanced strategic judgment, each module builds on the last and ends with a real deliverable, not a quiz score.
+            Start with product thinking fundamentals and build toward discovery, execution, strategy, leadership, and technical fluency. Each module builds on the last and ends with applied work.
           </p>
         </motion.div>
 

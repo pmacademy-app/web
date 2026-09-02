@@ -53,7 +53,7 @@ export const MODULES: MarketingModule[] = [
     skillLabels: ['Strategy', 'Execution'],
     estimatedTime: '4–5 hrs',
     lessonCount: 10,
-    outcome: 'Roadmap and tradeoff memo',
+    outcome: 'Roadmap and trade-off memo',
   },
   {
     number: 5,
@@ -107,37 +107,37 @@ export const MODULES: MarketingModule[] = [
 export const JOURNEY_STAGES: JourneyStage[] = [
   {
     label: 'Beginner',
-    description: 'PM vocabulary and product thinking',
-    milestones: ['PM vocabulary', 'Product thinking', 'Role clarity'],
+    description: 'Start with the language of product.',
+    milestones: ['PM foundations', 'Product vocabulary', 'Core mental models'],
     cluster: 'strategy',
   },
   {
     label: 'Foundation',
-    description: 'Discovery, users, and problem framing',
+    description: 'Understand users, problems, and opportunities.',
     milestones: ['User research', 'Problem framing', 'Opportunity briefs'],
     cluster: 'discovery',
   },
   {
     label: 'Execution',
-    description: 'PRDs, prioritization, and shipping',
-    milestones: ['Writing PRDs', 'Roadmapping', 'Prioritization frameworks'],
+    description: 'Turn product thinking into clear product work.',
+    milestones: ['Writing PRDs', 'Roadmapping', 'Prioritization'],
     cluster: 'execution',
   },
   {
     label: 'Strategy',
-    description: 'Markets, positioning, and business models',
-    milestones: ['Market sizing', 'Positioning', 'Business model thinking'],
+    description: 'Make decisions with markets and business models in mind.',
+    milestones: ['Market sizing', 'Positioning', 'Business models'],
     cluster: 'strategy',
   },
   {
     label: 'Leadership',
-    description: 'Alignment, influence, and tradeoffs',
-    milestones: ['Stakeholder alignment', 'Influence without authority', 'Tradeoff framing'],
+    description: 'Learn to align people around difficult decisions.',
+    milestones: ['Stakeholder alignment', 'Influence without authority', 'Trade-off framing'],
     cluster: 'leadership',
   },
   {
     label: 'Career Ready',
-    description: 'Portfolio and capstone, built to walk through in an interview',
+    description: 'Bring your strongest work together into a portfolio.',
     milestones: ['Portfolio artifacts', 'Capstone case study', 'Public profile'],
     cluster: 'growth',
   },
@@ -206,44 +206,54 @@ export const TESTIMONIALS: TestimonialItem[] = []
 
 export const FAQ_ITEMS: FAQItem[] = [
   {
-    question: 'Is PM Academy really free?',
-    answer: 'Yes. The core curriculum is free. No fake trial, no paywalled lesson 11, and no paid unlocks for the main learning path.',
+    question: 'Is Prodily really free?',
+    answer:
+      'Yes. The core 90-lesson curriculum is free, permanently. There are no paywalled lessons blocking the main learning path.',
   },
   {
     question: 'Do I need to already work in tech or product?',
-    answer: 'No. Prodily is built first for career switchers with no prior PM experience, plus founders, designers, engineers, and analysts who want stronger product judgment. The curriculum starts from first principles.',
+    answer:
+      'No. Prodily is built first for career switchers and people building product judgment from scratch. The curriculum starts with foundations and progresses from there.',
   },
   {
-    question: 'Who is PM Academy for?',
-    answer: 'It is built first for career switchers and ambitious learners who want a structured way to learn Product Management. It is also useful for founders, operators, designers, engineers, analysts, students, and anyone who wants stronger product judgment.',
+    question: 'Who is Prodily for?',
+    answer:
+      'It is built primarily for aspiring product managers, career switchers, students, and ambitious learners. It can also help founders, designers, engineers, analysts, and others who want stronger product judgment.',
   },
   {
     question: 'Do I need prior PM experience?',
-    answer: 'No. The curriculum starts with foundations and builds toward advanced product work.',
+    answer:
+      'No. The curriculum starts with foundations and gradually moves into discovery, execution, strategy, leadership, and applied product work.',
   },
   {
     question: 'How long does it take?',
-    answer: 'The full curriculum includes 90 lessons across 9 modules. Your pace can vary, but the structure is designed for steady weekly progress rather than cramming.',
+    answer:
+      'The curriculum contains 90 lessons across nine modules. You can move at your own pace; the structure is designed for steady progress rather than cramming.',
   },
   {
     question: 'What will I build?',
-    answer: 'You will create practical artifacts like PRDs, roadmaps, research notes, wireframe critiques, metrics trees, strategy memos, and capstone case studies.',
+    answer:
+      "You'll work toward applied product artifacts such as PRDs, opportunity briefs, roadmaps, metrics work, strategy documents, and case studies.",
   },
   {
-    question: 'Will I get a certificate?',
-    answer: 'The product may include a certificate, but the real value is your portfolio: the work you build and can explain.',
+    question: 'What is the public portfolio?',
+    answer:
+      'Your strongest completed work can be presented through a public profile that you can share with hiring managers, teammates, or on LinkedIn.',
   },
   {
-    question: 'Is there a community?',
-    answer: 'Community features will open gradually, including study groups, peer review, and opt-in cohort leaderboards.',
+    question: 'Is Prodily a certification program?',
+    answer:
+      'Prodily can issue completion credentials, but the focus is on building product judgment and tangible work. A credential should complement your portfolio, not replace it.',
   },
   {
-    question: 'Is PM Academy live and accessible now?',
-    answer: 'Yes! All 90 lessons across 9 modules are live and completely free forever. Create your free account to start learning and track your progress instantly.',
+    question: 'Does Prodily use AI to personalize learning?',
+    answer:
+      "No. Prodily's learning and progress systems are based on its structured curriculum, practice formats, and tracked activity rather than an AI-generated personalized learning path.",
   },
   {
-    question: 'Will lessons ever be paywalled?',
-    answer: 'No. The core lesson path is designed to remain free.',
+    question: 'How do I get started?',
+    answer:
+      'Create a free account and start with the curriculum. You can begin with the first lesson and build from there.',
   },
 ]
 

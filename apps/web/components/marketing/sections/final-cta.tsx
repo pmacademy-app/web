@@ -51,12 +51,12 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
             id="cta-heading"
             className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#171A17] tracking-[-0.03em] leading-[1.16]"
           >
-            Start building your portfolio. Not another line on your resume that says &ldquo;took a course.&rdquo;
+            Build the portfolio that shows what you can do.
           </h2>
 
           {/* Subtitle */}
           <p className="mt-4 text-base sm:text-lg text-[#70685A] leading-relaxed max-w-[560px]">
-            90 lessons, 9 applied capstone projects, a public portfolio URL. Free, permanently.
+            Work through 90 lessons, complete applied capstones, and turn your strongest product work into a public portfolio. Start building for free, permanently.
           </p>
 
           {/* CTA Action Group */}
@@ -110,15 +110,15 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#70685A]">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-[#1F6B4E]" />
-              No credit card required
+              90 lessons
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-[#1F6B4E]" />
-              Instant access to all 90 lessons
+              9 applied capstones
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-[#1F6B4E]" />
-              Free permanently
+              Public portfolio
             </span>
           </div>
         </motion.div>

@@ -31,7 +31,7 @@ const FORMATS: FormatItem[] = [
     id: 'lesson',
     title: 'Structured Lessons',
     subtitle: 'Concept Introduction',
-    description: 'First-principles breakdowns with interactive reading, decision diagrams, and immediate reflection.',
+    description: 'First-principles explanations, decision diagrams, and guided reflection that build a strong product foundation.',
     badge: '90 Lessons',
     icon: BookOpen,
   },
@@ -39,7 +39,7 @@ const FORMATS: FormatItem[] = [
     id: 'quiz',
     title: 'Active Recall Quizzes',
     subtitle: 'Instant Validation',
-    description: 'Scenario-based questions testing diagnostic judgment immediately after each concept.',
+    description: 'Scenario-based questions that test whether you can apply a product concept, not just recognize its definition.',
     badge: 'Instant Feedback',
     icon: CheckCircle2,
   },
@@ -47,15 +47,15 @@ const FORMATS: FormatItem[] = [
     id: 'flashcard',
     title: 'Spaced Repetition',
     subtitle: 'Long-Term Retention',
-    description: 'Algorithms schedule concept reviews at the exact moment of memory decay so mental models stick permanently.',
-    badge: 'SM-2 Algorithm',
+    description: 'Concept reviews return at planned intervals so important product mental models stay fresh over time.',
+    badge: 'Retention',
     icon: Layers,
   },
   {
     id: 'assignment',
     title: 'Applied Artifacts',
     subtitle: 'Hands-on Deliverables',
-    description: 'Write real PRDs, opportunity briefs, metrics trees, and roadmap trade-off memos for your portfolio.',
+    description: 'Create PRDs, opportunity briefs, metrics trees, roadmaps, and other product work you can keep and showcase.',
     badge: 'Portfolio Ready',
     icon: PenTool,
   },
@@ -63,8 +63,8 @@ const FORMATS: FormatItem[] = [
     id: 'casestudy',
     title: 'Real-World Case Studies',
     subtitle: 'Industry Trade-offs',
-    description: 'Deconstruct actual historical product decisions from Stripe, Netflix, and Airbnb through PM mental models.',
-    badge: 'Executive Teardowns',
+    description: 'Study real product decisions and use PM mental models to understand the reasoning, trade-offs, and outcomes.',
+    badge: 'Product Teardowns',
     icon: FileText,
   },
 ]
@@ -113,7 +113,7 @@ export function ExperienceSection() {
             Every format has a job.
           </h2>
           <p className="text-base sm:text-lg text-[#70685A] leading-relaxed">
-            Lessons introduce a concept. Quizzes test it immediately. Flashcards bring it back with spaced repetition so it sticks. Assignments make you apply it. Case studies show how it plays out in the real world.
+            Learn the concept, test your judgment, reinforce what you learned, apply it to a product problem, and study how the thinking plays out in practice. Each format supports a different part of learning product management.
           </p>
         </div>
 
