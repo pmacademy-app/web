@@ -262,6 +262,26 @@ export function classifyAuthError(
     }
   }
 
+  // 8b. Missing / expired recovery session (Supabase 'Auth session missing!' and related)
+  // This occurs if auth.updateUser() is called without an active SDK session.
+  // Surface it as an expired-link error rather than the generic AUTH_UNKNOWN_ERROR.
+  if (
+    rawMessage.includes('auth session missing') ||
+    rawMessage.includes('session missing') ||
+    rawMessage.includes('no session found') ||
+    rawMessage.includes('not authenticated') ||
+    rawMessage.includes('unauthenticated')
+  ) {
+    return {
+      code: 'AUTH_UNKNOWN_ERROR',
+      message: 'Your password reset session has expired. Please request a new reset link.',
+      retryable: false,
+      isNetworkError: false,
+      requiresAction: 'reset_password',
+      rawCode: rawCode || 'auth_session_missing',
+    }
+  }
+
   // 9. Provider / Service unavailable (502, 503, 504, 500 database error saving new user)
   if (
     rawMessage.includes('502') ||

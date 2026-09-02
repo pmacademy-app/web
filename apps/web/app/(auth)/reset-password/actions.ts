@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
-import { createAuthenticatedServerClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 export async function updatePasswordAction(newPassword: string) {
   try {
@@ -14,56 +14,73 @@ export async function updatePasswordAction(newPassword: string) {
       return { error: 'No active recovery session found. Please request a new password reset link.' }
     }
 
-    // Try with access token first
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+    let userId: string | null = null
+
+    // Step 1: Explicitly validate the access token by passing it directly to getUser(accessToken).
+    // This makes the authorization chain explicit:
+    // HttpOnly access-token cookie -> getUser(accessToken) -> Supabase validates JWT -> validated user.id -> admin.updateUserById()
     if (accessToken) {
-      const userClient = createAuthenticatedServerClient(accessToken)
-      const { error } = await userClient.auth.updateUser({ password: newPassword })
-
-      if (!error) {
-        // Clear the recovery session cookies
-        cookieStore.delete('sb-access-token')
-        cookieStore.delete('sb-refresh-token')
-        return { success: true }
+      try {
+        const verifyClient = createClient(supabaseUrl, anonKey, {
+          auth: { persistSession: false },
+        })
+        const { data: { user }, error } = await verifyClient.auth.getUser(accessToken)
+        if (!error && user?.id) {
+          userId = user.id
+        }
+      } catch {
+        // Access token verification failed; fall through to refresh below
       }
-
-      // If access token failed but we have no refresh token, report the error
-      if (!refreshToken) {
-        return { error: error.message || 'Failed to update password. Your reset link may have expired.' }
-      }
-      // Otherwise, fall through to refresh token fallback below
     }
 
-    // Refresh-token fallback: exchange for a fresh access token
-    if (refreshToken) {
-      const refreshClient = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        { auth: { persistSession: false } }
-      )
+    // Step 2: If access token is expired/invalid, refresh to get the user ID.
+    // The refresh token is read STRICTLY from the HttpOnly 'sb-refresh-token' cookie
+    // and cannot be supplied by any client-controlled parameter.
+    if (!userId && refreshToken) {
+      const refreshClient = createClient(supabaseUrl, anonKey, {
+        auth: { persistSession: false },
+      })
       const { data: refreshData, error: refreshError } = await refreshClient.auth.refreshSession({
         refresh_token: refreshToken,
       })
 
-      if (refreshError || !refreshData?.session) {
+      if (refreshError || !refreshData?.session?.user) {
         cookieStore.delete('sb-access-token')
         cookieStore.delete('sb-refresh-token')
         return { error: 'Your password reset link has expired. Please request a new one.' }
       }
 
-      const retryClient = createAuthenticatedServerClient(refreshData.session.access_token)
-      const { error: retryError } = await retryClient.auth.updateUser({ password: newPassword })
-
-      if (retryError) {
-        return { error: retryError.message || 'Failed to update password. Your reset link may have expired.' }
-      }
+      userId = refreshData.session.user.id
     }
 
-    // Clear the recovery session cookies
+    if (!userId) {
+      cookieStore.delete('sb-access-token')
+      cookieStore.delete('sb-refresh-token')
+      return { error: 'Your password reset link has expired. Please request a new one.' }
+    }
+
+    // Step 3: Use the Admin API to update the password for the validated user ID.
+    // This is the same approach used by Settings -> Security (api/settings/security/route.ts).
+    const adminClient = createServiceRoleClient()
+    const { error: updateError } = await adminClient.auth.admin.updateUserById(userId, {
+      password: newPassword,
+    })
+
+    if (updateError) {
+      console.error('[updatePasswordAction] Admin update error:', updateError.message)
+      return { error: updateError.message || 'Failed to update password. Please try again.' }
+    }
+
+    // Clear the recovery session cookies after a successful update
     cookieStore.delete('sb-access-token')
     cookieStore.delete('sb-refresh-token')
     return { success: true }
   } catch (err) {
-    console.error('[updatePasswordAction] Error:', err)
+    console.error('[updatePasswordAction] Unexpected error:', err)
     return { error: 'An unexpected error occurred.' }
   }
 }
+
