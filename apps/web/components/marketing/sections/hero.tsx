@@ -216,7 +216,7 @@ export function HeroSection() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EAF5EF] text-[#1F6B4E]">
-                            Capstone 04 · Execution
+                            Capstone 01 · Lesson 22
                           </span>
                           <span className="text-[11px] text-[#70685A] font-mono">PRD-2026-v2.pdf</span>
                         </div>
@@ -373,7 +373,7 @@ export function HeroSection() {
                           <span className="text-[10px] text-[#1F6B4E] font-mono">View Full Doc →</span>
                         </div>
                         <p className="text-[#70685A] text-[11px] leading-relaxed">
-                          B2B SaaS Onboarding Teardown & Activation Friction Matrix (Notion vs Linear).
+                          B2B SaaS Onboarding Journey Map &amp; Friction Ledger (Lesson 15 &amp; Lesson 69).
                         </p>
                       </div>
                     </motion.div>
