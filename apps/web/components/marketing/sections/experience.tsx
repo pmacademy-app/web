@@ -222,7 +222,7 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] text-[#171A17] px-2.5 py-0.5 rounded font-semibold">
-                          Module 03 · Lesson 14
+                          Module 03 · Lesson 29
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock size={13} /> 6 min read
@@ -246,7 +246,7 @@ export function ExperienceSection() {
                           Score = (Reach × Impact × Confidence) / Effort
                         </div>
                         <p className="text-[11px] text-[#70685A] mt-1">
-                          Forces teams to explicitly quantify confidence before over-investing engineering time.
+                          Forces teams to explicitly quantify confidence before over-investing engineering time (Lesson 29).
                         </p>
                       </div>
                     </motion.div>
@@ -264,7 +264,7 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-mono text-[#1F6B4E] bg-[#EAF5EF] px-2 py-0.5 rounded font-semibold">
-                          Scenario Assessment
+                          Scenario Assessment · Lesson 29
                         </span>
                         <span className="text-xs font-mono text-[#70685A]">+25 XP</span>
                       </div>
@@ -301,7 +301,7 @@ export function ExperienceSection() {
 
                       {selectedQuizOption === 'MoSCoW' && (
                         <div className="p-3 bg-[#EAF5EF]/80 border border-[#1F6B4E]/30 rounded-lg text-xs text-[#1F6B4E] leading-relaxed">
-                          <strong>Correct:</strong> MoSCoW forces stakeholders to categorize items into strictly non-negotiable &ldquo;Must Haves&rdquo; vs negotiable &ldquo;Should Haves&rdquo;.
+                          <strong>Correct:</strong> MoSCoW makes strategic exclusion an explicit, visible category (&ldquo;Won&apos;t Have&rdquo;), directly enforcing Lesson 10&apos;s discipline that a real strategy must say no.
                         </div>
                       )}
                     </motion.div>
@@ -319,7 +319,7 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] px-2 py-0.5 rounded font-semibold text-[#171A17]">
-                          Card 18 of 24 · Retention Mode
+                          Card 18 of 24 · Module 05 (Lesson 42)
                         </span>
                         <span className="text-[11px] text-[#70685A]">Next review: 3 days</span>
                       </div>
@@ -343,11 +343,11 @@ export function ExperienceSection() {
                         <div className="min-h-[70px] flex items-center">
                           {flashcardFlipped ? (
                             <p className="text-sm font-medium text-[#171A17] leading-relaxed">
-                              The single metric that best captures the core value your product delivers to customers (e.g. Spotify: Time spent listening).
+                              The single metric that best captures the core value your product delivers to customers, serving as the top-level anchor for the product&apos;s metric tree (Lesson 42).
                             </p>
                           ) : (
                             <h4 className="text-base font-semibold text-[#171A17]">
-                              What is a North Star Metric?
+                              What is the core purpose of a North Star Metric?
                             </h4>
                           )}
                         </div>
@@ -380,17 +380,17 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#EAF5EF] text-[#1F6B4E] px-2 py-0.5 rounded font-semibold">
-                          Capstone 03 · Execution
+                          Capstone Deliverable · Module 03 (Lesson 22)
                         </span>
                         <span className="font-mono font-semibold text-[#171A17]">+150 XP</span>
                       </div>
 
                       <div>
                         <h4 className="text-base font-semibold text-[#171A17]">
-                          One-Click Checkout PRD Spec
+                          Product Requirements Document (PRD) Specification
                         </h4>
                         <p className="text-xs text-[#70685A] mt-0.5">
-                          Problem statement, user stories, success metrics, and non-goals.
+                          Solution-free problem statement, non-goals, user stories, and acceptance criteria.
                         </p>
                       </div>
 
@@ -402,15 +402,15 @@ export function ExperienceSection() {
                         <div className="space-y-1.5 pt-1">
                           <div className="flex items-center gap-2 text-[#171A17]">
                             <CheckCircle2 size={13} className="text-[#1F6B4E]" />
-                            <span>Measurable success metric (Conversion +4.2%)</span>
+                            <span>Solution-free Problem Statement (Lesson 17 template)</span>
                           </div>
                           <div className="flex items-center gap-2 text-[#171A17]">
                             <CheckCircle2 size={13} className="text-[#1F6B4E]" />
-                            <span>Explicit Non-Goals defined to prevent scope creep</span>
+                            <span>Explicit Non-Goals defined to prevent scope creep (Lesson 22)</span>
                           </div>
                           <div className="flex items-center gap-2 text-[#171A17]">
                             <CheckCircle2 size={13} className="text-[#1F6B4E]" />
-                            <span>API dependency matrix signed off by Engineering</span>
+                            <span>Testable Acceptance Criteria with Gherkin syntax (Lesson 24)</span>
                           </div>
                         </div>
                       </div>
@@ -429,7 +429,7 @@ export function ExperienceSection() {
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] text-[#171A17] px-2 py-0.5 rounded font-semibold">
-                          Executive Teardown · Module 08
+                          Product Teardown · Module 07 (Lesson 61)
                         </span>
                         <span className="flex items-center gap-1 font-mono">
                           <Award size={13} className="text-[#1F6B4E]" /> Diagnostic Study
@@ -438,10 +438,10 @@ export function ExperienceSection() {
 
                       <div>
                         <h4 className="text-base font-semibold text-[#171A17]">
-                          Netflix: The Qwikster Split &amp; Pivot Strategy
+                          The Premature Marketplace: Platform Sequencing Failure
                         </h4>
                         <p className="text-xs text-[#70685A] mt-0.5">
-                          How Reed Hastings navigated splitting DVD-by-mail and streaming, and what it teaches about product positioning.
+                          How a B2B SaaS company invested in a public developer marketplace while its underlying APIs were still unversioned and unstable.
                         </p>
                       </div>
 
@@ -450,7 +450,7 @@ export function ExperienceSection() {
                           Key Decision Takeaway
                         </div>
                         <p className="text-[#171A17] leading-relaxed">
-                          Right strategic direction executed with wrong customer communication timing will destroy user trust faster than bad technology.
+                          Investing in an open developer marketplace before establishing reliable, versioned developer surfaces breaks cross-side trust and stalls ecosystem growth (Lesson 61).
                         </p>
                       </div>
                     </motion.div>
