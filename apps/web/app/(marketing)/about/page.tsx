@@ -7,27 +7,29 @@ import { CheckCircle2, ArrowRight } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'About — Free Product Management Academy',
-  description: 'Learn why Prodily PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
+  title: 'About Prodily PM Academy',
+  description:
+    "Learn why Prodily exists and how we're making structured product management education more accessible.",
   alternates: {
     canonical: `${siteUrl}/about`,
   },
   openGraph: {
-    title: 'About — Prodily PM Academy',
-    description: 'Learn why Prodily PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
+    title: 'About Prodily PM Academy',
+    description:
+      "Learn why Prodily exists and how we're making structured product management education more accessible.",
     url: `${siteUrl}/about`,
     type: 'website',
     images: [{
       url: BRAND.assets.ogImage,
       width: BRAND.assets.ogImageDimensions.width,
       height: BRAND.assets.ogImageDimensions.height,
-      alt: 'Prodily PM Academy — Learn Product Management Free',
+      alt: 'About Prodily PM Academy',
     }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'About — Prodily PM Academy',
-    description: '90 lessons. 9 modules. Free forever. No paywalls.',
+    title: 'About Prodily PM Academy',
+    description: 'Learn why Prodily exists and our mission to make PM education accessible.',
     images: [BRAND.assets.ogImage],
   },
 }
@@ -43,24 +45,24 @@ export default function AboutPage() {
       />
       <div className="text-center space-y-4 max-w-2xl mx-auto">
         <span className="text-xs font-bold uppercase tracking-wider text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-          Our Mission &amp; Philosophy
+          OUR MISSION
         </span>
         <h1 className="text-4xl md:text-5xl font-bold font-serif text-foreground">
-          Why {BRAND.fullName} is Free Forever
+          Make serious product management education accessible to everyone.
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Product management education should be accessible to everyone—built with the academic rigor of a business school and the habit-building power of modern software.
+          Prodily PM Academy exists to give aspiring product managers a structured way to learn, practice, and build proof of their product thinking without putting the core curriculum behind a paywall.
         </p>
       </div>
 
       <div className="rounded-3xl border border-border bg-card p-8 md:p-12 space-y-8 shadow-xs">
         <div className="space-y-4 text-foreground/90 leading-relaxed">
           <p className="text-lg font-medium text-foreground">
-            A career switcher or ambitious builder learning product management today faces a broken choice: either wade through fragmented blog posts with zero structure, or pay $200 to $2,000 for superficial bootcamps.
+            Learning product management shouldn&apos;t require choosing between scattered free resources and an expensive program before you can even discover whether product is the right path for you.
           </p>
 
           <p className="text-sm md:text-base">
-            We built {BRAND.fullName} to fill this gap. A complete 90-lesson curriculum organized into 9 progressive modules, 9 portfolio capstones, and interactive spaced-repetition flashcards—completely free with zero paywalled content.
+            Prodily brings the structure of a complete curriculum together with interactive practice and applied capstones, so learning doesn&apos;t stop at understanding a framework — it continues into doing the work.
           </p>
         </div>
 
@@ -73,40 +75,40 @@ export default function AboutPage() {
             <div className="p-5 rounded-2xl border border-border bg-card/60 space-y-2">
               <div className="flex items-center gap-2 text-primary font-bold text-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>1. Academic Depth Over Gimmicks</span>
+                <span>1. Depth over gimmicks</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Gamification serves memory retention and daily study habits—it never replaces rigorous product management strategy.
+                Interactive mechanics support serious product thinking. The goal is better judgment, not more badges.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl border border-border bg-card/60 space-y-2">
               <div className="flex items-center gap-2 text-primary font-bold text-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>2. 100% Free Forever</span>
+                <span>2. Free access to the core curriculum</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                No credit cards, no fake free trials, no locked lesson 11 onward. The entire core curriculum is open for all.
+                The core 90-lesson curriculum is free, permanently, without paywalled lessons blocking the learning path.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl border border-border bg-card/60 space-y-2">
               <div className="flex items-center gap-2 text-primary font-bold text-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>3. Proof of Skill, Not Just Certificates</span>
+                <span>3. Proof of skill</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Every module ends with an applied capstone project you can publish and present directly in job interviews.
+                Learning should leave you with work you can explain, refine, and showcase — not only a completion credential.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl border border-border bg-card/60 space-y-2">
               <div className="flex items-center gap-2 text-primary font-bold text-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>4. Respect the Learner&apos;s Time</span>
+                <span>4. Respect the learner&apos;s time</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Clear estimated reading times, self-paced progression, and structured learning paths built for busy professionals.
+                Clear progression, estimated reading times, and focused learning formats help learners make steady progress without unnecessary friction.
               </p>
             </div>
           </div>
@@ -119,7 +121,7 @@ export default function AboutPage() {
               Built by Aditya Gangwani
             </h3>
             <p className="text-xs text-muted-foreground">
-              Dedicated to democratizing serious product judgment and craft.
+              Prodily is an independent effort to make serious product management education more accessible and more practical.
             </p>
           </div>
 

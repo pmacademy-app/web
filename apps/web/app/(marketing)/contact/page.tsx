@@ -7,14 +7,16 @@ import { Mail, Heart, ArrowRight } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Contact Us',
-  description: 'Get in touch with the Prodily PM Academy team for support, feedback, or inquiries.',
+  title: 'Contact Prodily PM Academy',
+  description:
+    'Have a question, need support, or want to share feedback? Contact the Prodily PM Academy team.',
   alternates: {
     canonical: `${siteUrl}/contact`,
   },
   openGraph: {
-    title: 'Contact — Prodily PM Academy',
-    description: 'Get in touch with the PM Academy team for support, feedback, or questions.',
+    title: 'Contact Prodily PM Academy',
+    description:
+      'Have a question, need support, or want to share feedback? Contact the Prodily PM Academy team.',
     url: `${siteUrl}/contact`,
     type: 'website',
     images: [{
@@ -26,8 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contact — Prodily PM Academy',
-    description: 'Get in touch with the PM Academy team.',
+    title: 'Contact Prodily PM Academy',
+    description: 'Get in touch with the Prodily PM Academy team.',
     images: [BRAND.assets.ogImage],
   },
 }
@@ -37,13 +39,13 @@ export default function ContactPage() {
     <div className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-3xl space-y-12">
       <div className="text-center space-y-4 max-w-xl mx-auto">
         <span className="text-xs font-bold uppercase tracking-wider text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-          Get in Touch
+          GET IN TOUCH
         </span>
         <h1 className="text-4xl md:text-5xl font-bold font-serif text-foreground">
-          Contact {BRAND.shortName}
+          Have a question? Let&apos;s talk.
         </h1>
         <p className="text-base text-muted-foreground leading-relaxed">
-          Have a question, feedback, or issue? We are here to help you get the most out of your PM learning journey.
+          Questions about the curriculum, a technical issue, feedback, or something else? Send us a message and we&apos;ll get back to you.
         </p>
       </div>
 
@@ -58,10 +60,10 @@ export default function ContactPage() {
               <Mail className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold font-serif text-foreground">
-              Direct Support Email
+              Need direct support?
             </h2>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Send us an email directly for account help, bugs, or general feedback.
+              Email us if you&apos;re stuck, found a problem, or have a question about the curriculum.
             </p>
           </div>
 
@@ -84,7 +86,7 @@ export default function ContactPage() {
               Support Our Mission
             </h2>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              {BRAND.product} is 100% free. If our curriculum helped you land a job or build a product, consider supporting us.
+              {BRAND.fullName} is 100% free. If our curriculum helped you build product skills or start your career, consider supporting us.
             </p>
           </div>
 
@@ -101,17 +103,17 @@ export default function ContactPage() {
 
       {/* FAQs shortcut */}
       <div className="p-8 rounded-2xl border border-border bg-card/60 text-center space-y-3">
-        <h3 className="text-base font-bold font-serif text-foreground">
-          Looking for quick answers?
+        <h3 className="text-base font-bold text-foreground">
+          Looking for a quick answer?
         </h3>
         <p className="text-xs text-muted-foreground">
-          Check out our frequently asked questions on the homepage.
+          Browse the most common questions about Prodily.
         </p>
         <Link
-          href="/#faq"
+          href="/faq"
           className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
         >
-          <span>View Frequently Asked Questions</span>
+          <span>View FAQs</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>

@@ -10,34 +10,33 @@ export const NAV_LINKS: NavLink[] = [
   { label: 'Frameworks', href: '/frameworks', weight: 'secondary' },
   { label: 'About', href: '/about', weight: 'secondary' },
   { label: 'Contact', href: '/contact', weight: 'tertiary' },
-  { label: 'FAQ', href: '/#faq', weight: 'tertiary' },
+  { label: 'FAQ', href: '/faq', weight: 'tertiary' },
 ]
 
 export const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
   {
-    heading: 'Resources',
-    links: [
-      { label: 'Curriculum', href: '/curriculum' },
-      { label: 'Frameworks & Models', href: '/frameworks' },
-      { label: 'Preview Sample Lesson', href: '/lessons/lesson-001' },
-      { label: 'Buy Me a Coffee', href: 'https://buymeacoffee.com/prodily' },
-    ],
-  },
-  {
     heading: 'Product',
     links: [
-      { label: 'Learning Experience', href: '/#experience' },
-      { label: 'Skill Radar', href: '/#skill-radar' },
+      { label: 'Curriculum', href: '/curriculum' },
+      { label: 'Frameworks', href: '/frameworks' },
       { label: 'Portfolio', href: '/#portfolio' },
+      { label: 'Learning Journey', href: '/#journey' },
     ],
   },
   {
     heading: 'Company',
     links: [
-      { label: 'Home', href: '/' },
       { label: 'About', href: '/about' },
+      { label: 'Reviews', href: '/reviews' },
       { label: 'Contact', href: '/contact' },
-      { label: 'FAQ', href: '/#faq' },
+      { label: 'FAQ', href: '/faq' },
+    ],
+  },
+  {
+    heading: 'Resources',
+    links: [
+      { label: 'Preview a Lesson', href: '/lessons/lesson-001' },
+      { label: 'Support the mission', href: 'https://buymeacoffee.com/prodily' },
     ],
   },
   {

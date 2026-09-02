@@ -38,8 +38,8 @@ export function CurriculumSection() {
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="text-center mb-10"
         >
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-body-sm font-medium mb-4">
-            Complete learning path
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E] mb-3">
+            COMPLETE LEARNING PATH
           </div>
           <h2
             id="curriculum-heading"
@@ -48,41 +48,16 @@ export function CurriculumSection() {
             Nine modules. Ninety lessons. One coherent path.
           </h2>
           <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
-            From product thinking fundamentals to advanced strategic judgment — each module builds on the last and ends with a real deliverable, not a quiz score.
+            Start with product thinking fundamentals and build toward discovery, execution, strategy, leadership, and technical fluency. Each module builds on the last and ends with applied work.
           </p>
         </motion.div>
 
-        {/* Stats bar */}
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.18, delay: 0.05, ease: [0, 0, 0.2, 1] }}
-          className="
-            flex flex-wrap items-center justify-center gap-6 lg:gap-10
-            mb-12 py-5 px-6
-            bg-surface border border-border rounded-lg
-          "
-          aria-label="Curriculum statistics"
-        >
-          {[
-            { value: '90', label: 'Lessons' },
-            { value: '9', label: 'Modules' },
-            { value: '7', label: 'Competencies' },
-            { value: '1', label: 'Portfolio' },
-          ].map(({ value, label }) => (
-            <div key={label} className="text-center">
-              <p className="text-h2 font-display font-semibold text-foreground">{value}</p>
-              <p className="text-body-sm text-locked">{label}</p>
-            </div>
-          ))}
-        </motion.div>
-
         {/* Module grid */}
-        <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
+        <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10 items-stretch">
           {MODULES.map((module, index) => (
             <motion.div
               key={module.number}
+              className="h-full"
               initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
               animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
               transition={{
@@ -91,7 +66,7 @@ export function CurriculumSection() {
                 ease: [0, 0, 0.2, 1],
               }}
             >
-              <ModuleCard module={module} />
+              <ModuleCard module={module} className="h-full" />
             </motion.div>
           ))}
         </div>
