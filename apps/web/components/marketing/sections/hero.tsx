@@ -75,15 +75,23 @@ export function HeroSection() {
             animate="visible"
             className="lg:col-span-6 flex flex-col gap-6"
           >
+            {/* Eyebrow */}
+            <motion.div
+              variants={prefersReducedMotion ? undefined : FADE_UP}
+              className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]"
+            >
+              FREE, STRUCTURED PM CURRICULUM
+            </motion.div>
+
             {/* Main Headline */}
             <motion.h1
               id="hero-heading"
               variants={prefersReducedMotion ? undefined : FADE_UP}
               className="text-4xl sm:text-5xl lg:text-[3.25rem] font-semibold text-[#171A17] leading-[1.12] tracking-[-0.03em]"
             >
-              The structured path from ambition to a{' '}
+              The structured path from “I want to break into PM” to a{' '}
               <span className="text-[#1F6B4E] underline decoration-[#1F6B4E]/30 decoration-wavy underline-offset-4">
-                verified PM portfolio
+                portfolio that proves you can
               </span>
               .
             </motion.h1>
@@ -93,7 +101,7 @@ export function HeroSection() {
               variants={prefersReducedMotion ? undefined : FADE_UP}
               className="text-base sm:text-lg text-[#70685A] leading-relaxed max-w-[540px]"
             >
-              Master product judgment through 90 sequential lessons, active spaced repetition, and real capstone artifacts like PRDs, metrics trees, and strategy memos published to your public URL.
+              Learn product management through 90 structured lessons, applied capstones, and interactive practice — then turn the work you create into a public portfolio you can show. Built for career switchers and anyone building product judgment from scratch.
             </motion.p>
 
             {/* Action Buttons */}
@@ -156,26 +164,26 @@ export function HeroSection() {
               </motion.div>
             </motion.div>
 
-            {/* Key Value Anchors (Zero generic cards) */}
+            {/* Key Value Anchors */}
             <motion.div
               variants={prefersReducedMotion ? undefined : FADE_UP}
               className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#DED8CB]/80"
             >
               <div className="space-y-0.5">
                 <div className="text-sm font-bold text-[#171A17] font-mono">90 Lessons</div>
-                <div className="text-[11px] text-[#70685A]">9 Complete Modules</div>
+                <div className="text-[11px] text-[#70685A]">9 complete modules</div>
               </div>
               <div className="space-y-0.5">
                 <div className="text-sm font-bold text-[#171A17] font-mono">9 Capstones</div>
-                <div className="text-[11px] text-[#70685A]">Real PM Deliverables</div>
+                <div className="text-[11px] text-[#70685A]">Real PM deliverables</div>
               </div>
               <div className="space-y-0.5">
-                <div className="text-sm font-bold text-[#171A17] font-mono">7 Axes</div>
-                <div className="text-[11px] text-[#70685A]">Competency Radar</div>
+                <div className="text-sm font-bold text-[#171A17] font-mono">7 Competencies</div>
+                <div className="text-[11px] text-[#70685A]">Skill progress tracking</div>
               </div>
               <div className="space-y-0.5">
                 <div className="text-sm font-bold text-[#1F6B4E] font-mono">₹0 Tuition</div>
-                <div className="text-[11px] text-[#70685A]">Free, Permanently</div>
+                <div className="text-[11px] text-[#70685A]">Free, permanently</div>
               </div>
             </motion.div>
           </motion.div>

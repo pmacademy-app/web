@@ -11,15 +11,16 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Full Curriculum — 9 Modules, 90 Lessons — Prodily PM Academy',
+  title: 'Product Management Curriculum — 90 Lessons | Prodily',
   description:
-    'Explore all 90 Product Management lessons across 9 core modules. Business-school caliber strategy, discovery, execution, leadership, and portfolio capstones.',
+    "Explore Prodily's 90-lesson Product Management curriculum across nine structured modules, with applied capstones and portfolio-ready work.",
   alternates: {
     canonical: `${siteUrl}/curriculum`,
   },
   openGraph: {
-    title: 'Full PM Curriculum — 9 Modules, 90 Lessons',
-    description: 'Explore the complete free 90-lesson Product Management curriculum.',
+    title: 'Product Management Curriculum — 90 Lessons | Prodily',
+    description:
+      "Explore Prodily's 90-lesson Product Management curriculum across nine structured modules, with applied capstones and portfolio-ready work.",
     url: `${siteUrl}/curriculum`,
     type: 'website',
     images: [
@@ -69,10 +70,13 @@ export default async function CurriculumPage() {
           Complete Learning Path
         </span>
         <h1 className="text-3xl md:text-5xl font-bold font-serif text-foreground">
-          Full PM Curriculum
+          Learn Product Management from first principles to applied practice.
         </h1>
         <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          9 modules, 90 lessons, 9 applied capstones. Rigorous, structured, and free forever with zero paywalls.
+          A structured 90-lesson curriculum across nine modules, designed to build product judgment step by step and turn learning into tangible work.
+        </p>
+        <p className="text-sm md:text-base text-muted-foreground leading-relaxed pt-1">
+          You don&apos;t need prior PM experience. Start with the foundations, build your product thinking, and progressively work toward real product deliverables.
         </p>
       </div>
 
@@ -170,6 +174,28 @@ export default async function CurriculumPage() {
           )
         })}
       </div>
+
+      {/* Bottom CTA Block */}
+      <section className="rounded-2xl border border-border bg-card p-8 md:p-12 text-center space-y-6 shadow-xs max-w-3xl mx-auto">
+        <div className="space-y-3">
+          <h2 className="text-2xl md:text-3xl font-bold font-serif text-foreground">
+            Ready to start building?
+          </h2>
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl mx-auto">
+            Work through the curriculum at your own pace and build your portfolio as you go.
+          </p>
+        </div>
+
+        <div>
+          <Link
+            href="/signup"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-primary text-white font-semibold text-sm rounded-lg shadow-xs hover:bg-primary/90 hover:shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+          >
+            <span>Start Learning Free</span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }

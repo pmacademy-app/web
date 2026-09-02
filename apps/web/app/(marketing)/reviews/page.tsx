@@ -8,16 +8,16 @@ import { ArrowRight } from 'lucide-react'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
-  title: 'Learner Reviews & Testimonials — Prodily PM Academy',
+  title: 'Learner Reviews | Prodily PM Academy',
   description:
-    'Read verified reviews and feedback from product management learners, career switchers, and tech leads who completed Prodily PM Academy modules and capstones.',
+    'Read real learner feedback about the Prodily Product Management learning experience.',
   alternates: {
     canonical: `${siteUrl}/reviews`,
   },
   openGraph: {
-    title: 'Learner Reviews & Testimonials — Prodily PM Academy',
+    title: 'Learner Reviews | Prodily PM Academy',
     description:
-      'Verified reviews from learners across 90 lessons and 9 module capstones.',
+      'Read real learner feedback about the Prodily Product Management learning experience.',
     url: `${siteUrl}/reviews`,
     type: 'website',
     images: [
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Learner Reviews & Testimonials — Prodily PM Academy',
+    title: 'Learner Reviews | Prodily PM Academy',
     description: 'Read what learners say about Prodily PM Academy.',
     images: [BRAND.assets.ogImage],
   },
@@ -51,7 +51,7 @@ export default async function ReviewsPage() {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: 'Prodily PM Academy',
-    description: '90 lessons. 9 modules. One skill: product judgment. Completely free.',
+    description: 'Learn product. Build the work. Show the proof. Free permanently.',
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.9',
@@ -73,9 +73,7 @@ export default async function ReviewsPage() {
         {/* ── Page Header ───────────────────────────────────────────────── */}
         <header className="space-y-4 max-w-3xl">
           <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
-            <span>Community Feedback</span>
-            <span>&middot;</span>
-            <span>Verified Learners</span>
+            <span>COMMUNITY FEEDBACK</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-semibold text-[#171A17] tracking-[-0.03em] leading-[1.12]">
@@ -83,7 +81,7 @@ export default async function ReviewsPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-[#70685A] leading-relaxed">
-            Authentic reviews from career switchers, associate PMs, and founders who&apos;ve completed our 90-lesson curriculum and built real portfolio capstones.
+            Real feedback from people using Prodily to build their product management skills and experience.
           </p>
         </header>
 
@@ -94,11 +92,8 @@ export default async function ReviewsPage() {
         <section className="rounded-2xl border border-[#DED8CB] bg-white p-8 sm:p-12 shadow-xs space-y-6">
           <div className="max-w-2xl space-y-3">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#171A17] tracking-tight">
-              Ready to start your product journey?
+              Ready to build your own product experience?
             </h2>
-            <p className="text-sm sm:text-base text-[#70685A] leading-relaxed">
-              Join thousands of learners mastering real-world product judgment with complete open access to all 90 lessons.
-            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3.5 pt-2">

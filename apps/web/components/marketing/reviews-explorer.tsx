@@ -85,10 +85,10 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
           </div>
           <div className="space-y-1">
             <h3 className="text-base font-semibold text-[#171A17]">
-              Be One of the First Learners to Submit a Review
+              Be one of the first learners to share your experience.
             </h3>
             <p className="text-xs text-[#70685A] leading-relaxed max-w-sm mx-auto">
-              Completed curriculum lessons or capstone assignments? Share your feedback with our community.
+              Your feedback helps us improve Prodily and gives future learners a clearer picture of the experience.
             </p>
           </div>
           <button
@@ -102,7 +102,7 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
             "
           >
             <MessageSquarePlus size={14} />
-            <span>Write First Review</span>
+            <span>Write a Review</span>
           </button>
         </div>
       ) : (

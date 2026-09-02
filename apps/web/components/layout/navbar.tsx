@@ -146,24 +146,6 @@ export function Navbar() {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-2.5">
-            {/* Buy Me a Coffee Button */}
-            <a
-              href="https://buymeacoffee.com/prodily"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                group inline-flex items-center justify-center w-9 h-9 rounded-lg
-                bg-white/80 text-[#70685A] border border-[#DED8CB]/80
-                hover:border-[#BDB4A2] hover:bg-white hover:text-[#C2410C] hover:shadow-2xs hover:-translate-y-0.5
-                active:scale-95 transition-all duration-150
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
-              "
-              title="Buy Me a Coffee"
-              aria-label="Buy Me a Coffee"
-            >
-              <Coffee size={15} className="transition-transform duration-150 group-hover:scale-110" aria-hidden="true" />
-            </a>
-
             <CTAButton location="nav" />
           </div>
 
@@ -234,9 +216,9 @@ export function Navbar() {
                 <X size={20} />
               </button>
 
-              {/* Intro copy — Sprint 3 mobile menu intro */}
+              {/* Intro copy */}
               <p className="text-body-sm text-locked mb-6">
-                A complete PM curriculum, free from the first lesson to the final capstone.
+                A structured path to learn product management, build product work, and create proof of your skills.
               </p>
 
               {/* Nav links */}
