@@ -10,11 +10,7 @@ import { SkillRadar } from '@/components/marketing/product-mockup/skill-radar'
 import {
   ArrowRight,
   Sparkles,
-  FileText,
-  Target,
-  UserCheck,
   CheckCircle2,
-  Share2,
   Layers,
   Award,
   Zap,

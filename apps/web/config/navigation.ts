@@ -35,6 +35,8 @@ export const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
   {
     heading: 'Resources',
     links: [
+      { label: 'Curriculum', href: '/curriculum' },
+      { label: 'Frameworks', href: '/frameworks' },
       { label: 'Preview a Lesson', href: '/lessons/lesson-001' },
       { label: 'Support the mission', href: 'https://buymeacoffee.com/prodily' },
     ],

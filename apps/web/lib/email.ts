@@ -44,15 +44,17 @@ export async function sendEmail({
   subject,
   html,
   text,
+  fromEmail: customFromEmail,
   replyTo,
 }: {
   to: string
   subject: string
   html: string
   text: string
+  fromEmail?: string
   replyTo?: string
 }): Promise<SendEmailResult> {
-  const fromEmail = getFromEmail()
+  const fromEmail = customFromEmail || getFromEmail()
   const brevoApiKey = process.env.BREVO_API_KEY
   const resendApiKey = process.env.RESEND_API_KEY
   const isTest = process.env.NODE_ENV === 'test' && process.env.ALLOW_TEST_NETWORK_EMAILS !== 'true'

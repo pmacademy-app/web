@@ -9,9 +9,7 @@ import {
   ChevronRight,
   CheckCircle2,
   ArrowRight,
-  UserCheck,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 interface ArtifactCard {
   id: string

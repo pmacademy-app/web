@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Search, X, MessageSquare, ArrowRight, HelpCircle } from 'lucide-react'
+import { ChevronDown, Search, X } from 'lucide-react'
 import { FAQ_ITEMS } from '@/config/content'
 import { trackFAQExpand } from '@/lib/analytics'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'

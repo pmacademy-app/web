@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
 import { FRAMEWORKS } from '@/lib/frameworks'
 import { FrameworksExplorer } from '@/components/marketing/frameworks-explorer'
-import { ArrowRight, BookOpen, Layers } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
