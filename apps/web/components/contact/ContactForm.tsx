@@ -65,9 +65,9 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="p-8 rounded-2xl border border-border bg-card space-y-5 shadow-xs">
-      <h3 className="text-xl font-bold font-serif text-foreground">Send Us a Direct Message</h3>
+      <h3 className="text-xl font-bold font-serif text-foreground">Send us a message</h3>
       <p className="text-xs text-muted-foreground leading-relaxed">
-        Fill out the form below and our team will get back to you at your provided email address.
+        Tell us what you need help with and we&apos;ll respond at the email address you provide.
       </p>
 
       {success && (

@@ -10,19 +10,19 @@ const COMPARISON_CARDS = [
   {
     icon: 'Shuffle',
     title: 'Fragmented Self-Study',
-    description: 'Stitching YouTube, Reddit, and blog posts together. No structure, no feedback, no path.',
+    description: 'YouTube, Reddit, blogs, and scattered frameworks. Lots of information, but no coherent sequence or body of work.',
     variant: 'default' as const,
   },
   {
     icon: 'GraduationCap',
     title: 'Expensive Bootcamps',
-    description: '$200–$2,000 for cohort-based courses. Good content, high cost, often inaccessible.',
+    description: 'Structured and guided, but often costly — with the price of a program becoming a barrier to getting started.',
     variant: 'default' as const,
   },
   {
     icon: 'BookOpen',
     title: 'Prodily PM Academy',
-    description: 'Structured curriculum, skill analytics, interactive practice, and portfolio artifacts. Free, permanently.',
+    description: 'A structured curriculum with interactive practice, applied capstones, skill tracking, and a portfolio you can keep building.',
     variant: 'comparison-highlighted' as const,
   },
 ]
@@ -50,17 +50,17 @@ export function WhySection() {
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="max-w-[760px] mx-auto text-center mb-14"
         >
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-body-sm font-medium mb-4">
-            The trade-off you shouldn&apos;t have to make
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E] mb-3">
+            THE TRADE-OFF YOU SHOULDN&apos;T HAVE TO MAKE
           </div>
           <h2
             id="why-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
           >
-            Self-study is free but aimless. Bootcamps are structured but expensive. Prodily is neither trade-off.
+            Self-study gives you information. Bootcamps give you structure. Prodily gives you a path to practice and proof.
           </h2>
           <p className="text-body-lg text-locked leading-relaxed">
-            Most people learn product management by stitching together YouTube videos, Reddit threads, and outdated blog posts — no sequence, no feedback, no proof of what they&apos;ve actually learned. Bootcamps fix the structure problem but cost $200–$2,000 and often teach the same surface-level frameworks. Prodily gives you the structure of a paid program with the applied output to prove it — for the cost of nothing.
+            Product management is easy to study badly. You can collect hundreds of videos, frameworks, and opinions without ever building a coherent mental model or producing work of your own. Paid programs solve some of the structure problem, but they can be expensive. Prodily combines a structured curriculum with applied practice and portfolio output — without putting the core learning path behind a paywall.
           </p>
         </motion.div>
 

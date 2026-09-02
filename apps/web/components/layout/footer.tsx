@@ -22,7 +22,7 @@ export function Footer() {
               <BrandLogo variant="full" size="sm" />
             </div>
             <p className="text-body-sm text-locked leading-relaxed max-w-[240px]">
-              A free PM academy for people building real product judgment.
+              Prodily PM Academy — a structured path to learn product management, build product work, and create proof of your skills.
             </p>
           </div>
 
@@ -63,7 +63,7 @@ export function Footer() {
             >
               Aditya Gangwani
             </Link>{' '}
-            to make serious PM education accessible.
+            to make serious product management education more accessible.
           </p>
           <p className="text-body-sm text-locked">
             Free core curriculum. No paywalled lessons.

@@ -176,7 +176,8 @@ export function getAboutPageSchema() {
         '@id': `${siteUrl}/about#webpage`,
         url: `${siteUrl}/about`,
         name: `About — ${BRAND.fullName}`,
-        description: 'Learn why Prodily PM Academy was created to offer a 90-lesson, business-school caliber Product Management education for free.',
+        description:
+          "Learn why Prodily exists and how we're making structured product management education more accessible.",
         mainEntity: {
           '@id': `${siteUrl}/#person-aditya`,
         },

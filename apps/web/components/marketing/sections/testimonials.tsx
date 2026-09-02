@@ -64,9 +64,6 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="text-center mb-12 space-y-4"
         >
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-bold uppercase tracking-wider">
-            <Star className="w-3.5 h-3.5 fill-current" /> Learner Stories & Reviews
-          </div>
           <h2
             id="testimonials-heading"
             className="font-display text-h1 lg:text-display-lg font-semibold text-foreground"
@@ -74,7 +71,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
             What learners say
           </h2>
           <p className="text-body-lg text-locked max-w-[640px] mx-auto leading-relaxed">
-            Verified reviews from people who&apos;ve completed modules — submitted through the product, moderated before publishing.
+            Verified reviews from people who&apos;ve completed modules, submitted through the product and moderated before publishing.
           </p>
         </motion.div>
 
