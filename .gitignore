@@ -44,6 +44,7 @@ opencode.json
 # Local-only marketing campaign scripts and logs (never commit)
 apps/web/scripts/local-campaigns/
 apps/web/scripts/logs/
+apps/web/scripts/send-jolly-recovery-email.ts
 
 # Master plan document (never commit)
 CONTENT_UPDATE.md 
