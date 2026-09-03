@@ -77,10 +77,10 @@ function CTAButton({
       onClick={handleClick}
       className={cn(
         'group relative inline-flex items-center justify-center gap-1.5 font-medium rounded-lg',
-        'bg-[#1F6B4E] text-white',
+        'bg-primary text-white',
         'border border-[#288461]/80',
         'shadow-[0_1px_2px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.22)]',
-        'hover:bg-[#18553E] hover:border-[#1F6B4E] hover:shadow-[0_4px_16px_rgba(31,107,78,0.25),inset_0_1px_0_rgba(255,255,255,0.25)] hover:-translate-y-0.5',
+        'hover:bg-[#18553E] hover:border-primary hover:shadow-[0_4px_16px_rgba(31,107,78,0.25),inset_0_1px_0_rgba(255,255,255,0.25)] hover:-translate-y-0.5',
         'active:scale-[0.97] active:translate-y-0',
         'transition-all duration-150',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F80ED] focus-visible:ring-offset-2',

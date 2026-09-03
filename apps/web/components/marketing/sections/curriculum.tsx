@@ -38,7 +38,7 @@ export function CurriculumSection() {
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="text-center mb-10"
         >
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E] mb-3">
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
             COMPLETE LEARNING PATH
           </div>
           <h2

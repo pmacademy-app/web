@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ArrowRight,
 } from 'lucide-react'
+import { TOKENS } from '@/theme/tokens'
 
 interface ArtifactCard {
   id: string
@@ -34,7 +35,7 @@ const ARTIFACTS: ArtifactCard[] = [
     type: 'PRD Spec',
     module: 'Module 03 · Execution',
     badge: 'Capstone 01',
-    color: '#1F6B4E',
+    color: TOKENS.colors.primary,
     summary: 'A structured PRD covering the solution-free problem statement, non-goals, user stories, acceptance criteria, and success metrics.',
     deliverableBullets: [
       'Solution-free problem statement',
@@ -162,12 +163,12 @@ export function PortfolioSection() {
 
         {/* ── Section Header ────────────────────────────────────────────── */}
         <div className="max-w-3xl space-y-3">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary">
             PROOF OF WORK
           </div>
           <h2
             id="portfolio-heading"
-            className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#171A17] tracking-[-0.03em] leading-tight"
+            className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-foreground tracking-[-0.03em] leading-tight"
           >
             Finish with work you can show, not just a course you completed.
           </h2>
@@ -180,7 +181,7 @@ export function PortfolioSection() {
         <div
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
-          className="group relative rounded-2xl border border-[#DED8CB] bg-[#FBFAF6] p-7 sm:p-9 lg:p-10 shadow-xs overflow-hidden"
+          className="group relative rounded-2xl border border-[#DED8CB] bg-background p-7 sm:p-9 lg:p-10 shadow-xs overflow-hidden"
         >
 
           {/* PPT-Style Floating Left Arrow (Appears on Hover) */}
@@ -191,7 +192,7 @@ export function PortfolioSection() {
             className="
               absolute left-3.5 top-1/2 -translate-y-1/2 z-20
               w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/95 border border-[#DED8CB]
-              shadow-[0_4px_16px_rgba(23,26,23,0.1)] flex items-center justify-center text-[#171A17]
+              shadow-[0_4px_16px_rgba(23,26,23,0.1)] flex items-center justify-center text-foreground
               opacity-0 group-hover:opacity-100 transition-all duration-200
               hover:scale-110 active:scale-95 hover:bg-white
               focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
@@ -208,7 +209,7 @@ export function PortfolioSection() {
             className="
               absolute right-3.5 top-1/2 -translate-y-1/2 z-20
               w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/95 border border-[#DED8CB]
-              shadow-[0_4px_16px_rgba(23,26,23,0.1)] flex items-center justify-center text-[#171A17]
+              shadow-[0_4px_16px_rgba(23,26,23,0.1)] flex items-center justify-center text-foreground
               opacity-0 group-hover:opacity-100 transition-all duration-200
               hover:scale-110 active:scale-95 hover:bg-white
               focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
@@ -252,7 +253,7 @@ export function PortfolioSection() {
                       </span>
                     </div>
 
-                    <h3 className="text-2xl sm:text-3xl font-semibold text-[#171A17] tracking-tight">
+                    <h3 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
                       {activeArtifact.title}
                     </h3>
 
@@ -268,8 +269,8 @@ export function PortfolioSection() {
                     </div>
                     <div className="space-y-2">
                       {activeArtifact.deliverableBullets.map((bullet) => (
-                        <div key={bullet} className="flex items-center gap-2.5 text-xs text-[#171A17]">
-                          <div className="w-4 h-4 rounded-full bg-[#EAF5EF] text-[#1F6B4E] flex items-center justify-center shrink-0">
+                        <div key={bullet} className="flex items-center gap-2.5 text-xs text-foreground">
+                          <div className="w-4 h-4 rounded-full bg-[#EAF5EF] text-primary flex items-center justify-center shrink-0">
                             <CheckCircle2 size={12} />
                           </div>
                           <span className="font-medium">{bullet}</span>
@@ -283,24 +284,24 @@ export function PortfolioSection() {
                 <div className="lg:col-span-6">
                   <div className="bg-white border border-[#DED8CB] rounded-xl p-5 sm:p-6 space-y-3.5 shadow-2xs">
                     <div className="flex items-center justify-between pb-3 border-b border-[#DED8CB]/70 text-xs font-mono text-[#70685A]">
-                      <span className="font-semibold text-[#171A17]">Live Public Document Excerpt</span>
-                      <span className="text-[11px] bg-[#EAF5EF] px-2 py-0.5 rounded text-[#1F6B4E] font-semibold">
+                      <span className="font-semibold text-foreground">Live Public Document Excerpt</span>
+                      <span className="text-[11px] bg-[#EAF5EF] px-2 py-0.5 rounded text-primary font-semibold">
                         Public URL
                       </span>
                     </div>
 
                     <div className="space-y-2">
-                      <div className="text-xs font-bold text-[#171A17]">
+                      <div className="text-xs font-bold text-foreground">
                         {activeArtifact.previewSnippet.heading}
                       </div>
-                      <p className="text-xs text-[#70685A] leading-relaxed bg-[#FBFAF6] p-3.5 rounded-lg border border-[#DED8CB]/80 font-mono">
+                      <p className="text-xs text-[#70685A] leading-relaxed bg-background p-3.5 rounded-lg border border-[#DED8CB]/80 font-mono">
                         &ldquo;{activeArtifact.previewSnippet.body}&rdquo;
                       </p>
                     </div>
 
                     <div className="pt-2 text-[11px] text-[#70685A] flex items-center justify-between border-t border-[#DED8CB]/60 font-mono">
                       <span>{activeArtifact.previewSnippet.meta}</span>
-                      <span className="text-[#1F6B4E] font-semibold">100% Original Craft</span>
+                      <span className="text-primary font-semibold">100% Original Craft</span>
                     </div>
                   </div>
                 </div>
@@ -315,7 +316,7 @@ export function PortfolioSection() {
 
             <Link
               href="/signup"
-              className="text-xs font-semibold text-[#1F6B4E] hover:text-[#18553E] inline-flex items-center gap-1 shrink-0"
+              className="text-xs font-semibold text-primary hover:text-[#18553E] inline-flex items-center gap-1 shrink-0"
             >
               <span>See a Sample Portfolio</span>
               <ArrowRight size={13} />

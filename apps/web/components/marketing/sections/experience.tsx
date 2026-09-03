@@ -95,18 +95,18 @@ export function ExperienceSection() {
     <section
       id="experience"
       aria-labelledby="experience-heading"
-      className="py-20 lg:py-28 bg-[#FBFAF6] border-t border-[#DED8CB]/80 scroll-mt-24 lg:scroll-mt-28"
+      className="py-20 lg:py-28 bg-background border-t border-[#DED8CB]/80 scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         
         {/* ── Section Header ────────────────────────────────────────────── */}
         <div className="max-w-3xl mb-12 space-y-3">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary">
             Learning Architecture
           </div>
           <h2
             id="experience-heading"
-            className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#171A17] tracking-[-0.03em] leading-tight"
+            className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-foreground tracking-[-0.03em] leading-tight"
           >
             Every format has a job.
           </h2>
@@ -143,15 +143,15 @@ export function ExperienceSection() {
                   className={cn(
                     'group w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-start gap-3.5 relative overflow-hidden',
                     isActive
-                      ? 'bg-white border-[#1F6B4E] shadow-sm'
-                      : 'bg-[#FBFAF6] border-[#DED8CB]/80 hover:bg-white hover:border-[#BDB4A2]',
+                      ? 'bg-white border-primary shadow-sm'
+                      : 'bg-background border-[#DED8CB]/80 hover:bg-white hover:border-[#BDB4A2]',
                   )}
                 >
                   {/* Left Active Indicator Bar */}
                   {isActive && (
                     <motion.span
                       layoutId="activeFormatIndicator"
-                      className="absolute left-0 top-0 bottom-0 w-1 bg-[#1F6B4E]"
+                      className="absolute left-0 top-0 bottom-0 w-1 bg-primary"
                       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     />
                   )}
@@ -161,8 +161,8 @@ export function ExperienceSection() {
                     className={cn(
                       'w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors mt-0.5',
                       isActive
-                        ? 'bg-[#EAF5EF] text-[#1F6B4E]'
-                        : 'bg-white text-[#70685A] border border-[#DED8CB] group-hover:text-[#171A17]',
+                        ? 'bg-[#EAF5EF] text-primary'
+                        : 'bg-white text-[#70685A] border border-[#DED8CB] group-hover:text-foreground',
                     )}
                   >
                     <Icon size={18} />
@@ -171,7 +171,7 @@ export function ExperienceSection() {
                   {/* Text Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-sm font-semibold text-[#171A17]">
+                      <h3 className="text-sm font-semibold text-foreground">
                         {format.title}
                       </h3>
                       <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-[#F2EFE7] text-[#70685A]">
@@ -194,8 +194,8 @@ export function ExperienceSection() {
               {/* Simulator Header */}
               <div className="flex items-center justify-between pb-4 border-b border-[#DED8CB]/70 mb-5">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#1F6B4E] animate-pulse" />
-                  <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-xs font-mono font-semibold uppercase tracking-wider text-primary">
                     Interactive Sandbox · {FORMATS[activeIndex].subtitle}
                   </span>
                 </div>
@@ -219,7 +219,7 @@ export function ExperienceSection() {
                       className="space-y-4"
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
-                        <span className="font-mono bg-[#F2EFE7] text-[#171A17] px-2.5 py-0.5 rounded font-semibold">
+                        <span className="font-mono bg-[#F2EFE7] text-foreground px-2.5 py-0.5 rounded font-semibold">
                           Module 03 · Lesson 29
                         </span>
                         <span className="flex items-center gap-1">
@@ -228,7 +228,7 @@ export function ExperienceSection() {
                       </div>
 
                       <div className="space-y-2">
-                        <h4 className="text-lg font-semibold text-[#171A17]">
+                        <h4 className="text-lg font-semibold text-foreground">
                           Prioritizing with the RICE Framework
                         </h4>
                         <p className="text-xs text-[#70685A] leading-relaxed">
@@ -236,11 +236,11 @@ export function ExperienceSection() {
                         </p>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-[#FBFAF6] border border-[#DED8CB] space-y-2 text-xs">
-                        <div className="font-mono font-bold text-[#1F6B4E] text-[11px] uppercase">
+                      <div className="p-4 rounded-xl bg-background border border-[#DED8CB] space-y-2 text-xs">
+                        <div className="font-mono font-bold text-primary text-[11px] uppercase">
                           Formula Breakdown
                         </div>
-                        <div className="font-mono text-[#171A17] bg-white p-2.5 rounded-lg border border-[#DED8CB]/70 font-semibold text-center">
+                        <div className="font-mono text-foreground bg-white p-2.5 rounded-lg border border-[#DED8CB]/70 font-semibold text-center">
                           Score = (Reach × Impact × Confidence) / Effort
                         </div>
                         <p className="text-[11px] text-[#70685A] mt-1">
@@ -261,13 +261,13 @@ export function ExperienceSection() {
                       className="space-y-4"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-mono text-[#1F6B4E] bg-[#EAF5EF] px-2 py-0.5 rounded font-semibold">
+                        <span className="text-xs font-mono text-primary bg-[#EAF5EF] px-2 py-0.5 rounded font-semibold">
                           Scenario Assessment · Lesson 29
                         </span>
                         <span className="text-xs font-mono text-[#70685A]">+25 XP</span>
                       </div>
 
-                      <h4 className="text-sm sm:text-base font-semibold text-[#171A17]">
+                      <h4 className="text-sm sm:text-base font-semibold text-foreground">
                         Which prioritization framework best isolates hard non-negotiable scope constraints from negotiable trade-offs?
                       </h4>
 
@@ -286,19 +286,19 @@ export function ExperienceSection() {
                               className={cn(
                                 'w-full text-left px-3.5 py-2.5 rounded-xl border text-xs font-medium transition-all flex items-center justify-between',
                                 isSelected
-                                  ? 'bg-[#EAF5EF] border-[#1F6B4E] text-[#1F6B4E] font-semibold'
-                                  : 'bg-[#FBFAF6] border-[#DED8CB] text-[#171A17] hover:bg-white',
+                                  ? 'bg-[#EAF5EF] border-primary text-primary font-semibold'
+                                  : 'bg-background border-[#DED8CB] text-foreground hover:bg-white',
                               )}
                             >
                               <span>{option.label}</span>
-                              {isSelected && <span className="text-xs font-bold text-[#1F6B4E]">✓ Selected</span>}
+                              {isSelected && <span className="text-xs font-bold text-primary">✓ Selected</span>}
                             </button>
                           )
                         })}
                       </div>
 
                       {selectedQuizOption === 'MoSCoW' && (
-                        <div className="p-3 bg-[#EAF5EF]/80 border border-[#1F6B4E]/30 rounded-lg text-xs text-[#1F6B4E] leading-relaxed">
+                        <div className="p-3 bg-[#EAF5EF]/80 border border-primary/30 rounded-lg text-xs text-primary leading-relaxed">
                           <strong>Correct:</strong> MoSCoW makes strategic exclusion an explicit, visible category (&ldquo;Won&apos;t Have&rdquo;), directly enforcing Lesson 10&apos;s discipline that a real strategy must say no.
                         </div>
                       )}
@@ -316,7 +316,7 @@ export function ExperienceSection() {
                       className="space-y-4"
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
-                        <span className="font-mono bg-[#F2EFE7] px-2 py-0.5 rounded font-semibold text-[#171A17]">
+                        <span className="font-mono bg-[#F2EFE7] px-2 py-0.5 rounded font-semibold text-foreground">
                           Card 18 of 24 · Module 05 (Lesson 42)
                         </span>
                         <span className="text-[11px] text-[#70685A]">Next review: 3 days</span>
@@ -326,13 +326,13 @@ export function ExperienceSection() {
                       <button
                         type="button"
                         onClick={() => setFlashcardFlipped(!flashcardFlipped)}
-                        className="w-full text-left p-5 rounded-xl border border-[#DED8CB] bg-[#FBFAF6] hover:bg-white transition-all duration-200 shadow-2xs space-y-3 cursor-pointer group"
+                        className="w-full text-left p-5 rounded-xl border border-[#DED8CB] bg-background hover:bg-white transition-all duration-200 shadow-2xs space-y-3 cursor-pointer group"
                       >
                         <div className="flex items-center justify-between text-xs font-mono text-[#70685A]">
-                          <span className="text-[#1F6B4E] font-semibold">
+                          <span className="text-primary font-semibold">
                             {flashcardFlipped ? 'ANSWER (FLIPPED)' : 'PROMPT'}
                           </span>
-                          <span className="flex items-center gap-1 group-hover:text-[#171A17]">
+                          <span className="flex items-center gap-1 group-hover:text-foreground">
                             <RotateCw size={12} className="group-hover:rotate-180 transition-transform duration-300" />
                             Click to {flashcardFlipped ? 'hide' : 'reveal'}
                           </span>
@@ -340,11 +340,11 @@ export function ExperienceSection() {
 
                         <div className="min-h-[70px] flex items-center">
                           {flashcardFlipped ? (
-                            <p className="text-sm font-medium text-[#171A17] leading-relaxed">
+                            <p className="text-sm font-medium text-foreground leading-relaxed">
                               The single metric that best captures the core value your product delivers to customers, serving as the top-level anchor for the product&apos;s metric tree (Lesson 42).
                             </p>
                           ) : (
-                            <h4 className="text-base font-semibold text-[#171A17]">
+                            <h4 className="text-base font-semibold text-foreground">
                               What is the core purpose of a North Star Metric?
                             </h4>
                           )}
@@ -356,7 +356,7 @@ export function ExperienceSection() {
                         <span className="p-2 rounded-lg bg-[#F2EFE7] text-[11px] font-mono text-[#70685A]">
                           Again · 10m
                         </span>
-                        <span className="p-2 rounded-lg bg-[#EAF5EF] text-[11px] font-mono text-[#1F6B4E] font-semibold">
+                        <span className="p-2 rounded-lg bg-[#EAF5EF] text-[11px] font-mono text-primary font-semibold">
                           Good · 3d
                         </span>
                         <span className="p-2 rounded-lg bg-[#F2EFE7] text-[11px] font-mono text-[#70685A]">
@@ -377,14 +377,14 @@ export function ExperienceSection() {
                       className="space-y-4"
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
-                        <span className="font-mono bg-[#EAF5EF] text-[#1F6B4E] px-2 py-0.5 rounded font-semibold">
+                        <span className="font-mono bg-[#EAF5EF] text-primary px-2 py-0.5 rounded font-semibold">
                           Capstone Deliverable · Module 03 (Lesson 22)
                         </span>
-                        <span className="font-mono font-semibold text-[#171A17]">+150 XP</span>
+                        <span className="font-mono font-semibold text-foreground">+150 XP</span>
                       </div>
 
                       <div>
-                        <h4 className="text-base font-semibold text-[#171A17]">
+                        <h4 className="text-base font-semibold text-foreground">
                           Product Requirements Document (PRD) Specification
                         </h4>
                         <p className="text-xs text-[#70685A] mt-0.5">
@@ -392,22 +392,22 @@ export function ExperienceSection() {
                         </p>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-[#FBFAF6] border border-[#DED8CB] space-y-2 text-xs">
+                      <div className="p-4 rounded-xl bg-background border border-[#DED8CB] space-y-2 text-xs">
                         <div className="flex items-center justify-between font-mono text-[11px] text-[#70685A]">
                           <span>Portfolio Rubric Checklist</span>
-                          <span className="text-[#1F6B4E] font-semibold">3/3 Complete</span>
+                          <span className="text-primary font-semibold">3/3 Complete</span>
                         </div>
                         <div className="space-y-1.5 pt-1">
-                          <div className="flex items-center gap-2 text-[#171A17]">
-                            <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <CheckCircle2 size={13} className="text-primary" />
                             <span>Solution-free Problem Statement (Lesson 17 template)</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[#171A17]">
-                            <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <CheckCircle2 size={13} className="text-primary" />
                             <span>Explicit Non-Goals defined to prevent scope creep (Lesson 22)</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[#171A17]">
-                            <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <CheckCircle2 size={13} className="text-primary" />
                             <span>Testable Acceptance Criteria with Gherkin syntax (Lesson 24)</span>
                           </div>
                         </div>
@@ -426,16 +426,16 @@ export function ExperienceSection() {
                       className="space-y-4"
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
-                        <span className="font-mono bg-[#F2EFE7] text-[#171A17] px-2 py-0.5 rounded font-semibold">
+                        <span className="font-mono bg-[#F2EFE7] text-foreground px-2 py-0.5 rounded font-semibold">
                           Product Teardown · Module 07 (Lesson 61)
                         </span>
                         <span className="flex items-center gap-1 font-mono">
-                          <Award size={13} className="text-[#1F6B4E]" /> Diagnostic Study
+                          <Award size={13} className="text-primary" /> Diagnostic Study
                         </span>
                       </div>
 
                       <div>
-                        <h4 className="text-base font-semibold text-[#171A17]">
+                        <h4 className="text-base font-semibold text-foreground">
                           The Premature Marketplace: Platform Sequencing Failure
                         </h4>
                         <p className="text-xs text-[#70685A] mt-0.5">
@@ -443,11 +443,11 @@ export function ExperienceSection() {
                         </p>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-[#FBFAF6] border border-[#DED8CB] space-y-2 text-xs">
-                        <div className="font-mono text-[11px] font-bold text-[#1F6B4E] uppercase">
+                      <div className="p-4 rounded-xl bg-background border border-[#DED8CB] space-y-2 text-xs">
+                        <div className="font-mono text-[11px] font-bold text-primary uppercase">
                           Key Decision Takeaway
                         </div>
-                        <p className="text-[#171A17] leading-relaxed">
+                        <p className="text-foreground leading-relaxed">
                           Investing in an open developer marketplace before establishing reliable, versioned developer surfaces breaks cross-side trust and stalls ecosystem growth (Lesson 61).
                         </p>
                       </div>
@@ -462,7 +462,7 @@ export function ExperienceSection() {
                 <span className="text-[#70685A]">
                   Auto-advances through all 5 formats
                 </span>
-                <span className="font-semibold text-[#1F6B4E] flex items-center gap-1">
+                <span className="font-semibold text-primary flex items-center gap-1">
                   <span>Hover to pause</span>
                 </span>
               </div>

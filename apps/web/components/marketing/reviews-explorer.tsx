@@ -52,7 +52,7 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
       
       {/* ── Top Header Row ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-between border-b border-[#DED8CB]/80 pb-4">
-        <div className="text-xs font-mono font-semibold uppercase text-[#1F6B4E]">
+        <div className="text-xs font-mono font-semibold uppercase text-primary">
           {loading ? 'Loading Reviews...' : `Verified Reviews (${reviews.length})`}
         </div>
 
@@ -61,7 +61,7 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
           onClick={() => setModalOpen(true)}
           className="
             inline-flex items-center gap-1.5 px-3.5 py-1.5
-            bg-[#1F6B4E] text-white font-semibold text-xs rounded-lg
+            bg-primary text-white font-semibold text-xs rounded-lg
             shadow-[0_2px_10px_rgba(31,107,78,0.2)]
             hover:bg-[#18553E] active:scale-95
             transition-all duration-150 cursor-pointer
@@ -80,11 +80,11 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
       ) : reviews.length === 0 ? (
         /* Empty State (When no published testimonials in DB) */
         <div className="p-10 sm:p-14 rounded-2xl border border-dashed border-[#DED8CB] bg-white text-center max-w-lg mx-auto space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-full bg-[#EAF5EF] text-[#1F6B4E] flex items-center justify-center mx-auto ring-4 ring-[#1F6B4E]/10">
-            <Star className="w-6 h-6 fill-[#1F6B4E]" />
+          <div className="w-12 h-12 rounded-full bg-[#EAF5EF] text-primary flex items-center justify-center mx-auto ring-4 ring-primary/10">
+            <Star className="w-6 h-6 fill-primary" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-semibold text-[#171A17]">
+            <h3 className="text-base font-semibold text-foreground">
               Be one of the first learners to share your experience.
             </h3>
             <p className="text-xs text-[#70685A] leading-relaxed max-w-sm mx-auto">
@@ -96,7 +96,7 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
             onClick={() => setModalOpen(true)}
             className="
               inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl
-              bg-[#1F6B4E] text-white text-xs font-bold
+              bg-primary text-white text-xs font-bold
               shadow-sm hover:bg-[#18553E] active:scale-95
               transition-all duration-150 cursor-pointer
             "
@@ -119,7 +119,7 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
                 transition={{ duration: 0.22, delay: index * 0.04 }}
                 className="
                   bg-white border border-[#DED8CB] rounded-2xl p-6 shadow-xs
-                  hover:border-[#1F6B4E]/40 hover:shadow-[0_8px_30px_rgba(23,26,23,0.06)] hover:-translate-y-0.5
+                  hover:border-primary/40 hover:shadow-[0_8px_30px_rgba(23,26,23,0.06)] hover:-translate-y-0.5
                   transition-all duration-200 flex flex-col justify-between space-y-4
                 "
               >
@@ -130,20 +130,20 @@ export function ReviewsExplorer({ initialReviews }: ReviewsExplorerProps) {
                         <Star key={i} size={14} className="fill-[#D97706]" />
                       ))}
                     </div>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-[#1F6B4E] bg-[#EAF5EF] px-2 py-0.5 rounded border border-[#1F6B4E]/20">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-primary bg-[#EAF5EF] px-2 py-0.5 rounded border border-primary/20">
                       <CheckCircle2 size={11} />
                       <span>Verified Review</span>
                     </span>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[#171A17] leading-relaxed font-sans">
+                  <p className="text-xs sm:text-sm text-foreground leading-relaxed font-sans">
                     &ldquo;{rev.content}&rdquo;
                   </p>
                 </div>
 
                 <div className="pt-4 border-t border-[#DED8CB]/70 flex items-center justify-between text-xs">
                   <div>
-                    <h3 className="font-bold text-[#171A17]">{rev.authorName}</h3>
+                    <h3 className="font-bold text-foreground">{rev.authorName}</h3>
                     <p className="text-[11px] text-[#70685A]">{rev.role || 'Verified PM Learner'}</p>
                   </div>
                   {rev.createdAt && (
