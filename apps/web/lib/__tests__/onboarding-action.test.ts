@@ -172,11 +172,13 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
 
     // Verify proxy allows access to /academy without redirecting to /onboarding
     vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+      siteName: 'Prodily',
+      siteDescription: 'Product Management Academy',
+      contactEmail: 'support@prodily.app',
       maintenanceMode: false,
-      requireEmailVerification: false,
       allowSignups: true,
-      emailProvider: 'resend',
-      xpConfig: { basePerLesson: 50, perfectBonus: 25, reflectionBonus: 25, dailyCap: 300 },
+      requireEmailVerification: false,
+      sessionTimeoutMinutes: 10080,
     })
 
     const academyReq = new NextRequest('https://prodily.app/academy', {
@@ -199,11 +201,13 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     mockCookieStore.set('sb-access-token', { value: refreshedAccessToken })
 
     vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+      siteName: 'Prodily',
+      siteDescription: 'Product Management Academy',
+      contactEmail: 'support@prodily.app',
       maintenanceMode: false,
-      requireEmailVerification: false,
       allowSignups: true,
-      emailProvider: 'resend',
-      xpConfig: { basePerLesson: 50, perfectBonus: 25, reflectionBonus: 25, dailyCap: 300 },
+      requireEmailVerification: false,
+      sessionTimeoutMinutes: 10080,
     })
 
     const dashboardReq = new NextRequest('https://prodily.app/dashboard', {
