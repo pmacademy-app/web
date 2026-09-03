@@ -31,7 +31,6 @@ import {
   GraduationCap,
   Layers,
 } from 'lucide-react'
-import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { submitOnboarding, checkUsernameAvailability, OnboardingData } from './actions'
 import { AvatarUpload } from '@/components/profile/AvatarUpload'
 import { Input } from '@/components/ui/input'
@@ -412,13 +411,6 @@ export default function OnboardingWizard({ user, profile, onboardingSettings }: 
         localStorage.removeItem(DRAFT_STORAGE_KEY)
       } catch {
         // Storage unavailable
-      }
-
-      // Refresh Supabase session on client so token JWT contains updated user_metadata
-      const supabase = createBrowserSupabaseClient()
-      const { error: refreshError } = await supabase.auth.refreshSession()
-      if (refreshError) {
-        console.warn('[onboarding] Session refresh warning:', refreshError.message)
       }
 
       router.push(targetDestination)
