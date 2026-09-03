@@ -52,7 +52,7 @@ export default function FAQPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFAF6]">
+    <div className="min-h-screen bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
@@ -62,11 +62,11 @@ export default function FAQPage() {
         
         {/* ── Page Header ──────────────────────────────────────────────── */}
         <header className="space-y-4">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]">
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary">
             SUPPORT &amp; DETAILS
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-semibold text-[#171A17] tracking-[-0.03em] leading-tight">
+          <h1 className="text-4xl sm:text-5xl font-semibold text-foreground tracking-[-0.03em] leading-tight">
             Frequently Asked Questions
           </h1>
 
@@ -81,7 +81,7 @@ export default function FAQPage() {
         {/* ── Still Have Questions & Contact Box ───────────────────────── */}
         <section className="rounded-2xl border border-[#DED8CB] bg-white p-8 sm:p-10 shadow-xs space-y-6">
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-semibold text-[#171A17] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
               Still have a question?
             </h2>
             <p className="text-sm sm:text-base text-[#70685A] leading-relaxed">
@@ -94,7 +94,7 @@ export default function FAQPage() {
               href="/contact"
               className="
                 inline-flex items-center gap-2 px-5 py-3
-                bg-[#1F6B4E] text-white font-semibold text-sm rounded-lg
+                bg-primary text-white font-semibold text-sm rounded-lg
                 shadow-[0_2px_12px_rgba(31,107,78,0.25)]
                 hover:bg-[#18553E] hover:shadow-[0_4px_20px_rgba(31,107,78,0.35)]
                 active:scale-[0.98] transition-all duration-150
@@ -108,7 +108,7 @@ export default function FAQPage() {
               href="/curriculum"
               className="
                 inline-flex items-center gap-2 px-5 py-3
-                bg-white text-[#171A17] font-semibold text-sm rounded-lg
+                bg-white text-foreground font-semibold text-sm rounded-lg
                 border border-[#DED8CB] hover:border-[#BDB4A2] hover:bg-[#F2EFE7]
                 active:scale-[0.98] transition-all duration-150
               "

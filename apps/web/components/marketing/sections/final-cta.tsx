@@ -20,14 +20,14 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
     <section
       id="final-cta"
       aria-labelledby="cta-heading"
-      className="relative py-24 lg:py-32 overflow-hidden border-t border-[#DED8CB]/80 bg-[#FBFAF6] scroll-mt-24 lg:scroll-mt-28"
+      className="relative py-24 lg:py-32 overflow-hidden border-t border-[#DED8CB]/80 bg-background scroll-mt-24 lg:scroll-mt-28"
     >
       {/* Subtle ambient light vignette for soft depth */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-30"
       >
-        <div className="w-[600px] h-[300px] rounded-full bg-[#1F6B4E]/10 blur-[90px]" />
+        <div className="w-[600px] h-[300px] rounded-full bg-primary/10 blur-[90px]" />
       </div>
 
       <div className="relative max-w-[1120px] mx-auto px-5 lg:px-8">
@@ -41,7 +41,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
           {/* Trust Strip — only shown when specified */}
           {showTrustStrip && (
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DED8CB] text-xs text-[#70685A] font-medium mb-4 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-[#1F6B4E] inline-block" />
+              <span className="w-2 h-2 rounded-full bg-primary inline-block" />
               Built for the first wave of learners. Help shape what comes next.
             </div>
           )}
@@ -49,7 +49,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
           {/* Headline */}
           <h2
             id="cta-heading"
-            className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#171A17] tracking-[-0.03em] leading-[1.16]"
+            className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground tracking-[-0.03em] leading-[1.16]"
           >
             Build the portfolio that shows what you can do.
           </h2>
@@ -71,7 +71,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
                 onClick={() => trackHeroCTAClick('final_cta')}
                 className="
                   group relative inline-flex items-center justify-center gap-2.5 w-full sm:w-auto
-                  px-8 py-4 bg-[#1F6B4E] text-white font-semibold text-sm rounded-xl
+                  px-8 py-4 bg-primary text-white font-semibold text-sm rounded-xl
                   shadow-[0_4px_20px_rgba(31,107,78,0.25)]
                   hover:bg-[#18553E] hover:shadow-[0_6px_25px_rgba(31,107,78,0.35)]
                   transition-all duration-200 overflow-hidden
@@ -96,7 +96,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
               href="/curriculum"
               className="
                 inline-flex items-center justify-center gap-2 w-full sm:w-auto
-                px-6 py-4 bg-white text-[#171A17] font-semibold text-sm rounded-xl
+                px-6 py-4 bg-white text-foreground font-semibold text-sm rounded-xl
                 border border-[#DED8CB] hover:border-[#BDB4A2] hover:bg-[#F2EFE7]
                 shadow-2xs active:scale-[0.98] transition-all duration-150
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
@@ -109,15 +109,15 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
           {/* Minimalist Trust Features */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#70685A]">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+              <CheckCircle2 size={13} className="text-primary" />
               90 lessons
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+              <CheckCircle2 size={13} className="text-primary" />
               9 applied capstones
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={13} className="text-[#1F6B4E]" />
+              <CheckCircle2 size={13} className="text-primary" />
               Public portfolio
             </span>
           </div>

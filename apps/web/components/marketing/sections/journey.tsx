@@ -143,7 +143,7 @@ export function JourneySection() {
                       isActive
                         ? 'bg-white scale-110 shadow-lg'
                         : isPassed
-                          ? 'bg-[#FBFAF6] hover:scale-105 shadow-2xs'
+                          ? 'bg-background hover:scale-105 shadow-2xs'
                           : 'bg-surface hover:scale-105',
                     )}
                     style={{
@@ -194,7 +194,7 @@ export function JourneySection() {
                   <p
                     className={cn(
                       'mt-1 text-caption leading-relaxed max-w-[130px] transition-colors duration-200',
-                      isActive ? 'text-[#171A17] font-medium' : 'text-locked',
+                      isActive ? 'text-foreground font-medium' : 'text-locked',
                     )}
                   >
                     {stage.description}

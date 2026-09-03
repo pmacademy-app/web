@@ -53,12 +53,12 @@ export function HeroSection() {
     <section
       id="hero"
       aria-labelledby="hero-heading"
-      className="relative pt-16 pb-10 lg:pt-24 lg:pb-14 overflow-hidden bg-[#FBFAF6]"
+      className="relative pt-16 pb-10 lg:pt-24 lg:pb-14 overflow-hidden bg-background"
     >
       {/* Precision architectural background grid */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(to_right,#1F6B4E0A_1px,transparent_1px),linear-gradient(to_bottom,#1F6B4E0A_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_10%,#000_60%,transparent_100%)] pointer-events-none"
+        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(31,107,78,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(31,107,78,0.04)_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_10%,#000_60%,transparent_100%)] pointer-events-none"
       />
 
       <div className="relative max-w-[1180px] mx-auto px-5 lg:px-8">
@@ -74,7 +74,7 @@ export function HeroSection() {
             {/* Eyebrow */}
             <motion.div
               variants={prefersReducedMotion ? undefined : FADE_UP}
-              className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E]"
+              className="text-xs font-mono font-semibold uppercase tracking-wider text-primary"
             >
               FREE, STRUCTURED PM CURRICULUM
             </motion.div>
@@ -83,10 +83,10 @@ export function HeroSection() {
             <motion.h1
               id="hero-heading"
               variants={prefersReducedMotion ? undefined : FADE_UP}
-              className="text-4xl sm:text-5xl lg:text-[3.25rem] font-semibold text-[#171A17] leading-[1.12] tracking-[-0.03em]"
+              className="text-4xl sm:text-5xl lg:text-[3.25rem] font-semibold text-foreground leading-[1.12] tracking-[-0.03em]"
             >
               The structured path from “I want to break into PM” to a{' '}
-              <span className="text-[#1F6B4E] underline decoration-[#1F6B4E]/30 decoration-wavy underline-offset-4">
+              <span className="text-primary underline decoration-primary/30 decoration-wavy underline-offset-4">
                 portfolio that proves you can
               </span>
               .
@@ -115,7 +115,7 @@ export function HeroSection() {
                   onClick={() => trackHeroCTAClick('hero')}
                   className="
                     group relative overflow-hidden inline-flex items-center gap-2.5 px-6 py-3.5
-                    bg-[#1F6B4E] text-white font-semibold text-sm rounded-lg
+                    bg-primary text-white font-semibold text-sm rounded-lg
                     shadow-[0_2px_14px_rgba(31,107,78,0.3)]
                     hover:bg-[#18553E] hover:shadow-[0_4px_24px_rgba(31,107,78,0.45)]
                     transition-all duration-200
@@ -146,14 +146,14 @@ export function HeroSection() {
                   href="/curriculum"
                   className="
                     group inline-flex items-center gap-2 px-5 py-3.5
-                    bg-white text-[#171A17] font-semibold text-sm rounded-lg
+                    bg-white text-foreground font-semibold text-sm rounded-lg
                     border border-[#DED8CB] hover:border-[#BDB4A2] hover:bg-[#F2EFE7]
                     transition-all duration-150
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F80ED]
                   "
                 >
                   <span>Explore Curriculum</span>
-                  <span className="transition-transform duration-200 group-hover:translate-x-1 text-[#70685A] group-hover:text-[#171A17]">
+                  <span className="transition-transform duration-200 group-hover:translate-x-1 text-[#70685A] group-hover:text-foreground">
                     →
                   </span>
                 </Link>
@@ -166,19 +166,19 @@ export function HeroSection() {
               className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#DED8CB]/80"
             >
               <div className="space-y-0.5">
-                <div className="text-sm font-bold text-[#171A17] font-mono">90 Lessons</div>
+                <div className="text-sm font-bold text-foreground font-mono">90 Lessons</div>
                 <div className="text-[11px] text-[#70685A]">9 complete modules</div>
               </div>
               <div className="space-y-0.5">
-                <div className="text-sm font-bold text-[#171A17] font-mono">9 Capstones</div>
+                <div className="text-sm font-bold text-foreground font-mono">9 Capstones</div>
                 <div className="text-[11px] text-[#70685A]">Real PM deliverables</div>
               </div>
               <div className="space-y-0.5">
-                <div className="text-sm font-bold text-[#171A17] font-mono">7 Competencies</div>
+                <div className="text-sm font-bold text-foreground font-mono">7 Competencies</div>
                 <div className="text-[11px] text-[#70685A]">Skill progress tracking</div>
               </div>
               <div className="space-y-0.5">
-                <div className="text-sm font-bold text-[#1F6B4E] font-mono">₹0 Tuition</div>
+                <div className="text-sm font-bold text-primary font-mono">₹0 Tuition</div>
                 <div className="text-[11px] text-[#70685A]">Free, permanently</div>
               </div>
             </motion.div>
@@ -211,7 +211,7 @@ export function HeroSection() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EAF5EF] text-[#1F6B4E]">
+                          <span className="text-[11px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#EAF5EF] text-primary">
                             Capstone 01 · Lesson 22
                           </span>
                           <span className="text-[11px] text-[#70685A] font-mono">PRD-2026-v2.pdf</span>
@@ -221,41 +221,41 @@ export function HeroSection() {
                         </span>
                       </div>
 
-                      <div className="border border-[#DED8CB] rounded-xl p-4 bg-[#FBFAF6] space-y-3">
+                      <div className="border border-[#DED8CB] rounded-xl p-4 bg-background space-y-3">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <h4 className="text-base font-semibold text-[#171A17]">
+                            <h4 className="text-base font-semibold text-foreground">
                               One-Click Checkout Activation Funnel
                             </h4>
                             <p className="text-xs text-[#70685A] mt-0.5">
                               Authored by PM Fellow · Target: Q3 Growth Sprint
                             </p>
                           </div>
-                          <span className="text-[11px] font-mono bg-[#EAF5EF] text-[#1F6B4E] px-2 py-0.5 rounded font-semibold shrink-0">
+                          <span className="text-[11px] font-mono bg-[#EAF5EF] text-primary px-2 py-0.5 rounded font-semibold shrink-0">
                             +150 XP
                           </span>
                         </div>
 
                         <div className="space-y-2 pt-2 border-t border-[#DED8CB]/60 text-xs">
                           <div>
-                            <span className="font-semibold text-[#171A17]">1. Problem Statement:</span>
+                            <span className="font-semibold text-foreground">1. Problem Statement:</span>
                             <p className="text-[#70685A] mt-0.5">
                               42% of first-time mobile buyers abandon checkout at the address verification step due to redundant field validations.
                             </p>
                           </div>
 
                           <div>
-                            <span className="font-semibold text-[#171A17]">2. Non-Goals (Scope Boundary):</span>
+                            <span className="font-semibold text-foreground">2. Non-Goals (Scope Boundary):</span>
                             <p className="text-[#C2410C] mt-0.5 font-medium">
                               ✗ No third-party BNPL provider integration in Phase 1.
                             </p>
                           </div>
 
                           <div className="flex items-center gap-2 pt-1 font-mono text-[11px]">
-                            <span className="px-2 py-0.5 rounded bg-white border border-[#DED8CB] text-[#171A17]">
+                            <span className="px-2 py-0.5 rounded bg-white border border-[#DED8CB] text-foreground">
                               North Star: +18% Completion
                             </span>
-                            <span className="px-2 py-0.5 rounded bg-white border border-[#DED8CB] text-[#1F6B4E]">
+                            <span className="px-2 py-0.5 rounded bg-white border border-[#DED8CB] text-primary">
                               Latency Target: &lt;1.2s
                             </span>
                           </div>
@@ -264,10 +264,10 @@ export function HeroSection() {
 
                       <div className="flex items-center justify-between text-xs text-[#70685A] pt-1">
                         <span className="flex items-center gap-1.5">
-                          <Sparkles size={13} className="text-[#D98B24]" />
-                          Rubric Evaluation: <strong className="text-[#171A17]">Exemplary (96/100)</strong>
+                          <Sparkles size={13} className="text-accent" />
+                          Rubric Evaluation: <strong className="text-foreground">Exemplary (96/100)</strong>
                         </span>
-                        <span className="font-mono text-[11px] text-[#1F6B4E]">
+                        <span className="font-mono text-[11px] text-primary">
                           Published to Public Profile
                         </span>
                       </div>
@@ -285,7 +285,7 @@ export function HeroSection() {
                       className="flex flex-col items-center justify-center space-y-3"
                     >
                       <div className="w-full flex items-center justify-between text-xs">
-                        <span className="font-mono font-semibold text-[#1F6B4E] uppercase">
+                        <span className="font-mono font-semibold text-primary uppercase">
                           7-Axis Competency Assessment
                         </span>
                         <span className="text-[#70685A]">Overall Level 5 · Fellow</span>
@@ -300,15 +300,15 @@ export function HeroSection() {
                       </div>
 
                       <div className="w-full grid grid-cols-3 gap-2 pt-1 text-center font-mono text-xs">
-                        <div className="p-2 rounded bg-[#FBFAF6] border border-[#DED8CB]">
+                        <div className="p-2 rounded bg-background border border-[#DED8CB]">
                           <div className="text-[10px] text-[#70685A] uppercase">Execution</div>
-                          <div className="font-bold text-[#1F6B4E]">92%</div>
+                          <div className="font-bold text-primary">92%</div>
                         </div>
-                        <div className="p-2 rounded bg-[#FBFAF6] border border-[#DED8CB]">
+                        <div className="p-2 rounded bg-background border border-[#DED8CB]">
                           <div className="text-[10px] text-[#70685A] uppercase">Discovery</div>
                           <div className="font-bold text-[#0F766E]">84%</div>
                         </div>
-                        <div className="p-2 rounded bg-[#FBFAF6] border border-[#DED8CB]">
+                        <div className="p-2 rounded bg-background border border-[#DED8CB]">
                           <div className="text-[10px] text-[#70685A] uppercase">Strategy</div>
                           <div className="font-bold text-[#1D4ED8]">78%</div>
                         </div>
@@ -328,13 +328,13 @@ export function HeroSection() {
                     >
                       <div className="flex items-center justify-between border-b border-[#DED8CB] pb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-[#1F6B4E] text-white flex items-center justify-center font-bold text-sm">
+                          <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
                             AG
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-semibold text-sm text-[#171A17]">Aditya Gangwani</h4>
-                              <span className="text-[10px] font-semibold bg-[#EAF5EF] text-[#1F6B4E] px-2 py-0.5 rounded-full border border-[#1F6B4E]/20">
+                              <h4 className="font-semibold text-sm text-foreground">Aditya Gangwani</h4>
+                              <span className="text-[10px] font-semibold bg-[#EAF5EF] text-primary px-2 py-0.5 rounded-full border border-primary/20">
                                 Fellow
                               </span>
                             </div>
@@ -346,27 +346,27 @@ export function HeroSection() {
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div className="p-3 rounded-lg bg-[#FBFAF6] border border-[#DED8CB] space-y-1">
+                        <div className="p-3 rounded-lg bg-background border border-[#DED8CB] space-y-1">
                           <div className="flex items-center gap-1 text-[#70685A]">
-                            <Award size={13} className="text-[#D98B24]" />
+                            <Award size={13} className="text-accent" />
                             <span>Verified Credentials</span>
                           </div>
-                          <div className="font-semibold text-[#171A17]">9 / 9 Capstones Done</div>
+                          <div className="font-semibold text-foreground">9 / 9 Capstones Done</div>
                         </div>
 
-                        <div className="p-3 rounded-lg bg-[#FBFAF6] border border-[#DED8CB] space-y-1">
+                        <div className="p-3 rounded-lg bg-background border border-[#DED8CB] space-y-1">
                           <div className="flex items-center gap-1 text-[#70685A]">
-                            <Zap size={13} className="text-[#1F6B4E]" />
+                            <Zap size={13} className="text-primary" />
                             <span>Total Experience</span>
                           </div>
-                          <div className="font-semibold text-[#1F6B4E] font-mono">4,850 XP Earned</div>
+                          <div className="font-semibold text-primary font-mono">4,850 XP Earned</div>
                         </div>
                       </div>
 
                       <div className="p-3 rounded-lg border border-[#DED8CB] bg-white text-xs space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold text-[#171A17]">Featured Capstone Project</span>
-                          <span className="text-[10px] text-[#1F6B4E] font-mono">View Full Doc →</span>
+                          <span className="font-semibold text-foreground">Featured Capstone Project</span>
+                          <span className="text-[10px] text-primary font-mono">View Full Doc →</span>
                         </div>
                         <p className="text-[#70685A] text-[11px] leading-relaxed">
                           B2B SaaS Onboarding Journey Map &amp; Friction Ledger (Lesson 15 &amp; Lesson 69).
@@ -379,10 +379,10 @@ export function HeroSection() {
                 {/* Footer Strip */}
                 <div className="pt-3 border-t border-[#DED8CB] flex items-center justify-between text-[11px] text-[#70685A]">
                   <span className="flex items-center gap-1.5">
-                    <Layers size={12} className="text-[#1F6B4E]" />
+                    <Layers size={12} className="text-primary" />
                     Real-time learner state synchronization
                   </span>
-                  <span className="font-mono text-[#1F6B4E] font-medium">
+                  <span className="font-mono text-primary font-medium">
                     No login required to view portfolios
                   </span>
                 </div>

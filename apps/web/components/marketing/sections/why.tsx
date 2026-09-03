@@ -50,7 +50,7 @@ export function WhySection() {
           transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
           className="max-w-[760px] mx-auto text-center mb-14"
         >
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#1F6B4E] mb-3">
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
             THE TRADE-OFF YOU SHOULDN&apos;T HAVE TO MAKE
           </div>
           <h2
