@@ -66,8 +66,9 @@ export async function submitOnboarding(data: OnboardingData) {
   try {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('sb-access-token')?.value
+    let refreshToken = cookieStore.get('sb-refresh-token')?.value
 
-    if (!accessToken) {
+    if (!accessToken && !refreshToken) {
       return { error: 'Unauthorized: No active session' }
     }
 
@@ -75,13 +76,30 @@ export async function submitOnboarding(data: OnboardingData) {
     const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false },
     })
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser(accessToken)
 
-    if (authError || !user) {
-      return { error: 'Unauthorized: Invalid session' }
+    let userId: string | null = null
+
+    if (accessToken) {
+      const { data: { user }, error: authError } = await authSupabase.auth.getUser(accessToken)
+      if (!authError && user?.id) {
+        userId = user.id
+      }
     }
 
-    const userId = user.id
+    // Fallback: If access token is expired/invalid, refresh session to authenticate
+    if (!userId && refreshToken) {
+      const { data: refreshData, error: refreshError } = await authSupabase.auth.refreshSession({
+        refresh_token: refreshToken,
+      })
+      if (!refreshError && refreshData?.session?.user) {
+        userId = refreshData.session.user.id
+        refreshToken = refreshData.session.refresh_token
+      }
+    }
+
+    if (!userId) {
+      return { error: 'Unauthorized: Invalid session' }
+    }
 
     // Server-side validation
     const username = (data.username || '').trim().toLowerCase()
@@ -153,6 +171,31 @@ export async function submitOnboarding(data: OnboardingData) {
 
     if (metaError) {
       console.error('[onboarding/actions] Metadata update error:', metaError.message)
+    }
+
+    // 3. Refresh user session to mint a new JWT with updated user_metadata and persist to HTTP-only cookies
+    if (refreshToken) {
+      const { data: refreshData, error: refreshError } = await authSupabase.auth.refreshSession({
+        refresh_token: refreshToken,
+      })
+
+      if (!refreshError && refreshData?.session) {
+        const isProd = process.env.NODE_ENV === 'production'
+        cookieStore.set('sb-access-token', refreshData.session.access_token, {
+          httpOnly: true,
+          secure: isProd,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: refreshData.session.expires_in || 3600,
+        })
+        cookieStore.set('sb-refresh-token', refreshData.session.refresh_token, {
+          httpOnly: true,
+          secure: isProd,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        })
+      }
     }
 
     return { success: true }
