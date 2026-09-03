@@ -46,3 +46,4 @@ next-env.d.ts
 # Local-only marketing campaign scripts and logs (never commit)
 scripts/local-campaigns/
 scripts/logs/
+scripts/send-jolly-recovery-email.ts

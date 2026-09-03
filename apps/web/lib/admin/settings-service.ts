@@ -276,7 +276,7 @@ function getDefaultSettings<T>(section: SettingsSectionKey): T {
 
 export class SettingsService {
   private static sectionCache = new Map<string, { value: unknown; timestamp: number }>()
-  private static readonly CACHE_TTL_MS = 30_000 // 30 seconds TTL
+  private static readonly CACHE_TTL_MS = 60_000 // 60 seconds L1 in-memory TTL
 
   /**
    * Generic fetch for a settings section with in-memory caching.
@@ -364,6 +364,22 @@ export class SettingsService {
    */
   public static invalidateCache(): void {
     this.sectionCache.clear()
+    try {
+      // Revalidate Next.js Data Cache tag across serverless instances
+      import('next/cache').then(({ revalidateTag }) => {
+        if (typeof revalidateTag === 'function') {
+          try {
+            ;(revalidateTag as (tag: string, profile?: string) => void)('system_settings')
+          } catch {
+            ;(revalidateTag as (tag: string, profile?: string) => void)('system_settings', 'max')
+          }
+        }
+      }).catch(() => {
+        // Non-fatal if next/cache is unavailable in execution runtime
+      })
+    } catch {
+      // Non-fatal
+    }
   }
 
   // ─── Public API ────────────────────────────────────────────────────────────

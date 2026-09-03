@@ -5,8 +5,16 @@ import { Bell } from 'lucide-react'
 import { NotificationCenterDrawer } from './NotificationCenterDrawer'
 import { subscribeClientNotificationEvent } from '@/lib/events/client-event-bus'
 
+const NOTIFICATION_POLL_INTERVAL_MS = 300000 // 5 minutes background heartbeat
+const STALE_NOTIFICATION_THRESHOLD_MS = 300000 // Only refresh on tab focus if > 5 minutes old
+
+// Module-level in-flight deduplication promise
+let globalNotificationFetchPromise: Promise<number | null> | null = null
+let globalLastFetchTime = 0
+let globalLastUnreadCount = 0
+
 export function NotificationBell() {
-  const [unreadCount, setUnreadCount] = useState<number>(0)
+  const [unreadCount, setUnreadCount] = useState<number>(globalLastUnreadCount)
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
   const bellContainerRef = useRef<HTMLDivElement>(null)
   const triggerButtonRef = useRef<HTMLButtonElement>(null)
@@ -17,51 +25,74 @@ export function NotificationBell() {
     drawerOpenRef.current = drawerOpen
   }, [drawerOpen])
 
-  const lastFetchTimeRef = useRef<number>(0)
   const isFetchingRef = useRef<boolean>(false)
 
   useEffect(() => {
     let mounted = true
 
     const loadState = async (force = false) => {
-      // Avoid duplicate concurrent fetches
+      // Avoid duplicate concurrent fetches within component
       if (isFetchingRef.current) return
-      // Skip background polling if document is hidden unless forced
+      // Skip background heartbeat if document is hidden unless explicitly forced
       if (!force && typeof document !== 'undefined' && document.hidden) return
       // Skip if drawer is open and managing its own state
       if (drawerOpenRef.current && !force) return
 
+      // Throttle non-forced requests if recently fetched within 5 seconds
+      if (!force && Date.now() - globalLastFetchTime < 5000) return
+
       isFetchingRef.current = true
+
       try {
-        const res = await fetch('/api/notifications?limit=1')
-        const data = await res.json()
-        if (mounted && data.success) {
-          setUnreadCount(data.unreadCount || 0)
-          lastFetchTimeRef.current = Date.now()
+        if (!globalNotificationFetchPromise) {
+          globalNotificationFetchPromise = fetch('/api/notifications?limit=1')
+            .then(async (res) => {
+              if (!res.ok) return null
+              const data = await res.json()
+              if (data.success && typeof data.unreadCount === 'number') {
+                globalLastFetchTime = Date.now()
+                globalLastUnreadCount = data.unreadCount
+                return data.unreadCount
+              }
+              return null
+            })
+            .catch((err) => {
+              console.warn('[NotificationBell] Error fetching notifications:', err)
+              return null
+            })
+            .finally(() => {
+              globalNotificationFetchPromise = null
+            })
         }
-      } catch (err) {
-        console.warn('[NotificationBell] Error fetching notifications:', err)
+
+        const count = await globalNotificationFetchPromise
+        if (mounted && count !== null) {
+          setUnreadCount(count)
+        }
       } finally {
         isFetchingRef.current = false
       }
     }
 
+    // Initial mount load
     void loadState(true)
 
+    // Event-driven real-time refresh (fires when badges/milestones/events occur)
     const unsubscribe = subscribeClientNotificationEvent(() => {
       void loadState(true)
     })
 
-    // Periodic polling: 60s when visible and drawer is closed
+    // Relaxed periodic heartbeat (5 minutes)
     const interval = setInterval(() => {
       void loadState()
-    }, 60000)
+    }, NOTIFICATION_POLL_INTERVAL_MS)
 
-    // Visibility change handler: refresh on tab focus if > 60s since last fetch
+    // Smart visibility change handler: refresh on tab focus ONLY if data is stale (> 5 minutes)
     const handleVisibilityChange = () => {
+      if (typeof document === 'undefined') return
       if (document.visibilityState === 'visible' && !drawerOpenRef.current) {
-        const elapsed = Date.now() - lastFetchTimeRef.current
-        if (elapsed >= 60000) {
+        const elapsed = Date.now() - globalLastFetchTime
+        if (elapsed >= STALE_NOTIFICATION_THRESHOLD_MS) {
           void loadState(true)
         }
       }
@@ -108,9 +139,13 @@ export function NotificationBell() {
       <NotificationCenterDrawer
         isOpen={drawerOpen}
         onClose={handleCloseDrawer}
-        onUnreadCountChange={(cnt) => setUnreadCount(cnt)}
+        onUnreadCountChange={(cnt) => {
+          globalLastUnreadCount = cnt
+          setUnreadCount(cnt)
+        }}
         containerRef={bellContainerRef}
       />
     </div>
   )
 }
+
