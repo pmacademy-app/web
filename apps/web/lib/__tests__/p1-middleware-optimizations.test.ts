@@ -3,6 +3,16 @@ import { NextRequest } from 'next/server'
 import { proxy } from '../../proxy'
 import { SettingsService } from '../admin/settings-service'
 
+const mockProductSettings = {
+  siteName: 'Prodily',
+  siteDescription: 'Product Management Academy',
+  contactEmail: 'support@prodily.app',
+  maintenanceMode: false,
+  allowSignups: true,
+  requireEmailVerification: true,
+  sessionTimeoutMinutes: 10080,
+}
+
 function createMockJwt(payload: Record<string, unknown>): string {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url')
   const body = Buffer.from(JSON.stringify(payload)).toString('base64url')
@@ -18,6 +28,11 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
 
   describe('1. In-Memory JWT Parsing & Expiration Invariants', () => {
     it('allows valid unexpired verified learner JWT without network roundtrips', async () => {
+      vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+        ...mockProductSettings,
+        requireEmailVerification: true,
+      })
+
       const futureExp = Math.floor(Date.now() / 1000) + 3600 // 1 hour in future
       const token = createMockJwt({
         sub: 'usr_learner_123',
@@ -58,7 +73,12 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
       expect(res.headers.get('location')).toContain('/login')
     })
 
-    it('redirects unconfirmed email learners to /login?error=email_not_confirmed', async () => {
+    it('redirects unconfirmed email learners to /login?error=email_not_confirmed when verification is required', async () => {
+      vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+        ...mockProductSettings,
+        requireEmailVerification: true,
+      })
+
       const futureExp = Math.floor(Date.now() / 1000) + 3600
       const token = createMockJwt({
         sub: 'usr_unverified_123',
@@ -78,6 +98,31 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
       expect(res).toBeDefined()
       expect(res.status).toBe(307)
       expect(res.headers.get('location')).toContain('/login?error=email_not_confirmed')
+    })
+
+    it('allows unconfirmed email learners when verification is disabled', async () => {
+      vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+        ...mockProductSettings,
+        requireEmailVerification: false,
+      })
+
+      const futureExp = Math.floor(Date.now() / 1000) + 3600
+      const token = createMockJwt({
+        sub: 'usr_unverified_123',
+        email: 'unverified@example.com',
+        user_metadata: { onboarding_complete: true },
+        exp: futureExp,
+      })
+
+      const req = new NextRequest('https://prodily.app/dashboard', {
+        headers: {
+          cookie: `sb-access-token=${token}`,
+        },
+      })
+
+      const res = await proxy(req)
+      expect(res).toBeDefined()
+      expect(res.status).toBe(200)
     })
   })
 
@@ -128,6 +173,11 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
 
   describe('3. Onboarding & Curriculum Access Override Invariants', () => {
     it('redirects new learner without onboarding_complete to /onboarding', async () => {
+      vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+        ...mockProductSettings,
+        requireEmailVerification: false,
+      })
+
       const futureExp = Math.floor(Date.now() / 1000) + 3600
       const token = createMockJwt({
         sub: 'usr_new_learner',
@@ -150,6 +200,11 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
     })
 
     it('allows learner with curriculum_access_override claim to bypass onboarding', async () => {
+      vi.spyOn(SettingsService, 'getProductSettings').mockResolvedValue({
+        ...mockProductSettings,
+        requireEmailVerification: false,
+      })
+
       const futureExp = Math.floor(Date.now() / 1000) + 3600
       const token = createMockJwt({
         sub: 'usr_override_learner',
@@ -191,4 +246,5 @@ describe('P1 Middleware & Settings Optimization Test Suite', () => {
     })
   })
 })
+
 
