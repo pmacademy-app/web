@@ -8,13 +8,14 @@ import { getUserStreakStatus } from '@/lib/streaks-db'
 import { getSkillRadarSummary } from '@/lib/skillRadar'
 import { getUserCertificates, issueCertificate } from '@/lib/certificates-db'
 import { getUserBadgesData } from '@/lib/badges-db'
+import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
 import { LevelCard } from '@/components/dashboard/LevelCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { ProgressRingCard } from '@/components/dashboard/ProgressRingCard'
 import { SkillRadarCard } from '@/components/dashboard/SkillRadarCard'
 import { BadgeShowcaseCard } from '@/components/progress/BadgeShowcaseCard'
-import { Shield, Award as CertIcon, ExternalLink, ArrowRight } from 'lucide-react'
+import { Shield, Award as CertIcon, ExternalLink, ArrowRight, Play, CheckCircle } from 'lucide-react'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -42,6 +43,7 @@ export default async function ProgressPage() {
     badgesData,
     { data: capstoneRows },
     userCertificates,
+    curriculum,
   ] = await Promise.all([
     (supabase
       .from('user_lesson_progress') as unknown as DBChain)
@@ -60,10 +62,17 @@ export default async function ProgressPage() {
       data: Array<{ module_slug: string; status: string }> | null
     }>,
     getUserCertificates(supabase, user.id),
+    fetchCurriculumData().catch(() => null),
   ])
 
   const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0
   const completedPercentage = Math.min(100, Math.round((completedLessons / 90) * 100))
+
+  // Determine Next Best Action lesson
+  const completedLessonIds = new Set((progressRows || []).filter((p) => p.status === 'completed').map((p) => p.lesson_id))
+  const allLessons = curriculum?.lessons || []
+  const nextIncompleteLesson = allLessons.find((l) => !completedLessonIds.has(l.id)) || null
+  const nextLessonIndex = nextIncompleteLesson ? allLessons.findIndex((l) => l.id === nextIncompleteLesson.id) + 1 : null
 
   // Auto-issue certificate if 90 lessons completed and no certificate exists yet
   let certificates = userCertificates
@@ -110,6 +119,59 @@ export default async function ProgressPage() {
           Single source of truth for your product management skill radar, XP performance, capstones, and verified credentials.
         </p>
       </div>
+
+      {/* Recommended Next Action Banner */}
+      {nextIncompleteLesson ? (
+        <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-card to-background p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary border border-primary/30">
+                Recommended Next Action
+              </span>
+              <span className="text-xs text-muted-foreground font-mono">
+                Lesson {nextLessonIndex} of 90
+              </span>
+            </div>
+            <h2 className="text-lg font-bold font-serif text-foreground">
+              {nextIncompleteLesson.title}
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Continue your sequential curriculum path to advance your skill radar and maintain your study streak.
+            </p>
+          </div>
+          <Link
+            href={`/academy/${nextIncompleteLesson.module}/${nextIncompleteLesson.id}`}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 transition-all shrink-0"
+          >
+            <span>Continue Lesson {nextLessonIndex}</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-emerald-500" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
+                Curriculum Mastered 👑
+              </span>
+            </div>
+            <h2 className="text-lg font-bold font-serif text-foreground">
+              You have completed all 90 lessons!
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              All 9 modules are mastered. Complete your capstones to showcase your applied proof of work.
+            </p>
+          </div>
+          <Link
+            href="/capstones"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs hover:bg-emerald-500 transition-all shrink-0"
+          >
+            <span>Open Capstones Workspace</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
 
       {/* 1. Skill Radar (DOMINANT VISUAL) */}
       <SkillRadarCard

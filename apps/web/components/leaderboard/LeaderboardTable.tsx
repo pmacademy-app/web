@@ -2,8 +2,8 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Trophy, Flame, Zap, ArrowUp, ArrowDown, Minus, ExternalLink } from 'lucide-react'
-import type { LeaderboardEntry } from '@/lib/leaderboard'
+import { Trophy, Flame, Zap, ArrowUp, ArrowDown, Minus, ExternalLink, Shield } from 'lucide-react'
+import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
 import { cn } from '@/lib/utils'
 
 interface LeaderboardTableProps {
@@ -31,7 +31,7 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
           <thead>
             <tr className="border-b border-border bg-muted/40 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               <th className="py-3 px-4 w-16 text-center">Rank</th>
-              <th className="py-3 px-4">Learner</th>
+              <th className="py-3 px-4">Learner & Tier</th>
               <th className="py-3 px-4 text-center">Consistency (Days)</th>
               <th className="py-3 px-4 text-center">Lessons</th>
               <th className="py-3 px-4 text-center">Weekly XP</th>
@@ -47,6 +47,7 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
                 'text-slate-400 bg-slate-400/10 border-slate-400/30', // 2nd Silver
                 'text-amber-700 bg-amber-700/10 border-amber-700/30', // 3rd Bronze
               ]
+              const tierInfo = getLeaderboardTier(entry.level, entry.totalXp ?? entry.xpEarned)
 
               return (
                 <tr
@@ -91,24 +92,27 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
                     </div>
                   </td>
 
-                  {/* Learner Info */}
+                  {/* Learner Info & Tier */}
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold flex items-center justify-center shrink-0 uppercase font-mono text-xs">
                         {entry.name ? entry.name[0] : (entry.username ? entry.username[0] : 'P')}
                       </div>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="font-bold text-foreground truncate">
                             {entry.name || `@${entry.username}`}
                           </span>
+                          <span className={cn('text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border', tierInfo.badgeColor)}>
+                            {tierInfo.tier}
+                          </span>
                           {entry.isCurrentUser && (
-                            <span className="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded bg-primary text-primary-foreground">
+                            <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-primary text-primary-foreground">
                               You
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-sans block truncate">
+                        <span className="text-[10px] text-muted-foreground font-sans block truncate mt-0.5">
                           {entry.levelTitle} • Level {entry.level}
                         </span>
                       </div>

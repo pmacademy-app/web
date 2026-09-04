@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { BlockProps } from '../../renderer/registry';
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
+import { InlineConceptCheck } from './InlineConceptCheck';
 
 // Helper to check if children contains non-null renderable elements
 function hasRenderableChildren(children: React.ReactNode): boolean {
@@ -394,6 +395,10 @@ function MentalModelSection({ block, children }: BlockProps) {
       <div className="space-y-3 text-sm text-foreground/80 leading-relaxed">
         {children}
       </div>
+      <InlineConceptCheck
+        conceptTitle={name || 'Mental Model'}
+        prompt={`Key Takeaway: How will you apply "${name || 'this model'}" when evaluating trade-offs in your product decisions?`}
+      />
     </div>
   );
 }
@@ -440,6 +445,10 @@ function FrameworkSection({ block, children }: BlockProps) {
       <div className="space-y-3 text-sm text-foreground/80 leading-relaxed">
         {children}
       </div>
+      <InlineConceptCheck
+        conceptTitle={name || 'Framework'}
+        prompt={`Key Takeaway: Consider how "${name || 'this framework'}" structures decision-making in your team.`}
+      />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Trophy, Calendar, BookOpen, Eye, EyeOff } from 'lucide-react'
-import type { LeaderboardEntry } from '@/lib/leaderboard'
+import { Trophy, Calendar, BookOpen, Eye, EyeOff, Zap, Award } from 'lucide-react'
+import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
+import { cn } from '@/lib/utils'
 
 interface LeaderboardHeaderProps {
   personalEntry: LeaderboardEntry | null
@@ -17,6 +18,10 @@ export function LeaderboardHeader({
 }: LeaderboardHeaderProps) {
   const [isOptedIn, setIsOptedIn] = useState<boolean>(initialOptedIn)
   const [loading, setLoading] = useState<boolean>(false)
+
+  const tierInfo = personalEntry
+    ? getLeaderboardTier(personalEntry.level, personalEntry.totalXp ?? personalEntry.xpEarned)
+    : null
 
   const handleToggle = async () => {
     const nextState = !isOptedIn
@@ -51,7 +56,7 @@ export function LeaderboardHeader({
             Consistency Leaderboard
           </h1>
           <p className="text-xs md:text-sm text-muted-foreground mt-1">
-            Rewarding weekly study consistency and habit formation over raw XP accumulation.
+            Rewarding weekly study consistency, learning milestones, and habit formation over raw XP accumulation.
           </p>
         </div>
 
@@ -83,13 +88,25 @@ export function LeaderboardHeader({
       {/* 3 Personal Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-xl border border-border bg-card p-5 space-y-1 shadow-xs">
-          <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-            <Trophy className="w-3.5 h-3.5 text-primary" /> Weekly Rank
-          </span>
-          <div className="text-2xl font-bold font-serif text-foreground">
-            {personalEntry ? `#${personalEntry.rank}` : 'Unranked'}
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-primary" /> Weekly Rank
+            </span>
+            {tierInfo && (
+              <span className={cn('text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border', tierInfo.badgeColor)}>
+                {tierInfo.tier}
+              </span>
+            )}
           </div>
-          <span className="text-[10px] text-muted-foreground">
+          <div className="text-2xl font-bold font-serif text-foreground flex items-baseline gap-2">
+            <span>{personalEntry ? `#${personalEntry.rank}` : 'Unranked'}</span>
+            {personalEntry?.pointsToNextRank && personalEntry.rank > 1 && (
+              <span className="text-[11px] font-sans font-semibold text-primary">
+                (+{personalEntry.pointsToNextRank} XP to #{personalEntry.rank - 1})
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] text-muted-foreground block truncate">
             {isOptedIn ? 'Consistency Leaderboard' : 'Opted out of public list'}
           </span>
         </div>
@@ -106,13 +123,13 @@ export function LeaderboardHeader({
 
         <div className="rounded-xl border border-border bg-card p-5 space-y-1 shadow-xs">
           <span className="text-[11px] font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5 text-primary" /> Lessons Completed This Week
+            <BookOpen className="w-3.5 h-3.5 text-primary" /> Lessons &amp; XP Earned
           </span>
           <div className="text-2xl font-bold font-serif text-foreground">
             {personalEntry ? personalEntry.lessonsCompleted : 0} Lessons
           </div>
           <span className="text-[10px] text-primary font-bold">
-            +{personalEntry ? personalEntry.xpEarned : 0} Weekly XP
+            +{personalEntry ? personalEntry.xpEarned : 0} Weekly XP Earned
           </span>
         </div>
       </div>
