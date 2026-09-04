@@ -6,6 +6,7 @@ import {
   ShieldAlert,
   BookOpen,
   Award,
+  Trophy,
   Activity,
   Gauge,
   Settings,
@@ -57,6 +58,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { name: 'Curriculum', href: '/admin/curriculum', icon: BookOpen, built: true },
       { name: 'Achievements', href: '/admin/achievements', icon: Award, built: true },
+      { name: 'Leaderboard', href: '/admin/leaderboard', icon: Trophy, built: true },
     ],
   },
   {

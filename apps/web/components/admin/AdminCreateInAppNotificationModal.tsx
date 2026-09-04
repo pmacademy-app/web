@@ -9,8 +9,11 @@ import {
   Target,
   Link as LinkIcon,
   Filter,
+  AlertTriangle,
+  ShieldAlert,
 } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
+import { AdminUserMultiSelectPicker, type SelectedUser } from './AdminUserMultiSelectPicker'
 import type {
   InAppPriorityLevel,
   InAppCategory,
@@ -55,6 +58,7 @@ export function AdminCreateInAppNotificationModal({
   const [actionUrl, setActionUrl] = useState('')
   const [audience, setAudience] = useState<InAppAudienceType>('all')
   const [targetUserId, setTargetUserId] = useState('')
+  const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([])
   const [targetCohortId, setTargetCohortId] = useState('')
   const [sendTiming, setSendTiming] = useState<'immediate' | 'schedule' | 'draft'>('immediate')
   const [scheduledDate, setScheduledDate] = useState('')
@@ -69,6 +73,7 @@ export function AdminCreateInAppNotificationModal({
   const [sampleUsers, setSampleUsers] = useState<Array<{ id: string; email: string; name?: string }>>([])
   const [loadingSample, setLoadingSample] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showBroadConfirmation, setShowBroadConfirmation] = useState(false)
 
   // Recalculate recipient count
   useEffect(() => {
@@ -359,14 +364,35 @@ export function AdminCreateInAppNotificationModal({
 
             {/* Target inputs */}
             {audience === 'individual' && (
-              <div className="space-y-1 pt-1">
-                <input
-                  type="text"
-                  value={targetUserId}
-                  onChange={(e) => setTargetUserId(e.target.value)}
-                  placeholder="Enter User UUID (e.g. 550e8400-e29b-41d4-a716-446655440000)"
-                  className="w-full px-3 py-2 text-xs bg-admin-surface border border-admin-border rounded-lg text-admin-fg font-mono placeholder:text-admin-fg-subtle focus:outline-none focus:border-admin-accent"
+              <div className="space-y-2 pt-1">
+                <label className="text-[11px] font-semibold text-admin-fg-muted block">
+                  Select Target Learner
+                </label>
+                <AdminUserMultiSelectPicker
+                  singleSelect
+                  selectedUsers={selectedUsers}
+                  onChange={(users) => {
+                    setSelectedUsers(users)
+                    if (users.length > 0) {
+                      setTargetUserId(users[0].id)
+                    } else {
+                      setTargetUserId('')
+                    }
+                  }}
+                  placeholder="Search by learner name, email or @username..."
                 />
+                {!selectedUsers.length && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-admin-fg-subtle">Or paste User UUID directly:</span>
+                    <input
+                      type="text"
+                      value={targetUserId}
+                      onChange={(e) => setTargetUserId(e.target.value)}
+                      placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
+                      className="w-full px-3 py-1.5 text-xs bg-admin-surface border border-admin-border rounded-lg text-admin-fg font-mono placeholder:text-admin-fg-subtle focus:outline-none focus:border-admin-accent"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -589,7 +615,13 @@ export function AdminCreateInAppNotificationModal({
               <button
                 type="button"
                 disabled={isSubmitting}
-                onClick={() => handleSubmit('immediate')}
+                onClick={() => {
+                  if (audience === 'all' || (recipientCount !== null && recipientCount > 25)) {
+                    setShowBroadConfirmation(true)
+                  } else {
+                    void handleSubmit('immediate')
+                  }
+                }}
                 className="px-5 py-2 text-xs font-bold rounded-lg bg-admin-accent text-admin-accent-fg hover:bg-admin-accent/90 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" /> Send Immediately
@@ -597,6 +629,68 @@ export function AdminCreateInAppNotificationModal({
             )}
           </div>
         </form>
+
+        {/* Broad Audience Safety Confirmation Dialog */}
+        {showBroadConfirmation && (
+          <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+            <div className="bg-admin-surface border border-admin-danger/40 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-admin-danger-soft text-admin-danger border border-admin-danger/30">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-admin-fg">Confirm Notification Broadcast</h3>
+                  <p className="text-xs text-admin-fg-muted">Broad learner reach verification</p>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-lg bg-admin-surface-raised border border-admin-border text-xs space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-admin-fg-muted">Target Audience:</span>
+                  <span className="font-semibold text-admin-fg capitalize">{audience}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-admin-fg-muted">Estimated Recipients:</span>
+                  <span className="font-bold text-admin-accent font-mono">
+                    ~{recipientCount !== null ? recipientCount.toLocaleString() : 'All'} learners
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-admin-fg-muted">Priority:</span>
+                  <span className="font-semibold text-admin-fg uppercase text-[10px]">{priority}</span>
+                </div>
+                <div className="pt-2 border-t border-admin-border/50 text-[11px] text-admin-danger flex items-start gap-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>
+                    This notification will be dispatched immediately into all targeted learner inboxes and trigger live badge counts.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() => setShowBroadConfirmation(false)}
+                  className="px-3.5 py-1.5 text-xs font-semibold text-admin-fg-muted hover:text-admin-fg rounded-lg transition-colors cursor-pointer"
+                >
+                  Back to Edit
+                </button>
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() => {
+                    setShowBroadConfirmation(false)
+                    void handleSubmit('immediate')
+                  }}
+                  className="px-4 py-1.5 text-xs font-bold rounded-lg bg-admin-danger text-white hover:bg-admin-danger/90 transition-colors flex items-center gap-1.5 cursor-pointer shadow-lg shadow-admin-danger/20"
+                >
+                  <Send className="w-3.5 h-3.5" /> Confirm & Dispatch Now
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
