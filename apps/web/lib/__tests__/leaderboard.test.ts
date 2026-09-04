@@ -100,4 +100,45 @@ describe('Leaderboard & Consistency Ranking Unit Test Suite', () => {
       expect(ranked[1].userId).toBe('user-1')
     })
   })
+
+  describe('Tiers and Rank Progression', () => {
+    it('attaches correct tiers and calculates gap to next rank', () => {
+      const users: RawLeaderboardUserMetric[] = [
+        {
+          userId: 'u1',
+          username: 'lead',
+          name: 'Leader',
+          avatarUrl: null,
+          levelTitle: 'Lead PM',
+          level: 8,
+          daysStudied: 5,
+          lessonsCompleted: 10,
+          xpEarned: 500,
+          currentStreak: 7,
+          totalXp: 6000,
+        },
+        {
+          userId: 'u2',
+          username: 'chaser',
+          name: 'Chaser',
+          avatarUrl: null,
+          levelTitle: 'Associate PM',
+          level: 2,
+          daysStudied: 5,
+          lessonsCompleted: 10,
+          xpEarned: 450,
+          currentStreak: 3,
+          totalXp: 500,
+        },
+      ]
+
+      const ranked = calculateRankings(users)
+
+      expect(ranked[0].tier).toBe('Diamond')
+      expect(ranked[0].pointsToNextRank).toBeNull()
+
+      expect(ranked[1].tier).toBe('Bronze')
+      expect(ranked[1].pointsToNextRank).toBe(51) // 500 - 450 + 1
+    })
+  })
 })

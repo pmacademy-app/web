@@ -176,6 +176,7 @@ export async function getWeeklyLeaderboard(
       lessonsCompleted,
       xpEarned,
       currentStreak: u.current_streak || 0,
+      totalXp: u.total_xp || 0,
     }
   })
 
