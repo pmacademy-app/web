@@ -80,6 +80,17 @@ export async function toggleLeaderboardOptIn(
   return { success: true, isOptedIn }
 }
 
+// In-memory cache for weekly leaderboard calculations (45-second TTL)
+interface LeaderboardCacheEntry {
+  timestamp: number
+  users: UserRow[]
+  optedOutUserIds: Set<string>
+  rawMetrics: RawLeaderboardUserMetric[]
+}
+
+const LEADERBOARD_CACHE = new Map<string, LeaderboardCacheEntry>()
+const CACHE_TTL_MS = 45 * 1000
+
 /**
  * Fetches weekly consistency rankings for opted-in users.
  */
@@ -90,99 +101,121 @@ export async function getWeeklyLeaderboard(
 ): Promise<WeeklyLeaderboardPayload> {
   const weekStart = targetWeekStart || calculateWeekStart()
   const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
+  const now = Date.now()
 
-  // 1. Fetch users with total_xp > 0
-  const { data: users } = (await (supabase
-    .from('users') as unknown as DBChain)
-    .select('id, username, name, avatar_url, total_xp, current_streak, level')
-    .gt('total_xp', 0)) as unknown as { data: UserRow[] | null }
+  let cached = LEADERBOARD_CACHE.get(weekStart)
+  if (!cached || now - cached.timestamp > CACHE_TTL_MS) {
+    // 1. Fetch users with total_xp > 0
+    const { data: users } = (await (supabase
+      .from('users') as unknown as DBChain)
+      .select('id, username, name, avatar_url, total_xp, current_streak, level')
+      .gt('total_xp', 0)) as unknown as { data: UserRow[] | null }
 
-  const userIdsArray = (users || []).map((u) => u.id)
+    const userList = users || []
+    const userIdsArray = userList.map((u) => u.id)
 
-  // Always ensure the current user is fetched even if their total_xp is 0
-  if (!userIdsArray.includes(userId)) {
+    // 2. Fetch opted-out users so we can exclude them
+    const { data: optedOutRows } = (await (supabase
+      .from('user_leaderboard_settings') as unknown as DBChain)
+      .select('user_id')
+      .eq('is_opted_in', false)) as unknown as { data: { user_id: string }[] | null }
+
+    const optedOutUserIds = new Set<string>((optedOutRows || []).map((r) => r.user_id))
+
+    // 3. Fetch lesson progress in current week for consistency metric
+    const weekStartDate = new Date(weekStart)
+    const { data: lessonProgress } = (await (supabase
+      .from('user_lesson_progress') as unknown as DBChain)
+      .select('user_id, status, completed_at')
+      .in('user_id', userIdsArray.length ? userIdsArray : ['00000000-0000-0000-0000-000000000000'])
+      .eq('status', 'completed')
+      .gte('completed_at', weekStartDate.toISOString())) as unknown as {
+      data: { user_id: string; status: string; completed_at: string }[] | null
+    }
+
+    // 4. Fetch xp events in current week
+    const { data: xpEvents } = (await (supabase
+      .from('xp_events') as unknown as DBChain)
+      .select('user_id, amount, created_at')
+      .in('user_id', userIdsArray.length ? userIdsArray : ['00000000-0000-0000-0000-000000000000'])
+      .gte('created_at', weekStartDate.toISOString())) as unknown as {
+      data: { user_id: string; amount: number; created_at: string }[] | null
+    }
+
+    // Aggregate user weekly metrics
+    const rawMetrics: RawLeaderboardUserMetric[] = userList.map((u) => {
+      const userLessons = (lessonProgress || []).filter((lp) => lp.user_id === u.id)
+      const lessonsCompleted = userLessons.length
+
+      // Calculate unique days studied in week
+      const studyDays = new Set<string>()
+      for (const lp of userLessons) {
+        if (lp.completed_at) {
+          studyDays.add(lp.completed_at.split('T')[0])
+        }
+      }
+      const daysStudied = studyDays.size
+
+      // Calculate weekly XP
+      const userXpEvents = (xpEvents || []).filter((xe) => xe.user_id === u.id)
+      const xpEarned = userXpEvents.reduce((acc, curr) => acc + (curr.amount || 0), 0)
+
+      const levelInfo = calculateLevel(u.total_xp || 0)
+
+      return {
+        userId: u.id,
+        username: u.username ?? null,
+        name: u.name ?? null,
+        avatarUrl: u.avatar_url ?? null,
+        levelTitle: levelInfo.title,
+        level: levelInfo.level,
+        daysStudied,
+        lessonsCompleted,
+        xpEarned,
+        currentStreak: u.current_streak || 0,
+        totalXp: u.total_xp || 0,
+      }
+    })
+
+    cached = {
+      timestamp: now,
+      users: userList,
+      optedOutUserIds,
+      rawMetrics,
+    }
+    LEADERBOARD_CACHE.set(weekStart, cached)
+  }
+
+  // Ensure current user is present even if they have 0 total_xp
+  const rawMetrics = [...cached.rawMetrics]
+  if (!rawMetrics.some((m) => m.userId === userId)) {
     const { data: currentUser } = (await (supabase
       .from('users') as unknown as DBChain)
       .select('id, username, name, avatar_url, total_xp, current_streak, level')
       .eq('id', userId)
       .maybeSingle()) as unknown as { data: UserRow | null }
-      
+
     if (currentUser) {
-      users?.push(currentUser)
-      userIdsArray.push(currentUser.id)
+      const levelInfo = calculateLevel(currentUser.total_xp || 0)
+      rawMetrics.push({
+        userId: currentUser.id,
+        username: currentUser.username ?? null,
+        name: currentUser.name ?? null,
+        avatarUrl: currentUser.avatar_url ?? null,
+        levelTitle: levelInfo.title,
+        level: levelInfo.level,
+        daysStudied: 0,
+        lessonsCompleted: 0,
+        xpEarned: 0,
+        currentStreak: currentUser.current_streak || 0,
+        totalXp: currentUser.total_xp || 0,
+      })
     }
   }
-
-  if (userIdsArray.length === 0 || !users) {
-    return { weekStart, isOptedIn, entries: [], personalEntry: null }
-  }
-
-  // 2. Fetch opted-out users so we can exclude them
-  const { data: optedOutRows } = (await (supabase
-    .from('user_leaderboard_settings') as unknown as DBChain)
-    .select('user_id')
-    .eq('is_opted_in', false)) as unknown as { data: { user_id: string }[] | null }
-
-  const optedOutUserIds = new Set<string>((optedOutRows || []).map((r) => r.user_id))
-
-  // 3. Fetch lesson progress in current week for consistency metric
-  const weekStartDate = new Date(weekStart)
-  const { data: lessonProgress } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
-    .select('user_id, status, completed_at')
-    .in('user_id', userIdsArray)
-    .eq('status', 'completed')
-    .gte('completed_at', weekStartDate.toISOString())) as unknown as {
-    data: { user_id: string; status: string; completed_at: string }[] | null
-  }
-
-  // 4. Fetch xp events in current week
-  const { data: xpEvents } = (await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .select('user_id, amount, created_at')
-    .in('user_id', userIdsArray)
-    .gte('created_at', weekStartDate.toISOString())) as unknown as {
-    data: { user_id: string; amount: number; created_at: string }[] | null
-  }
-
-  // Aggregate user weekly metrics
-  const rawMetrics: RawLeaderboardUserMetric[] = users.map((u) => {
-    const userLessons = (lessonProgress || []).filter((lp) => lp.user_id === u.id)
-    const lessonsCompleted = userLessons.length
-
-    // Calculate unique days studied in week
-    const studyDays = new Set<string>()
-    for (const lp of userLessons) {
-      if (lp.completed_at) {
-        studyDays.add(lp.completed_at.split('T')[0])
-      }
-    }
-    const daysStudied = studyDays.size
-
-    // Calculate weekly XP
-    const userXpEvents = (xpEvents || []).filter((xe) => xe.user_id === u.id)
-    const xpEarned = userXpEvents.reduce((acc, curr) => acc + (curr.amount || 0), 0)
-
-    const levelInfo = calculateLevel(u.total_xp || 0)
-
-    return {
-      userId: u.id,
-      username: u.username ?? null,
-      name: u.name ?? null,
-      avatarUrl: u.avatar_url ?? null,
-      levelTitle: levelInfo.title,
-      level: levelInfo.level,
-      daysStudied,
-      lessonsCompleted,
-      xpEarned,
-      currentStreak: u.current_streak || 0,
-      totalXp: u.total_xp || 0,
-    }
-  })
 
   // Calculate final rankings
   const rankedEntries = calculateRankings(rawMetrics, userId)
-  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !optedOutUserIds.has(e.userId))
+  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !cached!.optedOutUserIds.has(e.userId))
   const personalEntry = rankedEntries.find((e) => e.isCurrentUser) ?? null
 
   return {
