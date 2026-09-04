@@ -43,7 +43,6 @@ function makeSupabaseMock() {
 vi.mock('@/lib/supabase', () => ({
   createServiceRoleClient: vi.fn(() => makeSupabaseMock()),
   createAuthenticatedServerClient: vi.fn(() => makeSupabaseMock()),
-  createPublicClient: vi.fn(() => makeSupabaseMock()),
 }))
 
 describe('System Monitoring & Error Instrumentation Unit Test Suite', () => {
