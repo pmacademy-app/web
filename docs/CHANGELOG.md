@@ -2,6 +2,27 @@
 
 All notable changes to **Prodily PM Academy** (`pmacademy-app/web`) are documented in this file.
 
+## [Prodily Evolution & Platform Improvements] — 2026-09-04
+### Phase 1: UI/UX & Learning Experience
+- **Leaderboard 2.0**: Added dynamic tier engine (`Bronze`, `Silver`, `Gold`, `Diamond`, `Fellow`) with points-to-next-rank delta indicators.
+- **Progress Continuity**: Implemented sequential path resolver with prominent "Recommended Next Action" hero card.
+- **Capstone Deliverable Readiness**: Added live word-count and deliverable readiness indicators in the workspace.
+- **Interactive Concept Checks**: Created inline reflection checkpoints (`InlineConceptCheck.tsx`) across frameworks & mental models.
+
+### Phase 2: Admin Panel & Operational Control
+- **Leaderboard Management Surface**: Added `/admin/leaderboard` route, service (`LeaderboardAdminService`), and UI (`AdminLeaderboardView.tsx`) with anomaly detection and privacy toggles.
+- **Searchable Learner Picker**: Created `AdminUserMultiSelectPicker.tsx` with debounced search, autocomplete, and removable chips.
+- **Safety Guardrails**: Added confirmation modal before broad notifications (>25 recipients or "All").
+
+### Phase 3: Backend & Data Scale
+- **Leaderboard Query Caching**: Added 45s in-memory TTL caching on `getWeeklyLeaderboard` to eliminate database join overhead.
+- **Real-Time Weekly Recaps**: Aggregated exact weekly XP from `xp_events` and completed lessons from `user_lesson_progress`.
+- **Cron Idempotency**: Verified deterministic `eventId` deduplication for all automated notifications.
+
+### Phase 4: Infrastructure & Monitoring Hardening
+- **Public Health Endpoint**: Implemented `/api/health` checking database connectivity and returning telemetry headers.
+- **Monitoring Verification**: Added unit tests in `system-monitoring.test.ts`.
+
 ## [Phases 1–10 Hardening & Production Rebuild] — 2026-08-24
 ### Phase 1: Repository Baseline, Audit Reconciliation & Production Data Integrity
 - Standardized lesson progress IDs to `les_` format across production database (137/137 rows reconciled).
