@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createPublicClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +8,7 @@ export async function GET() {
   let dbStatus = 'connected'
 
   try {
-    const supabase = createPublicClient()
+    const supabase = createServiceRoleClient()
     const { error } = await supabase.from('users').select('id').limit(1)
     if (error && !error.message?.includes('JWT')) {
       dbStatus = 'degraded'
