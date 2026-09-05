@@ -78,6 +78,7 @@
     "flexsearch": "^0.8.212",
     "framer-motion": "^12.42.2",
     "hermes-parser": "^0.37.0",
+    "isomorphic-dompurify": "^4.1.0",
     "lightningcss": "^1.33.0",
     "lucide-react": "^1.27.0",
     "marked": "^18.0.7",

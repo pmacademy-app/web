@@ -2,20 +2,22 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser } from '@/lib/auth'
+import { getServerUser, type UserProfile } from '@/lib/auth'
 import { getUserXpSummary } from '@/lib/xp-service'
 import { getUserStreakStatus } from '@/lib/streaks-db'
 import { getSkillRadarSummary } from '@/lib/skillRadar'
 import { getUserCertificates, issueCertificate } from '@/lib/certificates-db'
 import { getUserBadgesData } from '@/lib/badges-db'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
-import { CAPSTONE_DEFINITIONS } from '@/config/capstones'
+import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
 import { LevelCard } from '@/components/dashboard/LevelCard'
 import { StreakCard } from '@/components/dashboard/StreakCard'
 import { ProgressRingCard } from '@/components/dashboard/ProgressRingCard'
 import { SkillRadarCard } from '@/components/dashboard/SkillRadarCard'
 import { BadgeShowcaseCard } from '@/components/progress/BadgeShowcaseCard'
-import { Shield, Award as CertIcon, ExternalLink, ArrowRight, Play, CheckCircle } from 'lucide-react'
+import { RecommendedActionCard } from '@/components/progress/RecommendedActionCard'
+import { CapstonesOverviewCard } from '@/components/progress/CapstonesOverviewCard'
+import { CertificatesCard } from '@/components/progress/CertificatesCard'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -34,45 +36,62 @@ export default async function ProgressPage() {
 
   const supabase = createServiceRoleClient()
 
-  // Fetch all performance & competency data in parallel with lean column projection
+  // Batch 1: shared raw data reused by multiple sections below. Fetching
+  // `user_lesson_progress` and curriculum data ONCE here (instead of letting the
+  // skill-radar and badges services each fetch their own copies) removes what
+  // was previously 3x duplicate lesson-progress queries and 2x curriculum loads
+  // on this single page render.
   const [
     { data: progressRows },
+    { data: capstoneRows },
+    { data: personalizationRow },
     xpSummary,
     streakStatus,
-    radarSummary,
-    badgesData,
-    { data: capstoneRows },
     userCertificates,
     curriculum,
   ] = await Promise.all([
     (supabase
       .from('user_lesson_progress') as unknown as DBChain)
-      .select('lesson_id, status')
+      .select('lesson_id, status, quiz_score, quiz_attempts')
       .eq('user_id', user.id) as unknown as Promise<{
-      data: Array<{ lesson_id: string; status: string }> | null
+      data: Array<{ lesson_id: string; status: 'not_started' | 'in_progress' | 'completed'; quiz_score: number | null; quiz_attempts: number }> | null
     }>,
-    getUserXpSummary(supabase, user.id),
-    getUserStreakStatus(supabase, user.id),
-    getSkillRadarSummary(supabase, user.id),
-    getUserBadgesData(supabase, user.id),
     (supabase
       .from('capstone_submissions') as unknown as DBChain)
       .select('module_slug, status')
       .eq('user_id', user.id) as unknown as Promise<{
       data: Array<{ module_slug: string; status: string }> | null
     }>,
+    (supabase
+      .from('users') as unknown as DBChain)
+      .select('goal, career_role, onboarding_topics, onboarding_preference, learning_purpose')
+      .eq('id', user.id)
+      .maybeSingle() as unknown as Promise<{ data: Pick<UserProfile, 'goal' | 'career_role' | 'onboarding_topics' | 'onboarding_preference' | 'learning_purpose'> | null }>,
+    getUserXpSummary(supabase, user.id),
+    getUserStreakStatus(supabase, user.id),
     getUserCertificates(supabase, user.id),
     fetchCurriculumData().catch(() => null),
+  ])
+
+  const lessonModuleMap = new Map<string, string>(
+    (curriculum?.lessons || []).map((l) => [l.id, l.module])
+  )
+
+  // Batch 2: sections that reuse the rows/map fetched above instead of re-querying.
+  const [radarSummary, badgesData] = await Promise.all([
+    getSkillRadarSummary(supabase, user.id, { progressRows: progressRows || undefined, lessonModuleMap }),
+    getUserBadgesData(supabase, user.id, { progressRows: progressRows || undefined, capstoneRows: capstoneRows || undefined }),
   ])
 
   const completedLessons = progressRows?.filter((p) => p.status === 'completed').length ?? 0
   const completedPercentage = Math.min(100, Math.round((completedLessons / 90) * 100))
 
-  // Determine Next Best Action lesson
+  // Recommended Next Action: goal-aware milestone (never skips/reorders lessons —
+  // same personalization engine already used on the Dashboard).
   const completedLessonIds = new Set((progressRows || []).filter((p) => p.status === 'completed').map((p) => p.lesson_id))
   const allLessons = curriculum?.lessons || []
-  const nextIncompleteLesson = allLessons.find((l) => !completedLessonIds.has(l.id)) || null
-  const nextLessonIndex = nextIncompleteLesson ? allLessons.findIndex((l) => l.id === nextIncompleteLesson.id) + 1 : null
+  const personalizedPath = resolvePersonalizedPath(personalizationRow)
+  const recommendedMilestone = resolveNextRecommendedMilestone(personalizedPath, completedLessonIds, allLessons)
 
   // Auto-issue certificate if 90 lessons completed and no certificate exists yet
   let certificates = userCertificates
@@ -93,15 +112,6 @@ export default async function ProgressPage() {
     }
   }
 
-  // Map badge items for showcase
-  const badgeItems = badgesData.allBadges.map((b) => ({
-    key: b.definition.key,
-    name: b.definition.name,
-    description: b.definition.description,
-    unlocked: b.isEarned,
-    icon: b.definition.icon,
-  }))
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8 pb-16">
       {/* Header */}
@@ -120,58 +130,8 @@ export default async function ProgressPage() {
         </p>
       </div>
 
-      {/* Recommended Next Action Banner */}
-      {nextIncompleteLesson ? (
-        <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-card to-background p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary border border-primary/30">
-                Recommended Next Action
-              </span>
-              <span className="text-xs text-muted-foreground font-mono">
-                Lesson {nextLessonIndex} of 90
-              </span>
-            </div>
-            <h2 className="text-lg font-bold font-serif text-foreground">
-              {nextIncompleteLesson.title}
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Continue your sequential curriculum path to advance your skill radar and maintain your study streak.
-            </p>
-          </div>
-          <Link
-            href={`/academy/${nextIncompleteLesson.module}/${nextIncompleteLesson.id}`}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-xs hover:bg-primary/90 transition-all shrink-0"
-          >
-            <span>Continue Lesson {nextLessonIndex}</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-500" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
-                Curriculum Mastered 👑
-              </span>
-            </div>
-            <h2 className="text-lg font-bold font-serif text-foreground">
-              You have completed all 90 lessons!
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              All 9 modules are mastered. Complete your capstones to showcase your applied proof of work.
-            </p>
-          </div>
-          <Link
-            href="/capstones"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs hover:bg-emerald-500 transition-all shrink-0"
-          >
-            <span>Open Capstones Workspace</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      )}
+      {/* Where am I? / What have I achieved? / What should I do next? */}
+      <RecommendedActionCard personalizedPath={personalizedPath} milestone={recommendedMilestone} />
 
       {/* 1. Skill Radar (DOMINANT VISUAL) */}
       <SkillRadarCard
@@ -191,138 +151,18 @@ export default async function ProgressPage() {
       <BadgeShowcaseCard
         unlockedCount={badgesData.totalEarned}
         totalBadges={badgesData.totalAvailable}
-        badges={badgeItems}
+        badges={badgesData.allBadges}
       />
 
       {/* 4. Capstone Projects Section */}
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
-        <div className="flex items-center justify-between border-b border-border pb-4">
-          <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-bold font-serif text-foreground">
-              Module Capstone Projects (9 Total)
-            </h2>
-          </div>
-          <Link
-            href="/capstones"
-            className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
-          >
-            <span>View All Workspace</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Object.values(CAPSTONE_DEFINITIONS).map((cap) => {
-            const status = capstoneMap.get(cap.moduleSlug) || 'not_started'
-            const isDone = status === 'submitted' || status === 'reviewed'
-
-            return (
-              <div
-                key={cap.moduleSlug}
-                className="p-4 rounded-xl border border-border/80 bg-card/60 space-y-2 flex flex-col justify-between"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                      Module {cap.moduleNumber}
-                    </span>
-                    <span
-                      className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded border ${
-                        isDone
-                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                          : 'bg-muted text-muted-foreground border-border'
-                      }`}
-                    >
-                      {status.replace('_', ' ')}
-                    </span>
-                  </div>
-                  <h3 className="text-sm font-bold font-serif text-foreground">{cap.title}</h3>
-                  <p className="text-[11px] text-muted-foreground line-clamp-2">{cap.deliverableType}</p>
-                </div>
-
-                <Link
-                  href={`/capstones/${cap.moduleSlug}`}
-                  className="mt-2 inline-flex items-center justify-between text-xs font-bold text-primary hover:underline"
-                >
-                  <span>{isDone ? 'View Submission' : 'Open Workspace'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      <CapstonesOverviewCard capstoneStatusByModule={capstoneMap} />
 
       {/* 5. Certificates & Credentials Section */}
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-6 shadow-xs">
-        <div className="flex items-center justify-between border-b border-border pb-4">
-          <div className="flex items-center gap-2">
-            <CertIcon className="w-5 h-5 text-amber-500" />
-            <h2 className="text-xl font-bold font-serif text-foreground">
-              Official Certificates &amp; Credentials
-            </h2>
-          </div>
-        </div>
-
-        {certificates.length > 0 ? (
-          <div className="space-y-4">
-            {certificates.map((cert) => (
-              <div
-                key={cert.id}
-                className="p-6 rounded-2xl border border-amber-500/30 bg-amber-500/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-              >
-                <div className="space-y-1">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-amber-500 block">
-                    Verified Credential • {cert.certificate_code}
-                  </span>
-                  <h3 className="text-lg font-bold font-serif text-foreground">
-                    Prodily PM Academy Full Curriculum Completion Certificate
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Issued on {new Date(cert.issued_at).toLocaleDateString()} for mastering 90 lessons and achieving Level {cert.level} ({cert.career_title}).
-                  </p>
-                </div>
-
-                <Link
-                  href={`/verify/${encodeURIComponent(cert.certificate_code)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-amber-500 text-white font-bold text-xs shadow-sm hover:bg-amber-600 transition-all shrink-0"
-                >
-                  <span>View Verified Certificate</span>
-                  <ExternalLink className="w-4 h-4" />
-                </Link>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="p-6 rounded-2xl border border-border bg-card/60 space-y-4">
-            <div className="space-y-1">
-              <h3 className="text-base font-bold font-serif text-foreground">
-                Certificate Eligibility &amp; Progress
-              </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Earn your official PM Academy Completion Certificate by completing all 90 lessons across the 9 core modules.
-              </p>
-            </div>
-
-            {/* Progress Bar toward Certificate */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs font-bold font-mono">
-                <span className="text-foreground">Full Curriculum Certificate Eligibility</span>
-                <span className="text-primary">{completedLessons} / 90 Lessons ({completedPercentage}%)</span>
-              </div>
-              <div className="w-full h-3 rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-500"
-                  style={{ width: `${completedPercentage}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      <CertificatesCard
+        certificates={certificates}
+        completedLessons={completedLessons}
+        completedPercentage={completedPercentage}
+      />
     </div>
   )
 }

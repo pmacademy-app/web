@@ -275,39 +275,61 @@ export function getCompetencyBreakdown(
   })
 }
 
+export interface SkillRadarPreloadedData {
+  /** Already-fetched `user_lesson_progress` rows for this user — skips the internal query when provided. */
+  progressRows?: { lesson_id: string; status: 'not_started' | 'in_progress' | 'completed'; quiz_score: number | null; quiz_attempts: number }[]
+  /** Already-built lesson-id → module-slug map (e.g. from curriculum data the caller already loaded) — skips the internal curriculum.json read when provided. */
+  lessonModuleMap?: Map<string, string>
+}
+
 /**
  * Service function: Retrieves real-time Skill Radar summary for a user from database progress.
+ *
+ * Accepts optional `preloaded` data so callers that already fetched the same
+ * `user_lesson_progress` rows or curriculum lesson list (e.g. the Progress page,
+ * which needs both for other sections too) can avoid a duplicate query/file read.
+ * When omitted, behavior is identical to before (fetches everything itself).
  */
 export async function getSkillRadarSummary(
   supabase: SupabaseClient<Database>,
-  userId: string
+  userId: string,
+  preloaded?: SkillRadarPreloadedData
 ): Promise<SkillRadarSummary> {
-  const { data: progressRows, error } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
-    .select('lesson_id, status, quiz_score, quiz_attempts')
-    .eq('user_id', userId)) as unknown as {
-    data: { lesson_id: string; status: 'not_started' | 'in_progress' | 'completed'; quiz_score: number | null; quiz_attempts: number }[] | null
-    error: unknown
-  }
+  let progressRows = preloaded?.progressRows
 
-  if (error) {
-    console.error('[skillRadar] Error fetching user_lesson_progress for skill radar:', error)
-  }
-
-  const lessonModuleMap = new Map<string, string>()
-  try {
-    if (typeof window === 'undefined') {
-      const fs = await import('fs/promises')
-      const path = await import('path')
-      const curriculumPath = path.default.resolve(process.cwd(), '..', '..', 'content', 'dist', 'curriculum.json')
-      const raw = await fs.readFile(curriculumPath, 'utf-8')
-      const curriculum = JSON.parse(raw)
-      for (const l of curriculum.lessons) {
-        lessonModuleMap.set(l.id, l.module)
-      }
+  if (!progressRows) {
+    const { data, error } = (await (supabase
+      .from('user_lesson_progress') as unknown as DBChain)
+      .select('lesson_id, status, quiz_score, quiz_attempts')
+      .eq('user_id', userId)) as unknown as {
+      data: { lesson_id: string; status: 'not_started' | 'in_progress' | 'completed'; quiz_score: number | null; quiz_attempts: number }[] | null
+      error: unknown
     }
-  } catch {
-    console.warn('[skillRadar] Could not load curriculum.json for lesson mapping')
+
+    if (error) {
+      console.error('[skillRadar] Error fetching user_lesson_progress for skill radar:', error)
+    }
+    progressRows = data || []
+  }
+
+  let lessonModuleMap = preloaded?.lessonModuleMap
+
+  if (!lessonModuleMap) {
+    lessonModuleMap = new Map<string, string>()
+    try {
+      if (typeof window === 'undefined') {
+        const fs = await import('fs/promises')
+        const path = await import('path')
+        const curriculumPath = path.default.resolve(process.cwd(), '..', '..', 'content', 'dist', 'curriculum.json')
+        const raw = await fs.readFile(curriculumPath, 'utf-8')
+        const curriculum = JSON.parse(raw)
+        for (const l of curriculum.lessons) {
+          lessonModuleMap.set(l.id, l.module)
+        }
+      }
+    } catch {
+      console.warn('[skillRadar] Could not load curriculum.json for lesson mapping')
+    }
   }
 
   const userProgressList: LessonProgressInput[] = (progressRows || []).map((row) => ({

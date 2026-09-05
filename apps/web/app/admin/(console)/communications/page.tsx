@@ -80,7 +80,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
         : Promise.resolve(null),
       tab === 'email' ? CommunicationsService.getEmailVolumeSeries(14) : Promise.resolve([]),
       tab === 'automations' ? EmailAutomationsService.getState() : Promise.resolve(null),
-      tab === 'templates' ? Promise.resolve(CommunicationsService.getTemplateList()) : Promise.resolve([]),
+      tab === 'templates' || tab === 'broadcasts' ? CommunicationsService.getTemplateList() : Promise.resolve([]),
       tab === 'in-app' ? CommunicationsService.getNotificationEvents(50) : Promise.resolve([]),
       tab === 'contact' ? CommunicationsService.getContactMessages(100) : Promise.resolve([]),
       tab === 'announcements' ? AnnouncementsService.getAnnouncements({ limit: 100 }) : Promise.resolve({ announcements: [] }),
@@ -146,7 +146,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
 
       {/* Broadcasts */}
       {tab === 'broadcasts' && (
-        <AdminBroadcastsView initialData={broadcastsData} />
+        <AdminBroadcastsView initialData={broadcastsData} templates={templates || []} />
       )}
 
       {/* Announcements */}

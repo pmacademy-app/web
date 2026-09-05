@@ -80,6 +80,8 @@ export interface AdminUserFilters {
   onlyIfReceivedTemplate?: string
   /** Exclude users who were targeted by this broadcast ID. */
   excludeBroadcastId?: string
+  /** Target only these specific user IDs (Individual audience mode). Intersected with any other filters. */
+  userIds?: string[]
 }
 
 /** Paginated result of the Users workspace list query. */

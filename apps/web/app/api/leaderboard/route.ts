@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { getWeeklyLeaderboard, toggleLeaderboardOptIn } from '@/lib/leaderboard-db'
+import { getWeeklyLeaderboard, getCohortLeaderboard, toggleLeaderboardOptIn } from '@/lib/leaderboard-db'
 
 export async function GET(request: Request) {
   try {
@@ -14,13 +14,22 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = createServiceRoleClient()
-    const payload = await getWeeklyLeaderboard(supabase, user.id)
+    const { searchParams } = new URL(request.url)
+    const scope = searchParams.get('scope') || 'global'
+    const cohortId = searchParams.get('cohortId')
 
-    return NextResponse.json({
-      success: true,
-      ...payload,
-    })
+    const supabase = createServiceRoleClient()
+
+    if (scope === 'cohort') {
+      if (!cohortId) {
+        return NextResponse.json({ error: 'cohortId is required for scope=cohort.' }, { status: 400 })
+      }
+      const payload = await getCohortLeaderboard(supabase, user.id, cohortId)
+      return NextResponse.json({ success: true, scope: 'cohort', ...payload })
+    }
+
+    const payload = await getWeeklyLeaderboard(supabase, user.id)
+    return NextResponse.json({ success: true, scope: 'global', ...payload })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to fetch leaderboard.'
     console.error('[API GET /api/leaderboard] Error:', error)

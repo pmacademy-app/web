@@ -2,18 +2,20 @@
 
 import React, { useCallback, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ShieldAlert, MessageSquare, Lightbulb, FileCheck2, Globe, AlertTriangle } from 'lucide-react'
+import { ShieldAlert, MessageSquare, Lightbulb, FileCheck2, Globe, AlertTriangle, Award } from 'lucide-react'
 import { AdminPageShell } from './AdminPageShell'
 import { AdminLoadWarning } from './AdminLoadWarning'
 import { FeedbackModerationView } from './FeedbackModerationView'
 import { FeedbackListView } from './FeedbackListView'
 import { CapstonesView } from './CapstonesView'
 import { PortfoliosView } from './PortfoliosView'
+import { FellowRequestsView } from './FellowRequestsView'
 import type { TestimonialItem } from '@/lib/admin/feedback-service'
 import type { AdminFeedbackItem } from './FeedbackListView'
 import type { AdminCapstoneRow, AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
+import type { AdminFellowRequestItem } from '@/lib/admin/fellow-request-service'
 
-export type ModerationTab = 'testimonials' | 'feedback' | 'capstones' | 'portfolios'
+export type ModerationTab = 'testimonials' | 'feedback' | 'capstones' | 'portfolios' | 'fellow-requests'
 
 interface ModerationWorkspaceProps {
   initialTab: string
@@ -26,6 +28,7 @@ interface ModerationWorkspaceProps {
   initialCapstoneStatus: string
   selectedCapstoneId: string | null
   selectedCapstoneDetail: AdminCapstoneRow | null
+  initialFellowRequests: AdminFellowRequestItem[]
 }
 
 const TABS: { id: ModerationTab; label: string; icon: React.ElementType }[] = [
@@ -33,6 +36,7 @@ const TABS: { id: ModerationTab; label: string; icon: React.ElementType }[] = [
   { id: 'feedback', label: 'Product Feedback', icon: Lightbulb },
   { id: 'capstones', label: 'Capstones', icon: FileCheck2 },
   { id: 'portfolios', label: 'Portfolio Verification', icon: Globe },
+  { id: 'fellow-requests', label: 'Fellow Requests', icon: Award },
 ]
 
 export function ModerationWorkspace({
@@ -46,6 +50,7 @@ export function ModerationWorkspace({
   initialCapstoneStatus,
   selectedCapstoneId,
   selectedCapstoneDetail,
+  initialFellowRequests,
 }: ModerationWorkspaceProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -163,6 +168,8 @@ export function ModerationWorkspace({
             <PortfoliosView initialPortfolios={initialPortfolios} />
           </>
         )}
+
+        {activeTab === 'fellow-requests' && <FellowRequestsView initialQueue={initialFellowRequests} />}
       </div>
     </AdminPageShell>
   )

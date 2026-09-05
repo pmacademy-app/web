@@ -26,7 +26,77 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
 
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
-      <div className="overflow-x-auto">
+      {/* Mobile card layout */}
+      <div className="sm:hidden divide-y divide-border/60">
+        {entries.map((entry) => {
+          const isTop3 = entry.rank <= 3
+          const tierInfo = getLeaderboardTier(entry.level, entry.totalXp ?? entry.xpEarned)
+          return (
+            <div
+              key={entry.userId}
+              className={cn('p-4 space-y-2.5', entry.isCurrentUser && 'bg-primary/5')}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    'w-8 h-8 rounded-full border flex items-center justify-center font-bold text-xs shrink-0',
+                    isTop3
+                      ? ['text-amber-500 bg-amber-500/10 border-amber-500/30', 'text-slate-400 bg-slate-400/10 border-slate-400/30', 'text-amber-700 bg-amber-700/10 border-amber-700/30'][entry.rank - 1]
+                      : 'text-muted-foreground border-border font-mono'
+                  )}
+                >
+                  {entry.rank}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-foreground text-sm truncate">
+                      {entry.name || `@${entry.username}`}
+                    </span>
+                    <span className={cn('text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border', tierInfo.badgeColor)}>
+                      {tierInfo.tier}
+                    </span>
+                    {entry.isCurrentUser && (
+                      <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-primary text-primary-foreground">
+                        You
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground block truncate">
+                    {entry.levelTitle} • Level {entry.level}
+                  </span>
+                </div>
+                {entry.username && (
+                  <Link
+                    href={`/p/${entry.username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-muted-foreground hover:text-foreground rounded-md transition-colors shrink-0"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                )}
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-lg bg-muted/40 py-1.5">
+                  <div className="text-[9px] text-muted-foreground uppercase font-semibold">Days</div>
+                  <div className="text-xs font-bold font-mono text-emerald-500">{entry.daysStudied}/7</div>
+                </div>
+                <div className="rounded-lg bg-muted/40 py-1.5">
+                  <div className="text-[9px] text-muted-foreground uppercase font-semibold">XP</div>
+                  <div className="text-xs font-bold font-mono text-primary">+{entry.xpEarned}</div>
+                </div>
+                <div className="rounded-lg bg-muted/40 py-1.5">
+                  <div className="text-[9px] text-muted-foreground uppercase font-semibold">Streak</div>
+                  <div className="text-xs font-bold font-mono text-amber-500">{entry.currentStreak}d</div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Desktop table layout */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-border bg-muted/40 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">

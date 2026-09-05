@@ -100,18 +100,21 @@ export function interpolateVariables(template: string, variables: Record<string,
  * Renders an email template with published database version precedence.
  * Precedence:
  * 1. Published version from `notification_template_versions` (if exists and status === 'published')
- * 2. Static React Email component from `EMAIL_TEMPLATE_MAP` (fallback)
+ *    — this is the ONLY path for admin-created custom HTML templates, which have
+ *    no static component in EMAIL_TEMPLATE_MAP.
+ * 2. Static React Email component from `EMAIL_TEMPLATE_MAP` (fallback for built-in
+ *    transactional/lifecycle templates that ship in code).
  */
 export async function renderEmailTemplate(
   templateKey: string,
   variables: Record<string, unknown>
 ): Promise<{ html: string; text: string; subject: string }> {
   const entry = EMAIL_TEMPLATE_MAP[templateKey]
-  if (!entry) {
-    throw new Error(`Email template '${templateKey}' is not registered in EMAIL_TEMPLATE_MAP.`)
-  }
 
-  // 1. Check for published custom version in database (bypassed in test environment to preserve unit test fetch mocks)
+  // 1. Check for a published custom version in the database. Checked BEFORE
+  // requiring a static entry so admin-created templates (which only ever exist
+  // in the database) can be rendered too — bypassed in test env to preserve
+  // unit test fetch mocks.
   if (!process.env.VITEST && process.env.NODE_ENV !== 'test') {
     try {
       const { createServiceRoleClient } = await import('@/lib/supabase')
@@ -133,7 +136,7 @@ export async function renderEmailTemplate(
           .maybeSingle()
 
         if (publishedVersion && publishedVersion.body_html?.trim()) {
-          const rawSubject = publishedVersion.subject_line || entry.subjectLine
+          const rawSubject = publishedVersion.subject_line || entry?.subjectLine || 'Update from Prodily'
           const subject = interpolateVariables(rawSubject, variables)
           const interpolatedHtml = interpolateVariables(publishedVersion.body_html, variables)
           const html = interpolatedHtml.startsWith('<!DOCTYPE') ? interpolatedHtml : `<!DOCTYPE html>${interpolatedHtml}`
@@ -151,6 +154,10 @@ export async function renderEmailTemplate(
   }
 
   // 2. Default / Static React Email Component Fallback
+  if (!entry) {
+    throw new Error(`Email template '${templateKey}' has no published version and is not registered in EMAIL_TEMPLATE_MAP.`)
+  }
+
   const Component = entry.component
   const element = React.createElement(Component, variables)
   const { renderToStaticMarkup } = await import('react-dom/server')

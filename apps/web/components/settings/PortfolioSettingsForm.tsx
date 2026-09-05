@@ -9,6 +9,7 @@ import type {
 import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
 import { calculatePortfolioReadiness } from '@/lib/portfolio-readiness'
 import { PortfolioReadinessCard } from '@/components/settings/PortfolioReadinessCard'
+import { FellowRequestCard } from '@/components/settings/FellowRequestCard'
 import {
   trackPortfolioLayoutUpdated,
   trackPortfolioFeaturedCapstoneSet,
@@ -223,6 +224,9 @@ export function PortfolioSettingsForm() {
         username={formData.username}
         isPublic={formData.isPortfolioPublic}
       />
+
+      {/* PM Fellow Request (server-verified eligibility, independent of unsaved draft edits above) */}
+      <FellowRequestCard />
 
       {/* Public / Private Toggle */}
       <div id="visibility-toggle" tabIndex={-1} className="rounded-2xl border border-border bg-card p-6 space-y-4 focus:outline-none focus:ring-2 focus:ring-primary/40">

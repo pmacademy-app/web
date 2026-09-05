@@ -234,6 +234,11 @@ export async function resolveFilteredUserIds(
   let constraintIds: Set<string> | null = null
   const excludeIds: Set<string> = new Set()
 
+  // --- Individual audience mode: intersect with an explicit user ID list ---
+  if (filters.userIds && filters.userIds.length > 0) {
+    constraintIds = intersect(constraintIds, new Set(filters.userIds))
+  }
+
   // --- Verification ---
   if (filters.verification) {
     tasks.push(

@@ -1,6 +1,7 @@
 import React from 'react'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 import { ModerationService } from '@/lib/admin/moderation-service'
+import { FellowRequestAdminService } from '@/lib/admin/fellow-request-service'
 import { ModerationWorkspace } from '@/components/admin/ModerationWorkspace'
 
 export const revalidate = 0
@@ -17,11 +18,12 @@ export default async function AdminModerationPage({ searchParams }: AdminModerat
   const params = await searchParams
   const tab = params.tab || 'testimonials'
 
-  const [testimonials, feedback, capstones, portfolios] = await Promise.all([
+  const [testimonials, feedback, capstones, portfolios, fellowRequests] = await Promise.all([
     FeedbackAdminService.getModerationQueue('all'),
     FeedbackAdminService.getPrivateFeedbackList(),
     ModerationService.getCapstones('all'),
     ModerationService.getPortfolios(),
+    FellowRequestAdminService.getQueue('all'),
   ])
 
   const capstoneDetail = params.capstone
@@ -40,6 +42,7 @@ export default async function AdminModerationPage({ searchParams }: AdminModerat
       initialCapstoneStatus={params.status || 'all'}
       selectedCapstoneId={params.capstone || null}
       selectedCapstoneDetail={capstoneDetail}
+      initialFellowRequests={fellowRequests}
     />
   )
 }

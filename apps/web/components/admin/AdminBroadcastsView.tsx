@@ -4,9 +4,11 @@ import React, { useState, useTransition } from 'react'
 import { Send, Plus, Play, XCircle, Clock, CheckCircle, AlertTriangle, RotateCcw } from 'lucide-react'
 import { AdminCreateBroadcastModal } from './AdminCreateBroadcastModal'
 import type { BroadcastRecord, BroadcastListResult } from '@/lib/admin/broadcast-service'
+import type { AdminTemplateListItem } from '@/lib/admin/communications-service'
 
 interface AdminBroadcastsViewProps {
   initialData: BroadcastListResult | null
+  templates: AdminTemplateListItem[]
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
@@ -42,7 +44,7 @@ function ProgressBar({ sent, total }: { sent: number; total: number | null }) {
   )
 }
 
-export function AdminBroadcastsView({ initialData }: AdminBroadcastsViewProps) {
+export function AdminBroadcastsView({ initialData, templates }: AdminBroadcastsViewProps) {
   const [showCreate, setShowCreate] = useState(false)
   const [broadcasts, setBroadcasts] = useState<BroadcastRecord[]>(initialData?.broadcasts ?? [])
   const [total] = useState(initialData?.total ?? 0)
@@ -215,6 +217,7 @@ export function AdminBroadcastsView({ initialData }: AdminBroadcastsViewProps) {
       {/* Create Broadcast Modal */}
       {showCreate && (
         <AdminCreateBroadcastModal
+          templates={templates}
           onClose={() => setShowCreate(false)}
           onCreated={() => {
             setShowCreate(false)

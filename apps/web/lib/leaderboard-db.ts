@@ -92,17 +92,16 @@ const LEADERBOARD_CACHE = new Map<string, LeaderboardCacheEntry>()
 const CACHE_TTL_MS = 45 * 1000
 
 /**
- * Fetches weekly consistency rankings for opted-in users.
+ * Builds (or reuses the cached) raw weekly metrics for ALL opted-in-eligible users.
+ * Shared by global, cohort-scoped, and friend-scoped ranking views so the expensive
+ * aggregation queries run at most once per week per 45-second window, regardless of
+ * how many scopes/cohorts are viewed.
  */
-export async function getWeeklyLeaderboard(
+async function getOrBuildWeeklyRawMetrics(
   supabase: SupabaseClient<Database>,
-  userId: string,
-  targetWeekStart?: string
-): Promise<WeeklyLeaderboardPayload> {
-  const weekStart = targetWeekStart || calculateWeekStart()
-  const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
+  weekStart: string
+): Promise<LeaderboardCacheEntry> {
   const now = Date.now()
-
   let cached = LEADERBOARD_CACHE.get(weekStart)
   if (!cached || now - cached.timestamp > CACHE_TTL_MS) {
     // 1. Fetch users with total_xp > 0
@@ -186,36 +185,66 @@ export async function getWeeklyLeaderboard(
     LEADERBOARD_CACHE.set(weekStart, cached)
   }
 
-  // Ensure current user is present even if they have 0 total_xp
-  const rawMetrics = [...cached.rawMetrics]
-  if (!rawMetrics.some((m) => m.userId === userId)) {
-    const { data: currentUser } = (await (supabase
-      .from('users') as unknown as DBChain)
-      .select('id, username, name, avatar_url, total_xp, current_streak, level')
-      .eq('id', userId)
-      .maybeSingle()) as unknown as { data: UserRow | null }
+  return cached
+}
 
-    if (currentUser) {
-      const levelInfo = calculateLevel(currentUser.total_xp || 0)
-      rawMetrics.push({
-        userId: currentUser.id,
-        username: currentUser.username ?? null,
-        name: currentUser.name ?? null,
-        avatarUrl: currentUser.avatar_url ?? null,
-        levelTitle: levelInfo.title,
-        level: levelInfo.level,
-        daysStudied: 0,
-        lessonsCompleted: 0,
-        xpEarned: 0,
-        currentStreak: currentUser.current_streak || 0,
-        totalXp: currentUser.total_xp || 0,
-      })
-    }
+/**
+ * Ensures a user is represented in a raw-metrics list even if they have 0 total_xp
+ * (e.g. brand new users, or users in a cohort with no activity yet).
+ */
+async function ensureUserPresent(
+  supabase: SupabaseClient<Database>,
+  rawMetrics: RawLeaderboardUserMetric[],
+  userId: string
+): Promise<RawLeaderboardUserMetric[]> {
+  if (rawMetrics.some((m) => m.userId === userId)) {
+    return rawMetrics
   }
+
+  const { data: currentUser } = (await (supabase
+    .from('users') as unknown as DBChain)
+    .select('id, username, name, avatar_url, total_xp, current_streak, level')
+    .eq('id', userId)
+    .maybeSingle()) as unknown as { data: UserRow | null }
+
+  if (!currentUser) return rawMetrics
+
+  const levelInfo = calculateLevel(currentUser.total_xp || 0)
+  return [
+    ...rawMetrics,
+    {
+      userId: currentUser.id,
+      username: currentUser.username ?? null,
+      name: currentUser.name ?? null,
+      avatarUrl: currentUser.avatar_url ?? null,
+      levelTitle: levelInfo.title,
+      level: levelInfo.level,
+      daysStudied: 0,
+      lessonsCompleted: 0,
+      xpEarned: 0,
+      currentStreak: currentUser.current_streak || 0,
+      totalXp: currentUser.total_xp || 0,
+    },
+  ]
+}
+
+/**
+ * Fetches weekly consistency rankings for opted-in users (global scope).
+ */
+export async function getWeeklyLeaderboard(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  targetWeekStart?: string
+): Promise<WeeklyLeaderboardPayload> {
+  const weekStart = targetWeekStart || calculateWeekStart()
+  const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
+  const cached = await getOrBuildWeeklyRawMetrics(supabase, weekStart)
+
+  const rawMetrics = await ensureUserPresent(supabase, cached.rawMetrics, userId)
 
   // Calculate final rankings
   const rankedEntries = calculateRankings(rawMetrics, userId)
-  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !cached!.optedOutUserIds.has(e.userId))
+  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !cached.optedOutUserIds.has(e.userId))
   const personalEntry = rankedEntries.find((e) => e.isCurrentUser) ?? null
 
   return {
@@ -223,6 +252,61 @@ export async function getWeeklyLeaderboard(
     isOptedIn,
     entries: publicEntries,
     personalEntry,
+  }
+}
+
+export interface CohortLeaderboardPayload extends WeeklyLeaderboardPayload {
+  cohortId: string
+  cohortName: string | null
+  isMember: boolean
+}
+
+/**
+ * Fetches weekly consistency rankings scoped to a single cohort's membership.
+ * Reuses the same cached raw weekly metrics as the global leaderboard — cohort
+ * scoping is a cheap in-memory filter + re-rank, not a separate aggregation query.
+ */
+export async function getCohortLeaderboard(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  cohortId: string,
+  targetWeekStart?: string
+): Promise<CohortLeaderboardPayload> {
+  const weekStart = targetWeekStart || calculateWeekStart()
+  const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
+
+  const [cached, cohortResult, memberRows] = await Promise.all([
+    getOrBuildWeeklyRawMetrics(supabase, weekStart),
+    (supabase.from('cohorts') as unknown as DBChain)
+      .select('id, name')
+      .eq('id', cohortId)
+      .maybeSingle() as unknown as Promise<{ data: { id: string; name: string } | null }>,
+    (supabase.from('cohort_members') as unknown as DBChain)
+      .select('user_id')
+      .eq('cohort_id', cohortId) as unknown as Promise<{ data: { user_id: string }[] | null }>,
+  ])
+
+  const cohortName = cohortResult.data?.name ?? null
+  const memberIds = new Set<string>((memberRows.data || []).map((m) => m.user_id))
+  const isMember = memberIds.has(userId)
+
+  let rawMetrics = cached.rawMetrics.filter((m) => memberIds.has(m.userId))
+  if (isMember) {
+    rawMetrics = await ensureUserPresent(supabase, rawMetrics, userId)
+  }
+
+  const rankedEntries = calculateRankings(rawMetrics, userId)
+  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !cached.optedOutUserIds.has(e.userId))
+  const personalEntry = rankedEntries.find((e) => e.isCurrentUser) ?? null
+
+  return {
+    weekStart,
+    isOptedIn,
+    entries: publicEntries,
+    personalEntry,
+    cohortId,
+    cohortName,
+    isMember,
   }
 }
 

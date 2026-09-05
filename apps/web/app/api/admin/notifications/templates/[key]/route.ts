@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { CommunicationsService } from '@/lib/admin/communications-service'
+import { sanitizeEmailHtml } from '@/lib/admin/sanitize-email-html'
 import { revalidatePath } from 'next/cache'
 
 export const runtime = 'nodejs'
@@ -50,6 +51,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (!subjectLine || typeof subjectLine !== 'string') {
       return NextResponse.json({ error: 'subjectLine is required and must be a string' }, { status: 400 })
     }
+
+    // Admin-pasted HTML is untrusted input — sanitize before it is ever persisted.
+    const cleanBodyHtml = sanitizeEmailHtml((bodyHtml || '').trim())
+    const cleanBodyText = (bodyText || '').trim()
 
     const versionStatus = status === 'draft' ? 'draft' : 'published'
     const supabase = createServiceRoleClient()
@@ -119,8 +124,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         template_id: templateId,
         version: nextVersion,
         subject_line: subjectLine.trim(),
-        body_html: (bodyHtml || '').trim(),
-        body_text: (bodyText || '').trim(),
+        body_html: cleanBodyHtml,
+        body_text: cleanBodyText,
         status: versionStatus,
         created_at: now,
         updated_at: now,
