@@ -1,8 +1,7 @@
 # Observability & Metric Telemetry Specification — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `21cc985`  
-**Last Updated:** August 23, 2026  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
+**Last Updated:** September 6, 2026  
 
 ---
 
@@ -14,10 +13,10 @@ This document specifies the complete observability architecture across internal 
 
 | Metric Name | Primary Source | Reliability Level | Metric Type | Description |
 |---|---|---|---|---|
-| **Resend Account Usage** | Resend Dashboard API | 🟢 Live Verified Telemetry | Upstream API Count | Total outbound email HTTPS POST calls accepted by Resend |
-| **Prodily Automation Quota** | `public.system_settings` (`daily_email_quota_count`) | 🟢 Live Verified Application Metric | Internal Database Counter | Daily counter for optional queued background emails |
+| **Provider Account Usage** | Brevo/Resend Dashboard (whichever is primary) | 🟢 Live Verified Telemetry | Upstream API Count | Total outbound email HTTPS calls accepted by the active provider |
+| **Prodily Automation Quota** | `public.system_settings` (`email_daily_send_limit` / `daily_email_quota_count`) | 🟢 Live Verified Application Metric | Internal Database Counter | Daily counter for optional queued background emails — the only quota actually enforced (hourly/max-retry settings exist in the UI but are dead, see `docs/ISSUES_KNOWN.md` ISSUE-22) |
 | **Email Queue Pending** | `public.email_queue` (`status = 'pending'`) | 🟢 Live Verified Application Metric | Database State Query | Count of queued email items waiting for processing |
-| **Email Delivery Events** | `public.notification_delivery_events` | 🟢 Live Verified Application Metric | Audit Log Event Stream | Log of delivery attempts with Resend Message IDs |
+| **Email Delivery Events** | `public.email_delivery_events` / `public.notification_events` | 🟢 Live Verified Application Metric | Audit Log Event Stream | Log of delivery attempts with provider message IDs |
 | **System Errors** | `public.system_errors` | 🟢 Live Verified Application Metric | Sanitized Log Stream | Categorized application errors with deduplication |
 | **Admin Audit Logs** | `public.admin_audit_logs` | 🟢 Live Verified Application Metric | Administrative Audit Trail | Immutable record of admin production actions |
 | **Supabase Health Status** | `AdminConsoleService.getSystemHealth()` | 🟡 Configuration / Status Check | Connection Latency Check | Real-time query latency check on `public.users` |
@@ -51,14 +50,14 @@ A key observability distinction exists between upstream provider usage and inter
                   └─────────────────┬──────────────────┘
                                     │
                                     ▼
-                        Resend API (api.resend.com)
+                    Active Provider (Brevo or Resend — see INTEGRATIONS.md)
                                     │
                                     ▼
-                          Resend Account Usage
+                          Provider Account Usage
 ```
 
 ### Architectural Distinction
-1. **Resend Account Usage**: Counts **EVERY** outbound HTTPS request received by Resend API under the account API key across all endpoints.
+1. **Provider Account Usage**: Counts **EVERY** outbound HTTPS request received by the active provider (Brevo or Resend) under its account credentials, across all endpoints.
 2. **Prodily Automation Quota**: Counts **ONLY** optional automated batch emails dispatched from `email_queue`. It deliberately excludes critical Auth emails and direct administrative sends to ensure user signups are never blocked when optional background automations hit their limit.
 
 ---

@@ -1,8 +1,10 @@
-# Learner Portfolio, Fellow Verification & Credibility Architecture — Prodily PM Academy
+# Learner Portfolio, Verification & Credibility Architecture — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Framework:** Next.js 16.2.12 App Router / React 19 / Supabase PostgreSQL  
-**Last Updated:** August 30, 2026  
+**Last Updated:** September 6, 2026  
+
+> This document covers two genuinely separate credibility signals that happen to share similar names: **PM Fellow** (`is_fellow`, manually admin-granted — see §4 and [`docs/admin/fellow-designation.md`](admin/fellow-designation.md)) and **Automatic Portfolio Verification** (`isPortfolioVerified`, criteria-based and admin-overridable — see §4a and [`docs/admin/portfolio-verification.md`](admin/portfolio-verification.md)). A portfolio can have either, both, or neither.
 
 ---
 
@@ -16,6 +18,7 @@ The Public Learner Portfolio is a recruiter-ready, proof-of-work showcase design
 - **Fellow Designation (`users.is_fellow`):**
   - Displays a high-contrast `[ GraduationCap ] Product Management Fellow` badge and subtitle `"Product Management Fellow at Prodily"`.
   - **Credibility Guarantee:** Strictly represents practitioner review and verification by Prodily administrators. It does **NOT** imply employment at Prodily (strictly no `worksFor: Prodily` in JSON-LD schema or UI).
+- **Automatic Portfolio Verification (`isPortfolioVerified`):** a separate `BadgeCheck` icon next to the learner's name — see §4a below.
 - **Profile Elements:** Learner avatar, full name, `@username` handle, biography, social links (LinkedIn, X, GitHub, Personal Website).
 
 ### B. Single Project & Capstone Presentation
@@ -44,35 +47,35 @@ Learners manage their portfolio configuration at `/settings?tab=portfolio`:
 Every public portfolio features a dynamically generated 1200×630 OpenGraph social preview card.
 
 ### Visual & Architectural Design
-- **Engine:** `@vercel/og` / Next.js `ImageResponse` with edge-compatible JSX.
-- **Authentic Branding:** Embeds the official geometric Prodily Logo Mark (pure SVG path from `public/brand/logo-mark.svg`) rendered with `#019E75` and `#66D6A3`.
-- **Decoupled from Gamification:** Omits XP counters, level numbers, and lesson counts. Focuses on professional candidate identity:
-  - Top Badge: `★ PM FELLOW AT PRODILY` (if `is_fellow`) or `PRODILY PRODUCT MANAGEMENT PORTFOLIO`.
-  - Candidate Name, `@username`, and bio snippet.
-  - Metrics Strip: Verified Case Studies count, Evaluated Competencies count, and Top Skill Clusters.
+- **Engine:** Next.js `next/og` (`ImageResponse`) — not `@vercel/og` as a separate package; no external font is fetched (Satori's default sans is used deliberately, to avoid a network dependency on a public, reliability-critical endpoint).
+- **Authentic Branding:** Colors are pulled directly from the app's real **light-theme** design tokens (`theme/tokens.ts` `TOKENS.colors`) — cream background (`#FBFAF6`), white card surfaces, dark navy/foreground text (`#171A17`), green primary (`#1F6B4E`), gold accent (`#D98B24`, used only for the Fellow badge) — plus the exact logo colors (`#019E75` / `#011229`) hardcoded to match `public/brand/logo-mark.svg`. This intentionally matches the actual product's visual language rather than an invented palette.
+- **Layout, top to bottom:**
+  1. **Header:** Prodily logo mark + "Prodily" wordmark on the left; a pill badge on the right reading `★ PM Fellow at Prodily` (gold-tinted, if `is_fellow`) or `Product Portfolio` (neutral).
+  2. **Identity card** (white, rounded, soft shadow): avatar (or gradient-initial fallback), display name, `Product Management Fellow at Prodily` / `Product Management Portfolio` subtitle + `@username`, and a bio line (truncated, or a generic fallback sentence if empty).
+  3. **Stat row**, two cards: **"Applied Proof of Work"** (folder icon, count of the learner's public submitted/reviewed capstones — all of them, not a "verified-only" subset) and **"Evaluated PM Competencies"** (bar-chart icon, up to 4 skill-radar cluster pills, falling back to a default set if no radar data exists).
+  4. **Footer:** a link icon + `{domain}/p/{username}`, and the tagline "Show your work. Show how you think. · Prodily".
+- **Decoupled from Gamification:** No XP counters, level numbers, or lesson counts appear anywhere on the card.
 - **Edge Caching & Performance:**
-  - Emits `Cache-Control: public, max-age=60, s-maxage=3600, stale-while-revalidate=86400` on public portfolios (and 5-min TTL on private fallbacks).
-  - Updates to portfolio settings or Fellow status trigger proactive cache purging via `revalidatePath('/api/og/portfolio/' + username)`.
+  - Emits `Cache-Control: public, max-age=60, s-maxage=3600, stale-while-revalidate=86400` on public portfolios, and a 5-minute shared cache (`s-maxage=300`) on the private-portfolio fallback card.
+  - Updates to portfolio settings or Fellow/Verification status trigger proactive cache purging via `revalidatePath('/api/og/portfolio/' + username)`.
 
 ---
 
-## 4. Admin Portfolio Verification Queue (`/admin/moderation?tab=portfolios`)
+## 4. PM Fellow Designation
 
-Admins review and verify public portfolios in a dedicated moderation queue:
+Fellow (`users.is_fellow`) is a manually admin-granted credential — via either a learner-initiated request queue or a legacy admin-browse-all-portfolios queue, both writing the same flag. Only public portfolios (`is_portfolio_public === true`) are eligible; direct API attempts to grant Fellow on a private portfolio are rejected with `HTTP 400 Bad Request`. Full detail: [`docs/admin/fellow-designation.md`](admin/fellow-designation.md).
 
-- **Surface:** `/admin/moderation?tab=portfolios` (legacy `/admin/portfolios` redirects here).
-- **Eligibility Invariant:** Only portfolios that are currently public (`is_portfolio_public === true`) appear in the queue.
-- **Verification Semantics:** Clicking **`[ Verify ]`** sets `users.is_fellow = true`, granting the verified Fellow status.
-- **Server-Side Guard:** Direct API calls to verify a private portfolio are rejected with `HTTP 400 Bad Request: "Cannot verify a private portfolio. The user portfolio must be public."`.
-- **In-Line Actions:** Instant verify and unverify controls with toast notifications and confirmation dialogs.
+## 4a. Automatic Portfolio Verification
+
+A genuinely separate, unrelated signal (`isPortfolioVerified` / `users.portfolio_verification_override`): the portfolio is auto-verified the moment its owner has an avatar, a bio, and at least 2 of {LinkedIn, GitHub, website} — no request or admin approval needed. Shown as a `BadgeCheck` icon next to the learner's name on `/p/[username]` (distinct from the Fellow badge/pill). An admin can force-verify or force-reject via a per-user override in the User Detail Drawer. Full detail: [`docs/admin/portfolio-verification.md`](admin/portfolio-verification.md).
 
 ---
 
-## 5. Certificate System v2 & Public Verification
+## 5. Certificate System & Public Verification
 
-- **Public Verification Route (`/verify/[certificateId]`):** Publicly validates certificate issuance date, credential hash, recipient name, and curriculum scope.
+- **Public Verification Route (`/verify/[certificateId]`):** Publicly validates certificate issuance date, recipient name, and curriculum scope.
 - **LinkedIn Add to Profile:** Generates pre-filled certification links via `buildLinkedInCertificationUrl()` with official Org ID (`107873641`).
-- **Template Versioning:** V2 certificate layout features high-resolution vector borders, issuer attribution, and embedded verification QR codes.
+- **No template versioning:** every certificate uses one layout — there is no `template_version` or `credential_hash` field in the schema. The certificate identifier (e.g. `PMA-2026-8F2A7B9C`) is generated by `generateCertificateCode()` and used directly; QR code generation is applied unconditionally to all certificates, not gated by a "v2" tier.
 
 ---
 
@@ -85,6 +88,9 @@ Admins review and verify public portfolios in a dedicated moderation queue:
 | **Featured Capstone Card** | `components/portfolio/FeaturedCapstoneCard.tsx` | 🟢 Verified in Production |
 | **Portfolio Settings Route** | `app/api/settings/portfolio/route.ts` | 🟢 Verified in Production |
 | **Dynamic OpenGraph Route** | `app/api/og/portfolio/[username]/route.tsx` | 🟢 Verified in Production |
-| **Admin Verification Queue** | `components/admin/PortfoliosView.tsx` | 🟢 Verified in Production |
+| **Legacy Fellow Queue** | `components/admin/PortfoliosView.tsx` | 🟢 Verified in Production |
 | **Fellow Status API** | `app/api/admin/users/[id]/fellow-status/route.ts` | 🟢 Verified in Production |
+| **Fellow Requests (learner-initiated)** | `app/api/fellow-requests/route.ts`, `components/settings/FellowRequestCard.tsx` | 🟢 Verified in Production |
+| **Portfolio Verification (automatic)** | `lib/portfolio-readiness.ts` (`calculatePortfolioVerification`) | 🟢 Verified in Production |
+| **Portfolio Verification Admin Override** | `app/api/admin/users/[id]/portfolio-verification/route.ts`, `components/admin/UserPortfolioVerificationToggle.tsx` | 🟢 Verified in Production |
 | **Certificate Verification** | `app/verify/[certificateId]/page.tsx` | 🟢 Verified in Production |

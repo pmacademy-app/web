@@ -1,9 +1,8 @@
 # Known Issues & Production Verification Tracker — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Branch:** `prodily-product-evolution-plan`  
-**Current Baseline HEAD:** `2496754`  
-**Last Updated:** August 26, 2026  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
+**Current Branch:** `elite-dev`  
+**Last Updated:** September 6, 2026  
 
 ---
 
@@ -105,3 +104,52 @@
 #### ISSUE-14: Leaderboard 2.0 Tiers & Admin Console Management
 - **Status**: 🟢 Resolved & Verified
 - **Resolution**: Added tiered rank badges (`Bronze`, `Silver`, `Gold`, `Diamond`, `Fellow`), `pointsToNextRank` deltas, 45s in-memory TTL query caching, real-time weekly recap metrics, `/admin/leaderboard` inspection console, and learner search multi-picker with broadcast safety guardrails. Verified with `lib/__tests__/leaderboard.test.ts` and `next build`.
+
+#### ISSUE-15: Add Friend Broken for Non-UUID Usernames
+- **Status**: 🟢 Resolved & Verified
+- **Description**: `addFriend()` used a single `.or('username.eq.X,id.eq.X')` filter. Postgres rejected the whole query with an "invalid input syntax for type uuid" error whenever `X` was a plain username (since `id` is a UUID column), and the resulting DB error was silently swallowed (only `data` was read).
+- **Resolution**: Branch on a UUID regex to query the correct single column (`id` vs `username`), and surface DB errors instead of discarding them. Verified with `lib/__tests__/friend-accountability.test.ts` (8 tests).
+
+#### ISSUE-16: Email-Change Confirmation Redirect
+- **Status**: 🟢 Resolved — best-effort root cause, recommend live click-through confirmation
+- **Description**: Email-change verification links could land somewhere other than a dedicated success page (reported as landing on a certificate/verify page).
+- **Resolution**: `normalizeOtpType()` in `/api/auth/callback/route.ts` collapses Supabase's granular `email_change_current`/`email_change_new` sub-types to the canonical `email_change` OTP type; both the success and failure paths for `email_change` now unconditionally redirect to a new dedicated `/email-verified` page (success or `?status=error` state) instead of any other destination; `public.users.email` is synced from `auth.users.email` on every successful confirmation; a new isolated template key `auth.email_change_verify` eliminates any risk of template cross-contamination with `auth.verify_email`. Verified with `lib/__tests__/auth-callback-email-change.test.ts` (12 tests). The exact original root cause could not be 100% confirmed without live Supabase dashboard access — recommend a live click-through test to confirm.
+
+#### ISSUE-17: Automatic Portfolio Verification (New Feature)
+- **Status**: 🟢 Resolved & Verified
+- **Description**: Portfolios had no verification signal distinct from the manually-admin-granted PM Fellow designation.
+- **Resolution**: Added `calculatePortfolioVerification()` (reuses the existing readiness checklist's avatar/bio signals): auto-verified when avatar + bio + ≥2 of {LinkedIn, GitHub, website} are present. Admin can force-override via nullable `users.portfolio_verification_override` (`'verified' | 'rejected' | null`), surfaced via `UserPortfolioVerificationToggle` in the User Detail Drawer. Migration `20260906000001_add_portfolio_verification_override.sql` applied to production. Verified with `lib/__tests__/portfolio-verification.test.ts` (8 tests). **Note:** this is a genuinely separate concept from PM Fellow (`is_fellow`) despite the similar naming — see [`docs/admin/portfolio-verification.md`](admin/portfolio-verification.md) and [`docs/admin/fellow-designation.md`](admin/fellow-designation.md).
+
+#### ISSUE-18: Portfolio OG Card Brand Mismatch
+- **Status**: 🟢 Resolved & Verified
+- **Description**: The dynamic OG card (`/api/og/portfolio/[username]`) used an invented dark/admin-console-styled palette that didn't match Prodily's actual light-theme brand identity.
+- **Resolution**: Rewrote using the app's real light-theme tokens (`theme/tokens.ts`) and exact logo colors — cream background, white cards, navy text, green primary/logo accents — plus icon badges on the stat cards and a link icon in the footer, matching the product's actual visual language. Preserves 1200×630 dimensions, cache headers, and the private-portfolio fallback.
+
+#### ISSUE-19: Email Template Editor Had No Variable Tooling
+- **Status**: 🟢 Resolved & Verified
+- **Description**: The admin HTML template editor had no way to discover, insert, or validate `{{variable}}` tokens; the editor and the server-side preview/test-send routes each kept their own separate, drifted copy of the sample-variable list.
+- **Resolution**: Extracted a single isomorphic source of truth (`lib/admin/template-variables.ts`: `TEMPLATE_SAMPLE_VARIABLES`, `TEMPLATE_VARIABLE_CATALOG`, `findUnknownVariables`), shared by the server (`communications-service.ts` re-exports it) and both editor UIs. Added click-to-insert-at-cursor and unknown-variable warnings to `AdminTemplateEditor.tsx` and `AdminCreateTemplateModal.tsx`. The lightweight plain-HTML-textarea editing model was deliberately preserved — no WYSIWYG was introduced.
+
+---
+
+### 🟠 Newly Identified — Confirmed Code-Level Broken (found during 2026-09-06 documentation audit)
+
+#### ISSUE-20: Admin Analytics "XP Source Attribution" Always Reports 100% "Other"
+- **Status**: 🟠 Confirmed Code-Level Broken
+- **Description**: `AnalyticsService.getAnalyticsWorkspaceData` selects the `source_type` column from `xp_events`, but `computeXpBySource()` reads `event.source` (a field that doesn't exist on the row) — every event's source resolves to `'other'`. Even once the field-name mismatch is fixed, `XP_SOURCE_LABELS` doesn't recognize several real `XpSourceType` values (`theory_read`, `quiz_correct`, `quiz_bonus`, `referral`), so those would still fall into "Other." Evidence: `lib/admin/analytics-service.ts` vs `lib/admin/analytics-aggregation.ts` vs `lib/xp/xp.ts`.
+- **Impact**: The Analytics workspace's XP-by-source breakdown chart is non-functional as shipped.
+
+#### ISSUE-21: `/api/cron/cleanup` Is a No-Op Placeholder
+- **Status**: ⚪ Known Architectural Debt
+- **Description**: The route always returns `{ cleanedRows: 0 }` and performs no actual deletion, despite being scheduled hourly-equivalent in `notification-scheduler.yml` and despite prior documentation describing it as purging old delivery logs and expired tokens.
+- **Impact**: No automatic cleanup of old records currently happens; not urgent, but the scheduled job is currently dead weight.
+
+#### ISSUE-22: Email Quota Settings Partially Dead
+- **Status**: ⚪ Known Architectural Debt
+- **Description**: The admin Platform Settings UI exposes an `hourlySendLimit` and `maxRetryAttempts`, neither of which is read by the actual send/retry pipeline (`lib/notifications/queue/processor.ts`). Only the daily quota (`email_daily_send_limit`) has any real effect, and even that isn't enforced as a hard gate mid-batch.
+- **Impact**: Admins configuring these two settings will see no behavioral change. Low urgency, but worth fixing or removing the dead controls.
+
+#### ISSUE-23: Badge Auto-Award Trigger Point Not Found
+- **Status**: 🟡 Needs Verification
+- **Description**: `evaluateAndAwardBadges()` is only ever called from `POST /api/badges`, and no caller of that endpoint was found anywhere in the current frontend (badges/progress pages only read via `getUserBadgesData`). It's possible a caller exists via a dynamically-constructed URL that a static search missed — this needs a targeted follow-up rather than an assumption either way.
+- **Impact**: If genuinely orphaned, badges may not be auto-awarded in production despite the feature being otherwise fully implemented.

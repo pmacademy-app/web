@@ -27,7 +27,7 @@ All metrics are computed live from PostgreSQL tables (`xp_events`, `user_lesson_
 
 ### A. Learners Tab
 - **Active User Velocity:** Real-time tracking of Daily Active Users (DAU), Weekly Active Users (WAU), and Monthly Active Users (MAU) with DAU/MAU stickiness ratios.
-- **Level & Tier Distribution:** Breakdown of learners across PM Academy levels (Level 1 Associate through Level 5 Chief Product Officer).
+- **Level & Tier Distribution:** Breakdown of learners across the 9 PM Academy levels (Level 1 "Associate PM Trainee" through Levels 7–9, all titled "Chief Product Officer").
 - **Streak Health:** Distribution of current student streaks and streak freeze utilization.
 
 ### B. Learning Tab
@@ -37,13 +37,7 @@ All metrics are computed live from PostgreSQL tables (`xp_events`, `user_lesson_
 
 ### C. Engagement & XP Tab
 - **Daily XP Velocity:** Time-series tracking of total XP awarded per day.
-- **XP Source Attribution:** Breakdown of XP earned by source type:
-  - `theory` (Lesson reading completion)
-  - `quiz` (Passing end-of-lesson quizzes)
-  - `reflection` (Writing qualitative lesson reflections)
-  - `srs` (SM-2 flashcard recall reviews)
-  - `capstone` (Submitting module projects)
-  - `referral` (Invited peer first-lesson activation)
+- **XP Source Attribution — currently broken (see `docs/ISSUES_KNOWN.md` ISSUE-20):** intended to break down XP by source type (theory reads, quizzes, reflections, flashcards, capstones, referrals), but the aggregation reads a field name (`event.source`) that doesn't exist on the row (the real column is `source_type`), so every event resolves to "Other" regardless of actual source. The chart is non-functional as currently shipped.
 - **Flashcard Retention Habits:** Measures daily spaced repetition review consistency.
 
 ### D. Outcomes Tab
@@ -57,6 +51,6 @@ All metrics are computed live from PostgreSQL tables (`xp_events`, `user_lesson_
 **Investigating a drop-off in module completion:**
 1. Open `/admin/analytics` $\rightarrow$ select the **Learning Tab**.
 2. Set the date range to **30D**.
-3. Review the module drop-off chart. If `metrics` has a lower completion rate than `execution`:
-   - Inspect the individual lesson pass rates within the Metrics module.
+3. Review the module drop-off chart. If `technical` has a lower completion rate than `execution`:
+   - Inspect the individual lesson pass rates within the Technical PM module.
    - Cross-reference with `/admin/curriculum` to inspect student feedback for the specific lessons causing friction.

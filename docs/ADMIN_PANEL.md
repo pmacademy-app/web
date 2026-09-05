@@ -2,7 +2,7 @@
 
 **Status:** 🟢 Production Ready  
 **Scope:** Admin Console Workspaces, APIs, Navigation, RBAC, Services, and State Architecture  
-**Last Updated:** August 30, 2026  
+**Last Updated:** September 6, 2026  
 
 ---
 
@@ -11,13 +11,13 @@
 The Admin Panel (`/admin`) is the centralized operational control center for Prodily PM Academy administrators.
 
 It is structured around three core operational pillars:
-1. **Attention & Action:** Immediate visibility into items requiring human intervention — failed email deliveries, new learner contact inquiries, pending testimonials, active system alerts, and unverified public portfolios.
+1. **Attention & Action:** Immediate visibility into items requiring human intervention — the Attention Center currently surfaces exactly 4 items: failed email deliveries, new contact messages, pending testimonials, and active system alerts. (There is no portfolio/Fellow-request attention item today, despite earlier versions of this doc claiming one.)
 2. **Operations & Management:** Granular control over learners, curriculum content, achievement credentials, multi-channel communications, feature flags, and global product settings.
 3. **Intelligence & Health:** Live analytics across learner growth, curriculum drop-off funnels, engagement velocity, and deep platform health diagnostics.
 
 ### Access Control & Authorization
-- **Proxy Middleware Check (`apps/web/proxy.ts`):** Edge-level route protection requiring an authenticated session and admin status.
-- **Server-Side Authorization Guard (`lib/admin/authorization.ts`):** `requireAdminUser(request)` is enforced on 100% of `/api/admin/**` endpoints. A user is authorized if:
+- **Proxy Middleware Check (`apps/web/proxy.ts`):** Edge-level route protection requiring an authenticated session and admin status (with a fast-path JWT `app_metadata.is_admin` claim check before falling back to the DB).
+- **Server-Side Authorization Guard (`lib/admin/guard.ts`):** `requireAdminUser(request)` and `logAdminAction()` are enforced on every `/api/admin/**` endpoint, with per-request result caching. (`lib/admin/authorization.ts` holds the small `isAdminEmail()`/`isAdminUser()` helpers `guard.ts` imports — it is not itself the enforcement layer.) A user is authorized if:
   - Their email is in the `ADMIN_EMAILS` environment variable, **or**
   - Their database record has `users.is_admin === true`.
 - **Immutable Audit Logging:** Mutations trigger `logAdminAction()`, persisting structured event logs into `public.admin_audit_logs`.
@@ -36,33 +36,42 @@ PRODILY ADMIN
 │
 ├── Operations
 │   ├── Users                   /admin/users
-│   ├── Communications          /admin/communications  (tabs: Overview, Queue, Broadcasts, Automations, Templates, Notifications, Contact)
-│   └── Moderation              /admin/moderation      (tabs: Testimonials, Feedback, Capstones, Portfolio Verification)
+│   ├── Communications          /admin/communications  (11 tabs: overview, broadcasts, announcements,
+│   │                                                    in-app, email, automations, templates, queue,
+│   │                                                    contact, testimonials→moderation, feedback→moderation)
+│   └── Moderation              /admin/moderation      (5 tabs: testimonials, feedback, capstones,
+│                                                         portfolios [= Fellow legacy queue], fellow-requests)
 │
 ├── Learning
 │   ├── Curriculum              /admin/curriculum      (9 Modules, 90 Lessons, Quality Ratings & Feedback)
 │   └── Achievements            /admin/achievements    (Certificates Registry & Badges Directory)
 │
+├── Growth
+│   └── Leaderboard             /admin/leaderboard     (Ranking inspection, anomaly detection, privacy toggles)
+│
 ├── Insights
 │   └── Analytics               /admin/analytics       (Learners, Learning Funnel, Engagement/XP, Outcomes)
 │
 ├── System
-│   └── System                  /admin/system          (Health Diagnostics, Severity Alerts, Error Logs, Audit Trails)
+│   └── System                  /admin/system          (Health, Auth Telemetry, Storage Cleanup, Alerts, Errors, Audit Trails)
 │
 └── Settings
     └── Settings                /admin/settings        (Product, Learning, Email, Notifications, Feature Flags, Onboarding)
 ```
 
+Note: `is_fellow` (Fellow designation) is granted via **either** the `portfolios` tab (legacy, browse-all) **or** the `fellow-requests` tab (learner-initiated) — see [`docs/admin/fellow-designation.md`](admin/fellow-designation.md). Portfolio Verification (`portfolio_verification_override`) is an unrelated, automatic system with no moderation queue at all — see [`docs/admin/portfolio-verification.md`](admin/portfolio-verification.md).
+
 ### Route Aliases & Backward-Compatible Redirects
 
 | Legacy Route | Modern Canonical Route |
 |---|---|
-| `/admin/portfolios` | `/admin/moderation?tab=portfolios` (Portfolio Verification Queue) |
+| `/admin/portfolios` | `/admin/moderation?tab=portfolios` (legacy Fellow-designation queue) |
 | `/admin/content` | `/admin/curriculum` |
 | `/admin/emails` | `/admin/communications?tab=queue` |
 | `/admin/feature-flags` | `/admin/settings?section=feature-flags` |
 | `/admin/feedback` | `/admin/moderation?tab=testimonials` |
-| `/admin/notifications` | `/admin/communications?tab=notifications` |
+| `/admin/notifications` | `/admin/communications?tab=in-app` (internally remapped) |
+| `/admin/announcements` | `/admin/communications?tab=announcements` |
 | `/admin/templates` | `/admin/communications?tab=templates` |
 | `/admin/certificates` | `/admin/achievements/certificates` |
 
@@ -72,10 +81,10 @@ PRODILY ADMIN
 
 ### 3.1 Dashboard (`/admin`)
 - **Header & Filters:** Dynamic time-based greeting, date range selector (`Today`, `7D`, `30D`, `90D`, `Custom`), and instant data refresh.
-- **Attention Center (`AdminAttentionCenter`):** Live badge counts for failed emails, new contact messages, pending testimonials, active system alerts, and pending portfolio reviews.
+- **Attention Center (`AdminAttentionCenter`):** Exactly 4 items — failed emails, new contact messages, pending testimonials, active system alerts. (No portfolio/Fellow-request item exists in the current builder.)
 - **KPI Metrics (8 Cards):** Total Registered Users, Active Learners, New Signups, Verified Users, Lessons Completed, Overall Completion %, Total XP Earned, and Certificates Issued — with period-over-period trend deltas.
 - **Visualizations:** Learner Activity Area Chart (new vs. active learners), Learning Activity Bar Chart (lessons, quizzes, capstones), and All-Time Learner Journey Funnel (`AdminFunnelChart`).
-- **Live System Snapshot:** Real-time operational status across Database, Auth, Email Queue, Notifications, and Scheduler.
+- **Live System Snapshot:** 6 rows — Database, Auth, Email, Queue, Notifications, and Scheduler.
 
 ### 3.2 Users Workspace (`/admin/users`)
 - **Directory & Filters:** Search by name, email, or `@username`. Filter by Admin status, Verification status, Activity level, Progress, and XP tier.
@@ -86,55 +95,60 @@ PRODILY ADMIN
   - **Achievements Tab:** Earned badges list, issued certificates, and submitted capstones with public status.
   - **Communications Tab:** History of sent emails, in-app notifications, contact inquiries, and **[ Send Production Email ]** modal button.
   - **Account Tab:** Email, verification status, signup date, last active date, auth provider, timezone, and internal UUID.
-  - **Administrative Controls:**
+  - **Administrative Controls** (rendered above the tabs, always visible):
     - `UserRoleToggle`: Promote/demote Admin role (`is_admin`).
-    - `UserFellowToggle`: Grant/revoke Product Management Fellow designation (`is_fellow`).
+    - `UserFellowToggle`: Grant/revoke PM Fellow designation (`is_fellow`) — one of two paths to this flag, see [`docs/admin/fellow-designation.md`](admin/fellow-designation.md).
+    - `UserPortfolioVerificationToggle`: Verify / Reject / Reset-to-Auto override for the separate, automatic Portfolio Verification system — see [`docs/admin/portfolio-verification.md`](admin/portfolio-verification.md).
     - `DeveloperActionsSection`: Generate test certificates for verification pipeline QA (`/api/admin/dev/generate-test-certificate`).
     - Destructive actions with confirmation dialogs: **Reset All Progress** and **Delete User Account**.
 
 ### 3.3 Communications Workspace (`/admin/communications`)
+11 tabs total — see [`docs/admin/communications.md`](admin/communications.md) for the complete current list. Highlights:
 - **Overview Tab:** Delivery health KPIs, active email provider status, and broadcast campaign summaries.
-- **Email Queue Tab:** Real-time queue inspection (`pending`, `processing`, `delivered`, `failed`), dead-letter error logs, individual message retry, and bulk retry (`/api/admin/emails/queue/retry-all`).
+- **Email / Email Queue Tabs:** Email history & volume (`?tab=email`) is distinct from live queue inspection (`?tab=queue`: `pending`, `processing`, `delivered`, `retrying`, `dead_letter`, `suppressed`, `skipped`), with individual and bulk retry.
 - **Broadcasts Tab:** Multi-channel broadcast builder (`/api/admin/emails/broadcasts`): audience targeting, recipient estimation & sampling, scheduling, execution, and cancelation.
+- **Announcements Tab:** Platform banner announcements (merged in from the formerly-standalone `/admin/announcements`).
 - **Automations Tab:** Cron schedule inspector for daily reminders and weekly recaps with **[ Run Now ]** trigger.
-- **Templates Tab:** Transactional template registry with code editor, live HTML preview, variable substitution, and direct test-send to admin email (`/api/admin/emails/test-send`).
-- **Notifications Tab:** In-app broadcast management and in-app template testing (`/api/admin/notifications/in-app`).
-- **Contact Tab:** Inbound inquiry inbox with status categorization (`new`, `in_progress`, `resolved`, `archived`).
+- **Templates Tab:** Plain-HTML template editor (no WYSIWYG) with a shared variable catalog, click-to-insert, unknown-variable validation, sandboxed live preview, draft/publish versioning, and direct test-send.
+- **In-App Tab:** In-app broadcast management (`/api/admin/notifications/in-app`).
+- **Contact Tab:** Inbound inquiry inbox (`public.contact_messages`) with status categorization (`new`, `in_progress`, `resolved`, `archived`).
+- **Testimonials / Feedback Tabs:** cross-links into the Moderation workspace.
 
 ### 3.4 Moderation Workspace (`/admin/moderation`)
 - **Testimonials Tab:** Review learner reviews with ratings, approve for publishing, or reject.
-- **Product Feedback Tab:** In-depth learner feedback submitted after lessons or via feedback widgets.
+- **Product Feedback Tab:** Read-only in the current phase — no approve/reject actions (would require a backend status column).
 - **Capstones Tab:** Evaluate module capstone submissions, toggle public portfolio visibility, and publish/archive case studies.
-- **Portfolio Verification Queue (`PortfoliosView.tsx`):**
-  - Dedicated queue for public learner portfolios.
+- **Portfolio Verification Queue** (`PortfoliosView.tsx`, `?tab=portfolios`) — despite the name, this grants/revokes **PM Fellow** (`is_fellow`), not the separate automatic Portfolio Verification feature:
   - KPI Cards: **Pending Verification**, **Verified Fellows**, and **Total Public Portfolios**.
   - Filter tabs: **Pending Review**, **Verified Fellows**, and **All Public**.
-  - In-line **`[ Verify ]`** action granting `is_fellow = true` with live loading and toast feedback.
-  - In-line **`[ Unverify ]`** action with confirmation dialog.
-  - **Server-Side Invariant:** Direct API calls to verify private portfolios (`is_portfolio_public: false`) are rejected with HTTP 400 Bad Request.
+  - In-line **`[ Verify ]`** / **`[ Unverify ]`** actions with confirmation dialogs.
+  - **Server-Side Invariant:** Direct API calls to grant Fellow on private portfolios (`is_portfolio_public: false`) are rejected with HTTP 400.
+- **Fellow Requests Queue** (`?tab=fellow-requests`) — the newer, learner-initiated path to the same `is_fellow` flag; see [`docs/admin/fellow-designation.md`](admin/fellow-designation.md).
 
 ### 3.5 Curriculum Workspace (`/admin/curriculum`)
-- **Curriculum Browser:** 9 modules, 90 lessons, with prerequisite mapping.
+- **Curriculum Browser:** 9 modules (`foundations, discovery, design, execution, growth, leadership, technical, strategy, capstone`), 90 flat lesson files (`content/lessons/lesson-001.md` … `lesson-090.md`, no frontmatter).
 - **Content Quality Metrics:** Average clarity rating (1–5 stars) and clarity satisfaction percentage per lesson.
 - **Needs Review Filter:** Highlights lessons with clarity ratings below 3.5/5.0.
 - **Learner Feedback Drawer:** Inspect student feedback comments and issue tags (`confusing`, `typo`, `outdated`, `broken_diagram`).
-- **Lesson Detail & Preview:** Metadata inspector, live learner-facing preview, and publish/unpublish toggles.
+- **Lesson Detail & Preview:** Metadata inspector and live learner-facing preview. There is **no publish/unpublish control** — every lesson's status is a static "Published" display field with no backend toggle.
 
 ### 3.6 Achievements Workspace (`/admin/achievements`)
-- **Certificates Registry (`/admin/achievements/certificates`):** Table of issued credentials, recipient lookups, template versioning, and verification drawer with live QR verification preview.
+- **Certificates Registry (`/admin/achievements/certificates`):** Table of issued credentials, recipient lookups, and a verification drawer with live QR verification preview. There is **no template versioning and no credential-hash field** — every certificate uses one layout; the "code" shown (e.g. `PMA-2026-XXXXXXXX`) is the certificate identifier, not a separate hash.
 - **Badges Directory (`/admin/achievements/badges`):** Visual catalog of all platform badges with unlock criteria and recipient counts.
 
 ### 3.7 Analytics Workspace (`/admin/analytics`)
-- **Learners:** Acquisition velocity, DAU/WAU/MAU ratios, level distribution, and streak health.
+- **Learners:** Acquisition velocity, DAU/WAU/MAU ratios, level distribution (9 levels, "Chief Product Officer" reached at Level 7), and streak health.
 - **Learning:** Lesson completion funnel, drop-off hotspots, and quiz first-pass rates.
-- **Engagement & XP:** Daily XP velocity, XP source attribution, and SM-2 flashcard retention habits.
+- **Engagement & XP:** Daily XP velocity and SM-2 flashcard retention habits. **XP Source Attribution is currently broken** — it selects `source_type` but reads `event.source`, so every event resolves to "Other" (tracked in `docs/ISSUES_KNOWN.md` ISSUE-20).
 - **Outcomes:** Certificate issuance velocity and public portfolio adoption rates.
 - **Export:** One-click CSV export of analytics datasets.
 
 ### 3.8 System Workspace (`/admin/system`)
 - **Health Tab:** Real-time database latency, auth service health, email provider connection, queue health, and cron status.
-- **Alerts Tab:** Active system alerts grouped by severity (`critical`, `warning`, `info`).
-- **Errors Tab:** System error logs aggregated by fingerprint with 15-minute deduplication, occurrence count, and stack trace inspector.
+- **Auth Health:** 24h/7d auth failure telemetry with provider-vs-network failure buckets and spike detection (≥5 critical/error failures in 15 min) — not previously documented here.
+- **Storage Cleanup:** Triggers `AvatarService.cleanupOrphanedAvatars()` (dry-run or live) — not previously documented here.
+- **Alerts Tab:** Active system alerts grouped by severity — `critical`, `error`, or `warning` only (there is no `info` severity anywhere in the pipeline).
+- **Errors Tab:** System error logs deduplicated by fingerprint (category:operation:sanitized-message). Occurrence counts shown are computed by grouping rows at query time, not stored as an incrementing column.
 - **Audit Log Tab:** Searchable and filterable log of all admin mutations recorded in `public.admin_audit_logs`.
 - **Manual Trigger:** Header action button to trigger instant email queue processing (`POST /api/cron/process-email-queue`).
 
@@ -152,18 +166,18 @@ PRODILY ADMIN
 
 | Security Layer | Implementation Detail |
 |---|---|
-| **Edge Proxy** | `apps/web/proxy.ts` blocks unauthorized access to `/admin` and protected APIs |
-| **API Authorization** | `requireAdminUser(request)` in `lib/admin/authorization.ts` validates session & role |
+| **Edge Proxy** | `apps/web/proxy.ts` blocks unauthorized access to `/admin` and protected APIs (with a JWT `app_metadata.is_admin` fast path) |
+| **API Authorization** | `requireAdminUser(request)` in `lib/admin/guard.ts` validates session & role (imports helpers from `lib/admin/authorization.ts`) |
 | **Audit Trail** | `logAdminAction()` records admin email, IP/user agent, action name, and JSON payload |
 | **Service Role Client** | Server-only Supabase service-role client initialized strictly inside protected Route Handlers |
-| **Secret Sanitization** | `sanitizeErrorDetails()` strips API keys, tokens, and authorization headers before logging |
+| **Secret Sanitization** | `sanitizeErrorMessage()` (`lib/monitoring/logger.ts`) strips API keys, tokens, and authorization headers from the error `message` string before logging — the `details` object passed to `logSystemError()` is stored unsanitized |
 | **Search Engine Directives** | Admin routes emit `robots: { index: false, follow: false }` |
 
 ---
 
 ## 5. Verification & Quality Metrics
 
-- **Vitest Unit & Integration Tests:** 84 test suites (887 tests passing with 0 failures).
+- **Vitest Unit & Integration Tests:** 100 test suites, 1029 tests passing.
 - **TypeScript Typecheck:** 0 errors (`tsc --noEmit`).
 - **ESLint:** 0 errors, 0 warnings.
-- **Next.js Production Build:** 219 static and dynamic routes compiled successfully under Next.js 16.2.12 Turbopack.
+- **Next.js Production Build:** compiles successfully under Next.js 16.2.12 Turbopack.

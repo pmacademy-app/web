@@ -1,10 +1,10 @@
 # Automated Testing & Verification Framework — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Test Runner:** Vitest (Unit & Integration) / Playwright (E2E)  
-**Total Test Files:** 84 Test Suites  
-**Total Tests:** 887 Unit & Integration Tests (100% Passing)  
-**Last Updated:** August 30, 2026  
+**Total Test Files:** 100 Test Suites  
+**Total Tests:** 1029 Unit & Integration Tests (100% Passing)  
+**Last Updated:** September 6, 2026  
 
 ---
 
@@ -22,7 +22,9 @@ The repository uses **Vitest** for fast, high-coverage unit and integration test
 
 ---
 
-## 2. Complete Test Suite Inventory (84 Suites, 887 Tests)
+## 2. Test Suite Inventory (100 Suites, 1029 Tests)
+
+The list below is a representative sample of `apps/web/lib/__tests__/` grouped by domain, not an exhaustive file-by-file index — the directory has grown to 100 files and includes many additional suites (e.g. `dashboard.test.ts`, `analytics-aggregation.test.ts`, `onboarding.test.ts`, `system-monitoring.test.ts`, `portfolio-verification.test.ts`, `friend-accountability.test.ts`, `auth-callback-email-change.test.ts`, several `phaseN-*.test.ts` files) not individually listed here.
 
 ### Core Domain, Learning & Gamification Suites
 - `xp.test.ts` — XP formulas, level thresholds, and ledger mutations.
@@ -30,9 +32,9 @@ The repository uses **Vitest** for fast, high-coverage unit and integration test
 - `srs.test.ts` — SuperMemo SM-2 spaced repetition calculation logic.
 - `skillRadar.test.ts` — Competency radar scoring and spider chart aggregations.
 - `capstones.test.ts` — Capstone business rules, deliverable validation, and public visibility.
-- `certificates.test.ts` — Certificate v2 credential hash generation and template versioning.
-- `badges.test.ts` — Milestone badge evaluation and automated awards.
-- `leaderboard.test.ts` — Global, cohort, and friends leaderboard rankings.
+- `certificates.test.ts` — Certificate code generation, issuance, and QR verification link building.
+- `badges.test.ts` — Milestone badge evaluation and award logic.
+- `leaderboard.test.ts` — Global, cohort, and friends leaderboard ranking (consistency-first sort: days studied → lessons completed → weekly XP → streak).
 - `curriculum-integrity.test.ts` — 9-module & 90-lesson ID structure alignment.
 - `curriculum-prerequisite-access.test.ts` — Prerequisite unlocking and sequential progression.
 - `curriculum-access-override.test.ts` — Admin bypass for curriculum prerequisite locks.
@@ -54,8 +56,7 @@ The repository uses **Vitest** for fast, high-coverage unit and integration test
 - `seo-social-metadata.test.ts` — OpenGraph, Twitter cards, and dynamic XML sitemap verification (including public portfolios).
 
 ### Referrals & Growth Suites
-- `referrals.test.ts` — Referral attribution, self-referral prevention, and rolling rate limits.
-- `referral-activation.test.ts` — First-lesson completion trigger, +50 XP reward, and in-app notifications.
+- `referral-system.test.ts` — Referral attribution, self-referral prevention, rolling rate limits, first-lesson-completion activation trigger, +50 XP reward, and in-app notifications.
 
 ### Authentication & Account Security Suites
 - `auth-ui-integration.test.ts` — Login, registration form validation, and verification pending UI.
@@ -96,7 +97,7 @@ The repository uses **Vitest** for fast, high-coverage unit and integration test
 ```bash
 # From apps/web/
 
-# Run complete Vitest suite (84 test suites, 887 tests)
+# Run complete Vitest suite (100 test suites, 1029 tests)
 npm test
 
 # Run TypeScript typecheck (0 errors)
@@ -105,10 +106,10 @@ npm run typecheck
 # Run ESLint (0 errors, 0 warnings)
 npm run lint
 
-# Run Next.js production build (compiles all 219 static and dynamic routes)
+# Run Next.js production build (full static + dynamic route compilation)
 npm run build
 
-# Run Playwright E2E browser tests
+# Run Playwright E2E browser tests (3 specs, all under e2e/auth/)
 npx playwright test
 ```
 
@@ -118,7 +119,9 @@ npx playwright test
 
 GitHub Actions (`.github/workflows/ci.yml`) enforces the following gates on every pull request and push to `main`:
 1. **Content Compilation:** `npm run content:compile` (validates 90 markdown lessons).
-2. **Vitest Unit & Integration Suite:** 100% pass rate required across all 84 test suites.
+2. **Vitest Unit & Integration Suite:** 100% pass rate required across all 100 test suites.
 3. **TypeScript Typecheck:** `tsc --noEmit` must pass with 0 errors.
 4. **ESLint:** Must pass with 0 errors.
-5. **Next.js Production Build:** Full static and dynamic compilation of all 219 routes.
+5. **Next.js Production Build:** Full static and dynamic route compilation.
+6. **Playwright E2E:** Installs browsers and runs the `e2e/auth/` suite.
+7. **On push to `main` only:** Supabase migration deploy job.

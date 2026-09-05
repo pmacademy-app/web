@@ -29,10 +29,10 @@ The In-App Notifications workspace enables administrators to send real-time in-a
    - **Notification Body:** Message text explaining the update.
    - **Action URL:** Optional destination path (e.g., `/academy/strategy/strat-101`).
    - **Category:** `system`, `learning`, `achievement`, or `reminder`.
-   - **Audience Targeting:** `All Users`, `Active Learners (last 7 days)`, or `Cohort Members`.
+   - **Audience Targeting:** the API's audience enum is `all | individual | cohort | filtered` — `filtered` is the generic segment mechanism; there's no separate built-in "Active Learners (7 days)" preset.
 4. **Recipient Estimation:** Click **Estimate Recipients** to verify audience size and sample recipients.
 5. **Dispatch:**
-   - Click **Execute Now** to immediately insert notifications into `public.notifications` for all targeted learners.
+   - Click **Execute Now** to immediately insert notifications into `public.in_app_notifications` for all targeted learners.
    - Or click **Schedule** for future delivery.
 
 ### B. Pausing, Resuming & Canceling Broadcasts
@@ -41,9 +41,9 @@ In the In-App Broadcasts table:
 - **Resume Campaign:** Click **Resume** to restart processing.
 - **Cancel Campaign:** Click **Cancel** to abort unsent batches.
 
-### C. Publishing System Banner Announcements (`/admin/announcements`)
-Banner announcements display a dismissable alert bar across the top of the entire application:
-1. Navigate to `/admin/announcements` $\rightarrow$ click **[ Create Announcement ]**.
+### C. Publishing System Banner Announcements
+Banner announcements display a dismissable alert bar across the top of the entire application. `/admin/announcements` is now a redirect into the unified Communications hub (`?tab=announcements`), not an independent page:
+1. Navigate to `/admin/communications?tab=announcements` $\rightarrow$ click **[ Create Announcement ]**.
 2. **Configure Banner:**
    - **Title & Message:** Text displayed in the banner.
    - **Severity:** `info` (blue), `warning` (amber), `critical` (red).
@@ -58,8 +58,8 @@ Banner announcements display a dismissable alert bar across the top of the entir
 
 When an in-app notification is delivered:
 - **Navbar Bell:** The notification bell icon in the top navigation immediately increments its unread badge count.
-- **Popover Panel:** Clicking the bell opens the Notification Center popover (`components/notifications/NotificationCenterPopover.tsx`), displaying the new message with direct navigation links.
-- **Delivery Audit:** The event is logged in `public.notification_delivery_events`.
+- **Drawer Panel:** Clicking the bell opens `components/notifications/NotificationCenterDrawer.tsx`, displaying the new message grouped by date with direct navigation links. Opening the drawer auto-marks everything as read (there is no manual "mark all" button in the UI).
+- **Delivery Audit:** The event is logged in `public.email_delivery_events` / `public.notification_events`.
 
 ---
 

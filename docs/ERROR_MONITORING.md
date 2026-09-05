@@ -1,8 +1,7 @@
 # Application Error Monitoring & Alerting — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `21cc985`  
-**Last Updated:** August 23, 2026  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
+**Last Updated:** September 6, 2026  
 
 ---
 
@@ -11,28 +10,28 @@
 System errors across API routes, background crons, webhook handlers, and database operations are captured by the `logSystemError()` logging framework (`lib/monitoring/logger.ts`).
 
 - **Database Table**: `public.system_errors`
-- **Severity Levels**: `'info'`, `'warning'`, `'error'`, `'critical'`
-- **Categories**: `'system'`, `'auth'`, `'resend'`, `'webhook'`, `'cron'`, `'database'`
+- **Severity Levels**: `'critical'`, `'error'`, `'warning'` — there is no `'info'` level. This is enforced both in the TypeScript type and a DB `CHECK` constraint.
+- **Categories**: `'auth'`, `'verification'`, `'queue'`, `'resend'`, `'webhook'`, `'cron'`, `'system'` (plus `'brevo'` in the TypeScript type, though the DB `CHECK` constraint doesn't yet include it — an internal inconsistency worth fixing). There is no `'database'` category.
 - **Instrumentation**: Extensively instrumented across `/api/email/webhooks`, `/api/cron/*`, `/api/admin/emails/production-send`, and `/api/auth/send-email-hook`.
 
 ---
 
-## 2. Secret Sanitization & 15-Minute Deduplication
+## 2. Secret Sanitization & Fingerprint Deduplication
 
 ### Secret Sanitization
-Before writing error messages or stack traces to PostgreSQL, `sanitizeErrorDetails()` strips sensitive tokens and credentials matching sensitive patterns:
+Before writing error `message` strings to PostgreSQL, `sanitizeErrorMessage()` (not `sanitizeErrorDetails` — no such function exists) strips sensitive tokens and credentials matching sensitive patterns:
 - Bearer tokens (`Bearer eyJ...` → `Bearer [REDACTED]`)
 - Webhook secrets (`whsec_...` → `whsec_[REDACTED]`)
 - Secret keys (`sk_...`, `key_...` → `[REDACTED]`)
 - Passwords and auth header values.
 
-### 15-Minute Fingerprint Deduplication
+**Important gap:** this sanitization only applies to the `message` field. The `details` JSON object passed to `logSystemError()` is stored **as-is, unsanitized** — callers must not put raw secrets or tokens directly into `details`.
+
+### Fingerprint Deduplication
 To prevent log flooding during persistent service outages:
 - An MD5 fingerprint is calculated from `category + operation + sanitizedMessage`.
-- If an error with the same fingerprint occurred within the last 15 minutes, `logSystemError()` updates the existing row in `public.system_errors`:
-  - Increments `occurrence_count` by 1.
-  - Updates `last_seen_at` timestamp.
-  - Skips inserting duplicate rows.
+- If an error with the same fingerprint occurred recently, `logSystemError()` updates the existing row's `updated_at` timestamp rather than inserting a new row.
+- **There are no `occurrence_count` or `last_seen_at` columns on `system_errors`.** The "occurrence count" shown in the admin Errors tab is computed by grouping historical rows by `fingerprint` at query time (`SystemService.getErrorGroups`), not read from a stored counter.
 
 ---
 
@@ -52,8 +51,8 @@ To prevent log flooding during persistent service outages:
 | Monitoring Subsystem | Location | Status |
 |---|---|---|
 | **`logSystemError()` Framework** | `lib/monitoring/logger.ts` | 🟢 Verified in Production |
-| **Secret Sanitization Engine** | `lib/monitoring/logger.ts` | 🟢 Verified in Production |
-| **15m Fingerprint Deduplication** | `lib/monitoring/logger.ts` | 🟢 Verified in Production |
+| **Secret Sanitization Engine (`sanitizeErrorMessage`)** | `lib/monitoring/logger.ts` | 🟡 Verified — `message` only, `details` unsanitized |
+| **Fingerprint Deduplication (query-time grouping)** | `lib/monitoring/logger.ts`, `lib/admin/system-service.ts` | 🟢 Verified in Production |
 | **`public.system_errors` Schema** | `supabase/migrations/20260810000009_*.sql` | 🟢 Verified in Production |
 | **Admin System Alerts UI** | `components/admin/AdminSystemAlertsView.tsx` | 🟢 Verified in Production |
 | **Cron & Webhook Error Instrumentation**| `/api/cron/*`, `/api/email/webhooks` | 🟢 Verified in Production |

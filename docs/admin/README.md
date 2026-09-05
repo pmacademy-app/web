@@ -18,7 +18,7 @@ These guides are written for:
 To access the Admin Panel:
 1. You must sign in with an account whose email is listed in `ADMIN_EMAILS`, **or**
 2. Your account must have `is_admin = true` in PostgreSQL.
-3. Access is located at [`/admin`](https://prodily.app/admin) (or `http://localhost:3000/admin` in development).
+3. Access is located at `/admin` (or `http://localhost:3000/admin` in development).
 
 ---
 
@@ -28,8 +28,10 @@ To access the Admin Panel:
 |---|---|---|
 | **1. Operations Dashboard** | Attention center, real-time KPI metrics, activity charts, learner journey funnel, and live system snapshot | [Dashboard Guide](dashboard.md) |
 | **2. User Management** | Searching & filtering learners, inspecting profile tabs, changing admin roles, granting Fellow status, resetting progress, and account deletion | [Users Guide](users.md) |
-| **3. Portfolio Verification** | Verification queue workflow, Fellow designation semantics, public/private invariants, in-line verification, and audit logging | [Portfolio Verification Guide](portfolio-verification.md) |
-| **4. Referrals & Growth** | Referral lifecycle, attribution cookies, activation rewards (+50 XP), anti-abuse rules, and inspecting user referral counts | [Referrals Guide](referrals.md) |
+| **3a. PM Fellow Designation** | Both grant paths (learner-initiated requests + legacy admin-browse queue), eligibility, public-portfolio invariant, audit logging | [Fellow Designation Guide](fellow-designation.md) |
+| **3b. Portfolio Verification** | Automatic eligibility-based verification (distinct from Fellow), admin override in the User Detail Drawer | [Portfolio Verification Guide](portfolio-verification.md) |
+| **4. Referrals & Growth** | Referral lifecycle, attribution (URL param + cookie fallback), activation rewards (+50 XP), anti-abuse rules | [Referrals Guide](referrals.md) |
+| **4a. Leaderboard** | Ranking inspection console, anomaly detection, and privacy/opt-out management — see [`docs/LEADERBOARD.md`](../LEADERBOARD.md) for the full ranking system | `/admin/leaderboard` |
 | **5. Email Operations** | Queue monitoring, dead-letter retries, broadcast builder & campaign scheduling, template testing, and direct user email dispatch | [Emails Guide](emails.md) |
 | **6. In-App Notifications** | In-app broadcast campaigns, audience targeting, template manager, and platform banner announcements | [Notifications Guide](notifications.md) |
 | **7. Unified Communications** | Overview hub, contact message inbox, automation schedules, and template code editing | [Communications Guide](communications.md) |

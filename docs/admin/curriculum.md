@@ -22,16 +22,16 @@ The Curriculum Workspace allows administrators to inspect the full 9-module, 90-
 ## 3. Curriculum Structure & Content Quality Metrics
 
 ### A. 9-Module Academy Overview
-The workspace organizes all 90 compiled lessons across the 9 core curriculum modules:
+The workspace organizes all 90 compiled lessons across the 9 core curriculum modules (`lib/admin/curriculum-meta.ts`, `scripts/compiler/compile.ts`):
 1. `foundations` — PM Foundations & Mental Models
 2. `discovery` — User Research & Problem Discovery
-3. `strategy` — Product Strategy & Vision
+3. `design` — Design Thinking & UX
 4. `execution` — Agile Delivery & Roadmapping
-5. `metrics` — Product Analytics & North Star Frameworks
-6. `growth` — Acquisition, Retention & Monetization
-7. `tech-for-pm` — Technical PM & Architecture
-8. `leadership` — Stakeholder Influence & Executive Communication
-9. `ai-product` — AI/ML Product Management
+5. `growth` — Acquisition, Retention & Monetization
+6. `leadership` — Stakeholder Influence & Executive Communication
+7. `technical` — Technical PM & Architecture
+8. `strategy` — Product Strategy & Vision
+9. `capstone` — Capstone & Career Portfolio
 
 ### B. Content Quality & Clarity Ratings
 Every lesson captures direct learner feedback upon completion:
@@ -52,16 +52,16 @@ Every lesson captures direct learner feedback upon completion:
 1. Open `/admin/curriculum`.
 2. Click on any module card (e.g., `discovery`) to open `/admin/curriculum/discovery`.
 3. Review the lesson table for:
-   - **Lesson ID & Title:** Stable identifier (e.g., `disc-101`).
+   - **Lesson ID & Title:** Stable identifier.
    - **Clarity Rating:** Star rating and satisfaction percentage.
    - **Feedback Count:** Total number of student submissions.
-   - **Status:** Published / Active.
+   - **Status:** displayed as "Published" — this is a static display field with no backend publish/unpublish control; every lesson is always shown as published.
 
 ### B. Reviewing Student Feedback & Issue Tags
 1. Click on a lesson row with feedback or low clarity scores.
 2. The **Learner Feedback Drawer** slides open.
 3. Review student qualitative comments and the distribution of reported issue tags.
-4. Use this feedback to plan markdown edits in the source content repository (`content/modules/`).
+4. Use this feedback to plan markdown edits in the source content repository (`content/lessons/lesson-0NN.md` — flat files, not organized by module subfolder).
 
 ### C. Viewing Live Lesson Previews
 1. Navigate to `/admin/curriculum/[moduleSlug]/[lessonId]`.
@@ -74,7 +74,7 @@ Every lesson captures direct learner feedback upon completion:
 **Conducting a Weekly Content Quality Audit:**
 1. Open `/admin/curriculum`.
 2. Toggle the **"Needs Review (<3.5 Stars)"** filter.
-3. If `strat-103` is flagged with 3.1 stars and 4 `confusing` tags:
+3. If a lesson in the `strategy` module is flagged with 3.1 stars and 4 `confusing` tags:
    - Open the feedback drawer to read what students found confusing.
-   - Update the markdown source file in `content/modules/strategy/strat-103.md`.
+   - Update the corresponding markdown source file in `content/lessons/lesson-0NN.md`.
    - Run `npm run content:compile` to re-compile the static JSON distribution.

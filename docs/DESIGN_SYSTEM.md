@@ -1,23 +1,36 @@
 # Design System & Visual Identity — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `21cc985`  
-**Last Updated:** August 23, 2026  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
+**Last Updated:** September 6, 2026  
 
 ---
 
 ## 1. Visual Identity & Brand Tokens
 
-The Prodily PM Academy design system delivers a glassmorphic aesthetic built on curated color tokens (`theme/tokens.ts` and `lib/brand.ts`).
+`theme/tokens.ts` defines **two genuinely separate palettes** — an earlier version of this document described the admin-only palette as if it were the global brand palette. They are not interchangeable; `lib/brand.ts`'s `BRAND.colors` pulls from the **main app light theme** tokens below, not the admin ones.
 
-### Palette Tokens
-- **Primary Brand Green**: `#019E75` (Teal Hexagonal Ring / Primary Accents)
-- **Primary Dark Navy**: `#011229` (Gem Color / Dark Backgrounds)
-- **Dark Surface Background**: `#050B14`
-- **Card Fill / Glass Fill**: `rgba(255, 255, 255, 0.03)`
-- **Border / Glass Stroke**: `rgba(255, 255, 255, 0.08)`
-- **Text Primary**: `#F3F4F6`
-- **Text Secondary**: `#9CA3AF`
+### Main App Palette (`TOKENS.colors` — light theme, the actual brand identity)
+- **Background**: `#FBFAF6` (cream, not dark)
+- **Foreground**: `#171A17` (near-black text)
+- **Primary**: `#1F6B4E` (dark green)
+- **Accent**: `#D98B24` (amber/orange — used for the Fellow badge)
+- **Border**: `#DED8CB`
+
+### Main App Palette (`TOKENS.colors.dark` — dark theme)
+- **Background**: `#0E1110`
+- **Foreground**: `#F4F1E8`
+- **Primary**: `#66D6A3`
+- **Border**: `#343A34`
+
+### Admin Console Palette (`TOKENS.colors.admin` — scoped to `.admin-console`, a distinct dark UI theme)
+- **Background**: `#050B14`
+- **Accent**: `#019E75` (this is the exact logo-mark green — the admin console's accent, not the main app's primary)
+- **Foreground**: `#F3F4F6`
+- **Muted Text**: `#9CA3AF`
+- **Border**: `rgba(255, 255, 255, 0.08)`
+
+### Logo Mark Colors (used only for the literal logo graphic, everywhere it appears)
+- `#019E75` (outer ring) / `#011229` (inner gem) — see `public/brand/logo-mark.svg`. `#011229` exists only as this graphic's color and a descriptive code comment — it is not an applied UI token anywhere in `theme/tokens.ts`.
 
 ---
 

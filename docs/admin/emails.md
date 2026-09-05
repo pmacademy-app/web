@@ -1,6 +1,6 @@
 # Outbound Email Operations & Broadcasts — Operating Guide
 
-**Location:** `/admin/communications` (tabs: Queue, Broadcasts, Automations, Templates) & `/admin/users`  
+**Location:** `/admin/communications` (relevant tabs: Email, Queue, Broadcasts, Automations, Templates — see [`communications.md`](communications.md) for the full current tab list) & `/admin/users`  
 **Workspace:** Operations $\rightarrow$ Communications / Emails  
 **Audience:** Administrators & Community Managers  
 
@@ -44,10 +44,11 @@ The Email Operations workspace provides full operational control over outbound e
 
 ### C. Testing & Editing Transactional Templates
 1. Navigate to `/admin/communications?tab=templates`.
-2. Select any template (e.g., `auth.welcome`, `curriculum.certificate_issued`, `reengagement.nudge`).
-3. **Inspect Code & Variables:** View the React Email source code and supported template variables (e.g., `{{name}}`, `{{certificateCode}}`).
-4. **Live Preview:** Inspect the rendered responsive HTML preview.
-5. **Send Test Email:** Click **[ Send Test Email ]** in the top action bar. Enter your test email address and click **Send**. The template is rendered with mock data and sent directly via Resend.
+2. Select any template (e.g., `auth.welcome`, `achievement.certificate`, `inactive.resume_learning`).
+3. **Inspect Code & Variables:** Plain HTML `<textarea>` editor (no WYSIWYG) with a variable panel — click a variable to insert it at the cursor, or copy it. Unrecognized `{{tokens}}` are flagged inline with a warning.
+4. **Live Preview:** Fully sandboxed iframe preview with sample values interpolated client-side.
+5. **Send Test Email:** Click **[ Send Test Email ]** in the top action bar. Enter your test email address and click **Send**. The template is rendered with mock data and sent via whichever provider (Brevo or Resend) is currently primary.
+6. **Save Draft / Publish Version:** Each save creates a new version row; publishing archives the previous published version.
 
 ### D. Sending a Direct Production Email to a Specific Learner
 1. Navigate to `/admin/users` and open the student's **User Detail Drawer**.
@@ -61,11 +62,9 @@ The Email Operations workspace provides full operational control over outbound e
 
 ## 4. Platform Quotas & Rate Limits
 
-Outbound emails adhere to rate limits configured in `/admin/settings?section=email`:
-- **Daily Send Limit (`dailySendLimit`):** Default `1000` emails/day.
-- **Hourly Send Limit (`hourlySendLimit`):** Default `100` emails/hour.
-- **Max Retry Attempts (`maxRetryAttempts`):** Default `3` attempts before marking as permanently failed.
-- **Critical Auth Exemption:** Verification emails and password resets bypass daily automation quotas.
+- **Daily Send Limit:** the only limit actually enforced today (`email_daily_send_limit`, default `100`/day).
+- **Hourly Send Limit** and **Max Retry Attempts** exist as fields in `/admin/settings?section=email` but are **not read by the send/retry pipeline** — changing them currently has no effect (tracked in `docs/ISSUES_KNOWN.md` ISSUE-22). Actual retry attempts are set per priority level (1–5) at enqueue time, not by this setting.
+- **Critical Auth Exemption:** `auth.verify_email`, `auth.password_reset`, and `auth.email_change_verify` bypass the daily quota entirely.
 
 ---
 
