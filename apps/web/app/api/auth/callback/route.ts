@@ -79,6 +79,23 @@ export async function GET(request: NextRequest) {
         if (type !== 'recovery') {
           await ensureUserProfile(supabase, data.user)
         }
+
+        // Supabase Auth's email_change confirmation updates `auth.users.email`
+        // directly, but there is no trigger syncing that to `public.users.email`
+        // (the app's own profile table). Keep them consistent here — the one
+        // place both a signup insert AND every email-change confirmation flow
+        // through.
+        if (type === 'email_change' && data.user.email) {
+          try {
+            await supabase
+              .from('users')
+              .update({ email: data.user.email })
+              .eq('id', data.user.id)
+          } catch (syncErr) {
+            console.error('[auth/callback] Failed to sync public.users.email after email_change:', syncErr)
+          }
+        }
+
         if (type === 'signup' || type === 'email_change') {
           try {
             const { globalNotificationDispatcher } = await import('@/lib/notifications/dispatcher')
@@ -107,6 +124,14 @@ export async function GET(request: NextRequest) {
           return redirectWithSession(destination, data.session)
         }
 
+        // email_change confirmation is verified via the service-role client and
+        // does not mint a new session — the user is already logged in from
+        // before they requested the change. Land them back on the Security tab
+        // (their existing session cookies are untouched) instead of /login.
+        if (type === 'email_change') {
+          return NextResponse.redirect(destination)
+        }
+
         return NextResponse.redirect(new URL('/login?verified=true', requestUrl.origin))
       }
 
@@ -121,6 +146,12 @@ export async function GET(request: NextRequest) {
   // ── Fallback: both paths failed — send to appropriate destination with error ──
   if (type === 'recovery' || next.includes('reset-password')) {
     return NextResponse.redirect(new URL('/reset-password?error=expired', requestUrl.origin))
+  }
+
+  // Expired/invalid email-change confirmation: the user is already logged in,
+  // so send them back to the Security tab with an error flag rather than /login.
+  if (type === 'email_change') {
+    return NextResponse.redirect(new URL('/settings?tab=security&error=email_change_failed', requestUrl.origin))
   }
 
   // Distinguish email verification failures from generic auth failures

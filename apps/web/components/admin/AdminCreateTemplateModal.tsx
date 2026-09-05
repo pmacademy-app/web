@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { X, Plus, FileCode } from 'lucide-react'
+import { X, Plus, FileCode, Code2, Eye } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
+import { cn } from '@/lib/utils'
 
 interface AdminCreateTemplateModalProps {
   open: boolean
@@ -10,21 +11,29 @@ interface AdminCreateTemplateModalProps {
   onCreated?: () => void
 }
 
+/**
+ * Creates a new HTML EMAIL template (kept separate from in-app notification
+ * content). Admin pastes raw HTML directly; the server sanitizes it before
+ * persisting (see /api/admin/notifications/templates and
+ * lib/admin/sanitize-email-html.ts). The preview here uses the same fully
+ * sandboxed iframe pattern as the template editor and broadcast wizard.
+ */
 export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCreateTemplateModalProps) {
   const { toast } = useAdminToast()
   const [key, setKey] = useState('')
   const [name, setName] = useState('')
   const [category, setCategory] = useState('Custom')
   const [subjectLine, setSubjectLine] = useState('')
-  const [bodyText, setBodyText] = useState('')
+  const [bodyHtml, setBodyHtml] = useState('')
+  const [mode, setMode] = useState<'code' | 'preview'>('code')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (!open) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!key.trim() || !subjectLine.trim() || !bodyText.trim()) {
-      toast('Please fill in key, subject line, and body text.', 'error')
+    if (!key.trim() || !subjectLine.trim() || !bodyHtml.trim()) {
+      toast('Please fill in key, subject line, and HTML body.', 'error')
       return
     }
 
@@ -38,8 +47,7 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
           name: name.trim() || key.trim(),
           category: category.trim(),
           subjectLine: subjectLine.trim(),
-          bodyText: bodyText.trim(),
-          bodyHtml: `<p>${bodyText.trim().replace(/\n/g, '<br/>')}</p>`,
+          bodyHtml: bodyHtml.trim(),
         }),
       })
 
@@ -48,7 +56,7 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
         throw new Error(json.error || 'Failed to create template')
       }
 
-      toast(json.message || 'Template created successfully!', 'success')
+      toast(json.message || 'Email template created successfully!', 'success')
       onClose()
       onCreated?.()
     } catch (err) {
@@ -60,15 +68,17 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-admin-surface border border-admin-border rounded-xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+      <div className="bg-admin-surface border border-admin-border rounded-xl max-w-2xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between border-b border-admin-border pb-4">
           <div className="flex items-center gap-2.5">
             <span className="p-1.5 rounded-lg bg-admin-accent-soft border border-admin-accent/25">
               <FileCode className="w-5 h-5 text-admin-accent" />
             </span>
             <div>
-              <h2 className="text-base font-bold text-admin-fg">Create Notification Template</h2>
-              <p className="text-xs text-admin-fg-muted">Register a new custom notification template</p>
+              <h2 className="text-base font-bold text-admin-fg">Create Email Template</h2>
+              <p className="text-xs text-admin-fg-muted">
+                Paste HTML for a new broadcast email template (separate from in-app notifications)
+              </p>
             </div>
           </div>
           <button
@@ -131,16 +141,56 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-admin-fg">Template Body (Text / Markdown)</label>
-            <textarea
-              required
-              rows={4}
-              placeholder="Write the notification message content..."
-              value={bodyText}
-              onChange={(e) => setBodyText(e.target.value)}
-              className="w-full px-3 py-2 text-xs rounded-lg border border-admin-border bg-admin-bg text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent font-mono"
-            />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-admin-fg">Email Body (HTML)</label>
+              <div className="flex items-center gap-1 p-1 rounded-lg bg-admin-bg/60 border border-admin-border">
+                <button
+                  type="button"
+                  onClick={() => setMode('code')}
+                  className={cn(
+                    'px-2.5 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer',
+                    mode === 'code' ? 'bg-admin-accent text-admin-accent-contrast' : 'text-admin-fg-muted hover:text-admin-fg'
+                  )}
+                >
+                  <Code2 className="w-3 h-3" /> Code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode('preview')}
+                  className={cn(
+                    'px-2.5 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer',
+                    mode === 'preview' ? 'bg-admin-accent text-admin-accent-contrast' : 'text-admin-fg-muted hover:text-admin-fg'
+                  )}
+                >
+                  <Eye className="w-3 h-3" /> Preview
+                </button>
+              </div>
+            </div>
+
+            {mode === 'code' ? (
+              <textarea
+                required
+                rows={10}
+                spellCheck={false}
+                placeholder="<html>...</html> or an HTML fragment"
+                value={bodyHtml}
+                onChange={(e) => setBodyHtml(e.target.value)}
+                className="w-full px-3 py-2 text-[11px] font-mono leading-relaxed rounded-lg border border-admin-border bg-admin-bg text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent resize-y"
+              />
+            ) : (
+              <div className="rounded-lg border border-admin-border overflow-hidden bg-white">
+                <iframe
+                  title="Template HTML preview"
+                  srcDoc={bodyHtml}
+                  sandbox=""
+                  className="w-full h-64 bg-white"
+                />
+              </div>
+            )}
+            <p className="text-[11px] text-admin-fg-muted">
+              HTML is sanitized on save (scripts, embeds, and dangerous attributes are stripped). Preview is fully sandboxed and cannot execute scripts.
+            </p>
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-2">

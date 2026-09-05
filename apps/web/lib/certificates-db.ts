@@ -10,7 +10,7 @@ import { BRAND } from '@/lib/brand'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { generateCertificateCode } from '@/lib/certificates'
 
-type CertificateRow = Database['public']['Tables']['certificates']['Row']
+export type CertificateRow = Database['public']['Tables']['certificates']['Row']
 type UserRow = Database['public']['Tables']['users']['Row']
 
 interface DBChain {

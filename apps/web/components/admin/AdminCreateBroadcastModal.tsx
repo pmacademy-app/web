@@ -14,11 +14,16 @@ import {
   Loader2,
   Filter,
   Check,
+  Users,
+  ListFilter,
 } from 'lucide-react'
 import { AdminDatePicker } from './AdminDatePicker'
+import { AdminUserMultiSelectPicker, type SelectedUser } from './AdminUserMultiSelectPicker'
 import type { AdminUserFilters } from '@/lib/admin/types'
+import type { AdminTemplateListItem } from '@/lib/admin/communications-service'
 
 interface AdminCreateBroadcastModalProps {
+  templates: AdminTemplateListItem[]
   onClose: () => void
   onCreated: () => void
 }
@@ -68,18 +73,29 @@ const PREFERENCE_OPTIONS = [
   { id: 'case_studies', label: 'Case studies' },
 ]
 
-export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBroadcastModalProps) {
+export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: AdminCreateBroadcastModalProps) {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
+
+  // Template options: the full merged system + admin-created custom template list
+  // (falls back to the static defaults only if the server list is unavailable).
+  const templateOptions = templates.length > 0
+    ? templates.map((t) => ({ key: t.key, label: `${t.name}${t.isCustom ? ' (Custom)' : ''}`, defaultSubject: t.subjectLine }))
+    : TEMPLATE_OPTIONS
 
   // Step 1: Details
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [templateKey, setTemplateKey] = useState('inactive.resume_learning')
+  const [templateKey, setTemplateKey] = useState(templateOptions[0]?.key || 'inactive.resume_learning')
   const [subjectOverride, setSubjectOverride] = useState('')
   const [batchSize, setBatchSize] = useState<number>(100)
 
-  // Step 2: Filters
+  // Step 2: Audience — either a filtered segment or a hand-picked list of individuals.
+  const [audienceMode, setAudienceMode] = useState<'filtered' | 'individual'>('filtered')
   const [filters, setFilters] = useState<AdminUserFilters>({})
+  const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([])
+
+  const effectiveFilters: AdminUserFilters =
+    audienceMode === 'individual' ? { userIds: selectedUsers.map((u) => u.id) } : filters
 
   // Step 3: Calculation & Sample
   const [calculating, setCalculating] = useState(false)
@@ -135,7 +151,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
       const res = await fetch('/api/admin/emails/broadcasts/recipient-count', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filters: customFilters ?? filters }),
+        body: JSON.stringify({ filters: customFilters ?? effectiveFilters }),
       })
       const json = await res.json()
       if (json.success) {
@@ -148,7 +164,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
     } finally {
       setCalculating(false)
     }
-  }, [filters])
+  }, [effectiveFilters])
 
   const fetchSample = async () => {
     setLoadingSample(true)
@@ -156,7 +172,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
       const res = await fetch('/api/admin/emails/broadcasts/recipient-sample', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filters, limit: 20 }),
+        body: JSON.stringify({ filters: effectiveFilters, limit: 20 }),
       })
       const json = await res.json()
       if (json.success) {
@@ -195,7 +211,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
           template_key: templateKey,
           subject_override: subjectOverride || undefined,
           batch_size: batchSize,
-          recipient_filters: filters,
+          recipient_filters: effectiveFilters,
         }),
       })
 
@@ -338,7 +354,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                     onChange={(e) => setTemplateKey(e.target.value)}
                     className={cn(selectClass, 'w-full')}
                   >
-                    {TEMPLATE_OPTIONS.map((t) => (
+                    {templateOptions.map((t) => (
                       <option key={t.key} value={t.key}>
                         {t.label}
                       </option>
@@ -382,7 +398,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                   className="w-full h-9 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs text-admin-fg outline-none focus:border-admin-accent"
                 />
                 <p className="text-[11px] text-admin-fg-muted">
-                  Default: {TEMPLATE_OPTIONS.find((t) => t.key === templateKey)?.defaultSubject}
+                  Default: {templateOptions.find((t) => t.key === templateKey)?.defaultSubject}
                 </p>
               </div>
 
@@ -415,9 +431,51 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
             </div>
           )}
 
-          {/* STEP 2: Targeting Filters */}
+          {/* STEP 2: Audience */}
           {step === 2 && (
             <div className="space-y-6">
+              {/* Audience Mode Toggle */}
+              <div className="space-y-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-admin-accent">Audience</h3>
+                <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-admin-bg/60 border border-admin-border">
+                  <button
+                    type="button"
+                    onClick={() => setAudienceMode('filtered')}
+                    className={cn(
+                      'px-3 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer',
+                      audienceMode === 'filtered' ? 'bg-admin-accent text-admin-accent-fg' : 'text-admin-fg-muted hover:text-admin-fg'
+                    )}
+                  >
+                    <ListFilter className="w-3.5 h-3.5" /> Filtered Segment
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAudienceMode('individual')}
+                    className={cn(
+                      'px-3 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer',
+                      audienceMode === 'individual' ? 'bg-admin-accent text-admin-accent-fg' : 'text-admin-fg-muted hover:text-admin-fg'
+                    )}
+                  >
+                    <Users className="w-3.5 h-3.5" /> Specific Individuals
+                  </button>
+                </div>
+              </div>
+
+              {audienceMode === 'individual' ? (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-admin-fg block">
+                    Select Recipients <span className="text-admin-danger">*</span>
+                  </label>
+                  <p className="text-[11px] text-admin-fg-muted">
+                    Search by name, email, or username. Each match shows enough detail to avoid selecting the wrong person.
+                  </p>
+                  <AdminUserMultiSelectPicker selectedUsers={selectedUsers} onChange={setSelectedUsers} />
+                  <p className="text-[11px] text-admin-fg-muted font-mono">
+                    {selectedUsers.length} recipient{selectedUsers.length === 1 ? '' : 's'} selected
+                  </p>
+                </div>
+              ) : (
+                <>
               {/* Account & Activity Section */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-admin-accent flex items-center gap-1.5">
@@ -667,7 +725,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                       className={cn(selectClass, 'w-full')}
                     >
                       <option value="">None (Don&apos;t exclude by template)</option>
-                      {TEMPLATE_OPTIONS.map((t) => (
+                      {templateOptions.map((t) => (
                         <option key={t.key} value={t.key}>{t.label}</option>
                       ))}
                     </select>
@@ -681,13 +739,15 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                       className={cn(selectClass, 'w-full')}
                     >
                       <option value="">None (No prerequisite)</option>
-                      {TEMPLATE_OPTIONS.map((t) => (
+                      {templateOptions.map((t) => (
                         <option key={t.key} value={t.key}>{t.label}</option>
                       ))}
                     </select>
                   </label>
                 </div>
               </div>
+                </>
+              )}
             </div>
           )}
 
@@ -700,7 +760,7 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                     <h3 className="text-sm font-bold text-admin-fg">Estimated Recipients</h3>
                     <button
                       type="button"
-                      onClick={() => void calculateRecipients(filters)}
+                      onClick={() => void calculateRecipients(effectiveFilters)}
                       disabled={calculating}
                       className="text-[11px] font-semibold text-admin-accent hover:underline cursor-pointer"
                     >
@@ -809,16 +869,25 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                   </div>
                   <div>
                     <span className="text-admin-fg-muted block">Template:</span>
-                    <span className="font-mono text-admin-fg">{templateKey}</span>
+                    <span className="font-semibold text-admin-fg">
+                      {templateOptions.find((t) => t.key === templateKey)?.label || templateKey}
+                    </span>
+                    <span className="block font-mono text-[10px] text-admin-fg-muted">{templateKey}</span>
                   </div>
                   <div>
                     <span className="text-admin-fg-muted block">Subject:</span>
                     <span className="font-semibold text-admin-fg">
-                      {subjectOverride || TEMPLATE_OPTIONS.find((t) => t.key === templateKey)?.defaultSubject}
+                      {subjectOverride || templateOptions.find((t) => t.key === templateKey)?.defaultSubject}
                     </span>
                   </div>
                   <div>
-                    <span className="text-admin-fg-muted block">Estimated Audience:</span>
+                    <span className="text-admin-fg-muted block">Audience:</span>
+                    <span className="font-semibold text-admin-fg">
+                      {audienceMode === 'individual' ? `${selectedUsers.length} Specific Individual${selectedUsers.length === 1 ? '' : 's'}` : 'Filtered Segment'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-admin-fg-muted block">Recipient Count:</span>
                     <span className="font-bold text-admin-accent font-mono">
                       {recipientCount !== null ? recipientCount.toLocaleString() : '—'} users
                     </span>
@@ -955,9 +1024,13 @@ export function AdminCreateBroadcastModal({ onClose, onCreated }: AdminCreateBro
                     setErrorMsg('Please enter a broadcast name.')
                     return
                   }
+                  if (step === 2 && audienceMode === 'individual' && selectedUsers.length === 0) {
+                    setErrorMsg('Select at least one recipient, or switch to Filtered Segment.')
+                    return
+                  }
                   setErrorMsg(null)
                   if (step === 2) {
-                    void calculateRecipients(filters)
+                    void calculateRecipients(effectiveFilters)
                   }
                   setStep((s) => (s + 1) as 1 | 2 | 3 | 4)
                 }}
