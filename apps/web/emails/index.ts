@@ -22,6 +22,13 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
     component: PasswordReset,
     subjectLine: `Reset your ${BRAND.company} password`,
   },
+  // Dedicated key for the Settings → Security → Change Email confirmation link.
+  // Kept separate from 'auth.verify_email' (used by signup) so an admin-edited
+  // custom version of one can never affect the other.
+  'auth.email_change_verify': {
+    component: VerifyEmail,
+    subjectLine: `Confirm your new ${BRAND.shortName} email address`,
+  },
 
   // Direct Admin Messages
   'admin.direct_message': {

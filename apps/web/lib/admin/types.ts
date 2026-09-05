@@ -24,6 +24,10 @@ export interface AdminUserOverview {
   role: string
   isAdmin: boolean
   isFellow?: boolean
+  /** Automatic Portfolio Verification effective status (after any admin override). */
+  isPortfolioVerified?: boolean
+  /** Admin override for Portfolio Verification, if any (null/undefined = automatic). */
+  portfolioVerificationOverride?: 'verified' | 'rejected' | null
   isVerified: boolean
   emailConfirmedAt?: string | null
   totalXp: number

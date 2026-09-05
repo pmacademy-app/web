@@ -337,20 +337,37 @@ export async function getFriendLeaderboard(
   return entries.filter((e) => friendIds.has(e.userId))
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 /**
  * Adds a friend by username or user ID.
+ *
+ * Root-cause note: this previously used a single `.or('username.eq.X,id.eq.X')`
+ * filter for both lookup modes. Since `id` is a UUID column, PostgREST/Postgres
+ * fails the ENTIRE query with an "invalid input syntax for type uuid" error
+ * whenever X is a plain username (the normal case, since the UI always sends a
+ * username) — the resulting DB error was silently swallowed (only `data` was
+ * destructured), surfacing as an incorrect "Learner not found" for every
+ * attempt. Querying by the correct column for the identifier's actual shape
+ * avoids ever sending an invalid UUID comparison to Postgres.
  */
 export async function addFriend(
   supabase: SupabaseClient<Database>,
   userId: string,
   friendIdentifier: string
 ): Promise<{ success: boolean; message: string }> {
-  // Resolve friend by username or ID
-  const { data: targetUser } = (await (supabase
+  const isUuid = UUID_PATTERN.test(friendIdentifier)
+  const lookupColumn = isUuid ? 'id' : 'username'
+
+  const { data: targetUser, error: lookupError } = (await (supabase
     .from('users') as unknown as DBChain)
     .select('id, username')
-    .or(`username.eq.${friendIdentifier},id.eq.${friendIdentifier}`)
-    .maybeSingle()) as unknown as { data: { id: string; username: string } | null }
+    .eq(lookupColumn, friendIdentifier)
+    .maybeSingle()) as unknown as { data: { id: string; username: string } | null; error: unknown }
+
+  if (lookupError) {
+    throw new Error('Failed to look up learner. Please try again.')
+  }
 
   if (!targetUser) {
     throw new Error(`Learner "${friendIdentifier}" not found.`)

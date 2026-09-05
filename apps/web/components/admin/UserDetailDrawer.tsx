@@ -11,6 +11,7 @@ import { AdminAvatar } from './AdminAvatar'
 import { AdminEmptyState } from './AdminEmptyState'
 import { UserRoleToggle } from './UserRoleToggle'
 import { UserFellowToggle } from './UserFellowToggle'
+import { UserPortfolioVerificationToggle } from './UserPortfolioVerificationToggle'
 import { DeveloperActionsSection } from './DeveloperActionsSection'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { USER_DETAIL_TABS, UserTabPanels, type UserDetailTabKey } from './UserTabPanels'
@@ -230,6 +231,14 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
             <UserFellowToggle
               userId={user!.id}
               initialIsFellow={Boolean(user!.isFellow)}
+              userEmail={user!.email}
+            />
+
+            {/* Automatic Portfolio Verification Override Control */}
+            <UserPortfolioVerificationToggle
+              userId={user!.id}
+              initialIsVerified={Boolean(user!.isPortfolioVerified)}
+              initialOverride={user!.portfolioVerificationOverride}
               userEmail={user!.email}
             />
 

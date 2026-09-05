@@ -3,6 +3,7 @@ import { createServiceRoleClient } from '../supabase'
 import { globalFeatureFlagService } from '../notifications/feature-flags/service'
 import { fetchCurriculumData } from '../lesson-loader'
 import { getCapstoneDefinition } from '@/config/capstones'
+import { calculatePortfolioReadiness, calculatePortfolioVerification, type PortfolioVerificationOverride } from '@/lib/portfolio-readiness'
 import {
   buildModuleProgress,
   buildUserActivityTimeline,
@@ -446,6 +447,12 @@ export class AdminConsoleService {
       auth_provider?: string
       created_at: string
       updated_at?: string
+      bio?: string | null
+      avatar_url?: string | null
+      linkedin_url?: string | null
+      github_url?: string | null
+      website_url?: string | null
+      portfolio_verification_override?: string | null
     } | null
 
     const email = u?.email || authUser?.email || ''
@@ -636,6 +643,27 @@ export class AdminConsoleService {
     const lastActiveRow = lastActiveRes.data as unknown as { created_at: string } | null
     const lastActiveAt = lastActiveRow?.created_at || null
 
+    // Portfolio Verification — reuses the same eligibility computation as the
+    // public portfolio page / Settings, not a duplicate calculation.
+    const publicCapstonesCountForVerification = capstoneRows.filter((c) => c.is_public).length
+    const portfolioVerificationOverride = (u?.portfolio_verification_override ?? null) as PortfolioVerificationOverride
+    const portfolioReadinessForVerification = calculatePortfolioReadiness({
+      name: u?.name,
+      username: u?.username,
+      bio: u?.bio,
+      avatarUrl: u?.avatar_url,
+      linkedinUrl: u?.linkedin_url,
+      githubUrl: u?.github_url,
+      websiteUrl: u?.website_url,
+      isPortfolioPublic: u?.is_portfolio_public,
+      publicCapstonesCount: publicCapstonesCountForVerification,
+    })
+    const portfolioVerification = calculatePortfolioVerification(
+      portfolioReadinessForVerification,
+      { linkedinUrl: u?.linkedin_url, githubUrl: u?.github_url, websiteUrl: u?.website_url },
+      portfolioVerificationOverride
+    )
+
     return {
       id: userId,
       email,
@@ -644,6 +672,8 @@ export class AdminConsoleService {
       role: u?.is_admin ? 'Admin' : 'Learner',
       isAdmin: Boolean(u?.is_admin),
       isFellow: Boolean(u?.is_fellow),
+      isPortfolioVerified: portfolioVerification.isVerified,
+      portfolioVerificationOverride,
       isVerified,
       emailConfirmedAt,
       totalXp: u?.total_xp || 0,
@@ -946,6 +976,56 @@ export class AdminConsoleService {
     }
 
     // Proactively revalidate public portfolio and OG social preview cards
+    if (userRow.username) {
+      try {
+        revalidatePath(`/p/${userRow.username}`)
+        revalidatePath(`/api/og/portfolio/${userRow.username}`)
+      } catch {
+        // revalidatePath is best-effort in some environments
+      }
+    }
+
+    return true
+  }
+
+  /**
+   * Sets (or clears) the admin override for a user's Portfolio Verification.
+   * Automatic eligibility (computed live from profile completeness) remains
+   * the default source of truth — this override exists ONLY for admins to
+   * force-verify or force-reject a specific portfolio. Passing `null` clears
+   * the override and returns the portfolio to automatic evaluation.
+   */
+  public static async setPortfolioVerificationOverride(
+    targetUserId: string,
+    override: 'verified' | 'rejected' | null
+  ): Promise<boolean> {
+    const supabase = createServiceRoleClient()
+
+    type UserQueryChain = {
+      select: (cols: string) => {
+        eq: (col: string, val: string) => {
+          maybeSingle: () => Promise<{ data: { id: string; username: string | null } | null; error: unknown }>
+        }
+      }
+    }
+    const { data: userRow } = await (supabase.from('users') as unknown as UserQueryChain)
+      .select('id, username')
+      .eq('id', targetUserId)
+      .maybeSingle()
+
+    if (!userRow) {
+      return false
+    }
+
+    type DBUpdateChain = { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: unknown }> } }
+    const { error } = await (supabase.from('users') as unknown as DBUpdateChain)
+      .update({ portfolio_verification_override: override })
+      .eq('id', targetUserId)
+
+    if (error) {
+      return false
+    }
+
     if (userRow.username) {
       try {
         revalidatePath(`/p/${userRow.username}`)

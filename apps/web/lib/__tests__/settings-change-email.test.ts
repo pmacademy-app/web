@@ -185,7 +185,7 @@ describe('Change Email API Endpoint', () => {
     expect(mockUpdateUser).not.toHaveBeenCalled()
   })
 
-  it('on success: hydrates a session client and calls auth.updateUser with emailRedirectTo pointed at Settings → Security', async () => {
+  it('on success: hydrates a session client and calls auth.updateUser with emailRedirectTo pointed at the dedicated verification page', async () => {
     mockSignInWithPassword.mockResolvedValue({ data: { user: mockUser, session: null }, error: null })
     mockSetSession.mockResolvedValue({ data: {}, error: null })
     mockUpdateUser.mockResolvedValue({ data: { user: mockUser }, error: null })
@@ -201,7 +201,7 @@ describe('Change Email API Endpoint', () => {
     })
     expect(mockUpdateUser).toHaveBeenCalledWith(
       { email: 'new@example.com' },
-      expect.objectContaining({ emailRedirectTo: expect.stringContaining('/settings?tab=security&emailChanged=true') })
+      expect.objectContaining({ emailRedirectTo: expect.stringContaining('/email-verified') })
     )
   })
 

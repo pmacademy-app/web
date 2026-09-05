@@ -24,7 +24,7 @@ export function buildAuthCallbackUrl(
   } else {
     if (type === 'signup') nextPath = '/verified'
     if (type === 'recovery') nextPath = '/reset-password?mode=update'
-    if (type === 'email_change') nextPath = '/settings'
+    if (type === 'email_change') nextPath = '/email-verified'
     if (type === 'invite') nextPath = '/onboarding'
   }
 

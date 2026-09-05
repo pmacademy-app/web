@@ -2,6 +2,7 @@ export type EmailAutomationKey =
   | 'auth.welcome'
   | 'auth.verify_email'
   | 'auth.password_reset'
+  | 'auth.email_change_verify'
   | 'learning.module_complete'
   | 'achievement.badge_earned'
   | 'achievement.level_up'

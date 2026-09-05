@@ -13,6 +13,7 @@ import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { getSkillRadarSummary, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
 import { validateUsername, validateOptionalUrl } from '@/lib/portfolio'
+import { calculatePortfolioReadiness, calculatePortfolioVerification, type PortfolioVerificationOverride } from '@/lib/portfolio-readiness'
 import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
@@ -77,6 +78,7 @@ export interface PublicPortfolioPayload {
     totalXp: number
     levelInfo: LevelInfo
     isFellow: boolean
+    isPortfolioVerified: boolean
     isPortfolioPublic: boolean
     portfolioLayout: PortfolioSectionId[]
     featuredCapstoneId: string | null
@@ -107,6 +109,8 @@ export interface PortfolioSettingsData {
   portfolioLayout?: PortfolioSectionId[]
   featuredCapstoneId?: string | null
   portfolioViewCount?: number
+  /** Admin override for automatic Portfolio Verification, if any (null = automatic). */
+  verificationOverride?: PortfolioVerificationOverride
 }
 
 export interface LearnerSubmittedCapstoneSummary {
@@ -247,6 +251,27 @@ export async function getPublicPortfolioData(
   // Increment view count asynchronously (fire-and-forget, non-blocking)
   incrementPortfolioViewCount(supabase, user.id).catch(() => {})
 
+  // Portfolio Verification: computed live from data already loaded above — no
+  // extra query. Reuses the same readiness signals as the Settings checklist.
+  const verificationOverride = ((user as unknown as { portfolio_verification_override?: string | null })
+    .portfolio_verification_override ?? null) as PortfolioVerificationOverride
+  const readinessForVerification = calculatePortfolioReadiness({
+    name: user.name,
+    username: user.username,
+    bio: user.bio,
+    avatarUrl: user.avatar_url,
+    linkedinUrl: user.linkedin_url,
+    githubUrl: user.github_url,
+    websiteUrl: user.website_url,
+    isPortfolioPublic: user.is_portfolio_public,
+    publicCapstonesCount: capstones.length,
+  })
+  const verification = calculatePortfolioVerification(
+    readinessForVerification,
+    { linkedinUrl: user.linkedin_url, githubUrl: user.github_url, websiteUrl: user.website_url },
+    verificationOverride
+  )
+
   return {
     user: {
       id: user.id,
@@ -262,6 +287,7 @@ export async function getPublicPortfolioData(
       totalXp: user.total_xp || 0,
       levelInfo,
       isFellow: Boolean(user.is_fellow),
+      isPortfolioVerified: verification.isVerified,
       isPortfolioPublic: user.is_portfolio_public ?? true,
       portfolioLayout,
       featuredCapstoneId,
@@ -370,9 +396,17 @@ export async function getPortfolioSettings(
 ): Promise<PortfolioSettingsData> {
   const { data: user, error } = (await (supabase
     .from('users') as unknown as DBChain)
-    .select('username, name, bio, avatar_url, linkedin_url, github_url, website_url, is_portfolio_public, portfolio_layout, featured_capstone_id, portfolio_view_count')
+    .select('username, name, bio, avatar_url, linkedin_url, github_url, website_url, is_portfolio_public, portfolio_layout, featured_capstone_id, portfolio_view_count, portfolio_verification_override')
     .eq('id', userId)
-    .single()) as unknown as { data: (UserRow & { portfolio_layout?: unknown; featured_capstone_id?: string | null; portfolio_view_count?: number }) | null; error: unknown }
+    .single()) as unknown as {
+    data: (UserRow & {
+      portfolio_layout?: unknown
+      featured_capstone_id?: string | null
+      portfolio_view_count?: number
+      portfolio_verification_override?: string | null
+    }) | null
+    error: unknown
+  }
 
   if (error || !user) {
     throw new Error('User profile not found.')
@@ -400,6 +434,7 @@ export async function getPortfolioSettings(
     portfolioLayout,
     featuredCapstoneId: user.featured_capstone_id || null,
     portfolioViewCount: Number(user.portfolio_view_count || 0),
+    verificationOverride: (user.portfolio_verification_override ?? null) as PortfolioVerificationOverride,
   }
 }
 

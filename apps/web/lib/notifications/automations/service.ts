@@ -26,6 +26,7 @@ export const AUTOMATION_METADATA: Array<Omit<EmailAutomationMeta, 'enabled'>> = 
   // Critical Auth (Always On - Non-Toggleable)
   { key: 'auth.verify_email', name: 'Email Verification', description: 'Immediate account verification email with secure token link.', category: 'Transactional', isCritical: true },
   { key: 'auth.password_reset', name: 'Password Reset', description: 'Immediate password reset link email for recovery.', category: 'Transactional', isCritical: true },
+  { key: 'auth.email_change_verify', name: 'Email Change Verification', description: 'Confirmation link sent when a user changes their account email (Settings → Security).', category: 'Transactional', isCritical: true },
 
   // Optional Transactional
   { key: 'auth.welcome', name: 'Welcome Email', description: 'Triggered exactly once upon new user account creation.', category: 'Transactional', isCritical: false },
@@ -46,6 +47,7 @@ export const AUTOMATION_METADATA: Array<Omit<EmailAutomationMeta, 'enabled'>> = 
 export const DEFAULT_AUTOMATION_TOGGLES: Record<EmailAutomationKey, boolean> = {
   'auth.verify_email': true,
   'auth.password_reset': true,
+  'auth.email_change_verify': true,
   'auth.welcome': true,
   'learning.module_complete': true,
   'achievement.badge_earned': true,
@@ -221,7 +223,7 @@ export class EmailAutomationsService {
    * Checks if an individual automation is enabled.
    */
   public static async isAutomationEnabled(key: EmailAutomationKey): Promise<boolean> {
-    if (key === 'auth.verify_email' || key === 'auth.password_reset') return true
+    if (key === 'auth.verify_email' || key === 'auth.password_reset' || key === 'auth.email_change_verify') return true
     const state = await this.getState()
     const automation = state.automations.find((a) => a.key === key)
     return Boolean(automation?.enabled)
@@ -257,7 +259,11 @@ export class EmailAutomationsService {
           .upsert({ key: 'email_daily_send_limit', value: { limit: limitVal }, updated_at: new Date().toISOString() })
         if (error) return { success: false, error: error.message }
       } else if (settingKey === 'toggle' && payload.automationKey) {
-        if (payload.automationKey === 'auth.verify_email' || payload.automationKey === 'auth.password_reset') {
+        if (
+          payload.automationKey === 'auth.verify_email' ||
+          payload.automationKey === 'auth.password_reset' ||
+          payload.automationKey === 'auth.email_change_verify'
+        ) {
           return { success: false, error: 'Critical authentication emails cannot be disabled.' }
         }
         const state = await this.getState()
