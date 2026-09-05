@@ -500,13 +500,25 @@ export class BroadcastService {
     try {
       const { data: due } = await supabase
         .from('email_broadcasts')
-        .select('id')
+        .select('id, name, template_key, recipient_filters')
         .eq('status', 'scheduled')
         .lte('scheduled_at', new Date().toISOString())
 
-      for (const b of (due || []) as Array<{ id: string }>) {
+      for (const b of (due || []) as Array<{ id: string; name?: string; template_key?: string; recipient_filters?: any }>) {
         try {
-          await this.executeBroadcastBatch(b.id)
+          const isPortfolioActivation =
+            b.template_key === 'marketing.portfolio_activation' ||
+            b.name === 'portfolio_activation_sep_2026' ||
+            b.name === 'Prodily Public Portfolio & First Capstone Campaign' ||
+            b.recipient_filters?.campaignId === 'portfolio_activation_sep_2026' ||
+            b.recipient_filters?.target === 'portfolio_activation_sep_2026'
+
+          if (isPortfolioActivation) {
+            const { executePortfolioActivationCampaign } = await import('@/lib/campaigns/portfolio-activation-runner')
+            await executePortfolioActivationCampaign(supabase, b.id)
+          } else {
+            await this.executeBroadcastBatch(b.id)
+          }
           processed++
         } catch (err) {
           console.error(`[BroadcastService] Failed to execute scheduled broadcast ${b.id}:`, err)

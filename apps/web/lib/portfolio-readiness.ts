@@ -155,3 +155,52 @@ export function calculatePortfolioReadiness(input: PortfolioReadinessInput): Por
     recommendation,
   }
 }
+
+export type PortfolioVerificationOverride = 'verified' | 'rejected' | null
+
+export interface PortfolioVerificationStatus {
+  /** Whether the portfolio meets the automatic verification criteria right now. */
+  isAutoEligible: boolean
+  /** The effective status to display, after applying any admin override. */
+  isVerified: boolean
+  /** Where the effective status came from. */
+  source: 'auto' | 'admin_verified' | 'admin_rejected'
+  /** How many of the 3 social/portfolio links are present (0-3). */
+  linkCount: number
+}
+
+/**
+ * Automatic Portfolio Verification eligibility (no admin approval required).
+ *
+ * Reuses the SAME avatar/bio completeness signals `calculatePortfolioReadiness`
+ * already computes (via its `items` array) instead of re-deriving them, so the
+ * two features can never silently disagree about what counts as "has a bio",
+ * etc. The one genuinely new rule is requiring at least 2 of the 3
+ * social/portfolio links — readiness only requires at least 1 (as a single
+ * "recommended" checklist item), verification requires a stronger signal.
+ *
+ * An admin can force the result to 'verified' or 'rejected', which then takes
+ * precedence over the automatic computation until the override is cleared —
+ * automatic eligibility remains the default source of truth otherwise.
+ */
+export function calculatePortfolioVerification(
+  readiness: PortfolioReadinessSummary,
+  links: { linkedinUrl?: string | null; githubUrl?: string | null; websiteUrl?: string | null },
+  adminOverride: PortfolioVerificationOverride = null
+): PortfolioVerificationStatus {
+  const hasAvatar = readiness.items.find((i) => i.id === 'avatar')?.isComplete ?? false
+  const hasBio = readiness.items.find((i) => i.id === 'bio')?.isComplete ?? false
+  const linkCount = [links.linkedinUrl, links.githubUrl, links.websiteUrl].filter((u) =>
+    Boolean(u && u.trim().length > 0)
+  ).length
+
+  const isAutoEligible = hasAvatar && hasBio && linkCount >= 2
+
+  if (adminOverride === 'verified') {
+    return { isAutoEligible, isVerified: true, source: 'admin_verified', linkCount }
+  }
+  if (adminOverride === 'rejected') {
+    return { isAutoEligible, isVerified: false, source: 'admin_rejected', linkCount }
+  }
+  return { isAutoEligible, isVerified: isAutoEligible, source: 'auto', linkCount }
+}

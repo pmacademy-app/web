@@ -1,12 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { Shield, Key, Lock, Loader2, CheckCircle2, AlertCircle, Eye, EyeOff, Mail, Send } from 'lucide-react'
 
 function ChangeEmailCard() {
-  const searchParams = useSearchParams()
-
   const [currentEmail, setCurrentEmail] = useState<string | null>(null)
   const [loadingEmail, setLoadingEmail] = useState(true)
   const [emailPassword, setEmailPassword] = useState('')
@@ -16,11 +13,9 @@ function ChangeEmailCard() {
   const [emailSuccessMsg, setEmailSuccessMsg] = useState<string | null>(null)
   const [emailErrorMsg, setEmailErrorMsg] = useState<string | null>(null)
 
-  // Reflect the outcome of clicking the confirmation link (redirected back here
-  // by /api/auth/callback) without needing any server-detected "pending" state.
-  const confirmedFromCallback = searchParams.get('emailChanged') === 'true'
-  const failedFromCallback = searchParams.get('error') === 'email_change_failed'
-
+  // The confirmation link redirects to the dedicated /email-verified page
+  // (success or error state shown there), then the user comes back here —
+  // so this card only ever needs to reflect the current, already-synced email.
   useEffect(() => {
     let isMounted = true
     fetch('/api/settings/security/change-email')
@@ -100,17 +95,6 @@ function ChangeEmailCard() {
           <p className="text-sm text-foreground font-mono">{currentEmail || '—'}</p>
         )}
       </div>
-
-      {confirmedFromCallback && (
-        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-2" role="status">
-          <CheckCircle2 className="w-4 h-4 shrink-0" /> Your email address has been updated successfully.
-        </div>
-      )}
-      {failedFromCallback && (
-        <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-xs font-semibold text-destructive flex items-center gap-2" role="alert">
-          <AlertCircle className="w-4 h-4 shrink-0" /> That confirmation link is invalid or has expired. Please request the change again.
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1.5">

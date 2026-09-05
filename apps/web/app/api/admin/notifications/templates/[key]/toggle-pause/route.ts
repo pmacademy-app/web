@@ -27,7 +27,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'paused boolean field is required' }, { status: 400 })
     }
 
-    const isCritical = key === 'auth.verify_email' || key === 'auth.password_reset'
+    const isCritical = key === 'auth.verify_email' || key === 'auth.password_reset' || key === 'auth.email_change_verify'
     if (isCritical && paused) {
       return NextResponse.json({ error: 'Critical authentication emails cannot be paused.' }, { status: 400 })
     }

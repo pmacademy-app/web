@@ -146,7 +146,7 @@ export async function POST(request: Request) {
 
     const { error: updateError } = await sessionClient.auth.updateUser(
       { email: newEmail },
-      { emailRedirectTo: `${BRAND.siteUrl}/settings?tab=security&emailChanged=true` }
+      { emailRedirectTo: `${BRAND.siteUrl}/email-verified` }
     )
 
     if (updateError) {

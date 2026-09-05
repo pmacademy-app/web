@@ -7,8 +7,9 @@ import type {
   LearnerSubmittedCapstoneSummary,
 } from '@/lib/portfolio-db'
 import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
-import { calculatePortfolioReadiness } from '@/lib/portfolio-readiness'
+import { calculatePortfolioReadiness, calculatePortfolioVerification } from '@/lib/portfolio-readiness'
 import { PortfolioReadinessCard } from '@/components/settings/PortfolioReadinessCard'
+import { PortfolioVerificationCard } from '@/components/settings/PortfolioVerificationCard'
 import { FellowRequestCard } from '@/components/settings/FellowRequestCard'
 import {
   trackPortfolioLayoutUpdated,
@@ -81,6 +82,7 @@ export function PortfolioSettingsForm() {
     portfolioLayout: DEFAULT_PORTFOLIO_LAYOUT,
     featuredCapstoneId: null,
     portfolioViewCount: 0,
+    verificationOverride: null,
   })
 
   const [submittedCapstones, setSubmittedCapstones] = useState<LearnerSubmittedCapstoneSummary[]>([])
@@ -200,6 +202,13 @@ export function PortfolioSettingsForm() {
     isPortfolioPublic: formData.isPortfolioPublic,
     publicCapstonesCount,
   })
+  const verification = calculatePortfolioVerification(
+    readiness,
+    { linkedinUrl: formData.linkedinUrl, githubUrl: formData.githubUrl, websiteUrl: formData.websiteUrl },
+    formData.verificationOverride ?? null
+  )
+  const hasAvatarForVerification = readiness.items.find((i) => i.id === 'avatar')?.isComplete ?? false
+  const hasBioForVerification = readiness.items.find((i) => i.id === 'bio')?.isComplete ?? false
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -223,6 +232,13 @@ export function PortfolioSettingsForm() {
         readiness={readiness}
         username={formData.username}
         isPublic={formData.isPortfolioPublic}
+      />
+
+      {/* Automatic Portfolio Verification — becomes active as soon as criteria are met, no request needed */}
+      <PortfolioVerificationCard
+        verification={verification}
+        hasAvatar={hasAvatarForVerification}
+        hasBio={hasBioForVerification}
       />
 
       {/* PM Fellow Request (server-verified eligibility, independent of unsaved draft edits above) */}

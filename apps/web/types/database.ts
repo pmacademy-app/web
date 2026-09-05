@@ -1791,6 +1791,7 @@ export type Database = {
           onboarding_preference: string | null
           onboarding_topics: string[]
           portfolio_layout: Json | null
+          portfolio_verification_override: string | null
           portfolio_view_count: number
           streak_freezes_available: number
           timezone: string
@@ -1825,6 +1826,7 @@ export type Database = {
           onboarding_preference?: string | null
           onboarding_topics?: string[]
           portfolio_layout?: Json | null
+          portfolio_verification_override?: string | null
           portfolio_view_count?: number
           streak_freezes_available?: number
           timezone?: string
@@ -1859,6 +1861,7 @@ export type Database = {
           onboarding_preference?: string | null
           onboarding_topics?: string[]
           portfolio_layout?: Json | null
+          portfolio_verification_override?: string | null
           portfolio_view_count?: number
           streak_freezes_available?: number
           timezone?: string

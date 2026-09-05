@@ -8,35 +8,35 @@ import { TOKENS } from '@/theme/tokens'
 export const dynamic = 'force-dynamic'
 
 /**
- * OG card palette — sourced from the site's own public dark theme tokens
- * (theme/tokens.ts `colors.dark`), not the admin-console-only palette, so the
- * social preview matches the global Prodily visual identity rather than an
- * internal tool's look. Deliberately no custom font is loaded here (Satori's
- * default sans is used): fetching a font remotely per-instance would add an
- * external runtime dependency to a reliability-critical, publicly-shared
- * image endpoint for a purely cosmetic gain.
+ * OG card palette — sourced directly from the app's own PUBLIC light theme
+ * tokens (theme/tokens.ts `colors`, the same tokens the rest of the product
+ * UI uses) plus the exact logo colors (public/brand/logo-mark.svg: #019E75 /
+ * #011229), matching the existing static brand asset (public/brand/og-image.png:
+ * light background, deep navy headline text, green accent, soft white cards).
+ * The PREVIOUS dark-navy/admin-console-styled version did not match this at
+ * all — this redesign intentionally does not invent any new colors.
+ *
+ * No custom font is loaded (Satori's default sans is used): fetching a font
+ * remotely per-instance would add an external runtime dependency to a
+ * reliability-critical, publicly-shared image endpoint for a cosmetic gain.
  */
 const OG = {
-  background: TOKENS.colors.dark.background,
-  surface: 'rgba(22, 26, 24, 0.72)',
-  surfaceRaised: 'rgba(32, 37, 32, 0.6)',
-  border: 'rgba(244, 241, 232, 0.09)',
-  borderStrong: 'rgba(244, 241, 232, 0.16)',
-  foreground: TOKENS.colors.dark.foreground,
-  muted: TOKENS.colors.dark.textMuted,
-  subtle: '#6B7264',
-  primary: TOKENS.colors.dark.primary,
-  gold: TOKENS.colors.dark.accent,
+  background: TOKENS.colors.background, // '#FBFAF6'
+  surface: TOKENS.colors.surface, // '#FFFFFF'
+  surfaceMuted: TOKENS.colors.surfaceMuted, // '#F2EFE7'
+  border: TOKENS.colors.border, // '#DED8CB'
+  foreground: TOKENS.colors.foreground, // '#171A17'
+  muted: TOKENS.colors.textMuted, // '#70685A'
+  primary: TOKENS.colors.primary, // '#1F6B4E'
+  accent: TOKENS.colors.accent, // '#D98B24' — used for the Fellow distinction, matches the theme's own accent token
+  logoGreen: '#019E75', // exact logo-mark.svg color, used only for the logo graphic itself
 } as const
 
 interface RouteProps {
   params: Promise<{ username: string }>
 }
 
-/**
- * Official Prodily Logo Mark (SVG path from public/brand/logo-mark.svg).
- * Renders cleanly in Satori with brand primary green (#019E75) and dark emerald accent (#66D6A3).
- */
+/** Official Prodily Logo Mark (exact path + colors from public/brand/logo-mark.svg). */
 function ProdilyLogoMark({ size = 38 }: { size?: number }) {
   const height = Math.round((size * 497.69) / 422.46)
   return (
@@ -55,7 +55,7 @@ function ProdilyLogoMark({ size = 38 }: { size?: number }) {
         />
         <path
           d="M 232.816 270.366 C 217.968 279.346, 182.310 302.429, 181 303.909 C 179.692 305.388, 179.502 316.337, 179.516 389.560 C 179.532 471.475, 179.581 473.597, 181.516 476.871 C 182.970 479.329, 190.051 484.471, 208 496.098 C 221.475 504.828, 233.916 512.243, 235.648 512.577 C 240.115 513.439, 244.147 511.313, 269.500 494.735 C 283.722 485.435, 292.295 479.175, 293.750 477.027 L 296 473.704 296 389.526 L 296 305.349 293.750 303.275 C 291.377 301.087, 278.466 292.613, 253.316 276.737 L 238.131 267.151 232.816 270.366"
-          fill="#66D6A3"
+          fill="#011229"
         />
       </g>
     </svg>
@@ -82,7 +82,7 @@ export async function GET(request: Request, { params }: RouteProps) {
               justifyContent: 'center',
               backgroundColor: OG.background,
               backgroundImage:
-                `radial-gradient(circle at 50% 35%, rgba(102, 214, 163, 0.14), transparent 60%), radial-gradient(circle at 80% 80%, rgba(255, 180, 84, 0.09), transparent 50%)`,
+                `radial-gradient(circle at 12% 15%, rgba(1, 158, 117, 0.10), transparent 45%), radial-gradient(circle at 88% 85%, rgba(217, 139, 36, 0.08), transparent 45%)`,
               color: OG.foreground,
               fontFamily: 'sans-serif',
               padding: '60px',
@@ -95,7 +95,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                 gap: '10px',
                 padding: '8px 20px',
                 borderRadius: '9999px',
-                backgroundColor: OG.surfaceRaised,
+                backgroundColor: OG.surface,
                 border: `1px solid ${OG.border}`,
                 color: OG.muted,
                 fontSize: '16px',
@@ -149,7 +149,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                 gap: '8px',
                 fontSize: '15px',
                 color: OG.primary,
-                fontWeight: 600,
+                fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
               }}
@@ -201,7 +201,7 @@ export async function GET(request: Request, { params }: RouteProps) {
             justifyContent: 'space-between',
             backgroundColor: OG.background,
             backgroundImage:
-              `radial-gradient(circle at 8% 12%, rgba(102, 214, 163, 0.20), transparent 45%), radial-gradient(circle at 92% 88%, rgba(255, 180, 84, 0.10), transparent 45%), radial-gradient(circle at 50% 50%, rgba(22, 26, 24, 0.55), transparent 70%)`,
+              `radial-gradient(circle at 6% 10%, rgba(1, 158, 117, 0.12), transparent 42%), radial-gradient(circle at 94% 90%, rgba(217, 139, 36, 0.08), transparent 42%)`,
             color: OG.foreground,
             fontFamily: 'sans-serif',
             padding: '48px 56px',
@@ -252,7 +252,7 @@ export async function GET(request: Request, { params }: RouteProps) {
               </div>
             </div>
 
-            {/* Contextual Status Badge — gold for Fellow to read as a distinct, premium distinction */}
+            {/* Contextual Status Badge — accent gold for Fellow, matching the theme's own accent token */}
             <div
               style={{
                 display: 'flex',
@@ -260,9 +260,9 @@ export async function GET(request: Request, { params }: RouteProps) {
                 gap: '8px',
                 padding: '8px 18px',
                 borderRadius: '9999px',
-                backgroundColor: user.isFellow ? 'rgba(255, 180, 84, 0.16)' : OG.surfaceRaised,
-                border: user.isFellow ? `1px solid rgba(255, 180, 84, 0.45)` : `1px solid ${OG.border}`,
-                color: user.isFellow ? OG.gold : OG.foreground,
+                backgroundColor: user.isFellow ? 'rgba(217, 139, 36, 0.12)' : OG.surface,
+                border: user.isFellow ? `1px solid rgba(217, 139, 36, 0.4)` : `1px solid ${OG.border}`,
+                color: user.isFellow ? OG.accent : OG.foreground,
                 fontSize: '13px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
@@ -283,6 +283,7 @@ export async function GET(request: Request, { params }: RouteProps) {
               border: `1px solid ${OG.border}`,
               borderRadius: '24px',
               padding: '32px 36px',
+              boxShadow: '0 8px 24px rgba(23, 26, 23, 0.06)',
             }}
           >
             {/* Identity Row */}
@@ -301,9 +302,8 @@ export async function GET(request: Request, { params }: RouteProps) {
                     width: '104px',
                     height: '104px',
                     borderRadius: '9999px',
-                    border: `3px solid ${user.isFellow ? OG.gold : OG.primary}`,
+                    border: `3px solid ${user.isFellow ? OG.accent : OG.primary}`,
                     objectFit: 'cover',
-                    boxShadow: `0 0 24px ${user.isFellow ? 'rgba(255, 180, 84, 0.35)' : 'rgba(102, 214, 163, 0.3)'}`,
                   }}
                 />
               ) : (
@@ -312,15 +312,14 @@ export async function GET(request: Request, { params }: RouteProps) {
                     width: '104px',
                     height: '104px',
                     borderRadius: '9999px',
-                    background: `linear-gradient(135deg, ${OG.surfaceRaised} 0%, ${OG.primary} 100%)`,
-                    border: `3px solid ${user.isFellow ? OG.gold : OG.primary}`,
+                    background: `linear-gradient(135deg, ${OG.surfaceMuted} 0%, ${OG.primary} 100%)`,
+                    border: `3px solid ${user.isFellow ? OG.accent : OG.primary}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '44px',
                     fontWeight: 800,
-                    color: OG.foreground,
-                    boxShadow: `0 0 24px ${user.isFellow ? 'rgba(255, 180, 84, 0.3)' : 'rgba(102, 214, 163, 0.28)'}`,
+                    color: OG.surface,
                   }}
                 >
                   {displayName.charAt(0).toUpperCase()}
@@ -352,16 +351,16 @@ export async function GET(request: Request, { params }: RouteProps) {
                     style={{
                       fontSize: '19px',
                       fontWeight: user.isFellow ? 700 : 600,
-                      color: user.isFellow ? OG.gold : OG.muted,
+                      color: user.isFellow ? OG.accent : OG.muted,
                     }}
                   >
                     {user.isFellow ? 'Product Management Fellow at Prodily' : 'Product Management Portfolio'}
                   </span>
-                  <span style={{ color: OG.subtle, fontSize: '18px' }}>•</span>
+                  <span style={{ color: OG.border, fontSize: '18px' }}>•</span>
                   <span
                     style={{
                       fontSize: '17px',
-                      color: OG.subtle,
+                      color: OG.muted,
                       fontWeight: 600,
                       fontFamily: 'monospace',
                     }}
@@ -400,17 +399,18 @@ export async function GET(request: Request, { params }: RouteProps) {
                 flex: 1,
                 padding: '18px 24px',
                 borderRadius: '18px',
-                backgroundColor: OG.surfaceRaised,
+                backgroundColor: OG.surface,
                 border: `1px solid ${OG.border}`,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '4px',
+                boxShadow: '0 4px 14px rgba(23, 26, 23, 0.05)',
               }}
             >
               <span
                 style={{
                   fontSize: '12px',
-                  color: OG.subtle,
+                  color: OG.muted,
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
@@ -435,17 +435,18 @@ export async function GET(request: Request, { params }: RouteProps) {
                 flex: 1.4,
                 padding: '18px 24px',
                 borderRadius: '18px',
-                backgroundColor: OG.surfaceRaised,
+                backgroundColor: OG.surface,
                 border: `1px solid ${OG.border}`,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
+                boxShadow: '0 4px 14px rgba(23, 26, 23, 0.05)',
               }}
             >
               <span
                 style={{
                   fontSize: '12px',
-                  color: OG.subtle,
+                  color: OG.muted,
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
@@ -461,8 +462,8 @@ export async function GET(request: Request, { params }: RouteProps) {
                       fontSize: '13px',
                       fontWeight: 600,
                       color: OG.primary,
-                      backgroundColor: 'rgba(102, 214, 163, 0.12)',
-                      border: '1px solid rgba(102, 214, 163, 0.25)',
+                      backgroundColor: OG.surfaceMuted,
+                      border: `1px solid ${OG.border}`,
                       padding: '3px 10px',
                       borderRadius: '6px',
                     }}
@@ -481,12 +482,12 @@ export async function GET(request: Request, { params }: RouteProps) {
               alignItems: 'center',
               justifyContent: 'space-between',
               fontSize: '14px',
-              color: OG.subtle,
+              color: OG.muted,
               borderTop: `1px solid ${OG.border}`,
               paddingTop: '16px',
             }}
           >
-            <span style={{ color: OG.muted, fontWeight: 600, fontFamily: 'monospace' }}>
+            <span style={{ color: OG.foreground, fontWeight: 600, fontFamily: 'monospace' }}>
               {BRAND.domain}/p/{user.username}
             </span>
             <span style={{ fontWeight: 500 }}>
@@ -509,4 +510,3 @@ export async function GET(request: Request, { params }: RouteProps) {
     return new Response('Failed to generate OpenGraph preview image', { status: 500 })
   }
 }
-

@@ -271,8 +271,17 @@ export async function POST(request: NextRequest) {
       break
     }
 
-    case 'email_change': {
-      templateKey = 'auth.verify_email'
+    // Supabase reports email-change confirmations as 'email_change' (single
+    // opt-in) or the granular 'email_change_current' / 'email_change_new'
+    // (secure/double opt-in — one email to each address). All three must
+    // resolve to the SAME canonical 'email_change' OTP type when building the
+    // callback URL, since verifyOtp() only recognizes that literal value —
+    // passing the raw sub-type through would make the confirmation link
+    // unverifiable.
+    case 'email_change':
+    case 'email_change_current':
+    case 'email_change_new': {
+      templateKey = 'auth.email_change_verify'
       const verificationUrl = buildAuthCallbackUrl(siteUrl, tokenHash, 'email_change', email_data.redirect_to)
       templateVariables = { userName, verificationUrl }
       break

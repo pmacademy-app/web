@@ -12,6 +12,11 @@ import { EMAIL_TEMPLATE_MAP, renderEmailTemplate } from '@/emails'
 import { AUTOMATION_METADATA } from '@/lib/notifications/automations/service'
 import { BRAND } from '@/lib/brand'
 import type { AdminAttentionItem } from './types'
+import {
+  TEMPLATE_SAMPLE_VARIABLES,
+  TEMPLATE_VARIABLE_CATALOG,
+  type AdminTemplateVariable,
+} from './template-variables'
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 
@@ -54,12 +59,6 @@ export interface AdminTemplateListItem {
   subjectLine: string
   /** True for admin-created HTML email templates that exist only in the database (no static component). */
   isCustom?: boolean
-}
-
-export interface AdminTemplateVariable {
-  name: string
-  description: string
-  sample: string
 }
 
 export interface AdminTemplateDetail {
@@ -111,64 +110,15 @@ export interface AdminCommunicationsOverview {
 }
 
 /* ─── Template metadata helpers ─────────────────────────────────────────── */
-
-/** Sample values used for preview rendering (mirrors the test-send route). */
-export const TEMPLATE_SAMPLE_VARIABLES: Record<string, unknown> = {
-  userName: 'Aditya',
-  email: 'aditya@example.com',
-  confirmationUrl: `${BRAND.siteUrl}/api/auth/callback?token_hash=test_token_hash&type=signup`,
-  resetUrl: `${BRAND.siteUrl}/reset-password?token=test_reset_token`,
-  verificationUrl: `${BRAND.siteUrl}/verify/PMA-2026-TEST01`,
-  moduleName: 'Product Strategy & Vision',
-  moduleSlug: 'product-strategy',
-  badgeName: 'Visionary Strategist',
-  badgeDescription: 'Completed the Product Strategy module',
-  badgeIcon: '🏅',
-  newLevel: 5,
-  levelTitle: 'Senior Product Manager',
-  totalXp: 1250,
-  certificateCode: 'PMA-2026-TEST01',
-  portfolioUrl: `${BRAND.siteUrl}/p/aditya`,
-  weeklyXp: 450,
-  lessonsCompleted: 8,
-  streakDays: 12,
-  currentStreak: 12,
-  dueCount: 5,
-  xpBonus: 200,
-  daysStudiedThisWeek: 5,
-  lessonsCompletedThisWeek: 8,
-  xpEarnedThisWeek: 450,
-  appUrl: BRAND.siteUrl,
-}
-
-/** Curated catalog of variables available to email templates. */
-export const TEMPLATE_VARIABLE_CATALOG: AdminTemplateVariable[] = [
-  { name: 'userName', description: 'Recipient display name', sample: 'Aditya' },
-  { name: 'email', description: 'Recipient email address', sample: 'aditya@example.com' },
-  { name: 'appUrl', description: 'Application base URL', sample: BRAND.siteUrl },
-  { name: 'confirmationUrl', description: 'Email verification link', sample: `${BRAND.siteUrl}/api/auth/callback?token_hash=…` },
-  { name: 'resetUrl', description: 'Password reset link', sample: `${BRAND.siteUrl}/reset-password?token=…` },
-  { name: 'verificationUrl', description: 'Certificate verification link', sample: `${BRAND.siteUrl}/verify/PMA-2026-…` },
-  { name: 'moduleName', description: 'Completed module name', sample: 'Product Strategy & Vision' },
-  { name: 'moduleSlug', description: 'Module URL slug', sample: 'product-strategy' },
-  { name: 'badgeName', description: 'Earned badge name', sample: 'Visionary Strategist' },
-  { name: 'badgeDescription', description: 'Earned badge description', sample: 'Completed the strategy module' },
-  { name: 'newLevel', description: 'New XP level reached', sample: '5' },
-  { name: 'levelTitle', description: 'Level title', sample: 'Senior Product Manager' },
-  { name: 'certificateCode', description: 'Certificate credential ID', sample: 'PMA-2026-TEST01' },
-  { name: 'portfolioUrl', description: 'Public portfolio URL', sample: `${BRAND.siteUrl}/p/aditya` },
-  { name: 'weeklyXp', description: 'XP earned this week', sample: '450' },
-  { name: 'lessonsCompleted', description: 'Lessons completed this week', sample: '8' },
-  { name: 'streakDays', description: 'Current streak length', sample: '12' },
-  { name: 'currentStreak', description: 'Current streak length', sample: '12' },
-  { name: 'dueCount', description: 'Flashcards due for review', sample: '5' },
-  { name: 'xpBonus', description: 'Module completion XP bonus', sample: '200' },
-  { name: 'totalXp', description: 'Cumulative XP', sample: '1250' },
-  { name: 'daysStudiedThisWeek', description: 'Days studied this week', sample: '5' },
-  { name: 'lessonsCompletedThisWeek', description: 'Lessons completed this week', sample: '8' },
-  { name: 'xpEarnedThisWeek', description: 'XP earned this week', sample: '450' },
-  { name: 'unsubscribeToken', description: 'Per-recipient unsubscribe token', sample: '…' },
-]
+// TEMPLATE_SAMPLE_VARIABLES / TEMPLATE_VARIABLE_CATALOG / AdminTemplateVariable
+// live in ./template-variables (isomorphic — no server-only imports) so the
+// client-side template editor can share the exact same catalog instead of
+// keeping its own copy. Re-exported here for existing importers.
+export {
+  TEMPLATE_SAMPLE_VARIABLES,
+  TEMPLATE_VARIABLE_CATALOG,
+  type AdminTemplateVariable,
+} from './template-variables'
 
 /** Human label for a template key when no automation metadata exists. */
 function templateDisplayName(key: string): string {

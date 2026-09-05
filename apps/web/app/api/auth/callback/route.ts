@@ -29,11 +29,25 @@ function redirectWithSession(
   return response
 }
 
+/**
+ * Supabase's Send Email Hook reports email-change events as the granular
+ * `email_change_current` / `email_change_new` action types (one per address
+ * being notified), but `verifyOtp()` only recognizes the single canonical
+ * `email_change` OTP type. Normalizing here ensures a confirmation link is
+ * never misrouted or rejected due to that sub-type mismatch.
+ */
+function normalizeOtpType(rawType: string | null): EmailOtpType | null {
+  if (rawType === 'email_change_current' || rawType === 'email_change_new') {
+    return 'email_change'
+  }
+  return rawType as EmailOtpType | null
+}
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const token_hash = requestUrl.searchParams.get('token_hash')
-  const type = requestUrl.searchParams.get('type') as EmailOtpType | null
+  const type = normalizeOtpType(requestUrl.searchParams.get('type'))
   const next = requestUrl.searchParams.get('next') ?? '/dashboard'
   let destination = new URL(next, requestUrl.origin)
   if (destination.origin !== requestUrl.origin) {
@@ -82,9 +96,8 @@ export async function GET(request: NextRequest) {
 
         // Supabase Auth's email_change confirmation updates `auth.users.email`
         // directly, but there is no trigger syncing that to `public.users.email`
-        // (the app's own profile table). Keep them consistent here — the one
-        // place both a signup insert AND every email-change confirmation flow
-        // through.
+        // (the app's own profile table). Keep them consistent here — this is
+        // the one place every email-change confirmation flows through.
         if (type === 'email_change' && data.user.email) {
           try {
             await supabase
@@ -120,16 +133,16 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        if (data.session) {
-          return redirectWithSession(destination, data.session)
+        // email_change confirmation always lands on the dedicated success page
+        // (regardless of whether verifyOtp happened to mint a fresh session),
+        // rather than continuing on to a generic post-login destination.
+        if (type === 'email_change') {
+          const successUrl = new URL('/email-verified', requestUrl.origin)
+          return data.session ? redirectWithSession(successUrl, data.session) : NextResponse.redirect(successUrl)
         }
 
-        // email_change confirmation is verified via the service-role client and
-        // does not mint a new session — the user is already logged in from
-        // before they requested the change. Land them back on the Security tab
-        // (their existing session cookies are untouched) instead of /login.
-        if (type === 'email_change') {
-          return NextResponse.redirect(destination)
+        if (data.session) {
+          return redirectWithSession(destination, data.session)
         }
 
         return NextResponse.redirect(new URL('/login?verified=true', requestUrl.origin))
@@ -148,10 +161,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/reset-password?error=expired', requestUrl.origin))
   }
 
-  // Expired/invalid email-change confirmation: the user is already logged in,
-  // so send them back to the Security tab with an error flag rather than /login.
+  // Expired/invalid/already-used email-change confirmation: land on the same
+  // dedicated page in its error state rather than bouncing to /login.
   if (type === 'email_change') {
-    return NextResponse.redirect(new URL('/settings?tab=security&error=email_change_failed', requestUrl.origin))
+    return NextResponse.redirect(new URL('/email-verified?status=error', requestUrl.origin))
   }
 
   // Distinguish email verification failures from generic auth failures

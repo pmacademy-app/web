@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
-import { X, Plus, FileCode, Code2, Eye } from 'lucide-react'
+import React, { useMemo, useRef, useState } from 'react'
+import { X, Plus, FileCode, Code2, Eye, AlertTriangle } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
 import { cn } from '@/lib/utils'
+import { TEMPLATE_SAMPLE_VARIABLES, TEMPLATE_VARIABLE_CATALOG, findUnknownVariables } from '@/lib/admin/template-variables'
 
 interface AdminCreateTemplateModalProps {
   open: boolean
@@ -27,6 +28,34 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
   const [bodyHtml, setBodyHtml] = useState('')
   const [mode, setMode] = useState<'code' | 'preview'>('code')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const bodyRef = useRef<HTMLTextAreaElement>(null)
+
+  const knownVariableNames = useMemo(() => TEMPLATE_VARIABLE_CATALOG.map((v) => v.name), [])
+  const unknownVariables = useMemo(
+    () => findUnknownVariables(bodyHtml, knownVariableNames),
+    [bodyHtml, knownVariableNames]
+  )
+  const previewHtml = useMemo(() => {
+    let interpolated = bodyHtml
+    for (const [k, v] of Object.entries(TEMPLATE_SAMPLE_VARIABLES)) {
+      interpolated = interpolated.replace(new RegExp(`\\{\\{\\s*${k}\\s*\\}\\}`, 'g'), String(v))
+    }
+    return interpolated
+  }, [bodyHtml])
+
+  const handleInsertVariable = (name: string) => {
+    if (!name) return
+    const token = `{{${name}}}`
+    const el = bodyRef.current
+    const start = el?.selectionStart ?? bodyHtml.length
+    const end = el?.selectionEnd ?? bodyHtml.length
+    const next = bodyHtml.slice(0, start) + token + bodyHtml.slice(end)
+    setBodyHtml(next)
+    requestAnimationFrame(() => {
+      el?.focus()
+      el?.setSelectionRange(start + token.length, start + token.length)
+    })
+  }
 
   if (!open) return null
 
@@ -144,7 +173,21 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold text-admin-fg">Email Body (HTML)</label>
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-admin-bg/60 border border-admin-border">
+              <div className="flex items-center gap-2">
+                <select
+                  value=""
+                  onChange={(e) => handleInsertVariable(e.target.value)}
+                  className="px-2 py-1 text-[11px] rounded-lg border border-admin-border bg-admin-bg text-admin-fg-muted focus:outline-none focus:ring-2 focus:ring-admin-accent cursor-pointer"
+                  title="Insert a variable at the cursor position"
+                >
+                  <option value="">+ Insert Variable</option>
+                  {TEMPLATE_VARIABLE_CATALOG.map((v) => (
+                    <option key={v.name} value={v.name}>
+                      {`{{${v.name}}}`} — {v.description}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-1 p-1 rounded-lg bg-admin-bg/60 border border-admin-border">
                 <button
                   type="button"
                   onClick={() => setMode('code')}
@@ -165,15 +208,17 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
                 >
                   <Eye className="w-3 h-3" /> Preview
                 </button>
+                </div>
               </div>
             </div>
 
             {mode === 'code' ? (
               <textarea
                 required
+                ref={bodyRef}
                 rows={10}
                 spellCheck={false}
-                placeholder="<html>...</html> or an HTML fragment"
+                placeholder="<html>...</html> or an HTML fragment. Use {{variableName}} to insert dynamic content."
                 value={bodyHtml}
                 onChange={(e) => setBodyHtml(e.target.value)}
                 className="w-full px-3 py-2 text-[11px] font-mono leading-relaxed rounded-lg border border-admin-border bg-admin-bg text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent resize-y"
@@ -182,14 +227,21 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
               <div className="rounded-lg border border-admin-border overflow-hidden bg-white">
                 <iframe
                   title="Template HTML preview"
-                  srcDoc={bodyHtml}
+                  srcDoc={previewHtml}
                   sandbox=""
                   className="w-full h-64 bg-white"
                 />
               </div>
             )}
+            {unknownVariables.length > 0 && (
+              <p className="flex items-center gap-1.5 text-[11px] text-admin-warning">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                Unrecognized variable{unknownVariables.length > 1 ? 's' : ''}:{' '}
+                {unknownVariables.map((n) => `{{${n}}}`).join(', ')} — this won&apos;t be replaced when sent.
+              </p>
+            )}
             <p className="text-[11px] text-admin-fg-muted">
-              HTML is sanitized on save (scripts, embeds, and dangerous attributes are stripped). Preview is fully sandboxed and cannot execute scripts.
+              HTML is sanitized on save (scripts, embeds, and dangerous attributes are stripped). Preview interpolates sample values and is fully sandboxed.
             </p>
           </div>
 
