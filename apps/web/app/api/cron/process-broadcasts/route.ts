@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { BroadcastService } from '@/lib/admin/broadcast-service'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
 import { requireAdminUser } from '@/lib/admin/guard'
+import { apiInternalError } from '@/lib/errors/api-response'
 
 export const runtime = 'nodejs'
 
@@ -50,9 +51,11 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     })
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Internal server error' },
-      { status: 500 }
-    )
+    return apiInternalError({
+      cause: err,
+      domain: 'cron',
+      operation: 'cron.process_broadcasts',
+      summary: 'Unexpected failure while processing scheduled broadcasts',
+    })
   }
 }

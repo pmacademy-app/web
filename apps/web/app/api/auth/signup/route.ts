@@ -4,6 +4,7 @@ import { SettingsService } from '@/lib/admin/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
 import { createReferralAttribution } from '@/lib/referral/referral-service'
+import { apiInternalError, apiClassifiedAuthError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
@@ -132,10 +133,14 @@ export async function POST(request: NextRequest) {
       }
 
       if (error) {
-        return NextResponse.json(
-          { error: error.message || 'Registration failed.', code: error.code || 'SIGNUP_FAILED' },
-          { status: 400 }
-        )
+        // Route the provider error through the existing classifier rather than
+        // forwarding its message. The learner still gets the specific guidance
+        // (weak password, rate limited) but never the raw Supabase/GoTrue text.
+        return apiClassifiedAuthError({
+          cause: error,
+          context: 'signup',
+          status: 400,
+        })
       }
 
       // Record referral attribution if user was registered and referred
@@ -250,9 +255,13 @@ export async function POST(request: NextRequest) {
     }
   } catch (err) {
     console.error('[api/auth/signup] Error:', err)
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Internal registration error', code: 'SERVER_ERROR' },
-      { status: 500 }
-    )
+    return apiInternalError({
+      cause: err,
+      domain: 'auth',
+      operation: 'auth.signup',
+      summary: 'Unexpected failure while registering a learner',
+      code: 'SERVER_ERROR',
+      message: AUTH_SERVICE_UNAVAILABLE_MESSAGE,
+    })
   }
 }

@@ -193,7 +193,12 @@ export function classifyAuthError(
     rawMessage.includes('password is too weak') ||
     rawMessage.includes('weak password') ||
     rawMessage.includes('password must be') ||
-    rawMessage.includes('password too short')
+    rawMessage.includes('password too short') ||
+    // Idempotency: this classifier's OWN weak-password copy must re-classify to the
+    // same code. API routes now return classified messages instead of raw provider
+    // text, and the auth screens re-classify what they receive — without this the
+    // specific password guidance would degrade to AUTH_UNKNOWN_ERROR on the client.
+    rawMessage.includes('does not meet security requirements')
   ) {
     return {
       code: 'AUTH_PASSWORD_TOO_WEAK',
@@ -292,7 +297,10 @@ export function classifyAuthError(
     rawMessage.includes('gateway timeout') ||
     rawMessage.includes('database error saving new user') ||
     rawMessage.includes('internal server error') ||
-    rawMessage.includes('auth provider unavailable')
+    rawMessage.includes('auth provider unavailable') ||
+    // Idempotency: matches this classifier's own service-unavailable copy, which API
+    // routes return for unexpected auth failures.
+    rawMessage.includes('service is temporarily unavailable')
   ) {
     return {
       code: 'AUTH_PROVIDER_UNAVAILABLE',

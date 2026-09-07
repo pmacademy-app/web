@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { createAuthenticatedServerClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { apiClassifiedAuthError, apiInternalError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { isNetworkFailure } from '@/lib/auth/errors'
 
 export const runtime = 'nodejs'
@@ -157,10 +158,14 @@ export async function POST(request: NextRequest) {
           // Genuine unexpected update failure
           void logSystemError({ severity: 'warning', category: 'auth', operation: 'update_password_failure', message: error.message })
         }
-        const response = NextResponse.json(
-          { success: false, error: error.message || 'Failed to update password. Your reset link may have expired.' },
-          { status: isExpiredOrInvalid ? 401 : 400 }
-        )
+        // Classified rather than forwarded: the learner keeps an accurate,
+        // actionable message without seeing raw GoTrue text. Status codes are
+        // unchanged (401 expired/invalid link, 400 genuine failure).
+        const response = apiClassifiedAuthError({
+          cause: error,
+          context: 'reset_password',
+          status: isExpiredOrInvalid ? 401 : 400,
+        })
         if (isExpiredOrInvalid) {
           clearRecoveryCookies(response)
         }
@@ -228,8 +233,14 @@ export async function POST(request: NextRequest) {
     clearRecoveryCookies(response)
     return response
   } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Unknown server error'
-    void logSystemError({ severity: 'error', category: 'auth', operation: 'update_password_exception', message: errorMsg })
-    return NextResponse.json({ success: false, error: 'An unexpected error occurred.' }, { status: 500 })
+    // Already safe before P7 (no raw message leaked); routed through the shared helper
+    // so it also carries a stable code and a support-correlatable errorId.
+    return apiInternalError({
+      cause: err,
+      domain: 'auth',
+      operation: 'auth.update_password',
+      summary: 'Unexpected failure while updating a password',
+      message: AUTH_SERVICE_UNAVAILABLE_MESSAGE,
+    })
   }
 }

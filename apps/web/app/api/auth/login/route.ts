@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { SettingsService } from '@/lib/admin/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
+import { apiInternalError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 
 export const runtime = 'nodejs'
 
@@ -126,9 +127,15 @@ export async function POST(request: NextRequest) {
     return response
   } catch (err) {
     console.error('[api/auth/login] Error:', err)
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Internal login error', code: 'SERVER_ERROR' },
-      { status: 500 }
-    )
+    // The exception is recorded as an incident; the client gets safe copy plus an
+    // errorId. Previously this returned err.message verbatim on a public endpoint.
+    return apiInternalError({
+      cause: err,
+      domain: 'auth',
+      operation: 'auth.login',
+      summary: 'Unexpected failure while signing a learner in',
+      code: 'SERVER_ERROR',
+      message: AUTH_SERVICE_UNAVAILABLE_MESSAGE,
+    })
   }
 }
