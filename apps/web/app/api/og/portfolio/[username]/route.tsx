@@ -21,14 +21,14 @@ export const dynamic = 'force-dynamic'
  * reliability-critical, publicly-shared image endpoint for a cosmetic gain.
  */
 const OG = {
-  background: TOKENS.colors.background, // '#FBFAF6'
-  surface: TOKENS.colors.surface, // '#FFFFFF'
-  surfaceMuted: TOKENS.colors.surfaceMuted, // '#F2EFE7'
-  border: TOKENS.colors.border, // '#DED8CB'
-  foreground: TOKENS.colors.foreground, // '#171A17'
-  muted: TOKENS.colors.textMuted, // '#70685A'
-  primary: TOKENS.colors.primary, // '#1F6B4E'
-  accent: TOKENS.colors.accent, // '#D98B24' — used for the Fellow distinction, matches the theme's own accent token
+  background: TOKENS.colors.background, // light cream
+  surface: TOKENS.colors.surface, // white card surface
+  surfaceMuted: TOKENS.colors.surfaceMuted, // muted tan surface
+  border: TOKENS.colors.border, // soft tan border
+  foreground: TOKENS.colors.foreground, // near-black text
+  muted: TOKENS.colors.textMuted, // muted brown-gray text
+  primary: TOKENS.colors.primary, // dark green
+  accent: TOKENS.colors.accent, // amber accent — used for the Fellow distinction, matches the theme's own accent token
   logoGreen: '#019E75', // exact logo-mark.svg color, used only for the logo graphic itself
 } as const
 

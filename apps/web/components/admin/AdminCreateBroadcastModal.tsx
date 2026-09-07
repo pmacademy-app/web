@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   X,
   Send,
@@ -94,8 +94,10 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
   const [filters, setFilters] = useState<AdminUserFilters>({})
   const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([])
 
-  const effectiveFilters: AdminUserFilters =
-    audienceMode === 'individual' ? { userIds: selectedUsers.map((u) => u.id) } : filters
+  const effectiveFilters: AdminUserFilters = useMemo(
+    () => (audienceMode === 'individual' ? { userIds: selectedUsers.map((u) => u.id) } : filters),
+    [audienceMode, selectedUsers, filters]
+  )
 
   // Step 3: Calculation & Sample
   const [calculating, setCalculating] = useState(false)
@@ -144,7 +146,7 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
     }
   }
 
-  const calculateRecipients = useCallback(async (customFilters?: AdminUserFilters) => {
+  const calculateRecipients = async (customFilters?: AdminUserFilters) => {
     setCalculating(true)
     setErrorMsg(null)
     try {
@@ -164,7 +166,7 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
     } finally {
       setCalculating(false)
     }
-  }, [effectiveFilters])
+  }
 
   const fetchSample = async () => {
     setLoadingSample(true)

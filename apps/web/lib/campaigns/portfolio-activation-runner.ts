@@ -259,7 +259,7 @@ Manage Preferences / Unsubscribe: ${unsubscribeUrl}`
       ${previewText}
     </div>
   </head>
-  <body style="margin:0; padding:24px 16px; background-color:#FFFFFF; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#171A17; font-size:15px; line-height:1.6;">
+  <body style="margin:0; padding:24px 16px; background-color:#FFFFFF; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:${BRAND.colors.foreground}; font-size:15px; line-height:1.6;">
     <div style="max-width:580px; margin:0 auto;">
       <p style="margin:0 0 16px 0;">${greeting}</p>
       
@@ -269,7 +269,7 @@ Manage Preferences / Unsubscribe: ${unsubscribeUrl}`
       
       <p style="margin:0 0 16px 0;">
         You have a public portfolio page that you can use on LinkedIn, your resume, or share directly with a recruiter:<br>
-        <a href="${portfolioUrl}" style="color:#1F6B4E; text-decoration:underline; word-break:break-all;">${portfolioUrl}</a>
+        <a href="${portfolioUrl}" style="color:${BRAND.colors.primary}; text-decoration:underline; word-break:break-all;">${portfolioUrl}</a>
       </p>
       
       <p style="margin:0 0 16px 0;">
@@ -286,7 +286,7 @@ Manage Preferences / Unsubscribe: ${unsubscribeUrl}`
       
       <p style="margin:0 0 16px 0;">
         If you'd like to set it up, you can add your first capstone here:<br>
-        <a href="${ctaUrl}" style="color:#1F6B4E; font-weight:600; text-decoration:underline;">Add your first capstone</a>
+        <a href="${ctaUrl}" style="color:${BRAND.colors.primary}; font-weight:600; text-decoration:underline;">Add your first capstone</a>
       </p>
       
       <p style="margin:0 0 20px 0;">

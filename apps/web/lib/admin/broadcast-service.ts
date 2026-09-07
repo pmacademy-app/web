@@ -504,7 +504,7 @@ export class BroadcastService {
         .eq('status', 'scheduled')
         .lte('scheduled_at', new Date().toISOString())
 
-      for (const b of (due || []) as Array<{ id: string; name?: string; template_key?: string; recipient_filters?: any }>) {
+      for (const b of (due || []) as Array<{ id: string; name?: string; template_key?: string; recipient_filters?: Record<string, unknown> }>) {
         try {
           const isPortfolioActivation =
             b.template_key === 'marketing.portfolio_activation' ||
