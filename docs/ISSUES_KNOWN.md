@@ -21,6 +21,13 @@
 ### 🔴 Confirmed Code-Level Broken
 *None identified.* All static App Router pages compile cleanly with 0 TypeScript errors, and all unit/integration test suites pass.
 
+### 🟠 Active Incident Follow-Up
+
+#### ISSUE-23: Signup Abuse Cleanup Pending Approval
+- **Status**: 🟠 Mitigated, cleanup awaiting explicit approval
+- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). `allowSignups` is currently `false` in production. Root-cause fixes (signup rate limiting, real daily email quota enforcement, stricter Brevo/Resend fallback) are implemented and test-passing but not yet deployed.
+- **Required Action**: (1) Deploy the code fixes, (2) decide on CAPTCHA provider before reopening signups, (3) approve or reject the proposed ban-not-delete cleanup of the 1,233 flagged accounts.
+
 ---
 
 ### 🟢 Resolved Issues

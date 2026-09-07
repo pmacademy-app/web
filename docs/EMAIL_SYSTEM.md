@@ -52,7 +52,7 @@ Asynchronous emails are queued in `public.email_queue`:
 
 ### Quota Enforcement — Daily Only
 
-Only a **daily** send quota is actually enforced (`email_daily_send_limit` in `system_settings`, default `100`). Despite an `hourlySendLimit` field existing in the admin Platform Settings UI, there is **no hourly enforcement anywhere in the send/retry pipeline** — it's a dead/cosmetic setting today (tracked in [`ISSUES_KNOWN.md`](ISSUES_KNOWN.md) ISSUE-22). Critical Auth emails (`auth.verify_email`, `auth.password_reset`, `auth.email_change_verify`) bypass the daily quota completely.
+A **daily** send quota is enforced (`email_daily_send_limit` in `system_settings`, default `100`) via the atomic Postgres function `increment_daily_email_quota()`, checked in the queue processor **before** dispatch — until 2026-09-07 it was called *after* a successful send with its result discarded, so it tracked volume but never actually stopped anything (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). Despite an `hourlySendLimit` field existing in the admin Platform Settings UI, there is **no hourly enforcement anywhere in the send/retry pipeline** — it's a dead/cosmetic setting today (tracked in [`ISSUES_KNOWN.md`](ISSUES_KNOWN.md) ISSUE-22). Critical Auth emails (`auth.verify_email`, `auth.password_reset`, `auth.email_change_verify`) bypass the daily quota completely.
 
 ---
 
@@ -81,7 +81,7 @@ Admins can compose, estimate, test, schedule, and execute targeted email campaig
 ## 6. Provider Resilience & Fallback
 
 - **Provider Selection:** `PRIMARY_EMAIL_PROVIDER` (or the presence of `BREVO_API_KEY`) selects Brevo or Resend as primary. Both providers are called via raw `fetch` — neither is an installed SDK dependency.
-- **Fallback:** If the primary provider fails, `lib/email.ts` automatically falls back to the other provider (Brevo→Resend or vice versa).
+- **Fallback:** If the primary provider fails with a **transient** error (network exception, timeout, or 5xx), `lib/email.ts` automatically falls back to the other provider (Brevo→Resend or vice versa). It does **not** fall back on quota exhaustion, invalid recipient, or auth/config errors (4xx) — that distinction was added 2026-09-07 after an unconditional fallback was identified as a risk during a signup-abuse incident (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)).
 - **Webhook Bounce Handling:** Bounces/complaints arrive at `/api/email/webhooks`, which verifies **either** a Resend Svix HMAC signature **or** a Brevo shared-secret header, and logs structured delivery failure events.
 
 ---

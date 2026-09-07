@@ -176,8 +176,10 @@ export async function POST(request: Request) {
     // Normalize event type across Resend (payload.type) and Brevo (payload.event)
     let eventType = String(payload.type || '')
     let emailId = ''
+    let providerLabel: 'Resend' | 'Brevo' = 'Resend'
 
     if (!eventType && typeof payload.event === 'string') {
+      providerLabel = 'Brevo'
       const brevoEvent = payload.event.toLowerCase()
       if (brevoEvent === 'delivered') eventType = 'email.delivered'
       else if (brevoEvent === 'soft_bounce' || brevoEvent === 'hard_bounce' || brevoEvent === 'blocked' || brevoEvent === 'invalid_email') eventType = 'email.bounced'
@@ -232,7 +234,7 @@ export async function POST(request: Request) {
           } else if (eventType === 'email.failed' || eventType === 'email.bounced') {
             await supabase
               .from('email_queue')
-              .update({ status: 'failed', error_message: `Resend event: ${eventType}`, failed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+              .update({ status: 'failed', error_message: `${providerLabel} event: ${eventType}`, failed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
               .eq('id', queueId)
           }
         }

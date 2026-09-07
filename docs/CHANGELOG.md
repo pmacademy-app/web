@@ -2,6 +2,19 @@
 
 All notable changes to **Prodily PM Academy** (`prodily-monorepo`) are documented in this file.
 
+## [Signup Abuse Incident Response] — 2026-09-07
+
+Full incident writeup: [`docs/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md).
+
+### Fixed
+- **Signup rate limiting**: `/api/auth/signup` had zero throttling of any kind. Added persistent, cross-instance IP (5/15min) and canonical-email (3/24h, collapsing Gmail `+tag` aliases) rate limits.
+- **Email daily quota never actually enforced**: `increment_daily_email_quota()` was called *after* a successful send with its result discarded, so the documented ~100/day cap did nothing. Moved the check before dispatch in the queue processor so it now actually gates sending.
+- **Brevo↔Resend fallback too broad**: previously fell back on *any* provider failure, including quota exhaustion. Now only falls back on transient failures (timeout/network/5xx), not permanent ones (4xx).
+- **Webhook bounce diagnostics**: `/api/email/webhooks` mislabeled all bounce/failure events as `"Resend event: ..."` even when they came from Brevo.
+
+### Operational
+- Production `allowSignups` flag set to `false` (existing DB-backed feature flag) to stop new registrations immediately while the above was investigated and fixed. Existing users (login, password reset, email change) unaffected.
+
 ## [Bug Fixes, Portfolio Verification & Documentation Audit] — 2026-09-06
 ### Fixed
 - **Friend Accountability**: `addFriend()` no longer fails on non-UUID usernames (root cause: a `.or()` filter that broke Postgres query typing).

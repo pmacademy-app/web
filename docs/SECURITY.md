@@ -48,6 +48,16 @@ An Origin/Referer header check exists today on exactly **one** route: `POST /api
 
 ---
 
+## 3a. Signup Abuse Controls (added 2026-09-07)
+
+`POST /api/auth/signup` previously had **no rate limiting of any kind**, which allowed ~1,233 automated accounts to be created in ~25 hours (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). It now enforces, via the persistent cross-instance rate limiter (`lib/rate-limit.ts`):
+- **5 signups / 15 minutes** per client IP (`x-forwarded-for` / `x-real-ip`).
+- **3 signups / 24 hours** per canonicalized email — Gmail `local+tag@gmail.com` addresses collapse to `local@gmail.com` before the check, closing the specific alias-abuse pattern seen in the incident.
+
+No CAPTCHA/bot-challenge provider is configured anywhere in the codebase today. If signup abuse resumes after the above limits, that is the next control to add.
+
+---
+
 ## 4. Secret Safety & Environment Handling
 
 - **Server-Only Secrets**: `SUPABASE_SERVICE_ROLE_KEY`, `SEND_EMAIL_HOOK_SECRET`, `CRON_SECRET`, `BREVO_API_KEY`, `BREVO_WEBHOOK_SECRET`, `RESEND_API_KEY`, and `RESEND_WEBHOOK_SECRET` are strictly server-side.

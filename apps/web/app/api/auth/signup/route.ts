@@ -4,6 +4,7 @@ import { SettingsService } from '@/lib/admin/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
 import { createReferralAttribution } from '@/lib/referral/referral-service'
+import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -13,6 +14,35 @@ const signupSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters.'),
   refCode: z.string().optional().nullable(),
 })
+
+// Signup abuse controls. See incident 2026-09-06/07: unrestricted signup allowed
+// ~1,200+ accounts to be created in under 24h via scripted requests, each firing a
+// welcome email and overwhelming the Brevo send quota. Both limits are enforced
+// server-side via the persistent (cross-instance) rate limiter.
+const IP_SIGNUP_LIMIT = { windowMs: 15 * 60 * 1000, limit: 5 } // 5 signups / 15 min / IP
+const EMAIL_SIGNUP_LIMIT = { windowMs: 24 * 60 * 60 * 1000, limit: 3 } // 3 signups / 24h / canonical email
+
+function getClientIp(request: NextRequest): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip')?.trim() ||
+    'unknown'
+  )
+}
+
+/**
+ * Collapses `name+tag@gmail.com` / `name+tag@googlemail.com` down to `name@gmail.com`
+ * so the "+" alias trick (used to mass-create accounts from one inbox) can't dodge
+ * the per-email rate limit by generating unlimited unique-looking addresses.
+ */
+function canonicalizeEmailForRateLimit(email: string): string {
+  const [local, domain] = email.toLowerCase().split('@')
+  if (!domain) return email.toLowerCase()
+  if (domain === 'gmail.com' || domain === 'googlemail.com') {
+    return `${local.split('+')[0]}@${domain}`
+  }
+  return `${local}@${domain}`
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +58,11 @@ export async function POST(request: NextRequest) {
     const { name, email, password } = parsed.data
     const refCode = parsed.data.refCode || request.cookies.get('prodily_referrer')?.value || null
 
-    // Check both platform behavior controls in a single DB call
+    // Check both platform behavior controls in a single DB call. This is the
+    // coarsest, cheapest gate, so it runs first — while signups are closed
+    // platform-wide, a request should be rejected immediately without also
+    // consuming per-IP/per-email rate-limit budget for an attempt that was
+    // never going to be allowed through anyway.
     const productSettings = await SettingsService.getProductSettings()
 
     // Backend enforcement of Allow Signups setting.
@@ -40,6 +74,28 @@ export async function POST(request: NextRequest) {
           code: 'SIGNUPS_DISABLED',
         },
         { status: 403 }
+      )
+    }
+
+    // Server-side abuse throttling — evaluated before any Supabase Auth call so a
+    // scripted burst never reaches account creation or the email queue.
+    const clientIp = getClientIp(request)
+    const canonicalEmail = canonicalizeEmailForRateLimit(email)
+
+    const [ipLimit, emailLimit] = await Promise.all([
+      evaluatePersistentRateLimit(`signup_ip:${clientIp}`, IP_SIGNUP_LIMIT),
+      evaluatePersistentRateLimit(`signup_email:${canonicalEmail}`, EMAIL_SIGNUP_LIMIT),
+    ])
+
+    if (!ipLimit.success || !emailLimit.success) {
+      const resetInMs = Math.max(ipLimit.resetInMs, emailLimit.resetInMs)
+      return NextResponse.json(
+        {
+          error: 'Too many registration attempts. Please wait a while before trying again.',
+          code: 'RATE_LIMITED',
+          resetInMs,
+        },
+        { status: 429 }
       )
     }
 

@@ -32,6 +32,23 @@ export interface SendEmailResult {
   provider?: 'resend' | 'brevo' | 'simulated'
 }
 
+/**
+ * Decides whether a failed send should retry on the OTHER provider.
+ *
+ * Only transient, provider-availability failures qualify — a timeout, a
+ * network error, or a 5xx from the provider's API. Falling back on quota
+ * exhaustion (429/402), invalid recipient (400), or auth/config errors
+ * (401/403) would just move the same unbounded traffic onto the second
+ * provider instead of surfacing the real problem — which is how one
+ * exhausted Brevo quota during the 2026-09-06 signup-abuse incident could
+ * have silently pushed thousands of sends onto Resend if this were unguarded.
+ */
+function isTransientProviderFailure(result: SendEmailResult): boolean {
+  if (result.success) return false
+  if (!result.statusCode) return true // network exception with no HTTP response at all
+  return result.statusCode >= 500
+}
+
 export function maskEmail(email: string): string {
   if (!email || !email.includes('@')) return '***'
   const [local, domain] = email.split('@')
@@ -76,9 +93,12 @@ export async function sendEmail({
     if (brevoApiKey) {
       const brevoRes = await sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey, replyTo)
       if (brevoRes.success) return brevoRes
-      if (resendApiKey) {
-        console.log('[email] Attempting fallback from Brevo to Resend...')
+      if (resendApiKey && isTransientProviderFailure(brevoRes)) {
+        console.log(`[email] Brevo transient failure (status ${brevoRes.statusCode ?? 'network'}), falling back to Resend...`)
         return sendViaResend(to, subject, html, text, fromEmail, resendApiKey, replyTo)
+      }
+      if (!isTransientProviderFailure(brevoRes)) {
+        console.warn(`[email] Brevo permanent failure (status ${brevoRes.statusCode}) — not falling back to Resend to avoid masking a quota/config issue.`)
       }
       return brevoRes
     }
@@ -89,9 +109,12 @@ export async function sendEmail({
     if (resendApiKey) {
       const resendRes = await sendViaResend(to, subject, html, text, fromEmail, resendApiKey, replyTo)
       if (resendRes.success) return resendRes
-      if (brevoApiKey) {
-        console.log('[email] Attempting fallback from Resend to Brevo...')
+      if (brevoApiKey && isTransientProviderFailure(resendRes)) {
+        console.log(`[email] Resend transient failure (status ${resendRes.statusCode ?? 'network'}), falling back to Brevo...`)
         return sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey, replyTo)
+      }
+      if (!isTransientProviderFailure(resendRes)) {
+        console.warn(`[email] Resend permanent failure (status ${resendRes.statusCode}) — not falling back to Brevo to avoid masking a quota/config issue.`)
       }
       return resendRes
     }

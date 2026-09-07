@@ -283,6 +283,34 @@ export async function processEmailQueue(
       continue
     }
 
+    // C2. Global Daily Send Quota — checked BEFORE dispatch, not after.
+    // `increment_daily_email_quota` atomically increments-and-checks in one statement,
+    // returning false once `dailyLimit` is reached for today (critical auth emails
+    // bypass it, matching their suppression bypass above). This is the circuit
+    // breaker that was missing during the 2026-09-06 signup-abuse incident: the
+    // quota existed and was tracked, but was only ever incremented *after* a
+    // successful send, so it never actually stopped anything. Once quota is
+    // exhausted, every remaining non-critical item in this batch is deferred to
+    // the next processing run rather than burning further calls against it.
+    if (!isCritical) {
+      let quotaAvailable = true
+      try {
+        const { data: hasQuota } = await supabase.rpc('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
+        quotaAvailable = hasQuota !== false
+      } catch (quotaErr) {
+        console.warn('[processEmailQueue] Daily quota RPC check failed — proceeding without quota gate:', quotaErr)
+      }
+
+      if (!quotaAvailable) {
+        const nextRetryAt = new Date(Date.now() + 60 * 60 * 1000).toISOString() // retry in 1h
+        await supabase.from('email_queue')
+          .update({ status: 'retrying', next_retry_at: nextRetryAt, error_message: 'Daily email send quota reached', updated_at: new Date().toISOString() })
+          .eq('id', queueId)
+        skippedCount++
+        continue
+      }
+    }
+
     // D. Render Template
     let renderedHtml = ''
     let renderedText = ''
@@ -321,15 +349,6 @@ export async function processEmailQueue(
     })
 
     if (sendResult.success) {
-      // F. Post-Resend Acceptance: Increment Daily Quota ONLY on Successful Resend Acceptance
-      if (!isCritical) {
-        try {
-          await supabase.rpc('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
-        } catch {
-          // Non-fatal quota logging warning
-        }
-      }
-
       await supabase.from('email_queue')
         .update({
           status: 'delivered',
