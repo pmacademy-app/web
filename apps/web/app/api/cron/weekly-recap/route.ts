@@ -83,9 +83,40 @@ export async function POST(request: Request) {
     const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; total_xp?: number; current_streak?: number }>
 
     if (users.length > 0) {
+      const userIds = users.map((u) => u.id)
+      const weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+      // Fetch weekly XP events
+      const { data: xpRows } = await (supabase
+        .from('xp_events') as any)
+        .select('user_id, amount')
+        .in('user_id', userIds)
+        .gte('created_at', weekStartDate)
+
+      // Fetch weekly completed lessons
+      const { data: lessonRows } = await (supabase
+        .from('user_lesson_progress') as any)
+        .select('user_id')
+        .in('user_id', userIds)
+        .eq('status', 'completed')
+        .gte('completed_at', weekStartDate)
+
+      const xpMap = new Map<string, number>()
+      for (const row of xpRows || []) {
+        xpMap.set(row.user_id, (xpMap.get(row.user_id) || 0) + (row.amount || 0))
+      }
+
+      const lessonMap = new Map<string, number>()
+      for (const row of lessonRows || []) {
+        lessonMap.set(row.user_id, (lessonMap.get(row.user_id) || 0) + 1)
+      }
+
       const weekNumber = Math.ceil(new Date().getDate() / 7)
       for (const user of users) {
         if (!user.email) continue
+        const xpEarnedThisWeek = xpMap.get(user.id) || 0
+        const lessonsCompletedCount = lessonMap.get(user.id) || 0
+
         const result = await enqueueNotificationItem({
           userId: user.id,
           toEmail: user.email,
@@ -94,8 +125,8 @@ export async function POST(request: Request) {
           templateKey: 'learning.weekly_recap',
           templateVariables: {
             userName: user.name || user.email.split('@')[0],
-            lessonsCompletedCount: Math.floor((user.total_xp || 0) / 50),
-            xpEarnedThisWeek: Math.min(300, user.total_xp || 0),
+            lessonsCompletedCount,
+            xpEarnedThisWeek,
             currentStreak: user.current_streak || 0,
             weekNumber,
           },

@@ -9,6 +9,8 @@
  * Pure stateless functions with zero UI coupling.
  */
 
+export type LeaderboardTier = 'Bronze' | 'Silver' | 'Gold' | 'Diamond' | 'Fellow'
+
 export interface RawLeaderboardUserMetric {
   userId: string
   username: string | null
@@ -20,6 +22,7 @@ export interface RawLeaderboardUserMetric {
   lessonsCompleted: number
   xpEarned: number
   currentStreak: number
+  totalXp?: number
   previousRank?: number | null
 }
 
@@ -27,6 +30,30 @@ export interface LeaderboardEntry extends RawLeaderboardUserMetric {
   rank: number
   positionChange: number // positive = gained ranks, negative = lost ranks, 0 = unchanged
   isCurrentUser: boolean
+  tier?: LeaderboardTier
+  pointsToNextRank?: number | null
+}
+
+/**
+ * Resolves learning tier and design token colors based on level and experience.
+ */
+export function getLeaderboardTier(level: number, totalXp: number = 0): {
+  tier: LeaderboardTier
+  badgeColor: string
+} {
+  if (level >= 9 || totalXp >= 10000) {
+    return { tier: 'Fellow', badgeColor: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30' }
+  }
+  if (level >= 7 || totalXp >= 5000) {
+    return { tier: 'Diamond', badgeColor: 'text-cyan-500 bg-cyan-500/10 border-cyan-500/30' }
+  }
+  if (level >= 5 || totalXp >= 2500) {
+    return { tier: 'Gold', badgeColor: 'text-amber-500 bg-amber-500/10 border-amber-500/30' }
+  }
+  if (level >= 3 || totalXp >= 1000) {
+    return { tier: 'Silver', badgeColor: 'text-slate-400 bg-slate-400/10 border-slate-400/30' }
+  }
+  return { tier: 'Bronze', badgeColor: 'text-amber-700 bg-amber-700/10 border-amber-700/30' }
 }
 
 /**
@@ -68,12 +95,24 @@ export function calculateRankings(
     const rank = index + 1
     const previousRank = item.previousRank ?? rank
     const positionChange = previousRank - rank
+    const tierInfo = getLeaderboardTier(item.level, item.totalXp ?? item.xpEarned)
+
+    // Calculate gap to next rank
+    let pointsToNextRank: number | null = null
+    if (index > 0) {
+      const aheadUser = sorted[index - 1]
+      // Calculate XP gap if days and lessons are equal, or estimate XP needed
+      const xpGap = (aheadUser.xpEarned || 0) - (item.xpEarned || 0) + 1
+      pointsToNextRank = xpGap > 0 ? xpGap : 10
+    }
 
     return {
       ...item,
       rank,
       positionChange,
       isCurrentUser: Boolean(currentUserId && item.userId === currentUserId),
+      tier: tierInfo.tier,
+      pointsToNextRank,
     }
   })
 }

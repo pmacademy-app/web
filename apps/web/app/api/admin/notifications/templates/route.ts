@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { sanitizeEmailHtml } from '@/lib/admin/sanitize-email-html'
+import { stripHtmlToPlainText } from '@/emails'
 import { revalidatePath } from 'next/cache'
 
 export const runtime = 'nodejs'
@@ -25,6 +27,14 @@ export async function POST(request: NextRequest) {
     if (!subjectLine || typeof subjectLine !== 'string') {
       return NextResponse.json({ error: 'Subject line is required.' }, { status: 400 })
     }
+
+    if (!bodyHtml || typeof bodyHtml !== 'string' || !bodyHtml.trim()) {
+      return NextResponse.json({ error: 'Template HTML body is required.' }, { status: 400 })
+    }
+
+    // Admin-pasted HTML is untrusted input — sanitize before it is ever persisted.
+    const cleanBodyHtml = sanitizeEmailHtml(bodyHtml)
+    const cleanBodyText = typeof bodyText === 'string' && bodyText.trim() ? bodyText.trim() : stripHtmlToPlainText(cleanBodyHtml)
 
     const supabase = createServiceRoleClient()
     const cleanKey = key.trim().toLowerCase()
@@ -66,8 +76,8 @@ export async function POST(request: NextRequest) {
         template_id: tpl.id,
         version: 1,
         subject_line: subjectLine.trim(),
-        body_html: (bodyHtml || '').trim(),
-        body_text: (bodyText || '').trim(),
+        body_html: cleanBodyHtml,
+        body_text: cleanBodyText,
         status: 'published',
         created_at: now,
         updated_at: now,

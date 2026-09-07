@@ -148,4 +148,15 @@ describe('System Monitoring & Error Instrumentation Unit Test Suite', () => {
     expect(['healthy', 'degraded', 'down'].includes(overview.overallStatus)).toBe(true)
     expect(typeof overview.databaseLatencyMs).toBe('number')
   })
+
+  it('GET /api/health returns operational status and telemetry headers', async () => {
+    const { GET: handleHealthCheck } = await import('../../app/api/health/route')
+    const res = await handleHealthCheck()
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.status).toBe('ok')
+    expect(json.database).toBe('connected')
+    expect(typeof json.latencyMs).toBe('number')
+    expect(res.headers.get('cache-control')).toContain('no-cache')
+  })
 })

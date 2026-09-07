@@ -75,14 +75,12 @@
 - **Planned Resolution**: Migrate to official `@supabase/ssr` package (`createServerClient`), delete `/api/auth/session` route and `AuthStateListener.tsx`.
 
 #### ISSUE-07: Onboarding Recommendation Disconnected from Learning Path
-- **Status**: 🟠 Verified Product Gap (Targeted: Phase 3)
-- **Description**: Step 4 of `OnboardingWizard.tsx` calculates a recommended module preview based on user goal, experience level, and topics. However, the recommendation is not stored as an active curriculum path override. `/dashboard` and `/academy` strictly follow the hardcoded sequential order (Lessons 1..90).
-- **Evidence**: `OnboardingWizard.tsx:134-169`, `dashboard/page.tsx:96-108`.
+- **Status**: 🟢 Resolved & Verified
+- **Resolution**: Integrated `resolvePersonalizedPath()` and `resolveNextRecommendedMilestone()` on `/dashboard` with dynamic `PersonalizedGoalBanner` highlighting the learner's personalized curriculum track based on their onboarding persona. Verified with automated test suite `lib/__tests__/path-resolver.test.ts`.
 
-#### ISSUE-08: In-App GA4 Learning Event Instrumentation Omission
-- **Status**: 🟠 Verified Observability Gap (Targeted: Phase 1)
-- **Description**: `apps/web/lib/analytics.ts` defines and tracks 11 marketing and quick-start tour events. Core in-app learning actions (lesson starts, theory completions, quiz attempts, capstone submissions, badges, level-ups, certificates) are recorded only in PostgreSQL and Admin Console aggregations, with zero telemetry dispatched to GA4.
-- **Evidence**: `apps/web/lib/analytics.ts:24-110`.
+#### ISSUE-08: In-App GA4 Learning Event Instrumentation
+- **Status**: 🟢 Resolved & Verified
+- **Resolution**: Added comprehensive Google Analytics 4 event tracking wrappers in `apps/web/lib/analytics.ts` (`trackLessonStarted`, `trackTheoryRead`, `trackQuizCompleted`, `trackLessonCompleted`, `trackCapstoneSubmitted`, `trackBadgeEarned`, `trackLevelUp`, `trackFirstSessionStarted`, `trackGoalContextViewed`) with payload sanitization and null-safety. Verified with automated suite `lib/__tests__/analytics-learning-lifecycle.test.ts`.
 
 #### ISSUE-09: Undispatched Notification Platform Events
 - **Status**: 🟢 Resolved (Phase 0)
@@ -101,6 +99,9 @@
 - **Resolution**: Added clear explanatory copy and tooltip to `StreakCard.tsx` explaining that available streak freezes automatically protect the learner's study streak on missed days.
 
 #### ISSUE-13: Capstone Direct Submit-to-Portfolio Flow Alignment
-- **Status**: ⚪ Scope Clarification (Targeted: Phase 4)
-- **Decision**: Quality evaluation, grading rubrics, reviewer comments, and admin review queues are formally out of scope for the current 10-phase roadmap. Submitted capstones will display directly on the learner's public portfolio as submitted work, preserving platform safety moderation while removing review bottlenecks.
-- **Evidence**: Decision 2 in Planning Directive; `lib/capstones-db.ts`.
+- **Status**: 🟢 Resolved & Verified
+- **Resolution**: Quality evaluation, grading rubrics, reviewer comments, and admin review queues are formally out of scope. Submitted capstones display directly on the learner's public portfolio with real-time deliverable readiness progress indicators. Verified with `lib/__tests__/capstones.test.ts`.
+
+#### ISSUE-14: Leaderboard 2.0 Tiers & Admin Console Management
+- **Status**: 🟢 Resolved & Verified
+- **Resolution**: Added tiered rank badges (`Bronze`, `Silver`, `Gold`, `Diamond`, `Fellow`), `pointsToNextRank` deltas, 45s in-memory TTL query caching, real-time weekly recap metrics, `/admin/leaderboard` inspection console, and learner search multi-picker with broadcast safety guardrails. Verified with `lib/__tests__/leaderboard.test.ts` and `next build`.

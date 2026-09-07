@@ -12,6 +12,11 @@ import { EMAIL_TEMPLATE_MAP, renderEmailTemplate } from '@/emails'
 import { AUTOMATION_METADATA } from '@/lib/notifications/automations/service'
 import { BRAND } from '@/lib/brand'
 import type { AdminAttentionItem } from './types'
+import {
+  TEMPLATE_SAMPLE_VARIABLES,
+  TEMPLATE_VARIABLE_CATALOG,
+  type AdminTemplateVariable,
+} from './template-variables'
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 
@@ -52,12 +57,8 @@ export interface AdminTemplateListItem {
   isCritical: boolean
   isDeferred?: boolean
   subjectLine: string
-}
-
-export interface AdminTemplateVariable {
-  name: string
-  description: string
-  sample: string
+  /** True for admin-created HTML email templates that exist only in the database (no static component). */
+  isCustom?: boolean
 }
 
 export interface AdminTemplateDetail {
@@ -75,6 +76,8 @@ export interface AdminTemplateDetail {
   currentVersion?: number
   versionStatus?: 'draft' | 'published'
   hasCustomVersion?: boolean
+  /** True for admin-created HTML email templates that exist only in the database (no static component). */
+  isCustom?: boolean
 }
 
 export interface AdminNotificationEventItem {
@@ -107,64 +110,15 @@ export interface AdminCommunicationsOverview {
 }
 
 /* ─── Template metadata helpers ─────────────────────────────────────────── */
-
-/** Sample values used for preview rendering (mirrors the test-send route). */
-export const TEMPLATE_SAMPLE_VARIABLES: Record<string, unknown> = {
-  userName: 'Aditya',
-  email: 'aditya@example.com',
-  confirmationUrl: `${BRAND.siteUrl}/api/auth/callback?token_hash=test_token_hash&type=signup`,
-  resetUrl: `${BRAND.siteUrl}/reset-password?token=test_reset_token`,
-  verificationUrl: `${BRAND.siteUrl}/verify/PMA-2026-TEST01`,
-  moduleName: 'Product Strategy & Vision',
-  moduleSlug: 'product-strategy',
-  badgeName: 'Visionary Strategist',
-  badgeDescription: 'Completed the Product Strategy module',
-  badgeIcon: '🏅',
-  newLevel: 5,
-  levelTitle: 'Senior Product Manager',
-  totalXp: 1250,
-  certificateCode: 'PMA-2026-TEST01',
-  portfolioUrl: `${BRAND.siteUrl}/p/aditya`,
-  weeklyXp: 450,
-  lessonsCompleted: 8,
-  streakDays: 12,
-  currentStreak: 12,
-  dueCount: 5,
-  xpBonus: 200,
-  daysStudiedThisWeek: 5,
-  lessonsCompletedThisWeek: 8,
-  xpEarnedThisWeek: 450,
-  appUrl: BRAND.siteUrl,
-}
-
-/** Curated catalog of variables available to email templates. */
-export const TEMPLATE_VARIABLE_CATALOG: AdminTemplateVariable[] = [
-  { name: 'userName', description: 'Recipient display name', sample: 'Aditya' },
-  { name: 'email', description: 'Recipient email address', sample: 'aditya@example.com' },
-  { name: 'appUrl', description: 'Application base URL', sample: BRAND.siteUrl },
-  { name: 'confirmationUrl', description: 'Email verification link', sample: `${BRAND.siteUrl}/api/auth/callback?token_hash=…` },
-  { name: 'resetUrl', description: 'Password reset link', sample: `${BRAND.siteUrl}/reset-password?token=…` },
-  { name: 'verificationUrl', description: 'Certificate verification link', sample: `${BRAND.siteUrl}/verify/PMA-2026-…` },
-  { name: 'moduleName', description: 'Completed module name', sample: 'Product Strategy & Vision' },
-  { name: 'moduleSlug', description: 'Module URL slug', sample: 'product-strategy' },
-  { name: 'badgeName', description: 'Earned badge name', sample: 'Visionary Strategist' },
-  { name: 'badgeDescription', description: 'Earned badge description', sample: 'Completed the strategy module' },
-  { name: 'newLevel', description: 'New XP level reached', sample: '5' },
-  { name: 'levelTitle', description: 'Level title', sample: 'Senior Product Manager' },
-  { name: 'certificateCode', description: 'Certificate credential ID', sample: 'PMA-2026-TEST01' },
-  { name: 'portfolioUrl', description: 'Public portfolio URL', sample: `${BRAND.siteUrl}/p/aditya` },
-  { name: 'weeklyXp', description: 'XP earned this week', sample: '450' },
-  { name: 'lessonsCompleted', description: 'Lessons completed this week', sample: '8' },
-  { name: 'streakDays', description: 'Current streak length', sample: '12' },
-  { name: 'currentStreak', description: 'Current streak length', sample: '12' },
-  { name: 'dueCount', description: 'Flashcards due for review', sample: '5' },
-  { name: 'xpBonus', description: 'Module completion XP bonus', sample: '200' },
-  { name: 'totalXp', description: 'Cumulative XP', sample: '1250' },
-  { name: 'daysStudiedThisWeek', description: 'Days studied this week', sample: '5' },
-  { name: 'lessonsCompletedThisWeek', description: 'Lessons completed this week', sample: '8' },
-  { name: 'xpEarnedThisWeek', description: 'XP earned this week', sample: '450' },
-  { name: 'unsubscribeToken', description: 'Per-recipient unsubscribe token', sample: '…' },
-]
+// TEMPLATE_SAMPLE_VARIABLES / TEMPLATE_VARIABLE_CATALOG / AdminTemplateVariable
+// live in ./template-variables (isomorphic — no server-only imports) so the
+// client-side template editor can share the exact same catalog instead of
+// keeping its own copy. Re-exported here for existing importers.
+export {
+  TEMPLATE_SAMPLE_VARIABLES,
+  TEMPLATE_VARIABLE_CATALOG,
+  type AdminTemplateVariable,
+} from './template-variables'
 
 /** Human label for a template key when no automation metadata exists. */
 function templateDisplayName(key: string): string {
@@ -293,14 +247,18 @@ export class CommunicationsService {
   }
 
   /**
-   * Template list derived from the real template registry + automation metadata.
+   * Template list derived from the static template registry + automation metadata,
+   * merged with admin-created custom HTML templates that exist only in the
+   * `notification_templates` table (no static component in EMAIL_TEMPLATE_MAP).
+   * Without this merge, a newly-created custom template would be invisible in
+   * the admin UI despite having been saved successfully.
    */
-  public static getTemplateList(): AdminTemplateListItem[] {
+  public static async getTemplateList(): Promise<AdminTemplateListItem[]> {
     const automationByKey = new Map<string, (typeof AUTOMATION_METADATA)[number]>(
       AUTOMATION_METADATA.map((a) => [a.key, a])
     )
 
-    return Object.entries(EMAIL_TEMPLATE_MAP).map(([key, entry]) => {
+    const staticItems: AdminTemplateListItem[] = Object.entries(EMAIL_TEMPLATE_MAP).map(([key, entry]) => {
       const meta = automationByKey.get(key)
       return {
         key,
@@ -310,16 +268,68 @@ export class CommunicationsService {
         isCritical: Boolean(meta?.isCritical),
         isDeferred: meta?.isDeferred,
         subjectLine: entry.subjectLine,
+        isCustom: false,
       }
     })
+
+    const staticKeys = new Set(Object.keys(EMAIL_TEMPLATE_MAP))
+
+    try {
+      const supabase = createServiceRoleClient()
+      const { data: customTemplates } = await supabase
+        .from('notification_templates')
+        .select('id, template_key, category')
+        .order('created_at', { ascending: false })
+
+      const rows = (customTemplates || []) as unknown as Array<{ id: string; template_key: string; category: string | null }>
+      const customOnlyRows = rows.filter((r) => !staticKeys.has(r.template_key))
+
+      if (customOnlyRows.length > 0) {
+        const templateIds = customOnlyRows.map((r) => r.id)
+        const { data: versions } = await supabase
+          .from('notification_template_versions')
+          .select('template_id, subject_line, status, version')
+          .in('template_id', templateIds)
+          .order('version', { ascending: false })
+
+        const latestSubjectByTemplateId = new Map<string, string>()
+        for (const v of (versions || []) as unknown as Array<{ template_id: string; subject_line: string }>) {
+          if (!latestSubjectByTemplateId.has(v.template_id)) {
+            latestSubjectByTemplateId.set(v.template_id, v.subject_line)
+          }
+        }
+
+        const customItems: AdminTemplateListItem[] = customOnlyRows.map((r) => ({
+          key: r.template_key,
+          name: templateDisplayName(r.template_key),
+          category: r.category || 'Custom',
+          trigger: 'Admin-created (manual broadcasts)',
+          isCritical: false,
+          isDeferred: false,
+          subjectLine: latestSubjectByTemplateId.get(r.id) || '',
+          isCustom: true,
+        }))
+
+        return [...customItems, ...staticItems]
+      }
+    } catch (err) {
+      console.warn('[CommunicationsService] Failed to load custom templates:', err)
+    }
+
+    return staticItems
   }
 
   /**
    * Full template detail for the editor: metadata + rendered body with sample data and database version history.
+   * Falls back to a database-only lookup for admin-created custom templates
+   * that have no static component in EMAIL_TEMPLATE_MAP.
    */
   public static async getTemplateDetail(templateKey: string): Promise<AdminTemplateDetail | null> {
     const entry = EMAIL_TEMPLATE_MAP[templateKey]
-    if (!entry) return null
+
+    if (!entry) {
+      return CommunicationsService.getCustomTemplateDetail(templateKey)
+    }
 
     const automationByKey = new Map<string, (typeof AUTOMATION_METADATA)[number]>(
       AUTOMATION_METADATA.map((a) => [a.key, a])
@@ -404,6 +414,58 @@ export class CommunicationsService {
         versionStatus: dbVersion?.status || 'published',
         hasCustomVersion: Boolean(dbVersion),
       }
+    }
+  }
+
+  /**
+   * Loads an admin-created custom HTML template directly from the database.
+   * Used when a template key has no static component in EMAIL_TEMPLATE_MAP —
+   * there is no React component to render, so the DB version's HTML is the
+   * entire template (no static fallback).
+   */
+  private static async getCustomTemplateDetail(templateKey: string): Promise<AdminTemplateDetail | null> {
+    const supabase = createServiceRoleClient()
+
+    const { data: tpl } = await supabase
+      .from('notification_templates')
+      .select('id, category, current_version')
+      .eq('template_key', templateKey)
+      .maybeSingle()
+
+    if (!tpl?.id) return null
+
+    const { data: latestVersion } = await supabase
+      .from('notification_template_versions')
+      .select('version, subject_line, body_html, body_text, status')
+      .eq('template_id', tpl.id)
+      .order('version', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const version = latestVersion as unknown as {
+      version: number
+      subject_line: string
+      body_html: string
+      body_text: string
+      status: string
+    } | null
+
+    return {
+      key: templateKey,
+      name: templateDisplayName(templateKey),
+      category: tpl.category || 'Custom',
+      trigger: 'Admin-created (manual broadcasts)',
+      isCritical: false,
+      isDeferred: false,
+      isPaused: version?.status === 'paused',
+      subjectLine: version?.subject_line || '',
+      variables: TEMPLATE_VARIABLE_CATALOG,
+      bodyHtml: version?.body_html || '',
+      bodyText: version?.body_text || '',
+      currentVersion: version?.version || 1,
+      versionStatus: version?.status === 'draft' ? 'draft' : 'published',
+      hasCustomVersion: true,
+      isCustom: true,
     }
   }
 

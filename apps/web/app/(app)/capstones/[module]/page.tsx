@@ -423,6 +423,26 @@ export default function CapstoneWorkspacePage({ params }: PageProps) {
         )}
       </div>
 
+      {/* Deliverable Readiness Progress Indicator */}
+      {!isLocked && (
+        <div className="rounded-xl border border-border bg-card/70 p-4 space-y-2">
+          <div className="flex items-center justify-between text-xs font-semibold">
+            <span className="text-foreground flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-primary" /> Deliverable Readiness
+            </span>
+            <span className={validation.isValid ? 'text-emerald-500 font-bold' : 'text-muted-foreground'}>
+              {validation.wordCount} / {capstoneDef.minWordCount} words {validation.isValid ? '(Ready to Submit ✓)' : `(${Math.max(0, capstoneDef.minWordCount - validation.wordCount)} words remaining)`}
+            </span>
+          </div>
+          <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
+            <div
+              className={`h-full transition-all duration-300 ${validation.isValid ? 'bg-emerald-500' : 'bg-primary'}`}
+              style={{ width: `${Math.min(100, Math.round((validation.wordCount / capstoneDef.minWordCount) * 100))}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Main Rich Text Editor */}
       <div className="space-y-2">
         <div className="flex items-center justify-between px-1">

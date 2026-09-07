@@ -80,8 +80,156 @@ export async function toggleLeaderboardOptIn(
   return { success: true, isOptedIn }
 }
 
+// In-memory cache for weekly leaderboard calculations (45-second TTL)
+interface LeaderboardCacheEntry {
+  timestamp: number
+  users: UserRow[]
+  optedOutUserIds: Set<string>
+  rawMetrics: RawLeaderboardUserMetric[]
+}
+
+const LEADERBOARD_CACHE = new Map<string, LeaderboardCacheEntry>()
+const CACHE_TTL_MS = 45 * 1000
+
 /**
- * Fetches weekly consistency rankings for opted-in users.
+ * Builds (or reuses the cached) raw weekly metrics for ALL opted-in-eligible users.
+ * Shared by global, cohort-scoped, and friend-scoped ranking views so the expensive
+ * aggregation queries run at most once per week per 45-second window, regardless of
+ * how many scopes/cohorts are viewed.
+ */
+async function getOrBuildWeeklyRawMetrics(
+  supabase: SupabaseClient<Database>,
+  weekStart: string
+): Promise<LeaderboardCacheEntry> {
+  const now = Date.now()
+  let cached = LEADERBOARD_CACHE.get(weekStart)
+  if (!cached || now - cached.timestamp > CACHE_TTL_MS) {
+    // 1. Fetch users with total_xp > 0
+    const { data: users } = (await (supabase
+      .from('users') as unknown as DBChain)
+      .select('id, username, name, avatar_url, total_xp, current_streak, level')
+      .gt('total_xp', 0)) as unknown as { data: UserRow[] | null }
+
+    const userList = users || []
+    const userIdsArray = userList.map((u) => u.id)
+
+    // 2. Fetch opted-out users so we can exclude them
+    const { data: optedOutRows } = (await (supabase
+      .from('user_leaderboard_settings') as unknown as DBChain)
+      .select('user_id')
+      .eq('is_opted_in', false)) as unknown as { data: { user_id: string }[] | null }
+
+    const optedOutUserIds = new Set<string>((optedOutRows || []).map((r) => r.user_id))
+
+    // 3. Fetch lesson progress in current week for consistency metric
+    const weekStartDate = new Date(weekStart)
+    const { data: lessonProgress } = (await (supabase
+      .from('user_lesson_progress') as unknown as DBChain)
+      .select('user_id, status, completed_at')
+      .in('user_id', userIdsArray.length ? userIdsArray : ['00000000-0000-0000-0000-000000000000'])
+      .eq('status', 'completed')
+      .gte('completed_at', weekStartDate.toISOString())) as unknown as {
+      data: { user_id: string; status: string; completed_at: string }[] | null
+    }
+
+    // 4. Fetch xp events in current week
+    const { data: xpEvents } = (await (supabase
+      .from('xp_events') as unknown as DBChain)
+      .select('user_id, amount, created_at')
+      .in('user_id', userIdsArray.length ? userIdsArray : ['00000000-0000-0000-0000-000000000000'])
+      .gte('created_at', weekStartDate.toISOString())) as unknown as {
+      data: { user_id: string; amount: number; created_at: string }[] | null
+    }
+
+    // Aggregate user weekly metrics
+    const rawMetrics: RawLeaderboardUserMetric[] = userList.map((u) => {
+      const userLessons = (lessonProgress || []).filter((lp) => lp.user_id === u.id)
+      const lessonsCompleted = userLessons.length
+
+      // Calculate unique days studied in week
+      const studyDays = new Set<string>()
+      for (const lp of userLessons) {
+        if (lp.completed_at) {
+          studyDays.add(lp.completed_at.split('T')[0])
+        }
+      }
+      const daysStudied = studyDays.size
+
+      // Calculate weekly XP
+      const userXpEvents = (xpEvents || []).filter((xe) => xe.user_id === u.id)
+      const xpEarned = userXpEvents.reduce((acc, curr) => acc + (curr.amount || 0), 0)
+
+      const levelInfo = calculateLevel(u.total_xp || 0)
+
+      return {
+        userId: u.id,
+        username: u.username ?? null,
+        name: u.name ?? null,
+        avatarUrl: u.avatar_url ?? null,
+        levelTitle: levelInfo.title,
+        level: levelInfo.level,
+        daysStudied,
+        lessonsCompleted,
+        xpEarned,
+        currentStreak: u.current_streak || 0,
+        totalXp: u.total_xp || 0,
+      }
+    })
+
+    cached = {
+      timestamp: now,
+      users: userList,
+      optedOutUserIds,
+      rawMetrics,
+    }
+    LEADERBOARD_CACHE.set(weekStart, cached)
+  }
+
+  return cached
+}
+
+/**
+ * Ensures a user is represented in a raw-metrics list even if they have 0 total_xp
+ * (e.g. brand new users, or users in a cohort with no activity yet).
+ */
+async function ensureUserPresent(
+  supabase: SupabaseClient<Database>,
+  rawMetrics: RawLeaderboardUserMetric[],
+  userId: string
+): Promise<RawLeaderboardUserMetric[]> {
+  if (rawMetrics.some((m) => m.userId === userId)) {
+    return rawMetrics
+  }
+
+  const { data: currentUser } = (await (supabase
+    .from('users') as unknown as DBChain)
+    .select('id, username, name, avatar_url, total_xp, current_streak, level')
+    .eq('id', userId)
+    .maybeSingle()) as unknown as { data: UserRow | null }
+
+  if (!currentUser) return rawMetrics
+
+  const levelInfo = calculateLevel(currentUser.total_xp || 0)
+  return [
+    ...rawMetrics,
+    {
+      userId: currentUser.id,
+      username: currentUser.username ?? null,
+      name: currentUser.name ?? null,
+      avatarUrl: currentUser.avatar_url ?? null,
+      levelTitle: levelInfo.title,
+      level: levelInfo.level,
+      daysStudied: 0,
+      lessonsCompleted: 0,
+      xpEarned: 0,
+      currentStreak: currentUser.current_streak || 0,
+      totalXp: currentUser.total_xp || 0,
+    },
+  ]
+}
+
+/**
+ * Fetches weekly consistency rankings for opted-in users (global scope).
  */
 export async function getWeeklyLeaderboard(
   supabase: SupabaseClient<Database>,
@@ -90,98 +238,13 @@ export async function getWeeklyLeaderboard(
 ): Promise<WeeklyLeaderboardPayload> {
   const weekStart = targetWeekStart || calculateWeekStart()
   const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
+  const cached = await getOrBuildWeeklyRawMetrics(supabase, weekStart)
 
-  // 1. Fetch users with total_xp > 0
-  const { data: users } = (await (supabase
-    .from('users') as unknown as DBChain)
-    .select('id, username, name, avatar_url, total_xp, current_streak, level')
-    .gt('total_xp', 0)) as unknown as { data: UserRow[] | null }
-
-  const userIdsArray = (users || []).map((u) => u.id)
-
-  // Always ensure the current user is fetched even if their total_xp is 0
-  if (!userIdsArray.includes(userId)) {
-    const { data: currentUser } = (await (supabase
-      .from('users') as unknown as DBChain)
-      .select('id, username, name, avatar_url, total_xp, current_streak, level')
-      .eq('id', userId)
-      .maybeSingle()) as unknown as { data: UserRow | null }
-      
-    if (currentUser) {
-      users?.push(currentUser)
-      userIdsArray.push(currentUser.id)
-    }
-  }
-
-  if (userIdsArray.length === 0 || !users) {
-    return { weekStart, isOptedIn, entries: [], personalEntry: null }
-  }
-
-  // 2. Fetch opted-out users so we can exclude them
-  const { data: optedOutRows } = (await (supabase
-    .from('user_leaderboard_settings') as unknown as DBChain)
-    .select('user_id')
-    .eq('is_opted_in', false)) as unknown as { data: { user_id: string }[] | null }
-
-  const optedOutUserIds = new Set<string>((optedOutRows || []).map((r) => r.user_id))
-
-  // 3. Fetch lesson progress in current week for consistency metric
-  const weekStartDate = new Date(weekStart)
-  const { data: lessonProgress } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
-    .select('user_id, status, completed_at')
-    .in('user_id', userIdsArray)
-    .eq('status', 'completed')
-    .gte('completed_at', weekStartDate.toISOString())) as unknown as {
-    data: { user_id: string; status: string; completed_at: string }[] | null
-  }
-
-  // 4. Fetch xp events in current week
-  const { data: xpEvents } = (await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .select('user_id, amount, created_at')
-    .in('user_id', userIdsArray)
-    .gte('created_at', weekStartDate.toISOString())) as unknown as {
-    data: { user_id: string; amount: number; created_at: string }[] | null
-  }
-
-  // Aggregate user weekly metrics
-  const rawMetrics: RawLeaderboardUserMetric[] = users.map((u) => {
-    const userLessons = (lessonProgress || []).filter((lp) => lp.user_id === u.id)
-    const lessonsCompleted = userLessons.length
-
-    // Calculate unique days studied in week
-    const studyDays = new Set<string>()
-    for (const lp of userLessons) {
-      if (lp.completed_at) {
-        studyDays.add(lp.completed_at.split('T')[0])
-      }
-    }
-    const daysStudied = studyDays.size
-
-    // Calculate weekly XP
-    const userXpEvents = (xpEvents || []).filter((xe) => xe.user_id === u.id)
-    const xpEarned = userXpEvents.reduce((acc, curr) => acc + (curr.amount || 0), 0)
-
-    const levelInfo = calculateLevel(u.total_xp || 0)
-
-    return {
-      userId: u.id,
-      username: u.username ?? null,
-      name: u.name ?? null,
-      avatarUrl: u.avatar_url ?? null,
-      levelTitle: levelInfo.title,
-      level: levelInfo.level,
-      daysStudied,
-      lessonsCompleted,
-      xpEarned,
-      currentStreak: u.current_streak || 0,
-    }
-  })
+  const rawMetrics = await ensureUserPresent(supabase, cached.rawMetrics, userId)
 
   // Calculate final rankings
   const rankedEntries = calculateRankings(rawMetrics, userId)
-  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !optedOutUserIds.has(e.userId))
+  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !cached.optedOutUserIds.has(e.userId))
   const personalEntry = rankedEntries.find((e) => e.isCurrentUser) ?? null
 
   return {
@@ -189,6 +252,61 @@ export async function getWeeklyLeaderboard(
     isOptedIn,
     entries: publicEntries,
     personalEntry,
+  }
+}
+
+export interface CohortLeaderboardPayload extends WeeklyLeaderboardPayload {
+  cohortId: string
+  cohortName: string | null
+  isMember: boolean
+}
+
+/**
+ * Fetches weekly consistency rankings scoped to a single cohort's membership.
+ * Reuses the same cached raw weekly metrics as the global leaderboard — cohort
+ * scoping is a cheap in-memory filter + re-rank, not a separate aggregation query.
+ */
+export async function getCohortLeaderboard(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  cohortId: string,
+  targetWeekStart?: string
+): Promise<CohortLeaderboardPayload> {
+  const weekStart = targetWeekStart || calculateWeekStart()
+  const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
+
+  const [cached, cohortResult, memberRows] = await Promise.all([
+    getOrBuildWeeklyRawMetrics(supabase, weekStart),
+    (supabase.from('cohorts') as unknown as DBChain)
+      .select('id, name')
+      .eq('id', cohortId)
+      .maybeSingle() as unknown as Promise<{ data: { id: string; name: string } | null }>,
+    (supabase.from('cohort_members') as unknown as DBChain)
+      .select('user_id')
+      .eq('cohort_id', cohortId) as unknown as Promise<{ data: { user_id: string }[] | null }>,
+  ])
+
+  const cohortName = cohortResult.data?.name ?? null
+  const memberIds = new Set<string>((memberRows.data || []).map((m) => m.user_id))
+  const isMember = memberIds.has(userId)
+
+  let rawMetrics = cached.rawMetrics.filter((m) => memberIds.has(m.userId))
+  if (isMember) {
+    rawMetrics = await ensureUserPresent(supabase, rawMetrics, userId)
+  }
+
+  const rankedEntries = calculateRankings(rawMetrics, userId)
+  const publicEntries = rankedEntries.filter((e) => e.isCurrentUser || !cached.optedOutUserIds.has(e.userId))
+  const personalEntry = rankedEntries.find((e) => e.isCurrentUser) ?? null
+
+  return {
+    weekStart,
+    isOptedIn,
+    entries: publicEntries,
+    personalEntry,
+    cohortId,
+    cohortName,
+    isMember,
   }
 }
 
@@ -219,20 +337,37 @@ export async function getFriendLeaderboard(
   return entries.filter((e) => friendIds.has(e.userId))
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 /**
  * Adds a friend by username or user ID.
+ *
+ * Root-cause note: this previously used a single `.or('username.eq.X,id.eq.X')`
+ * filter for both lookup modes. Since `id` is a UUID column, PostgREST/Postgres
+ * fails the ENTIRE query with an "invalid input syntax for type uuid" error
+ * whenever X is a plain username (the normal case, since the UI always sends a
+ * username) — the resulting DB error was silently swallowed (only `data` was
+ * destructured), surfacing as an incorrect "Learner not found" for every
+ * attempt. Querying by the correct column for the identifier's actual shape
+ * avoids ever sending an invalid UUID comparison to Postgres.
  */
 export async function addFriend(
   supabase: SupabaseClient<Database>,
   userId: string,
   friendIdentifier: string
 ): Promise<{ success: boolean; message: string }> {
-  // Resolve friend by username or ID
-  const { data: targetUser } = (await (supabase
+  const isUuid = UUID_PATTERN.test(friendIdentifier)
+  const lookupColumn = isUuid ? 'id' : 'username'
+
+  const { data: targetUser, error: lookupError } = (await (supabase
     .from('users') as unknown as DBChain)
     .select('id, username')
-    .or(`username.eq.${friendIdentifier},id.eq.${friendIdentifier}`)
-    .maybeSingle()) as unknown as { data: { id: string; username: string } | null }
+    .eq(lookupColumn, friendIdentifier)
+    .maybeSingle()) as unknown as { data: { id: string; username: string } | null; error: unknown }
+
+  if (lookupError) {
+    throw new Error('Failed to look up learner. Please try again.')
+  }
 
   if (!targetUser) {
     throw new Error(`Learner "${friendIdentifier}" not found.`)

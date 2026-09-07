@@ -33,12 +33,24 @@ export interface UserBadgesSummaryPayload {
   recentBadge: BadgeProgressItem | null
 }
 
+export interface BadgeStatsPreloadedData {
+  /** Already-fetched `user_lesson_progress` rows for this user — skips the internal query when provided. */
+  progressRows?: { lesson_id: string; status: string; quiz_score: number | null; quiz_attempts: number }[]
+  /** Already-fetched `capstone_submissions` rows (any status) for this user — filtered internally to submitted/reviewed. */
+  capstoneRows?: { status: string }[]
+}
+
 /**
  * Aggregates user progress statistics from database for badge criteria evaluation.
+ *
+ * Accepts optional `preloaded` progress/capstone rows so callers that already
+ * fetched the same data for other sections (e.g. the Progress page) can avoid
+ * duplicate queries. When omitted, behavior is identical to before.
  */
 async function fetchUserStatsForBadges(
   supabase: SupabaseClient<Database>,
-  userId: string
+  userId: string,
+  preloaded?: BadgeStatsPreloadedData
 ): Promise<UserStatsForBadges> {
   // 1. Fetch user record
   const { data: user } = (await (supabase
@@ -47,12 +59,16 @@ async function fetchUserStatsForBadges(
     .eq('id', userId)
     .single()) as unknown as { data: UserRow | null }
 
-  // 2. Fetch completed lesson progress
-  const { data: progressRows } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
-    .select('lesson_id, status, quiz_score, quiz_attempts')
-    .eq('user_id', userId)) as unknown as {
-    data: { lesson_id: string; status: string; quiz_score: number | null; quiz_attempts: number }[] | null
+  // 2. Completed lesson progress
+  let progressRows = preloaded?.progressRows
+  if (!progressRows) {
+    const { data } = (await (supabase
+      .from('user_lesson_progress') as unknown as DBChain)
+      .select('lesson_id, status, quiz_score, quiz_attempts')
+      .eq('user_id', userId)) as unknown as {
+      data: { lesson_id: string; status: string; quiz_score: number | null; quiz_attempts: number }[] | null
+    }
+    progressRows = data || []
   }
 
   const completedLessons = (progressRows || []).filter((p) => p.status === 'completed')
@@ -67,14 +83,18 @@ async function fetchUserStatsForBadges(
     (p) => (p.quiz_score ?? 0) === 100
   ).length
 
-  // 3. Fetch capstone submissions count
-  const { data: capstones } = (await (supabase
-    .from('capstone_submissions') as unknown as DBChain)
-    .select('id')
-    .eq('user_id', userId)
-    .in('status', ['submitted', 'reviewed'])) as unknown as { data: { id: string }[] | null }
-
-  const capstonesSubmittedCount = capstones?.length ?? 0
+  // 3. Capstone submissions count (submitted/reviewed)
+  let capstonesSubmittedCount: number
+  if (preloaded?.capstoneRows) {
+    capstonesSubmittedCount = preloaded.capstoneRows.filter((c) => c.status === 'submitted' || c.status === 'reviewed').length
+  } else {
+    const { data: capstones } = (await (supabase
+      .from('capstone_submissions') as unknown as DBChain)
+      .select('id')
+      .eq('user_id', userId)
+      .in('status', ['submitted', 'reviewed'])) as unknown as { data: { id: string }[] | null }
+    capstonesSubmittedCount = capstones?.length ?? 0
+  }
 
   return {
     lessonsCompletedCount,
@@ -98,9 +118,10 @@ async function fetchUserStatsForBadges(
  */
 export async function getUserBadgesData(
   supabase: SupabaseClient<Database>,
-  userId: string
+  userId: string,
+  preloaded?: BadgeStatsPreloadedData
 ): Promise<UserBadgesSummaryPayload> {
-  const stats = await fetchUserStatsForBadges(supabase, userId)
+  const stats = await fetchUserStatsForBadges(supabase, userId, preloaded)
 
   // Fetch all badges definitions from DB
   const { data: dbBadges } = (await (supabase

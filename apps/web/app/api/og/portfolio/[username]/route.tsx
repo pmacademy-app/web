@@ -3,17 +3,40 @@ import { ImageResponse } from 'next/og'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getPublicPortfolioData } from '@/lib/portfolio-db'
 import { BRAND } from '@/lib/brand'
+import { TOKENS } from '@/theme/tokens'
 
 export const dynamic = 'force-dynamic'
+
+/**
+ * OG card palette — sourced directly from the app's own PUBLIC light theme
+ * tokens (theme/tokens.ts `colors`, the same tokens the rest of the product
+ * UI uses) plus the exact logo colors (public/brand/logo-mark.svg: #019E75 /
+ * #011229), matching the existing static brand asset (public/brand/og-image.png:
+ * light background, deep navy headline text, green accent, soft white cards).
+ * The PREVIOUS dark-navy/admin-console-styled version did not match this at
+ * all — this redesign intentionally does not invent any new colors.
+ *
+ * No custom font is loaded (Satori's default sans is used): fetching a font
+ * remotely per-instance would add an external runtime dependency to a
+ * reliability-critical, publicly-shared image endpoint for a cosmetic gain.
+ */
+const OG = {
+  background: TOKENS.colors.background, // '#FBFAF6'
+  surface: TOKENS.colors.surface, // '#FFFFFF'
+  surfaceMuted: TOKENS.colors.surfaceMuted, // '#F2EFE7'
+  border: TOKENS.colors.border, // '#DED8CB'
+  foreground: TOKENS.colors.foreground, // '#171A17'
+  muted: TOKENS.colors.textMuted, // '#70685A'
+  primary: TOKENS.colors.primary, // '#1F6B4E'
+  accent: TOKENS.colors.accent, // '#D98B24' — used for the Fellow distinction, matches the theme's own accent token
+  logoGreen: '#019E75', // exact logo-mark.svg color, used only for the logo graphic itself
+} as const
 
 interface RouteProps {
   params: Promise<{ username: string }>
 }
 
-/**
- * Official Prodily Logo Mark (SVG path from public/brand/logo-mark.svg).
- * Renders cleanly in Satori with brand primary green (#019E75) and dark emerald accent (#66D6A3).
- */
+/** Official Prodily Logo Mark (exact path + colors from public/brand/logo-mark.svg). */
 function ProdilyLogoMark({ size = 38 }: { size?: number }) {
   const height = Math.round((size * 497.69) / 422.46)
   return (
@@ -32,7 +55,7 @@ function ProdilyLogoMark({ size = 38 }: { size?: number }) {
         />
         <path
           d="M 232.816 270.366 C 217.968 279.346, 182.310 302.429, 181 303.909 C 179.692 305.388, 179.502 316.337, 179.516 389.560 C 179.532 471.475, 179.581 473.597, 181.516 476.871 C 182.970 479.329, 190.051 484.471, 208 496.098 C 221.475 504.828, 233.916 512.243, 235.648 512.577 C 240.115 513.439, 244.147 511.313, 269.500 494.735 C 283.722 485.435, 292.295 479.175, 293.750 477.027 L 296 473.704 296 389.526 L 296 305.349 293.750 303.275 C 291.377 301.087, 278.466 292.613, 253.316 276.737 L 238.131 267.151 232.816 270.366"
-          fill="#66D6A3"
+          fill="#011229"
         />
       </g>
     </svg>
@@ -57,10 +80,10 @@ export async function GET(request: Request, { params }: RouteProps) {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#050B14',
+              backgroundColor: OG.background,
               backgroundImage:
-                'radial-gradient(circle at 50% 35%, rgba(1, 158, 117, 0.12), transparent 60%), radial-gradient(circle at 80% 80%, rgba(217, 139, 36, 0.08), transparent 50%)',
-              color: '#ffffff',
+                `radial-gradient(circle at 12% 15%, rgba(1, 158, 117, 0.10), transparent 45%), radial-gradient(circle at 88% 85%, rgba(217, 139, 36, 0.08), transparent 45%)`,
+              color: OG.foreground,
               fontFamily: 'sans-serif',
               padding: '60px',
             }}
@@ -72,9 +95,9 @@ export async function GET(request: Request, { params }: RouteProps) {
                 gap: '10px',
                 padding: '8px 20px',
                 borderRadius: '9999px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: '#94A3B8',
+                backgroundColor: OG.surface,
+                border: `1px solid ${OG.border}`,
+                color: OG.muted,
                 fontSize: '16px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
@@ -99,7 +122,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                   fontSize: '44px',
                   fontWeight: 800,
                   letterSpacing: '-0.02em',
-                  color: '#F8FAFC',
+                  color: OG.foreground,
                 }}
               >
                 @{username}
@@ -109,7 +132,7 @@ export async function GET(request: Request, { params }: RouteProps) {
             <p
               style={{
                 fontSize: '22px',
-                color: '#94A3B8',
+                color: OG.muted,
                 maxWidth: '680px',
                 textAlign: 'center',
                 lineHeight: 1.5,
@@ -125,8 +148,8 @@ export async function GET(request: Request, { params }: RouteProps) {
                 alignItems: 'center',
                 gap: '8px',
                 fontSize: '15px',
-                color: '#66D6A3',
-                fontWeight: 600,
+                color: OG.primary,
+                fontWeight: 700,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
               }}
@@ -176,10 +199,10 @@ export async function GET(request: Request, { params }: RouteProps) {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            backgroundColor: '#050B14',
+            backgroundColor: OG.background,
             backgroundImage:
-              'radial-gradient(circle at 8% 12%, rgba(1, 158, 117, 0.22), transparent 45%), radial-gradient(circle at 92% 88%, rgba(102, 214, 163, 0.12), transparent 45%), radial-gradient(circle at 50% 50%, rgba(10, 20, 38, 0.5), transparent 70%)',
-            color: '#ffffff',
+              `radial-gradient(circle at 6% 10%, rgba(1, 158, 117, 0.12), transparent 42%), radial-gradient(circle at 94% 90%, rgba(217, 139, 36, 0.08), transparent 42%)`,
+            color: OG.foreground,
             fontFamily: 'sans-serif',
             padding: '48px 56px',
             position: 'relative',
@@ -209,7 +232,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                     fontSize: '26px',
                     fontWeight: 800,
                     letterSpacing: '-0.02em',
-                    color: '#F8FAFC',
+                    color: OG.foreground,
                     lineHeight: 1.1,
                   }}
                 >
@@ -220,7 +243,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                     fontSize: '11px',
                     fontWeight: 700,
                     letterSpacing: '0.18em',
-                    color: '#66D6A3',
+                    color: OG.primary,
                     textTransform: 'uppercase',
                   }}
                 >
@@ -229,7 +252,7 @@ export async function GET(request: Request, { params }: RouteProps) {
               </div>
             </div>
 
-            {/* Contextual Status Badge */}
+            {/* Contextual Status Badge — accent gold for Fellow, matching the theme's own accent token */}
             <div
               style={{
                 display: 'flex',
@@ -237,9 +260,9 @@ export async function GET(request: Request, { params }: RouteProps) {
                 gap: '8px',
                 padding: '8px 18px',
                 borderRadius: '9999px',
-                backgroundColor: user.isFellow ? 'rgba(1, 158, 117, 0.18)' : 'rgba(255, 255, 255, 0.06)',
-                border: user.isFellow ? '1px solid rgba(102, 214, 163, 0.4)' : '1px solid rgba(255, 255, 255, 0.12)',
-                color: user.isFellow ? '#66D6A3' : '#E2E8F0',
+                backgroundColor: user.isFellow ? 'rgba(217, 139, 36, 0.12)' : OG.surface,
+                border: user.isFellow ? `1px solid rgba(217, 139, 36, 0.4)` : `1px solid ${OG.border}`,
+                color: user.isFellow ? OG.accent : OG.foreground,
                 fontSize: '13px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
@@ -256,10 +279,11 @@ export async function GET(request: Request, { params }: RouteProps) {
               display: 'flex',
               flexDirection: 'column',
               gap: '20px',
-              backgroundColor: 'rgba(10, 20, 38, 0.65)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: OG.surface,
+              border: `1px solid ${OG.border}`,
               borderRadius: '24px',
               padding: '32px 36px',
+              boxShadow: '0 8px 24px rgba(23, 26, 23, 0.06)',
             }}
           >
             {/* Identity Row */}
@@ -275,29 +299,27 @@ export async function GET(request: Request, { params }: RouteProps) {
                   src={user.avatarUrl}
                   alt={displayName}
                   style={{
-                    width: '92px',
-                    height: '92px',
+                    width: '104px',
+                    height: '104px',
                     borderRadius: '9999px',
-                    border: '3px solid #019E75',
+                    border: `3px solid ${user.isFellow ? OG.accent : OG.primary}`,
                     objectFit: 'cover',
-                    boxShadow: '0 0 20px rgba(1, 158, 117, 0.35)',
                   }}
                 />
               ) : (
                 <div
                   style={{
-                    width: '92px',
-                    height: '92px',
+                    width: '104px',
+                    height: '104px',
                     borderRadius: '9999px',
-                    background: 'linear-gradient(135deg, #0A241B 0%, #019E75 100%)',
-                    border: '3px solid #66D6A3',
+                    background: `linear-gradient(135deg, ${OG.surfaceMuted} 0%, ${OG.primary} 100%)`,
+                    border: `3px solid ${user.isFellow ? OG.accent : OG.primary}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '40px',
+                    fontSize: '44px',
                     fontWeight: 800,
-                    color: '#F4F1E8',
-                    boxShadow: '0 0 20px rgba(1, 158, 117, 0.3)',
+                    color: OG.surface,
                   }}
                 >
                   {displayName.charAt(0).toUpperCase()}
@@ -311,7 +333,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                     fontWeight: 800,
                     margin: 0,
                     letterSpacing: '-0.025em',
-                    color: '#FFFFFF',
+                    color: OG.foreground,
                     lineHeight: 1.15,
                   }}
                 >
@@ -329,16 +351,16 @@ export async function GET(request: Request, { params }: RouteProps) {
                     style={{
                       fontSize: '19px',
                       fontWeight: user.isFellow ? 700 : 600,
-                      color: user.isFellow ? '#66D6A3' : '#94A3B8',
+                      color: user.isFellow ? OG.accent : OG.muted,
                     }}
                   >
                     {user.isFellow ? 'Product Management Fellow at Prodily' : 'Product Management Portfolio'}
                   </span>
-                  <span style={{ color: '#475569', fontSize: '18px' }}>•</span>
+                  <span style={{ color: OG.border, fontSize: '18px' }}>•</span>
                   <span
                     style={{
                       fontSize: '17px',
-                      color: '#64748B',
+                      color: OG.muted,
                       fontWeight: 600,
                       fontFamily: 'monospace',
                     }}
@@ -353,7 +375,7 @@ export async function GET(request: Request, { params }: RouteProps) {
             <p
               style={{
                 fontSize: '20px',
-                color: '#CBD5E1',
+                color: OG.muted,
                 margin: 0,
                 lineHeight: 1.45,
                 maxWidth: '1000px',
@@ -377,17 +399,18 @@ export async function GET(request: Request, { params }: RouteProps) {
                 flex: 1,
                 padding: '18px 24px',
                 borderRadius: '18px',
-                backgroundColor: 'rgba(10, 20, 38, 0.55)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backgroundColor: OG.surface,
+                border: `1px solid ${OG.border}`,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '4px',
+                boxShadow: '0 4px 14px rgba(23, 26, 23, 0.05)',
               }}
             >
               <span
                 style={{
                   fontSize: '12px',
-                  color: '#64748B',
+                  color: OG.muted,
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
@@ -399,7 +422,7 @@ export async function GET(request: Request, { params }: RouteProps) {
                 style={{
                   fontSize: '22px',
                   fontWeight: 800,
-                  color: '#F8FAFC',
+                  color: OG.foreground,
                 }}
               >
                 {projectText}
@@ -412,17 +435,18 @@ export async function GET(request: Request, { params }: RouteProps) {
                 flex: 1.4,
                 padding: '18px 24px',
                 borderRadius: '18px',
-                backgroundColor: 'rgba(10, 20, 38, 0.55)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backgroundColor: OG.surface,
+                border: `1px solid ${OG.border}`,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
+                boxShadow: '0 4px 14px rgba(23, 26, 23, 0.05)',
               }}
             >
               <span
                 style={{
                   fontSize: '12px',
-                  color: '#64748B',
+                  color: OG.muted,
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
@@ -437,9 +461,9 @@ export async function GET(request: Request, { params }: RouteProps) {
                     style={{
                       fontSize: '13px',
                       fontWeight: 600,
-                      color: '#66D6A3',
-                      backgroundColor: 'rgba(1, 158, 117, 0.14)',
-                      border: '1px solid rgba(102, 214, 163, 0.25)',
+                      color: OG.primary,
+                      backgroundColor: OG.surfaceMuted,
+                      border: `1px solid ${OG.border}`,
                       padding: '3px 10px',
                       borderRadius: '6px',
                     }}
@@ -458,12 +482,12 @@ export async function GET(request: Request, { params }: RouteProps) {
               alignItems: 'center',
               justifyContent: 'space-between',
               fontSize: '14px',
-              color: '#64748B',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              color: OG.muted,
+              borderTop: `1px solid ${OG.border}`,
               paddingTop: '16px',
             }}
           >
-            <span style={{ color: '#94A3B8', fontWeight: 600, fontFamily: 'monospace' }}>
+            <span style={{ color: OG.foreground, fontWeight: 600, fontFamily: 'monospace' }}>
               {BRAND.domain}/p/{user.username}
             </span>
             <span style={{ fontWeight: 500 }}>
@@ -486,4 +510,3 @@ export async function GET(request: Request, { params }: RouteProps) {
     return new Response('Failed to generate OpenGraph preview image', { status: 500 })
   }
 }
-

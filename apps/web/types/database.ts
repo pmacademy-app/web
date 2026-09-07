@@ -611,6 +611,54 @@ export type Database = {
         }
         Relationships: []
       }
+      fellow_requests: {
+        Row: {
+          id: string
+          user_id: string
+          status: string
+          requested_at: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          rejection_reason: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          status?: string
+          requested_at?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          rejection_reason?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          status?: string
+          requested_at?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          rejection_reason?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fellow_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fellow_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       in_app_broadcasts: {
         Row: {
           action_url: string | null
@@ -1743,6 +1791,7 @@ export type Database = {
           onboarding_preference: string | null
           onboarding_topics: string[]
           portfolio_layout: Json | null
+          portfolio_verification_override: string | null
           portfolio_view_count: number
           streak_freezes_available: number
           timezone: string
@@ -1777,6 +1826,7 @@ export type Database = {
           onboarding_preference?: string | null
           onboarding_topics?: string[]
           portfolio_layout?: Json | null
+          portfolio_verification_override?: string | null
           portfolio_view_count?: number
           streak_freezes_available?: number
           timezone?: string
@@ -1811,6 +1861,7 @@ export type Database = {
           onboarding_preference?: string | null
           onboarding_topics?: string[]
           portfolio_layout?: Json | null
+          portfolio_verification_override?: string | null
           portfolio_view_count?: number
           streak_freezes_available?: number
           timezone?: string

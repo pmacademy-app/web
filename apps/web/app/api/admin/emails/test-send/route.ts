@@ -3,6 +3,7 @@ import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { evaluateRateLimit } from '@/lib/rate-limit'
 import { renderEmailTemplate } from '@/emails'
 import { sendEmail } from '@/lib/email'
+import { sanitizeEmailHtml } from '@/lib/admin/sanitize-email-html'
 import { BRAND } from '@/lib/brand'
 
 export async function POST(request: Request) {
@@ -64,8 +65,12 @@ export async function POST(request: Request) {
 
     if (bodyHtml && typeof bodyHtml === 'string' && bodyHtml.trim()) {
       const { interpolateVariables, stripHtmlToPlainText } = await import('@/emails')
+      // Admin-authored/pasted HTML is untrusted input, sanitized before dispatch —
+      // this path sends unsaved editor content directly, bypassing the save-time
+      // sanitization on the template CRUD routes.
+      const cleanHtml = sanitizeEmailHtml(bodyHtml)
       finalSubject = interpolateVariables(subjectLine || 'Test Email', sampleVariables)
-      finalHtml = interpolateVariables(bodyHtml, sampleVariables)
+      finalHtml = interpolateVariables(cleanHtml, sampleVariables)
       finalText = bodyText ? interpolateVariables(bodyText, sampleVariables) : stripHtmlToPlainText(finalHtml)
     } else {
       const rendered = await renderEmailTemplate(templateKey, sampleVariables)
