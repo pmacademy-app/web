@@ -5,6 +5,15 @@ import { NextRequest } from 'next/server'
 import { POST as handleSignup } from '@/app/api/auth/signup/route'
 import { POST as handleLogin } from '@/app/api/auth/login/route'
 
+// The signup route's rate limiter is deliberately mocked at its own module
+// boundary (not left to fall through the @/lib/supabase mock below) so these
+// tests can never accidentally write to a real `rate_limits` table if that
+// fallback path ever changes shape — always-allow keeps this suite's own
+// behavior deterministic and focused on email-confirmation logic.
+vi.mock('@/lib/rate-limit', () => ({
+  evaluatePersistentRateLimit: vi.fn(async () => ({ success: true, remaining: 4, resetInMs: 60_000 })),
+}))
+
 const mockStore: {
   settings: Record<string, unknown>
   authUsers: Array<{

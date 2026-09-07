@@ -10,11 +10,25 @@
  * so two "different serverless instances" each getting a fresh Supabase
  * client still observe and mutate the SAME row.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import * as supabaseModule from '../supabase'
 import { evaluatePersistentRateLimit } from '../rate-limit'
+
+// `evaluatePersistentRateLimit` short-circuits to the in-memory limiter in test
+// environments by default (a hard guard added after a real leak into
+// production's `rate_limits` table — see the comment in lib/rate-limit.ts).
+// This file is the one legitimate exception: it needs the actual persistent
+// code path to run against the fully-mocked, in-process fake table below —
+// no real network call or credential is ever involved.
+const originalAllowTestDbAccess = process.env.ALLOW_TEST_DB_ACCESS
+beforeEach(() => {
+  process.env.ALLOW_TEST_DB_ACCESS = 'true'
+})
+afterEach(() => {
+  process.env.ALLOW_TEST_DB_ACCESS = originalAllowTestDbAccess
+})
 
 /** In-memory stand-in for the `public.rate_limits` Postgres table, external to the module under test. */
 function createFakeRateLimitsTable() {

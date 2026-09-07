@@ -1,7 +1,7 @@
 # Incident Report — Unthrottled Signup & Welcome-Email Flood (2026-09-06/07)
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Status:** Signups paused, root causes fixed in code (pending deploy/commit — left to the team), 1,233 flagged accounts banned (not deleted, fully reversible).
+**Status:** Signups paused, permanent fixes committed and deployed to production (`e13f907` + a follow-up test-isolation fix), 1,233 flagged accounts banned (not deleted, fully reversible).
 **Last Updated:** September 7, 2026
 
 ---
@@ -87,6 +87,11 @@ All four are minimal, targeted, and covered by the existing test suite (100 file
 2. **Email-provider fallback made failure-aware** ([`lib/email.ts`](../apps/web/lib/email.ts)) — Brevo→Resend (and the reverse) now only triggers on genuinely transient failures (network exception, timeout, or 5xx). It no longer falls back on quota exhaustion, invalid recipient, or auth/config errors (4xx), so a future Brevo quota event can no longer silently dump unlimited volume onto Resend.
 3. **The daily email send quota is now actually enforced** ([`lib/notifications/queue/processor.ts`](../apps/web/lib/notifications/queue/processor.ts)) — the existing atomic `increment_daily_email_quota()` Postgres function is now called **before** dispatch (not after), and non-critical items are deferred to the next processing run once the limit is reached, instead of being sent and merely logged. This is the actual circuit breaker that was missing.
 4. **Webhook diagnostic fix** ([`app/api/email/webhooks/route.ts`](../apps/web/app/api/email/webhooks/route.ts)) — bounce/failure `error_message` values were unconditionally labeled `"Resend event: ..."` even for Brevo-originated events, which made this exact investigation harder. Now correctly labeled per actual provider.
+
+Deployed as commit `e13f907` on `main`, 105 test files / 1,063 tests passing (34 new tests added specifically for these four fixes).
+
+### Follow-up: test-isolation gap found during production verification
+While verifying the deploy, a check of the live `rate_limits` table turned up three rows with obviously test-fixture emails (`sarah@example.com`, `john@example.com`, `duplicate@example.com`). Two **pre-existing** test files (`platform-behavior.test.ts`, `email-confirmation-requirement.test.ts`) call the signup route directly without mocking the new rate limiter; one of their Supabase mocks didn't implement `.upsert()` for the `rate_limits` table in a way that reliably fell back to the in-memory limiter, so a real write reached production using the local dev environment's live service-role credentials. The three test rows were deleted immediately (verified by exact key match against the known fixture set — nothing else was touched). Fixed at the source: `evaluatePersistentRateLimit()` ([`lib/rate-limit.ts`](../apps/web/lib/rate-limit.ts)) now hard-guards against running its real-database path in any test environment (`NODE_ENV=test`/`VITEST=true`) unless `ALLOW_TEST_DB_ACCESS=true` is explicitly set, so correctness no longer depends on every test's mock being complete. Both affected test files, plus the dedicated persistent-limiter test (which legitimately needs the real code path against a safe, fully in-process fake table), were updated accordingly. Re-ran the full suite after the fix: 0 new rows in `rate_limits`.
 
 ### Not yet implemented — requires a product/infra decision
 - **CAPTCHA / bot challenge (e.g. Cloudflare Turnstile) on signup.** No CAPTCHA provider is currently configured anywhere in the codebase or environment. Rate limiting alone would have slowed this specific incident dramatically (5/15min/IP vs. one request every ~9 seconds sustained) but a determined multi-IP script could still trickle through. Recommend provisioning a Turnstile site/secret key and gating the signup form + API on it.

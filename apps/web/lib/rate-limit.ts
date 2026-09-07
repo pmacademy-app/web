@@ -84,6 +84,22 @@ export async function evaluatePersistentRateLimit(
   const windowMs = options.windowMs ?? 60 * 1000
   const now = Date.now()
 
+  // Never touch the real `rate_limits` table from a test run. This is a hard
+  // guard, not just a warning: a 2026-09-07 test run leaked real rows into
+  // production here because a test's Supabase mock didn't happen to implement
+  // `.upsert()` for this table, so the failure fell through to the in-memory
+  // fallback via the try/catch below in that case — but nothing actually
+  // prevented a differently-shaped mock (or a missing one) from succeeding
+  // against live credentials instead. Route straight to the in-memory
+  // limiter in test envs so correctness here never depends on every caller's
+  // mock being complete.
+  if (
+    (process.env.NODE_ENV === 'test' || process.env.VITEST === 'true') &&
+    process.env.ALLOW_TEST_DB_ACCESS !== 'true'
+  ) {
+    return evaluateInMemoryRateLimit(key, { limit, windowMs })
+  }
+
   try {
     const { createServiceRoleClient } = await import('@/lib/supabase')
     const supabase = createServiceRoleClient()

@@ -3,6 +3,15 @@ import { NextRequest } from 'next/server'
 import { proxy } from '../../proxy'
 import { POST as signupPOST } from '../../app/api/auth/signup/route'
 
+// Mocked at its own module boundary — see email-confirmation-requirement.test.ts
+// for why this must not be left to fall through the @supabase/supabase-js mock
+// below (that fallback happened to land on the in-memory limiter here, but an
+// equivalent test elsewhere leaked real writes to production's `rate_limits`
+// table before this was made explicit).
+vi.mock('@/lib/rate-limit', () => ({
+  evaluatePersistentRateLimit: vi.fn(async () => ({ success: true, remaining: 4, resetInMs: 60_000 })),
+}))
+
 // Supabase mock: token 'mock-learner-token' = verified learner, 'mock-unverified-token' = unverified learner, 'mock-admin-token' = admin
 const mockGetUser = vi.fn(async (token: string) => {
   if (token === 'mock-unverified-token') {
