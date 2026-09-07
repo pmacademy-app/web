@@ -1,9 +1,8 @@
 'use client'
 
 import React from 'react'
-import { Send, Shield, RotateCcw, Key, Save } from 'lucide-react'
+import { Shield, RotateCcw, Key, Save } from 'lucide-react'
 import { AdminSection } from './AdminSection'
-import { AdminToggle } from './AdminToggle'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { SettingRow } from './SettingRow'
 import { NumberInput } from './NumberInput'
@@ -37,84 +36,32 @@ export function EmailSettingsSection({
 
   return (
     <div className="space-y-6">
-      {/* Sending Group */}
-      <AdminSection title="Sending Configuration" icon={Send} meta="Email sender identity">
-        <SettingRow
-          label="From Name"
-          description="Display name shown in recipient's inbox."
-        >
-          <input
-            type="text"
-            value={data.fromName}
-            onChange={(e) => handleInputChange('fromName', e.target.value)}
-            placeholder="Prodily"
-            disabled={isSaving}
-            className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent disabled:opacity-50 disabled:cursor-not-allowed hover:border-admin-border-strong transition-colors"
-          />
-        </SettingRow>
-
-        <SettingRow
-          label="From Email"
-          description="Sender email address. Must be a verified domain in Resend."
-        >
-          <input
-            type="email"
-            value={data.fromEmail}
-            onChange={(e) => handleInputChange('fromEmail', e.target.value)}
-            placeholder="noreply@prodily.app"
-            disabled={isSaving}
-            className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent disabled:opacity-50 disabled:cursor-not-allowed hover:border-admin-border-strong transition-colors"
-          />
-        </SettingRow>
-
-        <SettingRow
-          label="Reply-To Email"
-          description="Email address for replies. Can be different from sender."
-        >
-          <input
-            type="email"
-            value={data.replyToEmail}
-            onChange={(e) => handleInputChange('replyToEmail', e.target.value)}
-            placeholder="support@prodily.app"
-            disabled={isSaving}
-            className="w-full px-3 py-2 text-sm text-admin-fg bg-admin-surface border border-admin-border rounded-lg placeholder:text-admin-fg-subtle focus:outline-none focus:ring-2 focus:ring-admin-accent/50 focus:border-admin-accent disabled:opacity-50 disabled:cursor-not-allowed hover:border-admin-border-strong transition-colors"
-          />
-        </SettingRow>
-      </AdminSection>
-
-      {/* Limits Group */}
-      <AdminSection title="Daily & Hourly Limits" icon={Shield} meta="Rate limiting for email delivery">
+      {/* Limits — the only send limit the pipeline enforces. */}
+      <AdminSection title="Send Limits" icon={Shield} meta="Enforced by the email queue">
         <SettingRow
           label="Daily Send Limit"
-          description="Maximum emails sent per 24-hour period. Resend may enforce lower limits."
+          description="Maximum non-critical emails the queue will dispatch per day. Verification and password-reset emails bypass this limit. Shared with the daily limit on the Communications workspace."
         >
           <NumberInput
             value={data.dailySendLimit}
             onChange={(e) => handleInputChange('dailySendLimit', parseInt(e.target.value) || 0)}
-            min={1}
-            max={100000}
-            step={100}
-            disabled={isSaving}
-          />
-        </SettingRow>
-
-        <SettingRow
-          label="Hourly Send Limit"
-          description="Maximum emails sent per hour. Helps prevent burst sending."
-        >
-          <NumberInput
-            value={data.hourlySendLimit}
-            onChange={(e) => handleInputChange('hourlySendLimit', parseInt(e.target.value) || 0)}
-            min={1}
-            max={10000}
+            min={10}
+            max={1000}
             step={10}
             disabled={isSaving}
           />
         </SettingRow>
       </AdminSection>
 
-      {/* Sender Configuration Group */}
-      <AdminSection title="Sender Configuration" icon={Key} meta="Resend API status (read-only)">
+      {/* Sender identity is environment configuration, not a setting. */}
+      <AdminSection title="Sender & Providers" icon={Key} meta="Environment configuration (read-only)">
+        <SettingRow
+          label="Sender Identity"
+          description="From name, sender address and reply-to come from BREVO_FROM_EMAIL / RESEND_FROM_EMAIL and the brand configuration. They are not editable here."
+        >
+          <span className="text-xs text-admin-fg-muted">Set in the deployment environment</span>
+        </SettingRow>
+
         <SettingRow
           label="Resend API Key"
           description="Configured via RESEND_API_KEY environment variable. Cannot be changed here."
@@ -133,38 +80,11 @@ export function EmailSettingsSection({
         </SettingRow>
       </AdminSection>
 
-      {/* Automation Group */}
-      <AdminSection title="Automation Behavior" icon={RotateCcw} meta="Failed email retry configuration">
-        <SettingRow
-          label="Retry Failed Emails"
-          description="Automatically retry emails that fail to send."
-        >
-          <AdminToggle
-            pressed={data.retryFailedEmails}
-            onPressedChange={(v) => handleInputChange('retryFailedEmails', v)}
-            disabled={isSaving}
-            aria-label="Toggle retry failed emails"
-          />
-        </SettingRow>
-
-        <SettingRow
-          label="Max Retry Attempts"
-          description="Maximum number of retry attempts before marking as permanently failed."
-        >
-          <NumberInput
-            value={data.maxRetryAttempts}
-            onChange={(e) => handleInputChange('maxRetryAttempts', parseInt(e.target.value) || 0)}
-            min={1}
-            max={10}
-            step={1}
-            disabled={isSaving || !data.retryFailedEmails}
-            aria-disabled={isSaving || !data.retryFailedEmails}
-          />
-        </SettingRow>
-
+      {/* Retry — only the backoff base is read by the queue. */}
+      <AdminSection title="Retry Behavior" icon={RotateCcw} meta="Applied by the email queue processor">
         <SettingRow
           label="Retry Delay (minutes)"
-          description="Minutes to wait between retry attempts."
+          description="Base delay before a failed email is retried. The queue backs off exponentially from this value. The number of attempts is set per message priority, not globally."
         >
           <NumberInput
             value={data.retryDelayMinutes}
@@ -172,8 +92,7 @@ export function EmailSettingsSection({
             min={1}
             max={1440}
             step={5}
-            disabled={isSaving || !data.retryFailedEmails}
-            aria-disabled={isSaving || !data.retryFailedEmails}
+            disabled={isSaving}
           />
         </SettingRow>
       </AdminSection>

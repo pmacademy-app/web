@@ -5,6 +5,7 @@ import { MessageSquare, CheckCircle, XCircle, Eye, EyeOff, Edit3, Check, X } fro
 import { AdminPageHeader } from './AdminPageHeader'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
+import { useAdminToast } from './admin-toast'
 import type { TestimonialItem } from '@/lib/admin/feedback-service'
 
 interface FeedbackModerationViewProps {
@@ -19,6 +20,7 @@ export function FeedbackModerationView({ initialQueue, embedded = false }: Feedb
   // "Featured" concept is mapped to the published state: the "Published on
   // Site" chip + Publish/Unpublish actions below are the accurate equivalent.
   // No "Feature" action is offered because the data model cannot represent it.
+  const { toast } = useAdminToast()
   const [queue, setQueue] = useState<TestimonialItem[]>(initialQueue)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [loadingId, setLoadingId] = useState<string | null>(null)
@@ -63,9 +65,14 @@ export function FeedbackModerationView({ initialQueue, embedded = false }: Feedb
             }
           })
         )
+      } else {
+        // Without this the row silently kept its old state and the admin had no way
+        // to tell the action had been refused.
+        toast(data.error || `Could not ${action} this testimonial. Try again.`, 'error')
       }
     } catch (err) {
       console.error('Moderation action failed:', err)
+      toast('Could not reach the moderation service. Check your connection and try again.', 'error')
     } finally {
       setLoadingId(null)
       setEditingId(null)

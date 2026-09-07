@@ -250,6 +250,42 @@ describe('updatePasswordAction() Server Action — Authorization Chain', () => {
     expect(result.success).toBeUndefined()
   })
 
+  // --- 7b. The provider's own message must not cross to the browser ---
+  it('7b. Admin API failure returns classified copy, never the raw GoTrue message', async () => {
+    const USER_ID = 'abcd1234-ef56-7890-abcd-ef1234567890'
+
+    mockCookieGet.mockImplementation((name: string) => {
+      if (name === 'sb-access-token') return { value: 'valid-token' }
+      return undefined
+    })
+
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: USER_ID, email: 'user@example.com' } },
+      error: null,
+    })
+
+    // A realistic GoTrue error: internal wording, an error code, and a status.
+    const RAW_PROVIDER_MESSAGE =
+      'Password should be at least 6 characters. [gotrue:422] relation "auth.users" constraint violated'
+    mockUpdateUserById.mockResolvedValue({
+      data: { user: null },
+      error: { message: RAW_PROVIDER_MESSAGE, status: 422, code: 'weak_password' },
+    })
+
+    const result = await updatePasswordAction('short')
+
+    // The action's return value is serialized to the browser, so the raw string must
+    // not appear anywhere in it, not merely go unrendered.
+    const serialized = JSON.stringify(result)
+    expect(serialized).not.toContain(RAW_PROVIDER_MESSAGE)
+    expect(serialized).not.toContain('gotrue')
+    expect(serialized).not.toContain('auth.users')
+
+    // Classified copy and a stable code take its place.
+    expect(result.code).toBe('AUTH_PASSWORD_TOO_WEAK')
+    expect(result.error).toContain('security requirements')
+  })
+
   // --- 8. createServiceRoleClient is called ONLY after identity verified ---
   it('8. createServiceRoleClient() is invoked only after successful getUser() identity check', async () => {
     const createServiceRoleClientSpy = vi.spyOn(supabaseLib, 'createServiceRoleClient')

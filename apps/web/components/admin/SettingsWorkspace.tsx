@@ -128,16 +128,6 @@ export function SettingsWorkspace({
     [markDirty]
   )
 
-  const updateNotificationData = useCallback(
-    (partial: Partial<NotificationSettings>) => {
-      setSectionData((prev) => ({
-        ...prev,
-        notifications: { ...prev.notifications, ...partial },
-      }))
-      markDirty('notifications')
-    },
-    [markDirty]
-  )
 
   const updateOnboardingData = useCallback(
     (partial: Partial<OnboardingSettings>) => {
@@ -299,16 +289,7 @@ export function SettingsWorkspace({
           />
         )}
         {activeSection === 'notifications' && (
-          <NotificationSettingsSection
-            sectionKey="notifications"
-            data={sectionData.notifications}
-            onChange={updateNotificationData}
-            onSave={() => handleSave('notifications')}
-            onReset={() => handleReset('notifications')}
-            isDirty={dirtySections.has('notifications')}
-            isSaving={savingSection === 'notifications'}
-            initialData={initialData.notifications}
-          />
+          <NotificationSettingsSection />
         )}
         {activeSection === 'onboarding' && (
           <OnboardingSettingsSection

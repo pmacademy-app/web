@@ -1,9 +1,8 @@
 'use client'
 
 import React from 'react'
-import { Zap, Award, Brain, CheckCircle, RotateCcw, Save } from 'lucide-react'
+import { Zap, RotateCcw, Save } from 'lucide-react'
 import { AdminSection } from './AdminSection'
-import { AdminToggle } from './AdminToggle'
 import { SettingRow } from './SettingRow'
 import { NumberInput } from './NumberInput'
 import type { LearningSettings } from '@/lib/admin/types'
@@ -93,97 +92,8 @@ export function LearningSettingsSection({
         </SettingRow>
       </AdminSection>
 
-      {/* Streaks Group */}
-      <AdminSection title="Streaks" icon={Award} meta="Streak configuration and freeze options">
-        <SettingRow
-          label="Enable Streak Freeze"
-          description="Allow learners to use XP to protect their streak for one day."
-        >
-          <AdminToggle
-            pressed={data.streakFreezeEnabled}
-            onPressedChange={(v) => handleInputChange('streakFreezeEnabled', v)}
-            disabled={isSaving}
-            aria-label="Toggle streak freeze"
-          />
-        </SettingRow>
 
-        <SettingRow
-          label="Streak Freeze Cost (XP)"
-          description="XP cost to activate a streak freeze. Only applies when streak freeze is enabled."
-        >
-          <NumberInput
-            value={data.streakFreezeCostXp}
-            onChange={(e) => handleInputChange('streakFreezeCostXp', parseInt(e.target.value) || 0)}
-            min={0}
-            max={5000}
-            step={50}
-            disabled={isSaving || !data.streakFreezeEnabled}
-            aria-disabled={isSaving || !data.streakFreezeEnabled}
-          />
-        </SettingRow>
-      </AdminSection>
 
-      {/* Certificates Group */}
-      <AdminSection title="Certificates" icon={CheckCircle} meta="Certificate issuance and expiry settings">
-        <SettingRow
-          label="Auto-Issue Certificates"
-          description="Automatically issue certificates when learners complete all requirements."
-        >
-          <AdminToggle
-            pressed={data.certificateAutoIssue}
-            onPressedChange={(v) => handleInputChange('certificateAutoIssue', v)}
-            disabled={isSaving}
-            aria-label="Toggle auto-issue certificates"
-          />
-        </SettingRow>
-
-        <SettingRow
-          label="Certificate Expiry (days)"
-          description="Number of days after which certificates expire. Leave empty for no expiry."
-        >
-          <NumberInput
-            value={data.certificateExpiryDays ?? ''}
-            onChange={(e) => {
-              const val = e.target.value
-              handleInputChange('certificateExpiryDays', val === '' ? null : parseInt(val) || null)
-            }}
-            min={1}
-            max={3650}
-            step={1}
-            placeholder="No expiry"
-            disabled={isSaving}
-          />
-        </SettingRow>
-      </AdminSection>
-
-      {/* Learning Behavior Group */}
-      <AdminSection title="Learning Behavior" icon={Brain} meta="Core learning progression rules">
-        <SettingRow
-          label="Lesson Completion Required for Progress"
-          description="Require learners to complete lessons in order to progress through modules."
-        >
-          <AdminToggle
-            pressed={data.lessonCompletionRequiredForProgress}
-            onPressedChange={(v) => handleInputChange('lessonCompletionRequiredForProgress', v)}
-            disabled={isSaving}
-            aria-label="Toggle lesson completion required"
-          />
-        </SettingRow>
-
-        <SettingRow
-          label="Quiz Pass Threshold (%)"
-          description="Minimum percentage score required to pass a quiz."
-        >
-          <NumberInput
-            value={data.quizPassThreshold}
-            onChange={(e) => handleInputChange('quizPassThreshold', parseInt(e.target.value) || 0)}
-            min={0}
-            max={100}
-            step={1}
-            disabled={isSaving}
-          />
-        </SettingRow>
-      </AdminSection>
 
       {/* Actions */}
       <div className="flex items-center justify-end gap-3 border-t border-admin-border pt-4">

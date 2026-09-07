@@ -17,6 +17,19 @@ export type AuthErrorCode =
   | 'AUTH_SESSION_SYNC_FAILED'
   | 'AUTH_UNKNOWN_ERROR'
 
+/** Every code this classifier can produce, for validating a server-supplied code. */
+export const AUTH_ERROR_CODES = new Set<string>([
+  'AUTH_INVALID_CREDENTIALS',
+  'AUTH_EMAIL_NOT_CONFIRMED',
+  'AUTH_USER_ALREADY_EXISTS',
+  'AUTH_PASSWORD_TOO_WEAK',
+  'AUTH_NETWORK_ERROR',
+  'AUTH_PROVIDER_UNAVAILABLE',
+  'AUTH_RATE_LIMITED',
+  'AUTH_SESSION_SYNC_FAILED',
+  'AUTH_UNKNOWN_ERROR',
+])
+
 export interface ClassifiedAuthError {
   /** Machine-readable error code suitable for telemetry and UI branching. */
   code: AuthErrorCode
@@ -30,6 +43,8 @@ export interface ClassifiedAuthError {
   requiresAction?: 'verify_email' | 'login' | 'reset_password' | 'wait'
   /** Sanitized error name or original code for internal diagnostic logging (never rendered to UI). */
   rawCode?: string
+  /** Support correlation id returned by the API for an unexpected server failure. */
+  errorId?: string
 }
 
 /**
@@ -365,4 +380,49 @@ function extractErrorCode(error: unknown): string | undefined {
     if (typeof err.name === 'string' && err.name !== 'Error') return err.name
   }
   return undefined
+}
+
+
+/**
+ * Builds a ClassifiedAuthError from an API error response body.
+ *
+ * The auth screens previously re-derived the code by re-classifying the message
+ * string. That still works — the API returns classifier copy and the classifier is
+ * idempotent — but it is lossy: the server already decided the code, and reading it
+ * back out of English is a round-trip that only holds while the copy matches a
+ * pattern. When the server supplies one of our codes, trust it and keep its copy.
+ *
+ * `errorId` is carried through so an unexpected failure can be quoted to support.
+ */
+export function resolveApiAuthError(
+  body: { error?: string; code?: string; errorId?: string } | null | undefined,
+  context: AuthErrorContext,
+  fallbackMessage = 'Something went wrong. Please try again.'
+): ClassifiedAuthError {
+  const message = body?.error || fallbackMessage
+  const classified = classifyAuthError(new Error(message), context)
+
+  const serverCode = body?.code
+  if (serverCode && AUTH_ERROR_CODES.has(serverCode)) {
+    // The server already classified this. Trust its code and its copy.
+    classified.code = serverCode as AuthErrorCode
+    classified.message = message
+  } else if (body?.error && serverCode) {
+    // A platform code we do not own (VALIDATION, SIGNUPS_DISABLED, SERVER_ERROR).
+    // Keep the server's message: it is more specific than the classifier's fallback,
+    // and overwriting it turned "Password is required." into "An unexpected
+    // authentication error occurred." Classification still supplies the code and the
+    // retryable/requiresAction metadata the screens branch on.
+    //
+    // The presence of a `code` is the trust signal: it means the body came from the
+    // shared API error contract, which sanitizes its message. A body with no code is
+    // of unknown provenance, so its text is discarded in favour of safe copy.
+    classified.message = body.error
+  }
+
+  if (body?.errorId) {
+    classified.errorId = body.errorId
+  }
+
+  return classified
 }

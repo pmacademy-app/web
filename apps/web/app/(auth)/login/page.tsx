@@ -11,7 +11,7 @@ import { BRAND } from '@/lib/brand'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
-import { classifyAuthError, type ClassifiedAuthError } from '@/lib/auth/errors'
+import { classifyAuthError, type ClassifiedAuthError, resolveApiAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 
 const loginSchema = z.object({
@@ -89,7 +89,14 @@ function LoginForm() {
           return
         }
 
-        let json: { success?: boolean; error?: string; requiresVerification?: boolean; redirect?: string } = {}
+        let json: {
+          success?: boolean
+          error?: string
+          code?: string
+          errorId?: string
+          requiresVerification?: boolean
+          redirect?: string
+        } = {}
         try {
           json = await res.json()
         } catch {
@@ -100,7 +107,8 @@ function LoginForm() {
         }
 
         if (!res.ok || !json.success) {
-          const classified = classifyAuthError(new Error(json.error || 'Authentication failed'), 'login')
+          // Prefer the server's stable code over re-deriving one from the message.
+          const classified = resolveApiAuthError(json, 'login', 'Authentication failed')
           if (json.requiresVerification) {
             classified.requiresAction = 'verify_email'
             classified.code = 'AUTH_EMAIL_NOT_CONFIRMED'
@@ -148,10 +156,15 @@ function LoginForm() {
       {authError && (
         <div className="space-y-3">
           <div
-            className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
+            className="flex flex-col gap-1.5 p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
             role="alert"
           >
-            {authError.message}
+            <span>{authError.message}</span>
+            {authError.errorId && (
+              <span className="font-mono text-[11px] opacity-70">
+                Reference {authError.errorId}. Include this if you contact support.
+              </span>
+            )}
           </div>
           {authError.code === 'AUTH_EMAIL_NOT_CONFIRMED' && (
             <ResendVerificationCard email={attemptedEmail || getValues('email')} />

@@ -9,7 +9,7 @@ import * as z from 'zod'
 import { Eye, EyeOff, CheckCircle2, KeyRound, AlertCircle } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
-import { classifyAuthError } from '@/lib/auth/errors'
+import { classifyAuthError, resolveApiAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { updatePasswordAction } from './actions'
 
@@ -132,7 +132,9 @@ function ResetPasswordFormContent() {
         const result = await updatePasswordAction(values.newPassword)
 
         if (result.error) {
-          const classified = classifyAuthError(result.error, 'reset_password')
+          // The action now returns the shared error contract, so read its stable code
+          // instead of re-deriving one from the message.
+          const classified = resolveApiAuthError(result, 'reset_password')
           setErrorMsg(classified.message)
           recordAuthTelemetry(classified, 'reset_password')
           return

@@ -11,7 +11,7 @@ import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 import { ReferralBadge } from '@/components/referral/ReferralBadge'
-import { classifyAuthError, type ClassifiedAuthError } from '@/lib/auth/errors'
+import { classifyAuthError, type ClassifiedAuthError, resolveApiAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { trackReferralSignupCompleted } from '@/lib/analytics'
 
@@ -98,7 +98,7 @@ function SignupFormContent() {
             })
             return
           }
-          const classified = classifyAuthError(new Error(json.error || 'Registration failed'), 'signup')
+          const classified = resolveApiAuthError(json, 'signup', 'Registration failed')
           setAuthError(classified)
           recordAuthTelemetry(classified, 'signup')
           return
@@ -211,6 +211,11 @@ function SignupFormContent() {
               role="alert"
             >
               <span>{authError.message}</span>
+              {authError.errorId && (
+                <span className="font-mono text-[11px] opacity-70">
+                  Reference {authError.errorId}. Include this if you contact support.
+                </span>
+              )}
               {(authError.code === 'AUTH_USER_ALREADY_EXISTS' || authError.requiresAction === 'login') && (
                 <Link
                   href="/login"

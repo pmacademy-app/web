@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { classifyAuthError } from '@/lib/auth/errors'
 
 export async function updatePasswordAction(newPassword: string) {
   try {
@@ -11,7 +12,10 @@ export async function updatePasswordAction(newPassword: string) {
     const refreshToken = cookieStore.get('sb-refresh-token')?.value
 
     if (!accessToken && !refreshToken) {
-      return { error: 'No active recovery session found. Please request a new password reset link.' }
+      return {
+        error: 'No active recovery session found. Please request a new password reset link.',
+        code: 'AUTH_SESSION_SYNC_FAILED' as const,
+      }
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -50,7 +54,10 @@ export async function updatePasswordAction(newPassword: string) {
       if (refreshError || !refreshData?.session?.user) {
         cookieStore.delete('sb-access-token')
         cookieStore.delete('sb-refresh-token')
-        return { error: 'Your password reset link has expired. Please request a new one.' }
+        return {
+          error: 'Your password reset link has expired. Please request a new one.',
+          code: 'AUTH_SESSION_SYNC_FAILED' as const,
+        }
       }
 
       userId = refreshData.session.user.id
@@ -59,7 +66,10 @@ export async function updatePasswordAction(newPassword: string) {
     if (!userId) {
       cookieStore.delete('sb-access-token')
       cookieStore.delete('sb-refresh-token')
-      return { error: 'Your password reset link has expired. Please request a new one.' }
+      return {
+        error: 'Your password reset link has expired. Please request a new one.',
+        code: 'AUTH_SESSION_SYNC_FAILED' as const,
+      }
     }
 
     // Step 3: Use the Admin API to update the password for the validated user ID.
@@ -71,7 +81,12 @@ export async function updatePasswordAction(newPassword: string) {
 
     if (updateError) {
       console.error('[updatePasswordAction] Admin update error:', updateError.message)
-      return { error: updateError.message || 'Failed to update password. Please try again.' }
+      // Return classifier copy, not the provider's message. The raw GoTrue string was
+      // never rendered (the page classifies before display), but returning it sent it
+      // across to the browser, where it is visible in the network response. Same
+      // contract the API routes use: a stable code plus copy we wrote.
+      const classified = classifyAuthError(updateError, 'reset_password')
+      return { error: classified.message, code: classified.code }
     }
 
     // Clear the recovery session cookies after a successful update
@@ -80,7 +95,7 @@ export async function updatePasswordAction(newPassword: string) {
     return { success: true }
   } catch (err) {
     console.error('[updatePasswordAction] Unexpected error:', err)
-    return { error: 'An unexpected error occurred.' }
+    return { error: 'An unexpected error occurred.', code: 'AUTH_UNKNOWN_ERROR' as const }
   }
 }
 
