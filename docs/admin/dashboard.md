@@ -9,7 +9,7 @@
 ## 1. Purpose
 
 The Operations Dashboard is the primary home screen for platform administrators. It provides a real-time answer to two essential operational questions:
-1. **What needs my immediate attention?** (failed email deliveries, unread contact inquiries, pending testimonials, active system alerts, pending portfolio reviews).
+1. **What needs my immediate attention?** (failed email deliveries, unread contact inquiries, pending testimonials, active system alerts — exactly these 4 items; there is currently no "pending portfolio reviews" item).
 2. **What is happening across the academy right now?** (growth, engagement, curriculum completion, and system health).
 
 ---
@@ -35,13 +35,12 @@ The Operations Dashboard is the primary home screen for platform administrators.
 ## 4. Fields, Sections & Controls
 
 ### A. Attention Center (`AdminAttentionCenter`)
-Displays actionable alerts when items require human intervention:
+Displays actionable alerts when items require human intervention — exactly 4 items are built by `DashboardService.getAttentionItems()`:
 - **Failed Emails:** Number of failed items in `email_queue` $\rightarrow$ links to `/admin/communications?tab=queue`.
 - **New Contact Messages:** Unread student inquiries $\rightarrow$ links to `/admin/communications?tab=contact`.
-- **Pending Testimonials:** Reviews awaiting approval $\rightarrow$ links to `/admin/moderation?tab=testimonials`.
-- **Pending Portfolio Reviews:** Unverified public portfolios $\rightarrow$ links to `/admin/moderation?tab=portfolios`.
-- **System Alerts:** Active warnings or errors $\rightarrow$ links to `/admin/system?tab=alerts`.
-*Note: When all counts are zero, the section displays a green "Everything looks good" confirmation badge.*
+- **Pending Testimonials:** Reviews awaiting approval $\rightarrow$ links to `/admin/feedback` (redirects to `/admin/moderation?tab=testimonials`).
+- **System Alerts:** Active warnings or errors $\rightarrow$ links to `/admin/system`.
+*Note: When all counts are zero, the section displays a green "Everything looks good" confirmation badge. There is no "Pending Portfolio Reviews" item — Fellow/verification review queues are not currently surfaced in the Attention Center.*
 
 ### B. KPI Cards Grid (8 Metrics)
 | Metric | Definition | Data Source |
@@ -60,7 +59,7 @@ Displays actionable alerts when items require human intervention:
 - **Learning Activity (Bar Chart):** Daily volume of completed lessons, passed quizzes, and submitted capstones.
 - **Learning Journey Funnel (`AdminFunnelChart`):** Cumulative conversion stages:
   `Registered` $\rightarrow$ `Onboarding Completed` $\rightarrow$ `First Lesson` $\rightarrow$ `First Quiz` $\rightarrow$ `Module Completed` $\rightarrow$ `Course Completed` $\rightarrow$ `Certificate Issued`.
-- **System Snapshot:** Real-time ping status for Database, Authentication, Email Queue, Notifications, and Cron Schedulers.
+- **System Snapshot:** Real-time ping status across 6 rows — Database, Auth, Email, Queue, Notifications, and Scheduler.
 
 ---
 
@@ -77,5 +76,5 @@ Displays actionable alerts when items require human intervention:
 **Daily Morning Standup Procedure:**
 1. Open `/admin`.
 2. Inspect the **Attention Center**. If there are 3 failed emails, click the badge to jump to `/admin/communications?tab=queue` and click **Retry All**.
-3. If there are 2 pending portfolio reviews, click the badge to jump to `/admin/moderation?tab=portfolios` and review the student case studies.
+3. Separately check `/admin/moderation?tab=fellow-requests` and `?tab=portfolios` for pending Fellow reviews (not currently surfaced in the Attention Center).
 4. Set the date filter to **7D** to review weekly learner acquisition and lesson completion trends.

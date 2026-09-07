@@ -42,8 +42,10 @@ Review student case study deliverables produced at the end of curriculum modules
 4. **Toggle Public Portfolio Visibility:** Toggle the **Public / Private** switch to control whether this deliverable can be showcased on the learner's public portfolio.
 
 ### D. Portfolio Verification Queue (`?tab=portfolios`)
-Review candidate public portfolios and grant/revoke **Product Management Fellow** designation.
-*For full step-by-step procedures, refer to the [Portfolio Verification Operating Guide](portfolio-verification.md).*
+Despite its name, this tab grants/revokes **PM Fellow** designation (`is_fellow`), not the separate "Portfolio Verification" feature documented at [`docs/admin/portfolio-verification.md`](portfolio-verification.md). See [`docs/admin/fellow-designation.md`](fellow-designation.md) for full procedures on this queue.
+
+### E. Fellow Requests Queue (`?tab=fellow-requests`)
+A second, newer path to the same `is_fellow` designation: learners who reach full portfolio readiness can submit a request from Settings, which lands here for admin approval/rejection (rather than an admin having to browse every public portfolio). *Full procedures in [`docs/admin/fellow-designation.md`](fellow-designation.md).*
 
 ---
 
@@ -51,4 +53,5 @@ Review candidate public portfolios and grant/revoke **Product Management Fellow*
 
 - **Marketing Page Sync:** Publishing a testimonial automatically updates the landing page testimonials carousel.
 - **Portfolio Showcase:** Marking a capstone as public permits the learner to pin it as a featured case study on their public portfolio.
+- **Fellow Requests:** Approving/rejecting a request also sends the learner an in-app notification (the legacy Portfolio Verification queue does not).
 - **Audit Logging:** All moderation decisions (approve, publish, reject, toggle) are permanently recorded in `public.admin_audit_logs`.

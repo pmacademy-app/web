@@ -18,10 +18,15 @@ This guide explains the technical attribution lifecycle, anti-abuse mechanisms, 
 
 ```
                     1. INVITE LINK
-[ Referrer User ] ────────────────► [ Peer visits https://prodily.app/signup?ref=handle ]
+[ Referrer User ] ────────────────► [ Peer visits https://prodily.adityagangwani.me/signup?ref=handle ]
                                                 │
-                                                ▼ 2. ATTRIBUTION COOKIE (30 Days)
-                                    `prodily_referral` stored in browser
+                                                ▼ 2a. IMMEDIATE ATTRIBUTION (primary path)
+                                    Signup form reads ?ref= from the URL and submits it
+                                    directly in the signup request body
+                                                │
+                                                ▼ 2b. COOKIE FALLBACK (30 days)
+                                    `prodily_referrer` cookie set by proxy.ts — only used
+                                    if the signup request didn't already include a ref code
                                                 │
                                                 ▼ 3. SIGNUP
                                     Account created in auth.users
@@ -42,7 +47,7 @@ This guide explains the technical attribution lifecycle, anti-abuse mechanisms, 
 
 The referral engine enforces strict server-side safeguards in `lib/referral/referral-service.ts`:
 
-1. **Self-Referral Prevention:** Users cannot refer themselves or attribute their own signup (`auth.uid() !== referrer_id`).
+1. **Self-Referral Prevention:** Users cannot refer themselves or attribute their own signup (enforced in application code, `referral-service.ts` — not a Postgres RLS policy).
 2. **24-Hour Rolling Rate Limit:** A referrer can be credited for a maximum of **10 signups per rolling 24-hour window** (`MAX_REFERRALS_PER_24H = 10`). Excess signups within the window are rejected from attribution.
 3. **Activation Gate:** XP is **never** awarded on registration alone. The reward is gated strictly behind the invited learner completing their **first full theory/quiz lesson**, ensuring genuine student activation.
 4. **Idempotency Protection:** XP awards enforce unique transaction keys to prevent duplicate rewards for the same referred user.
@@ -52,7 +57,7 @@ The referral engine enforces strict server-side safeguards in `lib/referral/refe
 ## 4. Learner-Facing Referral Experience (`/settings?tab=referrals`)
 
 Students manage and monitor their referrals in their Account Settings:
-- **Personal Referral Link:** Unique link formatted as `https://prodily.app/signup?ref=username` (or UUID if username is not configured).
+- **Personal Referral Link:** Unique link formatted as `{siteUrl}/signup?ref=username` (or UUID if username is not configured).
 - **One-Click Share Buttons:** Native share triggers for LinkedIn, X (Twitter), and WhatsApp with pre-formatted copy.
 - **Invited Peers Dashboard:** Table displaying:
   - **Invited Learner:** Display name / initials.
@@ -64,10 +69,8 @@ Students manage and monitor their referrals in their Account Settings:
 
 ## 5. Admin Visibility & Operations
 
-### A. Inspecting a User's Referral Count in `/admin/users`
-1. Navigate to `/admin/users` and search for the user.
-2. Click their row to open the **User Detail Drawer**.
-3. Under the **Overview** and **Activity** sections, the system displays the learner's total active referrals count (`referralsCount`).
+### A. Referral Count Visibility
+`referralsCount` is computed on the backend (`lib/admin/service.ts`) but is **not currently rendered anywhere in the User Detail Drawer or elsewhere in the admin UI** — to check a specific user's referral activity today, use the SQL query below rather than looking for it in `/admin/users`.
 
 ### B. Direct Database Auditing
 Administrators with database access can inspect referral activity directly in `public.referrals`:

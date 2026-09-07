@@ -33,8 +33,12 @@ export function AdminUserMultiSelectPicker({
   // Debounced search
   useEffect(() => {
     if (!query.trim()) {
-      setResults([])
-      return
+      // Deferred (not synchronous-in-effect) so React doesn't flag a
+      // cascading render — the empty state only ever renders once the
+      // dropdown itself is hidden anyway (see the `query.trim().length > 0`
+      // gate below), this just avoids stale results flashing for the next query.
+      const clearTimer = setTimeout(() => setResults([]), 0)
+      return () => clearTimeout(clearTimer)
     }
 
     const timer = setTimeout(async () => {

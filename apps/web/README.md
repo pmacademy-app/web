@@ -19,26 +19,36 @@ Built with a static-first curriculum architecture and a lightweight Supabase Pos
 ```
 apps/web/
 ├── app/                        # Next.js App Router
-│   ├── (auth)/                 # Public auth pages (login, signup, reset-password, verified)
-│   ├── academy/                # 90-lesson curriculum browser & lesson viewer
-│   ├── admin/                  # Admin Console operations center (9 workspaces)
+│   ├── (app)/                  # Authenticated learner surface:
+│   │   ├── academy/            #   90-lesson curriculum browser & lesson viewer
+│   │   ├── badges/             #   Learner badge showcase
+│   │   ├── capstones/          #   Capstone project submission & showcase
+│   │   ├── dashboard/          #   "What do I do next" home (action-oriented)
+│   │   ├── leaderboard/        #   Global/Cohort/Friends leaderboard rankings
+│   │   ├── notifications/      #   Redirect stub → /dashboard (no real page here —
+│   │   │                       #     the notification UI is the header bell/drawer)
+│   │   ├── progress/           #   "How am I doing" summary (skill radar, badges,
+│   │   │                       #     capstones, certificates)
+│   │   ├── review/             #   SM-2 flashcard review queue
+│   │   └── settings/           #   Profile, portfolio, security, notification prefs
+│   ├── (auth)/                 # Public auth pages (login, signup, reset-password,
+│   │                           #   verified, email-verified)
+│   ├── (marketing)/            # Public landing page
+│   ├── (portfolio)/
+│   │   └── p/[username]/       # Public learner portfolio
+│   ├── admin/(console)/        # Admin Console operations center (19 workspaces)
 │   ├── api/                    # Serverless API routes (cron, admin, auth, settings, etc.)
-│   ├── badges/                 # Learner badge showcase
-│   ├── capstones/              # Capstone project submission & showcase
-│   ├── dashboard/              # Learner dashboard, streak tracker, activity heatmap
-│   ├── leaderboard/            # Cohort/Friend leaderboard rankings
-│   ├── notifications/          # In-app notification center
-│   ├── p/[username]/           # Public learner portfolio
-│   ├── profile/                # Profile & account settings
+│   ├── maintenance/            # Maintenance-mode holding page
+│   ├── onboarding/             # Post-signup onboarding flow
 │   └── verify/[id]/            # Public certificate authenticity verification
 ├── blocks/                     # Custom lesson block components
 ├── components/                 # React UI primitives, Admin, Layout, Auth, and Feedback
 ├── contexts/                   # React Contexts (auth session, breadcrumbs)
-├── e2e/                        # Playwright E2E browser tests (`e2e/auth/`)
+├── e2e/                        # Playwright E2E browser tests (`e2e/auth/`, 3 specs)
 ├── emails/                     # React Email templates & rendering components
 ├── hooks/                      # Custom client hooks
 ├── lib/                        # Core backend services, DB client, aggregations
-│   └── __tests__/              # Vitest unit and integration test suites (44 files)
+│   └── __tests__/              # Vitest unit and integration test suites (100 files)
 ├── theme/                      # Design system tokens (`theme/tokens.ts`)
 ├── types/                      # TypeScript definitions & auto-generated `database.ts`
 ├── proxy.ts                    # Next.js 16 request interceptor & auth proxy

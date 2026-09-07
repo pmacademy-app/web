@@ -1,7 +1,7 @@
 # Background Schedulers & Cron Architecture — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Last Updated:** Pre-Launch Final Verification  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
+**Last Updated:** September 6, 2026  
 
 ---
 
@@ -22,10 +22,10 @@ Background jobs, queue processing, broadcasts, and periodic maintenance are exec
 |---|:---:|---|:---:|:---:|---|
 | `/api/cron/process-email-queue` | `POST` | `process-email-queue` | `*/5 * * * *` | Every 5 minutes 24/7 | Processes pending items in `email_queue` |
 | `/api/cron/process-broadcasts` | `GET` | `process-broadcasts` | `*/5 * * * *` | Every 5 minutes 24/7 | Executes scheduled email & in-app broadcasts |
-| `/api/cron/retry-failed` | `POST` | `retry-failed-emails` | `30 * * * *` | Hourly at :00 IST | Retries failed emails under `max_attempts` |
+| `/api/cron/retry-failed` | `POST` | `retry-failed-emails` | `30 * * * *` | Hourly at :00 IST | Retries failed emails under `max_attempts` (internally calls the same `processEmailQueue(50)` as the 5-minute job — not a separate failed-only code path) |
 | `/api/cron/daily-reminder` | `POST` | `daily-reminder` | `30 3 * * *` | Daily at 09:00 AM IST | Enqueues SRS reminders and streak freeze alerts |
 | `/api/cron/weekly-recap` | `POST` | `weekly-recap` | `30 3 * * 1` | Mondays at 09:00 AM IST | Enqueues weekly progress recap digests |
-| `/api/cron/cleanup` | `POST` | `cleanup-logs` | `30 20 * * *` | Daily at 02:00 AM IST | Purges old delivery logs and expired tokens |
+| `/api/cron/cleanup` | `POST` | `cleanup-logs` | `30 20 * * *` | Daily at 02:00 AM IST | **Currently a no-op placeholder** — always returns `{ cleanedRows: 0 }`; no actual cleanup logic is implemented yet (see [`ISSUES_KNOWN.md`](ISSUES_KNOWN.md) ISSUE-21) |
 
 ---
 

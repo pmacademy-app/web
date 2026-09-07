@@ -1,95 +1,58 @@
-# Portfolio Verification & Fellow Designation — Operating Guide
+# Automatic Portfolio Verification — Operating Guide
 
-**Location:** `/admin/moderation?tab=portfolios`  
-**Workspace:** Operations $\rightarrow$ Moderation $\rightarrow$ Portfolio Verification  
-**Audience:** Platform Administrators & Lead Reviewers  
+**Location:** Learner-facing status on `/p/[username]` and Settings → Portfolio; admin control in `/admin/users/[id]`
+**Workspace:** User Detail Drawer (not a moderation queue)
+**Audience:** Platform Administrators
+
+> **Not to be confused with PM Fellow Designation** — a separate, manually-admin-granted credential covered in [`docs/admin/fellow-designation.md`](fellow-designation.md). Both happen to use the word "verification"/"verified" in the UI; they share no code, no database column, and no admin queue. A portfolio can be Verified without being Fellow, and vice versa.
 
 ---
 
 ## 1. Purpose
 
-The Portfolio Verification Queue is the dedicated workspace where administrators review public student portfolios, evaluate applied Product Management case studies, and grant or revoke **Product Management Fellow** designation (`is_fellow`).
+Unlike PM Fellow, Portfolio Verification is **automatic by default** — no admin action is required. A portfolio becomes Verified the moment its owner's profile meets a fixed completeness bar, computed live on every read. An admin can override the automatic result (force-verify or force-reject) for a specific user, but this is the exception, not the normal path.
 
 ---
 
-## 2. Access & Permissions
+## 2. Automatic Eligibility Rule
 
-- **Path:** Navigate to `/admin/moderation` $\rightarrow$ select the **Portfolio Verification** tab.
-- **Route Alias:** `/admin/portfolios` automatically redirects to this workspace.
-- **Permissions:** Admin role required (`is_admin = true` or listed in `ADMIN_EMAILS`).
+A portfolio is auto-verified when **all** of the following are true (`calculatePortfolioVerification()` in `lib/portfolio-readiness.ts`):
+- Profile has an **avatar** image.
+- Profile has a **bio** (reuses the same "has bio" signal as the Portfolio Readiness checklist).
+- At least **2 of 3** professional links are present: LinkedIn, GitHub, personal website.
 
----
+This deliberately reuses the same avatar/bio completeness signals as the existing "Ready to Share" readiness checklist rather than re-deriving them — the one materially stricter requirement is the **≥2 links** threshold (readiness only requires ≥1 link, and doesn't require an avatar at all).
 
-## 3. Verification Semantics & Credibility Standards
-
-### What "Verified" Means
-> *Prodily administrators have reviewed this candidate's public portfolio, case studies, and applied PM deliverables, confirming they meet Prodily's quality standards and designating them as a **Product Management Fellow at Prodily**.*
-
-### What "Verified" Does NOT Mean
-- It does **NOT** imply employment at Prodily (strictly no `worksFor: Prodily` in Schema.org JSON-LD or UI).
-- It does **NOT** guarantee employment or recruiter endorsement.
-- It does **NOT** represent formal Phase 2 fellowship cohort enrollment.
-
-### Public Portfolio Invariant
-- **Only public portfolios can be verified.**
-- If a user's portfolio is private (`is_portfolio_public = false`), they are excluded from the verification queue.
-- Direct API attempts to verify a private portfolio are rejected by the backend with `HTTP 400 Bad Request: "Cannot verify a private portfolio. The user portfolio must be public."`.
+There is **no request or approval step** — verification status simply reflects the current state of the profile, recomputed on every portfolio/settings page load.
 
 ---
 
-## 4. How to Review & Verify a Portfolio
+## 3. Where It's Shown
 
-1. **Open the Verification Queue:** Go to `/admin/moderation?tab=portfolios`.
-2. **Filter by Pending:** Select the **Pending Review** tab to view all public portfolios awaiting review.
-3. **Inspect the Portfolio:** Click the **[ Open ↗ ]** button on the candidate's row. This opens their live public portfolio (`/p/[username]`) in a new tab.
-4. **Evaluate Case Studies:**
-   - Read the candidate's pinned/submitted capstone deliverables.
-   - Check if problem framing, customer discovery, metrics, and PRD reasoning are sound.
-5. **Grant Verification:**
-   - Return to the Admin tab.
-   - Click the green **`[ Verify ]`** button on the candidate's row.
-   - The button shows a loading spinner, dispatches the update, and displays an instant success toast notification (`"Verified [Name] as a PM Fellow"`).
-   - The row immediately updates to **`[ Verified Fellow ✓ ]`** without refreshing the page.
+- **Public portfolio** (`/p/[username]`): `PortfolioHero.tsx` renders a `BadgeCheck` icon next to the learner's name, `title="Verified Portfolio"`, when `isPortfolioVerified` is true. This is visually and conceptually distinct from the separate "Product Management Fellow" badge/pill.
+- **Learner settings** (Settings → Portfolio): `PortfolioVerificationCard` shows the current status and exactly which of the three criteria are/aren't met, so the learner can self-serve their way to verification.
 
 ---
 
-## 5. How to Revoke Verification (Unverify)
+## 4. Admin Override
 
-1. Select the **Verified Fellows** or **All Public** tab.
-2. Locate the candidate and click the **`[ Unverify ]`** button.
-3. A confirmation dialog appears:
-   > *"Revoke PM Fellow verification for [Name]?"*
-4. Click **Confirm Revocation**.
-5. The Fellow status is removed (`is_fellow = false`), cache is purged, and the row status reverts to **`Pending Review`**.
+Located in the **User Detail Drawer** (`/admin/users/[id]`), rendered as `UserPortfolioVerificationToggle` directly below the PM Fellow toggle — **not** in any moderation queue, and not tied to a public-portfolio invariant the way Fellow is.
 
----
+Three actions:
+- **Verify** — force `portfolio_verification_override = 'verified'`. Overrides automatic eligibility (even if the profile doesn't actually meet the bar).
+- **Reject** — force `portfolio_verification_override = 'rejected'`. Overrides automatic eligibility even if the profile does meet the bar.
+- **Reset to Auto** — clears the override (`null`), returning to live automatic computation. Only shown when an override is currently active.
 
-## 6. Fields, Controls & Queue Metrics
+Backend: `POST /api/admin/users/[id]/portfolio-verification` → `AdminConsoleService.setPortfolioVerificationOverride()`, which writes the nullable `users.portfolio_verification_override` column (`'verified' | 'rejected' | null`) and revalidates `/p/[username]`, `/api/og/portfolio/[username]`, `/admin/users`, `/admin/moderation`, `/admin/portfolios`. Audit actions logged: `set_portfolio_verification_verified`, `set_portfolio_verification_rejected`, `reset_portfolio_verification`.
 
-### Top KPI Metrics
-- **Pending Verification (Amber):** Count of active public portfolios awaiting review (`is_portfolio_public && !is_fellow`).
-- **Verified Fellows (Emerald):** Count of verified PM Fellows with public portfolios (`is_portfolio_public && is_fellow`).
-- **Total Public Portfolios (Blue):** Total number of public portfolios on the platform.
-
-### Table Columns & Actions
-| Column | Description |
-|---|---|
-| **Learner & Handle** | Candidate avatar/initials, full name, `@username`, and bio snippet. |
-| **Submitted Projects** | Number of submitted module capstones. |
-| **Verification Status** | `Verified Fellow` (green check) or `Pending Review` (amber clock). |
-| **Portfolio Link** | Direct `[ Open ↗ ]` link to `/p/[username]`. |
-| **Verification Action** | In-line `[ Verify ]` or `[ Unverify ]` button. |
+**Precedence:** admin override (if set) always wins over the automatic computation. `null` = automatic eligibility applies (the default source of truth for the vast majority of users, who will never have an override set).
 
 ---
 
-## 7. System Effects & Cache Invalidation
+## 5. Practical Example
 
-When an admin clicks **Verify** or **Unverify**:
-1. **Database Update:** The backend updates `users.is_fellow` via service-role Supabase client.
-2. **Cache Purge:** The backend immediately triggers Next.js path revalidations:
-   - `/p/[username]` (Public Portfolio page)
-   - `/api/og/portfolio/[username]` (Dynamic OpenGraph card)
-   - `/admin/moderation` (Moderation workspace)
-   - `/admin/users` (Users workspace)
-3. **Audit Log:** The action is permanently recorded in `public.admin_audit_logs` with admin email and timestamp.
-4. **Public Portfolio Updates:** The candidate's live portfolio instantly renders the `Product Management Fellow` badge, updated `<title>` tag, and dynamic OpenGraph card.
+**A learner asks why their portfolio isn't showing as Verified:**
+1. Open `/admin/users`, search for the learner, open their detail drawer.
+2. Check the Portfolio Verification control's current state — if "Automatic," check their Settings → Portfolio page (or ask them) which of avatar / bio / 2-of-3-links is missing.
+3. If they've genuinely met the bar but something's stuck, or if you want to grant an exception, click **Verify** to force it.
+4. If you need to walk it back later, click **Reset to Auto** rather than leaving a stale manual override in place.

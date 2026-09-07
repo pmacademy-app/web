@@ -23,18 +23,16 @@ The Achievements Workspace allows administrators to inspect issued certificates,
 
 ### A. Certificates Registry (`/admin/achievements/certificates`)
 The central ledger of all verified credentials issued to learners:
-1. **Search & Filter:** Search by certificate code (e.g., `PRODILY-PM-2026-XXXX`), recipient name, or email.
+1. **Search & Filter:** Search by certificate code (e.g., `PMA-2026-8F2A7B9C`), recipient name, or email.
 2. **Table Information:**
-   - **Certificate Code:** Unique alphanumeric identifier.
+   - **Certificate Code:** Unique alphanumeric identifier (`generateCertificateCode()`).
    - **Recipient:** Student name, email, and avatar.
    - **Credential Type:** `full_curriculum` (Academy Master Certification) or module-specific credentials.
-   - **Template Version:** `v1` (Legacy) or `v2` (Modern with QR code).
    - **Issued At:** Timestamp of issuance.
+   - There is **no template versioning** — every certificate uses one layout, and there is no separate `credential_hash` field in the schema (the certificate code itself is the identifier).
 3. **Certificate Detail Drawer:** Click any certificate row to open the inspection drawer:
    - **Live Verification Link:** Direct link to `/verify/[certificateId]`.
-   - **Credential Hash:** SHA-256 verification hash.
-   - **QR Code Preview:** Visual verification QR code.
-   - **PDF Generation Status:** Confirms asset generation.
+   - **QR Code Preview:** Visual verification QR code (generated for every certificate, not gated by a version tier).
 
 ### B. Badges Directory (`/admin/achievements/badges`)
 Visual catalog of all platform achievement badges:

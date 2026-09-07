@@ -1,24 +1,24 @@
 # Content Compilation & Rendering Pipeline — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `21cc985`  
-**Last Updated:** August 23, 2026  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
+**Last Updated:** September 6, 2026  
 
 ---
 
 ## 1. Overview & Single Source of Truth
 
-- **Source Location**: 90 Markdown files located under `content/modules/module-01/` through `module-09/`.
+- **Source Location**: 90 flat Markdown files at `content/lessons/lesson-001.md` … `lesson-090.md` — there is **no `content/modules/` directory or per-module subfolder structure**.
+- **No Frontmatter**: Lesson files carry **no YAML frontmatter**. Metadata (module, difficulty, prerequisites, next lesson, unlocked topics) is instead parsed from an in-body `## Learning Path` Markdown table, combined with a hardcoded lesson-number → module-slug range map (`getModuleSlugForLessonNumber()` in `compile.ts`).
 - **Single Source of Truth**: Markdown source files are the authoritative source for lesson theory, quizzes, key takeaways, and Mermaid diagrams. Lesson text is NEVER stored in database tables.
-- **Compiled Output**: Emitted as static JSON to `content/dist/lessons/` during `npm run build` or `npm run content:compile`.
+- **Compiled Output**: Emitted as static JSON to `content/dist/` (`lessons/`, `curriculum.json`, `search-index.json`, `glossary-index.json`, `module-graph.json`) during `npm run build` or `npm run content:compile`.
 
 ---
 
-## 2. Content Compiler v2 Architecture (`compile.ts`)
+## 2. Content Compiler Architecture (`compile.ts`)
 
 The compiler script (`scripts/compiler/compile.ts`) executes at build time:
 
-1. **Markdown Parsing**: Reads frontmatter metadata (`id`, `title`, `moduleSlug`, `order`) and compiles Markdown body.
+1. **Markdown Parsing**: Reads each flat lesson file, deriving the lesson number from its filename and its module from the hardcoded range map; parses the in-body `## Learning Path` table for prerequisite/sequencing metadata (no frontmatter is read — there isn't any).
 2. **Mermaid Diagram Compilation (`mermaid-svg.ts`)**:
    - Extracts embedded ````mermaid``` code blocks.
    - Executes official `mermaid` v11 engine inside Node.js using JSDOM DOM polyfills.
@@ -34,8 +34,8 @@ The compiler script (`scripts/compiler/compile.ts`) executes at build time:
 
 | Content Component | Location | Status |
 |---|---|---|
-| **90 Markdown Source Lessons** | `content/modules/` | 🟢 Verified in Production |
-| **Compiler v2 Engine** | `scripts/compiler/compile.ts` | 🟢 Verified in Production |
+| **90 Markdown Source Lessons** | `content/lessons/` | 🟢 Verified in Production |
+| **Compiler Engine** | `scripts/compiler/compile.ts` | 🟢 Verified in Production |
 | **Build-Time Mermaid SVG Engine** | `scripts/compiler/mermaid-svg.ts` | 🟢 Verified in Production |
 | **Static JSON Output** | `content/dist/lessons/` | 🟢 Verified in Production |
 | **FlexSearch Pre-Indexed Search** | `content/dist/search-index.json` | 🟢 Verified in Production |

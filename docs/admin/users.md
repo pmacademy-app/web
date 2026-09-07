@@ -75,19 +75,27 @@ The Users workspace allows administrators to search, inspect, troubleshoot, and 
 - **Action:** Toggle **Product Management Fellow** designation (`is_fellow`).
 - **Effect:** Updates `users.is_fellow = true`. Immediately updates the learner's public portfolio hero badge, SEO title, OpenGraph preview card, and Person structured data.
 - **Invariant:** Requires the learner's portfolio to be public.
+- **Location:** rendered directly in the drawer body, above the tab set — always visible regardless of which tab is active, not confined to a specific tab.
+- **Relationship to Fellow Requests:** this is one of two paths to the same `is_fellow` flag — a learner can also self-request via Settings, reviewed at `/admin/moderation?tab=fellow-requests`. Both write the same column through the same service. See [`docs/admin/fellow-designation.md`](fellow-designation.md).
 
-### C. Developer QA Actions (`DeveloperActionsSection`)
-- **Generate Test Certificate:** Triggers the complete certificate issuance, PDF generation, notification dispatch, and email queue pipeline for QA verification. Bypasses curriculum completion prerequisites.
+### C. Portfolio Verification Override (`UserPortfolioVerificationToggle`)
+- **Action:** Three buttons — **Verify**, **Reject**, **Reset to Auto**.
+- **Effect:** Writes the nullable `users.portfolio_verification_override` column. Unlike Fellow, Portfolio Verification is **automatic by default** (avatar + bio + ≥2 of 3 professional links) — this control only overrides that automatic computation for one specific user; it does not require the portfolio to be public and has no relationship to `is_fellow`.
+- **Location:** rendered directly below the Fellow toggle, also always visible regardless of active tab.
+- Full detail: [`docs/admin/portfolio-verification.md`](portfolio-verification.md).
 
-### D. Direct Email Dispatch (`SendProductionEmailModal`)
+### D. Developer QA Actions (`DeveloperActionsSection`)
+- **Generate Test Certificate:** Triggers the complete certificate issuance, notification dispatch, and email queue pipeline for QA verification. Bypasses curriculum completion prerequisites.
+
+### E. Direct Email Dispatch (`SendProductionEmailModal`)
 - Located in the **Communications Tab**.
-- Allows selecting an approved transactional template (e.g., `auth.welcome`, `curriculum.certificate_issued`, `reengagement.nudge`), previewing variables, and immediately queuing it for delivery to this specific user.
+- Allows selecting an approved transactional template (e.g., `auth.welcome`, `achievement.certificate`, `inactive.resume_learning`), previewing variables, and immediately queuing it for delivery to this specific user.
 
-### E. Destructive Actions
+### F. Destructive Actions
 
 #### 1. Reset All User Progress
 - **Location:** Footer of the User Detail Drawer $\rightarrow$ **[ Reset Progress ]**.
-- **Effect:** Deletes all rows in `user_lesson_progress`, `user_reflections`, `user_streaks`, `user_badges`, and `xp_events` for this user. Sets `total_xp = 0` and `level = 1`.
+- **Effect:** Deletes all rows in `user_lesson_progress`, `reflections`, `user_badges`, and `xp_events` for this user, and resets the streak columns (`current_streak`, `longest_streak`, `streak_freezes_available`) on their `users` row (these are columns, not a separate table). Sets `total_xp = 0` and `level = 1`.
 - **Confirmation:** Requires confirming the prompt dialog. Cannot be undone.
 
 #### 2. Delete User Account

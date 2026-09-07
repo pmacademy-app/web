@@ -1,6 +1,19 @@
 # Repository Changelog — Prodily PM Academy
 
-All notable changes to **Prodily PM Academy** (`pmacademy-app/web`) are documented in this file.
+All notable changes to **Prodily PM Academy** (`prodily-monorepo`) are documented in this file.
+
+## [Bug Fixes, Portfolio Verification & Documentation Audit] — 2026-09-06
+### Fixed
+- **Friend Accountability**: `addFriend()` no longer fails on non-UUID usernames (root cause: a `.or()` filter that broke Postgres query typing).
+- **Email Change Verification Redirect**: confirmation links now land on a dedicated `/email-verified` success/error page instead of an unrelated destination; `public.users.email` is kept in sync with `auth.users.email`.
+- **Portfolio OG Card**: replaced an invented dark palette with the real Prodily light-theme brand identity (colors, logo, layout).
+
+### Added
+- **Automatic Portfolio Verification**: eligibility-based verification (avatar + bio + ≥2 of 3 links) distinct from PM Fellow, with admin override.
+- **Email Template Variable Tooling**: shared variable catalog, click-to-insert, and unknown-variable validation in the admin template editor and create-template modal.
+
+### Documentation
+- Full repository documentation audit against current code: corrected wrong database table names, fabricated curriculum module list, stale test/migration counts, an incorrect non-negotiable "no global leaderboard" product invariant, and multiple other doc/code mismatches. Added `docs/LEADERBOARD.md` and `docs/admin/fellow-designation.md`.
 
 ## [Prodily Evolution & Platform Improvements] — 2026-09-04
 ### Phase 1: UI/UX & Learning Experience

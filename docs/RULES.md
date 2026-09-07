@@ -1,8 +1,7 @@
 # Engineering Rules & Guidelines — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Current Baseline HEAD:** `21cc985`  
-**Last Updated:** August 23, 2026  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
+**Last Updated:** September 6, 2026  
 
 ---
 
@@ -22,7 +21,7 @@
 1. **No Duplicate Infrastructure**: Do not create parallel or secondary infrastructure when existing infrastructure can be extended (e.g., use existing Supabase Auth Hook for all authentication emails).
 2. **Never Expose Secrets**: `SUPABASE_SERVICE_ROLE_KEY`, `SEND_EMAIL_HOOK_SECRET`, `CRON_SECRET`, and `RESEND_API_KEY` are strictly server-side. Never import service-role keys into client code or expose them in Git.
 3. **No Unhandled Silent Errors**: Every failure path must log a sanitized, deduplicated system error via `logSystemError()` and return appropriate HTTP status codes.
-4. **Auditable Email Operations**: Admin production sends must be enqueued, processed through `email_queue`, and logged in `admin_audit_logs` and `notification_delivery_events`.
+4. **Auditable Email Operations**: Admin production sends must be enqueued, processed through `email_queue`, and logged in `admin_audit_logs` and the delivery event tables (`email_delivery_events` / `notification_events`).
 5. **Separate Test vs Production Sends**: Admin "Send Test Email" (direct verification to admin inbox) must remain completely separate from Admin "Send Production Email" (queued delivery to learner account).
 6. **No Fake External Telemetry**: External monitoring (Resend, Supabase, Vercel) must never be falsely presented as active telemetry when only environment-variable configuration checks exist.
 7. **Database-Backed Persistence**: State that requires survival across serverless restarts (rate limits, email queues, system errors, user progress) MUST use PostgreSQL database tables (`public.rate_limits`, `public.email_queue`, `public.system_errors`).

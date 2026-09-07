@@ -21,14 +21,14 @@ export const dynamic = 'force-dynamic'
  * reliability-critical, publicly-shared image endpoint for a cosmetic gain.
  */
 const OG = {
-  background: TOKENS.colors.background, // '#FBFAF6'
-  surface: TOKENS.colors.surface, // '#FFFFFF'
-  surfaceMuted: TOKENS.colors.surfaceMuted, // '#F2EFE7'
-  border: TOKENS.colors.border, // '#DED8CB'
-  foreground: TOKENS.colors.foreground, // '#171A17'
-  muted: TOKENS.colors.textMuted, // '#70685A'
-  primary: TOKENS.colors.primary, // '#1F6B4E'
-  accent: TOKENS.colors.accent, // '#D98B24' — used for the Fellow distinction, matches the theme's own accent token
+  background: TOKENS.colors.background, // light cream
+  surface: TOKENS.colors.surface, // white card surface
+  surfaceMuted: TOKENS.colors.surfaceMuted, // muted tan surface
+  border: TOKENS.colors.border, // soft tan border
+  foreground: TOKENS.colors.foreground, // near-black text
+  muted: TOKENS.colors.textMuted, // muted brown-gray text
+  primary: TOKENS.colors.primary, // dark green
+  accent: TOKENS.colors.accent, // amber accent — used for the Fellow distinction, matches the theme's own accent token
   logoGreen: '#019E75', // exact logo-mark.svg color, used only for the logo graphic itself
 } as const
 
@@ -58,6 +58,44 @@ function ProdilyLogoMark({ size = 38 }: { size?: number }) {
           fill="#011229"
         />
       </g>
+    </svg>
+  )
+}
+
+/** Minimal outline icons (lucide-equivalent paths) drawn by hand so the OG
+ * route has no runtime dependency on lucide-react inside next/og's Satori
+ * renderer — same approach as ProdilyLogoMark above. */
+function FolderIcon({ size = 26, color }: { size?: number; color: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: 'flex' }}>
+      <path
+        d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+function BarChartIcon({ size = 26, color }: { size?: number; color: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: 'flex' }}>
+      <path d="M3 3v16a2 2 0 0 0 2 2h16" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M18 17V9" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13 17V5" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 17v-3" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function LinkIcon({ size = 16, color }: { size?: number; color: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: 'flex' }}>
+      <path d="M9 17H7A5 5 0 0 1 7 7h2" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15 7h2a5 5 0 1 1 0 10h-2" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 12h8" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -222,34 +260,21 @@ export async function GET(request: Request, { params }: RouteProps) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '14px',
+                gap: '12px',
               }}
             >
-              <ProdilyLogoMark size={36} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
-                <span
-                  style={{
-                    fontSize: '26px',
-                    fontWeight: 800,
-                    letterSpacing: '-0.02em',
-                    color: OG.foreground,
-                    lineHeight: 1.1,
-                  }}
-                >
-                  Prodily
-                </span>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    letterSpacing: '0.18em',
-                    color: OG.primary,
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  PM ACADEMY
-                </span>
-              </div>
+              <ProdilyLogoMark size={38} />
+              <span
+                style={{
+                  fontSize: '32px',
+                  fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  color: OG.foreground,
+                  lineHeight: 1,
+                }}
+              >
+                Prodily
+              </span>
             </div>
 
             {/* Contextual Status Badge — accent gold for Fellow, matching the theme's own accent token */}
@@ -258,14 +283,14 @@ export async function GET(request: Request, { params }: RouteProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '8px 18px',
+                padding: '10px 22px',
                 borderRadius: '9999px',
                 backgroundColor: user.isFellow ? 'rgba(217, 139, 36, 0.12)' : OG.surface,
                 border: user.isFellow ? `1px solid rgba(217, 139, 36, 0.4)` : `1px solid ${OG.border}`,
                 color: user.isFellow ? OG.accent : OG.foreground,
-                fontSize: '13px',
+                fontSize: '15px',
                 fontWeight: 700,
-                letterSpacing: '0.08em',
+                letterSpacing: '0.1em',
                 textTransform: 'uppercase',
               }}
             >
@@ -302,7 +327,6 @@ export async function GET(request: Request, { params }: RouteProps) {
                     width: '104px',
                     height: '104px',
                     borderRadius: '9999px',
-                    border: `3px solid ${user.isFellow ? OG.accent : OG.primary}`,
                     objectFit: 'cover',
                   }}
                 />
@@ -313,7 +337,6 @@ export async function GET(request: Request, { params }: RouteProps) {
                     height: '104px',
                     borderRadius: '9999px',
                     background: `linear-gradient(135deg, ${OG.surfaceMuted} 0%, ${OG.primary} 100%)`,
-                    border: `3px solid ${user.isFellow ? OG.accent : OG.primary}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -402,31 +425,47 @@ export async function GET(request: Request, { params }: RouteProps) {
                 backgroundColor: OG.surface,
                 border: `1px solid ${OG.border}`,
                 display: 'flex',
-                flexDirection: 'column',
-                gap: '4px',
+                alignItems: 'center',
+                gap: '16px',
                 boxShadow: '0 4px 14px rgba(23, 26, 23, 0.05)',
               }}
             >
-              <span
+              <div
                 style={{
-                  fontSize: '12px',
-                  color: OG.muted,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '14px',
+                  backgroundColor: 'rgba(1, 158, 117, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
-                Applied Proof of Work
-              </span>
-              <span
-                style={{
-                  fontSize: '22px',
-                  fontWeight: 800,
-                  color: OG.foreground,
-                }}
-              >
-                {projectText}
-              </span>
+                <FolderIcon size={26} color={OG.primary} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    color: OG.muted,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Applied Proof of Work
+                </span>
+                <span
+                  style={{
+                    fontSize: '22px',
+                    fontWeight: 800,
+                    color: OG.foreground,
+                  }}
+                >
+                  {projectText}
+                </span>
+              </div>
             </div>
 
             {/* Core Competencies Card */}
@@ -438,39 +477,55 @@ export async function GET(request: Request, { params }: RouteProps) {
                 backgroundColor: OG.surface,
                 border: `1px solid ${OG.border}`,
                 display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
+                alignItems: 'center',
+                gap: '16px',
                 boxShadow: '0 4px 14px rgba(23, 26, 23, 0.05)',
               }}
             >
-              <span
+              <div
                 style={{
-                  fontSize: '12px',
-                  color: OG.muted,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '14px',
+                  backgroundColor: 'rgba(1, 158, 117, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
-                Evaluated PM Competencies
-              </span>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {topClusters.map((clusterName: string, idx: number) => (
-                  <span
-                    key={idx}
-                    style={{
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      color: OG.primary,
-                      backgroundColor: OG.surfaceMuted,
-                      border: `1px solid ${OG.border}`,
-                      padding: '3px 10px',
-                      borderRadius: '6px',
-                    }}
-                  >
-                    {clusterName}
-                  </span>
-                ))}
+                <BarChartIcon size={26} color={OG.primary} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    color: OG.muted,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Evaluated PM Competencies
+                </span>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {topClusters.map((clusterName: string, idx: number) => (
+                    <span
+                      key={idx}
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: OG.primary,
+                        backgroundColor: 'rgba(1, 158, 117, 0.10)',
+                        border: '1px solid rgba(1, 158, 117, 0.18)',
+                        padding: '4px 12px',
+                        borderRadius: '10px',
+                      }}
+                    >
+                      {clusterName}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -487,9 +542,12 @@ export async function GET(request: Request, { params }: RouteProps) {
               paddingTop: '16px',
             }}
           >
-            <span style={{ color: OG.foreground, fontWeight: 600, fontFamily: 'monospace' }}>
-              {BRAND.domain}/p/{user.username}
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <LinkIcon size={16} color={OG.primary} />
+              <span style={{ color: OG.foreground, fontWeight: 600, fontFamily: 'monospace' }}>
+                {BRAND.domain}/p/{user.username}
+              </span>
+            </div>
             <span style={{ fontWeight: 500 }}>
               Show your work. Show how you think. · Prodily
             </span>

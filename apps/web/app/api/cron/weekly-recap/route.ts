@@ -87,15 +87,15 @@ export async function POST(request: Request) {
       const weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
       // Fetch weekly XP events
-      const { data: xpRows } = await (supabase
-        .from('xp_events') as any)
-        .select('user_id, amount')
+      const { data: xpRows } = await supabase
+        .from('xp_events')
+        .select('user_id, xp_amount')
         .in('user_id', userIds)
         .gte('created_at', weekStartDate)
 
       // Fetch weekly completed lessons
-      const { data: lessonRows } = await (supabase
-        .from('user_lesson_progress') as any)
+      const { data: lessonRows } = await supabase
+        .from('user_lesson_progress')
         .select('user_id')
         .in('user_id', userIds)
         .eq('status', 'completed')
@@ -103,7 +103,8 @@ export async function POST(request: Request) {
 
       const xpMap = new Map<string, number>()
       for (const row of xpRows || []) {
-        xpMap.set(row.user_id, (xpMap.get(row.user_id) || 0) + (row.amount || 0))
+        if (!row.user_id) continue
+        xpMap.set(row.user_id, (xpMap.get(row.user_id) || 0) + (row.xp_amount || 0))
       }
 
       const lessonMap = new Map<string, number>()

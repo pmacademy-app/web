@@ -1,8 +1,8 @@
 # Email Infrastructure & Delivery Pipeline — Prodily PM Academy
 
-**Repository:** `pmacademy-app/web`  
-**Framework:** Next.js 16.2.12 / React Email / Resend API  
-**Last Updated:** August 30, 2026  
+**Repository:** `prodily-monorepo` (app code at `apps/web/`)
+**Framework:** Next.js 16.2.12 / React Email / dual Brevo+Resend delivery  
+**Last Updated:** September 6, 2026  
 
 ---
 
@@ -33,8 +33,9 @@ Supabase Auth uses a custom HTTP Hook endpoint to render branded React Email tem
 - **Endpoint:** `/api/auth/send-email-hook`
 - **Security:** Requires `SEND_EMAIL_HOOK_SECRET` via Bearer token, custom header (`x-supabase-auth-secret`), query string, or Svix HMAC signature (`webhook-signature`).
 - **Action Mapping:**
-  - `signup` / `email_change` / `magiclink` / `reauthentication` $\rightarrow$ `auth.verify_email`
+  - `signup` / `magiclink` / `reauthentication` $\rightarrow$ `auth.verify_email`
   - `recovery` $\rightarrow$ `auth.password_reset`
+  - `email_change` / `email_change_current` / `email_change_new` $\rightarrow$ **`auth.email_change_verify`** (dedicated key, kept isolated from `auth.verify_email` — see [`AUTHENTICATION.md`](AUTHENTICATION.md) §7)
   - `invite` $\rightarrow$ `auth.welcome`
 - **Callback URL Construction:** Generates links pointing to `${siteUrl}/api/auth/callback?token_hash=${tokenHash}&type=${actionType}&next=${nextPath}`.
 
@@ -45,14 +46,13 @@ Supabase Auth uses a custom HTTP Hook endpoint to render branded React Email tem
 Asynchronous emails are queued in `public.email_queue`:
 
 ### Lifecycle States
-1. `pending`: Inserted into queue via `enqueueNotificationItem()`.
-2. `processing`: Claimed with row locking by `processEmailQueue()`.
-3. `delivered`: Provider accepted email, `resend_id` populated, and timestamp recorded.
-4. `failed`: Error encountered. Retries incremented up to `max_attempts` (default: 3).
+`pending` → `processing` (claimed with row locking by `processEmailQueue()`) → `delivered` (provider accepted, provider ID + timestamp recorded), or on failure: `retrying`, `dead_letter` (attempts exhausted), `suppressed` (recipient on the suppression list), or `skipped`.
 
-### Daily & Hourly Quota Enforcement
-- Checked against `dailySendLimit` (default: 1000) and `hourlySendLimit` (default: 100) from `system_settings`.
-- Critical Auth emails bypass quota limits completely.
+`max_attempts` is **not** a flat default of 3 — it's set per priority level at enqueue time from a priority matrix (`lib/notifications/constants.ts`), ranging from 1 attempt (bulk) to 5 attempts (critical).
+
+### Quota Enforcement — Daily Only
+
+Only a **daily** send quota is actually enforced (`email_daily_send_limit` in `system_settings`, default `100`). Despite an `hourlySendLimit` field existing in the admin Platform Settings UI, there is **no hourly enforcement anywhere in the send/retry pipeline** — it's a dead/cosmetic setting today (tracked in [`ISSUES_KNOWN.md`](ISSUES_KNOWN.md) ISSUE-22). Critical Auth emails (`auth.verify_email`, `auth.password_reset`, `auth.email_change_verify`) bypass the daily quota completely.
 
 ---
 
@@ -80,6 +80,21 @@ Admins can compose, estimate, test, schedule, and execute targeted email campaig
 
 ## 6. Provider Resilience & Fallback
 
-- **Primary Provider:** Resend API.
-- **Secondary Fallback:** If Resend encounters an outage (500/503/timeout) and Brevo is configured in environment variables, the engine falls back to Brevo automatically.
-- **Webhook Bounce Handling:** Bounces received via `/api/email/webhooks` log structured delivery failure events in `public.notification_delivery_events`.
+- **Provider Selection:** `PRIMARY_EMAIL_PROVIDER` (or the presence of `BREVO_API_KEY`) selects Brevo or Resend as primary. Both providers are called via raw `fetch` — neither is an installed SDK dependency.
+- **Fallback:** If the primary provider fails, `lib/email.ts` automatically falls back to the other provider (Brevo→Resend or vice versa).
+- **Webhook Bounce Handling:** Bounces/complaints arrive at `/api/email/webhooks`, which verifies **either** a Resend Svix HMAC signature **or** a Brevo shared-secret header, and logs structured delivery failure events.
+
+---
+
+## 7. Template Variable System & Admin Editor
+
+The admin HTML template editor (`AdminTemplateEditor.tsx`, `/admin/communications/templates/[templateKey]`) and the create-new-template modal (`AdminCreateTemplateModal.tsx`) share a single isomorphic source of truth: `lib/admin/template-variables.ts`.
+
+- **`TEMPLATE_SAMPLE_VARIABLES`** — sample values used for live preview and admin test sends.
+- **`TEMPLATE_VARIABLE_CATALOG`** — the curated list of variables available to templates, with descriptions.
+- **`findUnknownVariables(text, knownNames)`** — flags `{{token}}` references in the Subject/Body that aren't in the known catalog, surfaced as inline warnings in both editor UIs.
+- **Variable syntax:** `{{variableName}}`. Both editors support click-to-insert-at-cursor.
+- **Editor model:** deliberately a plain HTML `<textarea>` — there is no WYSIWYG editor.
+- **Preview:** a fully sandboxed iframe (`sandbox=""`) rendering the template with `TEMPLATE_SAMPLE_VARIABLES` interpolated client-side.
+- **Draft/Publish versioning:** `notification_templates` + `notification_template_versions` tables — each save creates a new version row; publishing archives the previous published version.
+- **Custom admin-created templates:** admins can create brand-new, DB-only broadcast templates by pasting HTML (`AdminCreateTemplateModal.tsx`), sanitized server-side before persisting (`lib/admin/sanitize-email-html.ts`). These are separate from the static React-Email templates in `emails/`.
