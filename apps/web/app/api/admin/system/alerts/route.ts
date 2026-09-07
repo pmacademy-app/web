@@ -45,6 +45,20 @@ export async function GET(request: NextRequest) {
       // healthy system — the console showed a green all-clear while the query that
       // feeds it was erroring.
       console.error('[AdminSystemAlerts] DB query error:', queryErr.message)
+      try {
+        const { logErrorReport } = await import('@/lib/monitoring/logger')
+        void logErrorReport({
+          domain: 'admin',
+          kind: 'db_unavailable',
+          operation: 'admin.alerts_query',
+          summary: 'System alerts could not be read from the database',
+          nextAction:
+            'The alerts console cannot show incidents while this fails. Check Supabase availability before trusting an empty alert list.',
+          details: { error: queryErr.message },
+        })
+      } catch {
+        // Non-fatal logger fallback
+      }
       return NextResponse.json(
         {
           success: false,

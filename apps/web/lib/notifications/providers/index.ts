@@ -152,6 +152,28 @@ export async function sendEmailWithFailover(
   // Both providers refused. Surface BOTH failures — an admin looking at the resulting
   // queue row or alert must be able to tell that the failover ran and why each
   // provider declined, not just see the primary's error.
+  //
+  // This is the one email failure that is unambiguously critical: a single provider
+  // outage is routine and covered by failover, but losing both means mail has stopped.
+  // The individual attempts are already reported by each provider at their own
+  // severity; this adds the escalated "no provider is working" incident on top.
+  try {
+    const { logErrorReport } = await import('@/lib/monitoring/logger')
+    const { classifyProviderFailureKind } = await import('@/lib/monitoring/error-taxonomy')
+    void logErrorReport({
+      domain: 'email',
+      kind: classifyProviderFailureKind(primaryResult.statusCode),
+      operation: 'email.failover_exhausted',
+      summary: 'Every configured email provider refused the send',
+      subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
+      provider: { name: secondaryResult.providerName, statusCode: secondaryResult.statusCode, attempt: 2 },
+      allProvidersFailed: true,
+      details: { attempts: describeAttempts(attempts) },
+    })
+  } catch {
+    // Non-fatal logger fallback
+  }
+
   return {
     success: false,
     provider: secondaryResult.providerName,

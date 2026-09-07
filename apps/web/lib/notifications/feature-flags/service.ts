@@ -34,6 +34,41 @@ export const DEFAULT_FEATURE_FLAGS: Record<string, boolean> = {
 /** How long a hydrated snapshot is trusted before the next read-through. */
 const HYDRATION_TTL_MS = 10_000
 
+let flagFailureReportInFlight = false
+
+/**
+ * Reports a flag read/write failure.
+ *
+ * These were previously swallowed entirely, which is the worst place to be quiet: if
+ * hydration keeps failing, every instance silently serves DEFAULT_FEATURE_FLAGS and
+ * the admin kill switch does nothing, with no signal that anything is wrong.
+ */
+async function reportFlagFailure(operation: string, summary: string, detail: string): Promise<void> {
+  // Re-entrancy guard. A critical incident fans out an admin in-app notification,
+  // which reads IN_APP_NOTIFICATIONS_ENABLED, which hydrates flags again — so a
+  // sustained database outage could otherwise re-enter this path. Incident dedup
+  // would eventually break the cycle, but relying on that is timing-dependent.
+  if (flagFailureReportInFlight) return
+  flagFailureReportInFlight = true
+
+  try {
+    const { logErrorReport } = await import('@/lib/monitoring/logger')
+    await logErrorReport({
+      domain: 'admin',
+      kind: 'db_unavailable',
+      operation,
+      summary,
+      nextAction:
+        'Feature flags are falling back to compiled defaults, so admin toggles have no effect. Check Supabase availability and the system_settings table.',
+      details: { detail },
+    })
+  } catch {
+    // Never let instrumentation break flag resolution.
+  } finally {
+    flagFailureReportInFlight = false
+  }
+}
+
 export class FeatureFlagService {
   private inMemoryCache: Map<string, FeatureFlagRecord> = new Map()
   /** Epoch ms of the last successful DB hydration; 0 means never hydrated. */
@@ -99,7 +134,10 @@ export class FeatureFlagService {
         .eq('key', 'feature_flags')
         .maybeSingle()
 
-      if (error) return
+      if (error) {
+        await reportFlagFailure('config.flag_hydrate', 'Feature flags could not be read from the database', error.message)
+        return
+      }
 
       const value = (data as { value?: unknown } | null)?.value
       if (value && typeof value === 'object') {
@@ -116,8 +154,14 @@ export class FeatureFlagService {
       // A row that is absent or empty is a legitimate "no overrides" answer, so the
       // defaults stand and the snapshot still counts as fresh.
       this.hydratedAt = Date.now()
-    } catch {
-      // Offline / test environments: keep serving the current cache.
+    } catch (err) {
+      // Offline / test environments: keep serving the current cache. Still reported —
+      // a flag read that never succeeds means the kill switch is silently inert.
+      await reportFlagFailure(
+        'config.flag_hydrate',
+        'Feature flags could not be read from the database',
+        err instanceof Error ? err.message : String(err)
+      )
     }
   }
 
@@ -211,8 +255,13 @@ export class FeatureFlagService {
         value: flagsObj,
         updated_at: new Date().toISOString(),
       })
-    } catch {
-      // Graceful fallback for offline / test environments
+    } catch (err) {
+      // Graceful fallback for offline / test environments.
+      await reportFlagFailure(
+        'config.flag_persist',
+        'Feature flag change could not be persisted',
+        err instanceof Error ? err.message : String(err)
+      )
     }
   }
 

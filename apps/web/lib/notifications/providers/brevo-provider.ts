@@ -76,14 +76,18 @@ export class BrevoProvider implements NotificationProvider {
         console.error('[BrevoProvider] Error response from Brevo API:', data)
 
         try {
-          const { logSystemError } = await import('@/lib/monitoring/logger')
-          void logSystemError({
-            severity: 'critical',
-            category: 'brevo',
-            operation: 'send_email',
-            message: errorMsg,
-            templateKey: payload.templateKey,
-            details: { status: res.status },
+          const { logErrorReport } = await import('@/lib/monitoring/logger')
+          const { classifyProviderFailureKind } = await import('@/lib/monitoring/error-taxonomy')
+          void logErrorReport({
+            domain: 'email',
+            kind: classifyProviderFailureKind(statusCode),
+            operation: 'email.provider_send',
+            // Stable summary: the provider's own message goes in details, not here,
+            // or every distinct error text would fingerprint separately.
+            summary: 'Brevo rejected an email send',
+            subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
+            provider: { name: this.name, statusCode },
+            details: { providerMessage: errorMsg },
           })
         } catch {
           // Non-fatal logger fallback
@@ -138,14 +142,15 @@ export class BrevoProvider implements NotificationProvider {
       console.error('[BrevoProvider] Exception calling Brevo API:', friendlyMsg)
 
       try {
-        const { logSystemError } = await import('@/lib/monitoring/logger')
-        void logSystemError({
-          severity: 'critical',
-          category: 'brevo',
-          operation: 'send_email',
-          message: friendlyMsg,
-          templateKey: payload.templateKey,
-          details: { errorName: err instanceof Error ? err.name : 'unknown', isTimeout, isDns },
+        const { logErrorReport } = await import('@/lib/monitoring/logger')
+        void logErrorReport({
+          domain: 'email',
+          kind: isTimeout ? 'provider_timeout' : 'provider_outage',
+          operation: 'email.provider_send',
+          summary: isTimeout ? 'Brevo API request timed out' : 'Brevo API was unreachable',
+          subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
+          provider: { name: this.name, statusCode: isTimeout ? 504 : 503 },
+          details: { errorName: err instanceof Error ? err.name : 'unknown', isTimeout, isDns, detail: friendlyMsg },
         })
       } catch {
         // Non-fatal logger fallback

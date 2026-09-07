@@ -108,6 +108,20 @@ export async function POST(request: NextRequest) {
         .in('status', targetStatuses)
 
       if (updateErr) {
+        try {
+          const { logErrorReport } = await import('@/lib/monitoring/logger')
+          void logErrorReport({
+            domain: 'admin',
+            kind: 'db_unavailable',
+            operation: 'admin.queue_retry_all',
+            summary: 'Bulk email requeue failed',
+            subject: { userId: authResult.userId },
+            nextAction: 'The queue items were not requeued. Check Supabase availability and retry.',
+            details: { error: updateErr.message, statusFilter },
+          })
+        } catch {
+          // Non-fatal logger fallback
+        }
         // Never report success for a requeue the database refused.
         return NextResponse.json(
           { success: false, error: `Failed to requeue emails: ${updateErr.message}` },

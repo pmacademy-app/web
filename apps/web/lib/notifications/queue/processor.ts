@@ -217,12 +217,15 @@ export async function processEmailQueue(
       // means a migration is missing, so make it loud instead of silently limping.
       console.warn('[processEmailQueue] RPC claim_email_queue_items unavailable, using degraded fallback claim:', error?.message)
       try {
-        const { logSystemError } = await import('@/lib/monitoring/logger')
-        void logSystemError({
-          severity: 'error',
-          category: 'queue',
-          operation: 'claim_rpc_unavailable',
-          message: `claim_email_queue_items RPC unavailable — using non-atomic fallback claim: ${error?.message || 'unknown error'}`,
+        const { logErrorReport } = await import('@/lib/monitoring/logger')
+        void logErrorReport({
+          domain: 'queue',
+          kind: 'config_missing',
+          operation: 'queue.claim_rpc_unavailable',
+          summary: 'Queue claim RPC is unavailable; using the non-atomic fallback claim',
+          nextAction:
+            'Apply the pending database migration that creates claim_email_queue_items. Until then queue claiming is not concurrency-safe.',
+          details: { error: error?.message || 'unknown error' },
         })
       } catch {
         // Non-fatal logging fallback
@@ -547,16 +550,20 @@ async function handlePermanentFailure(
     .eq('id', queueId)
 
   try {
-    const { logSystemError } = await import('@/lib/monitoring/logger')
-    void logSystemError({
-      severity: 'error',
-      category: 'queue',
-      operation: 'dead_letter_drop',
-      message: failureReason,
-      queueId,
-      templateKey,
-      userId,
-      details: { attemptCount, provider: context?.provider, attempts },
+    const { logErrorReport } = await import('@/lib/monitoring/logger')
+    void logErrorReport({
+      domain: 'queue',
+      kind: 'provider_rejected',
+      operation: 'queue.dead_letter',
+      // Stable: the specific failure text and ids live in subject/details so that a
+      // burst of dead letters collapses into one incident with a count.
+      summary: 'Queued email exhausted its retries and was dead-lettered',
+      subject: { queueId, templateKey, userId },
+      provider: context?.provider ? { name: context.provider } : undefined,
+      retryability: 'manual_retry',
+      nextAction:
+        'Inspect the dead letter record, fix the underlying cause, then requeue it from the admin email queue.',
+      details: { attemptCount, failureReason, attempts },
     })
   } catch {
     // Non-fatal logging fallback

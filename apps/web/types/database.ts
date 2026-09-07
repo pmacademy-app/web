@@ -1086,10 +1086,16 @@ export type Database = {
           category: string
           created_at: string
           details: Json | null
+          domain: string | null
           fingerprint: string
+          first_seen_at: string | null
           id: string
+          kind: string | null
           message: string
+          next_action: string | null
+          occurrence_count: number
           operation: string
+          retryability: string | null
           queue_id: string | null
           resend_id: string | null
           severity: string
@@ -1103,10 +1109,16 @@ export type Database = {
           category: string
           created_at?: string
           details?: Json | null
+          domain?: string | null
           fingerprint: string
+          first_seen_at?: string | null
           id?: string
+          kind?: string | null
           message: string
+          next_action?: string | null
+          occurrence_count?: number
           operation: string
+          retryability?: string | null
           queue_id?: string | null
           resend_id?: string | null
           severity: string
@@ -1120,10 +1132,16 @@ export type Database = {
           category?: string
           created_at?: string
           details?: Json | null
+          domain?: string | null
           fingerprint?: string
+          first_seen_at?: string | null
           id?: string
+          kind?: string | null
           message?: string
+          next_action?: string | null
+          occurrence_count?: number
           operation?: string
+          retryability?: string | null
           queue_id?: string | null
           resend_id?: string | null
           severity?: string

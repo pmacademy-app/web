@@ -338,6 +338,28 @@ export async function POST(request: NextRequest) {
     const masked = maskEmail(toEmail)
     console.error(`[send-email-hook] Email delivery failed for action="${actionType}" recipient="${masked}":`, sendResult.error)
 
+    // Signup verification and password reset ride this path. Without a persisted
+    // incident an operator cannot tell that auth mail has stopped.
+    try {
+      const { logErrorReport } = await import('@/lib/monitoring/logger')
+      const { classifyProviderFailureKind } = await import('@/lib/monitoring/error-taxonomy')
+      void logErrorReport({
+        domain: 'auth',
+        kind: classifyProviderFailureKind(sendResult.statusCode),
+        operation: 'auth.email_delivery',
+        summary: 'Authentication email could not be delivered',
+        subject: { templateKey, maskedEmail: masked, userId: user.id },
+        provider: sendResult.provider && sendResult.provider !== 'simulated'
+          ? { name: sendResult.provider, statusCode: sendResult.statusCode }
+          : undefined,
+        nextAction:
+          'Learners cannot verify their email or reset their password until this clears. Check provider credit and credentials, then retry.',
+        details: { emailActionType: actionType, providerMessage: sendResult.error },
+      })
+    } catch {
+      // Never let instrumentation break the hook response.
+    }
+
     let status = 500
     if (sendResult.statusCode === 429) {
       status = 429

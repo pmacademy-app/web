@@ -51,6 +51,37 @@ function isFailoverEligibleFailure(result: SendEmailResult): boolean {
   return classifyProviderFailure(result.statusCode) === 'failover'
 }
 
+/**
+ * Records a transport failure as a structured incident.
+ *
+ * `lib/email.ts` carries signup verification and password reset via the Supabase Auth
+ * hook, and until now it emitted only a console.error on failure — so the platform's
+ * most business-critical email path produced zero rows in `system_errors` and zero
+ * admin alerts. During a Brevo quota exhaustion an operator looking at /admin/system
+ * would have seen a green all-clear.
+ */
+async function reportTransportFailure(
+  providerName: 'brevo' | 'resend',
+  result: SendEmailResult,
+  to: string
+): Promise<void> {
+  try {
+    const { logErrorReport } = await import('@/lib/monitoring/logger')
+    const { classifyProviderFailureKind } = await import('@/lib/monitoring/error-taxonomy')
+    void logErrorReport({
+      domain: 'email',
+      kind: classifyProviderFailureKind(result.statusCode),
+      operation: 'email.direct_send',
+      summary: `${providerName === 'brevo' ? 'Brevo' : 'Resend'} refused a direct transactional send`,
+      subject: { maskedEmail: maskEmail(to) },
+      provider: { name: providerName, statusCode: result.statusCode },
+      details: { providerMessage: result.error },
+    })
+  } catch {
+    // Never let instrumentation break a send path.
+  }
+}
+
 export function maskEmail(email: string): string {
   if (!email || !email.includes('@')) return '***'
   const [local, domain] = email.split('@')
@@ -97,6 +128,7 @@ export async function sendEmail({
     if (brevoApiKey) {
       const brevoRes = await sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey, replyTo)
       if (brevoRes.success) return brevoRes
+      void reportTransportFailure('brevo', brevoRes, to)
       if (resendApiKey && isFailoverEligibleFailure(brevoRes)) {
         console.log(`[email] Brevo failover-eligible failure (status ${brevoRes.statusCode ?? 'network'}), falling back to Resend...`)
         return sendViaResend(to, subject, html, text, fromEmail, resendApiKey, replyTo)
@@ -113,6 +145,7 @@ export async function sendEmail({
     if (resendApiKey) {
       const resendRes = await sendViaResend(to, subject, html, text, fromEmail, resendApiKey, replyTo)
       if (resendRes.success) return resendRes
+      void reportTransportFailure('resend', resendRes, to)
       if (brevoApiKey && isFailoverEligibleFailure(resendRes)) {
         console.log(`[email] Resend failover-eligible failure (status ${resendRes.statusCode ?? 'network'}), falling back to Brevo...`)
         return sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey, replyTo)
