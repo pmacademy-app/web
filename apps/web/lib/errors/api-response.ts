@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { classifyAuthError, type AuthErrorContext } from '@/lib/auth/errors'
 import type { ErrorDomain } from '@/lib/monitoring/error-taxonomy'
+import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
 
 /**
  * Shared API error response contract.
@@ -53,7 +54,12 @@ export function apiError(options: {
 }): NextResponse {
   const body: ApiErrorBody = {
     success: false,
-    error: options.message,
+    // Last line of defense. Callers are required to pass copy we wrote, but a single
+    // careless caller would otherwise publish a secret to an unauthenticated client.
+    // Static safe copy passes through unchanged, so this costs nothing when the
+    // contract is honoured. `extra` is NOT sanitized — routes legitimately echo the
+    // requester's own email there for the resend-verification flow.
+    error: sanitizeErrorMessage(options.message),
     code: options.code,
     ...(options.errorId ? { errorId: options.errorId } : {}),
     ...(options.extra || {}),

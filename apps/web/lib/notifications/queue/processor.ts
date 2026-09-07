@@ -5,6 +5,7 @@ import { createDefaultNotificationPreferences, isChannelEnabledByPreferences } f
 import { globalPriorityMatrix } from '../priority/matrix'
 import { globalProviderRegistry, sendEmailWithFailover } from '../providers'
 import type { ProviderSendResult } from '../providers/types'
+import { sanitizeStructuredPayload, maskEmailAddress } from '@/lib/monitoring/redaction'
 import { renderEmailTemplate } from '../../../emails'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '../automations/service'
@@ -179,11 +180,14 @@ async function recordSkippedEvent(
     await supabase.from('notification_events').insert({
       event_type: params.eventType,
       user_id: params.userId,
-      payload: {
+      // Same exposure as the dead-letter path: this payload spreads template
+      // variables, and `toEmail` is stored in full. Redact the variables and mask the
+      // recipient — the domain is the part with diagnostic value.
+      payload: (sanitizeStructuredPayload({
         templateKey: params.templateKey,
-        toEmail: params.toEmail,
+        toEmail: maskEmailAddress(params.toEmail),
         ...params.templateVariables,
-      },
+      }) as unknown as import('@/lib/supabase').Json),
       channels_notified: [],
       skipped_reason: skippedReason,
       created_at: new Date().toISOString(),
@@ -574,7 +578,12 @@ async function handlePermanentFailure(
       original_queue_id: queueId,
       user_id: userId || null,
       template_key: templateKey || 'unknown',
-      template_variables: ((templateVariables || {}) as unknown as import('@/lib/supabase').Json),
+      // Auth templates carry a live one-time credential in their variables
+      // (`verificationUrl` / `resetUrl` embed a `token_hash`). Dead letters are
+      // long-lived and admin-readable, so the variables are redacted before they are
+      // stored. Variable NAMES and non-sensitive values survive, which is what makes
+      // the record diagnosable; the token does not.
+      template_variables: (sanitizeStructuredPayload(templateVariables || {}) as unknown as import('@/lib/supabase').Json),
       failure_reason: failureReason,
       // Record every provider attempt, not just a single synthesized entry, so a
       // dead letter says which providers were tried and how each one refused.

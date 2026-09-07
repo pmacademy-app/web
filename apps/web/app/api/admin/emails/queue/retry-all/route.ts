@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
 
 export const runtime = 'nodejs'
 
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
         }
         // Never report success for a requeue the database refused.
         return NextResponse.json(
-          { success: false, error: `Failed to requeue emails: ${updateErr.message}` },
+          { success: false, error: `Failed to requeue emails: ${sanitizeErrorMessage(updateErr.message)}` },
           { status: 500 }
         )
       }

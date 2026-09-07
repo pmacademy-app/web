@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
 
 export const runtime = 'nodejs'
 
@@ -63,7 +64,9 @@ export async function GET(request: NextRequest) {
         {
           success: false,
           code: 'ALERTS_QUERY_FAILED',
-          error: `Unable to load system alerts: ${queryErr.message}`,
+          // Admins keep the database error text — it is the diagnostic — but any
+          // connection string or credential inside it is redacted first.
+          error: `Unable to load system alerts: ${sanitizeErrorMessage(queryErr.message)}`,
         },
         { status: 500 }
       )

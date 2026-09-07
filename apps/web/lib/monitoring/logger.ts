@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 
+import { sanitizeErrorMessage as redactText, sanitizeStructuredPayload } from './redaction'
 import {
   categoryForReport,
   resolveErrorReport,
@@ -49,51 +50,20 @@ const DEDUP_WINDOW_MS = 15 * 60 * 1000
 const ALERT_COOLDOWN_MS = 60 * 60 * 1000
 
 /**
- * Secret patterns stripped from every message and every details value.
- *
- * Brevo is the primary provider and its key prefix (`xkeysib-`) was absent here, so a
- * provider error body that echoed the `api-key` header persisted a live production
- * credential into `system_errors`, readable by every admin.
+ * Redaction lives in `./redaction` so there is exactly ONE implementation shared by
+ * the logger, the queue, and anything else that persists diagnostic payloads.
+ * Re-exported here because existing call sites and tests import it from this module.
  */
-const SECRET_PATTERNS: Array<[RegExp, string]> = [
-  [/Bearer\s+[A-Za-z0-9\-\._~\+\/]+=*/gi, 'Bearer [REDACTED]'],
-  [/(key|secret|token|password|auth|authorization)=['"]?[A-Za-z0-9\-\._~\+\/]+['"]?/gi, '$1=[REDACTED]'],
-  [/whsec_[A-Za-z0-9\+\/]+/gi, 'whsec_[REDACTED]'],
-  [/re_[A-Za-z0-9_]+/gi, 're_[REDACTED]'],
-  // Brevo API keys and SMTP keys.
-  [/xkeysib-[A-Za-z0-9\-_]+/gi, 'xkeysib-[REDACTED]'],
-  [/xsmtpsib-[A-Za-z0-9\-_]+/gi, 'xsmtpsib-[REDACTED]'],
-  // JWTs — Supabase anon/service-role keys are JWTs and must never be persisted.
-  [/eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]+/g, '[REDACTED_JWT]'],
-  [/v1,[A-Za-z0-9\+\/=]+/gi, 'v1,[REDACTED]'],
-]
-
-export function sanitizeErrorMessage(input: string): string {
-  if (!input) return ''
-  return SECRET_PATTERNS.reduce((acc, [pattern, replacement]) => acc.replace(pattern, replacement), input)
-}
+export { sanitizeErrorMessage, maskEmailAddress, maskEmailsInText } from './redaction'
 
 /**
- * Recursively sanitizes a details payload.
+ * Recursively sanitizes a details payload before persistence.
  *
- * `details` was previously written to the database raw, so anything a caller happened
- * to include — a stringified request, a provider error body — bypassed redaction
- * entirely.
+ * Redacts by value shape AND by key name — a token in an unanticipated format is
+ * still caught because of where it sits in the object.
  */
-export function sanitizeDetails(value: unknown, depth = 0): unknown {
-  if (depth > 6) return '[truncated]'
-  if (typeof value === 'string') return sanitizeErrorMessage(value)
-  if (value === null || typeof value === 'number' || typeof value === 'boolean') return value
-  if (Array.isArray(value)) return value.slice(0, 50).map((v) => sanitizeDetails(v, depth + 1))
-  if (value instanceof Error) return sanitizeErrorMessage(`${value.name}: ${value.message}`)
-  if (typeof value === 'object') {
-    const out: Record<string, unknown> = {}
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      out[k] = sanitizeDetails(v, depth + 1)
-    }
-    return out
-  }
-  return undefined
+export function sanitizeDetails(value: unknown): unknown {
+  return sanitizeStructuredPayload(value)
 }
 
 /**
@@ -269,7 +239,7 @@ async function notifyAdminsOnce(
  */
 export async function logErrorReport(report: ErrorReport): Promise<string | null> {
   const resolved = resolveErrorReport(report)
-  const summary = sanitizeErrorMessage(resolved.summary)
+  const summary = redactText(resolved.summary)
   const category = categoryForReport(resolved)
 
   const fingerprint = buildFingerprint([
@@ -323,7 +293,7 @@ export async function logErrorReport(report: ErrorReport): Promise<string | null
  * should use `logErrorReport()`, which derives severity and keeps summaries stable.
  */
 export async function logSystemError(options: LogSystemErrorOptions): Promise<string | null> {
-  const sanitizedMsg = sanitizeErrorMessage(options.message)
+  const sanitizedMsg = redactText(options.message)
   const fingerprint = buildFingerprint([
     options.category,
     options.operation,
