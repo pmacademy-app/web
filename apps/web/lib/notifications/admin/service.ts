@@ -129,11 +129,8 @@ export class AdminFoundationService implements NotificationAdminServices {
     return globalFeatureFlagService.getAll()
   }
 
-  public toggleFeatureFlag(key: string, enabled: boolean): FeatureFlagRecord {
-    if (enabled) {
-      return globalFeatureFlagService.enable(key)
-    }
-    return globalFeatureFlagService.disable(key)
+  public async toggleFeatureFlag(key: string, enabled: boolean): Promise<FeatureFlagRecord> {
+    return globalFeatureFlagService.setFlag(key, enabled)
   }
 
   public async getUserPreferences(userId: string): Promise<UserNotificationPreferences | null> {

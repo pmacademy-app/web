@@ -279,6 +279,12 @@ describe('Phase 5 — Authentication Reliability, Ghost Accounts & Email Hook Ha
     it('falls back to Brevo if Resend fails and Brevo is configured', async () => {
       process.env.RESEND_API_KEY = 're_test_key'
       process.env.BREVO_API_KEY = 'xkeysib-brevo-test-key'
+      // Resend-primary is now stated explicitly. This test previously relied on the
+      // implicit default in lib/email.ts, which preferred Resend whenever a Resend key
+      // was present while the provider registry preferred Brevo (audit B3). Both stacks
+      // now share `resolvePrimaryProvider()`, which prefers Brevo — so the direction of
+      // this fallback has to be declared rather than inferred.
+      process.env.PRIMARY_EMAIL_PROVIDER = 'resend'
       ;(process.env as any).NODE_ENV = 'development'
 
       let fetchCount = 0

@@ -7,6 +7,8 @@
  */
 
 import { BRAND } from '@/lib/brand'
+import { classifyProviderFailure } from '@/lib/notifications/providers/failure-classification'
+import { resolvePrimaryProvider } from '@/lib/notifications/config'
 
 export interface EmailRecipient {
   email: string
@@ -35,18 +37,18 @@ export interface SendEmailResult {
 /**
  * Decides whether a failed send should retry on the OTHER provider.
  *
- * Only transient, provider-availability failures qualify — a timeout, a
- * network error, or a 5xx from the provider's API. Falling back on quota
- * exhaustion (429/402), invalid recipient (400), or auth/config errors
- * (401/403) would just move the same unbounded traffic onto the second
- * provider instead of surfacing the real problem — which is how one
- * exhausted Brevo quota during the 2026-09-06 signup-abuse incident could
- * have silently pushed thousands of sends onto Resend if this were unguarded.
+ * Delegates to the shared classifier so this transport and the queue's provider
+ * registry apply identical rules. Failover covers provider-availability failures —
+ * timeout, network error, 5xx — AND capacity exhaustion (402/408/429), which is
+ * precisely the case a second provider exists for. It never covers failures both
+ * providers would reject identically (400 bad recipient, 401/403 auth/config).
+ *
+ * Volume containment is enforced upstream by the pre-dispatch daily quota gate and
+ * signup rate limiting, not by refusing to fail over.
  */
-function isTransientProviderFailure(result: SendEmailResult): boolean {
+function isFailoverEligibleFailure(result: SendEmailResult): boolean {
   if (result.success) return false
-  if (!result.statusCode) return true // network exception with no HTTP response at all
-  return result.statusCode >= 500
+  return classifyProviderFailure(result.statusCode) === 'failover'
 }
 
 export function maskEmail(email: string): string {
@@ -77,8 +79,10 @@ export async function sendEmail({
   const isTest = process.env.NODE_ENV === 'test' && process.env.ALLOW_TEST_NETWORK_EMAILS !== 'true'
   const isSimulated = process.env.BREVO_SIMULATE === 'true' || process.env.RESEND_SIMULATE === 'true'
 
-  const explicitProvider = process.env.PRIMARY_EMAIL_PROVIDER?.toLowerCase().trim()
-  const primaryProvider = explicitProvider || (resendApiKey ? 'resend' : brevoApiKey ? 'brevo' : 'brevo')
+  // Shared with the provider registry so auth mail and queued mail always leave via
+  // the same provider (previously this preferred Resend while the registry preferred
+  // Brevo, splitting sender identity and DKIM alignment between the two stacks).
+  const primaryProvider = resolvePrimaryProvider()
 
   const hasAnyKey = Boolean(brevoApiKey || resendApiKey)
 
@@ -93,12 +97,12 @@ export async function sendEmail({
     if (brevoApiKey) {
       const brevoRes = await sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey, replyTo)
       if (brevoRes.success) return brevoRes
-      if (resendApiKey && isTransientProviderFailure(brevoRes)) {
-        console.log(`[email] Brevo transient failure (status ${brevoRes.statusCode ?? 'network'}), falling back to Resend...`)
+      if (resendApiKey && isFailoverEligibleFailure(brevoRes)) {
+        console.log(`[email] Brevo failover-eligible failure (status ${brevoRes.statusCode ?? 'network'}), falling back to Resend...`)
         return sendViaResend(to, subject, html, text, fromEmail, resendApiKey, replyTo)
       }
-      if (!isTransientProviderFailure(brevoRes)) {
-        console.warn(`[email] Brevo permanent failure (status ${brevoRes.statusCode}) — not falling back to Resend to avoid masking a quota/config issue.`)
+      if (!isFailoverEligibleFailure(brevoRes)) {
+        console.warn(`[email] Brevo permanent failure (status ${brevoRes.statusCode}) — not falling back to Resend; both providers would reject this identically.`)
       }
       return brevoRes
     }
@@ -109,12 +113,12 @@ export async function sendEmail({
     if (resendApiKey) {
       const resendRes = await sendViaResend(to, subject, html, text, fromEmail, resendApiKey, replyTo)
       if (resendRes.success) return resendRes
-      if (brevoApiKey && isTransientProviderFailure(resendRes)) {
-        console.log(`[email] Resend transient failure (status ${resendRes.statusCode ?? 'network'}), falling back to Brevo...`)
+      if (brevoApiKey && isFailoverEligibleFailure(resendRes)) {
+        console.log(`[email] Resend failover-eligible failure (status ${resendRes.statusCode ?? 'network'}), falling back to Brevo...`)
         return sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey, replyTo)
       }
-      if (!isTransientProviderFailure(resendRes)) {
-        console.warn(`[email] Resend permanent failure (status ${resendRes.statusCode}) — not falling back to Brevo to avoid masking a quota/config issue.`)
+      if (!isFailoverEligibleFailure(resendRes)) {
+        console.warn(`[email] Resend permanent failure (status ${resendRes.statusCode}) — not falling back to Brevo; both providers would reject this identically.`)
       }
       return resendRes
     }

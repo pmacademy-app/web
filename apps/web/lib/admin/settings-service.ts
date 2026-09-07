@@ -394,9 +394,28 @@ export class SettingsService {
 
   public static async getEmailSettings(): Promise<EmailSettings> {
     const settings = await this.getSettings<EmailSettings>('email')
-    // Override read-only field with actual env status
+
+    // `dailySendLimit` is surfaced from `system_settings.email_daily_send_limit` —
+    // the key the queue processor's quota gate actually reads. This section used to
+    // persist its own `email_settings.dailySendLimit` that no runtime code consumed,
+    // so an admin lowering the limit here changed nothing.
+    let effectiveDailyLimit = settings.dailySendLimit
+    try {
+      const supabase = createServiceRoleClient()
+      const { data } = await supabase
+        .from('system_settings')
+        .select('value')
+        .eq('key', 'email_daily_send_limit')
+        .maybeSingle()
+      const limit = Number((data as { value?: { limit?: unknown } } | null)?.value?.limit)
+      if (Number.isFinite(limit) && limit > 0) effectiveDailyLimit = limit
+    } catch {
+      // Fall back to the stored section value if the runtime key is unreadable.
+    }
+
     return {
       ...settings,
+      dailySendLimit: effectiveDailyLimit,
       resendApiKeyConfigured: Boolean(process.env.RESEND_API_KEY),
     }
   }
@@ -444,6 +463,10 @@ export class SettingsService {
   }
 
   public static async getFeatureFlags(): Promise<FeatureFlagRecord[]> {
+    // Previously returned the in-memory map without reading the database, so the
+    // Settings workspace showed DEFAULT_FEATURE_FLAGS on any cold instance and a
+    // saved toggle appeared to revert on the next page load.
+    await globalFeatureFlagService.ensureHydrated()
     return globalFeatureFlagService.getAll()
   }
 
@@ -471,6 +494,23 @@ export class SettingsService {
     const allowed = { ...partial }
     delete (allowed as { resendApiKeyConfigured?: boolean }).resendApiKeyConfigured
     const updated = { ...current, ...allowed }
+
+    // Write `dailySendLimit` through to the key the send pipeline enforces, so this
+    // control and the Communications workspace's daily limit stay one value rather
+    // than two that silently diverge.
+    if (typeof allowed.dailySendLimit === 'number' && Number.isFinite(allowed.dailySendLimit)) {
+      const limitVal = Math.max(10, Math.min(1000, Math.trunc(allowed.dailySendLimit)))
+      updated.dailySendLimit = limitVal
+      try {
+        const supabase = createServiceRoleClient()
+        await supabase
+          .from('system_settings')
+          .upsert({ key: 'email_daily_send_limit', value: { limit: limitVal }, updated_at: new Date().toISOString() })
+      } catch (err) {
+        console.warn('[SettingsService] Failed to propagate dailySendLimit to email_daily_send_limit:', err)
+      }
+    }
+
     return this.upsertSettings('email', updated)
   }
 

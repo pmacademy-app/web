@@ -509,6 +509,8 @@ export type Database = {
           next_retry_at: string | null
           priority: number
           processing_at: string | null
+          provider: string | null
+          provider_attempts: Json | null
           resend_id: string | null
           scheduled_at: string
           skipped_reason: string | null
@@ -534,6 +536,8 @@ export type Database = {
           next_retry_at?: string | null
           priority?: number
           processing_at?: string | null
+          provider?: string | null
+          provider_attempts?: Json | null
           resend_id?: string | null
           scheduled_at?: string
           skipped_reason?: string | null
@@ -559,6 +563,8 @@ export type Database = {
           next_retry_at?: string | null
           priority?: number
           processing_at?: string | null
+          provider?: string | null
+          provider_attempts?: Json | null
           resend_id?: string | null
           scheduled_at?: string
           skipped_reason?: string | null

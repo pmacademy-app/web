@@ -40,8 +40,19 @@ export async function GET(request: NextRequest) {
     const { data: errors, error: queryErr } = await query
 
     if (queryErr) {
-      console.warn('[AdminSystemAlerts] DB query error (table may be pending migration):', queryErr.message)
-      return NextResponse.json({ success: true, alerts: [], total: 0 })
+      // A failed alerts query must NEVER be rendered as "no alerts". Returning an
+      // empty success made a broken monitoring pipeline indistinguishable from a
+      // healthy system — the console showed a green all-clear while the query that
+      // feeds it was erroring.
+      console.error('[AdminSystemAlerts] DB query error:', queryErr.message)
+      return NextResponse.json(
+        {
+          success: false,
+          code: 'ALERTS_QUERY_FAILED',
+          error: `Unable to load system alerts: ${queryErr.message}`,
+        },
+        { status: 500 }
+      )
     }
 
     // Also get unacknowledged critical alert count

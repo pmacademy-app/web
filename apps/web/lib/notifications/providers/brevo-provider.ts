@@ -72,6 +72,7 @@ export class BrevoProvider implements NotificationProvider {
 
       if (!res.ok) {
         const errorMsg = data?.message || data?.error || `HTTP ${res.status} error from Brevo`
+        const statusCode = res.status
         console.error('[BrevoProvider] Error response from Brevo API:', data)
 
         try {
@@ -92,6 +93,7 @@ export class BrevoProvider implements NotificationProvider {
           success: false,
           providerName: this.name,
           error: errorMsg,
+          statusCode,
           timestamp: new Date().toISOString(),
         }
       }
@@ -100,6 +102,7 @@ export class BrevoProvider implements NotificationProvider {
         success: true,
         providerName: this.name,
         externalId: data.messageId || data.id,
+        statusCode: res.status,
         timestamp: new Date().toISOString(),
       }
     } catch (err) {
@@ -152,9 +155,16 @@ export class BrevoProvider implements NotificationProvider {
         success: false,
         providerName: this.name,
         error: friendlyMsg,
+        // No HTTP response was produced. Timeout -> 504, other network faults -> 503,
+        // matching the convention in `lib/email.ts` so both stacks classify alike.
+        statusCode: isTimeout ? 504 : 503,
         timestamp: new Date().toISOString(),
       }
     }
+  }
+
+  public isConfigured(): boolean {
+    return Boolean(process.env.BREVO_API_KEY)
   }
 
   public async healthCheck(): Promise<ProviderHealthResult> {

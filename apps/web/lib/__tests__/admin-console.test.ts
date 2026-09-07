@@ -101,12 +101,14 @@ describe('Admin Console Unit Test Suite', () => {
   })
 
   it('AdminConsoleService.toggleFeatureFlag toggles runtime flag state', async () => {
-    AdminConsoleService.toggleFeatureFlag('MARKETING_EMAILS_ENABLED', true)
+    // Awaited: toggling now hydrates the persisted flag set before merging the change,
+    // so the write completes asynchronously.
+    await AdminConsoleService.toggleFeatureFlag('MARKETING_EMAILS_ENABLED', true)
     let flags = await AdminConsoleService.getFeatureFlags()
     let marketingFlag = flags.find((f) => f.key === 'MARKETING_EMAILS_ENABLED')
     expect(marketingFlag?.enabled).toBe(true)
 
-    AdminConsoleService.toggleFeatureFlag('MARKETING_EMAILS_ENABLED', false)
+    await AdminConsoleService.toggleFeatureFlag('MARKETING_EMAILS_ENABLED', false)
     flags = await AdminConsoleService.getFeatureFlags()
     marketingFlag = flags.find((f) => f.key === 'MARKETING_EMAILS_ENABLED')
     expect(marketingFlag?.enabled).toBe(false)

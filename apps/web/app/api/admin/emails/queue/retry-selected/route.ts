@@ -92,14 +92,25 @@ export async function POST(request: NextRequest) {
           error_message: null,
           failed_at: null,
           scheduled_at: now,
+          // `claim_email_queue_items` only claims rows where
+          // `next_retry_at IS NULL OR next_retry_at <= NOW()`, and skips rows still
+          // marked as being processed. Leaving either set meant a "requeued" item sat
+          // unclaimable for the remainder of its backoff (up to 1h after a quota
+          // deferral) while the admin was told it had been retried.
+          next_retry_at: null,
+          processing_at: null,
           updated_at: now,
         }, { count: 'exact' })
         .in('id', eligibleIds)
         .in('status', ['failed', 'dead_letter', 'retrying', 'skipped', 'suppressed'])
 
-      if (!updateErr) {
-        retriedCount = count || eligibleIds.length
+      if (updateErr) {
+        return NextResponse.json(
+          { success: false, error: `Failed to requeue emails: ${updateErr.message}` },
+          { status: 500 }
+        )
       }
+      retriedCount = typeof count === 'number' ? count : eligibleIds.length
     }
 
     await logAdminAction(

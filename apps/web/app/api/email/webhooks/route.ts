@@ -239,13 +239,23 @@ export async function POST(request: Request) {
           }
         }
 
-        // 4. Auto-suppress on spam complaints
-        if (eventType === 'email.complained') {
+        // 4. Auto-suppress on spam complaints and hard bounces.
+        //
+        // Bounces were previously logged but never suppressed, so the address stayed
+        // eligible for delivery: an admin "Retry All" would re-send to a mailbox that
+        // had already hard-bounced, damaging sender reputation on both providers.
+        // Suppression is also what keeps the retry routes from requeueing these rows —
+        // they exclude suppressed recipients before requeueing.
+        if (eventType === 'email.complained' || eventType === 'email.bounced') {
           const recipientEmail = String(data.email || data.to || data.recipient || payload.email || '')
           if (recipientEmail) {
             await supabase
               .from('email_suppressions')
-              .upsert({ email: recipientEmail, reason: 'spam_complaint', suppressed_at: new Date().toISOString() })
+              .upsert({
+                email: recipientEmail,
+                reason: eventType === 'email.complained' ? 'spam_complaint' : 'hard_bounce',
+                suppressed_at: new Date().toISOString(),
+              })
           }
         }
 

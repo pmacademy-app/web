@@ -42,7 +42,7 @@ export interface InAppNotificationWriteParams {
  */
 export async function createInAppNotification(params: InAppNotificationWriteParams): Promise<InAppNotificationResult> {
   try {
-    const inAppEnabled = globalFeatureFlagService.isEnabled('IN_APP_NOTIFICATIONS_ENABLED')
+    const inAppEnabled = await globalFeatureFlagService.isEnabledAsync('IN_APP_NOTIFICATIONS_ENABLED')
     if (!inAppEnabled) {
       return { success: false, reason: 'in_app_notifications_disabled' }
     }

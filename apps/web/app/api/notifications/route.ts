@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   }
 
   // Feature flag check
-  const inAppEnabled = globalFeatureFlagService.isEnabled('IN_APP_NOTIFICATIONS_ENABLED')
+  const inAppEnabled = await globalFeatureFlagService.isEnabledAsync('IN_APP_NOTIFICATIONS_ENABLED')
   if (!inAppEnabled) {
     return NextResponse.json({
       success: true,

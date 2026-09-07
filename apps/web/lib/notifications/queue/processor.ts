@@ -3,11 +3,15 @@ import { PRIORITY_MATRIX } from '../constants'
 import { globalFeatureFlagService } from '../feature-flags/service'
 import { createDefaultNotificationPreferences, isChannelEnabledByPreferences } from '../preferences/defaults'
 import { globalPriorityMatrix } from '../priority/matrix'
-import { globalProviderRegistry, getActiveEmailProvider } from '../providers'
+import { globalProviderRegistry, sendEmailWithFailover } from '../providers'
+import type { ProviderSendResult } from '../providers/types'
 import { renderEmailTemplate } from '../../../emails'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '../automations/service'
 import type { EmailAutomationKey } from '../automations/types'
+
+/** Backoff base used when the admin setting is unavailable or invalid. */
+const DEFAULT_RETRY_DELAY_MINUTES = 5
 
 export interface EnqueueNotificationParams {
   userId: string
@@ -35,8 +39,9 @@ export async function enqueueNotificationItem(
   const priorityDef = PRIORITY_MATRIX[priorityLevel]
   const supabase = createServiceRoleClient()
 
-  // 1. Feature Flag Check
-  const emailEnabled = globalFeatureFlagService.isEnabled('EMAIL_ENABLED')
+  // 1. Feature Flag Check — read through to the persisted flag set so an admin
+  // disabling EMAIL_ENABLED actually stops enqueueing on every serverless instance.
+  const emailEnabled = await globalFeatureFlagService.isEnabledAsync('EMAIL_ENABLED')
   if (params.channel === 'email' && !emailEnabled) {
     await recordSkippedEvent(supabase, params, 'email_system_disabled_via_flags')
     return { success: false, reason: 'Email system is disabled via Feature Flags' }
@@ -195,8 +200,8 @@ async function recordSkippedEvent(
 export async function processEmailQueue(
   batchSize: number = 50
 ): Promise<{ processed: number; delivered: number; failed: number; suppressed: number; skipped: number }> {
-  // Check Global Queue Processing Feature Flag
-  const processingEnabled = globalFeatureFlagService.isEnabled('QUEUE_PROCESSING_ENABLED')
+  // Check Global Queue Processing Feature Flag (persisted, not per-process default)
+  const processingEnabled = await globalFeatureFlagService.isEnabledAsync('QUEUE_PROCESSING_ENABLED')
   if (!processingEnabled) {
     return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }
   }
@@ -208,25 +213,56 @@ export async function processEmailQueue(
   try {
     const { data, error } = await supabase.rpc('claim_email_queue_items', { p_batch_size: batchSize })
     if (error || !data) {
-      console.warn('[processEmailQueue] RPC claim_email_queue_items warning/fallback:', error?.message)
-      // Fallback: SELECT + UPDATE for environments where RPC migration is pending
+      // The atomic RPC is the supported path. Falling back here is a degraded mode that
+      // means a migration is missing, so make it loud instead of silently limping.
+      console.warn('[processEmailQueue] RPC claim_email_queue_items unavailable, using degraded fallback claim:', error?.message)
+      try {
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'error',
+          category: 'queue',
+          operation: 'claim_rpc_unavailable',
+          message: `claim_email_queue_items RPC unavailable — using non-atomic fallback claim: ${error?.message || 'unknown error'}`,
+        })
+      } catch {
+        // Non-fatal logging fallback
+      }
+
+      const nowIso = new Date().toISOString()
       const { data: rawRows } = await supabase
         .from('email_queue')
         .select('*')
         .in('status', ['pending', 'retrying'])
-        .lte('scheduled_at', new Date().toISOString())
+        .lte('scheduled_at', nowIso)
+        // Mirrors the RPC's predicate: a row still inside its backoff window is not
+        // claimable, no matter what its status says.
+        .or(`next_retry_at.is.null,next_retry_at.lte.${nowIso}`)
         .order('priority', { ascending: true })
         .order('scheduled_at', { ascending: true })
         .limit(batchSize)
 
-      if (rawRows && rawRows.length > 0) {
-        const ids = rawRows.map((r: Record<string, unknown>) => String(r.id))
-        await supabase
+      // Claim row-by-row with a compare-and-swap on status, and increment
+      // attempt_count the way the RPC does. The previous bulk update did neither: a
+      // permanently failing item never advanced its attempt count, so it never reached
+      // max_attempts and retried forever, burning a provider call every cycle.
+      for (const row of (rawRows || []) as Array<Record<string, unknown>>) {
+        const currentAttempts = Number(row.attempt_count || 0)
+        const { data: claimedRow } = await supabase
           .from('email_queue')
-          .update({ status: 'processing', processing_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-          .in('id', ids)
+          .update({
+            status: 'processing',
+            processing_at: nowIso,
+            attempt_count: currentAttempts + 1,
+            updated_at: nowIso,
+          })
+          .eq('id', String(row.id))
+          .in('status', ['pending', 'retrying'])
+          .select('*')
+          .maybeSingle()
 
-        claimedRows = rawRows
+        // Only rows we actually won are ours to process; anything else was claimed
+        // concurrently and must be left alone.
+        if (claimedRow) claimedRows.push(claimedRow as Record<string, unknown>)
       }
     } else {
       claimedRows = data as Array<Record<string, unknown>>
@@ -241,6 +277,20 @@ export async function processEmailQueue(
   }
 
   const automationsState = await EmailAutomationsService.getState()
+
+  // Admin-configured retry backoff. `retryDelayMinutes` is persisted by the Settings
+  // workspace and previously had no runtime consumer — the backoff base was hardcoded.
+  let retryDelayMinutes = DEFAULT_RETRY_DELAY_MINUTES
+  try {
+    const { SettingsService } = await import('@/lib/admin/settings-service')
+    const emailSettings = await SettingsService.getEmailSettings()
+    if (Number.isFinite(emailSettings.retryDelayMinutes) && emailSettings.retryDelayMinutes > 0) {
+      retryDelayMinutes = emailSettings.retryDelayMinutes
+    }
+  } catch {
+    // Settings unavailable — keep the documented default rather than wedging the queue.
+  }
+
   let deliveredCount = 0
   let failedCount = 0
   let suppressedCount = 0
@@ -327,26 +377,26 @@ export async function processEmailQueue(
       continue
     }
 
-    // E. Dispatch via Active Email Provider (Brevo or Resend)
-    const provider = getActiveEmailProvider(globalProviderRegistry)
-    if (!provider) {
-      await handleRetryableFailure(supabase, queueId, 'No active email provider registered', attemptCount, maxAttempts)
-      failedCount++
-      continue
-    }
-
-    const sendResult = await provider.send({
-      recipient: { userId, email: toEmail, name: toName },
-      channel: 'email',
-      templateKey,
-      templateVersion: 1,
-      variables: {
-        ...templateVariables,
-        subject,
-        html: renderedHtml,
-        text: renderedText,
+    // E. Dispatch through the shared failover helper (primary provider, then the other
+    // one exactly once if the primary could not accept the message). This path used to
+    // resolve a single provider and re-try that same provider on every retry cycle, so
+    // the second provider was never attempted — Brevo quota exhaustion stalled the
+    // whole queue while a healthy Resend key sat idle.
+    const sendResult = await sendEmailWithFailover(
+      {
+        recipient: { userId, email: toEmail, name: toName },
+        channel: 'email',
+        templateKey,
+        templateVersion: 1,
+        variables: {
+          ...templateVariables,
+          subject,
+          html: renderedHtml,
+          text: renderedText,
+        },
       },
-    })
+      globalProviderRegistry
+    )
 
     if (sendResult.success) {
       await supabase.from('email_queue')
@@ -354,13 +404,29 @@ export async function processEmailQueue(
           status: 'delivered',
           delivered_at: new Date().toISOString(),
           resend_id: sendResult.externalId || null,
+          provider: sendResult.provider || null,
+          provider_attempts: (serializeAttempts(sendResult.attempts) as unknown as import('@/lib/supabase').Json),
           updated_at: new Date().toISOString(),
         })
         .eq('id', queueId)
 
       deliveredCount++
     } else {
-      await handleRetryableFailure(supabase, queueId, sendResult.error || 'Provider send failed', attemptCount, maxAttempts)
+      await handleRetryableFailure(
+        supabase,
+        queueId,
+        sendResult.error || 'Provider send failed',
+        attemptCount,
+        maxAttempts,
+        {
+          userId,
+          templateKey,
+          templateVariables,
+          provider: sendResult.provider,
+          attempts: sendResult.attempts,
+          retryDelayMinutes,
+        }
+      )
       failedCount++
     }
   }
@@ -384,19 +450,63 @@ async function updateItemSkipped(
     .eq('id', queueId)
 }
 
+/**
+ * Context carried alongside a failure so the resulting queue row, dead-letter record
+ * and system error can answer "which user, which template, which provider?".
+ */
+interface QueueFailureContext {
+  userId: string
+  templateKey: string
+  templateVariables: Record<string, unknown>
+  provider?: string
+  attempts?: ProviderSendResult[]
+  /** Admin-configured backoff base, in minutes. */
+  retryDelayMinutes?: number
+}
+
+/** Flattens provider attempts into a JSON-serializable audit trail. */
+function serializeAttempts(attempts?: ProviderSendResult[]): Array<Record<string, unknown>> {
+  return (attempts || []).map((a) => ({
+    provider: a.providerName,
+    success: a.success,
+    statusCode: a.statusCode ?? null,
+    error: a.error ?? null,
+    externalId: a.externalId ?? null,
+    timestamp: a.timestamp,
+  }))
+}
+
 async function handleRetryableFailure(
   supabase: ReturnType<typeof createServiceRoleClient>,
   queueId: string,
   errorMessage: string,
   attemptCount: number,
-  maxAttempts: number
+  maxAttempts: number,
+  context: QueueFailureContext
 ): Promise<void> {
   const now = new Date()
-  const nextRetryMinutes = Math.pow(2, attemptCount) * 5 // 10m, 20m, 40m
+  // Exponential backoff on the admin-configured base (default 5m -> 10m, 20m, 40m).
+  const backoffBase = context.retryDelayMinutes && context.retryDelayMinutes > 0
+    ? context.retryDelayMinutes
+    : DEFAULT_RETRY_DELAY_MINUTES
+  const nextRetryMinutes = Math.pow(2, attemptCount) * backoffBase
   const nextRetryAt = new Date(now.getTime() + nextRetryMinutes * 60 * 1000).toISOString()
 
   if (attemptCount >= maxAttempts) {
-    await handlePermanentFailure(supabase, queueId, '', '', {}, `Max retries (${maxAttempts}) exceeded. Last error: ${errorMessage}`, attemptCount)
+    // Previously this passed empty strings for user/template and an empty variables
+    // object, so every dead-lettered email lost the identity of who it was for and
+    // what it was — making it impossible to answer "which user was affected?" or to
+    // re-render the message for a replay.
+    await handlePermanentFailure(
+      supabase,
+      queueId,
+      context.userId,
+      context.templateKey,
+      context.templateVariables,
+      `Max retries (${maxAttempts}) exceeded. Last error: ${errorMessage}`,
+      attemptCount,
+      context
+    )
   } else {
     await supabase.from('email_queue')
       .update({
@@ -404,6 +514,8 @@ async function handleRetryableFailure(
         error_message: errorMessage,
         next_retry_at: nextRetryAt,
         failed_at: now.toISOString(),
+        provider: context.provider || null,
+        provider_attempts: (serializeAttempts(context.attempts) as unknown as import('@/lib/supabase').Json),
         updated_at: now.toISOString(),
       })
       .eq('id', queueId)
@@ -417,11 +529,21 @@ async function handlePermanentFailure(
   templateKey: string,
   templateVariables: Record<string, unknown>,
   failureReason: string,
-  attemptCount: number
+  attemptCount: number,
+  context?: Pick<QueueFailureContext, 'provider' | 'attempts'>
 ): Promise<void> {
   const now = new Date().toISOString()
+  const attempts = serializeAttempts(context?.attempts)
+
   await supabase.from('email_queue')
-    .update({ status: 'dead_letter', error_message: failureReason, failed_at: now, updated_at: now })
+    .update({
+      status: 'dead_letter',
+      error_message: failureReason,
+      failed_at: now,
+      provider: context?.provider || null,
+      provider_attempts: (attempts as unknown as import('@/lib/supabase').Json),
+      updated_at: now,
+    })
     .eq('id', queueId)
 
   try {
@@ -434,6 +556,7 @@ async function handlePermanentFailure(
       queueId,
       templateKey,
       userId,
+      details: { attemptCount, provider: context?.provider, attempts },
     })
   } catch {
     // Non-fatal logging fallback
@@ -446,7 +569,12 @@ async function handlePermanentFailure(
       template_key: templateKey || 'unknown',
       template_variables: ((templateVariables || {}) as unknown as import('@/lib/supabase').Json),
       failure_reason: failureReason,
-      all_errors: ([{ attempt: attemptCount, error: failureReason, timestamp: now }] as unknown as import('@/lib/supabase').Json),
+      // Record every provider attempt, not just a single synthesized entry, so a
+      // dead letter says which providers were tried and how each one refused.
+      all_errors: ([
+        { attempt: attemptCount, error: failureReason, timestamp: now, provider: context?.provider ?? null },
+        ...attempts,
+      ] as unknown as import('@/lib/supabase').Json),
       created_at: now,
     })
   } catch {

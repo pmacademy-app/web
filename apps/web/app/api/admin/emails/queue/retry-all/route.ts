@@ -95,14 +95,26 @@ export async function POST(request: NextRequest) {
           error_message: null,
           failed_at: null,
           scheduled_at: now,
+          // `claim_email_queue_items` only claims rows where
+          // `next_retry_at IS NULL OR next_retry_at <= NOW()`, and skips rows still
+          // marked as being processed. Leaving either set meant a "requeued" item sat
+          // unclaimable for the remainder of its backoff (up to 1h after a quota
+          // deferral) while the admin was told it had been retried.
+          next_retry_at: null,
+          processing_at: null,
           updated_at: now,
         }, { count: 'exact' })
         .in('id', eligibleIds)
         .in('status', targetStatuses)
 
-      if (!updateErr) {
-        retriedCount = count || eligibleIds.length
+      if (updateErr) {
+        // Never report success for a requeue the database refused.
+        return NextResponse.json(
+          { success: false, error: `Failed to requeue emails: ${updateErr.message}` },
+          { status: 500 }
+        )
       }
+      retriedCount = typeof count === 'number' ? count : eligibleIds.length
     }
 
     await logAdminAction(
@@ -118,6 +130,21 @@ export async function POST(request: NextRequest) {
         statusFilter,
       }
     )
+
+    // Matched rows but requeued none: the rows changed status underneath us. Report
+    // that rather than a green "requeued 0".
+    if (items.length > 0 && retriedCount === 0 && suppressedIds.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          matched: items.length,
+          retried: 0,
+          skipped: items.length,
+          error: 'No emails were requeued — matching items changed status before the update was applied. Refresh and try again.',
+        },
+        { status: 409 }
+      )
+    }
 
     return NextResponse.json({
       success: true,

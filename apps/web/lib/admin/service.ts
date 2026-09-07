@@ -1147,11 +1147,7 @@ export class AdminConsoleService {
   /**
    * Updates feature flag state from admin panel.
    */
-  public static toggleFeatureFlag(key: string, enabled: boolean) {
-    if (enabled) {
-      return globalFeatureFlagService.enable(key)
-    } else {
-      return globalFeatureFlagService.disable(key)
-    }
+  public static async toggleFeatureFlag(key: string, enabled: boolean) {
+    return globalFeatureFlagService.setFlag(key, enabled)
   }
 }

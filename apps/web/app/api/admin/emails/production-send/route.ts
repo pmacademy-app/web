@@ -171,25 +171,62 @@ export async function POST(request: NextRequest) {
     // Immediate queue processing trigger
     const processResult = await processEmailQueue(50)
 
-    // Inspect the specific queue row status to verify real delivery status
-    const { data: queueItem } = await supabase
+    // Inspect the specific queue row to verify REAL delivery status.
+    const { data: queueItem, error: queueReadErr } = await supabase
       .from('email_queue')
       .select('id, status, error_message, resend_id, attempt_count')
       .eq('id', queueId)
       .maybeSingle()
 
-    const queueStatus = (queueItem as { status?: string; error_message?: string; resend_id?: string } | null)?.status || 'delivered'
-    const queueError = (queueItem as { error_message?: string } | null)?.error_message
-    const resendId = (queueItem as { resend_id?: string } | null)?.resend_id
+    const typedItem = queueItem as { status?: string; error_message?: string; resend_id?: string } | null
+    const queueError = typedItem?.error_message
+    const resendId = typedItem?.resend_id
 
-    if (queueStatus === 'failed') {
+    // The row is the only evidence of what happened. If it cannot be read, we do not
+    // know the outcome — previously this defaulted to 'delivered', reporting success
+    // for a send whose result was never observed.
+    if (queueReadErr || !typedItem?.status) {
       return NextResponse.json({
         success: false,
-        error: `Production email dispatch failed: ${queueError || 'Provider delivery error'}`,
+        error: `Email was queued but its delivery status could not be confirmed${queueReadErr ? `: ${queueReadErr.message}` : '.'}`,
+        queueId,
+        status: 'unknown',
+        processResult,
+      }, { status: 500 })
+    }
+
+    const queueStatus = typedItem.status
+
+    // Only 'delivered' means a provider accepted the message. The processor writes
+    // 'retrying' or 'dead_letter' on failure and 'skipped'/'suppressed' on policy
+    // stops — it never writes 'failed' (only the bounce webhook does), so the previous
+    // `queueStatus === 'failed'` check matched nothing and every failure was reported
+    // to the admin, and recorded in the audit log, as a successful dispatch.
+    if (queueStatus !== 'delivered') {
+      const isPolicyStop = queueStatus === 'skipped' || queueStatus === 'suppressed'
+      const reason = isPolicyStop
+        ? `Email was not sent — ${queueStatus} (${queueError || 'blocked by suppression or automation policy'})`
+        : `Production email dispatch failed: ${queueError || `Provider delivery error (queue status: ${queueStatus})`}`
+
+      await logAdminAction(
+        adminUser.id,
+        adminUser.email,
+        'SEND_PRODUCTION_EMAIL_FAILED',
+        'email_queue',
+        queueId,
+        { recipientEmail, templateKey, queueId, status: queueStatus, error: queueError, processResult }
+      )
+
+      return NextResponse.json({
+        success: false,
+        error: reason,
         queueId,
         status: queueStatus,
         processResult,
-      }, { status: 400 })
+        // 400 preserves the established contract for a delivery failure; a policy stop
+        // (suppressed recipient / paused automation) is a distinct, previously
+        // unhandled outcome and gets its own conflict code.
+      }, { status: isPolicyStop ? 409 : 400 })
     }
 
     await logAdminAction(

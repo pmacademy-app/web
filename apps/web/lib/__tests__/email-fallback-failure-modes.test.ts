@@ -3,9 +3,13 @@
  * `sendEmail()` previously fell back from Brevo to Resend (or vice versa) on ANY
  * failure, including quota exhaustion — which could silently move unbounded
  * volume onto the second provider instead of surfacing the real problem.
- * These tests pin the fixed behavior: fallback fires ONLY for genuinely
- * transient failures (timeout, network error, 5xx), never for permanent ones
- * (4xx: bad request, invalid recipient, auth/config errors, quota exhaustion).
+ * These tests pin the intended behavior: fallback fires for failures that mean the
+ * provider cannot accept the message right now — timeout, network error, 5xx, and
+ * capacity exhaustion (402/429) — but never for failures both providers would reject
+ * identically (400 bad request / invalid recipient, 401/403 auth or config errors).
+ *
+ * The 402/429 cases were inverted on 2026-09-07; see the rationale on the
+ * "Provider capacity exhaustion DOES trigger fallback" block below.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { sendEmail } from '@/lib/email'
@@ -132,28 +136,45 @@ describe('Brevo <-> Resend fallback — transient-only, failure-aware', () => {
       expect(result.success).toBe(false)
     })
 
-    it('Brevo 429 (rate limit / quota exhaustion) -> NO fallback', async () => {
+  })
+
+  /**
+   * INVERTED 2026-09-07 (audit B2).
+   *
+   * These two cases previously asserted that quota exhaustion must NOT fall back.
+   * That conflated two separate concerns: "don't let a fallback amplify abusive
+   * traffic" and "don't fail over when the provider is out of capacity". Provider
+   * capacity exhaustion is precisely what a second provider exists for — and with
+   * Brevo primary, a spent daily allowance takes signup verification and password
+   * reset down while a healthy Resend key sits idle.
+   *
+   * Abuse containment stays where it belongs: the pre-dispatch daily quota gate in
+   * `processEmailQueue` (see email-daily-quota-enforcement.test.ts), signup rate
+   * limiting, and the per-provider circuit breaker that bounds failover volume.
+   */
+  describe('Provider capacity exhaustion DOES trigger fallback', () => {
+    it('Brevo 429 (rate limit / quota exhaustion) -> falls back to Resend', async () => {
       const { calls } = mockFetchByHost({
         brevo: () => ({ ok: false, status: 429, json: async () => ({ message: 'Too many requests — daily quota exceeded' }) }),
       })
 
       const result = await sendEmail({ to: 'x@example.com', subject: 's', html: '<p>h</p>', text: 't' })
 
-      // This is the incident's exact risk case: quota exhaustion must never silently
-      // transfer volume onto Resend.
-      expect(calls).toEqual(['brevo'])
-      expect(result.success).toBe(false)
+      expect(calls).toEqual(['brevo', 'resend'])
+      expect(result.success).toBe(true)
+      expect(result.provider).toBe('resend')
     })
 
-    it('Brevo 402 (payment/quota exhaustion) -> NO fallback', async () => {
+    it('Brevo 402 (payment/quota exhaustion) -> falls back to Resend', async () => {
       const { calls } = mockFetchByHost({
         brevo: () => ({ ok: false, status: 402, json: async () => ({ message: 'Plan sending limit reached' }) }),
       })
 
       const result = await sendEmail({ to: 'x@example.com', subject: 's', html: '<p>h</p>', text: 't' })
 
-      expect(calls).toEqual(['brevo'])
-      expect(result.success).toBe(false)
+      expect(calls).toEqual(['brevo', 'resend'])
+      expect(result.success).toBe(true)
+      expect(result.provider).toBe('resend')
     })
   })
 
@@ -197,15 +218,19 @@ describe('Brevo <-> Resend fallback — transient-only, failure-aware', () => {
       expect(result.success).toBe(false)
     })
 
-    it('Resend 429 (quota exhaustion) -> NO fallback', async () => {
+    // INVERTED 2026-09-07 (audit B2) — symmetric counterpart of the Brevo 429 case.
+    // Capacity exhaustion is failover-eligible in both directions; the classifier is
+    // shared, so this must mirror "Provider capacity exhaustion DOES trigger fallback".
+    it('Resend 429 (quota exhaustion) -> falls back to Brevo', async () => {
       const { calls } = mockFetchByHost({
         resend: () => ({ ok: false, status: 429, json: async () => ({ message: 'Rate limit exceeded' }) }),
       })
 
       const result = await sendEmail({ to: 'x@example.com', subject: 's', html: '<p>h</p>', text: 't' })
 
-      expect(calls).toEqual(['resend'])
-      expect(result.success).toBe(false)
+      expect(calls).toEqual(['resend', 'brevo'])
+      expect(result.success).toBe(true)
+      expect(result.provider).toBe('brevo')
     })
   })
 })

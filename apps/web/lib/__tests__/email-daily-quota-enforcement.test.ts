@@ -16,6 +16,11 @@ import * as supabaseModule from '../supabase'
 vi.mock('../notifications/feature-flags/service', () => ({
   globalFeatureFlagService: {
     isEnabled: vi.fn(() => true),
+    // The processor reads flags through the DB-backed async path so an admin kill
+    // switch takes effect across serverless instances; these suites are not about
+    // flag resolution, so both entry points simply report "enabled".
+    isEnabledAsync: vi.fn(async () => true),
+    ensureHydrated: vi.fn(async () => undefined),
   },
 }))
 
@@ -31,10 +36,23 @@ vi.mock('../../emails', () => ({
   renderEmailTemplate: vi.fn(async () => ({ html: '<p>Welcome</p>', text: 'Welcome', subject: 'Welcome to Prodily' })),
 }))
 
+// `mockSend` stands in for one provider dispatch. These tests are about the quota gate
+// — whether a send happens at all — not about which provider serves it, so the failover
+// helper is faked as a thin single-attempt wrapper around the same spy.
 const mockSend = vi.fn(async () => ({ success: true, externalId: 'sent-123' }))
 vi.mock('../notifications/providers', () => ({
   globalProviderRegistry: {},
   getActiveEmailProvider: vi.fn(() => ({ name: 'brevo', send: mockSend })),
+  sendEmailWithFailover: vi.fn(async () => {
+    const result = await mockSend()
+    return {
+      success: result.success,
+      provider: 'brevo',
+      externalId: result.externalId,
+      attempts: [{ ...result, providerName: 'brevo', timestamp: new Date().toISOString() }],
+      failedOver: false,
+    }
+  }),
 }))
 
 import { processEmailQueue } from '../notifications/queue/processor'

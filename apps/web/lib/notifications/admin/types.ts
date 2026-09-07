@@ -29,7 +29,8 @@ export interface NotificationAdminServices {
   inspectQueue(filter?: { status?: string; limit?: number }): Promise<QueueInspectionResult>
   inspectTemplates(): TemplateMetadata[]
   inspectFeatureFlags(): FeatureFlagRecord[]
-  toggleFeatureFlag(key: string, enabled: boolean): FeatureFlagRecord
+  /** Async because the flag set is merged onto the persisted state before writing. */
+  toggleFeatureFlag(key: string, enabled: boolean): Promise<FeatureFlagRecord>
   getUserPreferences(userId: string): Promise<UserNotificationPreferences | null>
   getUserTimeline(userId: string, limit?: number): Promise<UserNotificationTimelineRecord[]>
 }

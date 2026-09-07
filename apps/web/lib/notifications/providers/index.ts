@@ -1,11 +1,14 @@
 import type { NotificationChannel } from '../types'
-import type { NotificationProvider } from './types'
+import type { NotificationProvider, ProviderSendPayload, ProviderSendResult } from './types'
 import { ResendProvider } from './resend-provider'
 import { BrevoProvider } from './brevo-provider'
+import { classifyProviderFailure } from './failure-classification'
+import { resolvePrimaryProvider, getSecondaryProvider, type EmailProviderName } from '../config'
 
 export * from './types'
 export * from './resend-provider'
 export * from './brevo-provider'
+export * from './failure-classification'
 
 export class ProviderRegistry {
   private providers: Map<string, NotificationProvider> = new Map()
@@ -39,16 +42,121 @@ export const globalProviderRegistry = new ProviderRegistry()
 
 /**
  * Returns the active configured email provider.
- * Priority:
- * 1. PRIMARY_EMAIL_PROVIDER environment variable (e.g. 'brevo' or 'resend')
- * 2. Brevo if BREVO_API_KEY exists
- * 3. Resend fallback if RESEND_API_KEY exists
- * 4. Brevo default
+ *
+ * Selection is delegated to the shared `resolvePrimaryProvider()` so this registry and
+ * the direct transport in `lib/email.ts` can never disagree about which provider is
+ * primary (they previously did — see `lib/notifications/config.ts`).
  */
 export function getActiveEmailProvider(registry: ProviderRegistry = globalProviderRegistry): NotificationProvider {
-  const preferred = (process.env.PRIMARY_EMAIL_PROVIDER || (process.env.BREVO_API_KEY ? 'brevo' : 'resend')).toLowerCase().trim()
+  const preferred = resolvePrimaryProvider()
   const provider = registry.getProvider(preferred)
   if (provider) return provider
   return registry.getProvider('brevo') || registry.getProvider('resend') || new BrevoProvider()
 }
 
+/** Outcome of a send that may have involved a failover to the secondary provider. */
+export interface FailoverSendResult {
+  success: boolean
+  /** Provider whose result decided the outcome — the one that delivered, or the last tried. */
+  provider?: string
+  externalId?: string
+  /** Human-readable failure summary. On a both-provider failure this names BOTH providers. */
+  error?: string
+  /** Every attempt made, in order. At most two entries. */
+  attempts: ProviderSendResult[]
+  /** True when the secondary provider was tried after the primary failed. */
+  failedOver: boolean
+}
+
+/** "brevo: Plan sending limit reached | resend: Internal error" */
+function describeAttempts(attempts: ProviderSendResult[]): string {
+  return attempts
+    .map((a) => `${a.providerName}: ${a.error || `HTTP ${a.statusCode ?? 'unknown'}`}`)
+    .join(' | ')
+}
+
+/**
+ * Sends one email through the primary provider and, when that provider could not
+ * accept it, retries ONCE on the other configured provider.
+ *
+ * This is the single failover implementation for the platform. The queue processor
+ * previously resolved one provider and re-tried the same one on every retry cycle, so
+ * the second provider was never attempted — a Brevo quota exhaustion stalled the whole
+ * queue while a healthy Resend key sat idle.
+ *
+ * Guarantees:
+ *  - at most ONE secondary attempt; never a third provider call
+ *  - failover only for `classifyProviderFailure() === 'failover'`
+ *  - the secondary is skipped unless it actually has credentials, since an
+ *    unconfigured provider reports a simulated success
+ *  - every attempt is returned so callers can record what was tried and why it failed
+ */
+export async function sendEmailWithFailover(
+  payload: ProviderSendPayload,
+  registry: ProviderRegistry = globalProviderRegistry
+): Promise<FailoverSendResult> {
+  const attempts: ProviderSendResult[] = []
+
+  const primary = getActiveEmailProvider(registry)
+  const primaryResult = await primary.send(payload)
+  attempts.push(primaryResult)
+
+  if (primaryResult.success) {
+    return {
+      success: true,
+      provider: primaryResult.providerName,
+      externalId: primaryResult.externalId,
+      attempts,
+      failedOver: false,
+    }
+  }
+
+  // Both providers would reject this identically (bad payload, bad credentials) —
+  // failing over would only hide the real problem behind a second identical failure.
+  if (classifyProviderFailure(primaryResult.statusCode) !== 'failover') {
+    return {
+      success: false,
+      provider: primaryResult.providerName,
+      error: primaryResult.error,
+      attempts,
+      failedOver: false,
+    }
+  }
+
+  const secondaryName = getSecondaryProvider(primary.name as EmailProviderName)
+  const secondary = registry.getProvider(secondaryName)
+
+  if (!secondary || !secondary.isConfigured()) {
+    return {
+      success: false,
+      provider: primaryResult.providerName,
+      error: `${primaryResult.error} (no configured failover provider: ${secondaryName})`,
+      attempts,
+      failedOver: false,
+    }
+  }
+
+  const secondaryResult = await secondary.send(payload)
+  attempts.push(secondaryResult)
+
+  if (secondaryResult.success) {
+    return {
+      success: true,
+      provider: secondaryResult.providerName,
+      externalId: secondaryResult.externalId,
+      attempts,
+      failedOver: true,
+    }
+  }
+
+  // Both providers refused. Surface BOTH failures — an admin looking at the resulting
+  // queue row or alert must be able to tell that the failover ran and why each
+  // provider declined, not just see the primary's error.
+  return {
+    success: false,
+    provider: secondaryResult.providerName,
+    error: `All email providers failed — ${describeAttempts(attempts)}`,
+    attempts,
+    failedOver: true,
+  }
+}

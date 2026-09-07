@@ -8,6 +8,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: authGuard.error }, { status: authGuard.statusCode || 403 })
   }
 
+  // Read through to the persisted set so the console never renders this instance's
+  // in-memory defaults as if they were the saved configuration.
+  await globalFeatureFlagService.ensureHydrated()
   const flags = globalFeatureFlagService.getAll()
   return NextResponse.json({ success: true, flags })
 }
@@ -26,9 +29,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Missing key or enabled state' }, { status: 400 })
     }
 
-    const updated = enabled
-      ? globalFeatureFlagService.enable(key)
-      : globalFeatureFlagService.disable(key)
+    const updated = await globalFeatureFlagService.setFlag(key, enabled)
 
     await logAdminAction(
       authGuard.userId!,

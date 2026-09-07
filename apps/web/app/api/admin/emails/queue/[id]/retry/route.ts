@@ -77,6 +77,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         error_message: null,
         failed_at: null,
         scheduled_at: now,
+        // See retry-all: a lingering next_retry_at / processing_at keeps the row
+        // invisible to `claim_email_queue_items` despite the 'pending' status.
+        next_retry_at: null,
+        processing_at: null,
         updated_at: now,
       })
       .eq('id', id)
@@ -84,9 +88,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .select('id, status')
       .maybeSingle()
 
-    if (updateErr || !updated) {
+    // A database error and a concurrent status change are different failures and must
+    // not be collapsed into one ambiguous 409.
+    if (updateErr) {
       return NextResponse.json(
-        { error: 'Failed to requeue item. It may have already been claimed or transitioned by a concurrent process.' },
+        { success: false, error: `Failed to requeue item: ${updateErr.message}` },
+        { status: 500 }
+      )
+    }
+    if (!updated) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to requeue item. It may have already been claimed or transitioned by a concurrent process.' },
         { status: 409 }
       )
     }
