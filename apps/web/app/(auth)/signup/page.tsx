@@ -12,6 +12,7 @@ import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
 import { ReferralBadge } from '@/components/referral/ReferralBadge'
 import { classifyAuthError, type ClassifiedAuthError, resolveApiAuthError } from '@/lib/auth/errors'
+import { AuthErrorNotice } from '@/components/auth/AuthErrorNotice'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { trackReferralSignupCompleted } from '@/lib/analytics'
 
@@ -206,25 +207,16 @@ function SignupFormContent() {
       ) : (
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
           {authError && (
-            <div
-              className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium flex flex-col gap-1.5"
-              role="alert"
-            >
-              <span>{authError.message}</span>
-              {authError.errorId && (
-                <span className="font-mono text-[11px] opacity-70">
-                  Reference {authError.errorId}. Include this if you contact support.
-                </span>
-              )}
+            <AuthErrorNotice error={authError}>
               {(authError.code === 'AUTH_USER_ALREADY_EXISTS' || authError.requiresAction === 'login') && (
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-1 font-bold underline hover:opacity-80 text-primary w-fit"
+                  className="inline-flex w-fit items-center gap-1 font-bold text-primary underline underline-offset-2 hover:opacity-80"
                 >
-                  Go to Login →
+                  Go to Login
                 </Link>
               )}
-            </div>
+            </AuthErrorNotice>
           )}
 
           <form onSubmit={handleSubmit(handleSignup)} className="space-y-4" noValidate>

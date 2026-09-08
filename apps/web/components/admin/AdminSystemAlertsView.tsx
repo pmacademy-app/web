@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { AlertCircle, AlertTriangle, CheckCircle2, ShieldAlert, Filter, RefreshCw, Clock } from 'lucide-react'
+import { AlertCircle, AlertTriangle, ShieldAlert, Filter, RefreshCw, Clock, Inbox } from 'lucide-react'
 import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import { AdminErrorState } from './AdminErrorState'
+import { AdminEmptyState } from './AdminEmptyState'
 
 export interface SystemErrorAlert {
   id: string
@@ -233,8 +234,8 @@ export function AdminSystemAlertsView() {
           ))}
         </div>
 
-        {/* Category & Severity Selectors */}
-        <div className="flex items-center gap-2.5">
+        {/* Filters. Wraps: five selects do not fit one row on a phone. */}
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2">
           <div className="flex items-center gap-1.5 text-xs">
             <Filter className="w-3.5 h-3.5 text-admin-fg-muted" />
             <span className="text-admin-fg-muted font-medium">Severity:</span>
@@ -344,27 +345,32 @@ export function AdminSystemAlertsView() {
           onRetry={refresh}
         />
       ) : loading ? (
-        <div className="space-y-3" aria-busy="true" aria-label="Loading system alerts">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 rounded-2xl bg-admin-surface border border-admin-border animate-pulse" />
+        <div className="space-y-2" aria-busy="true" aria-label="Loading system alerts">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-14 rounded-xl bg-admin-surface border border-admin-border animate-pulse" />
           ))}
         </div>
       ) : visibleAlerts.length === 0 ? (
-        <div className="p-12 text-center border border-dashed border-admin-border rounded-2xl bg-admin-surface/30">
-          <CheckCircle2 className="w-8 h-8 mx-auto text-admin-success mb-2 opacity-80" />
-          <h3 className="text-sm font-bold text-admin-fg">No System Alerts Found</h3>
-          <p className="text-xs text-admin-fg-muted mt-1">
-            {hasFacetFilter
-              ? `No alerts match these facets. ${alerts.length} loaded alert${alerts.length === 1 ? '' : 's'} were filtered out.`
-              : 'No operational failure records match the current status and filter criteria.'}
-          </p>
-        </div>
+        <AdminEmptyState
+          icon={Inbox}
+          title="No alerts match these filters"
+          description={
+            hasFacetFilter
+              ? `${alerts.length} loaded alert${alerts.length === 1 ? '' : 's'} were filtered out by the current facets.`
+              : 'No operational failure records match the current status and filter criteria.'
+          }
+        />
       ) : (
         <div className="space-y-3">
           {visibleAlerts.map((alert) => {
             const isCritical = alert.severity === 'critical'
             const isError = alert.severity === 'error'
 
+            // Three tiers, each with icon, chip and container in agreement. The
+            // warning tier previously rendered on a plain neutral surface while its
+            // icon and chip were info-toned, so a warning read as an ordinary row.
+            // Info tint keeps recoverable failures visible without the red reserved
+            // for incidents that have actually stopped something.
             return (
               <div
                 key={alert.id}
@@ -373,7 +379,7 @@ export function AdminSystemAlertsView() {
                     ? 'bg-admin-danger-soft border-admin-danger/25'
                     : isError
                     ? 'bg-admin-warning-soft border-admin-warning/25'
-                    : 'bg-admin-surface border-admin-border'
+                    : 'bg-admin-info-soft/40 border-admin-info/20'
                 }`}
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">

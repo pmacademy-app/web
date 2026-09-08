@@ -6,10 +6,11 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { CheckCircle2 } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
+import { AuthErrorNotice } from '@/components/auth/AuthErrorNotice'
+import { AuthSuccessNotice } from '@/components/auth/AuthSuccessNotice'
 import { AuthHelpCard } from '@/components/auth/AuthHelpCard'
 import { classifyAuthError, type ClassifiedAuthError, resolveApiAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
@@ -134,38 +135,16 @@ function LoginForm() {
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
       {verifiedSuccess && (
-        <div
-          className="p-3 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-medium flex items-center gap-2"
-          role="status"
-        >
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-          <span>Your email address has been verified successfully! Please log in to continue.</span>
-        </div>
+        <AuthSuccessNotice>Your email address has been verified successfully! Please log in to continue.</AuthSuccessNotice>
       )}
 
       {resetSuccess && (
-        <div
-          className="p-3 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-medium flex items-center gap-2"
-          role="status"
-        >
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-          <span>Your password has been updated successfully! Please log in with your new password.</span>
-        </div>
+        <AuthSuccessNotice>Your password has been updated successfully! Please log in with your new password.</AuthSuccessNotice>
       )}
 
       {authError && (
         <div className="space-y-3">
-          <div
-            className="flex flex-col gap-1.5 p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium"
-            role="alert"
-          >
-            <span>{authError.message}</span>
-            {authError.errorId && (
-              <span className="font-mono text-[11px] opacity-70">
-                Reference {authError.errorId}. Include this if you contact support.
-              </span>
-            )}
-          </div>
+          <AuthErrorNotice error={authError} />
           {authError.code === 'AUTH_EMAIL_NOT_CONFIRMED' && (
             <ResendVerificationCard email={attemptedEmail || getValues('email')} />
           )}

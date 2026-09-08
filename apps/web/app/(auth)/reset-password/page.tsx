@@ -6,10 +6,12 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Eye, EyeOff, CheckCircle2, KeyRound, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle2, KeyRound } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { classifyAuthError, resolveApiAuthError } from '@/lib/auth/errors'
+import { AuthErrorNotice } from '@/components/auth/AuthErrorNotice'
+import { AuthSuccessNotice } from '@/components/auth/AuthSuccessNotice'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { updatePasswordAction } from './actions'
 
@@ -161,23 +163,11 @@ function ResetPasswordFormContent() {
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
       {errorMsg && (
-        <div
-          className="p-3 text-xs rounded-lg bg-destructive/10 border border-destructive/20 text-destructive font-medium flex items-start gap-2"
-          role="alert"
-        >
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{errorMsg}</span>
-        </div>
+        <AuthErrorNotice error={{ message: errorMsg }} />
       )}
 
       {message && (
-        <div
-          className="p-3 text-xs rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-medium flex items-start gap-2"
-          role="status"
-        >
-          <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 dark:text-emerald-400" />
-          <span>{message}</span>
-        </div>
+        <AuthSuccessNotice>{message}</AuthSuccessNotice>
       )}
 
       {!isUpdateMode ? (
