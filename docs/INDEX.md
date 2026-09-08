@@ -29,6 +29,7 @@ All primary architectural documentation lives directly under `docs/`:
 | Category | Canonical Document | Purpose / Owning Topic | Status |
 |---|---|---|---|
 | **Implementation Plan** | [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md) | **LOCKED** source of truth for all production-readiness implementation work: locked decisions, P0 safety tasks, 16 initiatives, batch specifications, gates, rollout and signup-reopening criteria | 🔒 Locked |
+| **Hardening Ledger** | [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) | Implementation ledger for production hardening batches (B0 baseline, B1 security fixes, verification, deferred work) | 🟢 Current |
 | **Production Audits** | [`audits/`](audits/) | Stage 1–4 read-only audits (architecture, security, frontend/mobile, reliability/operations) and the two 2026-09 signup-abuse incident investigations | 🟢 Current |
 | **Architecture Baseline** | [`PRODUCTION_BLUEPRINT.md`](PRODUCTION_BLUEPRINT.md) | Target-architecture rationale behind the implementation plan. Superseded by `FINAL_IMPLEMENTATION_PLAN.md` for anything actionable | 🟡 Reference |
 | **Core Architecture** | [`ARCHITECTURE.md`](ARCHITECTURE.md) | High-level system architecture, tech stack, directory boundaries, known debt | 🟢 Current |
