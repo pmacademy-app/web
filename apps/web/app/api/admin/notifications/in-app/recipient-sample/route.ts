@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { sampleMatchingUsers } from '@/lib/admin/user-filter-query'
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, users })
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to fetch recipient sample' },
+      { error: adminErrorMessage(err, 'Failed to fetch recipient sample') },
       { status: 500 }
     )
   }

@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
@@ -32,7 +33,7 @@ export async function POST(
     return NextResponse.json(res)
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Execution failed' },
+      { error: adminErrorMessage(err, 'Execution failed') },
       { status: 500 }
     )
   }

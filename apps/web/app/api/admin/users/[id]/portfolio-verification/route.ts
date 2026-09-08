@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
@@ -51,7 +52,7 @@ export async function POST(request: Request, { params }: Context) {
 
     return NextResponse.json({ success: true, targetUserId: id, override })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to update portfolio verification status'
+    const message = adminErrorMessage(error, 'Failed to update portfolio verification status')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

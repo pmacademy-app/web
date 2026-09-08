@@ -23,11 +23,17 @@ export async function POST(request: Request) {
   }
 
   try {
+    // This route runs a normal queue pass — the same work /api/cron/process-email-queue
+    // already does every five minutes. It performs no dead-letter recovery and does not
+    // clear next_retry_at, so `processed` is the honest field name; the previous
+    // `retried` read as "failed items recovered", which it never was.
+    // See ISSUES_KNOWN.md D-06 and ISSUE-21.
     const result = await processEmailQueue(50)
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
-      retried: result.processed,
+      processed: result.processed,
+      note: 'Duplicates the 5-minute queue pass; performs no dead-letter recovery.',
     })
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : 'Cron execution failed'

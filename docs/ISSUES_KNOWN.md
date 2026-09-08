@@ -31,20 +31,114 @@
 
 ---
 
-### ⚠️ Deferred — Known and Deliberate
+### Deferred Register (D-01 – D-08) — audited 2026-09-08
 
-These were found during the September 2026 pass and consciously left. They are not defects in the shipped behaviour but they are open work.
+Every item below was audited against the code on 2026-09-08. Two were fixed, one received a small honesty fix, and the rest were examined and consciously retained or deferred with a stated trigger for revisiting.
 
-| # | Item | Why deferred |
+| # | Item | Decision |
 |---|---|---|
-| D-01 | **No circuit breaker on failover.** Sustained double-provider failure raises a `critical` incident but is not rate-limited. | Volume is already capped by the daily quota gate and signup rate limiting. Add one if double outages become real. See [ADR-001](decisions/ADR-001-email-provider-resolution-and-failover.md). |
-| D-02 | **~18 admin API routes still return `err.message`.** | Behind `requireAdminUser`, and the messages are diagnostic by design. The two that embed database text are sanitized. See [ADR-006](decisions/ADR-006-api-error-response-contract.md). |
-| D-03 | **Alert facets (kind, retryability, provider) are client-side**, over the loaded 100-row window. | `kind`/`retryability` are not query parameters and `provider` lives inside JSONB `details`; server-side faceting needs API changes. |
-| D-04 | **Two error-token families coexist.** `components/feedback/{error,success}-state.tsx` use `danger`/`success`; the other 22 files use `destructive`. | Only `waitlist-form.tsx` consumes the former. Migrating families is a broader visual change. |
-| D-05 | **Dead settings types remain** in `lib/admin/types.ts` and `settings-service.ts` defaults, though their UI controls were removed. | Reshaping the settings schema is a backend change; the persisted values are inert. |
-| D-06 | **`/api/cron/retry-failed` still duplicates the queue cron** and performs no dead-letter recovery; `/api/cron/cleanup` remains a no-op returning `cleanedRows: 0`. | Both were out of the phases' scope. ISSUE-21 stands. |
-| D-07 | **Quota key timezone.** `increment_daily_email_quota()` derives its key from Postgres `NOW()`; `EmailAutomationsService` derives it from JS UTC. | If the database session timezone is not UTC the admin-displayed count reads a different key than the one incremented. Verify `SHOW timezone` in production. |
-| D-08 | **`lib/email.ts` and the provider registry remain separate transports.** | They now share resolution and classification. Full consolidation would change sender behaviour for the campaign scripts. See [ADR-001](decisions/ADR-001-email-provider-resolution-and-failover.md). |
+| D-01 | Circuit breaker on failover | **Defer** — trigger defined |
+| D-02 | Admin routes returning raw `err.message` | **Fixed** |
+| D-03 | Client-side alert facets | **Retain** |
+| D-04 | Two UI error-token families | **Defer** — approach documented |
+| D-05 | Dead settings types | **Retain** |
+| D-06 | `retry-failed` / `cleanup` cron routes | **Partially fixed + follow-up** |
+| D-07 | Daily quota key timezone | **Fixed** |
+| D-08 | Two email transports | **Defer** — trigger defined |
+
+---
+
+#### D-01 — Circuit breaker on provider failover · **DEFER**
+
+- **Current state**: `sendEmailWithFailover()` attempts the primary, then the secondary once. There is no breaker, so a sustained double-provider outage retries both on every queue cycle.
+- **Evidence**: `lib/notifications/providers/index.ts` keeps no state between calls. Exhaustion raises a `critical` `email.failover_exhausted` incident, deduplicated to one alert per fingerprint per hour.
+- **What it would solve**: wasted latency and provider calls while both providers are down, and the original concern of a failover amplifying abusive traffic onto the secondary.
+- **Protection that already exists**: the pre-dispatch daily quota gate caps optional email before any provider is called; signup rate limiting caps the abuse vector that motivated the concern; failover is hard-bounded to one secondary attempt; per-priority `max_attempts` caps retries (bulk = 1); exponential backoff spaces cycles.
+- **Risk of implementing now**: a breaker is cross-instance state. In-memory state gives each serverless instance its own breaker — the exact defect ADR-003 fixed for feature flags — so a correct implementation needs a shared store. That adds a database round-trip to the hot send path and a new failure mode: a stuck-open breaker silently blocking all mail.
+- **Risk of deferring**: bounded. The worst case during a double outage is wasted calls against providers already refusing, plus the existing critical alert.
+- **Decision**: defer. The named problem is already covered by upstream caps.
+- **Revisit when**: a double-provider outage is observed in production, **or** the daily quota is raised above ~1,000, **or** a third provider is added — at which point the attempt bound stops being "two".
+
+---
+
+#### D-02 — Admin routes returned raw `err.message` · **FIXED**
+
+- **Was**: 74 sites across 56 admin route files returned or logged an unsanitized exception message. They sit behind `requireAdminUser`, but a driver error can carry a connection string and a provider error can echo an API key.
+- **Fix**: `adminErrorMessage(cause, fallback)` in `lib/errors/api-response.ts` runs the message through the same redaction that guards `system_errors` (ADR-005) and falls back when there is nothing usable. Applied across `app/api/admin/**`; raw Supabase error fields (`updateErr.message`, `queryErr.message`, …) are wrapped in `sanitizeErrorMessage()`.
+- **Deliberately not genericized**: admins keep the failure detail. A refused bulk requeue is actionable with the Postgres error and useless as "something went wrong". Response shapes and status codes are unchanged.
+- **Out of scope**: Zod issue messages (`parsed.error.issues[0]?.message`) are our own schema copy and are left alone.
+- **Tests**: `lib/__tests__/deferred-items-d02-d07.test.ts`.
+
+---
+
+#### D-03 — Client-side alert facets · **RETAIN**
+
+- **Current state**: status, severity and category filter server-side; kind, retryability and provider filter client-side over the loaded window. The view requests the API maximum of 100 rows.
+- **Evidence**: `app/api/admin/system/alerts/route.ts` caps `limit` at 100; `AdminSystemAlertsView.tsx` derives `visibleAlerts` in a `useMemo`.
+- **Volume**: `system_errors` is deduplicated — repeats inside 15 minutes increment `occurrence_count` rather than inserting — so distinct incidents per window are low, and the default filter is `status = 'new'`.
+- **Response size**: 100 rows of mostly short text plus a sanitized `details` object; tens of KB, fetched on demand by an authenticated admin.
+- **Performance**: filtering 100 objects in a `useMemo` is not measurable.
+- **Security**: no additional exposure. Every value was sanitized at write time (ADR-005), and client-side filtering shows a subset of what the API already returned to an authenticated admin. It does not widen access.
+- **Scalability limit, stated honestly**: facets apply to the loaded window, so with more than 100 matching incidents a facet can hide older ones. The empty state names the window.
+- **Decision**: retain. Server-side faceting needs `kind`/`retryability` query parameters plus a JSONB query for `provider` — real API surface for no current problem.
+- **Revisit when**: `system_errors` routinely holds more than 100 `new` rows, or an operator reports a facet missing a known incident.
+
+---
+
+#### D-04 — Two UI error-token families · **DEFER**
+
+- **Current state**: `destructive` (shadcn) is used by 22 files including every auth surface and the shared `AuthErrorNotice`. `danger` / `success` (semantic tokens in `globals.css`) are used only by `components/feedback/error-state.tsx` and `success-state.tsx`.
+- **Evidence**: those two components are consumed by `components/forms/waitlist-form.tsx` and `components/marketing/product-mockup/lesson-card-preview.tsx`.
+- **Real inconsistency?** Marginal today. The families never appear on the same screen — `destructive` covers auth and app surfaces, `danger` covers one marketing form. The visible difference is a slightly different red and a `rounded-md` versus `rounded-lg` corner.
+- **Maintenance risk**: the real cost is decision friction. A new component has two plausible "error" tokens and no rule for choosing. That is how the P13 success-notice decision arose — moving auth success onto `--color-success` would have split the error/success pair across families.
+- **Decision**: defer; no design-system refactor in this task.
+- **Recommended approach when taken up**: adopt `destructive` as canonical (22 files versus 2), migrate the two `feedback/*` components, add a matching `success` role to the shadcn family so error and success live together, then delete the `--color-danger*` tokens. One PR, visual review only, no logic change.
+
+---
+
+#### D-05 — Dead settings types · **RETAIN**
+
+- **Current state**: fields whose controls were removed in P10 still exist on `ProductSettings`, `LearningSettings`, `EmailSettings` and `NotificationSettings`, with defaults in `settings-service.ts`.
+- **Evidence**: each dead field resolves to exactly two files — `lib/admin/types.ts` and `lib/admin/settings-service.ts`. Grep hits in `app/layout.tsx` and `lib/campaigns/portfolio-activation-runner.ts` are unrelated local identifiers that happen to be named `siteName` and `replyToEmail`, not these settings. No runtime code reads any of them.
+- **Migration needed to remove?** No schema migration. `system_settings` stores each section as a single JSONB blob, so dropping fields is a TypeScript-only change that leaves stale keys inside existing blobs.
+- **Misleading or unsafe?** No. Nothing renders them and nothing reads them; the persisted values are inert. The genuinely misleading part — controls implying enforcement — was removed in P10.
+- **Decision**: retain. Removal is cosmetic, and because `upsertSettings` merges over current values, trimming the types would silently drop keys from stored blobs on the next save for no benefit.
+- **Revisit when**: the settings schema is reshaped for another reason; fold the cleanup into that change.
+
+---
+
+#### D-06 — `retry-failed` and `cleanup` cron routes · **PARTIALLY FIXED + FOLLOW-UP**
+
+- **Invoked in production?** Yes, both. `.github/workflows/notification-scheduler.yml` calls `/api/cron/retry-failed` hourly and `/api/cron/cleanup` daily.
+- **`/api/cron/retry-failed`**: the body is `processEmailQueue(50)`, identical in effect to `/api/cron/process-email-queue`, which already runs every five minutes. It performs no dead-letter recovery and does not clear `next_retry_at`. It is a duplicate rather than a no-op — it does real work, just work the five-minute job already does — and it reported that work under a `retried` field, which reads as "failed items recovered" when it means "items a normal queue run processed".
+- **`/api/cron/cleanup`**: returned `{ success: true, cleanedRows: 0 }` and deleted nothing. This one did report success while doing nothing (ISSUE-21).
+- **Operational confusion**: yes for both. A green workflow run implied retention and dead-letter recovery were happening. Neither was.
+- **Fixed here (small, in scope)**: both routes now state what they actually do. `cleanup` returns `implemented: false` with an explicit note and logs a warning rather than reporting a clean success; `retry-failed` renames its misleading `retried` field to `processed`, keeps the accurate value, and documents that it duplicates the five-minute job. No retention policy or recovery logic was invented.
+- **Follow-up required**: decide a retention policy (which tables, what age) and implement `cleanup`; then either implement genuine dead-letter recovery in `retry-failed` or delete the route and its workflow job. Tracked as ISSUE-21.
+
+---
+
+#### D-07 — Daily quota key timezone · **FIXED**
+
+- **Was**: the key `email_sent_count_YYYY_MM_DD` was computed with two clocks. `increment_daily_email_quota()` and `get_current_daily_email_count()` used `TO_CHAR(NOW(), …)`, which resolves in the **Postgres session timezone**. `EmailAutomationsService.getState()` used `toISOString()`, which is always **UTC**.
+- **Enforcement was never wrong**: the RPC computes the key once and both increments and checks that same key, so the gate is internally consistent and could not over- or under-send around midnight.
+- **What was wrong**: the count an operator reads on the admin dashboard came from a different row than the one being written whenever the database timezone was not UTC — for the offset window every day. During an abuse event that is precisely when the number has to be trustworthy. Supabase defaults to UTC, so this was latent rather than active, but the agreement was implicit and a timezone change would have broken it silently.
+- **Serverless disagreement**: none between instances. `toISOString()` is UTC everywhere; the split was JS versus SQL.
+- **Fix**: one explicit policy — **the quota day is the UTC day**. Migration `20260908000002_quota_key_utc.sql` pins both SQL functions to `TO_CHAR((NOW() AT TIME ZONE 'UTC'), 'YYYY_MM_DD')`. `lib/notifications/daily-quota-key.ts` is the single TypeScript definition, and `EmailAutomationsService` calls it.
+- **Rollout note**: on a non-UTC database this shifts which key is written, so the deployment day can allow up to one extra quota's worth of optional email. Critical auth email bypasses the quota and is unaffected. Deploy near 00:00 UTC to minimise the overlap.
+- **Tests**: `lib/__tests__/deferred-items-d02-d07.test.ts` covers the offset-window rollover, the exact 00:00 UTC boundary, and month/year boundaries.
+
+---
+
+#### D-08 — Two email transports · **DEFER**
+
+- **Current state**: `lib/email.ts` implements its own Brevo and Resend `fetch` calls; `lib/notifications/providers/*` implements them again behind the registry.
+- **Who uses each**: `lib/email.ts` serves 15 callers — the Supabase Auth hook, `/api/contact`, `/api/waitlist`, admin test-send, the webhook bounce alert, `lib/campaigns/*` and the local campaign scripts. The registry serves `processEmailQueue()` and the template test-send.
+- **Do they behave differently?** Not on the axes that matter. Both resolve the primary through `resolvePrimaryProvider()` and classify failures through `classifyProviderFailure()`, so failover eligibility is identical, and both report through the error taxonomy. The remaining differences are intentional: the queue path records `provider` / `provider_attempts` on the row and is subject to the daily quota gate; the direct path has no row to annotate and is deliberately not quota-gated, because critical auth and contact mail must not be blocked by an optional-email cap.
+- **Actual risk**: low. The dangerous divergences — different primary, different failover policy, silent auth failures — are closed. What remains is duplicated HTTP-call code, a maintenance cost: a future provider change must be made twice.
+- **Why still separate**: the provider classes build the sender from `BRAND`, while `sendEmail()` accepts per-call `fromEmail` and `replyTo` that the marketing campaign scripts depend on. Unifying without addressing that would change sender identity for those campaigns.
+- **Decision**: defer. Consolidation is refactoring with real regression surface and no current reliability gain.
+- **Revisit when**: a third provider is added, or the campaign scripts stop needing per-call sender overrides — at which point `sendEmail()` can become a thin wrapper over `sendEmailWithFailover()`.
 
 ---
 

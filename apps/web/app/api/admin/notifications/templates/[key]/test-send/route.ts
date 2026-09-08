@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { EMAIL_TEMPLATE_MAP, interpolateVariables, stripHtmlToPlainText } from '@/emails'
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       externalId: sendRes.externalId,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Test send failed'
+    const message = adminErrorMessage(err, 'Test send failed')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

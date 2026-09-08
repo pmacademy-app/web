@@ -65,6 +65,7 @@ All database schema definitions are managed through versioned SQL DDL migration 
 | `20260906000001_add_portfolio_verification_override.sql` | `portfolio_verification_override text CHECK (IN ('verified','rejected'))` on `public.users` — admin override for Automatic Portfolio Verification |
 | `20260907000001_email_provider_failover.sql` | `email_queue.provider`, `email_queue.provider_attempts` — provider failover tracking |
 | `20260908000001_error_taxonomy.sql` | `system_errors` taxonomy columns (`domain`, `kind`, `retryability`, `next_action`, `occurrence_count`, `first_seen_at`); widens the `category` CHECK to accept `brevo` and domain values |
+| `20260908000002_quota_key_utc.sql` | Pins `increment_daily_email_quota()` and `get_current_daily_email_count()` to the UTC day, matching the application side |
 
 ---
 

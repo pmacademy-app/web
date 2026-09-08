@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create template'
+    const message = adminErrorMessage(err, 'Failed to create template')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

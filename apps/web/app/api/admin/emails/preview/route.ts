@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { renderEmailTemplate } from '@/emails'
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to render email preview' },
+      { error: adminErrorMessage(err, 'Failed to render email preview') },
       { status: 500 }
     )
   }

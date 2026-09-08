@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { AdminConsoleService } from '@/lib/admin/service'
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
     }
     return NextResponse.json({ success: true, count: users.length, total, users })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch users'
+    const message = adminErrorMessage(err, 'Failed to fetch users')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
@@ -56,7 +57,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ success: true, targetUserId, makeAdmin })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update user role'
+    const message = adminErrorMessage(err, 'Failed to update user role')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
       queuedCount,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Manual run failed'
+    const message = adminErrorMessage(err, 'Manual run failed')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

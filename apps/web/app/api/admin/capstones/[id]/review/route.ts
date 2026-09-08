@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { ModerationService } from '@/lib/admin/moderation-service'
@@ -44,7 +45,7 @@ export async function POST(request: Request, { params }: Context) {
 
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Error reviewing capstone submission.'
+    const message = adminErrorMessage(error, 'Error reviewing capstone submission.')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

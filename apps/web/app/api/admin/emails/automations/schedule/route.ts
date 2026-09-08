@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
     const schedules = await EmailAutomationsService.getDigestSchedules()
     return NextResponse.json({ success: true, schedules })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch digest schedules'
+    const message = adminErrorMessage(err, 'Failed to fetch digest schedules')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
       schedules: updated,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update digest schedules'
+    const message = adminErrorMessage(err, 'Failed to update digest schedules')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

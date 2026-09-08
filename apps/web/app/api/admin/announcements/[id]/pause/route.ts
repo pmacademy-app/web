@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { AnnouncementsService } from '@/lib/admin/announcements-service'
@@ -29,7 +30,7 @@ export async function POST(
       message: `Announcement ${paused ? 'paused' : 'resumed'} successfully`,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update pause state'
+    const message = adminErrorMessage(err, 'Failed to update pause state')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

@@ -1,3 +1,5 @@
+import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -92,7 +94,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // not be collapsed into one ambiguous 409.
     if (updateErr) {
       return NextResponse.json(
-        { success: false, error: `Failed to requeue item: ${updateErr.message}` },
+        { success: false, error: `Failed to requeue item: ${sanitizeErrorMessage(updateErr.message)}` },
         { status: 500 }
       )
     }
@@ -121,7 +123,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       message: `Email to ${item.to_email} requeued for delivery.`,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Retry failed'
+    const message = adminErrorMessage(err, 'Retry failed')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
@@ -71,7 +72,7 @@ export async function PATCH(
     return NextResponse.json({ success: true, item })
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Update failed' },
+      { error: adminErrorMessage(err, 'Update failed') },
       { status: 500 }
     )
   }

@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch queue metrics'
+    const message = adminErrorMessage(err, 'Failed to fetch queue metrics')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

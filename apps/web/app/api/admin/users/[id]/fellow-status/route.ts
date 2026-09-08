@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
@@ -51,7 +52,7 @@ export async function POST(request: Request, { params }: Context) {
 
     return NextResponse.json({ success: true, targetUserId: id, isFellow })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to update fellow status'
+    const message = adminErrorMessage(error, 'Failed to update fellow status')
     const isClientError = error instanceof Error && error.message.includes('Cannot verify a private portfolio')
     return NextResponse.json({ error: message }, { status: isClientError ? 400 : 500 })
   }

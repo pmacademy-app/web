@@ -54,6 +54,8 @@ Asynchronous emails are queued in `public.email_queue`:
 
 A **daily** send quota (`email_daily_send_limit` in `system_settings`, default `100`) is enforced via the atomic Postgres function `increment_daily_email_quota()`, checked in the queue processor **before** dispatch. Critical Auth emails (`auth.verify_email`, `auth.password_reset`, `auth.email_change_verify`) bypass it entirely.
 
+**The quota day is the UTC day.** The counter key is `email_sent_count_YYYY_MM_DD`, built from the UTC date on both sides: `TO_CHAR((NOW() AT TIME ZONE 'UTC'), 'YYYY_MM_DD')` in SQL (migration `20260908000002_quota_key_utc.sql`) and `lib/notifications/daily-quota-key.ts` in TypeScript, which is the single definition — do not inline the key format anywhere else. Before that migration the SQL side used the Postgres *session* timezone while the application used UTC, so on a non-UTC database the admin dashboard read a different row than the one being incremented. Enforcement was unaffected (the RPC computes the key once and both increments and checks it); the count shown to operators was.
+
 There is **no hourly enforcement** anywhere in the pipeline. The `hourlySendLimit` field and the `GLOBAL_RATE_LIMITS.HOURLY_SEND_LIMIT` constant exist but nothing reads them; the admin control for it was removed in September 2026 rather than left implying enforcement.
 
 ### Retry & Backoff

@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { requireAdminUser } from '@/lib/admin/guard'
@@ -58,7 +59,7 @@ export async function PATCH(request: Request, { params }: Context) {
     revalidatePath('/admin/moderation')
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Error moderating feedback item.'
+    const message = adminErrorMessage(error, 'Error moderating feedback item.')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { SystemService } from '@/lib/admin/system-service'
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
     })
     return NextResponse.json({ success: true, ...result })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch audit log'
+    const message = adminErrorMessage(err, 'Failed to fetch audit log')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

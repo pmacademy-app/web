@@ -143,3 +143,30 @@ export function apiClassifiedAuthError(options: {
     extra: options.extra,
   })
 }
+
+/**
+ * Message for an **admin-facing** error response.
+ *
+ * Admin routes deliberately surface the underlying failure text — a bulk requeue that
+ * the database refused is far more actionable with the Postgres error than with
+ * "something went wrong", and P3 made several of these loud on purpose. That text is
+ * still untrusted: a driver error can carry a connection string, and a provider error
+ * can echo an API key.
+ *
+ * So admin routes sanitize rather than genericize. The operator keeps the diagnostic;
+ * credentials, tokens and connection strings are redacted by the same rules that guard
+ * `system_errors` (see ADR-005).
+ *
+ * Not for unauthenticated surfaces — those use `apiInternalError()`, which replaces the
+ * message entirely and returns an `errorId`.
+ */
+export function adminErrorMessage(cause: unknown, fallback: string): string {
+  const raw =
+    cause instanceof Error
+      ? cause.message
+      : typeof cause === 'string'
+        ? cause
+        : ''
+  const sanitized = sanitizeErrorMessage(raw).trim()
+  return sanitized || fallback
+}

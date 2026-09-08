@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -151,7 +152,7 @@ export async function POST(request: NextRequest) {
           })
           inAppCount++
         } catch (inAppErr) {
-          errors.push(`In-App error for ${recipient.email}: ${inAppErr instanceof Error ? inAppErr.message : 'Unknown'}`)
+          errors.push(`In-App error for ${recipient.email}: ${adminErrorMessage(inAppErr, 'Unknown')}`)
         }
       }
 
@@ -179,7 +180,7 @@ export async function POST(request: NextRequest) {
             enqueuedCount++
           }
         } catch (emailErr) {
-          errors.push(`Email error for ${recipient.email}: ${emailErr instanceof Error ? emailErr.message : 'Unknown'}`)
+          errors.push(`Email error for ${recipient.email}: ${adminErrorMessage(emailErr, 'Unknown')}`)
         }
       }
     }
@@ -225,7 +226,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Unknown server error during broadcast'
+    const errorMsg = adminErrorMessage(err, 'Unknown server error during broadcast')
     void logSystemError({
       severity: 'error',
       category: 'system',

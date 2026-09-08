@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
       .limit(maxLimit)
 
     if (fetchErr) {
-      return NextResponse.json({ error: fetchErr.message }, { status: 500 })
+      return NextResponse.json({ error: sanitizeErrorMessage(fetchErr.message) }, { status: 500 })
     }
 
     const items = (rawItems || []) as Array<{ id: string; to_email: string; template_key: string; status: string }>
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
             summary: 'Bulk email requeue failed',
             subject: { userId: authResult.userId },
             nextAction: 'The queue items were not requeued. Check Supabase availability and retry.',
-            details: { error: updateErr.message, statusFilter },
+            details: { error: sanitizeErrorMessage(updateErr.message), statusFilter },
           })
         } catch {
           // Non-fatal logger fallback
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
       message: `Successfully requeued ${retriedCount} email(s) for delivery.`,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Retry all failed'
+    const message = adminErrorMessage(err, 'Retry all failed')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

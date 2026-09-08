@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true, data: detail })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch template detail'
+    const message = adminErrorMessage(err, 'Failed to fetch template detail')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
@@ -163,7 +164,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       data: versionRow,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update template'
+    const message = adminErrorMessage(err, 'Failed to update template')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

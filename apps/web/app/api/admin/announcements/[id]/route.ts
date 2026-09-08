@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { AnnouncementsService } from '@/lib/admin/announcements-service'
@@ -19,7 +20,7 @@ export async function GET(
     }
     return NextResponse.json({ success: true, announcement: item })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch announcement'
+    const message = adminErrorMessage(err, 'Failed to fetch announcement')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
@@ -44,7 +45,7 @@ export async function PATCH(
     )
     return NextResponse.json({ success: true, announcement: updated })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update announcement'
+    const message = adminErrorMessage(err, 'Failed to update announcement')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
@@ -67,7 +68,7 @@ export async function DELETE(
     )
     return NextResponse.json({ success: true, message: 'Announcement deleted successfully' })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to delete announcement'
+    const message = adminErrorMessage(err, 'Failed to delete announcement')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

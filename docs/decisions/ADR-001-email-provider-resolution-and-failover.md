@@ -45,5 +45,6 @@ One resolver and one failover helper, shared by both stacks.
 
 - Brevo quota exhaustion, 5xx, timeouts and network failures now reach Resend on both the auth path and the queue path.
 - `email_queue` records which provider produced the outcome and every attempt (`provider`, `provider_attempts` — migration `20260907000001_email_provider_failover.sql`).
-- Failover volume is bounded by the pre-dispatch daily quota gate and signup rate limiting, not by a circuit breaker. **No circuit breaker is implemented.** If sustained double-provider outages become a problem, one belongs in `sendEmailWithFailover()`.
+- Failover volume is bounded by the pre-dispatch daily quota gate and signup rate limiting, not by a circuit breaker. **No circuit breaker is implemented.**
+- Re-audited 2026-09-08 and deliberately still deferred. A breaker is cross-instance state; in-memory state would give each serverless instance its own, the exact defect ADR-003 fixed for feature flags, so a correct one needs a shared store on the hot send path plus a new stuck-open failure mode. Revisit when a double-provider outage is actually observed, the daily quota is raised above ~1,000, or a third provider is added. Full reasoning: [ISSUES_KNOWN.md D-01](../ISSUES_KNOWN.md).
 - Environments that never set `PRIMARY_EMAIL_PROVIDER` may see their primary change from Resend to Brevo. `.env.example` sets it explicitly.

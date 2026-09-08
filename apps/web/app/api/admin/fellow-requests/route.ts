@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { FellowRequestAdminService } from '@/lib/admin/fellow-request-service'
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ success: true, requests: queue })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch Fellow request queue.'
+    const message = adminErrorMessage(error, 'Failed to fetch Fellow request queue.')
     console.error('[API GET /api/admin/fellow-requests] Error:', error)
     return NextResponse.json({ error: message }, { status: 500 })
   }

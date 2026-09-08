@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       // empty success made a broken monitoring pipeline indistinguishable from a
       // healthy system — the console showed a green all-clear while the query that
       // feeds it was erroring.
-      console.error('[AdminSystemAlerts] DB query error:', queryErr.message)
+      console.error('[AdminSystemAlerts] DB query error:', sanitizeErrorMessage(queryErr.message))
       try {
         const { logErrorReport } = await import('@/lib/monitoring/logger')
         void logErrorReport({
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
           summary: 'System alerts could not be read from the database',
           nextAction:
             'The alerts console cannot show incidents while this fails. Check Supabase availability before trusting an empty alert list.',
-          details: { error: queryErr.message },
+          details: { error: sanitizeErrorMessage(queryErr.message) },
         })
       } catch {
         // Non-fatal logger fallback
@@ -119,7 +119,7 @@ export async function PATCH(request: NextRequest) {
     const { error: updateErr } = await query
 
     if (updateErr) {
-      return NextResponse.json({ error: updateErr.message }, { status: 400 })
+      return NextResponse.json({ error: sanitizeErrorMessage(updateErr.message) }, { status: 400 })
     }
 
     const targetId = alertId || fingerprint || 'group'

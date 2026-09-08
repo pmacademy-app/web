@@ -1,4 +1,5 @@
 import { createServiceRoleClient } from '@/lib/supabase'
+import { currentDailyQuotaKey } from '../daily-quota-key'
 import type {
   EmailAutomationKey,
   EmailAutomationMeta,
@@ -65,7 +66,9 @@ export class EmailAutomationsService {
    */
   public static async getState(): Promise<EmailAutomationsState> {
     const supabase = createServiceRoleClient()
-    const todayKey = `email_sent_count_${new Date().toISOString().slice(0, 10).replace(/-/g, '_')}`
+    // Single definition, pinned to UTC to match the SQL functions. See
+    // lib/notifications/daily-quota-key.ts and migration 20260908000002.
+    const todayKey = currentDailyQuotaKey()
 
     try {
       const { data: rawRows } = await supabase

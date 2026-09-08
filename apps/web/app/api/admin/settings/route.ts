@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { SettingsService } from '@/lib/admin/settings-service'
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, data: all })
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch settings'
+    const message = adminErrorMessage(err, 'Failed to fetch settings')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
@@ -133,7 +134,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: updated })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update settings'
+    const message = adminErrorMessage(err, 'Failed to update settings')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

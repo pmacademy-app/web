@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
     const queue = await FeedbackAdminService.getModerationQueue(statusFilter)
     return NextResponse.json({ queue })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch moderation queue.'
+    const message = adminErrorMessage(error, 'Failed to fetch moderation queue.')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

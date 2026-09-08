@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { globalFeatureFlagService } from '@/lib/notifications/feature-flags/service'
@@ -41,7 +42,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ success: true, flag: updated })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to toggle feature flag'
+    const message = adminErrorMessage(err, 'Failed to toggle feature flag')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

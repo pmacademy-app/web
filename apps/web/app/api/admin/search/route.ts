@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -176,7 +177,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Search failed'
+    const message = adminErrorMessage(error, 'Search failed')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

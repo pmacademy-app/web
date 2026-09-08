@@ -14,9 +14,17 @@ export async function POST(request: Request) {
     }
   }
 
-  // Cleanup old logs placeholder
+  // NOT IMPLEMENTED. No retention policy has been decided, so this route deletes
+  // nothing. It previously returned a plain success with cleanedRows: 0, which made a
+  // green scheduled run look like retention was happening. Report the truth instead so
+  // the workflow does not imply work that is not being done. See ISSUES_KNOWN.md D-06
+  // and ISSUE-21.
+  console.warn('[cron/cleanup] No-op: retention policy not implemented; no rows were deleted.')
+
   return NextResponse.json({
     success: true,
+    implemented: false,
+    note: 'Retention cleanup is not implemented. No rows were deleted. See ISSUES_KNOWN.md ISSUE-21.',
     timestamp: new Date().toISOString(),
     cleanedRows: 0,
   })

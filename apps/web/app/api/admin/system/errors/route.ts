@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { SystemService } from '@/lib/admin/system-service'
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     })
     return NextResponse.json({ success: true, ...result })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch system errors'
+    const message = adminErrorMessage(err, 'Failed to fetch system errors')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }
@@ -65,7 +66,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ ...result })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update system error'
+    const message = adminErrorMessage(err, 'Failed to update system error')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
-}
+}

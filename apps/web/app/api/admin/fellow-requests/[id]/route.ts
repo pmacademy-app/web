@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { requireAdminUser } from '@/lib/admin/guard'
@@ -42,7 +43,7 @@ export async function PATCH(request: Request, { params }: Context) {
 
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to review Fellow request.'
+    const message = adminErrorMessage(error, 'Failed to review Fellow request.')
     console.error('[API PATCH /api/admin/fellow-requests/[id]] Error:', error)
     return NextResponse.json({ error: message }, { status: 500 })
   }

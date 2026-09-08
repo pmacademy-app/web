@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, ...result })
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to list in-app notifications' },
+      { error: adminErrorMessage(err, 'Failed to list in-app notifications') },
       { status: 500 }
     )
   }
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('[POST /api/admin/notifications/in-app] Error:', err)
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to create in-app notification' },
+      { error: adminErrorMessage(err, 'Failed to create in-app notification') },
       { status: 500 }
     )
   }

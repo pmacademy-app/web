@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { EMAIL_TEMPLATE_MAP, interpolateVariables, stripHtmlToPlainText } from '@/emails'
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Preview rendering failed'
+    const message = adminErrorMessage(err, 'Preview rendering failed')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

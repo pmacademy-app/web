@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ messages: data })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch contact messages.'
+    const message = adminErrorMessage(error, 'Failed to fetch contact messages.')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -69,7 +70,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ success: true, messageId })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to update contact message.'
+    const message = adminErrorMessage(error, 'Failed to update contact message.')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

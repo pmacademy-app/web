@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
@@ -7,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     authResult = await requireAdminUser(request)
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: adminErrorMessage(err, 'Unauthorized') }, { status: 401 })
   }
 
   if (!authResult.authorized) {
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
   try {
     authResult = await requireAdminUser(request)
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: adminErrorMessage(err, 'Unauthorized') }, { status: 401 })
   }
 
   if (!authResult.authorized) {
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     const updatedState = await EmailAutomationsService.getState()
     return NextResponse.json({ success: true, state: updatedState })
   } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Invalid request payload'
+    const errorMsg = adminErrorMessage(err, 'Invalid request payload')
     return NextResponse.json({ success: false, error: errorMsg }, { status: 400 })
   }
 }

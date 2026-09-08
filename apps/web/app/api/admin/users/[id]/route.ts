@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
@@ -25,7 +26,7 @@ export async function GET(request: Request, { params }: Context) {
 
     return NextResponse.json({ user: userDetail })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch user details.'
+    const message = adminErrorMessage(error, 'Failed to fetch user details.')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -49,7 +50,7 @@ export async function DELETE(request: Request, { params }: Context) {
 
     return NextResponse.json({ success: true, deletedUserId: id })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to delete user account.'
+    const message = adminErrorMessage(error, 'Failed to delete user account.')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -120,7 +121,7 @@ export async function POST(request: Request, { params }: Context) {
 
     return NextResponse.json({ error: 'Invalid admin action' }, { status: 400 })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to execute admin action.'
+    const message = adminErrorMessage(error, 'Failed to execute admin action.')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

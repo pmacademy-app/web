@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { AnnouncementsService } from '@/lib/admin/announcements-service'
@@ -20,7 +21,7 @@ export async function POST(
     )
     return NextResponse.json({ success: true, announcement: updated, message: 'Announcement published successfully' })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to publish announcement'
+    const message = adminErrorMessage(err, 'Failed to publish announcement')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

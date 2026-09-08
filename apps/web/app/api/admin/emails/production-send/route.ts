@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest) {
     try {
       await renderEmailTemplate(templateKey, templateVars)
     } catch (renderErr) {
-      const renderMsg = renderErr instanceof Error ? renderErr.message : 'Render failure'
+      const renderMsg = adminErrorMessage(renderErr, 'Render failure')
       void logSystemError({
         severity: 'error',
         category: 'system',
@@ -254,7 +255,7 @@ export async function POST(request: NextRequest) {
       processResult,
     })
   } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Unknown server error'
+    const errorMsg = adminErrorMessage(err, 'Unknown server error')
     void logSystemError({
       severity: 'error',
       category: 'system',

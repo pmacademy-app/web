@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { evaluateRateLimit } from '@/lib/rate-limit'
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
     authGuard = await requireAdminUser(request)
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Unauthorized' },
+      { error: adminErrorMessage(err, 'Unauthorized') },
       { status: 401 }
     )
   }
@@ -105,7 +106,7 @@ export async function POST(request: Request) {
       resendId: sendResult.id,
     })
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Error sending test email'
+    const message = adminErrorMessage(err, 'Error sending test email')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

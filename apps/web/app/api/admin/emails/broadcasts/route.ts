@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
 import { BroadcastService } from '@/lib/admin/broadcast-service'
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data: result })
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Internal server error' },
+      { error: adminErrorMessage(err, 'Internal server error') },
       { status: 500 }
     )
   }
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: broadcast }, { status: 201 })
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Internal server error' },
+      { error: adminErrorMessage(err, 'Internal server error') },
       { status: 500 }
     )
   }

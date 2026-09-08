@@ -1,3 +1,4 @@
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdminUser } from '@/lib/admin/guard'
 import { countMatchingUsers } from '@/lib/admin/user-filter-query'
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, count, audience })
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to calculate recipient count' },
+      { error: adminErrorMessage(err, 'Failed to calculate recipient count') },
       { status: 500 }
     )
   }
