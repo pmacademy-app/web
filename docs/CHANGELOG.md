@@ -2,6 +2,35 @@
 
 All notable changes to **Prodily PM Academy** (`prodily-monorepo`) are documented in this file.
 
+## [Email Reliability & Observability Pass] — 2026-09-08
+
+Architecture decisions: [`docs/decisions/`](decisions/). Requires migrations `20260907000001_email_provider_failover.sql` and `20260908000001_error_taxonomy.sql`.
+
+### Fixed
+- **Queue had no provider failover**: `processEmailQueue()` resolved one provider and retried the *same* one on every cycle, so Resend was never attempted. This was the actual cause of "Resend fallback isn't working". Now dispatches through `sendEmailWithFailover()` — one secondary attempt, never a third. ([ADR-001](decisions/ADR-001-email-provider-resolution-and-failover.md))
+- **Capacity exhaustion was classified permanent**: Brevo answers a spent allowance with 402/429, both below 500, so the 2026-09-07 policy blocked failover exactly when it was needed. 402/408/429 are now failover-eligible; containment stays with the pre-dispatch quota gate and signup rate limiting. **Supersedes the fallback entry below.** ([ADR-002](decisions/ADR-002-provider-failure-classification.md))
+- **Split primary-provider resolution**: `lib/email.ts` preferred Resend while the registry preferred Brevo when `PRIMARY_EMAIL_PROVIDER` was unset. Both now share `resolvePrimaryProvider()`.
+- **Auth email failures were invisible**: `/api/auth/send-email-hook` and `lib/email.ts` emitted only `console.error`, producing zero `system_errors` rows for signup verification and password reset.
+- **Brevo failures wrote nothing**: the `system_errors.category` CHECK omitted `'brevo'`, so every insert violated it and was swallowed by the logger's warn-and-continue path.
+- **Deduplication broke after the second occurrence**: a multi-row `.maybeSingle()` returned an error that was discarded, inserting duplicates instead of grouping. Now orders, takes one row, and increments `occurrence_count`.
+- **Admin actions reported false success**: production-send treated a status the processor never writes as its only failure case; retry actions left `next_retry_at` set so requeued items stayed unclaimable; a failed alerts query rendered as the green "no alerts" state.
+- **Queue correctness**: the non-RPC fallback claim never incremented `attempt_count` (infinite retry); dead letters lost their user, template and variables; hard bounces were never suppressed.
+- **Feature flags never left process memory**: each serverless instance served compiled defaults, so the `EMAIL_ENABLED` kill switch had no effect on the cron running the queue. ([ADR-003](decisions/ADR-003-db-backed-configuration-control-plane.md))
+
+### Added
+- Structured error taxonomy — domain, kind, retryability, derived severity, next action — with admin facets. ([ADR-004](decisions/ADR-004-structured-error-taxonomy.md))
+- Two-layer secret redaction covering Brevo keys, JWTs, database credentials, session tokens and one-time auth tokens, applied to messages, `details`, dead-letter variables and API responses. ([ADR-005](decisions/ADR-005-sensitive-data-redaction.md))
+- Additive API error contract: `{ success, error, code, errorId }`. ([ADR-006](decisions/ADR-006-api-error-response-contract.md))
+- `email_queue.provider` / `provider_attempts` for per-attempt provider tracking.
+
+### Changed
+- Admin settings controls that persisted a value nothing read were removed rather than left implying enforcement. See [`admin/platform-settings.md`](admin/platform-settings.md) §3.G.
+
+### Known limitations
+- No circuit breaker on failover; ~18 admin routes still return raw error messages; alert facets are client-side. Tracked in [`ISSUES_KNOWN.md`](ISSUES_KNOWN.md) under Deferred.
+
+---
+
 ## [Signup Abuse Incident Response] — 2026-09-07
 
 Full incident writeup: [`docs/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md).

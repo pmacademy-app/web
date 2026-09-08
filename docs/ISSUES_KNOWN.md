@@ -1,8 +1,8 @@
 # Known Issues & Production Verification Tracker — Prodily PM Academy
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Current Branch:** `elite-dev`  
-**Last Updated:** September 6, 2026  
+**Current Branch:** `email-provider-failover-implementation`  
+**Last Updated:** September 8, 2026  
 
 ---
 
@@ -19,14 +19,32 @@
 ## 2. Active Issue Register
 
 ### 🔴 Confirmed Code-Level Broken
-*None identified.* All static App Router pages compile cleanly with 0 TypeScript errors, and all unit/integration test suites pass.
+*None open.* The September 2026 reliability pass (ADR-001 through ADR-006) closed the confirmed defects listed under "Resolved" below.
 
 ### 🟠 Active Incident Follow-Up
 
 #### ISSUE-23: Signup Abuse Cleanup Pending Approval
 - **Status**: 🟠 Mitigated, cleanup awaiting explicit approval
-- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). `allowSignups` is currently `false` in production. Root-cause fixes (signup rate limiting, real daily email quota enforcement, stricter Brevo/Resend fallback) are implemented and test-passing but not yet deployed.
-- **Required Action**: (1) Deploy the code fixes, (2) decide on CAPTCHA provider before reopening signups, (3) approve or reject the proposed ban-not-delete cleanup of the 1,233 flagged accounts.
+- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). `allowSignups` is currently `false` in production.
+- **Required Action**: (1) decide on a CAPTCHA provider before reopening signups, (2) approve or reject the proposed ban-not-delete cleanup of the 1,233 flagged accounts.
+- **Note**: the root-cause fixes (signup rate limiting, pre-dispatch daily quota enforcement, provider failover) are implemented and test-passing. Deployment requires migrations `20260907000001` and `20260908000001`.
+
+---
+
+### ⚠️ Deferred — Known and Deliberate
+
+These were found during the September 2026 pass and consciously left. They are not defects in the shipped behaviour but they are open work.
+
+| # | Item | Why deferred |
+|---|---|---|
+| D-01 | **No circuit breaker on failover.** Sustained double-provider failure raises a `critical` incident but is not rate-limited. | Volume is already capped by the daily quota gate and signup rate limiting. Add one if double outages become real. See [ADR-001](decisions/ADR-001-email-provider-resolution-and-failover.md). |
+| D-02 | **~18 admin API routes still return `err.message`.** | Behind `requireAdminUser`, and the messages are diagnostic by design. The two that embed database text are sanitized. See [ADR-006](decisions/ADR-006-api-error-response-contract.md). |
+| D-03 | **Alert facets (kind, retryability, provider) are client-side**, over the loaded 100-row window. | `kind`/`retryability` are not query parameters and `provider` lives inside JSONB `details`; server-side faceting needs API changes. |
+| D-04 | **Two error-token families coexist.** `components/feedback/{error,success}-state.tsx` use `danger`/`success`; the other 22 files use `destructive`. | Only `waitlist-form.tsx` consumes the former. Migrating families is a broader visual change. |
+| D-05 | **Dead settings types remain** in `lib/admin/types.ts` and `settings-service.ts` defaults, though their UI controls were removed. | Reshaping the settings schema is a backend change; the persisted values are inert. |
+| D-06 | **`/api/cron/retry-failed` still duplicates the queue cron** and performs no dead-letter recovery; `/api/cron/cleanup` remains a no-op returning `cleanedRows: 0`. | Both were out of the phases' scope. ISSUE-21 stands. |
+| D-07 | **Quota key timezone.** `increment_daily_email_quota()` derives its key from Postgres `NOW()`; `EmailAutomationsService` derives it from JS UTC. | If the database session timezone is not UTC the admin-displayed count reads a different key than the one incremented. Verify `SHOW timezone` in production. |
+| D-08 | **`lib/email.ts` and the provider registry remain separate transports.** | They now share resolution and classification. Full consolidation would change sender behaviour for the campaign scripts. See [ADR-001](decisions/ADR-001-email-provider-resolution-and-failover.md). |
 
 ---
 
@@ -142,7 +160,7 @@
 ### 🟠 Newly Identified — Confirmed Code-Level Broken (found during 2026-09-06 documentation audit)
 
 #### ISSUE-20: Admin Analytics "XP Source Attribution" Always Reports 100% "Other"
-- **Status**: 🟠 Confirmed Code-Level Broken
+- **Status**: 🟢 Resolved (September 2026) — `computeXpBySource` now reads `source_type`, `XP_SOURCE_LABELS` is keyed on the real `XpSourceType` union, and the parameter type was narrowed so the compiler catches the next drift.
 - **Description**: `AnalyticsService.getAnalyticsWorkspaceData` selects the `source_type` column from `xp_events`, but `computeXpBySource()` reads `event.source` (a field that doesn't exist on the row) — every event's source resolves to `'other'`. Even once the field-name mismatch is fixed, `XP_SOURCE_LABELS` doesn't recognize several real `XpSourceType` values (`theory_read`, `quiz_correct`, `quiz_bonus`, `referral`), so those would still fall into "Other." Evidence: `lib/admin/analytics-service.ts` vs `lib/admin/analytics-aggregation.ts` vs `lib/xp/xp.ts`.
 - **Impact**: The Analytics workspace's XP-by-source breakdown chart is non-functional as shipped.
 
@@ -152,7 +170,7 @@
 - **Impact**: No automatic cleanup of old records currently happens; not urgent, but the scheduled job is currently dead weight.
 
 #### ISSUE-22: Email Quota Settings Partially Dead
-- **Status**: ⚪ Known Architectural Debt
+- **Status**: 🟢 Resolved (September 2026) — `retryDelayMinutes` is now read by the queue backoff and `dailySendLimit` writes through to the key the quota gate enforces. `hourlySendLimit` and `maxRetryAttempts` had no coherent runtime meaning (there is no hourly gate; attempts are per-priority), so their controls were removed instead of wired. See [`admin/platform-settings.md`](admin/platform-settings.md) §3.G.
 - **Description**: The admin Platform Settings UI exposes an `hourlySendLimit` and `maxRetryAttempts`, neither of which is read by the actual send/retry pipeline (`lib/notifications/queue/processor.ts`). Only the daily quota (`email_daily_send_limit`) has any real effect, and even that isn't enforced as a hard gate mid-batch.
 - **Impact**: Admins configuring these two settings will see no behavioral change. Low urgency, but worth fixing or removing the dead controls.
 

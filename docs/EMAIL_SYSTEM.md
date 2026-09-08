@@ -2,7 +2,7 @@
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Framework:** Next.js 16.2.12 / React Email / dual Brevo+Resend delivery  
-**Last Updated:** September 6, 2026  
+**Last Updated:** September 8, 2026  
 
 ---
 
@@ -52,9 +52,21 @@ Asynchronous emails are queued in `public.email_queue`:
 
 ### Quota Enforcement — Daily Only
 
-A **daily** send quota is enforced (`email_daily_send_limit` in `system_settings`, default `100`) via the atomic Postgres function `increment_daily_email_quota()`, checked in the queue processor **before** dispatch — until 2026-09-07 it was called *after* a successful send with its result discarded, so it tracked volume but never actually stopped anything (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). Despite an `hourlySendLimit` field existing in the admin Platform Settings UI, there is **no hourly enforcement anywhere in the send/retry pipeline** — it's a dead/cosmetic setting today (tracked in [`ISSUES_KNOWN.md`](ISSUES_KNOWN.md) ISSUE-22). Critical Auth emails (`auth.verify_email`, `auth.password_reset`, `auth.email_change_verify`) bypass the daily quota completely.
+A **daily** send quota (`email_daily_send_limit` in `system_settings`, default `100`) is enforced via the atomic Postgres function `increment_daily_email_quota()`, checked in the queue processor **before** dispatch. Critical Auth emails (`auth.verify_email`, `auth.password_reset`, `auth.email_change_verify`) bypass it entirely.
 
----
+There is **no hourly enforcement** anywhere in the pipeline. The `hourlySendLimit` field and the `GLOBAL_RATE_LIMITS.HOURLY_SEND_LIMIT` constant exist but nothing reads them; the admin control for it was removed in September 2026 rather than left implying enforcement.
+
+### Retry & Backoff
+
+- **Attempt count** is per-priority, taken from `PRIORITY_MATRIX` (`lib/notifications/constants.ts`) at enqueue time: 5 for `critical`, 3 for `high`/`medium`, 2 for `low`, 1 for `bulk`. There is **no global max-retry setting** — the `maxRetryAttempts` field is not read by the pipeline.
+- **Backoff** is exponential on an admin-configurable base: `2^attempt × retryDelayMinutes`, default 5 minutes (10m, 20m, 40m). `retryDelayMinutes` is read once per batch from the Email settings section.
+- `attempt_count` is incremented by `claim_email_queue_items()`. The non-RPC fallback claim (used only when that function is missing) increments it too, via a per-row compare-and-swap, and reports a `config_missing` incident so the absent migration is visible.
+
+### Dead Letters & Bounce Suppression
+
+- Items that exhaust `max_attempts` move to `dead_letter` and are copied into `email_dead_letter` **with** their `user_id`, `template_key` and template variables, so an operator can tell who was affected. Those variables are redacted before storage — see [ADR-005](decisions/ADR-005-sensitive-data-redaction.md).
+- `email.bounced` webhooks now add the recipient to `email_suppressions` with reason `hard_bounce`, alongside the existing `spam_complaint` suppression on `email.complained`. This is what stops the admin retry actions from re-sending to an address that already hard-bounced.
+- Admin retry actions (`retry-all`, `retry-selected`, single retry) clear `next_retry_at` and `processing_at` when requeueing. Without that the row stayed unclaimable by `claim_email_queue_items()` for the remainder of its backoff while the UI reported it as requeued.
 
 ## 4. Email Broadcast Campaign System (`/admin/emails`)
 
@@ -78,13 +90,27 @@ Admins can compose, estimate, test, schedule, and execute targeted email campaig
 
 ---
 
-## 6. Provider Resilience & Fallback
+## 6. Provider Resilience & Failover
 
-- **Provider Selection:** `PRIMARY_EMAIL_PROVIDER` (or the presence of `BREVO_API_KEY`) selects Brevo or Resend as primary. Both providers are called via raw `fetch` — neither is an installed SDK dependency.
-- **Fallback:** If the primary provider fails with a **transient** error (network exception, timeout, or 5xx), `lib/email.ts` automatically falls back to the other provider (Brevo→Resend or vice versa). It does **not** fall back on quota exhaustion, invalid recipient, or auth/config errors (4xx) — that distinction was added 2026-09-07 after an unconditional fallback was identified as a risk during a signup-abuse incident (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)).
-- **Webhook Bounce Handling:** Bounces/complaints arrive at `/api/email/webhooks`, which verifies **either** a Resend Svix HMAC signature **or** a Brevo shared-secret header, and logs structured delivery failure events.
+All outbound email resolves its primary provider through **one** shared function, `resolvePrimaryProvider()` (`lib/notifications/config.ts`). Order: explicit `PRIMARY_EMAIL_PROVIDER` → Brevo when `BREVO_API_KEY` is set → Resend when `RESEND_API_KEY` is set → Brevo. Both providers are called via raw `fetch`; neither SDK is a dependency.
 
----
+**Failover.** `sendEmailWithFailover()` (`lib/notifications/providers/index.ts`) sends on the primary and, when the failure is failover-eligible, retries **once** on the other provider — never a third attempt. The secondary is skipped unless it actually has credentials, because an unconfigured provider simulates success. `processEmailQueue()` dispatches through this helper; `lib/email.ts` keeps its own transport but applies the same classifier and resolver.
+
+**Classification** (`lib/notifications/providers/failure-classification.ts`):
+
+| Class | Statuses | Behaviour |
+|---|---|---|
+| `failover` | no HTTP response, 5xx, **402**, **408**, **429** | Try the other provider once |
+| `permanent` | 400, 401, 403, 404, 422 | Do not fail over — both would reject it |
+| `retry` | anything else | Retry this provider later |
+
+Capacity exhaustion (402/429) **is** failover-eligible. Until 2026-09-07 it was not, which meant an exhausted Brevo allowance took signup verification and password reset down while a healthy Resend key sat idle. Volume containment is enforced upstream by the daily quota gate and signup rate limiting, not by refusing to fail over. See [ADR-002](decisions/ADR-002-provider-failure-classification.md).
+
+**There is no circuit breaker.** Sustained double-provider failure raises a `critical` incident (`email.failover_exhausted`) but is not otherwise rate-limited.
+
+**Provider tracking.** `email_queue.provider` records which provider produced the outcome and `email_queue.provider_attempts` records every attempt with its status code and error (migration `20260907000001_email_provider_failover.sql`).
+
+**Webhook bounce handling.** Bounces and complaints arrive at `/api/email/webhooks`, which verifies either a Resend Svix HMAC signature or a Brevo shared-secret header. Both now write to `email_suppressions`.
 
 ## 7. Template Variable System & Admin Editor
 

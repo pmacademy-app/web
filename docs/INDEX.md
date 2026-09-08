@@ -2,9 +2,9 @@
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Framework:** Next.js 16.2.12 (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)  
-**Test Suite:** 100 Test Files · 1029 Unit & Integration Tests (100% Passing)  
-**Database Migrations:** 41 Versioned SQL Migrations in `supabase/migrations/`  
-**Last Updated:** September 6, 2026  
+**Test Suite:** 112 Test Files · 1177 Unit & Integration Tests (100% Passing)  
+**Database Migrations:** 43 Versioned SQL Migrations in `supabase/migrations/`  
+**Last Updated:** September 8, 2026  
 
 ---
 
@@ -12,8 +12,8 @@
 
 1. **Current Production Behavior** (Live deployed runtime behavior)
 2. **Current Source Code** (TypeScript routes, services, React components, compilation scripts)
-3. **Database Migrations & Schema** (41 SQL DDL files in `supabase/migrations/`)
-4. **Automated Unit & Integration Tests** (100 test files, 1029 passed unit tests in `apps/web/lib/__tests__/`)
+3. **Database Migrations & Schema** (43 SQL DDL files in `supabase/migrations/`)
+4. **Automated Unit & Integration Tests** (112 test files, 1177 passed unit tests in `apps/web/lib/__tests__/`)
 5. **Operating Manuals & Workspaces** (`docs/admin/*.md`)
 6. **Detailed Architectural Documentation** (`docs/*.md`)
 7. **Historical Implementation Records** (Previous session logs and stale plans)
@@ -38,6 +38,7 @@ All primary architectural documentation lives directly under `docs/`:
 | **Email Infrastructure**| [`EMAIL_SYSTEM.md`](EMAIL_SYSTEM.md) | Auth Hook, email queue, queue processor, Resend delivery, broadcasts, templates | 🟢 Current |
 | **Authentication** | [`AUTHENTICATION.md`](AUTHENTICATION.md) | Supabase Auth, signup flow, 60s rate limit, session bridge, platform settings | 🟢 Current |
 | **Error Monitoring** | [`ERROR_MONITORING.md`](ERROR_MONITORING.md) | `logSystemError()`, secret sanitization, 15m fingerprint dedup, alerts UI | 🟢 Current |
+| **Architecture Decisions** | [`decisions/`](decisions/) | ADRs for significant, expensive-to-reverse decisions (email failover, failure classification, config control plane, error taxonomy, redaction, API error contract) | 🟢 Current |
 | **Observability** | [`OBSERVABILITY.md`](OBSERVABILITY.md) | Resend usage vs application quota, queue/delivery metrics, telemetry sources | 🟢 Current |
 | **Database & Schema** | [`DATABASE.md`](DATABASE.md) | PostgreSQL schema, 41 migration files, table definitions, RLS policies, types | 🟢 Current |
 | **Security & RBAC** | [`SECURITY.md`](SECURITY.md) | Threat model, RBAC authorization, webhook HMAC signatures, secret safety | 🟢 Current |

@@ -107,5 +107,5 @@ Notable naming/structure notes:
 ## 5. Known Architectural Debt
 
 - **Custom session bridge vs. `@supabase/ssr`:** Auth session sync uses custom `sb-access-token`/`sb-refresh-token` cookies via `proxy.ts` and `AuthStateListener.tsx`, rather than the official `@supabase/ssr` package (not a dependency). Server components cannot auto-refresh expired tokens; see [`docs/ISSUES_KNOWN.md`](ISSUES_KNOWN.md).
-- **Dual email-provider quota settings are partially dead code:** an `hourlySendLimit` and `maxRetryAttempts` exist in the admin Platform Settings UI but are not actually read by the send/retry pipeline — only the daily quota has any effect. See [`docs/EMAIL_SYSTEM.md`](EMAIL_SYSTEM.md).
+- **Email send limits:** only the daily quota is enforced, as a pre-dispatch gate in `processEmailQueue()`. There is no hourly limit and no global max-retry setting; retry attempts are per-priority from `PRIORITY_MATRIX`. The corresponding admin controls were removed in September 2026 rather than left implying enforcement. See [`docs/EMAIL_SYSTEM.md`](EMAIL_SYSTEM.md).
 - **`/api/cron/cleanup` is a placeholder:** it always returns `{ cleanedRows: 0 }` and performs no actual cleanup today, despite being scheduled. See [`docs/CRON_AND_SCHEDULING.md`](CRON_AND_SCHEDULING.md).

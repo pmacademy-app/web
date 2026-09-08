@@ -63,6 +63,8 @@ All database schema definitions are managed through versioned SQL DDL migration 
 | `20260830000001_add_is_fellow_column.sql` | `is_fellow` boolean column on `public.users` (PM Fellow designation) |
 | `20260905000001_create_fellow_requests.sql` | `public.fellow_requests` — pending/approved/rejected state machine for the learner-initiated Fellow request flow (one-pending-per-user unique index) |
 | `20260906000001_add_portfolio_verification_override.sql` | `portfolio_verification_override text CHECK (IN ('verified','rejected'))` on `public.users` — admin override for Automatic Portfolio Verification |
+| `20260907000001_email_provider_failover.sql` | `email_queue.provider`, `email_queue.provider_attempts` — provider failover tracking |
+| `20260908000001_error_taxonomy.sql` | `system_errors` taxonomy columns (`domain`, `kind`, `retryability`, `next_action`, `occurrence_count`, `first_seen_at`); widens the `category` CHECK to accept `brevo` and domain values |
 
 ---
 
@@ -97,10 +99,10 @@ This section reflects the current `public` schema as generated in `apps/web/type
 - **`public.referrals`** — Referral attributions (`id`, `referrer_id`, `referred_user_id`, `status`, `created_at`, `rewarded_at`).
 
 ### Communication & Broadcasts
-- **`public.email_queue`** — Asynchronous transactional email queue.
+- **`public.email_queue`** — Asynchronous transactional email queue. Carries `provider` (which provider produced the outcome) and `provider_attempts` (every attempt with status code and error, at most two — primary plus one failover), added by `20260907000001_email_provider_failover.sql`.
 - **`public.email_broadcasts`** — Targeted email campaigns (`id`, `title`, `audience_filter`, `status`, `sent_count`).
-- **`public.email_dead_letter`** — Permanently-failed email records after exhausting retries.
-- **`public.email_suppressions`** — Addresses excluded from future sends (bounces/unsubscribes).
+- **`public.email_dead_letter`** — Permanently-failed email records after exhausting retries. Retains `user_id`, `template_key` and template variables so an operator can tell who was affected; the variables are redacted before storage, so a dead-lettered auth email cannot be replayed with its original one-time token.
+- **`public.email_suppressions`** — Addresses excluded from future sends. Written on `email.complained` (`spam_complaint`) and on `email.bounced` (`hard_bounce`); the bounce case is what stops admin retry actions from re-sending to an address that already hard-bounced.
 - **`public.email_delivery_events`** / **`public.notification_events`** — Delivery/audit event logs (not a single `notification_delivery_events` table as previously documented — these are two distinct tables).
 - **`public.in_app_broadcasts`** — Targeted in-app notification campaigns.
 - **`public.in_app_notifications`** — In-app notification inbox. (Previously mislabeled `notifications`.)
@@ -119,7 +121,7 @@ This section reflects the current `public` schema as generated in `apps/web/type
 
 ### Platform & Observability Tables
 - **`public.system_settings`** — JSONB platform configuration (product, learning, email, notifications, feature flags, onboarding).
-- **`public.system_errors`** — Error logs, deduplicated by `fingerprint` (category:operation:sanitized-message). Severity is one of `critical` / `error` / `warning` only — there is no `info` level, and there are no `occurrence_count`/`last_seen_at` columns; occurrence counts shown in the admin UI are computed by grouping rows by `fingerprint` at query time, not stored. See [`docs/ERROR_MONITORING.md`](ERROR_MONITORING.md).
+- **`public.system_errors`** — Operational failure log. Classified by `domain` / `kind` / `retryability` with `severity` **derived from `kind`** (`critical` / `error` / `warning`; there is no `info` level). Deduplicated by `fingerprint` (`domain:kind:operation:stabilizedSummary`) inside a 15-minute window, incrementing the stored **`occurrence_count`**; `first_seen_at` records the first occurrence. `next_action` carries operator guidance. Added by `20260908000001_error_taxonomy.sql`, which also widens the `category` CHECK to accept `brevo` and the domain values — the previous constraint silently rejected every Brevo failure. See [`docs/ERROR_MONITORING.md`](ERROR_MONITORING.md).
 - **`public.admin_audit_logs`** — Immutable record of admin operations.
 - **`public.rate_limits`** — Persistent rate limiting records.
 

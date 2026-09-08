@@ -120,3 +120,30 @@ Settings → Security → Change Email reuses Supabase Auth's native email-chang
 | **Persistent 60s Rate Limiter** | `lib/rate-limit.ts`, `public.rate_limits` | 🟢 Verified in Production |
 | **Supabase Auth Hook Handler** | `app/api/auth/send-email-hook/route.ts` | 🟢 Verified in Production |
 | **Email Change & `/email-verified` Flow** | `app/api/settings/security/change-email/route.ts`, `app/api/auth/callback/route.ts`, `app/(auth)/email-verified/page.tsx` | 🟢 Verified in Production |
+
+---
+
+## API Error Response Contract
+
+Every auth API error uses one additive shape. `error` is a **string** and `code` is top-level, because the auth screens read `json.error` and re-classify it and `ResendVerificationCard` branches on `data.code`:
+
+```json
+{ "success": false, "error": "<safe message>", "code": "<stable code>", "errorId": "err_…" }
+```
+
+- **`error`** is always copy we wrote. Raw exception, provider and database text never reaches a client. Unexpected failures return generic copy plus an `errorId` that correlates to a `system_errors` incident.
+- **`code`** is stable and machine-readable — either an `AuthErrorCode` from `lib/auth/errors.ts` or a platform code (`VALIDATION`, `SIGNUPS_DISABLED`, `SERVER_ERROR`).
+- **`errorId`** appears only for unexpected server failures; the auth screens render it so a learner can quote it to support.
+- Route-specific fields (`requiresVerification`, `email`) are unchanged.
+
+Helpers live in `apps/web/lib/errors/api-response.ts`. On the client, `resolveApiAuthError()` reads the server's stable code rather than re-deriving one from the message. Provider errors are routed through the existing `classifyAuthError()` classifier so auth keeps one classification system.
+
+HTTP statuses are unchanged: `400` validation and provider rejection, `401` expired recovery link, `403` signups disabled, `409` user exists, `500` unexpected.
+
+The `updatePasswordAction` server action follows the same contract — its return value is serialized to the browser, so it returns classifier copy and a code rather than the GoTrue message.
+
+See [ADR-006](decisions/ADR-006-api-error-response-contract.md).
+
+## Auth Email Delivery Failures
+
+Delivery failures on `/api/auth/send-email-hook` and in `lib/email.ts` are recorded as structured incidents (`domain: auth` / `domain: email`) with the masked recipient, `email_action_type`, provider and status code. Until September 2026 this path emitted only `console.error`, so signup verification and password reset could fail with no admin-visible signal. See [`ERROR_MONITORING.md`](ERROR_MONITORING.md).

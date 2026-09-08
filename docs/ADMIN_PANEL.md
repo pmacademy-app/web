@@ -147,15 +147,15 @@ Note: `is_fellow` (Fellow designation) is granted via **either** the `portfolios
 - **Health Tab:** Real-time database latency, auth service health, email provider connection, queue health, and cron status.
 - **Auth Health:** 24h/7d auth failure telemetry with provider-vs-network failure buckets and spike detection (≥5 critical/error failures in 15 min) — not previously documented here.
 - **Storage Cleanup:** Triggers `AvatarService.cleanupOrphanedAvatars()` (dry-run or live) — not previously documented here.
-- **Alerts Tab:** Active system alerts grouped by severity — `critical`, `error`, or `warning` only (there is no `info` severity anywhere in the pipeline).
-- **Errors Tab:** System error logs deduplicated by fingerprint (category:operation:sanitized-message). Occurrence counts shown are computed by grouping rows at query time, not stored as an incrementing column.
+- **Alerts Tab:** Active system alerts by severity — `critical`, `error` or `warning` only (there is no `info` severity), with severity derived from the failure `kind`. Facets on kind, retryability and provider are applied client-side over the loaded window. Each alert shows its occurrence count, first-seen time, operator next action, and a context row (template, queue, user, masked recipient, provider status). A failed query renders an error state, never the empty "no alerts" state.
+- **Errors Tab:** System error logs deduplicated by fingerprint (`domain:kind:operation:stabilizedSummary`) inside a 15-minute window, incrementing the stored `occurrence_count` column.
 - **Audit Log Tab:** Searchable and filterable log of all admin mutations recorded in `public.admin_audit_logs`.
 - **Manual Trigger:** Header action button to trigger instant email queue processing (`POST /api/cron/process-email-queue`).
 
 ### 3.9 Settings Workspace (`/admin/settings`)
 - **Product Settings:** Platform name, contact email, Maintenance Mode toggle, Allow Signups toggle, Require Email Verification toggle, session timeout.
 - **Learning Settings:** Runtime XP awards (lesson completion, quiz pass, flashcard review, reflection), streak freeze cost, pass thresholds.
-- **Email Settings:** Sender name/email, daily/hourly send limits, retry policies, and API key status.
+- **Email Settings:** Daily send limit and retry backoff (both enforced by the queue), plus read-only sender identity and API-key status. The hourly limit, max-retry and editable sender fields were removed in September 2026 because nothing read them — see [`admin/platform-settings.md`](admin/platform-settings.md) §3.G.
 - **Notification Settings:** Daily reminder defaults, weekly recap schedule, default delivery channels.
 - **Feature Flags:** Dynamic boolean/percentage feature flags stored in `system_settings`.
 - **Onboarding Settings:** Structured goal options, recommended starting modules, and badge assignments.
@@ -170,7 +170,7 @@ Note: `is_fellow` (Fellow designation) is granted via **either** the `portfolios
 | **API Authorization** | `requireAdminUser(request)` in `lib/admin/guard.ts` validates session & role (imports helpers from `lib/admin/authorization.ts`) |
 | **Audit Trail** | `logAdminAction()` records admin email, IP/user agent, action name, and JSON payload |
 | **Service Role Client** | Server-only Supabase service-role client initialized strictly inside protected Route Handlers |
-| **Secret Sanitization** | `sanitizeErrorMessage()` (`lib/monitoring/logger.ts`) strips API keys, tokens, and authorization headers from the error `message` string before logging — the `details` object passed to `logSystemError()` is stored unsanitized |
+| **Secret Sanitization** | `lib/monitoring/redaction.ts` redacts messages **and** `details` recursively, by value shape and by key name, before anything is persisted. Covers provider keys, webhook secrets, JWTs, database credentials, session tokens and one-time auth tokens; emails are masked. See [ADR-005](decisions/ADR-005-sensitive-data-redaction.md) |
 | **Search Engine Directives** | Admin routes emit `robots: { index: false, follow: false }` |
 
 ---
