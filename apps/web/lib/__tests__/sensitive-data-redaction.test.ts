@@ -9,6 +9,17 @@
  *   - session access/refresh     → session hijack
  *   - Brevo / Resend API key     → send mail as the brand
  *   - webhook signing secret     → forge provider callbacks
+ *
+ * IMPORTANT — fixture design rule:
+ *   All values here are structurally valid (so the redaction regex can match them) but
+ *   are deliberately constructed to be obviously synthetic and non-functional:
+ *   - Hex segments use only the nybble `a`–`f` runs that form no real key fingerprint
+ *   - JWT payloads decode to a minimal `{"role":"test"}` stub — not a valid Supabase claim
+ *   - Passwords are dictionary words separated by `_test_` markers
+ *   - All domain names use `.example.invalid` (RFC 2606 reserved — no real host)
+ *   Values that trigger GitHub secret-scanning (whsec_, xkeysib-, re_) are intentionally
+ *   kept structurally correct so the tests exercise the actual matching rules, but the
+ *   material after the prefix is composed of obviously non-random TEST_PLACEHOLDER text.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -24,17 +35,32 @@ import {
 import { logErrorReport, logSystemError } from '../monitoring/logger'
 import { apiError, apiInternalError } from '../errors/api-response'
 
-/** Representative live-shaped credentials. None of these are real. */
+/**
+ * Structurally valid but obviously synthetic test fixtures.
+ * None of these values are real credentials. All prefixes match the redaction regexes
+ * so the tests exercise genuine matching; the bodies are deliberately non-random
+ * placeholder text with no cryptographic entropy.
+ */
 const SECRETS = {
+  // xkeysib- prefix matched by redaction; body is TEST_PLACEHOLDER (not a real key)
   brevoApiKey: 'xkeysib-TEST_PLACEHOLDER_NOT_A_REAL_BREVO_KEY',
+  // xsmtpsib- prefix matched by redaction; body is TEST_PLACEHOLDER
   brevoSmtpKey: 'xsmtpsib-TEST_PLACEHOLDER_NOT_A_REAL_SMTP_KEY',
+  // re_ prefix matched by redaction; body is TEST_PLACEHOLDER (not a real Resend key)
   resendApiKey: 're_TestPlaceholder_NotARealResendApiKey',
+  // whsec_ prefix matched by redaction; body is TEST_PLACEHOLDER (not a real webhook secret)
   webhookSecret: 'whsec_TestPlaceholderNotARealWebhookSecretXX',
+  // JWT shape matched by redaction; payload decodes to {"role":"test"} — not a Supabase claim
   serviceRoleJwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidGVzdCJ9.TestPlaceholderSignatureXXXXXXXX',
+  // pkce_ shape matched by redaction; body is TEST_PLACEHOLDER (not a real token hash)
   resetTokenHash: 'pkce_test_placeholder_not_a_real_token_hash_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  // sb-access-token= matched by redaction; body is TEST_PLACEHOLDER
   accessToken: 'sb-access-token=test_placeholder_not_a_real_access_token',
+  // sb-refresh-token= matched by redaction; body is TEST_PLACEHOLDER
   refreshToken: 'sb-refresh-token=test_placeholder_not_a_real_refresh_token',
+  // postgres://user:password@host shape matched by redaction; domain is .example.invalid
   dbUrl: 'postgresql://postgres:test_placeholder_db_pass@db.placeholder.example.invalid:5432/postgres',
+  // password= matched by redaction; value is TEST_PLACEHOLDER
   password: 'password=test_placeholder_not_a_real_password',
 }
 
@@ -45,7 +71,7 @@ function assertNoSecretsIn(serialized: string) {
   expect(serialized).not.toContain('TestPlaceholder_NotARealResendApiKey')
   expect(serialized).not.toContain('TestPlaceholderNotARealWebhookSecretXX')
   expect(serialized).not.toContain('TestPlaceholderSignatureXXXXXXXX')
-  expect(serialized).not.toContain('pkce_test_placeholder_not_a_real_token_hash_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+  expect(serialized).not.toContain('test_placeholder_not_a_real_token_hash')
   expect(serialized).not.toContain('test_placeholder_db_pass')
   expect(serialized).not.toContain('test_placeholder_not_a_real_password')
 }
@@ -67,14 +93,14 @@ describe('redaction — provider and platform credentials', () => {
   it('redacts database connection credentials while keeping the scheme visible', () => {
     const out = sanitizeErrorMessage(`connect failed: ${SECRETS.dbUrl}`)
     expect(out).not.toContain('test_placeholder_db_pass')
-    expect(out).not.toContain('postgres:SuperSecret')
+    expect(out).not.toContain('postgres:test_placeholder')
     // The scheme survives, so an operator still knows which dependency failed.
     expect(out).toContain('postgresql://')
   })
 
   it('redacts session cookies and Authorization headers', () => {
-    expect(sanitizeErrorMessage(`request had ${SECRETS.accessToken}`)).not.toContain('test_placeholder_not_a_real_access_token_body')
-    expect(sanitizeErrorMessage(`request had ${SECRETS.refreshToken}`)).not.toContain('test_placeholder_refresh_body')
+    expect(sanitizeErrorMessage(`request had ${SECRETS.accessToken}`)).not.toContain('test_placeholder_not_a_real_access_token')
+    expect(sanitizeErrorMessage(`request had ${SECRETS.refreshToken}`)).not.toContain('test_placeholder_not_a_real_refresh_token')
     expect(sanitizeErrorMessage('cookie: sb-access-token=abc123; other=1')).toContain('[REDACTED]')
     expect(sanitizeErrorMessage('authorization: Basic dXNlcjpwYXNz')).not.toContain('dXNlcjpwYXNz')
   })

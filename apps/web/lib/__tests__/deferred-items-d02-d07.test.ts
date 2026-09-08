@@ -38,10 +38,10 @@ describe('D-02 — admin error messages keep the diagnostic, drop the secret', (
   })
 
   it.each([
-    ['Brevo key', 'send rejected for xkeysib-TEST_PLACEHOLDER_BREVO_KEY', '0a1b2c3d4e5f6071'],
-    ['Resend key', 'auth failed with re_TestPlaceholderResendKey', '9aBcDeFg_HiJkLmNoPq'],
-    ['bearer token', 'upstream said Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.TestSig', 'eyJhbGciOiJIUzI1NiJ9'],
-    ['webhook secret', 'signature mismatch for whsec_TestPlaceholderWebhookXX', 'MfKQ9r8sT2uV5wX7'],
+    ['Brevo key', 'send rejected for xkeysib-TEST_PLACEHOLDER_BREVO_KEY', 'TEST_PLACEHOLDER_BREVO_KEY'],
+    ['Resend key', 'auth failed with re_TestPlaceholderResendKey', 'TestPlaceholderResendKey'],
+    ['bearer token', 'upstream said Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.TestSig', 'eyJzdWIiOiJ0ZXN0In0'],
+    ['webhook secret', 'signature mismatch for whsec_TestPlaceholderWebhookXX', 'TestPlaceholderWebhookXX'],
   ])('redacts a %s from an admin response message', (_label, raw, secretPart) => {
     expect(adminErrorMessage(new Error(raw), 'Failed')).not.toContain(secretPart)
   })
