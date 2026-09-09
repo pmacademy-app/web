@@ -8,6 +8,7 @@ import { CertificateActions } from '@/components/certificates/CertificateActions
 import { VerificationBadge } from '@/components/certificates/VerificationBadge'
 import { Award, AlertCircle, ArrowLeft, BookOpen, Layers, Zap, User } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 
 interface PageProps {
   params: Promise<{ certificateId: string }>
@@ -99,7 +100,7 @@ export default async function CertificateVerificationPage({ params }: PageProps)
       {/* Schema.org Credential JSON-LD */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(credentialJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(credentialJsonLd) }}
       />
 
       <div className="max-w-5xl mx-auto space-y-8">

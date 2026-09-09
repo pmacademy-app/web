@@ -21,6 +21,7 @@ import { getServerUser } from '@/lib/auth'
 import { isLessonUnlocked } from '@/lib/lessons-completion-service'
 import { getCanonicalPrerequisiteRange } from '@/lib/curriculum-access'
 import { BRAND } from '@/lib/brand'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import LessonPageContent from './lesson-content'
 
 interface PageProps {
@@ -339,7 +340,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
       {articleJsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(articleJsonLd) }}
         />
       )}
       <LessonPageContent

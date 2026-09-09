@@ -7,6 +7,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AuthStateListener from '@/components/layout/AuthStateListener'
 import { BRAND } from '@/lib/brand'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import '@/app/globals.css'
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
@@ -129,11 +130,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(orgSchema) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(siteSchema) }}
         />
       </head>
       <body>

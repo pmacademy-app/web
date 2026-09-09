@@ -5,6 +5,8 @@ import { ReviewsExplorer, type PublishedTestimonial } from '@/components/marketi
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 import { ArrowRight } from 'lucide-react'
 
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const metadata: Metadata = {
@@ -65,7 +67,7 @@ export default async function ReviewsPage() {
     <div className="min-h-screen bg-background">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
 
       <main className="container mx-auto px-5 lg:px-8 pt-24 pb-20 lg:pt-32 lg:pb-28 max-w-6xl space-y-12">

@@ -197,16 +197,65 @@ promote.
 
 ---
 
-## B2 — Public Portfolio XSS / Untrusted JSON Serialization — ⬜ **NEXT**
+## B2 — Public Portfolio XSS / Untrusted JSON Serialization — ✅ **Complete in code**
 
-**Not implemented.** No code for this batch exists on either branch.
+**Primary finding:** S2-C3 (plan reference: I-12).
+**Objective:** Prevent stored XSS breakouts on public portfolios (`/p/[username]`) and across all structured data JSON-LD contexts by escaping script-closing sequences (`</script>`, `</SCRIPT>`, `</ScRiPt>`, etc.) and enforcing URL validation and length boundaries on user-supplied profile data.
 
-- **Primary finding:** S2-C3 (plan reference: I-12).
-- **Objective:** escape `</script>` sequences in `JSON.stringify` output embedded in
-  public portfolio pages, and validate URL schemes on learner-supplied profile links.
-- **Why it is still next:** the incident work touched the email and abuse-control
-  surface only. It neither fixed nor blocked S2-C3, and nothing discovered during the
-  2026-09-10 reconciliation changes B2's priority or scope.
+### 1. Root Cause & Vulnerable Data Flow
+
+- **Vulnerability:** User-controlled profile fields (`bio`, `name`, `username`, social links) were serialized directly into `<script type="application/ld+json">` elements via `dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}`.
+- **Root Cause:** Standard JavaScript `JSON.stringify()` does not escape `<`, `>`, or `&`. In an HTML script-data state, any literal `</script>` sequence (case-insensitive) terminates the script block immediately, allowing subsequent characters to execute as arbitrary HTML/JavaScript in the learner or visitor's browser context.
+- **Write Boundary Exposure:** `/api/settings/profile` previously lacked schema length validation and protocol constraints on social links (`linkedin_url`, `github_url`, `website_url`), permitting dangerous URI schemes (`javascript:`, `data:`, `vbscript:`) and accepting `avatar_url` directly outside the dedicated avatar upload handler (`/api/user/avatar`).
+
+### 2. Implementation
+
+1. **Centralized Safe JSON-LD Serializer:** [`apps/web/lib/seo/safe-json-ld.ts`](../apps/web/lib/seo/safe-json-ld.ts)
+   - Created `safeJsonLd(data: unknown): string` and `safeJsonStringify(data: unknown): string`.
+   - Uses RFC 8259 Unicode escaping to replace `<`, `>`, `&`, `\u2028`, and `\u2029` with `\u003c`, `\u003e`, `\u0026`, `\u2028`, and `\u2029`.
+   - **Security Invariant:** Eliminates literal `<` and `>` from the rendered HTML source while preserving exact JSON semantics when parsed by search engines and browsers (`JSON.parse` recovers identical original strings).
+2. **Audit & Hardening of All 14 JSON-LD Script Contexts:**
+   - Public Portfolio: `apps/web/app/(portfolio)/p/[username]/page.tsx` (`profilePageJsonLd`)
+   - Certificate Verification: `apps/web/app/verify/[certificateId]/page.tsx` (`credentialJsonLd`)
+   - Root Layout Schemas: `apps/web/app/layout.tsx` (`orgSchema`, `siteSchema`)
+   - Marketing FAQ Component & Page: `apps/web/components/marketing/sections/faq.tsx` & `apps/web/app/(marketing)/faq/page.tsx` (`faqJsonLd`)
+   - Marketing Reviews: `apps/web/app/(marketing)/reviews/page.tsx` (`jsonLd`)
+   - Marketing Lessons: `apps/web/app/(marketing)/lessons/[slug]/page.tsx` (`lessonSchema`, `breadcrumbSchema`)
+   - Marketing Frameworks: `apps/web/app/(marketing)/frameworks/page.tsx` (`jsonLd`)
+   - Marketing Curriculum: `apps/web/app/(marketing)/curriculum/page.tsx` (`courseSchema`)
+   - Marketing About: `apps/web/app/(marketing)/about/page.tsx` (`aboutSchema`)
+   - Academy Lesson & Catalog: `apps/web/app/(app)/academy/[moduleSlug]/[lessonId]/page.tsx` (`articleJsonLd`) & `apps/web/app/(app)/academy/page.tsx` (`courseJsonLd`)
+3. **Profile Settings Write Boundary Hardening:** [`apps/web/app/api/settings/profile/route.ts`](../apps/web/app/api/settings/profile/route.ts)
+   - Added Zod validation `profileUpdateSchema`:
+     - `name`: max 100 characters.
+     - `bio`: max 500 characters.
+     - `linkedin_url`, `github_url`, `website_url`: max 500 characters, protocol strictly restricted to `http:` or `https:` using `validateOptionalUrl()`. Rejects `javascript:`, `data:`, `vbscript:`.
+     - `avatar_url`: excluded from profile POST update (avatar upload is strictly governed through `/api/user/avatar` with 2MB size cap and image MIME-type whitelist).
+4. **UI Defense-in-Depth:**
+   - `apps/web/components/settings/ProfileSettingsTab.tsx`: removed `avatar_url` from form submit payload.
+   - `apps/web/components/portfolio/PortfolioHero.tsx`: added `validateOptionalUrl()` guards before rendering social link `<a href="...">` anchors.
+
+### 3. Verification & Results
+
+- **Unit & Security Regression Test Suite:** [`apps/web/lib/__tests__/safe-json-ld.test.ts`](../apps/web/lib/__tests__/safe-json-ld.test.ts) (14 tests passed)
+  - `</script><script>alert(1)</script>` injection breakout prevention.
+  - Case variations (`</SCRIPT>`, `</ScRiPt>`) breakout prevention.
+  - HTML tag injection payloads (`</script><img src=x onerror=alert(1)>`).
+  - Escaping of `<`, `>`, `&`, `\u2028`, `\u2029`.
+  - Full semantic preservation of complex user bios, newlines, and emojis.
+  - Rejection of `javascript:`, `data:`, `vbscript:` URLs and oversized payload fields.
+- `npm run test:portfolio`: Passed (6 tests)
+- `npm run test:seo`: Passed (27 tests)
+- `npm run test:settings`: Passed (6 tests)
+- `npm run test`: Passed (119 test files, 1,273 tests passed, 0 failures)
+- `npm run typecheck`: Passed (0 errors)
+- `npm run lint`: Passed (0 errors, 34 warnings)
+- `npm run build`: Passed (All 225 pages compiled and optimized successfully)
+
+### 4. Remaining Limitations & Environment Note
+
+- **Database Content:** Existing stored database records were not mutated or stripped. Output-context sanitization ensures all existing and future user data renders safely.
+- **Production Deployment:** All changes are committed to `implementation/prodily-hardening` and tested locally; deployment to staging/production remains pending.
 
 ---
 
@@ -220,8 +269,8 @@ messages. "Plan ref" points at the batch specification in
 |---|---|---|---|
 | **B0** — baseline | — | ✅ Complete | |
 | **B1** — database / security exposure | I-02 | ✅ Complete in code | Migration unapplied |
-| **B2** — portfolio XSS | I-12 | ⬜ **Next** | S2-C3 untouched |
-| **B3** — session/token architecture | I-06, I-07 | ⬜ Outstanding | Unaffected by the incident |
+| **B2** — portfolio XSS | I-12 | ✅ Complete in code | S2-C3 resolved; 14 JSON-LD sites hardened |
+| **B3** — session/token architecture | I-06, I-07 | ⬜ **Next** | Unaffected by the incident |
 | **B4** — email gateway + signup ordering | I-04 | 🟡 **Largely delivered by `10a21a5`** | See below |
 | **B5** — atomic rate limiting + abuse controls | I-03 | 🟡 **Largely delivered by `10a21a5`** | See below |
 | **B6** — provider failover + email reliability | I-04, I-05 | 🟡 **Partially delivered by `10a21a5`** | See below |

@@ -8,6 +8,7 @@ import { getServerUser } from '@/lib/auth'
 import { BRAND } from '@/lib/brand'
 import { resolvePersonalizedPath } from '@/lib/personalization/path-resolver'
 import { resolveModuleCtaTarget } from '@/lib/curriculum-access'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 
 export const metadata: Metadata = {
   title: 'Curriculum',
@@ -169,7 +170,7 @@ export default async function AcademyPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(courseJsonLd) }}
       />
     <div className="container mx-auto px-4 py-8 max-w-5xl space-y-8">
       {/* Page Header */}

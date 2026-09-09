@@ -74,7 +74,6 @@ export function ProfileSettingsTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
-          avatar_url: formData.avatarUrl,
           bio: formData.bio,
           linkedin_url: formData.linkedinUrl,
           github_url: formData.githubUrl,

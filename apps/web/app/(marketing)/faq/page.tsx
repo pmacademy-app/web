@@ -4,6 +4,7 @@ import { BRAND } from '@/lib/brand'
 import { FAQ_ITEMS } from '@/config/content'
 import { FAQExplorer } from '@/components/marketing/faq-explorer'
 import { ArrowRight, MessageCircle } from 'lucide-react'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
@@ -55,7 +56,7 @@ export default function FAQPage() {
     <div className="min-h-screen bg-background">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(faqJsonLd) }}
       />
 
       <main className="container mx-auto px-5 lg:px-8 pt-24 pb-20 lg:pt-32 lg:pb-28 max-w-4xl space-y-12">

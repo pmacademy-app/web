@@ -80,4 +80,30 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
       expect(updated.level).toBe(1)
     })
   })
+
+  describe('Profile Settings API Hardening', () => {
+    it('rejects unauthenticated requests to POST /api/settings/profile with 401', async () => {
+      const { POST } = await import('../../app/api/settings/profile/route')
+      const request = new Request('http://localhost:3000/api/settings/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Test' }),
+      })
+
+      const response = await POST(request)
+      expect(response.status).toBe(401)
+      const data = await response.json()
+      expect(data.error).toContain('Unauthorized')
+    })
+
+    it('rejects unauthenticated requests to GET /api/settings/profile with 401', async () => {
+      const { GET } = await import('../../app/api/settings/profile/route')
+      const request = new Request('http://localhost:3000/api/settings/profile', {
+        method: 'GET',
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(401)
+    })
+  })
 })
