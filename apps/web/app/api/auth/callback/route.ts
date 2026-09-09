@@ -2,6 +2,24 @@ import { type EmailOtpType, createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
+import { applyPendingReferral } from '@/lib/referral/referral-service'
+
+/**
+ * Redeems a referral code that was recorded at signup and deliberately deferred.
+ *
+ * Never allowed to fail the verification itself: a learner confirming their address
+ * must land in the app whatever the referral system says.
+ */
+async function redeemPendingReferral(
+  supabase: Parameters<typeof applyPendingReferral>[0],
+  user: Parameters<typeof applyPendingReferral>[1],
+): Promise<void> {
+  try {
+    await applyPendingReferral(supabase, user)
+  } catch (err) {
+    console.warn('[auth/callback] Pending referral attribution failed (non-fatal):', err)
+  }
+}
 
 /** Attach the Supabase session as HTTP-only cookies on a redirect response. */
 function redirectWithSession(
@@ -62,6 +80,7 @@ export async function GET(request: NextRequest) {
 
       if (!error && data.user && data.session) {
         await ensureUserProfile(supabase, data.user)
+        await redeemPendingReferral(supabase, data.user)
         return redirectWithSession(destination, data.session)
       }
     } catch (err) {
@@ -92,6 +111,9 @@ export async function GET(request: NextRequest) {
         // Skip ensureUserProfile for recovery — the user already exists
         if (type !== 'recovery') {
           await ensureUserProfile(supabase, data.user)
+          // Verification is the registration milestone under Flow A, so this is where
+          // a referral code supplied at signup is finally redeemed.
+          await redeemPendingReferral(supabase, data.user)
         }
 
         // Supabase Auth's email_change confirmation updates `auth.users.email`

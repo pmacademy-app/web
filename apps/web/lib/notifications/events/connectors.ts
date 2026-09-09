@@ -69,6 +69,10 @@ export function initializeNotificationConnectors(force: boolean = false): void {
       eventType: event.event,
       category: 'security',
       priorityLevel: 'high',
+      // Exactly one welcome email per learner, enforced by a unique index rather than
+      // by a prior SELECT. The old check read `email_queue` and then inserted, so two
+      // concurrent registrations both saw "none" and both queued one.
+      idempotencyKey: `welcome:${event.userId}`,
     })
   })
 

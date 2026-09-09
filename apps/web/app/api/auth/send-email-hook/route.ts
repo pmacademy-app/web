@@ -2,7 +2,9 @@ import { NextRequest } from 'next/server'
 import crypto from 'crypto'
 import { BRAND } from '@/lib/brand'
 import { renderEmailTemplate } from '@/emails'
-import { sendEmail, maskEmail } from '@/lib/email'
+import { maskEmail } from '@/lib/email'
+import { sendGovernedEmail, type GovernedEmailPurpose } from '@/lib/email-governance'
+import { getClientIpBucket } from '@/lib/security/client-ip'
 import { buildAuthCallbackUrl } from '@/lib/auth-url'
 
 export const runtime = 'nodejs'
@@ -174,6 +176,44 @@ function jsonResponse(data: object, status = 200) {
   })
 }
 
+/**
+ * Maps a GoTrue action type onto the governed purpose that decides which controls
+ * and which rate-limit budget apply.
+ *
+ * An unrecognized action is treated as `auth.verify_email`, matching the template
+ * fallback below — an unknown action must land in a *metered* bucket, never in an
+ * unmetered default.
+ */
+function purposeForAction(actionType: string): GovernedEmailPurpose {
+  switch (actionType) {
+    case 'recovery':
+      return 'auth.password_reset'
+    case 'email_change':
+    case 'email_change_current':
+    case 'email_change_new':
+      return 'auth.email_change_verify'
+    case 'invite':
+      return 'auth.invite'
+    case 'reauthentication':
+      return 'auth.reauthentication'
+    default:
+      return 'auth.verify_email'
+  }
+}
+
+/**
+ * Derives a stable, non-reversible fingerprint of the one-time token.
+ *
+ * The token itself is a live credential. It is used here only to distinguish "the
+ * same verification email, redelivered" from "a new verification request", and the
+ * resulting idempotency key is persisted in `email_send_ledger`, so the raw value
+ * must not survive into it.
+ */
+function fingerprintToken(tokenHash: string): string {
+  if (!tokenHash) return 'no-token'
+  return crypto.createHash('sha256').update(tokenHash).digest('hex').slice(0, 32)
+}
+
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
@@ -326,16 +366,45 @@ export async function POST(request: NextRequest) {
     return jsonResponse({ error: `Template render failure: ${err instanceof Error ? err.message : 'Unknown'}` }, 500)
   }
 
-  // 5. Send email via Resend integration
-  const sendResult = await sendEmail({
+  // 5. Send through the governed gateway.
+  //
+  // This hook used to call `sendEmail()` directly, which is how untrusted signup
+  // traffic reached a paid provider with no quota, kill switch, deduplication or rate
+  // limit in the way. Supabase Auth invokes it for every `auth.signUp()` and
+  // `auth.resend()`, none of which require a `public.users` row to exist — so the
+  // application's own email governance never saw the sends that spent the credits.
+  const purpose = purposeForAction(actionType)
+  const masked = maskEmail(toEmail)
+
+  const sendResult = await sendGovernedEmail({
+    purpose,
     to: toEmail,
     subject: rendered.subject,
     html: rendered.html,
     text: rendered.text,
+    // Identity of the message, not of the request: the same user + action + token is
+    // the same email, so a redelivered hook call is deduplicated while a genuinely
+    // new verification request (new token) is not. The token is hashed rather than
+    // stored — the ledger row is long-lived and must not carry a live credential.
+    idempotencyKey: `auth:${user.id}:${actionType}:${fingerprintToken(tokenHash)}`,
+    ipBucket: getClientIpBucket(request),
   })
 
-  if (!sendResult.success) {
-    const masked = maskEmail(toEmail)
+  if (sendResult.blocked) {
+    // A governance refusal is not a provider failure. Report it as a retryable
+    // condition to Supabase Auth so GoTrue does not treat it as a hard error, and so
+    // the learner's client can back off rather than hammering the endpoint.
+    console.warn(`[send-email-hook] Governed send blocked action="${actionType}" reason="${sendResult.blocked}" recipient="${masked}"`)
+    const blockedStatus = sendResult.blocked === 'duplicate' ? 200 : 429
+    if (blockedStatus === 200) {
+      // The identical message is already in flight or delivered. Reporting success is
+      // correct here: retrying would only produce another duplicate.
+      return jsonResponse({ success: true, message: 'Email already dispatched for this request', deduplicated: true }, 200)
+    }
+    return jsonResponse({ error: 'Email temporarily unavailable', reason: sendResult.blocked }, blockedStatus)
+  }
+
+  if (!sendResult.sent) {
     console.error(`[send-email-hook] Email delivery failed for action="${actionType}" recipient="${masked}":`, sendResult.error)
 
     // Signup verification and password reset ride this path. Without a persisted

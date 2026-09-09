@@ -27,6 +27,15 @@ export interface ProviderSendResult {
    * convention in `lib/email.ts`. Consumed by `classifyProviderFailure()`.
    */
   statusCode?: number
+  /**
+   * The provider's own error code (or, failing that, its message).
+   *
+   * Required alongside `statusCode` because Brevo reports credit exhaustion as an
+   * ordinary HTTP 400 carrying `{"code":"not_enough_credits"}`. Classifying on the
+   * status alone read that as a permanent bad-request and refused to fail over,
+   * which is why Resend never took over during the 2026-09-09 incident.
+   */
+  providerCode?: string
   timestamp: string
 }
 

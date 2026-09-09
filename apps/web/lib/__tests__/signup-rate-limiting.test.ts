@@ -148,10 +148,18 @@ describe('Signup rate limiting (server-side, persistent, Gmail-alias-aware)', ()
     const [emailKey, emailOpts] = mockEvaluate.mock.calls.find((c) => (c[0] as string).startsWith('signup_email:'))!
 
     expect(ipKey).toBe('signup_ip:203.0.113.10')
-    expect(ipOpts).toEqual({ windowMs: 15 * 60 * 1000, limit: 5 })
+    // `failClosed` is part of the contract, not incidental: a limiter outage on the
+    // signup path must reject rather than degrade to an unmetered in-memory counter.
+    expect(ipOpts).toEqual({ windowMs: 15 * 60 * 1000, limit: 5, failClosed: true })
 
     expect(emailKey).toBe('signup_email:jane@example.com')
-    expect(emailOpts).toEqual({ windowMs: 24 * 60 * 60 * 1000, limit: 3 })
+    expect(emailOpts).toEqual({ windowMs: 24 * 60 * 60 * 1000, limit: 3, failClosed: true })
+
+    // The aggregate ceiling is the layer that survives IP and address rotation, so it
+    // must be evaluated on every signup, not only when the other two pass.
+    const aggregate = mockEvaluate.mock.calls.find((c) => c[0] === 'signup_global')
+    expect(aggregate).toBeDefined()
+    expect(aggregate![1]).toMatchObject({ windowMs: 60 * 60 * 1000, failClosed: true })
   })
 
   describe('Gmail "+tag" alias canonicalization', () => {

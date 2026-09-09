@@ -505,6 +505,7 @@ export type Database = {
           event_type: string
           failed_at: string | null
           id: string
+          idempotency_key: string | null
           max_attempts: number
           next_retry_at: string | null
           priority: number
@@ -532,6 +533,7 @@ export type Database = {
           event_type: string
           failed_at?: string | null
           id?: string
+          idempotency_key?: string | null
           max_attempts?: number
           next_retry_at?: string | null
           priority?: number
@@ -559,6 +561,7 @@ export type Database = {
           event_type?: string
           failed_at?: string | null
           id?: string
+          idempotency_key?: string | null
           max_attempts?: number
           next_retry_at?: string | null
           priority?: number
@@ -2061,6 +2064,41 @@ export type Database = {
       get_current_daily_email_count: { Args: never; Returns: number }
       increment_daily_email_quota: {
         Args: { p_limit: number }
+        Returns: boolean
+      }
+      // Added by 20260909000001_signup_abuse_email_governance.sql
+      claim_email_send: {
+        Args: { p_key: string; p_purpose: string; p_masked_email?: string | null }
+        Returns: boolean
+      }
+      finalize_email_send: {
+        Args: {
+          p_key: string
+          p_status: string
+          p_provider?: string | null
+          p_status_code?: number | null
+          p_attempts?: Json
+        }
+        Returns: undefined
+      }
+      consume_rate_limit: {
+        Args: { p_key: string; p_limit: number; p_window_ms: number }
+        Returns: { allowed: boolean; remaining: number; reset_in_ms: number }[]
+      }
+      reserve_provider_email_quota: {
+        Args: { p_provider: string; p_limit: number }
+        Returns: boolean
+      }
+      release_provider_email_quota: {
+        Args: { p_provider: string }
+        Returns: undefined
+      }
+      mark_provider_exhausted: {
+        Args: { p_provider: string }
+        Returns: undefined
+      }
+      is_provider_exhausted: {
+        Args: { p_provider: string }
         Returns: boolean
       }
     }
