@@ -20,6 +20,53 @@ function createMockJwt(payload: Record<string, unknown>): string {
   return `${header}.${body}.${signature}`
 }
 
+// Mock Supabase to simulate cryptographic token verification
+vi.mock('@supabase/supabase-js', () => {
+  return {
+    createClient: () => ({
+      auth: {
+        getUser: vi.fn(async (token: string) => {
+          if (!token || typeof token !== 'string') {
+            return { data: { user: null }, error: new Error('Invalid token') }
+          }
+          try {
+            const parts = token.split('.')
+            if (parts.length !== 3) {
+              return { data: { user: null }, error: new Error('Invalid token') }
+            }
+            const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))
+            if (payload.exp && payload.exp * 1000 <= Date.now()) {
+              return { data: { user: null }, error: new Error('JWT expired') }
+            }
+            return {
+              data: {
+                user: {
+                  id: payload.sub,
+                  email: payload.email,
+                  app_metadata: payload.app_metadata || {},
+                  user_metadata: payload.user_metadata || {},
+                  email_confirmed_at: payload.email_confirmed_at,
+                },
+              },
+              error: null,
+            }
+          } catch {
+            return { data: { user: null }, error: new Error('Invalid token') }
+          }
+        }),
+        refreshSession: vi.fn(async () => ({ data: { session: null, user: null }, error: null })),
+      },
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            maybeSingle: async () => ({ data: null, error: null }),
+          }),
+        }),
+      }),
+    }),
+  }
+})
+
 describe('P1 Middleware & Settings Optimization Test Suite', () => {
   beforeEach(() => {
     vi.restoreAllMocks()

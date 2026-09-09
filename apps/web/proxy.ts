@@ -15,7 +15,7 @@ const ACCESS_DENIED_PAGE = '/admin/access-denied'
  */
 function withSessionCookies(
   response: NextResponse,
-  session: { access_token: string; refresh_token: string; expires_in: number }
+  session: { access_token: string; refresh_token: string; expires_in?: number }
 ) {
   const isProd = process.env.NODE_ENV === 'production'
   response.cookies.set('sb-access-token', session.access_token, {
@@ -57,37 +57,6 @@ interface ProxyUser {
   app_metadata: Record<string, unknown>
   user_metadata: Record<string, unknown>
   email_confirmed_at?: string
-}
-
-/**
- * Fast in-memory JWT payload decoder for Next.js Middleware.
- * Decodes claims and validates token expiration in 0.01ms without network roundtrips.
- */
-function parseJwtUser(token: string): ProxyUser | null {
-  try {
-    const parts = token.split('.')
-    if (parts.length !== 3) return null
-    const base64Url = parts[1]
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    const json = typeof atob === 'function' ? atob(base64) : Buffer.from(base64, 'base64').toString('utf8')
-    const payload = JSON.parse(json)
-    if (!payload || !payload.sub) return null
-
-    // Validate expiration claim if present
-    if (typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now()) {
-      return null // Expired token
-    }
-
-    return {
-      id: String(payload.sub),
-      email: typeof payload.email === 'string' ? payload.email : '',
-      app_metadata: (payload.app_metadata && typeof payload.app_metadata === 'object') ? payload.app_metadata : {},
-      user_metadata: (payload.user_metadata && typeof payload.user_metadata === 'object') ? payload.user_metadata : {},
-      email_confirmed_at: payload.email_confirmed_at,
-    }
-  } catch {
-    return null
-  }
 }
 
 export async function proxy(request: NextRequest) {
@@ -180,20 +149,33 @@ export async function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get('sb-refresh-token')?.value
 
   let user: ProxyUser | null = null
-  let newSession: { access_token: string; refresh_token: string; expires_in: number } | null = null
+  let newSession: { access_token: string; refresh_token: string; expires_in?: number } | null = null
 
-  // 1. Fast in-memory JWT parsing (0 network roundtrips for valid active sessions)
-  if (accessToken) {
-    user = parseJwtUser(accessToken)
-  }
-
-  // 2. Fallback: If access token was missing, expired, or non-JWT mock, attempt refresh token or fallback getUser
-  if (!user && (accessToken || refreshToken)) {
+  // 1. Verify access token with Supabase GoTrue
+  if (accessToken || refreshToken) {
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false },
     })
 
-    if (refreshToken) {
+    if (accessToken) {
+      try {
+        const { data, error } = await supabase.auth.getUser(accessToken)
+        if (!error && data?.user) {
+          user = {
+            id: data.user.id,
+            email: data.user.email || '',
+            app_metadata: (data.user.app_metadata as Record<string, unknown>) || {},
+            user_metadata: (data.user.user_metadata as Record<string, unknown>) || {},
+            email_confirmed_at: data.user.email_confirmed_at,
+          }
+        }
+      } catch (err) {
+        console.error('[proxy] getUser error:', err)
+      }
+    }
+
+    // 2. Fallback: If access token was missing, expired, or invalid, attempt refresh token
+    if (!user && refreshToken) {
       try {
         const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken })
         if (!error && data?.session && data?.user) {
@@ -208,24 +190,6 @@ export async function proxy(request: NextRequest) {
         }
       } catch (err) {
         console.error('[proxy] Refresh session error:', err)
-      }
-    }
-
-    // Fallback for non-JWT test mock tokens or legacy tokens
-    if (!user && accessToken) {
-      try {
-        const { data, error } = await supabase.auth.getUser(accessToken)
-        if (!error && data?.user) {
-          user = {
-            id: data.user.id,
-            email: data.user.email || '',
-            app_metadata: (data.user.app_metadata as Record<string, unknown>) || {},
-            user_metadata: (data.user.user_metadata as Record<string, unknown>) || {},
-            email_confirmed_at: data.user.email_confirmed_at,
-          }
-        }
-      } catch {
-        // Ignore fallback error
       }
     }
   }

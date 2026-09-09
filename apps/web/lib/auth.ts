@@ -176,21 +176,31 @@ async function resolveAuthenticatedUserFromRequest(request: Request): Promise<Us
   // Fallback: Check sb-access-token cookie
   let refreshToken: string | null = null
   if (!token) {
-    try {
-      const cookieStore = await cookies()
-      const sbToken = cookieStore.get('sb-access-token')?.value
-      const sbRefresh = cookieStore.get('sb-refresh-token')?.value
-      if (sbToken) token = sbToken
-      if (sbRefresh) refreshToken = sbRefresh
-    } catch {
-      // Manual cookie header parsing fallback if cookies() unavailable
+    if ('cookies' in request && typeof (request as unknown as { cookies?: { get?: (k: string) => { value?: string } } }).cookies?.get === 'function') {
+      token = (request as unknown as { cookies: { get: (k: string) => { value?: string } | undefined } }).cookies.get('sb-access-token')?.value || null
+      refreshToken = (request as unknown as { cookies: { get: (k: string) => { value?: string } | undefined } }).cookies.get('sb-refresh-token')?.value || null
+    }
+
+    if (!token && cookieHeader) {
       const matchAccess = cookieHeader.match(/sb-access-token=([^;]+)/)
       if (matchAccess && matchAccess[1]) {
-        token = decodeURIComponent(matchAccess[1])
+        token = decodeURIComponent(matchAccess[1].trim())
       }
       const matchRefresh = cookieHeader.match(/sb-refresh-token=([^;]+)/)
       if (matchRefresh && matchRefresh[1]) {
-        refreshToken = decodeURIComponent(matchRefresh[1])
+        refreshToken = decodeURIComponent(matchRefresh[1].trim())
+      }
+    }
+
+    if (!token) {
+      try {
+        const cookieStore = await cookies()
+        const sbToken = cookieStore.get('sb-access-token')?.value
+        const sbRefresh = cookieStore.get('sb-refresh-token')?.value
+        if (sbToken) token = sbToken
+        if (sbRefresh) refreshToken = sbRefresh
+      } catch {
+        // Ignored if cookies() context is unavailable
       }
     }
   }

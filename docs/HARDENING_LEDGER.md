@@ -259,6 +259,47 @@ promote.
 
 ---
 
+## B3 — Authentication & Session Architecture Hardening — ✅ **Complete in code**
+
+**Primary findings:** S2-H2, S2-H3, S2-H4 (plan references: I-06, I-07).
+**Objective:** Harden Prodily's authentication and session architecture by removing unverified JWT base64 parsing in middleware, eliminating session fixation and unverified token injection in `/api/auth/session`, implementing token rotation and dedicated server-side refresh/logout endpoints, and establishing httpOnly cookie session authority.
+
+### 1. Root Cause & Security Weaknesses Addressed
+
+- **Unverified JWT Payload Trust in Middleware (S2-H2 / Invariant 1):**
+  - **Vulnerability:** `proxy.ts` contained `parseJwtUser()` which base64-decoded token payloads and evaluated expiration/user claims without cryptographic signature verification. An attacker presenting a forged JWT with spoofed claims (e.g. `sub`, `email`, `app_metadata.is_admin: true`) could bypass middleware route protection and RBAC guards.
+  - **Resolution:** Removed `parseJwtUser()`. All middleware authentication now verifies session tokens cryptographically via Supabase Auth `getUser(accessToken)` with fallback to `refreshSession({ refresh_token })`. Unauthenticated or invalid requests to protected routes immediately clear cookies and redirect to `/login` (or `/admin/login`).
+- **Session Fixation & Unverified Refresh Token Injection (S2-H3 / Invariant 2):**
+  - **Vulnerability:** `POST /api/auth/session` previously accepted arbitrary `refresh_token` strings without validating that the refresh token matched the authenticated user's session, wrote unverified tokens into `sb-refresh-token` cookies, and returned 200 on malformed payloads.
+  - **Resolution:** Re-architected `/api/auth/session` to validate both access and refresh credentials against Supabase Auth. Any mismatched or invalid refresh token returns 401. Added safe `GET /api/auth/session` endpoint for client components to check authenticated status without exposing raw tokens.
+- **Refresh Token Rotation & Dedicated Endpoints (S2-H4 / Invariants 3 & 5):**
+  - **Vulnerability:** Missing dedicated server-side token refresh and revocation endpoints; client-side listeners were required to manually negotiate refresh tokens.
+  - **Resolution:** Created `POST /api/auth/refresh` (rotates tokens and refreshes `sb-access-token` / `sb-refresh-token` cookies) and `POST /api/auth/logout` (revokes session server-side and deletes cookies with `maxAge: -1`).
+- **Session Boundary & Client Authority (Invariant 4):**
+  - **Resolution:** Server-side authentication relies strictly on httpOnly cookies (`sb-access-token`, `sb-refresh-token`) and verified Bearer tokens. `localStorage` is used solely for non-sensitive draft UI state (capstone autosave, wizard drafts) and has zero authority in server authorization.
+
+### 2. Files Changed / Created
+
+1. [`apps/web/proxy.ts`](../apps/web/proxy.ts) — Removed `parseJwtUser()`; enforced `supabase.auth.getUser()` and `supabase.auth.refreshSession()`.
+2. [`apps/web/app/api/auth/session/route.ts`](../apps/web/app/api/auth/session/route.ts) — Hardened session sync, added anti-fixation validation, added `GET` handler.
+3. [`apps/web/app/api/auth/refresh/route.ts`](../apps/web/app/api/auth/refresh/route.ts) — **[NEW]** Dedicated server-side token refresh endpoint.
+4. [`apps/web/app/api/auth/logout/route.ts`](../apps/web/app/api/auth/logout/route.ts) — **[NEW]** Dedicated server-side logout endpoint.
+5. [`apps/web/lib/auth.ts`](../apps/web/lib/auth.ts) — Enhanced `resolveAuthenticatedUserFromRequest` to check request-level cookies and headers directly.
+6. [`apps/web/lib/__tests__/b3-auth-session-hardening.test.ts`](../apps/web/lib/__tests__/b3-auth-session-hardening.test.ts) — **[NEW]** 22-test security regression suite covering all B3 attack scenarios.
+7. [`apps/web/lib/__tests__/p1-middleware-optimizations.test.ts`](../apps/web/lib/__tests__/p1-middleware-optimizations.test.ts) — Aligned mock Supabase client to verify tokens with cryptographic signature simulation.
+8. [`apps/web/lib/__tests__/onboarding-action.test.ts`](../apps/web/lib/__tests__/onboarding-action.test.ts) — Updated mocks to verify authenticated user metadata.
+
+### 3. Verification & Results
+
+- **B3 Focused Security Suite:** 22/22 tests passed (`b3-auth-session-hardening.test.ts`).
+- **All Auth Test Suites:** 14 test files, 161 tests passed.
+- **Full Test Suite:** 121 test files, 1,076 tests passed.
+- **Typecheck:** Passed (0 errors, `tsc --noEmit`).
+- **Lint:** Passed (0 errors, 34 warnings).
+- **Build:** Passed (`next build` compiled 118 static and dynamic routes successfully).
+
+---
+
 ## Roadmap — current status
 
 Statuses below were established by reading the merged code, not by reading commit
@@ -270,7 +311,7 @@ messages. "Plan ref" points at the batch specification in
 | **B0** — baseline | — | ✅ Complete | |
 | **B1** — database / security exposure | I-02 | ✅ Complete in code | Migration unapplied |
 | **B2** — portfolio XSS | I-12 | ✅ Complete in code | S2-C3 resolved; 14 JSON-LD sites hardened |
-| **B3** — session/token architecture | I-06, I-07 | ⬜ **Next** | Unaffected by the incident |
+| **B3** — session/token architecture | I-06, I-07 | ✅ Complete in code | Unverified JWT trust removed; session fixation closed; refresh/logout routes added |
 | **B4** — email gateway + signup ordering | I-04 | 🟡 **Largely delivered by `10a21a5`** | See below |
 | **B5** — atomic rate limiting + abuse controls | I-03 | 🟡 **Largely delivered by `10a21a5`** | See below |
 | **B6** — provider failover + email reliability | I-04, I-05 | 🟡 **Partially delivered by `10a21a5`** | See below |
@@ -324,11 +365,10 @@ Recorded here rather than acted on, per the reconciliation scope.
 
 ---
 
-## Deferred Findings (B3+)
+## Deferred Findings (B4+)
 
 Carried forward from the locked plan, updated for the statuses above:
 
-- **B3 (I-06 / I-07):** Session token cleanup from response bodies (`session: authData.session` removal) & JWT cryptographic verification.
 - **B7 (I-07):** Shared `withRoute()` route contract wrapper.
 - **B8 (I-08):** Typed data layer repository layer without `as unknown as`.
 - **B9 (I-10):** Admin observability, incident alerting, and uptime monitors.
