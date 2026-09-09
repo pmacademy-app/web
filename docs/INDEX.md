@@ -2,9 +2,14 @@
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Framework:** Next.js 16.2.12 (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)  
-**Test Suite:** 112 Test Files · 1177 Unit & Integration Tests (100% Passing)  
-**Database Migrations:** 43 Versioned SQL Migrations in `supabase/migrations/`  
-**Last Updated:** September 8, 2026  
+**Test Suite:** 118 Test Files · 1256 Unit & Integration Tests (100% Passing)  
+**Database Migrations:** 46 Versioned SQL Migrations in `supabase/migrations/`  
+**Last Updated:** September 10, 2026  
+
+> **Where the work stands.** [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) is the
+> authoritative record of implementation status; [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md)
+> remains the locked specification. Where they disagree about *status*, the ledger
+> wins; about *scope*, the plan wins. **Next batch: B2 — Public Portfolio XSS.**
 
 ---
 
@@ -12,8 +17,8 @@
 
 1. **Current Production Behavior** (Live deployed runtime behavior)
 2. **Current Source Code** (TypeScript routes, services, React components, compilation scripts)
-3. **Database Migrations & Schema** (43 SQL DDL files in `supabase/migrations/`)
-4. **Automated Unit & Integration Tests** (112 test files, 1177 passed unit tests in `apps/web/lib/__tests__/`)
+3. **Database Migrations & Schema** (46 SQL DDL files in `supabase/migrations/`)
+4. **Automated Unit & Integration Tests** (118 test files, 1256 passed unit tests in `apps/web/lib/__tests__/`)
 5. **Operating Manuals & Workspaces** (`docs/admin/*.md`)
 6. **Detailed Architectural Documentation** (`docs/*.md`)
 7. **Historical Implementation Records** (Previous session logs and stale plans)
@@ -28,9 +33,9 @@ All primary architectural documentation lives directly under `docs/`:
 
 | Category | Canonical Document | Purpose / Owning Topic | Status |
 |---|---|---|---|
-| **Implementation Plan** | [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md) | **LOCKED** source of truth for all production-readiness implementation work: locked decisions, P0 safety tasks, 16 initiatives, batch specifications, gates, rollout and signup-reopening criteria | 🔒 Locked |
-| **Hardening Ledger** | [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) | Implementation ledger for production hardening batches (B0 baseline, B1 security fixes, verification, deferred work) | 🟢 Current |
-| **Production Audits** | [`audits/`](audits/) | Stage 1–4 read-only audits (architecture, security, frontend/mobile, reliability/operations) and the two 2026-09 signup-abuse incident investigations | 🟢 Current |
+| **Implementation Status** | [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) | **Authoritative execution state:** what is built, what the 2026-09-09 incident fix (`10a21a5`) already delivered, per-batch status B0–B14, open questions, and the next batch | 🟢 Current |
+| **Implementation Plan** | [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md) | **LOCKED** specification: locked decisions, P0 safety tasks, 16 initiatives, batch specifications, gates, rollout and signup-reopening criteria. Carries a status overlay pointing at the ledger — check the ledger before starting any batch | 🔒 Locked |
+| **Production Audits** | [`audits/`](audits/) | Stage 1–4 read-only audits (architecture, security, frontend/mobile, reliability/operations) and the two 2026-09 signup-abuse incident investigations. **Historical evidence** — findings are preserved as written and several are since fixed; each carries a status banner | 🟡 Historical |
 | **Architecture Baseline** | [`PRODUCTION_BLUEPRINT.md`](PRODUCTION_BLUEPRINT.md) | Target-architecture rationale behind the implementation plan. Superseded by `FINAL_IMPLEMENTATION_PLAN.md` for anything actionable | 🟡 Reference |
 | **Core Architecture** | [`ARCHITECTURE.md`](ARCHITECTURE.md) | High-level system architecture, tech stack, directory boundaries, known debt | 🟢 Current |
 | **Product & Brand** | [`PRD.md`](PRD.md) | Product vision, target audience, brand rules, non-negotiable invariants | 🟢 Current |

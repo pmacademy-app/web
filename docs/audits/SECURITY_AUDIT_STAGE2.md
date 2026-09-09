@@ -6,6 +6,19 @@
 **Scope:** Read-only security architecture audit. No application code, tests, configuration, or migrations were modified. **S1 was not implemented.**
 **Inputs:** Stage 1 (`docs/ARCHITECTURE_AUDIT_STAGE1.md`), `INCIDENT_2026-09-06_SIGNUP_ABUSE.md`, `INCIDENT_2026-09-08_SIGNUP_EMAIL_ABUSE.md`, ADR-001…006, `ISSUES_KNOWN.md` — each independently re-verified against code.
 
+> **📌 Historical record — status as of 2026-09-10.** This document is preserved as
+> written; its findings were accurate at the commit it audited and are **not** edited
+> here. Several of them have since been fixed by commit `10a21a5` (the 2026-09-09
+> signup-abuse / email incident fix) — in particular the non-atomic, fail-open rate
+> limiter, the spoofable client-IP derivation, the ungoverned auth-hook email path, the
+> missing aggregate signup ceiling, and the Brevo capacity misclassification that
+> blocked failover to Resend.
+>
+> **For current implementation status, read [`HARDENING_LEDGER.md`](../HARDENING_LEDGER.md).**
+> Do not schedule work from this document alone.
+
+---
+
 **Finding labels used throughout:**
 - **[CONFIRMED]** — verified in code at this commit; the described behavior is what the code does.
 - **[WEAKNESS]** — architectural fragility. Not exploitable today, but the invariant holding it closed is unwritten and undefended.

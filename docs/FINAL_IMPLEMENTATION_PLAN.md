@@ -10,6 +10,43 @@
 
 ---
 
+> ## ⚠️ Status overlay — updated 2026-09-10
+>
+> **This plan is still the locked specification. It is no longer an accurate record of
+> what remains to be built.**
+>
+> On 2026-09-09 an unplanned production incident fix landed on `main` (commit
+> `10a21a5`, *"fix: harden signup email abuse and provider failover"*). It implemented a
+> substantial part of **I-03** and **I-04** outside this plan's batch sequence.
+>
+> **Before starting any batch below, check its current status in
+> [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md).** Where this plan and the ledger
+> disagree about *status*, the ledger wins; where they disagree about *scope*, this
+> document still wins.
+>
+> Already delivered by `10a21a5` — **do not re-implement**:
+> **I-03-B1** (atomic rate-limit RPC) · **I-03-B2** (limiter with an explicit fail
+> mode; shipped as `failClosed: boolean`) · **I-03-B5** (global signup ceiling) ·
+> **I-04-B6** (verification before durable side effects; `refCode` deferred to the
+> verification callback via auth metadata, so its planned migration was not needed).
+>
+> Partially delivered — **re-scope before starting**: I-03-B3, I-03-B4, I-03-B6,
+> I-04-B2, I-04-B3, I-04-B7.
+>
+> **I-04-B5** (route the auth hook through the queue) was **superseded in mechanism**:
+> the hook now runs through the synchronous governed gateway
+> (`lib/email-governance.ts`) instead of the queue. Its objective under L-10 — no
+> ungoverned egress on the hook path — is met.
+>
+> **I-04-B3 carries an unresolved conflict.** Its objective states the breaker should
+> trip "to a hard stop rather than shifting volume to the secondary", while ADR-002 and
+> the shipped code deliberately fail over on capacity exhaustion. This needs a human
+> decision before the batch is implemented — see the ledger's *Open questions*.
+>
+> **Next implementation batch: B2 — Public Portfolio XSS (finding S2-C3, plan ref I-12).**
+
+---
+
 ## 1. Executive summary
 
 Prodily is a Next.js 16 / Supabase / Vercel application with genuinely good engineering in places — a correctly claimed email queue, exponential backoff with dead-lettering, a best-in-class secret-redaction layer, an airtight admin API guard (61/61 routes), and real feature-flag kill switches. Four audits found that the weaknesses are not in that machinery but at its edges: nothing watches it, two of its levers are wired to the wrong path, and the layers around it were built route-by-route with no shared contract.
@@ -444,7 +481,8 @@ Every batch specifies initiative, ID, objective, rationale, dependencies, files 
 
 #### **I-03-B2 — Rewrite the limiter against the RPC, with an explicit fail mode**
 - **Objective:** `evaluatePersistentRateLimit()` calls the RPC and takes `failMode: 'open' | 'closed'`.
-- **Why:** F-SEC-6, L-08, L-13. Fail-open is currently the default everywhere.
+- **Why:** F-SEC-6, L-08, L-13. Fail-open was the default everywhere when this plan was written.
+- **Status 2026-09-10: ✅ delivered by `10a21a5`,** as `failClosed?: boolean` rather than the `failMode: 'open' | 'closed'` shape specified here. Fail-open remains the default for callers that do not opt in; every path that can spend provider credit now opts in. Adopt the shipped shape rather than churning the API.
 - **Depends on:** I-03-B1.
 - **Changes:** `apps/web/lib/rate-limit.ts`. **Must NOT change:** any route (B4 applies it).
 - **Migration:** no. **Tests:** fail-closed returns a denial when the DB errors; fail-open returns the in-memory result.

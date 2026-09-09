@@ -6,6 +6,19 @@
 **Scope:** Read-only architecture audit. No application code, tests, or configuration were modified. Signup-abuse S1 was **not** implemented.
 **Method:** the repository at that commit is the source of truth. Where `docs/` disagrees with code, code wins; drift is noted.
 
+> **📌 Historical record — status as of 2026-09-10.** This document is preserved as
+> written; its findings were accurate at the commit it audited and are **not** edited
+> here. Several of them have since been fixed by commit `10a21a5` (the 2026-09-09
+> signup-abuse / email incident fix) — in particular the non-atomic, fail-open rate
+> limiter, the spoofable client-IP derivation, the ungoverned auth-hook email path, the
+> missing aggregate signup ceiling, and the Brevo capacity misclassification that
+> blocked failover to Resend.
+>
+> **For current implementation status, read [`HARDENING_LEDGER.md`](../HARDENING_LEDGER.md).**
+> Do not schedule work from this document alone.
+
+---
+
 ---
 
 ## 1. Current architecture

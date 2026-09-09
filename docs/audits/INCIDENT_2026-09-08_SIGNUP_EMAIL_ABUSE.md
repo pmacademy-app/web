@@ -5,6 +5,19 @@
 **Scope:** Investigation and design only. No code, tests, or configuration were modified.
 **Predecessor:** [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](./INCIDENT_2026-09-06_SIGNUP_ABUSE.md) — the fixes from that incident are present in this branch and are *not* sufficient for what happened today.
 
+> **📌 Historical record — status as of 2026-09-10.** This document is preserved as
+> written; its findings were accurate at the commit it audited and are **not** edited
+> here. Several of them have since been fixed by commit `10a21a5` (the 2026-09-09
+> signup-abuse / email incident fix) — in particular the non-atomic, fail-open rate
+> limiter, the spoofable client-IP derivation, the ungoverned auth-hook email path, the
+> missing aggregate signup ceiling, and the Brevo capacity misclassification that
+> blocked failover to Resend.
+>
+> **For current implementation status, read [`HARDENING_LEDGER.md`](../HARDENING_LEDGER.md).**
+> Do not schedule work from this document alone.
+
+---
+
 ---
 
 ## 0. Executive summary

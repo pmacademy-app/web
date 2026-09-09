@@ -25,9 +25,15 @@
 
 #### ISSUE-23: Signup Abuse Cleanup Pending Approval
 - **Status**: 🟠 Mitigated, cleanup awaiting explicit approval
-- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). `allowSignups` is currently `false` in production.
+- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](audits/INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). `allowSignups` is currently `false` in production.
 - **Required Action**: (1) decide on a CAPTCHA provider before reopening signups, (2) approve or reject the proposed ban-not-delete cleanup of the 1,233 flagged accounts.
 - **Note**: the root-cause fixes (signup rate limiting, pre-dispatch daily quota enforcement, provider failover) are implemented and test-passing. Deployment requires migrations `20260907000001` and `20260908000001`.
+
+#### ISSUE-24: Signup Abuse Recurrence & Brevo Failover Failure (2026-09-09)
+- **Status**: 🟠 Fixed in code on `main` (`10a21a5`) — **not verified in production**
+- **Description**: The 2026-09-06 controls did not hold. Unauthenticated signup traffic again exhausted Brevo's allowance with no corresponding `public.users` rows, and Resend did not take over. Root causes: the auth hook sent email outside all governance; Brevo reports credit exhaustion as HTTP 400 + `not_enough_credits`, which the status-only classifier read as permanent and refused to fail over on; the per-IP limit keyed on the spoofable leftmost `X-Forwarded-For`; the limiter was non-atomic and failed open; `refCode` triggered a pre-verification welcome email.
+- **Required Action**: apply migration `20260909000001_signup_abuse_email_governance.sql` to staging, exercise signup and provider failover there, then promote. **The code depends on this migration** — until it is applied, `consume_rate_limit` does not exist and fail-closed paths return 429.
+- **Note**: full root-cause analysis, per-batch impact and remaining gaps are in [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md). Gaps confirmed still open during the 2026-09-10 reconciliation: `/api/auth/login` and `/api/auth/update-password` have no rate limiting, `/api/auth/telemetry` still reads the leftmost `X-Forwarded-For`, and two raw Resend `fetch` calls still lack timeouts.
 
 ---
 

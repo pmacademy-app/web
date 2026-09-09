@@ -1,4 +1,4 @@
--- Migration: 20260909000001_security_hardening_b1.sql
+-- Migration: 20260910000001_security_hardening_b1.sql
 -- Prodily Production Hardening: Batch B1
 -- 1. Restrict SECURITY DEFINER function execution privileges (S2-C1 / F-SEC-1)
 -- 2. Pin safe search_path for SECURITY DEFINER functions (S2-C1)

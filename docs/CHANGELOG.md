@@ -33,7 +33,7 @@ Architecture decisions: [`docs/decisions/`](decisions/). Requires migrations `20
 
 ## [Signup Abuse Incident Response] — 2026-09-07
 
-Full incident writeup: [`docs/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](INCIDENT_2026-09-06_SIGNUP_ABUSE.md).
+Full incident writeup: [`docs/INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](audits/INCIDENT_2026-09-06_SIGNUP_ABUSE.md).
 
 ### Fixed
 - **Signup rate limiting**: `/api/auth/signup` had zero throttling of any kind. Added persistent, cross-instance IP (5/15min) and canonical-email (3/24h, collapsing Gmail `+tag` aliases) rate limits.
