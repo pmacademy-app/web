@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { sendEmail } from '@/lib/email'
+import { EMAIL_HTTP_TIMEOUT_MS } from '@/lib/notifications/config'
 
 function escapeHtml(unsafe: string): string {
   return unsafe
@@ -93,6 +94,7 @@ async function fetchInboundEmailBody(emailId: string): Promise<{ text?: string; 
       headers: {
         Authorization: `Bearer ${apiKey}`,
       },
+      signal: AbortSignal.timeout(EMAIL_HTTP_TIMEOUT_MS),
     })
     if (!res.ok) return {}
     const emailData = await res.json()

@@ -1,6 +1,8 @@
 import type { NotificationProvider, ProviderSendPayload, ProviderSendResult, ProviderHealthResult } from './types'
 import type { NotificationChannel } from '../types'
 import { BRAND } from '@/lib/brand'
+import { EMAIL_HTTP_TIMEOUT_MS } from '../config'
+import { maskEmail } from '@/lib/email'
 
 /**
  * Resend Email Provider Implementation.
@@ -24,20 +26,26 @@ export class ResendProvider implements NotificationProvider {
     }
 
     const apiKey = process.env.RESEND_API_KEY
-    const isTest = process.env.NODE_ENV === 'test' || process.env.RESEND_SIMULATE === 'true'
+    const isTest = (process.env.NODE_ENV === 'test' && process.env.ALLOW_TEST_NETWORK_EMAILS !== 'true') || process.env.RESEND_SIMULATE === 'true'
     if (!apiKey || isTest) {
       console.log(`[ResendProvider:simulation] Simulating email send to ${recipientEmail} for template '${payload.templateKey}'`)
       return {
         success: true,
         providerName: this.name,
         externalId: `sim-resend-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        statusCode: 200,
         timestamp: new Date().toISOString(),
       }
     }
 
     try {
+      const fromEmail =
+        (payload.variables.fromEmail as string) ||
+        (process.env.RESEND_FROM_EMAIL || process.env.BREVO_FROM_EMAIL)?.trim() ||
+        this.defaultFrom
+
       const bodyPayload: Record<string, unknown> = {
-        from: this.defaultFrom,
+        from: fromEmail,
         to: [recipientEmail],
         subject: (payload.variables.subject as string) || 'Prodily Notification',
         html: payload.variables.html as string,
@@ -62,13 +70,13 @@ export class ResendProvider implements NotificationProvider {
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify(bodyPayload),
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(EMAIL_HTTP_TIMEOUT_MS),
       })
 
-      const data = await res.json()
+      const data = (await res.json().catch(() => ({}))) as { id?: string; message?: string; name?: string }
 
       if (!res.ok) {
-        const errorMsg = data?.message || data?.error || `HTTP ${res.status} error from Resend`
+        const errorMsg = data?.message || `HTTP ${res.status} error from Resend`
         const statusCode = res.status
         // Resend names the condition in `name` (e.g. `rate_limit_exceeded`,
         // `daily_quota_exceeded`). Same reasoning as Brevo: the code, not just the
@@ -79,14 +87,17 @@ export class ResendProvider implements NotificationProvider {
         try {
           const { logErrorReport } = await import('@/lib/monitoring/logger')
           const { classifyProviderFailureKind } = await import('@/lib/monitoring/error-taxonomy')
+          const op = payload.operation || 'email.provider_send'
           void logErrorReport({
             domain: 'email',
             kind: classifyProviderFailureKind(statusCode),
-            operation: 'email.provider_send',
-            // Stable summary: the provider's own message goes in details, not here,
-            // or every distinct error text would fingerprint separately.
-            summary: 'Resend rejected an email send',
-            subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
+            operation: op,
+            summary: op === 'email.direct_send' ? 'Resend refused a direct transactional send' : 'Resend rejected an email send',
+            subject: {
+              templateKey: payload.templateKey,
+              userId: payload.recipient.userId,
+              maskedEmail: maskEmail(recipientEmail),
+            },
             provider: { name: this.name, statusCode },
             details: { providerMessage: errorMsg, providerCode: data?.name ?? null },
           })
@@ -107,7 +118,7 @@ export class ResendProvider implements NotificationProvider {
       return {
         success: true,
         providerName: this.name,
-        externalId: data.id,
+        externalId: data.id || `resend-${Date.now()}`,
         statusCode: res.status,
         timestamp: new Date().toISOString(),
       }
@@ -139,12 +150,17 @@ export class ResendProvider implements NotificationProvider {
 
       try {
         const { logErrorReport } = await import('@/lib/monitoring/logger')
+        const op = payload.operation || 'email.provider_send'
         void logErrorReport({
           domain: 'email',
           kind: isTimeout ? 'provider_timeout' : 'provider_outage',
-          operation: 'email.provider_send',
-          summary: isTimeout ? 'Resend API request timed out' : 'Resend API was unreachable',
-          subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
+          operation: op,
+          summary: op === 'email.direct_send' ? 'Resend refused a direct transactional send' : (isTimeout ? 'Resend API request timed out' : 'Resend API was unreachable'),
+          subject: {
+            templateKey: payload.templateKey,
+            userId: payload.recipient.userId,
+            maskedEmail: maskEmail(recipientEmail),
+          },
           provider: { name: this.name, statusCode: isTimeout ? 504 : 503 },
           details: { errorName: err instanceof Error ? err.name : 'unknown', isTimeout, isDns, detail: friendlyMsg },
         })

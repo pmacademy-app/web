@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from '@/lib/supabase'
 import { currentDailyQuotaKey } from '../daily-quota-key'
+import { EMAIL_HTTP_TIMEOUT_MS } from '../config'
 import type {
   EmailAutomationKey,
   EmailAutomationMeta,
@@ -91,7 +92,8 @@ export class EmailAutomationsService {
         const resendApiKey = process.env.RESEND_API_KEY
         if (resendApiKey) {
           const res = await fetch('https://api.resend.com/emails', {
-            headers: { Authorization: `Bearer ${resendApiKey}` }
+            headers: { Authorization: `Bearer ${resendApiKey}` },
+            signal: AbortSignal.timeout(EMAIL_HTTP_TIMEOUT_MS),
           })
           
           if (res.ok) {

@@ -18,6 +18,12 @@ export interface NotificationPlatformConfig {
 export type EmailProviderName = 'brevo' | 'resend'
 
 /**
+ * Standard HTTP timeout for outbound provider calls and email-related fetch requests.
+ * Prevents unbounded hangs when communicating with external email provider APIs (F-REL-8).
+ */
+export const EMAIL_HTTP_TIMEOUT_MS = 8000
+
+/**
  * Single source of truth for which provider is primary.
  *
  * Previously each stack decided this for itself and they disagreed: `lib/email.ts`
