@@ -27,6 +27,19 @@ if (typeof setInterval !== 'undefined') {
 export interface RateLimitOptions {
   limit?: number
   windowMs?: number
+  /**
+   * What to do when the persistent limiter cannot reach the database.
+   *
+   * The default (`false`) degrades to the process-local in-memory counter, which is
+   * the right trade for cheap read endpoints. It is the WRONG trade for anything that
+   * spends money: on serverless every cold instance starts with an empty map, so
+   * "fall back to memory" is effectively "no limit at all" — an attacker who can make
+   * the limiter fail gets an unmetered email-sending path.
+   *
+   * Pass `true` on every path that can cause an outbound provider send. A limiter
+   * outage then rejects the request instead of granting unlimited budget.
+   */
+  failClosed?: boolean
 }
 
 /**
@@ -82,7 +95,6 @@ export async function evaluatePersistentRateLimit(
 ): Promise<{ success: boolean; remaining: number; resetInMs: number }> {
   const limit = options.limit ?? 1
   const windowMs = options.windowMs ?? 60 * 1000
-  const now = Date.now()
 
   // Never touch the real `rate_limits` table from a test run. This is a hard
   // guard, not just a warning: a 2026-09-07 test run leaked real rows into
@@ -104,57 +116,57 @@ export async function evaluatePersistentRateLimit(
     const { createServiceRoleClient } = await import('@/lib/supabase')
     const supabase = createServiceRoleClient()
 
-    const { data: existing, error: selectError } = await supabase
-      .from('rate_limits')
-      .select('key, last_requested_at, count')
-      .eq('key', key)
-      .maybeSingle()
-
-    if (selectError) {
-      throw selectError
-    }
-
-    if (existing) {
-      const lastTime = new Date(existing.last_requested_at).getTime()
-      const elapsed = now - lastTime
-
-      if (elapsed < windowMs) {
-        if (existing.count >= limit) {
-          return {
-            success: false,
-            remaining: 0,
-            resetInMs: Math.max(0, windowMs - elapsed),
-          }
-        }
-        
-        const newCount = existing.count + 1
-        await supabase
-          .from('rate_limits')
-          .update({ count: newCount, updated_at: new Date().toISOString() })
-          .eq('key', key)
-
-        return {
-          success: true,
-          remaining: limit - newCount,
-          resetInMs: Math.max(0, windowMs - elapsed),
-        }
-      }
-    }
-
-    // Upsert fresh record
-    await supabase.from('rate_limits').upsert({
-      key,
-      last_requested_at: new Date(now).toISOString(),
-      count: 1,
-      updated_at: new Date(now).toISOString(),
+    // Single-statement increment-and-check. The previous SELECT-then-UPDATE pair let
+    // N concurrent requests all read the same count and all pass, so a burst could
+    // exceed the limit by however many requests were in flight — precisely the shape
+    // of a scripted signup flood.
+    const { data, error } = await supabase.rpc('consume_rate_limit', {
+      p_key: key,
+      p_limit: limit,
+      p_window_ms: windowMs,
     })
 
+    if (error) throw error
+
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | { allowed?: boolean; remaining?: number; reset_in_ms?: number }
+      | null
+      | undefined
+
+    if (!row || typeof row.allowed !== 'boolean') {
+      // The RPC is the supported path; a missing/misshaped result means the migration
+      // has not been applied. Treat it as a limiter outage rather than a pass.
+      throw new Error('consume_rate_limit returned no decision (migration not applied?)')
+    }
+
     return {
-      success: true,
-      remaining: limit - 1,
-      resetInMs: windowMs,
+      success: row.allowed,
+      remaining: Math.max(0, Number(row.remaining ?? 0)),
+      resetInMs: Math.max(0, Number(row.reset_in_ms ?? windowMs)),
     }
   } catch (err) {
+    if (options.failClosed) {
+      // Deliberately NOT falling back to the in-memory counter. On serverless that
+      // counter is per-instance and empty on every cold start, so for a path that can
+      // spend provider credit it is indistinguishable from having no limit.
+      console.error('[rate-limit] Persistent limiter unavailable on a fail-closed path — rejecting:', err)
+      try {
+        const { logErrorReport } = await import('@/lib/monitoring/logger')
+        void logErrorReport({
+          domain: 'db',
+          kind: 'db_unavailable',
+          operation: 'rate_limit.unavailable',
+          summary: 'Persistent rate limiter unavailable; fail-closed path rejected the request',
+          nextAction:
+            'Requests that can send email are being refused until the rate_limits table and consume_rate_limit RPC are reachable. Check Supabase availability and that the latest migration is applied.',
+          details: { detail: err instanceof Error ? err.message : String(err) },
+        })
+      } catch {
+        // Never let instrumentation change the limiter decision.
+      }
+      return { success: false, remaining: 0, resetInMs: windowMs }
+    }
+
     console.warn('[rate-limit] Persistent rate limit DB query failed, falling back to memory:', err)
     return evaluateInMemoryRateLimit(key, { limit, windowMs })
   }

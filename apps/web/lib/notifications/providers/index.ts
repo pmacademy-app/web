@@ -2,13 +2,15 @@ import type { NotificationChannel } from '../types'
 import type { NotificationProvider, ProviderSendPayload, ProviderSendResult } from './types'
 import { ResendProvider } from './resend-provider'
 import { BrevoProvider } from './brevo-provider'
-import { classifyProviderFailure } from './failure-classification'
+import { classifyProviderFailure, isCapacityExhaustionSignal } from './failure-classification'
+import { isProviderExhausted, markProviderExhausted } from './provider-quota'
 import { resolvePrimaryProvider, getSecondaryProvider, type EmailProviderName } from '../config'
 
 export * from './types'
 export * from './resend-provider'
 export * from './brevo-provider'
 export * from './failure-classification'
+export * from './provider-quota'
 
 export class ProviderRegistry {
   private providers: Map<string, NotificationProvider> = new Map()
@@ -97,9 +99,29 @@ export async function sendEmailWithFailover(
 ): Promise<FailoverSendResult> {
   const attempts: ProviderSendResult[] = []
 
-  const primary = getActiveEmailProvider(registry)
+  const configuredPrimary = getActiveEmailProvider(registry)
+  const configuredPrimaryName = configuredPrimary.name as EmailProviderName
+  const alternateName = getSecondaryProvider(configuredPrimaryName)
+  const alternate = registry.getProvider(alternateName)
+
+  // Skip a provider already known to be out of credit for today rather than spending
+  // another request to rediscover it. Without this the queue kept hammering the
+  // exhausted Brevo on every retry cycle — one wasted call per item, forever.
+  let primary = configuredPrimary
+  let startedOnSecondary = false
+  if (await isProviderExhausted(configuredPrimaryName)) {
+    if (alternate && alternate.isConfigured() && !(await isProviderExhausted(alternateName))) {
+      primary = alternate
+      startedOnSecondary = true
+    }
+  }
+
   const primaryResult = await primary.send(payload)
   attempts.push(primaryResult)
+
+  if (!primaryResult.success && isCapacityExhaustionSignal(primaryResult.statusCode, primaryResult.providerCode)) {
+    await markProviderExhausted(primary.name as EmailProviderName)
+  }
 
   if (primaryResult.success) {
     return {
@@ -107,24 +129,25 @@ export async function sendEmailWithFailover(
       provider: primaryResult.providerName,
       externalId: primaryResult.externalId,
       attempts,
-      failedOver: false,
+      failedOver: startedOnSecondary,
     }
   }
 
   // Both providers would reject this identically (bad payload, bad credentials) —
   // failing over would only hide the real problem behind a second identical failure.
-  if (classifyProviderFailure(primaryResult.statusCode) !== 'failover') {
+  if (classifyProviderFailure(primaryResult.statusCode, primaryResult.providerCode) !== 'failover') {
     return {
       success: false,
       provider: primaryResult.providerName,
       error: primaryResult.error,
       attempts,
-      failedOver: false,
+      failedOver: startedOnSecondary,
     }
   }
 
+  // Never fall back onto the provider we just started from.
   const secondaryName = getSecondaryProvider(primary.name as EmailProviderName)
-  const secondary = registry.getProvider(secondaryName)
+  const secondary = startedOnSecondary ? undefined : registry.getProvider(secondaryName)
 
   if (!secondary || !secondary.isConfigured()) {
     return {
@@ -132,12 +155,16 @@ export async function sendEmailWithFailover(
       provider: primaryResult.providerName,
       error: `${primaryResult.error} (no configured failover provider: ${secondaryName})`,
       attempts,
-      failedOver: false,
+      failedOver: startedOnSecondary,
     }
   }
 
   const secondaryResult = await secondary.send(payload)
   attempts.push(secondaryResult)
+
+  if (!secondaryResult.success && isCapacityExhaustionSignal(secondaryResult.statusCode, secondaryResult.providerCode)) {
+    await markProviderExhausted(secondary.name as EmailProviderName)
+  }
 
   if (secondaryResult.success) {
     return {

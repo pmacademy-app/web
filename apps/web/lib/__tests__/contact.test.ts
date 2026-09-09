@@ -92,10 +92,18 @@ vi.mock('@/lib/supabase', () => ({
 
 vi.mock('@/lib/email', () => ({
   sendEmail: (...args: any[]) => mockSendEmail(...args),
+  // The governed gateway masks recipients before logging, so this export has to exist
+  // on the mock now that /api/contact dispatches through the gateway.
+  maskEmail: (email: string) => `***@${String(email).split('@')[1] ?? 'unknown'}`,
+  getFromEmail: () => 'Prodily <noreply@example.com>',
 }))
 
 vi.mock('@/lib/rate-limit', () => ({
   evaluateRateLimit: vi.fn(() => Promise.resolve(mockRateLimitResult)),
+  // The governed gateway evaluates its own recipient/IP/aggregate budgets through the
+  // persistent limiter. Left unmocked it is undefined here and the whole dispatch
+  // throws, which would report "email not sent" for reasons unrelated to this test.
+  evaluatePersistentRateLimit: vi.fn(() => Promise.resolve({ success: true, remaining: 10, resetInMs: 0 })),
 }))
 
 vi.mock('@/lib/auth', () => ({

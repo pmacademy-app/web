@@ -70,6 +70,10 @@ export class ResendProvider implements NotificationProvider {
       if (!res.ok) {
         const errorMsg = data?.message || data?.error || `HTTP ${res.status} error from Resend`
         const statusCode = res.status
+        // Resend names the condition in `name` (e.g. `rate_limit_exceeded`,
+        // `daily_quota_exceeded`). Same reasoning as Brevo: the code, not just the
+        // status, decides whether the other provider is worth trying.
+        const providerCode = [data?.name, data?.message].filter(Boolean).join(' ') || undefined
         console.error('[ResendProvider] Error response from Resend API:', data)
         
         try {
@@ -84,7 +88,7 @@ export class ResendProvider implements NotificationProvider {
             summary: 'Resend rejected an email send',
             subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
             provider: { name: this.name, statusCode },
-            details: { providerMessage: errorMsg },
+            details: { providerMessage: errorMsg, providerCode: data?.name ?? null },
           })
         } catch {
           // Non-fatal logger fallback
@@ -95,6 +99,7 @@ export class ResendProvider implements NotificationProvider {
           providerName: this.name,
           error: errorMsg,
           statusCode,
+          providerCode,
           timestamp: new Date().toISOString(),
         }
       }

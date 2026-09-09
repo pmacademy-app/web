@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
 import { evaluateRateLimit } from '@/lib/rate-limit'
-import { sendEmail } from '@/lib/email'
+import { sendGovernedEmail } from '@/lib/email-governance'
+import { getClientIpBucket } from '@/lib/security/client-ip'
 
 function escapeHtml(unsafe: string): string {
   return unsafe
@@ -16,8 +17,15 @@ function escapeHtml(unsafe: string): string {
 export async function POST(request: Request) {
   try {
     const user = await getAuthenticatedUserFromRequest(request)
-    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anon'
-    const rateCheck = await evaluateRateLimit(`contact_${user ? user.id : clientIp}`, { limit: 3, windowMs: 10 * 60 * 1000 })
+    // Trusted IP, not the leftmost `X-Forwarded-For` value the caller supplies —
+    // otherwise the per-IP budget is refreshed by rotating a header.
+    const clientIp = getClientIpBucket(request)
+    const rateCheck = await evaluateRateLimit(`contact_${user ? user.id : clientIp}`, {
+      limit: 3,
+      windowMs: 10 * 60 * 1000,
+      // This endpoint dispatches an email, so a limiter outage must not open it up.
+      failClosed: true,
+    })
 
     if (!rateCheck.success) {
       return NextResponse.json({ error: 'Too many contact messages sent. Please try again later.' }, { status: 429 })
@@ -119,17 +127,25 @@ export async function POST(request: Request) {
 
     let emailSent = false
     try {
-      const emailResult = await sendEmail({
+      const emailResult = await sendGovernedEmail({
+        purpose: 'contact.acknowledgement',
         to: 'pmacademyapp@gmail.com',
         subject: emailSubject,
         html: htmlContent,
         text: textContent,
+        // The stored message row is the durable state; one alert per row.
+        idempotencyKey: `contact:${data.id}`,
+        ipBucket: clientIp,
       })
 
-      if (emailResult.success) {
+      if (emailResult.sent) {
         emailSent = true
       } else {
-        console.error('[contact/route] Resend email dispatch failed for message ID:', data.id, emailResult.error)
+        console.error(
+          '[contact/route] Support alert dispatch failed for message ID:',
+          data.id,
+          emailResult.blocked ? `blocked: ${emailResult.blocked}` : emailResult.error
+        )
       }
     } catch (emailErr) {
       console.error('[contact/route] Exception sending alert email for message ID:', data.id, emailErr)

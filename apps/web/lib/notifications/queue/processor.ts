@@ -27,6 +27,17 @@ export interface EnqueueNotificationParams {
   priorityLevel?: NotificationPriorityLevel
   /** Optional broadcast ID — tags the email_queue row for deduplication and stats. */
   broadcastId?: string
+  /**
+   * Logical identity of this message, unique across `email_queue`.
+   *
+   * When set, duplicate prevention is enforced by a unique index instead of by a
+   * SELECT-then-INSERT: concurrent callers race on the insert and exactly one wins.
+   * The previous check could not do this — two simultaneous registrations both read
+   * "no existing row" and both queued a welcome email, and once two rows existed the
+   * `.maybeSingle()` lookup errored, the error was discarded, and every later attempt
+   * inserted another copy.
+   */
+  idempotencyKey?: string
 }
 
 /**
@@ -76,7 +87,13 @@ export async function enqueueNotificationItem(
   }
 
   // 4. Idempotency / Duplicate Prevention Check
-  if (params.broadcastId) {
+  //
+  // With an `idempotencyKey` the insert below carries it and the unique index decides
+  // the race, so no pre-read is needed (or wanted — a pre-read is exactly the part
+  // that could not be made concurrency-safe).
+  if (params.idempotencyKey) {
+    // Intentionally no SELECT here. Fall through to the insert.
+  } else if (params.broadcastId) {
     try {
       const { data: rawExistingBroadcast } = await supabase
         .from('email_queue')
@@ -135,6 +152,7 @@ export async function enqueueNotificationItem(
         created_at: now,
         updated_at: now,
         broadcast_id: params.broadcastId || null,
+        idempotency_key: params.idempotencyKey || null,
       })
       .select('id')
       .single()

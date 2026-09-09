@@ -3,7 +3,10 @@ import { z } from 'zod'
 import { createServiceRoleClient } from '@/lib/supabase'
 import type { ApiSuccess, ApiError } from '@/types'
 import { ROLE_OPTIONS } from '@/types'
-import { sendWaitlistConfirmationEmail } from '@/lib/email'
+import { buildWaitlistConfirmationEmail } from '@/lib/email'
+import { sendGovernedEmail } from '@/lib/email-governance'
+import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
+import { getClientIpBucket } from '@/lib/security/client-ip'
 
 // ─── Validation Schema ────────────────────────────────────────────────────────
 
@@ -27,33 +30,22 @@ const waitlistSchema = z.object({
   utm_campaign: z.string().max(100).optional().nullable(),
 })
 
-// ─── Simple in-memory rate limiting ──────────────────────────────────────────
-// Sufficient for MVP. Replace with Upstash/Redis at scale.
-
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT = { MAX: 5, WINDOW_MS: 60_000 } // 5 per minute per IP
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(ip)
-
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT.WINDOW_MS })
-    return true
-  }
-
-  if (entry.count >= RATE_LIMIT.MAX) return false
-
-  entry.count++
-  return true
-}
+// ─── Rate limiting ────────────────────────────────────────────────────────────
+//
+// This endpoint sends a confirmation email, so it is an independent way to spend
+// provider credit — the thing the 2026-09-09 incident was about. It previously used a
+// process-local Map keyed on the leftmost `X-Forwarded-For` value, which fails twice
+// over: the key is attacker-supplied, and on serverless every cold instance starts
+// with an empty map, so the counter rarely survives long enough to deny anything.
+// It now uses the persistent, cross-instance limiter on a trusted IP, fail-closed.
+const IP_WAITLIST_LIMIT = { windowMs: 60 * 60 * 1000, limit: 5, failClosed: true }
 
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiSuccess | ApiError>> {
-  // Rate limiting by IP
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  if (!checkRateLimit(ip)) {
+  const ipBucket = getClientIpBucket(request)
+  const ipLimit = await evaluatePersistentRateLimit(`waitlist_ip:${ipBucket}`, IP_WAITLIST_LIMIT)
+  if (!ipLimit.success) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again in a moment.', code: 'SERVER_ERROR' },
       { status: 429 }
@@ -133,8 +125,20 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
       )
     }
 
-    // Send waitlist confirmation email (asynchronous, non-blocking)
-    sendWaitlistConfirmationEmail({ name, email }).catch((err) => {
+    // Send the confirmation through the governed gateway (asynchronous, non-blocking).
+    // The waitlist row above is the durable state this email is attached to, and the
+    // idempotency key is derived from the address, so a duplicate submission that
+    // somehow got past the 23505 check still cannot produce a second send.
+    const waitlistEmail = buildWaitlistConfirmationEmail({ name })
+    void sendGovernedEmail({
+      purpose: 'waitlist.confirmation',
+      to: email,
+      subject: waitlistEmail.subject,
+      html: waitlistEmail.html,
+      text: waitlistEmail.text,
+      idempotencyKey: `waitlist:${email.toLowerCase()}`,
+      ipBucket,
+    }).catch((err) => {
       console.error('[waitlist] Error sending confirmation email:', err)
     })
 

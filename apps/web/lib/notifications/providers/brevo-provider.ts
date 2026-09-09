@@ -73,6 +73,10 @@ export class BrevoProvider implements NotificationProvider {
       if (!res.ok) {
         const errorMsg = data?.message || data?.error || `HTTP ${res.status} error from Brevo`
         const statusCode = res.status
+        // Brevo puts the machine-readable reason in `code`, and credit exhaustion
+        // arrives as HTTP 400 + `not_enough_credits`. Dropping this field is what made
+        // an exhausted Brevo look like a permanent bad-request and blocked failover.
+        const providerCode = [data?.code, data?.message].filter(Boolean).join(' ') || undefined
         console.error('[BrevoProvider] Error response from Brevo API:', data)
 
         try {
@@ -87,7 +91,7 @@ export class BrevoProvider implements NotificationProvider {
             summary: 'Brevo rejected an email send',
             subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
             provider: { name: this.name, statusCode },
-            details: { providerMessage: errorMsg },
+            details: { providerMessage: errorMsg, providerCode: data?.code ?? null },
           })
         } catch {
           // Non-fatal logger fallback
@@ -98,6 +102,7 @@ export class BrevoProvider implements NotificationProvider {
           providerName: this.name,
           error: errorMsg,
           statusCode,
+          providerCode,
           timestamp: new Date().toISOString(),
         }
       }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
+import { getClientIpBucket } from '@/lib/security/client-ip'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { classifyAuthError } from '@/lib/auth/errors'
@@ -22,19 +23,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Email address is required' }, { status: 400 })
     }
 
-    // 1. Persistent 60-Second Rate Limit Check (PostgreSQL public.rate_limits)
-    const rateLimit = await evaluatePersistentRateLimit(`verify_resend:${targetEmail}`, {
-      windowMs: 60 * 1000,
-      limit: 1,
-    })
+    // 1. Rate limits.
+    //
+    // The per-email 60s throttle alone was not an abuse control: this endpoint calls
+    // `supabase.auth.resend()`, which fires the GoTrue hook and spends provider
+    // credit, and an attacker rotating addresses got a fresh 60s bucket for every one
+    // of them. A trusted-IP budget and a platform-wide hourly ceiling now sit
+    // alongside it, and all three fail closed.
+    const ipBucket = getClientIpBucket(request)
+    const [rateLimit, ipLimit, aggregateLimit] = await Promise.all([
+      evaluatePersistentRateLimit(`verify_resend:${targetEmail}`, {
+        windowMs: 60 * 1000,
+        limit: 1,
+        failClosed: true,
+      }),
+      evaluatePersistentRateLimit(`verify_resend_ip:${ipBucket}`, {
+        windowMs: 60 * 60 * 1000,
+        limit: 10,
+        failClosed: true,
+      }),
+      evaluatePersistentRateLimit('verify_resend_global', {
+        windowMs: 60 * 60 * 1000,
+        limit: 60,
+        failClosed: true,
+      }),
+    ])
 
-    if (!rateLimit.success) {
-      const secondsLeft = Math.ceil(rateLimit.resetInMs / 1000)
+    if (!rateLimit.success || !ipLimit.success || !aggregateLimit.success) {
+      const resetInMs = Math.max(rateLimit.resetInMs, ipLimit.resetInMs, aggregateLimit.resetInMs)
+      const secondsLeft = Math.ceil(resetInMs / 1000)
       return NextResponse.json(
         {
           success: false,
           error: `Please wait ${secondsLeft} second${secondsLeft === 1 ? '' : 's'} before requesting another verification email.`,
-          resetInMs: rateLimit.resetInMs,
+          resetInMs,
         },
         { status: 429 }
       )

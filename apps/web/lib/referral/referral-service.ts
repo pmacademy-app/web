@@ -170,6 +170,48 @@ export async function createReferralAttribution(
 }
 
 /**
+ * Shape a referral code must have before it is worth storing or resolving.
+ *
+ * Applied at the signup boundary so attacker-controlled input cannot be carried
+ * through the auth flow as an arbitrary string. Codes are short alphanumeric slugs or
+ * a user UUID; anything else is dropped rather than persisted into user metadata.
+ */
+const REFERRAL_CODE_PATTERN = /^[A-Za-z0-9_-]{3,64}$/
+
+export function isPlausibleReferralCode(value: unknown): value is string {
+  return typeof value === 'string' && REFERRAL_CODE_PATTERN.test(value.trim())
+}
+
+/**
+ * Applies a referral code that was recorded at signup but deliberately NOT acted on
+ * until the account reached a durable, verified state.
+ *
+ * Attribution used to run inline during signup, and because it needed a
+ * `public.users` row it called `ensureUserProfile()` — which dispatches the welcome
+ * email. Supplying any `refCode` therefore produced a welcome email for an entirely
+ * unverified account, turning an attacker-controlled request field into an
+ * email-sending trigger. The code now rides along in auth metadata and is redeemed
+ * here, once verification has actually happened.
+ *
+ * Safe to call more than once: `createReferralAttribution` already enforces
+ * one-attribution-per-user.
+ */
+export async function applyPendingReferral(
+  supabase: SupabaseClient<Database>,
+  user: { id: string; user_metadata?: Record<string, unknown> | null }
+): Promise<ReferralRecordResult> {
+  const pending = user.user_metadata?.pending_ref_code
+  if (!isPlausibleReferralCode(pending)) {
+    return { created: false, reason: 'no_referrer_code' }
+  }
+
+  return createReferralAttribution(supabase, {
+    referrerCodeOrId: pending.trim(),
+    newUserId: user.id,
+  })
+}
+
+/**
  * Checks and activates referral rewards when a learner completes their first lesson.
  * Idempotent: rewards only once per referral attribution.
  */

@@ -30,30 +30,47 @@ afterEach(() => {
   process.env.ALLOW_TEST_DB_ACCESS = originalAllowTestDbAccess
 })
 
-/** In-memory stand-in for the `public.rate_limits` Postgres table, external to the module under test. */
+/**
+ * In-memory stand-in for the `consume_rate_limit(key, limit, window_ms)` RPC added in
+ * `20260909000001_signup_abuse_email_governance.sql`, external to the module under test.
+ *
+ * The limiter no longer does SELECT-then-UPDATE from the application — that pair was
+ * two statements, so N concurrent requests all read the same count and all passed.
+ * The decision now happens in one statement inside Postgres, and this fake mirrors
+ * that statement's semantics exactly:
+ *
+ *   - no live row, or the window has elapsed  -> reset to count 1, allow
+ *   - live row under the limit                -> increment, allow
+ *   - live row at the limit                   -> update nothing, deny
+ */
 function createFakeRateLimitsTable() {
   const rows = new Map<string, { key: string; last_requested_at: string; count: number }>()
 
   const client = {
-    from: (table: string) => {
-      if (table !== 'rate_limits') throw new Error(`Unexpected table: ${table}`)
+    rpc: async (fn: string, args: { p_key: string; p_limit: number; p_window_ms: number }) => {
+      if (fn !== 'consume_rate_limit') throw new Error(`Unexpected RPC: ${fn}`)
+      const { p_key: key, p_limit: limit, p_window_ms: windowMs } = args
+      const now = Date.now()
+      const existing = rows.get(key)
+      const elapsed = existing ? now - new Date(existing.last_requested_at).getTime() : Infinity
+
+      if (!existing || elapsed >= windowMs) {
+        rows.set(key, { key, last_requested_at: new Date(now).toISOString(), count: 1 })
+        return { data: [{ allowed: true, remaining: limit - 1, reset_in_ms: windowMs }], error: null }
+      }
+
+      if (existing.count >= limit) {
+        return {
+          data: [{ allowed: false, remaining: 0, reset_in_ms: Math.max(0, windowMs - elapsed) }],
+          error: null,
+        }
+      }
+
+      const next = { ...existing, count: existing.count + 1 }
+      rows.set(key, next)
       return {
-        select: () => ({
-          eq: (_col: string, key: string) => ({
-            maybeSingle: async () => ({ data: rows.get(key) ?? null, error: null }),
-          }),
-        }),
-        update: (payload: { count: number; updated_at: string }) => ({
-          eq: (_col: string, key: string) => {
-            const existing = rows.get(key)
-            if (existing) rows.set(key, { ...existing, count: payload.count })
-            return Promise.resolve({ data: null, error: null })
-          },
-        }),
-        upsert: async (row: { key: string; last_requested_at: string; count: number }) => {
-          rows.set(row.key, row)
-          return { data: null, error: null }
-        },
+        data: [{ allowed: true, remaining: limit - next.count, reset_in_ms: Math.max(0, windowMs - elapsed) }],
+        error: null,
       }
     },
   } as unknown as SupabaseClient<Database>

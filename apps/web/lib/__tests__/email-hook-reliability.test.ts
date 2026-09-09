@@ -29,6 +29,29 @@ function createMockRequest(url: string, options: {
   } as any
 }
 
+/**
+ * Mocks fetch for the email PROVIDER hosts only, letting everything else (the
+ * governed gateway's flag/limit/ledger queries against Supabase) fall through to the
+ * suite's default handler.
+ *
+ * These tests used to use `mockImplementationOnce`, which assumed the provider call
+ * was the first fetch the route made. Since the send-email hook was moved behind the
+ * governed gateway that is no longer true — the gateway checks the kill switch, the
+ * rate limits and the idempotency ledger first — so the "once" mock was being consumed
+ * by a database call and the real provider request escaped to the network. Matching on
+ * the host tests the same behavior without depending on call ordering.
+ */
+function mockProviderFetch(handler: (url: string) => Promise<Response> | Response) {
+  const original = global.fetch
+  vi.spyOn(global, 'fetch').mockImplementation((async (input: any, init?: any) => {
+    const url = String(input)
+    if (url.includes('resend.com') || url.includes('brevo.com')) {
+      return handler(url)
+    }
+    return original(input, init)
+  }) as any)
+}
+
 describe('Phase 5 — Authentication Reliability, Ghost Accounts & Email Hook Hardening', () => {
   const initialSecret = process.env.SEND_EMAIL_HOOK_SECRET
   const initialResendKey = process.env.RESEND_API_KEY
@@ -193,12 +216,12 @@ describe('Phase 5 — Authentication Reliability, Ghost Accounts & Email Hook Ha
       process.env.RESEND_API_KEY = 're_test_key_123'
       ;(process.env as any).NODE_ENV = 'development'
 
-      vi.spyOn(global, 'fetch').mockImplementationOnce(async () => {
-        return new Response(JSON.stringify({ message: 'Too many requests' }), {
+      mockProviderFetch(() =>
+        new Response(JSON.stringify({ message: 'Too many requests' }), {
           status: 429,
           headers: { 'Content-Type': 'application/json' },
         })
-      })
+      )
 
       const req = createMockRequest('http://localhost:3000/api/auth/send-email-hook', {
         body: JSON.stringify({
@@ -239,12 +262,12 @@ describe('Phase 5 — Authentication Reliability, Ghost Accounts & Email Hook Ha
       process.env.RESEND_API_KEY = 're_test_key'
       ;(process.env as any).NODE_ENV = 'development'
 
-      vi.spyOn(global, 'fetch').mockImplementationOnce(async () => {
-        return new Response(JSON.stringify({ message: 'Internal server error' }), {
+      mockProviderFetch(() =>
+        new Response(JSON.stringify({ message: 'Internal server error' }), {
           status: 503,
           headers: { 'Content-Type': 'application/json' },
         })
-      })
+      )
 
       const req = createMockRequest('http://localhost:3000/api/auth/send-email-hook', {
         body: JSON.stringify({
@@ -263,7 +286,7 @@ describe('Phase 5 — Authentication Reliability, Ghost Accounts & Email Hook Ha
 
       const timeoutErr = new Error('The operation was aborted due to timeout')
       timeoutErr.name = 'TimeoutError'
-      vi.spyOn(global, 'fetch').mockRejectedValueOnce(timeoutErr)
+      mockProviderFetch(() => { throw timeoutErr })
 
       const req = createMockRequest('http://localhost:3000/api/auth/send-email-hook', {
         body: JSON.stringify({

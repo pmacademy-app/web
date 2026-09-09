@@ -7,7 +7,8 @@
  */
 
 import { BRAND } from '@/lib/brand'
-import { classifyProviderFailure } from '@/lib/notifications/providers/failure-classification'
+import { classifyProviderFailure, isCapacityExhaustionSignal } from '@/lib/notifications/providers/failure-classification'
+import { markProviderExhausted } from '@/lib/notifications/providers/provider-quota'
 import { resolvePrimaryProvider } from '@/lib/notifications/config'
 
 export interface EmailRecipient {
@@ -31,6 +32,12 @@ export interface SendEmailResult {
   id?: string
   error?: string
   statusCode?: number
+  /**
+   * The provider's own error code/message. Brevo signals credit exhaustion as an
+   * HTTP 400 with `{"code":"not_enough_credits"}`, so the status code alone cannot
+   * decide failover eligibility. See `failure-classification.ts`.
+   */
+  providerCode?: string
   provider?: 'resend' | 'brevo' | 'simulated'
 }
 
@@ -48,7 +55,20 @@ export interface SendEmailResult {
  */
 function isFailoverEligibleFailure(result: SendEmailResult): boolean {
   if (result.success) return false
-  return classifyProviderFailure(result.statusCode) === 'failover'
+  return classifyProviderFailure(result.statusCode, result.providerCode) === 'failover'
+}
+
+/**
+ * Records capacity exhaustion so later dispatches skip this provider for the rest of
+ * the UTC day instead of spending another request to rediscover that it has no credit.
+ */
+async function noteExhaustionIfCapacity(
+  providerName: 'brevo' | 'resend',
+  result: SendEmailResult
+): Promise<void> {
+  if (result.success) return
+  if (!isCapacityExhaustionSignal(result.statusCode, result.providerCode)) return
+  await markProviderExhausted(providerName)
 }
 
 /**
@@ -96,6 +116,7 @@ export async function sendEmail({
   text,
   fromEmail: customFromEmail,
   replyTo,
+  preferProvider,
 }: {
   to: string
   subject: string
@@ -103,6 +124,18 @@ export async function sendEmail({
   text: string
   fromEmail?: string
   replyTo?: string
+  /**
+   * Start on this provider instead of the configured primary.
+   *
+   * Set by the governed gateway when it has already established that the configured
+   * primary is out of credit for the day, so this send should not spend a request
+   * rediscovering that. When it differs from the configured primary, failing back
+   * onto the skipped provider is suppressed — it was skipped deliberately.
+   *
+   * The decision is passed in rather than looked up here so that the common path
+   * stays a single provider call with no extra database round-trip.
+   */
+  preferProvider?: 'brevo' | 'resend'
 }): Promise<SendEmailResult> {
   const fromEmail = customFromEmail || getFromEmail()
   const brevoApiKey = process.env.BREVO_API_KEY
@@ -124,14 +157,28 @@ export async function sendEmail({
     return { success: true, id: `simulated-${primaryProvider}-${Date.now()}`, provider: 'simulated', statusCode: 200 }
   }
 
-  if (primaryProvider === 'brevo') {
+  // A provider already known to be out of credit is not worth a request. The caller
+  // supplies that decision (see `preferProvider`), which is what stops "select the
+  // exhausted Brevo, fail, fail over" from repeating on every single send.
+  const hasOther = primaryProvider === 'brevo' ? Boolean(resendApiKey) : Boolean(brevoApiKey)
+  const effectivePrimary = preferProvider && hasOther ? preferProvider : primaryProvider
+  if (effectivePrimary !== primaryProvider) {
+    console.log(`[email] Starting on ${effectivePrimary} instead of ${primaryProvider} at the caller's direction (primary exhausted).`)
+  }
+
+  if (effectivePrimary === 'brevo') {
     if (brevoApiKey) {
       const brevoRes = await sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey, replyTo)
       if (brevoRes.success) return brevoRes
       void reportTransportFailure('brevo', brevoRes, to)
-      if (resendApiKey && isFailoverEligibleFailure(brevoRes)) {
+      await noteExhaustionIfCapacity('brevo', brevoRes)
+      // Never fail back onto the provider we skipped for being exhausted.
+      const mayFailOver = Boolean(resendApiKey) && effectivePrimary === primaryProvider
+      if (mayFailOver && isFailoverEligibleFailure(brevoRes)) {
         console.log(`[email] Brevo failover-eligible failure (status ${brevoRes.statusCode ?? 'network'}), falling back to Resend...`)
-        return sendViaResend(to, subject, html, text, fromEmail, resendApiKey, replyTo)
+        const resendRes = await sendViaResend(to, subject, html, text, fromEmail, resendApiKey as string, replyTo)
+        await noteExhaustionIfCapacity('resend', resendRes)
+        return resendRes
       }
       if (!isFailoverEligibleFailure(brevoRes)) {
         console.warn(`[email] Brevo permanent failure (status ${brevoRes.statusCode}) — not falling back to Resend; both providers would reject this identically.`)
@@ -146,9 +193,13 @@ export async function sendEmail({
       const resendRes = await sendViaResend(to, subject, html, text, fromEmail, resendApiKey, replyTo)
       if (resendRes.success) return resendRes
       void reportTransportFailure('resend', resendRes, to)
-      if (brevoApiKey && isFailoverEligibleFailure(resendRes)) {
+      await noteExhaustionIfCapacity('resend', resendRes)
+      const mayFailOver = Boolean(brevoApiKey) && effectivePrimary === primaryProvider
+      if (mayFailOver && isFailoverEligibleFailure(resendRes)) {
         console.log(`[email] Resend failover-eligible failure (status ${resendRes.statusCode ?? 'network'}), falling back to Brevo...`)
-        return sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey, replyTo)
+        const brevoRes = await sendViaBrevo(to, subject, html, text, fromEmail, brevoApiKey as string, replyTo)
+        await noteExhaustionIfCapacity('brevo', brevoRes)
+        return brevoRes
       }
       if (!isFailoverEligibleFailure(resendRes)) {
         console.warn(`[email] Resend permanent failure (status ${resendRes.statusCode}) — not falling back to Brevo; both providers would reject this identically.`)
@@ -208,14 +259,17 @@ async function sendViaBrevo(
       signal: AbortSignal.timeout(8000),
     })
 
-    const data = (await res.json().catch(() => ({}))) as { messageId?: string; id?: string; message?: string }
+    const data = (await res.json().catch(() => ({}))) as { messageId?: string; id?: string; message?: string; code?: string }
 
     if (!res.ok) {
-      console.warn(`[email] Brevo API error (status ${res.status}):`, data.message || res.statusText)
+      console.warn(`[email] Brevo API error (status ${res.status}, code ${data.code ?? 'none'}):`, data.message || res.statusText)
       return {
         success: false,
         error: data.message ?? `Brevo error (${res.status})`,
         statusCode: res.status,
+        // Brevo answers "no credit left" with HTTP 400 + code `not_enough_credits`.
+        // Without this field the classifier saw only the 400 and called it permanent.
+        providerCode: [data.code, data.message].filter(Boolean).join(' ') || undefined,
         provider: 'brevo',
       }
     }
@@ -271,6 +325,7 @@ async function sendViaResend(
         success: false,
         error: data.message ?? `Resend error (${res.status})`,
         statusCode: res.status,
+        providerCode: [data.name, data.message].filter(Boolean).join(' ') || undefined,
         provider: 'resend',
       }
     }
@@ -287,13 +342,19 @@ async function sendViaResend(
   }
 }
 
-export async function sendWaitlistConfirmationEmail({
+/**
+ * Renders the waitlist confirmation email.
+ *
+ * Split out from sending so the caller can dispatch it through the governed gateway
+ * (`lib/email-governance.ts`) instead of straight at a provider. The gateway imports
+ * this module, so this module must not import the gateway — hence "build here, send
+ * there" rather than a governed wrapper living alongside the template.
+ */
+export function buildWaitlistConfirmationEmail({
   name,
-  email,
 }: {
   name: string
-  email: string
-}) {
+}): { subject: string; html: string; text: string } {
   const firstName = name.split(' ')[0] ?? 'there'
 
   const html = `
@@ -328,10 +389,9 @@ export async function sendWaitlistConfirmationEmail({
 
   const text = `Hi ${firstName},\n\nYou're on the list for ${BRAND.shortName}! We'll notify you as soon as early access opens.\n\n${BRAND.fullName} - ${BRAND.positioning}`
 
-  return sendEmail({
-    to: email,
+  return {
     subject: `You're on the ${BRAND.shortName} waitlist!`,
     html,
     text,
-  })
+  }
 }
