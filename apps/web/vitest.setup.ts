@@ -1,9 +1,11 @@
 import { vi, afterEach } from 'vitest'
 
-// Set deterministic test environment variables
-process.env.NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co'
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key'
-process.env.SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'mock-service-role-key'
+// Set deterministic test environment variables (isolate from local .env.local)
+if (process.env.ALLOW_LIVE_DB_TESTS !== 'true') {
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://mock.supabase.co'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'mock-anon-key'
+  process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock-service-role-key'
+}
 process.env.ADMIN_EMAILS = process.env.ADMIN_EMAILS || 'admin@prodily.app,owner@prodily.app'
 process.env.CRON_SECRET = process.env.CRON_SECRET || 'test-cron-secret'
 
