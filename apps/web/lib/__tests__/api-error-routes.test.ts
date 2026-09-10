@@ -161,7 +161,7 @@ describe('POST /api/auth/signup — error contract', () => {
     expect(typeof body.error).toBe('string')
   })
 
-  it('preserves the existing 409 USER_EXISTS contract', async () => {
+  it('returns a non-enumerating response when the email already exists instead of leaking USER_EXISTS', async () => {
     signUpImpl = async () => ({
       data: { user: { id: 'u1', identities: [] } },
       error: null,
@@ -170,7 +170,10 @@ describe('POST /api/auth/signup — error contract', () => {
     const res = await signupPOST(req('https://prodily.app/api/auth/signup', validBody))
     const body = await res.json()
 
-    expect(res.status).toBe(409)
-    expect(body.code).toBe('USER_EXISTS')
+    expect(res.status).toBe(200)
+    expect(body.success).toBe(true)
+    expect(body.verificationRequired).toBe(true)
+    expect(body.code).toBeUndefined()
+    expect(body.error).toBeUndefined()
   })
 })

@@ -173,10 +173,16 @@ export async function POST(request: NextRequest) {
         Boolean(data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
 
       if (isExistingAccount) {
-        return NextResponse.json(
-          { error: 'An account with this email address already exists.', code: 'USER_EXISTS' },
-          { status: 409 }
-        )
+        // Non-enumerating response: return the identical contract as a fresh registration.
+        // Attacker cannot discern whether this email is already registered.
+        // Legitimate users see the verification screen (which gives guidelines & login link).
+        // CRITICAL: No profile creation, no attribution, and no welcome email is sent.
+        return NextResponse.json({
+          success: true,
+          verificationRequired: true,
+          email,
+          message: 'Please check your email for the confirmation link.',
+        })
       }
 
       if (error) {
@@ -216,14 +222,22 @@ export async function POST(request: NextRequest) {
           createError.message?.toLowerCase().includes('already in use') ||
           createError.message?.toLowerCase().includes('already exists')
 
+        if (isExisting) {
+          // Non-enumerating response: direct user to login without revealing account existence or bypassing auth.
+          return NextResponse.json({
+            success: true,
+            verificationRequired: false,
+            redirect: '/login',
+            message: 'Account created successfully. Please log in.',
+          })
+        }
+
         return NextResponse.json(
           {
-            error: isExisting
-              ? 'An account with this email address already exists.'
-              : createError.message || 'Registration failed.',
-            code: isExisting ? 'USER_EXISTS' : createError.code || 'SIGNUP_FAILED',
+            error: createError.message || 'Registration failed.',
+            code: createError.code || 'SIGNUP_FAILED',
           },
-          { status: isExisting ? 409 : 400 }
+          { status: 400 }
         )
       }
 

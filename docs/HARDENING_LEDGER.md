@@ -312,8 +312,8 @@ messages. "Plan ref" points at the batch specification in
 | **B1** — database / security exposure | I-02 | ✅ Complete in code | Migration unapplied |
 | **B2** — portfolio XSS | I-12 | ✅ Complete in code | S2-C3 resolved; 14 JSON-LD sites hardened |
 | **B3** — session/token architecture | I-06, I-07 | ✅ Complete in code | Unverified JWT trust removed; session fixation closed; refresh/logout routes added |
-| **B4** — email gateway + signup ordering | I-04 | 🟡 **Largely delivered by `10a21a5`** | See below |
-| **B5** — atomic rate limiting + abuse controls | I-03 | 🟡 **Largely delivered by `10a21a5`** | See below |
+| **B4** — email gateway + signup ordering | I-04 | ✅ Complete in code | Direct transports unified through canonical failover registry; kill switch enforced; timeouts standardized; durable side effects verification-gated |
+| **B5** — atomic rate limiting + abuse controls | I-03 | ✅ Complete in code | Login & update-password fail-closed atomic rate limits implemented; telemetry leftmost-XFF trust removed; signup account enumeration closed; Turnstile deferred |
 | **B6** — provider failover + email reliability | I-04, I-05 | 🟡 **Partially delivered by `10a21a5`** | See below |
 | **B7** — shared auth + route/error contract | I-07 | ⬜ Outstanding | |
 | **B8** — typed data layer + DB correctness | I-08 | ⬜ Outstanding | Includes the P0 leaderboard column bug (I-08-B1) |
@@ -333,11 +333,11 @@ re-implement the items marked ✅.**
 |---|---|---|
 | **I-03-B1** atomic rate-limit RPC | ✅ Done | `consume_rate_limit` in the incident migration |
 | **I-03-B2** limiter + explicit fail mode | ✅ Done (variant) | Shipped as `failClosed?: boolean` rather than the planned `failMode: 'open' \| 'closed'`. Functionally equivalent; adopt the shipped shape rather than churning the API |
-| **I-03-B3** trusted client IP helper | 🟡 Partial | `lib/security/client-ip.ts` exists and is used by signup, resend-verification, waitlist, contact and the auth hook. **`app/api/auth/telemetry/route.ts:130` still reads the leftmost `X-Forwarded-For`** |
-| **I-03-B4** fail-closed limits on unprotected endpoints | 🟡 Partial | `waitlist` and `resend-verification` done. **`/api/auth/login` and `/api/auth/update-password` still have no rate limiting at all** — F-SEC-5 remains open |
+| **I-03-B3** trusted client IP helper | ✅ Complete | `lib/security/client-ip.ts` exists and is used by signup, resend-verification, waitlist, contact, the auth hook, and `app/api/auth/telemetry/route.ts` (leftmost-XFF trust removed in B5) |
+| **I-03-B4** fail-closed limits on unprotected endpoints | ✅ Complete | `waitlist`, `resend-verification`, `/api/auth/login` (IP + canonical email), and `/api/auth/update-password` (IP + authenticated user/token) protected with fail-closed atomic rate limiting (F-SEC-5 closed in B5) |
 | **I-03-B5** global signup ceiling | ✅ Done | `signup_global` key, hourly, derived from the configured daily email limit |
-| **I-03-B6** close enumeration oracles | 🟡 Partial | Rate-limit refusals no longer say which bucket tripped, and resend-verification is non-enumerating. **Signup still returns an explicit `409 USER_EXISTS`**, so the oracle is not closed |
-| **I-03-B7** Turnstile | ⬜ Outstanding | No CAPTCHA provider is configured anywhere in the repo or environment |
+| **I-03-B6** close enumeration oracles | ✅ Complete | Rate-limit refusals no longer say which bucket tripped, resend-verification is non-enumerating, and signup now returns a uniform non-enumerating generic response on existing accounts without dispatching durable side effects |
+| **I-03-B7** Turnstile | ⬜ Deferred | Evaluated in B5: Cloudflare Turnstile credentials and packages are not configured in repository/environment. Deferred pending operator provisioning |
 | **I-04-B1** `from_email`/`reply_to` on `email_queue` | ⚪ Not Required | Evaluated in B4: schema migration unnecessary. Custom sender metadata is carried via JSONB template variables; no queue consumers query dedicated columns. |
 | **I-04-B2** kill switch in the direct transport | ✅ Complete | Enforced `EMAIL_ENABLED` kill switch inside `sendEmail()` with explicit `isCritical` bypass support, protecting direct callers bypassing the gateway. |
 | **I-04-B3** global ceiling + circuit breaker above failover | 🟡 Partial — **and its stated intent now conflicts with ADR-002** | An aggregate hourly ceiling (`email_global:governed`) and per-provider exhaustion marking exist. But this batch's objective reads *"trips to a hard stop rather than shifting volume to the secondary"*, whereas ADR-002 and the incident fix deliberately **do** fail over on capacity exhaustion. L-10 asks for both bounded failover *and* a breaker above it. **Needs a human decision before implementation** — see Open Questions |
@@ -360,8 +360,6 @@ Recorded here rather than acted on, per the reconciliation scope.
 2. **Signup reopening.** L-09 holds signup CLOSED until §20 of the plan is satisfied.
    The incident fix addresses several §20 preconditions but not Turnstile (I-03-B7).
    Reopening remains a human decision.
-3. **Unprotected auth endpoints.** `/api/auth/login` has no rate limiting (F-SEC-5).
-   This is a live gap, scheduled under B5 / I-03-B4, not fixed by the incident work.
 
 ---
 

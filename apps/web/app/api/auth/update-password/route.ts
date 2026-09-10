@@ -1,12 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import { createAuthenticatedServerClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { apiClassifiedAuthError, apiInternalError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { isNetworkFailure } from '@/lib/auth/errors'
+import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
+import { getClientIpBucket } from '@/lib/security/client-ip'
 
 export const runtime = 'nodejs'
+
+// Rate limiting for password update operations:
+// - Authenticated sensitive operation
+// - 10 attempts / 15 min / IP
+// - 5 attempts / 15 min / user
+const IP_UPDATE_PASSWORD_LIMIT = { windowMs: 15 * 60 * 1000, limit: 10, failClosed: true }
+const USER_UPDATE_PASSWORD_LIMIT = { windowMs: 15 * 60 * 1000, limit: 5, failClosed: true }
+
+function resolveUserRateLimitKey(accessToken: string | null | undefined, refreshToken: string | null | undefined): string {
+  if (accessToken) {
+    try {
+      const parts = accessToken.split('.')
+      if (parts.length >= 2) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))
+        if (typeof payload?.sub === 'string' && payload.sub.length > 0) {
+          return `user:${payload.sub}`
+        }
+      }
+    } catch {
+      // Fall through to token hash
+    }
+  }
+  const tokenToHash = accessToken || refreshToken || 'unknown'
+  const hash = crypto.createHash('sha256').update(tokenToHash).digest('hex').slice(0, 32)
+  return `token:${hash}`
+}
 
 /** Helper to delete recovery cookies cleanly across all response paths */
 function clearRecoveryCookies(response: NextResponse): void {
@@ -135,6 +164,28 @@ export async function POST(request: NextRequest) {
       )
       clearRecoveryCookies(response)
       return response
+    }
+
+    // Evaluate atomic fail-closed rate limit for authenticated password update
+    const clientIp = getClientIpBucket(request)
+    const userKey = resolveUserRateLimitKey(accessToken, refreshToken)
+
+    const [ipLimit, userLimit] = await Promise.all([
+      evaluatePersistentRateLimit(`update_pwd_ip:${clientIp}`, IP_UPDATE_PASSWORD_LIMIT),
+      evaluatePersistentRateLimit(`update_pwd_user:${userKey}`, USER_UPDATE_PASSWORD_LIMIT),
+    ])
+
+    if (!ipLimit.success || !userLimit.success) {
+      const resetInMs = Math.max(ipLimit.resetInMs, userLimit.resetInMs)
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Too many password update attempts. Please wait a while before trying again.',
+          code: 'AUTH_RATE_LIMITED',
+          resetInMs,
+        },
+        { status: 429 }
+      )
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
