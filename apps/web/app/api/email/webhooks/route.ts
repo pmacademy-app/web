@@ -4,6 +4,29 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { sendEmail } from '@/lib/email'
 import { EMAIL_HTTP_TIMEOUT_MS } from '@/lib/notifications/config'
 
+/**
+ * True when a provider's bounce payload explicitly reports a TRANSIENT failure.
+ *
+ * A bounce is not one thing. A full mailbox, a greylisting delay or a momentarily
+ * unreachable MX is temporary and the address is still valid; "no such user" is
+ * permanent. Both used to normalise to `email.bounced` and both were then written to
+ * `email_suppressions` with `reason: 'hard_bounce'`, which meant one transient failure
+ * could permanently stop mail to a perfectly good address.
+ *
+ * The test is deliberately positive — a bounce is only treated as soft when the
+ * provider SAYS it is transient. `Permanent`, `Undetermined`, and any payload we
+ * cannot read stay hard, so this narrows suppression without weakening it.
+ *
+ * Resend nests the verdict under `data.bounce.type`; Brevo signals it with its own
+ * `soft_bounce` event name, which is handled where the event type is normalised.
+ */
+export function isTransientBounce(data: Record<string, unknown>): boolean {
+  const bounce = data?.bounce
+  if (!bounce || typeof bounce !== 'object') return false
+  const type = (bounce as Record<string, unknown>).type
+  return typeof type === 'string' && type.toLowerCase() === 'transient'
+}
+
 function escapeHtml(unsafe: string): string {
   return unsafe
     .replace(/&/g, '&amp;')
@@ -184,7 +207,9 @@ export async function POST(request: Request) {
       providerLabel = 'Brevo'
       const brevoEvent = payload.event.toLowerCase()
       if (brevoEvent === 'delivered') eventType = 'email.delivered'
-      else if (brevoEvent === 'soft_bounce' || brevoEvent === 'hard_bounce' || brevoEvent === 'blocked' || brevoEvent === 'invalid_email') eventType = 'email.bounced'
+      // `soft_bounce` is deliberately NOT folded in here — see `isTransientBounce`.
+      else if (brevoEvent === 'soft_bounce') eventType = 'email.bounced_soft'
+      else if (brevoEvent === 'hard_bounce' || brevoEvent === 'blocked' || brevoEvent === 'invalid_email') eventType = 'email.bounced'
       else if (brevoEvent === 'spam' || brevoEvent === 'complaint') eventType = 'email.complained'
       else if (brevoEvent === 'opened' || brevoEvent === 'unique_opened') eventType = 'email.opened'
       else if (brevoEvent === 'click') eventType = 'email.clicked'
@@ -198,6 +223,17 @@ export async function POST(request: Request) {
     const data = (payload.data || payload) as Record<string, unknown>
     if (!emailId) {
       emailId = String(data.email_id || data.id || data['message-id'] || data.message_id || '')
+    }
+
+    // Resend reports both kinds of bounce as `email.bounced` and puts the distinction
+    // in the payload (`data.bounce.type`), so it can only be read once `data` exists.
+    //
+    // Only an explicitly Transient bounce is downgraded. `Permanent`, `Undetermined`
+    // and a missing/malformed bounce block all stay hard: a mailbox we cannot prove is
+    // temporary must keep its suppression, or we regress the protection that stopped
+    // us re-sending to addresses that had already hard-bounced.
+    if (eventType === 'email.bounced' && isTransientBounce(data)) {
+      eventType = 'email.bounced_soft'
     }
     console.log('[EmailWebhook] Inbound webhook received event type:', eventType, 'emailId:', emailId || 'none')
 
@@ -239,9 +275,18 @@ export async function POST(request: Request) {
               .update({ status: 'failed', error_message: `${providerLabel} event: ${eventType}`, failed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
               .eq('id', queueId)
           }
+          // A soft bounce deliberately leaves `status` alone. The provider accepted the
+          // message and is still retrying it on its own schedule; flipping the row to
+          // `failed` would both misreport a delivery that may yet succeed and expose it
+          // to admin "Retry All", producing a duplicate send. The event itself is
+          // already recorded above, which is where transient failures belong.
         }
 
-        // 4. Auto-suppress on spam complaints and hard bounces.
+        // 4. Auto-suppress on spam complaints and HARD bounces only.
+        //
+        // `email.bounced_soft` is excluded on purpose: suppression here is permanent
+        // (`expires_at` is never set), so applying it to a transient failure would
+        // silently and irreversibly cut off a valid recipient.
         //
         // Bounces were previously logged but never suppressed, so the address stayed
         // eligible for delivery: an admin "Retry All" would re-send to a mailbox that
