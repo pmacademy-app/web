@@ -315,7 +315,7 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
       expect(res.cookies.get('sb-refresh-token')?.value).toBeDefined()
     })
 
-    it('rejects duplicate email signup with 409 conflict', async () => {
+    it('handles duplicate email signup with a non-enumerating response', async () => {
       mockStore.authUsers.push({
         id: 'existing-1',
         email: 'duplicate@example.com',
@@ -337,9 +337,10 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
       })
 
       const res = await handleSignup(req)
-      expect(res.status).toBe(409)
+      expect(res.status).toBe(200)
       const json = await res.json()
-      expect(json.error).toContain('already exists')
+      expect(json.success).toBe(true)
+      expect(json.redirect).toBe('/login')
     })
   })
 

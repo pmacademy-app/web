@@ -8,6 +8,16 @@ export type QueueStatus =
   | 'retrying'
   | 'dead_letter'
   | 'suppressed'
+  | 'skipped'
+
+export interface ProcessQueueResult {
+  processed: number
+  delivered: number
+  failed: number
+  suppressed: number
+  skipped: number
+  reclaimed?: number
+}
 
 export interface RetryMetadata {
   attemptCount: number

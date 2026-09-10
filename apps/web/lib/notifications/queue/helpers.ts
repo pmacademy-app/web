@@ -6,15 +6,49 @@ import type { QueuedNotificationItem, QueueStatus } from './types'
 export function isValidQueueStatusTransition(from: QueueStatus, to: QueueStatus): boolean {
   const allowedMap: Record<QueueStatus, QueueStatus[]> = {
     pending: ['processing', 'suppressed'],
-    processing: ['delivered', 'failed', 'suppressed'],
-    failed: ['retrying', 'dead_letter'],
-    retrying: ['processing'],
+    processing: ['delivered', 'retrying', 'dead_letter', 'suppressed', 'skipped'],
+    failed: ['retrying', 'dead_letter', 'pending'],
+    retrying: ['processing', 'pending'],
     delivered: [],
     dead_letter: ['pending'], // Manual admin retry
-    suppressed: [],
+    skipped: ['pending'],     // Manual admin retry
+    suppressed: ['pending'],  // Manual admin retry
   }
 
   return allowedMap[from]?.includes(to) ?? false
+}
+
+export interface RetryDelayOptions {
+  maxDelayMinutes?: number
+  jitterFactor?: number
+  randomFn?: () => number
+}
+
+/**
+ * Calculates exponential backoff retry delay with bounded jitter and ceiling.
+ * Default backoff base: 5m -> 10m, 20m, 40m... capped at 120m.
+ * Jitter factor (default +/-20%) prevents synchronized retry storms across concurrent failed jobs.
+ */
+export function calculateRetryDelayMinutes(
+  attemptCount: number,
+  baseMinutes: number = 5,
+  options?: RetryDelayOptions
+): number {
+  const maxDelayMinutes = options?.maxDelayMinutes ?? 120
+  const jitterFactor = options?.jitterFactor ?? 0.2 // +/-20%
+  const randomFn = options?.randomFn ?? Math.random
+
+  const safeBase = Number.isFinite(baseMinutes) && baseMinutes > 0 ? baseMinutes : 5
+  const safeAttempts = Math.max(1, Math.min(attemptCount, 10))
+
+  // Exponential growth capped at maxDelayMinutes
+  const rawBackoff = Math.min(maxDelayMinutes, safeBase * Math.pow(2, safeAttempts))
+
+  // Bounded jitter: [1 - jitterFactor, 1 + jitterFactor]
+  const jitterMultiplier = (1 - jitterFactor) + (randomFn() * (2 * jitterFactor))
+  const delayWithJitter = Math.min(maxDelayMinutes, Math.max(1, rawBackoff * jitterMultiplier))
+
+  return Number(delayWithJitter.toFixed(2))
 }
 
 /**

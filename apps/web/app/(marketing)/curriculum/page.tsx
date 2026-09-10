@@ -4,6 +4,7 @@ import { MODULES } from '@/config/content'
 import { BRAND } from '@/lib/brand'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getCourseSchema } from '@/lib/schema'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { ArrowRight, BookOpen, Clock } from 'lucide-react'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
@@ -61,7 +62,7 @@ export default async function CurriculumPage() {
     <div className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-5xl space-y-12">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(courseSchema) }}
       />
 
       {/* Header */}

@@ -105,6 +105,21 @@ interface PersistArgs {
 }
 
 /**
+ * Detects whether the current process is running in an automated test environment.
+ * Checks Vitest, Jest, and NODE_ENV test markers.
+ */
+export function isTestEnvironment(): boolean {
+  return (
+    typeof process !== 'undefined' &&
+    (process.env.NODE_ENV === 'test' ||
+      process.env.VITEST === 'true' ||
+      Boolean(process.env.VITEST) ||
+      Boolean(process.env.VITEST_WORKER_ID) ||
+      Boolean(process.env.JEST_WORKER_ID))
+  )
+}
+
+/**
  * Writes one incident, deduplicating repeats inside the window.
  *
  * The previous lookup used `.maybeSingle()` on a filter that can legitimately match
@@ -117,6 +132,20 @@ interface PersistArgs {
 async function persistIncident(args: PersistArgs): Promise<string | null> {
   try {
     const { createServiceRoleClient } = await import('@/lib/supabase')
+
+    // In automated test environments, protect the production database from synthetic test telemetry.
+    // Allow persistence ONLY if createServiceRoleClient is explicitly mocked/spied on in a test harness
+    // or if test DB persistence is explicitly enabled.
+    const isMocked =
+      typeof createServiceRoleClient === 'function' &&
+      ('_isMockFunction' in createServiceRoleClient ||
+        'mock' in createServiceRoleClient ||
+        'getMockName' in (createServiceRoleClient as unknown as Record<string, unknown>))
+
+    if (isTestEnvironment() && !isMocked && process.env.ALLOW_TEST_SYSTEM_ERRORS !== 'true') {
+      return `test_incident_${args.fingerprint.slice(0, 16)}`
+    }
+
     const supabase = createServiceRoleClient()
     const nowIso = new Date().toISOString()
     const windowStart = new Date(Date.now() - DEDUP_WINDOW_MS).toISOString()
@@ -195,6 +224,9 @@ async function notifyAdminsOnce(
   args: PersistArgs,
   incidentId: string
 ): Promise<void> {
+  if (isTestEnvironment() && process.env.ALLOW_TEST_ADMIN_NOTIFICATIONS !== 'true') {
+    return
+  }
   try {
     const cooldownStart = new Date(Date.now() - ALERT_COOLDOWN_MS).toISOString()
     const { data: priorRows } = await supabase

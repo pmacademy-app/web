@@ -95,7 +95,8 @@ function describeAttempts(attempts: ProviderSendResult[]): string {
  */
 export async function sendEmailWithFailover(
   payload: ProviderSendPayload,
-  registry: ProviderRegistry = globalProviderRegistry
+  registry: ProviderRegistry = globalProviderRegistry,
+  preferProvider?: EmailProviderName
 ): Promise<FailoverSendResult> {
   const attempts: ProviderSendResult[] = []
 
@@ -109,7 +110,15 @@ export async function sendEmailWithFailover(
   // exhausted Brevo on every retry cycle — one wasted call per item, forever.
   let primary = configuredPrimary
   let startedOnSecondary = false
-  if (await isProviderExhausted(configuredPrimaryName)) {
+  if (preferProvider) {
+    const preferred = registry.getProvider(preferProvider)
+    if (preferred && preferred.isConfigured()) {
+      primary = preferred
+      if (preferred.name !== configuredPrimaryName) {
+        startedOnSecondary = true
+      }
+    }
+  } else if (payload.operation !== 'email.direct_send' && (await isProviderExhausted(configuredPrimaryName))) {
     if (alternate && alternate.isConfigured() && !(await isProviderExhausted(alternateName))) {
       primary = alternate
       startedOnSecondary = true

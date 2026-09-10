@@ -10,6 +10,7 @@ import {
   AccordionContent,
 } from '@/components/ui/accordion'
 import { trackFAQExpand } from '@/lib/analytics'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 
 /**
  * FAQ section — Sprint 2 §18 + Sprint 3 FAQ copy (all 10 Q&A pairs).
@@ -38,7 +39,7 @@ export function FAQSection() {
     >
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(faqJsonLd) }}
       />
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[8fr_4fr] gap-12 lg:gap-16 items-start">

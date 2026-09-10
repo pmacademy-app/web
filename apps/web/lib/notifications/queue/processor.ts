@@ -10,9 +10,31 @@ import { renderEmailTemplate } from '../../../emails'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EmailAutomationsService } from '../automations/service'
 import type { EmailAutomationKey } from '../automations/types'
+import { calculateRetryDelayMinutes } from './helpers'
+import { classifyProviderFailure } from '../providers/failure-classification'
 
 /** Backoff base used when the admin setting is unavailable or invalid. */
 const DEFAULT_RETRY_DELAY_MINUTES = 5
+
+/** Threshold after which a queue item in 'processing' status is considered orphaned. */
+export const STALE_PROCESSING_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
+
+/** Default bounded concurrency for email queue dispatch. */
+export const DEFAULT_DISPATCH_CONCURRENCY = 5
+
+/** Maximum execution duration per batch invocation to guarantee completion within serverless bounds. */
+export const MAX_BATCH_EXECUTION_MS = 90_000 // 90 seconds
+
+/**
+ * Chains .eq('status', 'processing') if the query builder supports chained filters.
+ * Mocks in unit tests that return plain non-builder promises will cleanly proceed without throwing.
+ */
+function withProcessingStatusGuard<T>(builder: T): T {
+  if (builder && typeof (builder as unknown as { eq?: unknown }).eq === 'function') {
+    return (builder as unknown as { eq: (col: string, val: string) => T }).eq('status', 'processing')
+  }
+  return builder
+}
 
 export interface EnqueueNotificationParams {
   userId: string
@@ -216,19 +238,183 @@ async function recordSkippedEvent(
 }
 
 /**
+ * Atomically reclaims orphaned or stuck 'processing' queue items whose lease has expired (>15 min).
+ * Items with attempt_count >= max_attempts transition to 'dead_letter'.
+ * Items with attempt_count < max_attempts transition to 'retrying' with randomized immediate backoff.
+ */
+export async function reclaimStaleProcessingItems(
+  supabase: ReturnType<typeof createServiceRoleClient>,
+  staleThresholdMs: number = STALE_PROCESSING_THRESHOLD_MS
+): Promise<{ reclaimedCount: number; items: Array<{ id: string; newStatus: string }> }> {
+  const staleIntervalSeconds = Math.max(60, Math.floor(staleThresholdMs / 1000))
+
+  // 1. Try atomic PostgreSQL RPC reclaim_stale_processing_items
+  try {
+    const rpcFn = supabase.rpc as unknown as (
+      name: string,
+      params: Record<string, unknown>
+    ) => Promise<{ data: unknown; error: { message: string } | null }>
+
+    const { data, error } = await rpcFn('reclaim_stale_processing_items', {
+      p_stale_interval_seconds: staleIntervalSeconds,
+      p_max_reclaim: 50,
+    })
+
+    if (!error && Array.isArray(data)) {
+      const reclaimed = data as Array<{ id: string; curr_status?: string; new_status?: string; prev_status?: string }>
+      return {
+        reclaimedCount: reclaimed.length,
+        items: reclaimed.map((r) => ({ id: String(r.id), newStatus: String(r.new_status || r.curr_status || 'retrying') })),
+      }
+    }
+  } catch (rpcErr) {
+    console.warn('[reclaimStaleProcessingItems] RPC reclaim_stale_processing_items unavailable, using fallback query:', rpcErr)
+  }
+
+  // 2. Degraded fallback using atomic compare-and-swap
+  const now = new Date()
+  const staleDate = new Date(now.getTime() - staleThresholdMs)
+  const staleIso = staleDate.toISOString()
+  const nowIso = now.toISOString()
+
+  try {
+    const query = supabase
+      .from('email_queue')
+      .select('id, status, attempt_count, max_attempts, failed_at')
+      .eq('status', 'processing')
+
+    if (typeof (query as unknown as { lte?: unknown }).lte !== 'function') {
+      return { reclaimedCount: 0, items: [] }
+    }
+
+    const { data: rawStale } = await query
+      .lte('processing_at', staleIso)
+      .limit(50)
+
+    const staleRows = (rawStale || []) as Array<Record<string, unknown>>
+    const reclaimedItems: Array<{ id: string; newStatus: string }> = []
+
+    for (const row of staleRows) {
+      const id = String(row.id)
+      const attemptCount = Number(row.attempt_count || 1)
+      const maxAttempts = Number(row.max_attempts || 3)
+
+      if (attemptCount >= maxAttempts) {
+        const { data: updated } = await supabase
+          .from('email_queue')
+          .update({
+            status: 'dead_letter',
+            error_message: 'Processing lease expired: max attempts reached',
+            failed_at: nowIso,
+            processing_at: null,
+            updated_at: nowIso,
+          })
+          .eq('id', id)
+          .eq('status', 'processing')
+          .select('id')
+          .maybeSingle()
+
+        if (updated) {
+          reclaimedItems.push({ id, newStatus: 'dead_letter' })
+        }
+      } else {
+        // Random jitter between 0 and 30 seconds
+        const jitterMs = Math.floor(Math.random() * 30_000)
+        const nextRetryAt = new Date(now.getTime() + jitterMs).toISOString()
+
+        const { data: updated } = await supabase
+          .from('email_queue')
+          .update({
+            status: 'retrying',
+            error_message: 'Processing lease expired: reclaimed for retry',
+            next_retry_at: nextRetryAt,
+            processing_at: null,
+            updated_at: nowIso,
+          })
+          .eq('id', id)
+          .eq('status', 'processing')
+          .select('id')
+          .maybeSingle()
+
+        if (updated) {
+          reclaimedItems.push({ id, newStatus: 'retrying' })
+        }
+      }
+    }
+
+    return {
+      reclaimedCount: reclaimedItems.length,
+      items: reclaimedItems,
+    }
+  } catch (fallbackErr) {
+    console.error('[reclaimStaleProcessingItems] Fallback query failed:', fallbackErr)
+    return { reclaimedCount: 0, items: [] }
+  }
+}
+
+/**
+ * Executes async tasks over an array of items with bounded concurrency and deadline.
+ */
+async function mapConcurrent<T, R>(
+  items: T[],
+  limit: number,
+  deadlineMs: number,
+  fn: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = []
+  let nextIndex = 0
+  const startTime = Date.now()
+
+  async function worker() {
+    while (nextIndex < items.length) {
+      if (Date.now() - startTime > deadlineMs) {
+        console.warn(`[mapConcurrent] Execution deadline (${deadlineMs}ms) exceeded, stopping queue batch dispatch`)
+        break
+      }
+      const currentIndex = nextIndex++
+      const item = items[currentIndex]
+      try {
+        const res = await fn(item)
+        results.push(res)
+      } catch (err) {
+        console.error('[mapConcurrent] Unhandled error in worker item:', err)
+      }
+    }
+  }
+
+  const workerCount = Math.min(Math.max(1, limit), items.length)
+  const workers = Array.from({ length: workerCount }, () => worker())
+  await Promise.all(workers)
+  return results
+}
+
+/**
  * Processes a batch of pending emails from the persistent Supabase `email_queue`.
  * Claims rows atomically using PostgreSQL RPC claim_email_queue_items(batchSize).
  */
 export async function processEmailQueue(
   batchSize: number = 50
-): Promise<{ processed: number; delivered: number; failed: number; suppressed: number; skipped: number }> {
+): Promise<{ processed: number; delivered: number; failed: number; suppressed: number; skipped: number; reclaimed: number }> {
   // Check Global Queue Processing Feature Flag (persisted, not per-process default)
   const processingEnabled = await globalFeatureFlagService.isEnabledAsync('QUEUE_PROCESSING_ENABLED')
   if (!processingEnabled) {
-    return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }
+    return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0, reclaimed: 0 }
   }
 
   const supabase = createServiceRoleClient()
+
+  // 0. B6: Reclaim stale 'processing' items whose execution lease expired (>15 min)
+  let reclaimedCount = 0
+  try {
+    const reclaimResult = await reclaimStaleProcessingItems(supabase)
+    reclaimedCount = reclaimResult.reclaimedCount
+    if (reclaimedCount > 0) {
+      console.info(`[processEmailQueue] Reclaimed ${reclaimedCount} stale processing queue items`)
+    }
+  } catch (reclaimErr) {
+    console.warn('[processEmailQueue] Non-fatal stale reclaim check error:', reclaimErr)
+  }
+
   let claimedRows: Array<Record<string, unknown>> = []
 
   // 1. Atomic PostgreSQL Row Claiming via RPC (FOR UPDATE SKIP LOCKED)
@@ -294,11 +480,11 @@ export async function processEmailQueue(
     }
   } catch (err) {
     console.error('[processEmailQueue] Failed to claim queue items:', err)
-    return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }
+    return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0, reclaimed: reclaimedCount }
   }
 
   if (claimedRows.length === 0) {
-    return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0 }
+    return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0, reclaimed: reclaimedCount }
   }
 
   const automationsState = await EmailAutomationsService.getState()
@@ -321,139 +507,181 @@ export async function processEmailQueue(
   let suppressedCount = 0
   let skippedCount = 0
 
-  for (const rawItem of claimedRows) {
-    const queueId = String(rawItem.id)
-    const userId = String(rawItem.user_id)
-    const toEmail = String(rawItem.to_email)
-    const toName = rawItem.to_name ? String(rawItem.to_name) : undefined
-    const templateKey = String(rawItem.template_key)
-    const templateVariables = (rawItem.template_variables || {}) as Record<string, unknown>
-    const attemptCount = Number(rawItem.attempt_count || 1)
-    const maxAttempts = Number(rawItem.max_attempts || 3)
+  // B6: Bounded dispatch concurrency (configurable 1..10, default 5) with 90s deadline
+  let concurrency = DEFAULT_DISPATCH_CONCURRENCY
+  const envConcurrency = Number(process.env.QUEUE_DISPATCH_CONCURRENCY)
+  if (Number.isFinite(envConcurrency) && envConcurrency > 0) {
+    concurrency = Math.min(10, Math.max(1, Math.floor(envConcurrency)))
+  }
 
-    const isCritical = templateKey === 'auth.verify_email' || templateKey === 'auth.password_reset'
+  const outcomes = await mapConcurrent(
+    claimedRows,
+    concurrency,
+    MAX_BATCH_EXECUTION_MS,
+    async (rawItem): Promise<'delivered' | 'failed' | 'suppressed' | 'skipped'> => {
+      const queueId = String(rawItem.id)
+      const userId = String(rawItem.user_id)
+      const toEmail = String(rawItem.to_email)
+      const toName = rawItem.to_name ? String(rawItem.to_name) : undefined
+      const templateKey = String(rawItem.template_key)
+      const templateVariables = (rawItem.template_variables || {}) as Record<string, unknown>
+      const attemptCount = Number(rawItem.attempt_count || 1)
+      const maxAttempts = Number(rawItem.max_attempts || 3)
 
-    // A. Check Global Pause (Optional emails only)
-    if (!isCritical && automationsState.globalPause) {
-      await updateItemSkipped(supabase, queueId, 'global_pause_active')
-      skippedCount++
-      continue
-    }
+      const isCritical = templateKey === 'auth.verify_email' || templateKey === 'auth.password_reset'
 
-    // B. Check Individual Automation Setting (Optional emails only)
-    if (!isCritical) {
-      const isEnabled = await EmailAutomationsService.isAutomationEnabled(templateKey as EmailAutomationKey)
-      if (!isEnabled) {
-        await updateItemSkipped(supabase, queueId, `automation_disabled:${templateKey}`)
-        skippedCount++
-        continue
+      // A. Check Global Pause (Optional emails only)
+      if (!isCritical && automationsState.globalPause) {
+        await updateItemSkipped(supabase, queueId, 'global_pause_active')
+        return 'skipped'
       }
-    }
 
-    // C. Check Suppression (Optional emails only — critical auth emails bypass suppression)
-    const { data: suppression } = await supabase.from('email_suppressions').select('id').eq('email', toEmail).maybeSingle()
-    if (suppression && !isCritical) {
-      await supabase.from('email_queue').update({ status: 'suppressed', skipped_reason: 'email_suppressed', updated_at: new Date().toISOString() }).eq('id', queueId)
-      suppressedCount++
-      continue
-    }
+      // B. Check Individual Automation Setting (Optional emails only)
+      if (!isCritical) {
+        const isEnabled = await EmailAutomationsService.isAutomationEnabled(templateKey as EmailAutomationKey)
+        if (!isEnabled) {
+          await updateItemSkipped(supabase, queueId, `automation_disabled:${templateKey}`)
+          return 'skipped'
+        }
+      }
 
-    // C2. Global Daily Send Quota — checked BEFORE dispatch, not after.
-    // `increment_daily_email_quota` atomically increments-and-checks in one statement,
-    // returning false once `dailyLimit` is reached for today (critical auth emails
-    // bypass it, matching their suppression bypass above). This is the circuit
-    // breaker that was missing during the 2026-09-06 signup-abuse incident: the
-    // quota existed and was tracked, but was only ever incremented *after* a
-    // successful send, so it never actually stopped anything. Once quota is
-    // exhausted, every remaining non-critical item in this batch is deferred to
-    // the next processing run rather than burning further calls against it.
-    if (!isCritical) {
-      let quotaAvailable = true
+      // C. Check Suppression (Optional emails only — critical auth emails bypass suppression)
+      const { data: suppression } = await supabase.from('email_suppressions').select('id').eq('email', toEmail).maybeSingle()
+      if (suppression && !isCritical) {
+        await withProcessingStatusGuard(
+          supabase.from('email_queue')
+            .update({ status: 'suppressed', skipped_reason: 'email_suppressed', updated_at: new Date().toISOString() })
+            .eq('id', queueId)
+        )
+        return 'suppressed'
+      }
+
+      // C2. Global Daily Send Quota — checked BEFORE dispatch
+      if (!isCritical) {
+        let quotaAvailable = true
+        try {
+          const { data: hasQuota } = await supabase.rpc('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
+          quotaAvailable = hasQuota !== false
+        } catch (quotaErr) {
+          console.warn('[processEmailQueue] Daily quota RPC check failed — proceeding without quota gate:', quotaErr)
+        }
+
+        if (!quotaAvailable) {
+          const nextRetryAt = new Date(Date.now() + 60 * 60 * 1000).toISOString() // retry in 1h
+          await withProcessingStatusGuard(
+            supabase.from('email_queue')
+              .update({
+                status: 'retrying',
+                next_retry_at: nextRetryAt,
+                error_message: 'Daily email send quota reached',
+                processing_at: null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', queueId)
+          )
+          return 'skipped'
+        }
+      }
+
+      // D. Render Template
+      let renderedHtml = ''
+      let renderedText = ''
+      let subject = ''
       try {
-        const { data: hasQuota } = await supabase.rpc('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
-        quotaAvailable = hasQuota !== false
-      } catch (quotaErr) {
-        console.warn('[processEmailQueue] Daily quota RPC check failed — proceeding without quota gate:', quotaErr)
+        const rendered = await renderEmailTemplate(templateKey, templateVariables)
+        renderedHtml = rendered.html
+        renderedText = rendered.text
+        subject = rendered.subject
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Template render failure'
+        await handlePermanentFailure(supabase, queueId, userId, templateKey, templateVariables, `Template Render Error: ${errorMsg}`, attemptCount)
+        return 'failed'
       }
 
-      if (!quotaAvailable) {
-        const nextRetryAt = new Date(Date.now() + 60 * 60 * 1000).toISOString() // retry in 1h
-        await supabase.from('email_queue')
-          .update({ status: 'retrying', next_retry_at: nextRetryAt, error_message: 'Daily email send quota reached', updated_at: new Date().toISOString() })
-          .eq('id', queueId)
-        skippedCount++
-        continue
-      }
-    }
-
-    // D. Render Template
-    let renderedHtml = ''
-    let renderedText = ''
-    let subject = ''
-    try {
-      const rendered = await renderEmailTemplate(templateKey, templateVariables)
-      renderedHtml = rendered.html
-      renderedText = rendered.text
-      subject = rendered.subject
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Template render failure'
-      await handlePermanentFailure(supabase, queueId, userId, templateKey, templateVariables, `Template Render Error: ${errorMsg}`, attemptCount)
-      failedCount++
-      continue
-    }
-
-    // E. Dispatch through the shared failover helper (primary provider, then the other
-    // one exactly once if the primary could not accept the message). This path used to
-    // resolve a single provider and re-try that same provider on every retry cycle, so
-    // the second provider was never attempted — Brevo quota exhaustion stalled the
-    // whole queue while a healthy Resend key sat idle.
-    const sendResult = await sendEmailWithFailover(
-      {
-        recipient: { userId, email: toEmail, name: toName },
-        channel: 'email',
-        templateKey,
-        templateVersion: 1,
-        variables: {
-          ...templateVariables,
-          subject,
-          html: renderedHtml,
-          text: renderedText,
-        },
-      },
-      globalProviderRegistry
-    )
-
-    if (sendResult.success) {
-      await supabase.from('email_queue')
-        .update({
-          status: 'delivered',
-          delivered_at: new Date().toISOString(),
-          resend_id: sendResult.externalId || null,
-          provider: sendResult.provider || null,
-          provider_attempts: (serializeAttempts(sendResult.attempts) as unknown as import('@/lib/supabase').Json),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', queueId)
-
-      deliveredCount++
-    } else {
-      await handleRetryableFailure(
-        supabase,
-        queueId,
-        sendResult.error || 'Provider send failed',
-        attemptCount,
-        maxAttempts,
+      // E. Dispatch through failover helper
+      const sendResult = await sendEmailWithFailover(
         {
+          recipient: { userId, email: toEmail, name: toName },
+          channel: 'email',
+          templateKey,
+          templateVersion: 1,
+          variables: {
+            ...templateVariables,
+            subject,
+            html: renderedHtml,
+            text: renderedText,
+          },
+        },
+        globalProviderRegistry
+      )
+
+      if (sendResult.success) {
+        await withProcessingStatusGuard(
+          supabase.from('email_queue')
+            .update({
+              status: 'delivered',
+              delivered_at: new Date().toISOString(),
+              resend_id: sendResult.externalId || null,
+              provider: sendResult.provider || null,
+              provider_attempts: (serializeAttempts(sendResult.attempts) as unknown as import('@/lib/supabase').Json),
+              processing_at: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', queueId)
+        )
+
+        return 'delivered'
+      }
+
+      // B6: Distinguish permanent provider rejections (400 bad request, 401, 403, 422)
+      // from transient failures. Permanent rejections route directly to dead_letter.
+      const isPermanent = Boolean(
+        sendResult.attempts?.some(
+          (a) => classifyProviderFailure(a.statusCode, a.error) === 'permanent'
+        ) || (sendResult.attempts?.length === 1 && classifyProviderFailure(sendResult.attempts[0].statusCode, sendResult.attempts[0].error) === 'permanent')
+      )
+
+      if (isPermanent) {
+        await handlePermanentFailure(
+          supabase,
+          queueId,
           userId,
           templateKey,
           templateVariables,
-          provider: sendResult.provider,
-          attempts: sendResult.attempts,
-          retryDelayMinutes,
-        }
-      )
-      failedCount++
+          sendResult.error || 'Permanent provider rejection',
+          attemptCount,
+          {
+            provider: sendResult.provider,
+            attempts: sendResult.attempts,
+          }
+        )
+      } else {
+        await handleRetryableFailure(
+          supabase,
+          queueId,
+          sendResult.error || 'Provider send failed',
+          attemptCount,
+          maxAttempts,
+          {
+            userId,
+            templateKey,
+            templateVariables,
+            provider: sendResult.provider,
+            attempts: sendResult.attempts,
+            retryDelayMinutes,
+          }
+        )
+      }
+
+      return 'failed'
     }
+  )
+
+  for (const outcome of outcomes) {
+    if (outcome === 'delivered') deliveredCount++
+    else if (outcome === 'failed') failedCount++
+    else if (outcome === 'suppressed') suppressedCount++
+    else if (outcome === 'skipped') skippedCount++
   }
 
   return {
@@ -462,6 +690,7 @@ export async function processEmailQueue(
     failed: failedCount,
     suppressed: suppressedCount,
     skipped: skippedCount,
+    reclaimed: reclaimedCount,
   }
 }
 
@@ -470,9 +699,11 @@ async function updateItemSkipped(
   queueId: string,
   reason: string
 ): Promise<void> {
-  await supabase.from('email_queue')
-    .update({ status: 'skipped', skipped_reason: reason, updated_at: new Date().toISOString() })
-    .eq('id', queueId)
+  await withProcessingStatusGuard(
+    supabase.from('email_queue')
+      .update({ status: 'skipped', skipped_reason: reason, processing_at: null, updated_at: new Date().toISOString() })
+      .eq('id', queueId)
+  )
 }
 
 /**
@@ -510,11 +741,11 @@ async function handleRetryableFailure(
   context: QueueFailureContext
 ): Promise<void> {
   const now = new Date()
-  // Exponential backoff on the admin-configured base (default 5m -> 10m, 20m, 40m).
+  // Exponential backoff on the admin-configured base with bounded jitter and ceiling.
   const backoffBase = context.retryDelayMinutes && context.retryDelayMinutes > 0
     ? context.retryDelayMinutes
     : DEFAULT_RETRY_DELAY_MINUTES
-  const nextRetryMinutes = Math.pow(2, attemptCount) * backoffBase
+  const nextRetryMinutes = calculateRetryDelayMinutes(attemptCount, backoffBase)
   const nextRetryAt = new Date(now.getTime() + nextRetryMinutes * 60 * 1000).toISOString()
 
   if (attemptCount >= maxAttempts) {
@@ -533,17 +764,20 @@ async function handleRetryableFailure(
       context
     )
   } else {
-    await supabase.from('email_queue')
-      .update({
-        status: 'retrying',
-        error_message: errorMessage,
-        next_retry_at: nextRetryAt,
-        failed_at: now.toISOString(),
-        provider: context.provider || null,
-        provider_attempts: (serializeAttempts(context.attempts) as unknown as import('@/lib/supabase').Json),
-        updated_at: now.toISOString(),
-      })
-      .eq('id', queueId)
+    await withProcessingStatusGuard(
+      supabase.from('email_queue')
+        .update({
+          status: 'retrying',
+          error_message: errorMessage,
+          next_retry_at: nextRetryAt,
+          failed_at: now.toISOString(),
+          provider: context.provider || null,
+          provider_attempts: (serializeAttempts(context.attempts) as unknown as import('@/lib/supabase').Json),
+          processing_at: null,
+          updated_at: now.toISOString(),
+        })
+        .eq('id', queueId)
+    )
   }
 }
 
@@ -560,16 +794,19 @@ async function handlePermanentFailure(
   const now = new Date().toISOString()
   const attempts = serializeAttempts(context?.attempts)
 
-  await supabase.from('email_queue')
-    .update({
-      status: 'dead_letter',
-      error_message: failureReason,
-      failed_at: now,
-      provider: context?.provider || null,
-      provider_attempts: (attempts as unknown as import('@/lib/supabase').Json),
-      updated_at: now,
-    })
-    .eq('id', queueId)
+  await withProcessingStatusGuard(
+    supabase.from('email_queue')
+      .update({
+        status: 'dead_letter',
+        error_message: failureReason,
+        failed_at: now,
+        provider: context?.provider || null,
+        provider_attempts: (attempts as unknown as import('@/lib/supabase').Json),
+        processing_at: null,
+        updated_at: now,
+      })
+      .eq('id', queueId)
+  )
 
   try {
     const { logErrorReport } = await import('@/lib/monitoring/logger')

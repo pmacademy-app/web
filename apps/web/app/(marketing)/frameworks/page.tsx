@@ -4,6 +4,7 @@ import { BRAND } from '@/lib/brand'
 import { FRAMEWORKS } from '@/lib/frameworks'
 import { FrameworksExplorer } from '@/components/marketing/frameworks-explorer'
 import { ArrowRight } from 'lucide-react'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
@@ -59,7 +60,7 @@ export default function FrameworksPage() {
     <div className="min-h-screen bg-background">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
 
       {/* Main Content Area */}

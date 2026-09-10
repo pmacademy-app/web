@@ -60,6 +60,45 @@ export class SystemService {
       const dbHealthy = health.status === 'healthy'
       const queueTelemetryAvailable = !queue.failed
 
+      // B6: Resolve scheduler telemetry from durable system_settings heartbeat
+      let schedulerStatus: 'healthy' | 'degraded' | 'unknown' = 'unknown'
+      let schedulerSummary = `${CRON_JOBS.length} jobs configured`
+      let schedulerDetail = 'GitHub Actions cron — no run telemetry'
+
+      try {
+        const supabase = createServiceRoleClient()
+        const { data: heartbeatRow } = await supabase
+          .from('system_settings')
+          .select('value')
+          .eq('key', 'cron_heartbeat:process-email-queue')
+          .maybeSingle()
+
+        if (heartbeatRow?.value && typeof heartbeatRow.value === 'object') {
+          const hb = heartbeatRow.value as Record<string, unknown>
+          const lastRunAt = typeof hb.last_run_at === 'string' ? new Date(hb.last_run_at).getTime() : 0
+          const lastSuccessAt = typeof hb.last_success_at === 'string' ? new Date(hb.last_success_at).getTime() : 0
+          const status = hb.status === 'healthy' ? 'healthy' : 'failed'
+          const minutesSinceSuccess = lastSuccessAt > 0 ? Math.floor((Date.now() - lastSuccessAt) / 60000) : Infinity
+          const minutesSinceRun = lastRunAt > 0 ? Math.floor((Date.now() - lastRunAt) / 60000) : Infinity
+
+          if (status === 'healthy' && minutesSinceSuccess <= 15) {
+            schedulerStatus = 'healthy'
+            schedulerSummary = `Operational (last run ${minutesSinceRun < 1 ? 'just now' : `${minutesSinceRun}m ago`})`
+            schedulerDetail = 'Queue scheduler active & responsive'
+          } else if (status === 'failed') {
+            schedulerStatus = 'degraded'
+            schedulerSummary = `Last run failed (${minutesSinceRun}m ago)`
+            schedulerDetail = typeof hb.error === 'string' ? hb.error : 'Execution failure detected'
+          } else {
+            schedulerStatus = 'degraded'
+            schedulerSummary = `Stale (last success ${minutesSinceSuccess === Infinity ? 'unknown' : `${minutesSinceSuccess}m ago`})`
+            schedulerDetail = 'Scheduler heartbeat missed expected window (>15m)'
+          }
+        }
+      } catch {
+        // Degrade gracefully to unknown
+      }
+
       const services: AdminSystemServiceStatus[] = [
         {
           id: 'database',
@@ -112,10 +151,10 @@ export class SystemService {
         {
           id: 'scheduler',
           label: 'Scheduler',
-          status: 'unknown',
+          status: schedulerStatus,
           lastChecked,
-          summary: `${CRON_JOBS.length} jobs configured`,
-          detail: 'GitHub Actions cron — no run telemetry',
+          summary: schedulerSummary,
+          detail: schedulerDetail,
         },
       ]
 

@@ -42,7 +42,7 @@ prodily-monorepo/
 │       ├── e2e/                # Playwright E2E browser tests (auth lifecycle)
 │       ├── emails/             # React Email templates & rendering components
 │       ├── lib/                # Core business services, Supabase client, aggregations
-│       │   └── __tests__/      # Vitest unit and integration test files (100 test suites)
+│       │   └── __tests__/      # Vitest unit and integration test files (118 test suites)
 │       ├── theme/              # Central design tokens (theme/tokens.ts)
 │       ├── types/              # TypeScript types & database.ts (auto-generated schema)
 │       ├── proxy.ts            # Next.js 16 request interceptor / auth routing proxy
@@ -54,7 +54,7 @@ prodily-monorepo/
 ├── docs/                       # Canonical system documentation
 │   ├── INDEX.md                # Documentation reading map & index
 │   ├── ARCHITECTURE.md         # System architecture & known debt
-│   ├── DATABASE.md             # PostgreSQL schema & 41 versioned migrations
+│   ├── DATABASE.md             # PostgreSQL schema & 46 versioned migrations
 │   ├── TESTING.md              # Testing framework & suite inventory
 │   ├── LEADERBOARD.md          # Leaderboard, cohorts, friend accountability
 │   └── ...                     # Subsystem-specific specifications
@@ -62,7 +62,7 @@ prodily-monorepo/
 │   ├── brand/                  # Brand asset generation scripts
 │   └── compiler/               # Markdown table parser, Mermaid SVG compiler, search builder
 └── supabase/
-    └── migrations/             # 41 timestamped PostgreSQL SQL migrations
+    └── migrations/             # 46 timestamped PostgreSQL SQL migrations
 ```
 
 ---
@@ -76,11 +76,11 @@ prodily-monorepo/
 | **UI Library** | React | `19.2.4` |
 | **Styling** | Tailwind CSS v4 + CSS design tokens | Centralized design system, light/dark theming |
 | **Charts (Admin)**| Recharts | `^3.x` (MIT, free) |
-| **Database** | Supabase PostgreSQL | 41 versioned migrations |
+| **Database** | Supabase PostgreSQL | 46 versioned migrations |
 | **Authentication** | Supabase Auth | Email/password + PKCE, custom cookie session bridge |
 | **Transactional Email**| Brevo (primary) + Resend (fallback), via Supabase Auth Hook | Both called via raw `fetch`, no SDK dependency |
 | **Search Engine** | FlexSearch | Pre-indexed JSON at build time |
-| **Unit Testing** | Vitest | 100 test files in `apps/web/lib/__tests__/` (1029 tests) |
+| **Unit Testing** | Vitest | 118 test files in `apps/web/lib/__tests__/` (1256 tests) |
 | **E2E Testing** | Playwright | 3 auth-lifecycle specs in `apps/web/e2e/auth/` |
 | **Hosting** | Vercel Serverless | Configured at `apps/web/` root |
 
@@ -243,10 +243,11 @@ All system documentation lives directly under `docs/`:
 | Document | Purpose |
 |---|---|
 | [`docs/INDEX.md`](docs/INDEX.md) | Canonical documentation entry point and reading map |
+| [`docs/HARDENING_LEDGER.md`](docs/HARDENING_LEDGER.md) | Production-hardening implementation status: what is built, what remains, next batch |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | High-level system architecture & technical invariants |
 | [`docs/ADMIN_PANEL.md`](docs/ADMIN_PANEL.md) | Comprehensive Admin Console guide (workspaces, APIs, security) |
-| [`docs/DATABASE.md`](docs/DATABASE.md) | PostgreSQL schema, 41 migration files, table definitions |
-| [`docs/TESTING.md`](docs/TESTING.md) | Vitest test suite inventory (100 files, 1029 tests) & Playwright E2E |
+| [`docs/DATABASE.md`](docs/DATABASE.md) | PostgreSQL schema, 46 migration files, table definitions |
+| [`docs/TESTING.md`](docs/TESTING.md) | Vitest test suite inventory (118 files, 1256 tests) & Playwright E2E |
 | [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md) | Auth flows, session bridge, signup + email-change verification lifecycle |
 | [`docs/EMAIL_SYSTEM.md`](docs/EMAIL_SYSTEM.md) | Supabase Auth Send Email Hook, email queue, dual Brevo/Resend delivery |
 | [`docs/CRON_AND_SCHEDULING.md`](docs/CRON_AND_SCHEDULING.md) | GitHub Actions workflows & cron endpoints |

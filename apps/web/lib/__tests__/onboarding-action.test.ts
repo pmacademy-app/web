@@ -26,7 +26,36 @@ vi.mock('next/headers', () => ({
   })),
 }))
 
-const mockGetUser = vi.fn()
+const mockGetUser = vi.fn(async (token?: string) => {
+  if (!token) return { data: { user: null }, error: new Error('No token') }
+  try {
+    const parts = token.split('.')
+    if (parts.length === 3) {
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))
+      return {
+        data: {
+          user: {
+            id: payload.sub || 'usr_123',
+            email: payload.email || 'alex@example.com',
+            user_metadata: payload.user_metadata || {},
+            app_metadata: payload.app_metadata || {},
+          },
+        },
+        error: null,
+      }
+    }
+  } catch {}
+  return {
+    data: {
+      user: {
+        id: 'usr_123',
+        email: 'alex@example.com',
+        user_metadata: { onboarding_complete: true },
+      },
+    },
+    error: null,
+  }
+})
 const mockRefreshSession = vi.fn()
 const mockUpdateUserById = vi.fn()
 const mockDbUpdate = vi.fn()
@@ -111,11 +140,6 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
 
     mockCookieStore.set('sb-access-token', { value: initialAccessToken })
     mockCookieStore.set('sb-refresh-token', { value: initialRefreshToken })
-
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: 'usr_123', email: 'alex@example.com' } },
-      error: null,
-    })
 
     const refreshedAccessToken = createMockJwt({
       sub: 'usr_123',
@@ -227,7 +251,7 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     // getUser fails on expired token
     mockGetUser.mockResolvedValue({
       data: { user: null },
-      error: { message: 'JWT expired' },
+      error: new Error('JWT expired') as unknown as import('@supabase/supabase-js').AuthError,
     })
 
     // refreshSession succeeds
@@ -267,8 +291,8 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
     mockCookieStore.set('sb-access-token', { value: 'invalid-access' })
     mockCookieStore.set('sb-refresh-token', { value: 'invalid-refresh' })
 
-    mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'Invalid token' } })
-    mockRefreshSession.mockResolvedValue({ data: { session: null }, error: { message: 'Invalid refresh token' } })
+    mockGetUser.mockResolvedValue({ data: { user: null }, error: new Error('Invalid token') as unknown as import('@supabase/supabase-js').AuthError })
+    mockRefreshSession.mockResolvedValue({ data: { session: null }, error: new Error('Invalid refresh token') as unknown as import('@supabase/supabase-js').AuthError })
 
     const resultInvalid = await submitOnboarding(validOnboardingData)
     expect(resultInvalid).toEqual({ error: 'Unauthorized: Invalid session' })
@@ -277,7 +301,14 @@ describe('submitOnboarding Server Action & Session Refresh', () => {
   it('validates required fields before executing database updates', async () => {
     mockCookieStore.set('sb-access-token', { value: 'valid-token' })
     mockGetUser.mockResolvedValue({
-      data: { user: { id: 'usr_123' } },
+      data: {
+        user: {
+          id: 'usr_123',
+          email: 'alex@example.com',
+          user_metadata: { onboarding_complete: false },
+          app_metadata: {},
+        },
+      },
       error: null,
     })
 

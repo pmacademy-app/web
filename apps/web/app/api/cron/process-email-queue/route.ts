@@ -3,6 +3,31 @@ import { processEmailQueue } from '@/lib/notifications/queue/processor'
 
 import { requireAdminUser } from '@/lib/admin/guard'
 
+async function recordSchedulerHeartbeat(
+  status: 'healthy' | 'failed',
+  details: Record<string, unknown>
+): Promise<void> {
+  try {
+    const { createServiceRoleClient } = await import('@/lib/supabase')
+    const supabase = createServiceRoleClient()
+    const nowIso = new Date().toISOString()
+    const payload = {
+      job: 'process-email-queue',
+      status,
+      last_run_at: nowIso,
+      ...(status === 'healthy' ? { last_success_at: nowIso } : {}),
+      ...details,
+    }
+    await supabase.from('system_settings').upsert({
+      key: 'cron_heartbeat:process-email-queue',
+      value: (payload as unknown as import('@/lib/supabase').Json),
+      updated_at: nowIso,
+    })
+  } catch (err) {
+    console.warn('[process-email-queue] Failed to record scheduler heartbeat:', err)
+  }
+}
+
 export async function POST(request: Request) {
   const cronSecret = process.env.CRON_SECRET
   const authHeader = request.headers.get('Authorization') || request.headers.get('authorization')
@@ -22,15 +47,31 @@ export async function POST(request: Request) {
     }
   }
 
+  const startTime = Date.now()
   try {
     const result = await processEmailQueue(50)
+    const durationMs = Date.now() - startTime
+
+    await recordSchedulerHeartbeat('healthy', {
+      last_duration_ms: durationMs,
+      last_result: result,
+    })
+
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
+      durationMs,
       result,
     })
   } catch (err) {
+    const durationMs = Date.now() - startTime
     const errorMsg = err instanceof Error ? err.message : 'Cron execution failed'
+
+    await recordSchedulerHeartbeat('failed', {
+      last_duration_ms: durationMs,
+      error: errorMsg,
+    })
+
     const { logSystemError } = await import('@/lib/monitoring/logger')
     void logSystemError({
       severity: 'error',

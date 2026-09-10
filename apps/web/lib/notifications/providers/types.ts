@@ -3,7 +3,7 @@ export type { NotificationChannel }
 
 export interface ProviderSendPayload {
   recipient: {
-    userId: string
+    userId?: string
     email?: string
     name?: string
     phone?: string
@@ -13,6 +13,7 @@ export interface ProviderSendPayload {
   templateVersion: number
   variables: Record<string, unknown>
   event?: EventEnvelope
+  operation?: 'email.direct_send' | 'email.provider_send'
 }
 
 export interface ProviderSendResult {

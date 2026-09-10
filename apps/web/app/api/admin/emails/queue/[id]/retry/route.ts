@@ -26,7 +26,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // 1. Fetch current queue item
     const { data: item, error: fetchErr } = await supabase
       .from('email_queue')
-      .select('id, to_email, template_key, status, attempt_count')
+      .select('id, to_email, template_key, status, attempt_count, processing_at')
       .eq('id', id)
       .maybeSingle()
 
@@ -34,10 +34,26 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Queue item not found.' }, { status: 404 })
     }
 
-    // 2. State invariant: Only failed, dead_letter, or retrying items can be retried
-    if (['delivered', 'processing'].includes(item.status)) {
+    // 2. State invariant: Delivered items cannot be retried
+    if (item.status === 'delivered') {
       return NextResponse.json(
         { error: `Cannot retry queue item in '${item.status}' status.` },
+        { status: 400 }
+      )
+    }
+
+    // B6: Active processing items (<15m) cannot be retried to avoid duplicate concurrent sends.
+    // Stale processing items (>=15m) whose worker lease expired can be safely reclaimed.
+    const staleThresholdMs = 15 * 60 * 1000
+    const isProcessing = item.status === 'processing'
+    const isStaleProcessing =
+      isProcessing &&
+      item.processing_at &&
+      Date.now() - new Date(item.processing_at).getTime() >= staleThresholdMs
+
+    if (isProcessing && !isStaleProcessing) {
+      return NextResponse.json(
+        { error: 'Cannot retry queue item currently being processed by an active worker.' },
         { status: 400 }
       )
     }
@@ -71,7 +87,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // 4. Atomic Re-queue
     const now = new Date().toISOString()
-    const { data: updated, error: updateErr } = await supabase
+    const staleThresholdIso = new Date(Date.now() - staleThresholdMs).toISOString()
+
+    let updateBuilder = supabase
       .from('email_queue')
       .update({
         status: 'pending',
@@ -79,14 +97,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         error_message: null,
         failed_at: null,
         scheduled_at: now,
-        // See retry-all: a lingering next_retry_at / processing_at keeps the row
-        // invisible to `claim_email_queue_items` despite the 'pending' status.
         next_retry_at: null,
         processing_at: null,
         updated_at: now,
       })
       .eq('id', id)
-      .in('status', ['failed', 'dead_letter', 'retrying', 'skipped', 'suppressed'])
+
+    if (isStaleProcessing) {
+      updateBuilder = updateBuilder
+        .eq('status', 'processing')
+        .lte('processing_at', staleThresholdIso)
+    } else {
+      updateBuilder = updateBuilder
+        .in('status', ['failed', 'dead_letter', 'retrying', 'skipped', 'suppressed'])
+    }
+
+    const { data: updated, error: updateErr } = await updateBuilder
       .select('id, status')
       .maybeSingle()
 

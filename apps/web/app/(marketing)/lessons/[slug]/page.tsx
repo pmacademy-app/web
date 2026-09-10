@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { BRAND } from '@/lib/brand'
 import { getLessonSchema, getBreadcrumbSchema } from '@/lib/schema'
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 
 export const revalidate = 3600
 
@@ -127,11 +128,11 @@ export default async function PublicLessonPage({ params }: PageProps) {
     <article className="container mx-auto px-4 pt-24 pb-16 lg:pt-28 lg:pb-20 max-w-4xl space-y-8">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(lessonSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(lessonSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbSchema) }}
       />
 
       <div className="space-y-4">

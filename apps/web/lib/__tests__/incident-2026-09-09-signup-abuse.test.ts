@@ -221,15 +221,18 @@ describe('Incident 2026-09-09 — signup cannot become an email-spending oracle'
   })
 
   // TEST 4 / repeat-signup enumeration
-  it('a repeat signup for an existing account returns 409 without dispatching anything', async () => {
+  it('a repeat signup for an existing account returns a non-enumerating generic response without dispatching anything', async () => {
     authBehavior.signUpResult = { data: { user: { id: 'existing', identities: [] } }, error: null }
 
     const res = await signupPOST(
       signupRequest({ name: 'Jane Doe', email: 'taken@example.com', password: 'securePassword123' })
     )
 
-    expect(res.status).toBe(409)
-    expect((await res.json()).code).toBe('USER_EXISTS')
+    const json = await res.json()
+    expect(res.status).toBe(200)
+    expect(json.success).toBe(true)
+    expect(json.verificationRequired).toBe(true)
+    expect(json.code).toBeUndefined()
     expect(welcomeDispatches).toHaveLength(0)
   })
 

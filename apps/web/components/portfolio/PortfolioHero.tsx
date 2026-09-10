@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Flame, Zap, Award, GraduationCap, Globe, BadgeCheck } from 'lucide-react'
 import type { PublicPortfolioPayload } from '@/lib/portfolio-db'
 import { ShareButton } from '@/components/portfolio/ShareButton'
+import { validateOptionalUrl } from '@/lib/portfolio'
 
 interface PortfolioHeroProps {
   user: PublicPortfolioPayload['user']
@@ -49,6 +50,10 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
       .substring(0, 2)
       .toUpperCase()
   }
+
+  const isSafeLinkedIn = linkedinUrl && validateOptionalUrl(linkedinUrl) ? linkedinUrl : null
+  const isSafeGitHub = githubUrl && validateOptionalUrl(githubUrl) ? githubUrl : null
+  const isSafeWebsite = websiteUrl && validateOptionalUrl(websiteUrl) ? websiteUrl : null
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm space-y-6">
@@ -147,9 +152,9 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
 
         {/* Social Links */}
         <div className="flex items-center gap-2.5">
-          {linkedinUrl && (
+          {isSafeLinkedIn && (
             <a
-              href={linkedinUrl}
+              href={isSafeLinkedIn}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
@@ -159,9 +164,9 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
               <LinkedInIcon className="w-4 h-4 text-blue-500" />
             </a>
           )}
-          {githubUrl && (
+          {isSafeGitHub && (
             <a
-              href={githubUrl}
+              href={isSafeGitHub}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
@@ -171,9 +176,9 @@ export function PortfolioHero({ user }: PortfolioHeroProps) {
               <GitHubIcon className="w-4 h-4" />
             </a>
           )}
-          {websiteUrl && (
+          {isSafeWebsite && (
             <a
-              href={websiteUrl}
+              href={isSafeWebsite}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"

@@ -1,6 +1,8 @@
 import type { NotificationProvider, ProviderSendPayload, ProviderSendResult, ProviderHealthResult } from './types'
 import type { NotificationChannel } from '../types'
 import { BRAND } from '@/lib/brand'
+import { EMAIL_HTTP_TIMEOUT_MS } from '../config'
+import { maskEmail } from '@/lib/email'
 
 /**
  * Brevo (formerly Sendinblue) Transactional Email Provider Implementation.
@@ -23,20 +25,23 @@ export class BrevoProvider implements NotificationProvider {
     }
 
     const apiKey = process.env.BREVO_API_KEY
-    const isTest = process.env.NODE_ENV === 'test' || process.env.BREVO_SIMULATE === 'true'
+    const isTest = (process.env.NODE_ENV === 'test' && process.env.ALLOW_TEST_NETWORK_EMAILS !== 'true') || process.env.BREVO_SIMULATE === 'true'
     if (!apiKey || isTest) {
       console.log(`[BrevoProvider:simulation] Simulating email send to ${recipientEmail} for template '${payload.templateKey}'`)
       return {
         success: true,
         providerName: this.name,
         externalId: `sim-brevo-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        statusCode: 200,
         timestamp: new Date().toISOString(),
       }
     }
 
     try {
-      const senderName = BRAND.emailFromName
-      const senderEmail = BRAND.emailFromAddress
+      const fromEmail = (payload.variables.fromEmail as string) || (process.env.BREVO_FROM_EMAIL || process.env.RESEND_FROM_EMAIL)?.trim()
+      const senderName = fromEmail ? (fromEmail.split('<')[0].trim() || BRAND.emailFromName) : BRAND.emailFromName
+      const senderEmailMatch = fromEmail?.match(/<([^>]+)>/)
+      const senderEmail = senderEmailMatch ? senderEmailMatch[1] : (fromEmail || BRAND.emailFromAddress)
 
       const bodyPayload: Record<string, unknown> = {
         sender: { name: senderName, email: senderEmail },
@@ -65,7 +70,7 @@ export class BrevoProvider implements NotificationProvider {
           'accept': 'application/json',
         },
         body: JSON.stringify(bodyPayload),
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(EMAIL_HTTP_TIMEOUT_MS),
       })
 
       const data = await res.json().catch(() => ({}))
@@ -73,23 +78,23 @@ export class BrevoProvider implements NotificationProvider {
       if (!res.ok) {
         const errorMsg = data?.message || data?.error || `HTTP ${res.status} error from Brevo`
         const statusCode = res.status
-        // Brevo puts the machine-readable reason in `code`, and credit exhaustion
-        // arrives as HTTP 400 + `not_enough_credits`. Dropping this field is what made
-        // an exhausted Brevo look like a permanent bad-request and blocked failover.
         const providerCode = [data?.code, data?.message].filter(Boolean).join(' ') || undefined
         console.error('[BrevoProvider] Error response from Brevo API:', data)
 
         try {
           const { logErrorReport } = await import('@/lib/monitoring/logger')
           const { classifyProviderFailureKind } = await import('@/lib/monitoring/error-taxonomy')
+          const op = payload.operation || 'email.provider_send'
           void logErrorReport({
             domain: 'email',
             kind: classifyProviderFailureKind(statusCode),
-            operation: 'email.provider_send',
-            // Stable summary: the provider's own message goes in details, not here,
-            // or every distinct error text would fingerprint separately.
-            summary: 'Brevo rejected an email send',
-            subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
+            operation: op,
+            summary: op === 'email.direct_send' ? 'Brevo refused a direct transactional send' : 'Brevo rejected an email send',
+            subject: {
+              templateKey: payload.templateKey,
+              userId: payload.recipient.userId,
+              maskedEmail: maskEmail(recipientEmail),
+            },
             provider: { name: this.name, statusCode },
             details: { providerMessage: errorMsg, providerCode: data?.code ?? null },
           })
@@ -110,23 +115,17 @@ export class BrevoProvider implements NotificationProvider {
       return {
         success: true,
         providerName: this.name,
-        externalId: data.messageId || data.id,
+        externalId: data?.messageId || data?.id || `brevo-${Date.now()}`,
         statusCode: res.status,
         timestamp: new Date().toISOString(),
       }
     } catch (err) {
-      const isTimeout =
-        err instanceof Error &&
-        (err.name === 'TimeoutError' ||
-          err.name === 'AbortError' ||
-          (err.cause instanceof Error && (err.cause.name === 'TimeoutError' || err.cause.name === 'AbortError')))
-
+      const isTimeout = err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError')
       const isDns =
         err instanceof Error &&
         (err.message.includes('ENOTFOUND') ||
-          err.message.includes('ECONNREFUSED') ||
-          (err.cause instanceof Error &&
-            (err.cause.message?.includes('ENOTFOUND') || err.cause.message?.includes('ECONNREFUSED'))))
+          err.message.includes('EAI_AGAIN') ||
+          (err.cause instanceof Error && (err.cause.message.includes('ENOTFOUND') || err.cause.message.includes('EAI_AGAIN'))))
 
       let friendlyMsg: string
       if (isTimeout) {
@@ -148,12 +147,17 @@ export class BrevoProvider implements NotificationProvider {
 
       try {
         const { logErrorReport } = await import('@/lib/monitoring/logger')
+        const op = payload.operation || 'email.provider_send'
         void logErrorReport({
           domain: 'email',
           kind: isTimeout ? 'provider_timeout' : 'provider_outage',
-          operation: 'email.provider_send',
-          summary: isTimeout ? 'Brevo API request timed out' : 'Brevo API was unreachable',
-          subject: { templateKey: payload.templateKey, userId: payload.recipient.userId },
+          operation: op,
+          summary: op === 'email.direct_send' ? 'Brevo refused a direct transactional send' : (isTimeout ? 'Brevo API request timed out' : 'Brevo API was unreachable'),
+          subject: {
+            templateKey: payload.templateKey,
+            userId: payload.recipient.userId,
+            maskedEmail: maskEmail(recipientEmail),
+          },
           provider: { name: this.name, statusCode: isTimeout ? 504 : 503 },
           details: { errorName: err instanceof Error ? err.name : 'unknown', isTimeout, isDns, detail: friendlyMsg },
         })
@@ -165,8 +169,6 @@ export class BrevoProvider implements NotificationProvider {
         success: false,
         providerName: this.name,
         error: friendlyMsg,
-        // No HTTP response was produced. Timeout -> 504, other network faults -> 503,
-        // matching the convention in `lib/email.ts` so both stacks classify alike.
         statusCode: isTimeout ? 504 : 503,
         timestamp: new Date().toISOString(),
       }

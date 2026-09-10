@@ -20,20 +20,31 @@ export async function POST(request: NextRequest) {
     const { statusFilter = 'failed_and_dead_letter', limit = 100 } = body
     const maxLimit = Math.min(200, Math.max(1, Number(limit) || 100))
 
+    const staleThresholdMs = 15 * 60 * 1000
+    const staleThresholdIso = new Date(Date.now() - staleThresholdMs).toISOString()
+
     const targetStatuses =
       statusFilter === 'failed'
         ? ['failed']
         : statusFilter === 'dead_letter'
         ? ['dead_letter']
+        : statusFilter === 'stale_processing'
+        ? ['processing']
         : ['failed', 'dead_letter', 'retrying']
 
     const supabase = createServiceRoleClient()
 
     // 1. Fetch eligible items
-    const { data: rawItems, error: fetchErr } = await supabase
+    let fetchQuery = supabase
       .from('email_queue')
-      .select('id, to_email, template_key, status')
+      .select('id, to_email, template_key, status, processing_at')
       .in('status', targetStatuses)
+
+    if (statusFilter === 'stale_processing') {
+      fetchQuery = fetchQuery.lte('processing_at', staleThresholdIso)
+    }
+
+    const { data: rawItems, error: fetchErr } = await fetchQuery
       .order('created_at', { ascending: false })
       .limit(maxLimit)
 
@@ -89,7 +100,7 @@ export async function POST(request: NextRequest) {
     // Requeue eligible items atomically
     let retriedCount = 0
     if (eligibleIds.length > 0) {
-      const { error: updateErr, count } = await supabase
+      let updateBuilder = supabase
         .from('email_queue')
         .update({
           status: 'pending',
@@ -108,6 +119,12 @@ export async function POST(request: NextRequest) {
         }, { count: 'exact' })
         .in('id', eligibleIds)
         .in('status', targetStatuses)
+
+      if (statusFilter === 'stale_processing') {
+        updateBuilder = updateBuilder.lte('processing_at', staleThresholdIso)
+      }
+
+      const { error: updateErr, count } = await updateBuilder
 
       if (updateErr) {
         try {

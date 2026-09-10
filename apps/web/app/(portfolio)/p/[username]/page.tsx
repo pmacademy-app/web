@@ -12,6 +12,8 @@ import { FeaturedCapstoneCard } from '@/components/portfolio/FeaturedCapstoneCar
 import { Lock, ArrowLeft } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
 
+import { safeJsonLd } from '@/lib/seo/safe-json-ld'
+
 interface PageProps {
   params: Promise<{ username: string }>
 }
@@ -157,7 +159,7 @@ export default async function PublicPortfolioPage({ params }: PageProps) {
       {/* Schema.org ProfilePage & Person Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(profilePageJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(profilePageJsonLd) }}
       />
 
       <div className="max-w-5xl mx-auto space-y-8">

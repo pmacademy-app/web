@@ -1,5 +1,6 @@
 import { logSystemError, type ErrorSeverity } from '@/lib/monitoring/logger'
 import type { AuthErrorCode } from '@/lib/auth/errors'
+import { getClientIpBucket } from '@/lib/security/client-ip'
 
 export const runtime = 'nodejs'
 
@@ -125,11 +126,8 @@ function deriveSeverity(errorCode: AuthErrorCode): ErrorSeverity {
 }
 
 export async function POST(request: Request) {
-  // 1. IP extraction & rate limiting check
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'anonymous_client'
+  // 1. Trusted client IP extraction & rate limiting check
+  const ip = getClientIpBucket(request)
 
   if (isRateLimited(ip)) {
     return Response.json({ error: 'Rate limit exceeded' }, { status: 429 })
