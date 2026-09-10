@@ -51,6 +51,14 @@ All 17 variables above are confirmed present in `apps/web/.env.example` and conf
 > production values live in the Vercel project environment. `TURNSTILE_SECRET_KEY` in
 > particular must never appear in repository files or in any client bundle.
 
+> **CI builds.** Because `next.config.ts` refuses to build without
+> `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, the `build-and-validate` job in
+> [`ci.yml`](../.github/workflows/ci.yml) supplies Cloudflare's published always-pass
+> **test** keys when the corresponding repository secrets are unset. CI produces a
+> verification build that is never served, so it does not need the real keys — but the
+> guard still applies to it, which is why the fallback exists rather than an exemption.
+> If you add the real values as repository secrets they take precedence automatically.
+
 ---
 
 ## 3. Status Summary
