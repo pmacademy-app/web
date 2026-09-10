@@ -26,12 +26,15 @@ export async function POST(request: NextRequest) {
     const safeIds = ids.slice(0, 100).filter((id): id is string => typeof id === 'string' && Boolean(id.trim()))
     const supabase = createServiceRoleClient()
 
-    // 1. Fetch eligible items (not delivered or processing)
+    const staleThresholdMs = 15 * 60 * 1000
+    const staleThresholdIso = new Date(Date.now() - staleThresholdMs).toISOString()
+
+    // 1. Fetch eligible items (not delivered or active processing)
     const { data: rawItems, error: fetchErr } = await supabase
       .from('email_queue')
-      .select('id, to_email, template_key, status')
+      .select('id, to_email, template_key, status, processing_at')
       .in('id', safeIds)
-      .in('status', ['failed', 'dead_letter', 'retrying', 'skipped', 'suppressed'])
+      .or(`status.in.(failed,dead_letter,retrying,skipped,suppressed),and(status.eq.processing,processing_at.lte.${staleThresholdIso})`)
 
     if (fetchErr) {
       return NextResponse.json({ error: sanitizeErrorMessage(fetchErr.message) }, { status: 500 })
@@ -104,7 +107,7 @@ export async function POST(request: NextRequest) {
           updated_at: now,
         }, { count: 'exact' })
         .in('id', eligibleIds)
-        .in('status', ['failed', 'dead_letter', 'retrying', 'skipped', 'suppressed'])
+        .or(`status.in.(failed,dead_letter,retrying,skipped,suppressed),and(status.eq.processing,processing_at.lte.${staleThresholdIso})`)
 
       if (updateErr) {
         return NextResponse.json(

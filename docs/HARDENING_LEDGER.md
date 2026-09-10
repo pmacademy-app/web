@@ -3,7 +3,7 @@
 **Branch of Record:** `implementation/prodily-hardening`
 **Synchronized With:** `origin/main` @ `10a21a5` (merged 2026-09-10)
 **Date:** 2026-09-10
-**Status:** B0 complete · B1 complete · Signup-abuse incident fixed on `main` · **B2 is next**
+**Status:** B0..B5 complete · **B6 complete** · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -26,7 +26,12 @@
 | 1 | **B0** — baseline | hardening branch | ✅ Complete |
 | 2 | **B1** — database / security exposure | hardening branch | ✅ Complete in code · ⚠️ migration not yet applied |
 | 3 | **Signup-abuse incident (2026-09-09)** | `main` @ `10a21a5` | ✅ Complete in code · ⚠️ not verified in production |
-| 4 | **B2** — public portfolio XSS | — | ⬜ **NEXT** |
+| 4 | **B2** — public portfolio XSS | hardening branch | ✅ Complete |
+| 5 | **B3** — auth & session hardening | hardening branch | ✅ Complete |
+| 6 | **B4** — governed email egress | hardening branch | ✅ Complete |
+| 7 | **B5** — rate limiting & abuse controls | hardening branch | ✅ Complete |
+| 8 | **B6** — queue & scheduler reliability | hardening branch | ✅ Complete in code · ⚠️ migration not yet applied |
+| 9 | **B7** — route error contracts & auth wrapper | — | ⬜ **NEXT** |
 
 ---
 
@@ -300,6 +305,60 @@ promote.
 
 ---
 
+## B6 — Queue & Scheduler Reliability — ✅ Complete in code
+
+### 1. Findings Addressed
+- **Stale `processing` Item Reclamation:**
+  - Items in `processing` status could become stuck indefinitely if a serverless worker timed out or crashed.
+  - Implemented atomic `reclaim_stale_processing_items(p_stale_interval_seconds, p_max_reclaim)` RPC with `FOR UPDATE SKIP LOCKED` and lease expiration (>15 minutes).
+  - Items with `attempt_count >= max_attempts` transition to `dead_letter` with `failed_at = NOW()`.
+  - Items with `attempt_count < max_attempts` transition to `retrying` with randomized immediate jitter (0..30s) and cleared `processing_at`.
+  - Added atomic compare-and-swap query fallback in `reclaimStaleProcessingItems()` in `processor.ts`.
+  - Added indexes `idx_email_queue_processing_stale` and `idx_email_queue_claim_lookup`.
+- **Bounded Dispatch Concurrency:**
+  - Replaced unconstrained serial dispatch with a bounded worker pool (`DEFAULT_DISPATCH_CONCURRENCY = 5`, configurable between 1 and 10 via `QUEUE_DISPATCH_CONCURRENCY`).
+  - Added `MAX_BATCH_EXECUTION_MS = 90_000` (90s) overall batch execution deadline, ensuring dispatch loops complete well within the 5-minute GitHub Actions timeout window.
+  - Preserved individual provider 8-second HTTP timeout; slow jobs are isolated and do not serially block sibling workers.
+  - Preserved atomic daily send quota reservation (`increment_daily_email_quota`) across concurrent workers.
+- **Retry Backoff + Jitter & Permanent Failure Routing:**
+  - Implemented `calculateRetryDelayMinutes(attemptCount, baseMinutes, options)` in `helpers.ts`: exponential backoff with bounded +/-20% jitter and a 120-minute maximum delay ceiling.
+  - Provider rejections classified as `permanent` (e.g. 400 bad request, 401 unauthorized, 403 forbidden, 422 unprocessable) route directly to `dead_letter` via `handlePermanentFailure()`, preventing wasted provider quota.
+- **Scheduler Failure Detection & Heartbeat:**
+  - Added durable heartbeat recording to `system_settings` under key `cron_heartbeat:process-email-queue` in `/api/cron/process-email-queue/route.ts`.
+  - Records job name, timestamp, duration, result, and status (`healthy` or `failed`).
+  - Updated `SystemService.getHealthOverview()` to read this heartbeat and populate the Scheduler service card (`healthy` if run < 15m ago, `degraded` if stale or failed).
+- **Retry Duplication & Race Prevention:**
+  - Added compare-and-swap guard (`withProcessingStatusGuard` checking `status = 'processing'`) on all completion and failure updates in `processor.ts`.
+  - Updated admin retry endpoints (`[id]/retry`, `retry-all`, `retry-selected`) to permit manual retries of stale `processing` items (>15m) while strictly rejecting active (<15m) processing items.
+  - Preserved idempotency key constraints and ensured retries modify existing queue rows rather than inserting duplicate records.
+- **Queue State Machine Alignment:**
+  - Aligned `QueueStatus` union in `types.ts` to include `'skipped'`.
+  - Updated `isValidQueueStatusTransition` in `helpers.ts` to reflect actual production transitions.
+
+### 2. Files Changed
+- `supabase/migrations/20260910000002_queue_reliability_b6.sql` (New additive migration for reclaim RPC and indexes)
+- `apps/web/lib/notifications/queue/types.ts` (Added `'skipped'` to QueueStatus and ProcessQueueResult interface)
+- `apps/web/lib/notifications/queue/helpers.ts` (Updated state transitions and added calculateRetryDelayMinutes with jitter)
+- `apps/web/lib/notifications/queue/processor.ts` (Stale reclaim, bounded concurrency, backoff jitter, status guards)
+- `apps/web/app/api/cron/process-email-queue/route.ts` (Scheduler heartbeat recording)
+- `apps/web/lib/admin/system-service.ts` (Scheduler heartbeat observability in System Health)
+- `apps/web/app/api/admin/emails/queue/[id]/retry/route.ts` (Stale processing retry support)
+- `apps/web/app/api/admin/emails/queue/retry-all/route.ts` (Stale processing retry support)
+- `apps/web/app/api/admin/emails/queue/retry-selected/route.ts` (Stale processing retry support)
+- `apps/web/lib/__tests__/b6-queue-scheduler-reliability.test.ts` (19 comprehensive B6 tests)
+- `docs/HARDENING_LEDGER.md` (Audit and ledger records)
+
+### 3. Verification & Results
+- **Focused B6 Test Suite (`b6-queue-scheduler-reliability.test.ts`):** 19/19 passed.
+- **Affected Test Suites (7 files):** 73/73 passed.
+- **Full Test Suite (`npm test`):** 124 test files, 1,345/1,345 passed.
+- **Typecheck (`npm run typecheck`):** Passed (0 errors).
+- **ESLint (`npm run lint`):** Passed (0 errors, 35 pre-existing warnings).
+- **Production Build (`npm run build`):** Passed (227/227 static pages compiled successfully).
+- **Git Diff Check (`git diff --check`):** Passed (0 whitespace/conflict errors).
+
+---
+
 ## Roadmap — current status
 
 Statuses below were established by reading the merged code, not by reading commit
@@ -314,7 +373,7 @@ messages. "Plan ref" points at the batch specification in
 | **B3** — session/token architecture | I-06, I-07 | ✅ Complete in code | Unverified JWT trust removed; session fixation closed; refresh/logout routes added |
 | **B4** — email gateway + signup ordering | I-04 | ✅ Complete in code | Direct transports unified through canonical failover registry; kill switch enforced; timeouts standardized; durable side effects verification-gated |
 | **B5** — atomic rate limiting + abuse controls | I-03 | ✅ Complete in code | Login & update-password fail-closed atomic rate limits implemented; telemetry leftmost-XFF trust removed; signup account enumeration closed; Turnstile deferred |
-| **B6** — provider failover + email reliability | I-04, I-05 | 🟡 **Partially delivered by `10a21a5`** | See below |
+| **B6** — queue & scheduler reliability | I-04, I-05 | ✅ Complete in code | Migration 20260910000002 added; atomic stale processing reclamation implemented; bounded concurrency (pool of 5, 90s deadline); exponential backoff with jitter and 120m ceiling; durable scheduler heartbeat in system_settings; retry-failed duplication prevented; queue state machine aligned; 124 test files / 1345 tests passing |
 | **B7** — shared auth + route/error contract | I-07 | ⬜ Outstanding | |
 | **B8** — typed data layer + DB correctness | I-08 | ⬜ Outstanding | Includes the P0 leaderboard column bug (I-08-B1) |
 | **B9** — admin controls + observability | I-10 | ⬜ Outstanding | |
