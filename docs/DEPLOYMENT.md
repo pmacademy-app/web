@@ -41,8 +41,15 @@
 | `SEND_EMAIL_HOOK_SECRET` | **Server Only** | Secret verifying Supabase Auth Send Email Hook calls |
 | `CRON_SECRET` | **Server Only** | Bearer secret authorizing GitHub Actions cron routes |
 | `ADMIN_EMAILS` | **Server Only** | Comma-separated list of admin email addresses |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public (Client + Server) | Cloudflare Turnstile site key. **Required for a production build** — it is inlined into the client bundle at build time, so `next.config.ts` fails the build when it is absent (see [`SECURITY.md`](SECURITY.md)) |
+| `TURNSTILE_SECRET_KEY` | **Server Only** | Cloudflare Turnstile secret used for the server-side Siteverify call. Never prefix with `NEXT_PUBLIC_`; when missing in production the signup and resend-verification routes fail closed |
+| `DEV_TURNSTILE_BYPASS` | **Server Only** (local dev) | Optional. `true` skips Turnstile verification. Ignored whenever `NODE_ENV=production`, so it cannot weaken a deployed environment. Do **not** set it in Vercel |
 
-All 14 variables above are confirmed present in `apps/web/.env.example` and confirmed read somewhere in current code — no stale/removed variables found.
+All 17 variables above are confirmed present in `apps/web/.env.example` and confirmed read somewhere in current code — no stale/removed variables found.
+
+> **Never commit real values.** `.env.example` carries names and formats only; the
+> production values live in the Vercel project environment. `TURNSTILE_SECRET_KEY` in
+> particular must never appear in repository files or in any client bundle.
 
 ---
 

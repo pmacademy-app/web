@@ -15,6 +15,7 @@ export type AuthErrorCode =
   | 'AUTH_PROVIDER_UNAVAILABLE'
   | 'AUTH_RATE_LIMITED'
   | 'AUTH_SESSION_SYNC_FAILED'
+  | 'AUTH_CAPTCHA_FAILED'
   | 'AUTH_UNKNOWN_ERROR'
 
 /** Every code this classifier can produce, for validating a server-supplied code. */
@@ -27,6 +28,7 @@ export const AUTH_ERROR_CODES = new Set<string>([
   'AUTH_PROVIDER_UNAVAILABLE',
   'AUTH_RATE_LIMITED',
   'AUTH_SESSION_SYNC_FAILED',
+  'AUTH_CAPTCHA_FAILED',
   'AUTH_UNKNOWN_ERROR',
 ])
 
@@ -326,7 +328,23 @@ export function classifyAuthError(
     }
   }
 
-  // 10. Unknown / Unclassified error fallback
+  // 10. Security verification / CAPTCHA failure
+  if (
+    rawMessage.includes('security verification') ||
+    rawMessage.includes('verification challenge') ||
+    rawMessage.includes('turnstile') ||
+    rawMessage.includes('captcha')
+  ) {
+    return {
+      code: 'AUTH_CAPTCHA_FAILED',
+      message: 'Security verification failed. Please complete the verification challenge and try again.',
+      retryable: true,
+      isNetworkError: false,
+      rawCode: rawCode || 'captcha_failed',
+    }
+  }
+
+  // 11. Unknown / Unclassified error fallback
   return {
     code: 'AUTH_UNKNOWN_ERROR',
     message: 'An unexpected authentication error occurred. Please try again.',
@@ -403,7 +421,15 @@ export function resolveApiAuthError(
   const classified = classifyAuthError(new Error(message), context)
 
   const serverCode = body?.code
-  if (serverCode && AUTH_ERROR_CODES.has(serverCode)) {
+  if (serverCode === 'CAPTCHA_FAILED') {
+    classified.code = 'AUTH_CAPTCHA_FAILED'
+    classified.message = message
+    classified.retryable = true
+  } else if (serverCode === 'CAPTCHA_UNAVAILABLE') {
+    classified.code = 'AUTH_PROVIDER_UNAVAILABLE'
+    classified.message = message
+    classified.retryable = true
+  } else if (serverCode && AUTH_ERROR_CODES.has(serverCode)) {
     // The server already classified this. Trust its code and its copy.
     classified.code = serverCode as AuthErrorCode
     classified.message = message

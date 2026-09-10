@@ -50,13 +50,21 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }))
 
+// Turnstile is verified in its own suite (`turnstile-verification.test.ts`). Here it is
+// mocked explicitly so this suite states its assumption rather than inheriting a
+// global "CAPTCHA always passes" stub, and so no real Cloudflare call is attempted.
+vi.mock('@/lib/security/turnstile', () => ({
+  verifyTurnstileToken: vi.fn(async () => ({ success: true })),
+  evaluateSiteverifyBudget: vi.fn(async () => ({ success: true, resetInMs: 3_600_000 })),
+}))
+
 import { POST as signupPOST } from '../../app/api/auth/signup/route'
 
 function makeRequest(body: Record<string, unknown>, headers: Record<string, string> = {}) {
   return new NextRequest('https://prodily.app/api/auth/signup', {
     method: 'POST',
     headers: { 'content-type': 'application/json', ...headers },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ turnstileToken: 'test-turnstile-token', ...body }),
   })
 }
 

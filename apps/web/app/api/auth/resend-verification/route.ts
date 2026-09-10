@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
-import { getClientIpBucket } from '@/lib/security/client-ip'
+import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
+import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/turnstile'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { classifyAuthError } from '@/lib/auth/errors'
@@ -10,9 +11,11 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     let email: string | undefined
+    let turnstileToken: unknown
     try {
       const body = await request.json()
       email = body.email
+      turnstileToken = body.turnstileToken
     } catch {
       // Body optional if authenticated
     }
@@ -62,12 +65,68 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 2. Bot challenge.
+    //
+    // This endpoint calls `supabase.auth.resend()`, which fires the GoTrue hook and
+    // spends provider credit, so it is the endpoint an attacker moves to once signup
+    // carries a CAPTCHA. Verification is server-side and mandatory: a client-supplied
+    // "I solved it" flag is worth nothing, and the token is adjudicated by Cloudflare.
+    //
+    // Every refusal below is identical regardless of whether an account exists for the
+    // address, so the challenge cannot be used as an existence oracle.
+    if (typeof turnstileToken !== 'string' || !turnstileToken.trim()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Security verification failed. Please try again.',
+          code: 'CAPTCHA_FAILED',
+        },
+        { status: 400 }
+      )
+    }
+
+    const siteverifyBudget = await evaluateSiteverifyBudget()
+    if (!siteverifyBudget.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Please wait a while before requesting another verification email.',
+          resetInMs: siteverifyBudget.resetInMs,
+        },
+        { status: 429 }
+      )
+    }
+
+    // Cloudflare receives the trusted address only, never the `unresolved` bucket
+    // sentinel, which Siteverify would reject as a malformed `remoteip`.
+    const turnstileResult = await verifyTurnstileToken(turnstileToken, getTrustedClientIp(request) ?? undefined)
+    if (!turnstileResult.success) {
+      if (turnstileResult.code === 'CAPTCHA_UNAVAILABLE') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Security verification is temporarily unavailable. Please try again in a few moments.',
+            code: 'CAPTCHA_UNAVAILABLE',
+          },
+          { status: 503 }
+        )
+      }
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Security verification failed. Please try again.',
+          code: 'CAPTCHA_FAILED',
+        },
+        { status: 400 }
+      )
+    }
+
     const supabase = createServiceRoleClient()
     const {
       data: { user: sessionUser },
     } = await supabase.auth.getUser()
 
-    // 2. If user is logged in, check if already verified
+    // 3. If user is logged in, check if already verified
     if (sessionUser && sessionUser.email_confirmed_at) {
       return NextResponse.json({
         success: true,
@@ -76,7 +135,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // 3. Trigger Canonical Supabase Auth Resend Flow
+    // 4. Trigger Canonical Supabase Auth Resend Flow
     // Supabase Auth will invoke our Auth Hook (/api/auth/send-email-hook)
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://prodily.adityagangwani.me'
     const { error: resendError } = await supabase.auth.resend({
@@ -144,7 +203,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 4. Return Uniform Success Response (Non-enumerating for unauthenticated)
+    // 5. Return Uniform Success Response (Non-enumerating for unauthenticated)
     return NextResponse.json({
       success: true,
       message: 'If an unverified account exists for this email, a verification link has been sent.',

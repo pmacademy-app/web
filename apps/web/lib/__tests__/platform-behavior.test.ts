@@ -89,6 +89,14 @@ vi.mock('@/lib/admin/settings-service', () => ({
   },
 }))
 
+// Turnstile is verified in its own suite (`turnstile-verification.test.ts`). Here it is
+// mocked explicitly so this suite states its assumption rather than inheriting a
+// global "CAPTCHA always passes" stub, and so no real Cloudflare call is attempted.
+vi.mock('@/lib/security/turnstile', () => ({
+  verifyTurnstileToken: vi.fn(async () => ({ success: true })),
+  evaluateSiteverifyBudget: vi.fn(async () => ({ success: true, resetInMs: 3_600_000 })),
+}))
+
 describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
   beforeEach(() => {
     mockSettings.maintenanceMode = false
@@ -185,6 +193,7 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
           name: 'Jane Doe',
           email: 'jane@example.com',
           password: 'securePassword123',
+          turnstileToken: 'test-turnstile-token',
         }),
       })
       const res = await signupPOST(req)
@@ -204,6 +213,7 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
           name: 'Jane Doe',
           email: 'jane@example.com',
           password: 'securePassword123',
+          turnstileToken: 'test-turnstile-token',
         }),
       })
       const res = await signupPOST(req)
@@ -275,6 +285,7 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
           name: 'Jane Doe',
           email: 'jane@example.com',
           password: 'securePassword123',
+          turnstileToken: 'test-turnstile-token',
         }),
       })
       const res = await signupPOST(req)

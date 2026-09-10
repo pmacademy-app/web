@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Mail, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { classifyAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/auth/TurnstileWidget'
 
 interface ResendVerificationCardProps {
   email?: string
@@ -20,6 +21,22 @@ export function ResendVerificationCard({
   const [loading, setLoading] = useState<boolean>(false)
   const [inputEmail, setInputEmail] = useState<string>('')
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [turnstileToken, setTurnstileToken] = useState<string>('')
+  const turnstileRef = useRef<TurnstileWidgetRef>(null)
+
+  // Stable identities so the widget's render effect does not tear down and re-issue a
+  // challenge on every parent re-render (the cooldown timer re-renders once a second).
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token)
+  }, [])
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken('')
+  }, [])
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken('')
+  }, [])
 
   useEffect(() => {
     if (cooldown <= 0) return
@@ -37,6 +54,12 @@ export function ResendVerificationCard({
     }
 
     if (cooldown > 0 || loading) return
+
+    if (!turnstileToken) {
+      setStatusMessage({ type: 'error', text: 'Please complete the security check before requesting another email.' })
+      return
+    }
+
     setLoading(true)
     setStatusMessage(null)
 
@@ -44,10 +67,15 @@ export function ResendVerificationCard({
       const res = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: targetEmail }),
+        body: JSON.stringify({ email: targetEmail, turnstileToken }),
       })
 
       const data = await res.json()
+
+      // The token is single-use, so it is spent either way. Clear it and re-issue a
+      // fresh challenge so a retry never replays a token Cloudflare has already seen.
+      setTurnstileToken('')
+      turnstileRef.current?.reset()
 
       if (res.ok && data.success) {
         setStatusMessage({ type: 'success', text: data.message || 'Verification email sent successfully!' })
@@ -80,6 +108,8 @@ export function ResendVerificationCard({
       }
     } catch (err) {
       console.error('[ResendVerificationCard] Network error:', err)
+      setTurnstileToken('')
+      turnstileRef.current?.reset()
       const classified = classifyAuthError(err, 'resend_verification')
       recordAuthTelemetry(classified, 'resend_verification')
       setStatusMessage({ type: 'error', text: classified.message })
@@ -133,6 +163,15 @@ export function ResendVerificationCard({
               <span>{statusMessage.text}</span>
             </div>
           )}
+
+          <div className="mt-3">
+            <TurnstileWidget
+              ref={turnstileRef}
+              onSuccess={handleTurnstileSuccess}
+              onExpire={handleTurnstileExpire}
+              onError={handleTurnstileError}
+            />
+          </div>
 
           <div className="mt-4">
             <button

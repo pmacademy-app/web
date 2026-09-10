@@ -207,6 +207,14 @@ vi.mock('@/lib/supabase', () => {
   }
 })
 
+// Turnstile is verified in its own suite (`turnstile-verification.test.ts`). Here it is
+// mocked explicitly so this suite states its assumption rather than inheriting a
+// global "CAPTCHA always passes" stub, and so no real Cloudflare call is attempted.
+vi.mock('@/lib/security/turnstile', () => ({
+  verifyTurnstileToken: vi.fn(async () => ({ success: true })),
+  evaluateSiteverifyBudget: vi.fn(async () => ({ success: true, resetInMs: 3_600_000 })),
+}))
+
 describe('Phase 1 — Email Confirmation Requirement Control', () => {
   beforeEach(() => {
     SettingsService.invalidateCache()
@@ -263,6 +271,7 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
           name: 'Sarah Connor',
           email: 'sarah@example.com',
           password: 'Password123!',
+          turnstileToken: 'test-turnstile-token',
         }),
       })
 
@@ -294,6 +303,7 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
           name: 'John Connor',
           email: 'john@example.com',
           password: 'Password123!',
+          turnstileToken: 'test-turnstile-token',
         }),
       })
 
@@ -333,6 +343,7 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
           name: 'Dupe User',
           email: 'duplicate@example.com',
           password: 'Password123!',
+          turnstileToken: 'test-turnstile-token',
         }),
       })
 

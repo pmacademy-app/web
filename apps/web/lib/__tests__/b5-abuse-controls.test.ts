@@ -58,6 +58,19 @@ vi.mock('@/lib/monitoring/logger', () => ({
   logErrorReport: vi.fn().mockResolvedValue(undefined),
 }))
 
+const mockVerifyTurnstileToken = vi.fn()
+const mockEvaluateSiteverifyBudget = vi.fn()
+vi.mock('@/lib/security/turnstile', () => ({
+  verifyTurnstileToken: (...args: unknown[]) => mockVerifyTurnstileToken(...args),
+  evaluateSiteverifyBudget: (...args: unknown[]) => mockEvaluateSiteverifyBudget(...args),
+}))
+
+const mockCreateReferralAttribution = vi.fn()
+vi.mock('@/lib/referral/referral-service', () => ({
+  createReferralAttribution: (...args: unknown[]) => mockCreateReferralAttribution(...args),
+  isPlausibleReferralCode: (code: unknown) => typeof code === 'string' && code.length >= 3,
+}))
+
 // Import route handlers under test
 import { POST as loginPOST } from '@/app/api/auth/login/route'
 import { POST as updatePasswordPOST } from '@/app/api/auth/update-password/route'
@@ -99,6 +112,9 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
       data: { user: { id: 'usr-1' } },
       error: null,
     })
+    mockVerifyTurnstileToken.mockResolvedValue({ success: true })
+    mockEvaluateSiteverifyBudget.mockResolvedValue({ success: true, resetInMs: 3_600_000 })
+    mockCreateReferralAttribution.mockResolvedValue({ success: true })
   })
 
   // ============================================================================
@@ -364,6 +380,7 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         name: 'Existing User',
         email: 'registered@example.com',
         password: 'securePassword123',
+        turnstileToken: 'valid-turnstile-token',
       })
 
       const res = await signupPOST(req)
@@ -388,6 +405,7 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         name: 'New User',
         email: 'fresh@example.com',
         password: 'securePassword123',
+        turnstileToken: 'valid-turnstile-token',
       })
 
       const res = await signupPOST(req)
@@ -411,11 +429,214 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         email: 'registered@example.com',
         password: 'securePassword123',
         refCode: 'REF123',
+        turnstileToken: 'valid-turnstile-token',
       })
 
       await signupPOST(req)
       // Must NOT create profile or grant referral
       expect(ensureUserProfile).not.toHaveBeenCalled()
+    })
+  })
+
+  // ============================================================================
+  // 5. Turnstile Bot Challenge & Side-Effect Safety
+  // ============================================================================
+  describe('5. Turnstile Bot Challenge & Side-Effect Safety', () => {
+    it('11. rejects signup when turnstileToken is missing from request body', async () => {
+      const req = createRequest('https://prodily.app/api/auth/signup', {
+        name: 'Bot Attempt',
+        email: 'bot@example.com',
+        password: 'password123',
+      })
+
+      const res = await signupPOST(req)
+      const data = await res.json()
+
+      expect(res.status).toBe(400)
+      expect(data.code).toBe('VALIDATION')
+      expect(mockVerifyTurnstileToken).not.toHaveBeenCalled()
+      expect(mockSupabase.auth.signUp).not.toHaveBeenCalled()
+    })
+
+    it('12. rejects signup with CAPTCHA_FAILED when Turnstile verification fails', async () => {
+      mockVerifyTurnstileToken.mockResolvedValueOnce({
+        success: false,
+        code: 'CAPTCHA_FAILED',
+        errorCodes: ['invalid-input-response'],
+      })
+
+      const req = createRequest('https://prodily.app/api/auth/signup', {
+        name: 'Bot Attempt',
+        email: 'bot@example.com',
+        password: 'password123',
+        turnstileToken: 'invalid_token',
+      })
+
+      const res = await signupPOST(req)
+      const data = await res.json()
+
+      expect(res.status).toBe(400)
+      expect(data.code).toBe('CAPTCHA_FAILED')
+      expect(data.error).toBe('Security verification failed. Please try again.')
+    })
+
+    it('13. fails closed with CAPTCHA_UNAVAILABLE when Cloudflare is down or timed out', async () => {
+      mockVerifyTurnstileToken.mockResolvedValueOnce({
+        success: false,
+        code: 'CAPTCHA_UNAVAILABLE',
+        isTimeout: true,
+      })
+
+      const req = createRequest('https://prodily.app/api/auth/signup', {
+        name: 'User Attempt',
+        email: 'learner@example.com',
+        password: 'password123',
+        turnstileToken: 'token_during_outage',
+      })
+
+      const res = await signupPOST(req)
+      const data = await res.json()
+
+      expect(res.status).toBe(503)
+      expect(data.code).toBe('CAPTCHA_UNAVAILABLE')
+    })
+
+    it('14-17. guarantees zero side effects on failed Turnstile (no auth, no profile, no referral, no rate limit burn)', async () => {
+      const { ensureUserProfile } = await import('@/lib/auth')
+      mockVerifyTurnstileToken.mockResolvedValueOnce({
+        success: false,
+        code: 'CAPTCHA_FAILED',
+      })
+
+      const req = createRequest('https://prodily.app/api/auth/signup', {
+        name: 'Targeted Victim Lockout Attempt',
+        email: 'victim@example.com',
+        password: 'securePassword123',
+        refCode: 'REF999',
+        turnstileToken: 'forged_bad_token',
+      })
+
+      const res = await signupPOST(req)
+      expect(res.status).toBe(400)
+
+      // Invariant checks:
+      // 1. No Supabase Auth signup call
+      expect(mockSupabase.auth.signUp).not.toHaveBeenCalled()
+      // 2. No user profile created
+      expect(ensureUserProfile).not.toHaveBeenCalled()
+      // 3. No referral attribution
+      expect(mockCreateReferralAttribution).not.toHaveBeenCalled()
+      // 4. Phase 2 email and global rate limits are NEVER touched
+      expect(mockEvaluateRateLimit).not.toHaveBeenCalledWith(
+        expect.stringContaining('signup_email:victim@example.com'),
+        expect.anything()
+      )
+      expect(mockEvaluateRateLimit).not.toHaveBeenCalledWith(
+        'signup_global',
+        expect.anything()
+      )
+    })
+
+    it('19. platform-wide Siteverify budget is consumed before Cloudflare is contacted', async () => {
+      const req = createRequest('https://prodily.app/api/auth/signup', {
+        name: 'Normal Learner',
+        email: 'learner@example.com',
+        password: 'securePassword123',
+        turnstileToken: 'valid-turnstile-token',
+      })
+
+      await signupPOST(req)
+
+      expect(mockEvaluateSiteverifyBudget).toHaveBeenCalled()
+      expect(mockVerifyTurnstileToken).toHaveBeenCalled()
+    })
+
+    it('20. an exhausted Siteverify budget refuses without contacting Cloudflare or spending signup budget', async () => {
+      // A distributed campaign cannot be stopped by the per-IP limiter, because every
+      // rotated address buys a fresh budget. This constant-key ceiling is what bounds
+      // the outbound calls, and it must refuse BEFORE the invocation-holding fetch.
+      mockEvaluateSiteverifyBudget.mockResolvedValueOnce({ success: false, resetInMs: 1_800_000 })
+
+      const req = createRequest('https://prodily.app/api/auth/signup', {
+        name: 'Distributed Flooder',
+        email: 'victim@example.com',
+        password: 'securePassword123',
+        turnstileToken: 'any_token',
+      })
+
+      const res = await signupPOST(req)
+      const data = await res.json()
+
+      expect(res.status).toBe(429)
+      expect(data.code).toBe('RATE_LIMITED')
+      expect(mockVerifyTurnstileToken).not.toHaveBeenCalled()
+      expect(mockSupabase.auth.signUp).not.toHaveBeenCalled()
+      // The victim's per-email allowance and the platform signup ceiling stay untouched.
+      expect(mockEvaluateRateLimit).not.toHaveBeenCalledWith(
+        expect.stringContaining('signup_email:'),
+        expect.anything()
+      )
+      expect(mockEvaluateRateLimit).not.toHaveBeenCalledWith('signup_global', expect.anything())
+    })
+
+    it('21. Cloudflare receives the trusted client IP, never the `unresolved` bucket sentinel', async () => {
+      const resolved = createRequest(
+        'https://prodily.app/api/auth/signup',
+        {
+          name: 'Resolved IP',
+          email: 'resolved@example.com',
+          password: 'securePassword123',
+          turnstileToken: 'valid-turnstile-token',
+        },
+        { 'x-real-ip': '203.0.113.55' }
+      )
+      await signupPOST(resolved)
+      expect(mockVerifyTurnstileToken).toHaveBeenLastCalledWith('valid-turnstile-token', '203.0.113.55')
+
+      mockVerifyTurnstileToken.mockClear()
+
+      // No trusted header at all: the rate limiter still buckets under `unresolved`,
+      // but Cloudflare must be given `undefined` rather than that sentinel string.
+      const unresolved = createRequest('https://prodily.app/api/auth/signup', {
+        name: 'Unresolved IP',
+        email: 'unresolved@example.com',
+        password: 'securePassword123',
+        turnstileToken: 'valid-turnstile-token',
+      })
+      await signupPOST(unresolved)
+      expect(mockVerifyTurnstileToken).toHaveBeenLastCalledWith('valid-turnstile-token', undefined)
+      expect(mockEvaluateRateLimit).toHaveBeenCalledWith(
+        'signup_ip:unresolved',
+        expect.anything()
+      )
+    })
+
+    it('18. Phase 1 IP rate limit executes before Turnstile and halts single-IP flood', async () => {
+      mockEvaluateRateLimit.mockImplementation(async (key: string) => {
+        if (key.startsWith('signup_ip:')) {
+          return { success: false, remaining: 0, resetInMs: 900000 }
+        }
+        return { success: true, remaining: 5, resetInMs: 60000 }
+      })
+
+      const req = createRequest(
+        'https://prodily.app/api/auth/signup',
+        {
+          name: 'IP Flooder',
+          email: 'flooder@example.com',
+          password: 'password123',
+          turnstileToken: 'any_token',
+        },
+        { 'x-real-ip': '198.51.100.77' }
+      )
+
+      const res = await signupPOST(req)
+      const data = await res.json()
+
+      expect(res.status).toBe(429)
+      expect(data.code).toBe('RATE_LIMITED')
+      // Turnstile must NOT be invoked if IP rate limit fails
+      expect(mockVerifyTurnstileToken).not.toHaveBeenCalled()
     })
   })
 })

@@ -6,8 +6,9 @@ import { ensureUserProfile } from '@/lib/auth'
 import { createReferralAttribution, isPlausibleReferralCode } from '@/lib/referral/referral-service'
 import { apiInternalError, apiClassifiedAuthError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
-import { getClientIpBucket } from '@/lib/security/client-ip'
+import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
+import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/turnstile'
 
 export const runtime = 'nodejs'
 
@@ -16,6 +17,7 @@ const signupSchema = z.object({
   email: z.string().min(1, 'Email is required.').email('Please enter a valid email address.').trim().toLowerCase(),
   password: z.string().min(6, 'Password must be at least 6 characters.'),
   refCode: z.string().optional().nullable(),
+  turnstileToken: z.string().min(1, 'Security verification is required.'),
 })
 
 // Signup abuse controls.
@@ -80,7 +82,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { name, email, password } = parsed.data
+    const { name, email, password, turnstileToken } = parsed.data
     const refCode = parsed.data.refCode || request.cookies.get('prodily_referrer')?.value || null
 
     // Check both platform behavior controls in a single DB call. This is the
@@ -102,18 +104,71 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Server-side abuse throttling — evaluated before any Supabase Auth call, because
-    // `auth.signUp()` itself triggers an outbound verification email through the
-    // GoTrue hook. Anything that gets past this point has already cost money.
     const clientIp = getClientIpBucket(request)
+
+    // Phase 1 Rate Limiting: IP-level throttle protects Cloudflare Siteverify from single-IP floods
+    const ipLimit = await evaluatePersistentRateLimit(`signup_ip:${clientIp}`, IP_SIGNUP_LIMIT)
+    if (!ipLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many registration attempts. Please wait a while before trying again.',
+          code: 'RATE_LIMITED',
+          resetInMs: ipLimit.resetInMs,
+        },
+        { status: 429 }
+      )
+    }
+
+    // Platform-wide Siteverify ceiling. The per-IP limiter above bounds one source;
+    // this bounds a distributed campaign, which would otherwise turn every rotated
+    // address into another outbound Cloudflare call holding an invocation open.
+    const siteverifyBudget = await evaluateSiteverifyBudget()
+    if (!siteverifyBudget.success) {
+      // Same undifferentiated 429 as the other limiters — which ceiling was hit is not
+      // the caller's business, and the response contract is identical either way.
+      return NextResponse.json(
+        {
+          error: 'Too many registration attempts. Please wait a while before trying again.',
+          code: 'RATE_LIMITED',
+          resetInMs: siteverifyBudget.resetInMs,
+        },
+        { status: 429 }
+      )
+    }
+
+    // Bot challenge verification: must pass before email or global quotas are consumed.
+    // Cloudflare receives the trusted address only — never the `unresolved` bucket
+    // sentinel, which Siteverify would reject as a malformed `remoteip`.
+    const turnstileResult = await verifyTurnstileToken(turnstileToken, getTrustedClientIp(request) ?? undefined)
+    if (!turnstileResult.success) {
+      if (turnstileResult.code === 'CAPTCHA_UNAVAILABLE') {
+        return NextResponse.json(
+          {
+            error: 'Security verification is temporarily unavailable. Please try again in a few moments.',
+            code: 'CAPTCHA_UNAVAILABLE',
+          },
+          { status: 503 }
+        )
+      }
+      return NextResponse.json(
+        {
+          error: 'Security verification failed. Please try again.',
+          code: 'CAPTCHA_FAILED',
+        },
+        { status: 400 }
+      )
+    }
+
+    // Phase 2 Rate Limiting: Per-email and global ceilings are evaluated ONLY after
+    // Turnstile challenge verification succeeds. This ensures bad CAPTCHA tokens cannot be
+    // abused to lock out a victim's email or exhaust the platform-wide signup quota.
     const canonicalEmail = canonicalizeEmailForRateLimit(email)
 
     const dailyEmailLimit = await EmailAutomationsService.getState()
       .then((state) => state.dailyLimit)
       .catch(() => 100)
 
-    const [ipLimit, emailLimit, aggregateLimit] = await Promise.all([
-      evaluatePersistentRateLimit(`signup_ip:${clientIp}`, IP_SIGNUP_LIMIT),
+    const [emailLimit, aggregateLimit] = await Promise.all([
       evaluatePersistentRateLimit(`signup_email:${canonicalEmail}`, EMAIL_SIGNUP_LIMIT),
       evaluatePersistentRateLimit('signup_global', {
         windowMs: AGGREGATE_SIGNUP_WINDOW_MS,
@@ -122,9 +177,9 @@ export async function POST(request: NextRequest) {
       }),
     ])
 
-    if (!ipLimit.success || !emailLimit.success || !aggregateLimit.success) {
-      const resetInMs = Math.max(ipLimit.resetInMs, emailLimit.resetInMs, aggregateLimit.resetInMs)
-      // One undifferentiated message for all three. Telling a caller *which* limit
+    if (!emailLimit.success || !aggregateLimit.success) {
+      const resetInMs = Math.max(emailLimit.resetInMs, aggregateLimit.resetInMs)
+      // One undifferentiated message for both. Telling a caller *which* limit
       // they hit would confirm whether the address is known to us and would let an
       // attacker measure the aggregate ceiling; the response contract is the same
       // 429 either way.

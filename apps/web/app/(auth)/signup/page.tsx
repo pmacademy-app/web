@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, Suspense } from 'react'
+import { useState, useTransition, Suspense, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -15,6 +15,7 @@ import { classifyAuthError, type ClassifiedAuthError, resolveApiAuthError } from
 import { AuthErrorNotice } from '@/components/auth/AuthErrorNotice'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { trackReferralSignupCompleted } from '@/lib/analytics'
+import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/auth/TurnstileWidget'
 
 const signupSchema = z.object({
   name: z
@@ -45,6 +46,9 @@ function SignupFormContent() {
   const [authError, setAuthError] = useState<ClassifiedAuthError | null>(null)
   const [submittedEmail, setSubmittedEmail] = useState<string>('')
   const [verificationPending, setVerificationPending] = useState<boolean>(false)
+  const [turnstileToken, setTurnstileToken] = useState<string>('')
+  const [turnstileError, setTurnstileError] = useState<string | null>(null)
+  const turnstileRef = useRef<TurnstileWidgetRef>(null)
   const [isPending, startTransition] = useTransition()
 
   const {
@@ -63,15 +67,23 @@ function SignupFormContent() {
   const handleSignup = (values: SignupFormValues) => {
     setAuthError(null)
 
+    if (!turnstileToken) {
+      setTurnstileError('Please complete the security check above before submitting.')
+      return
+    }
+    setTurnstileError(null)
+
     startTransition(async () => {
       try {
         const res = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...values, refCode }),
+          body: JSON.stringify({ ...values, refCode, turnstileToken }),
         })
 
         if (res.status >= 502 && res.status <= 504) {
+          turnstileRef.current?.reset()
+          setTurnstileToken('')
           const classified = classifyAuthError(new Error(`${res.status} Bad Gateway / Service Unavailable`), 'signup')
           setAuthError(classified)
           recordAuthTelemetry(classified, 'signup')
@@ -82,6 +94,8 @@ function SignupFormContent() {
         try {
           json = await res.json()
         } catch {
+          turnstileRef.current?.reset()
+          setTurnstileToken('')
           const classified = classifyAuthError(new Error(`HTTP ${res.status}: Invalid server response`), 'signup')
           setAuthError(classified)
           recordAuthTelemetry(classified, 'signup')
@@ -89,6 +103,8 @@ function SignupFormContent() {
         }
 
         if (!res.ok || !json.success) {
+          turnstileRef.current?.reset()
+          setTurnstileToken('')
           // SIGNUPS_DISABLED is a known platform-control response, not an auth error
           if (res.status === 403 && ((json as { code?: string }).code === 'SIGNUPS_DISABLED' || json.error?.toLowerCase().includes('registrations are currently closed'))) {
             setAuthError({
@@ -115,12 +131,38 @@ function SignupFormContent() {
           router.refresh()
         }
       } catch (err) {
+        turnstileRef.current?.reset()
+        setTurnstileToken('')
         console.error('[signup] Error registering:', err)
         const classified = classifyAuthError(err, 'signup')
         setAuthError(classified)
         recordAuthTelemetry(classified, 'signup')
       }
     })
+  }
+
+  // Stable identities. The widget's render effect depends on these props, so a new
+  // function on every parent render would tear the widget down and re-render it —
+  // and because a fresh widget solves and calls back with a NEW token, that cycle
+  // never settles. Only the setters are referenced, and React guarantees those are
+  // stable, so there is no stale closure to worry about.
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token)
+    setTurnstileError(null)
+  }, [])
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken('')
+    setTurnstileError('Security verification expired. Please complete the check again.')
+  }, [])
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken('')
+  }, [])
+
+  const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    handleSubmit(handleSignup)(e)
   }
 
   const isLoading = isPending
@@ -197,6 +239,9 @@ function SignupFormContent() {
               onClick={() => {
                 setVerificationPending(false)
                 setSubmittedEmail('')
+                setTurnstileToken('')
+                setTurnstileError(null)
+                turnstileRef.current?.reset()
               }}
               className="text-xs text-primary font-semibold hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded p-1 cursor-pointer"
             >
@@ -219,7 +264,7 @@ function SignupFormContent() {
             </AuthErrorNotice>
           )}
 
-          <form onSubmit={handleSubmit(handleSignup)} className="space-y-4" noValidate>
+          <form onSubmit={onFormSubmit} className="space-y-4" noValidate>
             <div>
               <label htmlFor="signup-name" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
                 Full Name
@@ -282,6 +327,20 @@ function SignupFormContent() {
               {errors.password && (
                 <p id="password-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
                   {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <div className="py-1">
+              <TurnstileWidget
+                ref={turnstileRef}
+                onSuccess={handleTurnstileSuccess}
+                onExpire={handleTurnstileExpire}
+                onError={handleTurnstileError}
+              />
+              {turnstileError && (
+                <p className="mt-1 text-xs text-destructive font-medium text-center" role="alert">
+                  {turnstileError}
                 </p>
               )}
             </div>

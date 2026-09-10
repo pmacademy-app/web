@@ -1,4 +1,10 @@
 import path from 'path'
+import { assertTurnstileBuildConfig } from './lib/security/turnstile-env'
+
+// Fail a production build that would ship a signup page with no Turnstile widget.
+// NEXT_PUBLIC_TURNSTILE_SITE_KEY is inlined at build time, so a missing value cannot
+// be recovered at runtime — see lib/security/turnstile-env.ts.
+assertTurnstileBuildConfig()
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -53,7 +59,7 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https: wss:;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https://challenges.cloudflare.com; connect-src 'self' https: wss:;",
           },
         ],
       },

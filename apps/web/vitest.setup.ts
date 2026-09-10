@@ -8,8 +8,11 @@ if (process.env.ALLOW_LIVE_DB_TESTS !== 'true') {
 }
 process.env.ADMIN_EMAILS = process.env.ADMIN_EMAILS || 'admin@prodily.app,owner@prodily.app'
 process.env.CRON_SECRET = process.env.CRON_SECRET || 'test-cron-secret'
+process.env.TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA'
+process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
 
-// Mock fetch for mock.supabase.co to prevent DNS timeouts during unit test execution
+// Mock fetch for mock.supabase.co, and block real Cloudflare Turnstile calls, so unit
+// tests never depend on the network.
 const originalFetch = global.fetch
 global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
   const urlStr = String(input)
@@ -21,6 +24,20 @@ global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
         'Content-Range': '0-0/0',
       },
     })
+  }
+  // Turnstile Siteverify must never be contacted for real, and a blanket
+  // "always succeeds" stub is worse than no stub: it silently turned every route
+  // suite into one that passes the CAPTCHA with any string, so those suites proved
+  // nothing about the challenge. Failing loudly forces each suite to state what it
+  // expects — either by mocking `@/lib/security/turnstile`, or (as the dedicated
+  // Turnstile unit tests do) by stubbing `fetch` with the exact Cloudflare response
+  // under test.
+  if (urlStr.includes('challenges.cloudflare.com')) {
+    throw new Error(
+      `[vitest] Unmocked Cloudflare Turnstile call to ${urlStr}. ` +
+        'Mock @/lib/security/turnstile in this suite, or stub global fetch with the ' +
+        'Siteverify response the test intends to exercise.'
+    )
   }
   return originalFetch(input, init)
 }) as typeof global.fetch
