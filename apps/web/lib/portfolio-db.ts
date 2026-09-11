@@ -7,6 +7,7 @@
  * Enforces strict privacy rules: private portfolios and private reflections are never exposed.
  */
 
+import { cache } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
@@ -248,9 +249,6 @@ export async function getPublicPortfolioData(
     ? capstones.find((c) => c.id === featuredCapstoneId) || null
     : null
 
-  // Increment view count asynchronously (fire-and-forget, non-blocking)
-  incrementPortfolioViewCount(supabase, user.id).catch(() => {})
-
   // Portfolio Verification: computed live from data already loaded above — no
   // extra query. Reuses the same readiness signals as the Settings checklist.
   const verificationOverride = ((user as unknown as { portfolio_verification_override?: string | null })
@@ -306,6 +304,32 @@ export async function getPublicPortfolioData(
     publicReflectionsCount: reflections?.length ?? 0,
   }
 }
+
+/**
+ * Request-scoped deduplication of the public portfolio read.
+ *
+ * `getPublicPortfolioData()` costs five-plus Supabase round trips plus skill-radar and
+ * readiness computation, and the page ran the whole thing TWICE per view — once in
+ * `generateMetadata()` and again in the component — because neither call was
+ * deduplicated. React's `cache()` collapses them into one computation per request.
+ *
+ * Deliberately request-scoped and NOT a cross-request cache. A portfolio can be made
+ * private at any time, so a cross-request cache would keep serving a payload that is
+ * no longer public until it expired or was purged. Purging would have to be proven,
+ * and this codebase has never invoked `revalidateTag` — every `tags` option in it is
+ * decorative — while Next 16 has changed that API. Caching public portfolio data
+ * across requests is therefore gated on building and verifying that invalidation
+ * path, not on adding a `revalidate` value. See the V-OPT-2 report.
+ *
+ * Privacy is unchanged by this: the underlying function still returns `null` for a
+ * private portfolio, and nothing is retained past the request.
+ */
+export const getDedupedPublicPortfolioData = cache(
+  async (username: string): Promise<PublicPortfolioPayload | null> => {
+    const { createServiceRoleClient } = await import('@/lib/supabase')
+    return getPublicPortfolioData(createServiceRoleClient(), username.trim().toLowerCase())
+  }
+)
 
 /**
  * Atomically increments the portfolio visitor count for a user if public.

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { verifyCertificate } from '@/lib/certificates-db'
+import { getDedupedVerifiedCertificate } from '@/lib/certificates-db'
 import { generateCredentialJsonLd } from '@/lib/certificates'
 import { CertificateCard } from '@/components/certificates/CertificateCard'
 import { CertificateActions } from '@/components/certificates/CertificateActions'
@@ -16,10 +15,45 @@ interface PageProps {
 
 const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
+/**
+ * Issued certificates are effectively immutable, so this page is cached rather than
+ * rendered per request.
+ *
+ * Evidence, not assumption: the `certificates` table has no revocation, status or
+ * validity column — its columns are career_title, certificate_code, id, issued_at,
+ * learner_name, lessons_completed, level, module_slug, modules_completed, total_xp,
+ * type and user_id — and no migration adds one. Nothing in the app updates a
+ * certificate after issuance except an admin dev-only test-certificate generator.
+ * There is consequently no revocation to propagate.
+ *
+ * The one genuinely live part is the display join: `verifyCertificate()` resolves the
+ * holder's current `name`, `username` and `avatar_url`. An hour bounds how long a
+ * renamed holder shows their previous name — cosmetic, and nothing about the
+ * verification verdict depends on it.
+ *
+ * Nothing private is embedded: the payload is the certificate plus public profile
+ * display fields, the page reads no cookies or headers, and it performs no mutation
+ * and no view counting.
+ */
+export const revalidate = 3600
+
+/**
+ * `revalidate` alone does not cache a dynamic segment — the first build of this
+ * change still reported the route as dynamic with no revalidate value, because Next
+ * has no params to prerender and so never establishes a cache entry. Declaring an
+ * empty `generateStaticParams` with `dynamicParams` is the documented way to say
+ * "prerender none at build, generate and then cache each one on first request".
+ * Certificate IDs are unbounded and mostly never visited, so prerendering any of them
+ * at build time would be waste.
+ */
+export const dynamicParams = true
+export async function generateStaticParams(): Promise<Array<{ certificateId: string }>> {
+  return []
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { certificateId } = await params
-  const supabase = createServiceRoleClient()
-  const cert = await verifyCertificate(supabase, certificateId, SITE_ORIGIN)
+  const cert = await getDedupedVerifiedCertificate(certificateId, SITE_ORIGIN)
 
   if (!cert) {
     return {
@@ -58,8 +92,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CertificateVerificationPage({ params }: PageProps) {
   const { certificateId } = await params
-  const supabase = createServiceRoleClient()
-  const cert = await verifyCertificate(supabase, certificateId, SITE_ORIGIN)
+  const cert = await getDedupedVerifiedCertificate(certificateId, SITE_ORIGIN)
 
   if (!cert) {
     return (

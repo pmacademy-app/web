@@ -4,6 +4,7 @@
  * Handles server-side queries for certificate generation, issuance, and verification.
  */
 
+import { cache } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
@@ -111,6 +112,20 @@ export async function issueCertificate(
 /**
  * Verifies a certificate by code or ID for public verification page.
  */
+/**
+ * Request-scoped deduplication of a certificate lookup.
+ *
+ * The verify page resolves the same certificate twice per view — once in
+ * `generateMetadata()` and again in the component — and each resolution costs up to
+ * two `certificates` queries plus a `users` join. `cache()` collapses that to one.
+ */
+export const getDedupedVerifiedCertificate = cache(
+  async (codeOrId: string, siteOrigin: string = BRAND.siteUrl): Promise<VerifiedCertificatePayload | null> => {
+    const { createServiceRoleClient } = await import('@/lib/supabase')
+    return verifyCertificate(createServiceRoleClient(), codeOrId, siteOrigin)
+  }
+)
+
 export async function verifyCertificate(
   supabase: SupabaseClient<Database>,
   codeOrId: string,

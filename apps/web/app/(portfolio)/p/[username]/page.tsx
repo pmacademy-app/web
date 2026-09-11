@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getPublicPortfolioData, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
+import {
+  getDedupedPublicPortfolioData,
+  incrementPortfolioViewCount,
+  DEFAULT_PORTFOLIO_LAYOUT,
+} from '@/lib/portfolio-db'
 import { generateProfilePageJsonLd, formatPortfolioShareUrl } from '@/lib/portfolio'
 import { PortfolioHero } from '@/components/portfolio/PortfolioHero'
 import { PortfolioSkillRadar } from '@/components/portfolio/PortfolioSkillRadar'
@@ -22,8 +26,7 @@ const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || BRAND.siteUrl
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { username } = await params
-  const supabase = createServiceRoleClient()
-  const portfolio = await getPublicPortfolioData(supabase, username)
+  const portfolio = await getDedupedPublicPortfolioData(username)
 
   if (!portfolio || !portfolio.user.isPortfolioPublic) {
     return {
@@ -84,8 +87,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicPortfolioPage({ params }: PageProps) {
   const { username } = await params
-  const supabase = createServiceRoleClient()
-  const portfolio = await getPublicPortfolioData(supabase, username)
+  const portfolio = await getDedupedPublicPortfolioData(username)
+
+  // Counted here and ONLY here. It used to live inside the data fetch, which both
+  // `generateMetadata()` and this component call — so every view was counted twice.
+  // Keeping it on the request path (rather than inside the cached read) is what lets
+  // the expensive query be cached without turning the counter into a cache-miss
+  // counter. `incrementPortfolioViewCount` re-checks `is_portfolio_public` itself and
+  // never throws.
+  if (portfolio) {
+    const supabase = createServiceRoleClient()
+    void incrementPortfolioViewCount(supabase, portfolio.user.id).catch(() => {})
+  }
 
   // Private or non-existent profile state
   if (!portfolio) {
