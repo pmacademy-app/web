@@ -389,14 +389,48 @@ export async function proxy(request: NextRequest) {
   return withReferralCookie(NextResponse.next(), refParam)
 }
 
+/**
+ * Which requests enter the session proxy at all.
+ *
+ * Entering this proxy is not free: Vercel bills it as its own function invocation, so
+ * a request that reaches a page costs two. Every path listed below authenticates
+ * itself independently and reads nothing from the session, so running session
+ * verification for it bought nothing.
+ *
+ * This narrows only WHICH PATHS ENTER — it does not change what the proxy does for
+ * anything that still enters. Verified `getUser()`, refresh-session handling, cookie
+ * clearing, protected-page redirects and admin authorization are all untouched (B3).
+ *
+ * Newly excluded, each verified route-by-route rather than by pathname assumption:
+ *
+ *   api/cron/*              CRON_SECRET bearer, else `requireAdminUser(request)`.
+ *                           That fallback resolves the user from the request itself
+ *                           (`getAuthenticatedUserFromRequest` reads the cookie and
+ *                           calls `supabase.auth.getUser()`), so admin access still
+ *                           works without the proxy having run.
+ *   api/health              No auth of any kind; returns a liveness probe. A health
+ *                           check should also answer during maintenance mode.
+ *   api/og/*                Deliberately public — social crawlers must fetch it
+ *                           unauthenticated. Portfolio privacy is enforced inside the
+ *                           handler, not here.
+ *   api/email/webhooks      Svix (Resend) / shared-secret (Brevo) signature auth.
+ *   api/email/unsubscribe   One-time `unsubscribe_token` from the email itself.
+ *
+ * `api/email/*` is listed as its two concrete routes rather than as a namespace on
+ * purpose: they authenticate by two different mechanisms, and a future
+ * session-backed route added under that prefix must NOT inherit an exclusion by
+ * accident.
+ *
+ * Everything else still matches: all pages, and every other API route.
+ */
 export const config = {
   matcher: [
     /*
      * Match all paths except:
-     * - api routes (other than waitlist and auth callback/session api)
+     * - API routes that carry their own independent authentication (see above)
      * - static files (css, js, images, robots, sitemap)
      * - favicon.ico
      */
-    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/waitlist|api/auth/callback|[^/]*\\.[^/]*$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|content|brand|robots.txt|sitemap.xml|api/waitlist|api/auth/callback|api/cron|api/health|api/og|api/email/webhooks|api/email/unsubscribe|[^/]*\\.[^/]*$).*)',
   ],
 }

@@ -257,7 +257,13 @@ export class FeedbackAdminService {
           }
         },
         ['published-testimonials-v1'],
-        { revalidate: 60, tags: ['testimonials'] }
+        // Next takes the MINIMUM of this and the revalidate of any page that awaits
+        // it, so a 60s cache here silently pinned /reviews to 60s no matter what that
+        // page declared. Kept in step with the page (1800s): both consumers are
+        // public marketing surfaces showing admin-published testimonials, which change
+        // rarely. The `testimonials` tag is retained so on-demand invalidation stays
+        // available if it is ever wired up.
+        { revalidate: 1800, tags: ['testimonials'] }
       )
 
       return await fetcher()

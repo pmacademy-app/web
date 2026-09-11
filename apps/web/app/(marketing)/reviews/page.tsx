@@ -39,7 +39,15 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 60
+/**
+ * Unlike the landing page this one does read data (published testimonials), so it
+ * takes the smaller increase. Admins publish testimonials rarely, and the underlying
+ * `getPublishedTestimonials()` is itself wrapped in `unstable_cache` with a 60s
+ * revalidate — deliberately left alone, so each regeneration still picks up fresh
+ * rows. Half an hour keeps new reviews appearing promptly while removing ~97% of the
+ * ISR writes this page was generating.
+ */
+export const revalidate = 1800
 
 export default async function ReviewsPage() {
   let initialReviews: PublishedTestimonial[] = []

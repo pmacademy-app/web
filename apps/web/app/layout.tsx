@@ -3,7 +3,6 @@ import { Inter, Fraunces } from 'next/font/google'
 import Script from 'next/script'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AuthStateListener from '@/components/layout/AuthStateListener'
 import { BRAND } from '@/lib/brand'
@@ -148,9 +147,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Vercel Web Analytics */}
         <Analytics />
-
-        {/* Vercel Speed Insights */}
-        <SpeedInsights />
 
         {/* Google Tag Manager (optional) */}
         {GTM_ID && (

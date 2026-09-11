@@ -5,7 +5,43 @@ import { getPublicPortfolioData } from '@/lib/portfolio-db'
 import { BRAND } from '@/lib/brand'
 import { TOKENS } from '@/theme/tokens'
 
-export const dynamic = 'force-dynamic'
+/**
+ * Cached, not dynamic.
+ *
+ * This handler renders a real 1200x630 PNG through Satori/resvg, which is by a wide
+ * margin the most CPU-expensive operation in the app — roughly an order of magnitude
+ * more than an ordinary route. It is referenced as the OG image of every public
+ * portfolio, so every link preview, re-share and crawler visit used to re-render it
+ * from scratch.
+ *
+ * It was previously `force-dynamic`, which kept the result out of Next's Full Route
+ * Cache entirely. That also silently broke the invalidation the product already
+ * performs: `revalidatePath('/api/og/portfolio/<username>')` is called when a learner
+ * saves portfolio settings (app/api/settings/portfolio/route.ts) and when an admin
+ * changes a profile (lib/admin/service.ts) — with no cache entry to invalidate, those
+ * calls did nothing. Caching here is what makes them meaningful.
+ *
+ * One hour matches the `s-maxage=3600` the success path already sends, so the CDN and
+ * the route cache now agree instead of contradicting each other. Correctness does not
+ * depend on the interval: the two `revalidatePath()` call sites above invalidate the
+ * moment the underlying profile actually changes, and the entry is per-username, so a
+ * cached card can never be served under a different username.
+ *
+ * Privacy is enforced inside the handler on every regeneration, twice —
+ * `getPublicPortfolioData()` returns null for a private portfolio, and the branch
+ * below re-checks `isPortfolioPublic` — so a portfolio switched to private falls back
+ * to the generic card and is additionally invalidated by the settings-save path.
+ *
+ * `force-static` is required, not decorative: a GET Route Handler that declares the
+ * `Request` argument is treated as dynamic by Next, and this one declares it (unused)
+ * to reach the `{ params }` context in the second position. Without this directive
+ * `revalidate` alone leaves the route dynamic — confirmed from the build route table.
+ * It is safe here because the handler uses no request-scoped API: it reads only the
+ * route segment and the database. Do not add `headers()`, `cookies()` or
+ * `searchParams` usage below without revisiting this.
+ */
+export const dynamic = 'force-static'
+export const revalidate = 3600
 
 /**
  * OG card palette — sourced directly from the app's own PUBLIC light theme

@@ -18,7 +18,14 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 60
+/**
+ * This page renders no data at all — it is a composition of static section
+ * components with no awaits and no service calls, so its HTML can only change when
+ * the app is redeployed (which regenerates it regardless). Revalidating every 60s
+ * was therefore re-rendering byte-identical output up to 1,440 times a day and was
+ * the single largest source of ISR writes.
+ */
+export const revalidate = 3600
 
 /**
  * Main marketing landing page.
