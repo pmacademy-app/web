@@ -11,14 +11,17 @@
 
 ## Status board
 
-| Batch | Status | Risk | Human gate | Blocks |
+| Batch | Status | Risk | Human gate | Report |
 |---|---|---|---|---|
-| **B8-A** Leaderboard XP column | ✅ **COMPLETE** | Low | No | B8-B |
-| **B8-B** Authoritative XP total | ⬜ Not started | Low | No | B8-C |
-| **B8-C** Bound truncating queries | ⬜ Not started | Low | No | B8-D |
-| **B8-D** XP duplicate diagnostic | ⬜ Not started | Low | **Yes — review output** | B8-E |
-| **B8-E** XP uniqueness constraint | ⬜ Not started | **High** | **Yes — approve + backup** | — |
-| **B9-A** Out-of-band alerting | ⬜ Not started | Low | **Yes — choose channel** | — |
+| **B8-A** Leaderboard XP column | ✅ **COMPLETE** (`ee7b2e6`) | Low | Production check pending | [B8A](B8A_LEADERBOARD_XP_COLUMN.md) |
+| **B8-B** Authoritative XP total | ✅ **COMPLETE** | Low | No | — |
+| **B8-C** Bound truncating queries | ✅ **COMPLETE** | Low | No | — |
+| **B8-D** XP duplicate diagnostic | ✅ **COMPLETE** — ran against production | Low | **Report ready for review** | [report](B8D_XP_DUPLICATES_REPORT.txt) |
+| **B8-E** XP uniqueness constraint | ⏸️ **AUTHORED, NOT APPLIED** | **High** | **BLOCKED: approval + backup** | [B8E](B8E_XP_UNIQUENESS.md) |
+| **B9-A** Out-of-band alerting | ✅ **COMPLETE in code** | Low | **Needs `ALERT_WEBHOOK_URL`** | — |
+
+**Phase 1 is code-complete except B8-E's destructive apply**, which is correctly stopped
+at its safety gate. No approval was assumed and nothing was applied to production.
 
 ---
 
@@ -249,15 +252,90 @@ Recorded in [`B8A_LEADERBOARD_XP_COLUMN.md`](B8A_LEADERBOARD_XP_COLUMN.md).
 
 ---
 
+## Implementation outcomes (recorded after the work)
+
+### B8-B — done
+`getTotalXp()` reads `users.total_xp`, maintained in SQL by the trigger in
+`20260805000001` and re-derived by the anti-tampering trigger on every `users` update.
+The ledger sum survives only as a fallback when that row is unreadable, and the fallback
+is now **explicitly** bounded at 1,000 rows and logs when it hits the bound — an
+unbounded fallback would have recreated F-COR-2 one layer down.
+
+Two existing tests asserted the old contract and were updated rather than deleted:
+`performance-optimization.test.ts` (now asserts the authoritative read) and
+`settings.test.ts` (its `users` double only implemented `update`; it needed a read path).
+
+### B8-C — done
+Every aggregate-feeding query in both files is now paged to completion with
+`fetchAllRows()`:
+
+- `dashboard-service.ts` — the genuinely unbounded `users.select('total_xp')`, plus
+  seven queries that carried `.limit(5000)`/`.limit(2000)`. Those were *bounded* but
+  still silently truncating, which is the same wrong-number problem one cap higher.
+- `leaderboard-db.ts` — all four aggregation queries.
+
+Also closed, both carried from B8-A:
+- A degraded board is **no longer cached**, so a transient failure no longer pins zeros
+  for the full 45-second TTL.
+- The `users` and `user_leaderboard_settings` reads now surface their errors. The
+  opt-out query **fails the request** rather than continuing, because failing open there
+  would publish users who opted out of the leaderboard.
+
+**Two changes beyond the literal spec, both forced by it:**
+1. The `.in('user_id', <entire roster>)` filters were removed, not just bounded. The
+   week filter already limits the rows and the join now happens in JS, so the filter
+   only ever contributed a URL-length failure.
+2. The per-user `.filter()` aggregation became a `Map` grouping. It was O(users × events);
+   with the queries paged to completion and no longer pre-filtered by user, that cost
+   would have compounded.
+
+### B8-D — done, report ready for review
+Ran read-only against production. **46 duplicate groups · 50 excess rows · 510 XP ·
+16 users** out of 1,636 rows.
+
+Pure logic lives in `apps/web/lib/xp/duplicate-analysis.ts` rather than inside the
+script. **Deviation from the spec's "nothing else" scope, and why:** the batch requires
+a test of the grouping logic, and vitest only covers `apps/web/lib/__tests__/`, so logic
+placed in root `scripts/` would be both untypechecked and untestable.
+
+### B8-E — authored, correctly blocked
+See [`B8E_XP_UNIQUENESS.md`](B8E_XP_UNIQUENESS.md). Migration and rollback written;
+**nothing applied, no approval assumed**, and the application-side change deliberately
+held back because it hard-depends on the constraint existing and deploy ordering is not
+guaranteed (I-16-B4 outstanding).
+
+Two findings from that work:
+- **Deleting ledger rows does not reduce `users.total_xp`** — the trigger is AFTER
+  INSERT only. The migration re-derives affected users' totals; without that step the
+  dedupe would have left 16 users with 510 phantom XP and possibly inflated levels.
+- **`quiz_correct` duplicates land days apart**, so they are not the race F-COR-3
+  describes. Something re-awards XP on quiz re-attempts. The constraint will mask it
+  rather than fix it. Needs its own investigation.
+
+### B9-A — done in code
+Generic HTTPS webhook (`ALERT_WEBHOOK_URL`), chosen because the channel is an operator
+decision and a webhook satisfies Slack/Discord/Telegram/PagerDuty without a dependency
+or a vendor lock. It shares no infrastructure with Supabase or the email pipeline — the
+two things most likely broken when a critical incident fires.
+
+Delivery runs **before** the admin-list lookup: that lookup needs two more successful
+database reads and at least one admin row, and returns silently otherwise, which is
+exactly the outage this channel exists for. The existing one-per-fingerprint-per-hour
+cooldown still gates it; no second dedup was added.
+
+---
+
 ## Cross-batch human actions, collected
 
-| # | Action | Blocks | When |
+| # | Action | Blocks | Status |
 |---|---|---|---|
-| 1 | Verify `/leaderboard` shows non-zero weekly XP after deploy | closing B8-A | after next deploy |
-| 2 | Decide whether to merge `b14a/…` and `b8a/…` to `main` | deploying either | now |
-| 3 | Review the B8-D duplicate report | B8-E | after B8-D |
-| 4 | Approve duplicate deletion + take a fresh backup | B8-E | before B8-E apply |
-| 5 | Choose the out-of-band alert channel and provision its secret | B9-A | before B9-A |
+| 1 | Verify `/leaderboard` shows non-zero weekly XP after deploy | closing B8-A | ⬜ pending deploy |
+| 2 | Decide how `b14a/…` and `b8a/…` reach `main` | deploying anything | ⬜ open |
+| 3 | Review the B8-D duplicate report | B8-E | ⬜ **report ready** |
+| 4 | Approve duplicate deletion + take a fresh backup | B8-E apply | ⬜ **blocking** |
+| 5 | Set `ALERT_WEBHOOK_URL` in production | B9-A being live | ⬜ **code ships inert without it** |
+| 6 | Investigate `quiz_correct` XP re-award on re-attempts | — | ⬜ new, from B8-D |
+| 7 | Staging project for the B8-E staging apply (P0-1) | B8-E apply | ⬜ still outstanding |
 
 ---
 

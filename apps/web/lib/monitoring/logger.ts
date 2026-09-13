@@ -240,6 +240,26 @@ async function notifyAdminsOnce(
     // An earlier incident with this fingerprint already alerted within the cooldown.
     if (priorRows && priorRows.length > 0) return
 
+    // Out-of-band delivery happens BEFORE the admin lookup, deliberately.
+    //
+    // The in-app path below needs two more successful database reads and at least one
+    // admin row, and returns silently if either is unavailable — which is precisely the
+    // situation this channel exists for. Placing it after the cooldown check keeps the
+    // one-alert-per-fingerprint-per-hour guarantee while making delivery independent of
+    // everything downstream. Awaited so a test can observe it; it never throws.
+    // B9-A / F-REL-4.
+    const { deliverOutOfBandAlert } = await import('./out-of-band-alert')
+    await deliverOutOfBandAlert({
+      incidentId,
+      severity: args.severity,
+      kind: args.kind,
+      domain: args.domain,
+      operation: args.operation,
+      message: args.message,
+      nextAction: args.nextAction,
+      fingerprint: args.fingerprint,
+    })
+
     const { data: adminUsers } = await supabase.from('users').select('id').eq('is_admin', true)
     const adminList = (adminUsers || []) as unknown as Array<{ id: string }>
     if (adminList.length === 0) return

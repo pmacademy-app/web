@@ -36,19 +36,21 @@ describe('Phase 9 — Database, Query & Application Performance Optimization', (
       expect(mockSupabase.from).toHaveBeenCalledWith('xp_events')
     })
 
-    it('getTotalXp aggregates xp_amount from ledger rows', async () => {
-      const mockSupabase = {
-        from: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockResolvedValue({
-            data: [{ xp_amount: 50 }, { xp_amount: 150 }, { xp_amount: 25 }],
-            error: null,
-          }),
-        }),
-      } as any
+    // B8-B / F-COR-2 changed this contract: getTotalXp reads the trigger-maintained
+    // `users.total_xp` instead of summing ledger rows client-side, which truncated at
+    // the PostgREST row cap. Ledger-sum behaviour survives only as the fallback when
+    // the users row is unreadable — covered in xp-total-authority.test.ts.
+    it('getTotalXp reads the authoritative users.total_xp rather than scanning the ledger', async () => {
+      const usersChain: any = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        maybeSingle: vi.fn().mockResolvedValue({ data: { total_xp: 225 }, error: null }),
+      }
+      const mockSupabase = { from: vi.fn().mockReturnValue(usersChain) } as any
 
       const total = await getTotalXp(mockSupabase, 'usr-1')
       expect(total).toBe(225)
+      expect(mockSupabase.from).toHaveBeenCalledWith('users')
     })
   })
 

@@ -11,6 +11,9 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { calculateLevel } from '@/lib/xp'
 import { calculateWeekStart, calculateRankings, type LeaderboardEntry, type RawLeaderboardUserMetric } from '@/lib/leaderboard'
+// Generic page-walking helper. It lives under `lib/admin/` for historical reasons —
+// it has no admin-specific behaviour, and duplicating the loop here would be worse.
+import { fetchAllRows, type PageResult } from '@/lib/admin/fetch-all'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type CohortRow = Database['public']['Tables']['cohorts']['Row']
@@ -92,6 +95,18 @@ const LEADERBOARD_CACHE = new Map<string, LeaderboardCacheEntry>()
 const CACHE_TTL_MS = 45 * 1000
 
 /**
+ * Adapts a `DBChain` page query to the shape `fetchAllRows()` expects.
+ *
+ * `DBChain` is the module's existing escape hatch and resolves to `{ data: unknown }`,
+ * which does not structurally satisfy `PageResult<T>`. The cast is confined here rather
+ * than repeated at each of the four call sites. Removing it is B8-F's job, not this
+ * batch's — see `lib/db/` in the roadmap.
+ */
+function asPage<T>(query: unknown): PromiseLike<PageResult<T>> {
+  return query as unknown as PromiseLike<PageResult<T>>
+}
+
+/**
  * Records a failed weekly-aggregation query as a structured incident.
  *
  * These queries feed metrics that degrade to zero rather than to an error, so a silent
@@ -142,36 +157,84 @@ async function getOrBuildWeeklyRawMetrics(
   const now = Date.now()
   let cached = LEADERBOARD_CACHE.get(weekStart)
   if (!cached || now - cached.timestamp > CACHE_TTL_MS) {
-    // 1. Fetch users with total_xp > 0
-    const { data: users } = (await (supabase
-      .from('users') as unknown as DBChain)
-      .select('id, username, name, avatar_url, total_xp, current_streak, level')
-      .gt('total_xp', 0)) as unknown as { data: UserRow[] | null }
+    // Tracks whether any of the four aggregation queries failed. A partial board is
+    // still returned, but it must not be cached as if it were complete — see the
+    // cache write at the end of this block.
+    let aggregationDegraded = false
 
-    const userList = users || []
-    const userIdsArray = userList.map((u) => u.id)
+    // 1. Fetch users with total_xp > 0.
+    //
+    // Paged rather than issued as one unbounded select: PostgREST truncates at its row
+    // cap without reporting an error, which silently drops everyone past it from the
+    // board. F-COR-4.
+    let userList: UserRow[] = []
+    try {
+      userList = await fetchAllRows<UserRow>((from, to) =>
+        asPage<UserRow>(
+          (supabase.from('users') as unknown as DBChain)
+            .select('id, username, name, avatar_url, total_xp, current_streak, level')
+            .gt('total_xp', 0)
+            .range(from, to)
+        )
+      )
+    } catch (usersError) {
+      aggregationDegraded = true
+      await reportLeaderboardQueryFailure(
+        'leaderboard.weekly_users',
+        'Weekly leaderboard user roster query failed',
+        usersError
+      )
+    }
 
-    // 2. Fetch opted-out users so we can exclude them
-    const { data: optedOutRows } = (await (supabase
-      .from('user_leaderboard_settings') as unknown as DBChain)
-      .select('user_id')
-      .eq('is_opted_in', false)) as unknown as { data: { user_id: string }[] | null }
+    const userIds = new Set(userList.map((u) => u.id))
 
-    const optedOutUserIds = new Set<string>((optedOutRows || []).map((r) => r.user_id))
+    // 2. Fetch opted-out users so we can exclude them.
+    let optedOutRows: { user_id: string }[] = []
+    try {
+      optedOutRows = await fetchAllRows<{ user_id: string }>((from, to) =>
+        asPage<{ user_id: string }>(
+          (supabase.from('user_leaderboard_settings') as unknown as DBChain)
+            .select('user_id')
+            .eq('is_opted_in', false)
+            .range(from, to)
+        )
+      )
+    } catch (optOutError) {
+      aggregationDegraded = true
+      // Failing open here would publish users who opted OUT of the leaderboard, so the
+      // board is suppressed rather than shown without the exclusion list.
+      await reportLeaderboardQueryFailure(
+        'leaderboard.weekly_opt_outs',
+        'Weekly leaderboard opt-out query failed',
+        optOutError
+      )
+      throw optOutError
+    }
+
+    const optedOutUserIds = new Set<string>(optedOutRows.map((r) => r.user_id))
 
     // 3. Fetch lesson progress in current week for consistency metric
     const weekStartDate = new Date(weekStart)
-    const { data: lessonProgress, error: lessonProgressError } = (await (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
-      .select('user_id, status, completed_at')
-      .in('user_id', userIdsArray.length ? userIdsArray : ['00000000-0000-0000-0000-000000000000'])
-      .eq('status', 'completed')
-      .gte('completed_at', weekStartDate.toISOString())) as unknown as {
-      data: { user_id: string; status: string; completed_at: string }[] | null
-      error: unknown
-    }
-
-    if (lessonProgressError) {
+    //
+    // The `.in('user_id', <every qualifying id>)` filter this used to carry put the
+    // entire user roster into a query string, which fails on URL length as the user
+    // base grows. The week bound already limits the row set to recent activity, and the
+    // rows are matched against `userIds` in JS below, so the filter bought nothing that
+    // the client-side join does not. F-COR-4.
+    let lessonProgress: { user_id: string; status: string; completed_at: string }[] = []
+    try {
+      lessonProgress = await fetchAllRows<{ user_id: string; status: string; completed_at: string }>(
+        (from, to) =>
+          asPage<{ user_id: string; status: string; completed_at: string }>(
+            (supabase.from('user_lesson_progress') as unknown as DBChain)
+              .select('user_id, status, completed_at')
+              .eq('status', 'completed')
+              .gte('completed_at', weekStartDate.toISOString())
+              .range(from, to)
+          )
+      )
+    } catch (lessonProgressError) {
+      aggregationDegraded = true
       await reportLeaderboardQueryFailure(
         'leaderboard.weekly_lesson_progress',
         'Weekly leaderboard lesson-progress query failed',
@@ -186,16 +249,19 @@ async function getOrBuildWeeklyRawMetrics(
     // the error went nowhere, `data` came back null, and every user's weekly XP reduced
     // to 0 with no signal anywhere. Hence the check below: a failed read here must never
     // be indistinguishable from a week in which nobody earned XP. See F-COR-1.
-    const { data: xpEvents, error: xpEventsError } = (await (supabase
-      .from('xp_events') as unknown as DBChain)
-      .select('user_id, xp_amount, created_at')
-      .in('user_id', userIdsArray.length ? userIdsArray : ['00000000-0000-0000-0000-000000000000'])
-      .gte('created_at', weekStartDate.toISOString())) as unknown as {
-      data: { user_id: string; xp_amount: number; created_at: string }[] | null
-      error: unknown
-    }
-
-    if (xpEventsError) {
+    let xpEvents: { user_id: string; xp_amount: number; created_at: string }[] = []
+    try {
+      xpEvents = await fetchAllRows<{ user_id: string; xp_amount: number; created_at: string }>(
+        (from, to) =>
+          asPage<{ user_id: string; xp_amount: number; created_at: string }>(
+            (supabase.from('xp_events') as unknown as DBChain)
+              .select('user_id, xp_amount, created_at')
+              .gte('created_at', weekStartDate.toISOString())
+              .range(from, to)
+          )
+      )
+    } catch (xpEventsError) {
+      aggregationDegraded = true
       await reportLeaderboardQueryFailure(
         'leaderboard.weekly_xp_events',
         'Weekly leaderboard XP events query failed',
@@ -203,23 +269,37 @@ async function getOrBuildWeeklyRawMetrics(
       )
     }
 
+    // Group once by user rather than re-scanning both arrays per user. The previous
+    // per-user `.filter()` was O(users × events); now that the two queries are paged to
+    // completion and no longer pre-filtered by user id, that cost would compound.
+    // Rows belonging to users who are not on the board are dropped here — this is the
+    // client-side join that replaces the old `.in()` filter.
+    const lessonDaysByUser = new Map<string, Set<string>>()
+    const lessonCountByUser = new Map<string, number>()
+    for (const lp of lessonProgress) {
+      if (!userIds.has(lp.user_id)) continue
+      lessonCountByUser.set(lp.user_id, (lessonCountByUser.get(lp.user_id) ?? 0) + 1)
+      if (lp.completed_at) {
+        let days = lessonDaysByUser.get(lp.user_id)
+        if (!days) {
+          days = new Set<string>()
+          lessonDaysByUser.set(lp.user_id, days)
+        }
+        days.add(lp.completed_at.split('T')[0])
+      }
+    }
+
+    const xpByUser = new Map<string, number>()
+    for (const xe of xpEvents) {
+      if (!userIds.has(xe.user_id)) continue
+      xpByUser.set(xe.user_id, (xpByUser.get(xe.user_id) ?? 0) + (xe.xp_amount || 0))
+    }
+
     // Aggregate user weekly metrics
     const rawMetrics: RawLeaderboardUserMetric[] = userList.map((u) => {
-      const userLessons = (lessonProgress || []).filter((lp) => lp.user_id === u.id)
-      const lessonsCompleted = userLessons.length
-
-      // Calculate unique days studied in week
-      const studyDays = new Set<string>()
-      for (const lp of userLessons) {
-        if (lp.completed_at) {
-          studyDays.add(lp.completed_at.split('T')[0])
-        }
-      }
-      const daysStudied = studyDays.size
-
-      // Calculate weekly XP
-      const userXpEvents = (xpEvents || []).filter((xe) => xe.user_id === u.id)
-      const xpEarned = userXpEvents.reduce((acc, curr) => acc + (curr.xp_amount || 0), 0)
+      const lessonsCompleted = lessonCountByUser.get(u.id) ?? 0
+      const daysStudied = lessonDaysByUser.get(u.id)?.size ?? 0
+      const xpEarned = xpByUser.get(u.id) ?? 0
 
       const levelInfo = calculateLevel(u.total_xp || 0)
 
@@ -244,7 +324,13 @@ async function getOrBuildWeeklyRawMetrics(
       optedOutUserIds,
       rawMetrics,
     }
-    LEADERBOARD_CACHE.set(weekStart, cached)
+
+    // Only cache a complete result. Caching a degraded board would pin the wrong
+    // numbers for the full TTL and suppress recovery on the next request — the same
+    // "a wrong answer looks like a quiet week" failure mode as F-COR-1, one layer up.
+    if (!aggregationDegraded) {
+      LEADERBOARD_CACHE.set(weekStart, cached)
+    }
   }
 
   return cached

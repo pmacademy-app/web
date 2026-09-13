@@ -9,6 +9,7 @@ import {
   resolveRange,
 } from './dashboard-aggregation'
 import { AdminConsoleService } from './service'
+import { fetchAllRows } from './fetch-all'
 import type {
   AdminAttentionItem,
   AdminDashboardData,
@@ -99,12 +100,19 @@ export class DashboardService {
           supabase.from('capstone_submissions').select('id', { count: 'exact', head: true }),
           supabase.from('certificates').select('id', { count: 'exact', head: true }),
           supabase.from('users').select('id', { count: 'exact', head: true }).eq('is_portfolio_public', true),
-          supabase.from('users').select('total_xp'),
-          supabase
-            .from('xp_events')
-            .select('user_id')
-            .gte('created_at', past7d.toISOString())
-            .limit(5000),
+          // Both of these feed an aggregate (a sum and a distinct count), so a
+          // truncated page produces a confidently wrong number with no error. Paged to
+          // completion rather than capped. F-COR-4.
+          fetchAllRows<{ total_xp: number | null }>((from, to) =>
+            supabase.from('users').select('total_xp').range(from, to)
+          ).then((data) => ({ data })),
+          fetchAllRows<{ user_id: string | null }>((from, to) =>
+            supabase
+              .from('xp_events')
+              .select('user_id')
+              .gte('created_at', past7d.toISOString())
+              .range(from, to)
+          ).then((data) => ({ data })),
           AdminConsoleService.getSystemHealth(),
         ])
 
@@ -194,12 +202,14 @@ export class DashboardService {
         // ── 1. Users (counts + range-scoped rows) ─────────────────────────────────
         const [totalUsersRes, usersInRangeRes, usersInPreviousRes, usersWithGoalRes] = await Promise.all([
           supabase.from('users').select('id', { count: 'exact', head: true }),
-          supabase
-            .from('users')
-            .select('id, created_at')
-            .gte('created_at', rangeStartIso)
-            .lte('created_at', rangeEndIso)
-            .limit(5000),
+          fetchAllRows<{ id: string; created_at: string }>((from, to) =>
+            supabase
+              .from('users')
+              .select('id, created_at')
+              .gte('created_at', rangeStartIso)
+              .lte('created_at', rangeEndIso)
+              .range(from, to)
+          ).then((data) => ({ data })),
           supabase
             .from('users')
             .select('id', { count: 'exact', head: true })
@@ -214,24 +224,32 @@ export class DashboardService {
         const usersWithGoal = usersWithGoalRes?.count ?? 0
 
         // ── 2. XP events (active learners + XP earned within range) ───────────────
+        // These three feed XP sums and distinct active-user sets. A capped page here is
+        // what made the analytics view confidently wrong above the cap. F-COR-4.
         const [xpCurrentRes, xpPreviousRes, activeBeforeRes] = await Promise.all([
-          supabase
-            .from('xp_events')
-            .select('user_id, xp_amount, created_at')
-            .gte('created_at', rangeStartIso)
-            .lte('created_at', rangeEndIso)
-            .limit(5000),
-          supabase
-            .from('xp_events')
-            .select('user_id, xp_amount')
-            .gte('created_at', prevStartIso)
-            .lte('created_at', prevEndIso)
-            .limit(5000),
-          supabase
-            .from('xp_events')
-            .select('user_id')
-            .lt('created_at', rangeStartIso)
-            .limit(2000),
+          fetchAllRows<{ user_id: string | null; xp_amount: number; created_at: string }>((from, to) =>
+            supabase
+              .from('xp_events')
+              .select('user_id, xp_amount, created_at')
+              .gte('created_at', rangeStartIso)
+              .lte('created_at', rangeEndIso)
+              .range(from, to)
+          ).then((data) => ({ data })),
+          fetchAllRows<{ user_id: string | null; xp_amount: number }>((from, to) =>
+            supabase
+              .from('xp_events')
+              .select('user_id, xp_amount')
+              .gte('created_at', prevStartIso)
+              .lte('created_at', prevEndIso)
+              .range(from, to)
+          ).then((data) => ({ data })),
+          fetchAllRows<{ user_id: string | null }>((from, to) =>
+            supabase
+              .from('xp_events')
+              .select('user_id')
+              .lt('created_at', rangeStartIso)
+              .range(from, to)
+          ).then((data) => ({ data })),
         ])
 
         const xpCurrent = (xpCurrentRes.data || []) as Array<{ user_id: string | null; xp_amount: number; created_at: string }>
@@ -248,37 +266,45 @@ export class DashboardService {
         // ── 3. Learning events (charts + range counts) ───────────────────────────
         const [lessonsInRangeRes, lessonsInPreviousRes, quizzesInRangeRes, capstonesInRangeRes, certsInRangeRes, certsInPreviousRes] =
           await Promise.all([
-            supabase
-              .from('user_lesson_progress')
-              .select('user_id, completed_at')
-              .eq('status', 'completed')
-              .gte('completed_at', rangeStartIso)
-              .lte('completed_at', rangeEndIso)
-              .limit(5000),
+            fetchAllRows<{ user_id: string; completed_at: string | null }>((from, to) =>
+              supabase
+                .from('user_lesson_progress')
+                .select('user_id, completed_at')
+                .eq('status', 'completed')
+                .gte('completed_at', rangeStartIso)
+                .lte('completed_at', rangeEndIso)
+                .range(from, to)
+            ).then((data) => ({ data })),
             supabase
               .from('user_lesson_progress')
               .select('id', { count: 'exact', head: true })
               .eq('status', 'completed')
               .gte('completed_at', prevStartIso)
               .lte('completed_at', prevEndIso),
-            supabase
-              .from('quiz_attempts')
-              .select('id, user_id, attempted_at')
-              .gte('attempted_at', rangeStartIso)
-              .lte('attempted_at', rangeEndIso)
-              .limit(5000),
-            supabase
-              .from('capstone_submissions')
-              .select('user_id, submitted_at')
-              .gte('submitted_at', rangeStartIso)
-              .lte('submitted_at', rangeEndIso)
-              .limit(5000),
-            supabase
-              .from('certificates')
-              .select('id, user_id, issued_at')
-              .gte('issued_at', rangeStartIso)
-              .lte('issued_at', rangeEndIso)
-              .limit(5000),
+            fetchAllRows<{ id: string; user_id: string | null; attempted_at: string }>((from, to) =>
+              supabase
+                .from('quiz_attempts')
+                .select('id, user_id, attempted_at')
+                .gte('attempted_at', rangeStartIso)
+                .lte('attempted_at', rangeEndIso)
+                .range(from, to)
+            ).then((data) => ({ data })),
+            fetchAllRows<{ user_id: string | null; submitted_at: string }>((from, to) =>
+              supabase
+                .from('capstone_submissions')
+                .select('user_id, submitted_at')
+                .gte('submitted_at', rangeStartIso)
+                .lte('submitted_at', rangeEndIso)
+                .range(from, to)
+            ).then((data) => ({ data })),
+            fetchAllRows<{ id: string; user_id: string; issued_at: string }>((from, to) =>
+              supabase
+                .from('certificates')
+                .select('id, user_id, issued_at')
+                .gte('issued_at', rangeStartIso)
+                .lte('issued_at', rangeEndIso)
+                .range(from, to)
+            ).then((data) => ({ data })),
             supabase
               .from('certificates')
               .select('id', { count: 'exact', head: true })

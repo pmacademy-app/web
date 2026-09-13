@@ -54,6 +54,14 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
           }
           if (table === 'users') {
             return {
+              // B8-B: getTotalXp() now reads the trigger-maintained users.total_xp
+              // instead of summing the ledger, so this double must answer reads too.
+              select: () => ({
+                eq: () => ({
+                  maybeSingle: () =>
+                    Promise.resolve({ data: { total_xp: currentTotalXp }, error: null }),
+                }),
+              }),
               update: (row: Record<string, unknown>) => ({
                 eq: () => {
                   updatedUserRow = row
