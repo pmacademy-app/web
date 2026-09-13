@@ -102,6 +102,14 @@ The gate prints every accepted advisory on every run — an allowlist entry reco
 decision, it does not silence the finding. Entries that no longer match anything
 npm reports are flagged as stale (a warning, not a failure) so the list shrinks.
 
+**Worked example — the first time the gate blocked.** On 2026-09-14 it blocked on
+two Next.js criticals (GHSA-p293-qw3h-jr36, GHSA-2xp9-vwfh-vxw4). The AVIF
+image-optimizer RCE was judged plausibly reachable: `/_next/image` is enabled and
+`next.config.ts` lists `image/avif` in `formats`. Per the rule above, a reachable
+advisory is fixed rather than accepted — `next` was upgraded 16.2.12 → 16.3.5,
+which cleared both, and incidentally cleared four already-accepted `sharp` and
+`postcss` highs whose entries were then removed as stale.
+
 **Triage order for a new blocking advisory:** is the vulnerable code path reachable
 in production, build, test or deploy? If yes, fix it — update, replace, or remove
 the dependency. If no, and the analysis is checkable, add an allowlist entry with a

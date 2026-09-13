@@ -3,7 +3,7 @@
 **Branch of Record:** `main`
 **Synchronized With:** `origin/main` @ `d2a59be` + B8-E applied 2026-09-13
 **Date:** 2026-09-13
-**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 started: **B10-A and B14-B complete in code** on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
+**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A and B14-B complete in code** on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -408,6 +408,56 @@ re-implement the items marked ✅.**
 
 ---
 
+## Phase 2 — Security prerequisite: Next.js 16.3.5 — ✅ Complete
+
+**Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
+**Date:** 2026-09-14
+
+The B14-B audit gate was left blocking on two unreviewed Next.js critical
+advisories rather than allowlisting them. This batch clears them at the source.
+
+| Advisory | Description | Status |
+|---|---|---|
+| [GHSA-p293-qw3h-jr36](https://github.com/advisories/GHSA-p293-qw3h-jr36) | Unauthenticated RCE on Windows-hosted servers | Cleared |
+| [GHSA-2xp9-vwfh-vxw4](https://github.com/advisories/GHSA-2xp9-vwfh-vxw4) | Unauthenticated RCE in the Image Optimization API with AVIF | Cleared |
+
+**Change:** `next` and `eslint-config-next` 16.2.12 → **16.3.5**, both pinned
+exactly, matching the existing pinning convention. Nothing else was upgraded
+deliberately; the lockfile delta is confined to Next's own subtree — the `@next/*`
+SWC binaries, `@next/env`, `@swc/helpers`, Next's bundled `postcss`
+(8.4.31 → 8.5.23), and the `sharp` platform packages, which deduplicated to the
+root `sharp` 0.35.4 already permitted by the existing `^0.35.3` range.
+
+**Investigation before upgrading.** `image/avif` appears in exactly one place —
+`next.config.ts:16`, as an optimizer output format. No application code references
+AVIF, and no behaviour depends on the vulnerable path, so the upgrade could not
+regress a feature. `next@16.3.5` is the latest 16.3.x and a patch-level move from
+16.2.12.
+
+**Advisory side effects.** The upgrade also cleared four high advisories that the
+B14-B allowlist had accepted — two `sharp` (libvips, libheif) and two `postcss`
+(sourceMappingURL). Their allowlist entries were removed, which is the allowlist
+behaving as designed: the gate flagged them as stale and the list shrank. Five
+high advisories remain accepted (`fast-uri` ×4, `js-yaml`), unchanged.
+
+**No security control was weakened.** The audit gate, the allowlist mechanism,
+gitleaks and the image configuration are all unchanged; the allowlist only lost
+entries, never gained one.
+
+**Validation:** `npm audit` 1 critical / 4 high → **0 critical / 2 high**, both
+remaining highs allowlisted, gate exit 0. Typecheck 0 errors. 136 test files /
+1561 tests passed. Lint 0 errors. Production build compiled successfully,
+227/227 static pages. Playwright 8/8. gitleaks over tracked files: no leaks.
+
+**One new lint warning**, from `eslint-config-next` 16.3.5's new
+`@next/next/no-location-assign-relative-destination` rule, on
+`components/settings/DangerZoneTab.tsx:97`. The destination is the hardcoded
+literal `'/'` after account deletion, so there is no redirect risk; a full reload
+there is arguably correct because it discards all client state. Warning only,
+left unchanged — out of this batch's scope.
+
+---
+
 ## Phase 2 — B10-A: Frontend correctness leftovers — ✅ Complete in code
 
 **Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
@@ -479,12 +529,10 @@ changed except one test fixture — see below.
 
 ### What the gates found on their first run
 
-- **Two Next.js critical advisories block the audit gate** (GHSA-p293-qw3h-jr36,
-  GHSA-2xp9-vwfh-vxw4). Both are fixed by `next@16.3.5`, a patch-level upgrade,
-  which is out of B14-B's scope and excluded by the locked plan. They were
-  deliberately **not** allowlisted: the AVIF image-optimizer RCE is plausibly
-  reachable because `/_next/image` is enabled and `next.config.ts` lists
-  `image/avif` in `formats`. Tracked as ISSUE-25.
+- **Two Next.js critical advisories blocked the audit gate** (GHSA-p293-qw3h-jr36,
+  GHSA-2xp9-vwfh-vxw4), deliberately **not** allowlisted because the AVIF
+  image-optimizer RCE is plausibly reachable. **Resolved by the Phase 2 security
+  prerequisite below.** ISSUE-25.
 - **A 28-character prefix of the live `RESEND_API_KEY` was committed** in
   `lib/__tests__/system-monitoring.test.ts`, introduced at `f839ef3` and still in
   git history. The fixture is now synthetic, but the key requires rotation.

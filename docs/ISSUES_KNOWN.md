@@ -36,11 +36,11 @@
 - **Note**: full root-cause analysis, per-batch impact and remaining gaps are in [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md). Gaps confirmed still open during the 2026-09-10 reconciliation: `/api/auth/login` and `/api/auth/update-password` have no rate limiting, `/api/auth/telemetry` still reads the leftmost `X-Forwarded-For`, and two raw Resend `fetch` calls still lack timeouts.
 
 #### ISSUE-25: Unpatched Next.js critical advisories block the CI audit gate
-- **Status**: 🟠 Open — blocking `security-audit` on every run, by design
+- **Status**: 🟢 **Resolved 2026-09-14** — `next` upgraded 16.2.12 → 16.3.5; both advisories cleared and the audit gate passes
 - **Description**: `npm audit` reports two critical advisories against `next@16.2.12`: [GHSA-p293-qw3h-jr36](https://github.com/advisories/GHSA-p293-qw3h-jr36) (unauthenticated RCE on Windows-hosted servers) and [GHSA-2xp9-vwfh-vxw4](https://github.com/advisories/GHSA-2xp9-vwfh-vxw4) (unauthenticated RCE in the Image Optimization API when AVIF is used). Both are cleared by `next@16.3.5`, a patch-level upgrade.
 - **Reachability**: the Windows advisory does not apply to the Vercel Linux runtime. The AVIF advisory plausibly **does** apply: `/_next/image` is enabled, `next.config.ts:16` lists `image/avif` in `formats`, and `remotePatterns` allows `**.supabase.co`. `unoptimized` is set on four individual `next/image` call sites, which does not disable the optimizer endpoint. This weakens the locked plan's DEBT-07 premise that the image path is unreachable.
-- **Required Action**: upgrade `next` to 16.3.5 in its own batch with a full regression run (the locked plan excludes the upgrade from B14-B, and the change also clears the `postcss` and `sharp` advisories). Until then the audit gate fails loudly rather than accepting an advisory it cannot justify.
-- **Note**: deliberately **not** added to `scripts/ci/npm-audit-allowlist.json`. An allowlist entry for a reachable production path would be exactly the silent acceptance the gate exists to prevent.
+- **Resolution**: `next` and `eslint-config-next` upgraded to 16.3.5 (patch-level, no breaking changes). `npm audit` now reports 0 critical. The upgrade also cleared the two `sharp` and two `postcss` high advisories, whose allowlist entries were removed as stale. Neither advisory was ever added to `scripts/ci/npm-audit-allowlist.json` — an allowlist entry for a reachable production path would have been exactly the silent acceptance the gate exists to prevent.
+- **Residual**: the image optimizer is still enabled with AVIF in `formats`. The RCE is patched, but if the optimizer is not actually wanted (all four `next/image` call sites pass `unoptimized`), disabling it would remove the attack surface entirely rather than patching it. Left as a separate decision — see DEBT-07.
 
 #### ISSUE-26: Live Resend API key prefix committed to git history
 - **Status**: 🟠 Open — working tree cleaned, **rotation still required**

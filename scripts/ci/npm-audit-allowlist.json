@@ -11,30 +11,6 @@
   ],
   "advisories": [
     {
-      "id": "GHSA-f88m-g3jw-g9cj",
-      "package": "sharp",
-      "reason": "libvips decoder CVEs reachable only through sharp's image decoding. Prodily never invokes sharp directly; it is present as a Next.js image-optimizer peer and as a devDependency of the brand asset generator, which processes repository-controlled files only. Locked-plan decision DEBT-07. Caveat recorded 2026-09-14: /_next/image is still enabled, so the optimizer path is not structurally disabled — this acceptance rests on decoder input being limited to the configured remotePatterns, not on the optimizer being off.",
-      "reviewBy": "2026-10-15"
-    },
-    {
-      "id": "GHSA-rgj7-g3m4-5g8c",
-      "package": "sharp",
-      "reason": "libheif CVEs in the HEIF/HEIC decoder. Same reachability analysis as GHSA-f88m-g3jw-g9cj: no direct sharp usage in application code, and no upload path accepts HEIF — apps/web/app/api/user/avatar restricts uploads by MIME type. Cleared by the same dependency bump.",
-      "reviewBy": "2026-10-15"
-    },
-    {
-      "id": "GHSA-6g55-p6wh-862q",
-      "package": "postcss",
-      "reason": "sourceMappingURL file disclosure, build-time only. Requires an attacker-controlled CSS comment to reach the compiler; all compiled CSS originates in the repository. No runtime postcss invocation exists in apps/web.",
-      "reviewBy": "2026-10-15"
-    },
-    {
-      "id": "GHSA-r28c-9q8g-f849",
-      "package": "postcss",
-      "reason": "Previous-source-map path traversal, build-time only. Same analysis as the other postcss entries: the compiler is never handed untrusted CSS at runtime.",
-      "reviewBy": "2026-10-15"
-    },
-    {
       "id": "GHSA-5jgf-p345-68v8",
       "package": "fast-uri",
       "reason": "Transitive through ajv via @hookform/resolvers, used for JSON Schema $ref resolution during client-side form validation. The IDN canonicalization confusion needs fast-uri to resolve an attacker-supplied URI; the only URIs it sees are schema identifiers written in this repository. No server-side fetch uses it.",
