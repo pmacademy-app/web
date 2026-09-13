@@ -20,8 +20,49 @@
 | **B8-E** XP uniqueness constraint | ⏸️ **HELD at staging gate — app half shipped** | **High** | **BLOCKED: staging only** | [investigation](B8E_PRE_APPROVAL_INVESTIGATION.md) · [original](B8E_XP_UNIQUENESS.md) |
 | **B9-A** Out-of-band alerting | ✅ **COMPLETE in code** | Low | **Needs `ALERT_WEBHOOK_URL`** | — |
 
-**Phase 1 is code-complete except B8-E's destructive apply**, which is correctly stopped
-at its safety gate. No approval was assumed and nothing was applied to production.
+---
+
+## FINAL STATE — 2026-09-13
+
+### Phase 1 safe implementation: **COMPLETE and DEPLOYED TO PRODUCTION**
+
+| | |
+|---|---|
+| Deployed commit | **`164229a`** on `main` |
+| Vercel deployment | `READY`, `aliasAssigned=true`, ready 16:36:58.963Z |
+| Verified | 16:42:02Z — **303 s after the deployment went READY** |
+| Result | **15/15 production checks pass** |
+
+Deployed and verified in production: **B8-A** (leaderboard XP column), **B8-B**
+(authoritative XP total), **B8-C** (bounded truncating queries), **B8-D** (duplicate
+diagnostic), **B9-A** (out-of-band alerting, inert pending `ALERT_WEBHOOK_URL`), and the
+**`awardXp()` SQLSTATE 23505 handling**.
+
+### B8-E migration: **CORRECTED and PREPARED — NOT production-applied**
+
+**B8-E was not deployed and its migration has not been run against any database.**
+Verified after deployment: 47 migrations applied, `20260913000001` remote = `(none)`,
+and the 31-row / 310 XP / 13-user target set is **still present in production**, which is
+direct proof no dedupe occurred.
+
+The migration is held at `supabase/migrations/pending-approval/`, outside the path the
+CLI and the `deploy-supabase` CI job read, so pushing `main` could not and did not apply
+it.
+
+### Staging: **intentionally not provisioned**
+
+No staging Supabase project exists. Creating one provisions real infrastructure under the
+account and was deliberately not done without explicit approval. Requirements are
+documented in [`B8E_PRE_APPROVAL_INVESTIGATION.md`](B8E_PRE_APPROVAL_INVESTIGATION.md) §7.
+
+### B8-E remains separately gated
+
+It is a future controlled operation requiring, in order: a staging project, a passing run
+of `supabase/migrations/validation/b8e_staging_validation.sql`, a fresh logical backup,
+and then a deliberate `git mv` out of `pending-approval/`. **Nothing about this
+deployment advances B8-E.**
+
+---
 
 ---
 

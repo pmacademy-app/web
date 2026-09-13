@@ -402,6 +402,21 @@ Recorded so nothing here is mistaken for having been done.
 | — · `awardXp()` 23505 handling | ✅ **IMPLEMENTED + TESTED, not deployed** | `lib/xp/xp-service.ts`; 9 tests in `lib/__tests__/xp-award-duplicate-handling.test.ts`. Safe to ship ahead of the migration — it is error handling, not `ON CONFLICT`, so it is inert until the index exists. |
 | — · Migration made non-deployable | ✅ **DONE** | Moved to `supabase/migrations/pending-approval/`; `db push --dry-run` now reports `upToDate: true`. |
 
+### Post-deployment confirmation — 2026-09-13, 16:42:02Z
+
+`main` was pushed and deployed to production as `164229a`. **B8-E was not applied**,
+confirmed 303 s after the deployment went READY:
+
+- `supabase migration list --linked` → 47 applied; `20260913000001` remote = `(none)`.
+- The target set is **still present in production**: 31 rows / 310 XP / 13 users — direct
+  proof no dedupe ran.
+- `quiz_correct` 384, `flashcard` 823, `user_reset` 2 — all legitimate rows intact.
+
+`xp_events` read 1637 rather than the 1636 baseline. Reconciled: a single genuine
+`theory_read` award at 16:39:01Z from a real learner during the deploy window. One row
+since the 16:31:44Z baseline, and the count moved **up**, whereas B8-E would have moved it
+down to 1605.
+
 **Production was not modified in any way during this session.** Every call was a `GET`
 or a `--dry-run`.
 
