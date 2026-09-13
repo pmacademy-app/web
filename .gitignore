@@ -41,6 +41,11 @@ Thumbs.db
 opencode.json
 .tokencap/
 
+# Database backups (never commit)
+# These contain production user data — emails, profiles, the full XP ledger.
+# Committing one would publish the database to anyone with repository access.
+backups/
+
 # Local-only marketing campaign scripts and logs (never commit)
 apps/web/scripts/local-campaigns/
 apps/web/scripts/logs/

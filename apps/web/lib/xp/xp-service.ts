@@ -13,6 +13,26 @@ interface DBChain {
  */
 const XP_LEDGER_FALLBACK_LIMIT = 1000
 
+/** Postgres `unique_violation`. PostgREST forwards it verbatim in `error.code`. */
+const PG_UNIQUE_VIOLATION = '23505'
+
+/**
+ * Whether a Supabase error is a unique-constraint violation.
+ *
+ * Matches on the SQLSTATE code rather than the message, which is localised and carries
+ * the index name. Kept tolerant of the error being an unexpected shape, because the
+ * alternative — throwing from inside error handling — would turn a benign duplicate into
+ * a failed request.
+ */
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: unknown }).code === PG_UNIQUE_VIOLATION
+  )
+}
+
 export interface XpEventRow {
   id: string
   user_id: string
@@ -52,6 +72,24 @@ export async function awardXp(
     })
 
   if (error) {
+    // A unique violation means this exact award already exists. That is the concurrency
+    // race in F-COR-3 losing cleanly rather than producing a duplicate row: two requests
+    // both passed their check-then-write guard, one inserted, this one did not.
+    //
+    // It is a successful no-op, not a failure. Returning here — rather than throwing —
+    // is what stops the losing request from surfacing an error to a learner who did
+    // nothing wrong, and it must return BEFORE the level-transition block below, because
+    // no XP was added and a level-up notification would be spurious.
+    //
+    // Deliberately NOT expressed as `ON CONFLICT DO NOTHING`: the guarantee comes from a
+    // PARTIAL unique index (migration 20260913000001), and a partial index cannot be
+    // inferred as an `ON CONFLICT (cols)` target without restating its WHERE clause,
+    // which PostgREST cannot express. Handling the error keeps this correct whether or
+    // not the index exists, so it carries no deploy-ordering hazard.
+    if (isUniqueViolation(error)) {
+      return
+    }
+
     console.error(`[xp-service] Error inserting XP event for user ${userId}:`, error)
     throw new Error('Failed to record XP event')
   }

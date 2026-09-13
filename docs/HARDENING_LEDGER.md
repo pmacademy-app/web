@@ -375,8 +375,8 @@ messages. "Plan ref" points at the batch specification in
 | **B5** — atomic rate limiting + abuse controls | I-03 | ✅ Complete in code | Login & update-password fail-closed atomic rate limits implemented; telemetry leftmost-XFF trust removed; signup account enumeration closed; Turnstile deferred |
 | **B6** — queue & scheduler reliability | I-04, I-05 | ✅ Complete in code | Migration 20260910000002 added; atomic stale processing reclamation implemented; bounded concurrency (pool of 5, 90s deadline); exponential backoff with jitter and 120m ceiling; durable scheduler heartbeat in system_settings; retry-failed duplication prevented; queue state machine aligned; 124 test files / 1345 tests passing |
 | **B7** — shared auth + route/error contract | I-07 | ⬜ Outstanding | |
-| **B8** — typed data layer + DB correctness | I-08 | ⬜ Outstanding | Includes the P0 leaderboard column bug (I-08-B1) |
-| **B9** — admin controls + observability | I-10 | ⬜ Outstanding | |
+| **B8** — typed data layer + DB correctness | I-08 | 🟡 **P0 correctness complete in code; B8-E held** | Roadmap batches B8-A…B8-D complete (`ee7b2e6`, `6f6dc22`): leaderboard column bug fixed (F-COR-1), authoritative XP total (F-COR-2), truncating queries bounded (F-COR-4), duplicate diagnostic run against production (F-COR-3). **B8-E's destructive migration is written and deliberately held out of the auto-apply path** pending staging, which does not exist (P0-1). The typed repository layer (B8-F/B8-G) is untouched. See [`PHASE1_IMPLEMENTATION_TODO.md`](audits/PHASE1_IMPLEMENTATION_TODO.md) |
+| **B9** — admin controls + observability | I-10 | 🟡 **B9-A complete in code** | Out-of-band critical alerting added (F-REL-4) — inert until `ALERT_WEBHOOK_URL` is configured. Correlation IDs, structured logging and retention (B9-B…B9-D) outstanding |
 | **B10** — frontend API/data layer | I-11 | ⬜ Outstanding | |
 | **B11** — design system migration | I-13 | ⬜ Outstanding | |
 | **B12** — marketing performance | I-14 | ⬜ Outstanding | |

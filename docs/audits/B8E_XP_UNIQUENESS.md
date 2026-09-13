@@ -1,8 +1,22 @@
 # B8-E — XP Event Uniqueness
 
 **Batch:** B8-E (Phase 1) · **Finding:** `F-COR-3` · **Risk:** HIGH — destructive
-**Status:** ⏸️ **AUTHORED, NOT APPLIED — BLOCKED ON TWO HUMAN GATES**
+**Status:** ⏸️ **AUTHORED, NOT APPLIED — BLOCKED ON HUMAN GATES**
 **Date:** 2026-09-13
+
+> ## ⚠️ SUPERSEDED IN PART — read [`B8E_PRE_APPROVAL_INVESTIGATION.md`](B8E_PRE_APPROVAL_INVESTIGATION.md) first
+>
+> The investigation that this document asked for (§2, "filed for a human decision") was
+> carried out and **found the migration described below to be unsafe**. Of the 50 rows it
+> proposed to delete, only 31 are duplicates; the other 19 are legitimate earnings, and
+> the blanket UNIQUE constraint would have broken three working features.
+>
+> The migration has since been corrected and scoped. **The scope quoted throughout this
+> document — 50 rows / 510 XP — is no longer what it does.** The current scope is
+> **31 rows / 310 XP / 13 users, all `theory_read`.**
+>
+> This file is retained for the reasoning that still holds: the trigger/`total_xp`
+> finding in §4, the deploy-ordering analysis in §5, and the gate structure in §7.
 
 ---
 

@@ -17,7 +17,7 @@
 | **B8-B** Authoritative XP total | ✅ **COMPLETE** | Low | No | — |
 | **B8-C** Bound truncating queries | ✅ **COMPLETE** | Low | No | — |
 | **B8-D** XP duplicate diagnostic | ✅ **COMPLETE** — ran against production | Low | **Report ready for review** | [report](B8D_XP_DUPLICATES_REPORT.txt) |
-| **B8-E** XP uniqueness constraint | ⏸️ **AUTHORED, NOT APPLIED** | **High** | **BLOCKED: approval + backup** | [B8E](B8E_XP_UNIQUENESS.md) |
+| **B8-E** XP uniqueness constraint | ⏸️ **HELD at staging gate — app half shipped** | **High** | **BLOCKED: staging only** | [investigation](B8E_PRE_APPROVAL_INVESTIGATION.md) · [original](B8E_XP_UNIQUENESS.md) |
 | **B9-A** Out-of-band alerting | ✅ **COMPLETE in code** | Low | **Needs `ALERT_WEBHOOK_URL`** | — |
 
 **Phase 1 is code-complete except B8-E's destructive apply**, which is correctly stopped
@@ -307,10 +307,18 @@ guaranteed (I-16-B4 outstanding).
 Two findings from that work:
 - **Deleting ledger rows does not reduce `users.total_xp`** — the trigger is AFTER
   INSERT only. The migration re-derives affected users' totals; without that step the
-  dedupe would have left 16 users with 510 phantom XP and possibly inflated levels.
+  dedupe would have left affected users holding phantom XP and possibly inflated levels.
 - **`quiz_correct` duplicates land days apart**, so they are not the race F-COR-3
-  describes. Something re-awards XP on quiz re-attempts. The constraint will mask it
-  rather than fix it. Needs its own investigation.
+  describes. Flagged for investigation.
+
+**That investigation was then carried out — see
+[`B8E_PRE_APPROVAL_INVESTIGATION.md`](B8E_PRE_APPROVAL_INVESTIGATION.md) — and it found
+the migration unsafe as authored.** `quiz_correct` is an intentional incremental top-up,
+not a bug; `user_reset` uses a constant `source_id`; and `flashcard` (823 rows, the
+largest source type) awards once per day per card. A blanket UNIQUE would have destroyed
+280 XP, handed 80 XP back to one user, and broken all three features. The migration is
+now scoped to six once-only source types, verified against production to delete exactly
+31 rows / 310 XP / 13 users, all `theory_read`.
 
 ### B9-A — done in code
 Generic HTTPS webhook (`ALERT_WEBHOOK_URL`), chosen because the channel is an operator
@@ -331,11 +339,13 @@ cooldown still gates it; no second dedup was added.
 |---|---|---|---|
 | 1 | Verify `/leaderboard` shows non-zero weekly XP after deploy | closing B8-A | ⬜ pending deploy |
 | 2 | Decide how `b14a/…` and `b8a/…` reach `main` | deploying anything | ⬜ open |
-| 3 | Review the B8-D duplicate report | B8-E | ⬜ **report ready** |
-| 4 | Approve duplicate deletion + take a fresh backup | B8-E apply | ⬜ **blocking** |
-| 5 | Set `ALERT_WEBHOOK_URL` in production | B9-A being live | ⬜ **code ships inert without it** |
-| 6 | Investigate `quiz_correct` XP re-award on re-attempts | — | ⬜ new, from B8-D |
-| 7 | Staging project for the B8-E staging apply (P0-1) | B8-E apply | ⬜ still outstanding |
+| 3 | Review the B8-D duplicate report | B8-E | ✅ done — classified in the investigation |
+| 4 | Approve deleting **31 rows / 310 XP / 13 users** (corrected scope) | B8-E apply | ✅ **APPROVED 2026-09-13** |
+| 5 | Confirm the six once-only source types | B8-E apply | ✅ **CONFIRMED 2026-09-13** |
+| 6 | Take a fresh logical backup | B8-E apply | ⚠️ **data-only export taken — not the §18 `pg_dump`** |
+| 7 | Provision the staging project (P0-1) | B8-E apply | ⬜ **BLOCKING — confirmed absent; provisioning steps documented** |
+| 8 | Set `ALERT_WEBHOOK_URL` in production | B9-A being live | ⬜ **code ships inert without it** |
+| 9 | Investigate `quiz_correct` XP re-award on re-attempts | — | ✅ **closed — working as designed** |
 
 ---
 
