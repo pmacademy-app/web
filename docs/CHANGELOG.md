@@ -2,6 +2,24 @@
 
 All notable changes to **Prodily PM Academy** (`prodily-monorepo`) are documented in this file.
 
+## [Repository Cleanup] — 2026-09-13
+
+Deployed as `76bc600`. Housekeeping only — no application behaviour changed.
+
+- Removed five components verified unreferenced across every source root, two unused
+  dependencies (`@vercel/speed-insights`, `flexsearch`) and the empty root
+  `pnpm-lock.yaml`.
+- Renamed 11 test files from historical phase/batch labels to the behaviour they
+  protect. No test was deleted; all 1536 still pass.
+- Retired `docs/audits/`. Thirteen completed audits, incident investigations and batch
+  records moved to [`archive/`](archive/) — retained as traceability, not guidance. The
+  B8-E investigation was promoted to [`PENDING_B8E_MIGRATION.md`](PENDING_B8E_MIGRATION.md)
+  because it documents a pending operation rather than history.
+- Corrected three dead-code claims that were wrong: `MarkdownRenderer` and `QuizOption`
+  are live, and `lib/hooks/useUsageTimeTracker.ts` is a tested re-export shim.
+- **B8-E remains held** in `supabase/migrations/pending-approval/` and was not applied.
+
+
 ## [Email Reliability & Observability Pass] — 2026-09-08
 
 Architecture decisions: [`docs/decisions/`](decisions/). Requires migrations `20260907000001_email_provider_failover.sql` and `20260908000001_error_taxonomy.sql`.
