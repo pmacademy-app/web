@@ -49,6 +49,19 @@
 - **Required Action**: **rotate `RESEND_API_KEY` in Vercel and Resend.** Removing the literal from the working tree (done) does not remove it from history; rotation is the only remedy.
 - **Note**: the fixture is now synthetic and the redaction test still passes. `.gitleaks.toml` allowlists only the `re_TestPlaceholder` markers, so a real key reintroduced into a test fails the scan.
 
+#### ISSUE-27: Supabase auth-hook query-string secret cannot be removed until the configured hook URI is verified
+- **Status**: 🟠 Open — **human action required before the fix can ship**
+- **Description**: `app/api/auth/send-email-hook/route.ts` accepts its shared secret from a query parameter as well as from the `Authorization` header, three custom headers, and a standardwebhooks HMAC signature. A secret in a URL lands in access logs, CDN logs and `Referer` headers, which is F-SEC-12. B7-D made all four comparison paths constant-time but **could not remove the query-string branch**.
+- **Why it is blocked**: nothing in this repository records how the production Supabase Send Email Hook is configured. `supabase/config.toml` has no `[auth.hook.send_email]` section at all and governs local development regardless; `DEPLOYMENT.md` lists `SEND_EMAIL_HOOK_SECRET` as an environment variable with no endpoint; `.github/workflows/ci.yml` injects the secret but names no URI. If the configured hook URI carries the secret as a query parameter, deleting that branch stops every verification and password-reset email with no other signal.
+- **Required human action**:
+  1. Open the Supabase Dashboard for the production project → **Authentication → Hooks → Send Email Hook**.
+  2. Read the configured **URI**. Confirm whether it contains a `secret=` query parameter.
+  3. **If it does not** (the expected case — Supabase signs HTTP hooks with standardwebhooks HMAC headers): the query-string branch is dead code and can be deleted. Do not paste the URI or the secret into a commit, an issue, or a log.
+  4. **If it does**: first reconfigure the hook to the bare endpoint URL so authentication comes from the HMAC signature, redeploy, confirm a real signup verification email arrives, and only then delete the branch.
+  5. Either way, rotate `SEND_EMAIL_HOOK_SECRET` afterwards if the secret has ever appeared in a URL, since it will be present in historical access logs.
+- **Verification before deploying the removal**: exercise a real signup on staging and confirm the verification email is delivered, and confirm `system_errors` records no `send_email_hook_auth` failure.
+- **Note**: the branch is marked `DEPRECATED, pending removal` in the source with this issue named. It is no longer a timing oracle — the comparison is constant-time — but it remains an independent bypass surface and a log-exposure path until removed.
+
 ---
 
 ### Deferred Register (D-01 – D-08) — audited 2026-09-08

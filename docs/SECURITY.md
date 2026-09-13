@@ -66,6 +66,35 @@ No CAPTCHA/bot-challenge provider is configured anywhere in the codebase today. 
 
 ---
 
+## 4a. Constant-Time Secret Comparison
+
+`lib/security/constant-time.ts` is the single implementation used everywhere a
+caller-supplied shared secret is compared against one this system holds:
+
+- `resolveActor()` — the `CRON_SECRET` bearer token on the six cron routes.
+- `/api/auth/send-email-hook` — the `SEND_EMAIL_HOOK_SECRET` on its header and
+  query-parameter branches.
+
+Both sides are hashed to SHA-256 before `timingSafeEqual`. That is not decoration:
+`timingSafeEqual` throws when the buffers differ in length, and the obvious guard —
+comparing lengths first — leaks the secret's length through both timing and the
+early return. Fixed-width digests remove the length channel entirely.
+`secretMatchesAny()` evaluates every candidate without short-circuiting, so the work
+done does not reveal which accepted spelling of the secret matched.
+
+HMAC signature verification is a different problem and keeps its own path: the
+Supabase auth hook and `/api/email/webhooks` compare signatures with
+`timingSafeEqual` guarded by a length check, which is correct there because a
+signature's length is fixed by its encoding and is not secret.
+
+**F-SEC-12 is half closed.** All four of the auth hook's acceptance paths now compare
+in constant time. The query-parameter path is still *accepted*, because no artifact
+in this repository records how the production Supabase hook is configured, and
+removing it blind would stop verification and password-reset email. The exact human
+verification required is ISSUE-27.
+
+---
+
 ## 5. CI Supply-Chain & Secret-Scanning Gates
 
 Two gates run on every push and pull request, in the `security-audit` job of

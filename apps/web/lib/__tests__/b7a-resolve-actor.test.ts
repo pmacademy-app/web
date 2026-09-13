@@ -240,19 +240,20 @@ describe('B7-A — resolveActor: memoization', () => {
 
 describe('B7-A — resolveActor: cron secret comparison', () => {
   // `node:crypto`'s ESM namespace is not configurable, so the call cannot be spied
-  // on. The comparison is pinned at the source instead: this is what stops the
-  // six routes' `authHeader === \`Bearer ${cronSecret}\`` from reappearing here.
-  it('compares with timingSafeEqual and never with a plain equality operator', async () => {
+  // on. The delegation is pinned at the source instead: this is what stops the six
+  // cron routes' plain `===` bearer comparison from reappearing here. The crypto
+  // properties themselves belong to the shared helper and are asserted in
+  // b7d-hook-secret-hardening.test.ts.
+  it('delegates the cron comparison to the shared constant-time helper', async () => {
     const { readFileSync } = await import('node:fs')
     const path = await import('node:path')
     const source = readFileSync(path.resolve(import.meta.dirname, '../api/actor.ts'), 'utf8')
 
-    const comparison = source.slice(source.indexOf('function secretsMatch'), source.indexOf('function bearerToken'))
+    expect(source).toContain("from '@/lib/security/constant-time'")
 
-    expect(comparison).toContain('timingSafeEqual')
+    const comparison = source.slice(source.indexOf('function isCron'), source.indexOf('function deny'))
+    expect(comparison).toContain('secretsMatch')
     expect(comparison).not.toMatch(/[^=!<>]===[^=]/)
-    // Hashing first is what makes unequal lengths safe; a length guard would leak it.
-    expect(comparison).toContain('sha256')
     expect(source).not.toContain('`Bearer ${')
   })
 

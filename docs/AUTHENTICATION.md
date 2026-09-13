@@ -140,6 +140,30 @@ Covered by `apps/web/lib/__tests__/b10a-error-boundaries-and-logout.test.ts`.
 
 ---
 
+## 7b. Send Email Hook authentication
+
+`app/api/auth/send-email-hook/route.ts` accepts `SEND_EMAIL_HOOK_SECRET` from four
+places, in this order: the `Authorization: Bearer` header, one of three custom
+headers (`x-supabase-auth-secret`, `x-hook-secret`, `x-secret`), a `secret` query
+parameter, and a standardwebhooks/Svix HMAC signature over the raw request body.
+The secret is accepted in three spellings — raw, and with the `v1,` and `whsec_`
+prefixes stripped — because which form is stored depends on how it was copied out
+of the dashboard.
+
+Since B7-D every one of those comparisons is constant-time
+([`SECURITY.md` §4a](SECURITY.md)). The HMAC branch was already correct and is
+unchanged.
+
+**The query-parameter branch is deprecated and pending removal** (F-SEC-12). It
+cannot be deleted until a human confirms the configured hook URI in the Supabase
+Dashboard does not carry the secret — see ISSUE-27 in
+[`ISSUES_KNOWN.md`](ISSUES_KNOWN.md). Note that this route authenticates by HMAC
+over the **raw body**, which is why `resolveActor` deliberately does not model a
+`webhook` actor: a resolver that read the body would consume the stream the route
+still needs.
+
+---
+
 ## 8. Status Summary
 
 | Authentication Flow | Location | Status |

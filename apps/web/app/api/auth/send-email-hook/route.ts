@@ -5,6 +5,7 @@ import { renderEmailTemplate } from '@/emails'
 import { maskEmail } from '@/lib/email'
 import { sendGovernedEmail, type GovernedEmailPurpose } from '@/lib/email-governance'
 import { getClientIpBucket } from '@/lib/security/client-ip'
+import { secretMatchesAny } from '@/lib/security/constant-time'
 import { buildAuthCallbackUrl } from '@/lib/auth-url'
 
 export const runtime = 'nodejs'
@@ -66,29 +67,50 @@ function verifyHookSecret(request: NextRequest, rawBody: string, secret: string)
     unprefixedSecret = unprefixedSecret.substring(6).trim()
   }
 
-  // 1. Authorization header check (Bearer token)
+  // The same shared secret is accepted in three spellings, because the value in
+  // SEND_EMAIL_HOOK_SECRET may or may not carry the `v1,` and `whsec_` prefixes
+  // depending on how it was copied out of the dashboard.
+  const acceptedSecrets = [secret, cleanSecret, unprefixedSecret]
+
+  // 1. Authorization header check (Bearer token).
+  //    B7-D / F-SEC-12: compared in constant time. The previous `===` chain
+  //    returned as soon as a byte differed, which is a timing oracle on a
+  //    long-lived shared secret.
   const authHeader = request.headers.get('authorization')
   if (authHeader) {
     const token = authHeader.replace(/^Bearer\s+/i, '').trim()
-    if (token === secret || token === cleanSecret || token === unprefixedSecret) return true
+    if (secretMatchesAny(token, acceptedSecrets)) return true
   }
 
-  // 2. Custom header checks
+  // 2. Custom header checks — likewise constant-time.
   const headerSecret =
     request.headers.get('x-supabase-auth-secret') ||
     request.headers.get('x-hook-secret') ||
     request.headers.get('x-secret')
   if (headerSecret) {
     const val = headerSecret.trim()
-    if (val === secret || val === cleanSecret || val === unprefixedSecret) return true
+    if (secretMatchesAny(val, acceptedSecrets)) return true
   }
 
-  // 3. Query string check
+  // 3. Query string check — DEPRECATED, pending removal (F-SEC-12).
+  //
+  //    A secret in a URL lands in access logs, CDN logs and Referer headers, so
+  //    this branch must go. It is still accepted here for one reason only: no
+  //    repository artifact records how the production Supabase hook is
+  //    configured — `supabase/config.toml` has no [auth.hook.send_email] section
+  //    and governs local development regardless — so it cannot be shown that the
+  //    configured hook URI does not carry `?secret=`. Removing it blind would
+  //    silently stop every verification and password-reset email.
+  //
+  //    Removal is gated on a human confirming the configured hook URI in the
+  //    Supabase Dashboard (Authentication -> Hooks -> Send Email Hook). See
+  //    docs/SECURITY.md and ISSUE-27. The comparison is constant-time in the
+  //    meantime so this branch is no longer also a timing oracle.
   const searchParams = request.nextUrl.searchParams
   const querySecret = searchParams.get('secret')
   if (querySecret) {
     const val = querySecret.trim()
-    if (val === secret || val === cleanSecret || val === unprefixedSecret) return true
+    if (secretMatchesAny(val, acceptedSecrets)) return true
   }
 
   // 4. Standard Webhook / Svix / Supabase signature check

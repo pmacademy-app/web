@@ -1,7 +1,6 @@
-import { createHash, timingSafeEqual } from 'node:crypto'
-
 import { requireAdminUser } from '@/lib/admin/guard'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { secretsMatch } from '@/lib/security/constant-time'
 
 /**
  * Canonical actor resolution (B7-A).
@@ -67,19 +66,6 @@ export type ActorDenial = {
 }
 
 export type ActorResolution = { ok: true; actor: Actor } | ActorDenial
-
-/**
- * Compares two secrets without leaking their contents through timing.
- *
- * Hashing first is what makes this safe for unequal lengths: `timingSafeEqual`
- * throws on a length mismatch, and guarding that with a length check would leak
- * the secret's length. Both digests are always 32 bytes.
- */
-function secretsMatch(provided: string, expected: string): boolean {
-  const a = createHash('sha256').update(provided, 'utf8').digest()
-  const b = createHash('sha256').update(expected, 'utf8').digest()
-  return timingSafeEqual(a, b)
-}
 
 /** Extracts a bearer token, accepting either header casing as the cron routes do. */
 function bearerToken(request: Request): string | null {

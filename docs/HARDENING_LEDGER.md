@@ -3,7 +3,7 @@
 **Branch of Record:** `main`
 **Synchronized With:** `origin/main` @ `d2a59be` + B8-E applied 2026-09-13
 **Date:** 2026-09-13
-**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B, B7-A, B7-B and B7-C complete in code** on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
+**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B, B7-A, B7-B and B7-C complete in code; B7-D partially complete — query-string removal blocked on production-config verification (ISSUE-27)** on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -374,7 +374,7 @@ messages. "Plan ref" points at the batch specification in
 | **B4** — email gateway + signup ordering | I-04 | ✅ Complete in code | Direct transports unified through canonical failover registry; kill switch enforced; timeouts standardized; durable side effects verification-gated |
 | **B5** — atomic rate limiting + abuse controls | I-03 | ✅ Complete in code | Login & update-password fail-closed atomic rate limits implemented; telemetry leftmost-XFF trust removed; signup account enumeration closed; Turnstile deferred |
 | **B6** — queue & scheduler reliability | I-04, I-05 | ✅ Complete in code | Migration 20260910000002 added; atomic stale processing reclamation implemented; bounded concurrency (pool of 5, 90s deadline); exponential backoff with jitter and 120m ceiling; durable scheduler heartbeat in system_settings; retry-failed duplication prevented; queue state machine aligned; 124 test files / 1345 tests passing |
-| **B7** — shared auth + route/error contract | I-07 | 🟡 **B7-A, B7-B and B7-C complete in code** | Foundation (`lib/api/actor.ts`, `lib/api/with-route.ts`) plus wave 1: all six cron routes migrated. B7-D onwards outstanding |
+| **B7** — shared auth + route/error contract | I-07 | 🟡 **B7-A, B7-B, B7-C complete; B7-D partial** | Foundation (`lib/api/actor.ts`, `lib/api/with-route.ts`) plus wave 1: all six cron routes migrated. B7-D's constant-time comparisons are done; its query-string removal is blocked (ISSUE-27) and its eleven auth-route migrations are outstanding. B7-E onwards untouched |
 | **B8** — typed data layer + DB correctness | I-08 | 🟢 **P0 correctness DEPLOYED; B8-E prepared, NOT applied** | B8-A…B8-D deployed to production at `164229a` and verified 2026-09-13: leaderboard column bug fixed (F-COR-1), authoritative XP total (F-COR-2), truncating queries bounded (F-COR-4), duplicate diagnostic run read-only (F-COR-3). `awardXp()` now treats SQLSTATE 23505 as already-awarded. **B8-E applied to production 2026-09-13 18:15:34Z** — 31 `theory_read` duplicates removed, 310 XP across 13 users, scoped partial unique index over six once-only source types. 17/17 post-migration checks passed. Executed direct-to-production by explicit approval; no staging project was used (P0-1 remains outstanding). Typed repository layer (B8-F/B8-G) untouched. See [`PHASE1_IMPLEMENTATION_TODO.md`](archive/PHASE1_IMPLEMENTATION_TODO.md) |
 | **B9** — admin controls + observability | I-10 | 🟢 **B9-A deployed** | Out-of-band critical alerting deployed at `164229a` (F-REL-4) — **inert until `ALERT_WEBHOOK_URL` is configured in production**. Correlation IDs, structured logging and retention (B9-B…B9-D) outstanding |
 | **B10** — frontend API/data layer | I-11 | 🟡 **B10-A complete in code** | Error-boundary structure corrected (F-COR-5) and a single canonical client logout helper introduced (F-COR-6). Dead-code removal (I-12-B5) was already closed by the 2026-09-13 cleanup pass. B10-B…B10-D (typed API client, SWR adoption) outstanding |
@@ -731,6 +731,73 @@ scheduler's exact call shape per route, wrong-secret and shared-prefix rejection
 the admin-session fallback, anonymous refusal, denial logging (present on four,
 absent on two, absent when authorized), unchanged success shapes, the `force` flag,
 and migration scope. Plus 12 new `withRoute` tests for `onDenied` and `summary`.
+
+---
+
+## Phase 2 — B7-D: Hook-secret hardening — 🟡 Partially complete, **removal blocked**
+
+**Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
+**Date:** 2026-09-14
+
+F-SEC-12 has two halves. One is done; the other is blocked on a fact that does not
+exist in this repository.
+
+### Done — constant-time comparison
+
+`lib/security/constant-time.ts` is new and is now the single implementation:
+`secretsMatch(provided, expected)` and `secretMatchesAny(provided, candidates)`.
+Both hash to SHA-256 before `timingSafeEqual`, because that function throws on a
+length mismatch and the obvious length guard leaks the secret's length.
+`secretMatchesAny` deliberately does not short-circuit, so the work done does not
+reveal which variant matched.
+
+`app/api/auth/send-email-hook/route.ts` now compares its shared secret with that
+helper on **all three** previously-`===` branches (Authorization header, the three
+custom headers, the query string). The HMAC branch already used `timingSafeEqual`
+and is unchanged — including its length guard before that call, which is the
+correct standard pattern: a signature's length is fixed by its encoding and is not
+secret.
+
+`lib/api/actor.ts` had an identical private copy of the comparison; it now imports
+the shared helper, so there is one security-critical implementation rather than two.
+
+### Blocked — removing query-string acceptance
+
+**The query-string branch is still accepted.** Removing it was the point of the
+batch, and it is not done, because the production hook configuration cannot be
+verified from this repository:
+
+- `supabase/config.toml` contains **no `[auth.hook.send_email]` section at all** —
+  only commented-out `before_user_created` and `custom_access_token` templates —
+  and that file governs local development regardless.
+- `DEPLOYMENT.md` documents `SEND_EMAIL_HOOK_SECRET` as an environment variable and
+  records no hook URI.
+- `.github/workflows/ci.yml` injects the secret but never names an endpoint.
+- Searching the repository for a `secret=` query parameter returns only the two
+  audit documents **describing this route's code** — no configuration artifact.
+
+If the configured hook URI carries the secret as a query parameter, deleting that
+branch stops every verification and password-reset email with no other signal. The
+roadmap flags this exact risk. The code now carries a `DEPRECATED, pending removal`
+comment naming the gate, and the branch is at least no longer a timing oracle.
+
+**Required human action** is recorded as ISSUE-27.
+
+### Also not done: the rest of roadmap B7-D
+
+The roadmap's B7-D is *"migrate the auth routes (11) **and** close the hook-secret
+gap"*. This batch was scoped to the hook-secret half only. **The eleven
+`app/api/auth/*` route migrations remain outstanding.**
+
+**Tests:** `lib/__tests__/b7d-hook-secret-hardening.test.ts` — 10 tests covering
+exact match, same-length mismatch, shared prefix, unequal length without throwing,
+empty string, multi-variant matching, non-short-circuiting, and source-level
+assertions that the verifier's secret branches use the helper and contain no plain
+equality. The existing `send-email-hook.test.ts` suite (Bearer, HMAC hex, HMAC
+prefixed base64) still passes unchanged.
+
+**Production verification: NOT performed.** No staging exercise of the Supabase auth
+hook was possible from here, and none is claimed.
 
 ---
 
