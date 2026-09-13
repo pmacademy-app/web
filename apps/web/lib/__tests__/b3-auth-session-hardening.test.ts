@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { proxy } from '../../proxy'
 import { POST as sessionPost, GET as sessionGet } from '../../app/api/auth/session/route'
 import { POST as refreshPost } from '../../app/api/auth/refresh/route'
@@ -238,7 +238,7 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
           },
         }),
       })
-      const res = await sessionPost(req)
+      const res = (await sessionPost(req)) as NextResponse
       expect(res.status).toBe(200)
       const data = await res.json()
       expect(data.user.id).toBe('usr_learner_1')
@@ -286,7 +286,7 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
         method: 'POST',
         body: JSON.stringify({ refresh_token: INVALID_REFRESH }),
       })
-      const res = await refreshPost(req)
+      const res = (await refreshPost(req)) as NextResponse
       expect(res.status).toBe(401)
       expect(res.cookies.get('sb-access-token')?.value).toBe('')
       expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
@@ -297,7 +297,7 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
         method: 'POST',
         body: JSON.stringify({ refresh_token: VALID_LEARNER_REFRESH }),
       })
-      const res = await refreshPost(req)
+      const res = (await refreshPost(req)) as NextResponse
       expect(res.status).toBe(200)
       const data = await res.json()
       expect(data.success).toBe(true)
@@ -315,7 +315,11 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
           cookie: `sb-access-token=${VALID_LEARNER_TOKEN}; sb-refresh-token=${VALID_LEARNER_REFRESH}`,
         },
       })
-      const res = await logoutPost(req)
+      // B7-D: the route now returns through withRoute, whose declared return type
+      // is the wider `Response`. The runtime value is still the NextResponse the
+      // handler built, so the assertions below are unchanged — only the type is
+      // narrowed for them.
+      const res = (await logoutPost(req)) as NextResponse
       expect(res.status).toBe(200)
       expect(res.cookies.get('sb-access-token')?.value).toBe('')
       expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
@@ -326,7 +330,7 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
         method: 'POST',
         body: JSON.stringify({ action: 'sign_out' }),
       })
-      const res = await sessionPost(req)
+      const res = (await sessionPost(req)) as NextResponse
       expect(res.status).toBe(200)
       expect(res.cookies.get('sb-access-token')?.value).toBe('')
       expect(res.cookies.get('sb-refresh-token')?.value).toBe('')

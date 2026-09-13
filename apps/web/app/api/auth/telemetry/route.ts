@@ -1,3 +1,4 @@
+import { withRoute } from '@/lib/api/with-route'
 import { logSystemError, type ErrorSeverity } from '@/lib/monitoring/logger'
 import type { AuthErrorCode } from '@/lib/auth/errors'
 import { getClientIpBucket } from '@/lib/security/client-ip'
@@ -125,50 +126,69 @@ function deriveSeverity(errorCode: AuthErrorCode): ErrorSeverity {
   }
 }
 
-export async function POST(request: Request) {
-  // 1. Trusted client IP extraction & rate limiting check
-  const ip = getClientIpBucket(request)
+/**
+ * POST /api/auth/telemetry
+ *
+ * Anonymous by design: the browser reports a classified auth failure before any
+ * session exists. The wrapper supplies the actor policy and the canonical envelope
+ * for an unexpected fault; the allowlist validator and the in-memory limiter below
+ * stay in the handler, because both are specific to this endpoint's contract.
+ */
+export const POST = withRoute(
+  {
+    actor: { allow: ['anonymous'] },
+    operation: 'auth.telemetry',
+    domain: 'auth',
+    summary: 'Unhandled exception in /api/auth/telemetry',
+  },
+  async ({ request }) => {
+    // 1. Trusted client IP extraction & rate limiting check
+    const ip = getClientIpBucket(request)
 
-  if (isRateLimited(ip)) {
-    return Response.json({ error: 'Rate limit exceeded' }, { status: 429 })
+    if (isRateLimited(ip)) {
+      return Response.json({ error: 'Rate limit exceeded' }, { status: 429 })
+    }
+
+    // 2. Parse and validate JSON payload
+    let rawBody: unknown
+    try {
+      rawBody = await request.json()
+    } catch {
+      return Response.json({ error: 'Invalid JSON payload' }, { status: 400 })
+    }
+
+    const payload = validateTelemetryPayload(rawBody)
+    if (!payload) {
+      return Response.json({ error: 'Invalid telemetry payload schema' }, { status: 400 })
+    }
+
+    const { errorCode, authAction, isNetworkError, browserFamily, onlineState, rawCode } = payload
+    const severity = deriveSeverity(errorCode)
+
+    // 3. Log to system_errors infrastructure with safe sanitized metadata
+    try {
+      const errorId = await logSystemError({
+        severity,
+        category: 'auth',
+        operation: authAction,
+        message: `Authentication error ${errorCode} during ${authAction}`,
+        details: {
+          errorCode,
+          authAction,
+          rawCode: rawCode || undefined,
+          isNetworkError: Boolean(isNetworkError),
+          browserFamily: browserFamily || 'other',
+          onlineState: onlineState ?? true,
+        },
+      })
+
+      return Response.json({ success: true, errorId }, { status: 200 })
+    } catch (err) {
+      // Deliberately not rethrown into the wrapper's incident path: this catch fires
+      // when the incident sink itself failed, and reporting that failure through the
+      // same sink would recurse.
+      console.warn('[auth-telemetry] Internal logging exception:', err)
+      return Response.json({ success: false }, { status: 500 })
+    }
   }
-
-  // 2. Parse and validate JSON payload
-  let rawBody: unknown
-  try {
-    rawBody = await request.json()
-  } catch {
-    return Response.json({ error: 'Invalid JSON payload' }, { status: 400 })
-  }
-
-  const payload = validateTelemetryPayload(rawBody)
-  if (!payload) {
-    return Response.json({ error: 'Invalid telemetry payload schema' }, { status: 400 })
-  }
-
-  const { errorCode, authAction, isNetworkError, browserFamily, onlineState, rawCode } = payload
-  const severity = deriveSeverity(errorCode)
-
-  // 3. Log to system_errors infrastructure with safe sanitized metadata
-  try {
-    const errorId = await logSystemError({
-      severity,
-      category: 'auth',
-      operation: authAction,
-      message: `Authentication error ${errorCode} during ${authAction}`,
-      details: {
-        errorCode,
-        authAction,
-        rawCode: rawCode || undefined,
-        isNetworkError: Boolean(isNetworkError),
-        browserFamily: browserFamily || 'other',
-        onlineState: onlineState ?? true,
-      },
-    })
-
-    return Response.json({ success: true, errorId }, { status: 200 })
-  } catch (err) {
-    console.warn('[auth-telemetry] Internal logging exception:', err)
-    return Response.json({ success: false }, { status: 500 })
-  }
-}
+)

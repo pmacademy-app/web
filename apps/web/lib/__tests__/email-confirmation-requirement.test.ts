@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { SettingsService } from '../admin/settings-service'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { POST as handleSignup } from '@/app/api/auth/signup/route'
 import { POST as handleLogin } from '@/app/api/auth/login/route'
 
@@ -275,7 +275,7 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
         }),
       })
 
-      const res = await handleSignup(req)
+      const res = (await handleSignup(req)) as NextResponse
       const json = await res.json()
 
       expect(res.status).toBe(200)
@@ -307,7 +307,7 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
         }),
       })
 
-      const res = await handleSignup(req)
+      const res = (await handleSignup(req)) as NextResponse
       const json = await res.json()
 
       expect(res.status).toBe(200)
@@ -376,7 +376,7 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
         }),
       })
 
-      const res = await handleLogin(req)
+      const res = (await handleLogin(req)) as NextResponse
       const json = await res.json()
 
       expect(res.status).toBe(200)
@@ -434,7 +434,7 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
         }),
       })
 
-      const res = await handleLogin(req)
+      const res = (await handleLogin(req)) as NextResponse
       const json = await res.json()
 
       expect(res.status).toBe(200)

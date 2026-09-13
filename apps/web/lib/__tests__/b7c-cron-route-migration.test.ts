@@ -299,15 +299,24 @@ describe('B7-C — migration scope', () => {
     return hits.sort()
   }
 
-  it('exactly the six cron routes use the wrapper — no later wave was touched', () => {
-    expect(routeFilesImporting('@/lib/api/with-route')).toEqual([
-      'cron/cleanup/route.ts',
-      'cron/daily-reminder/route.ts',
-      'cron/process-broadcasts/route.ts',
-      'cron/process-email-queue/route.ts',
-      'cron/retry-failed/route.ts',
-      'cron/weekly-recap/route.ts',
-    ])
+  // This asserts B7-C's own wave only: all six cron routes are still on the
+  // wrapper. The exact global set of migrated routes is owned by one test —
+  // b7d-hook-secret-hardening.test.ts — so a future wave updates one list rather
+  // than every wave's list.
+  it('all six cron routes are still on the wrapper', () => {
+    const migrated = routeFilesImporting('@/lib/api/with-route')
+
+    expect(migrated).toEqual(
+      expect.arrayContaining([
+        'cron/cleanup/route.ts',
+        'cron/daily-reminder/route.ts',
+        'cron/process-broadcasts/route.ts',
+        'cron/process-email-queue/route.ts',
+        'cron/retry-failed/route.ts',
+        'cron/weekly-recap/route.ts',
+      ])
+    )
+    expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(6)
   })
 
   it('no cron route hand-rolls a secret comparison any more', () => {

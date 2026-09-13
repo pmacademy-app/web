@@ -87,11 +87,17 @@ Supabase auth hook and `/api/email/webhooks` compare signatures with
 `timingSafeEqual` guarded by a length check, which is correct there because a
 signature's length is fixed by its encoding and is not secret.
 
-**F-SEC-12 is half closed.** All four of the auth hook's acceptance paths now compare
-in constant time. The query-parameter path is still *accepted*, because no artifact
-in this repository records how the production Supabase hook is configured, and
-removing it blind would stop verification and password-reset email. The exact human
-verification required is ISSUE-27.
+**F-SEC-12 is closed.** The auth hook's remaining acceptance paths — `Authorization:
+Bearer`, three custom headers, and the standardwebhooks HMAC signature — all compare
+in constant time, and the query-parameter path is **removed**. The route no longer
+reads `nextUrl.searchParams` at all, so no secret can travel in a URL to this
+endpoint.
+
+Removal was gated on confirming production did not depend on it. A human verified
+the Supabase Send Email Hook configuration on 2026-09-14: the configured secret is
+in the standard `v1,whsec_...` form, which authenticates by HMAC over the raw
+request body. Post-deploy verification of email delivery is still outstanding — see
+ISSUE-27.
 
 ---
 

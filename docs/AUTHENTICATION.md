@@ -154,13 +154,17 @@ Since B7-D every one of those comparisons is constant-time
 ([`SECURITY.md` §4a](SECURITY.md)). The HMAC branch was already correct and is
 unchanged.
 
-**The query-parameter branch is deprecated and pending removal** (F-SEC-12). It
-cannot be deleted until a human confirms the configured hook URI in the Supabase
-Dashboard does not carry the secret — see ISSUE-27 in
-[`ISSUES_KNOWN.md`](ISSUES_KNOWN.md). Note that this route authenticates by HMAC
-over the **raw body**, which is why `resolveActor` deliberately does not model a
-`webhook` actor: a resolver that read the body would consume the stream the route
-still needs.
+**The query-parameter branch was removed in B7-D** (F-SEC-12), after a human
+verified on 2026-09-14 that the production hook is configured with a standard
+`v1,whsec_...` signing secret and therefore authenticates by HMAC, not by a URL
+secret. The route no longer reads query parameters at all.
+
+That HMAC is computed over the **raw body**, which is why this route is one of the
+two auth routes deliberately **not** wrapped in `withRoute`: `resolveActor` would
+have to read the body to authenticate, consuming the stream the route still needs.
+`app/api/auth/callback` is the other exception — it is a redirect-only browser
+endpoint with no JSON envelope, so the canonical error contract does not apply.
+The other eight auth routes are on the wrapper.
 
 ---
 

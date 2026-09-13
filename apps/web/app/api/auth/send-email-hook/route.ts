@@ -92,28 +92,9 @@ function verifyHookSecret(request: NextRequest, rawBody: string, secret: string)
     if (secretMatchesAny(val, acceptedSecrets)) return true
   }
 
-  // 3. Query string check — DEPRECATED, pending removal (F-SEC-12).
-  //
-  //    A secret in a URL lands in access logs, CDN logs and Referer headers, so
-  //    this branch must go. It is still accepted here for one reason only: no
-  //    repository artifact records how the production Supabase hook is
-  //    configured — `supabase/config.toml` has no [auth.hook.send_email] section
-  //    and governs local development regardless — so it cannot be shown that the
-  //    configured hook URI does not carry `?secret=`. Removing it blind would
-  //    silently stop every verification and password-reset email.
-  //
-  //    Removal is gated on a human confirming the configured hook URI in the
-  //    Supabase Dashboard (Authentication -> Hooks -> Send Email Hook). See
-  //    docs/SECURITY.md and ISSUE-27. The comparison is constant-time in the
-  //    meantime so this branch is no longer also a timing oracle.
-  const searchParams = request.nextUrl.searchParams
-  const querySecret = searchParams.get('secret')
-  if (querySecret) {
-    const val = querySecret.trim()
-    if (secretMatchesAny(val, acceptedSecrets)) return true
-  }
-
-  // 4. Standard Webhook / Svix / Supabase signature check
+  // 3. Standard Webhook / Svix / Supabase signature check — the mechanism
+  //    production actually uses (verified 2026-09-14: the configured secret is in
+  //    `v1,whsec_...` form). HMAC over the raw body, compared with timingSafeEqual.
   const signatureHeader =
     request.headers.get('webhook-signature') ||
     request.headers.get('svix-signature') ||

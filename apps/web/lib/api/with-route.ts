@@ -1,3 +1,5 @@
+import type { NextRequest } from 'next/server'
+
 import { apiError, apiInternalError } from '@/lib/errors/api-response'
 import type { ErrorDomain } from '@/lib/monitoring/error-taxonomy'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
@@ -75,8 +77,14 @@ export interface RateLimitRule {
   failClosed?: boolean
 }
 
-export interface RouteHandlerContext<TBody, TQuery> {
-  request: Request
+export interface RouteHandlerContext<TBody, TQuery, TRequest extends Request = NextRequest> {
+  /**
+   * Typed as `NextRequest` by default because that is what Next.js passes a route
+   * handler at runtime, so `cookies` and `nextUrl` are available without a cast.
+   * The wrapper's own parameter stays the wider `Request`, which keeps unit tests
+   * free to hand it a plain `Request`.
+   */
+  request: TRequest
   actor: Actor
   body: TBody
   query: TQuery
@@ -100,6 +108,18 @@ export interface WithRouteConfig<TBody, TQuery> {
    * failure's history in two. No ids — see the taxonomy's fingerprint rules.
    */
   summary?: string
+  /**
+   * Client-facing copy for an unexpected fault. Defaults to the generic
+   * server-error message.
+   *
+   * The auth routes must set `AUTH_SERVICE_UNAVAILABLE_MESSAGE`: the auth screens
+   * re-classify whatever string they receive, and that copy is phrased so it still
+   * reads as `AUTH_PROVIDER_UNAVAILABLE` instead of collapsing to
+   * `AUTH_UNKNOWN_ERROR`. ADR-006 pins this.
+   */
+  errorMessage?: string
+  /** Machine-readable code for an unexpected fault. Defaults to `SERVER_ERROR`. */
+  errorCode?: string
   body?: ParseableSchema<TBody>
   query?: ParseableSchema<TQuery>
   rateLimit?: RateLimitRule[]
@@ -180,9 +200,13 @@ async function enforceRateLimits(
  * so a rule may key on the parsed body, which is what the login and signup routes
  * need; the limiter runs last before the handler.
  */
-export function withRoute<TBody = undefined, TQuery = undefined>(
+export function withRoute<
+  TBody = undefined,
+  TQuery = undefined,
+  TRequest extends Request = NextRequest,
+>(
   config: WithRouteConfig<TBody, TQuery>,
-  handler: (context: RouteHandlerContext<TBody, TQuery>) => Promise<Response>
+  handler: (context: RouteHandlerContext<TBody, TQuery, TRequest>) => Promise<Response>
 ): (request: Request, context?: NextRouteContext) => Promise<Response> {
   return async function routeWithContract(request: Request, context?: NextRouteContext): Promise<Response> {
     try {
@@ -262,7 +286,13 @@ export function withRoute<TBody = undefined, TQuery = undefined>(
       }
 
       // 4. The route's own work.
-      return await handler({ request, actor, body, query, params: await resolveParams(context) })
+      return await handler({
+        request: request as TRequest,
+        actor,
+        body,
+        query,
+        params: await resolveParams(context),
+      })
     } catch (cause) {
       // An expected refusal the handler raised: already-safe copy, no incident.
       if (cause instanceof RouteError) {
@@ -281,6 +311,8 @@ export function withRoute<TBody = undefined, TQuery = undefined>(
         domain: config.domain ?? 'api',
         operation: config.operation,
         summary: config.summary ?? `Unhandled exception in ${config.operation}`,
+        ...(config.errorMessage ? { message: config.errorMessage } : {}),
+        ...(config.errorCode ? { code: config.errorCode } : {}),
       })
     }
   }

@@ -475,6 +475,32 @@ describe('B7-B — withRoute: error handling', () => {
     })
   })
 
+  it('uses route-declared failure copy and code, preserving the ADR-006 auth invariant', async () => {
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
+    const { AUTH_SERVICE_UNAVAILABLE_MESSAGE } = await import('@/lib/errors/api-response')
+
+    const route = withRoute(
+      {
+        actor: { allow: ['learner'] },
+        operation: 'auth.login',
+        domain: 'auth',
+        errorMessage: AUTH_SERVICE_UNAVAILABLE_MESSAGE,
+        errorCode: 'SERVER_ERROR',
+      },
+      async () => {
+        throw new Error('provider exploded')
+      }
+    )
+    const body = await (await route(get())).json()
+
+    // The auth screens re-classify whatever string they receive; this copy is
+    // phrased so it still reads as AUTH_PROVIDER_UNAVAILABLE rather than collapsing
+    // to AUTH_UNKNOWN_ERROR.
+    expect(body.error).toBe(AUTH_SERVICE_UNAVAILABLE_MESSAGE)
+    expect(body.code).toBe('SERVER_ERROR')
+    expect(body.errorId).toMatch(/^err_/)
+  })
+
   it('falls back to a summary derived from the operation', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
 

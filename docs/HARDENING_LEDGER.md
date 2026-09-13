@@ -3,7 +3,7 @@
 **Branch of Record:** `main`
 **Synchronized With:** `origin/main` @ `d2a59be` + B8-E applied 2026-09-13
 **Date:** 2026-09-13
-**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B, B7-A, B7-B and B7-C complete in code; B7-D partially complete — query-string removal blocked on production-config verification (ISSUE-27)** on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
+**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B, B7-A, B7-B, B7-C and B7-D complete in code.** Next batch: B7-E (learner routes) on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -374,7 +374,7 @@ messages. "Plan ref" points at the batch specification in
 | **B4** — email gateway + signup ordering | I-04 | ✅ Complete in code | Direct transports unified through canonical failover registry; kill switch enforced; timeouts standardized; durable side effects verification-gated |
 | **B5** — atomic rate limiting + abuse controls | I-03 | ✅ Complete in code | Login & update-password fail-closed atomic rate limits implemented; telemetry leftmost-XFF trust removed; signup account enumeration closed; Turnstile deferred |
 | **B6** — queue & scheduler reliability | I-04, I-05 | ✅ Complete in code | Migration 20260910000002 added; atomic stale processing reclamation implemented; bounded concurrency (pool of 5, 90s deadline); exponential backoff with jitter and 120m ceiling; durable scheduler heartbeat in system_settings; retry-failed duplication prevented; queue state machine aligned; 124 test files / 1345 tests passing |
-| **B7** — shared auth + route/error contract | I-07 | 🟡 **B7-A, B7-B, B7-C complete; B7-D partial** | Foundation (`lib/api/actor.ts`, `lib/api/with-route.ts`) plus wave 1: all six cron routes migrated. B7-D's constant-time comparisons are done; its query-string removal is blocked (ISSUE-27) and its eleven auth-route migrations are outstanding. B7-E onwards untouched |
+| **B7** — shared auth + route/error contract | I-07 | 🟡 **B7-A…B7-D complete in code** | Foundation (`lib/api/actor.ts`, `lib/api/with-route.ts`), wave 1 (six cron routes) and wave 2 (eight auth routes, plus the F-SEC-12 query-string secret removed). `send-email-hook` and `callback` are documented architectural exceptions. B7-E onwards untouched |
 | **B8** — typed data layer + DB correctness | I-08 | 🟢 **P0 correctness DEPLOYED; B8-E prepared, NOT applied** | B8-A…B8-D deployed to production at `164229a` and verified 2026-09-13: leaderboard column bug fixed (F-COR-1), authoritative XP total (F-COR-2), truncating queries bounded (F-COR-4), duplicate diagnostic run read-only (F-COR-3). `awardXp()` now treats SQLSTATE 23505 as already-awarded. **B8-E applied to production 2026-09-13 18:15:34Z** — 31 `theory_read` duplicates removed, 310 XP across 13 users, scoped partial unique index over six once-only source types. 17/17 post-migration checks passed. Executed direct-to-production by explicit approval; no staging project was used (P0-1 remains outstanding). Typed repository layer (B8-F/B8-G) untouched. See [`PHASE1_IMPLEMENTATION_TODO.md`](archive/PHASE1_IMPLEMENTATION_TODO.md) |
 | **B9** — admin controls + observability | I-10 | 🟢 **B9-A deployed** | Out-of-band critical alerting deployed at `164229a` (F-REL-4) — **inert until `ALERT_WEBHOOK_URL` is configured in production**. Correlation IDs, structured logging and retention (B9-B…B9-D) outstanding |
 | **B10** — frontend API/data layer | I-11 | 🟡 **B10-A complete in code** | Error-boundary structure corrected (F-COR-5) and a single canonical client logout helper introduced (F-COR-6). Dead-code removal (I-12-B5) was already closed by the 2026-09-13 cleanup pass. B10-B…B10-D (typed API client, SWR adoption) outstanding |
@@ -734,7 +734,7 @@ and migration scope. Plus 12 new `withRoute` tests for `onDenied` and `summary`.
 
 ---
 
-## Phase 2 — B7-D: Hook-secret hardening — 🟡 Partially complete, **removal blocked**
+## Phase 2 — B7-D: Hook-secret hardening — 🔄 Superseded (see the completion entry below)
 
 **Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
 **Date:** 2026-09-14
@@ -798,6 +798,118 @@ prefixed base64) still passes unchanged.
 
 **Production verification: NOT performed.** No staging exercise of the Supabase auth
 hook was possible from here, and none is claimed.
+
+---
+
+## Phase 2 — B7-D: Auth-route migration and hook-secret removal — ✅ Complete in code
+
+**Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
+**Date:** 2026-09-14
+
+Supersedes the partial B7-D entry above. The blocker recorded as ISSUE-27 was
+cleared by a human: the production Send Email Hook was manually verified on
+2026-09-14 to use the standard `v1,whsec_...` webhook-signing secret, which
+authenticates by HMAC over the raw request body. There is no legacy query-string
+secret in the production configuration.
+
+### Part 1 — the query-string secret is gone
+
+`app/api/auth/send-email-hook/route.ts` no longer reads a `secret` query
+parameter. The branch is deleted rather than disabled, and the route no longer
+touches `nextUrl.searchParams` at all.
+
+Three acceptance paths remain, all constant-time:
+
+| Path | Mechanism | Status |
+|---|---|---|
+| `Authorization: Bearer` | shared secret, `secretMatchesAny` | kept |
+| `x-supabase-auth-secret` / `x-hook-secret` / `x-secret` | shared secret, `secretMatchesAny` | kept |
+| `webhook-signature` / `svix-signature` / … | HMAC over the raw body, `timingSafeEqual` | kept — **this is what production uses** |
+| `?secret=` | — | **removed** |
+
+Raw-body handling is untouched: the route still reads `request.text()` once and
+verifies the signature over exactly those bytes. Fail-closed behaviour is
+unchanged — a production request with no configured secret is still refused 401,
+and every verification failure still records a `send_email_hook_auth` incident.
+
+### Part 2 — auth routes on the canonical contract
+
+**Count correction.** The roadmap's B7-D heading says "the auth routes (11)", but
+its own Scope line lists **ten** files, and `app/api/auth/` contains exactly those
+ten. There is no eleventh route; the heading is wrong. Eight are migrated and two
+are documented exceptions.
+
+Eight of the ten `app/api/auth/*` routes now go through `withRoute`:
+
+| Route | Actor policy | Body schema | Notes |
+|---|---|---|---|
+| `login` | anonymous | `loginSchema` | limiter kept in handler — `AUTH_RATE_LIMITED` code and the non-enumerating single message are I-03-B6 invariants |
+| `signup` | anonymous | `signupSchema` | limiter/Turnstile **ordering** kept in handler |
+| `logout` | anonymous | — | must clear cookies even for an invalid token |
+| `refresh` | anonymous | — | no schema: the token may arrive by body *or* cookie |
+| `session` (GET + POST) | anonymous | — | GET never 401s; POST payload is a discriminated pair |
+| `resend-verification` | anonymous | — | body is optional by design |
+| `telemetry` | anonymous | — | allowlist validator and in-memory limiter kept |
+| `update-password` | anonymous | — | authenticates with the recovery session, not a learner session |
+
+Every one of them is `anonymous` by policy, and that is correct rather than lazy:
+these are the routes that *establish* a session or operate on a credential the
+caller supplies directly. Declaring `learner` would have made them unreachable.
+
+**Rate limiting deliberately stayed in the handlers.** `withRoute`'s declarative
+rules evaluate in a single phase, but signup and resend-verification depend on
+their **order** — cheap gates before the ones that spend provider credit or hold
+an invocation open on an outbound Cloudflare call — and login and signup return
+route-specific refusal codes (`AUTH_RATE_LIMITED`, `CAPTCHA_FAILED`,
+`SIGNUPS_DISABLED`) that the auth screens branch on. Moving them would have
+changed both.
+
+**One addition to `withRoute`:** `errorMessage` / `errorCode`, so a route can
+declare the copy used for an unexpected fault. The auth routes must send
+`AUTH_SERVICE_UNAVAILABLE_MESSAGE`, which is phrased so the auth screens
+re-classify it as `AUTH_PROVIDER_UNAVAILABLE` rather than collapsing to
+`AUTH_UNKNOWN_ERROR` — an ADR-006 invariant. Three routes use it immediately.
+`withRoute` also became generic over the request type, defaulting to
+`NextRequest`, because route handlers legitimately need `cookies` and `nextUrl`.
+
+### Two documented architectural exceptions
+
+Neither is a shortcut; both would be actively worse under the wrapper.
+
+- **`send-email-hook`** — authenticates by HMAC over the **raw body**. A resolver
+  that read the body would consume the stream the route still needs, and lifting
+  the route-local `verifyHookSecret` into `resolveActor` would mean reimplementing
+  it. This is the same reason B7-A declined to model a `webhook` actor.
+- **`callback`** — a redirect-only browser endpoint. Every exit path is a
+  `NextResponse.redirect`, including its failure paths, which land the learner on
+  `/login?error=verification_failed`, `/reset-password?error=expired` or
+  `/email-verified?status=error`. It has no JSON envelope to make canonical, and
+  its credential is the OTP/PKCE token that Supabase verifies. Wrapping it would
+  add an unreachable code path whose only reachable effect would be returning JSON
+  to a browser navigation — a failure mode that does not exist today.
+
+### Test-scope consolidation
+
+The B7-C scope test asserted the exact global set of migrated routes, which this
+batch legitimately grew. It now asserts only its own wave (all six cron routes
+still on the wrapper); the exact global set is owned by one test in
+`b7d-hook-secret-hardening.test.ts`, so a future wave updates one list.
+
+Response-type assertions in five existing test files were narrowed with
+`as NextResponse`. `withRoute`'s declared return type is the wider `Response`; the
+runtime value is still the `NextResponse` the handler built, so no assertion
+changed — only the type in front of it.
+
+**Tests:** `b7d-hook-secret-hardening.test.ts` — 24 tests: constant-time helper
+behaviour, a valid `v1,whsec_` signature over the raw body, tamper detection
+(signature computed over a different body), invalid signature, missing credential,
+the query-string secret rejected in all three spellings, a query secret unable to
+bypass a bad signature, no other query parameter name accepted, no secret echoed
+into a response body, and migration scope including both exceptions.
+
+**Production verification: NOT performed.** The hook *configuration* was verified
+manually; the deployed behaviour after removing the branch has not been exercised.
+The procedure is recorded in ISSUE-27.
 
 ---
 

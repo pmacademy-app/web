@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { withRoute } from '@/lib/api/with-route'
 import { SettingsService } from '@/lib/admin/settings-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
 import { createReferralAttribution, isPlausibleReferralCode } from '@/lib/referral/referral-service'
-import { apiInternalError, apiClassifiedAuthError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
+import { apiClassifiedAuthError, AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
@@ -71,310 +72,319 @@ function canonicalizeEmailForRateLimit(email: string): string {
   return `${local}@${domain}`
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json().catch(() => ({}))
-    const parsed = signupSchema.safeParse(body)
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message || 'Invalid registration data.', code: 'VALIDATION' },
-        { status: 400 }
-      )
-    }
+/**
+ * POST /api/auth/signup
+ *
+ * Anonymous by policy. Every abuse control below stays inside the handler on
+ * purpose: their **order** is the security property, and the wrapper's declarative
+ * rate limiting evaluates all rules in one phase, which would change it.
+ *
+ * The order is: platform signup switch, then per-IP limit, then the Siteverify
+ * budget, then the Turnstile challenge, and only then the per-email and aggregate
+ * limits. Each cheap gate runs before the one that spends money or holds an
+ * invocation open on an outbound Cloudflare call. All three limiters fail closed.
+ */
+export const POST = withRoute(
+  {
+    actor: { allow: ['anonymous'] },
+    operation: 'auth.signup',
+    domain: 'auth',
+    summary: 'Unexpected failure while registering a learner',
+    errorMessage: AUTH_SERVICE_UNAVAILABLE_MESSAGE,
+    errorCode: 'SERVER_ERROR',
+    body: signupSchema,
+  },
+  async ({ request, body: parsedBody }) => {
+    try {
+      const { name, email, password, turnstileToken } = parsedBody
+      const refCode = parsedBody.refCode || request.cookies.get('prodily_referrer')?.value || null
 
-    const { name, email, password, turnstileToken } = parsed.data
-    const refCode = parsed.data.refCode || request.cookies.get('prodily_referrer')?.value || null
+      // Check both platform behavior controls in a single DB call. This is the
+      // coarsest, cheapest gate, so it runs first — while signups are closed
+      // platform-wide, a request should be rejected immediately without also
+      // consuming per-IP/per-email rate-limit budget for an attempt that was
+      // never going to be allowed through anyway.
+      const productSettings = await SettingsService.getProductSettings()
 
-    // Check both platform behavior controls in a single DB call. This is the
-    // coarsest, cheapest gate, so it runs first — while signups are closed
-    // platform-wide, a request should be rejected immediately without also
-    // consuming per-IP/per-email rate-limit budget for an attempt that was
-    // never going to be allowed through anyway.
-    const productSettings = await SettingsService.getProductSettings()
-
-    // Backend enforcement of Allow Signups setting.
-    // Do NOT rely only on hiding the signup form — the API must reject directly too.
-    if (!productSettings.allowSignups) {
-      return NextResponse.json(
-        {
-          error: 'New learner registrations are currently closed. Please check back later.',
-          code: 'SIGNUPS_DISABLED',
-        },
-        { status: 403 }
-      )
-    }
-
-    const clientIp = getClientIpBucket(request)
-
-    // Phase 1 Rate Limiting: IP-level throttle protects Cloudflare Siteverify from single-IP floods
-    const ipLimit = await evaluatePersistentRateLimit(`signup_ip:${clientIp}`, IP_SIGNUP_LIMIT)
-    if (!ipLimit.success) {
-      return NextResponse.json(
-        {
-          error: 'Too many registration attempts. Please wait a while before trying again.',
-          code: 'RATE_LIMITED',
-          resetInMs: ipLimit.resetInMs,
-        },
-        { status: 429 }
-      )
-    }
-
-    // Platform-wide Siteverify ceiling. The per-IP limiter above bounds one source;
-    // this bounds a distributed campaign, which would otherwise turn every rotated
-    // address into another outbound Cloudflare call holding an invocation open.
-    const siteverifyBudget = await evaluateSiteverifyBudget()
-    if (!siteverifyBudget.success) {
-      // Same undifferentiated 429 as the other limiters — which ceiling was hit is not
-      // the caller's business, and the response contract is identical either way.
-      return NextResponse.json(
-        {
-          error: 'Too many registration attempts. Please wait a while before trying again.',
-          code: 'RATE_LIMITED',
-          resetInMs: siteverifyBudget.resetInMs,
-        },
-        { status: 429 }
-      )
-    }
-
-    // Bot challenge verification: must pass before email or global quotas are consumed.
-    // Cloudflare receives the trusted address only — never the `unresolved` bucket
-    // sentinel, which Siteverify would reject as a malformed `remoteip`.
-    const turnstileResult = await verifyTurnstileToken(turnstileToken, getTrustedClientIp(request) ?? undefined)
-    if (!turnstileResult.success) {
-      if (turnstileResult.code === 'CAPTCHA_UNAVAILABLE') {
+      // Backend enforcement of Allow Signups setting.
+      // Do NOT rely only on hiding the signup form — the API must reject directly too.
+      if (!productSettings.allowSignups) {
         return NextResponse.json(
           {
-            error: 'Security verification is temporarily unavailable. Please try again in a few moments.',
-            code: 'CAPTCHA_UNAVAILABLE',
+            error: 'New learner registrations are currently closed. Please check back later.',
+            code: 'SIGNUPS_DISABLED',
           },
-          { status: 503 }
+          { status: 403 }
         )
       }
-      return NextResponse.json(
-        {
-          error: 'Security verification failed. Please try again.',
-          code: 'CAPTCHA_FAILED',
-        },
-        { status: 400 }
-      )
-    }
 
-    // Phase 2 Rate Limiting: Per-email and global ceilings are evaluated ONLY after
-    // Turnstile challenge verification succeeds. This ensures bad CAPTCHA tokens cannot be
-    // abused to lock out a victim's email or exhaust the platform-wide signup quota.
-    const canonicalEmail = canonicalizeEmailForRateLimit(email)
+      const clientIp = getClientIpBucket(request)
 
-    const dailyEmailLimit = await EmailAutomationsService.getState()
-      .then((state) => state.dailyLimit)
-      .catch(() => 100)
+      // Phase 1 Rate Limiting: IP-level throttle protects Cloudflare Siteverify from single-IP floods
+      const ipLimit = await evaluatePersistentRateLimit(`signup_ip:${clientIp}`, IP_SIGNUP_LIMIT)
+      if (!ipLimit.success) {
+        return NextResponse.json(
+          {
+            error: 'Too many registration attempts. Please wait a while before trying again.',
+            code: 'RATE_LIMITED',
+            resetInMs: ipLimit.resetInMs,
+          },
+          { status: 429 }
+        )
+      }
 
-    const [emailLimit, aggregateLimit] = await Promise.all([
-      evaluatePersistentRateLimit(`signup_email:${canonicalEmail}`, EMAIL_SIGNUP_LIMIT),
-      evaluatePersistentRateLimit('signup_global', {
-        windowMs: AGGREGATE_SIGNUP_WINDOW_MS,
-        limit: aggregateSignupCeiling(dailyEmailLimit),
-        failClosed: true,
-      }),
-    ])
+      // Platform-wide Siteverify ceiling. The per-IP limiter above bounds one source;
+      // this bounds a distributed campaign, which would otherwise turn every rotated
+      // address into another outbound Cloudflare call holding an invocation open.
+      const siteverifyBudget = await evaluateSiteverifyBudget()
+      if (!siteverifyBudget.success) {
+        // Same undifferentiated 429 as the other limiters — which ceiling was hit is not
+        // the caller's business, and the response contract is identical either way.
+        return NextResponse.json(
+          {
+            error: 'Too many registration attempts. Please wait a while before trying again.',
+            code: 'RATE_LIMITED',
+            resetInMs: siteverifyBudget.resetInMs,
+          },
+          { status: 429 }
+        )
+      }
 
-    if (!emailLimit.success || !aggregateLimit.success) {
-      const resetInMs = Math.max(emailLimit.resetInMs, aggregateLimit.resetInMs)
-      // One undifferentiated message for both. Telling a caller *which* limit
-      // they hit would confirm whether the address is known to us and would let an
-      // attacker measure the aggregate ceiling; the response contract is the same
-      // 429 either way.
-      return NextResponse.json(
-        {
-          error: 'Too many registration attempts. Please wait a while before trying again.',
-          code: 'RATE_LIMITED',
-          resetInMs,
-        },
-        { status: 429 }
-      )
-    }
-
-    const isRequired = productSettings.requireEmailVerification
-    const supabase = createServiceRoleClient()
-    const origin = request.headers.get('origin') || request.nextUrl.origin || 'http://localhost:3000'
-
-    // Attacker-controlled input: validate the shape before it is carried anywhere.
-    // An unrecognizable code is dropped rather than persisted into auth metadata.
-    const safeRefCode = isPlausibleReferralCode(refCode) ? refCode.trim() : null
-
-    if (isRequired) {
-      // ── Flow A: Verification required (ON) ──────────────────────────────────
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          // The referral code rides along in auth metadata and is redeemed after
-          // verification (see `applyPendingReferral`). It is deliberately NOT acted on
-          // here: attribution needs a `public.users` row, creating that row dispatches
-          // the welcome email, and doing so for an unverified account turned a request
-          // field into an email-sending trigger.
-          data: safeRefCode ? { full_name: name, pending_ref_code: safeRefCode } : { full_name: name },
-          emailRedirectTo: `${origin}/api/auth/callback?next=/verified`,
-        },
-      })
-
-      const isExistingAccount =
-        Boolean(
-          error && (
-            error.message?.toLowerCase().includes('already registered') ||
-            error.message?.toLowerCase().includes('already in use') ||
-            error.message?.toLowerCase().includes('already exists')
+      // Bot challenge verification: must pass before email or global quotas are consumed.
+      // Cloudflare receives the trusted address only — never the `unresolved` bucket
+      // sentinel, which Siteverify would reject as a malformed `remoteip`.
+      const turnstileResult = await verifyTurnstileToken(turnstileToken, getTrustedClientIp(request) ?? undefined)
+      if (!turnstileResult.success) {
+        if (turnstileResult.code === 'CAPTCHA_UNAVAILABLE') {
+          return NextResponse.json(
+            {
+              error: 'Security verification is temporarily unavailable. Please try again in a few moments.',
+              code: 'CAPTCHA_UNAVAILABLE',
+            },
+            { status: 503 }
           )
-        ) ||
-        Boolean(data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
+        }
+        return NextResponse.json(
+          {
+            error: 'Security verification failed. Please try again.',
+            code: 'CAPTCHA_FAILED',
+          },
+          { status: 400 }
+        )
+      }
 
-      if (isExistingAccount) {
-        // Non-enumerating response: return the identical contract as a fresh registration.
-        // Attacker cannot discern whether this email is already registered.
-        // Legitimate users see the verification screen (which gives guidelines & login link).
-        // CRITICAL: No profile creation, no attribution, and no welcome email is sent.
+      // Phase 2 Rate Limiting: Per-email and global ceilings are evaluated ONLY after
+      // Turnstile challenge verification succeeds. This ensures bad CAPTCHA tokens cannot be
+      // abused to lock out a victim's email or exhaust the platform-wide signup quota.
+      const canonicalEmail = canonicalizeEmailForRateLimit(email)
+
+      const dailyEmailLimit = await EmailAutomationsService.getState()
+        .then((state) => state.dailyLimit)
+        .catch(() => 100)
+
+      const [emailLimit, aggregateLimit] = await Promise.all([
+        evaluatePersistentRateLimit(`signup_email:${canonicalEmail}`, EMAIL_SIGNUP_LIMIT),
+        evaluatePersistentRateLimit('signup_global', {
+          windowMs: AGGREGATE_SIGNUP_WINDOW_MS,
+          limit: aggregateSignupCeiling(dailyEmailLimit),
+          failClosed: true,
+        }),
+      ])
+
+      if (!emailLimit.success || !aggregateLimit.success) {
+        const resetInMs = Math.max(emailLimit.resetInMs, aggregateLimit.resetInMs)
+        // One undifferentiated message for both. Telling a caller *which* limit
+        // they hit would confirm whether the address is known to us and would let an
+        // attacker measure the aggregate ceiling; the response contract is the same
+        // 429 either way.
+        return NextResponse.json(
+          {
+            error: 'Too many registration attempts. Please wait a while before trying again.',
+            code: 'RATE_LIMITED',
+            resetInMs,
+          },
+          { status: 429 }
+        )
+      }
+
+      const isRequired = productSettings.requireEmailVerification
+      const supabase = createServiceRoleClient()
+      const origin = request.headers.get('origin') || request.nextUrl.origin || 'http://localhost:3000'
+
+      // Attacker-controlled input: validate the shape before it is carried anywhere.
+      // An unrecognizable code is dropped rather than persisted into auth metadata.
+      const safeRefCode = isPlausibleReferralCode(refCode) ? refCode.trim() : null
+
+      if (isRequired) {
+        // ── Flow A: Verification required (ON) ──────────────────────────────────
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            // The referral code rides along in auth metadata and is redeemed after
+            // verification (see `applyPendingReferral`). It is deliberately NOT acted on
+            // here: attribution needs a `public.users` row, creating that row dispatches
+            // the welcome email, and doing so for an unverified account turned a request
+            // field into an email-sending trigger.
+            data: safeRefCode ? { full_name: name, pending_ref_code: safeRefCode } : { full_name: name },
+            emailRedirectTo: `${origin}/api/auth/callback?next=/verified`,
+          },
+        })
+
+        const isExistingAccount =
+          Boolean(
+            error && (
+              error.message?.toLowerCase().includes('already registered') ||
+              error.message?.toLowerCase().includes('already in use') ||
+              error.message?.toLowerCase().includes('already exists')
+            )
+          ) ||
+          Boolean(data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
+
+        if (isExistingAccount) {
+          // Non-enumerating response: return the identical contract as a fresh registration.
+          // Attacker cannot discern whether this email is already registered.
+          // Legitimate users see the verification screen (which gives guidelines & login link).
+          // CRITICAL: No profile creation, no attribution, and no welcome email is sent.
+          return NextResponse.json({
+            success: true,
+            verificationRequired: true,
+            email,
+            message: 'Please check your email for the confirmation link.',
+          })
+        }
+
+        if (error) {
+          // Route the provider error through the existing classifier rather than
+          // forwarding its message. The learner still gets the specific guidance
+          // (weak password, rate limited) but never the raw Supabase/GoTrue text.
+          return apiClassifiedAuthError({
+            cause: error,
+            context: 'signup',
+            status: 400,
+          })
+        }
+
+        // No profile creation and no attribution here. Under Flow A the account does
+        // not exist as far as the application is concerned until the learner clicks the
+        // verification link, and `/api/auth/callback` does both at that point.
+
         return NextResponse.json({
           success: true,
           verificationRequired: true,
           email,
           message: 'Please check your email for the confirmation link.',
         })
-      }
-
-      if (error) {
-        // Route the provider error through the existing classifier rather than
-        // forwarding its message. The learner still gets the specific guidance
-        // (weak password, rate limited) but never the raw Supabase/GoTrue text.
-        return apiClassifiedAuthError({
-          cause: error,
-          context: 'signup',
-          status: 400,
+      } else {
+        // ── Flow B: Verification NOT required (OFF) ─────────────────────────────
+        // 1. Create confirmed user using Supabase Admin API
+        const { data: createData, error: createError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: { full_name: name },
         })
-      }
 
-      // No profile creation and no attribution here. Under Flow A the account does
-      // not exist as far as the application is concerned until the learner clicks the
-      // verification link, and `/api/auth/callback` does both at that point.
+        if (createError) {
+          const isExisting =
+            createError.message?.toLowerCase().includes('already registered') ||
+            createError.message?.toLowerCase().includes('already in use') ||
+            createError.message?.toLowerCase().includes('already exists')
 
-      return NextResponse.json({
-        success: true,
-        verificationRequired: true,
-        email,
-        message: 'Please check your email for the confirmation link.',
-      })
-    } else {
-      // ── Flow B: Verification NOT required (OFF) ─────────────────────────────
-      // 1. Create confirmed user using Supabase Admin API
-      const { data: createData, error: createError } = await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: { full_name: name },
-      })
+          if (isExisting) {
+            // Non-enumerating response: direct user to login without revealing account existence or bypassing auth.
+            return NextResponse.json({
+              success: true,
+              verificationRequired: false,
+              redirect: '/login',
+              message: 'Account created successfully. Please log in.',
+            })
+          }
 
-      if (createError) {
-        const isExisting =
-          createError.message?.toLowerCase().includes('already registered') ||
-          createError.message?.toLowerCase().includes('already in use') ||
-          createError.message?.toLowerCase().includes('already exists')
+          return NextResponse.json(
+            {
+              error: createError.message || 'Registration failed.',
+              code: createError.code || 'SIGNUP_FAILED',
+            },
+            { status: 400 }
+          )
+        }
 
-        if (isExisting) {
-          // Non-enumerating response: direct user to login without revealing account existence or bypassing auth.
+        const user = createData.user
+        if (!user) {
+          return NextResponse.json(
+            { error: 'Failed to create user record.', code: 'SERVER_ERROR' },
+            { status: 500 }
+          )
+        }
+
+        // 2. Initialize public.users record and record referral attribution.
+        //
+        // Flow B is the branch where the operator has turned verification OFF, so
+        // `admin.createUser({ email_confirm: true })` above already produced a
+        // confirmed account. That IS the required registration milestone under this
+        // configuration, so creating the profile (and with it the welcome email) here
+        // is correct. Flow A's milestone is the verification click instead.
+        await ensureUserProfile(supabase, user, { name })
+        if (safeRefCode) {
+          try {
+            await createReferralAttribution(supabase, {
+              referrerCodeOrId: safeRefCode,
+              newUserId: user.id,
+            })
+          } catch (refErr) {
+            console.warn('[signup] Referral attribution error in Flow B:', refErr)
+          }
+        }
+
+        // 3. Generate genuine Supabase session via password login
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (authError || !authData?.session) {
           return NextResponse.json({
             success: true,
             verificationRequired: false,
+            user,
             redirect: '/login',
             message: 'Account created successfully. Please log in.',
           })
         }
 
-        return NextResponse.json(
-          {
-            error: createError.message || 'Registration failed.',
-            code: createError.code || 'SIGNUP_FAILED',
-          },
-          { status: 400 }
-        )
-      }
-
-      const user = createData.user
-      if (!user) {
-        return NextResponse.json(
-          { error: 'Failed to create user record.', code: 'SERVER_ERROR' },
-          { status: 500 }
-        )
-      }
-
-      // 2. Initialize public.users record and record referral attribution.
-      //
-      // Flow B is the branch where the operator has turned verification OFF, so
-      // `admin.createUser({ email_confirm: true })` above already produced a
-      // confirmed account. That IS the required registration milestone under this
-      // configuration, so creating the profile (and with it the welcome email) here
-      // is correct. Flow A's milestone is the verification click instead.
-      await ensureUserProfile(supabase, user, { name })
-      if (safeRefCode) {
-        try {
-          await createReferralAttribution(supabase, {
-            referrerCodeOrId: safeRefCode,
-            newUserId: user.id,
-          })
-        } catch (refErr) {
-          console.warn('[signup] Referral attribution error in Flow B:', refErr)
-        }
-      }
-
-      // 3. Generate genuine Supabase session via password login
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (authError || !authData?.session) {
-        return NextResponse.json({
+        // 4. Attach HTTP-only session cookies
+        const response = NextResponse.json({
           success: true,
           verificationRequired: false,
-          user,
-          redirect: '/login',
-          message: 'Account created successfully. Please log in.',
+          user: authData.user,
+          session: authData.session,
+          redirect: '/dashboard',
         })
+
+        const isProd = process.env.NODE_ENV === 'production'
+        response.cookies.set('sb-access-token', authData.session.access_token, {
+          httpOnly: true,
+          secure: isProd,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: authData.session.expires_in || 3600,
+        })
+        response.cookies.set('sb-refresh-token', authData.session.refresh_token, {
+          httpOnly: true,
+          secure: isProd,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        })
+
+        return response
       }
-
-      // 4. Attach HTTP-only session cookies
-      const response = NextResponse.json({
-        success: true,
-        verificationRequired: false,
-        user: authData.user,
-        session: authData.session,
-        redirect: '/dashboard',
-      })
-
-      const isProd = process.env.NODE_ENV === 'production'
-      response.cookies.set('sb-access-token', authData.session.access_token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: authData.session.expires_in || 3600,
-      })
-      response.cookies.set('sb-refresh-token', authData.session.refresh_token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-      })
-
-      return response
+    } catch (err) {
+      console.error('[api/auth/signup] Error:', err)
+      // Rethrown so the wrapper records the incident and returns the same envelope
+      // this catch used to build by hand.
+      throw err
     }
-  } catch (err) {
-    console.error('[api/auth/signup] Error:', err)
-    return apiInternalError({
-      cause: err,
-      domain: 'auth',
-      operation: 'auth.signup',
-      summary: 'Unexpected failure while registering a learner',
-      code: 'SERVER_ERROR',
-      message: AUTH_SERVICE_UNAVAILABLE_MESSAGE,
-    })
   }
-}
+)

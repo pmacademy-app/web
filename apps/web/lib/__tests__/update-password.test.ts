@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 // Spy on logSystemError to verify monitoring behavior
 const mockLogSystemError = vi.fn().mockResolvedValue('mock-system-error-id')
@@ -62,7 +62,7 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ newPassword: 'validPassword123' }),
     })
-    const res = await POST(req)
+    const res = (await POST(req)) as NextResponse
     expect(res.status).toBe(401)
     const json = await res.json()
     expect(json.success).toBe(false)
@@ -83,7 +83,7 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
       body: JSON.stringify({ newPassword: 'newValidPassword123' }),
     })
 
-    const res = await POST(req)
+    const res = (await POST(req)) as NextResponse
     if (res.status === 200) {
       const json = await res.json()
       expect(json.success).toBe(true)
@@ -103,7 +103,7 @@ describe('Password Update Endpoint Security & Functional Unit Tests', () => {
       },
       body: JSON.stringify({ newPassword: 'newValidPassword123' }),
     })
-    const res = await POST(req)
+    const res = (await POST(req)) as NextResponse
     expect(res.status).toBe(401)
     const json = await res.json()
     expect(json.success).toBe(false)
