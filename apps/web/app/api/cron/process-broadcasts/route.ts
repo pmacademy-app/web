@@ -1,38 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+
 import { BroadcastService } from '@/lib/admin/broadcast-service'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
-import { requireAdminUser } from '@/lib/admin/guard'
-import { apiInternalError } from '@/lib/errors/api-response'
+import { withRoute } from '@/lib/api/with-route'
 
 export const runtime = 'nodejs'
 
 /**
  * GET /api/cron/process-broadcasts
  *
- * Cron endpoint that finds scheduled email and in-app broadcasts past their scheduled_at time
- * and executes their delivery.
+ * Finds scheduled email and in-app broadcasts past their `scheduled_at` time and
+ * executes their delivery.
  *
- * Authentication:
- * 1. Checks Authorization header against CRON_SECRET (standard for Vercel Cron or external schedulers).
- * 2. If CRON_SECRET is not provided or not configured, falls back to requiring an authenticated Admin user.
- * 3. Rejects any unauthenticated public access.
+ * Authentication accepts the scheduler's `CRON_SECRET` bearer token or an
+ * authenticated admin session; anything else is rejected. Before B7-C the secret
+ * was compared with `===` in this file, which is now a constant-time comparison
+ * inside `resolveActor`.
+ *
+ * This route has no POST handler, matching the workflow, which calls it with GET.
  */
-export async function GET(request: NextRequest) {
-  const cronSecret = process.env.CRON_SECRET
-  const authHeader = request.headers.get('authorization')
-  const providedSecret = authHeader?.replace('Bearer ', '')
-
-  const isCronAuthorized = Boolean(cronSecret && providedSecret && providedSecret === cronSecret)
-
-  if (!isCronAuthorized) {
-    // Fall back to verifying admin user session
-    const adminCheck = await requireAdminUser(request)
-    if (!adminCheck.authorized) {
-      return NextResponse.json({ error: 'Unauthorized: Valid CRON_SECRET or Admin session required.' }, { status: 401 })
-    }
-  }
-
-  try {
+export const GET = withRoute(
+  {
+    actor: { allow: ['cron', 'admin'] },
+    operation: 'cron.process_broadcasts',
+    domain: 'cron',
+    summary: 'Unexpected failure while processing scheduled broadcasts',
+  },
+  async () => {
     const [emailResult, inAppResult] = await Promise.all([
       BroadcastService.processScheduledBroadcasts(),
       InAppManagerService.processScheduledInAppBroadcasts(),
@@ -50,12 +44,5 @@ export async function GET(request: NextRequest) {
       },
       timestamp: new Date().toISOString(),
     })
-  } catch (err) {
-    return apiInternalError({
-      cause: err,
-      domain: 'cron',
-      operation: 'cron.process_broadcasts',
-      summary: 'Unexpected failure while processing scheduled broadcasts',
-    })
   }
-}
+)

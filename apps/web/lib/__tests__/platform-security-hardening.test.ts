@@ -120,7 +120,12 @@ describe('Platform Hardening, Security & Production Reliability', () => {
       const res = await cronProcessEmailQueuePost(req)
       expect(res.status).toBe(401)
       const json = await res.json()
-      expect(json.error).toContain('Unauthorized')
+      // B7-C: the route now emits the canonical ADR-006 envelope. `code` is the
+      // stable machine-readable contract, so assert that rather than the prose,
+      // which changed from 'Unauthorized: Valid CRON_SECRET...' to the wrapper's
+      // generic copy.
+      expect(json.success).toBe(false)
+      expect(json.code).toBe('UNAUTHORIZED')
     })
 
     it('allows /api/cron/process-email-queue with valid CRON_SECRET bearer token', async () => {
@@ -164,7 +169,13 @@ describe('Platform Hardening, Security & Production Reliability', () => {
 
       const req = new Request('https://prodily.app/api/cron/weekly-recap', { method: 'POST' })
       const res = await cronWeeklyRecapPost(req)
-      expect(res.status).toBe(401)
+      // B7-C behaviour change, deliberate: an authenticated caller who is not an
+      // admin now gets 403 rather than 401. Before migration every cron route
+      // hardcoded 401 even when the admin guard had already answered 403, which
+      // reported an authenticated user as unauthenticated. Both are refusals and
+      // no client consumes these endpoints, so the canonical status wins.
+      expect(res.status).toBe(403)
+      expect((await res.json()).code).toBe('FORBIDDEN')
     })
 
     it('rejects /api/cron/retry-failed when unauthorized', async () => {

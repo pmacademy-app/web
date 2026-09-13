@@ -2,7 +2,7 @@ import { apiError, apiInternalError } from '@/lib/errors/api-response'
 import type { ErrorDomain } from '@/lib/monitoring/error-taxonomy'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 
-import { resolveActor, type Actor, type ActorPolicy } from './actor'
+import { resolveActor, type Actor, type ActorDenial, type ActorPolicy } from './actor'
 
 /**
  * Canonical route contract wrapper (B7-B).
@@ -91,9 +91,32 @@ export interface WithRouteConfig<TBody, TQuery> {
   operation: string
   /** Incident domain. Defaults to `api`. */
   domain?: ErrorDomain
+  /**
+   * Stable one-line incident summary for an unexpected fault. Defaults to
+   * `Unhandled exception in <operation>`.
+   *
+   * Worth setting when a route already had a specific summary before migration:
+   * the summary feeds the incident fingerprint, so changing it silently splits a
+   * failure's history in two. No ids — see the taxonomy's fingerprint rules.
+   */
+  summary?: string
   body?: ParseableSchema<TBody>
   query?: ParseableSchema<TQuery>
   rateLimit?: RateLimitRule[]
+  /**
+   * Side effect to run when the **actor policy** refuses the request — and only
+   * then. Validation failures, rate-limit refusals and handler faults do not
+   * invoke it; those are not authorization events.
+   *
+   * It exists because four cron routes record an unauthorized attempt with
+   * `logSystemError`, and that signal must survive migration to the wrapper. The
+   * hook receives the denial's internal `reason`, which the client never sees.
+   *
+   * It cannot influence the response: the return value is ignored and a rejection
+   * is swallowed, on the same principle as `apiInternalError`'s incident write —
+   * instrumentation must never change the decision it is observing.
+   */
+  onDenied?: (context: { request: Request; denial: ActorDenial }) => void | Promise<void>
 }
 
 /** Next.js passes dynamic params as the second argument; in 15+ they are a promise. */
@@ -166,6 +189,17 @@ export function withRoute<TBody = undefined, TQuery = undefined>(
       // 1. Who is calling?
       const resolution = await resolveActor(request, config.actor)
       if (!resolution.ok) {
+        if (config.onDenied) {
+          // Awaited rather than fire-and-forget: on a serverless runtime the
+          // response ends the invocation, so an un-awaited log can simply be
+          // dropped — which is the one log you least want to lose.
+          try {
+            await config.onDenied({ request, denial: resolution })
+          } catch (hookError) {
+            console.error(`[withRoute] onDenied hook failed for ${config.operation}:`, hookError)
+          }
+        }
+
         // `resolution.reason` stays out of the response on purpose — a refusal
         // must not tell the caller which check refused it.
         return apiError({
@@ -246,7 +280,7 @@ export function withRoute<TBody = undefined, TQuery = undefined>(
         cause,
         domain: config.domain ?? 'api',
         operation: config.operation,
-        summary: `Unhandled exception in ${config.operation}`,
+        summary: config.summary ?? `Unhandled exception in ${config.operation}`,
       })
     }
   }

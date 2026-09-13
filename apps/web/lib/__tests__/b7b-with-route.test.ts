@@ -453,6 +453,39 @@ describe('B7-B — withRoute: error handling', () => {
     expect(typeof body.error).toBe('string')
   })
 
+  it('uses the route-declared incident summary when one is given', async () => {
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
+
+    const route = withRoute(
+      {
+        actor: { allow: ['learner'] },
+        operation: 'cron.process_broadcasts',
+        domain: 'cron',
+        summary: 'Unexpected failure while processing scheduled broadcasts',
+      },
+      async () => {
+        throw new Error('boom')
+      }
+    )
+    await route(get())
+
+    expect(logErrorReport.mock.calls[0][0]).toMatchObject({
+      domain: 'cron',
+      summary: 'Unexpected failure while processing scheduled broadcasts',
+    })
+  })
+
+  it('falls back to a summary derived from the operation', async () => {
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
+
+    const route = withRoute({ actor: { allow: ['learner'] }, operation: 'thing.create' }, async () => {
+      throw new Error('boom')
+    })
+    await route(get())
+
+    expect(logErrorReport.mock.calls[0][0].summary).toBe('Unhandled exception in thing.create')
+  })
+
   it('still returns a 500 when the incident write itself fails', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
     logErrorReport.mockRejectedValue(new Error('incident sink down'))
@@ -586,24 +619,161 @@ describe('B7-B — withRoute: envelope is byte-compatible with lib/errors/api-re
   })
 })
 
-describe('B7-B — withRoute: no route was migrated', () => {
-  it('is imported by no route handler yet', async () => {
-    const { readFileSync, readdirSync, statSync } = await import('node:fs')
-    const path = await import('node:path')
-    const apiDir = path.resolve(import.meta.dirname, '../../app/api')
+describe('B7-B — withRoute: onDenied hook', () => {
+  it('runs on a 401 actor denial and receives the denial detail', async () => {
+    const onDenied = vi.fn()
 
-    const offenders: string[] = []
-    const walk = (dir: string) => {
-      for (const entry of readdirSync(dir)) {
-        const full = path.join(dir, entry)
-        if (statSync(full).isDirectory()) walk(full)
-        else if (entry === 'route.ts' && readFileSync(full, 'utf8').includes('@/lib/api/with-route')) {
-          offenders.push(full)
-        }
+    const route = withRoute(
+      { actor: { allow: ['learner'] }, operation: 'thing.read', onDenied },
+      async () => Response.json({ success: true })
+    )
+    await route(get())
+
+    expect(onDenied).toHaveBeenCalledTimes(1)
+    expect(onDenied.mock.calls[0][0].denial).toMatchObject({ status: 401, code: 'UNAUTHORIZED' })
+    expect(onDenied.mock.calls[0][0].request).toBeInstanceOf(Request)
+  })
+
+  it('runs on a 403 actor denial', async () => {
+    requireAdminUser.mockResolvedValue({
+      authorized: false,
+      error: 'Access denied: Admin privileges required',
+      statusCode: 403,
+    })
+    const onDenied = vi.fn()
+
+    const route = withRoute(
+      { actor: { allow: ['admin'] }, operation: 'admin.thing', onDenied },
+      async () => Response.json({ success: true })
+    )
+    await route(get())
+
+    expect(onDenied.mock.calls[0][0].denial).toMatchObject({ status: 403, code: 'FORBIDDEN' })
+  })
+
+  it('does not run when the actor resolves', async () => {
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
+    const onDenied = vi.fn()
+
+    const route = withRoute(
+      { actor: { allow: ['learner'] }, operation: 'thing.read', onDenied },
+      async () => Response.json({ success: true })
+    )
+    await route(get())
+
+    expect(onDenied).not.toHaveBeenCalled()
+  })
+
+  it('does not run for a validation failure', async () => {
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
+    const onDenied = vi.fn()
+
+    const route = withRoute(
+      {
+        actor: { allow: ['learner'] },
+        operation: 'thing.create',
+        body: z.object({ title: z.string().min(1) }),
+        onDenied,
+      },
+      async () => Response.json({ success: true })
+    )
+    const res = await route(post({ title: '' }))
+
+    expect(res.status).toBe(400)
+    expect(onDenied).not.toHaveBeenCalled()
+  })
+
+  it('does not run for a rate-limit refusal', async () => {
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
+    evaluatePersistentRateLimit.mockResolvedValue({ success: false, remaining: 0, resetInMs: 100 })
+    const onDenied = vi.fn()
+
+    const route = withRoute(
+      {
+        actor: { allow: ['learner'] },
+        operation: 'thing.read',
+        rateLimit: [{ key: () => 'b', limit: 1, windowMs: 1000 }],
+        onDenied,
+      },
+      async () => Response.json({ success: true })
+    )
+    const res = await route(get())
+
+    expect(res.status).toBe(429)
+    expect(onDenied).not.toHaveBeenCalled()
+  })
+
+  it('does not run when the handler throws', async () => {
+    getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
+    const onDenied = vi.fn()
+
+    const route = withRoute(
+      { actor: { allow: ['learner'] }, operation: 'thing.read', onDenied },
+      async () => {
+        throw new Error('boom')
       }
-    }
-    walk(apiDir)
+    )
+    const res = await route(get())
 
-    expect(offenders).toEqual([])
+    expect(res.status).toBe(500)
+    expect(onDenied).not.toHaveBeenCalled()
+  })
+
+  it('is awaited, so a fire-and-forget log cannot be dropped before the response', async () => {
+    let settled = false
+    const onDenied = vi.fn(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      settled = true
+    })
+
+    const route = withRoute(
+      { actor: { allow: ['learner'] }, operation: 'thing.read', onDenied },
+      async () => Response.json({ success: true })
+    )
+    await route(get())
+
+    expect(settled).toBe(true)
+  })
+
+  it('never lets a failing hook change the response', async () => {
+    const onDenied = vi.fn(async () => {
+      throw new Error('logging sink down')
+    })
+
+    const route = withRoute(
+      { actor: { allow: ['learner'] }, operation: 'thing.read', onDenied },
+      async () => Response.json({ success: true })
+    )
+    const res = await route(get())
+    const body = await res.json()
+
+    expect(res.status).toBe(401)
+    expect(body.code).toBe('UNAUTHORIZED')
+    expect(body.errorId).toBeUndefined()
+  })
+
+  it('keeps the internal denial reason out of the client response', async () => {
+    requireAdminUser.mockResolvedValue({
+      authorized: false,
+      error: 'Access denied: Admin privileges required',
+      statusCode: 403,
+    })
+    const onDenied = vi.fn()
+
+    const route = withRoute(
+      { actor: { allow: ['admin'] }, operation: 'admin.thing', onDenied },
+      async () => Response.json({ success: true })
+    )
+    const res = await route(get())
+
+    // The hook sees the reason; the client never does.
+    expect(onDenied.mock.calls[0][0].denial.reason).toContain('Admin privileges required')
+    expect(JSON.stringify(await res.json())).not.toContain('Admin privileges required')
   })
 })
+
+// The "no route imports this yet" guard that lived here belonged to B7-B, when the
+// wrapper had no consumers. B7-C migrated the six cron routes, so migration scope is
+// now asserted in exactly one place — b7c-cron-route-migration.test.ts, which pins the
+// precise set of route files allowed to import the wrapper. Duplicating it here would
+// mean two assertions to update on every future wave, and one of them would drift.
