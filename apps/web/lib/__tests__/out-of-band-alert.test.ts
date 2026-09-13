@@ -38,7 +38,7 @@ afterEach(() => {
   else process.env.ALERT_WEBHOOK_URL = originalUrl
 })
 
-describe('B9-A · buildAlertPayload', () => {
+describe('buildAlertPayload', () => {
   it('renders a text field most chat webhooks can display directly', () => {
     const payload = buildAlertPayload(ALERT) as any
     expect(payload.text).toContain('[CRITICAL]')
@@ -71,7 +71,7 @@ describe('B9-A · buildAlertPayload', () => {
   })
 })
 
-describe('B9-A · deliverOutOfBandAlert', () => {
+describe('deliverOutOfBandAlert', () => {
   it('does nothing and reports why when no channel is configured', async () => {
     const fetchSpy = vi.fn()
     global.fetch = fetchSpy as any

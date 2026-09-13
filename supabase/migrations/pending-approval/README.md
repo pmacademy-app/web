@@ -26,7 +26,7 @@ Deletes 31 `theory_read` concurrency duplicates, removes 310 XP across 13 users,
 adds a partial unique index over six once-only source types. Scope approved 2026-09-13;
 staging validation is the outstanding gate.
 
-Full context: [`docs/audits/B8E_PRE_APPROVAL_INVESTIGATION.md`](../../../docs/audits/B8E_PRE_APPROVAL_INVESTIGATION.md).
+Full context: [`docs/PENDING_B8E_MIGRATION.md`](../../../docs/PENDING_B8E_MIGRATION.md).
 
 ## Releasing a held migration
 

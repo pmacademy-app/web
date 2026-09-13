@@ -54,7 +54,7 @@ beforeEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('B8-E · awardXp duplicate handling (SQLSTATE 23505)', () => {
+describe('awardXp duplicate handling (SQLSTATE 23505)', () => {
   it('resolves without throwing when the insert hits a unique violation', async () => {
     const { supabase } = makeSupabase({ code: '23505', message: 'duplicate key value' })
     await expect(awardXp(supabase, 'user-1', 'theory_read', 10, 'les_1')).resolves.toBeUndefined()

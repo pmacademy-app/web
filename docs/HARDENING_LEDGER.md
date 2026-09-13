@@ -1,9 +1,9 @@
 # Prodily Production Hardening — Implementation Ledger
 
-**Branch of Record:** `implementation/prodily-hardening`
-**Synchronized With:** `origin/main` @ `10a21a5` (merged 2026-09-10)
-**Date:** 2026-09-10
-**Status:** B0..B5 complete · **B6 complete** · **B7 is next**
+**Branch of Record:** `main`
+**Synchronized With:** `origin/main` @ `18961e8` (deployed 2026-09-13)
+**Date:** 2026-09-13
+**Status:** B0–B6 complete · Phase 1 (B8-A…B8-D, B9-A) deployed 2026-09-13 · **B8-E prepared, NOT applied** · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -23,21 +23,21 @@
 
 | # | Work | Where | Status |
 |---|---|---|---|
-| 1 | **B0** — baseline | hardening branch | ✅ Complete |
-| 2 | **B1** — database / security exposure | hardening branch | ✅ Complete in code · ⚠️ migration not yet applied |
-| 3 | **Signup-abuse incident (2026-09-09)** | `main` @ `10a21a5` | ✅ Complete in code · ⚠️ not verified in production |
-| 4 | **B2** — public portfolio XSS | hardening branch | ✅ Complete |
-| 5 | **B3** — auth & session hardening | hardening branch | ✅ Complete |
-| 6 | **B4** — governed email egress | hardening branch | ✅ Complete |
-| 7 | **B5** — rate limiting & abuse controls | hardening branch | ✅ Complete |
-| 8 | **B6** — queue & scheduler reliability | hardening branch | ✅ Complete in code · ⚠️ migration not yet applied |
+| 1 | **B0** — baseline | merged to `main` | ✅ Complete |
+| 2 | **B1** — database / security exposure | merged to `main` | ✅ Complete · migration applied in production |
+| 3 | **Signup-abuse incident (2026-09-09)** | `main` @ `10a21a5` | ✅ Complete · migration applied in production |
+| 4 | **B2** — public portfolio XSS | merged to `main` | ✅ Complete |
+| 5 | **B3** — auth & session hardening | merged to `main` | ✅ Complete |
+| 6 | **B4** — governed email egress | merged to `main` | ✅ Complete |
+| 7 | **B5** — rate limiting & abuse controls | merged to `main` | ✅ Complete |
+| 8 | **B6** — queue & scheduler reliability | merged to `main` | ✅ Complete · migration applied in production |
 | 9 | **B7** — route error contracts & auth wrapper | — | ⬜ **NEXT** |
 
 ---
 
 ## Baseline (B0) — ✅ Complete
 
-- **Branch:** `implementation/prodily-hardening`
+- **Branch:** `implementation/prodily-hardening` (merged to `main`; branch since deleted)
 - **Starting SHA:** `edc7436f634665fd7cf79ef82d4d89352bd56e43`
 - **Working-Tree State:** Clean
 - **Baseline Verification Results:**
@@ -102,7 +102,7 @@
 ### 4. Remaining Limitations & Environment Note
 
 - **Live Database Grants:** Could not be directly queried from this environment as live Supabase database credentials are not configured in local environment variables.
-- **Deployment Requirement:** Migration `20260910000001_security_hardening_b1.sql` must be applied to staging and verified before applying to production. **It has not been applied anywhere yet.**
+- **Deployment Requirement:** Migration `20260910000001_security_hardening_b1.sql` must be applied to staging and verified before applying to production. **Applied in production; verified 2026-09-13 (B14-A).**
 - **Migration renumbered 2026-09-10.** This migration was originally authored as `20260909000001_security_hardening_b1.sql`. The incident fix on `main` independently added `20260909000001_signup_abuse_email_governance.sql`, so after the merge two migrations shared the version `20260909000001` — the Supabase CLI keys `schema_migrations` on that version string, so the pair would not have applied correctly. The B1 file was renumbered (rather than the incident file) because the incident migration is the one already on `main` and closer to deployment, while B1's had not been applied anywhere. Only the filename and its header comment changed; the SQL body is untouched, and `rls.test.ts` locates the file by the `security_hardening_b1` substring rather than by version, so no test or code reference needed changing.
 
 ---
@@ -111,7 +111,7 @@
 
 **Commit:** `10a21a5` — *fix: harden signup email abuse and provider failover*
 **Merged into this branch:** `edfa701` (2026-09-10)
-**Source investigation:** [`audits/INCIDENT_2026-09-08_SIGNUP_EMAIL_ABUSE.md`](audits/INCIDENT_2026-09-08_SIGNUP_EMAIL_ABUSE.md)
+**Source investigation:** [`archive/INCIDENT_2026-09-08_SIGNUP_EMAIL_ABUSE.md`](archive/INCIDENT_2026-09-08_SIGNUP_EMAIL_ABUSE.md)
 
 This was an unplanned production response, executed on `main` outside the batch
 sequence. It lands squarely on top of scope that the locked plan had assigned to
@@ -375,7 +375,7 @@ messages. "Plan ref" points at the batch specification in
 | **B5** — atomic rate limiting + abuse controls | I-03 | ✅ Complete in code | Login & update-password fail-closed atomic rate limits implemented; telemetry leftmost-XFF trust removed; signup account enumeration closed; Turnstile deferred |
 | **B6** — queue & scheduler reliability | I-04, I-05 | ✅ Complete in code | Migration 20260910000002 added; atomic stale processing reclamation implemented; bounded concurrency (pool of 5, 90s deadline); exponential backoff with jitter and 120m ceiling; durable scheduler heartbeat in system_settings; retry-failed duplication prevented; queue state machine aligned; 124 test files / 1345 tests passing |
 | **B7** — shared auth + route/error contract | I-07 | ⬜ Outstanding | |
-| **B8** — typed data layer + DB correctness | I-08 | 🟢 **P0 correctness DEPLOYED; B8-E prepared, NOT applied** | B8-A…B8-D deployed to production at `164229a` and verified 2026-09-13: leaderboard column bug fixed (F-COR-1), authoritative XP total (F-COR-2), truncating queries bounded (F-COR-4), duplicate diagnostic run read-only (F-COR-3). `awardXp()` now treats SQLSTATE 23505 as already-awarded. **B8-E's destructive migration is written, corrected and held at `supabase/migrations/pending-approval/` — it has NOT been applied to any database.** Blocked on staging (P0-1, intentionally not provisioned). Typed repository layer (B8-F/B8-G) untouched. See [`PHASE1_IMPLEMENTATION_TODO.md`](audits/PHASE1_IMPLEMENTATION_TODO.md) |
+| **B8** — typed data layer + DB correctness | I-08 | 🟢 **P0 correctness DEPLOYED; B8-E prepared, NOT applied** | B8-A…B8-D deployed to production at `164229a` and verified 2026-09-13: leaderboard column bug fixed (F-COR-1), authoritative XP total (F-COR-2), truncating queries bounded (F-COR-4), duplicate diagnostic run read-only (F-COR-3). `awardXp()` now treats SQLSTATE 23505 as already-awarded. **B8-E's destructive migration is written, corrected and held at `supabase/migrations/pending-approval/` — it has NOT been applied to any database.** Blocked on staging (P0-1, intentionally not provisioned). Typed repository layer (B8-F/B8-G) untouched. See [`PHASE1_IMPLEMENTATION_TODO.md`](archive/PHASE1_IMPLEMENTATION_TODO.md) |
 | **B9** — admin controls + observability | I-10 | 🟢 **B9-A deployed** | Out-of-band critical alerting deployed at `164229a` (F-REL-4) — **inert until `ALERT_WEBHOOK_URL` is configured in production**. Correlation IDs, structured logging and retention (B9-B…B9-D) outstanding |
 | **B10** — frontend API/data layer | I-11 | ⬜ Outstanding | |
 | **B11** — design system migration | I-13 | ⬜ Outstanding | |

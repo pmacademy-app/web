@@ -5,7 +5,7 @@ import { AdminConsoleService } from '../admin/service'
 import { evaluateRateLimit } from '../rate-limit'
 import { renderEmailTemplate } from '../../emails'
 
-describe('End-to-End Production Remediation Audit & Fixes Test Suite', () => {
+describe('Production Remediation Invariants', () => {
   it('60-Second Persistent Rate Limiter enforced cooldown on duplicate request', async () => {
     const testEmail = `audit_user_${Date.now()}@example.com`
     const rateLimitKey = `verify_resend:${testEmail}`

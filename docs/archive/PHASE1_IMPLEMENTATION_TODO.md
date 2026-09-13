@@ -17,7 +17,7 @@
 | **B8-B** Authoritative XP total | ✅ **COMPLETE** | Low | No | — |
 | **B8-C** Bound truncating queries | ✅ **COMPLETE** | Low | No | — |
 | **B8-D** XP duplicate diagnostic | ✅ **COMPLETE** — ran against production | Low | **Report ready for review** | [report](B8D_XP_DUPLICATES_REPORT.txt) |
-| **B8-E** XP uniqueness constraint | ⏸️ **HELD at staging gate — app half shipped** | **High** | **BLOCKED: staging only** | [investigation](B8E_PRE_APPROVAL_INVESTIGATION.md) · [original](B8E_XP_UNIQUENESS.md) |
+| **B8-E** XP uniqueness constraint | ⏸️ **HELD at staging gate — app half shipped** | **High** | **BLOCKED: staging only** | [investigation](../PENDING_B8E_MIGRATION.md) · [original](B8E_XP_UNIQUENESS.md) |
 | **B9-A** Out-of-band alerting | ✅ **COMPLETE in code** | Low | **Needs `ALERT_WEBHOOK_URL`** | — |
 
 ---
@@ -53,7 +53,7 @@ it.
 
 No staging Supabase project exists. Creating one provisions real infrastructure under the
 account and was deliberately not done without explicit approval. Requirements are
-documented in [`B8E_PRE_APPROVAL_INVESTIGATION.md`](B8E_PRE_APPROVAL_INVESTIGATION.md) §7.
+documented in [`B8E_PRE_APPROVAL_INVESTIGATION.md`](../PENDING_B8E_MIGRATION.md) §7.
 
 ### B8-E remains separately gated
 
@@ -353,7 +353,7 @@ Two findings from that work:
   describes. Flagged for investigation.
 
 **That investigation was then carried out — see
-[`B8E_PRE_APPROVAL_INVESTIGATION.md`](B8E_PRE_APPROVAL_INVESTIGATION.md) — and it found
+[`B8E_PRE_APPROVAL_INVESTIGATION.md`](../PENDING_B8E_MIGRATION.md) — and it found
 the migration unsafe as authored.** `quiz_correct` is an intentional incremental top-up,
 not a bug; `user_reset` uses a constant `source_id`; and `flashcard` (823 rows, the
 largest source type) awards once per day per card. A blanket UNIQUE would have destroyed

@@ -5,7 +5,7 @@ import { requireAdminUser } from '../admin/guard'
 import * as supabaseModule from '../supabase'
 import type { Database } from '@/lib/supabase'
 
-describe('Phase 3 — Authentication & Session Lookup Optimization Test Suite', () => {
+describe('Authentication & Session Lookup Deduplication', () => {
   const originalEnv = process.env.ADMIN_EMAILS
 
   beforeEach(() => {

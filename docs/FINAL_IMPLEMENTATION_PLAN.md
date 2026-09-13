@@ -3,8 +3,8 @@
 **Status:** LOCKED — source of truth for all subsequent implementation work
 **Branch of record:** `docs/final-implementation-plan` · **Base:** `main` @ `2b8d281`
 **Date:** 2026-09-08
-**Supersedes for implementation purposes:** `docs/PRODUCTION_BLUEPRINT.md` (architectural baseline, retained for rationale)
-**Audits:** `docs/audits/ARCHITECTURE_AUDIT_STAGE1.md`, `SECURITY_AUDIT_STAGE2.md`, `FRONTEND_MOBILE_READINESS_AUDIT.md`, `RELIABILITY_OPERATIONS_AUDIT.md`
+**Supersedes for implementation purposes:** `docs/archive/PRODUCTION_BLUEPRINT.md` (architectural baseline, retained for rationale)
+**Audits:** `docs/archive/ARCHITECTURE_AUDIT_STAGE1.md`, `SECURITY_AUDIT_STAGE2.md`, `FRONTEND_MOBILE_READINESS_AUDIT.md`, `RELIABILITY_OPERATIONS_AUDIT.md`
 
 > **Authority.** Where this document and any audit or the blueprint disagree, **this document wins**. Decisions in §4 are locked and must not be re-litigated during implementation. If implementation discovers a concrete technical contradiction, stop the batch, report it, and get the decision revised — do not work around it silently.
 

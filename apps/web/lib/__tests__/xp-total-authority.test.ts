@@ -70,7 +70,7 @@ beforeEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('B8-B · getTotalXp reads the authoritative total (F-COR-2)', () => {
+describe('getTotalXp reads the authoritative total (F-COR-2)', () => {
   it('returns users.total_xp for a user whose ledger exceeds the PostgREST row cap', async () => {
     const { supabase, calls } = makeSupabase({
       userRow: { total_xp: TRUE_TOTAL },

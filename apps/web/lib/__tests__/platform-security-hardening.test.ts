@@ -48,7 +48,7 @@ vi.mock('@/lib/notifications/automations/service', () => ({
   },
 }))
 
-describe('Phase 8 — Platform Hardening, Security & Production Reliability Suite', () => {
+describe('Platform Hardening, Security & Production Reliability', () => {
   const originalEnv = process.env
 
   beforeEach(() => {

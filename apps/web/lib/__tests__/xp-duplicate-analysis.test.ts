@@ -24,7 +24,7 @@ function row(
   }
 }
 
-describe('B8-D · analyzeDuplicates', () => {
+describe('analyzeDuplicates', () => {
   it('reports nothing for a ledger with no collisions', () => {
     const report = analyzeDuplicates([
       row({ id: 'a', source_id: 'lesson-1' }),
@@ -156,7 +156,7 @@ describe('B8-D · analyzeDuplicates', () => {
   })
 })
 
-describe('B8-D · formatDuplicateReport', () => {
+describe('formatDuplicateReport', () => {
   it('states plainly that nothing was deleted', () => {
     const text = formatDuplicateReport(analyzeDuplicates([]))
     expect(text).toContain('READ ONLY')

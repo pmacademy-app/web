@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { generateCertificateCode, generateQrCodeSvg } from '../certificates'
 import { evaluateRateLimit } from '../rate-limit'
 
-describe('Pre-Launch Remediation Unit Test Suite', () => {
+describe('Remediation Unit Invariants', () => {
   it('generateQrCodeSvg creates ISO/IEC 18004 compliant QR matrix with rects', () => {
     const code = generateCertificateCode('test-user-123', 'full_curriculum')
     const url = `https://prodily.adityagangwani.me/verify/${code}`

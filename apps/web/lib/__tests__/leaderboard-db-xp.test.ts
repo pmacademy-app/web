@@ -107,7 +107,7 @@ beforeEach(() => {
   seedHealthyTables()
 })
 
-describe('B8-A · weekly leaderboard XP aggregation (F-COR-1)', () => {
+describe('weekly leaderboard XP aggregation (F-COR-1)', () => {
   it('requests xp_amount, not amount', async () => {
     const { getWeeklyLeaderboard } = await loadModule()
     await getWeeklyLeaderboard(supabase, USER_ID, WEEK_START)
@@ -176,7 +176,7 @@ describe('B8-A · weekly leaderboard XP aggregation (F-COR-1)', () => {
   })
 })
 
-describe('B8-C · bounded aggregation (F-COR-4)', () => {
+describe('bounded aggregation (F-COR-4)', () => {
   it('pages past the PostgREST row cap instead of truncating the roster', async () => {
     // 2,400 users: three pages at the helper's 1,000-row page size.
     tableRows.users = Array.from({ length: 2400 }, (_, i) => ({

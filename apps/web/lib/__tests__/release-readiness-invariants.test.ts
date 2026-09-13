@@ -62,7 +62,7 @@ function getSliceIds(startOrder: number, endOrder: number): string[] {
     .map((l) => l.id)
 }
 
-describe('Phase 9 — Production Readiness & Release Verification Suite', () => {
+describe('Production Readiness & Release Verification', () => {
 
   // ─── 1. Canonical Curriculum Registry & Structure Integrity ───────────────
   describe('1. Canonical Curriculum Structure & Map Invariants', () => {

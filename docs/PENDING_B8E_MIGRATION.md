@@ -23,7 +23,7 @@
 > ```
 >
 > Releasing it is a one-line `git mv` once staging validation passes — see
-> [`supabase/migrations/pending-approval/README.md`](../../supabase/migrations/pending-approval/README.md).
+> [`supabase/migrations/pending-approval/README.md`](../supabase/migrations/pending-approval/README.md).
 
 ---
 

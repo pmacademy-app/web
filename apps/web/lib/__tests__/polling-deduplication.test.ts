@@ -4,7 +4,7 @@ import { PATCH as notificationsPatch } from '../../app/api/notifications/route'
 import * as authLib from '../auth'
 import * as supabaseLib from '../supabase'
 
-describe('Phase 2 — Polling & Duplicate Request Reduction Test Suite', () => {
+describe('Polling & Duplicate Request Reduction', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })

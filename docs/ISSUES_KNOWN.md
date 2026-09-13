@@ -1,8 +1,8 @@
 # Known Issues & Production Verification Tracker — Prodily PM Academy
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Current Branch:** `email-provider-failover-implementation`  
-**Last Updated:** September 8, 2026  
+**Current Branch:** `main`  
+**Last Updated:** September 13, 2026  
 
 ---
 
@@ -25,7 +25,7 @@
 
 #### ISSUE-23: Signup Abuse Cleanup Pending Approval
 - **Status**: 🟠 Mitigated, cleanup awaiting explicit approval
-- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](audits/INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). `allowSignups` is currently `false` in production.
+- **Description**: 1,233 automated test/spam accounts created 2026-09-06/07 (see [`INCIDENT_2026-09-06_SIGNUP_ABUSE.md`](archive/INCIDENT_2026-09-06_SIGNUP_ABUSE.md)). `allowSignups` is currently `false` in production.
 - **Required Action**: (1) decide on a CAPTCHA provider before reopening signups, (2) approve or reject the proposed ban-not-delete cleanup of the 1,233 flagged accounts.
 - **Note**: the root-cause fixes (signup rate limiting, pre-dispatch daily quota enforcement, provider failover) are implemented and test-passing. Deployment requires migrations `20260907000001` and `20260908000001`.
 

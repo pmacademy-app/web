@@ -1,5 +1,5 @@
 /**
- * Batch B6: Queue & Scheduler Reliability Verification Suite
+ * Queue & Scheduler Reliability Verification Suite
  *
  * Verifies:
  * 1. Stale processing item reclamation (>15m threshold, max attempts, fresh item protection)
@@ -52,7 +52,7 @@ vi.mock('../monitoring/logger', () => ({
   logSystemError: vi.fn(),
 }))
 
-describe('Batch B6: Queue & Scheduler Reliability', () => {
+describe('Queue & Scheduler Reliability', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })

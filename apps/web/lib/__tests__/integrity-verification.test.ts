@@ -13,7 +13,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import type { CurriculumEntry } from '@/types'
 
-describe('Pre-Launch Remediation & Integrity Verification Suite', () => {
+describe('Integrity Verification', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
   })

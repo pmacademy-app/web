@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { dispatchClientNotificationEvent, subscribeClientNotificationEvent } from '../events/client-event-bus'
 import { useUsageTimeTracker, resetUsageTimeTrackerState } from '../../hooks/useUsageTimeTracker'
 
-describe('P0 Vercel Fluid Compute Polling Optimization Suite', () => {
+describe('Fluid Compute Polling Optimizations', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.restoreAllMocks()
