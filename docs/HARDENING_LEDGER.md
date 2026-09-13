@@ -3,7 +3,7 @@
 **Branch of Record:** `main`
 **Synchronized With:** `origin/main` @ `d2a59be` + B8-E applied 2026-09-13
 **Date:** 2026-09-13
-**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A and B14-B complete in code** on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
+**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B and B7-A complete in code** on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -555,6 +555,61 @@ changed except one test fixture — see below.
   unreviewed, expired, accepted, stale and moderate-severity paths.
 
 **Tests:** `lib/__tests__/b14b-ci-security-gates.test.ts` — 13 tests.
+
+---
+
+## Phase 2 — B7-A: Canonical actor resolution — ✅ Complete in code
+
+**Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
+**Date:** 2026-09-14
+
+**Scope, exactly as specified:** `apps/web/lib/api/actor.ts` and its test. Zero
+routes and zero existing helpers changed; nothing in production imports it yet.
+
+`resolveActor(request, policy)` answers "who is making this request?" in one place.
+It **delegates** rather than reimplements, which is the point of the batch:
+`requireAdminUser` keeps its service-role re-read of `is_admin` and its
+`access_denied` audit logging, and `getAuthenticatedUserFromRequest` keeps its
+bearer/cookie/refresh-token resolution and per-request WeakMap.
+
+**Actor is a discriminated union** — `anonymous`, `learner`, `admin`, `cron` — so a
+handler narrowed to `admin` reaches `userId` without a cast and one that is not,
+cannot.
+
+**Security properties, each pinned by a test:**
+
+- **Fail-closed.** `policy.allow` is mandatory and non-empty; an empty list throws
+  rather than defaulting to public.
+- **No escalation.** An unrecognised credential resolves to `anonymous` where the
+  policy permits it and is refused otherwise. It is never promoted to admin.
+- **A missing secret grants nothing.** An unset or empty `CRON_SECRET` refuses every
+  caller, rather than being read as "no check required".
+- **Constant-time cron comparison.** SHA-256 digests fed to `timingSafeEqual`;
+  hashing first is what makes unequal lengths safe, since a length guard would leak
+  the secret's length. This replaces the plain `===` bearer comparison the six cron
+  routes each hand-roll today, when B7-C migrates them.
+- **Policy-gated probing.** A route that does not accept cron never has its
+  `Authorization` header compared against the cron secret.
+- **Denial reasons stay internal.** The refusal carries a `reason` for logs and a
+  generic `code` for clients, preserving the I-03-B6 enumeration fix.
+- **Memoization preserved**, per request *and* per policy, order-insensitive.
+
+**Deviation from the roadmap, deliberate.** The roadmap lists `webhook` and
+`internal` as actor kinds. Neither is modelled:
+
+- `webhook` — `app/api/auth/send-email-hook` and `app/api/email/webhooks`
+  authenticate by HMAC over the **raw request body**. A resolver that read the body
+  would consume the stream the route still needs, and lifting that route-local
+  `verifyHookSecret` here would mean reimplementing it, which this batch exists to
+  avoid. Those routes keep their own verification until a body-aware policy is
+  designed. **Open for whichever batch migrates the webhook routes.**
+- `internal` — no mechanism distinct from cron or admin exists in the code today.
+  `app/api/admin/emails/production-send` uses `requireAdminUser` like any other
+  admin route. Modelling a kind nothing can return would be a lie in the type.
+
+**Tests:** `lib/__tests__/b7a-resolve-actor.test.ts` — 28 tests across actor kinds,
+fail-closed behaviour, policy precedence, memoization, secret comparison and
+actor shape.
 
 ---
 
