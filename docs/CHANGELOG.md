@@ -2,6 +2,25 @@
 
 All notable changes to **Prodily PM Academy** (`prodily-monorepo`) are documented in this file.
 
+## [B8-E — XP Event Uniqueness] — 2026-09-13
+
+Migration `20260913000001_xp_event_uniqueness_b8e.sql` applied to production at 18:15:34Z.
+**Destructive:** removed 31 duplicate `theory_read` XP events, 310 XP across 13 users.
+
+- Added a **partial** unique index over `(user_id, source_type, source_id)` scoped to the
+  six once-only sources: `theory_read`, `quiz_bonus`, `reflection`, `streak`,
+  `referral`, `capstone`. Repeatable sources — `quiz_correct` (incremental top-up),
+  `flashcard` (once per day per card) and `user_reset` — remain deliberately
+  unconstrained.
+- Affected users' `total_xp` and `level` re-derived from the ledger. All 13 reconcile
+  exactly; **no learner lost a level**; no unaffected user changed.
+- Uniqueness observed in production: a duplicate `theory_read` insert is refused with
+  SQLSTATE 23505, which `awardXp()` treats as already-awarded.
+- Executed **direct-to-production by explicit approval, without a staging project**.
+  Pre-migration backup: data-only PostgREST export (not a `pg_dump`).
+
+Execution record: [`archive/B8E_XP_UNIQUENESS_EXECUTION.md`](archive/B8E_XP_UNIQUENESS_EXECUTION.md).
+
 ## [Repository Cleanup] — 2026-09-13
 
 Deployed as `76bc600`. Housekeeping only — no application behaviour changed.
@@ -13,11 +32,11 @@ Deployed as `76bc600`. Housekeeping only — no application behaviour changed.
   protect. No test was deleted; all 1536 still pass.
 - Retired `docs/audits/`. Thirteen completed audits, incident investigations and batch
   records moved to [`archive/`](archive/) — retained as traceability, not guidance. The
-  B8-E investigation was promoted to [`PENDING_B8E_MIGRATION.md`](PENDING_B8E_MIGRATION.md)
+  B8-E investigation was promoted to [`PENDING_B8E_MIGRATION.md`](archive/B8E_XP_UNIQUENESS_EXECUTION.md)
   because it documents a pending operation rather than history.
 - Corrected three dead-code claims that were wrong: `MarkdownRenderer` and `QuizOption`
   are live, and `lib/hooks/useUsageTimeTracker.ts` is a tested re-export shim.
-- **B8-E remains held** in `supabase/migrations/pending-approval/` and was not applied.
+- **B8-E was held** in `supabase/migrations/pending-approval/` and not applied by this change. It was applied later the same day — see the B8-E entry above.
 
 
 ## [Email Reliability & Observability Pass] — 2026-09-08

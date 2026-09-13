@@ -1,43 +1,50 @@
 # `pending-approval/` — migrations held out of the auto-apply path
 
-Migrations in this directory are **written, reviewed, and deliberately not deployable.**
+Migrations placed here are **written, reviewed, and deliberately not deployable.**
 
 The Supabase CLI only reads `.sql` files at the top level of `supabase/migrations/`, so
 anything here is invisible to `supabase db push` and to the `deploy-supabase` CI job.
-Verified: with this directory populated, `supabase db push --dry-run` reports
-`Remote database is up to date`.
 
 ## Why this exists
 
-B14-A fixed the `deploy-supabase` job so that it actually runs. That was the right fix,
-and it means **any migration sitting in `supabase/migrations/` is applied to production
-automatically on the next merge to `main`** — no further human gate.
+B14-A fixed the `deploy-supabase` job so that it actually runs. That means **any
+migration sitting in `supabase/migrations/` is applied to production automatically on the
+next merge to `main`** — with no further human gate.
 
-For an additive migration that is fine. For a destructive one awaiting approval and
-staging validation, it is not. This directory is where such a migration waits.
+For an additive migration that is fine. For a destructive one awaiting approval, it is
+not. This directory is where such a migration waits.
 
 ## Currently held
 
-### `20260913000001_xp_event_uniqueness_b8e.sql` — B8-E / F-COR-3
+**Nothing.** The directory is empty by design; it stays in the repository so the next
+destructive migration has an obvious place to wait.
 
-**Blocked on:** staging validation. There is no staging Supabase project (P0-1).
+## Previously held
 
-Deletes 31 `theory_read` concurrency duplicates, removes 310 XP across 13 users, and
-adds a partial unique index over six once-only source types. Scope approved 2026-09-13;
-staging validation is the outstanding gate.
+`20260913000001_xp_event_uniqueness_b8e.sql` (B8-E / F-COR-3) was held here until it was
+approved and **applied to production on 2026-09-13 at 18:15:34Z**. It now lives in
+`supabase/migrations/` as part of the applied history.
 
-Full context: [`docs/PENDING_B8E_MIGRATION.md`](../../../docs/PENDING_B8E_MIGRATION.md).
+Execution record, including preflight numbers and the full post-migration
+reconciliation: [`docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md`](../../../docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md).
 
-## Releasing a held migration
+## Holding a migration
 
-Only after its gates are satisfied:
+```bash
+git mv supabase/migrations/<file>.sql supabase/migrations/pending-approval/
+npx supabase db push --dry-run   # must report upToDate
+```
+
+## Releasing one
+
+Only after its gates are satisfied — approval, backup, and whatever validation the change
+demands:
 
 ```bash
 git mv supabase/migrations/pending-approval/<file>.sql supabase/migrations/
-npx supabase db push --dry-run   # confirm it is now listed as pending
+npx supabase db push --dry-run   # confirm it is now the expected pending migration
+npx supabase db push
 ```
-
-Then merge. The CI job applies it.
 
 **Do not move a file out of here to "test something".** The next merge to `main` applies
 it to production.

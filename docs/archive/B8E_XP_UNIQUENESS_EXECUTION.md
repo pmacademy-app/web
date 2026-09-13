@@ -1,3 +1,136 @@
+# B8-E — XP Uniqueness: Execution Record
+
+**Status:** ✅ **APPLIED TO PRODUCTION — 2026-09-13 18:15:34–18:15:39Z**
+**Migration:** `supabase/migrations/20260913000001_xp_event_uniqueness_b8e.sql`
+**Executed by:** direct-to-production, **explicitly approved without a staging project**
+
+> This document began as a pre-approval investigation. It is retained in full below
+> because its analysis is what made the migration safe — it is the reason the original
+> blanket-uniqueness design was rejected. The execution record is at the top; the
+> investigation follows unchanged.
+
+---
+
+## Execution result
+
+### Decision
+
+Direct production execution was **explicitly approved** without staging. No staging
+Supabase project was created; P0-1 remains outstanding. This is recorded as a conscious
+decision, not an oversight: the migration was applied to production as its first and
+only execution.
+
+### Backup taken beforehand
+
+`backups/b8e-preapply-2026-09-13T1820Z/` — 45 tables, 18,764 rows, 9.1 MB, captured
+18:13:38Z, minutes before the apply.
+
+Verified before proceeding: all 45 SHA-256 digests re-checked independently; the 31
+target rows re-derived **from the backup file alone** yielding 31 rows / 310 XP / 13
+users, each with complete primary key and payload; gitignored and untracked.
+
+**Limitation, stated plainly: this is NOT a `pg_dump`.** It is a data-only PostgREST
+export, unencrypted, on local disk. `pg_dump`, `psql`, Docker and Podman are all absent
+from the execution host and no database password is available, so the
+`FINAL_IMPLEMENTATION_PLAN` §18 method could not be used. It captures no schema, roles,
+RLS policies, `auth` schema or storage objects — it is sufficient to restore the deleted
+rows, which is what this migration needed, and nothing more.
+
+### Preflight — 10/10, re-derived from live production
+
+| Check | Result |
+|---|---|
+| Deletion set | **exactly 31 rows** |
+| XP removed | **exactly 310** |
+| Affected users | **exactly 13** |
+| All rows `theory_read` | yes |
+| `quiz_correct` in deletion set | none |
+| `flashcard` in deletion set | none |
+| `user_reset` in deletion set | none |
+| Every deleted row has a surviving earlier sibling | yes |
+| Index violations remaining after deletion | 0 |
+| `users.total_xp` already matched ledger | 13/13 |
+
+Pre-migration totals and levels were captured for all 326 users
+(`preflight-snapshot.json`, alongside the backup) so reconciliation could be exact
+rather than approximate.
+
+### Applied
+
+```
+Applying migration 20260913000001_xp_event_uniqueness_b8e.sql...
+{upToDate:false,dryRun:false,migrations:[20260913000001_xp_event_uniqueness_b8e.sql]}
+```
+
+48 migrations now applied; `20260913000001` recorded remotely; `db push --dry-run`
+reports `upToDate`. No unrelated migration was applied — the pending set was exactly one.
+
+### Post-migration verification — 17/17
+
+**Deduplication**
+
+| Measure | Before | After |
+|---|---|---|
+| `xp_events` | 1639 | **1608** (−31) |
+| `theory_read` | 237 | **206** (−31) |
+| `quiz_correct` | 385 | **385** (unchanged) |
+| `flashcard` | 823 | **823** (unchanged) |
+| `user_reset` | 2 | **2** (unchanged) |
+
+All 31 target rows confirmed gone. Cross-checked against the backup export: **no row
+outside the target set was removed.**
+
+**Affected users — all 13 reconcile exactly on both `total_xp` and `level`**
+
+| User | Before | Δ | After | Level |
+|---|---|---|---|---|
+| ef4b0bad | 200 | −10 | 190 | L1 (unchanged) |
+| 216d27c3 | 725 | −50 | 675 | L2 (unchanged) |
+| b0ede5c5 | 4231 | −110 | 4121 | L5 (unchanged) |
+| c1602ad9 | 720 | −10 | 710 | L2 (unchanged) |
+| be1fb420 | 905 | −30 | 875 | L3 (unchanged) |
+| 96b048ce | 1137 | −20 | 1117 | L3 (unchanged) |
+| 5b570e09 | 449 | −10 | 439 | L2 (unchanged) |
+| 977f7392 | 98 | −10 | 88 | L1 (unchanged) |
+| 8e685dce | 544 | −10 | 534 | L2 (unchanged) |
+| b67abf63 | 454 | −10 | 444 | L2 (unchanged) |
+| 5964d91b | 200 | −10 | 190 | L1 (unchanged) |
+| 948a7345 | 660 | −10 | 650 | L2 (unchanged) |
+| 48aa23a8 | 2060 | −20 | 2040 | L4 (unchanged) |
+
+**No learner lost a level.** No unaffected user’s XP or level changed — verified against
+the full 326-user snapshot. `users.total_xp` matches the ledger sum for all 61 users
+with XP, confirming the step-3 trigger re-derivation worked.
+
+**Uniqueness — observed, not assumed**
+
+A duplicate `theory_read` insert against a deleted key was **refused with HTTP 409 /
+SQLSTATE 23505**, and wrote nothing: that key still holds exactly one row. The
+repeatable types remain unconstrained — 16 `quiz_correct` duplicate groups still exist
+and were untouched.
+
+**Application**
+
+Health 200 / DB connected; `/`, `/curriculum`, `/leaderboard`, `/login` all non-5xx;
+**0 `system_errors` since the migration.**
+
+### `awardXp()` 23505 handling — precise status
+
+The handling is **deployed** (shipped in `510f672`, live since `164229a`) and covered by
+9 unit tests, and the database-level refusal it depends on is now **observed in
+production**. What has *not* been observed is the two composed end-to-end: no XP has been
+awarded since the migration, so no real race has occurred to exercise the swallow path.
+Manufacturing one was deliberately avoided — it would alter real learner data.
+
+### Rollback
+
+`supabase/migrations/rollback/20260913000001_xp_event_uniqueness_b8e.down.sql` drops the
+index. **It does not restore the 31 deleted rows** — those come from the backup above, or
+not at all.
+
+---
+
+# Original pre-approval investigation
 # B8-E — Pre-Approval Investigation
 
 **Batch:** B8-E (Phase 1) · **Findings:** `F-COR-3`, plus three new
@@ -23,7 +156,7 @@
 > ```
 >
 > Releasing it is a one-line `git mv` once staging validation passes — see
-> [`supabase/migrations/pending-approval/README.md`](../supabase/migrations/pending-approval/README.md).
+> [`supabase/migrations/pending-approval/README.md`](../../supabase/migrations/pending-approval/README.md).
 
 ---
 

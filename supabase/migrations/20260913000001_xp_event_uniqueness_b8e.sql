@@ -5,7 +5,7 @@
 -- ⚠️  DESTRUCTIVE. This migration DELETES rows from public.xp_events.
 --     Do not apply without:
 --       1. a reviewed B8-D diagnostic report + the B8-E investigation
---          (docs/PENDING_B8E_MIGRATION.md),
+--          (docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md),
 --       2. explicit human approval to delete the excess rows,
 --       3. a fresh logical backup taken immediately beforehand.
 --     Deleted rows are recoverable ONLY from that backup.
@@ -124,7 +124,7 @@ WHERE u.id = a.user_id;
 -- `INSERT ... ON CONFLICT (cols)` target without restating its WHERE clause, and
 -- PostgREST cannot express that. The follow-up must therefore treat a unique-violation
 -- error (SQLSTATE 23505) as "already awarded" rather than using ON CONFLICT.
--- See docs/PENDING_B8E_MIGRATION.md §5.
+-- See docs/archive/B8E_XP_UNIQUENESS_EXECUTION.md §5.
 CREATE UNIQUE INDEX IF NOT EXISTS xp_events_once_only_source_unique
   ON public.xp_events (user_id, source_type, source_id)
   WHERE source_id IS NOT NULL

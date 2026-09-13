@@ -4,7 +4,7 @@
 **Status:** ⏸️ **AUTHORED, NOT APPLIED — BLOCKED ON HUMAN GATES**
 **Date:** 2026-09-13
 
-> ## ⚠️ SUPERSEDED IN PART — read [`B8E_PRE_APPROVAL_INVESTIGATION.md`](../PENDING_B8E_MIGRATION.md) first
+> ## ⚠️ SUPERSEDED IN PART — read [`B8E_PRE_APPROVAL_INVESTIGATION.md`](B8E_XP_UNIQUENESS_EXECUTION.md) first
 >
 > The investigation that this document asked for (§2, "filed for a human decision") was
 > carried out and **found the migration described below to be unsafe**. Of the 50 rows it
