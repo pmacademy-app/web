@@ -113,12 +113,28 @@ jobs:
       - name: Run Playwright E2E Tests
         run: npm run test:e2e
 
+  # Applies pending migrations in supabase/migrations/ to the linked project.
+  #
+  # This job previously guarded its only step with
+  #   if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != ''
+  # which made a missing secret indistinguishable from a successful deploy: the step
+  # was skipped, the job reported success, and nothing said the schema had not moved.
+  # F-REL-7 / B14-A. Credential presence is now asserted in its own step that FAILS,
+  # and the applied state is verified after the push rather than assumed.
   deploy-supabase:
     needs: build-and-validate
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
+    env:
+      # Secrets reach the scripts as environment variables rather than as `${{ }}`
+      # interpolations inside `run:` bodies, so no secret is substituted into the
+      # rendered script text. SUPABASE_ACCESS_TOKEN is read by the CLI directly.
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -128,11 +144,61 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Link Project & Deploy Migrations
-        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != ''
+      # Fail loudly rather than skipping. A migration job that silently does nothing is
+      # worse than one that fails: the schema the application expects is simply absent,
+      # and every downstream check reads green.
+      - name: Assert Supabase deployment credentials are present
         run: |
-          npx supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}" --password "${{ secrets.SUPABASE_DB_PASSWORD }}" --yes
-          npx supabase db push --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          set -euo pipefail
+          missing=""
+          [ -n "${SUPABASE_ACCESS_TOKEN:-}" ] || missing="${missing} SUPABASE_ACCESS_TOKEN"
+          [ -n "${SUPABASE_PROJECT_ID:-}" ]   || missing="${missing} SUPABASE_PROJECT_ID"
+          [ -n "${SUPABASE_DB_PASSWORD:-}" ]  || missing="${missing} SUPABASE_DB_PASSWORD"
+          if [ -n "${missing}" ]; then
+            echo "::error title=Supabase migration deploy cannot run::Missing repository secret(s):${missing}. Migrations in supabase/migrations/ were NOT applied. Configure these secrets, then re-run this workflow. Do not treat this run as deployed."
+            exit 1
+          fi
+          echo "✓ All three Supabase deployment secrets are present."
+
+      - name: Link Supabase project
+        run: |
+          set -euo pipefail
+          npx supabase link --project-ref "${SUPABASE_PROJECT_ID}" --password "${SUPABASE_DB_PASSWORD}" --yes
+
+      # Recorded before and after so a run's log answers "what did this change?" without
+      # anyone needing production access.
+      - name: Migration state BEFORE push
+        run: |
+          set -euo pipefail
+          npx supabase migration list --linked
+
+      - name: Push pending migrations
+        run: |
+          set -euo pipefail
+          npx supabase db push --password "${SUPABASE_DB_PASSWORD}"
+
+      - name: Migration state AFTER push
+        run: |
+          set -euo pipefail
+          npx supabase migration list --linked
+
+      # The push above exits non-zero on failure, but a partial or no-op apply would
+      # still pass. A dry run is the CLI's own answer to "is anything still pending?",
+      # so the job only succeeds when the remote schema actually matches the repository.
+      - name: Verify no migrations remain pending
+        run: |
+          set -euo pipefail
+          output="$(npx supabase db push --dry-run --password "${SUPABASE_DB_PASSWORD}" 2>&1)"
+          echo "${output}"
+          # `upToDate` is a structured field in the CLI's JSON output and is the primary
+          # signal; the prose forms are accepted as a fallback across CLI versions.
+          if echo "${output}" | grep -qE '"upToDate"[[:space:]]*:[[:space:]]*true'; then
+            echo "✓ Remote schema matches supabase/migrations/."
+            exit 0
+          fi
+          if echo "${output}" | grep -qiE 'Remote database is up to date|no migrations to apply'; then
+            echo "✓ Remote schema matches supabase/migrations/."
+            exit 0
+          fi
+          echo "::error title=Migrations still pending after push::supabase db push --dry-run did not report the remote database as up to date. The deploy may be partial. Review the migration state output above before treating this deploy as complete."
+          exit 1
