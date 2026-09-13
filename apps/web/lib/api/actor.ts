@@ -183,3 +183,20 @@ export function resolveActor(request: Request, policy: ActorPolicy): Promise<Act
   byPolicy.set(key, promise)
   return promise
 }
+
+/**
+ * The user id behind a `learner` or `admin` actor.
+ *
+ * Every route whose policy is learner- or admin-only needs this id, and the
+ * discriminated union means reading `actor.userId` requires narrowing at each
+ * call site. This does the narrowing once.
+ *
+ * It throws for `anonymous` and `cron`, which is unreachable under such a policy.
+ * The throw exists so that a route which later widens its policy without updating
+ * its handler fails loudly, rather than silently querying the database for an
+ * empty id.
+ */
+export function requireUserId(actor: Actor): string {
+  if (actor.kind === 'learner' || actor.kind === 'admin') return actor.userId
+  throw new Error(`requireUserId: actor kind '${actor.kind}' carries no user id`)
+}

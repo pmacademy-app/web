@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { createDefaultNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 
@@ -7,11 +8,15 @@ interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
 }
 
-export async function GET(request: Request) {
-  const authUser = await getAuthenticatedUserFromRequest(request)
-  if (!authUser) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.notifications.read',
+    domain: 'api',
+    summary: 'Unexpected failure reading notification preferences',
+  },
+  async ({ actor }) => {
+    const authUserId = requireUserId(actor)
 
   const supabase = createServiceRoleClient()
 
@@ -19,17 +24,17 @@ export async function GET(request: Request) {
     const { data: userRow } = await supabase
       .from('users')
       .select('timezone')
-      .eq('id', authUser.id)
+      .eq('id', authUserId)
       .single()
 
     const { data: prefRow } = await supabase
       .from('user_notification_preferences')
       .select('*')
-      .eq('user_id', authUser.id)
+      .eq('user_id', authUserId)
       .maybeSingle()
 
     if (!prefRow) {
-      const defaultPrefs = createDefaultNotificationPreferences(authUser.id)
+      const defaultPrefs = createDefaultNotificationPreferences(authUserId)
       return NextResponse.json({
         success: true,
         preferences: defaultPrefs,
@@ -43,16 +48,22 @@ export async function GET(request: Request) {
       timezone: (userRow as unknown as { timezone?: string })?.timezone || 'UTC',
     })
   } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Failed to fetch preferences'
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 })
+    // Rethrown: the wrapper records the incident and returns generic copy with an
+    // errorId. This branch previously sent err.message to the client.
+    throw err
   }
-}
+  }
+)
 
-export async function PATCH(request: Request) {
-  const authUser = await getAuthenticatedUserFromRequest(request)
-  if (!authUser) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export const PATCH = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.notifications.update',
+    domain: 'api',
+    summary: 'Unexpected failure updating notification preferences',
+  },
+  async ({ request, actor }) => {
+    const authUserId = requireUserId(actor)
 
   try {
     const body = await request.json()
@@ -62,7 +73,7 @@ export async function PATCH(request: Request) {
       .from('user_notification_preferences') as unknown as DBChain)
       .upsert(
         {
-          user_id: authUser.id,
+          user_id: authUserId,
           ...body,
           updated_at: new Date().toISOString(),
         },
@@ -75,7 +86,9 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ success: true, updated: body })
   } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Failed to update preferences'
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 })
+    // Rethrown: the wrapper records the incident and returns generic copy with an
+    // errorId. This branch previously sent err.message to the client.
+    throw err
   }
-}
+  }
+)

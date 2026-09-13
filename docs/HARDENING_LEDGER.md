@@ -3,7 +3,7 @@
 **Branch of Record:** `main`
 **Synchronized With:** `origin/main` @ `d2a59be` + B8-E applied 2026-09-13
 **Date:** 2026-09-13
-**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B, B7-A, B7-B, B7-C and B7-D complete in code.** Next batch: B7-E (learner routes) on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
+**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B, B7-A…B7-D and B7-F complete in code.** B7-E (learner routes) is still outstanding and was skipped by request on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -374,7 +374,7 @@ messages. "Plan ref" points at the batch specification in
 | **B4** — email gateway + signup ordering | I-04 | ✅ Complete in code | Direct transports unified through canonical failover registry; kill switch enforced; timeouts standardized; durable side effects verification-gated |
 | **B5** — atomic rate limiting + abuse controls | I-03 | ✅ Complete in code | Login & update-password fail-closed atomic rate limits implemented; telemetry leftmost-XFF trust removed; signup account enumeration closed; Turnstile deferred |
 | **B6** — queue & scheduler reliability | I-04, I-05 | ✅ Complete in code | Migration 20260910000002 added; atomic stale processing reclamation implemented; bounded concurrency (pool of 5, 90s deadline); exponential backoff with jitter and 120m ceiling; durable scheduler heartbeat in system_settings; retry-failed duplication prevented; queue state machine aligned; 124 test files / 1345 tests passing |
-| **B7** — shared auth + route/error contract | I-07 | 🟡 **B7-A…B7-D complete in code** | Foundation (`lib/api/actor.ts`, `lib/api/with-route.ts`), wave 1 (six cron routes) and wave 2 (eight auth routes, plus the F-SEC-12 query-string secret removed). `send-email-hook` and `callback` are documented architectural exceptions. B7-E onwards untouched |
+| **B7** — shared auth + route/error contract | I-07 | 🟡 **B7-A…B7-D and B7-F complete in code** | Foundation, cron wave (6), auth wave (8, plus F-SEC-12 closed) and settings wave (11, plus N-2 and N-3 closed). `send-email-hook` and `callback` are documented architectural exceptions. **B7-E (learner routes) is skipped and still outstanding**; B7-G/H untouched |
 | **B8** — typed data layer + DB correctness | I-08 | 🟢 **P0 correctness DEPLOYED; B8-E prepared, NOT applied** | B8-A…B8-D deployed to production at `164229a` and verified 2026-09-13: leaderboard column bug fixed (F-COR-1), authoritative XP total (F-COR-2), truncating queries bounded (F-COR-4), duplicate diagnostic run read-only (F-COR-3). `awardXp()` now treats SQLSTATE 23505 as already-awarded. **B8-E applied to production 2026-09-13 18:15:34Z** — 31 `theory_read` duplicates removed, 310 XP across 13 users, scoped partial unique index over six once-only source types. 17/17 post-migration checks passed. Executed direct-to-production by explicit approval; no staging project was used (P0-1 remains outstanding). Typed repository layer (B8-F/B8-G) untouched. See [`PHASE1_IMPLEMENTATION_TODO.md`](archive/PHASE1_IMPLEMENTATION_TODO.md) |
 | **B9** — admin controls + observability | I-10 | 🟢 **B9-A deployed** | Out-of-band critical alerting deployed at `164229a` (F-REL-4) — **inert until `ALERT_WEBHOOK_URL` is configured in production**. Correlation IDs, structured logging and retention (B9-B…B9-D) outstanding |
 | **B10** — frontend API/data layer | I-11 | 🟡 **B10-A complete in code** | Error-boundary structure corrected (F-COR-5) and a single canonical client logout helper introduced (F-COR-6). Dead-code removal (I-12-B5) was already closed by the 2026-09-13 cleanup pass. B10-B…B10-D (typed API client, SWR adoption) outstanding |
@@ -910,6 +910,89 @@ into a response body, and migration scope including both exceptions.
 **Production verification: NOT performed.** The hook *configuration* was verified
 manually; the deployed behaviour after removing the branch has not been exercised.
 The procedure is recorded in ISSUE-27.
+
+---
+
+## Phase 2 — B7-F: Settings routes and the profile leaks — ✅ Complete in code
+
+**Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
+**Date:** 2026-09-14
+
+**Count correction.** The roadmap says "the settings routes (12)". `app/api/settings/`
+contains **11** route files. All 11 are migrated; there is no twelfth.
+
+| Route | Methods | Notes |
+|---|---|---|
+| `settings/profile` | GET, POST | N-2 and N-3 both closed here |
+| `settings/portfolio` | GET, POST | typed validation boundary, see below |
+| `settings/notifications` | GET, PATCH | both handlers leaked `err.message` |
+| `settings/security` | POST | password change; re-auth needs the caller's own address |
+| `settings/security/change-email` | GET, POST | keeps its per-user rate limit |
+| `settings/delete-account` | POST | still clears session cookies on success |
+| `settings/reset/{xp,streak,progress,flashcards,skill-radar}` | POST | all five leaked `error.message` |
+
+### N-2 — https-only on write, without breaking stored data
+
+The obvious move — tightening `validateOptionalUrl` to https — would have been a
+silent regression. That function has **two** callers with different jobs:
+
+- **Read-side**: `components/portfolio/PortfolioHero.tsx` and
+  `generatePersonJsonLd()` use it to decide whether a *stored* value is safe to
+  emit as an `href`. Tightening it would have un-rendered the portfolio links of
+  every learner who saved an `http://` address before this batch.
+- **Write-side**: the profile schema and `updatePortfolioSettings()`.
+
+So `validateWritableUrl()` is a **new, separate** function in `lib/portfolio.ts`:
+https-only, used by both write paths. `validateOptionalUrl` is unchanged and keeps
+accepting `http:` — it is an XSS guard against `javascript:`/`data:`, not a policy
+gate. The roadmap's requirement that "validation is write-side only" is satisfied
+by construction rather than by convention, and a test asserts the two functions
+disagree about `http://`.
+
+**Client checked, as the roadmap requires.** `components/settings/ProfileSettingsTab.tsx`
+already uses `type="url"` with `https://…` placeholders on all three fields and
+never submits `http://` itself. No client change was needed.
+
+### N-3 — no raw exception text on the wire
+
+Nine handlers across seven files returned `error.message` to an authenticated
+learner. Every one now rethrows, so `withRoute` records a structured incident and
+returns generic copy plus a correlating `errorId`.
+
+`settings/portfolio` needed more than a rethrow: `updatePortfolioSettings()`
+throws both learner-fixable rejections ("This username is already taken", "…must
+start with https://") and genuine faults, and the old catch returned *both* as
+`error.message`. A new `PortfolioValidationError` in `lib/portfolio-db.ts` makes
+that boundary explicit — the route maps it to a 400 `VALIDATION` with the exact
+message, and everything else is rethrown and genericised. Useful feedback is kept;
+driver text cannot escape.
+
+### One addition to the foundation
+
+`requireUserId(actor)` in `lib/api/actor.ts`. Reading `actor.userId` requires
+narrowing the discriminated union at every call site; this narrows once. It throws
+for `anonymous`/`cron` — unreachable under a learner- or admin-only policy — so a
+route that later widens its policy without updating its handler fails loudly
+rather than querying for an empty id. (This is the helper removed as speculative
+during B7-A; it now has 11 consumers, with 37 more in B7-G1.)
+
+### Behaviour changes
+
+- **Unauthenticated responses are the canonical envelope.** Status stays 401; the
+  body gains `success: false` and `code: 'UNAUTHORIZED'`, and the prose changes
+  from each route's bespoke wording to the wrapper's generic copy. Two existing
+  assertions checked the prose and now assert `code`, which is the stable contract.
+- **`http://` is refused on write.** Previously accepted. Stored values are
+  unaffected on read.
+- **Raw exception text no longer reaches the client** on the nine handlers above.
+
+**Tests:** `lib/__tests__/b7f-settings-migration.test.ts` — 17 tests covering the
+https-only write policy, the deliberately-unchanged read guard, `http://` rejected
+on every URL field, a valid https profile still saving, a profile saving with the
+URL fields empty, an exception yielding generic copy plus an `errorId` with no
+driver text, the canonical 401, malformed JSON, and migration scope. Two existing
+suites were updated to the canonical envelope, and `safe-json-ld.test.ts` gained an
+explicit `http://`-rejection case.
 
 ---
 

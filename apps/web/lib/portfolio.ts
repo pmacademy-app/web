@@ -59,6 +59,29 @@ export function validateOptionalUrl(url?: string | null): boolean {
 }
 
 /**
+ * Write-side URL policy: **https only** (N-2).
+ *
+ * Deliberately a second function rather than a tightening of
+ * `validateOptionalUrl`. The two answer different questions:
+ *
+ * - `validateOptionalUrl` asks *"is this stored value safe to render as a link?"*
+ *   and guards the public portfolio and the JSON-LD against `javascript:` and
+ *   `data:` URLs. It must keep accepting `http:` — learners who saved an `http://`
+ *   address before this batch would otherwise have their links silently disappear
+ *   from their own portfolio. Validation here is write-side only.
+ * - `validateWritableUrl` asks *"may we accept this as new input?"* and is where
+ *   the locked plan's https-only allowlist belongs.
+ */
+export function validateWritableUrl(url?: string | null): boolean {
+  if (!url || !url.trim()) return true
+  try {
+    return new URL(url.trim()).protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+/**
  * Generates schema.org Person JSON-LD for public portfolio SEO.
  */
 export function generatePersonJsonLd({

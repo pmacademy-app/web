@@ -13,7 +13,7 @@ import type { Database } from '@/lib/supabase'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { getSkillRadarSummary, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
-import { validateUsername, validateOptionalUrl } from '@/lib/portfolio'
+import { validateUsername, validateWritableUrl } from '@/lib/portfolio'
 import { calculatePortfolioReadiness, calculatePortfolioVerification, type PortfolioVerificationOverride } from '@/lib/portfolio-readiness'
 import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
@@ -414,6 +414,24 @@ export async function getLearnerSubmittedCapstones(
 /**
  * Retrieves portfolio settings for the authenticated user.
  */
+/**
+ * A portfolio-settings rejection the learner caused and can fix — a taken
+ * username, a non-https URL, a capstone that is not theirs.
+ *
+ * Typed so the route can answer 400 with this exact message while everything else
+ * that throws from this module stays an unexpected fault and is genericised by
+ * `withRoute`. Before B7-F the settings route returned `error.message` for both
+ * cases, which is how a driver error could have reached a learner (N-3).
+ *
+ * The message must therefore always be copy we wrote, never provider text.
+ */
+export class PortfolioValidationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'PortfolioValidationError'
+  }
+}
+
 export async function getPortfolioSettings(
   supabase: SupabaseClient<Database>,
   userId: string
@@ -473,20 +491,21 @@ export async function updatePortfolioSettings(
   // 1. Validate username
   const usernameCheck = validateUsername(settings.username)
   if (!usernameCheck.isValid) {
-    throw new Error(usernameCheck.reason || 'Invalid username.')
+    throw new PortfolioValidationError(usernameCheck.reason || 'Invalid username.')
   }
 
   const cleanUsername = settings.username.trim().toLowerCase()
 
-  // 2. Validate URLs
-  if (!validateOptionalUrl(settings.linkedinUrl)) {
-    throw new Error('LinkedIn URL must begin with http:// or https://')
+  // 2. Validate URLs. https-only on write (N-2); stored http:// values keep
+  //    rendering, because the read-side guard is a separate function.
+  if (!validateWritableUrl(settings.linkedinUrl)) {
+    throw new PortfolioValidationError('LinkedIn URL must start with https://')
   }
-  if (!validateOptionalUrl(settings.githubUrl)) {
-    throw new Error('GitHub URL must begin with http:// or https://')
+  if (!validateWritableUrl(settings.githubUrl)) {
+    throw new PortfolioValidationError('GitHub URL must start with https://')
   }
-  if (!validateOptionalUrl(settings.websiteUrl)) {
-    throw new Error('Website URL must begin with http:// or https://')
+  if (!validateWritableUrl(settings.websiteUrl)) {
+    throw new PortfolioValidationError('Website URL must start with https://')
   }
 
   // 3. Check for unique username collision
@@ -498,7 +517,7 @@ export async function updatePortfolioSettings(
     .limit(1)) as unknown as { data: { id: string }[] | null }
 
   if (existingUsers && existingUsers.length > 0) {
-    throw new Error('This username is already taken by another user.')
+    throw new PortfolioValidationError('This username is already taken by another user.')
   }
 
   // 4. Update user record
@@ -535,7 +554,7 @@ export async function updatePortfolioSettings(
         .maybeSingle()) as unknown as { data: { id: string; user_id: string; status: string } | null }
 
       if (!capstoneRec) {
-        throw new Error('Selected featured capstone does not exist or does not belong to you.')
+        throw new PortfolioValidationError('Selected featured capstone does not exist or does not belong to you.')
       }
 
       updatePayload.featured_capstone_id = featId

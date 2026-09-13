@@ -1,26 +1,20 @@
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { resetStreak } from '@/lib/settings/settings-service'
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.reset.streak',
+    domain: 'api',
+    summary: 'Unexpected failure while resetting a learner streak',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    await resetStreak(supabase, user.id)
+    await resetStreak(supabase, requireUserId(actor))
 
     return NextResponse.json({ success: true })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to reset streak.'
-    console.error('[API POST /api/settings/reset/streak] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)

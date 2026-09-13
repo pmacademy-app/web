@@ -101,6 +101,33 @@ ISSUE-27.
 
 ---
 
+## 4b. Profile URL Validation (N-2)
+
+Two functions, deliberately separate, because they answer different questions:
+
+| Function | Question | Accepts |
+|---|---|---|
+| `validateOptionalUrl` | is this **stored** value safe to render as a link? | `http:`, `https:` |
+| `validateWritableUrl` | may we accept this as **new input**? | `https:` only |
+
+`validateOptionalUrl` guards the public portfolio and the JSON-LD against
+`javascript:` and `data:` URLs. It must keep accepting `http:`: tightening it
+would have silently un-rendered the links of every learner who saved an `http://`
+address before B7-F. Validation is write-side only.
+
+`validateWritableUrl` is where the locked plan's https-only allowlist lives. Both
+write paths use it — the `app/api/settings/profile` schema and
+`updatePortfolioSettings()`.
+
+**Learner-fixable rejections are typed.** `PortfolioValidationError` separates a
+message the learner should see (taken username, non-https URL, a capstone that is
+not theirs) from a genuine fault. The route answers 400 with the former and
+rethrows the latter into `withRoute`, which genericises it. Before B7-F both
+returned `error.message`, which is how a driver error carrying a connection string
+could have reached an authenticated learner (N-3).
+
+---
+
 ## 5. CI Supply-Chain & Secret-Scanning Gates
 
 Two gates run on every push and pull request, in the `security-audit` job of

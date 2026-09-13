@@ -1,28 +1,28 @@
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { deleteAccount } from '@/lib/settings/settings-service'
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.delete_account',
+    domain: 'api',
+    summary: 'Unexpected failure while deleting a learner account',
+  },
+  async ({ actor }) => {
+    const userId = requireUserId(actor)
 
     // Use service-role client for admin operations (bypasses RLS, has auth.admin access)
     const supabase = createServiceRoleClient()
 
     // 1. Delete all application-owned data rows (cascades through all user tables)
-    await deleteAccount(supabase, user.id)
+    await deleteAccount(supabase, userId)
 
     // 2. Permanently delete the Supabase Auth user — this is the critical step that
     //    prevents the user from logging in again. Requires service_role key.
-    const { error: authDeleteError } = await supabase.auth.admin.deleteUser(user.id)
+    const { error: authDeleteError } = await supabase.auth.admin.deleteUser(userId)
     if (authDeleteError) {
       // If auth deletion fails, log the error but still return success since data
       // is already cleaned. The user can no longer access any application data.
@@ -35,9 +35,5 @@ export async function POST(request: Request) {
     response.cookies.delete('sb-access-token')
     response.cookies.delete('sb-refresh-token')
     return response
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to delete account.'
-    console.error('[API POST /api/settings/delete-account] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)

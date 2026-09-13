@@ -66,7 +66,9 @@ describe('Settings Change Password API Endpoint Unit Tests', () => {
     expect(res.status).toBe(401)
     const json = await res.json()
     expect(json.success).toBe(false)
-    expect(json.error).toContain('Unauthorized')
+    // B7-F: canonical ADR-006 envelope. `code` is the stable contract; the prose
+    // changed to the wrapper's generic copy.
+    expect(json.code).toBe('UNAUTHORIZED')
   })
 
   it('2. Rejects short new password (< 6 chars) with 400', async () => {

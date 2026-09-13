@@ -278,6 +278,25 @@ describe('B7-A — resolveActor: cron secret comparison', () => {
   })
 })
 
+describe('B7-A — requireUserId', () => {
+  it('returns the id for the two actor kinds that carry one', async () => {
+    const { requireUserId } = await import('@/lib/api/actor')
+
+    expect(requireUserId({ kind: 'learner', userId: 'u1', email: null })).toBe('u1')
+    expect(requireUserId({ kind: 'admin', userId: 'a1', email: 'a@b.c' })).toBe('a1')
+  })
+
+  it('throws for an actor kind that has no user id', async () => {
+    const { requireUserId } = await import('@/lib/api/actor')
+
+    // Unreachable under a learner- or admin-only policy; it exists so a route that
+    // widens its policy without updating its handler fails loudly rather than
+    // silently querying for an empty id.
+    expect(() => requireUserId({ kind: 'anonymous' })).toThrow(/anonymous/)
+    expect(() => requireUserId({ kind: 'cron' })).toThrow(/cron/)
+  })
+})
+
 describe('B7-A — resolveActor: learner shape', () => {
   it('carries a null email when the provider has none', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue({ id: 'user-2', email: undefined })

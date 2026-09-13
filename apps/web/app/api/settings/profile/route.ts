@@ -1,96 +1,71 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+
+import { RouteError, withRoute } from '@/lib/api/with-route'
+import { validateWritableUrl } from '@/lib/portfolio'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { validateOptionalUrl } from '@/lib/portfolio'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
 }
 
+/**
+ * N-2: the URL fields are https-only on write. `validateWritableUrl` is separate
+ * from the read-side `validateOptionalUrl` on purpose — see the comment on it.
+ * Learners whose stored value is `http://` keep rendering; they are only asked
+ * for https when they next save.
+ */
+const urlField = (label: string) =>
+  z
+    .string()
+    .max(500, `${label} must be 500 characters or fewer.`)
+    .refine((url) => !url || validateWritableUrl(url), {
+      message: `${label} must start with https://`,
+    })
+    .optional()
+    .nullable()
+
 export const profileUpdateSchema = z.object({
   name: z.string().max(100, 'Name must be 100 characters or fewer.').optional().nullable(),
   bio: z.string().max(500, 'Bio must be 500 characters or fewer.').optional().nullable(),
-  linkedin_url: z
-    .string()
-    .max(500, 'LinkedIn URL must be 500 characters or fewer.')
-    .refine((url) => !url || validateOptionalUrl(url), {
-      message: 'LinkedIn URL must start with http:// or https://',
-    })
-    .optional()
-    .nullable(),
-  github_url: z
-    .string()
-    .max(500, 'GitHub URL must be 500 characters or fewer.')
-    .refine((url) => !url || validateOptionalUrl(url), {
-      message: 'GitHub URL must start with http:// or https://',
-    })
-    .optional()
-    .nullable(),
-  website_url: z
-    .string()
-    .max(500, 'Website URL must be 500 characters or fewer.')
-    .refine((url) => !url || validateOptionalUrl(url), {
-      message: 'Website URL must start with http:// or https://',
-    })
-    .optional()
-    .nullable(),
+  linkedin_url: urlField('LinkedIn URL'),
+  github_url: urlField('GitHub URL'),
+  website_url: urlField('Website URL'),
 })
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.profile.read',
+    domain: 'api',
+    summary: 'Unexpected failure reading learner profile settings',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
     const { data: profile, error } = (await (supabase
       .from('users') as unknown as DBChain)
       .select('name, avatar_url, bio, linkedin_url, github_url, website_url, is_portfolio_public, username')
-      .eq('id', user.id)
+      .eq('id', actor.kind === 'learner' ? actor.userId : '')
       .maybeSingle()) as unknown as { data: Record<string, unknown> | null; error: unknown }
 
     if (error) {
-      return NextResponse.json({ error: 'Failed to fetch user profile.' }, { status: 500 })
+      throw new RouteError(500, 'SERVER_ERROR', 'Failed to fetch user profile.')
     }
 
     return NextResponse.json({ success: true, profile })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'An error occurred.'
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
-    let rawBody: unknown
-    try {
-      rawBody = await request.json()
-    } catch {
-      return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 })
-    }
-
-    const parsed = profileUpdateSchema.safeParse(rawBody)
-    if (!parsed.success) {
-      const errorMsg = parsed.error.issues[0]?.message || 'Invalid profile settings.'
-      return NextResponse.json({ error: errorMsg }, { status: 400 })
-    }
-
-    const { name, bio, linkedin_url, github_url, website_url } = parsed.data
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.profile.update',
+    domain: 'api',
+    summary: 'Unexpected failure updating learner profile settings',
+    body: profileUpdateSchema,
+  },
+  async ({ actor, body }) => {
+    const { name, bio, linkedin_url, github_url, website_url } = body
 
     const supabase = createServiceRoleClient()
     const { error } = await (supabase
@@ -102,16 +77,16 @@ export async function POST(request: Request) {
         github_url: typeof github_url === 'string' && github_url.trim() ? github_url.trim() : null,
         website_url: typeof website_url === 'string' && website_url.trim() ? website_url.trim() : null,
       })
-      .eq('id', user.id)
+      .eq('id', actor.kind === 'learner' ? actor.userId : '')
 
     if (error) {
+      // N-3: the driver error is logged, never returned. Before B7-F the outer
+      // catch on this route sent `error.message` straight to an authenticated
+      // learner, which can carry a connection string.
       console.error('[API POST /api/settings/profile] Error updating profile:', error)
-      return NextResponse.json({ error: 'Failed to update profile settings.' }, { status: 400 })
+      throw new RouteError(400, 'SERVER_ERROR', 'Failed to update profile settings.')
     }
 
     return NextResponse.json({ success: true })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'An error occurred.'
-    return NextResponse.json({ error: message }, { status: 400 })
   }
-}
+)

@@ -1,25 +1,26 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { resetProgress } from '@/lib/settings/settings-service'
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.reset.progress',
+    domain: 'api',
+    summary: 'Unexpected failure while resetting learner progress',
+  },
+  async ({ request, actor }) => {
+    // No body schema: the single optional field is tolerated in any shape, as
+    // before migration, so a malformed body still resets everything rather than
+    // becoming a 400.
     const body = await request.json().catch(() => ({}))
     const moduleSlug = body.module_slug
 
     const supabase = createServiceRoleClient()
-    await resetProgress(supabase, user.id, moduleSlug)
+    await resetProgress(supabase, requireUserId(actor), moduleSlug)
 
     // Clear next.js data cache for academy pages so they accurately reflect locked state
     revalidatePath('/academy', 'layout')
@@ -28,9 +29,5 @@ export async function POST(request: Request) {
     revalidatePath('/capstones', 'layout')
 
     return NextResponse.json({ success: true })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to reset progress.'
-    console.error('[API POST /api/settings/reset/progress] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)

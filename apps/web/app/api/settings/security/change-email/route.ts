@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { evaluateRateLimit } from '@/lib/rate-limit'
 import { BRAND } from '@/lib/brand'
 import { logSystemError } from '@/lib/monitoring/logger'
@@ -14,19 +15,22 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 /**
  * GET returns the authenticated user's current email (for display in Settings → Security).
  */
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user || !user.email) {
-      return NextResponse.json({ error: 'Unauthorized. Authenticated session required.' }, { status: 401 })
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.security.read_email',
+    domain: 'auth',
+    summary: 'Unexpected failure reading the learner email address',
+  },
+  async ({ actor }) => {
+    const email = actor.kind === 'learner' ? actor.email : null
+    if (!email) {
+      throw new RouteError(401, 'UNAUTHORIZED', 'Authentication required.')
     }
 
-    return NextResponse.json({ success: true, email: user.email })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'An error occurred.'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ success: true, email })
   }
-}
+)
 
 /**
  * POST initiates a secure email address change.
@@ -39,7 +43,14 @@ export async function GET(request: Request) {
  * The actual `auth.users.email` change — and the `public.users.email` sync —
  * only happens once the user clicks the confirmation link.
  */
-export async function POST(request: Request) {
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.security.change_email',
+    domain: 'auth',
+    summary: 'Unexpected failure changing a learner email address',
+  },
+  async ({ request, actor }) => {
   try {
     const contentType = request.headers.get('content-type') || ''
     if (!contentType.includes('application/json')) {
@@ -49,8 +60,9 @@ export async function POST(request: Request) {
       )
     }
 
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user || !user.id || !user.email) {
+    const userId = requireUserId(actor)
+    const userEmail = actor.kind === 'learner' ? actor.email : null
+    if (!userEmail) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Authenticated session required.' },
         { status: 401 }
@@ -75,12 +87,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address.' }, { status: 400 })
     }
 
-    if (newEmail === user.email.trim().toLowerCase()) {
+    if (newEmail === userEmail.trim().toLowerCase()) {
       return NextResponse.json({ success: false, error: 'This is already your current email address.' }, { status: 400 })
     }
 
     // Rate-limit change requests to slow account-takeover / enumeration attempts.
-    const rateCheck = await evaluateRateLimit(`change_email_${user.id}`, { limit: 5, windowMs: 60 * 60 * 1000 })
+    const rateCheck = await evaluateRateLimit(`change_email_${userId}`, { limit: 5, windowMs: 60 * 60 * 1000 })
     if (!rateCheck.success) {
       return NextResponse.json(
         { success: false, error: 'Too many email change attempts. Please try again later.' },
@@ -92,7 +104,7 @@ export async function POST(request: Request) {
 
     // 1. Re-authenticate with current password (defense against session hijacking).
     const { error: verifyError } = await supabase.auth.signInWithPassword({
-      email: user.email,
+      email: userEmail,
       password: currentPassword,
     })
 
@@ -109,7 +121,7 @@ export async function POST(request: Request) {
       .ilike('email', newEmail)
       .maybeSingle()
 
-    if (existing && existing.id !== user.id) {
+    if (existing && existing.id !== userId) {
       return NextResponse.json(
         { success: false, error: 'This email address is already associated with another account.' },
         { status: 409 }
@@ -174,7 +186,9 @@ export async function POST(request: Request) {
       message: `Confirmation link sent to ${newEmail}. Your email will change once you confirm.`,
     })
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'An error occurred.'
-    return NextResponse.json({ success: false, error: message }, { status: 400 })
+    // Rethrown so the wrapper genericises it; this branch previously returned
+    // error.message to an authenticated learner (N-3).
+    throw error
   }
-}
+  }
+)

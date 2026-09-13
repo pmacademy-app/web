@@ -1,63 +1,67 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import {
   getPortfolioSettings,
   updatePortfolioSettings,
   getLearnerSubmittedCapstones,
+  PortfolioValidationError,
 } from '@/lib/portfolio-db'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.portfolio.read',
+    domain: 'api',
+    summary: 'Unexpected failure reading portfolio settings',
+  },
+  async ({ actor }) => {
+    const userId = requireUserId(actor)
 
     const supabase = createServiceRoleClient()
     const [settings, submittedCapstones] = await Promise.all([
-      getPortfolioSettings(supabase, user.id),
-      getLearnerSubmittedCapstones(supabase, user.id),
+      getPortfolioSettings(supabase, userId),
+      getLearnerSubmittedCapstones(supabase, userId),
     ])
 
     return NextResponse.json({ success: true, settings, submittedCapstones })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch portfolio settings.'
-    console.error('[API GET /api/settings/portfolio] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.portfolio.update',
+    domain: 'api',
+    summary: 'Unexpected failure updating portfolio settings',
+  },
+  async ({ request, actor }) => {
+    const userId = requireUserId(actor)
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
+    try {
+      const supabase = createServiceRoleClient()
+      const body = await request.json()
+      const result = await updatePortfolioSettings(supabase, userId, body)
+
+      if (result.settings.username) {
+        revalidatePath(`/p/${result.settings.username}`)
+        revalidatePath(`/api/og/portfolio/${result.settings.username}`)
+      }
+      revalidatePath('/settings')
+
+      return NextResponse.json({ success: true, settings: result.settings })
+    } catch (error: unknown) {
+      // A learner-fixable rejection keeps its exact message at 400. Anything else
+      // is an unexpected fault and is rethrown so the wrapper genericises it —
+      // before B7-F both cases returned error.message, so a driver error could
+      // reach a learner (N-3).
+      if (error instanceof PortfolioValidationError) {
+        throw new RouteError(400, 'VALIDATION', error.message)
+      }
+      console.error('[API POST /api/settings/portfolio] Error:', error)
+      throw error
     }
-
-    const supabase = createServiceRoleClient()
-    const body = await request.json()
-    const result = await updatePortfolioSettings(supabase, user.id, body)
-
-    if (result.settings.username) {
-      revalidatePath(`/p/${result.settings.username}`)
-      revalidatePath(`/api/og/portfolio/${result.settings.username}`)
-    }
-    revalidatePath('/settings')
-
-    return NextResponse.json({ success: true, settings: result.settings })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to update portfolio settings.'
-    console.error('[API POST /api/settings/portfolio] Error:', error)
-    return NextResponse.json({ error: message }, { status: 400 })
   }
-}
+)

@@ -180,7 +180,10 @@ describe('B2: Public Portfolio XSS & Untrusted JSON-LD Serialization Security Su
       })
       expect(dangerousLinkedin.success).toBe(false)
       if (!dangerousLinkedin.success) {
-        expect(dangerousLinkedin.error.issues[0]?.message).toContain('http:// or https://')
+        // B7-F / N-2: the write-side policy is https-only, so the guidance the
+        // schema gives now names https rather than "http:// or https://". The
+        // rejection itself is unchanged.
+        expect(dangerousLinkedin.error.issues[0]?.message).toContain('https://')
       }
 
       const dangerousGithub = profileUpdateSchema.safeParse({
@@ -192,6 +195,12 @@ describe('B2: Public Portfolio XSS & Untrusted JSON-LD Serialization Security Su
         website_url: 'vbscript:msgbox("hello")',
       })
       expect(dangerousWebsite.success).toBe(false)
+
+      // N-2: plain http is now refused on write too, which it was not before B7-F.
+      const insecureWebsite = profileUpdateSchema.safeParse({
+        website_url: 'http://example.com',
+      })
+      expect(insecureWebsite.success).toBe(false)
     })
 
     it('rejects excessively long strings exceeding security limits', () => {

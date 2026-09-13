@@ -1,11 +1,19 @@
 import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { logSystemError } from '@/lib/monitoring/logger'
 
 export const runtime = 'nodejs'
 
-export async function POST(request: Request) {
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'settings.security.change_password',
+    domain: 'auth',
+    summary: 'Unexpected failure changing a learner password',
+  },
+  async ({ request, actor }) => {
   try {
     const contentType = request.headers.get('content-type') || ''
     if (!contentType.includes('application/json')) {
@@ -15,13 +23,14 @@ export async function POST(request: Request) {
       )
     }
 
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user || !user.id || !user.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
+    const userId = requireUserId(actor)
+    // The provider must be re-authenticated with the caller's own address, so an
+    // actor with no email cannot proceed. Kept as an explicit guard rather than
+    // folded into the policy: `resolveActor` models identity, not this
+    // route's precondition.
+    const userEmail = actor.kind === 'learner' ? actor.email : null
+    if (!userEmail) {
+      throw new RouteError(401, 'UNAUTHORIZED', 'Authentication required.')
     }
 
     let body: {
@@ -84,7 +93,7 @@ export async function POST(request: Request) {
     // 1. Verify current password against Supabase Auth
     let newSessionAfterAuth: { access_token: string; refresh_token: string; expires_in: number } | null = null
     const { data: signInData, error: verifyError } = await supabase.auth.signInWithPassword({
-      email: user.email,
+      email: userEmail,
       password: currentPassword,
     })
 
@@ -100,7 +109,7 @@ export async function POST(request: Request) {
     }
 
     // 2. Update user's password securely through Supabase Auth Admin API
-    const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
+    const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
       password: newPassword,
     })
 
@@ -144,7 +153,9 @@ export async function POST(request: Request) {
 
     return response
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'An error occurred.'
-    return NextResponse.json({ success: false, error: message }, { status: 400 })
+    // Rethrown so the wrapper genericises it; this branch previously returned
+    // error.message to an authenticated learner (N-3).
+    throw error
   }
-}
+  }
+)

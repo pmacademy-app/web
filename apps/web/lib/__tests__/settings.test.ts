@@ -101,7 +101,12 @@ describe('Sprint 7.2 Settings 2.0 & Auth Regression Unit Tests', () => {
       const response = await POST(request)
       expect(response.status).toBe(401)
       const data = await response.json()
-      expect(data.error).toContain('Unauthorized')
+      // B7-F: the route now emits the canonical ADR-006 envelope. `code` is the
+      // stable machine-readable contract, so assert that rather than the prose,
+      // which changed from 'Unauthorized. Authenticated session required.' to the
+      // wrapper's generic copy.
+      expect(data.success).toBe(false)
+      expect(data.code).toBe('UNAUTHORIZED')
     })
 
     it('rejects unauthenticated requests to GET /api/settings/profile with 401', async () => {

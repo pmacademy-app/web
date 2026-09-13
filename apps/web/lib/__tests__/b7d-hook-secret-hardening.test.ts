@@ -255,8 +255,12 @@ describe('B7-D — auth route migration scope', () => {
     return hits.sort()
   }
 
-  it('migrates exactly the eight eligible auth routes plus the six cron routes', () => {
-    expect(routeFilesImporting('@/lib/api/with-route')).toEqual([
+  // B7-D's own wave only. The exact global set of migrated routes is owned by one
+  // test — b7f-settings-migration.test.ts — so a later wave updates one list.
+  it('migrates exactly the eight eligible auth routes', () => {
+    const auth = routeFilesImporting('@/lib/api/with-route').filter((f) => f.startsWith('auth/'))
+
+    expect(auth).toEqual([
       'auth/login/route.ts',
       'auth/logout/route.ts',
       'auth/refresh/route.ts',
@@ -265,12 +269,6 @@ describe('B7-D — auth route migration scope', () => {
       'auth/signup/route.ts',
       'auth/telemetry/route.ts',
       'auth/update-password/route.ts',
-      'cron/cleanup/route.ts',
-      'cron/daily-reminder/route.ts',
-      'cron/process-broadcasts/route.ts',
-      'cron/process-email-queue/route.ts',
-      'cron/retry-failed/route.ts',
-      'cron/weekly-recap/route.ts',
     ])
   })
 
@@ -285,12 +283,10 @@ describe('B7-D — auth route migration scope', () => {
     }
   })
 
-  it('migrated no learner, settings or admin route', () => {
+  it('migrated no admin route in this wave', () => {
     const migrated = routeFilesImporting('@/lib/api/with-route')
 
     expect(migrated.filter((f) => f.startsWith('admin/'))).toEqual([])
-    expect(migrated.filter((f) => f.startsWith('settings/'))).toEqual([])
-    expect(migrated.every((f) => f.startsWith('auth/') || f.startsWith('cron/'))).toBe(true)
   })
 
   it('every migrated auth route declares an explicit actor policy', () => {
