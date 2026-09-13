@@ -381,7 +381,7 @@ messages. "Plan ref" points at the batch specification in
 | **B11** — design system migration | I-13 | ⬜ Outstanding | |
 | **B12** — marketing performance | I-14 | ⬜ Outstanding | |
 | **B13** — mobile/API readiness | D-01, D-04 | ⬜ Outstanding | Decision still deferred |
-| **B14** — CI/security/E2E hardening | I-01 | 🟡 **B14-A and B14-B complete in code** | B14-A made the migration deploy fail loudly. B14-B added the `security-audit` CI job: a blocking `npm audit` gate with a reviewed, expiring allowlist, gitleaks secret scanning pinned by checksum, and Dependabot for npm and github-actions. Policy in [`SECURITY.md`](SECURITY.md) §5. **The gate currently blocks on two unreviewed Next.js critical advisories** — see ISSUE-25. B14-C (E2E + component tests) outstanding |
+| **B14** — CI/security/E2E hardening | I-01 | 🟡 **B14-A and B14-B complete in code** | B14-A made the migration deploy fail loudly. B14-B added the `security-audit` CI job: a blocking `npm audit` gate with a reviewed, expiring allowlist, gitleaks secret scanning pinned by checksum, and Dependabot for npm and github-actions. Policy in [`SECURITY.md`](SECURITY.md) §5. The two Next.js critical advisories it blocked on were cleared by the 16.3.5 upgrade rather than allowlisted (ISSUE-25, resolved). B14-C (E2E + component tests) outstanding |
 
 ### B4 / B5 / B6 reassessment against `10a21a5`
 

@@ -26,6 +26,15 @@ vi.mock('@/lib/monitoring/logger', () => ({
 const { withRoute, RouteError } = await import('@/lib/api/with-route')
 type Ctx = import('@/lib/api/with-route').RouteHandlerContext<unknown, unknown>
 
+/**
+ * A handler spy typed through the generic rather than through a declared
+ * parameter, so `handler.mock.calls[0][0]` is inferred without leaving an unused
+ * binding for the linter.
+ */
+function makeHandler() {
+  return vi.fn<(ctx: Ctx) => Promise<Response>>(async () => Response.json({ success: true }))
+}
+
 const LEARNER = { id: 'user-1', email: 'learner@prodily.app' }
 const CRON_SECRET = 'cron-secret-value-for-tests'
 
@@ -56,7 +65,7 @@ beforeEach(() => {
 describe('B7-B — withRoute: actor policy', () => {
   it('runs the handler with a resolved learner actor', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute({ actor: { allow: ['learner'] }, operation: 'thing.read' }, handler)
     const res = await route(get())
@@ -71,7 +80,7 @@ describe('B7-B — withRoute: actor policy', () => {
   })
 
   it('refuses an unauthenticated request with 401 and a code, without running the handler', async () => {
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute({ actor: { allow: ['learner'] }, operation: 'thing.read' }, handler)
     const res = await route(get())
@@ -89,7 +98,7 @@ describe('B7-B — withRoute: actor policy', () => {
       error: 'Access denied: Admin privileges required',
       statusCode: 403,
     })
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute({ actor: { allow: ['admin'] }, operation: 'admin.thing' }, handler)
     const res = await route(get())
@@ -115,7 +124,7 @@ describe('B7-B — withRoute: actor policy', () => {
   })
 
   it('composes with resolveActor for the cron policy', async () => {
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute({ actor: { allow: ['cron', 'admin'] }, operation: 'cron.thing' }, handler)
     const res = await route(get({ authorization: `Bearer ${CRON_SECRET}` }))
@@ -125,7 +134,7 @@ describe('B7-B — withRoute: actor policy', () => {
   })
 
   it('fails closed with a 500 when a route declares an empty policy', async () => {
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     // An empty allow list is a configuration mistake, not a policy. The type
     // rejects it (hence the directive); if one reaches the wrapper anyway, the
@@ -157,7 +166,7 @@ describe('B7-B — withRoute: validation', () => {
 
   it('rejects an invalid body with 400 VALIDATION and the schema message', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute(
       { actor: { allow: ['learner'] }, operation: 'thing.create', body: bodySchema },
@@ -239,7 +248,7 @@ describe('B7-B — withRoute: rate limiting', () => {
 
   it('evaluates declared rules and proceeds when under the limit', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute(
       { actor: { allow: ['learner'] }, operation: 'thing.read', rateLimit: [rule] },
@@ -273,7 +282,7 @@ describe('B7-B — withRoute: rate limiting', () => {
     evaluatePersistentRateLimit
       .mockResolvedValueOnce({ success: true, remaining: 4, resetInMs: 500 })
       .mockResolvedValueOnce({ success: false, remaining: 0, resetInMs: 9000 })
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute(
       {
@@ -475,7 +484,7 @@ describe('B7-B — withRoute: handler behaviour is preserved', () => {
   it('passes the request through to the handler', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
     const request = get()
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute({ actor: { allow: ['learner'] }, operation: 'thing.read' }, handler)
     await route(request)
@@ -485,7 +494,7 @@ describe('B7-B — withRoute: handler behaviour is preserved', () => {
 
   it('resolves and forwards dynamic route params', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute({ actor: { allow: ['learner'] }, operation: 'thing.read' }, handler)
     await route(get(), { params: Promise.resolve({ id: 'abc' }) })
@@ -495,7 +504,7 @@ describe('B7-B — withRoute: handler behaviour is preserved', () => {
 
   it('gives an empty params object when the route is not dynamic', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue(LEARNER)
-    const handler = vi.fn(async (_ctx: Ctx) => Response.json({ success: true }))
+    const handler = makeHandler()
 
     const route = withRoute({ actor: { allow: ['learner'] }, operation: 'thing.read' }, handler)
     await route(get())
