@@ -92,6 +92,44 @@ const LEADERBOARD_CACHE = new Map<string, LeaderboardCacheEntry>()
 const CACHE_TTL_MS = 45 * 1000
 
 /**
+ * Records a failed weekly-aggregation query as a structured incident.
+ *
+ * These queries feed metrics that degrade to zero rather than to an error, so a silent
+ * failure reads as "nobody was active this week" — which is why F-COR-1 survived
+ * unnoticed. The board is still returned (a partially-correct leaderboard beats a blank
+ * page), but the failure is no longer invisible.
+ *
+ * `kind: 'db_unavailable'` is the taxonomy's entry for a required query failing; it
+ * derives to `critical` / `manual_retry`. Instrumentation never changes the outcome:
+ * if the incident sink itself fails, the leaderboard request still completes.
+ */
+async function reportLeaderboardQueryFailure(
+  operation: string,
+  summary: string,
+  cause: unknown
+): Promise<void> {
+  try {
+    const { logErrorReport } = await import('@/lib/monitoring/logger')
+    await logErrorReport({
+      domain: 'db',
+      kind: 'db_unavailable',
+      operation,
+      summary,
+      details: {
+        cause:
+          cause instanceof Error
+            ? `${cause.name}: ${cause.message}`
+            : typeof cause === 'object' && cause !== null && 'message' in cause
+              ? String((cause as { message: unknown }).message)
+              : String(cause),
+      },
+    })
+  } catch {
+    // Never let instrumentation change what the caller sees.
+  }
+}
+
+/**
  * Builds (or reuses the cached) raw weekly metrics for ALL opted-in-eligible users.
  * Shared by global, cohort-scoped, and friend-scoped ranking views so the expensive
  * aggregation queries run at most once per week per 45-second window, regardless of
@@ -123,22 +161,46 @@ async function getOrBuildWeeklyRawMetrics(
 
     // 3. Fetch lesson progress in current week for consistency metric
     const weekStartDate = new Date(weekStart)
-    const { data: lessonProgress } = (await (supabase
+    const { data: lessonProgress, error: lessonProgressError } = (await (supabase
       .from('user_lesson_progress') as unknown as DBChain)
       .select('user_id, status, completed_at')
       .in('user_id', userIdsArray.length ? userIdsArray : ['00000000-0000-0000-0000-000000000000'])
       .eq('status', 'completed')
       .gte('completed_at', weekStartDate.toISOString())) as unknown as {
       data: { user_id: string; status: string; completed_at: string }[] | null
+      error: unknown
     }
 
-    // 4. Fetch xp events in current week
-    const { data: xpEvents } = (await (supabase
+    if (lessonProgressError) {
+      await reportLeaderboardQueryFailure(
+        'leaderboard.weekly_lesson_progress',
+        'Weekly leaderboard lesson-progress query failed',
+        lessonProgressError
+      )
+    }
+
+    // 4. Fetch xp events in current week.
+    //
+    // The column is `xp_amount`, not `amount`. This selected `amount` until B8-A, which
+    // PostgREST rejects as an unknown column — and because only `data` was destructured,
+    // the error went nowhere, `data` came back null, and every user's weekly XP reduced
+    // to 0 with no signal anywhere. Hence the check below: a failed read here must never
+    // be indistinguishable from a week in which nobody earned XP. See F-COR-1.
+    const { data: xpEvents, error: xpEventsError } = (await (supabase
       .from('xp_events') as unknown as DBChain)
-      .select('user_id, amount, created_at')
+      .select('user_id, xp_amount, created_at')
       .in('user_id', userIdsArray.length ? userIdsArray : ['00000000-0000-0000-0000-000000000000'])
       .gte('created_at', weekStartDate.toISOString())) as unknown as {
-      data: { user_id: string; amount: number; created_at: string }[] | null
+      data: { user_id: string; xp_amount: number; created_at: string }[] | null
+      error: unknown
+    }
+
+    if (xpEventsError) {
+      await reportLeaderboardQueryFailure(
+        'leaderboard.weekly_xp_events',
+        'Weekly leaderboard XP events query failed',
+        xpEventsError
+      )
     }
 
     // Aggregate user weekly metrics
@@ -157,7 +219,7 @@ async function getOrBuildWeeklyRawMetrics(
 
       // Calculate weekly XP
       const userXpEvents = (xpEvents || []).filter((xe) => xe.user_id === u.id)
-      const xpEarned = userXpEvents.reduce((acc, curr) => acc + (curr.amount || 0), 0)
+      const xpEarned = userXpEvents.reduce((acc, curr) => acc + (curr.xp_amount || 0), 0)
 
       const levelInfo = calculateLevel(u.total_xp || 0)
 
