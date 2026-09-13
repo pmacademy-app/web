@@ -1,0 +1,83 @@
+# Secret scanning configuration (B14-B).
+#
+# The upstream rule set is used in full; this file only records the values that
+# look like credentials but provably are not, so the scan stays believable. An
+# allowlist entry must name a real, checkable reason — never "this one is noisy".
+title = "Prodily secret scan"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "prodily-supabase-service-role-key"
+description = "Supabase service-role JWT committed to the repository"
+# Service-role keys are the highest-value secret in this system: they bypass RLS
+# entirely. The default `jwt` rule already catches any JWT; this one exists so the
+# finding NAMES what leaked instead of reporting a generic token.
+#
+# `"role":"service_role"` sits at an unknown byte offset inside the base64url
+# payload, so its encoding depends on the alignment. The three alternatives below
+# are the stable cores of the three possible phases (offset 0, 1, 2) — a single
+# hand-written fragment matches only one of them, which is a rule that looks like
+# coverage without being it.
+regex = '''eyJ[A-Za-z0-9_-]{8,}\.eyJ[A-Za-z0-9_-]*(?:InJvbGUiOiJzZXJ2aWNlX3Jv|b2xlIjoic2VydmljZV9yb2xl|cm9sZSI6InNlcnZpY2Vfcm9s)[A-Za-z0-9_-]*\.[A-Za-z0-9_-]{8,}'''
+keywords = ["eyj"]
+
+[[rules]]
+id = "prodily-resend-api-key"
+description = "Resend API key"
+# Resend is the transactional email provider (RESEND_API_KEY). The upstream rule
+# set has no `re_` rule, and the generic-api-key heuristic misses these because a
+# Resend key's entropy sits below its threshold — verified 2026-09-14.
+regex = '''\bre_[A-Za-z0-9]{8,}_[A-Za-z0-9]{16,}\b|\bre_[A-Za-z0-9]{24,}\b'''
+keywords = ["re_"]
+
+[allowlist]
+description = "Published test values and verified fixtures — not credentials"
+
+# Machine-generated trees that are git-ignored and therefore absent from a CI
+# checkout. They are excluded so a local run over a dirty working copy reports the
+# same thing CI does. `.env*` is deliberately NOT excluded: those files are
+# git-ignored too, but one force-added into a commit is exactly the accident this
+# scan exists to catch.
+paths = [
+  '''(^|[\\/])node_modules[\\/]''',
+  '''(^|[\\/])\.next[\\/]''',
+  '''(^|[\\/])backups[\\/]''',
+  '''(^|[\\/])\.tokencap[\\/]''',
+  # Lockfiles carry integrity hashes, not secrets.
+  '''package-lock\.json''',
+]
+
+regexes = [
+  # Cloudflare's published always-pass Turnstile test keys. These are documented
+  # public dummies: the site key is visible in every page that renders the widget,
+  # and the secret only ever validates the matching dummy token.
+  # https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+  '''1x00000000000000000000AA''',
+  '''1x0000000000000000000000000000000AA''',
+  '''2x00000000000000000000AB''',
+  '''2x0000000000000000000000000000000AA''',
+  '''3x00000000000000000000FF''',
+  # Deterministic unit-test doubles defined in apps/web/vitest.setup.ts. They are
+  # literal strings, not redacted real values.
+  '''mock-anon-key''',
+  '''mock-service-role-key''',
+  '''test-cron-secret''',
+  '''https://mock\.supabase\.co''',
+
+  # Fixtures in apps/web/lib/__tests__/ that exist precisely because the redaction
+  # code must be proven to scrub credential-shaped strings. Each was read and
+  # confirmed synthetic on 2026-09-14; they are matched by their placeholder
+  # markers rather than by allowlisting the test directory, so a real secret
+  # pasted into a test still fails the scan.
+  '''xkeysib-SECRET1''',                      # api-error-contract.test.ts
+  '''test_brevo_api_key_123''',               # brevo-email-infrastructure.test.ts
+  '''bcast-1724345000-abc1234''',             # learning-settings-runtime.test.ts — an idempotency key, not a credential
+  '''s1gnatureV4lu3''',                       # error-taxonomy.test.ts — JWT with a literal fake signature
+  '''whsec_abc123xyz456''',                   # system-monitoring.test.ts
+  '''TestPlaceholderSignatureXXXXXXXX''',     # sensitive-data-redaction.test.ts
+  '''TEST_PLACEHOLDER''',                     # sensitive-data-redaction.test.ts
+  '''ZmFrZS1vcGFxdWUtdG9rZW4tMTIz''',         # sensitive-data-redaction.test.ts — base64 of "fake-opaque-token-123"
+  '''re_TestPlaceholder''',                   # Resend placeholders in the redaction suites and the archived Stage 2 audit
+]

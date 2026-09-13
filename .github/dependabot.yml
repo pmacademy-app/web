@@ -1,0 +1,57 @@
+# Dependabot keeps the dependency and workflow-action surfaces current so the CI
+# audit gate (scripts/ci/audit-gate.ts) has something to converge on rather than an
+# allowlist that only ever grows.
+#
+# Three ecosystems, matching the three things that are actually installed:
+#   - apps/web         the application dependency tree and its lockfile
+#   - /                the monorepo root manifest (scripts only, no lockfile of its own)
+#   - github-actions   the action versions pinned in .github/workflows/
+version: 2
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    # Patch and minor noise is grouped into one PR per week; majors stay separate so
+    # each one gets its own review and regression run.
+    groups:
+      production-minor-and-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development-minor-and-patch:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "ci"
+    commit-message:
+      prefix: "chore(ci)"

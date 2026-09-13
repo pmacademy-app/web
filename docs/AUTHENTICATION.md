@@ -105,6 +105,41 @@ Settings → Security → Change Email reuses Supabase Auth's native email-chang
 
 ---
 
+## 7a. Logout
+
+`apps/web/lib/auth/logout.ts` is the only client-side logout implementation. Both
+consumers call it and differ only in destination: `components/layout/Topbar.tsx`
+sends the learner to `/login`, and `lib/admin/session.ts` (`signOutAdmin()`, shared
+by `AdminHeader` and `AdminSidebar`) sends the admin to `/admin/login`.
+
+Logging out is two independent network calls:
+
+1. `supabase.auth.signOut()` revokes the browser-held Supabase session.
+2. `POST /api/auth/session` with `{ action: 'sign_out', session: null }` clears the
+   httpOnly `sb-access-token` / `sb-refresh-token` cookies, which are what the
+   server actually trusts.
+
+Three properties the helper guarantees, and why each exists:
+
+- **Each step is settled independently.** The earlier duplicated implementations
+  ran both inside one `try`, so a failing provider sign-out skipped the cookie
+  clear entirely and left a usable server-side session behind.
+- **Navigation happens in `finally`.** An offline browser or a failing provider
+  still moves the user off the authenticated view.
+- **Failures are returned, not swallowed.** `logout()` never throws; it returns
+  `{ ok, failures }`, where each failure names the step (`provider_sign_out` or
+  `session_cookie_clear`) and a short, non-sensitive reason. A non-2xx response to
+  the cookie-clearing call counts as a failure — `fetch` rejects only on transport
+  errors, so a 5xx would otherwise read as a successful logout.
+
+`POST /api/auth/logout` is a separate server route that additionally revokes the
+session server-side from a bearer token. No client currently calls it; it exists
+for non-browser consumers.
+
+Covered by `apps/web/lib/__tests__/b10a-error-boundaries-and-logout.test.ts`.
+
+---
+
 ## 8. Status Summary
 
 | Authentication Flow | Location | Status |

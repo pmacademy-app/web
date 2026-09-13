@@ -3,7 +3,7 @@
 **Branch of Record:** `main`
 **Synchronized With:** `origin/main` @ `d2a59be` + B8-E applied 2026-09-13
 **Date:** 2026-09-13
-**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · **B7 is next**
+**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 started: **B10-A and B14-B complete in code** on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -377,11 +377,11 @@ messages. "Plan ref" points at the batch specification in
 | **B7** — shared auth + route/error contract | I-07 | ⬜ Outstanding | |
 | **B8** — typed data layer + DB correctness | I-08 | 🟢 **P0 correctness DEPLOYED; B8-E prepared, NOT applied** | B8-A…B8-D deployed to production at `164229a` and verified 2026-09-13: leaderboard column bug fixed (F-COR-1), authoritative XP total (F-COR-2), truncating queries bounded (F-COR-4), duplicate diagnostic run read-only (F-COR-3). `awardXp()` now treats SQLSTATE 23505 as already-awarded. **B8-E applied to production 2026-09-13 18:15:34Z** — 31 `theory_read` duplicates removed, 310 XP across 13 users, scoped partial unique index over six once-only source types. 17/17 post-migration checks passed. Executed direct-to-production by explicit approval; no staging project was used (P0-1 remains outstanding). Typed repository layer (B8-F/B8-G) untouched. See [`PHASE1_IMPLEMENTATION_TODO.md`](archive/PHASE1_IMPLEMENTATION_TODO.md) |
 | **B9** — admin controls + observability | I-10 | 🟢 **B9-A deployed** | Out-of-band critical alerting deployed at `164229a` (F-REL-4) — **inert until `ALERT_WEBHOOK_URL` is configured in production**. Correlation IDs, structured logging and retention (B9-B…B9-D) outstanding |
-| **B10** — frontend API/data layer | I-11 | ⬜ Outstanding | |
+| **B10** — frontend API/data layer | I-11 | 🟡 **B10-A complete in code** | Error-boundary structure corrected (F-COR-5) and a single canonical client logout helper introduced (F-COR-6). Dead-code removal (I-12-B5) was already closed by the 2026-09-13 cleanup pass. B10-B…B10-D (typed API client, SWR adoption) outstanding |
 | **B11** — design system migration | I-13 | ⬜ Outstanding | |
 | **B12** — marketing performance | I-14 | ⬜ Outstanding | |
 | **B13** — mobile/API readiness | D-01, D-04 | ⬜ Outstanding | Decision still deferred |
-| **B14** — CI/security/E2E hardening | I-01 | ⬜ Outstanding | |
+| **B14** — CI/security/E2E hardening | I-01 | 🟡 **B14-A and B14-B complete in code** | B14-A made the migration deploy fail loudly. B14-B added the `security-audit` CI job: a blocking `npm audit` gate with a reviewed, expiring allowlist, gitleaks secret scanning pinned by checksum, and Dependabot for npm and github-actions. Policy in [`SECURITY.md`](SECURITY.md) §5. **The gate currently blocks on two unreviewed Next.js critical advisories** — see ISSUE-25. B14-C (E2E + component tests) outstanding |
 
 ### B4 / B5 / B6 reassessment against `10a21a5`
 
@@ -405,6 +405,108 @@ re-implement the items marked ✅.**
 | **I-04-B6** verification before durable side effects | ✅ Done (variant) | No `public.users` row, no welcome email and no attribution before verification under Flow A. `refCode` is validated and carried in auth metadata rather than in a new pending-referral table, so **the planned migration was not needed**. Note Flow B (`requireEmailVerification = false`) still creates the profile at signup — correct, since `admin.createUser({ email_confirm: true })` makes that the registration milestone under that configuration |
 | **I-04-B7** timeouts & remaining direct callers | ✅ Complete | Standardized `EMAIL_HTTP_TIMEOUT_MS = 8000` applied to raw HTTP fetches (`automations/service.ts`, `api/email/webhooks/route.ts`). All production email dispatch paths audited, categorized, and kill-switch bounded. |
 | **I-05-B1…B5** queue & scheduler reliability | ⬜ Outstanding | Untouched by the incident fix |
+
+---
+
+## Phase 2 — B10-A: Frontend correctness leftovers — ✅ Complete in code
+
+**Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
+**Date:** 2026-09-14
+
+### Error boundary structure (F-COR-5)
+
+`app/error.tsx` emitted its own `<html>`/`<body>` from a segment boundary, which
+nests a second document inside the root layout, and no `app/global-error.tsx`
+existed at all — so a root-layout failure had no boundary.
+
+- `app/error.tsx` → `app/global-error.tsx` (git-tracked rename). It keeps the
+  document shell, which is correct there because it stands in for the root layout.
+  It now imports `@/app/globals.css` directly: a global error replaces the root
+  layout, so the layout's stylesheet is not applied and the page would otherwise
+  render unstyled. It also logs the error, which the previous version discarded.
+- A new plain `app/error.tsx` catches root-segment errors inside the layout and
+  surfaces `error.digest` so a production report is traceable.
+- `app/(app)/error.tsx` and `app/admin/(console)/error.tsx` are untouched, as the
+  plan requires.
+
+### Canonical logout (F-COR-6)
+
+`lib/auth/logout.ts` is new and is the only client-side logout implementation.
+`components/layout/Topbar.tsx` and `lib/admin/session.ts` now both delegate to it
+and differ only in destination. Behaviour corrected, not just deduplicated:
+
+- The two network steps settle independently. Previously both ran in one `try`, so
+  a failing provider sign-out skipped the cookie clear and left a usable
+  server-side session.
+- Navigation runs in `finally` — an offline browser still leaves the
+  authenticated view.
+- A non-2xx response to the cookie-clearing call is reported as a failure. `fetch`
+  rejects only on transport errors, so a 5xx previously read as a clean logout.
+- `redirectTo` is constrained to app-relative paths, so logout cannot become an
+  open redirect.
+
+`app/api/auth/session/route.ts` and `app/api/auth/logout/route.ts` are unchanged,
+as the plan requires. Documented in [`AUTHENTICATION.md`](AUTHENTICATION.md) §7a.
+
+**Not in scope, already done:** I-12-B5 dead-code removal was closed by the
+2026-09-13 cleanup pass; the master roadmap records it as RESOLVED.
+
+**Tests:** `lib/__tests__/b10a-error-boundaries-and-logout.test.ts` — 12 tests
+covering both boundary shapes and the logout failure modes.
+
+---
+
+## Phase 2 — B14-B: CI security gates and Dependabot — ✅ Complete in code
+
+**Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
+**Date:** 2026-09-14
+
+A new `security-audit` job in `.github/workflows/ci.yml`, separate from
+`build-and-validate` so a finding is its own check, and not a dependency of
+`deploy-supabase` so it cannot silently hold back an otherwise-correct migration
+deploy. The job installs nothing — `npm audit` resolves from the committed
+lockfile — so it executes no third-party install script.
+
+| Control | Implementation |
+|---|---|
+| Dependency audit | `scripts/ci/audit-gate.ts` — blocks on high/critical, reports moderate/low, allows only reviewed and dated exceptions |
+| Audit exceptions | `scripts/ci/npm-audit-allowlist.json` — every entry carries a reachability `reason` and a `reviewBy` date; expired entries block again |
+| Secret scanning | `gitleaks` 8.30.1, pinned by SHA-256, config in `.gitleaks.toml` |
+| Dependency updates | `.github/dependabot.yml` — npm (`/apps/web`, `/`) and github-actions, weekly |
+
+Policy is documented in [`SECURITY.md`](SECURITY.md) §5. No application file
+changed except one test fixture — see below.
+
+### What the gates found on their first run
+
+- **Two Next.js critical advisories block the audit gate** (GHSA-p293-qw3h-jr36,
+  GHSA-2xp9-vwfh-vxw4). Both are fixed by `next@16.3.5`, a patch-level upgrade,
+  which is out of B14-B's scope and excluded by the locked plan. They were
+  deliberately **not** allowlisted: the AVIF image-optimizer RCE is plausibly
+  reachable because `/_next/image` is enabled and `next.config.ts` lists
+  `image/avif` in `formats`. Tracked as ISSUE-25.
+- **A 28-character prefix of the live `RESEND_API_KEY` was committed** in
+  `lib/__tests__/system-monitoring.test.ts`, introduced at `f839ef3` and still in
+  git history. The fixture is now synthetic, but the key requires rotation.
+  Tracked as ISSUE-26.
+- Nine high advisories (`sharp`, `postcss`, `fast-uri`, `js-yaml`) were reviewed
+  and allowlisted with reachability analysis and a 2026-10-15 review date. The
+  `sharp` entry records a caveat: the locked plan's "not reachable, every remote
+  image uses `unoptimized`" premise is weaker than stated, since `unoptimized` is
+  set per call site and the optimizer endpoint remains enabled.
+
+### Validation performed locally
+
+- `gitleaks` 8.30.1 run over an export of tracked files only (what CI checks out):
+  **no leaks found**.
+- Planted-secret test: a forged Supabase service-role JWT and a Resend-shaped key
+  both fail the scan with the named Prodily rules. The service-role rule was
+  corrected after the first attempt matched only one of the three base64
+  alignments of the `service_role` claim.
+- Audit gate exercised against the real dependency tree and unit-tested for the
+  unreviewed, expired, accepted, stale and moderate-severity paths.
+
+**Tests:** `lib/__tests__/b14b-ci-security-gates.test.ts` — 13 tests.
 
 ---
 

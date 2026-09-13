@@ -2,14 +2,14 @@
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Framework:** Next.js 16.2.12 (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)  
-**Test Suite:** 134 Test Files · 1536 Unit & Integration Tests (100% Passing)  
+**Test Suite:** 136 Test Files · 1561 Unit & Integration Tests (100% Passing)  
 **Database Migrations:** 48 Applied Migrations in `supabase/migrations/`  
-**Last Updated:** September 13, 2026  
+**Last Updated:** September 14, 2026  
 
 > **Where the work stands.** [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) is the
 > authoritative record of implementation status; [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md)
 > remains the locked specification. Where they disagree about *status*, the ledger
-> wins; about *scope*, the plan wins. **B0–B6 and Phase 1 (B8-A…B8-E, B9-A) are complete and deployed. Next batch: B7.**
+> wins; about *scope*, the plan wins. **B0–B6 and Phase 1 (B8-A…B8-E, B9-A) are complete and deployed. Phase 2 has started: B10-A and B14-B are complete in code on `b10a-b14b/error-boundaries-logout-ci-security` (not merged). Next batch: B7.**
 
 ---
 
@@ -18,7 +18,7 @@
 1. **Current Production Behavior** (Live deployed runtime behavior)
 2. **Current Source Code** (TypeScript routes, services, React components, compilation scripts)
 3. **Database Migrations & Schema** (48 SQL DDL files in `supabase/migrations/`)
-4. **Automated Unit & Integration Tests** (134 test files, 1536 passed unit tests in `apps/web/lib/__tests__/`)
+4. **Automated Unit & Integration Tests** (136 test files, 1561 passed unit tests in `apps/web/lib/__tests__/`)
 5. **Operating Manuals & Workspaces** (`docs/admin/*.md`)
 6. **Detailed Architectural Documentation** (`docs/*.md`)
 7. **Historical Implementation Records** (Previous session logs and stale plans)

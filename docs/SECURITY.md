@@ -63,3 +63,82 @@ No CAPTCHA/bot-challenge provider is configured anywhere in the codebase today. 
 - **Server-Only Secrets**: `SUPABASE_SERVICE_ROLE_KEY`, `SEND_EMAIL_HOOK_SECRET`, `CRON_SECRET`, `BREVO_API_KEY`, `BREVO_WEBHOOK_SECRET`, `RESEND_API_KEY`, and `RESEND_WEBHOOK_SECRET` are strictly server-side.
 - **Client Expose Prevention**: Never import service-role client into client components (`'use client'`).
 - **Secret Sanitization**: `lib/monitoring/redaction.ts` is the single redaction implementation, applied to logged messages, to `details` payloads recursively, to queue template variables before they reach `email_dead_letter` / `notification_events`, and to the outgoing message of `apiError()`. It redacts by value shape (provider keys `xkeysib-`/`xsmtpsib-`/`re_`, `whsec_` and Svix signatures, JWTs, database connection credentials, `Authorization` and cookie headers, session tokens, one-time auth tokens in URLs, passwords) **and** by key name for structured payloads. Email addresses are masked rather than dropped so the recipient domain stays diagnosable. See [ADR-005](decisions/ADR-005-sensitive-data-redaction.md). Admin API responses use `adminErrorMessage()`, which sanitizes rather than genericizes: the operator keeps the diagnostic text, credentials and connection strings do not survive.
+
+---
+
+## 5. CI Supply-Chain & Secret-Scanning Gates
+
+Two gates run on every push and pull request, in the `security-audit` job of
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml). The job is deliberately
+separate from `build-and-validate` so a security finding appears as its own check
+rather than as a line in a build log, and neither gate is advisory-only: both fail
+the job when they find something.
+
+The job installs nothing. `npm audit` resolves entirely from the committed
+lockfile, so the job that exists to distrust the dependency tree never executes a
+third-party install script.
+
+### 5.1 Dependency audit policy
+
+[`scripts/ci/audit-gate.ts`](../scripts/ci/audit-gate.ts) wraps `npm audit`:
+
+| Severity | Behaviour |
+|---|---|
+| `critical`, `high` | **Blocks**, unless reviewed in the allowlist |
+| `moderate`, `low` | Reported in the job log; never blocks |
+
+The only way past a blocking advisory is an entry in
+[`scripts/ci/npm-audit-allowlist.json`](../scripts/ci/npm-audit-allowlist.json)
+carrying two mandatory fields:
+
+- **`reason`** — what was actually checked. An entry states the reachability
+  analysis, not a conclusion. No entry may be added for an advisory whose
+  vulnerable code path is reachable in production; the remedy there is to fix the
+  dependency.
+- **`reviewBy`** — the date the judgement stops being valid. Past that date the
+  gate blocks again, so an acceptance cannot quietly become permanent.
+
+The gate prints every accepted advisory on every run — an allowlist entry records a
+decision, it does not silence the finding. Entries that no longer match anything
+npm reports are flagged as stale (a warning, not a failure) so the list shrinks.
+
+**Triage order for a new blocking advisory:** is the vulnerable code path reachable
+in production, build, test or deploy? If yes, fix it — update, replace, or remove
+the dependency. If no, and the analysis is checkable, add an allowlist entry with a
+short review date. Never `npm audit fix --force`: forced remediation crosses
+declared dependency ranges and is not reviewed.
+
+### 5.2 Secret scanning
+
+`gitleaks` runs over the working tree with [`.gitleaks.toml`](../.gitleaks.toml),
+which extends the upstream rule set and adds two Prodily-specific rules:
+
+- **`prodily-supabase-service-role-key`** — a Supabase service-role JWT. The
+  upstream `jwt` rule already catches any JWT; this one exists so the finding
+  *names* the highest-value secret in the system rather than reporting a generic
+  token. It matches all three base64 phase alignments of the `service_role` claim.
+- **`prodily-resend-api-key`** — `re_` keys, which the upstream rule set does not
+  cover and which fall below the generic-key entropy threshold.
+
+The binary is pinned by version **and** verified by SHA-256 checksum: an unpinned
+scanner is a supply-chain hole in the control that exists to find supply-chain
+holes. Findings are `--redact`ed so a discovered secret never reaches the public
+build log, while the file, line and rule are still reported.
+
+The allowlist covers published test values (Cloudflare's documented always-pass
+Turnstile keys), the deterministic doubles in `vitest.setup.ts`, and the
+credential-shaped fixtures in `lib/__tests__/` that exist precisely to prove
+`lib/monitoring/redaction.ts` scrubs them. Each fixture is allowlisted by its
+placeholder marker rather than by allowlisting the test directory, so a real
+secret pasted into a test still fails the scan. Machine-generated, git-ignored
+trees (`node_modules/`, `.next/`, `backups/`) are excluded so a local run reports
+what CI reports — **`.env*` is deliberately not excluded**, since one force-added
+into a commit is exactly the accident this scan exists to catch.
+
+### 5.3 Dependabot
+
+[`.github/dependabot.yml`](../.github/dependabot.yml) opens weekly PRs for
+`apps/web`, the monorepo root manifest, and the pinned GitHub Actions. Patch and
+minor updates are grouped; majors stay separate so each gets its own review and
+regression run. Dependabot is what keeps the audit allowlist converging rather
+than only growing.

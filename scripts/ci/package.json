@@ -1,0 +1,4 @@
+{
+  "//": "Scopes Node module resolution for scripts/ci/ to ESM. audit-gate.ts uses import statements and import.meta.url, and Node derives a .ts file's module type from the nearest package.json; without this the CI step would depend on Node's module-syntax auto-detection instead of a declared type.",
+  "type": "module"
+}

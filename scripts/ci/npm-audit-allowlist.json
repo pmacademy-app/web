@@ -1,0 +1,68 @@
+{
+  "$comment": [
+    "Advisories accepted for the apps/web dependency tree, consumed by scripts/ci/audit-gate.ts.",
+    "An entry here does NOT silence the advisory: the gate still prints it on every run.",
+    "It records a reviewed judgement that the advisory is not actionable today, and the date",
+    "on which that judgement stops being valid. Past reviewBy, the gate blocks again.",
+    "Only high and critical advisories are gated; moderate and low are reported only.",
+    "Rules: every entry states what was checked, not just a conclusion. No entry may be added",
+    "for an advisory whose vulnerable code path is reachable in production.",
+    "Policy and triage procedure: docs/SECURITY.md section 6."
+  ],
+  "advisories": [
+    {
+      "id": "GHSA-f88m-g3jw-g9cj",
+      "package": "sharp",
+      "reason": "libvips decoder CVEs reachable only through sharp's image decoding. Prodily never invokes sharp directly; it is present as a Next.js image-optimizer peer and as a devDependency of the brand asset generator, which processes repository-controlled files only. Locked-plan decision DEBT-07. Caveat recorded 2026-09-14: /_next/image is still enabled, so the optimizer path is not structurally disabled — this acceptance rests on decoder input being limited to the configured remotePatterns, not on the optimizer being off.",
+      "reviewBy": "2026-10-15"
+    },
+    {
+      "id": "GHSA-rgj7-g3m4-5g8c",
+      "package": "sharp",
+      "reason": "libheif CVEs in the HEIF/HEIC decoder. Same reachability analysis as GHSA-f88m-g3jw-g9cj: no direct sharp usage in application code, and no upload path accepts HEIF — apps/web/app/api/user/avatar restricts uploads by MIME type. Cleared by the same dependency bump.",
+      "reviewBy": "2026-10-15"
+    },
+    {
+      "id": "GHSA-6g55-p6wh-862q",
+      "package": "postcss",
+      "reason": "sourceMappingURL file disclosure, build-time only. Requires an attacker-controlled CSS comment to reach the compiler; all compiled CSS originates in the repository. No runtime postcss invocation exists in apps/web.",
+      "reviewBy": "2026-10-15"
+    },
+    {
+      "id": "GHSA-r28c-9q8g-f849",
+      "package": "postcss",
+      "reason": "Previous-source-map path traversal, build-time only. Same analysis as the other postcss entries: the compiler is never handed untrusted CSS at runtime.",
+      "reviewBy": "2026-10-15"
+    },
+    {
+      "id": "GHSA-5jgf-p345-68v8",
+      "package": "fast-uri",
+      "reason": "Transitive through ajv via @hookform/resolvers, used for JSON Schema $ref resolution during client-side form validation. The IDN canonicalization confusion needs fast-uri to resolve an attacker-supplied URI; the only URIs it sees are schema identifiers written in this repository. No server-side fetch uses it.",
+      "reviewBy": "2026-10-15"
+    },
+    {
+      "id": "GHSA-f65p-4m7j-42xc",
+      "package": "fast-uri",
+      "reason": "SSRF via malformed IPv6 normalization. Same path as GHSA-5jgf-p345-68v8 — ajv schema resolution only. Prodily performs no server-side fetch of a user-supplied URL through this dependency.",
+      "reviewBy": "2026-10-15"
+    },
+    {
+      "id": "GHSA-fph4-wmhf-6fwf",
+      "package": "fast-uri",
+      "reason": "SSRF via repeated hostname percent-decoding. Same ajv-only reachability as the other fast-uri entries.",
+      "reviewBy": "2026-10-15"
+    },
+    {
+      "id": "GHSA-jqff-g426-hqxp",
+      "package": "fast-uri",
+      "reason": "Host confusion via percent-encoded scheme normalization. Same ajv-only reachability as the other fast-uri entries.",
+      "reviewBy": "2026-10-15"
+    },
+    {
+      "id": "GHSA-2883-xcg3-v3hh",
+      "package": "js-yaml",
+      "reason": "CPU exhaustion parsing crafted YAML merge keys. Development-only: js-yaml is reached through eslint's @eslint/eslintrc and shadcn's cosmiconfig, neither of which ships in the production bundle, and both parse configuration files from this repository. Confirmed absent from the production tree by npm audit --omit=dev on 2026-09-14.",
+      "reviewBy": "2026-10-15"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Menu, Search, User, LogOut, ChevronRight, Sparkles, MessageSquare } from 'lucide-react'
 import { useSearch } from '@/components/search/SearchOverlayProvider'
-import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { formatLogoutFailures, logout, LEARNER_LOGIN_PATH } from '@/lib/auth/logout'
 import { getLevelTitle } from '@/lib/xp'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
@@ -51,23 +51,12 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
   const breadcrumbs = contextCrumbs.length > 0 ? contextCrumbs : defaultCrumbs
 
   const handleSignOut = async () => {
-    try {
-      const supabase = createBrowserSupabaseClient()
-      await supabase.auth.signOut()
+    const result = await logout(router, { redirectTo: LEARNER_LOGIN_PATH })
 
-      // Sync and clear server-side cookies
-      await fetch('/api/auth/session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'sign_out', session: null }),
-      })
-
-      router.push('/login')
-      router.refresh()
-    } catch (err) {
-      console.error('[Topbar] Sign out error:', err)
+    if (!result.ok) {
+      // Navigation has already happened; this records which step failed so a
+      // session that survived the click is diagnosable.
+      console.error('[Topbar] Sign out completed with failures:', formatLogoutFailures(result))
     }
   }
 

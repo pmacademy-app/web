@@ -63,9 +63,11 @@ describe('System Monitoring & Error Instrumentation Unit Test Suite', () => {
   })
 
   it('sanitizeErrorMessage redacts Resend API key prefixes', () => {
-    const input = 'API key re_dz6o4sMR_28GupYbvaBVCddGx leaked in message'
+    // Synthetic key. This fixture previously held a 28-character prefix of the
+    // live RESEND_API_KEY, which the B14-B secret scan caught on its first run.
+    const input = 'API key re_TestPlaceholder_NotARealResendKey000 leaked in message'
     const output = sanitizeErrorMessage(input)
-    expect(output).not.toContain('dz6o4sMR_28GupYbvaBVCddGx')
+    expect(output).not.toContain('TestPlaceholder_NotARealResendKey000')
     expect(output).toContain('re_[REDACTED]')
   })
 
