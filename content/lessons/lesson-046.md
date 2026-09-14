@@ -402,195 +402,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the key structural difference between a growth loop and a funnel?**
-A) Loops are always faster than funnels
-B) A loop reinvests the output of one cycle as new input to the same cycle, enabling compounding growth; a funnel is a linear, one-way sequence with no such reinvestment
-C) Funnels only apply to paid acquisition; loops only apply to organic acquisition
-D) There is no meaningful structural difference between the two
+A) Loops run measurably faster than funnels in general
+B) Funnels just serve paid channels; loops serve organic ones
+C) There is no meaningful structural difference between them
+D) A loop reinvests its output as new input; funnels do not
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly defines this structural distinction.*
+*Correct answer: D*
+*Explanation: The reinvestment step is what makes a cycle circular rather than a one-way sequence, and it's the entire basis for the distinction this lesson draws.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the four generic components of any growth loop?**
-A) Awareness, acquisition, activation, retention
-B) Input, action, output, reinvestment
-C) Hypothesis, primary metric, guardrail, sample size
-D) Now, Next, Later, Never
+A) Awareness, acquisition, activation, and retention
+B) Hypothesis, primary metric, guardrail, sample size
+C) Input, action, output, and the reinvestment step back into input
+D) A fixed sequence known instead as Now, Next, Later, Shelved
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly names these four components as the structure of any genuine growth loop.*
+*Correct answer: C*
+*Explanation: These four stages, ending in reinvestment back into new input, are what any genuine loop can be broken into regardless of its specific mechanism.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is the formula for the viral coefficient (K-factor)?**
-A) Total users divided by total revenue
-B) Invites sent per user multiplied by the conversion rate of those invites into new users
-C) Retention rate multiplied by activation rate
-D) Cycle time divided by total input
+A) Invites per user, times their conversion rate
+B) The total user count divided by total revenue
+C) Retention rate multiplied by the activation rate
+D) Cycle time divided by the size of the input pool
 
-*Correct answer: B*
-*Explanation: The Theory section states this exact formula for K.*
+*Correct answer: A*
+*Explanation: Multiplying how many invites each user sends by what share convert gives the average number of new users each existing user produces.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What does a K-factor greater than 1 indicate?**
-A) The loop is losing money
-B) The loop is theoretically self-sustaining, generating more than one new user per existing user on average, enabling compounding growth even without external input
-C) The loop has reached saturation
-D) The loop's cycle time is too long to matter
+A) The loop is theoretically self-sustaining
+B) The loop has reached full saturation already
+C) The loop's cycle time has grown too long to matter
+D) The loop is currently losing the company money
 
-*Correct answer: B*
-*Explanation: The Theory section explains that K > 1 indicates genuine, self-sustaining compounding growth.*
+*Correct answer: A*
+*Explanation: Above 1, each cycle produces more new users than it started with, so the loop could in principle keep growing without any outside acquisition.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Why can two loops with identical K-factors above 1 produce very different growth trajectories?**
-A) Because K-factor calculations are always inaccurate
-B) Because viral cycle time — how long one full loop cycle takes to complete — also affects how quickly growth compounds, even at an identical K
-C) Because only paid loops have meaningful cycle times
-D) Because K-factor and growth trajectory are completely unrelated concepts
+A) K-factor calculations tend to be unreliable overall
+B) Paid loops alone carry a meaningful cycle time
+C) Cycle time shapes how fast the same K-factor compounds
+D) K-factor bears no relation to any growth outcome
 
-*Correct answer: B*
-*Explanation: The Theory section explains that cycle time is a second, independent factor that affects how quickly compounding growth actually materializes.*
+*Correct answer: C*
+*Explanation: A faster cycle completes more rounds in the same stretch of time, so identical multipliers still compound at very different real-world speeds.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. Why does a viral loop's sustainability depend on retention, as covered in this lesson?**
-A) It doesn't; retention is unrelated to loop performance
-B) New users must stick around long enough to themselves complete another loop cycle (e.g., send their own invites); poor retention prevents this, collapsing the loop's effective compounding rate regardless of the initial K-factor
-C) Retention only matters for paid loops, not viral loops
-D) Retention is only relevant to funnel analysis, never to loops
+A) New users need to stay active to refer others too
+B) Retention has no bearing on how a loop performs
+C) Retention matters for paid loops, not viral ones
+D) Retention is a concept that applies to funnels alone
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #3 explains this exact dependency between retention and a loop's ability to sustain compounding.*
+*Correct answer: A*
+*Explanation: A referred user who churns before sending their own invites never completes their cycle, so the loop's real compounding rate depends on people sticking around.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what critical measurement had the team never actually verified about their referral program?**
-A) The total number of signups generated by referrals
-B) Whether referred users themselves went on to refer additional users at a meaningful rate — the reinvestment step of the loop
-C) The cost of the referral discount offered
-D) Whether the referral program had a mobile-friendly interface
+A) Whether referred users referred others in turn
+B) The total signups the referral links had generated
+C) The size of the discount offered per referral
+D) Whether the flow rendered properly on mobile
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly identifies this unverified reinvestment step as the critical gap in the team's analysis.*
+*Correct answer: A*
+*Explanation: The team had tracked first-generation signups closely but had never checked whether that second generation kept the cycle going at all.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
 
 ---
 
 **8. What did the growth analyst discover when finally measuring the referral program's multi-generational conversion rate?**
-A) Referred users referred new users at a much higher rate than the original user base
-B) Referred users referred new users at barely a quarter of the rate of the original, organically-acquired user base, meaning the true K-factor was well below 1
-C) The referral program had no measurable effect on signups at all
-D) The referral program's K-factor was exactly 2.0
+A) No measurable effect on signups was found
+B) The program's K-factor worked out to exactly 2.0
+C) Referred users referred at a far higher rate than originals
+D) Referred users referred at roughly a quarter of the original rate
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly states this finding — a much lower second-generation referral rate revealing a true K-factor below 1.*
+*Correct answer: D*
+*Explanation: Once the second generation was actually measured, the referral chain turned out to be fading rather than sustaining itself.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does this lesson caution against optimizing K-factor through aggressive, low-quality invite mechanics?**
-A) Because K-factor cannot be affected by invite mechanics at all
-B) Because this can produce low invite-conversion rates and damage product reputation, echoing Lesson 41's Goodhart's Law caution about optimizing a metric's formula directly rather than the underlying value it represents
-C) Because low-quality invites always increase K-factor reliably
-D) Because invite mechanics are entirely unrelated to viral loops
+A) K-factor cannot be moved by invite mechanics
+B) Low-quality invites raise K-factor with total reliability
+C) Inflating the number while it erodes value
+D) Invite mechanics have no real bearing on loops
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #5 explicitly connects this risk to Lesson 41's Goodhart's Law, since gaming the K-factor formula's inputs can degrade genuine value.*
+*Correct answer: C*
+*Explanation: Spammy invites can lift the raw number while damaging conversion quality and reputation, the same target-versus-value gap Goodhart's Law warns about.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
 **10. What is "saturation," in the context of a growth loop?**
-A) A technical term for a loop's cycle time
-B) The mechanical reduction in a loop's effective conversion rate as it reaches an increasingly large share of the addressable population, shrinking the pool of new potential users over time
-C) A synonym for the viral coefficient
-D) A measurement that only applies to paid acquisition loops
+A) A technical name for a loop's own cycle time
+B) A shrinking rate as fewer new candidates remain reachable
+C) Just another way of naming the viral coefficient
+D) A measurement used solely inside paid acquisition loops
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #4 defines saturation exactly this way.*
+*Explanation: As a loop reaches more of the people it could ever reach, each cycle finds fewer genuinely new candidates left to convert.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they'd verify whether a referral program is genuinely viral, and answers: "I'd look at how many signups came from referral links last month." Based on this lesson's Interview Perspective section, what is missing from this answer?**
-A) Nothing; total referral signups is sufficient evidence of virality
-B) Verification of the multi-generational K-factor — specifically whether referred users themselves go on to generate further referrals — rather than only measuring first-generation conversion
-C) A recommendation to switch to a paid acquisition strategy instead
-D) A calculation of the product's Net Promoter Score
+A) A calculation of the product's Net Promoter Score
+B) A recommendation to shift fully to paid acquisition
+C) Whether referrals themselves generate more referrals
+D) A conclusion that total referral signups prove virality
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer specifically checks multi-generational conversion, exactly the verification missing from this answer and from the Case Study's original flawed analysis.*
+*Correct answer: C*
+*Explanation: First-generation signups say nothing about whether the chain continues, which is exactly the multi-generational check a strong answer would raise.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Using the Loop Component Health Check, if a loop has plenty of eligible users (input) and a healthy action rate, but very few of its outputs convert into new input, what does this suggest?**
-A) The loop's input component is the bottleneck
-B) The reinvestment conversion step is likely the bottleneck, and should be the focus of further investigation before optimizing other components
-C) The loop must not be a genuine loop at all
-D) Nothing can be diagnosed from this information
+A) The loop's input pool is the component most likely bottlenecked
+B) This cannot be a genuine loop given that pattern
+C) Just this pattern alone permits no real diagnosis
+D) Reinvestment is likely this loop's bottleneck step
 
-*Correct answer: B*
-*Explanation: The Framework Explanation section's Loop Component Health Check identifies exactly this pattern — healthy input and action rate but poor reinvestment conversion — as pointing to the reinvestment step as the bottleneck.*
+*Correct answer: D*
+*Explanation: Strong performance everywhere upstream but weak conversion at the final step points straight at where the cycle is actually breaking down.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A team wants to improve an underperforming viral loop and proposes simply increasing the discount offered per successful referral, assuming this will improve K-factor. Using this lesson's and Lesson 45's frameworks together, what is the most defensible next step?**
-A) Roll out the increased discount to all users immediately, since the reasoning seems sound
-B) First diagnose which specific loop component (input, action rate, output quality, reinvestment conversion) is actually the bottleneck using the Loop Component Health Check, then validate the proposed discount increase through a controlled experiment (Lesson 45) rather than assuming it will work
-C) Ignore the proposal entirely without any further analysis
-D) Increase the discount only for the highest-spending customers, regardless of loop diagnostics
+A) Roll out the larger discount to everyone at once
+B) Diagnose the bottleneck, then test the change
+C) Raise the discount for top-spending customers alone
+D) Set the proposal aside without further analysis
 
 *Correct answer: B*
-*Explanation: This combines the Loop Component Health Check's bottleneck diagnosis with Lesson 45's experimentation discipline — the right sequence is diagnosing the actual bottleneck first, then validating any proposed fix rigorously rather than assuming it works.*
+*Explanation: The proposal assumes a cause without checking it — the right order is finding which component is actually limiting the loop, then validating the fix with an experiment.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects a genuine growth loop, as opposed to a funnel mislabeled as one?**
-A) A one-time email campaign that generates a spike in signups but has no further reinvestment mechanism
-B) A referral mechanism where measured, verified data confirms that a meaningful share of newly referred users go on to refer additional users themselves, sustaining the cycle
-C) A paid advertising campaign with a fixed monthly budget and no revenue-based reinvestment relationship
-D) A one-time product launch announcement shared on social media
+A) A one-time launch announcement shared on social media
+B) A fixed monthly ad budget with no revenue reinvestment
+C) A one-time email blast with no reinvestment mechanism
+D) A referral chain verified to keep generating referrers
 
-*Correct answer: B*
-*Explanation: Only option B includes a verified reinvestment step where output becomes new input for further cycles — the defining structural feature of a genuine loop per this lesson's Theory.*
+*Correct answer: D*
+*Explanation: The other three each stop after a single round with nothing measured flowing back into new input, which is exactly what a funnel looks like.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A company's viral loop has a K-factor of 1.4 and has been growing steadily for a year, but growth has recently begun to slow despite no changes to the loop's design or messaging. Using this lesson's frameworks, what is the most likely explanation, and how would you investigate it?**
-A) The K-factor formula must have been calculated incorrectly from the start
-B) The loop may be experiencing saturation as it reaches an increasingly large share of the addressable population; investigate by checking whether the pool of not-yet-reached potential users has meaningfully shrunk, and consider whether cycle time or retention (Lesson 44) among newer cohorts has also changed
-C) A K-factor above 1 guarantees indefinite growth with no possible slowdown, so this must be a measurement error
-D) The loop should be immediately discontinued, since any slowdown indicates total failure
+A) The K-factor formula was miscalculated from day one
+B) Saturation of the reachable population
+C) A K-factor above 1 rules out any slowdown at all
+D) The loop should be shut down at any sign of slowdown
 
 *Correct answer: B*
-*Explanation: This applies the lesson's saturation concept directly — a previously strong, unchanged loop naturally slowing over time is the classic signature of reaching diminishing returns in the addressable population, and investigating alongside cycle time and retention reflects the multi-factor reasoning this lesson establishes rather than assuming K-factor alone tells the whole story.*
+*Explanation: A previously stable loop slowing with nothing else changed is the classic signature of running out of untouched population, worth checking alongside cycle time and retention.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 

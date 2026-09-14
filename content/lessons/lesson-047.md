@@ -393,195 +393,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What are the four quadrants of the power/interest grid?**
-A) Now, Next, Later, Never
-B) Manage Closely, Keep Satisfied, Keep Informed, Monitor
-C) Input, Action, Output, Reinvestment
-D) Discover, Define, Develop, Deliver
+A) Discover, Define, Develop, and Deliver stages
+B) Input, Action, Output, and Reinvestment stages
+C) Manage, Satisfy, Inform, Monitor
+D) A fixed Now, Next, Later, and Shelved sequence
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly names these four quadrants.*
+*Correct answer: C*
+*Explanation: These four labels name the quadrants the grid sorts stakeholders into, based on their power and interest.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. According to the power/interest grid, what communication approach fits a high-power, low-interest stakeholder?**
-A) No communication at all, since their interest is low
-B) Periodic, milestone-based, high-level updates focused on outcomes, with proactive heads-up before anything surprising
-C) Frequent, detailed, two-way conversation identical to a high-interest stakeholder
-D) Communication only when the stakeholder directly requests it
+A) No communication at all, given their low interest
+B) Periodic updates with a heads-up before surprises
+C) The same frequent conversation as a high-interest one
+D) Communication just when that stakeholder asks
 
 *Correct answer: B*
-*Explanation: The Framework Explanation section's cadence table specifies this approach for the "Keep Satisfied" quadrant.*
+*Explanation: Their influence stays high even though attention is low, so the cadence trades frequency for a reliable heads-up before anything surprising.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. What is structural bias toward customer-channel signal, as extended from Lesson 5?**
-A) A bias toward using too many communication channels simultaneously
-B) The tendency for feedback reaching a PM through sales or support channels to over-represent loud, well-connected customers rather than the broader user base
-C) A statistical bias that only affects A/B testing results
-D) A preference for written communication over verbal communication
+A) Using too many communication channels at once
+B) A bias that applies solely to A/B testing results
+C) A preference for written over verbal updates
+D) Channel feedback over-representing loud customers
 
-*Correct answer: B*
-*Explanation: The Theory section defines this concept exactly this way, extending Lesson 5's original framing.*
+*Correct answer: D*
+*Explanation: The channels that reach a PM most easily are shaped by access and persistence, not by how common the underlying need actually is.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Why does this lesson caution against discarding sales- or support-relayed customer feedback entirely, even while warning about structural bias?**
-A) Because such feedback should always be treated as the single most important signal available
-B) Because it remains valuable, specific, and often genuinely urgent information — the caution is against treating it as a *substitute* for broader validation, not against using it at all
-C) Because sales and support teams are never trustworthy sources of information
-D) Because structural bias only applies to support channels, not sales channels
+A) It stays valuable; caution targets relying on it alone
+B) It should be treated as the single most important signal
+C) Sales and support are rarely trustworthy feedback sources
+D) Structural bias applies to support channels and not sales
 
-*Correct answer: B*
-*Explanation: The Theory section and Case Study both clarify that channel feedback remains valuable and should be supplemented, not discarded.*
+*Correct answer: A*
+*Explanation: The complaint reaching a PM through a channel is usually real. The problem is mistaking one channel's volume for the whole population's preference.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **5. What practice does this lesson's Real Company Example (Intuit) illustrate as a countermeasure to structural bias?**
-A) Ignoring all sales-relayed feedback permanently
-B) Direct, structured customer immersion research (such as "follow-me-home" style observation), gathering broader understanding than channel-amplified feedback alone provides
-C) Relying exclusively on the loudest customer voices to guide the roadmap
-D) Eliminating the sales team's ability to relay any customer feedback
+A) Structured, direct customer immersion in the field
+B) Relying exclusively on the loudest customer voices
+C) Ignoring all sales-relayed feedback going forward
+D) Ending the sales team's ability to relay feedback
 
-*Correct answer: B*
-*Explanation: The Real Company Example describes exactly this kind of deliberate, structured research as a countermeasure to channel-amplified bias.*
+*Correct answer: A*
+*Explanation: Watching customers in their own context surfaces needs nobody thought to escalate through a channel at all.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what did the PM discover after shipping the urgently-requested enterprise feature?**
-A) Adoption was widespread and all enterprise deals closed faster as predicted
-B) Adoption among the broader customer base was minimal (under 3%), and none of the originally cited enterprise deals closed any faster because of the feature
-C) The feature was never actually built due to engineering constraints
-D) Sales stopped relaying any further feedback after this incident
+A) Every cited enterprise deal closed faster as promised
+B) Adoption stayed under 3%, no deal closed faster
+C) Sales stopped relaying any feedback after the episode
+D) Engineering constraints kept the feature from shipping
 
 *Correct answer: B*
-*Explanation: The Case Study explicitly states this outcome — minimal broad adoption and no measurable impact on the deals that had driven the original urgency.*
+*Explanation: The urgency at the time the request arrived never translated into either broad usage or the deal outcomes it had been justified by.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **7. What did a subsequent, broader survey reveal in the Detailed Case Study?**
-A) No customers wanted any new features at all
-B) The most commonly requested improvement was a different, less dramatic workflow change that had never been escalated through sales, because no single customer considered it individually urgent enough to push for
-C) The original enterprise feature request was actually the top priority after all
-D) The survey results were inconclusive and provided no useful information
+A) A quieter, unescalated workflow change topped the list
+B) Customers wanted no new features of any kind
+C) The survey's results turned out to be inconclusive
+D) It confirmed the original feature as the priority
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this finding — a quieter, more broadly-held need that never generated the same channel-amplified volume.*
+*Correct answer: A*
+*Explanation: No single customer had felt strongly enough to push it through sales, so it never generated the volume that gets a request escalated.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **8. What four elements characterize delivering difficult news well, according to this lesson?**
-A) Delay, minimize detail, avoid specifics, offer no alternatives
-B) Deliver directly and promptly, explain the reasoning transparently, acknowledge specific impact, offer a concrete alternative or next step where possible
-C) Deliver only through written communication, never verbally
-D) Deliver only to the highest-power stakeholder, regardless of who else is affected
+A) Delaying it while minimizing detail and alternatives
+B) Prompt delivery, transparency, impact, next step
+C) Written communication with no verbal follow-up
+D) Delivery just to the highest-power stakeholder
 
 *Correct answer: B*
-*Explanation: The Theory section explicitly lists these four elements as the pattern that best preserves trust.*
+*Explanation: These four elements are what the Theory section names as the pattern that keeps trust intact through unwelcome news.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does delaying difficult news typically compound rather than avoid damage, according to this lesson?**
-A) Because delayed news is always factually different from prompt news
-B) Because the stakeholder loses valuable time to adjust and may reasonably question how long the PM already knew before sharing it
-C) Because delaying news is illegal in most organizations
-D) Because delayed news never needs to be delivered at all eventually
+A) It costs adjustment time and raises trust doubts
+B) Delayed news is invariably different somehow
+C) Delaying news is prohibited at most organizations
+D) Delayed news eventually skips being delivered
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #4 explains this exact reasoning — delay reduces the stakeholder's adjustment time and raises legitimate trust concerns.*
+*Correct answer: A*
+*Explanation: Less runway to adjust and a reasonable question about how long the PM already knew both make the eventual conversation harder, not easier.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **10. (Scenario) A PM receives a single, highly detailed, urgently-framed feature request from a support team representing one frustrated customer, and immediately elevates it to the top of the roadmap without further validation. Using the Signal Amplification Map, what is the most likely risk?**
-A) There is no risk; support-relayed requests are always representative of broad customer need
-B) The PM may be over-indexing on a request that reached them through channel amplification, without verifying whether it represents a broadly shared need across the wider customer base
-C) The request should be ignored entirely simply because it came through support
-D) This scenario has no relevance to structural bias, since it involves only one customer
+A) None; support requests are invariably representative
+B) The request warrants dismissal, given the channel it arrived through
+C) Over-indexing on a signal without checking its reach
+D) The scenario carries no bearing on structural bias with one customer
 
-*Correct answer: B*
-*Explanation: This is a direct instance of the structural bias this lesson warns against — treating a single, channel-amplified voice as sufficient evidence without broader validation.*
+*Correct answer: C*
+*Explanation: A single detailed voice reaching a PM through an easy channel says nothing yet about how many other customers share the same need.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they'd handle a specific, urgent customer request relayed repeatedly by sales, and answers: "I'd prioritize it immediately, since sales clearly believes it's important." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; sales requests should always be prioritized immediately
-B) It fails to recognize structural bias toward customer-channel signal, and skips validating the request against broader, more representative research before committing significant roadmap priority to it
-C) It correctly demonstrates strong responsiveness to sales needs
-D) It shows an appropriate level of trust in the sales team's judgment
+A) None; sales requests should be prioritized right away
+B) It skips validating the request against broader research first
+C) It shows appropriate trust in the sales team's judgment
+D) It demonstrates strong responsiveness to sales needs
 
 *Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer recognizes structural bias and validates channel-amplified requests against broader research before prioritizing them.*
+*Explanation: Sales believing something is important and a request being widely shared are two separate claims, and the answer treats them as one.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does misjudging a stakeholder's power/interest quadrant carry real cost in both directions, according to this lesson?**
-A) It doesn't; there is no cost to misjudging a stakeholder's quadrant
-B) Over-communicating with a low-power, low-interest stakeholder wastes effort and creates noise, while under-communicating with a high-power, low-interest stakeholder risks a damaging surprise
-C) Only under-communication carries any cost; over-communication is always harmless
-D) Only over-communication carries any cost; under-communication is always harmless
+A) There is no real cost either way to misjudging a quadrant
+B) Under-communication alone carries cost, not the reverse
+C) Over-communication alone carries cost, not the reverse
+D) Wasted effort on one side; a real surprise on the other
 
-*Correct answer: B*
-*Explanation: The Framework Explanation section explicitly describes costs in both directions of misapplying the cadence table.*
+*Correct answer: D*
+*Explanation: Both errors are wasteful in their own way — one burns effort on someone who barely notices, the other under-prepares someone whose reaction carries weight.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A PM wants to validate whether a channel-amplified feature request represents broad demand before committing significant engineering resources to it. Using this lesson's and earlier lessons' frameworks together, what is the most defensible approach?**
-A) Trust the channel-amplified request entirely, since it arrived with clear urgency
-B) Conduct broader, structured research (a survey or representative sampling, echoing Lesson 8's discovery discipline and this lesson's Intuit example) to assess actual prevalence of the need, before committing significant roadmap priority based on the single amplified signal alone
-C) Ignore the request entirely without any further investigation
-D) Ask the same sales team to relay the request one more time to confirm it
+A) Trust the amplified request fully, given its urgency
+B) Ask the same sales team to relay the request again
+C) Run broader, structured research before committing
+D) Set the request aside without further investigation
 
-*Correct answer: B*
-*Explanation: This combines the Signal Amplification Map's core recommendation with earlier discovery discipline (Lesson 8) — validating with broader research rather than either blind trust or dismissal.*
-*Learning objective tested: #2, #5*
+*Correct answer: C*
+*Explanation: A survey or representative sample checks the claim the channel signal only asserted, before that signal gets to spend real engineering time.*
+*Learning objective tested: #2, #3*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects a well-executed instance of delivering difficult news, per this lesson's frameworks?**
-A) Waiting several weeks to inform a stakeholder of a delay, hoping the timeline will recover on its own first
-B) Informing the stakeholder promptly, explaining specifically what changed and why, acknowledging how the delay affects their specific plans, and proposing a concrete next step or alternative
-C) Sending a brief, vague message with no explanation of the reasoning behind the decision
-D) Informing only the highest-power stakeholder and leaving other affected stakeholders to find out indirectly
+A) A brief, vague note that skips the reasoning outright
+B) Informing just the highest-power stakeholder present
+C) A delay of weeks, hoping the timeline recovers first
+D) Prompt, transparent, acknowledges impact, offers a step
 
-*Correct answer: B*
-*Explanation: This reflects all four elements of well-delivered difficult news described in the Theory section: promptness, transparent reasoning, acknowledged impact, and a concrete next step.*
+*Correct answer: D*
+*Explanation: All four elements the Theory section names for well-delivered bad news show up together here — nothing is softened away or left implicit.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A PM has validated, through broad research, that a channel-amplified request from a major enterprise account does NOT represent a widely shared need. The account's sales lead is upset and insists the deal will be lost without it. Using this lesson's frameworks, what is the most defensible way forward?**
-A) Reverse the decision immediately based solely on the sales lead's insistence, to avoid conflict
-B) Communicate the research findings transparently to the sales lead (positioned appropriately on the power/interest grid), acknowledge the specific business impact they're concerned about, and explore whether a smaller, less resource-intensive accommodation could address the account's need without committing the broader roadmap to a low-demand feature
-C) Refuse to discuss the decision further with sales under any circumstances
-D) Ignore the sales lead's concerns entirely and make no further effort to communicate the reasoning
+A) Reverse the decision at once, to avoid the conflict
+B) Decline to discuss the decision with sales further
+C) Leave the sales lead's concern without any reply
+D) Share findings, acknowledge stakes, explore a smaller step
 
-*Correct answer: B*
-*Explanation: This combines the lesson's structural-bias validation, power/interest-grid-appropriate communication, and difficult-news delivery principles — transparent reasoning, acknowledged impact, and exploring an alternative, rather than either capitulating or dismissing the stakeholder's legitimate business concern.*
+*Correct answer: D*
+*Explanation: This keeps the research-backed decision intact while still treating the sales lead's business concern as real, looking for a proportionate response rather than an all-or-nothing one.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*
 

@@ -392,195 +392,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the primary purpose of decomposing a user journey into funnel stages, rather than looking only at an aggregate start-to-end conversion rate?**
-A) To make the analysis look more sophisticated
-B) To identify specifically where in the journey users drop off, since an aggregate rate alone gives no guidance on where to focus improvement effort
-C) To eliminate the need for any further qualitative research
-D) To calculate total company revenue
+A) To make the analysis appear more rigorous to leadership
+B) To locate the specific transition where users are lost
+C) To remove the need for later qualitative follow-up
+D) To calculate the company's total revenue per quarter
 
 *Correct answer: B*
-*Explanation: The Theory section explains that funnel decomposition exists specifically to identify where users drop off, which an aggregate rate cannot reveal on its own.*
+*Explanation: An aggregate rate tells you the journey leaks without saying where. Improvement effort has to be pointed at a particular transition to be worth spending.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the difference between relative and absolute drop-off?**
-A) They are the same measurement with different names
-B) Relative drop-off is the percentage of users lost at a step; absolute drop-off is the raw number of users lost
-C) Relative drop-off only applies to mobile apps; absolute drop-off only applies to desktop apps
-D) Absolute drop-off is always larger than relative drop-off
+A) Relative is the percentage lost; absolute is the count
+B) They are the same measurement under two different names
+C) Relative applies to mobile; absolute applies to desktop
+D) Absolute drop-off exceeds relative drop-off at each step
 
-*Correct answer: B*
-*Explanation: The Theory section defines these two terms exactly this way, and notes both should inform prioritization since they can point to different conclusions.*
+*Correct answer: A*
+*Explanation: The two can rank the same funnel differently, which is why the lesson treats them as a pair rather than picking one as the real measure.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **3. Why might a step with a smaller relative drop-off percentage still deserve high prioritization?**
-A) It never would; relative drop-off is always the only factor that matters
-B) If that step has a much higher volume of users passing through it, its absolute number of lost users could be larger than a step with a higher relative drop-off but lower volume
-C) Smaller relative drop-offs are always statistically insignificant
-D) Absolute drop-off is irrelevant to prioritization decisions
+A) Because smaller relative drop-offs are statistically stronger
+B) High volume through it can make the raw loss larger
+C) Because relative figures are the sole prioritisation input
+D) Because absolute figures play no part in prioritisation
 
 *Correct answer: B*
-*Explanation: The Theory section's example table shows exactly this dynamic — a lower relative drop-off at a high-volume step can produce a larger absolute number of lost users.*
+*Explanation: The Theory table shows this exact case: a 30% loss early and a 55% loss later cost the same 300 users, because far more people reach the early step.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **4. What is Simpson's Paradox, as described in this lesson?**
-A) A rule stating that funnels always have exactly five stages
-B) A phenomenon where a trend visible in aggregated data reverses or disappears once the data is broken into meaningful subgroups
-C) A law requiring all metrics to be reported as percentages
-D) A synonym for Goodhart's Law
+A) A trend that reverses once data is segmented
+B) A rule fixing every funnel at five distinct stages
+C) A requirement to report all metrics as percentages
+D) Another label for Goodhart's Law from Lesson 41
 
-*Correct answer: B*
-*Explanation: The Theory section defines Simpson's Paradox exactly this way, distinct from Goodhart's Law (Lesson 41).*
+*Correct answer: A*
+*Explanation: Goodhart's Law is Lesson 41's point about targets distorting behaviour. This one is about aggregation concealing what the subgroups are doing.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Why does this lesson recommend segmenting funnel data by dimensions like acquisition channel or device type?**
-A) Because segmentation is required by law for all analytics reporting
-B) Because an aggregate conversion rate can mask a serious, segment-specific problem hidden by the overall traffic mix, per Simpson's Paradox
-C) Because segmented data is always easier to compute than aggregate data
-D) Because only segmented data can be visualized in a dashboard
+A) Because analytics regulation requires segmented reporting
+B) Because segmented data is cheaper to compute than aggregate
+C) The overall rate can hide a segment-specific problem
+D) Because dashboards can display segmented data alone
 
-*Correct answer: B*
-*Explanation: The Theory section explains this exact reasoning — aggregation can hide segment-specific problems that only checking key segments would reveal.*
+*Correct answer: C*
+*Explanation: A steady aggregate can sit on top of a mix shift, so the number looks reassuring while one segment quietly degrades underneath it.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what did the team initially assume was causing the largest funnel drop-off, before segmenting the data?**
-A) A technical bug in the signup form
-B) A confusing UI in the project setup flow, based on the aggregate drop-off number alone
-C) A pricing issue affecting all users equally
-D) A server outage affecting all users
+A) A confusing setup-flow UI, inferred from the aggregate figure
+B) A technical defect in the signup form's validation
+C) A pricing problem affecting the whole user base
+D) A server outage during the measurement window
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes the team's initial, aggregate-based assumption about a UI problem, later revealed to be incorrect after segmentation.*
+*Correct answer: A*
+*Explanation: The assumption was reasonable and untested. A drop-off at a setup step invites a design explanation before anyone checks whether it is uniform across users.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What did segmenting the funnel data by acquisition channel reveal in the Detailed Case Study?**
-A) All channels converted identically, ruling out any channel-specific issue
-B) Users from a specific paid marketing channel dropped off at nearly double the rate of organic/referral users, due to a messaging-driven expectation mismatch, not the shared UI
-C) Mobile users converted better than desktop users
-D) The UI was in fact the cause, confirming the team's original hypothesis
+A) Every channel converted at essentially the same rate
+B) Mobile users converted better than desktop users overall
+C) The UI was the cause, confirming the first hypothesis
+D) One paid channel dropped off at near double the rate, an expectation mismatch
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this channel-specific divergence and its underlying cause as an expectation mismatch from marketing messaging, not a UI flaw.*
+*Correct answer: D*
+*Explanation: The same screen worked acceptably for organic arrivals. What differed was what the paid messaging had led people to expect before they reached it.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. Why did the qualitative interviews in the Case Study matter, even after the funnel data had already identified the problem step?**
-A) They were unnecessary, since the funnel data alone was sufficient
-B) They revealed the actual cause (a marketing expectation mismatch) behind the quantitatively-identified drop-off, turning a plausible guess into an evidence-based diagnosis
-C) They were used only to confirm the UI redesign hypothesis
-D) They replaced the need for any funnel analysis at all
+A) They were redundant, as the funnel data already sufficed
+B) They served to confirm the planned UI redesign
+C) They removed the need for the funnel analysis itself
+D) They surfaced the actual cause behind the measured drop
 
-*Correct answer: B*
-*Explanation: The Theory and Case Study both emphasize that qualitative investigation is what moves from "where" (identified by funnel data) to "why" (revealed by interviews).*
+*Correct answer: D*
+*Explanation: Funnel data is reliable about where and silent about why. The interviews are what turned a located problem into a diagnosed one.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. What would have likely happened if the team had proceeded directly with a UI redesign based on the aggregate drop-off number alone?**
-A) The redesign would have definitely fixed the problem regardless of the underlying cause
-B) The redesign would likely have shown little improvement, since the actual cause was a channel-specific expectation mismatch unrelated to the UI's visual design
-C) The redesign would have had no cost to the organization
-D) The redesign would have automatically revealed the segmentation insight anyway
+A) The redesign would have fixed the problem regardless
+B) Little improvement, since the cause lay elsewhere
+C) The redesign would have carried no cost whatsoever
+D) The redesign would have surfaced the segment insight anyway
 
 *Correct answer: B*
-*Explanation: The Case Study's "What went wrong (and what was caught in time)?" section explicitly states this — a UI fix would have addressed a symptom rather than the actual, channel-specific cause.*
+*Explanation: A redesign addresses visual and structural clarity. Neither is what a mismatch between marketing promise and product reality is made of.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
 **10. Using the Funnel Segmentation Table, what is the appropriate response to a "Notable Divergence" finding in a specific segment dimension?**
-A) Ignore it and proceed with a universal fix regardless
-B) Investigate that specific segment further, since the divergence suggests the aggregate number is hiding a segment-specific story worth understanding on its own
-C) Immediately conclude the entire funnel analysis was invalid
-D) Assume the divergence is a data error and discard the segment from future analysis
+A) Proceed with a universal fix across the whole user base
+B) Conclude the whole funnel analysis was invalid
+C) Treat it as a data error and drop that segment
+D) Investigate that segment, since the aggregate is hiding its story
 
-*Correct answer: B*
-*Explanation: The Framework Explanation section explicitly recommends investigating a segment showing notable divergence, rather than dismissing or ignoring it.*
+*Correct answer: D*
+*Explanation: Divergence is the table's purpose, not its failure. A dimension that splits sharply is the one carrying information the aggregate threw away.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they'd analyze a low-converting signup funnel, and answers: "I'd look at the overall conversion rate and immediately propose a redesign of the signup page." Based on this lesson's Interview Perspective section, what is missing from this answer?**
-A) Nothing; this is a complete and sufficient process
-B) Decomposition into discrete stages, consideration of both absolute and relative drop-off, segmentation to check for hidden patterns, and qualitative investigation before proposing a specific fix
-C) A recommendation to switch from Scrum to Kanban
-D) A commitment to redesign the entire product, not just the signup page
+A) Stage decomposition, both drop-off measures, segmentation, and interviews
+B) No gap; the described process is complete as stated
+C) A recommendation to move the team from Scrum to Kanban
+D) A commitment to redesign the entire product at once
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section describes a strong answer as including stage decomposition, absolute/relative consideration, segmentation, and qualitative investigation — all missing from this answer's premature jump to a fix.*
+*Correct answer: A*
+*Explanation: The answer jumps from a single number straight to a solution. Every step that would have identified which problem to solve has been skipped.*
 *Learning objective tested: #1, #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson emphasize that funnel stage definitions should meet the same precision standard as any other metric (per Lesson 41)?**
-A) Because funnel stages are exempt from definitional precision requirements
-B) Because an imprecisely defined stage (e.g., ambiguous about what counts as "starting" a form) inherits the same definitional risk as any other poorly-defined metric, undermining comparisons over time or across teams
-C) Because funnel stages are always computed identically regardless of definition
-D) Because only the final funnel stage needs a precise definition
+A) Because funnel stages are exempt from definitional requirements
+B) Because a stage computes the same however it is defined
+C) Because the final stage alone requires a firm definition
+D) An ambiguous stage undermines comparison over time or teams
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #5 explicitly connects funnel stage definition precision to Lesson 41's broader metric definition discipline.*
+*Correct answer: D*
+*Explanation: If "started the form" means a page view one quarter and a first keystroke the next, the conversion rate moved without any user behaviour changing.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A funnel shows a 40% relative drop-off at Step A (affecting 200 users) and a 15% relative drop-off at Step B (affecting 900 users, due to much higher volume passing through that step). Using the Leaky Bucket mental model, which step likely deserves higher priority if the goal is recovering the most total users?**
-A) Step A, because its relative drop-off percentage is higher
-B) Step B, because its absolute number of lost users is larger, potentially offering a greater total recovery even though its relative drop-off is lower
-C) Neither step matters, since only relative drop-off should ever be considered
-D) Both steps are equally unimportant regardless of the numbers
+A) Step A, since its relative drop-off percentage is higher
+B) Neither step, as relative drop-off is the sole input
+C) Step B, whose larger raw loss offers greater recovery
+D) Both steps rank equally whatever the numbers show
 
-*Correct answer: B*
-*Explanation: This directly applies the lesson's dual consideration of absolute and relative drop-off — Step B's larger absolute number suggests greater total recovery potential despite its lower relative percentage.*
+*Correct answer: C*
+*Explanation: The stated goal is total users recovered, and that is an absolute quantity. Step A is the more broken step; Step B is the larger leak.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking) An aggregate funnel conversion rate has remained flat over the past two quarters, but the company's traffic mix has shifted significantly toward a new acquisition channel during that time. Using Simpson's Paradox reasoning, what should a PM suspect?**
-A) Nothing; a flat aggregate rate always means nothing meaningful has changed
-B) The flat aggregate number may be masking a genuine change in segment-specific conversion rates, since a shifting traffic mix combined with a stable aggregate can hide either an improving or worsening trend in specific segments
-C) The funnel must be broken and should be discarded entirely
-D) Simpson's Paradox only applies to funnels with fewer than three stages
+A) No concern; a flat aggregate rules out change
+B) The flat figure may be masking segment-level movement
+C) The funnel is defective and should be discarded outright
+D) Simpson's Paradox applies to short funnels alone
 
 *Correct answer: B*
-*Explanation: This is a direct application of the Simpson's Paradox caution — a shifting traffic mix alongside a stable aggregate number is a strong signal to check segment-level data before concluding nothing has changed.*
+*Explanation: A flat line produced by a changing mix is a coincidence of arithmetic. Segments could be improving, worsening, or both while the total sits still.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A team identifies a funnel drop-off, segments the data thoroughly and finds no meaningful divergence across channels, devices, or cohorts, and conducts qualitative interviews revealing a plausible, evidence-based cause. What should the team do next, given what this lesson connects forward to?**
-A) Immediately roll the proposed fix out to 100% of users without further validation, since the qualitative evidence is convincing
-B) Recognize that a plausible, evidence-based hypothesis is still not the same as a proven causal fix, and proceed to validate the proposed change through a controlled experiment before full rollout, as covered in Lesson 45
-C) Abandon the fix entirely, since qualitative evidence is never trustworthy
-D) Re-run the same qualitative interviews repeatedly until a different explanation emerges
+A) Roll the fix out to all users at once on the interview evidence
+B) Drop the fix, since qualitative evidence cannot be trusted
+C) Validate the change through a controlled experiment first
+D) Repeat the same interviews until another explanation appears
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit forward connection to Lesson 45 — even strong qualitative evidence for a hypothesis should be validated through controlled experimentation before broad rollout, distinguishing correlation/plausibility from proven causal improvement.*
+*Correct answer: C*
+*Explanation: The team has a well-supported hypothesis, which is not yet a demonstrated improvement. Lesson 45 covers the step that closes that gap.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 

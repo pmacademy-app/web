@@ -404,195 +404,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What specific mechanism allows a controlled experiment to establish causation rather than mere correlation?**
-A) A large enough overall sample size
-B) Random assignment, which ensures treatment and control groups are statistically identical except for the tested change
-C) Running the experiment for at least 30 days
-D) Using a p-value threshold below 0.01 instead of 0.05
+A) Running the experiment for at least thirty days
+B) Using a p-value threshold below the usual 0.05
+C) Random assignment, which equalizes the two groups
+D) Collecting a sufficiently large overall sample size
 
-*Correct answer: B*
-*Explanation: The Theory section explains that random assignment specifically neutralizes other systematic differences between groups, isolating the tested change as the cause of any reliable difference.*
+*Correct answer: C*
+*Explanation: Randomization is what neutralizes the other systematic differences between groups, leaving the tested change as the explanation left standing for any reliable gap.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What does a p-value of 0.03 actually indicate?**
-A) There is a 97% probability the tested change works
-B) If the change genuinely had no real effect, there would be roughly a 3% chance of observing a difference this large or larger by pure chance
-C) The effect size is definitely large enough to be practically meaningful
-D) The experiment was run for exactly 3% of the required duration
+A) There is a 97% probability the change works
+B) A roughly 3% chance of this result under pure chance
+C) The effect size is large enough to matter practically
+D) The experiment ran for 3% of its required duration
 
 *Correct answer: B*
-*Explanation: The Theory section explains that a p-value indicates the likelihood of the observed result under pure chance assuming no real effect — not the probability the change works.*
+*Explanation: The figure describes how surprising the result would be under a no-effect assumption, not how probable the change is to actually work.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Why might an underpowered experiment fail to detect a real, genuinely existing effect?**
-A) Because underpowered experiments always produce false positives
-B) Because insufficient sample size relative to the effect size being tested for can prevent reliable detection, even when a real effect exists
-C) Because underpowered experiments cannot use random assignment
-D) Because power only matters for guardrail metrics, not primary metrics
+A) Underpowered experiments invariably yield false positives
+B) Power calculations apply to guardrails, not the primary metric
+C) Underpowered experiments cannot use random assignment
+D) Too little data can leave a genuine effect undetected
 
-*Correct answer: B*
-*Explanation: The Theory section explains that an underpowered experiment risks concluding "no significant difference" not because there's no effect, but because there wasn't enough data to reliably detect it.*
+*Correct answer: D*
+*Explanation: A real but modest effect needs enough observations to separate it from noise, and an underpowered run simply doesn't collect enough of them.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What is "peeking," and why does it inflate false positives?**
-A) Peeking is reviewing an experiment's design before launch; it has no effect on false positives
-B) Peeking is checking results before the planned endpoint and stopping early on an appealing result, which systematically increases the true false-positive rate beyond the nominal significance threshold
-C) Peeking is a required step in every valid experiment design
-D) Peeking only affects guardrail metrics, not primary metrics
+A) Checking results early, stopping the instant they look favorable
+B) A design review conducted before an experiment launches
+C) A step every valid experiment design must include
+D) A practice affecting guardrail metrics, not the primary one
 
-*Correct answer: B*
-*Explanation: The Theory section explains this exact mechanism — repeated checking and early stopping on noise inflates the true false-positive rate.*
+*Correct answer: A*
+*Explanation: A metric fluctuates above and below the true effect throughout a run, and stopping at the first favorable wander catches that wander rather than the real number.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. What does pre-registration require a team to define before an experiment launches?**
-A) Only the experiment's start date
-B) Hypothesis, primary metric, guardrail metrics, minimum detectable effect, sample size/duration, and analysis plan
-C) Only the color scheme of the treatment variant
-D) The final decision on whether to ship the change, decided before any data is collected
+A) Just the calendar date the experiment is set to begin
+B) The hypothesis, primary metric, guardrails, and plan
+C) Just the visual styling of the treatment variant
+D) The shipping decision, fixed ahead of any data
 
 *Correct answer: B*
-*Explanation: The Framework Explanation section's Experiment Pre-Registration Checklist lists exactly these fields.*
+*Explanation: The checklist commits a team to these fields in advance specifically so none can be quietly substituted once results start looking one way or another.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, why did the PM's day-four decision to stop the experiment turn out to be unreliable?**
-A) The experiment's hypothesis was fundamentally wrong
-B) The experiment was never pre-registered with a planned sample size, and the day-four result was very likely a random fluctuation rather than a genuine, lasting effect
-C) The control group was not randomly assigned
-D) The guardrail metrics showed clear harm that was ignored
+A) The underlying hypothesis was shown to be mistaken
+B) There had been no random assignment of the control group
+C) Pre-registration was skipped, so day four was noise
+D) A guardrail metric showed harm that was dismissed
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly attributes the unreliable result to peeking without pre-registration, not to a flaw in the underlying hypothesis or randomization.*
+*Correct answer: C*
+*Explanation: Without a planned sample size to reach first, an early favorable reading can't be told apart from an ordinary fluctuation that reverses by day ten.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. Why does the Case Study conclude that the underlying hypothesis (a messaging-expectation mismatch) might still be correct, despite the failed experiment?**
-A) Because failed experiments always confirm the original hypothesis
-B) Because the experiment's failure to hold up was attributed to a lack of rigor (peeking, no pre-registration), not necessarily to the hypothesis itself being wrong
-C) Because the guardrail metrics proved the hypothesis directly
-D) Because the treatment group was larger than the control group
+A) A failed experiment routinely confirms its hypothesis
+B) The failure traced to a lack of rigor, not the hypothesis
+C) The guardrail metrics proved the hypothesis directly
+D) The treatment group outnumbered the control group
 
 *Correct answer: B*
-*Explanation: The Case Study explicitly distinguishes a flawed experimental process from a necessarily false hypothesis, recommending a properly powered re-run rather than abandoning the hypothesis.*
+*Explanation: An experiment can be badly run in support of a perfectly sound idea, which is why the recommendation was to rerun it, not to discard the reasoning behind it.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
 **8. Why is checking many secondary metrics after an experiment and treating whichever one moved significantly as "the real result" considered a mistake?**
-A) Because secondary metrics should never be measured at all
-B) Because testing enough metrics will, by chance alone, produce some significant-looking results even with no genuine underlying effect — a subtler cousin of peeking
-C) Because secondary metrics are always less accurate than primary metrics
-D) Because this approach is required by most experimentation platforms
+A) Secondary metrics deserve no tracking at any point
+B) Every experimentation platform requires this practice
+C) Secondary metrics are inherently less accurate
+D) Testing enough metrics turns up chance winners
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #4 explains this exact risk — retroactive metric selection can produce false positives purely by chance across many tested metrics.*
+*Correct answer: D*
+*Explanation: Searching across a dozen secondary metrics for one that crossed the threshold is a slower-motion version of peeking, and it finds the same kind of noise.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. Why shouldn't a statistically significant result automatically be treated as proof a change is worth shipping?**
-A) Because statistical significance is always fabricated
-B) Because significance indicates the difference is unlikely to be pure chance, but says nothing about whether the effect is practically meaningful or whether guardrail metrics were harmed
-C) Because only guardrail metrics matter, never primary metrics
-D) Because shipping decisions should never depend on any data at all
+A) Significance leaves size or guardrail cost unaddressed
+B) Statistical significance results are routinely fabricated
+C) Just guardrail metrics carry any real weight here
+D) Shipping should rarely depend on any data at all
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #1 and #5 both explain that practical significance and guardrail metric impact must be considered alongside statistical significance before shipping.*
+*Correct answer: A*
+*Explanation: A result can be reliably non-random and still be too small to matter, or arrive alongside a cost the primary metric never captured.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
 
 ---
 
 **10. (Scenario) An experiment reaches its pre-registered sample size, and the primary metric shows a statistically significant 0.1 percentage point improvement — far below the pre-specified minimum detectable effect of 2 percentage points. What is the most appropriate conclusion?**
-A) Ship the change immediately, since any statistically significant result should always be deployed
-B) The result, while statistically significant, falls short of the effect size the team predetermined as practically meaningful, so shipping may not be justified despite technical significance
-C) The experiment must have been run incorrectly, since a significant result was found at all
-D) Statistical significance and minimum detectable effect are the same concept and cannot diverge
+A) The improvement falls short of what was pre-specified
+B) Ship the change at once, since it reached significance
+C) The run was flawed, since it found significance at all
+D) Statistical and practical significance mean the same thing
 
-*Correct answer: B*
-*Explanation: This directly applies the lesson's distinction between statistical and practical significance — a technically significant but tiny effect, below the pre-specified minimum detectable effect, may not justify shipping.*
+*Correct answer: A*
+*Explanation: The pre-specified threshold exists precisely to stop a technically real but trivially small movement from being mistaken for the outcome worth shipping for.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked to design an A/B test and answers: "I'd launch it and check the dashboard every day until I see a clear winner." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; frequent checking is the recommended best practice
-B) It describes exactly the peeking behavior this lesson identifies as inflating false positives, rather than a pre-registered plan with a single analysis at a predetermined endpoint
-C) It correctly demonstrates thorough monitoring of the experiment
-D) It shows strong statistical rigor
+A) None; it reflects careful, frequent monitoring
+B) It names peeking, not a registered plan
+C) It correctly demonstrates thorough oversight
+D) It shows unusually strong statistical discipline
 
 *Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer includes pre-registration elements defined before launch, not informal daily checking and early stopping.*
-*Learning objective tested: #4, #5*
+*Explanation: "Until I see a clear winner" describes stopping on the first favorable reading, exactly the behavior the lesson names as inflating false positives.*
+*Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson recommend calculating minimum detectable effect and required sample size before launching an experiment, rather than simply running it until a decision "feels" clear?**
-A) Because sample size calculations are a formality with no real impact on results
-B) Because without this calculation, a team risks either wasting resources on a severely underpowered test unable to detect a real effect, or running the experiment far longer than necessary for an obvious effect
-C) Because minimum detectable effect only applies to guardrail metrics
-D) Because sample size calculations eliminate the need for random assignment
+A) Sample size math removes the need for randomization
+B) Minimum detectable effect concerns guardrails alone
+C) Skipping it risks an underpowered test or a needlessly long one
+D) Such calculations are a formality without real bearing
 
-*Correct answer: B*
-*Explanation: The Theory section explains both risks of skipping this calculation — underpowering and unnecessary over-running — directly motivating the pre-launch calculation.*
+*Correct answer: C*
+*Explanation: The calculation sizes the experiment correctly on both ends — not so small it misses a real effect, not so long it wastes time confirming an obvious one.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A team runs an experiment and finds the primary metric improved significantly, but a guardrail metric tracking customer complaints also increased significantly. Using this lesson's frameworks, what is the most defensible next step?**
-A) Ship the change immediately, since the primary metric result is all that matters
-B) Investigate and understand the guardrail metric's regression before deciding whether to ship, since an improvement in the primary metric achieved at the cost of a guardrail metric may not represent a net-positive change, echoing Lesson 41's Goodhart's Law caution
-C) Ignore the guardrail metric entirely, since it wasn't the primary focus of the experiment
-D) Assume the guardrail metric regression is unrelated and irrelevant without further investigation
+A) Assume the complaint rise is unrelated, unchecked
+B) Ship without delay; the primary metric decides
+C) Investigate the guardrail regression first
+D) Disregard complaints, since they weren't the focus
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #5 explicitly warns against ignoring guardrail metrics when the primary metric improves, recommending investigation of the trade-off before shipping.*
+*Correct answer: C*
+*Explanation: A primary-metric win bought at the guardrail's expense is the Goodhart's Law pattern the pre-registration checklist exists to catch before shipping.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects the Peeking Trap mental model's core distinction?**
-A) There is no meaningful difference between checking results once at a planned endpoint versus checking repeatedly and stopping early
-B) A single, planned analysis at a pre-determined endpoint produces a trustworthy false-positive rate matching the stated significance level; repeated informal checking with early stopping produces a much higher true false-positive rate than stated
-C) Checking results more frequently always produces more accurate conclusions
-D) The Peeking Trap only applies to experiments with guardrail metrics
+A) Checking more frequently invariably yields sounder results
+B) The Peeking Trap concerns just guardrail metrics
+C) There is no real difference between one check and many
+D) One analysis holds its rate; repeated checks exceed it
 
-*Correct answer: B*
-*Explanation: The Mental Model section explicitly draws this exact contrast between pre-registered single analysis and informal repeated checking.*
+*Correct answer: D*
+*Explanation: The stated significance level is a promise about a single analysis, and multiplying the chances to stop early breaks that promise even though the number stays posted.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A PM wants to test a change but calculates that reaching adequate statistical power would take four months given current traffic levels — far longer than the team's planning horizon allows. Using this lesson's frameworks, what is the most defensible approach?**
-A) Run the experiment for two weeks anyway and treat whatever result appears as final, regardless of power calculations
-B) Recognize the experiment is likely to be underpowered within the available timeframe, and consider alternatives: testing a larger, more dramatic version of the change to increase the expected effect size, accepting a larger minimum detectable effect threshold, pooling traffic across a longer eligible population, or supplementing with qualitative research (Lesson 8) rather than relying on an underpowered quantitative result
-C) Abandon all experimentation permanently for this product due to insufficient traffic
-D) Reduce the required sample size arbitrarily without recalculating power, just to fit the planning horizon
+A) Run it for two weeks and treat that result as final
+B) Cut the required sample size to fit the horizon
+C) Abandon experimentation for this product for good
+D) Reshape the test: bigger effect or added research
 
-*Correct answer: B*
-*Explanation: This reflects a sophisticated application of the lesson's power and sample-size discipline — rather than either ignoring power requirements (option A/D) or giving up on evidence entirely (option C), the defensible path involves adjusting the experiment's design or complementing it with other rigorous methods to work within real constraints.*
+*Correct answer: D*
+*Explanation: Each option works within the real power constraint rather than pretending it away, including leaning on Lesson 8's methods where a clean quantitative read isn't reachable in time.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
