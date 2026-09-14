@@ -456,130 +456,130 @@ There is no single correct answer. The purpose of this exercise is to practice d
 ## Quiz
 
 **1. What are the five stages of design thinking, in order?**
-A) Research, Design, Build, Launch, Measure
-B) Empathize, Define, Ideate, Prototype, Test
-C) Discover, Define, Develop, Deliver, Document
-D) Plan, Execute, Review, Iterate, Ship
+A) Discover, Define, Develop, Deliver, and Document
+B) Research, Design, Build, Launch, and then Measure
+C) Empathize, Define, Ideate, Prototype, Test
+D) Plan, Execute, Review, Iterate, and finally Ship
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit, standard five-stage sequence, directly mapped to this curriculum's Modules 1 through 3.*
+*Correct answer: C*
+*Explanation: Each maps onto ground this curriculum already covered — Module 2 for Empathize, Lesson 17 for Define, Lessons 25 and 26 for Prototype and Test.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the single most commonly misunderstood feature of design thinking, according to this lesson?**
-A) That it requires expensive, specialized tools
-B) That its five stages are explicitly non-linear, with genuine backward iteration representing the process working correctly rather than a failure
-C) That it can only be applied to physical products, never software
-D) That it requires a minimum team size of ten people
+A) The stages are non-linear; looping back is the process working
+B) That it can be applied to physical products but never software
+C) That it requires expensive, specialised tooling to carry out
+D) That it requires a minimum team size of around ten participants each
 
-*Correct answer: B*
-*Explanation: The lesson explicitly identifies non-linearity, and the common misunderstanding that stages must proceed strictly forward, as its central corrective point.*
+*Correct answer: A*
+*Explanation: Returning to Define after a test is not a setback in the method. It is the method responding to evidence, which is the only reason to run it.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is "deferred judgment" in the context of brainstorming?**
-A) Waiting until the end of a project to make any decisions at all
-B) Strictly separating idea generation from idea evaluation, generating many candidate ideas before any critique or filtering is applied
-C) Only allowing senior team members to judge which ideas are good
-D) A technique for accelerating the Prototype stage
+A) Allowing senior members alone to judge which ideas are good
+B) Waiting until a project ends to decide anything
+C) A technique for accelerating the Prototype stage of the work
+D) Separating generation from evaluation, generating first
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition, distinguishing deferred judgment from unrelated concepts like decision timing or team hierarchy.*
+*Correct answer: D*
+*Explanation: Early criticism suppresses the unconventional idea before it is fully said. Keeping the two activities in separate phases is what protects the breadth of what gets generated.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What does "How Might We" reframing accomplish, according to this lesson?**
-A) It narrows a problem statement down to a single, specific solution immediately
-B) It transforms a validated problem statement into an open-ended, optimistic question, deliberately widening the candidate solution space before committing to a direction
-C) It replaces the need for any further empathy research
-D) It is only used during the Test stage, never during Ideate
+A) It removes the need for any further empathy research at all
+B) It narrows a problem statement to a single solution at once
+C) It turns the statement into an open question, widening the solution space
+D) It is used during Test rather than during the Ideate stage
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit description of the HMW technique's purpose — widening, not narrowing, the solution space, and used specifically at the Ideate stage.*
+*Correct answer: C*
+*Explanation: "Users abandon checkout over surprise shipping costs" becomes "how might we help users feel confident about total cost before committing?" — the same problem, more room to answer it.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What is the "design thinking as linear checklist" failure pattern?**
-A) Using too many Post-it notes during a brainstorming session
-B) Treating the five stages as a rigid, one-directional sequence, with each stage considered permanently finished once completed, rather than genuinely revisiting earlier stages when warranted
-C) Completing all five stages too quickly
-D) A required best practice for applying design thinking correctly
+A) Completing all five of the stages considerably too quickly
+B) Using too many sticky notes during a brainstorming session
+C) A required best practice for applying the method
+D) Treating each stage as finished, refusing to revisit any
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the failure pattern, directly undermining the methodology's core, defining value of genuine iteration.*
+*Correct answer: D*
+*Explanation: Once Define is marked done, a test that undermines the problem definition has nowhere to go, and the team pushes forward on a premise it no longer believes.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what was the actual underlying issue behind the negative user reaction to the real-time spending alert?**
-A) The alert's wording was too polite and needed to be more direct
-B) The original problem definition hadn't captured the importance of timing and emotional framing — receiving an alert during an already-stressful purchasing decision increased anxiety rather than reducing it
-C) The alert appeared too infrequently to be useful
-D) Users did not understand what the alert was for at all
+A) The alert's wording was too polite and needed more directness
+B) Users could not tell what the alert was actually there for
+C) The definition missed timing and emotional framing
+D) The alert appeared too infrequently to be of any use to users
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies this Define-stage gap (missing the timing/framing nuance) as the actual underlying issue, not a simple wording problem.*
+*Correct answer: C*
+*Explanation: An alert arriving mid-purchase raised anxiety rather than lowering it. That is a fact about when and how, and the problem statement had no room for either.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. Why did the team's superficial wording adjustment fail to resolve the user complaints in the Detailed Case Study?**
-A) Because wording adjustments are never effective for any usability issue
-B) Because the actual issue was a Define-stage gap, and a Prototype-stage wording change addressed the wrong level of the problem entirely
-C) Because the team used the wrong prototyping tool
-D) Because the wording adjustment was implemented incorrectly by engineering
+A) Because the wording change was implemented wrongly by engineering
+B) Because wording changes never resolve any usability issue at all
+C) Because the team had used the wrong prototyping tool throughout
+D) Because a Define-stage gap cannot be closed by a Prototype-stage fix
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the failure to a mismatch between the level of the actual problem (Define-stage) and the level of the attempted fix (Prototype-stage wording).*
+*Correct answer: D*
+*Explanation: The words were not the problem, so changing them could not be the fix. Matching the level of the response to the level of the gap is the whole diagnostic skill here.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. According to the Loop-Back Trigger Table, what should a team do if a prototype test surfaces an entirely new, unrelated pain point?**
-A) Immediately abandon the current project to pursue the new finding
-B) Capture the new finding as a candidate opportunity (per Lesson 19's Opportunity Solution Tree) for future comparison, without derailing the current project's focus
-C) Ignore the new finding entirely, since it's outside the current test's scope
-D) Immediately loop back to the Define stage of the current project based on this unrelated finding
+A) Abandon the current project at once to pursue the new finding
+B) Capture it as a candidate opportunity without derailing focus
+C) Disregard it, since it falls outside this test's defined scope
+D) Loop straight back to Define for the current project regardless
 
 *Correct answer: B*
-*Explanation: The Loop-Back Trigger Table explicitly distinguishes a genuinely new, unrelated opportunity (which should be captured separately) from a gap in the current effort (which would warrant looping back within the current project).*
+*Explanation: An unrelated finding is a new branch for the tree, not a gap in this effort. Chasing it now is the creep Lesson 21 warned about; discarding it loses something real.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team generates candidate solutions during Ideate, but every single idea feels weak, forced, or overly similar to existing competitor products. According to the Loop-Back Trigger Table, what does this most likely indicate?**
-A) The team should proceed directly to Prototype with the least weak idea, regardless of the underlying pattern
-B) This likely indicates a Define-stage gap — the problem may be framed too narrowly, warranting a return to Define to potentially revisit or reframe the "How Might We" question
-C) This indicates the team needs more prototyping tools, not a return to any earlier stage
-D) This pattern has no diagnostic significance and should be ignored
+A) A Define-stage gap; reframe the How Might We question
+B) Proceed to Prototype with the least weak of the ideas anyway
+C) The team needs more prototyping tools rather than an earlier stage
+D) This pattern carries no diagnostic weight and should be ignored
 
-*Correct answer: B*
-*Explanation: The Loop-Back Trigger Table explicitly identifies this pattern (weak, forced ideation results) as a likely sign of a Define-stage framing issue, warranting a return to that stage rather than proceeding forward regardless.*
+*Correct answer: A*
+*Explanation: Uniformly weak ideation usually means the question is too narrow to admit an interesting answer. The fix is upstream of the ideas, in how the problem was framed.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team's usability test reveals that users misunderstand a prototype specifically because of confusion about their own context and workflow constraints that the team hadn't previously considered. According to the Loop-Back Trigger Table, which stage should the team return to?**
-A) Ideate, since the issue is about generating better ideas
-B) Empathize, since the issue reflects a gap in the team's understanding of user context, not a flaw in the problem definition or the specific prototype execution
-C) No stage should be revisited; the team should proceed directly to full development
-D) Test again with the exact same prototype and no other changes
+A) Empathize, since the gap is in understanding context
+B) Ideate, since the issue concerns generating stronger ideas
+C) Test again with the identical prototype and no other change
+D) No stage needs revisiting; proceed to full development now
 
-*Correct answer: B*
-*Explanation: The Loop-Back Trigger Table explicitly identifies missing context or constraint understanding as indicating an Empathize-stage gap specifically, distinct from a Define-stage or Ideate-stage issue.*
+*Correct answer: A*
+*Explanation: The problem may be correctly defined and the solution reasonable; what is missing is knowledge of the circumstances the user is operating in, which is empathy work.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
@@ -587,64 +587,64 @@ D) Test again with the exact same prototype and no other changes
 
 **11. (Interview Reasoning) A candidate describes their design thinking process as always proceeding in the exact order Empathize, Define, Ideate, Prototype, Test, with no examples of ever revisiting an earlier stage across multiple projects. What might this signal, based on this lesson's Interview Perspective section?**
 A) An exceptionally well-executed, ideal design thinking process
-B) A likely instance of the "linear checklist" failure pattern, since genuine design thinking should produce at least some instances of backward iteration when new information warrants it
-C) That the candidate is unqualified for any product or design role
-D) Nothing meaningful, since a strictly linear process is the intended, correct application of design thinking
+B) The linear-checklist pattern; real practice loops back sometimes
+C) Evidence the candidate is unsuited to any product or design role
+D) Nothing of note, since a strictly linear order is the intended one
 
 *Correct answer: B*
-*Explanation: This directly reflects the lesson's core diagnostic — a complete absence of any backward iteration across multiple projects is itself a warning sign of the linear-checklist failure pattern, not evidence of ideal execution.*
+*Explanation: Across several projects, evidence should have overturned something at least once. A perfect forward march suggests the loops were unavailable rather than unnecessary.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team is under significant schedule pressure and a Test-stage finding suggests a genuine Define-stage gap, similar to the Detailed Case Study. What is the most defensible path forward, according to this lesson, given the schedule constraint?**
-A) Ignore the schedule pressure entirely and take as much time as needed for a full return to Empathize and Define, regardless of any other consideration
-B) Apply a superficial fix at the current stage to preserve the schedule, similar to what the Detailed Case Study's team did, accepting the resulting unresolved user complaints as an acceptable trade-off
-C) Make the schedule trade-off explicit and deliberate — potentially conducting a brief, targeted return to Define (rather than a full, extensive one) that respects the schedule constraint while still genuinely addressing the identified gap, rather than defaulting to a superficial fix that doesn't actually resolve the underlying issue
-D) Cancel the entire project immediately upon discovering any Define-stage gap
+A) Make the trade-off explicit; run a brief, targeted return to Define
+B) Apply a superficial fix to hold the schedule, as the case study did
+C) Cancel the project as soon as any Define-stage gap is discovered
+D) Disregard the schedule and return fully to Empathize regardless
 
-*Correct answer: C*
-*Explanation: This reflects a more nuanced, realistic application of the lesson's discipline — genuine iteration doesn't necessarily require unlimited time, but does require actually addressing the identified gap at its correct level, rather than defaulting to a superficial, schedule-preserving fix that fails to resolve the real issue, as the Detailed Case Study's team did.*
+*Correct answer: A*
+*Explanation: Genuine iteration does not require unlimited time; it requires addressing the gap at the level it actually sits. A short, targeted loop can respect both.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer asks a candidate to critique the Detailed Case Study's team decision to apply a wording tweak rather than loop back to Define. What is the strongest critique, based on this lesson?**
-A) The wording tweak was poorly written and should have been more clearly worded
-B) The team correctly diagnosed the issue as a Prototype-stage flaw, but should have spent more time on the wording adjustment specifically
-C) The team failed to correctly diagnose which stage the Test-stage finding actually indicated a gap in, applying a fix at the wrong level (Prototype) when the actual gap was at an earlier stage (Define), guaranteeing the fix wouldn't resolve the underlying issue
-D) The team should never have proceeded to the Prototype stage at all for this particular problem
+A) The team should not have reached the Prototype stage for this at all
+B) They misdiagnosed the stage, fixing at Prototype what sat at Define
+C) The wording tweak was poorly written and needed clearer phrasing
+D) They diagnosed correctly and should have spent longer on the wording
 
-*Correct answer: C*
-*Explanation: This reflects the lesson's precise diagnostic framing — the core failure was a diagnostic error (misidentifying which stage needed revisiting), not a matter of execution quality within the wrong stage, or an argument against ever reaching Prototype in the first place.*
+*Correct answer: B*
+*Explanation: The failure was diagnostic rather than executional. A better-worded alert, produced with more care, would have missed in exactly the same way.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team applies "How Might We" reframing to a problem statement and generates a wide, genuinely diverse set of candidate solutions during deferred-judgment brainstorming. During the subsequent evaluation step, how should the team decide which candidates to prototype, connecting this lesson to Lesson 29's prioritization discipline?**
-A) The team should prototype every single candidate idea generated, regardless of their number
-B) The team should apply a prioritization framework (such as RICE or MoSCoW, per Lesson 29) to the generated candidates, using genuine, evidence-grounded criteria rather than simply choosing the first or most personally appealing idea
-C) The team should skip evaluation entirely and proceed directly to full development of a randomly selected candidate
-D) Prioritization frameworks are not relevant to the design thinking process at all
+A) Prototype every candidate idea generated, whatever their number
+B) Skip evaluation and develop a randomly chosen candidate in full
+C) Apply a prioritisation framework using evidence-grounded criteria
+D) Prioritisation frameworks bear no relation to this work
 
-*Correct answer: B*
-*Explanation: This connects design thinking's Ideate-to-Prototype transition directly to Lesson 29's prioritization discipline — a wide range of generated ideas still requires genuine, evidence-grounded prioritization before committing prototyping resources, rather than defaulting to arbitrary or exhaustive selection.*
+*Correct answer: C*
+*Explanation: Deferred judgment postpones evaluation; it does not cancel it. The breadth generated is only useful if something disciplined then selects from it.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team has internalized this lesson's non-linear discipline well, genuinely looping back between stages as warranted across a project's lifecycle. However, senior leadership, unfamiliar with design thinking's non-linear nature, becomes concerned that the project "keeps going backward" and appears disorganized. What is the most appropriate response, connecting this lesson to Lesson 9's Vision Filter and Lesson 22's collaborative documentation practices?**
-A) The team should abandon genuine iteration entirely to appear more linear and organized to leadership, regardless of the cost to the project's actual quality
-B) The team should proactively and transparently communicate the design thinking framework itself to leadership — explaining that backward iteration reflects genuine responsiveness to new evidence rather than disorganization, potentially using a visible, living document (echoing Lesson 22's collaborative PRD practices) to track what's been learned at each loop and why a return was warranted
-C) The team should hide the fact that any backward iteration has occurred from leadership entirely
-D) The team should insist leadership has no legitimate basis for any concern and refuse further discussion
+A) Insist leadership has no legitimate basis here and decline further discussion
+B) Abandon genuine iteration to look more linear, whatever the cost
+C) Conceal the fact that any backward iteration has occurred at all
+D) Explain the framework openly and track each loop in a living document
 
-*Correct answer: B*
-*Explanation: This synthesizes the lesson's core argument with earlier lessons on collaborative documentation and stakeholder communication — proactive, transparent explanation of the methodology itself (rather than hiding iteration, abandoning good practice, or dismissing legitimate stakeholder concern) is the most defensible path, turning a potential misunderstanding into an opportunity for genuine alignment.*
+*Correct answer: D*
+*Explanation: The concern is reasonable from the outside, because backward movement genuinely does look like churn. A visible record of what each loop learned turns it into evidence of responsiveness.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 

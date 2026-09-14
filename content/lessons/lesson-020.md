@@ -421,26 +421,26 @@ There is no single correct answer. The purpose of this exercise is to practice d
 ## Quiz
 
 **1. Why is the full discovery process described as "circular" in this lesson, rather than a linear project with a defined endpoint?**
-A) Because discovery findings are always eventually proven wrong
-B) Because after a validated opportunity moves to delivery, the team should return to the Opportunity Solution Tree to select the next candidate, maintaining a continuously running process
-C) Because delivery teams always send work back to discovery teams for revision
-D) Because circular processes are easier to present in slide decks
+A) The team returns to the tree for the next candidate
+B) Because discovery findings are always eventually proven wrong
+C) Because delivery teams routinely send work back for revision
+D) Because circular processes present better in slide decks
 
-*Correct answer: B*
-*Explanation: The lesson explicitly describes the Discovery Flywheel as continuously spinning — after delivery begins on one opportunity, the team returns to the tree for the next, rather than treating the process as complete.*
+*Correct answer: A*
+*Explanation: The flywheel keeps turning while delivery runs in parallel. Treating one validated opportunity as the end of discovery is the phase-based pattern Lesson 8 warned about.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. When is a discovery sprint more appropriate than continuous discovery, according to this lesson?**
-A) For every single validation need, regardless of stakes
-B) For genuinely high-stakes or high-uncertainty decisions, such as a major pivot or new product direction
-C) Discovery sprints should never be used under any circumstances
-D) Only when a team has no existing customers to interview
+A) For every single validation need, whatever the stakes
+B) For genuinely high-stakes or high-uncertainty decisions
+C) Just when a team has no existing customers to interview
+D) Discovery sprints should never be used under any conditions
 
 *Correct answer: B*
-*Explanation: The lesson explicitly reserves discovery sprints for higher-stakes, higher-uncertainty situations, with lighter continuous discovery handling most ongoing validation needs.*
+*Explanation: Sprints are expensive and hard to sustain. A major pivot warrants one; the weekly cadence should carry most ordinary validation without them.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -449,167 +449,167 @@ D) Only when a team has no existing customers to interview
 **3. Which of the following is NOT one of the four factors this lesson recommends checking before deciding evidence is sufficient to proceed to delivery?**
 A) Whether the riskiest assumption has specifically been tested
 B) Whether the test was genuine rather than discovery theater
-C) Whether the marketing team has approved the messaging
+C) Whether marketing has approved the messaging
 D) Whether the evidence aligns with the original problem statement
 
 *Correct answer: C*
-*Explanation: The four factors are riskiest-assumption testing, test genuineness, evidence trustworthiness appropriate to stakes, and alignment with the original problem statement — marketing approval is not one of the named criteria.*
+*Explanation: Messaging sign-off is a launch dependency, not a test of whether the evidence supports building the thing at all.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What is the "discovery-delivery handoff" failure pattern?**
-A) A healthy practice of formally documenting discovery findings before delivery begins
-B) Organizationally separating discovery and delivery, or ceasing discovery activity once delivery begins, risking lost context and unvalidated implementation assumptions
-C) A required step in every product development process
-D) A term describing when a customer switches from one product to a competitor
+A) Separating the two organisationally, risking lost context and untested assumptions
+B) A healthy practice of documenting findings before delivery starts
+C) A required step within every product development process
+D) A term for a customer switching to a competitor's product
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the failure pattern, distinct from simply documenting findings (which can be healthy) — the issue is organizational separation or a full cessation of ongoing discovery.*
+*Correct answer: A*
+*Explanation: Documenting findings is fine. The failure is a team receiving conviction secondhand, plus the implicit signal that discovery on this opportunity is now closed.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. According to this lesson's corrective principle, who should ideally retain ownership from discovery through delivery for a given opportunity?**
-A) A separate, dedicated research team only
-B) The same cross-functional team, including product, design, and engineering
-C) Only the engineering team, once a specification document has been finalized
-D) Only senior leadership, with no involvement from the working team
+A) Only the engineering team, once the specification has been finalised
+B) A separate, dedicated research team handling all discovery work
+C) Senior leadership alone, without the working team involved
+D) The same cross-functional product, design, and engineering team
 
-*Correct answer: B*
-*Explanation: The lesson's corrective principle, echoing the empowered product team model, calls for the same cross-functional team maintaining continuity across both discovery and delivery.*
+*Correct answer: D*
+*Explanation: Continuity of context is the point. The people who heard the customer say it are the ones best placed to judge the implementation details no document anticipated.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what specific mistake occurred despite an otherwise excellent, rigorous discovery sprint?**
-A) The team never validated the original opportunity at all
-B) The team treated the sprint as a complete substitute for ongoing discovery, allowing an untested implementation-stage assumption (the visualization format) to reach launch without validation
-C) The team spent too much time on discovery and not enough on delivery
-D) The team failed to use the Opportunity Solution Tree at any point
+A) The team never validated the original opportunity in any way
+B) The team failed to use the Opportunity Solution Tree at any point
+C) The team spent too long on discovery and too little on delivery
+D) The sprint replaced ongoing discovery, letting a later assumption reach launch
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the launch problem to treating the initial sprint as sufficient for the entire project, rather than maintaining ongoing discovery to catch new, smaller assumptions emerging during implementation.*
+*Correct answer: D*
+*Explanation: The sprint did its job on the big question. What it could not do was anticipate the smaller decisions that only appear once people start building.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. Why should the evidence bar for proceeding to delivery scale with a decision's stakes and reversibility, according to this lesson?**
-A) Because all decisions require exactly the same amount of evidence regardless of context
-B) Because a low-stakes, easily reversible decision can reasonably proceed on lighter evidence, while a large, hard-to-reverse investment warrants a higher evidentiary bar
-C) Because reversible decisions should always require more evidence than irreversible ones
-D) Because evidence quality is irrelevant to decision-making
+A) Because all decisions need exactly the same evidence regardless
+B) Because reversible decisions should require more evidence than irreversible ones
+C) Because a reversible, low-stakes call can proceed on lighter evidence
+D) Because evidence quality has no bearing on decision-making at all
 
-*Correct answer: B*
-*Explanation: The lesson explicitly argues that the appropriate evidence bar depends on the stakes and reversibility of the decision, rather than being fixed regardless of context.*
+*Correct answer: C*
+*Explanation: A fixed bar is either too heavy for small reversible calls or too light for large irreversible ones. Matching rigour to consequence is what makes it proportionate.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. What specific new, unvalidated assumption emerged during the Detailed Case Study's delivery phase, and how was it handled?**
-A) A new pricing model, which was tested using a full discovery sprint before implementation
-B) A specific data-visualization format, which was decided based on the design team's intuition alone, without further testing
-C) A new target market, which was validated using continuous discovery
-D) A new customer segment, which was properly added to the Opportunity Solution Tree
+A) A data-visualisation format, chosen on design intuition with no further testing
+B) A new pricing model, tested with a full sprint before implementation
+C) A new target market, validated through the continuous cadence
+D) A new customer segment, properly added to the opportunity tree
 
-*Correct answer: B*
-*Explanation: The case study explicitly describes the visualization format as an untested, intuition-based decision made during implementation, without any further validation.*
+*Correct answer: A*
+*Explanation: It was a small decision made by capable people and never checked with a user. That is precisely the gap a standing cadence exists to close during delivery.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team is considering a low-stakes, easily reversible UI copy change and has only lightweight, informal customer feedback supporting it. According to this lesson, what is the most appropriate response?**
-A) Refuse to proceed until a full discovery sprint has been conducted, regardless of the decision's low stakes
-B) Recognize that a low-stakes, easily reversible decision can reasonably proceed on lighter evidence, and move forward while remaining open to adjusting if early signals are negative
-C) Ignore the evidence entirely and make the decision based purely on personal preference
-D) Escalate the decision to senior leadership regardless of its low stakes
+A) Escalate the decision up to senior leadership despite its very low stakes
+B) Ignore the evidence and decide purely on personal preference
+C) Refuse to proceed until a full discovery sprint has been run
+D) Proceed on lighter evidence, staying open to early negative signals
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's stakes-sensitive evidence bar — a low-stakes, reversible decision doesn't require the same rigor as a major, hard-to-reverse investment.*
+*Correct answer: D*
+*Explanation: Copy that can be changed back on Monday does not warrant the rigour of an irreversible investment. Insisting otherwise spends discovery capacity where it buys least.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team's Opportunity Solution Tree has not been updated in six months because the team has been fully absorbed in a single, large delivery effort. According to the Discovery Process Health Checklist, what does this indicate?**
-A) This is a healthy sign, since the team is focused on delivery
-B) This is a warning sign, suggesting the Discovery Flywheel may have stopped spinning and the team should re-establish at least a lightweight, ongoing discovery cadence alongside delivery
-C) The Opportunity Solution Tree is no longer a relevant tool once delivery begins
-D) This indicates the team has successfully completed all necessary discovery permanently
+A) A healthy sign, since the team has rightly been focused on delivery work
+B) A warning sign; re-establish a lightweight cadence alongside delivery
+C) The tree stops being a relevant tool once delivery has begun
+D) Evidence the team has completed all necessary discovery permanently
 
 *Correct answer: B*
-*Explanation: An unchanged Opportunity Solution Tree for six months is explicitly flagged in the Health Checklist as a warning sign of a stalled discovery process, not a healthy or complete one.*
+*Explanation: A stalled tree is the checklist's clearest warning sign. The flywheel has stopped, and the current initiative is being treated as the final answer to every outstanding need.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes their organization as having a dedicated "research team" that conducts all discovery work and hands validated findings to separate "build teams." What might this signal, based on this lesson's Interview Perspective section?**
-A) An ideal, best-practice organizational structure with no meaningful risks
-B) A possible instance of the discovery-delivery handoff pattern, risking lost context and reduced conviction during the transition from discovery to delivery
-C) That the candidate's organization has no discovery process at all
-D) Nothing meaningful, since organizational structure has no bearing on discovery quality
+A) An ideal, best-practice structure carrying no meaningful risks
+B) A discovery-delivery handoff risking lost context
+C) That the candidate's organisation has no discovery process at all
+D) Nothing of note, since structure has no bearing on discovery quality
 
 *Correct answer: B*
-*Explanation: This directly describes the organizational separation this lesson explicitly warns against, and a strong interview answer would recognize and articulate this risk rather than presenting it as an unambiguous best practice.*
+*Explanation: The structure guarantees the builders never heard the conversations. A strong answer names that risk rather than presenting the split as obviously good practice.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team has just completed a rigorous discovery sprint validating a major opportunity, and is debating whether to disband their discovery cadence during the subsequent long delivery phase. Using this lesson's framework, what is the strongest argument against disbanding it?**
-A) Discovery sprints are never sufficient on their own, regardless of how rigorously they were conducted
-B) New, smaller assumptions (implementation details not covered by the original validated opportunity) will likely emerge during delivery, and a standing, lightweight discovery cadence is needed to catch and test them before they reach launch unvalidated
-C) Disbanding the cadence is always acceptable once a major sprint has concluded
-D) Discovery cadences are only useful before any opportunity has been validated
+A) Sprints are never sufficient alone, however rigorously they are run
+B) Disbanding is acceptable once a major sprint has properly concluded
+C) Implementation assumptions emerge and need testing
+D) Cadences are useful just before an opportunity has been validated
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core argument — a rigorous sprint validates the major opportunity, but does not anticipate every smaller, implementation-stage assumption that will emerge, which is exactly the gap continuous discovery is meant to fill.*
+*Correct answer: C*
+*Explanation: The sprint answered the question it was designed around. The questions that surface in month three of building were not on the list when it ran.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer asks a candidate how they would respond if senior leadership insisted that discovery formally "end" once a project's initial validation phase concludes. A weak answer would most likely include which of the following?**
-A) Proposing to maintain a lightweight, ongoing discovery cadence throughout delivery to catch new, smaller assumptions, while clearly communicating this as a continuation rather than a separate, additional workstream
-B) Agreeing entirely and disbanding all further discovery activity once the initial validation phase concludes, regardless of new assumptions that may emerge
-C) Explaining the specific risks of the discovery-delivery handoff pattern using a concrete example
-D) Proposing a scaled-down, but still standing, customer conversation rhythm during the delivery period
+A) Propose a lightweight ongoing cadence through delivery, framed as continuation
+B) Agree entirely and disband all further discovery once the validation phase concludes
+C) Explain the risks of the handoff pattern with a concrete example
+D) Propose a scaled-down but standing customer conversation rhythm
 
 *Correct answer: B*
-*Explanation: Fully disbanding discovery activity without pushback, despite the lesson's clear warnings about the risks of doing so, reflects a weak, non-diagnostic response compared to the more thoughtful, evidence-based alternatives in the other options.*
+*Explanation: The other three all keep some form of ongoing validation alive while engaging leadership's concern. Only B accepts the premise and leaves the later assumptions untested.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team maintains a genuinely continuous discovery cadence throughout an eight-month delivery project, but recruits interview participants only from currently active users of the specific feature under development. What risk, connecting back to Lesson 11, does this practice introduce?**
-A) No risk, since currently active users are always the most representative population
-B) A sampling representativeness risk (per Lesson 11), since currently active users may not represent the perspectives of non-users or churned users, who might reveal different or more serious concerns
-C) This practice ensures the discovery process is fully continuous with no further risk
-D) This practice guarantees the evidence gathered is at the highest rung of the Evidence Trustworthiness Ladder regardless of other factors
+A) A representativeness risk, since non-users and churned users are excluded
+B) No risk, since currently active users are the most representative group
+C) This guarantees the evidence sits at the ladder's highest rung regardless
+D) This ensures the process is fully continuous with no remaining risk
 
-*Correct answer: B*
-*Explanation: This connects this lesson's continuous discovery cadence back to Lesson 11's representativeness warning — maintaining a continuous cadence does not, by itself, guarantee a representative sample; both disciplines must be applied together.*
+*Correct answer: A*
+*Explanation: Cadence and sampling are separate disciplines. Talking to someone every week for eight months does not help if it is the same self-selected slice every time.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team has a healthy, continuously spinning Discovery Flywheel, a cross-functional team retaining ownership from discovery through delivery, and a stakes-appropriate evidence bar — but has never revisited whether its underlying desired outcome (the root of its Opportunity Solution Tree) still reflects current company strategy, since that strategy shifted significantly six months ago. What does this scenario illustrate, connecting this lesson to Lessons 9, 10, and 19?**
-A) A fully healthy discovery process with no remaining gaps
-B) That even an otherwise exemplary discovery process (per this lesson's Health Checklist) can still become strategically disconnected if the root outcome itself, per Lesson 19's Opportunity Pruning Cadence, is not periodically re-validated against current vision and strategy (Lessons 9 and 10)
-C) That vision and strategy have no bearing on a team's discovery process once it has been established
-D) That the team should immediately discard its entire Opportunity Solution Tree and start over from nothing
+A) A fully healthy discovery process with no remaining gaps to close
+B) That vision and strategy stop mattering once discovery is established
+C) Even a healthy process drifts if the root outcome is never re-validated
+D) That the team should discard the whole tree and start again from scratch
 
-*Correct answer: B*
-*Explanation: This integrates this lesson's process health checks with Lesson 19's pruning cadence and Lessons 9–10's guidance on revisiting vision and strategy — a well-functioning tactical discovery process can still drift out of alignment with current strategic direction if the root outcome itself isn't periodically re-validated, which is a distinct and additional check beyond simply running the Flywheel correctly.*
+*Correct answer: C*
+*Explanation: Every check in the Health Checklist can pass while the whole apparatus points at a target the company stopped caring about. Process health and strategic alignment are separate tests.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 

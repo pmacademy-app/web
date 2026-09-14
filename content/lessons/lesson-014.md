@@ -385,195 +385,195 @@ There is no single correct answer. The purpose of this exercise is to practice b
 ## Quiz
 
 **1. According to this lesson, what is the load-bearing content of a genuinely useful persona?**
-A) The persona's name, photo, and hobbies
-B) The persona's validated job to be done, goals, and pain points
-C) The persona's age and job title
-D) The number of personas a team has created
+A) The validated job to be done, goals, and pain points
+B) The persona's name, photo, and weekend hobbies
+C) The persona's age bracket and current job title
+D) The total number of personas the team has produced so far
 
-*Correct answer: B*
-*Explanation: The lesson explicitly identifies job, goals, and pain points as the substantive core of a useful persona, distinct from demographic or biographical detail.*
+*Correct answer: A*
+*Explanation: Name, photo, and biography are the most visible parts and almost never the useful ones. Demographic detail earns its place only when it genuinely predicts a different behaviour.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the Persona Substance Test?**
-A) A test measuring how many team members can recall a persona's name
-B) A diagnostic that removes a persona's name, photo, and biography to check what specific, research-traceable content remains
-C) A survey sent to customers asking whether they identify with a given persona
-D) A method for determining how many personas a company should create
+A) A survey asking customers whether they identify with a persona
+B) Stripping name, photo, and biography to see what remains
+C) A measure of how many colleagues recall the name
+D) A method for deciding how many personas a company should keep
 
 *Correct answer: B*
-*Explanation: The Persona Substance Test specifically evaluates whether meaningful, evidence-based content remains once surface-level narrative details are stripped away.*
+*Explanation: If a distinct job, distinct goals, and distinct pain points survive the strip-down, you have a persona. If little remains, you have a character sketch with professional formatting.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **3. Why does this lesson warn against building personas primarily from team assumption?**
-A) Because assumptions are always incorrect
-B) Because an assumption-based persona inherits the team's existing biases, and its polished, professional presentation can make it feel more trustworthy than it has actually earned the right to be
-C) Because personas built from assumption are illegal in most industries
-D) Because team assumptions are always more accurate than customer interviews
+A) It inherits team bias, and polish makes it feel more earned
+B) Because team assumptions are invariably incorrect
+C) Because team assumptions outperform customer interviews reliably
+D) Because assumption-based personas are prohibited in most sectors
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core warning, directly extending Lesson 11's point that polished presentation does not confer evidentiary trustworthiness.*
+*Correct answer: A*
+*Explanation: An assumption written into a document with a name and a photograph reads as a finding. The format confers authority the underlying evidence never earned.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Which of the following is the clearest example of the "too many personas" failure pattern?**
-A) A team maintains a single, well-validated persona reflecting its primary target segment
-B) A team creates twelve distinct personas to represent every variation observed in a small set of interviews, diluting the team's ability to reference any of them meaningfully in daily decisions
-C) A team periodically revisits its personas as new research emerges
-D) A team uses the Persona Prioritization Filter to evaluate a new feature
+A) Twelve personas built from a small interview set, none referenced
+B) One well-validated persona reflecting the primary target segment
+C) A team revisiting its personas as new research becomes available
+D) A team applying the Persona Prioritization Filter to a new feature
 
-*Correct answer: B*
-*Explanation: Creating an excessive number of personas dilutes the artifact's core purpose of being memorable and actionable, which is precisely the "too many personas" pattern this lesson warns against.*
+*Correct answer: A*
+*Explanation: Nobody holds twelve personas in mind during a prioritisation call. A long list usually means the segments were never consolidated around what the current strategy actually needs.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. What does "persona as decoration" describe?**
-A) A persona that includes too much visual design detail
-B) A persona document that is well-received when first presented but never actually referenced again in real prioritization or design decisions
-C) A persona built entirely from survey data with no qualitative research
-D) A persona that has been translated into multiple languages
+A) A persona document translated into several different languages
+B) A persona built from survey data alone with no qualitative research
+C) A persona carrying an excessive amount of visual design detail
+D) A persona well received once, then never used again
 
-*Correct answer: B*
-*Explanation: "Persona as decoration" specifically describes a polished artifact that fails to function as an ongoing decision-making tool, directly paralleling Lesson 8's discovery theater concept.*
+*Correct answer: D*
+*Explanation: This is the persona form of discovery theater — the visible artefact of research synthesis, produced and admired, without ever functioning as a decision-making tool.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what specific problem was discovered when a new PM asked about "Busy Ben's" stated pain point?**
-A) The pain point was accurately sourced from three separate customer interviews
-B) No one could locate any research evidence behind the pain point, which turned out to be an assumption voiced during the original workshop and written into the document as if it were an established finding
-C) The pain point had been validated by a large-scale survey
-D) The persona document had been lost entirely
+A) The persona document had been lost from the team's shared drive
+B) The pain point was accurately sourced from three real interviews
+C) No research backed the pain point; it was a workshop assumption written in as fact
+D) The pain point had already been validated by a large-scale survey
 
-*Correct answer: B*
-*Explanation: The case study explicitly reveals that the pain point was an unvalidated assumption presented as established fact, with no traceable research behind it.*
+*Correct answer: C*
+*Explanation: Nobody could trace it to an interview or a survey response. Once written into the document alongside genuine findings, it had been treated as one for as long as nobody asked.*
 *Learning objective tested: #2, #4*
 *Difficulty: Easy*
 
 ---
 
 **7. According to the persona template described in this lesson, what is required of any quotes included in a persona document?**
-A) Quotes should be written by the design team to sound as plausible and polished as possible
-B) Quotes must be real and sourced from actual research, never invented or presented as genuine when they are not
-C) Quotes are optional and rarely add value to a persona
-D) Quotes should always be attributed to a fictional character rather than a real research participant
+A) Quotes are optional and seldom add value to the document
+B) Quotes should be drafted by design to sound as polished as possible
+C) Quotes must be real and sourced from actual research conducted
+D) Quotes should be attributed to the fictional character, not a participant
 
-*Correct answer: B*
-*Explanation: The lesson's template explicitly requires representative quotes to be real and sourced, directly warning against the fabricated-quote failure shown in the Detailed Case Study.*
+*Correct answer: C*
+*Explanation: A sourced quote keeps the persona anchored to evidence a sceptical colleague can go and check. An invented one manufactures the appearance of that anchor without the substance.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. What are the four questions in the Persona Prioritization Filter?**
-A) What is the persona's name, age, job title, and hobby?
-B) Which persona does this feature serve, does it address their validated job/goal/pain point, is investment proportionate to their validated prevalence, and what trade-off does it create against another persona?
-C) How many personas exist, how were they created, who approved them, and when were they last updated?
-D) Is the persona demographic-based or behavior-based, and does it include a photo?
+A) Persona count, creation method, approver, and last update date
+B) The persona's name, age bracket, job title, and chosen hobby
+C) Whether the persona is demographic or behaviour-based, and whether it has a photo
+D) Which persona, validated job fit, proportionate investment, and trade-offs
 
-*Correct answer: B*
-*Explanation: This is the exact four-question structure of the Persona Prioritization Filter described in this lesson's Framework Explanation section.*
+*Correct answer: D*
+*Explanation: The four together force an explicit answer where teams usually say "users." The last one surfaces the cost to a second persona, which is the Stakeholder Ledger applied at this level.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team wants to evaluate a proposed feature using the Persona Prioritization Filter, but the underlying personas were built entirely from unvalidated team assumption. According to this lesson, what is the likely outcome?**
-A) The filter will function correctly regardless of how the personas were built
-B) The filter will simply launder unvalidated guesses through an official-looking prioritization process, producing false confidence rather than genuine rigor
-C) The filter cannot be applied to any persona under any circumstances
-D) The filter will automatically correct for any underlying persona inaccuracies
+A) The filter will correct for any underlying persona inaccuracies
+B) It launders unvalidated guesses through an official-looking process
+C) The filter functions correctly however the personas were built
+D) The filter cannot be applied to any persona under any conditions
 
 *Correct answer: B*
-*Explanation: The lesson explicitly warns that the Persona Prioritization Filter only functions correctly when applied to personas that have passed the Persona Substance Test — applying it to assumption-based personas simply adds false confidence, not genuine rigor.*
+*Explanation: A rigorous-looking process applied to invented inputs produces confident wrong answers rather than no answer, which is worse than skipping the filter entirely.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. Why should demographic detail be included in a persona only when it is "genuinely predictive of behavior," according to this lesson?**
-A) Because demographic detail is always inaccurate
-B) Because demographic detail that isn't tied to actual behavioral difference risks distracting from, or substituting for, the research-based substance a persona is meant to convey
-C) Because including any demographic detail is against best practice in all cases
-D) Because demographic detail cannot be gathered through interviews or surveys
+A) Because demographic detail is inaccurate in essentially every case
+B) Because including demographic detail breaches best practice always
+C) Because demographics cannot be gathered through interview or survey
+D) Because unjustified detail distracts from the research substance
 
-*Correct answer: B*
-*Explanation: The lesson doesn't ban demographic detail outright, but warns that unjustified inclusion risks distracting from or substituting for the actual research-based job, goals, and pain points that matter most.*
+*Correct answer: D*
+*Explanation: The lesson does not ban demographics. It warns that colour added for narrative reasons competes for attention with the job and pain points that actually drive decisions.*
 *Learning objective tested: #1, #3*
 *Difficulty: Medium*
 
 ---
 
 **11. (Product Thinking) A team has built a genuine, research-based persona but has not referenced it in any roadmap discussion in the eight months since its creation. What does this most likely indicate, according to this lesson?**
-A) The persona was built correctly and requires no further action
-B) A possible instance of "persona as decoration" — the persona may need to be actively integrated into ongoing prioritization practices, such as the Persona Prioritization Filter, rather than treated as a one-time artifact
-C) The persona should be immediately discarded and never referenced again
-D) This is normal and expected behavior for any well-built persona
+A) The persona was built correctly and needs no further action taken
+B) Normal and expected behaviour for any persona that is well built
+C) Possible persona as decoration; integrate it into prioritisation
+D) The persona should be discarded and never referenced again at all
 
-*Correct answer: B*
-*Explanation: An unreferenced persona, even a well-built one, risks becoming "persona as decoration" if it isn't actively used in ongoing decisions — the lesson recommends practices like the Persona Prioritization Filter to keep it alive.*
+*Correct answer: C*
+*Explanation: Being well built is not the same as being used. A persona stays alive only through a standing practice that requires consulting it, such as the Prioritization Filter.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **12. (Interview Reasoning) A candidate describes their persona-building process as entirely based on a brainstorming workshop with no reference to interviews or surveys. What might this signal, based on this lesson's Interview Perspective section?**
-A) A strong, efficient approach to persona development
-B) A likely sign that the resulting personas are assumption-based rather than research-grounded, echoing this lesson's core warning about fictional-character personas
-C) That brainstorming workshops are the industry-standard best practice for all persona development
-D) Nothing meaningful, since persona-building methodology is not typically discussed in interviews
+A) A strong and efficient approach to developing product personas
+B) Nothing notable, since methodology rarely comes up in interviews
+C) That brainstorming workshops are the accepted standard for all persona work
+D) A likely sign the personas are assumption-based, not research-grounded
 
-*Correct answer: B*
-*Explanation: The lesson's Interview Perspective explicitly looks for research grounding in a candidate's persona-building process, treating a purely brainstorming-based approach as a weak signal.*
+*Correct answer: D*
+*Explanation: A workshop synthesises what the room already believes. The interviewer is listening for where the evidence came in, and in this answer it never does.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **13. (Product Thinking, Higher Difficulty) A team has one well-validated, research-based persona representing 70% of its user base by survey-validated prevalence, and is considering adding a second persona representing a niche 5% segment with a vivid, memorable pain point. According to this lesson, what should guide this decision?**
-A) The second persona should always be added, since any distinct pain point deserves its own persona
-B) The team should weigh whether the niche segment's strategic importance (per Lesson 10) justifies a second persona, being cautious that a vivid but small segment doesn't disproportionately influence prioritization relative to its actual validated prevalence
-C) The second persona should never be added under any circumstances, regardless of strategic importance
-D) Persona count should always be maximized to represent the full diversity of the user base
+A) Always add the second, since any distinct pain point deserves one
+B) Weigh strategic importance against validated prevalence
+C) Decline to add a second persona, whatever its strategic importance
+D) Maximise persona count to represent the full diversity of users
 
 *Correct answer: B*
-*Explanation: This reflects the lesson's caution about the "too many personas" pattern and the Persona Prioritization Filter's concern about disproportionate investment in a vivid but numerically small segment — the decision should weigh strategic importance against prevalence, not default to either extreme.*
+*Explanation: A vivid pain point is memorable out of proportion to how many people hold it. The 5% segment may still matter strategically, and that case has to be made rather than assumed from vividness.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **14. (Interview Reasoning, Higher Difficulty) An interviewer asks a candidate how they would respond if a colleague insisted on including a fabricated but "plausible-sounding" quote in a persona document to make it feel more complete. What is the strongest response, based on this lesson?**
-A) Agree, since a plausible-sounding quote makes the persona more engaging and memorable
-B) Decline, and explain that quotes must be real and sourced from actual research, since a fabricated quote creates a false impression of evidentiary support that doesn't exist and undermines the persona's trustworthiness
-C) Agree, but only if the quote is clearly labeled as fictional in very small print
-D) Refuse to include any quotes in personas going forward, regardless of whether they are genuine
+A) Agree, since a plausible quote makes the persona more memorable
+B) Agree, provided the quote is labelled as fictional in small print
+C) Decline, since a fabricated quote creates evidentiary support that does not exist
+D) Refuse to include quotes in any persona from that point onward
 
-*Correct answer: B*
-*Explanation: This directly reflects the lesson's explicit requirement that quotes be real and sourced, and its warning about the false confidence created by fabricated content presented as genuine.*
+*Correct answer: C*
+*Explanation: The quote's function is to let someone trace the claim back to a real participant. Inventing one removes that function while keeping every appearance of it.*
 *Learning objective tested: #2, #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team has built a single, genuine, well-sourced persona based on interviews conducted three years ago, and has not updated it since, despite significant changes in the product and market during that time. Using this lesson's framework, what is the most appropriate response?**
-A) Continue using the persona indefinitely without any further validation, since it was built correctly at the time
-B) Recognize that a persona, like a vision (Lesson 9), can become outdated as markets and behavior shift, and conduct fresh research to validate whether the persona's job, goals, and pain points still accurately reflect the current segment
-C) Discard the persona entirely and refuse to use any persona going forward
-D) Rebuild the persona based purely on team assumption, since conducting new research would be too time-consuming
+A) Treat it as potentially outdated and run fresh research to revalidate it
+B) Continue using it indefinitely, since it was built correctly then
+C) Rebuild it from team assumption, since new research costs too much
+D) Discard it entirely and decline to use personas going forward
 
-*Correct answer: B*
-*Explanation: This mirrors the lesson's explicit guidance that personas should be periodically revisited against fresh research as markets and behavior evolve, rather than either treated as permanently valid or discarded and replaced with unvalidated assumption.*
+*Correct answer: A*
+*Explanation: Like a vision, a persona is stable rather than permanent. Three years of product and market change is exactly the trigger for checking whether the job and pain points still hold.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 

@@ -458,169 +458,169 @@ There is no single correct answer. The purpose of this exercise is to practice a
 ## Quiz
 
 **1. What is the RICE formula?**
-A) Reach + Impact + Confidence + Effort
+A) Reach + Impact + Confidence + Effort, summed together
 B) (Reach × Impact × Confidence) / Effort
 C) Reach / (Impact × Confidence × Effort)
 D) (Reach + Impact) × (Confidence + Effort)
 
 *Correct answer: B*
-*Explanation: This is the lesson's explicit formula, with Effort as a divisor (lower effort increases the score) and the other three factors as multipliers.*
+*Explanation: Effort sits in the denominator, so a cheaper initiative scores higher for the same benefit. The other three multiply, so a weak score on any one pulls the whole result down.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why is the Confidence factor described as particularly important in preventing certain failure patterns?**
-A) Because Confidence is always the easiest factor to estimate accurately
-B) Because it should genuinely reflect the strength of underlying evidence, preventing vivid but weakly evidenced candidates from scoring artificially high, echoing Lesson 16's "vivid but rare" warning
-C) Because Confidence is the only factor that affects the final RICE score
-D) Because Confidence should always be set to 100% regardless of evidence quality
+A) Because Confidence is the easiest of the four to estimate well
+B) It appropriately discounts candidates that are vivid but weakly evidenced
+C) Because Confidence is the sole factor affecting the final score
+D) Because Confidence should sit at 100% whatever the evidence
 
 *Correct answer: B*
-*Explanation: The lesson explicitly connects Confidence to preventing the reintroduction of earlier-named failure patterns under RICE's formal numeric structure.*
+*Explanation: Without an honest Confidence score, RICE simply relabels the loudest voice as a number. This is the factor that keeps Lesson 16's failures from re-entering in formal dress.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. What are the four categories in the MoSCoW method?**
-A) Must have, Should have, Could have, Won't have
-B) High, Medium, Low, None
-C) Reach, Impact, Confidence, Effort
-D) Urgent, Important, Optional, Deferred
+A) Urgent, Important, Optional, and Deferred in order
+B) Reach, Impact, Confidence, and Effort in order
+C) Must have, Should have, Could have, and Won't have
+D) High, Medium, Low, and None in descending order
 
-*Correct answer: A*
-*Explanation: This is the lesson's explicit statement of the MoSCoW categories.*
+*Correct answer: C*
+*Explanation: The fourth category is the one that does the strategic work, because it names what the team has decided against rather than leaving it unmentioned.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is MoSCoW's "Won't have" category described as particularly valuable?**
-A) Because it allows teams to avoid making any prioritization decisions at all
-B) Because it makes strategic exclusion an explicit, visible, named category, directly enforcing Lesson 10's discipline that a real strategy must say no to something
-C) Because "Won't have" items are always technically infeasible
-D) Because it eliminates the need for any further prioritization discussion
+A) It makes strategic exclusion an explicit, named category
+B) Because it removes the need for further prioritisation talk
+C) Because items there are technically unbuildable anyway
+D) Because it lets teams avoid making prioritisation decisions
 
-*Correct answer: B*
-*Explanation: The lesson explicitly connects this category to Lesson 10's exclusion discipline, making a real strategic choice visible rather than an implicit, unstated omission.*
+*Correct answer: A*
+*Explanation: Lesson 10 argued a real strategy says no to something plausible. MoSCoW gives that no a box to sit in, where everyone can see it.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **5. What is "prioritization theater"?**
-A) A presentation format for sharing prioritization decisions with stakeholders
-B) Applying a formal-looking scoring framework to a set of candidates whose priority order has already been decided for other reasons, to produce justifying numbers after the fact
-C) A required step in every legitimate prioritization process
-D) A technique for accelerating prioritization decisions
+A) A presentation format for sharing priority decisions with others
+B) A required step within every legitimate prioritisation process
+C) A technique for reaching prioritisation decisions more quickly
+D) Scoring applied after the order was already decided
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition, directly extending Lesson 8's discovery theater concept to the practice of prioritization.*
+*Correct answer: D*
+*Explanation: The framework produces numbers that justify a conclusion rather than reaching one. Like acceptance criteria written after the build, it could not have come out any other way.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, how was the Confidence factor specifically misapplied?**
-A) It was left out of the scoring exercise entirely
-B) A feature with no supporting research beyond an executive's personal conviction received an inflated confidence score, while a genuinely well-validated candidate was held to a stricter, higher evidentiary bar
-C) It was calculated using an incorrect mathematical formula
-D) It was applied consistently and honestly to all four candidates
+A) It was calculated using an incorrect mathematical formula
+B) It was left out of the scoring exercise for every candidate
+C) An executive's conviction scored high while a validated candidate faced a stricter bar
+D) It was applied consistently and honestly across all four candidates
 
-*Correct answer: B*
-*Explanation: The case study explicitly describes this inconsistent application of the Confidence factor as the specific mechanism producing the predetermined, ultimately costly ranking.*
+*Correct answer: C*
+*Explanation: The arithmetic was fine. Two different evidentiary standards were applied to two candidates, and the formula faithfully propagated that inconsistency into the ranking.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. What is the key diagnostic question for identifying prioritization theater, according to this lesson?**
-A) Whether the scoring exercise used RICE rather than MoSCoW
-B) Whether the exercise could, in principle, have produced a result contradicting the team's initial expectation or a stakeholder's preference
-C) Whether the exercise was completed within a specific time limit
-D) Whether every candidate received the exact same final score
+A) Whether the exercise could have contradicted the expected result
+B) Whether every candidate ended up with the exact same final score
+C) Whether the exercise used RICE in place of MoSCoW as the method
+D) Whether the exercise finished inside a set time limit
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit diagnostic, directly echoing Lesson 8's genuine-test criterion applied to prioritization specifically.*
+*Correct answer: A*
+*Explanation: This is Lesson 8's genuine-test criterion applied to prioritisation. An exercise that has never once surprised the team is not measuring anything.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. What does "eating the frog" refer to in this lesson's sequencing discussion?**
-A) Always choosing the easiest, lowest-value task to build first
-B) Tackling the highest-value, hardest task first, rather than deferring it
-C) A specific step within the RICE scoring formula
-D) A requirement to complete all "Must have" MoSCoW items before any "Should have" items
+A) Tackling the hardest, highest-value task first rather than deferring
+B) Choosing the easiest, lowest-value task to build first each time
+C) A specific step contained within the RICE scoring formula itself
+D) Completing every Must have item before any single Should have item begins
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of "eating the frog," distinct from RICE's formula or MoSCoW's categories.*
+*Correct answer: A*
+*Explanation: The argument is that deferred hard work often never happens, or happens rushed under worse conditions. The counterargument for easy wins first is genuine too, and context decides.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team scores four candidates using RICE, and one candidate — backed only by a single, vivid customer story with no further validation — receives a high Confidence score simply because the story was compelling. What is the issue with this scoring decision, according to this lesson?**
-A) There is no issue; compelling stories always warrant high confidence scores
-B) This directly reintroduces Lesson 16's "vivid but rare" failure pattern — Confidence should reflect genuine evidence strength (per Lesson 11's Evidence Trustworthiness Ladder), not how compelling or memorable the story was
-C) Confidence scores should always be set at exactly 50% regardless of evidence
-D) This scoring decision is correct as long as the Reach and Impact scores are also high
+A) No issue; a compelling story warrants a high confidence score
+B) Confidence should sit at exactly 50% whatever the evidence base
+C) It reintroduces the vivid-but-rare pattern under a numeric disguise
+D) The scoring holds provided that Reach and Impact are also scored highly
 
-*Correct answer: B*
-*Explanation: This is a direct instance of the exact failure pattern this lesson warns against — the persuasiveness of a story should not be conflated with the genuine strength of underlying evidence when scoring Confidence.*
+*Correct answer: C*
+*Explanation: How persuasive a story is in the room and how much evidence sits behind it are different quantities. Confidence measures the second one.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team is deciding whether to communicate release scope to a broad, non-specialist group of internal stakeholders using RICE scores or MoSCoW categories. According to this lesson, which is generally more appropriate, and why?**
-A) RICE, since numeric scores are always easier for any audience to understand
-B) MoSCoW, since it provides a simpler, qualitative categorization better suited to communicating clearly with stakeholders less familiar with quantitative scoring models
-C) Neither method should ever be used for stakeholder communication
-D) Both methods are equally suited to every possible audience and purpose
+A) RICE, since numeric scores suit any audience without exception
+B) MoSCoW, a simpler categorisation for non-specialist audiences
+C) Neither method suits stakeholder communication
+D) Both suit every possible audience and purpose about equally well
 
 *Correct answer: B*
-*Explanation: The lesson explicitly notes MoSCoW's advantage for broad, non-specialist stakeholder communication, distinct from RICE's strength in ranking dissimilar candidates on a common numeric scale.*
+*Explanation: RICE ranks dissimilar candidates well and asks the reader to trust a formula. Four named buckets communicate a release boundary to people who will not interrogate the arithmetic.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes running a RICE scoring exercise where every candidate happened to confirm exactly the priority order senior leadership had already informally indicated beforehand. What might this signal, based on this lesson's Interview Perspective section?**
-A) An exceptionally well-aligned team with no meaningful concerns
-B) A possible instance of prioritization theater, since a genuine scoring exercise should be capable, in principle, of producing a result that contradicts prior expectations at least occasionally
-C) That the candidate has strong leadership alignment skills that should be considered a core strength
-D) Nothing meaningful, since RICE scores should always confirm leadership's existing preferences
+A) An exceptionally well-aligned team, carrying no real concerns
+B) Strong leadership alignment skill counting as a core strength
+C) Nothing of note, since scores should confirm existing preferences
+D) Possible theater; a real exercise should sometimes contradict
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core diagnostic — a scoring process that never produces a surprising or contradicting result relative to prior expectations is itself a warning sign worth taking seriously.*
+*Correct answer: D*
+*Explanation: Perfect agreement every time is the signature of a process that cannot produce disagreement. The occasional uncomfortable ranking is evidence the exercise is live.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team has a well-validated, high-value but genuinely difficult initiative (requiring significant effort) and several smaller, easier initiatives with lower but real value. Using RICE's Effort factor, how would the difficult initiative's score be affected, all else being equal?**
-A) The Effort factor has no bearing on the final RICE score
-B) A higher Effort value (more resources/time required) would lower the overall RICE score, since Effort is a divisor — meaning a high-value initiative can still score lower than a smaller one if its effort cost is proportionally much higher
-C) Higher Effort always increases the RICE score
-D) Effort should always be ignored in favor of Reach and Impact alone
+A) Effort bears no relation at all to the final computed RICE score
+B) Higher effort lowers the score, since Effort divides
+C) Higher effort raises the score, since Effort is a multiplier
+D) Effort should be set aside in favour of Reach and Impact alone
 
 *Correct answer: B*
-*Explanation: Since RICE divides by Effort, a genuinely high-value but very high-effort initiative may still score lower than a smaller, easier one — this is a legitimate, built-in trade-off the formula makes explicit, distinct from the separate "eating the frog" sequencing question.*
+*Explanation: A valuable, expensive initiative can legitimately score below a cheaper one. That is the formula making a real trade-off visible, and it is separate from the sequencing question.*
 *Learning objective tested: #1, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer asks a candidate how they would respond if a senior stakeholder insisted their preferred initiative be scored with high confidence, despite having no supporting research. A weak answer would most likely include which of the following?**
-A) Proposing a lightweight validation step (echoing Lesson 8's confidence ladder) to establish genuine confidence before finalizing the score, and being transparent about the current, honest confidence level in the meantime
-B) Agreeing to inflate the confidence score as requested, without pushing back or proposing any further validation
-C) Explaining the Confidence factor's purpose and its connection to genuine evidence quality
-D) Proposing to run both RICE and MoSCoW to give the stakeholder multiple ways to understand the trade-offs involved
+A) Propose a lightweight validation step to establish confidence honestly
+B) Explain the Confidence factor's link to genuine evidence quality
+C) Run both RICE and MoSCoW so the trade-offs are visible two ways
+D) Agree to inflate the score, without pushback or further validation
 
-*Correct answer: B*
-*Explanation: Agreeing to inflate the score without pushback or proposing further validation reflects a weak response compared to the more evidence-grounded, honest alternatives in the other options, and directly risks reproducing the Detailed Case Study's failure.*
+*Correct answer: D*
+*Explanation: An inflated Confidence score is how the case study's ranking went wrong. The other three each keep the stakeholder engaged while leaving the number honest.*
 *Learning objective tested: #1, #4*
 *Difficulty: Hard*
 
@@ -628,25 +628,25 @@ D) Proposing to run both RICE and MoSCoW to give the stakeholder multiple ways t
 
 **14. (Product Thinking, Higher Difficulty) A team applies MoSCoW to a release and finds that nearly every candidate item has been categorized as "Must have," with almost nothing in "Should have," "Could have," or "Won't have." According to this lesson, what does this suggest?**
 A) The release scope has been defined with excellent, appropriate discipline
-B) This likely indicates a failure to make genuine prioritization distinctions, echoing Lesson 10's warning against a "grab-bag" that endorses everything as equally essential rather than making real, differentiated choices
-C) "Must have" is always the correct category for the vast majority of any release's candidate items
-D) This pattern has no diagnostic significance and requires no further scrutiny
+B) Must have is the right category for most items in any release
+C) A failure to make real distinctions, echoing the grab-bag warning
+D) This pattern carries no diagnostic weight and needs no scrutiny
 
-*Correct answer: B*
-*Explanation: A MoSCoW exercise where nearly everything lands in "Must have" fails to make the genuine, differentiated choices the method is meant to surface, directly echoing Lesson 10's warning about a strategy that endorses everything without real exclusion.*
+*Correct answer: C*
+*Explanation: If everything is required, the method has sorted nothing. This is Lesson 10's grab-bag arriving with four labels and using one of them.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team runs a genuinely honest, evidence-grounded RICE exercise (passing the Prioritization Integrity Checklist) and it produces a ranking that a senior stakeholder strongly disagrees with, based on their own separate business context the team wasn't fully aware of (e.g., a specific contractual commitment). What is the most appropriate next step, connecting this lesson to Lesson 6's laddering discipline and Lesson 10's strategic judgment?**
-A) The team should discard the RICE exercise entirely and defer completely to the stakeholder's preference without further discussion
-B) The team should present the honest RICE results transparently, then genuinely engage with the stakeholder's additional context (potentially laddering, per Lesson 6, to understand the underlying business need behind their concern), reassessing the priority with this new information incorporated — rather than either ignoring the stakeholder's context or abandoning the evidence-based process entirely
-C) The team should insist the RICE ranking is final and non-negotiable, regardless of any additional business context
-D) The team should run the exercise again, this time deliberately adjusting scores to match the stakeholder's preference
+A) Insist the ranking is final and not open to any revision at all
+B) Rerun the exercise, adjusting scores to match the preference
+C) Discard the exercise and defer wholly to the stakeholder's view
+D) Present the results, ladder the new context, reassess
 
-*Correct answer: B*
-*Explanation: This integrates this lesson's integrity discipline with Lesson 6's laddering technique and Lesson 10's strategic judgment — a genuinely honest scoring exercise doesn't mean the result is beyond revision when genuinely new, relevant information (a business context the team lacked) emerges; the correct response is transparent engagement and reassessment, not either rigid adherence or unprincipled score manipulation.*
+*Correct answer: D*
+*Explanation: An honest score is an input, not a verdict. A contractual commitment the team did not know about is genuinely new information, and incorporating it is not the same as bending the numbers.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 

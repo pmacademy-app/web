@@ -416,195 +416,195 @@ There is no single correct answer. The purpose of this exercise is to practice r
 ## Quiz
 
 **1. Which of the following best exemplifies a specific, genuinely useful pain point, as described in this lesson?**
-A) "Users find the app confusing."
-B) "62% of new users abandon at the bank-account-connection screen, and interviews show several hesitate because they don't understand why it's required before seeing product value."
-C) "We should add a tutorial video."
-D) "Some people don't like our app."
+A) "Users find the onboarding flow confusing to work through."
+B) "We should add a short tutorial video to the first screen."
+C) "62% abandon at the bank-connection screen, unclear why it is required."
+D) "A number of people say they dislike using our application."
 
-*Correct answer: B*
-*Explanation: This option names the specific step, the specific friction, and a consequence (abandonment), meeting this lesson's bar for a genuinely useful, actionable pain point, unlike the vague statements in the other options.*
+*Correct answer: C*
+*Explanation: C names the step, the friction, and the consequence. A is a vague complaint, B is a proposed solution, and D is sentiment with no location attached to it.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. In the Severity/Frequency Framework, which quadrant generally represents the clearest priority?**
-A) Low severity, low frequency
-B) High severity, high frequency
-C) Low severity, high frequency
-D) High severity, low frequency
+A) High severity, high frequency
+B) Low severity but high frequency
+C) High severity, low frequency
+D) Low severity, low frequency
 
-*Correct answer: B*
-*Explanation: A pain point that is both costly when it occurs and widespread across the user base represents the clearest, least ambiguous priority in the framework.*
+*Correct answer: A*
+*Explanation: Costly when it happens and happening to many people is the one combination needing no argument. The off-diagonal quadrants are where the genuinely hard judgment calls live.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Why might a high-severity, low-frequency pain point still warrant priority, according to this lesson?**
-A) Because frequency is always less important than severity in every case
-B) Because severity alone can justify prioritization even without high prevalence, such as a rare but catastrophic issue like data loss
-C) Because low-frequency pain points are always easier to fix
-D) Low-frequency pain points should never be prioritized under any circumstances
+A) Because low-frequency pain points are always cheaper to fix
+B) Because frequency matters less than severity in every situation
+C) Because low-frequency pain points warrant no priority at all
+D) Because severity alone can justify it, as with a rare data-loss bug
 
-*Correct answer: B*
-*Explanation: The lesson explicitly notes that a rare but catastrophic pain point can still justify priority, since the framework requires deliberate judgment for off-diagonal cases rather than automatic neglect of low-frequency issues.*
+*Correct answer: D*
+*Explanation: Losing a small number of users' data is worth urgent attention even at low prevalence. The framework asks for deliberate judgment on the off-diagonal, not an automatic rule either way.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. What is the purpose of laddering a pain point before prioritizing it?**
-A) To make the pain point sound more severe than it actually is
-B) To distinguish the surface-level, reported symptom from the actual underlying root cause, since fixing the symptom alone may not resolve the real issue
-C) To reduce the number of pain points a team needs to consider
-D) To determine which stakeholder raised the complaint most recently
+A) To reduce how many pain points the team must weigh up
+B) To separate the reported symptom from the actual root cause
+C) To make the pain point sound more severe than it truly is
+D) To establish which stakeholder raised the complaint most recently
 
 *Correct answer: B*
-*Explanation: Laddering, extended from Lesson 6, is specifically used to move past a surface-level complaint to its actual underlying cause, which the lesson argues is essential before committing to a fix.*
+*Explanation: A faster search that still returns poor results fixes the reported complaint and leaves the experience unchanged. Laddering is what reveals which of the two you are about to build.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What is the "loudest voice wins" failure pattern?**
-A) Prioritizing based on a pain point's actual, systematically evaluated severity and frequency
-B) Prioritizing a pain point based on how forcefully or persistently it was raised, rather than genuine severity/frequency analysis
-C) Prioritizing pain points in the exact order they were originally reported
-D) A pattern that only occurs in customer support contexts, never internally
+A) Prioritising by a pain point's systematically evaluated severity
+B) Prioritising pain points in the order they were first reported
+C) A pattern occurring in support contexts but not inside a company
+D) Prioritising by how forcefully a complaint was raised
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition — prioritization driven by the forcefulness of a complaint rather than a genuine, evidence-based comparison.*
+*Correct answer: D*
+*Explanation: Forcefulness stands in for evidence. It is the same structural bias as Lesson 5's customer-channel problem, operating between colleagues rather than between channels.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what was the key mistake made in the original response to the "exports take too long" complaint?**
-A) The team ignored the complaint entirely
-B) The team accepted the complaint at its surface level and invested in raw processing speed, without laddering to discover that most affected users were actually frustrated by report formatting requiring manual cleanup
-C) The team fixed the formatting issue instead of the speed issue
-D) The team never gathered any evidence about the complaint at all
+A) The team took the complaint at face value and optimised raw speed
+B) The team ignored the complaint and gathered no evidence at all
+C) The team fixed the formatting problem instead of the speed issue
+D) The team escalated the complaint without investigating it properly
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the wasted effort to accepting the surface-level version of the complaint without laddering to the actual, formatting-related root cause.*
+*Correct answer: A*
+*Explanation: The export did get faster, and the frustration stayed, because what users minded was the manual cleanup the report format forced on them afterwards.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **7. Why is over-weighting a "vivid but rare" pain point considered risky, according to this lesson?**
-A) Because vivid stories are always factually false
-B) Because a single, memorable anecdote can dominate prioritization discussions far out of proportion to its actual prevalence, unless frequency is established through systematic evidence
-C) Because vivid pain points are always low severity
-D) Because rare pain points should never be discussed in prioritization meetings
+A) A memorable story can dominate beyond its real prevalence
+B) Because vivid pain point stories are essentially always false
+C) Because rare pain points should be excluded from a prioritisation talk
+D) Because vividly described pain points carry low severity by nature
 
-*Correct answer: B*
-*Explanation: The lesson explains that vivid stories are more persuasive and memorable in a room than an aggregate statistic, which can distort prioritization unless frequency is established through systematic evidence rather than the story's emotional resonance.*
+*Correct answer: A*
+*Explanation: One dramatic account is more persuasive in a room than an aggregate figure representing far more people. The risk is not that the story is untrue but that its reach is silently overestimated.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **8. What is the Pain Point Validation Checklist primarily used for?**
-A) Determining how many personas a team should build
-B) Confirming that a pain point has been laddered, that severity and frequency are based on real evidence rather than assumption or vividness, and that it has been compared against other identified pain points
-C) Deciding which survey scale (Likert or NPS) to use
-D) Measuring how quickly a customer support ticket was resolved
+A) Deciding how many personas a product team ought to maintain
+B) Choosing between a Likert scale and NPS for a given survey
+C) Confirming a pain point is laddered, evidence-based, and compared with others
+D) Measuring how quickly a given support ticket was resolved
 
-*Correct answer: B*
-*Explanation: This checklist, described in the Framework Explanation section, specifically validates whether a pain point has been rigorously characterized before being elevated to a roadmap priority.*
+*Correct answer: C*
+*Explanation: Each question closes one of the failure modes — surface-level framing, assumed severity, assumed frequency, and evaluation in isolation rather than against the alternatives.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A product team has three pain points: one raised forcefully by a senior executive based on a single dramatic customer story, one identified through survey data as affecting 40% of users with moderate severity, and one identified through interviews as affecting a small number of users but causing complete task failure. According to this lesson, what is the most appropriate first step?**
-A) Immediately prioritize the executive's pain point, since executive attention should always determine roadmap priority
-B) Establish severity and frequency for all three pain points using systematic evidence, and plot them on the Severity/Frequency Grid before making a prioritization decision
-C) Ignore the executive's pain point entirely, since it was based on only one story
-D) Prioritize whichever pain point was most recently discussed in a meeting
+A) Prioritise the executive's, since executive attention sets the roadmap
+B) Prioritise whichever pain point came up most recently in a meeting
+C) Establish severity and frequency for all three, then plot them
+D) Set the executive's aside, since it rests on one story
 
-*Correct answer: B*
-*Explanation: The lesson's core discipline is establishing severity and frequency systematically for all identified pain points before comparing them, rather than defaulting to executive pressure, dismissal, or recency.*
+*Correct answer: C*
+*Explanation: All three may deserve attention, and the grid is what makes the comparison honest. Deferring to the executive and dismissing them both skip the analysis rather than performing it.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team ladders a reported pain point ("checkout is confusing") and discovers that the actual underlying issue is a specific, unexpected shipping fee revealed only at the final checkout step. What should the team conclude about the original, surface-level version of the complaint?**
-A) The surface-level complaint was entirely inaccurate and should be disregarded
-B) The surface-level complaint was a real signal of dissatisfaction, but laddering revealed a more specific, actionable root cause (the unexpected fee) that a generic "make checkout less confusing" fix might have missed
-C) The team should have ignored the complaint since it used the word "confusing" rather than a more technical term
-D) The laddering process was unnecessary, since the original complaint was already sufficiently specific
+A) The original complaint was inaccurate and should be disregarded
+B) A real signal, but laddering found the actionable cause a generic fix would miss
+C) Laddering was unnecessary, since the complaint was already specific
+D) The complaint should have been ignored for using the word confusing
 
 *Correct answer: B*
-*Explanation: This reflects the lesson's core argument — a surface-level complaint remains a real signal, but laddering reveals the specific, actionable root cause that a fix aimed only at the vague, reported symptom might not actually resolve.*
+*Explanation: "Confusing" was an accurate report of the feeling and a useless brief for a fix. A general effort to simplify checkout could easily have left the late fee exactly where it was.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes prioritizing pain points strictly in the order they were reported, with the most recent complaint always addressed first. What might this signal, according to this lesson's Interview Perspective section?**
-A) A strong, disciplined prioritization process
-B) A likely instance of the "most recent complaint wins" failure pattern, substituting recency for genuine severity/frequency analysis
-C) That the candidate has extensive experience with the Severity/Frequency Framework
-D) Nothing meaningful, since recency is always the most important prioritization factor
+A) A strong and disciplined approach to pain point prioritisation
+B) No cause for note, since recency is the key prioritisation factor overall
+C) Likely "most recent complaint wins," substituting recency for analysis
+D) Extensive practical experience with the Severity/Frequency Framework
 
-*Correct answer: B*
-*Explanation: The lesson explicitly names this exact pattern — prioritizing by recency rather than systematic analysis — as a failure mode to guard against, not a strong prioritization practice.*
+*Correct answer: C*
+*Explanation: A queue ordered by arrival time looks like process and performs no comparison. Whichever complaint landed last quietly sets the agenda for everything else.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team has survey data showing a pain point affects a large share of users, but qualitative interviews reveal that most affected users rate its severity as quite low (a minor annoyance, not a significant obstacle). Where does this pain point most likely sit on the Severity/Frequency Grid, and what does that suggest?**
-A) High severity, low frequency — requiring urgent, top priority attention
-B) Low severity, high frequency — often worth a cheap, quick fix specifically because of its reach, even though no individual instance is severe
-C) This combination of data is contradictory and should be discarded entirely
-D) High severity, high frequency — the clearest possible priority
+A) High severity and low frequency, calling for urgent top priority
+B) Low severity, high frequency — often worth a cheap fix
+C) High severity and high frequency, the clearest possible priority
+D) A contradictory combination of data that ought to be discarded
 
 *Correct answer: B*
-*Explanation: This describes the low-severity, high-frequency quadrant, which the lesson notes is often worth a cheap fix precisely because of its wide reach, even without high individual-instance severity.*
+*Explanation: Reach is doing the work here, not depth. A small, inexpensive fix can be well justified by how many people meet the annoyance, even though no single encounter is serious.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where a senior executive insists on prioritizing a pain point based on one dramatic customer story, and asks how the candidate would respond. A weak answer would most likely include which of the following?**
-A) Acknowledging the story's legitimacy while proposing to establish the pain point's actual frequency and severity using systematic evidence before finalizing prioritization
-B) Immediately agreeing to prioritize the pain point solely because of the executive's insistence, without any further evidence-gathering
-C) Comparing the story-based pain point against other systematically evaluated pain points on the Severity/Frequency Grid
-D) Explaining the distinction between a vivid anecdote and genuinely established prevalence
+A) Acknowledge the story, then establish real frequency and severity
+B) Compare it against other pain points on the Severity/Frequency Grid
+C) Explain the difference between a vivid anecdote and real prevalence
+D) Agree to prioritise it solely because the executive insisted on it
 
-*Correct answer: B*
-*Explanation: Capitulating to executive pressure without any genuine evidence-gathering is precisely the "loudest voice wins" pattern this lesson warns against, representing the weak response among these options.*
+*Correct answer: D*
+*Explanation: Capitulation is the loudest-voice pattern with a senior job title attached. The other three all keep the story in play while insisting its reach be established rather than assumed.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team discovers, after laddering, that two seemingly distinct reported pain points ("checkout is slow" and "checkout feels untrustworthy") actually share the same root cause: an unexpected, late-appearing shipping fee that both slows down the process (due to hesitation and reconsideration) and damages trust. According to this lesson, what does this finding suggest about how the team should treat these two pain points going forward?**
-A) They should continue to be tracked and prioritized as two entirely separate, unrelated pain points
-B) They should be recognized as two surface-level manifestations of the same underlying root cause, and a single fix addressing that root cause (e.g., surfacing shipping costs earlier) would likely resolve both simultaneously
-C) The team should prioritize whichever of the two was reported more recently
-D) The team should build two separate, independent fixes, one for each surface-level complaint
+A) Keep tracking and prioritising them as two separate, unrelated items
+B) Treat them as one root cause that a single fix resolves
+C) Prioritise whichever of the two happened to be reported more recently
+D) Build two independent fixes, one for each surface-level complaint
 
 *Correct answer: B*
-*Explanation: This reflects the core value of root-cause laddering — recognizing that multiple surface-level complaints can share a single underlying cause, allowing one well-targeted fix to resolve what initially appeared to be two distinct problems.*
+*Explanation: Two complaints collapsing into one cause is laddering paying for itself. Surfacing the fee earlier addresses the hesitation and the trust damage in the same change.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team has rigorously validated a pain point's severity and frequency using systematic evidence, laddered it to a clear root cause, and confirmed it sits in the high-severity, high-frequency quadrant — but a competing, less-validated pain point is being pushed by a senior stakeholder based on a single vivid anecdote. According to this lesson, what is the most appropriate way to handle this conflict?**
-A) Automatically prioritize the stakeholder's pain point, since seniority should always override evidence-based analysis
-B) Present both pain points side by side using the Severity/Frequency Grid and available evidence, making the comparative case for the rigorously validated pain point explicit, while remaining open to further investigating the stakeholder's example if it suggests a previously unmeasured or emerging issue
-C) Refuse to discuss the stakeholder's example at all, since it lacks systematic evidence
-D) Prioritize both pain points equally, splitting resources evenly regardless of their evidentiary strength
+A) Present both on the grid, making the comparative case explicit
+B) Prioritise the stakeholder's, since seniority overrides the evidence
+C) Decline to discuss it, since it lacks systematic evidence
+D) Split resources evenly between them regardless of evidence strength
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's balanced discipline — using evidence to make an explicit, comparative case, while still remaining genuinely open to investigating a vivid example further (since it could reflect an emerging or previously unmeasured issue), rather than either dismissing it outright or deferring automatically to seniority.*
+*Correct answer: A*
+*Explanation: The anecdote may be the first sighting of something real and unmeasured, so it earns investigation rather than dismissal — but the comparison should be made in the open, on the same axes.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 

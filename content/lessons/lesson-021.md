@@ -420,13 +420,13 @@ There is no single correct answer. The purpose of this exercise is to practice a
 ## Quiz
 
 **1. Which of the following best defines a minimum viable product, according to this lesson?**
-A) The lowest-quality version of a product a team can ship
-B) The smallest version of a solution capable of producing genuine, decision-relevant learning about the riskiest remaining assumption
-C) The first phase of an already-decided, larger, predetermined product plan
-D) A non-functional visual mockup used to gather initial impressions
+A) A non-functional visual mockup used to gather early first impressions
+B) The lowest-quality version of a product that a team can manage to ship
+C) The first phase of an already-decided, larger and predetermined product plan
+D) The smallest version that produces learning about the riskiest assumption
 
-*Correct answer: B*
-*Explanation: This is the lesson's precise definition, distinguishing an MVP from a low-quality product, a predetermined plan fragment, or a non-functional prototype.*
+*Correct answer: D*
+*Explanation: Three words carry the definition: smallest, decision-relevant, and riskiest remaining. A well-built MVP aimed at a comfortable assumption has still not done its job.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
@@ -434,181 +434,181 @@ D) A non-functional visual mockup used to gather initial impressions
 
 **2. What does the skateboard-versus-car analogy illustrate about correct MVP thinking?**
 A) That MVPs should always be simple modes of transportation
-B) That each MVP iteration should be a complete, independently useful artifact, not a fragment of a larger, predetermined plan that only becomes useful once fully assembled
-C) That MVPs should never evolve into more complex products over time
-D) That cars are always a better analogy for enterprise software than skateboards
+B) That each iteration should be a complete, usable artifact rather than a fragment
+C) That MVPs rarely evolve into more complex products later
+D) That cars suit enterprise software better than skateboards do
 
 *Correct answer: B*
-*Explanation: The analogy specifically contrasts a series of complete, useful artifacts (skateboard, scooter, bicycle) against a series of useless fragments (wheel, axle, chassis) that only become useful once fully assembled into a car.*
+*Explanation: A wheel, an axle, and a chassis are each useless until the car exists. A skateboard gets someone down the road today and produces feedback the wheel never could.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **3. According to the MVP Scoping Filter, what should be the default decision for a candidate feature under consideration for an MVP?**
-A) Include it, unless someone actively objects
-B) Exclude it, unless a specific, articulable connection to the riskiest assumption being tested can be made
-C) Include it if it is technically easy to build
-D) Include it if at least one stakeholder requests it
+A) Exclude it unless it is needed for the riskiest assumption
+B) Include it, unless somebody on the team actively objects to it
+C) Include it whenever it happens to be technically easy to build
+D) Include it if at least one stakeholder has requested the feature
 
-*Correct answer: B*
-*Explanation: The lesson explicitly reverses the more common, permissive default — exclusion is the default unless a specific connection to the riskiest assumption test can be made.*
+*Correct answer: A*
+*Explanation: This deliberately reverses the usual permissive default. Inclusion has to be argued for against a specific test, rather than surviving because nobody pushed back.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. What is "MVP creep"?**
-A) A technique for scoping an MVP correctly
-B) The gradual, cumulative expansion of an MVP's scope through individually reasonable but ultimately unnecessary additions
-C) The process of testing an MVP with real users
-D) A method for identifying the riskiest assumption
+A) A technique for scoping an MVP correctly against its assumption
+B) Cumulative scope additions that undermine minimality
+C) The process of testing a completed MVP with genuine real users
+D) A method for identifying which assumption is riskiest to test
 
 *Correct answer: B*
-*Explanation: This is the lesson's explicit definition — cumulative, individually reasonable-sounding scope additions that undermine an MVP's minimality.*
+*Explanation: Each addition sounds reasonable by itself. Together they push the build past the point where it is either minimal or fast enough to still function as a timely test.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. What is "MVP theater"?**
-A) A presentation format for sharing MVP results with stakeholders
-B) Building something small and calling it an MVP without it actually being capable of testing the riskiest remaining assumption
-C) A rehearsal process before launching an MVP
+A) A rehearsal process run before an MVP is launched publicly
+B) A presentation format for sharing MVP results with stakeholders
+C) Something small that cannot actually test the riskiest assumption
 D) A method for gathering user feedback on a fully built product
 
-*Correct answer: B*
-*Explanation: MVP theater specifically describes a small build that fails to actually address the riskiest assumption, providing the appearance without the substance of genuine discovery discipline.*
+*Correct answer: C*
+*Explanation: Smallness alone is not the discipline. A cheap build aimed at the wrong question has the appearance of discovery rigour and none of its substance.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Zappos example, what was the riskiest assumption being tested by the manual, unscalable photography and fulfillment process?**
-A) Whether the company could build an automated inventory system quickly
-B) Whether people would actually buy shoes online without trying them on first
-C) Whether local shoe stores would agree to a partnership
-D) Whether the company's branding would appeal to online shoppers
+A) Whether local shoe stores would agree to a partnership arrangement
+B) Whether people would buy shoes online without trying them on
+C) Whether the company could build an automated inventory system fast
+D) Whether the branding would appeal to online shoppers
 
 *Correct answer: B*
-*Explanation: The example explicitly identifies this core value-risk assumption — willingness to buy shoes online sight-unseen — as the specific question the manual process was designed to test.*
+*Explanation: That was the question worth spending on, and no warehouse or inventory system was needed to answer it. The unscalable process was the point, not a compromise.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what was the actual cost of the two-month delay caused by MVP creep, beyond the timeline itself?**
-A) The team's core finding about user trust changed significantly due to the added features
-B) The team's discovery cadence on other, potentially higher-value opportunities was effectively paused during the additional seven weeks
-C) The added features (recurring meetings, three calendar providers, branded emails) proved essential to the core assumption test
-D) No meaningful cost resulted from the delay
+A) The core finding about user trust shifted due to the added features
+B) No meaningful cost resulted from the delay beyond the schedule
+C) The three added features proved essential to the assumption test
+D) Discovery on other, potentially higher-value opportunities paused
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies the opportunity cost of pausing discovery on other opportunities, distinct from the delay itself, as the more significant consequence.*
+*Correct answer: D*
+*Explanation: The seven extra weeks did not change what the test concluded. What they consumed was the capacity to be learning anything about the rest of the tree.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. Why did none of the three stakeholder requests in the Detailed Case Study belong in the original MVP scope, according to this lesson's framework?**
-A) Because all three requests were technically infeasible
-B) Because none of the three was necessary to test the specific trust assumption the MVP was designed to validate, despite each being individually reasonable for the eventual product
-C) Because stakeholders should never be allowed to request features
-D) Because the requests came from different departments
+A) Because stakeholders should not be permitted to request features
+B) Because all three of the requests were technically infeasible then
+C) Because the requests came from different departments
+D) Because none was needed to test the specific trust assumption
 
-*Correct answer: B*
-*Explanation: The MVP Scoping Filter's core test is whether an element is necessary for the specific riskiest assumption at hand — none of the three requests met this bar, regardless of their broader legitimacy.*
+*Correct answer: D*
+*Explanation: Recurring meetings, three calendar providers, and branded email may all belong in the eventual product. None of them changes what the trust test would reveal.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team is scoping an MVP to test whether users will trust an AI-generated summary feature enough to rely on it instead of reading a full document. Which of the following would most likely belong in the MVP, according to the MVP Scoping Filter?**
-A) A fully polished, branded visual design for the summary display
-B) Support for summarizing documents in ten different file formats
-C) The core AI-generated summary functionality itself, presented in a basic but functional and legible way
-D) An advanced customization feature allowing users to adjust summary length and tone
+A) The core summary functionality itself, shown in a basic but legible way
+B) A fully polished, branded visual design for the summary display
+C) Support for summarising documents in ten different file formats
+D) Customisation letting users adjust summary length and tone
 
-*Correct answer: C*
-*Explanation: The core summary functionality is directly necessary to test the trust assumption; the other options (polish, format breadth, customization) are not necessary for this specific test and would represent MVP creep if included by default.*
+*Correct answer: A*
+*Explanation: Trust cannot be tested without a real summary to trust. Polish, format breadth, and customisation each matter for the eventual product and none of them changes this answer.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team builds a very small feature quickly, but on reflection realizes it doesn't actually address the specific riskiest assumption identified through assumption mapping — it tests a much more comfortable, already-high-confidence assumption instead. What has this team most likely produced?**
-A) A genuine, well-scoped MVP
-B) An instance of MVP theater — small, but not actually testing the riskiest remaining assumption
-C) An instance of MVP creep
-D) A fully validated solution requiring no further testing
+A) A fully validated solution that requires no further testing at all
+B) A genuine, well-scoped MVP that did exactly what it should have
+C) MVP theater — small, but not testing the riskiest assumption
+D) An instance of MVP creep during the planning stage
 
-*Correct answer: B*
-*Explanation: This matches the lesson's definition of MVP theater precisely — smallness alone does not make something a genuine MVP if it fails to address the actual riskiest assumption.*
+*Correct answer: C*
+*Explanation: The build is minimal and the learning is not decision-relevant, because confidence on that assumption was already high. Creep is the opposite failure, of adding rather than misaiming.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes an MVP that included every feature originally planned for the full product, just built to a lower quality bar to ship faster. What might this signal, based on this lesson's Interview Perspective section?**
-A) A strong, disciplined MVP scoping process
-B) A likely misunderstanding of MVP as "the same scope, lower quality" rather than "the smallest scope necessary to test the riskiest assumption" — echoing Beginner Mistake 1
-C) That the candidate has extensive MVP experience and should be considered highly qualified
-D) Nothing meaningful, since quality reduction is an acceptable way to scope any MVP
+A) A strong and disciplined process for scoping a minimum viable product
+B) That the candidate has deep MVP experience and is highly qualified
+C) Nothing of note, since reducing quality is an acceptable scoping method
+D) Confusing minimum with lower quality rather than narrower scope
 
-*Correct answer: B*
-*Explanation: This directly reflects Beginner Mistake 1 — conflating "minimum" with "lower quality" rather than "narrower scope, still fully functional," which the lesson identifies as a common and significant misunderstanding.*
+*Correct answer: D*
+*Explanation: Minimum refers to how much is built, not how well. Shipping the whole plan badly produces a poor product and no particular learning about anything.*
 *Learning objective tested: #1*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team identifies two candidate riskiest assumptions for a new feature: one concerning whether users want the feature at all (value risk), and one concerning whether the underlying technical architecture can scale to full user volume (feasibility risk). Assumption mapping indicates the value-risk assumption has much lower confidence and higher importance. According to this lesson, how should the MVP be scoped?**
-A) The MVP should be scoped to test the feasibility-risk assumption, since technical concerns are always more urgent
-B) The MVP should be scoped specifically to test the value-risk assumption, since it is the genuinely riskiest one per assumption mapping, even if this means using a technically unscalable, manual, or concierge-style approach that doesn't address feasibility at all yet
-C) The MVP should attempt to test both assumptions equally within the same build
-D) The MVP should be scoped around whichever assumption is easiest for engineering to test
+A) Scope it around whichever assumption the engineering team finds easiest to test
+B) Test the feasibility assumption, since technical concerns come first
+C) Scope it to the value assumption, even if the approach must be manual
+D) Attempt to test both assumptions equally within one single build
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core principle — scope should follow the assumption identified as riskiest through assumption mapping, potentially using a manual or unscalable approach (as in the Zappos example) rather than defaulting to feasibility concerns or ease of testing.*
+*Correct answer: C*
+*Explanation: Scaling something nobody wants is a solved problem of no value. Zappos answered the same shape of question with a camera and a trip to a shoe shop.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where five different, individually reasonable stakeholder requests each get added to an MVP over several weeks, ultimately delaying the launch by two months without changing the core finding. What is the strongest diagnostic question a candidate should ask in response, based on this lesson?**
-A) "Which stakeholder was most senior, and should their request have simply been prioritized above the others?"
-B) "Was each of the five additions ever explicitly checked against the specific riskiest assumption the MVP was meant to test, using something like the MVP Scoping Filter?"
-C) "Should the team have skipped MVP testing entirely and built the full product directly?"
-D) "Was the MVP built using the correct engineering framework?"
+A) "Which stakeholder was most senior, and should their request have led?"
+B) "Was each addition checked against the riskiest assumption?"
+C) "Should the team have skipped MVP testing and built the full product?"
+D) "Was the MVP built using the correct engineering framework for this?"
 
 *Correct answer: B*
-*Explanation: This reflects the lesson's core diagnostic — the failure mode is the absence of an explicit, applied filter checking each addition against the specific riskiest assumption, not a question of stakeholder seniority, skipping MVP testing, or engineering tooling.*
+*Explanation: The absence of that check is the whole mechanism. With it, five reasonable requests become five easy noes; without it, each one wins on its own merits.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team scopes a genuinely minimal MVP, correctly limited to testing a single riskiest assumption, and successfully validates it within one week. What should the team do next, according to this lesson's connection to Lesson 20's Discovery Flywheel?**
-A) Immediately build the full, envisioned product without any further testing, since the core assumption has been validated
-B) Return to the Discovery Flywheel to identify the next riskiest assumption or the next candidate opportunity, potentially scoping a new, similarly minimal MVP or iteration rather than assuming all future decisions are now fully de-risked
-C) Disband the discovery process entirely, since the MVP successfully validated the idea
-D) Repeat the exact same MVP test multiple times to increase confidence further, regardless of diminishing returns
+A) Build the full envisioned product straight away, since the core assumption held
+B) Repeat the same MVP test several times to raise confidence further
+C) Return to the Flywheel for the next riskiest assumption or opportunity
+D) Disband the discovery process, since the MVP validated the idea well
 
-*Correct answer: B*
-*Explanation: This connects directly to Lesson 20's Discovery Flywheel — a successful MVP test resolves one specific assumption, not every future decision; the team should continue the discovery cycle for the next riskiest assumption or opportunity, echoing the skateboard-to-scooter progression rather than jumping straight to the full car.*
+*Correct answer: C*
+*Explanation: One assumption resolved is not every assumption resolved. The skateboard worked, which argues for a scooter next, not for skipping straight to the car.*
 *Learning objective tested: #1, #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team has built a genuinely minimal, well-scoped MVP, correctly limited to a single riskiest assumption, but during the test, several real users report an entirely new, unexpected pain point unrelated to the original assumption being tested. According to this lesson combined with Lesson 19's opportunity discipline, what is the most appropriate response?**
-A) Ignore the new finding entirely, since it falls outside the current MVP's specific test scope
-B) Immediately expand the current MVP to address the new pain point, even though it's unrelated to the assumption being tested, since more feedback is always better to act on immediately
-C) Record the new finding as a candidate addition to the Opportunity Solution Tree (Lesson 19) for future sizing and comparison, while keeping the current MVP's scope focused on its original, specific test
-D) Discard the entire MVP and restart discovery from the beginning based on this single new finding
+A) Record it on the Opportunity Solution Tree for later sizing, keeping this MVP's scope intact
+B) Expand the current MVP to address it, since more feedback is better
+C) Ignore it entirely, since it falls outside this MVP's test scope
+D) Discard the MVP and restart discovery based on this new finding
 
-*Correct answer: C*
-*Explanation: This integrates this lesson's scoping discipline with Lesson 19's opportunity management — a new, unrelated finding is valuable and should be captured for future comparison and sizing, but expanding the current MVP's scope to address it immediately would reintroduce exactly the kind of MVP creep this lesson warns against.*
+*Correct answer: A*
+*Explanation: The finding is genuinely valuable and belongs in the queue to be sized against everything else. Folding it into the running test is how creep begins, one good reason at a time.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 

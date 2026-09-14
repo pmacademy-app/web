@@ -456,195 +456,195 @@ There is no single correct answer. The purpose of this exercise is to practice a
 ## Quiz
 
 **1. What are acceptance criteria, according to this lesson?**
-A) A company's overall mission statement
-B) The specific, testable conditions that define when a user story is complete
-C) A list of every possible feature a product could eventually have
-D) A document describing a company's competitive positioning
+A) A list of every feature the product could eventually have
+B) A document describing the company's competitive positioning
+C) The testable conditions that define when a story is done
+D) The organisation's overall mission statement and purpose
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition, distinguishing acceptance criteria from broader strategic or competitive documents.*
+*Correct answer: C*
+*Explanation: They sit below the story's "so that" benefit and above nothing else — a concrete checklist for one already-scoped capability, narrower than a PRD's feature-level requirements.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the three components of the Given/When/Then format?**
-A) Goal, Workflow, Timeline
-B) A precondition (Given), a triggering action (When), and a specific, observable outcome (Then)
-C) Gather, Weigh, Test
-D) Government, Workplace, Team
+A) Gather, then Weigh, then Test in sequence
+B) Goal, Workflow, and Timeline, in that order
+C) Government, Workplace, and Team roles
+D) A precondition, an action, an outcome
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit structure for the format, forcing explicitness about context, action, and result.*
+*Correct answer: D*
+*Explanation: Naming the starting state, the trigger, and the observable result is what removes the ambiguity that "password reset should work correctly" leaves wide open.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Why is it important for a complete set of acceptance criteria to cover more than just the happy path?**
-A) Because happy path scenarios are never actually valuable to test
-B) Because real users, in aggregate, will encounter edge cases and error conditions with some regularity, and unspecified scenarios leave engineering and QA to guess inconsistently what should happen
-C) Because QA teams refuse to test happy path scenarios
-D) Because edge cases and negative scenarios are always easier to test than the happy path
+A) Real users hit edge and error cases regularly
+B) Because QA teams refuse to test happy path scenarios at all
+C) Because happy path scenarios are rarely valuable to test
+D) Because edge cases are simpler to test than happy paths
 
-*Correct answer: B*
-*Explanation: This directly reflects the lesson's core argument, extending Lesson 15's "happy path only" warning to the level of individual story verification.*
+*Correct answer: A*
+*Explanation: Unspecified scenarios do not go unbuilt; they get built to somebody's guess. The gap surfaces when a real user reaches it in production.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What is the "acceptance criteria written after the fact" failure pattern?**
-A) A best practice for ensuring criteria accurately reflect the finished implementation
-B) Writing criteria only after implementation is already complete, which inverts the artifact's purpose of forcing clarity before work begins
-C) A technique for writing criteria more quickly than the Given/When/Then format allows
-D) A required step in all agile development processes
+A) A required step within all agile development processes
+B) A technique for writing criteria faster than Gherkin allows
+C) Writing criteria after implementation, inverting their clarifying purpose
+D) A best practice ensuring criteria match the finished build
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the failure pattern, directly echoing Lesson 8's discovery theater concept — criteria written to match an already-built implementation cannot serve their intended clarifying function.*
+*Correct answer: C*
+*Explanation: Criteria written to match what exists cannot catch a mismatch between intention and implementation. Like discovery theater, the test could not have failed.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. Which of the following acceptance criteria best exemplifies over-specification, as warned against in this lesson?**
-A) "Given a valid discount code, when the customer enters it at checkout, then the order total should be reduced by the correct amount."
-B) "Given a valid discount code, when the customer enters it, then the system should use a specific caching mechanism and store the discount value in this exact database column."
-C) "Given an expired discount code, when the customer attempts to apply it, then a clear error message should be displayed."
-D) "Given a discount code has already been applied, when the customer attempts to apply it again, then the system should prevent a second application."
+A) "Given an expired code, when applied, then show a clear error."
+B) "Given a valid code, when entered at checkout, then reduce the total."
+C) "Given a code already applied, when reapplied, then block it."
+D) "Given a valid code, when entered, then cache it and store it in this exact column."
 
-*Correct answer: B*
-*Explanation: This criterion dictates a specific technical implementation detail (a caching mechanism, a specific database column) rather than specifying observable behavior, violating the Precision Dial principle extended to acceptance criteria.*
+*Correct answer: D*
+*Explanation: The other three describe what a person would observe. D names a caching approach and a column, which are engineering's decisions to make and live with.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, why did QA fail to catch the expired-code and double-application issues before launch?**
-A) QA was negligent and failed to test the feature at all
-B) QA correctly tested exactly what the acceptance criteria specified, but the criteria only covered the happy path, leaving these scenarios entirely unspecified
-C) The engineering team refused to allow QA to test the feature
-D) QA lacked the technical skill to test discount code functionality
+A) QA tested exactly what the criteria specified
+B) QA was negligent and did not test the feature at all
+C) Engineering refused to let QA test the feature here
+D) QA lacked the skill to test discount code functionality
 
-*Correct answer: B*
-*Explanation: The case study explicitly frames this as a demonstration that QA can only verify what has been explicitly specified — the gap was in the criteria, not in QA's execution of the criteria as written.*
+*Correct answer: A*
+*Explanation: The verification was faithful to a specification that had a hole in it. QA can confirm what was written down and cannot confirm what nobody thought to write.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **7. What two specific scenarios were missing from the original discount-code story's acceptance criteria in the Detailed Case Study?**
-A) A scenario for successful discount application and a scenario for customer support contact
-B) A negative scenario (expired/invalid code) and an edge case (applying the same code twice)
-C) A scenario for shipping cost calculation and a scenario for tax calculation
-D) A scenario for multiple currencies and a scenario for international shipping
+A) A negative scenario (expired code) and an edge case (reapplied code)
+B) A shipping-cost scenario and a tax-calculation scenario
+C) A multi-currency scenario and an international shipping scenario here
+D) A successful-application scenario and a support-contact scenario
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies these two specific gaps — an unspecified negative scenario and an unspecified edge case — as the source of the production issues.*
+*Correct answer: A*
+*Explanation: One of each missing category, which is what made the Coverage Map's third box the one that would have caught both.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **8. According to the Acceptance Criteria Quality Checklist, when should acceptance criteria be written and reviewed?**
-A) After the story has been fully implemented and deployed to production
-B) Before implementation begins, so that ambiguity is resolved through discussion rather than discovered later
-C) Only after a customer complaint has been received
-D) Acceptance criteria do not need to be reviewed at any specific time
+A) After the story has shipped fully to production users
+B) Before implementation, resolving ambiguity by discussion
+C) Once a customer complaint has actually been received
+D) At no particular point; timing makes no real difference
 
 *Correct answer: B*
-*Explanation: The Quality Checklist explicitly requires criteria to be written and reviewed before implementation begins, directly preventing the "written after the fact" failure pattern.*
+*Explanation: The whole value is in surfacing disagreement while it is still cheap. Written afterwards, the same words describe the build instead of testing it.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team writes an acceptance criterion: "Given a user is on the checkout page, when they click submit, then the order should process correctly." According to this lesson, what is the primary issue with this criterion?**
-A) It is over-specified with unnecessary technical implementation details
-B) It is vague and lacks a concrete, observable outcome — "process correctly" doesn't specify what observable result should actually occur
-C) It correctly follows the Given/When/Then format with no issues
-D) It covers too many edge cases at once
+A) It is over-specified with needless technical implementation detail
+B) It covers far too many distinct edge cases within one criterion
+C) It is vague; "process correctly" names no observable outcome
+D) It follows Given/When/Then correctly and needs no revision
 
-*Correct answer: B*
-*Explanation: "Process correctly" is not a specific, observable outcome — this criterion needs to specify exactly what should happen (e.g., "the order confirmation should display, and the customer should receive a confirmation email"), which the lesson identifies as essential to a genuinely testable criterion.*
+*Correct answer: C*
+*Explanation: The format is right and the third clause is empty. "Correctly" could mean a confirmation screen, a receipt email, a stock decrement, or all three, and nobody has said which.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team's acceptance criteria correctly cover the happy path and negative scenarios but include no edge cases at all. Using the Coverage Map, what should the team do next?**
-A) Consider the criteria complete, since happy path and negative scenarios are the only two required categories
-B) Identify at least one meaningful edge case (a boundary or unusual but valid scenario) and write a corresponding criterion, since the Coverage Map requires all three categories for genuine completeness
-C) Remove the negative scenario criteria, since only two categories can be included at a time
-D) Discard the entire set of criteria and start over from scratch
+A) Remove the negative criteria, since just two categories fit
+B) Add at least one meaningful edge case to complete the map
+C) Treat it as complete; two categories suffice
+D) Discard the whole set of criteria and begin again from scratch
 
 *Correct answer: B*
-*Explanation: The Coverage Map explicitly requires all three categories — happy path, edge cases, and negative scenarios — for a criteria set to be considered genuinely complete.*
+*Explanation: Two boxes of three is real progress and an incomplete set. Boundary values and unusual-but-valid combinations are where the remaining surprises live.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes writing acceptance criteria immediately after a feature ships, to "document what was built" for future reference. What might this signal, based on this lesson's Interview Perspective section?**
-A) An exemplary, best-practice approach to acceptance criteria
-B) A likely instance of the "written after the fact" failure pattern, providing documentation value but not the clarifying, pre-implementation function acceptance criteria are meant to serve
-C) That the candidate has extensive QA experience that should be considered a core strength
-D) Nothing meaningful, since acceptance criteria can be written at any point in a project with no difference in value
+A) The written-after-the-fact pattern; documentation without clarifying value
+B) An exemplary, best-practice approach to writing acceptance criteria
+C) Deep QA experience that should count as a core candidate strength
+D) Nothing of note, since the timing makes no difference to their value at all
 
-*Correct answer: B*
-*Explanation: This directly matches the lesson's definition of the "written after the fact" failure pattern — while such documentation has some value, it doesn't serve the pre-implementation clarity-forcing function that is acceptance criteria's primary purpose.*
+*Correct answer: A*
+*Explanation: As a record it has some use. As acceptance criteria it arrived too late to do the one job the artifact exists for.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team is deciding whether an acceptance criterion should specify "the system should cache the user's session token in local storage" or "the user should remain logged in across page refreshes within the same browser session." Which version aligns with this lesson's guidance, and why?**
-A) "The system should cache the user's session token in local storage," since more technical specificity is always preferable
-B) "The user should remain logged in across page refreshes within the same browser session," since it specifies the observable behavior and outcome without dictating a specific technical implementation mechanism, leaving that choice to engineering
-C) Both versions are equally appropriate and interchangeable
-D) Neither version is appropriate; acceptance criteria should never mention session behavior
+A) The caching version, since technical specificity is invariably better
+B) The stays-logged-in version; it names behaviour, not mechanism
+C) Both are equally appropriate and interchangeable
+D) Neither; criteria should avoid mentioning session behaviour
 
 *Correct answer: B*
-*Explanation: This directly applies the Precision Dial extended to acceptance criteria — specifying the observable behavior/outcome (remaining logged in) rather than the specific technical mechanism (local storage caching) that achieves it.*
+*Explanation: The observable outcome is testable and leaves engineering free to pick a mechanism. Naming local storage forecloses that and may well be the wrong choice.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a bug that reached production because a discount code could be applied twice, despite the team having written seemingly thorough acceptance criteria. A weak diagnostic response would most likely conclude which of the following?**
-A) The team's criteria likely lacked coverage for this specific edge case, despite appearing thorough for the happy path and other scenarios — the Coverage Map should be checked explicitly for gaps rather than assuming apparent thoroughness guarantees completeness
-B) QA must have failed to test the feature at all, regardless of what the criteria specified
-C) Acceptance criteria are fundamentally unreliable and should be abandoned as a practice
-D) The bug was unavoidable regardless of how the criteria were written
+A) Acceptance criteria are unreliable and should be abandoned entirely
+B) The bug was unavoidable however the criteria had been written
+C) QA must have failed to test the feature at all, whatever the criteria said
+D) The criteria likely lacked this edge case; check the Coverage Map for gaps
 
-*Correct answer: B*
-*Explanation: Attributing the issue to a QA failure, without first checking whether the criteria themselves specified this scenario at all, reflects a weaker diagnostic response — the lesson's Detailed Case Study specifically shows that QA correctly tests exactly what's specified, making incomplete criteria the more likely root cause to investigate first.*
+*Correct answer: C*
+*Explanation: Reaching for a QA failure before checking whether the scenario was ever specified skips the likelier cause. The case study shows a faithful QA pass against an incomplete list.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team's acceptance criteria are written using strict Given/When/Then format, cover happy path, edge cases, and negative scenarios, and were finalized before implementation began — but none of the criteria reference the story's stated "so that" benefit at all. What potential issue does this raise, according to this lesson?**
-A) No issue; Given/When/Then format alone guarantees a complete and correct set of criteria
-B) The criteria may be technically well-formed but could still miss whether they collectively serve the story's actual intended value — the "so that" clause remains important context for evaluating whether the criteria are well-chosen, not just well-formatted
-C) The "so that" clause should always be removed once acceptance criteria have been written
-D) This scenario indicates the story itself was poorly written, regardless of the criteria's quality
+A) No issue; Given/When/Then alone guarantees a complete correct set
+B) Well-formed criteria can still miss whether they serve the story's actual value
+C) The "so that" clause should be removed once criteria are written
+D) The story itself was poorly written, whatever the criteria's quality
 
 *Correct answer: B*
-*Explanation: This reflects Common Mistake 5 — proper Given/When/Then formatting and Coverage Map completeness are necessary but not sufficient; criteria should also be evaluated against whether they genuinely serve the story's underlying benefit, not just whether they're technically well-formatted.*
+*Explanation: Format and coverage are necessary and not sufficient. A set can be flawlessly structured and still verify technical correctness that has drifted from the benefit it was meant to deliver.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team writes complete, well-formatted acceptance criteria before implementation, covering happy path, edge cases, and negative scenarios, all correctly avoiding implementation-detail over-specification. During implementation, engineering discovers a technical constraint that makes one of the specified negative-scenario outcomes (a specific error message) infeasible to implement exactly as written. What is the most appropriate next step, connecting this lesson to Lesson 22's collaborative-review discipline?**
-A) Engineering should silently implement whatever is technically feasible without informing the PM, since the criteria were already finalized
-B) Engineering should raise the constraint directly with the PM, treating the acceptance criteria as a living, negotiable artifact (echoing Lesson 22's "PRD as one-way document" corrective) rather than an immutable decree, allowing the specific wording to be revised collaboratively while preserving the underlying intent
-C) The entire story should be abandoned, since any deviation from originally written criteria is unacceptable
-D) The criteria should be ignored entirely, and the story marked complete regardless of whether it satisfies the original intent
+A) Abandon the story, since any deviation from the criteria is unacceptable
+B) Ignore the criteria and mark the story complete regardless
+C) Implement whatever is feasible silently, since the criteria were final
+D) Raise it with the PM and revise the wording, preserving the intent
 
-*Correct answer: B*
-*Explanation: This connects this lesson's Given/When/Then discipline with Lesson 22's warning against treating specification documents as one-way, unquestionable decrees — a technical constraint discovered during implementation should prompt collaborative revision of the specific criterion, not silent deviation or wholesale abandonment.*
+*Correct answer: D*
+*Explanation: Criteria are a living artifact for the same reason a PRD is. The constraint is new information, and the right response is to change the wording together while holding the intent fixed.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 

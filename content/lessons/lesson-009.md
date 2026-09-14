@@ -429,195 +429,195 @@ There is no single correct answer. The purpose of this exercise is to practice a
 ## Quiz
 
 **1. Which of the following best defines a product vision?**
-A) A list of features planned for the next quarter
-B) A clear, durable description of the future state a product is working toward, typically over a multi-year horizon
-C) A company's overall statement of purpose, covering all of its products
-D) A specific, present-tense comparative claim about why customers should choose a product over a competitor
+A) A company-wide statement of purpose spanning every product line
+B) The list of initiatives planned for the coming quarter
+C) A durable description of the future state the product works toward
+D) A present-tense comparative claim about why customers should choose it
 
-*Correct answer: B*
-*Explanation: A product vision describes a durable future state, distinct from a roadmap (near-term feature list), a mission (company-wide purpose), and a value proposition (a present-tense comparative claim).*
+*Correct answer: C*
+*Explanation: Vision sits between mission and strategy on the Altitude Ladder. The other three options describe a mission, a roadmap, and a value proposition respectively — each real, each a different altitude.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why does this lesson argue that a vision should remain more stable than a roadmap?**
-A) Because roadmaps are unimportant and rarely need to change
-B) Because roadmaps are expected to change frequently as discovery reveals new information, while a vision operating at a higher altitude should generally survive many such iterations
-C) Because visions cannot legally be changed once published
-D) Because roadmaps and visions should always be identical documents
+A) Because roadmaps rarely need changing once they are agreed
+B) Because roadmaps shift as discovery lands, while vision sits higher up
+C) Because a published vision cannot be revised once it is announced
+D) Because the vision and the roadmap are meant to be the same document anyway
 
 *Correct answer: B*
-*Explanation: The lesson explains that healthy products change roadmaps constantly in response to new discovery findings, while a genuinely well-written vision should remain largely intact across many such iterations.*
+*Explanation: Healthy products change roadmaps constantly, because discovery keeps revealing new information. A vision that needs rewriting every quarter was written at too low an altitude to begin with.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Which of the following vision statements would most likely FAIL the specificity test described in this lesson?**
-A) "We believe the future of work is asynchronous, and we are building the definitive platform for asynchronous team collaboration."
-B) "We will empower people to achieve their goals."
-C) "We believe small business owners should spend their time running their business, not doing their books."
-D) "We are building toward a future of customer-centric commerce with the broadest selection and fastest delivery."
+A) "We will empower people everywhere to achieve their own goals."
+B) "We believe the future of work is asynchronous, and we are building for it."
+C) "Small business owners should run their business, not do their books."
+D) "We are building customer-centric commerce with the fastest delivery."
 
-*Correct answer: B*
-*Explanation: "We will empower people to achieve their goals" is generic enough to apply to almost any company in almost any industry, failing the specificity test, unlike the other options, which describe particular, industry-specific future states.*
+*Correct answer: A*
+*Explanation: A could sit on the wall of a fitness app, a bank, or a shoe company without alteration. The other three each name a particular future in a particular domain, which is what makes them usable as a filter.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What does "directional falsifiability" mean in the context of evaluating a vision statement?**
-A) The vision must be provably true at the moment it is written
-B) It must be possible, in principle, to point to evidence and say whether the company is moving toward or away from the stated future state
-C) The vision must be re-written every time new evidence emerges
-D) The vision must include specific, measurable financial targets
+A) The vision must be provably true at the moment it is written down
+B) You can say whether a decision moves toward or away from it
+C) The vision must be rewritten whenever evidence shifts
+D) The vision must state specific, measurable financial targets
 
 *Correct answer: B*
-*Explanation: Directional falsifiability means a vision gives enough specificity that real decisions or market changes could plausibly be assessed as moving toward or away from it — not that the vision itself must currently be a proven fact.*
+*Explanation: The test is whether "off track" is a describable state. A vision that no possible evidence could contradict gives the team no signal about anything, however well it reads.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. According to this lesson, why is a well-written, inspiring vision statement not itself a strategy?**
-A) Because visions are always poorly written
-B) Because a vision describes a destination, while strategy describes the sequenced, concrete path connecting today's decisions to that destination
-C) Because strategy and vision are the same concept under different names
-D) Because visions should never be communicated to the broader team
+A) Because visions are typically written in vague, unhelpful language
+B) Because a vision names the destination while strategy sequences the path there
+C) Because vision and strategy are the same concept under two names
+D) Because a vision should not be shared with the wider team at all
 
 *Correct answer: B*
-*Explanation: The lesson explicitly distinguishes vision (the destination) from strategy (the sequenced path to get there), and warns that having one without the other produces paralysis or scattered activity.*
+*Explanation: Vision answers where and why; strategy answers how and in what order. A team with only the first tends toward paralysis or toward many plausible initiatives that never compound.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what was the core missing element between the company's vision and its actual roadmap?**
-A) The vision was not specific enough to be useful
-B) A sequenced strategy connecting the asynchronous-work vision to concrete near-term roadmap priorities was never developed, and the Vision Filter was never applied to roadmap decisions
-C) The company had no product vision at all
-D) The roadmap perfectly matched the vision, but employees were simply unaware of it
+A) The vision itself was too vague to guide any real decision
+B) The company had never articulated a product vision at all
+C) The roadmap matched the vision, but staff were unaware of it
+D) No strategy connected the vision to near-term priorities
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the disconnect to a missing strategy layer and the absence of an explicit Vision Filter check on roadmap decisions, not to the vision itself being poorly written or entirely absent.*
+*Correct answer: D*
+*Explanation: The vision was specific and well received. What was absent was the sequencing layer beneath it, and any habit of checking roadmap items against it before committing.*
 *Learning objective tested: #4, #5*
 *Difficulty: Easy*
 
 ---
 
 **7. Which specific feature in the Detailed Case Study most directly conflicted with the company's stated asynchronous-work vision?**
-A) Structured written status updates
-B) A "who's online now" live presence indicator
-C) Notification batching
-D) Decision logs
+A) A "who's online now" live presence indicator in the sidebar
+B) Structured written status updates posted once each day
+C) Notification batching that delivers digests on a fixed schedule
+D) Decision logs that record why a choice was made
 
-*Correct answer: B*
-*Explanation: A live "who's online now" presence indicator reinforces real-time, synchronous collaboration dynamics, working against a vision centered on reducing dependence on being online at the same time as teammates.*
+*Correct answer: A*
+*Explanation: Presence indicators reward being online at the same moment as your colleagues, which is the dependency an asynchronous vision exists to remove. The other three all reduce it.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **8. According to the Vision Filter, what should happen when a proposed roadmap item conflicts with the stated vision?**
-A) The item should always be rejected immediately, with no further discussion
-B) The item should always be approved, since customer requests take precedence over vision
-C) The conflict should prompt explicit discussion — the item might still be worth doing despite the tension, or it might signal the vision itself needs revisiting, but the trade-off should not be made silently
-D) The vision should be deleted and replaced immediately
+A) The item should be approved, since customer requests outrank vision
+B) The vision should be deleted and replaced with a revised statement
+C) The item should be rejected at once, with no further discussion held
+D) The conflict should prompt an explicit, deliberate discussion
 
-*Correct answer: C*
-*Explanation: The lesson explicitly states that a conflict with the vision does not mean automatic rejection; it means the trade-off must be made deliberately and explicitly, rather than silently accepted or rejected by default.*
+*Correct answer: D*
+*Explanation: A necessary near-term move can be worth making in tension with the vision. What the filter prevents is the common case — a locally sensible decision quietly working against the stated future, with nobody noticing.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A company's roadmap changes substantially every quarter based on new discovery findings, but its stated vision has remained essentially unchanged for two years. According to this lesson, is this a sign of a problem?**
-A) Yes — a vision unchanged for two years always signals stagnation
-B) No — this is the expected, healthy pattern; roadmaps should change frequently while a genuinely well-written vision remains stable across many such iterations
-C) Yes — vision and roadmap should always change together at the same rate
-D) It cannot be determined without knowing the company's specific industry
+A) Yes — a vision left unchanged for two years always signals stagnation
+B) Yes — vision and roadmap ought to change at the same rate
+C) It cannot be judged without knowing the company's specific industry
+D) No — this is precisely the healthy pattern the lesson describes
 
-*Correct answer: B*
-*Explanation: This is precisely the pattern the lesson describes as healthy — frequent roadmap iteration alongside long-term vision stability, rather than a warning sign.*
+*Correct answer: D*
+*Explanation: A vision surviving many roadmap iterations intact is evidence it was written at the right altitude. Frequent roadmap change is discovery working as intended, not direction failing.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team's vision statement is so broad it could describe almost any company in its industry, yet the team insists it is useful because "everyone likes it." According to this lesson, what is the most accurate assessment?**
-A) The vision is functioning well, since broad appeal is the primary goal of a vision statement
-B) The vision likely fails the specificity test, and broad, generic appeal is itself evidence of the problem, since it suggests the statement provides no real filter for any decision
-C) The vision cannot be evaluated without financial data
-D) All vision statements should aim for the broadest possible appeal to maximize motivation
+A) The vision works well, since broad appeal is its primary purpose
+B) It likely fails the specificity test, and broad appeal is the evidence
+C) The vision cannot be judged without reviewing the financial results first
+D) Vision statements should aim for the widest possible appeal to motivate
 
 *Correct answer: B*
-*Explanation: The lesson explicitly frames generic, universally appealing language as a failure of the specificity test, precisely because such language could apply to any company and therefore filters nothing.*
+*Explanation: Universal agreement is what a statement earns by ruling nothing out. The same property that makes it uncontroversial is what makes it useless for deciding between two roadmap items.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked to describe a product vision they worked toward, and their answer focuses entirely on how inspiring and well-received the statement was internally, without describing any instance where it actually changed a prioritization decision. What does this most likely signal, based on this lesson's Interview Perspective section?**
-A) Strong vision-setting skills, since internal reception is the primary measure of a good vision
-B) A possible sign the vision was treated as decorative rather than as a practical filter actually used in real decisions
-C) That the candidate is unqualified for any product role
-D) Nothing meaningful, since visions are not typically discussed in interviews
+A) A sign the vision was decorative rather than actually used
+B) Strong vision-setting, since internal reception is the real measure
+C) Nothing notable, since visions rarely come up in product interviews
+D) Evidence the candidate is unsuited to any product management role
 
-*Correct answer: B*
-*Explanation: The lesson's Interview Perspective explicitly looks for evidence that a vision was used as a practical filter in real prioritization decisions, not just well-received as an internal communication artifact.*
+*Correct answer: A*
+*Explanation: The interviewer is listening for a decision the vision changed — something the team did differently, or declined to do, because of it. Warm internal reception is compatible with a statement nobody ever consulted.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A company's market undergoes a fundamental shift — a new regulation makes its core product's approach illegal in its primary market. According to this lesson, what is the most appropriate response regarding the company's vision?**
-A) The vision should never be changed under any circumstances, regardless of market shifts
-B) This qualifies as one of the legitimate triggers described in this lesson for revisiting the vision itself, not just the roadmap
-C) Only the roadmap should change; visions are entirely independent of market conditions
-D) The company should immediately abandon product management as a discipline
+A) The roadmap alone should change, since vision is independent of markets
+B) The vision should never change under any circumstances whatsoever
+C) This is one of the legitimate triggers for revisiting the vision itself, not just the roadmap
+D) The company should withdraw from the affected market without revising anything
 
-*Correct answer: B*
-*Explanation: The lesson explicitly names a genuine, disruptive market shift as one of the legitimate reasons to revisit a vision, rather than simply adjusting the roadmap while leaving an now-outdated vision unexamined.*
+*Correct answer: C*
+*Explanation: Stable does not mean permanent. A genuine market rupture, a revised understanding of the underlying job, or repeated strategic failure despite good execution are the three reasons this lesson accepts for reopening a vision.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where a team has an excellent, specific, motivating vision, but has never translated it into any sequenced set of near-term priorities, resulting in scattered, uncoordinated feature work. What is this scenario a direct example of?**
-A) Discovery theater (Lesson 8)
-B) The "vision without strategy" failure pattern described in this lesson
-C) A well-functioning Vision Filter
-D) The Value Proposition Filter (Lesson 7) working correctly
+A) The Value Proposition Filter from Lesson 7 operating correctly
+B) Discovery theater as described in the previous lesson on discovery
+C) A well-functioning Vision Filter applied to roadmap decisions
+D) The "vision without strategy" failure pattern named in this lesson
 
-*Correct answer: B*
-*Explanation: This is the exact failure pattern this lesson names directly — a compelling vision with no accompanying sequenced strategy, producing scattered, uncoordinated activity.*
+*Correct answer: D*
+*Explanation: Scattered activity launched in the vision's name is one of the two symptoms this pattern produces; the other is paralysis, where everyone agrees on the destination and nobody can name a first move.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A new PM proposes rejecting any roadmap item that isn't in perfect, unambiguous alignment with the company's long-term vision, including urgent, commercially necessary near-term requests. According to this lesson, is this the correct application of the Vision Filter?**
-A) Yes — the Vision Filter requires automatic rejection of anything not in perfect alignment
-B) No — the Vision Filter is meant to surface tension for explicit, deliberate discussion, not to mandate automatic rejection of every item in tension with the vision
-C) Yes, but only for B2B products
-D) The Vision Filter does not apply to urgent or commercially necessary requests at all
+A) Yes — the filter requires rejecting whatever is not clearly aligned
+B) Yes, though this rule should apply only to B2B product teams
+C) No — the filter surfaces tension for deliberate discussion, not automatic rejection
+D) No — the filter does not apply to urgent commercial requests at all
 
-*Correct answer: B*
-*Explanation: The lesson explicitly states that items in tension with the vision may still be worth doing, and that the Filter's purpose is to make such trade-offs explicit, not to enforce automatic rejection.*
+*Correct answer: C*
+*Explanation: The filter's third branch is a prompt, not a verdict. A competitive response or a major customer's urgent need can be worth doing in tension with the vision, provided the team knows it is making that trade.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) Two team members are in an extended disagreement: one insists a specific quarterly roadmap decision "betrays the company's whole direction," while the other insists the roadmap decision is "just a normal tactical choice unrelated to any bigger picture." Using the Altitude Ladder, what is the most likely underlying issue in this disagreement, and what should happen next?**
-A) One person is simply wrong and should be overruled immediately, without further discussion
-B) The two people are likely arguing about the same decision at mismatched altitudes (one treating it as vision-level, the other as roadmap-level), and the productive next step is to explicitly name which altitude the decision actually belongs to, and whether it connects meaningfully to the vision or not
-C) This kind of disagreement is impossible to resolve and should be escalated to company leadership immediately without further analysis
-D) The roadmap decision should simply be cancelled to avoid the disagreement entirely
+A) One person is simply wrong and ought to be overruled without discussion
+B) The disagreement cannot be resolved and should go straight to leadership
+C) They are arguing at mismatched altitudes; name the altitude first
+D) The decision should be cancelled to end the disagreement
 
-*Correct answer: B*
-*Explanation: The Altitude Ladder is explicitly introduced as a diagnostic for exactly this kind of mismatched-altitude disagreement — naming the actual altitude in question is the productive first step, rather than assuming one side is simply correct or escalating without analysis.*
+*Correct answer: C*
+*Explanation: Both may be right at their own altitude. Naming which level the decision actually belongs to usually converts the argument from who is correct into how the two levels connect.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 

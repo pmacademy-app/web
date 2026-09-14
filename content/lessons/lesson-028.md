@@ -484,196 +484,195 @@ There is no single correct answer. The purpose of this exercise is to practice d
 ## Quiz
 
 **1. What is information architecture, according to this lesson?**
-A) The visual color and typography choices used throughout a product
-B) The practice of organizing, structuring, labeling, and connecting a product's content and functionality
-C) The specific behavior of interface elements when a user interacts with them
-D) A company's internal engineering team structure
+A) Organising, structuring, and labelling a product's content
+B) The visual colour and typography choices used across a product
+C) How interface elements behave when a user interacts with them
+D) A company's internal engineering and product team structure
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition, distinguished from visual design (appearance) and interaction design (element behavior).*
+*Correct answer: A*
+*Explanation: It is the layer beneath the other two. A product can be beautiful and smooth to operate while users still cannot find the screen they need.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the difference between an open and a closed card sort?**
-A) Open sorts are conducted in person; closed sorts are conducted remotely
-B) In an open card sort, participants create their own categories; in a closed card sort, participants sort cards into predefined categories
-C) Open sorts use physical cards; closed sorts use digital cards exclusively
-D) There is no meaningful difference between the two
+A) Open sorts are conducted in person, whereas closed sorts run remotely
+B) Open sorts let participants name categories; closed ones predefine
+C) Open sorts use physical cards while closed sorts use digital ones
+D) There is no meaningful difference between the two card variants
 
 *Correct answer: B*
-*Explanation: This is the lesson's explicit distinction between the two card sorting variants, each serving a different validation purpose.*
+*Explanation: An open sort discovers how users group things; a closed sort tests whether a structure you already have matches how they would. Medium and location are incidental.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is the "org chart as navigation" failure pattern?**
-A) A navigation structure that changes too frequently for users to learn
-B) Structuring a product's navigation around internal team or department boundaries rather than validated user mental models
-C) A navigation structure with too few categories
-D) A required best practice for enterprise software navigation
+A) A navigation structure that changes too often for users to learn
+B) A required best practice within enterprise software navigation
+C) A navigation structure containing too few top-level categories
+D) Navigation mirroring internal team boundaries, not users
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the failure pattern, distinguishing it from unrelated navigation issues like excessive change frequency or category count.*
+*Correct answer: D*
+*Explanation: Users have no view of who owns what internally and no reason to. A structure built on that boundary confuses them however logical it looks from inside.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is a team's internal familiarity with a category structure a poor indicator of its genuine intuitiveness to users, according to this lesson?**
-A) Because internal teams are always wrong about everything related to their product
-B) Because the team's deep familiarity with internal logic and terminology is precisely what makes them poor judges of a fresh user's actual, unfamiliar experience
-C) Because internal teams never use their own products
-D) Because internal familiarity is only relevant to visual design, not information architecture
+A) Deep familiarity with internal logic distorts judgment of a fresh user
+B) Because internal teams are wrong about everything in their product
+C) Because internal teams do not use the products they build at all
+D) Because familiarity bears on visual design rather than on architecture
 
-*Correct answer: B*
-*Explanation: The lesson explains this specific mechanism — deep internal familiarity actively distorts a team's ability to judge intuitiveness for someone without that same context.*
+*Correct answer: A*
+*Explanation: The team cannot unknow the terminology or the history. That knowledge is exactly what a first-time user lacks, which makes the team the wrong instrument for this judgment.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Which of the following is the clearest example of ambiguous labeling, as described in this lesson?**
-A) A navigation category labeled "Billing," containing payment and subscription-related settings
-B) A navigation category labeled "Workspace Configuration," using internal jargon unfamiliar to typical users
-C) A navigation category labeled "My Profile," containing user account details
-D) A navigation category labeled "Help," containing support resources
+A) "Billing," containing payment and subscription-related settings
+B) "Workspace Configuration," internal jargon users rarely meet
+C) "My Profile," containing the user's own account details and preferences
+D) "Help," containing the product's support and documentation resources
 
 *Correct answer: B*
-*Explanation: "Workspace Configuration" reflects internal, jargon-heavy terminology likely unfamiliar to typical users, unlike the more commonly understood labels in the other options.*
+*Explanation: The phrase is precise inside the company and unmoored outside it. A user who cannot predict what sits behind a label has to guess and explore, which is the cost.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, why was "Notification Rules" established as its own separate top-level navigation section?**
-A) Because card sorting research validated this as the ideal user-facing category
-B) Because a separate internal engineering team happened to own that functionality, not because of any user research validation
-C) Because users specifically requested this exact category name and placement
-D) Because notification settings are inherently unrelated to any other product functionality
+A) Because card sorting validated it as the ideal user-facing category
+B) Because users specifically asked for that exact name and placement
+C) Because a separate internal team owned that functionality
+D) Because notification settings relate to no other product function
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes this placement to internal team ownership, emerging organically without any user-validated research behind the decision.*
+*Correct answer: C*
+*Explanation: Nobody decided it should be top-level for users. It became top-level because a team owned it, which is how this pattern usually arrives — organically, undecided.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **7. What did the card sorting study in the Detailed Case Study reveal about users' actual mental model?**
-A) Users wanted notification settings removed from the product entirely
-B) Most users' actual mental model grouped notification preferences together with general account and profile settings, rather than as a separate top-level category
-C) Users preferred notification settings to remain exactly where they were originally placed
-D) Users could not understand the concept of notification preferences at all
+A) Users could not grasp the concept of notification preferences at all
+B) Most grouped notification preferences with account and profile settings
+C) Users preferred notification settings exactly where they already sat
+D) Users wanted the notification settings section withdrawn from the product
 
 *Correct answer: B*
-*Explanation: The case study explicitly describes this finding as the key mismatch between the existing structure and users' genuine mental model.*
+*Explanation: Users think of it as part of managing their account, not as a distinct area of the product. The internal boundary had no counterpart in anybody's head outside the company.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium*
 
 ---
 
 **8. According to the Information Architecture Validation Checklist, how should validation effort be determined?**
-A) Maximal validation effort should always be applied regardless of a product's complexity
-B) Validation effort should be proportional to the product's actual organizational complexity and stakes
-C) No validation effort is ever necessary if the internal team is confident in the structure
-D) Validation effort should be determined solely by how much time is available, regardless of product complexity
+A) Maximal validation effort applies whatever the product's complexity
+B) No validation is needed where the internal team feels confident
+C) Proportional to the product's actual complexity and its stakes
+D) By however much time happens to be available in the schedule
 
-*Correct answer: B*
-*Explanation: The Checklist explicitly calls for validation effort proportional to actual complexity and stakes, avoiding both under- and over-validation.*
+*Correct answer: C*
+*Explanation: The same proportionality that governs MVP scope and prototype fidelity governs this. Three clearly distinct sections warrant less than twelve overlapping ones.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A small startup's product has three clearly distinct sections with no significant overlap or ambiguity. According to this lesson, is an extensive, formal card sorting study necessarily warranted?**
-A) Yes, extensive card sorting is always required regardless of a product's simplicity
-B) Not necessarily — validation effort should be proportional to actual complexity and stakes, and a genuinely simple, clearly distinct structure may not require extensive formal research
-C) No, card sorting should never be used for any product regardless of complexity
-D) This scenario cannot be evaluated using this lesson's framework
+A) Yes, extensive card sorting is required whatever the simplicity
+B) Card sorting should be avoided for any product, whatever its size or type
+C) Not necessarily; effort should track actual complexity and stakes
+D) This scenario cannot be evaluated using the lesson's framework
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's proportionality principle — a simple, low-stakes structure doesn't automatically require the same validation investment as a complex, high-stakes one.*
+*Correct answer: C*
+*Explanation: Formal taxonomy work on three unambiguous sections spends effort where little is at risk. The technique is sound and the investment should still be earned.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A mid-size company's product has grown from three simple sections to twelve overlapping ones over several years, with no revalidation since the original launch. What does this lesson suggest the team should do?**
-A) Nothing; the original structure should remain permanent regardless of how the product has grown
-B) Revisit and revalidate the information architecture, since structures can become overloaded or inconsistent as new content is added over time, and should not be treated as a one-time, permanent decision
-C) Immediately remove all navigation categories added after the initial launch, regardless of their validated usefulness
-D) Rely solely on internal team confidence going forward, without further user research
+A) Nothing; the original structure should stand however the product grew
+B) Rely on internal team confidence from here, without further research
+C) Remove every category added since launch, whatever its usefulness
+D) Revalidate the architecture, since structures overload as content accretes
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit warning against treating IA as a one-time decision — growth over time is exactly the kind of situation warranting deliberate revalidation.*
+*Correct answer: D*
+*Explanation: Each addition was locally sensible and the accumulation was never designed. This is the situation where findability quietly degrades without any single decision causing it.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes organizing a product's settings page by asking each internal team to define their own section, without any user research involved. What might this signal, based on this lesson's Interview Perspective section?**
-A) An efficient, well-organized approach with no meaningful concerns
-B) A likely instance of the "org chart as navigation" failure pattern, risking a structure that reflects internal convenience rather than validated user mental models
-C) That the candidate has strong internal stakeholder management skills that should be considered a core strength
-D) Nothing meaningful, since internal team input is always the most reliable source for navigation decisions
+A) An efficient, well-organised approach carrying no real concerns
+B) Strong internal stakeholder management counting as a core strength
+C) The org-chart-as-navigation pattern, reflecting internal convenience over user models
+D) Nothing of note, since internal input is the most reliable source
 
-*Correct answer: B*
-*Explanation: This directly matches the lesson's definition of the "org chart as navigation" failure pattern, which the Interview Perspective section treats as a weak signal when described without any user validation.*
+*Correct answer: C*
+*Explanation: Asking each owner to define their own section guarantees the result maps the org chart. It is efficient to produce and it encodes a boundary users cannot see.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team conducts a closed card sort testing a proposed four-category structure, and results show most participants sort a specific set of cards inconsistently across all four categories, with no clear consensus. What does this most likely indicate?**
-A) The proposed structure is excellent and requires no further changes
-B) The inconsistent sorting suggests this specific set of cards doesn't fit clearly into any of the four proposed categories, indicating a likely structural gap or mismatch that warrants further investigation, possibly including an open card sort to discover a better-fitting category
-C) The card sorting method itself is invalid and should never be used again
-D) This result should be ignored, since inconsistent sorting has no diagnostic value
+A) A structural gap; those cards fit none of the four categories cleanly
+B) The proposed structure is excellent and needs no further changes
+C) The card sorting method is invalid and should be abandoned here
+D) The result should be ignored, since inconsistency carries no diagnostic signal
 
-*Correct answer: B*
-*Explanation: Inconsistent sorting results are a genuine diagnostic signal — they suggest the proposed categories don't clearly accommodate this content from users' perspective, warranting further investigation rather than being dismissed or treated as confirming the existing structure.*
+*Correct answer: A*
+*Explanation: Scattered sorting is a finding, not noise. It says the content has no natural home in the scheme on offer, and an open sort may reveal the category that is missing.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where a company's internal team structure has recently changed significantly, and asks how this should affect the product's existing information architecture. What is the strongest response, based on this lesson?**
-A) The product's navigation structure should be immediately reorganized to match the new internal team structure
-B) The internal reorganization should have no automatic bearing on the product's navigation structure, which should remain grounded in validated user mental models rather than whichever internal structure happens to currently exist
-C) The product's navigation should always mirror whatever the current internal team structure is, updated continuously
-D) Internal reorganizations are irrelevant to any aspect of product strategy or design
+A) Reorganise the navigation at once to match the new team structure
+B) The reorganisation should not move navigation, which stays anchored to validated user models
+C) Navigation should mirror the current internal structure continuously
+D) Internal reorganisations bear on no aspect of product design at all
 
 *Correct answer: B*
-*Explanation: This reflects the lesson's core principle — navigation structure should remain anchored to validated user mental models, independent of internal organizational changes, which is precisely the discipline that prevents the "org chart as navigation" failure pattern from recurring.*
+*Explanation: Reshuffling navigation to follow a reorg is the org-chart pattern arriving a second time. Users' mental models did not change because the reporting lines did.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team has validated an information architecture through card sorting, but two years later, the product has added substantial new content and features without any further validation. Support tickets have begun increasing around findability issues. What should the team conclude, and what should they do?**
-A) The original card sorting study remains valid forever, and no further action is needed
-B) The original validation, while genuinely useful at the time, may no longer reflect the product's current, expanded content and user base — the team should conduct fresh validation research (potentially another card sort) rather than assuming the original study remains accurate indefinitely
-C) Card sorting should be abandoned as a technique, since it apparently failed to prevent the current findability issues
-D) The team should immediately revert to the original three-section structure regardless of current content
-E) (Not applicable — select from A-D)
+A) The original study stays valid indefinitely and needs no action
+B) Revert to the original three-section structure whatever the content
+C) Abandon card sorting, since it failed to prevent these issues
+D) Run fresh validation; the original study predates the current content and base
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's warning against treating IA as a one-time, permanent decision — genuine, rigorous validation at one point in time doesn't guarantee continued accuracy as a product substantially grows and changes, warranting periodic revalidation.*
+*Correct answer: D*
+*Explanation: The study was accurate about a product that no longer exists in that form. Rising findability tickets are the slow, indirect way this problem announces itself.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team validates a proposed information architecture through rigorous card sorting with a representative sample of current users, and the structure performs well. Six months later, the company launches a major new feature targeting an entirely new customer segment (per Lesson 18's segmentation discipline) with potentially different mental models than the original user base. What should the team do regarding their existing information architecture?**
-A) Assume the existing, validated structure automatically extends to the new segment without further investigation, since it was rigorously validated for the original user base
-B) Recognize that a structure validated for one user segment does not automatically generalize to a different, newly targeted segment with potentially different mental models, and conduct additional validation (potentially a new card sort with the new segment specifically) before assuming the existing structure serves them equally well
-C) Discard the entire existing structure immediately, without any further validation, simply because a new segment has been introduced
-D) Ignore the new segment's potential differences entirely, since information architecture should never account for segment-specific mental model differences
+A) Validate again with the new segment before assuming the structure serves them
+B) Assume the validated structure extends to the new segment without any checking
+C) Discard the whole structure at once, since a new segment has arrived
+D) Disregard segment differences, since architecture ignores them anyway
 
-*Correct answer: B*
-*Explanation: This integrates this lesson with Lesson 18's segmentation discipline — a structure validated for one segment's mental model doesn't automatically generalize to a different segment, and the appropriate response is targeted, proportional revalidation for the new segment specifically, rather than either uncritical extension or wholesale discarding of previously validated work.*
+*Correct answer: A*
+*Explanation: The study was representative of the users who existed when it ran. A segment with a different job may group the same content differently, and that is a testable question.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
 

@@ -389,195 +389,195 @@ There is no single correct answer. The purpose of this exercise is to practice r
 ## Quiz
 
 **1. Which of the following best completes a value proposition template?**
-A) "We believe in helping people work smarter."
-B) "For freelancers who lose time coordinating meetings by email, [Product] is the booking tool that lets clients pick a slot in one click, unlike endless email threads."
-C) "Our app has calendar sync, notifications, and reminders."
-D) "Our product is the best on the market."
+A) "For small teams juggling many calendars, [Product] is the scheduling tool that saves hours every single week."
+B) "[Product] is the booking tool that completely replaces the back-and-forth of email scheduling threads."
+C) "For freelancers losing hours to scheduling email, [Product] is the booking tool that lets clients self-book, unlike email threads."
+D) "For freelancers, [Product] offers calendar sync, automated reminders, and a shareable public booking page."
 
-*Correct answer: B*
-*Explanation: Option B names a specific audience, job, differentiated benefit, and primary alternative — the four load-bearing elements of a real value proposition — while the others are a mission statement, a feature list, and an unsupported claim, respectively.*
+*Correct answer: C*
+*Explanation: Only C carries all four load-bearing elements: a named audience, a named job, a differentiated benefit, and a named alternative. A omits the alternative, B omits the audience and job, and D lists features rather than a benefit.*
 *Learning objective tested: #1, #2*
 *Difficulty: Easy*
 
 ---
 
 **2. Why is a value proposition described as being "built on top of" a job statement?**
-A) Because job statements are less important than value propositions
-B) Because a value proposition's claim of being the best solution only makes sense if the underlying job has actually been validated as real and poorly served
-C) Because job statements should be discarded once a value proposition is written
-D) Because the two concepts are unrelated
+A) Because the claim depends on the job beneath it being genuinely real
+B) Because job statements become obsolete once positioning is written
+C) Because the two artifacts are owned by separate teams in most firms
+D) Because a value proposition must be signed off before discovery begins
 
-*Correct answer: B*
-*Explanation: Without a validated job underneath it, a value proposition's comparative claim (being the best available option) has no real foundation to stand on.*
+*Correct answer: A*
+*Explanation: A value proposition asserts you are the best available answer to a job. If that job has not been validated as real, painful, and poorly served, the comparative claim has nothing underneath it.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Why does this lesson argue that "for everyone" is not a real value proposition?**
-A) Because it is too long to be memorable
-B) Because it fails to make a genuine strategic choice and describes nothing a competitor couldn't equally claim
-C) Because value propositions must always target consumers rather than businesses
-D) Because "for everyone" statements always violate advertising regulations
+A) Because such statements tend to be too long to be memorable
+B) Because value propositions must target consumers, not businesses
+C) Because broad claims attract regulatory scrutiny in most markets
+D) Because it makes no real choice and excludes nothing
 
-*Correct answer: B*
-*Explanation: A real value proposition requires specificity — naming a bounded audience and a bounded job — which "for everyone" explicitly avoids, robbing it of usefulness as a strategic filter.*
+*Correct answer: D*
+*Explanation: A strategic choice necessarily rules something out. A statement a hundred other tools could equally make gives the PM no way to judge whether a proposed feature strengthens or dilutes the product's position.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **4. According to this lesson, when might a product need two distinct value propositions?**
-A) Never — a product should always have exactly one value proposition
-B) When user and customer audiences diverge significantly, since each may have a different job and different concerns
-C) Only when the product is sold in two different countries
-D) Only when the product has more than one pricing tier, regardless of audience
+A) When the product is sold across two or more separate countries
+B) When the product offers more than one paid pricing tier
+C) When marketing and product teams disagree about the messaging
+D) When user and customer audiences genuinely diverge
 
-*Correct answer: B*
-*Explanation: The lesson explicitly connects this to Lesson 5's Alignment Spectrum — meaningful divergence between user and customer audiences often justifies two coherent but distinct value propositions.*
+*Correct answer: D*
+*Explanation: Divergence on the Alignment Spectrum means two audiences holding different jobs. The two statements should be consistent with one another, but they will emphasize different benefits because they answer different questions.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. In the Value Proposition Filter, what does it mean if a proposed feature merely matches an alternative's existing capability?**
-A) It is automatically the highest priority feature
-B) It is "table stakes" — necessary in some cases, but not itself a source of differentiation
-C) It should always be rejected outright
-D) It proves the value proposition is incorrect
+A) It is table stakes — possibly necessary, but not differentiating
+B) It should immediately become the single highest priority on the roadmap
+C) It should be rejected, since matching a rival is wasted effort
+D) It indicates the stated value proposition needs to be rewritten
 
-*Correct answer: B*
-*Explanation: Table stakes features may still be worth building, but the Filter distinguishes them from features that specifically help win against the named alternative, since only the latter directly advances differentiation.*
+*Correct answer: A*
+*Explanation: Table stakes features are sometimes worth building to stay credible in a category. The filter's job is to keep them from being mistaken for work that advances differentiation.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what was the core strategic mistake made by the scheduling tool's team?**
-A) Building any features for the enterprise segment at all
-B) Simultaneously building for two audiences with different jobs and different primary alternatives, without an explicit strategic choice about which to prioritize
-C) Refusing to serve the freelancer audience once enterprise usage appeared
-D) Charging enterprise customers a higher price than freelancers
+A) Building any enterprise features at all for the newly arrived segment
+B) Serving two audiences with different jobs and alternatives, without choosing
+C) Refusing to keep serving freelancers once enterprise use grew
+D) Charging enterprise buyers more than the freelancer segment paid
 
 *Correct answer: B*
-*Explanation: The case study attributes the failure specifically to the lack of an explicit choice — not to serving the enterprise segment being inherently wrong, but to doing so silently and simultaneously with the original audience, producing an incoherent product.*
+*Explanation: Serving enterprise was not inherently wrong. Drifting into it silently, while still claiming the original freelancer proposition, produced a product that was a compromise on both counts.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. Which of the following is the clearest example of Beginner Mistake 1 (listing features instead of benefits) in a value proposition?**
-A) "For managers who need a quick pulse on team workload, [Product] surfaces the one metric that matters before your Monday stand-up."
-B) "Our app has push notifications, calendar sync, and offline mode."
-C) "Unlike digging through three separate spreadsheets, [Product] gives you one dashboard."
-D) "For HR leaders who must demonstrate measurable productivity gains to the board, [Product] provides audit-ready reporting in one click."
+A) "Our app has push notifications, calendar sync, and offline mode."
+B) "For managers, [Product] surfaces the one metric that matters."
+C) "Unlike three separate spreadsheets, [Product] gives you one dashboard."
+D) "For HR leaders, [Product] delivers audit-ready reporting in one click."
 
-*Correct answer: B*
-*Explanation: Option B lists product features without connecting them to a specific audience, job, or differentiated benefit — the hallmark of Mistake 1.*
+*Correct answer: A*
+*Explanation: A names three capabilities and stops. It never says who they are for, what job they serve, or what they beat — features are the means, and a value proposition is about the result the audience gets.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **8. (Scenario) A product's value proposition names "spreadsheets and manual tracking" as its primary alternative. According to this lesson, what does naming a primary alternative allow a PM to do that a value proposition without one cannot?**
-A) Nothing — naming an alternative is purely a marketing formality
-B) Evaluate the value proposition as an actual comparative, falsifiable claim, since "better than X" can be tested, while an unnamed comparison cannot
-C) Guarantee the product will outperform every competitor automatically
-D) Avoid ever needing to update the value proposition again
+A) Evaluate the proposition as a genuinely testable comparative claim
+B) Guarantee that the product will outperform every rival automatically
+C) Little — naming an alternative is mainly a marketing formality
+D) Avoid revisiting the value proposition as the market shifts
 
-*Correct answer: B*
-*Explanation: The lesson argues that a named alternative is what makes a value proposition a testable comparative claim rather than an unfalsifiable, generic statement.*
+*Correct answer: A*
+*Explanation: "Better than X" can be checked against evidence; "better" on its own cannot. Naming the alternative is what converts a generic description into a falsifiable claim the team can be wrong about.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **9. (Product Thinking) A team discovers that a proposed feature is popular in user surveys but does not serve the audience or job named in their current value proposition. According to the Value Proposition Filter, what is the most appropriate next step?**
-A) Build it immediately, since popularity alone justifies prioritization
-B) Reject it outright without further discussion, since it fails the filter
-C) Treat the mismatch as a flag for explicit discussion — is this evidence the value proposition itself needs to evolve, or is this simply out-of-scope work that should be deprioritized?
-D) Ignore user survey data entirely going forward
+A) Build it right away, since survey popularity justifies the work
+B) Discard all future survey data as an unreliable input to planning
+C) Reject it outright, since a filter failure settles the question
+D) Treat the mismatch as a flag for explicit discussion
 
-*Correct answer: C*
-*Explanation: The lesson frames the filter as a discipline for surfacing mismatches for deliberate discussion, not as an automatic rejection mechanism — a mismatch could indicate either scope creep or a genuine signal that the value proposition needs to be revisited.*
+*Correct answer: D*
+*Explanation: The filter surfaces a question rather than answering it. The mismatch might mean scope creep, or it might be early evidence that the value proposition itself should evolve — and only a deliberate conversation distinguishes the two.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Interview Reasoning) A candidate describes their product's value proposition as "we help businesses succeed." What is the most likely interviewer reaction, based on this lesson's Interview Perspective section?**
-A) High approval, since this framing sounds ambitious and universally positive
-B) Skepticism, since the statement names no specific audience, job, differentiated benefit, or alternative, and could apply to almost any business product
-C) No particular reaction, since value propositions are not typically discussed in interviews
-D) Approval, since broad value propositions signal larger addressable markets
+A) Approval, since broad propositions imply larger addressable markets
+B) Skepticism, since it names no audience, job, or alternative, and could fit any product
+C) Indifference, since positioning rarely comes up in PM interviews
+D) Approval, since the framing is ambitious and universally positive
 
 *Correct answer: B*
-*Explanation: This lesson explicitly frames generic, unfalsifiable statements as a weak signal, precisely because a strong value proposition requires the specificity this example lacks entirely.*
+*Explanation: The statement is unfalsifiable. An interviewer is listening for whether the candidate has made a real choice about who the product is for and what it beats, and this answer reveals that none has been made.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **11. (Product Thinking, Higher Difficulty) A subscription fitness app's user-facing value proposition emphasizes "personalized workouts that adapt daily," while its customer-facing (corporate wellness buyer) value proposition emphasizes "measurable employee engagement reporting for HR." According to this lesson, is having two different value propositions here a problem?**
-A) Yes — a product must have exactly one universal value proposition at all times
-B) No, provided the two value propositions are coherent and consistent with each other rather than contradictory, since they serve genuinely different audiences with different jobs (per Lesson 5's Alignment Spectrum)
-C) Yes, because customers and users must always be given identical messaging
-D) No, but only because fitness apps are a special exception to this lesson's rule
+A) Yes — a product must maintain exactly one universal value proposition
+B) Yes — users and buyers must receive identical product messaging
+C) No, provided the two stay coherent with each other rather than contradictory
+D) No, though this is a special exception peculiar to fitness products
 
-*Correct answer: B*
-*Explanation: The lesson explicitly supports two distinct value propositions when user-customer divergence is real, as long as they remain coherent and non-contradictory, rather than treating a single universal value proposition as mandatory in all cases.*
+*Correct answer: C*
+*Explanation: Two audiences, two jobs, two propositions. Both can be true of the same product; the requirement is consistency, not sameness, and a single compromise statement would serve neither audience well.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **12. Which of the following would most directly indicate that a proposed feature passes all three gates of the Value Proposition Filter?**
-A) The feature is technically impressive but unrelated to the named audience's job
-B) The feature strengthens the named differentiated benefit, serves the named audience and job, and specifically helps win against the named alternative rather than merely matching it
-C) The feature is inexpensive to build
-D) The feature was requested by a senior executive
+A) The feature is inexpensive for the team to build this quarter
+B) The feature was personally requested by a senior executive last week
+C) The feature is technically impressive but has no bearing on the audience's named job
+D) It strengthens the benefit, serves the named audience, and beats the alternative
 
-*Correct answer: B*
-*Explanation: This directly restates the three filter questions — strengthening the benefit, serving the named audience/job, and winning specifically against the named alternative — as the criteria for a feature passing the filter.*
+*Correct answer: D*
+*Explanation: All three gates have to clear together. A feature can be cheap, well-sponsored, and impressive while still adding scope rather than advancing the product's strategic position.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer presents a scenario where a product is used heavily by two very different audiences with different jobs, and asks the candidate how they'd approach positioning. A weak answer would most likely do which of the following?**
-A) Recognize the divergence and propose evaluating whether to serve both with distinct value propositions, pivot fully, or build separate experiences
-B) Immediately propose writing one broad, compromise value proposition intended to satisfy both audiences equally
+A) Recognize the divergence and weigh distinct propositions, a pivot, or separate experiences
+B) Propose one broad compromise statement meant to satisfy both audiences equally
 C) Ask clarifying questions about each audience's specific job before answering
-D) Reference the Value Proposition Filter as a way to test any proposed resolution
+D) Reference the Value Proposition Filter to test any proposed resolution
 
 *Correct answer: B*
-*Explanation: This lesson explicitly frames a single broad compromise statement as a weak, generic response that avoids the real strategic choice — echoing the Detailed Case Study's core mistake — while the other options reflect stronger, more deliberate reasoning.*
+*Explanation: The compromise statement dodges the strategic choice the scenario is built to surface, and reproduces the exact drift described in the Case Study. The other three all engage the choice directly.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **14. Why does this lesson argue that discovering a new, unplanned audience for a product requires an explicit strategic choice, rather than default expansion to serve both?**
-A) Because serving a second audience is always illegal without a formal decision process
-B) Because features that serve one audience's job can directly work against the differentiated benefit claimed for the other audience's job, as shown in the Detailed Case Study
-C) Because a second audience is always less valuable than the original one
-D) Because value propositions cannot legally be changed once written
+A) Because a second audience is inherently less valuable than the first
+B) Because a published value proposition cannot be revised
+C) Because features serving one job can undercut the other's benefit
+D) Because serving two segments requires a formal legal review process
 
-*Correct answer: B*
-*Explanation: The case study shows precisely this mechanism — enterprise features added complexity that undermined the original freelancer value proposition's core promise of simplicity, and vice versa.*
+*Correct answer: C*
+*Explanation: In the case study the enterprise work added exactly the complexity the freelancer proposition promised to remove. Expansion is a legitimate option; doing it without deciding is what produces the incoherence.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Highest Difficulty) A team completes the positioning statement template but is unable to fill in a specific, defensible answer for the "unlike [primary alternative]" and "key point of differentiation" blanks. According to this lesson, what does this most likely indicate?**
-A) The template itself is flawed and should be abandoned
-B) The team should invent a plausible-sounding alternative and differentiator, since any value proposition is better than none
-C) A gap in prior discovery work — the team likely has not yet done enough work to know what alternative they're really competing against or why customers would truly choose them over it
-D) The product should be discontinued immediately
+A) The template is flawed and the team should abandon it for another
+B) A gap in discovery — the team does not yet know what it competes against
+C) The team should invent a plausible alternative, since any statement beats none
+D) The product should be discontinued and the segment abandoned entirely
 
-*Correct answer: C*
-*Explanation: The lesson explicitly frames the inability to complete the template with specific language as a diagnostic signal pointing to unfinished discovery work (Lesson 8), not merely a wording or copywriting problem to be smoothed over.*
+*Correct answer: B*
+*Explanation: The empty blank is the finding, not the failure. It says the team has not yet established what customers would otherwise do, which is discovery work rather than a copywriting problem to smooth over.*
 *Learning objective tested: #1, #2*
 *Difficulty: Hard*
 

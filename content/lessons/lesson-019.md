@@ -452,52 +452,52 @@ There is no single correct answer. The purpose of this exercise is to practice c
 ## Quiz
 
 **1. Where does an "opportunity" sit on the continuum described in this lesson?**
-A) Before a raw pain point
-B) Between a problem statement and a specific solution
-C) After a specific solution has already been built and launched
-D) Opportunities and pain points are identical concepts with no meaningful distinction
+A) Between a problem statement and a specific solution
+B) Before a raw pain point has even been identified
+C) After a specific solution has been built and launched
+D) Opportunities and pain points are the same concept
 
-*Correct answer: B*
-*Explanation: The lesson explicitly places an opportunity between a problem statement (a validated, solution-free description of a problem) and a solution, adding a comparative sizing dimension.*
+*Correct answer: A*
+*Explanation: A pain point says something hurts. A problem statement says precisely what, for whom, and why. An opportunity adds the comparison: how does this rank against every other validated problem competing for the same capacity?*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the core structure of an Opportunity Solution Tree?**
-A) A single list of features ranked by engineering cost
-B) A shared desired outcome at the root, multiple candidate opportunities as branches, and candidate solutions as leaves beneath each opportunity
-C) A demographic breakdown of the customer base
-D) A timeline of customer support tickets over the past year
+A) A demographic breakdown of the whole customer base by segment
+B) A timeline of customer support tickets over the past twelve months
+C) A single list of candidate features ranked by estimated engineering cost
+D) A shared outcome at root, opportunities as branches, solutions below
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit structural description of the Opportunity Solution Tree, which keeps opportunities and solutions as distinct node types.*
+*Correct answer: D*
+*Explanation: Keeping opportunities and solutions as distinct node types is what makes side-by-side comparison possible before anyone tunnels into building the first idea that surfaced.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Which two dimensions does this lesson recommend combining to size a candidate opportunity?**
-A) Engineering cost and marketing budget
-B) The importance-satisfaction gap and segment-validated prevalence/strategic value
-C) How recently the opportunity was raised and how senior the person who raised it is
-D) The number of competitor products addressing a similar area
+A) Engineering cost and available marketing budget
+B) Importance-satisfaction gap and segment prevalence
+C) How recently it was raised and how senior the source is
+D) The number of competitor products in a similar area
 
 *Correct answer: B*
-*Explanation: The lesson explicitly recommends combining an importance-satisfaction gap with segment-validated prevalence and strategic value, not recency or seniority of the source.*
+*Explanation: A wide gap on a job people care about, affecting a large and strategically valuable segment, is the clearest candidate. Strength on only one dimension needs an explicit judgment call.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What is "opportunity sprawl"?**
-A) A well-organized, actively pruned Opportunity Solution Tree
-B) An ever-growing, unconsolidated list of candidate opportunities that provides no more real strategic direction than an empty list
-C) A technique for validating segment prevalence
-D) A method for writing solution-free problem statements
+A) A well-organised Opportunity Solution Tree, actively pruned each quarter
+B) A technique for validating a segment's actual prevalence
+C) A method for writing solution-free problem statements
+D) An unconsolidated list giving no more direction than an empty one
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the failure pattern — genuine research volume without corresponding consolidation and comparison produces an unusable list.*
+*Correct answer: D*
+*Explanation: Forty loosely characterised items nobody has sized creates an impression of thoroughness while hiding which few actually deserve the team's attention.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
@@ -505,142 +505,142 @@ D) A method for writing solution-free problem statements
 
 **5. Why is "increase revenue by 15%" not considered a genuine opportunity, according to this lesson?**
 A) Because revenue goals are never legitimate business objectives
-B) Because it names a desired business outcome without identifying any specific, validated user-side driver that could plausibly move it
-C) Because 15% is too large a target to be realistic
-D) Because opportunities can only be expressed in percentage terms
+B) Because opportunities are best expressed in percentage terms overall
+C) Because 15% is far too large a target to be realistic here
+D) Because it names an outcome without a validated user-side driver
 
-*Correct answer: B*
-*Explanation: The lesson explicitly distinguishes a restated business goal, which lacks a specific underlying driver, from a genuine opportunity, which must be specific enough to be sized and compared.*
+*Correct answer: D*
+*Explanation: It works well as the root of a tree and cannot be scored on importance-satisfaction or prevalence, because it is not yet a hypothesis about any particular cause.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what specific practice was missing that allowed the opportunity list to grow to 47 items?**
-A) The team never conducted any customer interviews
-B) The team conducted genuine, continuous discovery but lacked a corresponding practice of consolidating, sizing, and pruning the resulting opportunity list
-C) The team refused to use any structured framework at all
-D) The team only interviewed a single customer over the entire eighteen-month period
+A) The team never conducted any customer interviews at all
+B) Genuine continuous discovery without consolidating, sizing, or pruning the list
+C) The team refused to use any structured framework whatsoever
+D) The team interviewed one customer across eighteen months
 
 *Correct answer: B*
-*Explanation: The case study explicitly attributes the sprawl to genuine discovery effort without a matching discipline of synthesis, consolidation, and pruning — not a lack of research itself.*
+*Explanation: The research was real and the synthesis never happened. Discovery that only ever adds, without a matching habit of merging and cutting, produces exactly this.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. What specific consequence resulted from tracking near-duplicate opportunities separately in the Detailed Case Study?**
-A) The team's opportunity list became more accurate and useful
-B) The list was artificially inflated, obscuring which underlying themes were actually most significant once properly merged
-C) The near-duplicate opportunities were automatically prioritized above all others
-D) No meaningful consequence resulted from this practice
+A) The opportunity list became more accurate and more useful
+B) No meaningful consequence resulted from the practice at all
+C) The list inflated, obscuring which themes actually mattered most
+D) The near-duplicates were automatically prioritised above all others
 
-*Correct answer: B*
-*Explanation: The case study explicitly notes that failing to consolidate near-duplicates inflated the apparent size of the list and obscured the true significance of the underlying theme.*
+*Correct answer: C*
+*Explanation: Three fragments of one theme look like three small items rather than one large one, which systematically understates the thing that most deserved attention.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. According to the Opportunity Pruning Cadence, what should happen to low-scoring candidate opportunities during a review cycle?**
-A) They should be silently ignored without any explicit decision
-B) They should be explicitly deprioritized, following Lesson 10's exclusion discipline, rather than left in an undifferentiated, ever-growing list
-C) They should always be immediately deleted and never reconsidered under any circumstances
-D) They should automatically be merged with the highest-scoring opportunity
+A) They are explicitly deprioritised rather than silently ignored
+B) They are deleted at once and never reconsidered afterwards
+C) They are merged automatically into the highest-scoring item
+D) They are left in place, since every candidate deserves tracking
 
-*Correct answer: B*
-*Explanation: The Pruning Cadence explicitly calls for deliberate, explicit deprioritization — echoing Lesson 10's "Say No" discipline — rather than silent neglect or automatic deletion.*
+*Correct answer: A*
+*Explanation: This is Lesson 10's exclusion discipline applied to a backlog. An item quietly ignored still occupies the list; an item explicitly set aside no longer competes for attention.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team has validated five distinct problem statements (per Lesson 17) but has not yet compared them against each other using importance-satisfaction or prevalence data. According to this lesson, what is the most appropriate next step before committing to a solution for any one of them?**
-A) Immediately build a solution for the problem statement that was written most recently
-B) Size and compare all five using the Opportunity Comparison Grid before committing significant discovery or delivery resources to any single one
-C) Build solutions for all five simultaneously, regardless of their relative size or value
-D) Discard four of the five problem statements without any comparative evaluation
+A) Size and compare all five on the grid before committing resources
+B) Build a solution for whichever statement was written most recently
+C) Build solutions for all five at once, whatever their relative value
+D) Discard four of the five without comparative evaluation
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core discipline — comparing validated candidates systematically before committing resources, rather than defaulting to recency or building for all or only one without genuine comparison.*
+*Correct answer: A*
+*Explanation: All five may describe real problems. Without sizing, the team could invest heavily in the smallest of them and never learn that it did.*
 *Learning objective tested: #1, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) An opportunity scores high on the importance-satisfaction gap but affects only a very small, strategically low-value segment. According to this lesson, what is the most appropriate response?**
-A) Automatically treat it as the top priority, since a high importance-satisfaction gap alone always determines priority
-B) Weigh this off-diagonal case deliberately and explicitly, similar to Lesson 16's guidance on off-diagonal severity/frequency cases, rather than either automatically prioritizing or automatically dismissing it
-C) Automatically discard it, since small segments are never worth considering under any circumstances
-D) Ignore the importance-satisfaction data entirely and rely solely on segment size
+A) Automatically treat it as top priority on gap score alone
+B) Ignore the importance-satisfaction data and use segment size
+C) Discard it automatically, since small segments never matter
+D) Weigh the off-diagonal case deliberately and explicitly
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's guidance that off-diagonal cases (strong on one dimension, weak on another) require deliberate, explicit judgment, directly paralleling Lesson 16's treatment of severity/frequency trade-offs.*
+*Correct answer: D*
+*Explanation: Strong on one axis and weak on the other is the same shape of problem as Lesson 16's rare-but-severe pain point, and it calls for the same explicit reasoning rather than a rule.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes prioritizing whichever customer problem was most recently discussed in a stakeholder meeting, without any structured comparison against other known validated problems. What might this signal, based on this lesson's Interview Perspective section?**
-A) A strong, systematic opportunity identification process
-B) A likely instance of prioritizing by recency rather than genuine importance-satisfaction and prevalence comparison, echoing Lesson 16's "most recent complaint wins" pattern at the opportunity level
-C) That the candidate has extensive experience with the Opportunity Solution Tree
-D) Nothing meaningful, since recency is always an appropriate prioritization factor
+A) A strong and systematic opportunity identification process overall
+B) Recency substituting for genuine gap and prevalence comparison
+C) Extensive practical experience with the Opportunity Solution Tree
+D) Nothing of note, since recency is an appropriate factor to weigh
 
 *Correct answer: B*
-*Explanation: This directly echoes the lesson's warning against recency-driven prioritization, applied at the level of comparing entire opportunities rather than individual pain points.*
+*Explanation: This is Lesson 16's most-recent-complaint pattern operating one level up, where the cost of choosing badly is a quarter of delivery rather than a single fix.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team merges three previously separate opportunities into one, after discovering through re-scoring that they all describe variations of the same underlying theme (agents lacking fast access to historical context). What should happen to this newly merged opportunity's importance-satisfaction and prevalence scores?**
-A) The three original scores should simply be averaged without further investigation
-B) The scores should be re-established for the newly consolidated, more accurately defined opportunity, since the original three scores were based on an artificially fragmented view of the underlying issue
-C) The merged opportunity should be assigned the lowest of the three original scores automatically
-D) No re-scoring is necessary, since merging opportunities has no effect on their sizing
+A) Average the three original scores without further investigation
+B) Assign the merged item the lowest of the three original scores
+C) Re-establish scores for the consolidated item, since the originals were fragmented
+D) No re-scoring is needed, since merging has no effect on sizing
 
-*Correct answer: B*
-*Explanation: Since the original fragmented items likely each captured only part of the true underlying theme, the lesson's discipline calls for re-establishing scores for the properly consolidated opportunity, rather than mechanically combining potentially inaccurate fragmented data.*
+*Correct answer: C*
+*Explanation: Each original score measured a partial view of the real theme. Combining three partial measurements arithmetically does not produce a measurement of the whole.*
 *Learning objective tested: #3, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer asks a candidate to distinguish a business goal from a genuine opportunity, and the candidate responds that "reduce customer churn" is itself a valid opportunity to add to an Opportunity Solution Tree. What is the strongest critique of this answer, based on this lesson?**
-A) "Reduce customer churn" is an excellent, fully specified opportunity requiring no further refinement
-B) "Reduce customer churn" is better understood as a desired outcome (the root of the tree) rather than an opportunity itself, since it does not name any specific, validated user-side driver that could plausibly reduce churn
-C) Business goals should never appear anywhere in an Opportunity Solution Tree, including as the root outcome
-D) The candidate's answer is correct, since any measurable business metric qualifies as an opportunity
+A) It is a root-level desired outcome, not an opportunity
+B) It is an excellent, fully specified opportunity needing no refinement
+C) Business goals should never appear anywhere in the tree at all
+D) The answer is correct, since any measurable metric is an opportunity
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit distinction — "reduce churn" functions well as a root-level desired outcome, but a genuine opportunity beneath it must name a specific, validated user-side driver, which the candidate's answer fails to do.*
+*Correct answer: A*
+*Explanation: Churn reduction belongs at the root, where it does useful work. As a branch it names no user-side driver and therefore cannot be scored against the branches beside it.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team runs an importance-satisfaction survey and finds that a candidate opportunity has both low importance and low satisfaction scores among users. What does this combination most likely suggest, according to this lesson's framework?**
-A) This is automatically the highest-priority opportunity, since low satisfaction always indicates urgent need
-B) This combination suggests a comparatively weaker opportunity, since a low importance rating indicates the underlying job itself may not matter much to users, regardless of how poorly it's currently served
-C) Importance and satisfaction scores are irrelevant if segment prevalence is high
-D) This combination cannot be meaningfully interpreted using the importance-satisfaction framework
+A) Importance and satisfaction are irrelevant when prevalence is high
+B) This combination cannot be interpreted using the framework at all
+C) A comparatively weaker opportunity, since the job itself matters little to users
+D) Automatically the top priority, since low satisfaction signals urgency
 
-*Correct answer: B*
-*Explanation: The lesson explains that a job rated as unimportant represents a comparatively weaker opportunity even with low satisfaction, since the gap's value depends on the underlying job actually mattering to the user in the first place.*
+*Correct answer: C*
+*Explanation: Serving a job badly only matters if the job matters. Low satisfaction on something users do not care about is a gap nobody is waiting to have closed.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team has a well-maintained, properly pruned Opportunity Solution Tree with six genuinely distinct, sized opportunities. The company's overall strategy (per Lesson 10) then shifts significantly due to a new market entrant. According to this lesson and its connections to Lesson 9 and Lesson 10, what is the most appropriate response?**
-A) Continue using the existing tree indefinitely, since it was properly constructed and pruned before the strategic shift
-B) Re-validate the shared outcome at the root of the tree against the new strategic guiding policy, since a properly maintained tree can still become disconnected from current strategy if the root outcome itself is no longer the right one to pursue
-C) Discard the entire tree and start over from a completely empty list, ignoring all six previously validated opportunities
-D) Assume the tree remains valid permanently, since sizing was done rigorously using both qualitative and quantitative methods originally
+A) Continue with the existing tree, since it was properly pruned before
+B) Re-validate the root outcome, since a well-pruned tree can still go stale
+C) Discard the tree and start again from a completely empty list
+D) Assume permanent validity, given the original rigour of the sizing
 
 *Correct answer: B*
-*Explanation: This integrates the lesson's Opportunity Pruning Cadence (specifically, re-validating the root outcome whenever strategy is revisited) with Lessons 9 and 10's guidance on revisiting vision and strategy when the underlying situation genuinely shifts — a properly built tree can still become strategically disconnected if its root outcome no longer reflects current priorities.*
+*Explanation: Every branch is measured against the root. If the root outcome no longer matches the guiding policy, six well-sized opportunities are being ranked against the wrong target.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 

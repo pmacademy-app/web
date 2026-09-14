@@ -350,195 +350,195 @@ There is no single correct answer. Work through the following before reading fur
 ## Quiz
 
 **1. What is the correct order of the standard product lifecycle stages used in this lesson?**
-A) Growth, Maturity, Introduction, Decline, Problem-Solution Fit
-B) Problem-Solution Fit, Introduction, Growth, Maturity, Decline
-C) Introduction, Problem-Solution Fit, Decline, Growth, Maturity
-D) Maturity, Growth, Introduction, Problem-Solution Fit, Decline
+A) Problem-Solution Fit, Introduction, Growth, Maturity, Decline
+B) Introduction, Problem-Solution Fit, Growth, Decline, Maturity
+C) Problem-Solution Fit, Growth, Introduction, Maturity, Decline
+D) Introduction, Growth, Problem-Solution Fit, Maturity, Decline
 
-*Correct answer: B*
-*Explanation: This is the sequence defined in the Theory section, moving from earliest validation through eventual decline or reinvention.*
+*Correct answer: A*
+*Explanation: This is the sequence defined in the Theory section, running from earliest small-scale validation through eventual decline or reinvention.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What does "Product-Market Fit" specifically require, beyond Problem-Solution Fit?**
-A) Nothing additional — they are the same concept
-B) Evidence that the solution works not just for a small group of early adopters, but for a broader, definable market at scale with durable retention
-C) A specific number of paying customers, regardless of retention
-D) Approval from company leadership
+A) A defined number of paying customers on annual contracts
+B) Durable demand across a broader, definable, reachable market
+C) Formal sign-off from company leadership on the launch plan
+D) A positive contribution margin on every acquisition channel
 
 *Correct answer: B*
-*Explanation: Product-Market Fit extends beyond small-scale validation to require evidence of durable resonance across a broader, reachable market — a distinct and later gate than Problem-Solution Fit.*
+*Explanation: Problem-Solution Fit is evidence that a solution lands for some users. PMF extends that to a market — scale, consistency, and retention durable enough to suggest the demand will hold.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. In the Detailed Case Study, what was the core mistake made by the furniture e-commerce company?**
-A) They never built the AI room-design feature
-B) They scaled paid acquisition based on small-sample beta enthusiasm, without validating durable retention and broader market resonance first
-C) They spent too little on marketing
-D) They only tested the feature with employees
+A) The team shipped the room-design feature before designing the checkout
+B) The team tested the feature with employees rather than with real buyers
+C) The team scaled paid acquisition on small-sample beta enthusiasm alone
+D) The team underspent on marketing relative to its established competitors
 
-*Correct answer: B*
-*Explanation: The company applied Growth-stage tactics (scaling acquisition spend) while the product was still genuinely in the Introduction stage, without evidence of durable fit beyond a small beta group.*
+*Correct answer: C*
+*Explanation: The product was still genuinely in Introduction, and the team applied Growth-stage tactics to it. Acquiring users faster does not repair an unvalidated value proposition; it multiplies the number of people who churn from it.*
 *Learning objective tested: #3, #4*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is Maturity described in this lesson as a normal stage rather than a failure state?**
-A) Because Maturity always means declining revenue
-B) Because slowing growth in Maturity typically reflects market saturation, and the stage has its own appropriate priorities — efficiency, defense, and adjacent growth — not simply "less successful Growth"
-C) Because Maturity only applies to companies, never to individual products
-D) Because Maturity products should always be sunset immediately
+A) Slowing growth reflects saturation, and the stage has its own priorities
+B) Maturity revenue is guaranteed to hold steady once the stage is reached
+C) Maturity applies to whole companies rather than to individual products
+D) Maturity products should be harvested and wound down on a fixed schedule
 
-*Correct answer: B*
-*Explanation: The lesson explicitly frames Maturity as a distinct, often profitable stage with its own legitimate priorities, warning against treating it as a lesser or failed version of Growth.*
+*Correct answer: A*
+*Explanation: Maturity is frequently the most profitable stage a product has. Efficiency, defending position, and finding adjacent pockets of growth are the right goals there — not a diminished version of Growth-stage goals.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **5. Which of the following is a sign that a PM should investigate a possible lifecycle stage mismatch?**
-A) A product's retention and growth evidence look like early Introduction-stage conditions, but the team is applying aggressive Growth-stage acquisition tactics
-B) A mature product's team is focused on efficiency and defending market share
-C) An early-stage product's team is running small, low-cost validation experiments
-D) A declining product's team is deliberately deciding between reinvestment, harvesting, or sunsetting
+A) A mature product's team concentrates on efficiency and defending share
+B) An early-stage team runs small, cheap experiments to test resonance
+C) An Introduction-stage product's team is scaling acquisition spend hard
+D) A declining product's team is weighing reinvestment against sunsetting
 
-*Correct answer: A*
-*Explanation: This describes a direct mismatch between the actual evidence-based stage (Introduction) and the tactics being applied (Growth-stage scaling), the central failure mode this lesson warns against; the other options describe appropriately stage-matched behavior.*
+*Correct answer: C*
+*Explanation: The other three describe tactics that match the stage the product is actually in. Scaling spend before fit is established is the specific, expensive mismatch this lesson is built around.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. According to this lesson, can a single company have products in different lifecycle stages at the same time?**
-A) No, a company operates in exactly one lifecycle stage at all times
-B) Yes — this is common, and lifecycle diagnosis should be applied to each specific product or initiative individually
-C) Only very small companies can have this happen
-D) Only Big Tech companies experience this
+A) No — a company occupies exactly one lifecycle stage at any given time
+B) Rarely — this happens mainly at small firms with few product lines
+C) Chiefly at very large firms with formal portfolio review processes
+D) Yes — and stage should be diagnosed per product, not per company
 
-*Correct answer: B*
-*Explanation: The lesson explicitly states this is common across company sizes and warns against treating an entire company as though it occupies a single lifecycle stage uniformly.*
+*Correct answer: D*
+*Explanation: A mature flagship funding an early-stage bet is an ordinary arrangement at almost any company size. Diagnosing at the company level applies the wrong priorities to at least one of them.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What commonly cited evidence helped establish Slack's early Problem-Solution Fit, as described in this lesson's Real Company Example?**
-A) A large, immediate customer base upon public launch
-B) The founding team's own intense internal use of the tool, along with early interest from other teams shown the tool
-C) A significant marketing campaign prior to launch
-D) A patent filing for the underlying technology
+A) A large customer base signed up in the first week of public launch
+B) The founding team's own heavy internal use, plus early outside interest
+C) A sustained marketing campaign run in the months before launch
+D) A patent filing covering the underlying real-time messaging technology
 
 *Correct answer: B*
-*Explanation: The example describes the team's own direct, intensive use and early interest from others as the evidence supporting a deliberate pivot, illustrating small-scale Problem-Solution Fit validation before scaling.*
+*Explanation: Intense first-hand use by the team, combined with genuine interest from the first outside teams shown the tool, is small-scale qualitative evidence of resonance — exactly what this gate asks for before scaling.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. In the Seasons mental model, what does "Winter" represent?**
-A) Aggressive scaling of acquisition spend
-B) The Decline stage, where the central decision is whether to reinvest, harvest for remaining value, or responsibly sunset the product
-C) The initial validation of Problem-Solution Fit
-D) A permanent, unrecoverable end state with no further decisions to make
+A) The planting period when the problem-solution match is still being tested
+B) The Decline stage, where the team chooses to reinvest, harvest, or sunset
+C) The Summer conditions in which scaling acquisition is most appropriate
+D) A closed end state in which no further strategic decisions remain open
 
 *Correct answer: B*
-*Explanation: Winter maps to the Decline stage, and the model explicitly frames it as requiring a deliberate strategic decision, not simply an inevitable, passive endpoint.*
+*Explanation: Winter maps to Decline, and the model frames it as a decision point rather than a passive ending — survive until the next spring through reinvention, harvest what remains, or wind down responsibly.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does this lesson caution against determining lifecycle stage based on a product's age (e.g., "it's been five years, so it must be mature")?**
-A) Because product age is always the most reliable signal
-B) Because a long-existing product that has never found a resonant, retained audience may still effectively be in Introduction, regardless of elapsed time — stage should be diagnosed from evidence, not calendar time
-C) Because all products become mature after exactly five years
-D) Because age is irrelevant to any product decision
+A) A long-lived product without a retained audience may still be early
+B) Product age correlates with stage only for consumer, not B2B, products
+C) Age matters less than the number of major releases a product has had
+D) Most products reach Maturity at roughly the five-year mark regardless
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #1 explicitly warns against inferring stage from age rather than from actual retention, growth, and resonance evidence.*
+*Correct answer: A*
+*Explanation: A product repeatedly repositioned over five years, with no clearly resonant audience, is effectively still in Introduction. Stage is read from retention behavior, growth pattern, and breadth of resonance — not from the calendar.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **10. (Product Thinking) A mature product's growth has flattened, but retention among existing users remains strong and stable. A newer competitor is not gaining meaningful share. According to this lesson's framework, what is the most appropriate response?**
-A) Panic and immediately attempt to re-find Product-Market Fit from scratch
-B) Recognize this as a normal Maturity stage and shift priorities toward efficiency, defending the existing position, and exploring smaller adjacent growth opportunities
-C) Aggressively cut all further investment immediately, assuming Decline is imminent
-D) Ignore the flattened growth entirely and continue applying Growth-stage tactics unchanged
+A) Treat the flattening as Decline and reduce further investment sharply
+B) Restart the search for Product-Market Fit as though the product were new
+C) Hold the current Growth-stage acquisition plan unchanged through the year
+D) Read this as Maturity and shift to efficiency, defense, and adjacencies
 
-*Correct answer: B*
-*Explanation: Flattened growth with stable retention and no meaningful competitive share loss is a textbook Maturity-stage signal, calling for the stage-appropriate priorities described in the lesson, not panic or unchanged Growth tactics.*
+*Correct answer: D*
+*Explanation: Flat growth with stable retention and no share loss is the textbook Maturity signature. Neither panic nor unchanged Growth tactics fit the evidence; the stage-appropriate priorities do.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) An interviewer asks how a candidate would decide whether to invest in growth marketing for a given product. A weak candidate immediately proposes specific marketing channels and budgets. What does this reveal, per this lesson's Interview Perspective section?**
-A) Strong, decisive product instincts
-B) A failure to first check for evidence of Problem-Solution Fit and durable retention before recommending acquisition spend — the same mistake made in the Detailed Case Study
-C) That the candidate has strong marketing expertise
-D) Nothing meaningful — interviewers only evaluate the specific channels proposed
+A) Strong command of acquisition mechanics applied decisively under pressure
+B) A failure to check for fit evidence before recommending acquisition spend
+C) A preference for paid channels over the organic growth the product needs
+D) An understanding that growth marketing decisions are budget decisions first
 
 *Correct answer: B*
-*Explanation: As described in Interview Perspective question 1, jumping directly to acquisition tactics without first establishing whether fit evidence exists mirrors the exact premature-scaling mistake this lesson warns against.*
+*Explanation: The question is a trap for premature scaling. Channels and budgets are downstream of a prior question the candidate skipped: is there evidence this product retains the users it already has?*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Highest Difficulty, Product Thinking) A company's flagship product is in Maturity, generating stable, efficient revenue. Leadership proposes reallocating most of that product's engineering budget toward an early-stage bet still searching for Problem-Solution Fit. Using this lesson's framework, what is the most important diagnostic question before evaluating this proposal?**
-A) Whether the flagship product's engineering team wants to be reallocated
-B) What appropriate operating model, funding structure, and success metrics apply to each stage individually — a Maturity-stage product and a Problem-Solution Fit-stage bet should not be evaluated or resourced using the same playbook
-C) Whether the new bet has a catchy product name
-D) Whether the flagship product is older than the new bet
+A) Whether the flagship product's engineering team supports being reassigned
+B) Whether the early-stage bet can reach revenue parity within the same year
+C) Whether the flagship's market is saturated enough to justify the transfer
+D) Whether each product is being judged by standards appropriate to its stage
 
-*Correct answer: B*
-*Explanation: This applies the lesson's core principle that different lifecycle stages require fundamentally different priorities and evaluation criteria; before evaluating a resourcing decision across two products in different stages, a PM must ensure each is being judged by stage-appropriate standards rather than a single uniform lens.*
+*Correct answer: D*
+*Explanation: A Maturity product and a pre-fit bet need different operating models, funding structures, and success metrics. Comparing them through one lens guarantees at least one of the two is misjudged.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **13. According to the Theory section, is the lifecycle model deterministic — does it predict what a product must do next?**
-A) Yes, once a product enters Decline, it will always fail
-B) No — the model is explicitly diagnostic rather than deterministic; a mature product can be reinvigorated into a second growth curve, and decline can sometimes reflect a temporary, addressable problem rather than an inevitable trajectory
-C) Yes, stages always proceed in strict linear order with no exceptions
-D) No — lifecycle stage has no bearing on which questions a PM should ask
+A) Yes — entering Decline reliably predicts that the product will be retired
+B) Yes — the stages proceed in strict order, which is what makes them useful
+C) No — it is diagnostic, and a mature product can reach a second growth curve
+D) No — and stage therefore has little bearing on which questions a PM asks
 
-*Correct answer: B*
-*Explanation: The lesson explicitly states the stages are not always linear or permanent, and that the model's value is in telling you what questions to ask right now, not in predicting a fixed future trajectory.*
+*Correct answer: C*
+*Explanation: Stages are neither strictly linear nor permanent. The model earns its keep by telling you which question to ask right now, not by forecasting a fixed trajectory — decline is sometimes addressable rather than structural.*
 *Learning objective tested: #1, #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **14. What is the practical difference between "Problem-Solution Fit" and "Product-Market Fit" functioning as gates, per the Theory section?**
-A) They are the same gate, reached at the same time
-B) Problem-Solution Fit is typically established through qualitative, small-scale evidence that a solution addresses a real problem for some users; Product-Market Fit requires evidence of durable demand at scale across a definable, reachable market, and can also be lost later even after being reached
-C) Product-Market Fit is always reached before Problem-Solution Fit
-D) Neither gate requires any evidence to be considered reached
+A) They describe the same threshold, reached at the same point in a product's life
+B) Product-Market Fit is normally established before Problem-Solution Fit is
+C) One is small-scale qualitative evidence; the other is durable scale demand
+D) Both are permanent once reached and do not need to be re-verified later
 
-*Correct answer: B*
-*Explanation: The lesson describes Problem-Solution Fit as small-scale qualitative validation and Product-Market Fit as broader, durable, scale-evidenced demand — and notes PMF is not permanent, since markets and competitors can shift a product back toward Maturity or Decline.*
+*Correct answer: C*
+*Explanation: Problem-Solution Fit comes from interviews, prototypes, and concierge solutions with a few users. PMF requires evidence the demand holds across a reachable market — and unlike the first gate, it can be lost again as markets shift.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Highest Difficulty, Product Thinking) A large company's flagship product is clearly in Maturity, while a newer internal bet is still searching for Problem-Solution Fit. Leadership issues a single company-wide OKR: "grow revenue 20% via aggressive acquisition spend across all product lines this year." Using Common Beginner Mistake #4 and the Theory section, what is the strongest critique of this directive?**
-A) The directive is appropriate exactly as written for every product line
-B) It treats the entire company as though it occupies one lifecycle stage; applying identical Growth-stage acquisition tactics to a still-unvalidated bet would scale a solution that hasn't been shown to work, while the Maturity-stage flagship needs efficiency and defense priorities, not the same acquisition-spend lens
-C) The directive should apply only to the flagship product and ignore the new bet entirely
-D) Revenue growth targets are never appropriate at any company
+A) It treats one company as a single stage, misapplying growth tactics to both
+B) It sets a revenue target when engagement would be the more honest measure
+C) It should exclude the unvalidated bet and apply to the flagship product only
+D) It understates the growth rate a mature flagship product can still deliver
 
-*Correct answer: B*
-*Explanation: This directly applies Mistake #4 (treating a company as a single lifecycle stage) and the lesson's core principle that priorities and appropriate metrics differ fundamentally by stage — a single acquisition-spend mandate misapplies Growth-stage tactics to both a Maturity-stage product (wrong priority) and an unvalidated bet (the exact premature-scaling risk described in the Detailed Case Study).*
+*Correct answer: A*
+*Explanation: One acquisition mandate lands wrong twice: it scales an unvalidated bet before fit, and it pushes a saturated flagship toward spend when efficiency and defense are the stage-appropriate levers.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 

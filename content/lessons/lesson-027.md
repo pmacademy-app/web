@@ -445,195 +445,195 @@ There is no single correct answer. The purpose of this exercise is to practice a
 ## Quiz
 
 **1. What does Hick's Law state?**
-A) Larger targets are always visually more appealing
-B) The time required to make a decision increases with the number and complexity of available choices
-C) Users always prefer recall-based interfaces over recognition-based ones
-D) Cognitive load only matters within a single screen, never across a flow
+A) Larger interaction targets are invariably more appealing visually
+B) Decision time rises with the number of available choices
+C) Users prefer recall-based interfaces over recognition-based ones
+D) Cognitive load matters within a screen but not across a flow
 
 *Correct answer: B*
-*Explanation: This is the lesson's explicit statement of Hick's Law, distinct from the other listed principles and misconceptions.*
+*Explanation: Complexity of the choices counts alongside their number. The practical consequence is that every avoidable option on a screen costs every user who meets it.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What does Fitts's Law describe?**
-A) The relationship between target size, distance, and the time/accuracy of successfully selecting that target
-B) The number of colors a designer should use in an interface
-C) The maximum number of screens a user flow should contain
-D) The relationship between cognitive load and user satisfaction scores
+A) The number of distinct colours a designer should use in an interface
+B) How target size and distance affect selection speed and accuracy
+C) The maximum number of screens a single user flow should contain
+D) The link between cognitive load and reported satisfaction scores
 
-*Correct answer: A*
-*Explanation: This is the lesson's explicit statement of Fitts's Law, concerning target size, distance, and interaction speed/accuracy.*
+*Correct answer: B*
+*Explanation: Bigger and nearer is faster and more accurate. A frequent action tucked small into a corner is paid for on every repetition.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. Why is unnecessary choice proliferation a concern, according to Hick's Law, even though presenting many options is sometimes genuinely necessary?**
-A) Because more options always look visually cluttered
-B) Because unnecessary additional choices increase decision time and cognitive burden without providing corresponding value, even though some tasks do genuinely require presenting many options
-C) Because Hick's Law states that users should never be given more than one choice under any circumstances
-D) Because choice proliferation is illegal under most accessibility standards
+A) Extra choices add decision time and burden without matching value
+B) Because more options look visually cluttered on any given screen
+C) Because users should be given a single choice in every situation
+D) Because it breaches most accessibility standards in force
 
-*Correct answer: B*
-*Explanation: The lesson explicitly clarifies that the principle concerns the cost of unnecessary choice proliferation specifically, not a blanket rule against ever presenting multiple options.*
+*Correct answer: A*
+*Explanation: A product catalogue genuinely needs many options. The law is about the cost of the ones that are there for no reason, and progressive disclosure is one legitimate answer.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **4. Which of the following is the clearest example of favoring recall over recognition, a pattern this lesson identifies as generally increasing user effort?**
-A) Displaying a user's previously entered shipping address again at checkout for confirmation
-B) Requiring a user to remember and manually re-type an account number they saw on a previous screen
-C) Showing a dropdown list of valid options for a user to select from
-D) Displaying a clear error message immediately after an invalid input
+A) Displaying the saved shipping address again at checkout for confirmation
+B) Showing a dropdown of valid options for the user to pick from
+C) Making a user remember and retype an account number seen earlier
+D) Displaying a clear error message right after an invalid entry
 
-*Correct answer: B*
-*Explanation: Requiring a user to remember and re-type information from memory, without displaying it again, is the defining example of recall, which this lesson identifies as generally harder and more error-prone than recognition.*
+*Correct answer: C*
+*Explanation: The information exists and the interface declines to show it, so the user holds it in working memory and retypes it from there. That is recall, and it is where errors come from.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **5. What is the "PM as design dictator" failure pattern?**
-A) A PM who never provides any feedback on design work
-B) A PM using UX knowledge to unilaterally prescribe specific visual or interaction design solutions, rather than raising concerns and deferring execution to design expertise
-C) A PM who only reviews wireframes, never prototypes
-D) A required leadership role within a design organization
+A) Prescribing the specific solution rather than raising the concern
+B) A PM who offers no feedback at all on any design work
+C) A required leadership position within a design organisation
+D) A PM who reviews wireframes but declines to review any prototypes
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the failure pattern, directly extending Lesson 22's over-specification warning to the design-review context.*
+*Correct answer: A*
+*Explanation: Noticing a real problem is valuable PM work. Deciding the fix reaches past it into visual design, interaction patterns, and accessibility, where another expertise should lead.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. Which of the following review comments correctly applies Fitts's Law without overstepping into design dictation, according to this lesson?**
-A) "Make this button exactly 48 pixels tall and move it to the top-right corner."
-B) "This is our most frequently used action — is it currently easy to reach and select reliably?"
-C) "I don't have any thoughts on this button's placement or size."
-D) "Change this button's color to blue immediately."
+A) "Change this button's colour to blue before the next review."
+B) "I have no particular thoughts on this button's size or place."
+C) "Make this button 48 pixels tall and move it to the top right."
+D) "This action is our most frequent — is it easy to reach and hit?"
 
-*Correct answer: B*
-*Explanation: This comment raises the underlying concern (ease of reaching and selecting an important action) at an appropriately pitched level, without prescribing a specific pixel dimension or exact placement, unlike option A.*
+*Correct answer: D*
+*Explanation: It names the principle's concern and stops there. The pixel figure in C is a design decision arrived at by someone without design's training in it.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, which two UX principles did the original single-screen account-setup form violate simultaneously?**
-A) Fitts's Law and recognition vs. recall
-B) Hick's Law and cognitive load
-C) Only Hick's Law, with no other principle involved
-D) Only cognitive load, with no other principle involved
+A) Fitts's Law together with recognition versus recall
+B) Cognitive load alone, with no other principle involved
+C) Hick's Law alone, with no other principle involved here
+D) Hick's Law together with cognitive load across the screen
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies both Hick's Law (too many simultaneous choices) and cognitive load (too much unrelated information to process at once) as being violated by the original design.*
+*Correct answer: D*
+*Explanation: Six unrelated decisions on one screen is both too many simultaneous choices and too much to hold in mind at once, which is why the two principles show up together so often.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium*
 
 ---
 
 **8. How did the PM in the Detailed Case Study correctly avoid the "PM as design dictator" failure pattern?**
-A) By refusing to raise any concern about the form at all
-B) By naming the specific principles and underlying problem (six unrelated decisions bundled together) while explicitly leaving the choice of specific solution to the design team's expertise
-C) By specifying the exact number of steps and fields for each step personally
-D) By requiring the design team to use a specific named UX methodology
+A) By declining to raise any concern about the form at all
+B) By naming the principle and problem, leaving the fix to design
+C) By specifying the exact steps and fields for each stage personally
+D) By requiring the design team to adopt a specific named methodology
 
 *Correct answer: B*
-*Explanation: The case study explicitly describes the PM raising the concern at the level of principle and problem, then deferring the specific solution (progressive disclosure via staged steps) to the design team.*
+*Explanation: The PM supplied the diagnosis; design supplied progressive disclosure across staged steps. Neither contribution would have been as good coming from the other side.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A PM reviewing a wireframe notices that a checkout flow requires users to remember a promo code they saw on an earlier marketing email, with no way to view or reference it again during checkout. Which principle is most directly relevant to this concern?**
-A) Fitts's Law
-B) Recognition vs. recall
-C) Hick's Law
-D) None of these principles apply to this scenario
+A) Recognition versus recall, since the code must be held in memory
+B) Fitts's Law, concerning target size and distance to reach
+C) Hick's Law, concerning the number of simultaneous choices
+D) No principle from this lesson applies to the situation
 
-*Correct answer: B*
-*Explanation: This scenario directly concerns requiring users to recall information from memory (the promo code) rather than allowing recognition (displaying or referencing it again), making recognition vs. recall the most directly relevant principle.*
+*Correct answer: A*
+*Explanation: The user is asked to retrieve a string from memory with no cue available. Surfacing the code, or letting them look it up in place, converts recall back into recognition.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A PM raises a cognitive-load concern about a multi-step flow, correctly noting that later steps require remembering choices made in earlier steps. According to this lesson, what should the PM do next?**
-A) Personally redesign the flow to fix the issue, without involving the design team
-B) Raise the concern at the level of underlying principle and user impact, and defer the specific solution (e.g., a persistent summary panel, a review step) to the design team's expertise
-C) Ignore the concern entirely, since cognitive load is not a legitimate PM-level consideration
-D) Demand that the entire flow be reduced to a single screen regardless of any other consideration
+A) Redesign the flow personally, without involving the design team
+B) Raise it at the level of principle and leave the fix to design
+C) Disregard it, since cognitive load is not a PM-level concern
+D) Demand the whole flow collapse to one screen, whatever the cost
 
 *Correct answer: B*
-*Explanation: This reflects the lesson's core discipline — raising the concern at the appropriate level while deferring specific solution design to the relevant expertise, avoiding the "PM as design dictator" pattern.*
+*Explanation: A summary panel, a review step, or inline echoes of earlier choices are all plausible answers. Picking among them is the part that belongs to design.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes reviewing a prototype and telling the design team exactly which specific font size, color, and spacing to use for every element, based on their own reading about UX principles. What might this signal, based on this lesson's Interview Perspective section?**
-A) Strong, well-informed UX judgment that should be considered a core strength
-B) A likely instance of the "PM as design dictator" failure pattern, overstepping from legitimate concern-raising into design's domain of specific implementation expertise
-C) That the candidate should be considered for a design role instead of a PM role
-D) Nothing meaningful, since specifying exact visual details is always appropriate once a PM has read about UX principles
+A) Strong, well-informed UX judgment counting as a core strength
+B) That the candidate suits a design role rather than a product one
+C) The design-dictator pattern, overstepping into design
+D) Nothing of note, since exact visual detail is a PM call once read
 
-*Correct answer: B*
-*Explanation: This directly matches the lesson's definition of the failure pattern — even genuine UX knowledge does not license dictating specific implementation details that belong to design expertise.*
+*Correct answer: C*
+*Explanation: Having read about the principles is what makes the overstep tempting. Real fluency shows up as a sharper question, not a more confident prescription.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A design team proposes reducing a settings page from twelve simultaneous options to four, citing Hick's Law, but a PM is concerned this might remove options some users genuinely need regularly. What is the most appropriate way to resolve this tension, according to this lesson?**
-A) The PM should defer entirely to the design team's citation of Hick's Law without further discussion, since the principle is well-established
-B) The PM should raise the specific concern (some users may need regular access to the removed options) as a distinct, evidence-relevant question, potentially suggesting further validation (e.g., usability testing per Lesson 26) to check whether progressive disclosure appropriately serves those users' actual needs, without dictating the specific solution
-C) The PM should insist all twelve options remain visible simultaneously, overriding the design team's proposal entirely
-D) Hick's Law should be disregarded entirely in this case, since it conflicts with the PM's intuition
+A) Defer wholly to the design team's citation, since the law is settled
+B) Insist all twelve stay visible, overriding the proposal outright
+C) Raise the specific concern and suggest validation, without dictating
+D) Disregard Hick's Law here, since it conflicts with instinct
 
-*Correct answer: B*
-*Explanation: This reflects a balanced application of this lesson's discipline — raising a genuine, evidence-relevant concern about real user needs, and suggesting validation, without either deferring uncritically or overriding design's proposal unilaterally.*
+*Correct answer: C*
+*Explanation: Hick's Law is real and does not settle which four. Whether the hidden eight are needed regularly is an empirical question, and usability testing can answer it.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer asks a candidate how they would respond if a designer disagreed with a UX concern the candidate raised, arguing that a specific established convention justified the design as-is. What is the strongest response, based on this lesson?**
-A) Insisting the designer is wrong regardless of the convention cited, since the candidate's principle-based concern should always take precedence
-B) Genuinely engaging with the cited convention and the underlying rationale, potentially proposing a specific test (echoing Lesson 26) to check whether the convention holds in this specific context, rather than either capitulating without genuine engagement or overriding the designer's expertise unilaterally
-C) Immediately dropping the concern entirely without further discussion, regardless of its merit
-D) Escalating to senior leadership immediately without further direct engagement with the designer
+A) Engage the convention and propose a test in this context
+B) Insist the designer is wrong, whatever convention was cited
+C) Drop the concern at once, whatever its underlying merit was
+D) Escalate to senior leadership without engaging the designer further
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's collaborative, evidence-oriented discipline — genuinely engaging with design's expertise and proposing validation where appropriate, rather than either unilaterally overriding it or abandoning a potentially valid concern without discussion.*
+*Correct answer: A*
+*Explanation: The convention may well hold here and may not. Treating the disagreement as an answerable question respects the expertise and keeps the concern alive.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A PM notices that an interface violates cognitive load principles by requiring users to remember dietary restrictions entered on a previous screen. The PM raises this concern, and the design team responds by adding a persistent summary panel that displays these restrictions throughout the flow. How should the PM verify this solution actually resolves the concern, rather than simply assuming it does?**
-A) Assume the concern is fully resolved once any visible change has been made, without further verification
-B) Apply Lesson 26's usability testing discipline — testing the revised flow with real users to confirm the persistent summary panel actually reduces the cognitive burden and improves the user experience, rather than assuming the proposed fix is automatically correct
-C) Insist on a completely different solution without testing either option
-D) Skip verification entirely, since the design team's expertise should never be questioned once a change has been proposed
+A) Assume it is resolved once a visible change has been made at all
+B) Skip verification, since design expertise stands unquestioned
+C) Insist on a wholly different solution, without testing either option
+D) Test the revised flow with real users to confirm the burden dropped
 
-*Correct answer: B*
-*Explanation: This connects this lesson directly back to Lesson 26 — a proposed design change addressing a raised UX concern should still be validated through genuine usability testing, rather than assumed correct simply because a change was made, echoing the Detailed Case Study's validation step.*
+*Correct answer: D*
+*Explanation: A plausible fix for a real problem is still a hypothesis. The panel might be ignored, or add clutter that costs more than the recall it removed.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A PM has become skilled at applying Hick's Law, Fitts's Law, cognitive load, and recognition/recall principles, and routinely raises well-pitched, appropriately leveled concerns during design reviews. Over time, however, the PM notices that the design team has started deferring almost every decision to the PM's stated principle-based preferences, rather than exercising independent design judgment. What does this scenario suggest, and what should the PM do?**
-A) Continue as before, since the design team's deference reflects the PM's superior UX judgment
-B) Recognize that even well-pitched, principle-grounded concerns can gradually erode a healthy collaborative dynamic if the design team begins treating them as de facto prescriptions rather than genuine starting points for discussion — the PM should actively encourage the design team to propose and test their own solutions, rather than treating the PM's framing as the final word
-C) Stop raising any UX concerns entirely, to avoid any possibility of overstepping
-D) This scenario has no meaningful implications and requires no adjustment in practice
+A) Stop raising UX concerns at all, to remove any risk of overstepping
+B) Continue as before, since the deference reflects sounder judgment
+C) This carries no real implications and needs no change
+D) Encourage design to propose and test their own solutions
 
-*Correct answer: B*
-*Explanation: This tests a subtler, higher-order point — even correctly pitched concerns, raised consistently and skillfully, can unintentionally shift a team's dynamic toward the PM's implicit authority over design decisions if not actively counterbalanced, requiring the PM to remain vigilant about preserving genuine design ownership and independent judgment, not merely about phrasing each individual concern correctly.*
+*Correct answer: D*
+*Explanation: Each individual comment was pitched correctly and the accumulated effect still moved authority. Phrasing concerns well is necessary; watching what the pattern does to the room is the rest of it.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 

@@ -444,26 +444,26 @@ There is no single correct answer. The purpose of this exercise is to practice t
 ## Quiz
 
 **1. Which of the following best defines a "job to be done"?**
-A) A specific feature a customer has requested
-B) The underlying progress a person is trying to make, independent of any specific product
-C) A demographic description of a target user
-D) A company's internal engineering roadmap
+A) The underlying progress a person is trying to make
+B) A specific feature that a customer has formally requested
+C) A demographic profile describing the target user
+D) A prioritized list of upcoming roadmap commitments
 
-*Correct answer: B*
-*Explanation: A job to be done describes the underlying task or goal a person is trying to accomplish, not a specific feature or demographic profile.*
+*Correct answer: A*
+*Explanation: A job describes the progress someone wants in a circumstance, independent of any product. Written properly it would have been true before your product existed and stays true if a competitor gets hired instead.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the primary purpose of the "laddering" technique?**
-A) To estimate engineering effort for a feature
-B) To decompose a stated request into its underlying job by repeatedly asking "why" or "what would that let you do"
-C) To rank features by revenue impact
-D) To assign a request to a specific engineering team
+A) To decompose a stated request into its underlying job
+B) To estimate the engineering effort a request will finally require
+C) To rank competing requests by their revenue impact
+D) To route an incoming request to the right delivery team
 
-*Correct answer: B*
-*Explanation: Laddering is the technique of repeatedly probing a stated request to reveal the underlying job it is meant to serve.*
+*Correct answer: A*
+*Explanation: Laddering asks "why" or "what would that let you do" until the explanation would stay stable no matter which solution were chosen. That is the point at which you have reached the job.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -476,163 +476,163 @@ C) Social
 D) Financial
 
 *Correct answer: D*
-*Explanation: The three dimensions described are functional (the practical task), emotional (how the person wants to feel), and social (how the person wants to be perceived). "Financial" is not one of the three named dimensions.*
+*Explanation: The three dimensions are functional (the practical task), emotional (how the person wants to feel), and social (how they want to be perceived). Cost considerations live inside those dimensions rather than forming a fourth.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. In the milkshake example referenced in this lesson, what did researchers discover by asking about the underlying job rather than demographics?**
-A) Younger customers bought more milkshakes than older customers
-B) A significant segment of buyers were commuters hiring the milkshake as a long-lasting, one-handed companion for a boring commute, unrelated to typical dessert framing
-C) Milkshakes were primarily purchased as gifts
-D) Demographic segmentation was ultimately the most useful method after all
+A) Younger buyers purchased milkshakes more often than older buyers
+B) Milkshakes were most often bought as gifts for other people
+C) Commuters hired milkshakes to make a long, dull drive bearable
+D) Demographic segmentation proved the most useful method after all
 
-*Correct answer: B*
-*Explanation: The job-based analysis revealed a commuter segment hiring milkshakes for a purpose entirely disconnected from age or income demographics — a job traditional segmentation had missed.*
+*Correct answer: C*
+*Explanation: The job had almost nothing to do with dessert or indulgence, and it pointed to different improvements — a thicker shake that lasts the drive, a faster way to buy one — than any age or income cut would have surfaced.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. According to this lesson, why is a product's real competitor often "non-consumption" rather than a named rival product?**
-A) Because named rivals never actually compete for the same customers
-B) Because a large number of potential customers may currently be solving the job through an informal workaround, or not solving it at all, representing a larger opportunity than rivalry with a named competitor
-C) Because non-consumption is always impossible to overcome
-D) Because JTBD theory does not consider competition relevant
+A) Many people solve the job informally or not at all today
+B) Named rivals rarely chase the same customers
+C) Competitive dynamics fall outside the scope of JTBD theory
+D) Workarounds are cheaper to displace than a rival's product
 
-*Correct answer: B*
-*Explanation: Many people solving a job through a workaround or not at all represent an underused opportunity, and this population is often larger and more significant to address than rivalry with the closest named competitor.*
+*Correct answer: A*
+*Explanation: A project tool competes with a shared spreadsheet and with the team's memory. That population is usually larger than the one using the nearest branded rival, which reframes what winning requires.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. A team ships a functionally superior tool, but adoption remains low because users are afraid of losing years of data during migration. Using the Forces of Progress model, which force is most directly responsible for this outcome?**
-A) Push
-B) Pull
-C) Anxiety
-D) Habit
+A) Push — dissatisfaction with the current approach
+B) Pull — the attraction of the new solution on offer
+C) Habit — comfort with the existing way of working
+D) Anxiety — uncertainty about the new solution
 
-*Correct answer: C*
-*Explanation: Fear or uncertainty about the new solution itself (e.g., migration risk) is the Anxiety force, which can outweigh even a strong functional Pull.*
+*Correct answer: D*
+*Explanation: Anxiety is fear attached to the change itself, and migration risk is its clearest form. A switch happens only when Push plus Pull exceed Anxiety plus Habit, so a strong Pull alone will not carry it.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what was the actual underlying job customers were describing, as opposed to the feature the company initially built?**
-A) A way to permanently delete old file versions
-B) A way to instantly know, without investigation, whether the file currently being viewed is the team's current working version
-C) A way to compare two documents side by side
-D) A way to restrict document editing to certain team members
+A) A way to compare two document versions side by side in the app
+B) A way to restrict editing rights to specific team members
+C) A way to know at a glance if a file is the current version
+D) A way to permanently delete older superseded versions of a file
 
-*Correct answer: B*
-*Explanation: The deeper job was about preventing confusion at the moment of opening a file, not investigating history after confusion had already occurred — which is what the built version-history viewer addressed instead.*
+*Correct answer: C*
+*Explanation: The job was about the moment of opening a file — avoiding the confusion entirely — rather than reconstructing what happened once confusion had already set in.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **8. Why did the version-history viewer in the Detailed Case Study see low adoption despite being well-built?**
-A) It was too expensive for customers to access
-B) It solved an adjacent but different job (investigating history after confusion) rather than the actual job customers described (preventing confusion at the moment of opening a file)
-C) Customers did not know the feature existed
-D) The feature had significant bugs
+A) Customers were largely unaware the feature had shipped
+B) It solved investigating history after confusion, not preventing it
+C) The feature shipped with defects that blocked regular use
+D) Access to the feature required a higher-priced plan tier
 
 *Correct answer: B*
-*Explanation: The case study attributes low adoption to a mismatch between the built solution and the actual underlying job, not to awareness or quality issues.*
+*Explanation: The build quality was fine. The feature was hired for an adjacent job nobody had asked for, which is what a solution-first reading of the original request tends to produce.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
 
 ---
 
 **9. Which of the following job statements is written correctly, according to the structure introduced in this lesson?**
-A) "I want your app to have a dark mode setting."
-B) "When I'm reviewing documents late at night, I want to reduce eye strain, so I can keep working without discomfort."
-C) "Your competitor has dark mode, so we need it too."
-D) "Dark mode is a commonly requested feature."
+A) "When reviewing documents at night, I want to reduce eye strain, so I can keep working"
+B) "I would like your application to offer a proper dark mode setting"
+C) "Our closest competitor already ships dark mode, so we should match it"
+D) "Dark mode is among the most frequently requested features we track"
 
-*Correct answer: B*
-*Explanation: Option B follows the "When [situation], I want to [motivation], so I can [outcome]" structure and names no specific product or feature, unlike the others, which describe a solution or a competitive comparison rather than an underlying job.*
+*Correct answer: A*
+*Explanation: Only option A follows "When [situation], I want to [motivation], so I can [outcome]" and names no product or feature. The others describe a solution, a competitive comparison, and a request tally.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **10. What is the risk of "laddering too far," as described in this lesson's Common Beginner Mistakes?**
-A) The stakeholder becomes annoyed by too many questions
-B) The explanation becomes so abstract (e.g., "I want to be happy") that it no longer usefully constrains solution design
-C) Engineering will refuse to build anything after too many "why" questions
-D) There is no such thing as laddering too far
+A) Stakeholders grow frustrated with repeated questioning
+B) Engineering declines to estimate anything after many whys
+C) The explanation grows so abstract it stops constraining design
+D) The original request gets lost during the conversation
 
-*Correct answer: B*
-*Explanation: The correct stopping point is the most specific, stable explanation across possible solutions — laddering past that point produces an explanation too abstract to guide design.*
+*Correct answer: C*
+*Explanation: "I want to be happy" is a true statement that guides no design decision. The right stopping point is the most specific explanation that stays stable across several plausible solutions.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **11. (Scenario) A customer requests "an export-to-Excel button." Using this lesson's framework, what should a PM do first?**
-A) Immediately scope the export button for engineering, since it is a simple, well-understood feature
-B) Ladder the request to understand what the customer actually intends to do with the exported data, since a different, perhaps simpler, in-app solution might satisfy the same underlying need
-C) Reject the request, since JTBD theory argues all stated requests should be ignored
-D) Ask other customers if they also want an export button, and build it only if a majority agree
+A) Scope the export button immediately, since it is well understood and small
+B) Decline it, since JTBD treats stated requests as unreliable
+C) Poll other customers and build it if a majority also want it
+D) Ladder the request to learn what they do with the exported data
 
-*Correct answer: B*
-*Explanation: The lesson's core habit is to ladder a stated solution request to its underlying job before evaluating or scoping it, since the export button may be one of several possible solutions to a deeper need (e.g., needing to share a specific view with someone outside the tool).*
+*Correct answer: D*
+*Explanation: The export button is one candidate solution. If the job turns out to be sharing a particular view with someone outside the tool, a shareable link may serve it better, faster, and without sending data out of the product.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **12. (Product Thinking) Two users with very different job titles and ages are both observed using a note-taking app in the exact same way: capturing a fleeting thought during a meeting so it isn't forgotten. According to JTBD theory, what does this suggest about how the product should be segmented?**
-A) By age, since age is always the most reliable segmentation variable
-B) By job title, since professional context always determines product needs
-C) By the shared job ("capture a fleeting thought before it's lost"), since both users are hiring the product for the same underlying job despite different demographics
-D) The product cannot be segmented at all in this scenario
+A) By age bracket, which reliably predicts product need
+B) By job title, since professional context drives requirements
+C) By the shared job both are hiring the product to do
+D) By tenure with the product, which shapes expectations
 
 *Correct answer: C*
-*Explanation: JTBD theory argues that shared jobs, not shared demographics, are the more meaningful segmentation axis — two demographically different users hiring a product for the same job should often be treated as the same segment for that use case.*
+*Explanation: Demographics diverge here while the job is identical, which is exactly the case JTBD segmentation is built for. The same person would belong to a different segment when hiring the app for a different job.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning) An interviewer asks, "Who is your product's biggest competitor?" A candidate names only the closest, most well-known rival product. What might this signal, according to this lesson's Interview Perspective section?**
-A) Strong competitive awareness and nothing more is needed
-B) A possibly incomplete picture, since the candidate did not consider non-consumption (workarounds, doing nothing) as frequently the larger and more significant competitive force
-C) That the candidate has misunderstood the question entirely
-D) That naming a specific rival is always the wrong answer
+A) Strong competitive awareness that needs no further elaboration
+B) An incomplete picture that omits non-consumption alternatives
+C) A misreading of the question, which asked about the market
+D) A correct answer, since naming a specific rival is expected of candidates
 
 *Correct answer: B*
-*Explanation: The lesson notes that a stronger answer names both the obvious rival and the often-larger non-consumption alternative, and that defaulting only to the named rival can indicate an incomplete strategic picture.*
+*Explanation: A stronger answer names the branded rival and the workaround — the spreadsheet, the group chat, doing nothing — and says which represents the larger pool of the job going unserved.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team ships a feature that is measurably superior on every functional benchmark compared to a competitor's equivalent feature, yet adoption remains flat. Using the frameworks in this lesson, what are two plausible, non-mutually-exclusive explanations?**
-A) The feature failed to satisfy the emotional or social dimension of the job, and/or the Anxiety or Habit forces anchoring users to their current approach were never addressed
-B) Functional superiority always guarantees adoption, so this scenario is not possible
-C) The feature must have had a bug, since functional superiority is the only relevant factor
-D) The competitor's product must be functionally superior in reality, despite the benchmarks
+A) The functional benchmarks must have been measured incorrectly here
+B) The competitor is probably superior in ways the benchmarks did not capture
+C) Functional superiority guarantees adoption, so this outcome cannot occur
+D) Unmet emotional or social job dimensions, or unresolved Anxiety
 
-*Correct answer: A*
-*Explanation: This lesson explicitly argues that functional superiority alone does not guarantee adoption — unaddressed emotional/social dimensions or unresolved Anxiety/Habit forces can each independently suppress adoption even when functional benchmarks favor the new solution.*
+*Correct answer: D*
+*Explanation: A feature can win every functional comparison and still lose on how the person wants to feel or be seen, or lose to migration risk and six years of habit. Either mechanism suppresses adoption on its own.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A VP insists a specific technical solution ("full offline mode") is the only acceptable fix for a sales-blocking connectivity complaint. After laddering the request, a PM identifies a lighter-weight "queue and auto-sync" solution that appears to satisfy the same underlying job at a fraction of the engineering cost. What is the most defensible next step, according to this lesson's overall approach?**
-A) Silently build the lighter-weight solution without informing the VP, since the PM's technical judgment should not be questioned
-B) Build the VP's originally specified solution exactly as requested, since ignoring a senior stakeholder's explicit instruction is never appropriate
-C) Present the underlying job, the evidence behind it, and the lighter-weight alternative to the VP directly, making the trade-off (cost, speed, risk) explicit, while remaining open to the VP's business context possibly ruling it out
-D) Escalate the disagreement to engineering leadership for a unilateral technical ruling
+A) Build the VP's originally specified solution, since seniority settles it
+B) Present the underlying job and the lighter alternative, with trade-offs made explicit
+C) Build the lighter solution quietly, since the technical call is the PM's
+D) Escalate to engineering leadership for a binding technical ruling
 
-*Correct answer: C*
-*Explanation: This mirrors the lesson's consistent guidance (and Lesson 1's Common Beginner Mistake 4): the goal of laddering is not to unilaterally override a stakeholder, but to surface a broader solution space with clear reasoning and let the actual decision be made with that fuller picture — respecting that the VP may still have context (e.g., a specific contractual commitment) that the PM does not.*
+*Correct answer: B*
+*Explanation: Laddering widens the solution space; it does not transfer the decision to the PM. The VP may hold context — a signed commitment, a named account — that rules the lighter option out, and can only apply it if the alternative is put in front of them.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 

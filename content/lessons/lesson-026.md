@@ -453,195 +453,195 @@ There is no single correct answer. The purpose of this exercise is to practice e
 ## Quiz
 
 **1. What is a prototype, according to this lesson?**
-A) A finished, launch-ready product
-B) An interactive representation of a solution, ranging from low-fidelity linked screens to high-fidelity functional builds
-C) A written specification document
-D) A static, non-interactive visual mockup
+A) A written specification document for the engineering team
+B) A static, non-interactive visual mockup of the interface
+C) An interactive representation, from linked screens to real builds
+D) A finished, launch-ready product already delivered to real customers
 
-*Correct answer: B*
-*Explanation: The lesson's core definition emphasizes interactivity across a range of fidelity levels, distinguishing a prototype from both a finished product and a static mockup.*
+*Correct answer: C*
+*Explanation: Interactivity is the defining property, and fidelity varies widely within it. A static mockup lacks the interaction; a shipped product is past the point of being a testing artifact.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Where does prototyping sit on Lesson 8's confidence ladder?**
-A) At the "full delivery" rung
-B) At the "concept test" rung, before the cost of a limited pilot or full delivery
-C) Before the "conversation" rung
-D) Prototyping is not part of the confidence ladder at all
+A) At the full delivery rung, after a limited pilot has run
+B) At the concept test rung, before a pilot's cost
+C) Before the conversation rung, at the very start of discovery
+D) Prototyping forms no part of the confidence ladder at all
 
 *Correct answer: B*
-*Explanation: The lesson explicitly places prototyping at the "concept test" rung, positioned deliberately before the greater cost and commitment of later rungs.*
+*Explanation: It buys interactive evidence before the commitment of a pilot. A team going from wireframe straight to delivery has skipped this rung, which is the discipline Lesson 8 warned about.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What should determine whether a low- or high-fidelity prototype is appropriate for a given test?**
-A) Whichever fidelity level is fastest to build, regardless of the question being tested
-B) The specific riskiest assumption being tested, following the same discipline as the MVP Scoping Filter
-C) Whichever fidelity level looks most impressive to stakeholders
-D) High fidelity should always be used regardless of the specific question
+A) Whichever level looks most impressive to the stakeholders
+B) Whichever level is fastest to build, whatever the question
+C) The specific riskiest assumption the test is meant to answer
+D) High fidelity suits every question and should be the default
 
-*Correct answer: B*
-*Explanation: The lesson explicitly connects fidelity choice to the specific riskiest assumption at hand, directly extending Lesson 21's MVP Scoping Filter discipline to prototyping.*
+*Correct answer: C*
+*Explanation: Navigation questions are answered by linked screens. Questions about tolerating a real delay, or reading live data correctly, are not, and the assumption decides which you are facing.*
 *Learning objective tested: #1, #2*
 *Difficulty: Easy*
 
 ---
 
 **4. How does usability testing differ from discovery interviewing (Lesson 12)?**
-A) They are identical practices with different names
-B) Usability testing observes interaction with a specific, already-built solution; discovery interviewing understands existing behavior and needs, typically independent of a specific solution
-C) Usability testing can only be conducted remotely, while discovery interviewing must be in person
-D) Usability testing never involves real users, while discovery interviewing always does
+A) They are identical practices carrying two different names
+B) Usability testing runs remotely; discovery must be in person
+C) Usability testing avoids real users; discovery involves them
+D) Usability watches interaction with a build; discovery studies behaviour
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit distinction, directly connecting back to Lesson 12's discovery-versus-usability-interview framing.*
+*Correct answer: D*
+*Explanation: Both involve real users and answer different questions. Discovery establishes the job and the pain; usability checks whether this particular solution resolves it without introducing new friction.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What is the think-aloud technique?**
-A) A method for summarizing test results after all participants have completed testing
-B) Asking a test participant to verbalize their thoughts continuously while interacting with a prototype
-C) A technique for building high-fidelity prototypes more quickly
-D) A method for recruiting usability test participants
+A) A technique for building high-fidelity prototypes more quickly
+B) A method for recruiting suitable usability test participants
+C) A way of summarising results once all testing has concluded
+D) Asking a participant to verbalise thoughts while interacting
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the think-aloud technique, distinct from post-test summarization, prototype-building methods, or recruitment.*
+*Correct answer: D*
+*Explanation: What they are looking at, what they expect next, what confuses them — said as it happens rather than reconstructed at the end.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **6. Why is the think-aloud technique considered more reliable than relying solely on a participant's after-the-fact summary?**
-A) Because participants always lie when summarizing their experience afterward
-B) Because it captures moments of hesitation, confusion, or incorrect expectation as they happen, rather than relying on retrospective recollection, which is often less reliable per Lesson 11's stated/revealed preference distinction
-C) Because think-aloud testing is always faster to conduct
-D) Because after-the-fact summaries are technically impossible to collect
+A) Because participants invariably misreport their experience afterward
+B) It catches hesitation as it happens, rather than after recall
+C) Because think-aloud sessions are faster to run than the alternative
+D) Because after-the-fact summaries cannot be collected
 
 *Correct answer: B*
-*Explanation: This directly connects the think-aloud technique's value to Lesson 11's broader framework distinguishing more reliable, in-the-moment observation from less reliable retrospective self-report.*
+*Explanation: Someone who paused for four seconds at step three will often report afterwards that it felt intuitive, and mean it. The pause is the finding, and only a live protocol catches it.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What is "over-engineered prototype," as described in this lesson?**
-A) A prototype that is too low in fidelity to test anything meaningfully
-B) Investing more time and fidelity into a prototype than the specific riskiest assumption being tested actually requires
-C) A prototype that has been tested with too many participants
-D) A prototype built using outdated design tools
+A) More fidelity than the assumption under test requires
+B) A prototype that has been tested with far too many participants
+C) A prototype too low in fidelity to test anything meaningfully
+D) A prototype built using outdated and unsupported design tools
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition, directly echoing Lesson 21's MVP creep concept applied to the prototyping stage.*
+*Correct answer: A*
+*Explanation: This is MVP creep relocated to the prototyping stage. Real backend logic adds cost and does not improve a test of whether people can find the next button.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. In the Detailed Case Study, what specific assumption did the original low-fidelity prototype fail to test, leading to the post-launch conversion drop?**
-A) Whether users could successfully navigate the multi-step checkout flow
-B) Whether users would tolerate a multi-second delay caused by a real-world third-party shipping API's response time
-C) Whether users preferred a different color scheme for the checkout page
-D) Whether users understood the checkout flow's terminology
+A) Whether users understood the checkout flow's chosen terminology
+B) Whether users preferred a different colour scheme at checkout
+C) Whether users would tolerate a multi-second third-party shipping API delay
+D) Whether users could navigate the multi-step checkout flow itself
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies the untested realistic-performance assumption (the shipping calculation delay) as the specific gap that caused the post-launch problem, despite successful navigation testing.*
+*Correct answer: C*
+*Explanation: Navigation tested well and was tested honestly. Linked static screens cannot simulate a real API's latency, so that risk went out of the door untouched.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team successfully tests a low-fidelity prototype's navigation flow with real users and concludes the entire checkout experience is now fully validated and ready for development. According to this lesson, what is the flaw in this conclusion?**
-A) There is no flaw; a successful navigation test validates the entire experience
-B) The team is committing a scope-of-validation error — the test validated only navigation flow, not other potentially risky dimensions like realistic performance or data behavior, which remain untested
-C) The team should have used an even lower-fidelity prototype instead
-D) The team should have skipped prototyping entirely and gone straight to development
+A) The team should have used an even lower-fidelity prototype instead
+B) A scope error; navigation was tested, performance was not
+C) No flaw; a successful navigation test validates the experience
+D) The team should have skipped prototyping and gone to development
 
 *Correct answer: B*
-*Explanation: This reflects the lesson's core warning against extending a test's validated scope beyond what it actually tested — exactly the error shown in the Detailed Case Study.*
+*Explanation: A test validates the dimension it was built to examine and no others. Extending the result to untested dimensions is inference, not evidence.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team is testing whether users understand a new multi-step onboarding flow's navigation, with no need to test realistic data or backend performance. According to the Prototype Fidelity Match, what is the most appropriate prototype fidelity?**
-A) A fully functional, high-fidelity prototype with real backend logic
-B) A low-fidelity prototype of linked static screens, sufficient to test navigation flow without unnecessary additional investment
-C) No prototype should be built at all; the team should proceed directly to full development
-D) A fidelity level should be chosen at random, since fidelity has no bearing on test validity
+A) Low-fidelity linked screens, sufficient for the navigation question
+B) A fully functional, high-fidelity prototype wired to real backend logic
+C) No prototype at all; proceed directly to full feature development
+D) A fidelity level chosen at random, since fidelity changes nothing
 
-*Correct answer: B*
-*Explanation: Since the specific assumption concerns navigation flow rather than realistic performance or data behavior, a low-fidelity, linked-screen prototype is sufficient and appropriately matched, per the Prototype Fidelity Match discipline.*
+*Correct answer: A*
+*Explanation: The simplest fidelity that can answer the question is the right one. Adding backend realism here spends time without changing what the test can tell you.*
 *Learning objective tested: #1, #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes building a fully functional, production-quality prototype (with real backend integration) for every usability test, regardless of the specific question being tested, explaining that "more realistic is always better." What might this signal, based on this lesson's Interview Perspective section?**
-A) An exemplary, best-practice approach to prototyping
-B) A likely instance of over-engineering, failing to match prototype fidelity to the specific riskiest assumption at hand
-C) That the candidate has strong technical skills that should be considered a core strength regardless of context
-D) Nothing meaningful, since higher fidelity is always preferable in every prototyping scenario
+A) Over-engineering; fidelity is not matched to the question at hand
+B) An exemplary, best-practice approach to prototyping in general
+C) Strong technical skill that counts as a core strength regardless
+D) Nothing of note, since higher fidelity is preferable in every case
 
-*Correct answer: B*
-*Explanation: This directly reflects the lesson's warning against over-engineering — defaulting to maximum fidelity regardless of the specific question at hand wastes investment without necessarily improving the test's ability to answer that question.*
+*Correct answer: A*
+*Explanation: Defaulting to maximum realism turns a cheap rung of the ladder into an expensive one, and slows the cycle without improving the answers on most questions.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team identifies two distinct riskiest assumptions for a new feature: one concerning whether users can navigate a specific flow, and one concerning whether users will tolerate a specific real-world performance characteristic. According to this lesson, should these be tested using the same single prototype, or should the team consider a different approach?**
-A) They should always be tested using a single, identical prototype and test session regardless of their different natures
-B) The team should consider whether a single prototype can adequately test both assumptions, or whether separate, appropriately fidelity-matched tests (as shown in the Detailed Case Study's recommended fix) are needed for each distinct assumption
-C) Only the navigation assumption should ever be tested; performance assumptions are never worth testing via prototype
-D) Only the performance assumption should be tested; navigation assumptions are always self-evident and don't require testing
+A) Test the navigation assumption; performance is not worth prototyping
+B) Use one identical prototype and session, whatever their differences
+C) Consider separate, fidelity-matched tests for each distinct assumption
+D) Test performance; navigation questions answer themselves without testing
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core recommendation from the Detailed Case Study — distinct riskiest assumptions may require distinct, separately fidelity-matched tests rather than assuming a single prototype and test session can adequately validate multiple different dimensions of risk simultaneously.*
+*Correct answer: C*
+*Explanation: The two questions want different fidelities. Forcing them into one artifact means over-building for the first question or under-building for the second.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where a prototype tested very well with users, but the candidate is asked what additional information they would want before feeling confident proceeding to full development. A weak answer would most likely include which of the following?**
-A) Explicitly identifying which specific riskiest assumptions the prototype test actually validated, and which remain untested
-B) Immediately proceeding to full development without further consideration, since the prototype test went well
-C) Considering whether a different fidelity level might be needed to test any remaining, distinct risk dimensions
-D) Reflecting on whether the test used a think-aloud protocol or relied only on retrospective summary
+A) Name which assumptions the test validated and which remain untested
+B) Consider whether another fidelity level suits the remaining risks
+C) Reflect on whether think-aloud or a retrospective summary was used
+D) Proceed straight to full development, since the prototype tested well
 
-*Correct answer: B*
-*Explanation: Proceeding immediately without further consideration, despite the prompt asking what additional information would be valuable, reflects a weaker response compared to the more diagnostic, scope-aware alternatives in the other options.*
+*Correct answer: D*
+*Explanation: The question invites the candidate to name what is still unknown. Treating one good result as sufficient is the exact inference the case study punished.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team presents a high-fidelity, functionally realistic prototype to company leadership during a project update, and leadership subsequently begins referencing a specific launch date, apparently believing the prototype represents a nearly finished product. What failure pattern does this illustrate, and what should the team have done differently?**
-A) This illustrates "over-engineered prototype," and the team should have used lower fidelity
-B) This illustrates "prototype as finished product" — the team should have explicitly clarified, when presenting the prototype, that it is a testing artifact rather than a launch-ready solution, to prevent this kind of false expectation
-C) This illustrates a failure of the think-aloud technique specifically
-D) This scenario does not relate to any failure pattern discussed in this lesson
+A) Over-engineered prototype; the team should have used lower fidelity
+B) A failure of the think-aloud technique in this particular session
+C) This scenario relates to no failure pattern covered in the lesson
+D) Prototype as finished product; clarify status when presenting
 
-*Correct answer: B*
-*Explanation: This is a direct example of the "prototype as finished product" failure pattern — the issue is not the fidelity level itself, but the lack of explicit clarification about the prototype's actual purpose and status, which led to a false expectation about timeline and completeness.*
+*Correct answer: D*
+*Explanation: The fidelity may have been right for the test it was built for. What was missing was a sentence telling the room what they were looking at.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team runs a rigorous, well-scoped, think-aloud usability test on a low-fidelity prototype, correctly limited to testing navigation flow, and explicitly documents that realistic performance remains untested. Engineering later implements the feature, and a performance issue similar to the Detailed Case Study's shipping-delay problem emerges, despite the team's explicit documentation of this gap. What does this scenario suggest about the limits of prototyping discipline alone?**
-A) This proves that prototyping is fundamentally ineffective, regardless of how rigorously it's conducted
-B) Explicitly documenting an untested risk is a necessary but not sufficient step — the team must also ensure that documented, still-open risks are actually tracked and addressed (e.g., through a follow-up, appropriately fidelity-matched test) before or during implementation, rather than the documentation alone preventing the issue from recurring
-C) The team should have skipped prototyping entirely, since it failed to prevent the issue
-D) This scenario is identical to the original Detailed Case Study and reveals no new insight
+A) Documenting an open risk is necessary and not sufficient; it must be tracked and retested
+B) This proves prototyping is ineffective however rigorously it is run
+C) The team should have skipped prototyping, since it prevented nothing
+D) This is identical to the case study and reveals no further insight
 
-*Correct answer: B*
-*Explanation: This tests a subtler point — correctly identifying and documenting an untested risk (a genuine improvement over the original Detailed Case Study's team) is still not sufficient on its own; the documented risk must be actively tracked and addressed through appropriate follow-up action, not merely noted and then left unaddressed through the remainder of the project.*
+*Correct answer: A*
+*Explanation: This team did better than the case study's — they named the gap. A named gap that nobody owns or schedules a follow-up test for produces the same outcome as an unnamed one.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 

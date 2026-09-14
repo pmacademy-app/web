@@ -387,195 +387,195 @@ There is no single correct answer. The purpose of this exercise is to practice t
 ## Quiz
 
 **1. Which of the following best completes the definition of product strategy used in this lesson?**
-A) An ambitious goal stated with conviction
-B) A three-part structure: an honest diagnosis, a guiding policy responding to it, and coordinated actions that follow from the policy
-C) A list of every initiative a team would like to pursue
+A) An ambitious goal stated with real conviction and clarity
+B) A diagnosis, a guiding policy, and coordinated actions
+C) A list of every initiative the team would like to pursue
 D) A restated version of the company's mission statement
 
 *Correct answer: B*
-*Explanation: This lesson's core definition, adapted from Rumelt's framework, requires all three components — diagnosis, guiding policy, and coordinated action — to constitute a real strategy.*
+*Explanation: All three parts are necessary. A diagnosis without a policy is analysis, a policy without coordinated actions is an intention, and actions without a diagnosis are activity.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Which of the following is the clearest example of "fluff," as described in this lesson's bad strategy patterns?**
-A) "Our diagnosis is that enterprise buyers choose incumbents on integration depth, not features."
-B) "We will leverage synergies to drive customer-centric innovation across all touchpoints."
-C) "We will not pursue the international expansion opportunity this year."
-D) "Our guiding policy is to win through a narrow, best-in-class integration ecosystem."
+A) "We will not pursue the international expansion opportunity this year."
+B) "Our guiding policy is to win through best-in-class integration depth."
+C) "Enterprise buyers choose incumbents on integrations, not features."
+D) "We will leverage synergies to drive customer-centric innovation across every touchpoint."
 
-*Correct answer: B*
-*Explanation: This statement sounds sophisticated but states nothing concrete, falsifiable, or specific to any particular situation — the hallmark of fluff, as distinguished from the specific diagnosis, exclusion, and policy statements in the other options.*
+*Correct answer: D*
+*Explanation: D sounds strategic and asserts nothing checkable. The other three are, respectively, a real exclusion, a real guiding policy, and a real diagnosis — each specific enough to be wrong.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is the single most reliable signal, according to this lesson, that a strategy is real rather than decorative?**
-A) It is written in formal, professional language
-B) It explicitly excludes at least one genuinely plausible, individually reasonable option
-C) It has been approved by senior leadership
-D) It contains at least five distinct priorities
+A) It has been formally approved by the senior leadership team
+B) It is written in precise, professional, well-structured language
+C) It sets out at least five clearly articulated distinct priorities
+D) It explicitly excludes a plausible, reasonable option
 
-*Correct answer: B*
-*Explanation: The lesson repeatedly emphasizes that genuine exclusion — saying no to something plausible — is the clearest available signal of real strategic work, since a document endorsing everything has not made an actual choice.*
+*Correct answer: D*
+*Explanation: Every excluded option usually has a genuine case for it — that is what makes the exclusion hard, and what makes its presence evidence that a choice was actually made.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is "we will become the market leader in project management software" described in this lesson as a goal rather than a strategy?**
-A) Because market leadership is an unrealistic goal for any company
-B) Because it contains no diagnosis of the current obstacle and no guiding policy for closing the gap — it states an ambition without a plan
-C) Because goals are always shorter than strategies
-D) Because it does not mention a specific product category
+A) Because market leadership is unrealistic for most companies in any sector
+B) Because it names no obstacle and no approach for closing the gap
+C) Because goals are conventionally shorter than strategy statements are
+D) Because it fails to name the specific product category being targeted
 
 *Correct answer: B*
-*Explanation: This lesson explicitly distinguishes a stated ambition (a goal) from an actual plan containing a diagnosis and guiding policy for achieving it (a strategy).*
+*Explanation: The statement says where the company would like to end up and nothing about why it is not there now or what would change that. Ambition is not a plan.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **5. In the Detailed Case Study, what was the primary reason all five initiatives showed only partial, underwhelming progress?**
-A) All five ideas were fundamentally bad ideas
-B) Engineering capacity was spread thin across all five, with no diagnosis or guiding policy concentrating investment, guaranteeing diluted results
-C) The company lacked sufficient funding to pursue any of the five
-D) Customers did not want any of the five initiatives
+A) All five ideas were fundamentally weak and poorly conceived
+B) The company lacked the funding to pursue any of the five at all
+C) Capacity was spread across all five with no concentrating logic
+D) Customer research showed no demand for any of the five initiatives
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the underwhelming results to spreading limited capacity across all five initiatives without any diagnosis-driven concentration of effort, not to the ideas themselves being flawed.*
+*Correct answer: C*
+*Explanation: The ideas were individually reasonable, which is what made the situation hard to see. Without a diagnosis to concentrate investment, partial progress on everything was the arithmetically guaranteed result.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. According to this lesson, what must come first when connecting a stated vision to a concrete strategy?**
-A) Choosing a guiding policy based on what the team is most comfortable executing
-B) An honest, evidence-based diagnosis of the actual gap and obstacle between the current state and the vision
-C) Assigning engineering resources to as many plausible initiatives as possible
-D) Rewriting the vision statement to match the current roadmap
+A) Assigning engineering capacity to as many plausible initiatives as possible
+B) Choosing a guiding policy the team already feels comfortable executing
+C) An honest, evidence-based diagnosis of the actual gap and obstacle
+D) Rewriting the vision statement so it matches the current roadmap
 
-*Correct answer: B*
-*Explanation: The lesson's sequence explicitly places honest diagnosis first, since a guiding policy chosen before diagnosis tends to reflect existing preferences rather than the actual situation.*
+*Correct answer: C*
+*Explanation: A policy picked before the diagnosis tends to encode what the team already wanted to do. The diagnosis is what makes the policy a response to the situation rather than to existing preference.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. What does the "Say No" Test check for in a strategy document?**
-A) Whether the document is grammatically correct
-B) Whether the document names at least one plausible option that will explicitly NOT be pursued
-C) Whether the document has been reviewed by at least three stakeholders
-D) Whether the document uses the word "strategy" at least once
+A) Whether the document names a plausible option that will not be pursued
+B) Whether at least three stakeholders have reviewed the document
+C) Whether the document uses the word strategy somewhere in it
+D) Whether the document is clearly written and free of errors
 
-*Correct answer: B*
-*Explanation: The "Say No" Test specifically evaluates whether a strategy makes a real exclusionary choice, which the lesson identifies as the clearest marker of genuine strategic work.*
+*Correct answer: A*
+*Explanation: A document in which everything is a priority has not allocated anything. The absence of an exclusion is not evidence of ambition; it is evidence that no choice was made.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. (Scenario) A strategy document states a diagnosis and a guiding policy, but its "coordinated actions" section lists five unrelated initiatives that could each be removed without affecting the others. According to this lesson, what does this suggest?**
-A) The strategy is complete and well-formed, since a diagnosis and guiding policy are present
-B) The coordinated actions likely don't actually follow from, or reinforce, the stated guiding policy — a real set of coordinated actions should be mutually reinforcing, not independently removable
-C) This is an example of excellent, flexible strategic planning
-D) The document should add even more unrelated initiatives to increase its scope
+A) The strategy is complete, since diagnosis and guiding policy are present
+B) This is flexible planning that keeps the team's options genuinely open
+C) The actions likely do not follow from the stated policy
+D) The document should add further initiatives to broaden its coverage
 
-*Correct answer: B*
-*Explanation: The lesson specifies that real coordinated actions reinforce each other and derive specifically from the guiding policy; a list of independently removable items suggests the "actions" section was not actually derived from the stated policy.*
+*Correct answer: C*
+*Explanation: Coordinated actions are supposed to reinforce one another, so that removing one weakens the rest. A list that survives arbitrary trimming intact was assembled separately from the policy above it.*
 *Learning objective tested: #1, #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **9. (Product Thinking) A company's leadership names an honest diagnosis (a specific competitive weakness) but refuses to deprioritize any existing initiative to address it, insisting all current work continues "in parallel" with new efforts targeting the diagnosis. What does this most likely indicate, according to this lesson?**
-A) This is a strong strategy, since it addresses the diagnosis without disrupting existing work
-B) Despite having a real diagnosis, the refusal to exclude anything suggests the resulting plan may still function as bad strategy in practice, since resources will likely be diluted across old and new priorities alike
-C) This approach guarantees success on both the diagnosis-driven initiative and all existing work
-D) Diagnosis alone is sufficient for a strategy to be considered complete and real
+A) This guarantees success on the new initiative and the existing work alike
+B) A diagnosis on its own is sufficient for a strategy to count as complete and real
+C) This is strong, since it addresses the diagnosis without disrupting work
+D) Without exclusion, resources dilute and the plan still acts as bad strategy
 
-*Correct answer: B*
-*Explanation: Even with an honest diagnosis, the lesson's core argument is that failing to exclude anything undermines a strategy's coherence — diagnosis alone is necessary but not sufficient without a policy and genuine, resource-concentrating exclusion.*
+*Correct answer: D*
+*Explanation: An honest diagnosis is necessary and not sufficient. If nothing is given up, the new work is funded out of the same finite capacity as everything else, and the diagnosis changes nothing in practice.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Interview Reasoning) A candidate is asked to describe a strategy they developed, and their answer consists entirely of an ambitious target with no mention of an underlying obstacle or approach for overcoming it. What does this most likely signal, based on this lesson's Interview Perspective section?**
-A) Strong strategic thinking, since ambitious targets demonstrate leadership
-B) A likely conflation of a goal with an actual strategy, missing the diagnosis and guiding policy this lesson identifies as necessary
-C) That the candidate is unqualified for any senior product role
-D) Nothing meaningful, since strategy questions are rarely asked in interviews
+A) Strong strategic thinking, since ambitious targets signal leadership
+B) A conflation of a goal with a strategy, missing diagnosis and guiding policy
+C) Nothing notable, since strategy questions rarely arise in interviews
+D) Evidence the candidate is unsuited to a senior product role anywhere
 
 *Correct answer: B*
-*Explanation: This lesson's Interview Perspective explicitly frames a stated-goal-only answer as a weak signal, since it lacks the diagnosis and guiding policy that distinguish a real strategy from an ambition.*
+*Explanation: The interviewer is listening for the obstacle. A candidate who can name what stood in the way, and the logic chosen to get past it, is describing strategy; one who names only the target is describing a wish.*
 *Learning objective tested: #1*
 *Difficulty: Hard*
 
 ---
 
 **11. (Product Thinking, Higher Difficulty) A team's guiding policy is "win through best-in-class integration depth rather than competing on feature count," and a stakeholder proposes a new, unrelated feature module that would require significant engineering investment. Using this lesson's framework, what is the most appropriate response?**
-A) Automatically approve the feature, since all stakeholder requests should be treated equally regardless of strategic fit
-B) Evaluate the proposal against the guiding policy — since it does not follow from an integration-focused approach, treat this as a candidate for explicit exclusion, or require a deliberate discussion about revising the guiding policy if there's compelling new evidence
-C) Approve the feature without discussion, since guiding policies are not meant to influence real decisions
-D) Reject the guiding policy entirely in favor of pursuing every stakeholder's individual proposal
+A) Weigh it against the guiding policy as a candidate for exclusion
+B) Approve it automatically, since stakeholder requests deserve equal treatment
+C) Approve it without discussion, since guiding policies are not real constraints
+D) Discard the guiding policy and pursue each stakeholder proposal on its merits
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core discipline — using the guiding policy as an actual filter for evaluating proposals, and treating a mismatch as grounds for explicit exclusion or a deliberate, evidence-based reconsideration of the policy itself, rather than either blind approval or blind rejection of the policy.*
+*Correct answer: A*
+*Explanation: The policy exists precisely to answer proposals like this one. If compelling new evidence argues the diagnosis was wrong, the policy can be revisited deliberately — but not quietly bypassed one request at a time.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **12. Which of the following best distinguishes a strategic choice from a tactical or operational one, according to this lesson?**
-A) Strategic choices are always more expensive than tactical ones
-B) Strategic choices involve the fundamental diagnosis, guiding policy, and resource-allocation logic of the business; tactical/operational choices are near-term execution details that should follow from that logic
-C) There is no meaningful distinction between strategic and tactical choices
-D) Strategic choices are only made by senior executives, while tactical choices are made by anyone else
+A) Strategic choices set diagnosis, policy, and resource allocation; tactical ones execute
+B) Strategic choices always cost considerably more money than tactical ones
+C) Strategic choices are made by executives; tactical ones by everyone else
+D) There is no meaningful distinction between the two kinds of choice
 
-*Correct answer: B*
-*Explanation: The lesson explicitly warns against treating every decision as equally "strategic," distinguishing the higher-altitude diagnosis/policy/resource-allocation decisions from the more granular execution decisions that should derive from them.*
+*Correct answer: A*
+*Explanation: The distinction is about altitude, not cost or seniority. Treating every decision as strategic drains the word of meaning and leaves the genuinely strategic ones getting no more scrutiny than the rest.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer asks a candidate to critique a real strategy document that lists ten equally weighted "strategic pillars" with no stated diagnosis. What is the strongest possible critique, based on this lesson?**
-A) The document should have more pillars to increase strategic coverage
-B) The document likely represents a grab-bag of disconnected objectives rather than a real strategy, since it lacks a diagnosis, a unifying guiding policy, and any explicit exclusion among the ten pillars
-C) The document is excellent, since ten pillars demonstrates thorough strategic thinking
-D) The document's only flaw is that it should be reordered alphabetically
+A) The document is strong, since ten pillars show thorough strategic coverage
+B) The document's main flaw is that the pillars are not ordered by priority
+C) It is a grab-bag lacking diagnosis, unifying policy, and any exclusion
+D) The document should add further pillars to close remaining coverage gaps
 
-*Correct answer: B*
-*Explanation: This is a direct instance of the "grab-bag of disconnected objectives" bad-strategy pattern this lesson names explicitly — a long list without diagnosis, guiding policy, or exclusion.*
+*Correct answer: C*
+*Explanation: Ten equal pillars means no pillar is load-bearing. Ordering them would not repair the missing diagnosis, and nothing in the document says what the company will decline to do.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A company diagnoses that its core obstacle to growth is a weak onboarding funnel causing early churn, and adopts a guiding policy of "invest exclusively in onboarding and early retention this year, deferring new-market expansion." A stakeholder objects that deferring international expansion "leaves money on the table." Using this lesson's framework, how should this objection be evaluated?**
-A) The objection is automatically correct, since any foregone opportunity represents a real cost, and the strategy should be abandoned
-B) The objection may be valid in the abstract, but the guiding policy was chosen specifically because the diagnosis identified onboarding, not new-market opportunity, as the primary constraint — the objection would need new diagnostic evidence to justify revising the policy, not just the existence of a plausible alternative
-C) The objection should be ignored entirely without any consideration
-D) The strategy should immediately add international expansion as an eleventh equally weighted priority
+A) It may be valid, but revising the policy needs new diagnostic evidence
+B) The objection is correct, and the strategy should therefore be abandoned
+C) The objection should be disregarded without any consideration at all
+D) Expansion should be added as an equally weighted parallel priority now
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's repeated theme — a real strategy will always have plausible foregone alternatives, and the correct response is to weigh new evidence against the existing diagnosis, not to treat every plausible objection as automatic grounds for abandoning the exclusion that makes the strategy real in the first place.*
+*Correct answer: A*
+*Explanation: Every real strategy leaves money on some table; that is what exclusion means. The objection earns a policy change only if it shows the diagnosis was wrong, not merely that an alternative exists.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A product team has a specific, well-written vision (Lesson 9) and a specific, well-formed strategy (this lesson's Strategy Kernel), but its actual roadmap for the next two quarters bears little visible relationship to either. What does this most likely indicate, and what is the appropriate next step?**
-A) The vision and strategy are irrelevant documents and should be discarded in favor of the existing roadmap
-B) There is likely a breakdown in the final translation step — coordinated actions and roadmap items should be explicitly checked against both the guiding policy and the Vision Filter, and the roadmap should be revised to reflect that connection, or the mismatch should prompt honest reconsideration of whether the strategy itself needs updating
-C) This is normal and requires no further action, since roadmaps and strategies operate independently of each other
-D) The team should abandon strategic planning altogether, since apparently even a well-formed strategy cannot influence a roadmap
+A) The vision and strategy should be discarded in favour of the live roadmap
+B) Nothing is wrong; roadmaps and strategies operate independently of each other
+C) The team should abandon strategic planning, since it cannot shape a roadmap
+D) The translation step broke; check roadmap items against policy and vision
 
-*Correct answer: B*
-*Explanation: This mirrors the exact failure diagnosed in Lesson 9's case study and this lesson's core argument — a well-formed vision and strategy still require an active, checked translation into roadmap decisions; a disconnect here calls for closing that gap, not discarding the higher-altitude work or assuming the disconnect is unavoidable.*
+*Correct answer: D*
+*Explanation: Good work at two altitudes does not propagate downward on its own. Each roadmap item has to be checked against the guiding policy and the Vision Filter, and a persistent mismatch is itself evidence worth weighing.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 

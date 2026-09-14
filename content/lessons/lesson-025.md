@@ -413,195 +413,195 @@ There is no single correct answer. The purpose of this exercise is to practice r
 ## Quiz
 
 **1. What is the defining characteristic of a wireframe, according to this lesson?**
-A) It is fully interactive and can be clicked through like a real product
-B) It is a deliberately low-fidelity representation of structural layout, without visual design detail
-C) It uses the company's final brand colors and typography
-D) It is identical to a finished visual design, just produced earlier in the process
+A) It is fully interactive and can be clicked through like a product
+B) It uses the company's final brand colours and typography throughout
+C) A deliberately low-fidelity layout without visual design detail
+D) It matches a finished visual design, just produced earlier on
 
-*Correct answer: B*
-*Explanation: The lesson's core definition emphasizes deliberate low fidelity and structural focus, distinct from interactivity (a prototype's defining feature) or full visual polish (a mockup or finished design's defining feature).*
+*Correct answer: C*
+*Explanation: Interactivity belongs to a prototype and full styling to a mockup. A wireframe answers what goes where, and in what order, and stops there.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is "premature visual commitment," as described in this lesson?**
-A) A technique for speeding up the design process
-B) The effect where polished visuals shift reviewer attention toward surface-level, cosmetic feedback and away from structural questions
-C) A requirement that all wireframes must be completed within a fixed time limit
-D) The practice of finalizing a design before any stakeholder review occurs
+A) A technique for speeding up the overall design process
+B) Polish shifting reviewer attention toward cosmetic feedback
+C) A rule that wireframes be completed within a fixed time limit
+D) Finalising a design before any stakeholder review takes place
 
 *Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the phenomenon that makes wireframing's low fidelity valuable rather than a limitation.*
+*Explanation: A finished-looking screen implicitly says the decisions are made, so the room supplies the kind of comment that suits a finished thing. The structural questions go unasked.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Which of the following best distinguishes a wireframe from a prototype?**
-A) A wireframe is always more expensive to produce than a prototype
-B) A wireframe shows structural layout without interactivity; a prototype is interactive, allowing a user to click through and experience some real interaction
-C) A wireframe and a prototype are identical concepts with different names
-D) A wireframe always includes final visual styling, while a prototype does not
+A) A wireframe costs more to produce than a prototype does
+B) A wireframe shows layout; a prototype can be clicked through
+C) The two are identical concepts carrying different labels
+D) A wireframe carries final visual styling while a prototype does not
 
 *Correct answer: B*
-*Explanation: This is the lesson's explicit distinction — interactivity is the defining feature separating a prototype from a wireframe, not visual styling (which neither typically includes at full polish) or cost.*
+*Explanation: Interactivity is the dividing line. A prototype may itself be low or high fidelity, so styling does not separate the two.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **4. Why does this lesson argue that wireframing's low fidelity is "the point, not a limitation"?**
-A) Because low-fidelity work is always cheaper to produce, regardless of any other consideration
-B) Because deliberately low fidelity avoids premature visual commitment, keeping reviewer attention on structural questions rather than surface-level cosmetic details
-C) Because clients and stakeholders always prefer rough, unpolished work
-D) Because wireframes are legally required to be low fidelity in most design processes
+A) Because clients and stakeholders prefer rough, unpolished work
+B) Because low-fidelity work costs less to produce, whatever else
+C) Because it avoids premature commitment, keeping focus structural
+D) Because most design processes require wireframes to be low fidelity
 
-*Correct answer: B*
-*Explanation: The lesson's core argument connects low fidelity directly to avoiding the premature-commitment effect, not to cost alone or any external requirement.*
+*Correct answer: C*
+*Explanation: Roughness is a signal as much as a saving. It tells reviewers the structure is still open, which is precisely the feedback worth having at this stage.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **5. According to this lesson, how should fidelity be adjusted for showing a wireframe to real users during early testing, compared to an internal structural review?**
-A) Fidelity should be identical in both cases, regardless of audience
-B) Real users typically need slightly higher fidelity than a purely internal rough sketch, since they lack the team's internal context, but should still stop short of full visual polish
-C) Real users should always see the fully finished, polished design, never a wireframe
-D) Internal team members should always require higher fidelity than real users
+A) Slightly higher than a rough sketch, short of full polish
+B) Identical in both cases, whatever the audience happens to be
+C) Real users should see the fully finished, polished design instead
+D) Internal reviewers require higher fidelity than real users do
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's audience-matching discipline — real users need enough clarity to interpret the layout meaningfully, but excessive polish still risks the premature-commitment problem even with this audience.*
+*Correct answer: A*
+*Explanation: Users arrive without the team's shared context and need enough clarity to read the layout. Full polish would reintroduce the commitment problem with a new audience.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what specific structural problem went unaddressed because the team skipped the wireframe stage?**
-A) The dashboard loaded too slowly for users with slow internet connections
-B) The dashboard's information hierarchy buried the single most important metric below several less critical pieces of information
-C) The dashboard used the wrong color palette for the company's brand guidelines
-D) The dashboard was not compatible with mobile devices
+A) The most important metric sat below less critical items
+B) The dashboard loaded slowly for users on poor connections
+C) The dashboard used a palette outside the brand guidelines
+D) The dashboard proved incompatible with common mobile devices
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies this information-hierarchy problem as the structural issue that went unaddressed due to premature visual commitment.*
+*Correct answer: A*
+*Explanation: Information hierarchy is exactly what a grey box layout makes visible and a beautiful mockup hides, because the eye goes to the styling instead of the order.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. Why did the internal review in the Detailed Case Study focus primarily on button color, font size, and icon spacing rather than the dashboard's information hierarchy?**
-A) The reviewers did not care about the product's success
-B) The polished mockup's visual completeness implicitly signaled the design was largely finished, inviting cosmetic rather than structural scrutiny — precisely the premature visual commitment effect
-C) The reviewers were only qualified to comment on visual design, not structure
-D) The information hierarchy was not actually a real problem with the design
+A) The reviewers were qualified to judge visuals rather than structure
+B) The information hierarchy was in fact fine as designed
+C) The reviewers had little interest in the product's eventual success
+D) Visual completeness signalled the design was largely finished
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the nature of the feedback received to the premature visual commitment effect triggered by the polished presentation.*
+*Correct answer: D*
+*Explanation: Nobody decided to skip the structural questions. The artifact's polish set the register of the conversation before anyone spoke.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
 
 ---
 
 **8. According to the Wireframe Review Framing Checklist, what should be done at the start of a wireframe review, in addition to using low fidelity?**
-A) Nothing further is necessary once low fidelity has been achieved
-B) The review's purpose should be explicitly stated (e.g., "we're evaluating structure, not polish") to direct reviewer attention appropriately
-C) The wireframe should be immediately converted to a fully polished mockup before the meeting begins
-D) All acceptance criteria should be removed from consideration during this specific review
+A) The wireframe should be converted to a polished mockup beforehand
+B) Acceptance criteria should be set aside for this particular review
+C) The review's purpose should be stated: structure, not polish
+D) No further step is needed once fidelity is low
 
-*Correct answer: B*
-*Explanation: The Checklist explicitly notes that fidelity and framing together determine the kind of feedback a review produces — low fidelity alone is not sufficient without also stating the review's intended focus.*
+*Correct answer: C*
+*Explanation: Fidelity and framing work together. Low fidelity invites structural feedback; saying so out loud is what reliably produces it.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A designer produces a rough, hand-drawn sketch of a new feature and shows it directly to real users for feedback, without any adjustment in fidelity. What risk does this practice raise, according to this lesson?**
-A) No risk; rough sketches are always the ideal fidelity level regardless of audience
-B) Real users, lacking the team's internal context, may struggle to meaningfully interpret an extremely rough sketch, producing confused or unreliable feedback rather than genuine structural insight
-C) This practice guarantees premature visual commitment will occur
-D) This practice is only a problem if the sketch includes color
+A) No risk; rough sketches suit any audience equally well
+B) Users lacking the team's context may misread it and give unreliable feedback
+C) This guarantees premature visual commitment will occur
+D) A problem arises here solely if the sketch includes colour
 
 *Correct answer: B*
-*Explanation: This reflects Common Mistake 4 — matching fidelity to audience matters in both directions; too little fidelity for an audience lacking internal context risks producing unreliable feedback, not just too much fidelity risking premature commitment.*
+*Explanation: Fidelity can be wrong in both directions. Too little for the audience produces confusion dressed up as findings, which is its own kind of unreliable evidence.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team wants to resolve a genuinely open structural question — whether a specific piece of information should appear above or below another on a screen — before investing in any visual design work. According to the Fidelity Ladder, what is the most appropriate next step?**
-A) Skip directly to a fully polished mockup, since visual design will make the comparison clearer
-B) Use a rough sketch or wireframe to test both structural arrangements quickly and cheaply, before any visual styling investment is made
-C) Build a fully interactive, high-fidelity prototype to resolve this specific structural question
-D) Make the decision based purely on personal preference without any visual exploration at all
+A) Build a fully interactive high-fidelity prototype to settle it
+B) Skip to a polished mockup, since styling clarifies the comparison
+C) Decide from personal preference without any visual exploration
+D) Sketch both arrangements cheaply before styling anything
 
-*Correct answer: B*
-*Explanation: A purely structural question (ordering of information) is exactly the kind of question the Fidelity Ladder's early, low-fidelity stages are designed to resolve cheaply, before investing in higher-fidelity stages not yet warranted.*
+*Correct answer: D*
+*Explanation: Ordering is the cheapest possible question to test and the most expensive to change later. Two sketches settle it before a single styling decision is made.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes routinely producing fully polished, on-brand mockups for the very first round of internal design review, explaining that "it saves time since we'll need the polish eventually anyway." What might this signal, based on this lesson's Interview Perspective section?**
-A) An efficient, best-practice approach to design review
-B) A likely instance of skipping the wireframe stage of the Fidelity Ladder, risking premature visual commitment and the loss of cheap, early structural iteration
-C) That the candidate has strong visual design skills that should be considered a core PM competency
-D) Nothing meaningful, since polish is always beneficial regardless of the review stage
+A) Skipping the wireframe rung, risking premature commitment and lost iteration
+B) An efficient, best-practice approach to running a design review
+C) Strong visual design skill counting as a core PM competency
+D) Nothing of note, since polish helps at whatever review stage
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit warning against skipping wireframing, even when framed as a time-saving measure — the actual risk is losing cheap early structural iteration and inviting the wrong kind of feedback.*
+*Correct answer: A*
+*Explanation: The reasoning sounds efficient and buys polish on a structure nobody has stress-tested. Any structural change now costs the polish as well as the layout.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team correctly produces a low-fidelity wireframe and explicitly frames the review as structural, but reviewers still spend most of the meeting discussing minor spacing preferences. What additional factor, beyond fidelity and framing, might explain this outcome?**
-A) The wireframe fidelity was too low, and should have included full visual polish instead
-B) Reviewers may need more explicit guidance connecting the review specifically back to acceptance criteria and journey map touchpoints (per the Framing Checklist), or may simply need a habit-forming reminder, since old review habits can persist even when fidelity and stated framing are both correct
-C) This outcome proves that wireframing is fundamentally ineffective as a technique
-D) The review should have been skipped entirely, since reviewers are incapable of giving structural feedback under any circumstances
+A) Fidelity was too low and should have carried full visual polish
+B) This proves wireframing fails as a technique in practice
+C) Review habits persist; anchor the session to criteria and touchpoints
+D) The review should be skipped, since reviewers cannot judge structure well
 
-*Correct answer: B*
-*Explanation: This reflects a more nuanced point — even with correct fidelity and stated framing, team habits and review culture can still drift toward familiar, comfortable feedback patterns, suggesting the Framing Checklist's practices (explicitly referencing criteria and journey touchpoints) may need reinforcement, not that the underlying technique has failed.*
+*Correct answer: C*
+*Explanation: Habit outlasts a single instruction. Referencing the specific acceptance criteria and journey touchpoints under review gives the room something concrete to answer.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where a team's wireframes are appropriately low fidelity, but the PM has no involvement in reviewing them against the original acceptance criteria, delegating this entirely to the design team. What is the strongest critique of this practice, based on this lesson?**
-A) No critique is warranted; wireframe review should always be handled entirely by the design team
-B) The PM's active involvement in checking that wireframes genuinely reflect specified behavior and required scenarios (per Common Mistake 5) remains valuable and shouldn't be fully delegated away, since the PM holds the connection to the underlying validated requirements
-C) PMs should never be involved in any aspect of visual design, including wireframe review
-D) This practice is ideal, since designers are always better positioned to catch requirement mismatches than PMs
+A) Ideal, since designers catch requirement mismatches better than PMs
+B) PMs should stay out of visual design work, wireframe review included
+C) No critique applies; wireframe review belongs to design alone
+D) The PM holds the link to validated requirements and should check them
 
-*Correct answer: B*
-*Explanation: This directly reflects Common Mistake 5 — the PM's continued involvement in checking wireframes against specified acceptance criteria and journey map touchpoints is explicitly recommended, not something to be fully delegated away.*
+*Correct answer: D*
+*Explanation: Designers own the layout craft. Whether the layout covers the negative scenario someone specified three weeks ago is a question the PM is best placed to ask.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team is deciding between two options: spending an extra day iterating on multiple rough wireframe variations before committing to one, or moving directly to a single polished mockup to save time. Using this lesson's arguments, which option is generally preferable, and why?**
-A) Moving directly to a single polished mockup, since more time spent on any stage is inherently wasteful
-B) Spending the extra day iterating on rough wireframe variations, since structural changes are dramatically cheaper to make at low fidelity than after visual polish has been invested, potentially saving significantly more time later if a structural issue would otherwise be discovered post-polish
-C) Both options are equally time-efficient regardless of when structural issues are discovered
-D) Neither option matters, since visual design has no bearing on structural quality
+A) Both options prove equally time-efficient whenever the issues surface
+B) Visual design has no bearing on structural quality either way
+C) Go straight to the mockup, since extra stages waste time
+D) Iterate rough variations; structural change costs far less early
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core economic argument for wireframing — the cost of structural change increases significantly at higher fidelity stages, making early, low-fidelity iteration a net time-saver even though it adds an explicit step, as shown by the costly outcome in the Detailed Case Study.*
+*Correct answer: D*
+*Explanation: The extra day buys cheap reversibility. The case study is what the alternative costs when a hierarchy problem is found after the polish is already paid for.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team produces a genuinely low-fidelity wireframe, explicitly frames the review as structural, and receives excellent structural feedback that leads to several layout changes. The team then moves to a polished mockup stage — but upon final user testing, discovers that the same information-hierarchy problem from this lesson's Detailed Case Study has somehow reappeared. What does this scenario suggest, and what should the team check?**
-A) Wireframing is fundamentally ineffective, since the same problem reappeared despite following the correct process
-B) The team should check whether the structural changes agreed upon during the wireframe review were actually and faithfully carried through into the subsequent mockup and prototype stages, since a correct wireframing process does not automatically guarantee that its conclusions survive translation into later, higher-fidelity stages
-C) The mockup stage should be eliminated entirely from the process going forward
-D) This outcome is unrelated to the wireframing process and should be attributed entirely to user testing methodology
+A) Wireframing fails as a technique, since the problem returned anyway
+B) Check the agreed changes survived into the mockup stage
+C) The mockup stage should be dropped from the process going forward
+D) This is unrelated to wireframing and belongs to testing methodology
 
 *Correct answer: B*
-*Explanation: This tests a subtler point — even a well-executed wireframing stage doesn't automatically guarantee that its structural conclusions are faithfully preserved through subsequent fidelity increases; the team should specifically verify that the mockup stage carried forward the wireframe's validated structural decisions, rather than assuming success at one stage guarantees success at all subsequent stages.*
+*Explanation: Conclusions do not carry themselves up the Fidelity Ladder. A decision agreed at the wireframe stage can quietly be lost in translation to the next artifact unless someone checks.*
 *Learning objective tested: #1, #3*
 *Difficulty: Hard*
 

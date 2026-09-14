@@ -418,195 +418,195 @@ There is no single correct answer. The purpose of this exercise is to practice q
 ## Quiz
 
 **1. Which of the following best describes the key difference between demographic/firmographic segmentation and behavioral/needs-based segmentation?**
-A) Demographic segmentation is always more accurate than behavioral segmentation
-B) Demographic segmentation is easy to measure but often weakly predictive of actual behavior; behavioral segmentation is harder to measure but more strongly predictive when validated
-C) Behavioral segmentation can only be used for consumer products, never for B2B products
-D) There is no meaningful difference between the two approaches
+A) Behavioural segmentation suits consumer products but never B2B ones
+B) Demographic segmentation proves more accurate than behavioural in all cases
+C) Demographic is easy to measure, behavioural more truly predictive
+D) There is no meaningful difference between the two at all
 
-*Correct answer: B*
-*Explanation: This is the lesson's core distinction — ease of measurement does not imply predictive validity, and the two approaches trade off convenience against actual predictive strength.*
+*Correct answer: C*
+*Explanation: The trade is convenience against predictive strength. Company size sits in the CRM already; the underlying job requires the research investment this module has been building toward.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Under what condition, according to this lesson, can a demographic attribute serve as a legitimate segmentation basis?**
-A) Whenever it is convenient to measure, regardless of validation
-B) When it has been genuinely validated as correlating with an actual underlying behavioral driver, rather than simply assumed
-C) Only when the demographic attribute is company size specifically
-D) Demographic attributes can never serve as a legitimate segmentation basis under any circumstances
+A) Whenever it is convenient to measure, whatever the validation status
+B) When validated as correlating with a real behavioural driver
+C) Just where the attribute in question is company size
+D) Demographic attributes are never a legitimate basis in any situation
 
 *Correct answer: B*
-*Explanation: The lesson explicitly allows for demographic proxies, but only when genuinely validated against actual behavior, not assumed based on convenience.*
+*Explanation: Demographics can be honest proxies. What makes one legitimate is a checked correlation with the behaviour that actually drives the decision, rather than an assumed one.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. In the Detailed Case Study, what was the actual underlying behavioral driver of feature sophistication and support needs?**
-A) Company revenue
-B) Whether the company had a dedicated, specialized marketing team versus marketing managed by a generalist role
-C) The company's geographic location
-D) The number of years the company had used the product
+A) The number of years the company had been using this particular product
+B) The company's geographic location and regional office spread
+C) The company's annual revenue as recorded in the sales system
+D) Whether marketing sat with a dedicated specialist or a generalist
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies dedicated-team-versus-generalist role structure as the real underlying driver, distinct from the assumed firmographic proxy of company size.*
+*Correct answer: D*
+*Explanation: Role structure was doing the work that company size was being credited for. A small firm with a specialist and a large one with a generalist both broke the assumed pattern.*
 *Learning objective tested: #2, #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What is the purpose of the "actionability check" in the Segmentation Validity Chain?**
-A) To determine whether a segmentation scheme is easy to present in a slide deck
-B) To confirm that a statistically real difference between groups is also large enough and identifiable enough to justify meaningfully different treatment
-C) To measure how many customers fall into each segment
-D) To check whether segment names are memorable
+A) To confirm a real difference is big and identifiable enough to act on
+B) To determine how many customers currently fall into each segment
+C) To check whether the chosen segment names are memorable enough
+D) To judge whether the scheme presents well in a leadership slide deck
 
-*Correct answer: B*
-*Explanation: The actionability check specifically evaluates whether a real difference is practically useful, not merely statistically detectable.*
+*Correct answer: A*
+*Explanation: A difference can be statistically real, too small to change any treatment, and impossible to detect in a new customer without manual digging. All three have to clear, not just the first.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What is "segmentation for its own sake"?**
-A) A segmentation scheme validated using both qualitative and quantitative methods
-B) The failure pattern of building a rigorous, valid segmentation scheme that never actually informs any real decision, providing no practical value despite its analytical sophistication
-C) A segmentation scheme based entirely on demographic convenience
-D) A segmentation scheme used only for tactical personalization purposes
+A) A scheme validated with both qualitative and quantitative methods
+B) A scheme resting wholly on demographic convenience without checks
+C) A rigorous, valid scheme that never informs any real decision and so adds no value
+D) A scheme used for tactical personalisation rather than strategy
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the failure pattern — validity and rigor alone are insufficient if the segmentation never actually changes a real decision.*
+*Correct answer: C*
+*Explanation: The research can be sound and the output still worthless, because the test this curriculum keeps applying is whether anything the team does next actually changes.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. Which of the following best distinguishes strategic targeting segmentation from tactical personalization segmentation?**
-A) Strategic segments are many and granular; tactical segments are few and broad
-B) Strategic segments are few, stable, and broad, guiding long-horizon strategy; tactical segments are many, dynamic, and granular, driving individualized experiences
-C) There is no meaningful distinction between the two; the same segments always serve both purposes equally well
-D) Strategic segmentation is only used by startups, while tactical segmentation is only used by large companies
+A) Strategic segments are few and stable; tactical many and dynamic
+B) Strategic segments are many and granular; tactical few and very broad
+C) The same segments always serve both purposes equally well in practice
+D) Strategic segmentation suits startups while tactical suits large firms
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit distinction, and it explicitly warns that conflating the two purposes tends to produce a poor fit for both.*
+*Correct answer: A*
+*Explanation: "Mid-market logistics firms" guides where to point the roadmap. Deciding which tooltip a given user sees next needs something far more granular and far more current.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what specific mistake occurred at the earliest stage of the segmentation process?**
-A) The company conducted quantitative validation but skipped qualitative research
-B) The segmentation was operationalized into pricing, onboarding, and support structures without any qualitative or quantitative validation of the assumed correlation between company size and marketing sophistication
-C) The company only interviewed enterprise customers
-D) The company used behavioral segmentation exclusively, without any firmographic data at all
+A) The company interviewed only its enterprise customers at the outset
+B) The company ran quantitative work but skipped the qualitative side
+C) The company used behavioural segmentation with no firmographic data at all
+D) The scheme was operationalised without validating the assumed correlation
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies the lack of any validation step — qualitative or quantitative — before the firmographic scheme was operationalized across major business functions.*
+*Correct answer: D*
+*Explanation: Pricing, onboarding, and support were all restructured around a correlation nobody had checked. The failure was upstream of any particular method, in skipping validation entirely.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. Why does this lesson caution against treating a validated demographic proxy as if it were the actual underlying cause of a behavioral difference?**
-A) Because demographic proxies are never actually correlated with real behavior
-B) Because the segmentation risks being misapplied whenever the correlation breaks down for an atypical case, since the proxy is not itself the real driver
-C) Because demographic data is always inaccurate
-D) Because underlying causes can never be identified through research
+A) Because demographic data is inaccurate in nearly every real case
+B) Because underlying causes can never be identified through research
+C) Because the correlation breaks for atypical cases and miscategorises them
+D) Because proxies are rarely correlated with real behaviour in practice
 
-*Correct answer: B*
-*Explanation: The lesson explains that conflating a proxy with the actual cause creates risk precisely because the correlation is not perfect — atypical cases (an unusually small company with complex needs, for instance) will be miscategorized.*
+*Correct answer: C*
+*Explanation: Size correlates with organisational complexity and is not the same thing as it. The small company with heavy compliance needs is exactly where the proxy quietly fails.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team discovers a statistically significant, real difference in usage patterns between two customer groups, but the difference is small in magnitude and there's no reliable way to identify which group a new customer belongs to without extensive manual investigation. According to this lesson, what should the team conclude?**
-A) This is automatically a highly useful segmentation basis, since the difference is statistically real
-B) The segmentation likely fails the actionability check — even though the difference is real, it may not be large enough or identifiable enough to justify differentiated treatment in practice
-C) The team should immediately build separate pricing tiers around this distinction
-D) Statistical significance alone always guarantees a useful segmentation basis regardless of practical considerations
+A) It likely fails the actionability check, despite being statistically real
+B) Build separate pricing tiers around the distinction straight away
+C) Statistical significance alone guarantees a useful segmentation basis
+D) This is automatically a highly useful basis, since the difference is real
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit actionability check — a real, statistically valid difference is not automatically useful unless it is also large enough and identifiable enough to warrant differentiated treatment.*
+*Correct answer: A*
+*Explanation: Significance says the difference exists. Usefulness needs it to be large enough to warrant different treatment and cheap enough to detect, and neither holds here.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A company has built a sophisticated, quantitatively validated ten-segment scheme, but discovers that no team has actually used any of the segments to inform pricing, messaging, or roadmap decisions in over a year. According to this lesson, what does this indicate?**
-A) The segmentation is inherently flawed and should never have been built, regardless of its validation
-B) This is an instance of "segmentation for its own sake" — the scheme may be analytically valid, but has provided no practical value because it was never actually used to inform a real decision
-C) Ten segments is always too many, regardless of whether they are used
-D) The company should immediately discard all data related to the segmentation
+A) Ten segments is too many, whether or not any of them get used
+B) The company should discard all data relating to the segmentation
+C) An instance of segmentation for its own sake, valid but never applied to a decision
+D) The scheme is inherently flawed and should not have been built at all
 
-*Correct answer: B*
-*Explanation: This is a direct instance of the "segmentation for its own sake" failure pattern — validity alone does not confer practical value if the segmentation was never actually applied to real decisions.*
+*Correct answer: C*
+*Explanation: Nothing here says the analysis was wrong. It says a year of rigour produced no change in what anyone did, which is the whole of the failure.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes segmenting a customer base entirely by industry vertical, with no mention of any qualitative or quantitative validation of behavioral differences across those verticals. What might this signal, based on this lesson's Interview Perspective section?**
-A) A strong, sophisticated segmentation approach
-B) A possible default to firmographic convenience without validating whether industry actually correlates with meaningfully different behavior or needs
-C) That industry-based segmentation is always the correct approach for any product
-D) Nothing meaningful, since industry segmentation is universally valid across all product categories
+A) A possible default to firmographic convenience with no behavioural validation
+B) A strong and sophisticated approach to customer segmentation work
+C) That industry segmentation is the correct approach for any product
+D) Nothing of note, since industry segmentation holds across categories
 
-*Correct answer: B*
-*Explanation: The lesson's Interview Perspective explicitly looks for evidence of validation before accepting any demographic or firmographic segmentation basis, treating an unvalidated default as a weaker signal.*
+*Correct answer: A*
+*Explanation: Vertical is available in the CRM, which is why it gets reached for. The interviewer is listening for whether anyone checked that it predicts anything about how these customers behave.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team wants to use its broad, strategic three-segment scheme (small, mid-market, enterprise) to drive granular, real-time in-product personalization decisions (e.g., which of fifty possible onboarding tooltips to show a specific new user). According to this lesson, what is the likely outcome?**
-A) This will work perfectly, since any valid segmentation scheme is equally useful for any purpose
-B) This is likely to produce a poor fit, since strategic segments (few, stable, broad) are generally not granular or dynamic enough to drive effective tactical personalization decisions
-C) The three-segment scheme should be immediately discarded for all purposes, including its original strategic use
-D) Real-time personalization always requires demographic data rather than behavioral data
+A) This works well, since a valid scheme serves any purpose equally
+B) Real-time personalisation always needs demographic rather than behavioural data
+C) The three-segment scheme should be discarded for every purpose now
+D) A poor fit; strategic segments lack the needed granularity
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit warning against conflating strategic and tactical segmentation purposes — a broad, stable scheme is unlikely to provide the granularity needed for effective real-time personalization.*
+*Correct answer: D*
+*Explanation: Three stable bands cannot choose between fifty tooltips. The scheme is not wrong, it is simply built at the wrong resolution for this job.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer asks a candidate how they would respond if senior leadership insisted on continuing to use an existing firmographic segmentation scheme despite emerging evidence (from support tickets and interviews) suggesting it poorly predicts actual customer needs. A weak answer would most likely include which of the following?**
-A) Proposing a structured qualitative-then-quantitative validation process to test whether the existing scheme, or an alternative behavioral distinction, better predicts actual outcomes
-B) Immediately abandoning the existing scheme without presenting any validating evidence to leadership
-C) Deferring entirely to leadership's preference without proposing any validation process, despite the emerging contrary evidence
-D) Using both qualitative and quantitative evidence to make an explicit, evidence-based case for reconsidering the scheme
+A) Propose a qualitative-then-quantitative process to test which scheme predicts better
+B) Abandon the existing scheme at once without presenting any evidence
+C) Use both kinds of evidence to make an explicit case for reconsidering it
+D) Defer entirely to leadership without proposing any validation
 
-*Correct answer: C*
-*Explanation: Deferring entirely without proposing any validation process, despite clear emerging evidence, reflects a weak, non-diagnostic response — in contrast to the more rigorous, evidence-based approaches in the other options.*
+*Correct answer: D*
+*Explanation: Evidence has surfaced and the response is to do nothing with it. Abandoning the scheme unilaterally is also weak, but at least engages the finding rather than shelving it.*
 *Learning objective tested: #2, #3*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team validates, through both qualitative interviews and quantitative behavioral analysis, that "whether a company has a dedicated specialist role for a given function" strongly predicts product needs across multiple product categories the company sells into. What broader principle does this finding illustrate, connecting back to Lesson 6?**
-A) Company size is always the best segmentation basis regardless of product category
-B) The underlying job to be done (echoing Lesson 6) — shaped by role dedication and organizational structure — can be a more reliable, generalizable predictor of behavior than a superficial firmographic attribute like company size
-C) Firmographic segmentation should never be validated, since it is inherently unreliable
-D) Behavioral segmentation is only relevant for B2C products, not B2B products
+A) Company size remains the best basis whatever the product category
+B) The underlying job, shaped by role structure, predicts better than firmographics
+C) Firmographic segmentation should never be validated at all, being inherently unreliable
+D) Behavioural segmentation matters for consumer products, not business ones
 
 *Correct answer: B*
-*Explanation: This connects the lesson's core argument directly back to Lesson 6 — the underlying job (shaped here by role dedication) is the more fundamental, generalizable driver, of which firmographic attributes are, at best, an imperfect proxy.*
+*Explanation: That the finding generalises across categories is the tell. It is tracking something about the work being done rather than an attribute of the company doing it.*
 *Learning objective tested: #2, #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A company has validated a genuine, actionable behavioral segment, correctly distinguished it from its strategic-targeting segments, and used it successfully to drive tactical personalization decisions for two years. The underlying market then undergoes a significant shift (e.g., a major shift in how the product category is typically used). What is the most appropriate response, according to this lesson's principles combined with Lesson 14's guidance on revisiting personas?**
-A) Continue using the existing segmentation indefinitely, since it was validated correctly at the time
-B) Recognize that, like personas and journey maps, a validated segmentation scheme can become outdated as markets and behavior shift, and conduct fresh qualitative and quantitative validation to check whether the scheme still accurately reflects current customer behavior
-C) Discard the segmentation scheme entirely and revert to a purely firmographic approach
-D) Assume the segmentation remains valid permanently, since it was rigorously validated using both qualitative and quantitative methods originally
+A) Continue using the existing segmentation, since it validated correctly then
+B) Revalidate it, since schemes go stale as markets shift
+C) Discard the scheme and revert to a purely firmographic approach instead
+D) Assume permanent validity, given the original rigour of both methods used
 
 *Correct answer: B*
-*Explanation: This integrates this lesson's validation discipline with Lesson 14's periodic-revisiting principle — even a rigorously validated scheme requires re-validation as markets and behavior evolve, rather than being treated as permanently fixed or abandoned in favor of an unvalidated alternative.*
+*Explanation: The same currency principle governs personas, journey maps, and segments alike. Original rigour says the scheme was right about the old market, not the new one.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 

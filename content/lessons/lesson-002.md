@@ -354,195 +354,195 @@ There is no single correct answer. Work through the following before reading fur
 ## Quiz
 
 **1. What is the defining characteristic of a project, as distinguished from a product?**
-A) It requires more engineers
-B) It has a defined scope and a genuine end date
-C) It is always more important than a product
-D) It cannot be managed by a Product Manager
+A) It is staffed with a dedicated cross-functional team
+B) It is evaluated on the outcomes it produces over time
+C) It has a defined scope and a genuine end date
+D) It is owned by a program manager rather than a PM
 
-*Correct answer: B*
-*Explanation: A project's defining trait is a temporary duration with a specific deliverable and finish line, unlike a product, which has no natural end state.*
+*Correct answer: C*
+*Explanation: A project is a temporary endeavor with a specific deliverable and a real finish line. Team structure, evaluation basis, and who manages it are all variable; the bounded scope and end date are what make it a project.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why is "is this product done?" typically the wrong question for a healthy, actively served product?**
-A) Products are never evaluated
-B) User needs continue to evolve, so a product that stops evolving is stagnating rather than "finished" in a successful sense
-C) Products do not have users
-D) Only projects can be evaluated for completion
+A) Because products are evaluated by leadership rather than by users
+B) Because a product's scope is agreed at launch and rarely revisited
+C) Because user needs keep evolving, so a static product is stagnating
+D) Because only the engineering team can judge when work is complete
 
-*Correct answer: B*
-*Explanation: Because user needs, competition, and technology keep changing, an actively served product has no natural finish line; "done" applies more sensibly to projects.*
+*Correct answer: C*
+*Explanation: Competitors, technology, and user needs all keep moving, so a product that stops evolving is not finished in any successful sense — it is losing ground. Products that are genuinely done are usually ones the company has chosen to sunset.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. How does a single product typically relate to projects over its life?**
-A) A product and a project are the same thing
-B) A product is delivered and evolved through a sequence of discrete projects, each with its own scope and end date
-C) A product can only ever have one project associated with it
-D) Projects replace the need for a product entirely once shipped
+A) Each product corresponds to exactly one project from launch onward
+B) Projects replace the product once the initial deliverable has shipped
+C) Products and projects describe the same work at different altitudes
+D) A product is evolved through a sequence of separately scoped projects
 
-*Correct answer: B*
-*Explanation: As described in the River and Bridge model, a product persists across many individual, well-scoped projects over time.*
+*Correct answer: D*
+*Explanation: The River and Bridge model captures this: the product is the river that keeps flowing, and each project is a bridge built across it with its own scope and completion date.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **4. In the CRM Case Study, what was the fundamental organizational mistake made across all three years?**
-A) The engineering quality was poor
-B) The company staffed the CRM with rotating project teams instead of a standing product team accountable for its ongoing fit with evolving customer needs
-C) The company never launched a CRM
-D) Customers never provided feedback
+A) The engineering quality of each release was too low to retain customers
+B) Rotating project teams replaced a standing team accountable for the product
+C) Customer feedback was collected but never routed back to the build team
+D) The scope agreed for each yearly release was consistently too ambitious
 
 *Correct answer: B*
-*Explanation: Each project team executed correctly, but no team held ongoing accountability for the product's continued fit with changing user needs, so the same gap reopened repeatedly.*
+*Explanation: Every project team delivered its scope correctly. The gap was structural: no one held continuing accountability for the CRM's fit with changing customer needs, so the company kept building bridges while nobody watched the river.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Which of the following is typically true about how projects are funded and evaluated, compared to products?**
-A) Projects are evaluated on ongoing outcomes; products are evaluated on delivery
-B) Projects are typically evaluated on delivery (schedule, budget, scope); products are typically evaluated on ongoing outcomes (retention, revenue, engagement)
-C) Both are evaluated identically in all companies
-D) Neither is ever evaluated formally
+A) Projects are judged on delivery; products are judged on outcomes over time
+B) Projects are judged on outcomes; products are judged on delivery to schedule
+C) Projects receive ongoing funding; products receive one fixed budget each
+D) Projects and products are both judged mainly on engineering throughput
 
-*Correct answer: B*
-*Explanation: This mirrors the lesson's discussion of funding/evaluation differences, which also connects to the output vs. outcome distinction from Lesson 1.*
+*Correct answer: A*
+*Explanation: Projects are usually given a fixed budget and measured on scope, schedule, and budget. Products are funded on a continuing basis and measured on retention, revenue, and engagement — a direct consequence of the output versus outcome distinction.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. According to the Finite/Infinite Work framework, which of the following is best categorized as "finite work"?**
-A) Improving overall user retention indefinitely
-B) A contractual integration a partner requires to be delivered by a specific date
-C) Continuously growing revenue
-D) Maintaining product-market fit over time
+A) Improving the product's overall retention rate over the coming years
+B) Keeping the product more valuable to users than the alternatives
+C) Growing recurring revenue sustainably across the customer base
+D) Delivering a partner integration by the date a contract specifies
 
-*Correct answer: B*
-*Explanation: A contractual deliverable with a specific date has a defined scope and win condition — the hallmark of finite work, appropriately managed as a project.*
+*Correct answer: D*
+*Explanation: Finite work has a defined win condition and a real endpoint. A contractual integration with a fixed date qualifies; retention, relative value, and revenue growth are all directions of travel with no final moment of completion.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. A PM says: "Our roadmap has hard delivery dates for every initiative through the next two years, regardless of what we learn along the way." What mistake does this most likely reflect?**
-A) No mistake — this is a best practice
-B) Treating the roadmap like a fixed project plan, rather than allowing infinite, evidence-driven product work to remain flexible
-C) The PM is using too many Mermaid diagrams
-D) The roadmap is too short-term
+A) Treating the roadmap as a fixed project plan that cannot absorb new evidence
+B) Setting a planning horizon that is too short for a product of this maturity
+C) Committing to outcomes rather than to the outputs leadership asked for
+D) Delegating roadmap sequencing to the engineering team instead of owning it
 
-*Correct answer: B*
-*Explanation: This is Common Beginner Mistake #2 — applying rigid project-style planning to product work that should flex as new evidence emerges.*
+*Correct answer: A*
+*Explanation: This is Common Beginner Mistake #2. A roadmap that cannot flex when research or data arrives will either be broken by reality or defended past the point where it still makes sense.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. In the River and Bridge mental model, what does "the river" represent?**
-A) A single project's timeline
-B) The ongoing, continuous product and its underlying user need
-C) The engineering team's backlog
-D) A quarterly OKR
+A) The fixed timeline along which a single release is planned and tracked
+B) The backlog of work the engineering team has committed to this quarter
+C) The quarterly objectives leadership sets for the product organization
+D) The ongoing product and the continuing user need it exists to serve
 
-*Correct answer: B*
-*Explanation: The river represents the product — continuous and ongoing — while each bridge represents an individual, time-bound project built across it.*
+*Correct answer: D*
+*Explanation: The river is the product: continuous, flowing regardless of any single crossing. Each bridge is a bounded project built across it at a point in time, with a genuine completion date of its own.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does Amazon Prime serve as a useful illustration of the product/project relationship in this lesson?**
-A) Because Prime was completed in a single project in 2005 and has not changed since
-B) Because Prime has existed as an ongoing product for years, evolving through many discrete project launches (e.g., Prime Video, expanded delivery) without ever reaching a "finished" state
-C) Because Amazon does not use projects at all
-D) Because Prime is evaluated purely on project delivery metrics
+A) Prime was scoped and completed as one launch project and has held steady since
+B) Prime has evolved through many bounded launches without reaching a finished state
+C) Prime is evaluated purely on whether each benefit launched on its target date
+D) Prime demonstrates that large companies organize work without using projects
 
 *Correct answer: B*
-*Explanation: Prime illustrates a product that has continuously evolved through many bounded projects over time, with no single "done" state, consistent with the lesson's core distinction.*
+*Explanation: Prime has run since 2005 as a continuously evolving product, absorbing discrete launches — video, expanded delivery, grocery — each of which had a real finish line while the product itself never did.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **10. (Product Thinking) A team ships a new onboarding flow (a project) exactly on schedule and exactly to the agreed scope. Three months later, activation rates have not improved. What should this scenario be classified as, using the frameworks in this lesson?**
-A) A product failure and a project failure
-B) A project success and a possible product failure — the project delivered as scoped, but whether it served the underlying, ongoing user need remains unproven
-C) Proof that project thinking should never be used
-D) Evidence that the roadmap needs more Mermaid diagrams
+A) A project failure, because the agreed scope did not produce the intended result
+B) A product success, because the team delivered exactly what it had committed to
+C) A project success and an unresolved product question about the underlying need
+D) A planning failure, because three months is too short to read an activation shift
 
-*Correct answer: B*
-*Explanation: The project succeeded by its own definition (on schedule, on scope). Whether it served the product's ongoing outcome need is a separate question, unresolved by project completion alone — the exact distinction this lesson is built around.*
+*Correct answer: C*
+*Explanation: By its own definition the project succeeded — on time, on scope. Whether it served the ongoing user need is a separate question that project completion cannot answer, and it stays open until the outcome is measured.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked, "How would you plan a roadmap for a product with no clear end state?" A weak candidate responds by describing a rigid Gantt chart with fixed dates for the next 18 months. What does this reveal, per this lesson's Interview Perspective section?**
-A) Strong planning discipline
-B) A project-mindset default being incorrectly applied to inherently infinite, evidence-driven product work
-C) That the candidate has excellent technical skills
-D) Nothing — this is the correct approach for all roadmaps
+A) Strong delivery discipline applied to a domain that rewards predictability
+B) A project-mindset default applied to work that is inherently open-ended
+C) A preference for outcome themes over the fixed dates stakeholders want
+D) An understanding that roadmaps exist mainly to coordinate across teams
 
 *Correct answer: B*
-*Explanation: As covered in Interview Perspective, forcing a rigid, date-driven plan onto ongoing product work (rather than organizing around outcomes and flexible sequencing) signals a project-mindset default that interviewers are specifically listening for.*
+*Explanation: The interviewer is listening for whether the candidate can resist making a roadmap look like a fixed project plan. A strong answer organizes around outcomes and themes with evidence-driven sequencing instead.*
 *Learning objective tested: #2, #3*
 *Difficulty: Hard*
 
 ---
 
 **12. (Highest Difficulty, Product Thinking) A company's leadership says: "We finished the mobile app project last year, so mobile is handled — let's focus engineering elsewhere." Using both the Finite/Infinite Work framework and the River and Bridge model, what is the strongest argument a PM could make in response?**
-A) Agree — since the project was completed, no further investment is needed
-B) Argue that "the mobile app" is not itself a finite project but an ongoing product surface; last year's work was one bridge across that river, and user needs on mobile will keep evolving regardless of whether the original project is closed
-C) Argue that mobile apps are always less important than web products
-D) Argue that engineering resources should never be reallocated
+A) Mobile is an ongoing surface; last year's work was one bridge across it
+B) Mobile work should be paused until the next contractual deadline arrives
+C) Mobile deserves permanent staffing because app stores require frequent updates
+D) Mobile and web should be merged so a single team can own both surfaces
 
-*Correct answer: B*
-*Explanation: This applies the lesson's core distinction directly: "the mobile app project" (finite, completed) is different from "the mobile product surface" (infinite, ongoing), and completing the former does not discharge accountability for the latter.*
+*Correct answer: A*
+*Explanation: "The mobile app project" was finite and is genuinely closed. "The mobile product surface" is infinite and is not, because user needs there keep moving. Completing the first does not discharge accountability for the second.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **13. According to the lesson's Real World Perspective, why do PMs at early-stage startups typically operate almost entirely in "project mode"?**
-A) Because startups never build real products
-B) Because the entire company is often organized around a single upcoming launch that effectively is the product's current existence, not because project thinking is the permanent shape of the job
-C) Because startup PMs are less skilled than Big Tech PMs
-D) Because startups do not have engineers
+A) The company is often organized around one upcoming launch at that stage
+B) Early-stage products are simpler and need less ongoing outcome tracking
+C) Startup PMs are usually hired before the product strategy is defined
+D) Investors evaluate early-stage teams on delivery milestones exclusively
 
-*Correct answer: B*
-*Explanation: The Real World Perspective section explains this is a natural, temporary condition tied to early-stage company structure, not a lesser or permanent version of the PM role — the lesson explicitly warns the PM should recognize it as temporary.*
+*Correct answer: A*
+*Explanation: At that stage the imminent launch effectively is the product's current existence, so project mode is appropriate. The lesson's warning is that the PM should read this as a temporary condition rather than the permanent shape of the job.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **14. Common Beginner Mistake #4 warns against overcorrecting into believing "project mindset is simply wrong." What is the accurate takeaway instead?**
-A) Projects should never be used in product work under any circumstances
-B) Projects remain a legitimate way to organize discrete, deadline-bound work; the actual mistake is applying project-style finality to the product itself rather than to its bounded component pieces
-C) Only Big Tech companies should use projects
-D) Products and projects are interchangeable terms with no meaningful difference
+A) Project planning belongs to program managers rather than to product managers
+B) Project and product are interchangeable labels for the same underlying work
+C) Project methods suit large organizations but not small, fast-moving teams
+D) Project methods suit bounded work; the error is applying finality to the product
 
-*Correct answer: B*
-*Explanation: The lesson is explicit that project thinking is necessary and appropriate for bounded pieces of work (a compliance deadline, a partner integration); the error is applying that same finality to the ongoing product itself.*
+*Correct answer: D*
+*Explanation: Compliance deadlines, partner integrations, and conference launches are genuinely project-shaped and should be planned that way. The mistake is extending that sense of finality to the product itself rather than to its component pieces.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Highest Difficulty, Product Thinking) A mid-size company's newly hired Technical Program Manager (TPM) begins owning all delivery-mechanics work (schedules, cross-team dependencies), while the PM continues spending most of her time building detailed Gantt charts herself. Using the Real World Perspective section, what does this scenario most likely signal?**
-A) A healthy, well-functioning division of labor between the TPM and PM roles
-B) An unhealthy blurring of role boundaries — the specialized delivery function exists precisely so the PM can focus on ongoing, undefined-end product direction and outcome questions instead of defaulting back into project-only thinking
-C) That the company should eliminate the TPM role immediately
-D) That Gantt charts are always inappropriate in any context
+A) A healthy split in which both roles track delivery from different angles
+B) A staffing error that suggests the TPM role was added too early here
+C) A blurring of boundaries, since the TPM exists to free the PM for direction
+D) A sign the PM should transfer roadmap ownership to the TPM as well
 
-*Correct answer: B*
-*Explanation: The lesson explicitly states that a PM who continues to spend most of their time on delivery-mechanics tracking after a specialized delivery role exists is a signal that role boundaries have blurred unhealthily, since that function exists specifically to free the PM for direction and outcome work.*
+*Correct answer: C*
+*Explanation: The specialized delivery function exists so the PM can concentrate on open-ended direction and outcome questions. A PM who keeps doing delivery tracking after that role arrives has defaulted back into project-only thinking.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 

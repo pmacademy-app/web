@@ -390,195 +390,195 @@ There is no single correct answer. The purpose of this exercise is to practice d
 ## Quiz
 
 **1. Which of the following best distinguishes user research from an informal, unstructured conversation with a customer?**
-A) User research always takes longer to conduct
-B) User research uses deliberate methods designed to control for bias, sampling, and question framing, while informal conversation typically lacks this structure
-C) User research can only be conducted by a dedicated research team, never by a PM
-D) There is no meaningful distinction between the two
+A) It uses deliberate methods that control for bias
+B) It takes considerably longer to plan and to conduct
+C) It can only be run by a dedicated research team, not a PM
+D) It draws on larger samples than any informal conversation can
 
-*Correct answer: B*
-*Explanation: The lesson explicitly distinguishes user research by its deliberate, bias-aware methodology, not by who conducts it or how long it takes.*
+*Correct answer: A*
+*Explanation: The difference is method, not duration, headcount, or sample size. A hallway chat reaches the most accessible and most enthusiastic users, and drifts toward topics the interviewer already has views about.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Which type of research question is qualitative research best suited to answer?**
-A) What percentage of the user base experiences a specific problem?
-B) Why does a user abandon a workflow partway through, and what is their mental model of the problem?
-C) How does a specific pricing change affect conversion at scale?
-D) Is an effect observed in a small sample statistically significant across the full user base?
+A) What share of the user base hits this problem?
+B) Why does a user abandon a workflow partway through?
+C) Does this effect hold at scale across the whole base?
+D) How does a pricing change affect conversion by segment?
 
 *Correct answer: B*
-*Explanation: Qualitative research is suited to why/how questions requiring depth and open-ended follow-up, unlike quantitative methods better suited to prevalence and scale questions.*
+*Explanation: Depth and open-ended follow-up are what qualitative methods buy. The other three are prevalence and scale questions that need samples large enough to generalise from.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is the key difference between stated preference and revealed preference?**
-A) Stated preference is always more accurate than revealed preference
-B) Stated preference is what someone says they want or would do; revealed preference is what they actually do when given a real opportunity with real stakes
-C) Revealed preference can only be measured through surveys
-D) The two terms describe the same concept using different vocabulary
+A) Stated preference is consistently the more accurate of the two
+B) Stated is what people say; revealed is what they actually do
+C) Revealed preference can be captured only through survey instruments
+D) The two terms name the same concept in different vocabulary
 
 *Correct answer: B*
-*Explanation: This is the lesson's core distinction — stated preference reflects hypothetical or low-stakes responses, while revealed preference reflects actual behavior under real stakes.*
+*Explanation: The gap between the two is well documented and rarely dishonesty. Predicting your own behaviour in a hypothetical is genuinely hard, and nothing is at stake when you answer.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is the question "would you use this feature?" considered a common research trap?**
-A) Because users are always dishonest when answering survey questions
-B) Because there is no real cost to a generous, hypothetical answer, systematically overstating genuine future adoption intent
-C) Because this question is illegal to ask in most research contexts
-D) Because this question can only be asked in quantitative surveys, never in interviews
+A) Because respondents are generally dishonest in survey settings
+B) Because the question can be asked in surveys but not interviews
+C) Because a generous hypothetical answer costs the respondent nothing, so intent is overstated
+D) Because most research ethics boards prohibit hypothetical questions
 
-*Correct answer: B*
-*Explanation: The lesson explains this trap as a consequence of the stated-preference problem — answering "yes" costs the respondent nothing in the moment, unlike a real adoption decision.*
+*Correct answer: C*
+*Explanation: Saying yes in a research conversation carries none of the cost of an actual adoption decision. The answer is cheap, so it is systematically inflated relative to what people go on to do.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Which of the following best describes confirmation bias in the context of user research?**
-A) The tendency for respondents to answer in ways that make them look good
-B) The tendency to notice, weight, and remember evidence supporting an existing belief while discounting contradicting evidence
-C) The tendency for surveys to always contain leading questions
-D) The tendency for revealed preference data to be more reliable than stated preference data
+A) The tendency to answer so as to look good to the researcher
+B) The tendency of surveys to contain subtly leading question phrasing
+C) The tendency to weight evidence that supports an existing belief
+D) The tendency of revealed-preference data to outperform stated data
 
-*Correct answer: B*
-*Explanation: This is the lesson's definition of confirmation bias, distinct from social desirability bias (option A) and leading questions (a separate, related bias).*
+*Correct answer: C*
+*Explanation: A researcher who already likes an idea reads ambiguous responses more warmly than a neutral observer would. Option A describes social desirability bias, which is a different mechanism.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, why was the fitness app's survey an unrepresentative sample of the population most relevant to the conversion problem?**
-A) The survey was too long for most users to complete
-B) The survey could only be answered by users who were still engaged enough to respond, systematically excluding the larger population who had already disengaged within the first four days
-C) The survey asked about pricing instead of features
-D) The survey was sent to too many people, diluting the results
+A) Only users still engaged enough to respond could answer it
+B) The survey ran too long for most users to finish
+C) The survey asked about pricing rather than about feature value
+D) The survey went to too many people, which diluted the findings
 
-*Correct answer: B*
-*Explanation: The case study explicitly identifies the sample as excluding precisely the disengaged population whose behavior most needed to be understood, since only still-engaged users would respond to a survey at all.*
+*Correct answer: A*
+*Explanation: The people whose behaviour the team most needed to understand had already stopped opening the app, which meant they were structurally excluded from the instrument measuring them.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
-**7. What was the actual underlying cause of low conversion in the Detailed Case Study, as revealed by behavioral (revealed-preference) data?**
-A) The subscription price was too high
-B) Users disengaged from the app entirely within the first four days, well before price would have been a relevant factor
-C) Users did not understand how to cancel their free trial
-D) The app had significant technical bugs during the trial period
+**7. What was the actual underlying cause of low conversion in the Detailed Case Study, as revealed by behavioural (revealed-preference) data?**
+A) The subscription price sat above what the market would bear
+B) Users could not work out how to cancel their free trial
+C) The app carried significant technical defects during the trial
+D) Users disengaged within the first four days, long before price mattered
 
-*Correct answer: B*
-*Explanation: The follow-up behavioral investigation found early disengagement, not price, as the actual driver of non-conversion — the opposite of what the original survey suggested.*
+*Correct answer: D*
+*Explanation: Price was what the still-engaged minority named, and it was not what drove the outcome. The behavioural data placed the drop-off well upstream of any pricing decision.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
 **8. According to the Evidence Trustworthiness Ladder, which of the following would sit at the STRONGEST rung?**
-A) A stated-preference survey sent only to existing power users, using leading questions
-B) A stated-preference survey sent to a broad, representative sample, using neutral questions
-C) Revealed-preference data from a genuine, larger-scale A/B experiment
-D) A handful of informal, enthusiastic hallway conversations
+A) A stated-preference survey of power users using leading questions
+B) A stated-preference survey of a broad sample using neutral wording
+C) Revealed-preference data from a genuine larger-scale experiment
+D) A handful of enthusiastic conversations held in the hallway
 
 *Correct answer: C*
-*Explanation: Revealed preference at larger scale (a genuine experiment or real usage data) occupies the strongest rung on the ladder, since it reflects actual behavior under real stakes at a scale sufficient to generalize.*
+*Explanation: Real behaviour under real stakes, at a scale sufficient to generalise, clears every bias the lower rungs are exposed to. A neutral broad survey is better than a leading one and still only reports intent.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A PM wants to know whether users would pay for a proposed premium feature. Which of the following research approaches would provide the strongest evidence, according to this lesson?**
-A) Asking a survey question: "Would you pay for this feature if it existed?"
-B) Asking only the company's most loyal existing subscribers whether they like the idea
-C) Offering a real, even if small-scale, pre-order or paid pilot and observing actual sign-up behavior
-D) Asking the sales team what they believe customers want
+A) A survey question asking whether they would pay if it existed
+B) A real pre-order or paid pilot, observing actual sign-up behaviour
+C) Asking the most loyal existing subscribers whether they like it
+D) Asking the sales team what they believe customers would be willing to pay
 
-*Correct answer: C*
-*Explanation: A real, small-stakes commitment (a pre-order or paid pilot) captures revealed preference, which the lesson identifies as far more reliable than stated-preference survey questions or secondhand stakeholder impressions.*
+*Correct answer: B*
+*Explanation: Willingness to pay is the classic case where stated and revealed preference part company. A small real commitment produces a signal that can come back negative; a survey answer cannot.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. Which of the following questions is the clearest example of a leading question, as described in this lesson?**
-A) "How do you currently manage this task?"
-B) "Don't you find it frustrating when this happens?"
-C) "What would you change about this experience, if anything?"
-D) "Can you walk me through the last time you did this?"
+A) "Can you walk me through the last time you did this task?"
+B) "What would you change about this experience, if anything?"
+C) "How do you currently manage this part of your workflow?"
+D) "Don't you find it frustrating when this happens?"
 
-*Correct answer: B*
-*Explanation: This question is phrased in a way that suggests a preferred answer (frustration), prompting agreement rather than an independent, genuine response, unlike the neutral, open-ended phrasing in the other options.*
+*Correct answer: D*
+*Explanation: The question supplies the emotion and invites agreement. The other three leave the respondent free to describe their own experience, including one that contains no frustration at all.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **11. (Product Thinking) A team has run five in-depth qualitative interviews suggesting a new onboarding flow reduces confusion. Before rolling the change out to the entire user base, what should the team most likely do next, according to this lesson's framework?**
-A) Roll the change out immediately to all users, since five interviews is sufficient evidence for any decision
-B) Treat the qualitative finding as a hypothesis and use a quantitative method (e.g., an A/B experiment) to test whether the effect holds and is significant at scale, before full rollout
-C) Discard the qualitative finding entirely, since qualitative research is never useful
-D) Repeat the same five interviews multiple times until the sample size feels sufficient
+A) Treat it as a hypothesis and test prevalence with a quantitative experiment before rollout
+B) Roll it out to all users, since five interviews settles the matter
+C) Discard the qualitative finding, since small samples prove nothing
+D) Repeat the same five interviews until the sample feels adequate
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's guidance on complementary methods — qualitative research generates a hypothesis, and quantitative research is the appropriate next step to test its prevalence and significance at scale before a costly full rollout.*
+*Correct answer: A*
+*Explanation: Five interviews are the right instrument for generating this hypothesis and the wrong one for claiming it holds across the base. The two methods are complementary, used in that order.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **12. (Interview Reasoning) A candidate describes their research process as consistently confirming the team's original hypothesis across every single project they've worked on. What might this most likely signal, according to this lesson's Interview Perspective section?**
-A) Exceptionally strong initial product instincts that never require correction
-B) A possible sign of confirmation bias contaminating the research process, since genuine research should sometimes surface disconfirming evidence
-C) That the candidate's team never needed to conduct research at all
-D) Nothing meaningful, since consistently confirmed hypotheses are the expected, normal outcome of good research
+A) Exceptional product instincts that require no correction at all
+B) No cause for concern, since consistently confirmed hypotheses are normal
+C) That the candidate's team had little real need to run research
+D) Possible confirmation bias, since real research sometimes disconfirms
 
-*Correct answer: B*
-*Explanation: The lesson's Interview Perspective explicitly treats an inability to produce a real example of disconfirming research findings as a signal of a research process that may lack genuine rigor.*
+*Correct answer: D*
+*Explanation: Research designed to be able to fail will occasionally fail. An unbroken record of confirmation is more likely to describe the method than the accuracy of the hypotheses.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **13. (Product Thinking, Higher Difficulty) A large-sample quantitative survey shows that 80% of respondents rate a proposed feature as "very appealing," but the team has no data on what specifically makes it appealing or what problem it solves for different types of users. According to this lesson, what is the most appropriate next step?**
-A) Proceed directly to full-scale delivery, since 80% approval is a strong quantitative signal
-B) Conduct qualitative research (interviews) to understand the why/how behind the appeal, since the quantitative survey alone cannot explain the underlying motivations or use cases driving that number
-C) Disregard the survey entirely, since quantitative methods are inherently less trustworthy than qualitative ones
-D) Repeat the identical survey with a larger sample size to increase confidence in the same limited finding
+A) Run qualitative interviews to understand what drives the appeal
+B) Proceed to full delivery, since 80% is a strong quantitative signal
+C) Disregard the survey, since quantitative work is less trustworthy
+D) Repeat the identical survey at larger scale to raise confidence
 
-*Correct answer: B*
-*Explanation: This reflects the complementary relationship between methods described in this lesson — a quantitative finding (prevalence of appeal) benefits from qualitative follow-up to understand the underlying why, rather than treating either method as sufficient alone.*
+*Correct answer: A*
+*Explanation: The survey establishes prevalence and explains nothing. Without knowing which job the appeal attaches to, the team cannot tell which version of the feature would actually deliver it.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **14. (Interview Reasoning, Higher Difficulty) An interviewer asks how a candidate would evaluate a piece of user research evidence before allowing it to influence a costly decision. A weak answer would most likely include which of the following?**
-A) Checking whether the sample was representative of the relevant population
-B) Accepting the finding at face value simply because it was labeled as "user research," without examining sample, question framing, or preference type
-C) Distinguishing whether the evidence reflects stated or revealed preference
-D) Considering whether the research method fits the type of claim being made (prevalence vs. depth of understanding)
+A) Checking whether the sample represented the relevant population
+B) Accepting it because it was labelled user research
+C) Distinguishing whether it captures stated or revealed preference
+D) Considering whether the method fits the claim being made from it
 
 *Correct answer: B*
-*Explanation: The lesson's trustworthiness checklist explicitly requires examining these specific factors; accepting labeled "research" uncritically, without checking sample, framing, or preference type, is precisely the weak, undisciplined approach this lesson warns against.*
+*Explanation: The label guarantees nothing about sample, framing, or preference type. The other three are the checklist questions that determine how much weight the finding has actually earned.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team recognizes that its usual research process disproportionately samples existing power users, and is designing a new study to correct for this. Which of the following study designs would MOST directly address that specific weakness, based on this lesson?**
-A) Sending the same survey to an even larger number of existing power users to increase the sample size
-B) Deliberately including non-users, churned users, and casual users in the sample, and pairing revealed-preference behavioral data with any qualitative interviews conducted
-C) Switching entirely from qualitative to quantitative methods, regardless of the specific research question being asked
-D) Asking existing power users to recommend other power users to interview, to expand the sample further
+A) Send the same survey to a larger number of existing power users
+B) Switch entirely to quantitative methods whatever the question is
+C) Ask power users to recommend further power users to interview
+D) Include non-users, churned and casual users, and pair interviews with behavioural data
 
-*Correct answer: B*
-*Explanation: The core weakness described is sample representativeness — deliberately including non-users, churned users, and casual users (rather than only more power users) directly addresses this, while also strengthening the evidence with revealed-preference data, consistent with this lesson's trustworthiness checklist.*
+*Correct answer: D*
+*Explanation: The defect is who is in the sample, not how many. Adding more power users, or asking them for referrals, deepens the same bias rather than correcting it.*
 *Learning objective tested: #1, #4, #5*
 *Difficulty: Hard*
 

@@ -430,195 +430,195 @@ There is no single correct answer. The purpose of this exercise is to practice a
 ## Quiz
 
 **1. What is the standard format for a user story, according to this lesson?**
-A) "The system shall [requirement]."
-B) "As a [role], I want [capability], so that [benefit]."
-C) "Given [context], when [action], then [result]."
-D) "The team will build [feature] by [date]."
+A) "Given [context], when [action], then [expected outcome]."
+B) "The team will build [feature] by the agreed target date."
+C) "As a [role], I want [capability], so that [benefit]."
+D) "The system shall provide [requirement] under all conditions."
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit standard format, distinct from a formal requirements statement, an acceptance-criteria format (covered in Lesson 24), or a project timeline statement.*
+*Correct answer: C*
+*Explanation: Option A is the acceptance-criteria format covered in Lesson 24, B is a delivery commitment, and D is a formal requirements statement. Only C names a role, a capability, and a reason.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why does this lesson emphasize the importance of the "so that" clause in a user story?**
-A) Because it is the only clause required for a story to be valid
-B) Because it provides context that allows implementers to make sound, independent judgment calls on ambiguous implementation details
-C) Because it must always be longer than the "I want" clause
-D) Because it is the only clause engineering teams are permitted to read
+A) Because it is the single clause a story truly requires to be valid
+B) Because it must invariably run longer than the "I want" clause
+C) Because engineering is only permitted to read that one clause
+D) Because it lets implementers judge ambiguous details soundly
 
-*Correct answer: B*
-*Explanation: The lesson explains that the "so that" clause supplies the underlying reason, which lets implementers fill in ambiguous details appropriately, directly connecting to Lesson 22's Precision Dial.*
+*Correct answer: D*
+*Explanation: The reason behind a capability is what lets someone resolve an unspecified detail sensibly on their own. A well-written "so that" is often what permits the "how" to stay open.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. What does the "I" in INVEST stand for?**
-A) Interesting
-B) Independent
-C) Iterative
-D) Integrated
+A) Independent — buildable without being blocked by other stories
+B) Iterative — delivered in repeated cycles over time
+C) Integrated — connected to the surrounding system
+D) Interesting — engaging enough to motivate the team
 
-*Correct answer: B*
-*Explanation: INVEST stands for Independent, Negotiable, Valuable, Estimable, Small, and Testable — "Independent" is the correct expansion of the first letter.*
+*Correct answer: A*
+*Explanation: The full set is Independent, Negotiable, Valuable, Estimable, Small, and Testable. Independence is what allows stories to be sequenced and dropped freely.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Which of the following user stories most clearly fails the "Valuable" INVEST criterion, as described in this lesson?**
-A) "As a customer, I want to receive an email confirmation after checkout, so that I know my order was successful."
-B) "As a developer, I want to refactor the payment module's internal code structure."
-C) "As a user, I want to filter search results by price, so that I can find products within my budget."
-D) "As an admin, I want to export a report as a CSV file, so that I can analyze it in a spreadsheet."
+A) "As a customer, I want an email confirmation after checkout, so I know it worked."
+B) "As a user, I want to filter by price, so I can stay in budget."
+C) "As an admin, I want to export a CSV report, so I can analyse it in a sheet."
+D) "As a developer, I want to refactor the payment module's code structure."
 
-*Correct answer: B*
-*Explanation: This item names no benefit to an actual product user or persona — it is a technical task written in story-format grammar, failing the "Valuable" criterion as this lesson defines it.*
+*Correct answer: D*
+*Explanation: The refactor may well be necessary and it delivers nothing a product user would notice. Tracking it honestly as a technical task keeps the value conversation clear.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. Which story-splitting technique would be most appropriate for an epic involving a multi-step booking-and-payment process?**
-A) Split by interface variations
-B) Split by workflow steps
-C) Split by data variations
-D) No splitting technique is appropriate for multi-step processes
+A) Split by workflow steps, taking booking and payment apart
+B) Split by data variations across differing input types
+C) Split by interface variations across several separate platforms
+D) No splitting technique suits a multi-step process here
 
-*Correct answer: B*
-*Explanation: A multi-step process is the specific scenario this lesson identifies as well-suited to a workflow-step split, provided each resulting step still delivers standalone value.*
+*Correct answer: A*
+*Explanation: A sequence of distinct steps is the textbook case for this split, provided each resulting step still stands on its own rather than becoming a fragment of the full flow.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. Why must every story-splitting result be re-checked against the INVEST criteria, according to this lesson?**
-A) Because splitting always produces perfectly formed stories automatically
-B) Because mechanical splitting can produce fragments with no standalone value, just as easily as genuine, independently valuable stories
-C) Because INVEST only applies to unsplit epics, not split stories
-D) Because re-checking is only necessary for stories split by data variations
+A) Because INVEST applies to unsplit epics rather than split stories
+B) Because splitting reliably yields perfectly formed stories by itself
+C) Because mechanical splitting can produce fragments with no standalone value
+D) Because re-checking matters only for splits by data variation
 
-*Correct answer: B*
-*Explanation: The lesson explicitly warns that splitting alone doesn't guarantee well-formed stories — the result must still be verified, particularly against "Valuable" and "Independent."*
+*Correct answer: C*
+*Explanation: Applying a technique correctly does not guarantee the output is a story. A username field and a password field are a clean split and neither one lets anybody log in.*
 *Learning objective tested: #3, #4*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what specific INVEST criterion did the original, unsplit expense-approval story clearly fail?**
-A) Testable
-B) Small
-C) Negotiable
-D) Independent
+A) Testable — no clear way to verify completion existed
+B) Negotiable — the implementation was fixed in advance
+C) Independent — it was blocked by other queued stories
+D) Small — six weeks is not a single sprint's work
 
-*Correct answer: B*
-*Explanation: The six-week estimated story clearly failed the "Small" criterion, which the lesson explicitly identifies as the core issue the team failed to address.*
+*Correct answer: D*
+*Explanation: Six weeks of estimated effort in one item is the failure the team could see and chose not to act on, and every later difficulty followed from it.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **8. What specific consequence resulted from the team's failure to split the expense-approval epic before an external policy change occurred?**
-A) The team was able to easily drop the now-unnecessary multi-level approval functionality without disruption
-B) The now-unnecessary functionality couldn't be dropped without re-estimating and restructuring nearly the entire remaining engineering effort, since it had been built as one tightly interwoven unit
-C) The policy change had no effect on the project at all
-D) The team was able to ship the entire epic ahead of schedule despite the policy change
+A) The team shipped the whole epic ahead of its schedule regardless
+B) The redundant work could not be dropped without restructuring the rest
+C) The team dropped the now-unnecessary approval logic without any disruption
+D) The external policy change had no effect on the project at all
 
 *Correct answer: B*
-*Explanation: The case study explicitly attributes this specific difficulty to the unsplit, tightly interwoven nature of the single large story, in contrast to how a properly split set of stories would have handled the same external change.*
+*Explanation: Built as one interwoven unit, the obsolete portion had no seam to cut along. A split set would have allowed the affected stories to be dropped and the rest to continue.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team splits a login feature into two separate stories: "build the username input field" and "build the password input field." According to this lesson, what is the likely problem with this split?**
-A) This is an excellent, well-formed split with no issues
-B) Neither resulting piece likely delivers standalone value on its own — a user cannot meaningfully log in with only a username field or only a password field — representing an over-split producing valueless fragments
-C) This split correctly follows the "split by interface variations" technique
-D) This split should have been done by data variations instead
+A) Over-split; neither fragment lets a user actually log in
+B) An excellent, well-formed split with no issues at all to address
+C) A correct application of the interface-variation technique
+D) A split that should have used data variations instead
 
-*Correct answer: B*
-*Explanation: This is a clear example of over-splitting — neither fragment provides standalone value to a user, echoing Lesson 21's car-wheel failure pattern at the level of individual stories.*
+*Correct answer: A*
+*Explanation: Shipping either one alone changes nothing for anybody. This is the car-wheel failure from Lesson 21, arriving at the scale of a single sprint item.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team has a story: "As a user, I want to see all products, filter by category, filter by price, and sort by rating, so that I can find what I need." According to this lesson, what is the most likely issue, and how should it be addressed?**
-A) This story is appropriately sized and requires no further action
-B) This story likely combines multiple distinct capabilities that should be split (e.g., by business rule/feature variation) into separate stories — basic product viewing, category filtering, price filtering, and sorting — each checked against INVEST individually
-C) This story should be discarded entirely, since filtering and sorting are never valuable features
-D) This story should be rewritten entirely in technical task format, since it involves multiple database queries
+A) Rewrite it entirely as a technical task, since it spans many queries
+B) Split it into separate capabilities, checked against INVEST
+C) Discard it outright, since filtering and sorting add little value
+D) Leave it as written; the story is appropriately sized already
 
 *Correct answer: B*
-*Explanation: This story bundles multiple distinct, likely independently valuable capabilities together, making it a strong candidate for splitting into separate, INVEST-compliant stories rather than being built or estimated as one large unit.*
+*Explanation: Four distinct capabilities are bundled here, and each plausibly delivers value alone. Estimating and building them as one unit forfeits that flexibility for no gain.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes routinely writing technical infrastructure work (e.g., "As a developer, I want to migrate our database to a new server") in user-story format alongside genuine, persona-valuable stories in the same backlog, without distinction. What might this signal, based on this lesson's Interview Perspective section?**
-A) Excellent backlog management practice with no meaningful concerns
-B) A likely instance of the "story as a disguised task" failure pattern, obscuring the genuine distinction between value-delivering and infrastructure-supporting work
-C) That the candidate has extensive technical expertise that should be considered a core strength
-D) Nothing meaningful, since all backlog items should always use identical formatting regardless of their nature
+A) Likely the disguised-task pattern, blurring value and infra work
+B) Excellent backlog management practice with no real concerns raised
+C) Deep technical expertise that counts as a core product strength
+D) Nothing of note, since every backlog item should share one single format
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit warning about mislabeling technical tasks as user stories, which obscures honest conversations about the trade-off between value-delivering work and infrastructure-supporting work during planning.*
+*Correct answer: A*
+*Explanation: The migration may be essential. Dressing it in story grammar makes it harder to have the honest planning conversation about how much capacity goes to user value versus foundations.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team splits an epic by business rule variations, producing a first story for the most common case and several subsequent stories for edge cases and variants. How does this practice connect to Lesson 21's MVP discipline?**
-A) It has no connection to MVP scoping principles
-B) It directly echoes Lesson 21's riskiest-assumption discipline — building and testing the most essential, common case first, before investing in less critical variants, mirrors scoping an MVP around what's necessary to test first
-C) Business rule variation splits should always be built in reverse order, starting with the rarest edge case
-D) This technique is only applicable to fully mature, post-MVP products, never to initial MVP scoping
+A) Business rule splits apply only to mature, post-MVP products
+B) It echoes the riskiest-assumption discipline: essential case first
+C) There is no connection to MVP scoping principles whatsoever
+D) Such splits should run in reverse, starting from the rarest edge case
 
 *Correct answer: B*
-*Explanation: Prioritizing the most common, essential case first when splitting by business rule variations directly parallels Lesson 21's discipline of testing the riskiest, most essential assumption before investing in less critical variants or polish.*
+*Explanation: Building the common case first and deferring the variants is the same logic as scoping an MVP around what must be tested now, applied to a single epic instead of a whole initiative.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a story that passes "Independent," "Negotiable," "Estimable," "Small," and "Testable," but the team is unsure whether it satisfies "Valuable." What is the strongest diagnostic question a candidate should ask, based on this lesson's Story Value Test?**
-A) "How long will this story take to estimate accurately?"
-B) "If this story were the only thing shipped this sprint, with nothing else, would the named persona or business genuinely be better off?"
-C) "Is this story written in the correct grammatical format?"
-D) "Has this story been assigned to a specific engineer yet?"
+A) "Has this story been assigned to a specific engineer yet?"
+B) "Is this story written in the correct grammatical format?"
+C) "If this shipped alone this sprint, would the persona be better off?"
+D) "How long will this story take the team to estimate accurately?"
 
-*Correct answer: B*
-*Explanation: This is the exact question posed by the Story Value Test, specifically designed to evaluate the "Valuable" criterion when it's in doubt.*
+*Correct answer: C*
+*Explanation: The question isolates value from every other property. If the honest answer is no, the item is either a fragment or a task, whatever its grammar and estimate look like.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team has an oversized story and considers two options: leaving it unsplit but committing extra sprint time to it, or applying a data-variation split that would produce a first story handling only the single most common input type, with additional types added later. According to this lesson, which option is generally preferable, and why?**
-A) Leaving it unsplit, since splitting always introduces unnecessary complexity
-B) Applying the data-variation split, since it allows incremental delivery of standalone value and greater flexibility if priorities or circumstances change mid-project, as shown in the Detailed Case Study
-C) Both options are equally preferable in all circumstances
-D) Neither option is appropriate; the story should be discarded entirely
+A) Neither option is appropriate; the story should be discarded outright
+B) Leave it unsplit, since splitting adds needless complexity
+C) Both options are equally preferable in essentially all circumstances
+D) Split it, enabling incremental value and resilience to change
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core argument, reinforced by the Detailed Case Study — splitting enables incremental value delivery and resilience to changing circumstances, which an oversized, unsplit story cannot provide.*
+*Correct answer: D*
+*Explanation: The case study showed what the unsplit path costs when circumstances shift mid-build. A split set delivers value earlier and can absorb a change without restructuring everything.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team applies a workflow-step split to a large epic, producing what appear to be several INVEST-compliant stories. Midway through implementation, however, engineering discovers that two of the "independent" stories actually share a tightly coupled underlying data model, such that changes to one frequently require rework in the other. What does this reveal about the team's original splitting process, and what should they do differently going forward?**
-A) Nothing went wrong; this level of coupling is unavoidable and expected in all split stories
-B) The "Independent" INVEST criterion was not actually satisfied for these two stories, despite initially appearing well-split — the team should recognize that a workflow-step split does not automatically guarantee technical independence, and should more explicitly verify independence (potentially in consultation with engineering) before finalizing a split as INVEST-compliant
-C) The stories should be immediately merged back into a single, unsplit epic and never split again
-D) This coupling issue is irrelevant to the INVEST criteria and does not need to be addressed
+A) The coupling is unavoidable and expected across all split stories
+B) Independence was never satisfied; verify it with engineering before finalising
+C) Merge them back into one epic and avoid splitting them again
+D) The coupling is irrelevant to INVEST and needs no attention
 
 *Correct answer: B*
-*Explanation: This tests a subtler point — a split that appears reasonable at the story-description level can still fail "Independent" at the technical implementation level, and genuine verification (ideally with engineering's input, given their visibility into underlying technical coupling) is needed beyond simply applying a splitting technique and assuming independence follows automatically.*
+*Explanation: A split can read as independent at the description level and be tightly bound underneath. Only the people who can see the data model are positioned to confirm that criterion.*
 *Learning objective tested: #2, #3*
 *Difficulty: Hard*
 

@@ -398,195 +398,195 @@ There is no single correct answer. The purpose of this exercise is to practice a
 ## Quiz
 
 **1. According to this lesson, when is a survey generally the most appropriate research method?**
-A) When exploring an entirely new, undefined problem space with no prior hypothesis
-B) When testing a specific hypothesis, often generated through prior qualitative research, across a larger population
-C) When a team wants to avoid talking to real customers entirely
-D) Only when a product has fewer than 100 total users
+A) When exploring a wholly new problem space with no prior hypothesis
+B) When a team wants to avoid speaking with real customers
+C) Only when a product has fewer than a hundred total users
+D) When testing an existing hypothesis across a large population
 
-*Correct answer: B*
-*Explanation: The lesson explains that surveys work best testing an already-formed hypothesis at scale, since they can only ask about what the designer already thought to ask, unlike open-ended interviews.*
+*Correct answer: D*
+*Explanation: A survey can only ask about what its designer already thought to ask. That makes it a poor instrument for exploration and a good one for measuring how widely a known hypothesis holds.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Which of the following is an example of a double-barreled survey question?**
-A) "How satisfied are you with the product's loading speed?"
-B) "How satisfied are you with the product's speed and ease of use?"
-C) "How often did you use this feature last week?"
-D) "How likely are you to recommend this product to a colleague?"
+A) "How satisfied are you with the product's speed and ease of use?"
+B) "How satisfied are you with the product's loading speed?"
+C) "How likely are you to recommend this product to a colleague?"
+D) "How many separate times did you use this feature during the last week?"
 
-*Correct answer: B*
-*Explanation: This question combines two distinct dimensions (speed and ease of use) into a single question, making the resulting answer difficult to interpret cleanly — the defining feature of a double-barreled question.*
+*Correct answer: A*
+*Explanation: A respondent may love the speed and struggle with the interface. One combined answer hides which of the two produced the score.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is the primary limitation of Net Promoter Score (NPS), as described in this lesson?**
-A) It cannot be calculated using a 0–10 scale
-B) It measures a hypothetical future action rather than actual behavior, and provides no insight into why a respondent scored as they did
-C) It can only be used by B2B companies
-D) It requires a minimum sample size of 10,000 respondents to be valid
+A) It requires a minimum of ten thousand respondents to be valid
+B) It can be applied meaningfully by business-to-business firms alone
+C) It cannot be computed on the standard zero-to-ten response scale
+D) It asks about a hypothetical action and explains nothing about why
 
-*Correct answer: B*
-*Explanation: NPS asks about a hypothetical recommendation (a stated-preference concern per Lesson 11) and, as a single number, offers no explanation of the underlying reasoning behind the score.*
+*Correct answer: D*
+*Explanation: A recommendation that may never happen is stated preference, and a single number carries no reasoning. NPS is useful for tracking direction and for flagging where to go and ask properly.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. Why does an in-app pop-up survey, shown only to currently active users, introduce sampling bias?**
-A) Because in-app pop-ups are technically difficult to implement
-B) Because it systematically excludes churned users, frustrated non-adopters, and other disengaged populations who may be most relevant to certain research questions
-C) Because active users always provide dishonest answers
-D) Because pop-up surveys always have leading questions by design
+A) Because pop-up surveys are technically difficult to implement well
+B) Because actively engaged users answer survey questions dishonestly
+C) Because it excludes churned and frustrated users from responding
+D) Because pop-up surveys carry leading questions by design
 
-*Correct answer: B*
-*Explanation: Restricting distribution to currently active users excludes precisely the population (churned, disengaged, or frustrated users) that questions about overall health or churn risk would most need to capture.*
+*Correct answer: C*
+*Explanation: The people who found the product frustrating enough to stop opening it are exactly the ones a health or churn question needs to reach, and the distribution method removes them before the first question is asked.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. In the Detailed Case Study, why did stable, positive NPS scores fail to predict the later spike in churn?**
-A) The NPS scale was mathematically miscalculated
-B) The survey's distribution method (requiring ten minutes of active session time) excluded disengaging users, who were the population actually driving the churn
-C) NPS is never a useful metric under any circumstances
-D) The company simply didn't collect enough NPS responses
+A) The NPS figure was mathematically miscalculated each quarter
+B) Net Promoter Score is never a useful metric in any context
+C) The company did not gather enough NPS responses to be sure
+D) The ten-minute session gate excluded the disengaging users
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the missed signal to a distribution-method bias that excluded exactly the population whose behavior was predictive of the churn problem.*
+*Correct answer: D*
+*Explanation: Requiring ten minutes of active session time before showing the survey meant only committed users ever saw it. The scores were accurate about the people who answered and silent about the people who left.*
 *Learning objective tested: #4, #5*
 *Difficulty: Easy*
 
 ---
 
 **6. According to this lesson, what should always accompany a tracked quantitative score like NPS?**
-A) Nothing — a single quantitative score is always sufficient on its own
-B) A mechanism (such as a mandatory open-ended follow-up question) for understanding the underlying reasoning behind the score
-C) A requirement that all respondents must also complete a lengthy in-person interview
-D) An immediate decision to change the product, regardless of the score's value
+A) An immediate product change, whatever the score
+B) A requirement that respondents also sit a long in-person interview
+C) A mechanism for understanding the reasoning behind the score
+D) Nothing further — a single tracked score is sufficient on its own
 
-*Correct answer: B*
-*Explanation: The lesson explicitly recommends pairing a quantitative score with a mechanism for understanding the "why," since the number alone doesn't explain the reasoning behind it.*
+*Correct answer: C*
+*Explanation: An open-ended follow-up, or planned qualitative work, is what turns a moving number into something a team can act on. The score says that something changed, not what.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
 **7. Why can a survey with a very large number of responses still produce misleading findings?**
-A) Large sample sizes are always statistically invalid
-B) A biased distribution method can produce a confident-looking result at scale without correcting for the underlying exclusion of a relevant population
-C) Large samples always contain more leading questions than small samples
-D) Survey platforms limit the accuracy of results once a certain sample size is reached
+A) Survey platforms lose accuracy past a certain response volume
+B) Larger samples tend to contain more leading questions than small ones
+C) A biased distribution is not corrected by more responses
+D) Very large sample sizes are statistically invalid by construction
 
-*Correct answer: B*
-*Explanation: This lesson explicitly warns that a large sample does not fix a biased distribution method — it simply produces a false sense of confidence at greater scale.*
+*Correct answer: C*
+*Explanation: Scale multiplies confidence, not representativeness. A large biased sample is a small biased sample with a more persuasive-looking chart attached.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. Which of the following best describes the Survey Validity Chain?**
-A) A sequence of checkpoints (distribution, question design, scale, sample/response rate, interpretation) where a break at any single link can invalidate the overall result
-B) A single-step process focused only on choosing the correct scale (Likert vs. NPS)
-C) A method for calculating statistical significance without needing to consider sample bias
-D) A checklist used only after a survey has already been fielded, with no relevance to survey design
+A) A single-step process concerned only with choosing the right scale
+B) Checkpoints where one broken link invalidates the result
+C) A method for computing significance without considering sample bias
+D) A checklist applied after fielding, irrelevant to survey design
 
-*Correct answer: A*
-*Explanation: The chain represents multiple sequential checkpoints, each of which can independently invalidate the survey's results regardless of how the others perform.*
+*Correct answer: B*
+*Explanation: A perfectly worded question sent to the wrong population fails at distribution; a representative sample asked leading questions fails at design. The numbers look equally clean either way.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team wants to know precisely why users abandon a specific onboarding step, an open-ended and not-yet-understood problem. According to this lesson, what is the most appropriate first research method?**
-A) A large-scale quantitative survey with predefined multiple-choice answer options
-B) Qualitative interviews (per Lesson 12), since the team does not yet have a specific hypothesis a survey could test
-C) An NPS survey sent to all users regardless of whether they experienced the onboarding step
-D) No research is needed; the team should simply guess based on internal opinion
+A) Qualitative interviews, since no specific hypothesis exists yet to test
+B) A large quantitative survey with predefined multiple-choice options
+C) An NPS survey sent to all users regardless of their onboarding path
+D) No research at all; decide from internal opinion about the flow
 
-*Correct answer: B*
-*Explanation: Since the team lacks a specific, already-formed hypothesis, qualitative interviews are the appropriate first step, consistent with the lesson's guidance that surveys work best testing hypotheses rather than exploring undefined problems.*
+*Correct answer: A*
+*Explanation: Predefined options can only return reasons the team already imagined. An interview can follow the unexpected thread, which is the whole point when the problem is not yet understood.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A survey shows a small average difference between two feature versions (3.8 vs. 4.1 on a 5-point Likert scale). According to this lesson, what should a team be cautious about before treating this as a meaningful, decision-worthy difference?**
-A) Nothing — any numeric difference should be treated as decisive
-B) Individual variation in how respondents use Likert scales (central tendency bias and similar effects) can produce noise of this magnitude, so a small difference may not reflect a meaningful underlying sentiment gap
-C) Likert scales cannot be used for comparing two different feature versions under any circumstances
-D) The team should immediately discard both feature versions
+A) Individual scale-use variation can produce noise of this size
+B) Nothing — any numeric difference should be treated as decisive
+C) Likert scales cannot compare two feature versions in any case
+D) The team should discard both versions and start the work again
 
-*Correct answer: B*
-*Explanation: The lesson explicitly warns against over-interpreting small Likert-average differences, given known individual-level noise in how people use rating scales.*
+*Correct answer: A*
+*Explanation: Some respondents never pick the endpoints whatever they feel. That central-tendency effect alone can move an average by a few tenths without any underlying sentiment gap.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) An interviewer presents a scenario where survey results show high satisfaction but churn is rising, and asks a candidate how to reconcile this. A weak answer would most likely do which of the following?**
-A) Immediately question the survey's distribution method and consider whether a relevant population was excluded
-B) Accept both figures as simply contradictory and unresolvable, without further investigation
-C) Propose supplementary outreach to disengaging or churned users who may have been excluded from the original survey
-D) Ask what the survey's actual questions were, to check for leading or double-barreled phrasing
+A) Question the distribution method and which population was excluded
+B) Accept both figures as contradictory and leave it unresolved
+C) Propose outreach to churned users excluded from the original survey
+D) Ask what the questions were, checking for leading phrasing
 
 *Correct answer: B*
-*Explanation: The lesson's Interview Perspective explicitly frames immediate suspicion of sampling or distribution bias as the strong response; treating the two figures as simply irreconcilable without further investigation reflects a weaker, less diagnostic approach.*
+*Explanation: The two figures are not in conflict once you ask who answered. Treating the contradiction as a dead end skips the diagnostic step the scenario was built to elicit.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team wants to track customer sentiment about a specific feature over multiple quarters. Which of the following practices would most undermine the validity of that tracked trend, according to this lesson?**
-A) Using the same Likert scale and wording consistently across each quarterly wave
-B) Changing the survey's question wording or scale between waves, making comparisons across time unreliable
-C) Pairing the tracked score with an open-ended follow-up question each quarter
-D) Distributing the survey to a consistent, well-defined population across waves
+A) Using the same Likert scale and wording in each wave
+B) Changing question wording or scale between measurement waves
+C) Pairing the tracked score with an open-ended follow-up each quarter
+D) Distributing to a consistent, well-defined population across waves
 
 *Correct answer: B*
-*Explanation: Changing question wording or scale between measurement waves breaks the ability to meaningfully compare results over time, undermining the core purpose of a tracked trend metric.*
+*Explanation: A trend line only means something if the instrument held still. Rewording mid-series produces a change in the measurement that is indistinguishable from a change in sentiment.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) A candidate proposes fielding a broad, open-ended survey to "discover what's wrong with the product," with no prior hypothesis to test. What is the strongest critique of this approach, based on this lesson?**
-A) Surveys are never useful for any purpose and should be avoided entirely
-B) A survey without a specific prior hypothesis is poorly suited to genuine exploration, since it can only ask about what the designer already thought to ask — qualitative interviews are better suited to this open-ended goal
-C) The survey should include as many double-barreled questions as possible to cover more ground efficiently
-D) This approach is ideal, since broader questions always produce more useful data
+A) The approach is ideal, since broader questions yield more useful data
+B) Surveys are rarely useful and should be avoided in every situation
+C) A survey can only ask what the designer already anticipated
+D) The survey should add double-barreled questions to cover more ground
 
-*Correct answer: B*
-*Explanation: This directly reflects the lesson's guidance that surveys are the wrong tool for genuinely open-ended exploration, since they are inherently limited to questions already anticipated by the designer.*
+*Correct answer: C*
+*Explanation: The instrument is bounded by the imagination of whoever wrote it, so it cannot surface the problem nobody has thought of. That is precisely the job an interview does well.*
 *Learning objective tested: #1*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team notices their survey's response rate is very low, and wonders whether respondents differ systematically from non-respondents. What concept does this concern reflect, and why does it matter?**
-A) Central tendency bias, and it matters because it affects only Likert scale interpretation
-B) Non-response bias, and it matters because if respondents are systematically different from non-respondents (e.g., more engaged or more dissatisfied), the survey's findings may not generalize to the full population being studied
-C) Double-barreled question bias, and it matters only for questions combining multiple dimensions
-D) This concern is irrelevant as long as the total number of responses is large
+A) Central tendency bias, which affects only Likert interpretation
+B) Double-barreled bias, relevant to multi-dimension questions alone
+C) An irrelevant concern as long as the raw response count is large
+D) Non-response bias, since respondents may differ systematically
 
-*Correct answer: B*
-*Explanation: Non-response bias — the concern that respondents differ systematically from non-respondents — is explicitly named in this lesson's trustworthiness checklist as a factor to consider alongside raw sample size.*
+*Correct answer: D*
+*Explanation: If the people who bothered to reply are the unusually engaged or the unusually angry, the result describes them rather than the population, and a bigger raw count does not repair that.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A survey uses neutral, single-barreled, well-defined questions and a large, representative sample distributed across active users, recent churned users, and prospects who never converted — but reports only a single aggregated NPS-style score with no open-ended follow-up. Applying the full Survey Validity Chain, what specific weakness remains?**
-A) No weakness remains; this survey is fully valid and complete
-B) The interpretation link remains weak — a single aggregated stated-preference score, even from a well-distributed, well-designed survey, still lacks the "why" that would come from an open-ended follow-up or complementary qualitative research
-C) The distribution link is the only weakness, since active, churned, and prospective users were all included
-D) The question design link is the only remaining weakness, despite the description explicitly noting neutral, single-barreled, well-defined questions
+A) No weakness remains; the survey is fully valid and complete
+B) The interpretation link stays weak, since an aggregated score carries no why
+C) The distribution link is the weakness, despite the broad sampling described
+D) The question design link is weak, despite the neutral wording described
 
 *Correct answer: B*
-*Explanation: Even a survey that clears the distribution and question-design links can still fail at the interpretation link if it relies solely on an aggregated stated-preference score without any mechanism for understanding the underlying reasoning — testing whether the full chain, not just the earlier links, has been checked.*
+*Explanation: Distribution and design both clear here. The chain still breaks at the end, because one stated-preference number with no follow-up tells the team a score and not a reason.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 

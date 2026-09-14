@@ -469,196 +469,195 @@ There is no single correct answer. The purpose of this exercise is to practice m
 ## Quiz
 
 **1. Which of the following best distinguishes product discovery from product delivery?**
-A) Discovery is optional; delivery is mandatory
-B) Discovery tests whether a solution is worth building; delivery builds a validated solution well and at scale
-C) Discovery is performed only by designers; delivery is performed only by engineers
-D) Discovery and delivery are two names for the same process
+A) Discovery is handled by designers; delivery is handled by engineers
+B) Discovery is an optional step, whereas delivery is always mandatory
+C) Discovery and delivery are two labels for one continuous process
+D) Discovery tests whether to build; delivery builds it well
 
-*Correct answer: B*
-*Explanation: Discovery and delivery serve distinct goals — discovery reduces risk and validates assumptions before investment, while delivery focuses on building the validated solution to a high quality bar at scale.*
+*Correct answer: D*
+*Explanation: Discovery is optimized for speed and learning and often produces artifacts never meant to ship. Delivery is optimized for quality and scale. Both involve the whole team, and neither is optional.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Which of the following is NOT one of the four risk categories discovery is designed to test?**
-A) Value risk
+A) Marketing risk
 B) Usability risk
-C) Marketing risk
+C) Feasibility risk
 D) Viability risk
 
-*Correct answer: C*
-*Explanation: The four risk categories described in this lesson are value, usability, feasibility, and viability risk. "Marketing risk" is not one of the four named categories.*
+*Correct answer: A*
+*Explanation: The four are value, usability, feasibility, and viability. Concerns about reaching an audience sit inside value and viability rather than forming a separate category.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Why is testing only value risk (e.g., via a well-received prototype demo) considered incomplete discovery?**
-A) Because value risk is the least important of the four risks
-B) Because usability, feasibility, and viability risk remain completely unexamined, and any one of them could still invalidate the solution even if value risk is confirmed
-C) Because prototype demos are never useful for any purpose
-D) Because value risk cannot actually be tested with a prototype
+A) Because value risk matters least among the four categories
+B) Because prototype demos serve no useful purpose at any stage of discovery
+C) Because value risk cannot be tested with a prototype at all
+D) Because usability, feasibility, or viability could still sink it
 
-*Correct answer: B*
-*Explanation: The lesson explicitly warns that a validated, desirable idea can still fail if it turns out to be infeasible, unusable, or non-viable — testing only value risk leaves three other potential failure points unexamined.*
+*Correct answer: D*
+*Explanation: A desirable idea that proves legally non-viable or infeasible at the required scale has still failed. Confirming value alone completes roughly a quarter of the job.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. According to this lesson, why should discovery run continuously alongside delivery, rather than as a phase completed before delivery begins?**
-A) Because continuous discovery is required by regulation in most industries
-B) Because new risks (technical constraints discovered mid-build, competitor moves, early feedback) can emerge throughout delivery, and a one-time discovery phase leaves a team unable to catch them
-C) Because delivery teams are not capable of building without discovery running simultaneously
-D) Because discovery and delivery must always be performed by the same person
+A) Because regulators in most industries now require it
+B) Because delivery teams cannot build without parallel research running
+C) Because new risks surface during the build that early work missed
+D) Because the same person must own both discovery and delivery work
 
-*Correct answer: B*
-*Explanation: The lesson argues that treating discovery as a completed phase misses new risks that emerge during the delivery process itself.*
+*Correct answer: C*
+*Explanation: A constraint found mid-implementation, a competitor launch that changes the viability picture, a usability problem no prototype exposed — none of these are visible to a research phase that closed before building started.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. In assumption mapping, which assumption should generally be tested first?**
-A) The assumption that is easiest to test, regardless of its importance
-B) The assumption with high confidence and high importance
-C) The assumption with low confidence and high importance
-D) The assumption with low confidence and low importance
+A) The one that is easiest to test, whatever its importance
+B) The one with high confidence and high importance attached
+C) The one with low confidence and low importance attached
+D) The one with low confidence and high importance attached
 
-*Correct answer: C*
-*Explanation: The assumption that is both least certain (low confidence) and most consequential if wrong (high importance) carries the most risk and should be tested first, regardless of which risk category it belongs to.*
+*Correct answer: D*
+*Explanation: Least certain and most consequential is the combination that carries the most risk. Teams often drift toward whichever assumption is procedurally familiar to test instead, which leaves the real exposure untouched.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. Which of the following is the clearest example of "discovery theater," as defined in this lesson?**
-A) Running a small, manual concierge pilot where real customers make real purchasing decisions with real stakes
-B) Showing a polished prototype to existing enthusiastic fans and asking whether they would use it, then treating their positive response as full validation
-C) Designing a test specifically intended to surface a possible negative result before committing to full delivery
-D) Testing the riskiest, least-confident assumption identified through assumption mapping
+A) Showing a polished prototype to existing fans and reading their enthusiasm as validation
+B) Running a concierge pilot where customers make real decisions
+C) Designing a test intended to surface a negative result before committing
+D) Testing the riskiest assumption identified by assumption mapping
 
-*Correct answer: B*
-*Explanation: Surveying existing enthusiastic users about a new idea, and treating a polite positive response as validation, is a textbook example of discovery theater — a test structured such that a genuinely negative signal was unlikely to surface.*
+*Correct answer: A*
+*Explanation: An enthusiastic audience asked a no-cost question will answer generously. The test could not realistically have produced a negative result, so it reduced no risk whatever it returned.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what specific viability risk was assumed away without being tested?**
-A) Whether customers wanted more recipe variety
-B) The fulfillment cost impact of handling highly variable, per-customer ingredient combinations
-C) Whether the interface redesign would be visually appealing
-D) Whether competitors already offered a similar feature
+A) Whether customers actually wanted a wider selection of recipe variety
+B) The fulfillment cost of highly variable per-customer ingredients
+C) Whether the redesigned interface would be visually appealing
+D) Whether a competitor had already shipped a comparable feature
 
 *Correct answer: B*
-*Explanation: The case study explicitly identifies the unexamined operational/fulfillment cost impact as a viability risk that was never modeled before the feature was built.*
+*Explanation: Per-customer ingredient variation changes the economics of picking, packing, and sourcing. That cost was never modeled, so a feature customers might well have liked was never checked against whether the business could carry it.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **8. What was the actual underlying job that most customers in the Detailed Case Study valued the fixed-recipe structure for satisfying?**
-A) Maximizing ingredient control and customization
-B) Reducing weekly meal-planning decision-making burden
-C) Minimizing the cost of groceries
-D) Increasing the variety of cuisines available
+A) Maximizing control over ingredients and portion sizes
+B) Minimizing the total weekly cost of their groceries
+C) Reducing the weekly meal-planning burden
+D) Increasing the range of cuisines available weekly
 
-*Correct answer: B*
-*Explanation: The post-launch investigation found that customers valued the fixed structure specifically because it reduced weekly decision-making effort — the opposite of what the customization feature assumed customers wanted.*
+*Correct answer: C*
+*Explanation: The fixed structure was the benefit, not a limitation to be removed. Customization handed back exactly the weekly decision-making the product had been hired to take away.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
 
 ---
 
 **9. According to the confidence ladder framework, what is the core discipline it enforces?**
-A) Always begin discovery at the most expensive, highest-fidelity rung to save time
-B) Progress from cheap, low-fidelity tests to more expensive, higher-fidelity ones without skipping rungs
-C) Skip discovery entirely once a prototype has been built
-D) Use only one type of discovery test regardless of the situation
+A) Progress from cheap tests to expensive ones without skipping rungs
+B) Begin at the highest-fidelity rung available in order to save time
+C) Stop discovery once a working prototype has been built and shown
+D) Apply one single type of discovery test regardless of the situation at hand
 
-*Correct answer: B*
-*Explanation: The ladder's core discipline is climbing deliberately, one rung at a time, rather than jumping straight to expensive, high-fidelity tests (or full delivery) without first extracting the cheaper learning available at earlier rungs.*
+*Correct answer: A*
+*Explanation: Jumping from a few encouraging conversations straight to a production build skips the cheap rungs that would have surfaced the same disconfirming evidence for a fraction of the cost.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
 **10. (Scenario) A team wants to test whether customers would actually pay for a proposed new feature, using the cheapest possible rung on the confidence ladder that could still produce a genuine signal. Which of the following best fits that goal?**
-A) Immediately building the full, production-grade feature and observing revenue
-B) Conducting a single internal team discussion about whether the feature seems appealing
-C) A simple landing page or concept description offering the (not-yet-built) feature, measuring how many real users attempt to sign up or pre-pay for it
-D) Asking only the company's most loyal, existing power users whether they like the idea
+A) Build the full production feature and watch the revenue it earns
+B) Offer the not-yet-built feature on a landing page and count real sign-ups or pre-payments
+C) Hold an internal team discussion about whether it seems appealing
+D) Ask the company's most loyal power users whether they like the idea
 
-*Correct answer: C*
-*Explanation: A landing page or pre-payment test occupies a cheap-but-genuine rung on the confidence ladder — it can produce a real, disconfirmable signal about willingness to pay without requiring the full feature to be built, unlike the internal discussion (too weak a test) or immediate full build (skips cheaper rungs).*
+*Correct answer: B*
+*Explanation: A sign-up or pre-payment costs the user something real, so the signal can come back negative. An internal discussion tests nothing external, and a full build skips every cheaper rung on the way.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Product Thinking) A PM is told that discovery is "done" for a project because the team completed ten user interviews at the very beginning, before any delivery work started. Using this lesson's framework, what is the most appropriate response?**
-A) Agree, since ten interviews is generally considered sufficient regardless of context
-B) Note that discovery should continue throughout delivery, not end once building starts, since new risks can emerge during implementation that the initial interviews could not have surfaced
-C) Insist that the interviews be repeated exactly as before, with no changes
-D) Argue that no discovery was needed at all in this case
+A) Agree, since ten interviews is generally a sufficient sample size
+B) Insist the same interviews be repeated without any changes made
+C) Note that discovery continues through delivery, since risks emerge during the build
+D) Argue no discovery was warranted for a project of this kind
 
-*Correct answer: B*
-*Explanation: This directly reflects the lesson's continuous discovery principle — a one-time, front-loaded research phase does not account for risks that emerge later during the delivery process.*
+*Correct answer: C*
+*Explanation: The count is not the issue. Ten interviews conducted before implementation cannot speak to a constraint found in week six, and treating the phase as closed removes the team's ability to notice one.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **12. (Interview Reasoning) An interviewer asks a candidate to describe a validated idea, and the candidate describes only a series of encouraging conversations with existing fans, with no mention of any test that could have produced a negative result. What does this most likely signal, according to this lesson's Interview Perspective section?**
-A) Strong discovery practice, since talking to real users is always sufficient validation
-B) A possible instance of discovery theater — the described process may not have been structured in a way that could have surfaced disconfirming evidence
-C) That the candidate should have talked to even more existing fans
-D) Nothing meaningful, since interviews are always the gold standard of discovery
+A) Strong discovery practice, since speaking to real users is sufficient
+B) Possible discovery theater, since no described test could have produced a negative result
+C) A sampling gap the candidate could close by talking to more fans
+D) Nothing notable, since interviews are the gold standard of discovery
 
 *Correct answer: B*
-*Explanation: Per the lesson's discovery theater concept and Interview Perspective section, a validation story lacking any real possibility of a negative outcome is a weak signal, not a strong one, regardless of how many conversations occurred.*
+*Explanation: More conversations with the same friendly population would not repair the structural problem. The interviewer is listening for a test the candidate could have failed.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **13. (Product Thinking, Higher Difficulty) A team has high confidence that a proposed feature is technically feasible (their engineers have built similar systems before) but low confidence that customers actually want it, and the feature's success depends entirely on customer adoption. According to assumption mapping, where should the team focus its discovery effort first?**
-A) On feasibility, since it's important to be thorough about every risk category equally regardless of confidence level
-B) On value risk (customer desire), since it is the low-confidence, high-importance assumption in this scenario, while feasibility is already high-confidence
-C) On viability, since it was not mentioned in the scenario and should therefore be assumed to be the riskiest
-D) Discovery effort should be spread exactly evenly across all four risk categories regardless of the specifics described
+A) On feasibility, since every risk category deserves equal scrutiny
+B) On viability, since it went unmentioned and is therefore riskiest
+C) On value risk, the low-confidence, high-importance assumption
+D) Evenly across all four categories regardless of the specifics given
 
-*Correct answer: B*
-*Explanation: Assumption mapping directs discovery effort toward the assumption combining lowest confidence and highest importance — here, that is customer desire (value risk), not feasibility, which the team already has high confidence in.*
-<br>
+*Correct answer: C*
+*Explanation: Feasibility is already high-confidence, so testing it buys little. Adoption is both uncertain and the thing the whole feature rests on, which places it squarely in the test-first quadrant.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Interview Reasoning, Higher Difficulty) A candidate is asked how they scale the amount of discovery effort applied to different ideas. A weak answer would most likely include which of the following?**
-A) Explaining that discovery effort should scale with the risk profile of the idea, using something like assumption mapping to prioritize
-B) Describing a fixed, identical discovery process (e.g., always exactly five interviews) applied uniformly regardless of an idea's underlying risk or consequence
-C) Distinguishing between value, usability, feasibility, and viability risk when scoping a discovery plan
-D) Referencing the confidence ladder to decide how far to climb before committing to full delivery
+A) Explaining that discovery effort should scale with an idea's risk profile
+B) Describing one fixed process applied to every idea alike
+C) Distinguishing value, usability, feasibility, and viability when scoping
+D) Referencing the confidence ladder to decide how far to climb first
 
 *Correct answer: B*
-*Explanation: The lesson explicitly frames a one-size-fits-all, fixed discovery process (applied without regard to an idea's actual risk profile) as a weak signal, in contrast to the principled, risk-scaled approaches described in the other options.*
+*Explanation: A fixed ritual — always five interviews — treats a low-stakes tweak and a bet-the-quarter initiative as equivalent. The other three each tie the depth of discovery to what is actually at risk.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team runs a concierge-style manual pilot (Rung 3 of the confidence ladder) for a proposed feature, and the pilot reveals strong customer interest but also an unexpectedly high manual operating cost per customer. According to this lesson, what should the team do next?**
-A) Proceed immediately to full-scale automated delivery, since customer interest was strong
-B) Abandon the idea entirely, since manual operating cost was higher than expected
-C) Treat the newly discovered cost risk as a viability-risk assumption requiring its own targeted test (e.g., whether automation or pricing changes could resolve it) before advancing further up the confidence ladder
-D) Ignore the cost finding, since only value risk matters for this type of feature
+A) Treat the cost finding as a viability risk needing its own test
+B) Proceed to full automated delivery, since interest was strong
+C) Abandon the idea, since the manual cost exceeded expectations
+D) Disregard the cost finding, since value risk is what matters here
 
-*Correct answer: C*
-*Explanation: This reflects the lesson's core principle that discovery must test all four risk categories, and that a newly surfaced viability risk (cost) deserves its own genuine test before the team commits to a more expensive rung (full delivery) — neither blind proceeding nor outright abandonment reflects the deliberate, evidence-driven approach this lesson advocates.*
+*Correct answer: A*
+*Explanation: The pilot answered value and raised viability. Whether automation or a price change closes the gap is a new, testable question, and it deserves an answer before the team buys the next rung of the ladder.*
 *Learning objective tested: #2, #3, #4*
 *Difficulty: Hard*
 

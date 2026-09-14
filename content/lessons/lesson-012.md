@@ -394,194 +394,194 @@ There is no single correct answer. The purpose of this exercise is to practice s
 
 **1. Which of the following interview questions best exemplifies the "past-behavior" question type described in this lesson?**
 A) "Would you use a feature that automates employee scheduling?"
-B) "What do you think about scheduling software in general?"
-C) "Tell me about the last time you had to create a weekly schedule for your team. Walk me through exactly what happened."
-D) "Do you think scheduling is a common problem for small businesses?"
+B) "Tell me about the last time you built a weekly team schedule. Walk me through it."
+C) "Do you think scheduling is a common problem for small firms?"
+D) "What do you generally think about scheduling software today?"
 
-*Correct answer: C*
-*Explanation: This question asks for a specific, real past event rather than a hypothetical prediction or a general opinion, making it a past-behavior question in the sense described by this lesson.*
+*Correct answer: B*
+*Explanation: B asks for one real, completed event. The others ask for a prediction, a generalisation about other people, and an abstract opinion — none of which the respondent has to have actually lived.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why are past-behavior questions considered more reliable than hypothetical questions, according to this lesson?**
-A) Because hypothetical questions are always dishonestly answered
-B) Because specific, real memories are harder to answer with a comfortable, generic response, and cost the respondent something (accuracy to their own memory) to fabricate, unlike a low-stakes prediction about the future
-C) Because past-behavior questions are always shorter to ask
-D) Because hypothetical questions can only be asked in written surveys, not interviews
+A) A specific memory is harder to answer generically
+B) Hypothetical questions are answered dishonestly as a rule
+C) Past-behavior questions are always quicker to ask aloud
+D) Hypothetical questions belong in written surveys, not interviews
 
-*Correct answer: B*
-*Explanation: The lesson explains that predicting future behavior is unreliable and low-cost to answer generously, while recalling a specific past event is harder to fabricate convincingly and tends to surface concrete, revealing detail.*
+*Correct answer: A*
+*Explanation: Recalling what actually happened surfaces friction, workarounds, and abandoned attempts. A prediction about the future costs nothing to answer generously, which is why it so often is.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. What is the purpose of the "passive looking" step in a switch interview?**
-A) To ask the respondent whether they would recommend the eventual solution to a friend
-B) To understand what the respondent did just after their first thought of dissatisfaction, even before actively searching for a solution
-C) To show the respondent a prototype and gauge their reaction
-D) To ask the respondent to rate their overall satisfaction on a numeric scale
+A) To show the respondent a working prototype and gauge their reaction
+B) To ask whether they would recommend the eventual solution to a colleague
+C) To ask the respondent to rate their satisfaction numerically
+D) To learn what they did after first dissatisfaction, before searching
 
-*Correct answer: B*
-*Explanation: "Passive looking" specifically asks what happened between the first moment of dissatisfaction and the point where the respondent began actively searching, per the switch interview structure described in this lesson.*
+*Correct answer: D*
+*Explanation: Passive looking sits between the first flicker of dissatisfaction and the decision to go looking properly. What happens in that gap often explains what eventually triggered the real search.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Which of the following is the clearest example of the "pitching instead of listening" mistake?**
-A) Asking a respondent to describe their current workflow before mentioning any proposed feature
-B) Describing a prototype's key features early in the conversation and asking after each one whether it "seems useful"
-C) Tolerating a long pause after asking a question
-D) Asking a follow-up question when a respondent gives a vague answer
+A) Asking about the current workflow before mentioning any feature
+B) Describing prototype features early and asking after each whether it seems useful
+C) Tolerating a long pause after asking an open-ended question
+D) Following up with detail when a respondent gives a vague answer
 
 *Correct answer: B*
-*Explanation: Describing the solution's features early and immediately asking for reactions anchors subsequent answers to the shown solution, exactly the "pitching instead of listening" pattern this lesson warns against.*
+*Explanation: Once the solution is on the table, every later answer is anchored to it, and there is no way to recover what the respondent would have said without that framing.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. According to this lesson, what should an interviewer do when a respondent answers, "It was just annoying"?**
-A) Record the answer as a complete finding and move to the next question
-B) Follow up with specific, concrete questions (e.g., "What specifically happened that felt annoying?") to dig past the vague surface-level answer
-C) Assume the respondent does not have a real opinion and skip the topic
-D) Rephrase the original question as a multiple-choice option to make it easier to answer
+A) Log it as a complete finding and move to the next topic
+B) Assume the respondent holds no real view and skip the topic
+C) Follow up concretely to learn what specifically happened
+D) Rephrase it as a multiple-choice prompt to ease answering
 
-*Correct answer: B*
-*Explanation: The lesson explicitly frames vague answers as a signal to dig deeper using concrete follow-up questions or the Five Whys, not as a finished finding.*
+*Correct answer: C*
+*Explanation: Vague language marks the place where the useful detail is, not the end of the answer. "Annoying" becomes actionable only once you know which step, in what order, produced it.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **6. What is the key difference between a discovery interview and a usability interview, as described in this lesson?**
-A) Discovery interviews are always longer than usability interviews
-B) A discovery interview understands existing behavior and needs, often independent of a specific solution; a usability interview observes interaction with an already-built prototype or product
-C) Usability interviews can only be conducted in person, never remotely
-D) There is no meaningful difference between the two
+A) Discovery studies behaviour; usability observes a built product
+B) Discovery interviews always run longer than usability interviews do
+C) Usability interviews must be conducted in person rather than remotely
+D) The two labels describe the same activity under different names today
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit distinction — discovery interviews focus on solution-independent behavior and needs, while usability interviews focus on interaction with a specific built solution.*
+*Correct answer: A*
+*Explanation: Neither is superior; they answer different questions. The failure is drifting from one into the other mid-session without noticing which one you are now running.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what was the key structural flaw in the original round of ten interviews?**
-A) Too few interviews were conducted
-B) The prototype was shown early, and respondents were asked hypothetical, solution-anchored questions ("Does this seem useful?") rather than past-behavior questions about their existing tracking methods
-C) The interviews were conducted in the wrong language
-D) The respondents were not real customers at all
+A) Too few interviews were conducted to support any real conclusion
+B) The respondents recruited were not actual customers of the product
+C) The interviews were run in a language respondents were unsure of
+D) The prototype was shown first, which anchored the later questions
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the flawed validation to showing the prototype early and asking hypothetical, solution-anchored questions, rather than first understanding actual existing behavior through past-behavior questions.*
+*Correct answer: D*
+*Explanation: Ten is a workable number for discovery. What undid the round was leading with the artefact and then asking whether it seemed useful, which is a reaction, not a behaviour.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. What specific, highly relevant fact did the original (flawed) interview round fail to surface, which the second, more disciplined round did surface?**
-A) That respondents preferred a different color scheme for the interface
-B) That respondents had previously tried and abandoned similar, more full-featured project management tools due to a mismatch with their informal working style
-C) That respondents were unwilling to pay for any project management tool
-D) That respondents preferred to use a competitor's product exclusively
+A) They had abandoned fuller tools that clashed with their informal style
+B) They preferred a different colour scheme for the product interface
+C) They were unwilling to pay for any project management tool at all
+D) They intended to keep using a competitor's product exclusively going forward
 
-*Correct answer: B*
-*Explanation: The second round's past-behavior questions revealed a documented prior pattern of tool adoption and abandonment tied to a specific mismatch in working style — exactly the kind of finding hypothetical, solution-anchored questions had missed.*
+*Correct answer: A*
+*Explanation: A prior adoption that failed is exactly the kind of detail a past-behaviour question reaches and a "does this seem useful?" question never will, because nobody volunteers it unprompted.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) An interviewer asks a respondent a question and the respondent pauses for several seconds before answering. According to this lesson, what is the most appropriate interviewer response?**
-A) Immediately offer a multiple-choice-style prompt to help the respondent answer faster
-B) Tolerate the silence, giving the respondent space to think past their first, most readily available answer
-C) Repeat the question louder, assuming the respondent didn't hear it
-D) Move on to the next question immediately, since the pause indicates the respondent has nothing to say
+A) Move on at once, since the pause shows they have nothing to say
+B) Tolerate the silence, giving them space to think past the first answer
+C) Offer a multiple-choice prompt so they can answer more quickly
+D) Repeat the question louder, assuming they did not hear it
 
 *Correct answer: B*
-*Explanation: The lesson explicitly recommends tolerating silence rather than rescuing the respondent with a prompt, since doing so often short-circuits a more considered, genuine answer.*
+*Explanation: The pause is usually the respondent thinking, and the discomfort is the interviewer's. Rescuing them replaces their considered answer with one of your suggestions.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team wants to run a session to observe how users interact with a nearly finished prototype and identify points of confusion. According to this lesson, what kind of session is this, and what should the team be careful about?**
-A) This is a discovery interview, and the team should avoid showing the prototype at all
-B) This is a usability interview, and the team should be careful not to conflate it with discovery-style past-behavior questioning, since the two answer different questions
-C) This is not a legitimate research method at all
-D) This session type does not require any interview structure
+A) A discovery interview, so the prototype should not be shown at all
+B) A usability interview, distinct from discovery questioning
+C) Not a legitimate research method under this lesson's framework
+D) A session type that needs no particular interview structure at all
 
 *Correct answer: B*
-*Explanation: Observing interaction with an already-built prototype to identify confusion is a usability interview, and the lesson warns against blending this with discovery-style questioning without deliberate awareness of the different purposes.*
+*Explanation: Watching someone use a built thing is a usability session and a perfectly good one. The care required is not calling it discovery afterwards, or reading its findings as solution-independent.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes every past customer interview they've conducted as ultimately confirming their team's original product idea, with no example of a surprising or disconfirming finding. What might this signal, based on this lesson's Interview Perspective section?**
-A) Exceptionally accurate initial product instincts requiring no further scrutiny
-B) A possible sign of a pitching-not-listening pattern, or another bias, preventing genuinely disconfirming findings from surfacing
-C) That customer interviews are inherently unable to produce disconfirming findings
-D) Nothing meaningful, since consistent confirmation is the expected, normal outcome of interviews
+A) Exceptionally accurate instincts that warrant no further scrutiny at all
+B) No cause for note, since consistent confirmation is the usual outcome
+C) A pitching-not-listening pattern suppressing disconfirmation
+D) That interviews cannot in principle produce disconfirming findings
 
-*Correct answer: B*
-*Explanation: Echoing Lesson 11's related concern, an inability to describe a real disconfirming finding may signal a research process (in this case, an interviewing practice) contaminated by bias, such as pitching before listening or interviewer confirmation bias.*
+*Correct answer: C*
+*Explanation: Interviews that begin with the solution tend to return agreement with the solution. An unbroken confirmation record usually describes the method rather than the quality of the ideas.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A respondent in a switch interview describes actively searching for a new tool but ultimately says, "I almost didn't switch because I was worried about losing all my existing data." Which Force of Progress (Lesson 6) does this statement most directly surface?**
-A) Push
-B) Pull
-C) Anxiety
-D) Habit
+A) Push — dissatisfaction with the current way of working
+B) Pull — the attraction of the new solution on offer
+C) Anxiety — worry about a specific consequence of switching
+D) Habit — comfort with the existing, familiar approach
 
 *Correct answer: C*
-*Explanation: Worry about a specific negative consequence of switching (losing data) is a direct example of the Anxiety force from Lesson 6's Forces of Progress model, distinct from Habit (comfort with the old approach) or Push/Pull (dissatisfaction and attraction).*
+*Explanation: The worry attaches to the act of switching rather than to the old tool or the new one. That is what separates Anxiety from Habit, which is inertia without a specific fear.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer is asked to critique a colleague's interview guide, which begins with a five-minute demo of the proposed solution before any questions about the respondent's current behavior. What is the strongest critique, based on this lesson?**
-A) The guide is well-structured, since showing the solution early builds respondent enthusiasm
-B) The guide risks anchoring every subsequent answer to the shown solution, and should instead place past-behavior, solution-independent questions first, with any solution reaction moved to a clearly separated, later segment
-C) The guide should be lengthened by adding even more demo time at the start
-D) The guide has no meaningful flaws, since demos are always appropriate at any point in an interview
+A) It anchors later answers; move past-behavior questions first
+B) It is well structured, since an early demo builds respondent enthusiasm
+C) It should be improved by adding further demo time up front
+D) It has no meaningful flaw, since demos suit any point in a session
 
-*Correct answer: B*
-*Explanation: This directly reflects the lesson's core structural guidance — solution description should come last and be clearly separated from the past-behavior discovery segment, precisely to avoid the anchoring problem shown in the Detailed Case Study.*
+*Correct answer: A*
+*Explanation: Solution reaction belongs at the end, clearly fenced off, and weighted as the weaker stated-preference evidence it is. Put first, it contaminates everything that follows.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team has completed several interviews and is unsure whether a recurring vague theme ("it's just complicated") represents a genuine, specific finding or an unexplored surface-level answer. Using the Interview Depth Staircase, what should the team conclude?**
-A) The theme is a complete, actionable finding as stated, and no further investigation is needed
-B) The theme likely represents Step 1 (a surface answer) on the staircase, and further digging (concrete follow-up questions, the Five Whys) is needed before treating it as an actionable insight
-C) The theme should be discarded entirely, since vague findings are never useful
-D) The team should immediately build a solution addressing "complexity" without further clarification
+A) An actionable finding as stated, requiring no further investigation
+B) A theme to discard outright, since vague findings are never useful
+C) Grounds to build a complexity fix straight away without clarifying it further
+D) A Step 1 surface answer needing concrete follow-up before it is actionable
 
-*Correct answer: B*
-*Explanation: A recurring vague theme sitting at Step 1 of the staircase is exactly the signal this lesson describes as requiring further digging before being treated as a specific, actionable insight — neither accepting it at face value nor discarding it outright is appropriate.*
+*Correct answer: D*
+*Explanation: Recurrence makes the theme worth pursuing, not worth acting on as written. "Complicated" could mean too many steps, unfamiliar vocabulary, or an unclear mental model, and each implies a different fix.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team conducts twenty interviews, all recruited through an in-app pop-up shown only to daily active users, and all following a past-behavior-first structure with solution reaction deferred to the end. According to this lesson and Lesson 11 combined, what specific limitation remains, despite the strong interview structure?**
-A) There is no remaining limitation, since the interview structure itself was well-designed
-B) The sample is still likely unrepresentative, since it excludes non-users, churned users, and less-engaged customers — a strong interview technique does not, by itself, correct for a biased recruitment strategy
-C) Twenty interviews is an insufficient sample size for any purpose, regardless of structure
-D) The interviews should have been conducted as usability tests instead
+A) No limitation remains, since the interview structure was well designed
+B) Twenty interviews is too small a sample for any purpose whatsoever
+C) The sample still excludes non-users and churned, less-engaged customers
+D) The sessions should have been run as usability tests rather than interviews
 
-*Correct answer: B*
-*Explanation: This tests the integration of Lesson 11 and Lesson 12 — even an excellent interview structure does not correct for an unrepresentative recruitment strategy (here, only daily active users), which remains a distinct, unresolved limitation per Lesson 11's representativeness criterion.*
+*Correct answer: C*
+*Explanation: Technique and recruitment are independent failure points. A flawless guide administered to a self-selected slice of the most engaged users still cannot speak for the people who left.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 

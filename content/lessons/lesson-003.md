@@ -352,195 +352,195 @@ There is no single correct answer. Work through the following before reading fur
 ## Quiz
 
 **1. Which of the following best defines product thinking, as introduced in this lesson?**
-A) Always basing decisions on quantitative data
-B) The habit of examining the underlying user and business need behind a request before evaluating how to build a solution
-C) A personality trait some people are born with
-D) Refusing all stakeholder feature requests by default
+A) Basing every product decision on quantitative usage data
+B) Evaluating whether a request is buildable and clearly wanted
+C) An innate aptitude that strong product people are born with
+D) Examining the underlying need behind a request before solving it
 
-*Correct answer: B*
-*Explanation: Product thinking is explicitly defined as a learnable habit of examining underlying need first, not an innate trait or a rule about data or refusal.*
+*Correct answer: D*
+*Explanation: Product thinking is a learnable habit of asking what user and business need a request connects to before evaluating how to build it. The other three options are each named in the lesson as misconceptions about what it means.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **2. What is "feature thinking," as contrasted with product thinking in this lesson?**
-A) A more advanced version of product thinking
-B) Evaluating a request based only on whether it's technically buildable and stated as wanted, without examining the deeper need
-C) Thinking exclusively about UI features
-D) A synonym for product thinking
+A) Designing the user interface before the underlying data model
+B) Judging a request on buildability and stated demand alone
+C) A more advanced form of product thinking used by senior PMs
+D) Focusing on the feature set a competitor has already shipped
 
 *Correct answer: B*
-*Explanation: Feature thinking accepts requests at face value, evaluating buildability and stated demand, without digging into the underlying need — the opposite instinct from product thinking.*
+*Explanation: Feature thinking takes the request at face value and asks only whether it can be built and whether someone wants it. The lesson is careful to note this is often fast and occasionally correct — the problem is using it as a permanent default.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **3. In the Five Whys example involving a CSV export request, what was the eventual underlying need uncovered?**
-A) Customers wanted a more powerful CSV parser
-B) The reporting dashboard's fixed views no longer matched how customers wanted to slice their data
-C) Customers didn't actually want any new feature
-D) Customers wanted to switch to a competitor's product
+A) Customers needed a faster and more reliable export format
+B) Fixed dashboard views no longer matched how customers sliced data
+C) Customers had already decided to migrate to a competing tool
+D) The export feature had been built but was hard for users to find
 
 *Correct answer: B*
-*Explanation: The chain of "whys" revealed that the dashboard's limited set of fixed report views was the underlying mismatch driving the CSV export request.*
+*Explanation: Five steps of "why" moved the request from a button to a mismatch: the three report views built at launch were never revisited as usage diversified, so customers went outside the product to slice their own data.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. Why does this lesson caution against applying the Five Whys as a rigid, visible script in stakeholder meetings?**
-A) Because asking "why" is always inappropriate
-B) Because it can come across as adversarial or as though the request is being doubted, damaging trust; it should surface as natural, curious follow-up instead
-C) Because stakeholders never know the answer to "why"
-D) Because the technique only works in writing, not conversation
+A) Because stakeholders rarely know the answer beyond the first why
+B) Because the technique was designed for manufacturing, not software
+C) Because it can read as adversarial and erode the requester's trust
+D) Because five rounds take longer than most meetings allow for
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #2 warns that a rigid, visible interrogation can feel adversarial; the technique should structure internal reasoning and come across as genuine, collaborative curiosity.*
+*Correct answer: C*
+*Explanation: Rapid-fire "why" questions can feel like the requester's judgment is being doubted, or like the PM is stalling. The technique is meant to structure your own reasoning and surface as collaborative curiosity.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Is product thinking the same as "being data-driven"? According to this lesson:**
-A) Yes, they are identical concepts
-B) No — product thinking is about asking the right question first; data is one of several possible ways to answer it, alongside interviews and sound reasoning
-C) No — product thinking specifically avoids using data
-D) Yes, but only for B2B products
+A) Yes — both describe deciding only once evidence has been gathered
+B) No — product thinking deliberately sets quantitative data aside
+C) No — it concerns which question to ask; data is one way to answer
+D) Yes — though the equivalence holds mainly for mature B2B products
 
-*Correct answer: B*
-*Explanation: The lesson explicitly distinguishes the two: product thinking concerns which question to ask, while data-driven approaches concern one way (among several) of answering that question.*
+*Correct answer: C*
+*Explanation: A PM with no data can still ask what need a request serves and answer it through interviews, analogous cases, or reasoning. A PM sitting on excellent data can still fail to ask the right question of it.*
 *Learning objective tested: #1, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **6. In the "Add More Filters" Case Study, why was matching the competitor's filter complexity likely not the best solution?**
-A) Because filters are never useful
-B) Because the actual underlying friction was users needing to reconstruct the same filter combinations repeatedly, which raw filter power alone would not resolve
-C) Because the competitor's product was technically inferior
-D) Because sales teams should never be consulted
+A) The real friction was rebuilding the same filter combination daily
+B) The competitor's filter engine was technically weaker on inspection
+C) Sales had overstated how many deals actually turned on filtering
+D) Filter panels are a poor interface pattern for large task lists
 
-*Correct answer: B*
-*Explanation: The Five Whys process revealed the real friction was repeated manual reconstruction of filter combinations, a problem better addressed by saved/shareable views than by adding more raw filter options.*
+*Correct answer: A*
+*Explanation: The fourth "why" reframed the problem from insufficient filter power to repeated manual reconstruction of the same view. Saved, shareable views address that directly, and likely at lower engineering cost than a richer query engine.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What relationship does this lesson draw between product thinking and the Accountability Triangle from Lesson 1?**
-A) They are unrelated concepts
-B) Product thinking is the day-to-day cognitive practice of applying the Accountability Triangle and Decision Chain, holding desirability, feasibility, and viability in view simultaneously
-C) Product thinking replaces the need for the Accountability Triangle
-D) The Accountability Triangle only applies to engineers, not PMs
+A) Product thinking supersedes the Triangle once a PM becomes sufficiently senior
+B) Product thinking covers desirability while the Triangle covers the other legs
+C) Product thinking and the Triangle address unrelated parts of the PM's job
+D) Product thinking is the Triangle and Decision Chain put into daily practice
 
-*Correct answer: B*
-*Explanation: The lesson explicitly frames product thinking as the practical application of Lesson 1's frameworks, particularly refusing to settle on a solution before examining the underlying problem (desirability) with the same rigor as feasibility and viability.*
+*Correct answer: D*
+*Explanation: Product thinking is not a separate concept sitting alongside Lesson 1's frameworks — it is what applying them looks like hour to hour, holding all three legs in view and refusing to settle on a solution before the problem has been examined.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **8. According to the Symptom vs. Root Cause framework, what is a useful test for telling the two apart?**
-A) Symptoms are always reported by executives; root causes are always reported by engineers
-B) Ask whether fixing the stated symptom directly would leave the underlying condition unchanged, allowing a related symptom to reappear later
-C) Root causes are always more expensive to fix than symptoms
-D) There is no reliable way to distinguish them
+A) Ask whether fixing the report would let a related complaint resurface
+B) Ask whether the report came from users or from internal stakeholders
+C) Ask whether the fix costs more engineering time than the issue warrants
+D) Ask whether the issue appears in analytics as well as in support tickets
 
-*Correct answer: B*
-*Explanation: This is the explicit test given in the Framework Explanation section — if a fix would plausibly leave a related symptom free to emerge again, the current focus is likely still a symptom, not the root cause.*
+*Correct answer: A*
+*Explanation: If a proposed fix would leave the underlying condition intact, a different symptom will surface later from the same source. That is the signal you are still working at the symptom level.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does this lesson caution against applying skepticism to every incoming feature request equally?**
-A) Because all requests are equally risky and deserve equal scrutiny
-B) Because reflexive skepticism toward every request, regardless of size or risk, damages stakeholder trust and slows down genuinely good, low-risk ideas unnecessarily
-C) Because skepticism is never appropriate in product management
-D) Because stakeholders are always correct
+A) Stakeholders lose confidence when a PM asks any clarifying questions
+B) Requests from sales deserve less scrutiny than requests from support
+C) Skepticism belongs in discovery rather than in stakeholder conversations
+D) Scrutiny should scale with a request's size and risk, not apply uniformly
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #3 explicitly warns against overcorrecting into reflexive skepticism for every request; scrutiny should scale with the size and risk of the request.*
+*Correct answer: D*
+*Explanation: Common Beginner Mistake #3 warns against overcorrecting into reflexive doubt. A low-cost, low-risk, clearly justified request does not warrant the same investigation as a major engineering commitment.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **10. (Product Thinking) A support team reports rising complaints about "slow load times" on a specific page. A PM immediately assigns engineers to optimize that page's load speed. Using this lesson's framework, what should the PM have done first?**
-A) Nothing — immediate optimization is always correct
-B) Investigate whether "slow load times" is the root cause or a symptom of something else (e.g., the page loading unnecessary data, or users only perceiving it as slow because of a confusing loading state), before committing engineering time to a specific fix
-C) Ignore the complaints entirely
-D) Immediately redesign the entire application
+A) Redesign the page so the loading state communicates progress clearly
+B) Route the complaints to engineering and let them choose the fix
+C) Check whether slow load time is the cause or a symptom of something else
+D) Compare the page's load time against competitor benchmarks first
 
-*Correct answer: B*
-*Explanation: Consistent with the Symptom vs. Root Cause framework, "slow load times" is a reported symptom; product thinking requires investigating what's actually driving that perception or reality before committing to a specific technical fix.*
+*Correct answer: C*
+*Explanation: "Slow load times" is a reported symptom. The page may be fetching data it does not need, or a confusing loading state may make an acceptable duration feel long. Each implies a different fix, so the diagnosis has to come before the engineering commitment.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) An interviewer asks a candidate to "design a product for elderly users unfamiliar with smartphones." A weak candidate immediately lists five specific app features. What does this reveal, per this lesson's Interview Perspective section?**
-A) Excellent product thinking, because the candidate moved quickly
-B) A feature-thinking default — proposing solutions before identifying the specific underlying needs and constraints of that particular user group
-C) That the candidate has strong technical skills
-D) Nothing meaningful; interviewers only evaluate the final feature list
+A) Strong prioritization, since the candidate produced a concrete scope
+B) A feature-thinking default, since no underlying need was identified
+C) A research gap, since the candidate did not request usage data first
+D) Strong empathy, since the features were chosen for a specific group
 
 *Correct answer: B*
-*Explanation: As described in Interview Perspective question 2, jumping to generic proposed features without first identifying the specific underlying needs and constraints of the named user group reflects feature thinking, not product thinking.*
+*Explanation: The question tests whether a candidate can reason about an unfamiliar user group rather than pattern-match to features seen elsewhere. Naming the group's specific needs and constraints has to come before naming solutions.*
 *Learning objective tested: #1, #2*
 *Difficulty: Hard*
 
 ---
 
 **12. (Highest Difficulty, Product Thinking) A PM uncovers, via the Five Whys, that a stakeholder's request for "faster customer support response times" is actually rooted in customers not being able to self-serve answers to common questions. The PM proposes a self-service help center instead of hiring more support staff. What is the strongest justification for this choice, using this lesson's Symptom vs. Root Cause framework?**
-A) Hiring more support staff is always more expensive than any alternative
-B) Hiring more support staff would address the symptom (slow responses) without resolving the underlying root cause (lack of self-service options), leaving room for the same complaint to resurface as support volume grows again
-C) Self-service help centers are always preferred by customers over live support
-D) The stakeholder's original request should never be questioned
+A) More staff would address response speed while the self-serve gap remains
+B) Self-service help centers are preferred by customers over live support
+C) Hiring support staff carries a higher long-run cost than any software
+D) The stakeholder's framing should be adopted once volume data confirms it
 
-*Correct answer: B*
-*Explanation: This directly applies the lesson's root-cause test: addressing only the symptom (response speed) via more staffing would leave the underlying condition (no self-service option) unchanged, meaning the same complaint would likely reemerge as volume scales — the hallmark of a symptom-level fix rather than a root-cause fix.*
+*Correct answer: A*
+*Explanation: Adding staff moves the symptom without touching the condition producing it. As volume grows the same complaint returns, which is exactly the test the framework provides for recognizing a symptom-level fix.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **13. Common Beginner Mistake #1 warns against treating product thinking as a personality trait. Why does this matter practically?**
-A) Because it doesn't matter — some people genuinely cannot learn it
-B) Because treating it as an innate gift rather than a learnable habit is both discouraging and inaccurate; like the Five Whys technique, it is developed through deliberate, repeated practice on real requests until it becomes automatic
-C) Because only people with technical backgrounds can develop product thinking
-D) Because product thinking is identical to intelligence
+A) Framing it as innate discourages the repeated practice that builds it
+B) Framing it as innate understates how much technical background matters
+C) Framing it as innate makes hiring harder than it needs to be for teams
+D) Framing it as innate conflates product judgment with general intelligence
 
-*Correct answer: B*
-*Explanation: The lesson explicitly frames product thinking as a practiced, learnable diagnostic skill, not an innate trait — treating it as a fixed trait discourages the deliberate practice that actually builds it.*
+*Correct answer: A*
+*Explanation: The habit develops the way any diagnostic skill does — by applying it to real requests until it becomes automatic. Treating it as a gift removes the reason to practice, which is what actually prevents people from developing it.*
 *Learning objective tested: #1*
 *Difficulty: Hard*
 
 ---
 
 **14. Using the Iceberg mental model and the Netflix Real Company Example, what distinguishes product thinking from a naive, feature-thinking response to "customers want more convenience"?**
-A) Feature thinking and product thinking would have produced the same DVD-logistics solution
-B) A feature-thinking response optimizes the visible tip (e.g., faster DVD shipping, more distribution centers); product thinking interrogates the underlying need (convenient access to entertainment) beneath it, which can lead to a fundamentally different solution like streaming
-C) The Iceberg model only applies to physical, tangible products like DVDs
-D) Netflix never considered any solution other than streaming
+A) Both instincts would have converged on the same distribution improvements
+B) Feature thinking optimizes the visible tip; product thinking digs beneath it
+C) The Iceberg model applies to physical goods more readily than to software
+D) Streaming was the only solution the underlying need could plausibly support
 
 *Correct answer: B*
-*Explanation: The Netflix example illustrates the Iceberg model directly: optimizing the visible request (faster delivery) versus digging into the underlying need (convenient access to content), which pointed toward a fundamentally different category of solution.*
+*Explanation: Faster shipping and more distribution centers optimize the visible request. Reading the need as convenient access to entertainment, rather than faster DVDs, opens a different category of solution entirely.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty, Product Thinking) A PM holds all three legs of the Accountability Triangle in view for a proposed feature: it is technically feasible, and a financial model shows it would be profitable. However, the PM has not yet examined whether the underlying user need is real. Using this lesson's framework, what should the PM do next, and why?**
-A) Proceed immediately, since feasibility and viability are both confirmed
-B) Examine desirability with the same rigor already applied to feasibility and viability, since product thinking specifically refuses to settle on a solution until the underlying problem has been examined — a technically excellent, profitable solution to the wrong problem is still a failure
-C) Skip desirability entirely, since it is the least important leg of the Triangle
-D) Assume desirability is automatically satisfied if viability is confirmed
+A) Proceed, since two of the three legs have been confirmed with evidence
+B) Treat desirability as satisfied, because a profitable model implies demand
+C) Defer the decision until a competitor validates the category for them
+D) Examine desirability with the rigor already applied to the other two legs
 
-*Correct answer: B*
-*Explanation: The lesson defines product thinking as holding all three legs of the Triangle in view simultaneously, specifically refusing to settle on a solution until desirability has been examined with the same rigor as feasibility and viability — confirming the other two legs alone is precisely the failure mode of pure technical or pure business thinking described in the Theory section.*
+*Correct answer: D*
+*Explanation: Confirming feasibility and viability alone is precisely the pure-technical and pure-business failure mode the Theory section describes. A well-engineered, profitable solution to a problem no one has is still a failure.*
 *Learning objective tested: #1, #4*
 *Difficulty: Hard*
 

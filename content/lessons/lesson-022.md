@@ -415,195 +415,195 @@ There is no single correct answer. The purpose of this exercise is to practice a
 ## Quiz
 
 **1. Which of the following best describes the core purpose of a PRD, according to this lesson?**
-A) To make a PM appear thorough to senior leadership
-B) To give engineering, design, and QA a shared, unambiguous reference point for what is being built, why, and to what specification
-C) To replace the need for any further cross-functional communication during a project
-D) To specify every possible implementation detail exhaustively, leaving no decisions to engineering or design
+A) To make a PM appear thorough to the senior leadership team above
+B) To remove the need for further cross-functional communication
+C) To specify every implementation detail exhaustively
+D) To give engineering, design, and QA one shared reference point
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit core purpose — solving the specific failure of different team members building from different mental models, not appearing thorough or eliminating further communication.*
+*Correct answer: D*
+*Explanation: The failure a PRD exists to prevent is three functions building from three private mental models of the same feature. It supports further conversation rather than replacing it.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why must a PRD's problem statement and goals be established before functional requirements are specified?**
-A) Because functional requirements are always less important than goals
-B) Because opening with requirements invites readers to evaluate them against their own private, unstated assumptions about the problem, rather than a shared, explicit understanding
-C) Because problem statements must always be longer than functional requirements sections
-D) Because engineering teams refuse to read documents that don't open with a problem statement
+A) Because problem statements must run longer than requirements
+B) Because functional requirements always matter less than goals do
+C) Because requirements first invites readers' private assumptions
+D) Because engineering refuses to read documents ordered any other way
 
-*Correct answer: B*
-*Explanation: This directly reflects the lesson's ordering discipline, extending Lesson 17's anchoring-avoidance principle to the structure of an entire specification document.*
+*Correct answer: C*
+*Explanation: Without a stated problem at the top, each reviewer silently supplies their own and judges the requirements against that. The anchoring risk from Lessons 12 and 17 recurs at document scale.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Which of the following is the clearest example of over-specification in a PRD, according to this lesson?**
-A) "The system must send a notification within 5 seconds of the triggering event."
-B) "The database should use this exact table schema with these specific column names and types."
-C) "Users should be able to dismiss the notification."
-D) "The feature must be accessible to users relying on screen readers."
+A) "The database should use this exact schema, with these column names and types."
+B) "The system must send a notification within five seconds of the trigger."
+C) "The feature must be usable by people relying on screen readers."
+D) "Users should be able to dismiss the notification they receive."
 
-*Correct answer: B*
-*Explanation: Specifying an exact database schema dictates an implementation detail properly belonging to engineering expertise, unlike the other options, which specify required behavior without pre-empting technical implementation choices.*
+*Correct answer: A*
+*Explanation: The other three specify required behaviour and leave the method open. A schema is a technical decision belonging to the people who will live with its consequences.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What is the risk of under-specification in a PRD?**
-A) It pre-empts engineering or design expertise
-B) It leaves genuine ambiguity that different team members may resolve inconsistently, discovering the mismatch during implementation or QA
-C) It always makes a document too long
-D) It eliminates the need for any further collaboration
+A) It removes the need for any further collaboration on the build
+B) It leaves ambiguity that team members resolve inconsistently, surfacing late in QA
+C) It pre-empts the engineering or design expertise on the team
+D) It always makes the resulting document considerably too long
 
 *Correct answer: B*
-*Explanation: Under-specification is defined by the lesson as leaving requirements vague enough that reasonable people could interpret them very differently, exactly the failure a PRD exists to prevent.*
+*Explanation: "Handle errors gracefully" means something different to each reader, and the divergence stays invisible until someone tests it against a definition nobody agreed on.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What is the "PRD as one-way document" failure pattern?**
-A) A PRD that is too short to be useful
-B) Treating a PRD as a final, unquestionable decree handed to engineering and design, rather than a living, collaboratively refined artifact
-C) A PRD that includes too many open questions
-D) A PRD written collaboratively by multiple stakeholders from the outset
+A) A document written collaboratively by several stakeholders from the start
+B) A document containing rather too many unresolved open questions
+C) Treating a PRD as a decree rather than a living artifact
+D) A document that is simply too short to be genuinely useful
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition of the failure pattern, distinct from document length or the inclusion of open questions (which the lesson actually encourages).*
+*Correct answer: C*
+*Explanation: Questions then read as deviations from a settled plan rather than the expected refinements they are, and the implementation-stage insight never reaches the document.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what specific consequence resulted from over-specifying the database schema?**
-A) The system launched significantly ahead of schedule
-B) A subsequent notification-digest feature required a costly database migration, directly because of the original schema choice
-C) The engineering team refused to build the specified schema at all
-D) No meaningful consequence resulted from this specific decision
+A) The engineering team declined to build the specified schema at all
+B) The system launched considerably ahead of its original schedule
+C) No meaningful consequence followed from that specific decision
+D) A later notification-digest feature needed a costly migration
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes the costly later migration to the prematurely specified schema, which an engineer had concerns about but didn't feel invited to raise given the document's framing.*
+*Correct answer: D*
+*Explanation: An engineer had misgivings at review time and did not feel invited to raise them. The cost arrived months later, as a migration nobody had budgeted for.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. Why did the engineer and designer in the Detailed Case Study not raise their concerns about the specified requirements before implementation?**
-A) They had no concerns about the specifications at all
-B) They treated the PRD as a finalized, non-negotiable specification, given how the document was framed and circulated, rather than an invitation to genuine collaborative review
-C) They were not informed that a PRD existed for this project
-D) They agreed completely with every specified detail
+A) They read the PRD as already finalised rather than open for review
+B) They held no concerns about any of the specifications
+C) They were never told a PRD existed for this project
+D) They agreed completely with every specified detail in the document
 
-*Correct answer: B*
-*Explanation: The case study explicitly attributes their silence to the document's one-way framing, not agreement or lack of awareness — both had legitimate concerns they didn't feel invited to raise.*
+*Correct answer: A*
+*Explanation: Both had real reservations. How the document was framed and circulated told them the decisions were closed, so neither treated review as an invitation.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. According to the PRD Review Checklist, what should happen with open questions and risks in a PRD?**
-A) They should be omitted to project confidence and certainty
-B) They should be explicitly listed, rather than papered over with false specificity
-C) They should be resolved unilaterally by the PM before the document is shared with anyone
-D) They are not a necessary component of a PRD
+A) List them explicitly rather than papering over them
+B) Omit them so the document projects confidence and certainty
+C) Resolve them unilaterally before sharing with anybody else
+D) Treat them as an unnecessary component of any PRD document
 
-*Correct answer: B*
-*Explanation: The Review Checklist explicitly calls for open questions and risks to be listed transparently, rather than hidden behind false confidence or specificity.*
+*Correct answer: A*
+*Explanation: A document that hides its uncertainty projects more confidence than the team has earned, and the unresolved question surfaces later at a higher price.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A PM drafts a PRD specifying that "the checkout process must feel fast and modern." According to the Precision Dial, what is the issue with this requirement, and how should it be improved?**
-A) This requirement is appropriately specified and needs no revision
-B) This requirement is under-specified — "feel fast and modern" is vague and open to inconsistent interpretation; it should be replaced with a specific, testable behavior or performance target while still leaving exact visual execution to design
-C) This requirement is over-specified and should be removed entirely
-D) This requirement should specify the exact CSS styling to use, to eliminate any ambiguity
+A) It is appropriately specified as written and needs no revision
+B) Under-specified; replace with a testable target
+C) Over-specified and should be removed from the document entirely
+D) It should name the exact CSS styling to remove all ambiguity
 
 *Correct answer: B*
-*Explanation: "Feel fast and modern" is vague and untestable, an example of under-specification; the fix is a specific, testable requirement (e.g., a load-time target) while still leaving exact visual execution — the "how" — to design's expertise.*
+*Explanation: Nobody can build or test "modern." A load-time threshold is checkable, and the visual execution that delivers it still belongs to design.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A PM circulates a draft PRD and explicitly writes, "I'd like genuine pushback on the approach in section 3 — please propose alternatives if you see a better way to meet this goal." What discipline does this practice reflect?**
-A) The "PRD as one-way document" failure pattern
-B) A deliberate effort to avoid the one-way document failure pattern, inviting genuine collaborative review rather than passive acceptance
-C) Over-specification, since the PM is dictating exactly what feedback to provide
-D) Under-specification, since the PM has not yet finalized the requirements
+A) Under-specification, since the requirements are not yet finalised
+B) Over-specification, since the PM dictates the feedback
+C) A deliberate move against the one-way document failure pattern
+D) The one-way document failure pattern, in its clearest possible form
 
-*Correct answer: B*
-*Explanation: This explicit invitation for pushback and alternatives is precisely the corrective practice this lesson recommends against the one-way document failure pattern.*
+*Correct answer: C*
+*Explanation: Naming where pushback is wanted converts a nominal review into a real one, which is exactly what the engineer in the case study needed and did not get.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate describes writing a PRD that specifies the exact pixel spacing and color hex codes for every UI element, without input from the design team. What might this signal, based on this lesson's Interview Perspective section?**
-A) An exceptionally thorough and well-regarded PRD practice
-B) A likely instance of over-specification, dictating implementation details outside the PM's design expertise without inviting the relevant experts' judgment
-C) That the candidate has strong visual design skills that should be considered a core PM competency
-D) Nothing meaningful, since specifying visual details is always appropriate for a PM to do unilaterally
+A) A thorough and widely admired PRD writing practice
+B) Strong visual design skill, which counts as a core PM competency
+C) Over-specification, dictating choices that belong to design
+D) Nothing of note, since specifying visual detail is always a PM call
 
-*Correct answer: B*
-*Explanation: This directly matches the lesson's definition of over-specification — dictating detailed implementation choices (here, exact visual styling) that belong to design expertise, without inviting collaborative input.*
+*Correct answer: C*
+*Explanation: Deciding it unilaterally risks being both wrong and constraining. The PM can specify what the interface must accomplish and leave the execution to the people trained in it.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A PRD includes a section attempting to break down every individual user story and specific acceptance criterion in exhaustive detail, duplicating content that the team also maintains separately in a project management tool. According to this lesson, what is the issue with this practice?**
-A) This is ideal practice, since more detail in a single document is always better
-B) This risks duplicating, and potentially conflicting with, more granular artifacts (user stories, acceptance criteria) that are better maintained separately, per Lessons 23 and 24
-C) User stories and acceptance criteria should never exist as separate artifacts from the PRD under any circumstances
-D) This practice has no meaningful downside as long as the PRD is kept up to date
+A) Ideal practice, since more detail in one document is always better
+B) User stories ought not exist separately from the PRD document
+C) No meaningful downside, provided the PRD is kept fully up to date
+D) It duplicates artifacts better maintained separately
 
-*Correct answer: B*
-*Explanation: The lesson explicitly warns against a PRD duplicating content that belongs in more granular, separately maintained artifacts, since this risks inconsistency and blurs the PRD's appropriate scope.*
+*Correct answer: D*
+*Explanation: Two copies of the same acceptance criteria drift apart, and then the team has two sources of truth and no way to tell which one is current.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes a scenario where an engineer, during implementation, discovers a significant technical constraint that would require deviating from a PRD's specified approach, but proceeds with the flawed original specification anyway rather than raising the concern. What is the strongest diagnostic question for a candidate to ask about the team's process, based on this lesson?**
-A) "Was the PRD written in a format the engineering team could technically access?"
-B) "Was the PRD treated as a living, collaboratively refined document that genuinely welcomed this kind of mid-implementation pushback, or was it framed and circulated as a final, unquestionable decree?"
-C) "Did the PRD include enough Mermaid diagrams to be visually engaging?"
-D) "Was the PRD approved by a sufficiently senior stakeholder before implementation began?"
+A) "Was the PRD approved by a senior enough stakeholder beforehand?"
+B) "Was the PRD in a format the engineering team could actually access?"
+C) "Did the PRD contain enough diagrams to be visually engaging?"
+D) "Was the PRD framed as a living document that welcomed this pushback?"
 
-*Correct answer: B*
-*Explanation: This diagnostic question directly targets the lesson's core failure pattern — whether the document's framing and team culture invited genuine, ongoing collaboration or discouraged raising legitimate concerns once implementation had begun.*
+*Correct answer: D*
+*Explanation: The engineer knew and said nothing, which points at the document's framing rather than its accessibility, its diagrams, or its approval chain.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team's PRD process requires formal, multi-stakeholder sign-off before any implementation can begin, and stakeholders routinely approve documents without substantive comment, viewing the sign-off as a procedural formality. According to this lesson, does this satisfy the goal of collaborative, living specification?**
-A) Yes, since a formal sign-off process is sufficient regardless of the substance of the review
-B) No — a formal sign-off process that has become a procedural formality without substantive engagement still risks functioning as a "one-way document" in practice, despite its formal appearance of collaboration
-C) Yes, as long as the PRD includes all the required sections listed in this lesson's template
-D) This scenario is not addressed by this lesson's framework at all
+A) No — a formality without engagement still works as a one-way document
+B) Yes, since a formal sign-off step suffices whatever its substance
+C) Yes, provided the PRD contains every section this lesson lists
+D) This scenario falls outside the scope of the lesson's framework entirely
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's distinction between the appearance of collaboration (a formal sign-off step) and its substance (genuine, engaged review and pushback) — a procedural formality without real engagement still falls into the one-way document failure pattern in practice.*
+*Correct answer: A*
+*Explanation: The signatures record that people saw the document, not that anyone examined it. Structurally this is the same outcome as handing over a decree, with more paperwork.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team writes a PRD that correctly opens with a problem statement and goals, specifies functional requirements at an appropriate level of precision, explicitly lists open questions, and circulates the document for genuine review — but the underlying problem statement itself, inherited from an earlier stage, is later discovered to be based on an un-laddered, surface-level pain point (per Lesson 16) rather than its actual root cause. What does this scenario illustrate?**
-A) That PRD-writing discipline alone is sufficient regardless of the quality of the underlying problem statement it's built on
-B) That a well-constructed PRD, following every discipline in this lesson, can still lead a team astray if the problem statement it opens with was never properly validated and laddered in the first place — PRD quality does not substitute for the upstream research and problem-formalization work in Lessons 6, 16, and 17
-C) That problem statements are unnecessary once a PRD's functional requirements are appropriately specified
-D) That this scenario is impossible if a PRD follows the structure described in this lesson
+A) PRD discipline alone suffices, whatever the problem statement beneath
+B) A well-built PRD can still mislead if the problem beneath it was never laddered and validated
+C) Problem statements become unnecessary once requirements are precise
+D) This scenario cannot occur if a PRD follows the structure described
 
 *Correct answer: B*
-*Explanation: This connects PRD-writing discipline back to the upstream chain the entire curriculum has built — a PRD's internal quality (structure, precision, collaborative review) cannot substitute for a genuinely validated, laddered problem statement underneath it; both layers of discipline are necessary, and excellence at one layer does not compensate for a failure at another.*
+*Explanation: Every discipline in this lesson operated correctly, on top of a foundation from Lesson 16 that had not. Excellence at one layer of the chain does not repair a gap in another.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 

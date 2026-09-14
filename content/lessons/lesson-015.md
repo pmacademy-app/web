@@ -421,194 +421,194 @@ There is no single correct answer. The purpose of this exercise is to practice b
 
 **1. Which of the following is NOT one of the five core components of a user journey map described in this lesson?**
 A) Stages
-B) Actions
-C) Competitor pricing
-D) Touchpoints
+B) Competitor pricing
+C) Touchpoints
+D) Thoughts and emotions
 
-*Correct answer: C*
-*Explanation: The five core components are stages, actions, thoughts/emotions, touchpoints, and pain points. Competitor pricing is not one of the named components.*
+*Correct answer: B*
+*Explanation: The five are stages, actions, thoughts/emotions, touchpoints, and pain points. What rivals charge belongs to competitive analysis, not to a map of one persona's experience.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why is a journey map built from a team's idealized, assumed version of a process considered risky, according to this lesson?**
-A) Because idealized processes are always technically infeasible
-B) Because it tends to reflect how the team designed the process to work rather than how users actually experience it, often omitting uncomfortable friction points
-C) Because assumption-based maps take longer to build than research-based ones
-D) Because idealized maps cannot be presented visually
+A) Because idealized processes prove technically infeasible to build
+B) Because assumption-based maps take longer to build than researched ones
+C) Because an idealized map cannot be presented visually
+D) Because it reflects intended design, not lived experience
 
-*Correct answer: B*
-*Explanation: This directly parallels Lesson 14's warning about assumption-based personas — an idealized map reflects intended design, not lived reality, and tends to miss uncomfortable friction.*
+*Correct answer: D*
+*Explanation: The map ends up describing how the team meant the flow to work. It is especially prone to omitting the friction that would implicate a decision someone in the room championed.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is the "happy path only" failure pattern?**
-A) Building a journey map that only includes touchpoints, without stages or actions
-B) Building a journey map that represents only the smoothest, most successful version of a process, omitting real friction, detours, and abandoned attempts
-C) Building a journey map for more than one persona at once
-D) Building a journey map without any visual diagram
+A) Building a map covering more than one persona at the same time
+B) Building a map with touchpoints but no stages or actions listed
+C) Building a map without producing any accompanying visual diagram
+D) Building a map of the smoothest version, omitting friction and detours
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit definition — a map that captures only the cleanest possible version of a journey, missing the messier reality many real users actually experience.*
+*Correct answer: D*
+*Explanation: The result looks clean and presentable and leaves out the backtracking, the workarounds, and the people who gave up — which is most of what a map is for.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is it important for a journey map to capture thoughts and emotions in addition to actions?**
-A) Because actions alone are always inaccurate
-B) Because two users can take an identical sequence of actions while having very different internal experiences, and the emotional/cognitive detail often points most directly to an actionable fix
-C) Because emotions are easier to measure than actions
-D) Because thoughts and emotions are the only component required in a journey map
+A) Because emotions are easier to measure reliably than actions are
+B) Because recorded actions are inaccurate in essentially every case
+C) Because identical actions can hide different experiences
+D) Because thoughts and emotions are the sole required map component
 
-*Correct answer: B*
-*Explanation: The lesson explains that action-only maps cannot distinguish between a confident and a confused user taking the same steps, losing exactly the detail most useful for design decisions.*
+*Correct answer: C*
+*Explanation: One user clicks through confidently, another clicks through anxious but with no alternative. The action log is identical, and the two call for entirely different design responses.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. According to the Journey Map Truth Test, what should a reviewer suspect about a journey map that shows zero friction anywhere in the process?**
-A) That the process is genuinely flawless and requires no further investigation
-B) That the map is likely idealized and assumption-based, since real user experiences of any nontrivial process virtually always include at least some genuine friction
-C) That the map was built using only quantitative behavioral data
-D) That the map is too detailed and should be simplified
+A) That the map was built from quantitative behavioural data alone
+B) That the process is genuinely flawless and needs no investigation
+C) That the map carries too much detail and should be simplified
+D) That it is likely idealized, since real processes carry some friction
 
-*Correct answer: B*
-*Explanation: The Journey Map Truth Test treats the complete absence of uncomfortable friction as a reliable warning sign of an idealized, assumption-based map rather than a genuinely research-grounded one.*
+*Correct answer: D*
+*Explanation: Any nontrivial process produces some friction for someone. Its total absence from a map says more about how the map was built than about how the process runs.*
 *Learning objective tested: #2, #3*
 *Difficulty: Easy*
 
 ---
 
 **6. What is the recommended scope for a single journey map, according to this lesson?**
-A) The entire user experience of the product, across all personas and all processes
-B) One specific, validated persona moving through one specific, well-defined process
-C) Every persona the company has identified, mapped through a single generic process
-D) A journey map should never be scoped narrowly, since broader maps are always more useful
+A) One specific validated persona moving through one well-defined process
+B) Every persona identified, mapped through a single generic process
+C) The entire product experience, across all personas and processes
+D) Narrow scoping should be avoided, since broader maps prove useful
 
-*Correct answer: B*
-*Explanation: The lesson explicitly recommends narrow scoping — one persona, one process — warning that broader attempts lose the specific, actionable detail that makes journey mapping useful.*
+*Correct answer: A*
+*Explanation: A map covering everything abstracts away the concrete detail that made it worth drawing. This is the "for everyone" failure from Lesson 7, arriving at the level of process.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what specific research method revealed the friction the original happy-path map had missed?**
-A) A large-scale quantitative survey
-B) Customer interviews using past-behavior questions about the first two weeks of the subscription
-C) A focus group conducted with the product team itself
-D) An analysis of competitor products
+A) A large-scale quantitative survey of the full subscriber base
+B) Past-behavior interviews about the first two weeks
+C) A focus group conducted with members of the product team
+D) A competitive analysis of rival meal-kit subscription products
 
 *Correct answer: B*
-*Explanation: The case study explicitly describes past-behavior interviews (per Lesson 12's technique) as the method that revealed the portion-size overwhelm and skip-week confusion the original map had missed.*
+*Explanation: Asking what actually happened in those two weeks surfaced the portion-size overwhelm and the hunt for the skip-week control. A team focus group would have reproduced the idealized map.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium*
 
 ---
 
 **8. What specific consequence resulted from the hard-to-locate "skip a week" feature in the Detailed Case Study?**
-A) The customer successfully found the feature after a brief search
-B) At least one customer contacted support in frustration and ultimately canceled the subscription rather than continuing to search for the feature
-C) The feature was immediately removed from the product
-D) The customer recommended the product to a friend despite the difficulty
+A) A customer contacted support in frustration and then cancelled
+B) The customer located the feature after only a brief further search
+C) The feature was removed in the following release
+D) The customer recommended the product despite the difficulty faced
 
-*Correct answer: B*
-*Explanation: The case study explicitly describes this specific escalation from confusion to frustration to cancellation as the consequence of the hard-to-locate feature.*
+*Correct answer: A*
+*Explanation: The escalation ran from confusion to frustration to cancellation. None of those three steps appeared anywhere on the original map, which showed a clean path through the same period.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team is deciding whether to build one comprehensive journey map covering "the entire customer lifecycle" or several narrower maps for specific processes (onboarding, renewal, cancellation). According to this lesson, which approach is recommended, and why?**
-A) One comprehensive map, since covering everything at once is always more efficient
-B) Several narrower maps, since a map scoped to one persona and one specific process retains the concrete detail needed to be genuinely useful, while an overly broad map loses that specificity
-C) Neither approach is valid; journey maps should never be built for more than a single touchpoint
-D) The choice does not matter, since journey map scope has no effect on usefulness
+A) Several narrower maps, which retain concrete, usable detail
+B) One comprehensive map, since covering everything at once is efficient
+C) Neither, since maps should never exceed a single touchpoint in scope
+D) The choice does not matter, since scope has no bearing on usefulness
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit scoping guidance — narrower, process-specific maps retain useful, actionable detail, while an attempt to cover an entire lifecycle in one map tends to lose specificity.*
+*Correct answer: A*
+*Explanation: Onboarding friction and cancellation friction are different problems with different stages and emotions. Forced into one artefact, both lose the specificity that would make either actionable.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A journey map shows a smooth, linear happy path with high emotional confidence at every single stage, based entirely on the design team's understanding of the intended onboarding flow. What should a PM do before trusting this map?**
-A) Accept the map immediately, since a clean, confident journey reflects a well-designed process
-B) Apply the Journey Map Truth Test and seek out actual research (interviews, behavioral data) to check whether real users experience the process as smoothly as the map suggests
-C) Add more visual polish to the map to make it more presentable
-D) Assume the map is accurate simply because it was created by the design team
+A) Accept it, since a clean journey shows good design
+B) Apply the Truth Test and check it against real research first
+C) Add further visual polish so the map presents more convincingly
+D) Assume accuracy, since the design team produced the artefact itself
 
 *Correct answer: B*
-*Explanation: A frictionless, entirely design-team-derived map is precisely the pattern the Journey Map Truth Test warns about, and should prompt validation against real research before being trusted.*
+*Explanation: Two warning signs coincide here — no friction anywhere, and no source outside the team that designed the flow. Either alone would warrant validation before the map drives decisions.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) An interviewer asks a candidate to describe a journey map they've built, and the candidate's description includes no mention of any friction, hesitation, or drop-off points anywhere in the process. What might this signal, based on this lesson's Interview Perspective section?**
-A) An exceptionally well-designed process requiring no further scrutiny
-B) A possible sign that the map was built from assumption rather than genuine research, since real processes of any complexity typically include at least some friction
-C) That the candidate is unqualified for any product research role
-D) Nothing meaningful, since frictionless journey maps are the expected, normal outcome of good design
+A) An exceptionally well-designed process needing no further scrutiny
+B) Nothing of note, since frictionless maps are the normal outcome
+C) Evidence the candidate is unsuited to any product research role
+D) A possible sign the map came from assumption rather than research
 
-*Correct answer: B*
-*Explanation: This directly applies the Journey Map Truth Test in an interview context — the complete absence of friction in a described journey map is treated as a weak signal, not a strong one.*
+*Correct answer: D*
+*Explanation: The interviewer is applying the Truth Test to the candidate's account. A map that implicates nothing usually means nobody went and asked the people who struggled.*
 *Learning objective tested: #2, #3*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team has behavioral analytics showing a sharp drop-off at a specific onboarding step, but no qualitative research explaining why users are dropping off at that point. According to this lesson and Lesson 11's complementary-methods framework, what should the team do next?**
-A) Conclude the drop-off is unimportant, since only quantitative data is available
-B) Conduct qualitative research (interviews) specifically targeting users who dropped off at that step, to understand the underlying thoughts and emotions driving the behavior the analytics data has only quantified, not explained
-C) Immediately redesign the step without further investigation, based purely on the drop-off percentage
-D) Ignore the analytics data entirely and rely solely on the team's assumption about the cause
+A) Redesign the step immediately, working from the drop-off rate alone
+B) Treat the drop-off as unimportant, since only quantitative data exists
+C) Interview users who dropped off, to learn why the behaviour occurs
+D) Disregard the analytics and rely on the team's assumption
 
-*Correct answer: B*
-*Explanation: This reflects the complementary-methods principle from Lesson 11 — quantitative data reveals the drop-off's existence and scale, while qualitative research is needed to understand the underlying why, which the journey map's thoughts/emotions component is specifically meant to capture.*
+*Correct answer: C*
+*Explanation: The analytics establish that and how much; they are silent on why. That gap is precisely what the thoughts-and-emotions row of a journey map exists to fill, and it needs qualitative work to fill it.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) A candidate is asked how they would scope a journey map for a complex, multi-featured product with several distinct user segments. A weak answer would most likely propose which of the following?**
-A) Building several narrower maps, each scoped to a specific validated persona and a specific process
-B) Attempting to build a single, comprehensive map covering the entire user experience across all segments and processes simultaneously
-C) Prioritizing which processes are most strategically important (echoing Lesson 10) before deciding which maps to build first
-D) Grounding each map in actual research specific to the relevant persona and process
+A) Attempt one comprehensive map spanning all segments and processes
+B) Build several narrower maps, each scoped to one persona and process
+C) Prioritise which processes matter most strategically before mapping
+D) Ground each map in research specific to that persona and process
 
-*Correct answer: B*
-*Explanation: Attempting to cover the entire user experience in a single map is explicitly identified in this lesson as producing an artifact too broad to retain useful, actionable specificity — the weak-answer pattern here.*
+*Correct answer: A*
+*Explanation: Breadth feels thorough and produces an artefact too abstract to act on. The other three each narrow the scope or strengthen the evidence behind it.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A journey map accurately identifies several genuine, research-grounded pain points, but the team has not yet decided which one to address first. What lesson does this scenario most directly set up?**
-A) Lesson 9 (Product Vision)
-B) Lesson 16 (Pain Points), which addresses prioritizing among multiple identified pain points
-C) Lesson 7 (Value Proposition)
-D) Lesson 5 (Users vs. Customers)
+A) Lesson 9, which covers product vision and long-term direction
+B) Lesson 16, which covers prioritising among identified pain points
+C) Lesson 7, which covers value proposition and positioning work
+D) Lesson 5, which covers the distinction between users and customers
 
 *Correct answer: B*
-*Explanation: The Connections section explicitly identifies Lesson 16 as the next lesson addressing exactly this gap — how to prioritize among multiple pain points a well-constructed journey map is likely to surface.*
+*Explanation: A good map reliably surfaces more friction than a team can address at once, which makes comparing those pain points the immediate next problem.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team builds a journey map using both past-behavior interviews and behavioral analytics, correctly scoped to one persona and one process, and including genuine friction points with associated thoughts and emotions — but the underlying research was conducted four years ago, before a significant product redesign. According to this lesson, what is the most appropriate response?**
-A) Continue using the map indefinitely, since it was built correctly at the time using rigorous methods
-B) Recognize that, like a persona (Lesson 14) or a vision (Lesson 9), a journey map can become outdated as the product and market evolve, and conduct fresh research to validate whether the mapped stages, friction points, and emotions still reflect the current, redesigned experience
-C) Discard the map entirely and build a new one based purely on team assumption, since re-running research would take too much time
-D) Assume the map remains accurate simply because it was built using rigorous methods originally
+A) Continue using it indefinitely, since the original method was sound
+B) Assume it holds, because rigorous methods were used at the time
+C) Treat it as potentially outdated and revalidate the mapped stages with fresh research
+D) Discard it and rebuild from team assumption, since research costs time
 
-*Correct answer: B*
-*Explanation: This tests the integration of this lesson's currency principle with Lesson 14's persona-updating guidance — even a rigorously built map can become outdated after a significant product change, and the appropriate response is fresh validation, not indefinite reliance or wholesale assumption-based replacement.*
+*Correct answer: C*
+*Explanation: Method quality does not survive a redesign. The same currency principle that applies to personas and visions applies here: the map was right about a product that no longer exists.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 

@@ -419,195 +419,195 @@ There is no single correct answer. The purpose of this exercise is to practice c
 ## Quiz
 
 **1. Which of the following best completes the problem statement template described in this lesson?**
-A) "[Persona] needs [specific feature] to solve [problem]."
-B) "[Specific persona] experiences [specific, laddered pain point] when trying to [specific job], particularly in [specific context]. This matters because [cited evidence]."
-C) "We should build [feature] because customers are asking for it."
-D) "Users are unhappy with the product overall."
+A) "[Persona] experiences [laddered pain point] doing [job], in [context], per [evidence]."
+B) "[Persona] needs [specific feature] in order to solve the problem that they currently face."
+C) "We should build [feature], because our customers keep asking us for it."
+D) "Users are broadly unhappy with the product as it currently stands today."
 
-*Correct answer: B*
-*Explanation: This is the lesson's explicit template, naming a specific persona, laddered pain point, job, context, and cited evidence, while deliberately excluding any proposed solution — unlike the other options.*
+*Correct answer: A*
+*Explanation: Every clause in A does work: a named segment instead of "users," a laddered cause instead of a symptom, a real job, a bounded context, and evidence that makes the claim falsifiable. None of it names a solution.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why must a problem statement exclude any proposed solution, according to this lesson?**
-A) Because solutions are always technically infeasible at the problem-framing stage
-B) Because naming even a passing candidate solution anchors the team's subsequent thinking, making genuine consideration of alternatives extraordinarily difficult
-C) Because problem statements are only used by executives, never by engineering teams
-D) Because including a solution would make the statement too long
+A) Because problem statements are used by executives, not engineers
+B) Because including a solution would make the statement too long
+C) Because solutions are always infeasible at the framing stage
+D) Because naming one anchors the team and forecloses the alternatives
 
-*Correct answer: B*
-*Explanation: The lesson explains this exclusion is about preventing the anchoring effect, where a named solution forecloses genuine exploration of the full solution space during subsequent discovery.*
+*Correct answer: D*
+*Explanation: Once "dark mode" is in the sentence, adjustable brightness, break reminders, and session-length simplification quietly stop being candidates — before a single discovery conversation happens.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Which of the following is the clearest example of a problem statement that is "too broad," as described in this lesson?**
-A) "Users need a PDF export button."
-B) "Users find the product hard to use."
-C) "Enterprise power users, who report multi-hour continuous sessions, experience visual fatigue during evening usage; this affects roughly 30% of daily active enterprise seats."
-D) "Asynchronous collaborators experience uncertainty about a document's most recent changes when returning after time away."
+A) "Users need a PDF export button on the reports screen."
+B) "Asynchronous collaborators feel unsure about recent document edits."
+C) "Users find the product hard to use in daily work."
+D) "Enterprise power users report fatigue in long evening sessions."
 
-*Correct answer: B*
-*Explanation: This statement fails to name a specific persona, pain point, or context, making it too general to provide any real direction for discovery — the defining feature of the "too broad" failure.*
+*Correct answer: C*
+*Explanation: No persona, no specific friction, no context. It could describe almost any product and gives a discovery team nowhere in particular to start.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. Which of the following is the clearest example of a "disguised solution" masquerading as a problem statement?**
-A) "Users need real-time cursor indicators showing who else is currently in a document."
-B) "Users experience uncertainty about who has recently edited a shared document."
-C) "This affects roughly 40% of asynchronous collaborators per usage analytics."
-D) "Asynchronous collaborators, who edit documents at different times, experience uncertainty about recent changes."
+A) "Users feel uncertain about who recently edited a shared document."
+B) "This affects roughly 40% of asynchronous collaborators per analytics."
+C) "Users need real-time cursor indicators showing who is in a document."
+D) "Asynchronous collaborators, editing at different times, feel uncertain about changes."
 
-*Correct answer: A*
-*Explanation: This statement names a specific solution (real-time cursor indicators) outright, rather than describing the underlying problem in solution-agnostic terms — exactly the "too narrow" / disguised-solution failure this lesson warns against.*
+*Correct answer: C*
+*Explanation: This is a build order in the grammar of a problem. It never says what goes wrong for whom, only what to make — and so it cannot be debated as the proposal it actually is.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What is the Purity Test used for, according to this lesson?**
-A) Checking whether a survey question is neutrally worded
-B) Checking whether a draft problem statement remains consistent with at least five genuinely different candidate solutions
-C) Determining how many personas a team should build
-D) Measuring a pain point's severity and frequency
+A) Checking whether a survey question is worded neutrally enough
+B) Checking a statement stays consistent with five different solutions
+C) Determining how many personas a product team ought to build
+D) Measuring both the severity and the frequency of a given pain point
 
 *Correct answer: B*
-*Explanation: The Purity Test specifically checks whether multiple, genuinely different solutions remain plausible given the problem statement as written — if only one obviously fits, a solution has likely been smuggled in.*
+*Explanation: If only one candidate comes to mind, that candidate is already inside the statement, whether or not anyone wrote its name.*
 *Learning objective tested: #2, #3*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what was the actual underlying problem that the "real-time cursor indicator" solution failed to address?**
-A) Users wanted a faster document loading time
-B) Most complaining users worked asynchronously and were actually concerned about not knowing whether a document reflected a colleague's most recent changes, not about simultaneous editing
-C) Users wanted the ability to delete old document versions
-D) Users wanted a way to prevent colleagues from editing documents at all
+A) Users wanted the ability to delete older document versions
+B) Users wanted faster document loading on the shared workspace
+C) Most complaining users worked asynchronously, not at the same time
+D) Users wanted a way to stop colleagues editing documents entirely
 
-*Correct answer: B*
-*Explanation: The case study explicitly reveals that most complaining users edited documents asynchronously, and their actual concern was about recent changes rather than the literal, simultaneous-editing scenario the built feature addressed.*
+*Correct answer: C*
+*Explanation: The feature solved simultaneous editing, which was not the situation these users were in. Their worry was whether what they were reading reflected a colleague's latest work.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **7. Why is citing evidence considered essential in a problem statement, according to this lesson?**
-A) Because evidence citation is only required for problems affecting more than half of all users
-B) Because a statement built on assumption rather than laddered pain points and research findings is an unvalidated guess dressed up in a formal-looking structure
-C) Because evidence citation makes a problem statement legally binding
-D) Because problem statements without evidence are always factually false
+A) Because citing evidence makes a problem statement legally binding
+B) Because uncited statements are always factually incorrect
+C) Because citation is required for problems affecting most of the base
+D) Because without it the statement is an assumption in formal dress
 
-*Correct answer: B*
-*Explanation: The lesson explicitly warns that an uncited problem statement risks being an unvalidated assumption wearing the appearance of rigor, echoing Lesson 11's general warning about polished presentation not conferring trustworthiness.*
+*Correct answer: D*
+*Explanation: A structured template makes a guess look validated. The citation is what lets a sceptical colleague check the claim instead of taking the formatting as proof.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. What is the most important ongoing function of a problem statement once it has been finalized, according to this lesson?**
-A) Serving as a permanent, unchangeable historical record
-B) Serving as a shared reference point for checking whether an eventually proposed solution actually addresses the specific persona, pain point, job, and context originally named
-C) Replacing the need for any further discovery or research
-D) Determining the exact engineering timeline for a project
+A) Determining the precise engineering timeline for the project
+B) Replacing the need for any further discovery or research work
+C) Serving as a permanent, unchangeable historical record of intent
+D) Serving as the reference point for checking whether a solution fits
 
-*Correct answer: B*
-*Explanation: The lesson explicitly frames this ongoing filtering function — checking proposed solutions against the original statement — as the problem statement's most important continued use.*
+*Correct answer: D*
+*Explanation: Without a stable, solution-free statement to return to, there is no way to ask later whether what got built actually solves what the team set out to solve.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. (Scenario) A team writes a problem statement that reads: "Mid-market customers, who manage teams of 10–30 employees, struggle to get timely approval on expense reports, particularly when a manager is traveling; this affects 45% of mid-market accounts per support ticket analysis and interview findings." Does this problem statement pass the Purity Test?**
-A) No, because it names a specific solution
-B) Yes, since multiple genuinely different solutions (delegate-approval settings, automated approval thresholds, mobile-optimized approval flows, or manager-substitute rules) would all remain consistent with this framing
-C) No, because it is too broad and vague
-D) It is impossible to determine without knowing the exact engineering team assigned to the project
+A) Yes — several different solutions stay consistent with this framing
+B) No, because the statement names a specific solution outright
+C) No, because the statement is too broad and vague to act on
+D) It cannot be judged without knowing which engineering team is assigned
 
-*Correct answer: B*
-*Explanation: This statement names a specific persona, pain point, job, context, and evidence without committing to any single solution, leaving multiple genuinely different candidate solutions open — passing the Purity Test.*
+*Correct answer: A*
+*Explanation: Delegate approvals, automatic thresholds, a mobile approval flow, and substitute-approver rules all fit the statement as written, which is exactly what the test is looking for.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **10. (Product Thinking) A team proposes a solution and, upon reviewing their original problem statement, realizes the solution actually addresses a different persona and context than the one specified. According to this lesson, what should the team do?**
-A) Proceed with the solution anyway, since problem statements are not meant to be checked against later
-B) Recognize that the mismatch is a genuine warning sign, and either adjust the solution to better address the originally validated problem, or explicitly revisit and reconsider whether the problem statement itself needs updating based on new evidence
-C) Ignore the problem statement entirely and rely solely on the proposed solution's technical merits
-D) Discard the proposed solution automatically, without further discussion, whenever any mismatch is found
+A) Proceed with it regardless, since problem statements are not meant to be rechecked
+B) Treat the mismatch as a warning; adjust the solution or revisit the statement
+C) Rely on the solution's technical merits and set the statement aside
+D) Discard the solution automatically whenever any mismatch appears
 
 *Correct answer: B*
-*Explanation: This reflects the lesson's guidance on using the problem statement as an active filter — a mismatch should prompt deliberate reconsideration, not automatic rejection or being ignored outright.*
+*Explanation: A mismatch means one of the two is wrong, and which one is a real question. New evidence may justify updating the statement; drift alone does not.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked to describe a problem statement they've written, and their description includes a specific named feature as part of the "problem." What might this signal, based on this lesson's Interview Perspective section?**
-A) Strong, efficient problem-framing skills
-B) A possible instance of solution contamination, since a genuine problem statement should remain agnostic about which specific solution will resolve the underlying issue
-C) That the candidate has advanced technical skills
-D) Nothing meaningful, since including a solution in a problem statement is standard best practice
+A) Possible solution contamination, since the framing should stay agnostic
+B) Strong and efficient problem-framing skills under time pressure
+C) Evidence of unusually advanced technical skill in the candidate's background
+D) Nothing of note, since embedding a solution is standard practice here
 
-*Correct answer: B*
-*Explanation: The lesson's Interview Perspective explicitly treats a solution embedded within a described "problem statement" as a weak signal, reflecting the exact anchoring risk this lesson warns against.*
+*Correct answer: A*
+*Explanation: The interviewer is checking whether the candidate can hold a problem open. A feature inside the problem statement means the solution space closed before discovery began.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **12. (Product Thinking, Higher Difficulty) A team's problem statement names a specific persona and job, but provides no cited evidence for the claimed pain point's severity or frequency. According to the Problem Statement Review Checklist, what should happen next?**
-A) The problem statement should be finalized as-is, since persona and job specification are sufficient on their own
-B) The team should gather and cite specific evidence (laddered interview findings, survey or behavioral data) before treating the statement as validated and ready to anchor discovery work
-C) The problem statement should be discarded entirely, since it is fundamentally unusable without evidence
-D) The team should proceed directly to building a solution, since evidence citation is optional for internal documents
+A) Finalise it as-is, since persona and job specification already suffice
+B) Proceed straight to building, since citation is optional internally
+C) Gather and cite specific evidence before anchoring discovery
+D) Discard the statement entirely, since it is unusable without evidence
 
-*Correct answer: B*
-*Explanation: The Review Checklist explicitly requires cited evidence as one of its criteria; a statement missing this element needs further validation before being treated as a trustworthy, ready-to-use problem statement.*
+*Correct answer: C*
+*Explanation: The framing may well be right; it simply has not been shown to be. Evidence is an addition the draft needs, not grounds for throwing the draft away.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Interview Reasoning, Higher Difficulty) An interviewer describes two draft problem statements and asks a candidate which is better: Draft A specifies a persona, pain point, job, and context but cites no evidence; Draft B specifies a persona and cites strong evidence but is written as "users need feature X to solve their frustration." Which draft has the more fundamental flaw, and why?**
-A) Draft A, since missing evidence is always a more severe flaw than solution contamination
-B) Draft B, since naming a specific solution ("feature X") forecloses genuine consideration of the full solution space — a more fundamental violation of the problem statement's core purpose than a missing evidence citation, which can still be added later without changing the statement's essential framing
-C) Neither draft has any meaningful flaw
-D) Draft A, because it is longer than Draft B
+A) Draft A, since missing evidence always outweighs solution contamination
+B) Draft B, since naming a solution forecloses the space as a citation gap does not
+C) Draft A, because it runs noticeably longer than Draft B
+D) Neither draft carries any meaningful flaw worth raising here
 
 *Correct answer: B*
-*Explanation: While both drafts have real flaws, this lesson treats solution contamination as the single most important discipline to protect — a solution-contaminated statement undermines the entire purpose of the artifact in a way that a missing (but addable) evidence citation does not.*
+*Explanation: Both are flawed. A citation can be added without changing what Draft A frames; removing feature X from Draft B changes what the statement is about, which is the deeper problem.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 
 ---
 
 **14. (Product Thinking, Higher Difficulty) A team applies the Purity Test to a draft problem statement and can only identify one plausible candidate solution, despite genuine effort to brainstorm alternatives. What does this most likely indicate?**
-A) The problem statement is excellent and ready to use, since a single clear solution demonstrates strong problem-framing
-B) The problem statement has likely been scoped too narrowly, and may already be a disguised solution requiring broader reframing before discovery begins
-C) The team should proceed immediately with the one identified solution, since Purity Test results are not meant to be acted upon
-D) The Purity Test is not applicable in cases where only one solution is identified
+A) The statement is excellent, since one clear solution shows strong framing
+B) Scoped too narrowly; it is likely a disguised solution already
+C) Proceed with the one solution, since test results are not to be acted on
+D) The Purity Test does not apply where only a single solution is identified
 
 *Correct answer: B*
-*Explanation: The Purity Test's core function is precisely this — an inability to generate multiple genuinely different candidate solutions signals that a solution has very likely already been prematurely smuggled into the framing.*
+*Explanation: A genuinely open problem admits several routes. When only one fits, the statement has usually described the route rather than the destination.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A team writes a correctly scoped, evidence-cited, solution-free problem statement, uses it to generate five genuinely different candidate solutions, and ultimately builds one of them. Six months later, usage data shows the built solution has not resolved the original pain point. Using this lesson's framework, what should the team do?**
-A) Conclude that problem statements are not useful tools, since the chosen solution failed
-B) Return to the original problem statement as the stable reference point, and use it to evaluate the remaining candidate solutions (or generate new ones), rather than assuming the underlying problem itself was invalid
-C) Assume the persona and pain point named in the original statement were incorrect, and abandon the entire initiative
-D) Build all five originally identified candidate solutions simultaneously, without further evaluation
+A) Conclude problem statements are not useful, since the chosen solution failed
+B) Assume the persona and pain point were wrong, and abandon the initiative
+C) Build all five candidate solutions at once, without further evaluation
+D) Return to the statement and evaluate the remaining candidates
 
-*Correct answer: B*
-*Explanation: This reflects the problem statement's core value as a stable reference point — a failed solution attempt does not invalidate a well-validated problem statement; it simply means the wrong candidate solution (out of several genuinely considered) was chosen, and the team should return to the same evidence-based framing to evaluate alternatives rather than either discarding the discipline or the entire initiative.*
+*Correct answer: D*
+*Explanation: A validated problem and a failed solution are different findings. The statement is the asset that survives the failure, and four considered alternatives are still sitting beside it.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 

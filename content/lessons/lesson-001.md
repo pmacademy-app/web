@@ -490,13 +490,13 @@ There is no single correct answer. The purpose of this exercise is to practice r
 ## Quiz
 
 **1. What is the primary distinguishing accountability of a Product Manager, compared to an engineer or designer?**
-A) Writing the highest-quality code
-B) Accountability for the fit between problem, solution, and business value
-C) Managing the largest team
-D) Creating the final visual design
+A) Accountability for the technical correctness of what the team builds
+B) Accountability for the usability and visual quality of the interface
+C) Accountability for the fit between problem, solution, and business value
+D) Accountability for the delivery schedule and budget the team commits to
 
-*Correct answer: B*
-*Explanation: Engineers are accountable for whether the code works and designers for usability; the PM is uniquely accountable for whether the product solves the right problem in a way that creates value.*
+*Correct answer: C*
+*Explanation: Engineers own technical correctness and designers own usability; the delivery schedule belongs to project management. Only the PM is accountable for whether the product solves the right problem in a way that creates value.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
@@ -504,12 +504,12 @@ D) Creating the final visual design
 
 **2. Which of the following is NOT one of the three core questions a PM must answer?**
 A) What problem are we solving, and for whom?
-B) What should we build to solve it?
-C) How much will each team member be paid?
-D) How do we know if it worked?
+B) What should we build in order to solve it?
+C) How will we know whether it actually worked?
+D) How should we divide the work across the team?
 
-*Correct answer: C*
-*Explanation: Compensation is an HR/management function, not one of the three defining questions of product management.*
+*Correct answer: D*
+*Explanation: Dividing and sequencing the work is an execution concern held by the team and its engineering lead. The three core questions concern the problem, the solution, and the measure of success.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -517,168 +517,168 @@ D) How do we know if it worked?
 
 **3. A team ships five new features in a quarter, but user retention does not improve. This is best described as:**
 A) High outcome, low output
-B) High output, low outcome
-C) High viability, low feasibility
-D) A failure of engineering execution
+B) High viability, low feasibility
+C) High output, low outcome
+D) High desirability, low viability
 
-*Correct answer: B*
-*Explanation: Shipping features is output. Since retention (a behavior change) did not improve, outcome was low, despite high output.*
+*Correct answer: C*
+*Explanation: Shipping five features is output. Because retention — a behavior change — did not move, the outcome was low despite substantial output. This is the pattern the lesson calls the Build Trap.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is the "PM Venn diagram" (intersection of business, technology, design) described as incomplete in this lesson?**
-A) Because PMs do not work with designers
+A) Because it leaves out the marketing and go-to-market disciplines
 B) Because it describes proximity to disciplines, not actual accountability
-C) Because it does not include marketing
-D) Because it applies only to Spotify
+C) Because it applies to large companies but not to early-stage startups
+D) Because it overstates how much technical depth the role truly requires
 
 *Correct answer: B*
-*Explanation: The Venn diagram shows which departments a PM sits near, not what the PM is actually responsible for delivering — problem-solution-value fit.*
+*Explanation: The diagram shows which functions a PM sits near, not what result the PM alone is on the hook for. Knowing a little about each discipline is a side effect of holding accountability for problem-solution-value fit, not the accountability itself.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. In the Accountability Triangle, "Viability" refers to:**
-A) Whether users want the solution
-B) Whether the solution can technically be built
-C) Whether the solution makes sense for the business
-D) Whether the solution has been tested with real users
+A) Whether users actually want the solution being proposed
+B) Whether the solution makes commercial and strategic sense
+C) Whether the solution can be built with available technology
+D) Whether the solution has been validated through usability testing
 
-*Correct answer: C*
-*Explanation: Viability concerns business sense — cost, revenue, strategic fit — distinct from desirability (user want) and feasibility (technical possibility).*
+*Correct answer: B*
+*Explanation: Viability concerns the business case — cost, revenue, and strategic fit. Desirability covers user want, feasibility covers technical possibility, and usability validation is a method rather than a leg of the triangle.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. A PM wants to change the design direction of a feature, but the designer disagrees based on usability research. According to this lesson, what should the PM most likely do?**
-A) Override the designer, since the PM has final authority
-B) Escalate immediately to leadership
-C) Use influence, evidence, and discussion to resolve the disagreement, since PMs typically lack direct authority over design decisions
-D) Cancel the feature entirely
+A) Work through evidence and discussion, since design judgment sits with the designer
+B) Exercise the PM's final authority over design decisions and move ahead
+C) Escalate to leadership immediately and ask them to settle the question
+D) Defer the feature to a later release until the disagreement resolves itself
 
-*Correct answer: C*
-*Explanation: The lesson establishes that PMs typically operate through influence rather than command authority, especially in domains like design where another role holds the strongest expertise.*
+*Correct answer: A*
+*Explanation: The lesson establishes that PMs hold responsibility without direct authority, particularly in a domain where another role holds the stronger signal. Influence and evidence are the available levers; escalation is a last resort, not a first move.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what was the primary mistake made by the product team?**
-A) They hired too few engineers
-B) They shipped output (new features) without first defining the underlying problem or success metric
-C) They did not use Mermaid diagrams
-D) They ignored competitor products entirely
+A) The team underestimated how much engineering capacity the work required
+B) The team shipped features without defining the problem or a success metric
+C) The team researched competitors instead of interviewing its own customers
+D) The team launched the four features simultaneously rather than in sequence
 
 *Correct answer: B*
-*Explanation: The team reacted to competitive pressure by shipping features without answering the three core questions — problem, solution, and success measurement — first.*
+*Explanation: The team optimized for output in response to competitive anxiety, never answering what problem it was solving or how it would know the work had succeeded. Each feature was individually plausible, which is what makes this failure mode hard to spot.*
 *Learning objective tested: #1, #4*
 *Difficulty: Medium*
 
 ---
 
 **8. At Spotify, as referenced in this lesson, how is the PM's relationship to their team best described?**
-A) The PM has direct command authority over all squad decisions, including implementation details
-B) The PM sets direction and priorities for the squad; the squad retains autonomy over execution
-C) The PM is not part of the squad and works separately from engineers and designers
-D) The PM's role is purely administrative
+A) The PM sits outside the squad and coordinates its work from a central team
+B) The PM holds decision authority over both squad priorities and implementation
+C) The PM sets mission and priorities while the squad decides how to execute
+D) The PM rotates between squads each quarter to spread product context widely
 
-*Correct answer: B*
-*Explanation: The Spotify model illustrates "responsibility without authority" — the PM defines mission and priorities, while the squad decides how to execute.*
+*Correct answer: C*
+*Explanation: The squad model is a concrete instance of responsibility without authority — the PM is embedded in the team and owns direction, while the squad retains autonomy over implementation.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. Which statement correctly distinguishes a Project Manager from a Product Manager, based on this lesson?**
-A) They are the same role with different titles
-B) A Project Manager focuses on schedule and budget; a Product Manager focuses on what should be built and why
-C) A Project Manager has more authority than a Product Manager
-D) A Product Manager only works on internal tools
+A) The Project Manager owns the roadmap; the Product Manager owns the sprint backlog
+B) The Project Manager reports into the Product Manager at most modern technology firms
+C) The Project Manager coordinates engineers; the Product Manager coordinates designers
+D) The Project Manager owns schedule adherence; the Product Manager owns problem choice
 
-*Correct answer: B*
-*Explanation: The comparison table shows Project Managers are primarily concerned with schedule/budget adherence, while PMs are concerned with defining the right thing to build.*
+*Correct answer: D*
+*Explanation: The role comparison table assigns delivery predictability to the Project Manager and problem-solution-value fit to the Product Manager. The two roles differ by accountability, not by reporting line or by which function they talk to.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **10. In the Decision Chain mental model, what does the feedback loop from "Outcome" back to "Problem" represent?**
-A) A sign that the initiative has failed
-B) The idea that measuring outcomes refines your understanding of the original problem, informing the next cycle
-C) A requirement to repeat the exact same execution
-D) An optional step that most teams skip
+A) A signal that the initiative failed and the cycle must restart from scratch
+B) A reminder that execution should be repeated until the outcome is positive
+C) An optional review step that mature teams can safely compress or skip
+D) A loop in which measured outcomes sharpen the understanding of the problem
 
-*Correct answer: B*
-*Explanation: The Decision Chain is a loop, not a straight line — outcome measurement feeds back into a sharper understanding of the problem for the next cycle of work.*
+*Correct answer: D*
+*Explanation: The chain is a loop rather than a line. Measuring what actually changed refines the team's model of the problem, which is what makes the next cycle better informed than the last.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **11. Why does this lesson argue that "authority" is the wrong lens for understanding PM effectiveness?**
-A) Because PMs technically outrank engineers in most organizations
-B) Because most PMs cannot mandate outcomes through direct command, and must instead rely on influence and evidence
-C) Because authority is only relevant in large companies
-D) Because engineers have more authority than PMs in all cases
+A) Because PMs must secure outcomes through influence rather than command
+B) Because PMs formally outrank engineers in most product organizations
+C) Because authority questions apply to large companies but not to startups
+D) Because engineering managers hold budget authority over product decisions
 
-*Correct answer: B*
-*Explanation: The lesson explicitly frames PM effectiveness around influence — through reasoning, communication, and trust — rather than formal command authority.*
+*Correct answer: A*
+*Explanation: A PM is accountable for an outcome they cannot mandate. Effectiveness therefore comes from reasoning, evidence, and accumulated trust — and the lesson frames this as a deliberate organizational design choice rather than an oversight.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **12. A feature is desirable (users want it) and viable (good business case) but would require a complete rebuild of the product's backend architecture within an unrealistic timeframe. Which element of the Accountability Triangle is in question?**
-A) Desirability
-B) Feasibility
-C) Viability
-D) Authority
+A) Feasibility — whether it can be built within real constraints
+B) Desirability — whether users actually want the solution
+C) Viability — whether the business case justifies the cost
+D) Durability — whether the solution holds up as usage scales
 
-*Correct answer: B*
-*Explanation: Feasibility concerns whether something can actually be built with available technology and resources — a backend rebuild constraint is a feasibility issue.*
+*Correct answer: A*
+*Explanation: Feasibility asks whether the work can realistically be done with available technology, people, and time. An architecture rebuild that cannot fit the timeframe is a feasibility constraint, and durability is not one of the three legs.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A PM at a 15-person startup and a PM at a 10,000-person company both apply the Decision Chain. According to the Real World Perspective section, which part of the job is most likely to look different between them, even though the underlying accountability is identical?**
-A) Whether they need to understand the problem before building
-B) Whether outcome, not output, is the right measure of success
-C) How much of the "Understanding" and "Execution" work they do personally versus through specialists
-D) Whether the Accountability Triangle applies to their decisions
+A) Whether the Accountability Triangle still governs the decisions they make
+B) How much research and coordination they handle personally versus delegate
+C) Whether they must understand the problem before committing engineering time
+D) Whether outcomes rather than outputs are the right measure of their success
 
-*Correct answer: C*
-*Explanation: The core accountability (problem-solution-value fit, output vs. outcome, the Triangle) is invariant across company stages. What changes is how much of the day-to-day work — research, coordination, QA — the PM does hands-on versus delegates to specialists, per the Real World Perspective section.*
+*Correct answer: B*
+*Explanation: The accountability is invariant across company stages. What shifts is how much of the research, coordination, and QA the PM does hands-on versus routes through dedicated specialists — from generalist execution at a startup to deciding and aligning at scale.*
 *Learning objective tested: #1, #3*
 *Difficulty: Hard*
 
 ---
 
 **14. (Interview Reasoning) An interviewer asks, "Tell me about a product you think is badly designed, and how you'd fix it." A candidate immediately describes three new features they would add. What does this response most likely signal to the interviewer, based on this lesson's Interview Perspective section?**
-A) Strong product instincts, because the candidate proposed concrete solutions quickly
-B) A solution-first instinct, since the candidate never established what problem the current design fails to solve, or for whom
-C) That the candidate has strong design skills
-D) Nothing meaningful — interviewers only care about the final list of features proposed
+A) Strong instincts, because the candidate moved quickly to concrete proposals
+B) Strong design skills, because the candidate reasoned about the interface itself
+C) A solution-first instinct, because no problem or user segment was established
+D) A scoping weakness, because the candidate proposed more than one change at once
 
-*Correct answer: B*
-*Explanation: As described in the Interview Perspective section, jumping straight to proposed fixes without first diagnosing the underlying problem and affected user segment mirrors the exact failure mode described in this lesson's Case Study, and is read as a weak signal by experienced interviewers.*
+*Correct answer: C*
+*Explanation: The interviewer is testing which instinct fires first under time pressure. Naming fixes before naming the problem they address, and for whom, reproduces the exact failure mode from the Case Study, and experienced interviewers read it as a weak signal.*
 *Learning objective tested: #1, #4*
 *Difficulty: Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A VP tells a PM: "Our top three enterprise prospects all said they won't sign unless we build offline mode. Build it." Using only the frameworks in this lesson, what is the single best justification for the PM to pause before committing engineering time — even though the request comes from a powerful stakeholder with real urgency?**
-A) The PM has final authority and can simply decline the request outright
-B) "Offline mode" is a proposed solution, not a validated problem statement — the underlying need (e.g., unreliable venue connectivity, data security concerns, or something else entirely) is not yet known, and different underlying problems could imply different, possibly cheaper or more valuable, solutions
-C) Engineering will refuse to build it regardless of justification
-D) The request should be declined because it did not come through the design team first
+A) The PM should decline, because roadmap authority sits with product, not with sales
+B) The PM should comply, because enterprise revenue outweighs discovery concerns here
+C) The PM should defer, because the request bypassed the design and research review
+D) The PM should probe, because offline mode is a proposed solution, not a problem
 
-*Correct answer: B*
-*Explanation: This mirrors the lesson's core lesson about solution-first requests (Common Beginner Mistake #4) and the ordering of the three core questions: understanding the problem must precede committing to a specific solution, even under real stakeholder pressure. The PM's job is not to refuse the request, nor to accept it uncritically, but to establish the actual problem first — which may or may not confirm offline mode as the right answer.*
+*Correct answer: D*
+*Explanation: This is Common Beginner Mistake #4 under real pressure. The underlying need behind "offline mode" — unreliable venue connectivity, data security, or something else — is still unknown, and different underlying problems imply different and possibly cheaper solutions. The PM's job is neither to refuse nor to comply, but to establish the problem first.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Hard*
 

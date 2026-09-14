@@ -405,195 +405,195 @@ There is no single correct answer. The purpose of this exercise is to practice n
 ## Quiz
 
 **1. Which of the following best defines a "user," as distinct from a "customer"?**
-A) The person who pays for the product
-B) The person who directly interacts with the product
-C) The person who approves the marketing budget
-D) The company's largest shareholder
+A) The person or entity that pays the invoices for the product
+B) The person who approves the department's budget
+C) The person who directly interacts with the product
+D) The person who negotiates the vendor contract
 
-*Correct answer: B*
-*Explanation: A user is defined by direct interaction with the product; a customer is defined by the purchasing decision, and these are frequently different people.*
+*Correct answer: C*
+*Explanation: A user is defined by direct interaction — clicking the buttons, reading the screen, living with the friction. A customer is defined by the purchasing decision. In many products these are different people.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. In a two-sided food delivery marketplace, which of the following is the most accurate statement about user/customer roles?**
-A) There is only ever one user and one customer
-B) Diners and restaurants can each be considered users, and restaurants (paying commission) can simultaneously be considered customers
-C) Only diners are users; restaurants have no meaningful role
-D) The delivery courier is always the primary customer
+A) The courier is the primary customer in most delivery models
+B) Diners are users, and restaurants have no product role
+C) Restaurants can be users and customers at the same time
+D) Each marketplace has exactly one user and one customer role
 
-*Correct answer: B*
-*Explanation: Multi-sided marketplaces often have overlapping roles — a participant can be both a user and a customer simultaneously, depending on the specific relationship being examined.*
+*Correct answer: C*
+*Explanation: A restaurant operates the tool daily and pays commission on orders, so it occupies both roles at once. Multi-sided marketplaces routinely have three or more populations with overlapping relationships.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. A product where a single person both buys and uses a paid mobile game would sit where on the User-Customer Alignment Spectrum?**
-A) Fully divergent
-B) Partially divergent
-C) Fully aligned
-D) Undefined — the spectrum does not apply
+A) Fully aligned — buyer and daily user are the same person
+B) Mostly aligned — the buyer also uses it, with some divergence
+C) Partially divergent — purchase criteria differ from use criteria
+D) Fully divergent — the paying party benefits from more attention
 
-*Correct answer: C*
-*Explanation: When the same person is both the buyer and the daily user, the product sits at the fully aligned end of the spectrum, and user research and customer research are effectively the same activity.*
+*Correct answer: A*
+*Explanation: When one person occupies both roles, user research and customer research collapse into the same activity, and the distinction stops carrying weight day to day.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is "desirability" from the Accountability Triangle described as underspecified in this lesson?**
-A) Because desirability does not apply to enterprise software
-B) Because it does not distinguish whose desire is being measured — the user's or the customer's — which can differ
-C) Because desirability should be replaced entirely by feasibility
-D) Because desirability only matters for consumer apps
+A) Because desirability is measured after launch rather than before
+B) Because it omits whose desire is being measured, user or customer
+C) Because desirability applies to consumer but not enterprise products
+D) Because feasibility should be assessed before desirability is raised
 
 *Correct answer: B*
-*Explanation: The lesson argues that "desirable" must always be paired with "to whom" once user and customer roles diverge, since the same feature can be desirable to one and undesirable to the other.*
+*Explanation: A compliance dashboard can be highly desirable to procurement and unwelcome to the person who has to use it. Reporting "high desirability" without naming whose quietly picks a side.*
 *Learning objective tested: #1, #3*
 *Difficulty: Easy*
 
 ---
 
 **5. According to this lesson, why do product roadmaps tend to systematically over-index on customer requests relative to user needs, absent deliberate correction?**
-A) Because customers are always right
-B) Because customer signal typically arrives through louder, more revenue-connected organizational channels than user signal
-C) Because users never provide useful feedback
-D) Because engineering prefers building customer-requested features
+A) Because engineering teams prefer building customer-requested work
+B) Because customer requests are validated more rigorously than user ones
+C) Because user feedback channels produce less reliable signal overall
+D) Because customer signal arrives through louder, revenue-linked channels
 
-*Correct answer: B*
-*Explanation: Customer complaints often arrive through sales, account management, or renewal conversations with direct executive visibility, while user signal arrives through weaker channels like support tickets or app reviews — a structural bias, not a reflection of relative importance.*
+*Correct answer: D*
+*Explanation: A customer complaint reaches the roadmap through an account manager or a renewal conversation. A user complaint arrives as a support ticket or an app store review. The difference is channel power, not signal quality.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. A parental-control app's core end-user is a child, while the paying customer is a parent. According to this lesson, what special obligation does this create for the PM?**
-A) None — children's preferences are irrelevant to product decisions
-B) A heightened obligation to build genuine proxies for the child user's actual experience, since the market mechanism of "users can stop paying" does not apply
-C) An obligation to let the child make all final product decisions
-D) An obligation to ignore the parent's requests entirely
+A) To defer each product decision to the paying parent without exception
+B) To build genuine proxies for the child user's actual experience
+C) To let the child user hold final say over the feature set
+D) To treat the parent's requests as secondary to the child's
 
 *Correct answer: B*
-*Explanation: Products for dependents represent the most extreme form of user-customer divergence, and the lesson argues for a heightened obligation to genuinely represent the user's experience, since normal market feedback loops don't operate the same way.*
+*Explanation: Products for dependents sit at the far end of the spectrum. The usual corrective — a dissatisfied user stops paying — is unavailable, so the PM has to manufacture the feedback loop the market will not supply.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, what was the underlying structural reason that user-side neglect disproportionately increased churn risk among smaller accounts?**
-A) Smaller accounts had lower usage overall
-B) In smaller accounts, the user and the customer were frequently the same person, so user dissatisfaction converted directly into customer churn with no intermediary
-C) Smaller accounts did not use the compliance dashboard
-D) Smaller accounts had signed longer contracts
+A) Smaller accounts had lower overall usage of the core product
+B) In smaller accounts the user and the customer were the same person
+C) Smaller accounts had no access to the new compliance dashboard
+D) Smaller accounts were locked into shorter renewal cycles than large ones
 
 *Correct answer: B*
-*Explanation: Where the user and customer are the same person, there is no procurement or account-management layer to buffer user dissatisfaction — it converts directly and quickly into churn risk.*
+*Explanation: With no procurement layer in between, user dissatisfaction has nothing to travel through — it becomes a renewal decision directly, and much faster than in a large account.*
 *Learning objective tested: #3, #4*
 *Difficulty: Medium*
 
 ---
 
 **8. Using the Stakeholder Ledger described in this lesson, what should a PM do first upon receiving a new feature request?**
-A) Immediately estimate engineering cost
-B) Explicitly identify whose interest the request represents — user, customer, or both — before evaluating its priority
-C) Reject any request that comes from a customer rather than a user
-D) Assume all requests represent the same, undifferentiated interest
+A) Estimate the engineering cost before anything else is considered
+B) Weight the request by the revenue attached to its originating account
+C) Treat every incoming request as representing the same interest
+D) Name whose interest the request represents before weighting it at all
 
-*Correct answer: B*
-*Explanation: The Stakeholder Ledger's core habit is naming the source of a request on the user-customer axis before deciding how much weight to give it.*
+*Correct answer: D*
+*Explanation: The habit is diagnostic and comes before evaluation. Misprioritized roadmaps often trace back to a PM who treated every request as coming from one undifferentiated source with one set of incentives.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. Which of the following is the most accurate description of how a PM should respond upon discovering user-customer divergence?**
-A) Always prioritize the user's interest over the customer's
-B) Always prioritize the customer's interest over the user's
-C) Make the trade-off explicit and deliberate, since both interests can be legitimate
-D) Avoid making a decision until the divergence resolves itself
+A) Prioritize the user's interest, since they experience the product
+B) Prioritize the customer's interest, since they carry the revenue
+C) Make the trade-off explicit, since both interests can be legitimate
+D) Postpone the call until one side's position changes on its own
 
 *Correct answer: C*
-*Explanation: The lesson explicitly warns against assuming either side automatically wins; the goal is an explicit, deliberate trade-off rather than an accidental one driven by organizational default.*
+*Explanation: Security compliance and cost control are real concerns the user might share if they could see them. The failure mode is not choosing wrong — it is choosing by organizational default without noticing a choice was made.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **10. (Scenario) An ad-supported app sees engagement rise sharply after a new feature launch, and the advertising team is pleased. What should a PM do, according to this lesson, before treating this as unambiguous product success?**
-A) Nothing — rising engagement is always good news
-B) Check whether the engagement increase reflects genuine user value or primarily reflects value to the advertiser-customer, since the two are not automatically the same in a fully divergent product
-C) Immediately roll back the feature
-D) Ask the advertisers whether they are satisfied, and stop there
+A) Check whether the rise reflects user value or advertiser value
+B) Treat the rise as unambiguous success and scale the feature further
+C) Roll the feature back until the advertising team can review the data
+D) Survey the advertising partners and close the question on their answer
 
-*Correct answer: B*
-*Explanation: In products near the "fully divergent" end of the spectrum, engagement metrics can reward the customer's (advertiser's) interest without reliably indicating user wellbeing — the lesson explicitly warns against treating engagement as a proxy for user satisfaction in this context.*
+*Correct answer: A*
+*Explanation: Near the divergent end of the spectrum, engagement is a direct measure of what the customer is buying and only an indirect, sometimes misleading, measure of whether the user is better off.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Product Thinking) A B2B software company's IT-department customers all request a new security feature that end-users have told researchers they find confusing and disruptive. What is the most mature PM response, based on this lesson and its connection to Lesson 6 (Jobs to Be Done)?**
-A) Refuse to build the security feature, since users dislike it
-B) Build exactly what the IT departments specified, since they are the paying customer
-C) Investigate the underlying security need behind the request and look for an implementation that satisfies it without the specific user-disruptive design
-D) Escalate the disagreement to legal for a final ruling
+A) Build the specification exactly as the IT departments originally submitted it
+B) Probe the underlying security need and find a less disruptive design
+C) Decline the feature, since researched users report it as confusing
+D) Refer the conflict to the legal team for a binding determination
 
-*Correct answer: C*
-*Explanation: This mirrors the lesson's guidance to separate the underlying business need (a legitimate customer concern) from a specific proposed implementation, and to seek solutions that satisfy the real need without unnecessary user cost — previewing the Jobs to Be Done approach in Lesson 6.*
+*Correct answer: B*
+*Explanation: The security concern is legitimate; the specific implementation is a proposal, not the need itself. Separating the two usually reveals a design that satisfies procurement without imposing the friction users reported.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **12. Why does the lesson caution against treating "the user" as a single, homogeneous person even within a single product?**
-A) Because there is only ever one type of user in any product
-B) Because different user roles (e.g., an admin user vs. an end-user) can have different, sometimes conflicting needs, hiding exactly the kind of divergence this lesson addresses
-C) Because user research is unreliable
-D) Because customers are always more important than users
+A) Because user research is generally less reliable than sales input
+B) Because most products in practice serve exactly one kind of user
+C) Because customer needs should outrank user needs when they conflict
+D) Because admin and end-user roles within one tool can conflict
 
-*Correct answer: B*
-*Explanation: Beginner Mistake 3 explicitly warns that lumping all users together can hide internal conflicts of need — for example, between an admin user and an end-user of the same tool.*
+*Correct answer: D*
+*Explanation: Beginner Mistake 3 warns that an undifferentiated "the user" hides precisely the conflicts this lesson teaches you to look for — the admin who wants control and the end-user who wants speed are both users.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking, Higher Difficulty) A company's free tier and paid tier are structurally identical in features, but the free tier is ad-supported and the paid tier removes ads for a subscription fee. According to this lesson, how should a PM's approach to prioritization differ between the two tiers?**
-A) It should not differ at all, since the product is the same
-B) The PM should recognize the free tier sits further right on the Alignment Spectrum (user ≠ paying customer, i.e., the advertiser) while the paid tier sits further left (user = paying customer), and weigh signals accordingly for each
-C) The PM should ignore the free tier entirely, since it generates no direct revenue
-D) The PM should always prioritize the paid tier's feature requests over the free tier's
+A) The free tier sits further right on the spectrum than the paid tier does
+B) The two tiers should be prioritized identically, since features match
+C) The free tier should be deprioritized, since it carries no direct revenue
+D) The paid tier's requests should outrank the free tier's in every cycle
 
-*Correct answer: B*
-*Explanation: The lesson explicitly notes that alignment is a property of a business model, not a fixed company trait — the same underlying product can sit at different points on the spectrum depending on its monetization model, requiring re-diagnosis for each.*
+*Correct answer: A*
+*Explanation: Alignment is a property of the business model, not the company. On the free tier the paying customer is the advertiser; on the paid tier it is the user. The same feature therefore warrants different signals and different weighting.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **14. (Interview Reasoning) An interviewer asks a candidate to describe a time they balanced conflicting user and customer needs. The candidate responds that "our users and customers were always the same, so this never came up." What does this likely signal to an experienced interviewer, according to this lesson's Interview Perspective section?**
-A) Strong product instincts, since alignment is the ideal state
-B) A possible sign the candidate has not looked closely enough to notice the many roles at play in most products, or has not worked on a product where the distinction mattered
-C) That the candidate is uniquely qualified for enterprise software roles
-D) Nothing meaningful — this is a fully acceptable and complete answer
+A) A strong answer, since full alignment is the healthiest state for a product
+B) A sign the candidate is best suited to enterprise software positions
+C) A complete answer that gives the interviewer little further to probe
+D) A sign the candidate has not looked closely at the roles actually in play
 
-*Correct answer: B*
-*Explanation: The lesson notes that claiming user and customer were "always aligned" is often a weak signal, since most real products have at least some role divergence worth examining, and a strong candidate can usually surface a genuine example.*
+*Correct answer: D*
+*Explanation: Most real products carry at least some role divergence, even mild ones. A candidate who can surface a genuine tension, and describe how they decided, signals a sharper read than one who reports none existed.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Highest Difficulty) A workplace analytics company deprioritizes a long-standing user complaint for an entire quarter in favor of a customer-requested compliance dashboard, and large-account renewals close successfully as a result. According to the Detailed Case Study, was this necessarily the wrong decision, and what did the PM's process lack regardless of the final call?**
-A) It was necessarily wrong, since users should always be prioritized over customers
-B) It was necessarily right, since it directly protected revenue
-C) The decision itself may have been reasonable, but the process lacked an explicit accounting of the churn risk in the segment where users and customers were the same person, and likely under-resourced user-side work that could have been partially addressed in parallel
-D) The case study shows that compliance dashboards should never be built
+A) Necessarily wrong, because user needs outrank customer needs here
+B) Necessarily right, because it directly protected renewal revenue
+C) Possibly reasonable, but the concentrated churn risk was left implicit
+D) Wrong, because compliance dashboards rarely change renewal outcomes
 
 *Correct answer: C*
-*Explanation: The case study explicitly argues that the final trade-off may have been defensible, but the failure was in not making the trade-off — and its risk to user-equals-customer segments — explicit, and not seeking even partial parallel investment in user-side work.*
+*Explanation: The case study's point is about process, not verdict. The trade-off may well have been defensible, but the risk concentrated in the segment where user and customer are one person went unaccounted for, and partial parallel investment was never considered.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 
