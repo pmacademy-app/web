@@ -394,195 +394,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What four elements does this lesson's positioning framework require?**
-A) Price, features, competitors, and reviews
-B) Target market, category, differentiator, and primary alternative
-C) Sales team size, marketing budget, launch date, and channel partners
-D) Only a single tagline with no further detail
+A) A target market, category, differentiator, and alternative
+B) Price, features, competitors, and reviews
+C) Sales team size, budget, and launch date
+D) A single unexplained tagline is all it is
 
-*Correct answer: B*
-*Explanation: The Theory section's positioning framework explicitly requires these four elements.*
+*Correct answer: A*
+*Explanation: Each of these four elements forces a specific, falsifiable claim rather than a vague description that could describe almost anything.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the three core GTM motions covered in this lesson?**
-A) Now, Next, Later
-B) Product-led, sales-led, channel/partner-led
-C) Input, action, output
-D) Discover, define, develop
+A) Discover, define, develop, deliver stages
+B) A basic Now, Next, and Later sequence
+C) Product-led, sales-led, and channel-led
+D) Input, action, output, and reinvestment stages
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly names these three motions.*
+*Correct answer: C*
+*Explanation: The Theory section names these three as the primary mechanisms by which a product acquires and converts customers.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Which GTM motion is generally best suited to a low price point, low buying complexity product?**
-A) Sales-led
-B) Product-led (PLG)
-C) Channel/partner-led exclusively
-D) No motion is appropriate for low-price products
+A) Sales-led, engaging prospects directly
+B) Channel-led, via trusted partners
+C) A blended motion, picked at random
+D) Product-led, given low price
 
-*Correct answer: B*
-*Explanation: The Theory section's motion table identifies product-led as best fitting low price point, low complexity products.*
+*Correct answer: D*
+*Explanation: A low price and simple decision favor letting people try and adopt the product on their own rather than routing it through a costly sales process.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Why does mismatching a product's complexity to an unsuited GTM motion create friction on both sides of a transaction?**
-A) It doesn't; motion choice has no effect on customer or sales experience
-B) A simple product forced into a slow, high-touch process frustrates prospects expecting speed, while a complex product pushed through self-serve leaves prospects needing guidance unsupported
-C) Because GTM motions are legally required to match price point exactly
-D) Because only sales-led motions can ever create friction
+A) A slow process frustrates simple buyers; self-serve strands complex
+B) Motion choice really does not affect the buyer
+C) GTM motions must legally match price exactly
+D) Just a sales-led motion can create friction
 
-*Correct answer: B*
-*Explanation: The Theory section explains both directions of this friction explicitly.*
+*Correct answer: A*
+*Explanation: Each direction fails a different way — one wastes an expensive sales process on a small deal, the other strands a buyer who genuinely needed guidance.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. How does this lesson extend Lesson 36's launch tiering system?**
-A) It replaces launch tiering with an entirely different framework
-B) It extends the same proportional-ceremony principle beyond engineering and support to marketing, sales, and external communication for a full GTM launch
-C) It argues launch tiering should no longer apply to any launches
-D) It restricts launch tiering to only apply to sales teams
+A) It replaces tiering with an unrelated framework
+B) Ceremony now spans marketing and sales as well
+C) It argues tiering should no longer apply
+D) It restricts tiering to sales teams alone
 
 *Correct answer: B*
-*Explanation: The Theory section explicitly describes a full GTM launch as an extension of Lesson 36's tiering principle to additional functions.*
+*Explanation: A full GTM launch is the same underlying idea — scale the ceremony to the actual stakes — carried past engineering and support into the rest of the launch.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, why was it a mistake to route the new, lower-priced product through the existing enterprise sales motion?**
-A) The enterprise sales team refused to work on the new product entirely
-B) The product's actual price point and buying complexity were far better suited to a self-serve, product-led motion, and the mismatch frustrated prospects and led sales to deprioritize the smaller deals
-C) The product itself was fundamentally broken and unusable
+A) The enterprise team refused the product
+B) The product itself was fundamentally broken
+C) Self-serve suited it better
 D) The company had no sales team at all
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly attributes the failure to motion mismatch, not a flaw in the underlying product.*
+*Correct answer: C*
+*Explanation: The mismatch frustrated buyers expecting a fast path and left sales quietly deprioritizing deals too small to be worth the effort.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What did the corrective response in the Case Study involve?**
-A) Discontinuing the new product entirely
-B) Building a genuinely product-led motion for the new offering — self-serve trial, in-product onboarding, a lightweight purchase path — decoupled from the existing enterprise sales process
-C) Doubling the size of the existing enterprise sales team
-D) Raising the new product's price to match the core product's price point
+A) Ending the new product's run
+B) Doubling the size of the sales team
+C) A self-serve motion, apart from sales
+D) Raising the price to match the core product
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this corrective response.*
+*Correct answer: C*
+*Explanation: Building a real trial-and-onboarding path let the smaller product finally move at the speed its own price point actually called for.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
 **8. Using the GTM Failure Diagnosis Table, what signal specifically points to a "motion" problem rather than a "product" problem?**
-A) Poor retention among users who complete onboarding
-B) High abandonment specifically during a mismatched sales or evaluation process, even though users who do engage with the product find genuine value
-C) Low overall awareness within the target segment
-D) Confused or inconsistent descriptions of the product from prospects
+A) Poor retention among users past onboarding
+B) Confused descriptions of the product from prospects
+C) Low overall awareness in the target segment
+D) Abandonment partway through despite real value
 
-*Correct answer: B*
-*Explanation: The Framework Explanation section's diagnosis table identifies this specific signal as pointing to a motion problem.*
+*Correct answer: D*
+*Explanation: The product is doing its job for people who reach it; the drop-off is happening in how the purchase itself is being handled.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does this lesson caution against writing an overly broad positioning statement (e.g., target market of "businesses")?**
-A) Because broad positioning statements are illegal in marketing
-B) Because vagueness at the positioning level cascades downward, producing equally vague and unpersuasive messaging and GTM tactics, per the Positioning Pyramid
-C) Because broad positioning always produces higher conversion rates
-D) Because positioning statements should never mention a target market at all
+A) Broad statements are illegal in marketing
+B) Vagueness at the top cascades down
+C) Broad positioning raises conversion rates
+D) Positioning should skip naming a market
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #1 and the Positioning Pyramid both explain this cascading effect of vague positioning.*
+*Explanation: Every later GTM decision leans on the positioning above it, so a vague foundation leaves nothing specific for messaging or sales conversations to stand on.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **10. Why did Slack's early go-to-market approach, as described in this lesson's Real Company Example, rely primarily on a product-led motion?**
-A) Because product-led motions are always superior to sales-led motions in every context
-B) Because it matched the product's early reality: low friction to try, individual/small-team adoption, and low initial price point
-C) Because the company had no access to any sales talent at the time
-D) Because sales-led motions were not yet invented
+A) Product-led generally outperforms sales-led
+B) The company lacked access to sales talent
+C) Sales-led motions had not yet been invented
+D) It fit the product's early reality of the time
 
-*Correct answer: B*
-*Explanation: The Real Company Example explains that the early motion matched the product's actual characteristics at that stage, consistent with this lesson's fit principle.*
+*Correct answer: D*
+*Explanation: The early motion fit the product as it actually was at that stage, not a preference for one motion over another in the abstract.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they'd choose a GTM motion for a new product, and answers: "I'd use a sales-led motion, since that's what our company has always done." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; consistency with existing infrastructure should always be the deciding factor
-B) It defaults to organizational habit rather than reasoning from the specific product's price point and buying complexity, risking the exact mismatch illustrated in this lesson's Case Study
-C) It correctly demonstrates strong organizational alignment
-D) It shows appropriate deference to the existing sales team's expertise
+A) None; existing infrastructure should decide
+B) It shows deference to the sales team's expertise
+C) It demonstrates strong organizational alignment
+D) It defaults to habit rather than product fit
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer reasons from product fit, not organizational habit, exactly the distinction this answer fails to make.*
+*Correct answer: D*
+*Explanation: What the company has always done says nothing about whether this particular product's price point and buying complexity actually call for that same process.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson recommend testing positioning against real customer-facing conversations before finalizing broader messaging?**
-A) Because positioning developed in isolation risks sounding coherent internally while falling flat or confusing people in actual market interactions
-B) Because customer-facing teams are legally required to approve all positioning statements
-C) Because testing positioning is only relevant for channel-led motions
-D) Because real conversations always produce worse positioning than internal brainstorming
+A) Customer-facing teams must legally approve it
+B) It can sound fine internally, flat once live
+C) Testing just matters for channel-led motions
+D) Real conversations tend to worsen positioning
 
-*Correct answer: A*
-*Explanation: Common Beginner Mistake #5 explains this exact risk of untested, isolation-developed positioning.*
+*Correct answer: B*
+*Explanation: A sales or support conversation is where a claim either lands with a real prospect or doesn't, which is a very different test than an internal review room.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A product launch shows strong initial awareness and trial signups, but very few trial users convert to paying customers, and those who do convert report strong satisfaction. Using the GTM Failure Diagnosis Table, what layer does this pattern most likely point to?**
-A) Channel — since awareness and trial signups are strong, the product is clearly reaching its target market and channel is not the primary issue
-B) Motion — the specific conversion step from trial to paid may not match how this product's buying decision actually needs to be supported, even though the product itself and its reach are working
-C) Product — since the product is clearly the entire problem
-D) Positioning — since positioning has nothing to do with conversion rates
+A) Channel, since reach and signups are strong
+B) Motion, since the path to paid may not fit
+C) Product, since it is clearly the whole issue
+D) Positioning, unrelated to conversion at all
 
 *Correct answer: B*
-*Explanation: Strong reach (channel) and clear product value among converters (not primarily a product problem) combined with poor trial-to-paid conversion points toward the motion — how the purchase decision itself is being supported — as the most likely bottleneck.*
+*Explanation: Reach is fine and the product satisfies the people who complete it, which leaves the step in between — how the purchase itself gets closed — as the likely bottleneck.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects a well-constructed positioning statement, per this lesson's framework?**
-A) "Our product is easy to use and helps businesses succeed."
-B) "For small marketing teams struggling to coordinate multi-channel campaigns, [Product] is a campaign orchestration tool that automates cross-channel scheduling, unlike generic project management tools that require manual coordination."
-C) "Our product has more features than any competitor."
-D) "Our product is for everyone who wants to be more productive."
+A) A market, category, and the displaced rival named
+B) "Our product is easy to use and helps businesses"
+C) "Our product has more features than any rival"
+D) "Our product is for everyone wanting productivity"
 
-*Correct answer: B*
-*Explanation: Option B specifies a precise target market, a category, a clear differentiator, and a named primary alternative — exactly the structure this lesson's positioning framework requires, unlike the vague alternatives.*
+*Correct answer: A*
+*Explanation: Only this option supplies the specific, falsifiable claims the framework requires; the rest could plausibly describe almost any product on the market.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A company has successfully used a product-led motion for its core, low-price product, and is now launching a new, significantly more complex and expensive add-on aimed at large enterprise customers with multiple stakeholders in the buying decision. Using this lesson's frameworks, what is the most defensible GTM approach?**
-A) Continue using the exact same product-led, self-serve motion for the new add-on, since it worked well for the core product
-B) Recognize that the new add-on's price point and buying complexity likely warrant a different motion (sales-led, or a hybrid), rather than assuming the core product's successful motion will automatically transfer to a fundamentally different offering — echoing the same fit principle illustrated by Slack's own evolution and this lesson's Case Study
-C) Avoid launching the add-on at all, since introducing any new motion is inherently too risky
-D) Use a channel-led motion exclusively, regardless of whether trusted intermediary relationships are actually relevant to this specific market
+A) Keep the identical self-serve motion unchanged
+B) Avoid launching the add-on as too risky
+C) Reassess whether the motion still fits
+D) Use a channel-led motion regardless of fit
 
-*Correct answer: B*
-*Explanation: This applies the lesson's core fit principle correctly — motion should match the specific product's price point and complexity, not be assumed to transfer automatically from a different product within the same company, mirroring both the Case Study's failure and Slack's own real evolution toward a hybrid motion as its offerings diversified.*
+*Correct answer: C*
+*Explanation: A different price point and a genuinely more complex buying decision are exactly the conditions this lesson says should reopen the motion question, not carry the old answer forward by default.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
 
