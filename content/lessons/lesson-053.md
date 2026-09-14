@@ -358,195 +358,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the difference between a position and an interest in a negotiation?**
-A) They are identical concepts with different names
-B) A position is what someone explicitly states they want; an interest is the underlying reason or need behind that position
-C) A position is always more important than an interest
-D) An interest can only be identified after a negotiation has already failed
+A) A position invariably outranks an interest
+B) Interests exist just once talks fail
+C) Positions and interests mean one thing
+D) A stated want versus its reason
 
-*Correct answer: B*
-*Explanation: The Theory section defines these two terms exactly this way.*
+*Correct answer: D*
+*Explanation: A position is the specific ask on the table; the interest is why that ask matters to the person making it.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why does negotiating over positions tend to produce worse outcomes than negotiating over interests?**
-A) Because positions are always dishonest
-B) Because directly conflicting positions tend to produce adversarial, zero-sum dynamics, while underlying interests may actually be compatible or reveal a creative solution serving both parties
-C) Because positions are illegal to discuss in most negotiations
-D) Because interests are always identical to positions
+A) Positions cannot legally be discussed
+B) Conflicting positions read zero-sum
+C) Interests and positions are one thing
+D) Positions are dishonest by nature
 
 *Correct answer: B*
-*Explanation: The Theory section explains this exact dynamic — positional conflict is often zero-sum, while interests may reveal compatibility.*
+*Explanation: Two stated positions can sit directly opposed while the reasons behind them turn out to be compatible, or even served by the same solution.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. What does BATNA stand for, and what does it represent?**
-A) Best Available Time for Negotiating Agreements — a scheduling concept
-B) Best Alternative to a Negotiated Agreement — what a party would do if the current negotiation fails
-C) Basic Agreement Terms and Amendments — a legal document type
-D) A synonym for ZOPA with no meaningful difference
+A) A scheduling term for negotiation timing
+B) A document type covering agreement terms
+C) The deal fallback, plainly stated
+D) Another word for ZOPA, no difference
 
-*Correct answer: B*
-*Explanation: The Theory section defines BATNA exactly this way.*
+*Correct answer: C*
+*Explanation: Knowing this fallback is what tells a party how much pressure they're actually under to accept a given deal.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. What is ZOPA?**
-A) A synonym for BATNA
-B) The Zone of Possible Agreement — the range within which both parties' interests and BATNAs can genuinely be satisfied
-C) A specific currency in the Cohen/Bradford exchange model
-D) A term used only in international trade negotiations
+A) A currency named in the exchange model
+B) A term confined to trade negotiations
+C) Where both sides interests meet
+D) Another name for BATNA itself
 
-*Correct answer: B*
-*Explanation: The Theory section defines ZOPA exactly this way.*
+*Correct answer: C*
+*Explanation: This overlap is where an actual agreement can be found, once each side's BATNA has been honestly considered.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **5. What does the Cohen/Bradford currencies of exchange model suggest about influence without authority?**
-A) That influence without authority is impossible
-B) That influence without authority is fundamentally an exchange, requiring the influencer to offer genuine task-related, position-related, relationship-related, or personal value in return for cooperation
-C) That only formal authority can ever secure genuine cooperation
-D) That goodwill alone is always sufficient to secure cooperation
+A) Formal authority is the sole real lever
+B) Genuine exchange, not goodwill
+C) Goodwill alone secures it every time
+D) Influence without authority cannot work
 
 *Correct answer: B*
-*Explanation: The Theory section explains this exact reframing of influence without authority as a genuine exchange.*
+*Explanation: Someone with no formal obligation to help needs a genuine reason to, and this model names what a person can concretely offer in return.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, why did the PM's first attempt to secure the other team's engineering time fail?**
-A) The other team had no engineering capacity at all
-B) The request was framed entirely around the requesting PM's own position, with no attempt to understand the other team's actual interests, and no currency of exchange offered
-C) The integration itself was technically impossible to build
-D) The other team's manager was on vacation
+A) It leaned on the PM own position, offering
+B) The integration was technically barred
+C) The other team's manager was traveling
+D) The other team had no free capacity
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong the first time?" analysis explicitly attributes the failure to purely positional framing with no interest exploration or currency offered.*
+*Correct answer: A*
+*Explanation: The ask went straight to "prioritize this," never touching what the other team actually needed or what they'd get out of saying yes.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What underlying interest did the PM discover in the Detailed Case Study's second attempt?**
-A) The other team simply disliked the requesting PM personally
-B) The other engineering team was under pressure to reduce technical debt before their own roadmap commitments, and any new unplanned request threatened that goal
-C) The other team had no manager at all
-D) The other team wanted a higher budget allocation
+A) The other team wanted a bigger budget
+B) The other team simply disliked the PM
+C) Pressure to cut technical debt came first
+D) The other team had no manager then
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly identifies this technical-debt-reduction pressure as the other team's actual underlying interest.*
+*Correct answer: C*
+*Explanation: A new unplanned request threatened exactly the goal that team was already under pressure to hit, which explained the original resistance.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **8. How did the PM successfully reframe the request in the Case Study's second attempt?**
-A) By repeating the original request more forcefully
-B) By proposing the integration be built with a technical approach that would also help address one of the technical debt items the other team was already trying to resolve, turning a competing request into one that served their interest
-C) By escalating the request to a senior executive to force compliance
-D) By offering a financial payment to the other team
+A) Building it to help resolve a debt item too
+B) Repeating the original request more forcefully
+C) Offering the other team a financial payment
+D) Escalating the request to force compliance
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this reframing as the key to the second attempt's success — connecting the request to the other team's own genuine priority.*
+*Correct answer: A*
+*Explanation: The same underlying ask, once tied to the other team's own genuine priority, stopped competing with their goals and started serving them.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does this lesson recommend building coalition support incrementally before a key decision conversation?**
-A) Because coalition-building is illegal in most organizations
-B) Because influence compounds through prior relationships and exposure to an idea, making a decision feel like a natural continuation rather than a surprising imposition
-C) Because a single conversation is always sufficient to secure any needed cooperation
-D) Because coalition-building eliminates the need for any negotiation skill at all
+A) One conversation is invariably enough
+B) It removes any need for negotiation skill
+C) Coalition-building is barred organizationally
+D) Prior exposure makes a decision feel natural
 
-*Correct answer: B*
-*Explanation: The Theory section explains this exact compounding benefit of incremental coalition-building.*
+*Correct answer: D*
+*Explanation: An idea a decision-maker has already heard about from a few directions lands very differently than one sprung on them cold.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **10. What does Microsoft's publicly discussed "One Microsoft" cultural shift illustrate, according to this lesson's Real Company Example?**
-A) That organizational culture has no effect on cross-team cooperation
-B) That an organizational culture and incentive structure rewarding cross-group collaboration makes genuine, interest-based negotiation meaningfully easier to practice than a culture of internal competition
-C) That formal authority is always required for cross-team cooperation regardless of culture
-D) That Microsoft eliminated all internal team boundaries entirely
+A) Formal authority is required regardless
+B) Culture rewarding collaboration helps
+C) Every internal boundary was eliminated
+D) Culture has no bearing on cooperation
 
 *Correct answer: B*
-*Explanation: The Real Company Example explains this exact principle about organizational culture shaping the ease of cross-team influence.*
+*Explanation: The same negotiation skills land differently depending on whether the surrounding incentives reward collaboration or internal competition.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they secured another team's cooperation without formal authority, and answers: "I just explained clearly why my priority mattered, and they eventually agreed." Based on this lesson's Interview Perspective section, what is missing from this answer?**
-A) Nothing; clear explanation of importance is always sufficient
-B) Any evidence of exploring the other party's actual interests or offering genuine reciprocal value (a currency of exchange), rather than simply asserting the importance of the request
-C) A description of a formal escalation to a senior leader
-D) A demonstration of strong technical skills
+A) A description of an escalation attempt
+B) A demonstration of technical skill
+C) Just a clear explanation works fine
+D) Exploring interests or offering value
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer involves understanding the other party's interests and offering genuine value, not simply restating importance.*
+*Correct answer: D*
+*Explanation: Explaining importance harder is still a positional appeal — nothing here shows what the other side's actual interest was or what they got out of agreeing.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Why should a PM think through their own BATNA before an important negotiation, according to this lesson?**
-A) Because BATNA has no practical relevance to actual negotiation outcomes
-B) Because it clarifies how much pressure exists to accept an unfavorable deal — a strong BATNA reduces that pressure, a weak BATNA increases it, and without this awareness a PM cannot judge whether a proposed outcome is genuinely favorable
-C) Because BATNA must always be disclosed directly to the other party
-D) Because only the other party's BATNA matters, never your own
+A) BATNA carries no bearing on outcomes
+B) A BATNA must invariably be disclosed
+C) Clarifies pressure to accept a deal
+D) Just the other party BATNA matters
 
-*Correct answer: B*
-*Explanation: The Theory section explains this exact reasoning about BATNA clarifying genuine negotiating pressure and leverage.*
+*Correct answer: C*
+*Explanation: Without this, a PM has no basis for telling whether a proposed deal is genuinely good or simply the first thing offered.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A PM needs cooperation from a peer team but has no clear sense of what that team's actual priorities or pressures are, and no history of working with them. Using this lesson's frameworks, what is the most defensible first step?**
-A) Send a direct, forceful request immediately, emphasizing how important the ask is
-B) Have an exploratory conversation first, aimed at understanding the other team's actual interests and constraints (per the Interest Iceberg), before formulating a specific request or offer
-C) Escalate immediately to a senior leader to force the other team's cooperation
-D) Assume the other team's interests are irrelevant and proceed with the original request unchanged
+A) Treat the other team's own interests as irrelevant
+B) Send an immediate, forceful request right away
+C) Escalate right away to force cooperation
+D) Have a talk first, surfacing their interests and constraints
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core recommended sequence — understand interests before responding to or making a specific positional request, exactly the approach that succeeded in the Case Study's second attempt.*
+*Correct answer: D*
+*Explanation: Understanding the other team's actual pressures before making an ask is what let the Case Study's second attempt find a request that served both sides.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects a genuine "currency of exchange" offered in a negotiation, per the Cohen/Bradford model?**
-A) Simply repeating that a request is important to your own team
-B) Offering direct help with the other team's own stated priority, in exchange for their cooperation on your request
-C) Threatening to escalate to leadership if the other team doesn't comply
-D) Assuming the other team is obligated to help regardless of any exchange
+A) Direct help with their own stated priority
+B) Assuming the other team is obligated to help
+C) Threatening escalation if they don't comply
+D) Repeating that the request matters to you
 
-*Correct answer: B*
-*Explanation: Offering direct help with the other team's own priority is a task-related currency, exactly the kind of genuine exchange this lesson's model describes, unlike the other options which involve no real reciprocity.*
+*Correct answer: A*
+*Explanation: This is a task-related currency — real reciprocal value, rather than pressure or an appeal to obligation.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A PM has identified that a key stakeholder's underlying interest in a contentious decision is protecting their team's headcount and influence, which conflicts with the PM's stated position of consolidating a function under a different team. Using this lesson's frameworks, what is the most defensible next step?**
-A) Continue arguing for the original position unchanged, since the stakeholder's concern is irrelevant to the PM's own priorities
-B) Explore whether an alternative structure exists that addresses the PM's underlying interest (the actual business outcome needed) without requiring the specific consolidation that threatens the stakeholder's headcount and influence — searching for a solution at the level of interests rather than remaining stuck at the level of conflicting positions
-C) Escalate immediately to force the stakeholder's compliance regardless of their concerns
-D) Abandon the underlying business goal entirely to avoid any conflict with the stakeholder
+A) Escalate right away to force compliance
+B) Serve the outcome, not the threat
+C) Keep arguing the original position unchanged
+D) Drop the underlying business goal to avoid conflict
 
 *Correct answer: B*
-*Explanation: This reflects the Interest Iceberg's core insight — when positions conflict but the underlying interests are examined honestly, a creative alternative addressing the real interest (the business outcome) without the specific threatening element (headcount/influence loss) may exist, rather than either forcing the original position or abandoning the underlying goal entirely.*
+*Explanation: The actual interest at stake is the business outcome, not the specific consolidation — once that's separated from the position, other structures may serve it just as well.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 

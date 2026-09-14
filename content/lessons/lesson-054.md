@@ -392,195 +392,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What does the "no surprises" principle require?**
-A) Waiting until a problem is fully resolved before informing a manager
-B) Proactively disclosing risks and bad news to a manager as soon as they're known with reasonable confidence
-C) Only sharing positive updates with a manager
-D) Informing a manager only when directly asked
+A) Waiting for a problem to be fully resolved
+B) Informing a manager just when asked
+C) Sharing just positive updates, invariably
+D) Disclosing risks once reasonably confirmed
 
-*Correct answer: B*
-*Explanation: The Theory section defines the no-surprises principle exactly this way.*
+*Correct answer: D*
+*Explanation: Waiting for certainty, or for someone else to raise it first, is exactly what the principle exists to prevent.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why does a manager learning about a problem from someone else damage trust more than the underlying bad news itself?**
-A) It doesn't; the underlying bad news is always the primary source of damage
-B) It signals a gap between what the PM knew and what they shared, causing the manager to reasonably question what else might be withheld
-C) Because managers are never upset by bad news itself, only by how it's delivered
-D) Because bad news delivered by a third party is always inaccurate
+A) Third-party accounts are invariably less accurate
+B) The underlying news invariably does more damage
+C) Managers are rarely upset by news itself
+D) It raises real doubt about withholding
 
-*Correct answer: B*
-*Explanation: The Theory section explains this exact dynamic — the surprise itself, not the news, is what damages trust.*
+*Correct answer: D*
+*Explanation: The gap between what the PM knew and what got shared is what a manager notices, not just the fact itself.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. What four dimensions does the Working Styles Matrix use to assess a manager's communication preferences?**
-A) Salary, title, tenure, and department
-B) Detail level, format, involvement, and timing
-C) Age, education, location, and team size
+A) Age, education, location, and team size
+B) Detail, format, involvement, and timing
+C) Salary, title, tenure, and department
 D) Scrum, Kanban, hybrid, and waterfall
 
 *Correct answer: B*
-*Explanation: The Framework Explanation section explicitly lists these four dimensions.*
+*Explanation: These four dimensions are what the Framework Explanation lists as the places a mismatch most commonly shows up.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Why does this lesson caution against assuming a new manager shares a previous manager's working-style preferences?**
-A) Because all managers have identical preferences by default
-B) Because working styles vary meaningfully between individuals, and assuming continuity risks the same kind of style mismatch that causes friction unrelated to the substance of the work
-C) Because new managers are legally required to disclose their preferences in writing
-D) Because working styles never change over a career
+A) New managers must disclose style by law
+B) All managers hold identical preferences
+C) Assuming continuity risks a real mismatch
+D) Working styles rarely shift over time
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #4 explains this exact risk of assuming preference continuity across different managers.*
+*Correct answer: C*
+*Explanation: A style that worked well with one manager can be exactly the wrong fit for the next, and the mismatch has nothing to do with the work itself.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **5. What is the key difference between managing up and managing across?**
-A) They are identical practices applied to different job titles
-B) Managing up is the ongoing relationship discipline with one's own manager; managing across is the ongoing maintenance of peer relationships, independent of any specific request
-C) Managing across only applies to negotiations, never to ongoing relationships
-D) Managing up only matters during performance reviews
+A) Managing up applies just during reviews
+B) Managing across concerns negotiation alone
+C) Up is with a manager; across sustains peers
+D) The two names describe one practice
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly distinguishes these two practices this way.*
+*Correct answer: C*
+*Explanation: One is the discipline with the person you report to; the other is the discipline with people who report to no one above you.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. How does managing across extend Lesson 53's currencies of exchange model?**
-A) It replaces the currencies of exchange model entirely with an unrelated framework
-B) It applies the same exchange logic to an ongoing, continuously maintained relationship rather than a single negotiation, building accumulated goodwill over time
-C) It only applies to relationships with formal authority, unlike Lesson 53
-D) It has no relationship to Lesson 53's concepts at all
+A) It bears no relation to Lesson 53's model
+B) It applies just where formal authority exists
+C) It swaps in an altogether unrelated model
+D) It deposits the same currencies, well before any request arrives
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly describes managing across as extending Lesson 53's model into an ongoing practice.*
+*Correct answer: D*
+*Explanation: The same currencies still apply; the difference is depositing them steadily rather than only when a request is on the table.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. Why does a purely transactional pattern of peer engagement tend to make future requests harder to secure?**
-A) It doesn't; transactional engagement always produces the same results as ongoing investment
-B) It produces a one-sided relationship pattern peers reasonably notice, since no goodwill or reciprocal value has been invested in the relationship independent of specific asks
-C) Because transactional engagement is illegal in most organizations
-D) Because peers are obligated to help regardless of relationship history
+A) No goodwill was ever deposited to draw on
+B) Peers must help regardless of history
+C) Transactional engagement is barred outright
+D) It performs identically to real investment
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #3 and the Theory section both explain this exact dynamic.*
+*Correct answer: A*
+*Explanation: A relationship touched only when something is needed reads exactly that way to the peer on the other end of it.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. In the Detailed Case Study, what was the actual root cause of the damage to the manager relationship?**
-A) The launch delay itself, which was outside the PM's direct control
-B) The manager learning about the delay risk from another executive in a public leadership review, rather than from the PM directly and early
-C) The dependency team's poor performance
-D) The PM's lack of technical skill
+A) The manager heard it secondhand, in public first
+B) The PM's technical skill was found lacking
+C) The dependency team had performed poorly
+D) The delay itself, beyond the PM's control
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong?" section explicitly attributes the damage to the surprise itself, not the underlying delay.*
+*Correct answer: A*
+*Explanation: The delay was real either way; what actually damaged trust was hearing it secondhand rather than from the PM directly.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. What was the PM's reasoning for delaying disclosure in the Detailed Case Study, and why was this reasoning flawed?**
-A) The PM wanted to avoid ever discussing the issue at all; this was flawed because avoidance is never acceptable
-B) The PM wanted to present a fully resolved update rather than an unresolved risk; this was flawed because it left the manager without timely information about a significant, reasonably-confident risk
-C) The PM believed the manager would not care about the delay; this was flawed because all managers care equally about every issue
-D) The PM had no reasoning at all for the delay
+A) The PM assumed the manager wouldn't care
+B) The PM had no particular reasoning at all
+C) Waiting for resolution left a real risk unshared
+D) The PM meant to avoid the topic altogether
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this reasoning (waiting for a tidy resolution) and identifies it as the specific flaw underlying Mistake 1.*
+*Correct answer: C*
+*Explanation: Waiting for a tidy answer instead of sharing the risk as it stood is exactly the flaw the no-surprises principle targets.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
 ---
 
 **10. Why does this lesson caution against raising every minor, low-confidence concern reflexively, even while endorsing proactive disclosure?**
-A) Because no risks should ever be raised proactively
-B) Because reflexively raising every minor concern would create noise and erode a manager's ability to distinguish genuine signal from routine uncertainty
-C) Because managers are never interested in any risks at all
-D) Because minor concerns are always resolved automatically without any communication
+A) No risk should ever be raised proactively
+B) Constant alerts bury the real signal
+C) Minor concerns invariably resolve unaided
+D) Managers have no interest in risk
 
 *Correct answer: B*
-*Explanation: The Case Study's corrective practice discussion explicitly notes this balance — proactive disclosure of significant, reasonably-confident risks, not reflexive noise about every minor uncertainty.*
+*Explanation: The principle is about genuine, reasonably-confident risk, not narrating every passing uncertainty as though it carries equal weight.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they adapt their communication style to different managers, and answers: "I communicate the same way with everyone, since that's what feels most natural and efficient to me." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; a single consistent style is always most effective
-B) It fails to describe genuine adaptation to a manager's specific working-style preferences, applying instead a single default style regardless of what actually works best for that manager
-C) It correctly demonstrates strong personal consistency
-D) It shows appropriate confidence in one's own communication approach
+A) One default style, not real adaptation
+B) None; one consistent style performs best
+C) It shows confidence in one's own approach
+D) It shows strong personal consistency
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer describes specific, observed style differences and genuine adaptation, not a single unchanging approach.*
+*Correct answer: A*
+*Explanation: "What feels natural to me" is the opposite of the observation-and-adaptation this lesson actually asks for.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson explicitly distinguish managing up from flattery or telling a manager only what they want to hear?**
-A) Because flattery and managing up are actually identical practices
-B) Because genuine managing up is about ensuring accurate, timely, well-adapted communication, including uncomfortable information — not curating an artificially positive picture that will eventually be contradicted by reality
-C) Because managers always prefer flattery over accurate information
-D) Because flattery is a required component of effective managing up
+A) Flattery and managing up name one thing
+B) Managers generally prefer flattery to fact
+C) It includes uncomfortable information too
+D) Flattery is a required component of it
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #5 explicitly makes this distinction between genuine managing up and ingratiating, artificially positive communication.*
+*Correct answer: C*
+*Explanation: A picture that's only ever positive eventually meets a reality that contradicts it, and that gap is where the real damage happens.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A PM notices their manager seems to disengage during long written status reports but responds enthusiastically and asks detailed questions during brief verbal updates. Using the Working Styles Matrix, what should the PM do?**
-A) Continue sending long written reports regardless, since that's the PM's own preferred format
-B) Shift toward brief verbal updates as the primary communication format for this manager, based on the observed engagement pattern, while still making detailed written material available if requested
-C) Stop communicating with this manager entirely
-D) Insist the manager adapt to the PM's preferred written format instead
+A) Shift to brief verbal updates, per the pattern
+B) Stop communicating with this manager
+C) Keep sending long written reports regardless
+D) Insist the manager adapt to the PM's format
 
-*Correct answer: B*
-*Explanation: This reflects the Working Styles Matrix's core recommendation — observing actual engagement patterns and adapting to the manager's real preferences, rather than expecting the manager to adapt to the PM's own natural style.*
+*Correct answer: A*
+*Explanation: This is the matrix's actual test in practice — noticing which format gets real engagement, and adapting to that rather than a personal default.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects genuine managing-across practice, per this lesson?**
-A) Reaching out to a peer team only when a specific resource or favor is needed
-B) Regularly checking in with a peer team, offering proactive help, and maintaining mutual visibility into priorities, independent of any current specific need
-C) Avoiding any contact with peer teams until a formal negotiation is required
-D) Only communicating with peers through a manager as an intermediary
+A) Reaching out just when a favor is needed
+B) Checking in regularly with no ask attached
+C) Avoiding contact until negotiation is needed
+D) Routing peer contact through a manager
 
 *Correct answer: B*
-*Explanation: This reflects the ongoing, non-transactional investment this lesson defines as genuine managing-across practice, in contrast to purely transactional or avoidant patterns.*
+*Explanation: This is the non-transactional, ongoing investment this lesson names as the actual practice, not contact that only appears alongside a request.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A PM has a new manager whose working-style preferences are still unclear, and simultaneously discovers a moderate, not-yet-fully-confirmed risk to a major deliverable. Using this lesson's frameworks together, what is the most defensible approach?**
-A) Wait until the working relationship with the new manager is fully established before ever raising any risks, regardless of severity
-B) Proactively disclose the risk now, using a reasonably cautious, appropriately-hedged framing given its not-yet-fully-confirmed status (echoing Lesson 35's Confidence Gradient), while also using this early interaction as an opportunity to learn more about the new manager's preferred communication style through direct observation and inquiry
-C) Avoid mentioning the risk at all until it either resolves itself or becomes undeniable
-D) Escalate the risk immediately to senior leadership without ever informing the direct manager first
+A) Escalate straight to leadership, skipping the manager
+B) Hold off on the risk until trust builds
+C) Avoid it until it resolves or becomes obvious
+D) Disclose now, hedged, and learn their style too
 
-*Correct answer: B*
-*Explanation: This combines the no-surprises principle (proactive, appropriately-hedged disclosure per Lesson 35's Confidence Gradient) with the Manager Operating Manual practice (using early interactions to learn a new manager's style), rather than either delaying disclosure indefinitely or bypassing the direct manager relationship entirely.*
+*Correct answer: D*
+*Explanation: A cautiously framed early disclosure serves the no-surprises principle and doubles as a first real data point on how this manager prefers to hear things.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Hard*
 

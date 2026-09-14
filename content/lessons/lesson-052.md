@@ -384,195 +384,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What does the "customer as hero" narrative framing recommend?**
-A) Positioning the product or company as the main character of the story
-B) Positioning the customer as the protagonist facing a real problem, with the product as a guide helping them overcome it
-C) Removing any mention of the customer from product communication entirely
-D) Focusing exclusively on the company's founding history
+A) Focusing on the company's founding story
+B) Removing the customer from communication
+C) Customer as protagonist, product as guide
+D) The product as the story's main character
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly defines this framing, inverting the instinct to center the product or company as the hero.*
+*Correct answer: C*
+*Explanation: This inverts the instinct to center the product, letting the audience see themselves as the one facing the problem instead.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the five elements of the Story Spine?**
-A) Now, Next, Later, Never, Done
-B) Problem, guide, plan, call to action, stakes
+A) Now, Next, Later, Shelved, Done
+B) Problem, guide, plan, action, stakes
 C) Input, action, output, reinvestment, decay
-D) Discover, Define, Develop, Deliver, Done
+D) Discover, define, develop, deliver, done
 
 *Correct answer: B*
-*Explanation: The Theory section explicitly names these five elements as the narrative arc structuring effective product storytelling.*
+*Explanation: These five elements, in sequence, are what the Theory section names as the narrative arc for product storytelling.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Why is data alone often insufficient for durable persuasion, according to this lesson?**
-A) Because data is always inaccurate
-B) Because data can be intellectually accepted but emotionally forgettable, failing to generate lasting buy-in or memorability
-C) Because data should never be included in any presentation
-D) Because data only matters for engineering audiences
+A) Data belongs to engineering audiences alone
+B) Accepted, yet remains forgettable
+C) Data is inaccurate in most contexts
+D) Data should not appear in a presentation
 
 *Correct answer: B*
-*Explanation: The Theory section explains this exact limitation of data presented without narrative framing.*
+*Explanation: A number can register as true without moving how urgent or important a decision actually feels to the person hearing it.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is narrative alone often insufficient for durable persuasion, especially with sophisticated audiences?**
-A) Because narrative is always false
-B) Because a vivid story with no supporting evidence risks feeling like manipulation rather than genuine insight, and sophisticated audiences will often discount it specifically for lacking rigor
-C) Because narrative should never be used in business communication
-D) Because narrative only works for consumer products, never B2B products
+A) An ungrounded story can read as manipulation
+B) Narrative should not appear in business settings
+C) Narrative just suits consumer products
+D) A story is false by its very nature
 
-*Correct answer: B*
-*Explanation: The Theory section explains this exact risk of narrative presented without supporting data.*
+*Correct answer: A*
+*Explanation: A vivid story with nothing behind it asks an analytical audience to trust the telling rather than the evidence, and that's often a trade they won't make.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. How does this lesson's caution about manufactured excitement connect to Lesson 38's premature high-fidelity concept?**
-A) There is no connection between the two concepts
-B) Both describe how polish (visual in Lesson 38, narrative in this lesson) can create false confidence and premature attachment to an idea that hasn't actually been validated with real evidence
-C) Lesson 38 only applies to engineering, and this lesson only applies to marketing
-D) Premature high-fidelity is the opposite of manufactured excitement, with no shared underlying principle
+A) The two concepts share no real principle
+B) Lesson 38 is marketing; this lesson is engineering
+C) There is no meaningful link between the lessons
+D) Both concern polish creating false confidence early
 
-*Correct answer: B*
-*Explanation: The Theory section and Common Beginner Mistake #4 explicitly draw this parallel between visual and narrative polish creating similar risks.*
+*Correct answer: D*
+*Explanation: A slick mockup and a vivid, unvalidated story create the same premature attachment through two different kinds of polish.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what was missing from the original roadmap presentation, despite its factual accuracy?**
-A) Supporting metrics for each roadmap item
-B) A clearly articulated, evidenced problem, a "guide" framing, and stated stakes connecting the roadmap items into a coherent story
-C) A complete list of every feature shipped
-D) Organization by team and Sprint
+A) Metrics attached to each roadmap item
+B) Organization by team and by Sprint
+C) A problem, guide, stakes
+D) A complete list of shipped features
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong?" section explicitly identifies these missing narrative elements, despite the presentation's factual accuracy and organization.*
+*Correct answer: C*
+*Explanation: The individual facts were sound; what was absent was anything connecting them into a single coherent story.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What did the corrective revision in the Detailed Case Study involve?**
-A) Adding more bulleted items to the roadmap list
-B) Opening with a specific, real, evidenced customer story, connecting it to the roadmap items as the plan addressing it, and closing with stated stakes
-C) Removing all supporting data from the presentation
-D) Extending the presentation's length significantly with additional metrics
+A) Removing all supporting data altogether
+B) Extending the deck with more metrics
+C) A real customer story, then the roadmap
+D) Adding more bulleted items to the list
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this narrative restructuring as the corrective revision, using the same underlying roadmap content.*
+*Correct answer: C*
+*Explanation: The same underlying roadmap content was reordered around a narrative arc rather than rewritten from scratch.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **8. Why does this lesson describe the roadmap presentation's failure as a "narrative gap, not a content or accuracy problem"?**
-A) Because the underlying roadmap content was factually wrong
-B) Because the same underlying content, when restructured with a narrative arc, produced substantially better recall and engagement in the following quarter, without any change to the actual roadmap facts
-C) Because narrative gaps and content problems are the same thing
-D) Because the presentation was too short
+A) Narrative gaps and content problems are one thing
+B) Restructuring alone lifted recall, facts unchanged
+C) The roadmap content had been factually wrong
+D) The presentation ran too short in length
 
 *Correct answer: B*
-*Explanation: The Case Study explicitly attributes the improved engagement to narrative restructuring alone, with no change to the underlying facts, confirming the diagnosis as a narrative gap rather than a content problem.*
+*Explanation: Nothing about the roadmap itself changed between versions — only its narrative structure did, and that alone shifted how it landed.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. What does the Airbnb storyboarding example illustrate, according to this lesson's Real Company Example?**
-A) That feature lists are always superior to customer journey mapping
-B) That mapping a customer's full narrative journey, with a clear problem and emotional arc, produces more coherent product decisions than an isolated feature list
-C) That storyboarding is only relevant to animation studios, not software products
-D) That Airbnb never used any data in its early product decisions
+A) A full journey map beats an isolated feature list
+B) Storyboarding suits animation, not software
+C) Feature lists invariably outperform journey maps
+D) Airbnb's early decisions used no data at all
 
-*Correct answer: B*
-*Explanation: The Real Company Example explains this exact principle about narrative journey mapping producing coherent product decisions.*
+*Correct answer: A*
+*Explanation: Seeing the whole journey, not a scattered list of features, is what let the story reveal where the real gaps sat.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **10. Using the Data-Narrative Balance Table, what is a warning sign that a communication fails the "narrative grounding" check specifically?**
-A) The communication includes both a story and supporting data
-B) A compelling story is presented with no cited source or supporting evidence behind it
-C) The communication is too short to include any narrative at all
-D) The communication includes only bulleted metrics with no narrative
+A) The communication pairs a story with data
+B) A story with no real source behind it
+C) Bulleted metrics with no narrative present
+D) The communication is too brief for narrative
 
 *Correct answer: B*
-*Explanation: The Framework Explanation section's table identifies an ungrounded, uncited story as the specific warning sign for the narrative grounding check.*
+*Explanation: A vivid story can pass every other check and still fail this one, if nothing behind it can be traced to real evidence.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they ensure a compelling story doesn't overstate what they actually know, and answers: "I just make sure the story feels authentic and confident." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; confidence alone is sufficient to ensure a story is grounded in evidence
-B) It fails to describe any deliberate practice for grounding the story in genuine research or data, relying instead on subjective feeling rather than evidence-checking
-C) It correctly demonstrates strong communication skills
-D) It shows an appropriate level of narrative polish
+A) Relies on feeling, no check
+B) It demonstrates strong communication skill
+C) It shows an appropriate level of polish
+D) There is no weakness in this answer
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer describes a deliberate practice for grounding stories in real evidence, not a subjective sense of authenticity alone.*
+*Correct answer: A*
+*Explanation: Feeling authentic and being grounded in real evidence are two different properties, and this answer only speaks to the first.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson emphasize that storytelling should complement, not replace, the structural discipline from Lesson 51?**
-A) Because structure and narrative are identical concepts
-B) Because a narrative that meanders without reaching a clear point or ask undermines actionability, even if it's engaging — storytelling should make a structured argument more compelling, not replace the structure that makes it actionable
-C) Because Lesson 51's principles no longer apply once storytelling is introduced
-D) Because narrative should always come before any structural consideration
+A) Lesson 51's principles stop applying here
+B) Narrative should invariably precede structure
+C) A meandering story still needs a clear ask
+D) Structure and narrative name one concept
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #5 explains this exact relationship between narrative and structure.*
+*Correct answer: C*
+*Explanation: An engaging story that never reaches a clear point leaves the listener moved but unsure what's actually being asked of them.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A PM has genuine, validated user research showing a specific painful problem, but is nervous about using a vivid, story-driven presentation format, worried it might seem unprofessional to an executive audience. Using this lesson's frameworks, what is the most defensible approach?**
-A) Avoid any narrative framing entirely and present only raw data tables
-B) Use the Story Spine to frame the genuinely evidenced problem narratively, paired with supporting data (per the Data-Narrative Balance Table) — since the underlying story is grounded in real research, this combination is likely to be both credible and memorable, not unprofessional
-C) Invent a more dramatic story than the research actually supports, to maximize impact
-D) Present the data first with no narrative framing, then add a story only if specifically requested
+A) Present raw data tables, skip narrative
+B) Add data later, just if requested
+C) A more dramatic version than the research shows
+D) Pair the grounded story with data
 
-*Correct answer: B*
-*Explanation: Since the underlying problem is genuinely evidenced, combining a grounded narrative with supporting data (rather than avoiding narrative or inventing an exaggerated one) is the approach this lesson recommends for durable, credible persuasion.*
+*Correct answer: D*
+*Explanation: Since the research genuinely backs the story, combining the two rather than choosing between them is exactly the pairing this lesson recommends.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects the "customer as hero" framing applied correctly to a roadmap presentation?**
-A) Opening with a detailed history of the company's founding and growth milestones
-B) Opening with a specific, evidenced description of a real user's struggle with a current problem, then presenting the roadmap as the plan (guided by the product) to help resolve that struggle
-C) Opening with an exhaustive list of every feature the product currently offers
-D) Opening with a comparison to competitors' feature lists
+A) A real struggle first, roadmap as its resolution
+B) A comparison against competitors' feature lists
+C) An exhaustive list of every current feature
+D) A history of the company's founding milestones
 
-*Correct answer: B*
-*Explanation: This reflects the correct application of the customer-as-hero framing — centering the customer's real problem, with the product/roadmap as the guide and plan, not the company's own history or feature list.*
-*Learning objective tested: #1, #2*
+*Correct answer: A*
+*Explanation: Leading with the user's actual struggle is what puts the customer, not the product, at the center of the story.*
+*Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A PM wants to present a major strategic pitch to a mixed audience of both highly analytical executives and more empathetic, narrative-receptive team members, using a single unified presentation. Using this lesson's and Lesson 51's frameworks together, what is the most defensible approach?**
-A) Prepare two entirely separate, unrelated presentations with no shared core content
-B) Structure the presentation using BLUF (Lesson 51) to lead with the core recommendation, build it around the Story Spine with a genuinely evidenced customer problem, and support the narrative with concrete data (per the Data-Narrative Balance Table) — satisfying both the emotional engagement narrative-receptive members need and the rigor analytical members require, within a single coherent structure
-C) Remove all narrative elements to avoid confusing the analytical members of the audience
-D) Remove all data to keep the presentation purely narrative and avoid overwhelming the more empathetic members of the audience
+A) Two disconnected presentations, no shared content
+B) Strip out all data, keep it purely narrative
+C) Strip out all narrative for the analytical group
+D) BLUF, a grounded Story Spine, backed by data
 
-*Correct answer: B*
-*Explanation: This combines Lesson 51's structural discipline (BLUF) with this lesson's narrative and data-balance principles into a single, audience-inclusive structure, rather than either splitting into disconnected presentations or stripping out an element some part of the audience needs.*
+*Correct answer: D*
+*Explanation: Combining Lesson 51's lead-with-the-point discipline with a grounded story and supporting data serves both halves of the audience within one structure, rather than splitting or stripping either element out.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 

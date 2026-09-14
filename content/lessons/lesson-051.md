@@ -424,26 +424,26 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What does BLUF require, according to this lesson?**
-A) Building up to the conclusion through chronological background first
-B) Stating the conclusion or recommendation first, before supporting context or reasoning
-C) Avoiding any conclusion or recommendation entirely
-D) Presenting only detailed evidence with no summary at all
+A) Avoiding any conclusion or recommendation
+B) Presenting just detailed evidence, no summary
+C) Building up to the conclusion chronologically
+D) Stating the conclusion first, before supporting reasoning
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly defines BLUF this way, inverting the natural chronological instinct.*
+*Correct answer: D*
+*Explanation: This inverts the natural chronological instinct, since a time-constrained executive audience needs the point before the buildup.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the key discipline the Pyramid Principle enforces?**
-A) Every level of an argument should require the reader to already understand the level below it
-B) The top-level conclusion should be a complete, standalone statement, with supporting arguments and detailed evidence available at deeper levels only if needed
-C) All evidence must be presented before any conclusion is stated
-D) Only executives are allowed to read the top level of any document
+A) Just executives may read a document's top level
+B) All evidence must precede any stated conclusion
+C) Each level requires understanding the level below it
+D) The top line stands alone, complete
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly describes this standalone-completeness discipline as the Pyramid Principle's key requirement.*
+*Correct answer: D*
+*Explanation: A complete, standalone top line is what lets a reader grasp the recommendation without first working through everything beneath it.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -451,168 +451,168 @@ D) Only executives are allowed to read the top level of any document
 
 **3. What does the Altitude Dial concept describe?**
 A) The physical location of an executive's office
-B) Matching the level of detail and abstraction in communication to a given audience's actual decision-making needs
-C) A synonym for the Pyramid Principle with no meaningful difference
-D) A tool used only in engineering communication, never in executive contexts
+B) A tool used just in engineering communication
+C) Matching detail level to the audience's needs
+D) Another name for the Pyramid Principle itself
 
-*Correct answer: B*
-*Explanation: The Theory section defines the Altitude Dial as matching detail level to audience needs, extending Lesson 47's power/interest grid.*
+*Correct answer: C*
+*Explanation: This extends Lesson 47's power/interest reasoning to how much abstraction versus implementation detail a given audience actually needs.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What five elements does a well-structured decision memo include, per the Decision Memo Structure framework?**
-A) Background, history, methodology, appendix, references
-B) Recommendation, context, alternatives considered, key trade-offs, and an explicit ask
-C) Only a recommendation, with no further detail
-D) A slide deck, a video, a survey, and a summary
+A) The recommendation, context, alternatives, trade-offs, and ask
+B) A slide deck, a video, a survey, a summary
+C) Background, history, methodology, appendix, references
+D) Just a recommendation, without further detail
 
-*Correct answer: B*
-*Explanation: The Framework Explanation section explicitly lists these five elements.*
+*Correct answer: A*
+*Explanation: These five sections together give an executive both the headline decision and the supporting rigor to evaluate it further.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. Why does omitting "alternatives considered" from an executive communication undermine trust, according to this lesson?**
-A) It doesn't; alternatives are irrelevant to executive trust
-B) An executive presented with only one option has no visible basis to trust that genuine analysis, rather than a predetermined conclusion, drove the recommendation
-C) Because alternatives are legally required in all business documents
-D) Because presenting alternatives always changes the final recommendation
+A) Alternatives are legally required in business documents
+B) One option alone gives no visible sign of real analysis
+C) Presenting alternatives invariably changes the outcome
+D) Alternatives carry no bearing on executive trust
 
 *Correct answer: B*
-*Explanation: The Theory section and Common Beginner Mistake #2 explain this exact trust-related risk.*
+*Explanation: A single option with no visible weighing of alternatives reads as a conclusion worked backward to, not one reached through genuine analysis.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what was the actual root cause of the recommendation failing to land in the meeting?**
-A) The underlying technical debt analysis was fundamentally flawed
-B) The document's chronological structure buried the actual recommendation on page four, past where the time-constrained executive audience's attention held
-C) The executives were not interested in technical debt at all
-D) The PM failed to include any supporting data whatsoever
+A) The executives had no interest in technical debt
+B) It sat buried, several pages down
+C) No supporting data was included at all
+D) The technical debt analysis was flawed
 
 *Correct answer: B*
-*Explanation: The Case Study explicitly attributes the failure to structure, not content — a direct instance of the BLUF violation this lesson describes.*
+*Explanation: The chronological structure delayed the actual ask past where a time-constrained audience's attention held.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What did the corrective revision in the Detailed Case Study involve?**
-A) Conducting entirely new research and analysis
-B) Restructuring the same underlying analysis so the recommendation appeared first, followed by key supporting reasons, with detailed data moved to an appendix
-C) Abandoning the technical debt paydown recommendation entirely
-D) Adding more background history to the beginning of the document
+A) Abandoning the paydown recommendation altogether
+B) Adding more background history at the start
+C) Restructuring the analysis, recommendation first
+D) Conducting altogether new research
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this restructuring, not re-researching, as the corrective response.*
+*Correct answer: C*
+*Explanation: The fix was structural, not a re-analysis — the same evidence, reordered to lead with the ask.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **8. Why does this lesson caution against pitching executive communication at too low an altitude (excessive granular detail)?**
-A) Because granular detail is always factually incorrect
-B) Because it overwhelms an executive audience's actual decision-making needs, which are typically focused on trade-offs and outcomes rather than implementation specifics
-C) Because granular detail should only ever be shared with customers, never executives
-D) Because low-altitude communication is illegal in most organizations
+A) Granular detail is invariably factually incorrect
+B) It can overwhelm decision-making on trade-offs
+C) Low-altitude communication is barred outright
+D) Detail should reach customers, not executives
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #3 explains this exact risk of miscalibrated altitude.*
+*Explanation: Sprint-level specifics serve an engineering audience's needs; an executive audience is generally weighing trade-offs and outcomes instead.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does this lesson caution against treating an executive's request for more detail as a sign the initial communication failed?**
-A) Because executives never ask follow-up questions if a communication is well-structured
-B) Because a well-structured Pyramid Principle communication should prompt targeted follow-up questions from an engaged executive wanting to verify a specific claim — this is the structure working as intended
-C) Because follow-up questions always indicate the recommendation was wrong
-D) Because executives are required to ask at least one question regardless of communication quality
+A) A targeted follow-up often means the structure works
+B) Executives rarely ask follow-up questions at all
+C) A follow-up question invariably means it was wrong
+D) Executives must ask at least one question regardless
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #4 explicitly frames targeted follow-up questions as evidence of the structure working correctly, not failing.*
+*Correct answer: A*
+*Explanation: A well-built pyramid invites exactly this — a specific question about a specific claim, rather than confusion about the whole thing.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
 **10. What does Amazon's widely reported narrative memo and silent-reading practice illustrate, according to this lesson's Real Company Example?**
-A) That slide decks are always superior to written memos
-B) That a memo intended to be read silently and understood on its own terms forces a more complete, rigorous argument than a format that can rely on a live presenter's delivery to carry gaps in reasoning
-C) That executives should never read anything before a meeting
-D) That six-page memos are required by law for all business communication
+A) Six-page memos are legally required everywhere
+B) Slide decks invariably outperform written memos
+C) Executives should rarely read before a meeting
+D) A memo meant to stand fully on its own
 
-*Correct answer: B*
-*Explanation: The Real Company Example explains this exact principle — standalone-readable communication forces more rigorous structure than a live-presented format.*
+*Correct answer: D*
+*Explanation: A presenter can paper over a gap in reasoning; a silently-read memo has to carry the whole argument on its own.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they structure updates for executive leadership, and answers: "I usually start with background so they understand the full history before I get to my point." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; background should always come before any conclusion
-B) It describes a chronological, background-first structure that works against a time-constrained executive audience's actual needs, rather than applying BLUF or the Pyramid Principle
-C) It correctly demonstrates thorough preparation
-D) It shows strong attention to detail
+A) Background-first order fights time-pressed needs
+B) Background should invariably precede a conclusion
+C) It demonstrates strong attention to detail
+D) It correctly shows thorough preparation
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer defaults to BLUF and the Pyramid Principle, not a chronological, background-first approach.*
+*Correct answer: A*
+*Explanation: BLUF and the Pyramid Principle both invert exactly this instinct, for exactly this reason.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson recommend an explicit, unambiguous "ask" at the end of a decision memo?**
-A) Because without a specific stated ask, an executive may be unclear on what decision or action is actually being requested, risking no action or a misaligned one
-B) Because asks are only relevant for financial decisions
-C) Because the ask should always be identical regardless of the recommendation's content
-D) Because executives are legally required to respond to every ask within 24 hours
+A) An ask is just relevant for financial decisions
+B) Executives must respond to every ask in a day
+C) Without one, the requested action can go unclear
+D) The ask should stay identical no matter the content
 
-*Correct answer: A*
-*Explanation: Common Beginner Mistake #5 explains this exact risk of omitting a clear, explicit ask.*
+*Correct answer: C*
+*Explanation: A recommendation without a stated ask can leave an executive unsure whether they're meant to decide, fund, or simply note it.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A PM's executive update is technically accurate and thorough but takes fifteen minutes to reach its actual recommendation, and the executive audience seems increasingly distracted as it progresses. Using this lesson's frameworks, what is the most likely diagnosis and fix?**
-A) The recommendation itself must be fundamentally wrong and should be abandoned
-B) This is likely a structure problem, not a content problem — restructuring using BLUF and the Pyramid Principle (recommendation first, then key supporting arguments) is likely to resolve the issue without requiring new analysis
-C) The executives are simply uninterested in the topic and no restructuring will help
-D) The PM should add even more background detail to provide additional context
+A) A structure problem, fixable by reordering the memo
+B) The executives are simply uninterested in the topic
+C) The recommendation itself must be fundamentally wrong
+D) More background detail should be added throughout
 
-*Correct answer: B*
-*Explanation: This directly applies the Case Study's core distinction — a structure problem requires restructuring, not necessarily new content or analysis.*
+*Correct answer: A*
+*Explanation: The content held up fine once reordered — the fifteen-minute wait was the actual problem, not the underlying analysis.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects appropriate altitude-matching for an executive audience, per this lesson?**
-A) Presenting identical Sprint-ticket-level detail to executives and engineering teams alike
-B) Leading with strategic trade-offs, business impact, and the specific decision needed, with granular implementation detail available in an appendix or on request
-C) Omitting all supporting evidence or trade-off information to keep the communication as short as possible
-D) Presenting only vague, unsupported claims with no substantive grounding at all
+A) Identical Sprint-ticket detail for executives and engineers
+B) Just vague, unsupported claims with no grounding
+C) Omitting all evidence and trade-offs to stay short
+D) Trade-offs and the decision needed first, detail available on request
 
-*Correct answer: B*
-*Explanation: This reflects the Altitude Dial's correct application — high-altitude focus for the primary audience, with detail available but not presented by default.*
+*Correct answer: D*
+*Explanation: This keeps the primary audience at the altitude their decision actually needs, without discarding the rigor available underneath.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A PM has a genuinely strong recommendation but knows from past experience that this specific executive audience tends to ask detailed, skeptical questions about any option not explicitly shown to have been considered and ruled out. Using this lesson's frameworks, what is the most defensible preparation approach?**
-A) Present only the final recommendation with no mention of alternatives, to keep the document as short as possible
-B) Proactively include a concise "alternatives considered" section addressing the most likely alternatives this audience would raise, demonstrating genuine analytical rigor upfront rather than waiting to be asked and appearing unprepared or as though alternatives were never seriously weighed
-C) Avoid presenting to this executive audience at all, given their skeptical tendencies
-D) Include exhaustive detail on every conceivable alternative, regardless of how implausible, to avoid any possible follow-up question
+A) Present just the final recommendation alone
+B) Proactively address the alternatives likely raised
+C) Avoid presenting to this audience altogether
+D) Include exhaustive detail on every conceivable alternative
 
 *Correct answer: B*
-*Explanation: This reflects a sophisticated, audience-aware application of the Decision Memo Structure — proactively addressing the specific alternatives this audience is likely to probe, at a level of detail proportionate to genuine relevance, rather than either omitting alternatives entirely or overloading the document indiscriminately.*
+*Explanation: This anticipates the specific skepticism rather than either omitting alternatives or burying the memo under every implausible one.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
