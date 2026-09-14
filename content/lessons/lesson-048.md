@@ -354,195 +354,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the key difference between value-based and cost-plus pricing?**
-A) They are identical approaches with different names
-B) Value-based pricing anchors price to what the product is worth to the customer; cost-plus pricing anchors it to internal production cost plus a margin
-C) Cost-plus pricing is always higher than value-based pricing
-D) Value-based pricing can only be used for physical products, not software
+A) Cost-plus pricing invariably ends up costing more
+B) Value-based pricing suits solely physical goods
+C) The two approaches are effectively identical here
+D) Value-based tracks worth; cost-plus tracks cost
 
-*Correct answer: B*
-*Explanation: The Theory section defines these two approaches exactly this way.*
+*Correct answer: D*
+*Explanation: One anchors to what the customer would pay for the outcome; the other anchors to what it cost the seller to produce it.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Which pricing model is generally most appropriate when customer usage varies widely and continuously across the customer base?**
-A) Flat-rate
-B) Usage-based, or a hybrid with a base fee
-C) A single price with no variation of any kind
-D) Freemium exclusively
+A) A single flat price with no variation
+B) Usage-based pricing, or a hybrid with a base fee
+C) Freemium alone, with no paid tier at all
+D) Per-seat pricing regardless of usage volume
 
 *Correct answer: B*
-*Explanation: The Theory section and Pricing Model Selection Table both identify usage-based (or hybrid) pricing as the appropriate fit for widely varying usage.*
+*Explanation: Tying price to the unit that actually varies keeps light and heavy users each paying roughly in proportion to what they consume.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is the difference between pricing and packaging?**
-A) They are the same decision and should always be made together as a single choice
-B) Pricing is how much a customer pays; packaging is what they receive at each price point
-C) Packaging only applies to physical products
-D) Pricing only applies to freemium models
+A) Pricing and packaging are one decision, invariably
+B) How much a customer actually pays
+C) Packaging applies to physical goods alone
+D) Pricing applies to freemium models alone
 
 *Correct answer: B*
-*Explanation: The Theory section explicitly distinguishes these two related but separate decisions.*
+*Explanation: A price can be right while what it buys is bundled badly, or the reverse, which is exactly why the lesson treats these as separate decisions.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What does the Van Westendorp price sensitivity meter ask customers?**
-A) Only their income level
-B) Four questions about when a price feels too cheap, a bargain, expensive, or too expensive to consider
-C) A single question about their maximum budget
-D) Whether they prefer flat-rate or tiered pricing
+A) The four price-sensitivity questions
+B) Just a question about household income
+C) One question about a customer's top budget
+D) Whether flat-rate beats tiered pricing overall
 
-*Correct answer: B*
-*Explanation: The Theory section describes these exact four questions as the basis of the Van Westendorp technique.*
+*Correct answer: A*
+*Explanation: Plotting the four answers across a sample of customers is what produces the acceptable price range this technique is known for.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. What is cross-subsidization, in a pricing context?**
-A) A legal requirement for all SaaS pricing models
-B) A dynamic where light users effectively subsidize heavy users under a poorly-aligned pricing model, such as flat-rate pricing applied to widely varying usage
-C) A synonym for freemium pricing
-D) A technique for calculating cost-plus pricing
+A) Light users effectively cover heavy costs
+B) A clause required in most SaaS contracts
+C) Another name for freemium pricing specifically
+D) A technique for computing cost-plus pricing
 
-*Correct answer: B*
-*Explanation: The Theory section and Glossary define cross-subsidization exactly this way.*
+*Correct answer: A*
+*Explanation: A flat fee calibrated to typical usage collects the same amount from everyone, so someone below that average is quietly paying for someone above it.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, why did the company's gross margin erode specifically on its heaviest-usage customers?**
-A) Those customers stopped paying entirely
-B) The flat rate was calibrated to a "typical" usage level that heavy users far exceeded, meaning the company was serving them at a cost the flat fee no longer covered
-C) Heavy users were charged more than light users under the flat-rate model
-D) The company's infrastructure costs had nothing to do with usage volume
+A) Those customers had stopped paying for good
+B) Heavy users paid more than light users did
+C) The flat fee no longer covered serving them
+D) Infrastructure cost had no link to usage volume
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly attributes the margin erosion to this specific mismatch between flat-fee revenue and usage-driven cost.*
+*Correct answer: C*
+*Explanation: The flat rate was set against a "typical" usage figure, and once actual usage ran well past that figure the fee stopped covering the cost of serving it.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. Why was the margin problem in the Case Study invisible in the company's aggregate revenue figures?**
-A) Because aggregate revenue figures are always inaccurate
-B) Because aggregate revenue continued growing as the customer base grew, masking a segment-specific margin problem only visible through usage-segmented analysis, echoing Lesson 43's Simpson's Paradox caution
-C) Because the company never tracked revenue at all
-D) Because heavy users were a majority of the customer base
+A) Aggregate revenue figures are inherently unreliable
+B) Growing revenue masked a segment margin problem
+C) The company had not tracked revenue at all
+D) Heavy users were billed noticeably more overall
 
 *Correct answer: B*
-*Explanation: The Case Study explicitly connects this masking effect to Lesson 43's Simpson's Paradox caution about aggregate numbers hiding segment-specific problems.*
+*Explanation: The headline number kept climbing as the customer base grew, exactly the kind of aggregation Lesson 43 warned could hide a worsening story underneath.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **8. Why does this lesson caution that pricing changes are unusually high-stakes compared to most product decisions?**
-A) Because pricing changes are always illegal without government approval
-B) Because pricing is unusually visible and difficult to reverse, and a poorly communicated change can generate immediate, vocal backlash from an existing, trust-dependent customer base
-C) Because pricing changes never affect existing customers, only new ones
-D) Because pricing decisions require no stakeholder communication at all
+A) Pricing is visible, hard to reverse, risks backlash
+B) Pricing changes invariably need government approval
+C) Pricing changes touch just new customers, not existing ones
+D) Pricing needs no stakeholder communication at all
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #5 explains this exact caution about visibility, difficulty of reversal, and backlash risk.*
+*Correct answer: A*
+*Explanation: A poorly handled change reaches an entire existing customer base at once, and unwinding it afterward is far harder than the decision to make it.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. Using the Pricing Model Selection Table, which pricing model is generally most appropriate when value scales primarily with the number of individual users, and usage per user is relatively consistent?**
-A) Usage-based pricing
-B) Per-seat pricing
-C) Flat-rate pricing regardless of team size
-D) Freemium exclusively
+A) Usage-based pricing tied to consumption volume
+B) Per-seat pricing scaled to the team headcount
+C) A flat rate applied regardless of team size
+D) Freemium, to the exclusion of paid tiers
 
 *Correct answer: B*
-*Explanation: The Pricing Model Selection Table identifies per-seat pricing as the appropriate fit when value scales with headcount rather than usage volume.*
+*Explanation: Where each added person brings roughly the same value and cost, charging per person keeps price tracking that value directly.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **10. (Scenario) A company's freemium pricing model offers such generous free-tier functionality that almost no customers ever feel a need to upgrade to a paid tier. Using the Pricing Model Selection Table's noted risk, what is the most likely explanation?**
-A) The company has successfully implemented value-based pricing
-B) The free tier removes any meaningful incentive to upgrade, exactly the risk the table identifies for a freemium model with an overly generous free tier
-C) This is not a pricing problem at all, only a marketing problem
-D) Freemium models never have any associated risks
+A) The company has fully achieved value-based pricing
+B) This is a marketing problem, not a pricing one
+C) It removes the upgrade incentive
+D) Freemium models carry no risk once launched
 
-*Correct answer: B*
-*Explanation: The Pricing Model Selection Table explicitly lists an overly generous free tier removing upgrade incentive as freemium's key risk if misapplied.*
+*Correct answer: C*
+*Explanation: A free tier generous enough to cover most needs leaves nothing distinctive for the paid tier to sell.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. (Interview Reasoning) A candidate is asked how they'd decide on a pricing model for a new product, and answers: "I'd look at what competitors charge and match it." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; competitor pricing is the only factor that matters
-B) It skips reasoning from the product's own actual or anticipated usage patterns and value delivery, relying instead purely on external benchmarking without justification specific to the product itself
-C) It correctly demonstrates strong competitive awareness
-D) It shows an appropriate level of market research
+A) None; competitor pricing is the sole factor
+B) It shows strong competitive awareness overall
+C) It skips the product's own usage, leaning on a benchmark
+D) It reflects appropriate market diligence
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer reasons from actual usage patterns and value delivery, not simply matching competitors without independent justification.*
+*Correct answer: C*
+*Explanation: Two products can look similar from outside while creating very different value, and matching a competitor's number says nothing about either one.*
 *Learning objective tested: #1, #2*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson recommend structured customer input (such as the Van Westendorp technique) rather than relying purely on internal intuition when setting price?**
-A) Because internal intuition is always illegal to use in pricing decisions
-B) Because pricing calibrated purely to what feels reasonable internally risks a gap from what customers actually perceive as fair value, a gap that's easy to miss without deliberately measuring it
-C) Because customer input always produces a single, unambiguous correct price
-D) Because Van Westendorp is required by law for SaaS pricing
+A) Internal intuition is prohibited by law here
+B) Van Westendorp is mandatory for every launch
+C) Customer input invariably yields one correct number
+D) No usage link at all to speak of
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #4 explains this exact reasoning about the risk of purely intuition-based pricing.*
+*Correct answer: D*
+*Explanation: What feels reasonable inside the building and what a customer will actually pay are two separate questions, and only one gets checked by instinct alone.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A company notices that a small number of customers with very few seats generate disproportionately high usage volume under a per-seat pricing model, while many customers with many seats use the product lightly. Using the Value-Price Alignment Check, what does this suggest?**
-A) The per-seat model is perfectly aligned and requires no further examination
-B) The pricing dimension (seats) may not be tracking the dimension that actually drives value and cost (usage volume), suggesting a potential misalignment worth investigating further, similar to this lesson's Case Study
-C) This pattern is irrelevant to pricing decisions and only affects marketing
-D) The company should immediately switch to a flat-rate model instead
+A) The charged dimension may not track real value or cost here
+B) The per-seat model is fully aligned already
+C) This pattern is irrelevant, a marketing matter
+D) The company should switch to flat rate at once
 
-*Correct answer: B*
-*Explanation: This is a direct application of the Value-Price Alignment Check — a mismatch between the charged dimension (seats) and the actual value/cost driver (usage) signals a potential pricing misalignment.*
+*Correct answer: A*
+*Explanation: Seats and usage have come apart here — the bill tracks headcount while the cost and the value both track volume, the same gap the Alignment Check exists to surface.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects appropriately separating pricing from packaging decisions, per this lesson?**
-A) Setting a single price and a single feature set for all customers regardless of need
-B) Designing packages that group value coherently around distinct customer needs and willingness to pay, then setting the price of each resulting package based on its value — treating the two as related but genuinely separate design decisions
-C) Setting price first, then randomly assigning features to whichever tier seems convenient
-D) Assuming pricing and packaging must always be identical decisions made by the same process
+A) One price and one feature set for everyone
+B) Setting price first, features assigned at random
+C) Packages grouped by need, each priced to value
+D) Pricing and packaging as one identical decision
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's explicit recommendation to treat packaging (grouping value coherently) and pricing (valuing each resulting package) as related but distinct design steps.*
+*Correct answer: C*
+*Explanation: Grouping value coherently and then pricing what was grouped keeps each decision answerable on its own terms instead of tangled into the other.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A company wants to transition from a poorly-aligned flat-rate model (as in this lesson's Case Study) to a usage-based hybrid model, but is concerned about backlash from its existing customer base. Using this lesson's and Lesson 47's frameworks together, what is the most defensible approach?**
-A) Announce the change with no advance notice and implement it immediately for all customers
-B) Validate the new pricing structure with structured customer research (Van Westendorp or direct value-based input), then communicate the change transparently to existing customers using Lesson 47's difficult-news principles — explaining the reasoning, acknowledging specific impact, and considering a grandfathering or phased transition period to reduce backlash risk
-C) Avoid changing the pricing model at all, regardless of the ongoing margin and churn problems it's causing
-D) Change the pricing model only for new customers, permanently ignoring the underlying problem for the existing customer base
+A) Leave the pricing unchanged despite the margin problem
+B) Change the model for new customers alone, forever
+C) Announce the change at once with no notice
+D) Validate the structure, then communicate with real care
 
-*Correct answer: B*
-*Explanation: This combines the lesson's customer-validation discipline with Lesson 47's difficult-news delivery principles — addressing the underlying pricing misalignment while managing the transition's stakeholder and trust risks deliberately, rather than either ignoring the problem or executing the change carelessly.*
+*Correct answer: D*
+*Explanation: This pairs a validated pricing fix with a communication plan that gives the existing base warning, reasoning, and a softer landing, rather than either avoiding the fix or springing it on people.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
