@@ -88,8 +88,15 @@ export interface RouteHandlerContext<TBody, TQuery, TRequest extends Request = N
   actor: Actor
   body: TBody
   query: TQuery
-  /** Resolved dynamic segment params, `{}` for a static route. */
-  params: Record<string, string | string[]>
+  /**
+   * Resolved dynamic segment params, `{}` for a static route.
+   *
+   * Typed as single values because this app has no catch-all segments — every
+   * dynamic directory under `app/` is `[id]`, `[key]`, `[lessonId]`, `[module]`
+   * or `[username]`. A catch-all (`[...slug]`) would yield an array and this type
+   * would have to widen with it.
+   */
+  params: Record<string, string>
 }
 
 export interface WithRouteConfig<TBody, TQuery> {
@@ -141,7 +148,7 @@ export interface WithRouteConfig<TBody, TQuery> {
 
 /** Next.js passes dynamic params as the second argument; in 15+ they are a promise. */
 interface NextRouteContext {
-  params?: Record<string, string | string[]> | Promise<Record<string, string | string[]>>
+  params?: Record<string, string> | Promise<Record<string, string>>
 }
 
 const UNAUTHORIZED_MESSAGE = 'Authentication required.'
@@ -152,7 +159,7 @@ function firstIssueMessage(error: { issues: Array<{ message?: string }> }, fallb
   return error.issues[0]?.message || fallback
 }
 
-async function resolveParams(context?: NextRouteContext): Promise<Record<string, string | string[]>> {
+async function resolveParams(context?: NextRouteContext): Promise<Record<string, string>> {
   if (!context?.params) return {}
   return await context.params
 }

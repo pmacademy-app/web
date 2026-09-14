@@ -235,11 +235,12 @@ describe('B7-F — migration scope', () => {
     walk(settingsDir)
   })
 
-  it('keeps the earlier waves intact and migrates no admin route yet', () => {
+  // The global migrated set is owned by b7g1-admin-route-migration.test.ts. This
+  // asserts only that the waves completed before B7-F are still intact.
+  it('keeps the cron and auth waves intact', () => {
     const migrated = routeFilesImporting('@/lib/api/with-route')
 
     expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(6)
     expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(8)
-    expect(migrated.filter((f) => f.startsWith('admin/'))).toEqual([])
   })
 })

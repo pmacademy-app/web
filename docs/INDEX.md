@@ -2,14 +2,14 @@
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Framework:** Next.js 16.2.12 (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)  
-**Test Suite:** 140 Test Files · 1710 Unit & Integration Tests (100% Passing)  
+**Test Suite:** 142 Test Files · 1745 Unit & Integration Tests (100% Passing)  
 **Database Migrations:** 48 Applied Migrations in `supabase/migrations/`  
 **Last Updated:** September 14, 2026  
 
 > **Where the work stands.** [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) is the
 > authoritative record of implementation status; [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md)
 > remains the locked specification. Where they disagree about *status*, the ledger
-> wins; about *scope*, the plan wins. **B0–B6 and Phase 1 (B8-A…B8-E, B9-A) are complete and deployed. Phase 2 is in progress on `b10a-b14b/error-boundaries-logout-ci-security` (not merged): the Next.js 16.3.5 security prerequisite, B10-A, B14-B and B7-A through B7-D are complete in code. Next batch: B7-E.**
+> wins; about *scope*, the plan wins. **B0–B6 and Phase 1 (B8-A…B8-E, B9-A) are complete and deployed. Phase 2 is in progress on `b10a-b14b/error-boundaries-logout-ci-security` (not merged): the Next.js 16.3.5 security prerequisite, B10-A, B14-B, B7-A–B7-D, B7-F and B7-G1 are complete in code. Remaining: B7-E (skipped), B7-G2, B7-H.**
 
 ---
 
@@ -18,7 +18,7 @@
 1. **Current Production Behavior** (Live deployed runtime behavior)
 2. **Current Source Code** (TypeScript routes, services, React components, compilation scripts)
 3. **Database Migrations & Schema** (48 SQL DDL files in `supabase/migrations/`)
-4. **Automated Unit & Integration Tests** (140 test files, 1710 passed unit tests in `apps/web/lib/__tests__/`)
+4. **Automated Unit & Integration Tests** (142 test files, 1745 passed unit tests in `apps/web/lib/__tests__/`)
 5. **Operating Manuals & Workspaces** (`docs/admin/*.md`)
 6. **Detailed Architectural Documentation** (`docs/*.md`)
 7. **Historical Implementation Records** (Previous session logs and stale plans)

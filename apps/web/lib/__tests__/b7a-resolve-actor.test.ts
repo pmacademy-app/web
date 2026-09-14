@@ -297,6 +297,25 @@ describe('B7-A — requireUserId', () => {
   })
 })
 
+describe('B7-A — requireAdmin', () => {
+  it('returns the id and email of an admin actor', async () => {
+    const { requireAdmin } = await import('@/lib/api/actor')
+
+    expect(requireAdmin({ kind: 'admin', userId: 'a1', email: 'a@b.c' })).toEqual({
+      userId: 'a1',
+      email: 'a@b.c',
+    })
+  })
+
+  it('throws for any non-admin actor', async () => {
+    const { requireAdmin } = await import('@/lib/api/actor')
+
+    expect(() => requireAdmin({ kind: 'learner', userId: 'u1', email: 'u@b.c' })).toThrow(/learner/)
+    expect(() => requireAdmin({ kind: 'anonymous' })).toThrow(/anonymous/)
+    expect(() => requireAdmin({ kind: 'cron' })).toThrow(/cron/)
+  })
+})
+
 describe('B7-A — resolveActor: learner shape', () => {
   it('carries a null email when the provider has none', async () => {
     getAuthenticatedUserFromRequest.mockResolvedValue({ id: 'user-2', email: undefined })

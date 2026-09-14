@@ -1,53 +1,49 @@
 import { adminErrorMessage } from '@/lib/errors/api-response'
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/admin/guard'
+import { NextResponse } from 'next/server'
+import { withRoute } from '@/lib/api/with-route'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 
-export async function GET(request: NextRequest) {
-  let authResult
-  try {
-    authResult = await requireAdminUser(request)
-  } catch (err) {
-    return NextResponse.json({ error: adminErrorMessage(err, 'Unauthorized') }, { status: 401 })
+export const GET = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.emails.automations.get',
+    domain: 'admin',
+    summary: 'Unexpected failure in GET /api/admin/emails/automations',
+  },
+  async () => {
+
+    const state = await EmailAutomationsService.getState()
+    return NextResponse.json({ success: true, state })
   }
+)
 
-  if (!authResult.authorized) {
-    return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.statusCode || 403 })
-  }
+export const POST = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.emails.automations.post',
+    domain: 'admin',
+    summary: 'Unexpected failure in POST /api/admin/emails/automations',
+  },
+  async ({ request }) => {
 
-  const state = await EmailAutomationsService.getState()
-  return NextResponse.json({ success: true, state })
-}
+    try {
+      const body = await request.json()
+      const { settingKey, payload } = body
 
-export async function POST(request: NextRequest) {
-  let authResult
-  try {
-    authResult = await requireAdminUser(request)
-  } catch (err) {
-    return NextResponse.json({ error: adminErrorMessage(err, 'Unauthorized') }, { status: 401 })
-  }
+      if (!settingKey || !payload) {
+        return NextResponse.json({ error: 'Missing settingKey or payload' }, { status: 400 })
+      }
 
-  if (!authResult.authorized) {
-    return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.statusCode || 403 })
-  }
+      const result = await EmailAutomationsService.updateSetting(settingKey, payload)
+      if (!result.success) {
+        return NextResponse.json({ success: false, error: result.error || 'Failed to update setting' }, { status: 400 })
+      }
 
-  try {
-    const body = await request.json()
-    const { settingKey, payload } = body
-
-    if (!settingKey || !payload) {
-      return NextResponse.json({ error: 'Missing settingKey or payload' }, { status: 400 })
+      const updatedState = await EmailAutomationsService.getState()
+      return NextResponse.json({ success: true, state: updatedState })
+    } catch (err) {
+      const errorMsg = adminErrorMessage(err, 'Invalid request payload')
+      return NextResponse.json({ success: false, error: errorMsg }, { status: 400 })
     }
-
-    const result = await EmailAutomationsService.updateSetting(settingKey, payload)
-    if (!result.success) {
-      return NextResponse.json({ success: false, error: result.error || 'Failed to update setting' }, { status: 400 })
-    }
-
-    const updatedState = await EmailAutomationsService.getState()
-    return NextResponse.json({ success: true, state: updatedState })
-  } catch (err) {
-    const errorMsg = adminErrorMessage(err, 'Invalid request payload')
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 400 })
   }
-}
+)

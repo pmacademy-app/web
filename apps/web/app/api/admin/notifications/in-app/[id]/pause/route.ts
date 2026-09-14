@@ -1,31 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
+import { NextResponse } from 'next/server'
+import { logAdminAction } from '@/lib/admin/guard'
+import { requireAdmin } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
 
 export const runtime = 'nodejs'
 
-export async function POST(
-  request: NextRequest,
-  props: { params: Promise<{ id: string }> }
-) {
-  const auth = await requireAdminUser(request)
-  if (!auth.authorized || !auth.userId) {
-    return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: auth.statusCode || 401 })
+export const POST = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.notifications.in_app.id.pause.post',
+    domain: 'admin',
+    summary: 'Unexpected failure in POST /api/admin/notifications/in-app/[id]/pause',
+  },
+  async ({ actor, params }) => {
+    const admin = requireAdmin(actor)
+    const { id } = params
+    const res = await InAppManagerService.pauseBroadcast(id)
+    if (!res.success) {
+      return NextResponse.json({ error: res.error || 'Pause failed' }, { status: 400 })
+    }
+
+    await logAdminAction(
+      admin.userId,
+      admin.email || '',
+      'in_app_notification_paused',
+      'in_app_broadcast',
+      id
+    )
+
+    return NextResponse.json({ success: true })
   }
-
-  const { id } = await props.params
-  const res = await InAppManagerService.pauseBroadcast(id)
-  if (!res.success) {
-    return NextResponse.json({ error: res.error || 'Pause failed' }, { status: 400 })
-  }
-
-  await logAdminAction(
-    auth.userId,
-    auth.email || '',
-    'in_app_notification_paused',
-    'in_app_broadcast',
-    id
-  )
-
-  return NextResponse.json({ success: true })
-}
+)

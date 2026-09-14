@@ -1,6 +1,8 @@
 import { adminErrorMessage } from '@/lib/errors/api-response'
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
+import { NextResponse } from 'next/server'
+import { logAdminAction } from '@/lib/admin/guard'
+import { requireAdmin } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { InAppManagerService } from '@/lib/admin/in-app-manager-service'
 import { z } from 'zod'
 
@@ -22,101 +24,108 @@ const createBroadcastSchema = z.object({
   idempotencyKey: z.string().optional(),
 })
 
-export async function GET(request: NextRequest) {
-  const auth = await requireAdminUser(request)
-  if (!auth.authorized) {
-    return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: auth.statusCode || 401 })
-  }
+export const GET = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.notifications.in_app.get',
+    domain: 'admin',
+    summary: 'Unexpected failure in GET /api/admin/notifications/in-app',
+  },
+  async ({ request }) => {
+    const { searchParams } = new URL(request.url)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
+    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '25', 10)))
+    const status = searchParams.get('status') || undefined
+    const search = searchParams.get('search') || undefined
 
-  const { searchParams } = new URL(request.url)
-  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
-  const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '25', 10)))
-  const status = searchParams.get('status') || undefined
-  const search = searchParams.get('search') || undefined
-
-  try {
-    const result = await InAppManagerService.listBroadcasts(page, pageSize, status, search)
-    return NextResponse.json({ success: true, ...result })
-  } catch (err) {
-    return NextResponse.json(
-      { error: adminErrorMessage(err, 'Failed to list in-app notifications') },
-      { status: 500 }
-    )
-  }
-}
-
-export async function POST(request: NextRequest) {
-  const auth = await requireAdminUser(request)
-  if (!auth.authorized || !auth.userId) {
-    return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: auth.statusCode || 401 })
-  }
-
-  try {
-    const body = await request.json().catch(() => ({}))
-    const parsed = createBroadcastSchema.safeParse(body)
-    if (!parsed.success) {
+    try {
+      const result = await InAppManagerService.listBroadcasts(page, pageSize, status, search)
+      return NextResponse.json({ success: true, ...result })
+    } catch (err) {
       return NextResponse.json(
-        { error: parsed.error.issues[0]?.message || 'Invalid input data', code: 'VALIDATION' },
-        { status: 400 }
+        { error: adminErrorMessage(err, 'Failed to list in-app notifications') },
+        { status: 500 }
       )
     }
-
-    const {
-      title,
-      body: contentBody,
-      category,
-      priority,
-      actionUrl,
-      audience,
-      targetUserId,
-      targetCohortId,
-      recipientFilters,
-      scheduledAt,
-      expiresAt,
-      status,
-      idempotencyKey,
-    } = parsed.data
-
-    if (audience === 'individual' && !targetUserId) {
-      return NextResponse.json({ error: 'Target user is required for individual audience.' }, { status: 400 })
-    }
-
-    if (audience === 'cohort' && !targetCohortId) {
-      return NextResponse.json({ error: 'Target cohort is required for cohort audience.' }, { status: 400 })
-    }
-
-    const item = await InAppManagerService.createBroadcast({
-      title,
-      body: contentBody,
-      category,
-      priority,
-      actionUrl: actionUrl || null,
-      audience,
-      targetUserId: targetUserId || null,
-      targetCohortId: targetCohortId || null,
-      recipientFilters: recipientFilters as never,
-      scheduledAt: scheduledAt || null,
-      expiresAt: expiresAt || null,
-      status,
-      createdBy: auth.userId,
-      idempotencyKey,
-    })
-
-    await logAdminAction(
-      auth.userId,
-      auth.email || '',
-      'in_app_notification_created',
-      'in_app_broadcast',
-      item.id,
-      { title: item.title, audience: item.audience, status: item.status }
-    )
-
-    return NextResponse.json({ success: true, item }, { status: 201 })
-  } catch (err) {
-    console.error('[POST /api/admin/notifications/in-app] Error:', err)
-    return NextResponse.json(
-      { error: adminErrorMessage(err, 'Failed to create in-app notification') },
-      { status: 500 }
-    )
   }
-}
+)
+
+export const POST = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.notifications.in_app.post',
+    domain: 'admin',
+    summary: 'Unexpected failure in POST /api/admin/notifications/in-app',
+  },
+  async ({ request, actor }) => {
+    const admin = requireAdmin(actor)
+    try {
+      const body = await request.json().catch(() => ({}))
+      const parsed = createBroadcastSchema.safeParse(body)
+      if (!parsed.success) {
+        return NextResponse.json(
+          { error: parsed.error.issues[0]?.message || 'Invalid input data', code: 'VALIDATION' },
+          { status: 400 }
+        )
+      }
+
+      const {
+        title,
+        body: contentBody,
+        category,
+        priority,
+        actionUrl,
+        audience,
+        targetUserId,
+        targetCohortId,
+        recipientFilters,
+        scheduledAt,
+        expiresAt,
+        status,
+        idempotencyKey,
+      } = parsed.data
+
+      if (audience === 'individual' && !targetUserId) {
+        return NextResponse.json({ error: 'Target user is required for individual audience.' }, { status: 400 })
+      }
+
+      if (audience === 'cohort' && !targetCohortId) {
+        return NextResponse.json({ error: 'Target cohort is required for cohort audience.' }, { status: 400 })
+      }
+
+      const item = await InAppManagerService.createBroadcast({
+        title,
+        body: contentBody,
+        category,
+        priority,
+        actionUrl: actionUrl || null,
+        audience,
+        targetUserId: targetUserId || null,
+        targetCohortId: targetCohortId || null,
+        recipientFilters: recipientFilters as never,
+        scheduledAt: scheduledAt || null,
+        expiresAt: expiresAt || null,
+        status,
+        createdBy: admin.userId,
+        idempotencyKey,
+      })
+
+      await logAdminAction(
+        admin.userId,
+        admin.email || '',
+        'in_app_notification_created',
+        'in_app_broadcast',
+        item.id,
+        { title: item.title, audience: item.audience, status: item.status }
+      )
+
+      return NextResponse.json({ success: true, item }, { status: 201 })
+    } catch (err) {
+      console.error('[POST /api/admin/notifications/in-app] Error:', err)
+      return NextResponse.json(
+        { error: adminErrorMessage(err, 'Failed to create in-app notification') },
+        { status: 500 }
+      )
+    }
+  }
+)

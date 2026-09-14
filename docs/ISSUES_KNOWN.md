@@ -62,6 +62,13 @@
   5. If email stops: the hook is not authenticating. Roll back the deploy; do not re-add the query-string path — reconfigure the hook to the bare endpoint URL with its `v1,whsec_...` secret instead.
 - **Note**: never paste the hook URI or the secret into a commit, an issue, a log or a chat. Verification is by observing email delivery and the absence of auth incidents, not by echoing configuration.
 
+#### ISSUE-28: `npm run build` rewrites lesson source files
+- **Status**: 🟠 Open — repository hygiene, no production impact
+- **Description**: `npm run build` runs `content:build`, and the content compiler writes back to the **source** files under `content/lessons/` rather than only emitting to `content/dist/`. Observed repeatedly on 2026-09-14: successive builds of the *same* commit reordered quiz answer options in a different set of lessons each time — 2 files, then 2 more, then 23. The shuffle is applied in place and is non-deterministic.
+- **Impact**: every local build dirties the working tree with unrelated content churn, which is easy to sweep into an unrelated commit. It also means two builds of the same commit do not produce the same source tree.
+- **Required Action**: make the compiler emit only to `content/dist/` and treat `content/lessons/**` as read-only input; if the shuffle is intentional it belongs in the emitted artifact, not the source. Until then, `git checkout content/` after a local build before staging.
+- **Note**: verified that no commit on the Phase 2 branch has swept this in — `git log --name-only 76b96e2..HEAD -- content/` is empty. Discovered during B7-G1; not caused by it.
+
 ---
 
 ### Deferred Register (D-01 – D-08) — audited 2026-09-08

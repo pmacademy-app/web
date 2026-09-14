@@ -200,3 +200,21 @@ export function requireUserId(actor: Actor): string {
   if (actor.kind === 'learner' || actor.kind === 'admin') return actor.userId
   throw new Error(`requireUserId: actor kind '${actor.kind}' carries no user id`)
 }
+
+/**
+ * The identity behind an `admin` actor.
+ *
+ * The admin routes need both fields — `userId` and `email` are what
+ * `logAdminAction` records in `admin_audit_logs` — and reading them off the union
+ * requires narrowing at every call site.
+ *
+ * It throws for any other kind, which is unreachable under an admin-only policy.
+ * The throw is what stops a widened policy from silently writing an audit row
+ * attributed to the wrong actor.
+ */
+export function requireAdmin(actor: Actor): { userId: string; email: string } {
+  if (actor.kind !== 'admin') {
+    throw new Error(`requireAdmin: actor kind '${actor.kind}' is not an admin`)
+  }
+  return { userId: actor.userId, email: actor.email }
+}

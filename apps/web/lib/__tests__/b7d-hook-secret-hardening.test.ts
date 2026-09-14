@@ -283,10 +283,14 @@ describe('B7-D — auth route migration scope', () => {
     }
   })
 
-  it('migrated no admin route in this wave', () => {
+  // Scope beyond this wave is asserted in exactly one place —
+  // b7g1-admin-route-migration.test.ts owns the global migrated set — so a later
+  // wave updates one list rather than every wave's list.
+  it('migrated no learner or settings route in this wave', () => {
     const migrated = routeFilesImporting('@/lib/api/with-route')
 
-    expect(migrated.filter((f) => f.startsWith('admin/'))).toEqual([])
+    expect(migrated.filter((f) => f.startsWith('user/'))).toEqual([])
+    expect(migrated.filter((f) => f.startsWith('capstones/'))).toEqual([])
   })
 
   it('every migrated auth route declares an explicit actor policy', () => {

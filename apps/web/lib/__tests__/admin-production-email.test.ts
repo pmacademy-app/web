@@ -162,7 +162,14 @@ describe('Phase 3 — Admin Individual User Production Email Dispatch', () => {
     const res = await productionSendPOST(req)
     expect(res.status).toBe(403)
     const json = await res.json()
-    expect(json.error).toContain('Admin privileges required')
+    // B7-G1: the route now emits the canonical ADR-006 envelope for an actor
+    // denial, and the guard's internal reason is deliberately withheld from the
+    // client. `code` is the stable machine-readable contract. Note this affects
+    // only authorization denials — an *operational* failure still carries the
+    // underlying detail through adminErrorMessage (D-02).
+    expect(json.success).toBe(false)
+    expect(json.code).toBe('FORBIDDEN')
+    expect(JSON.stringify(json)).not.toContain('Admin privileges required')
   })
 
   it('rejects requests missing targetUserId or templateKey with 400', async () => {

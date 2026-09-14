@@ -3,7 +3,7 @@
 **Branch of Record:** `main`
 **Synchronized With:** `origin/main` @ `d2a59be` + B8-E applied 2026-09-13
 **Date:** 2026-09-13
-**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B, B7-A…B7-D and B7-F complete in code.** B7-E (learner routes) is still outstanding and was skipped by request on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
+**Status:** B0–B6 complete · Phase 1 (B8-A…B8-E, B9-A) complete · **B8-E applied to production 2026-09-13** · Phase 2 in progress: **Next.js security prerequisite, B10-A, B14-B, B7-A…B7-D, B7-F and B7-G1 complete in code.** B7-E (learner routes) was skipped by request and is still outstanding; B7-G2 and B7-H remain on `b10a-b14b/error-boundaries-logout-ci-security`, not merged · **B7 is next**
 
 > **What this document is.** The authoritative record of what has actually been
 > implemented, in what order, and what remains. It is the execution state.
@@ -374,7 +374,7 @@ messages. "Plan ref" points at the batch specification in
 | **B4** — email gateway + signup ordering | I-04 | ✅ Complete in code | Direct transports unified through canonical failover registry; kill switch enforced; timeouts standardized; durable side effects verification-gated |
 | **B5** — atomic rate limiting + abuse controls | I-03 | ✅ Complete in code | Login & update-password fail-closed atomic rate limits implemented; telemetry leftmost-XFF trust removed; signup account enumeration closed; Turnstile deferred |
 | **B6** — queue & scheduler reliability | I-04, I-05 | ✅ Complete in code | Migration 20260910000002 added; atomic stale processing reclamation implemented; bounded concurrency (pool of 5, 90s deadline); exponential backoff with jitter and 120m ceiling; durable scheduler heartbeat in system_settings; retry-failed duplication prevented; queue state machine aligned; 124 test files / 1345 tests passing |
-| **B7** — shared auth + route/error contract | I-07 | 🟡 **B7-A…B7-D and B7-F complete in code** | Foundation, cron wave (6), auth wave (8, plus F-SEC-12 closed) and settings wave (11, plus N-2 and N-3 closed). `send-email-hook` and `callback` are documented architectural exceptions. **B7-E (learner routes) is skipped and still outstanding**; B7-G/H untouched |
+| **B7** — shared auth + route/error contract | I-07 | 🟡 **B7-A…B7-D, B7-F and B7-G1 complete in code** | Foundation, cron (6), auth (8, F-SEC-12 closed), settings (11, N-2 and N-3 closed) and admin wave 1 (37). 62 routes on the wrapper. `send-email-hook` and `callback` are documented architectural exceptions. **B7-E (learner routes, skipped) , B7-G2 (24 admin routes) and B7-H remain** |
 | **B8** — typed data layer + DB correctness | I-08 | 🟢 **P0 correctness DEPLOYED; B8-E prepared, NOT applied** | B8-A…B8-D deployed to production at `164229a` and verified 2026-09-13: leaderboard column bug fixed (F-COR-1), authoritative XP total (F-COR-2), truncating queries bounded (F-COR-4), duplicate diagnostic run read-only (F-COR-3). `awardXp()` now treats SQLSTATE 23505 as already-awarded. **B8-E applied to production 2026-09-13 18:15:34Z** — 31 `theory_read` duplicates removed, 310 XP across 13 users, scoped partial unique index over six once-only source types. 17/17 post-migration checks passed. Executed direct-to-production by explicit approval; no staging project was used (P0-1 remains outstanding). Typed repository layer (B8-F/B8-G) untouched. See [`PHASE1_IMPLEMENTATION_TODO.md`](archive/PHASE1_IMPLEMENTATION_TODO.md) |
 | **B9** — admin controls + observability | I-10 | 🟢 **B9-A deployed** | Out-of-band critical alerting deployed at `164229a` (F-REL-4) — **inert until `ALERT_WEBHOOK_URL` is configured in production**. Correlation IDs, structured logging and retention (B9-B…B9-D) outstanding |
 | **B10** — frontend API/data layer | I-11 | 🟡 **B10-A complete in code** | Error-boundary structure corrected (F-COR-5) and a single canonical client logout helper introduced (F-COR-6). Dead-code removal (I-12-B5) was already closed by the 2026-09-13 cleanup pass. B10-B…B10-D (typed API client, SWR adoption) outstanding |
@@ -993,6 +993,82 @@ URL fields empty, an exception yielding generic copy plus an `errorId` with no
 driver text, the canonical 401, malformed JSON, and migration scope. Two existing
 suites were updated to the canonical envelope, and `safe-json-ld.test.ts` gained an
 explicit `http://`-rejection case.
+
+---
+
+## Phase 2 — B7-G1: Admin routes, wave 1 — ✅ Complete in code
+
+**Branch:** `b10a-b14b/error-boundaries-logout-ci-security` (not merged, not pushed)
+**Date:** 2026-09-14
+
+**37 route files** under `admin/{emails,notifications,announcements}` migrated to
+`withRoute` with the `['admin']` actor policy — verified against the repository,
+out of 61 admin routes total, leaving **24 for B7-G2**. No `requireAdminUser` call
+remains anywhere in the G1 groups.
+
+### What was preserved, deliberately
+
+- **`adminErrorMessage()` semantics (D-02).** Every handler keeps its own
+  `try/catch` returning `adminErrorMessage(err, fallback)` at its original status.
+  The wrapper's unexpected-exception path genericises, which would have destroyed
+  the diagnostic admins are meant to keep — a refused bulk requeue is actionable
+  with the Postgres error and useless as "something went wrong". Three tests pin
+  this: the underlying failure text still reaches the admin, credentials in it are
+  still redacted, and a source-level assertion counts the routes still on
+  `adminErrorMessage`.
+- **Denial audit logging.** `requireAdminUser` writes the `access_denied` row
+  itself, and `resolveActor` delegates to it rather than reimplementing, so the
+  audit trail survives untouched. `onDenied` was **not** needed here and was not
+  used — it exists for the cron routes, which log from the route.
+- **The database re-read of `is_admin`.** Same delegation; asserted by test.
+- **`logAdminAction` on success**, now called with the resolved admin identity.
+
+### Behaviour change
+
+**An unauthenticated caller now gets 401 instead of 403.** Every G1 route
+previously hardcoded 403 (or `statusCode || 403`) regardless of whether the caller
+was unauthenticated or merely not an admin. An authenticated non-admin still gets
+403. Both are refusals, and nothing in the admin UI branches on the status — the
+only `403` in `app/admin/` is static copy on the access-denied page.
+
+**The guard's internal denial reason is no longer returned.** Previously the
+client received `authResult.error` verbatim ("Access denied: Admin privileges
+required"); the canonical envelope withholds it and returns `code`. This affects
+**authorization denials only** — operational failures still carry their detail
+through `adminErrorMessage`. One existing assertion checked that prose and now
+asserts `code`.
+
+### Foundation additions
+
+- **`requireAdmin(actor)`** in `lib/api/actor.ts`, returning `{ userId, email }` —
+  the two fields `logAdminAction` records. It throws for any non-admin kind, which
+  is unreachable under an admin-only policy; the throw stops a widened policy from
+  silently writing an audit row attributed to the wrong actor.
+- **`params` narrowed** from `Record<string, string | string[]>` to
+  `Record<string, string>`. Verified first: this app has no catch-all segments —
+  every dynamic directory is `[id]`, `[key]`, `[lessonId]`, `[module]` or
+  `[username]`. A future `[...slug]` would require widening it back.
+
+### How the migration was done
+
+Mechanically, by a brace-aware transformer rather than by hand, because the
+preamble had five variants: the guard inside or outside the `try`, the result
+variable named `authResult`/`authGuard`/`auth`, the status hardcoded `403` or
+`statusCode || 403`, a multi-line signature whose params annotation contains
+balanced braces of its own, and a `let authResult` form wrapped in its own
+try/catch. Two files were finished by hand. Every step was gated on `tsc`.
+
+A follow-up pass pruned what the migration made dead: unused destructured context
+names, now-unreachable `RouteParams` interfaces, unused `NextRequest` imports, and
+`const admin = requireAdmin(actor)` in handlers that never used it. Lint is back at
+its 36-warning baseline with **zero** warnings introduced.
+
+**Tests:** `lib/__tests__/b7g1-admin-route-migration.test.ts` — 14 tests across the
+admin actor policy, 401 vs 403, the withheld denial reason, the preserved
+database re-read, audit logging on success and its absence on refusal, dynamic
+param resolution, D-02 error detail with redaction, and migration scope. This file
+now owns the **global** migrated set (62 routes: 6 cron + 8 auth + 11 settings +
+37 admin), so each earlier wave asserts only its own.
 
 ---
 
