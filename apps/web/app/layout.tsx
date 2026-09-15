@@ -7,6 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import AuthStateListener from '@/components/layout/AuthStateListener'
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
+import { ApiClientProvider } from '@/lib/api/hooks'
 import '@/app/globals.css'
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
@@ -137,10 +138,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <TooltipProvider>
-          <AuthStateListener />
-          {children}
-        </TooltipProvider>
+        <ApiClientProvider>
+          <TooltipProvider>
+            <AuthStateListener />
+            {children}
+          </TooltipProvider>
+        </ApiClientProvider>
 
         {/* Google Analytics 4 */}
         {GA_ID && <GoogleAnalytics gaId={GA_ID} />}

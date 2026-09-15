@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertTriangle, RotateCcw, Zap, Flame, Compass, Award, UserX, CheckCircle2 } from 'lucide-react'
+import { apiPost } from '@/lib/api/client'
+import { mutate } from '@/lib/api/hooks'
 import { ConfirmDestructiveAction } from '@/components/settings/ConfirmDestructiveAction'
 
 const MODULE_OPTIONS = [
@@ -31,13 +33,11 @@ export function DangerZoneTab() {
 
   // Action handlers calling API routes
   const handleResetProgress = async () => {
-    const res = await fetch('/api/settings/reset/progress', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ module_slug: selectedModule }),
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/progress', {
+      module_slug: selectedModule,
     })
-    const data = await res.json()
-    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to reset progress.')
+    if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset progress.' : res.error.message)
+    void mutate((key) => typeof key === 'string' && key.includes('/api/'), undefined, { revalidate: true })
     router.refresh()
     showSuccess(
       selectedModule === 'all'
@@ -47,52 +47,33 @@ export function DangerZoneTab() {
   }
 
   const handleResetXp = async () => {
-    const res = await fetch('/api/settings/reset/xp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const data = await res.json()
-    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to reset XP.')
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/xp')
+    if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset XP.' : res.error.message)
+    void mutate('/api/xp')
     showSuccess('XP total reset to 0 (ledger audit entry recorded).')
   }
 
   const handleResetFlashcards = async () => {
-    const res = await fetch('/api/settings/reset/flashcards', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const data = await res.json()
-    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to reset flashcards.')
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/flashcards')
+    if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset flashcards.' : res.error.message)
     showSuccess('Flashcard SRS history reset successfully.')
   }
 
   const handleResetStreak = async () => {
-    const res = await fetch('/api/settings/reset/streak', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const data = await res.json()
-    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to reset streak.')
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/streak')
+    if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset streak.' : res.error.message)
     showSuccess('Streak reset to 0 days.')
   }
 
   const handleResetSkillRadar = async () => {
-    const res = await fetch('/api/settings/reset/skill-radar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const data = await res.json()
-    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to reset Skill Radar.')
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/reset/skill-radar')
+    if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to reset Skill Radar.' : res.error.message)
     showSuccess('Skill Radar competency state reset successfully.')
   }
 
   const handleDeleteAccount = async () => {
-    const res = await fetch('/api/settings/delete-account', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    })
-    const data = await res.json()
-    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to delete account.')
+    const res = await apiPost<{ success: boolean; error?: string }>('/api/settings/delete-account')
+    if (!res.ok || !res.data.success) throw new Error(res.ok ? res.data.error || 'Failed to delete account.' : res.error.message)
     // Redirect to home on full account deletion
     window.location.href = '/'
   }

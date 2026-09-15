@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPatch, apiPost } from '@/lib/api/client'
 
 export interface LessonProgressV2 {
   status: 'not_started' | 'in_progress' | 'completed'
@@ -11,131 +13,121 @@ export interface LessonProgressV2 {
   completed_at: string | null
 }
 
+export interface QuizAttemptApiResponse {
+  success: boolean
+  isCompleted?: boolean
+  isFirstLesson?: boolean
+  totalCompletedLessons?: number
+  correctCount?: number
+  totalQuestions?: number
+  scorePercentage?: number
+  score: number
+  xpEarned: number
+  isPerfect?: boolean
+  isFirstAttempt?: boolean
+}
+
 /**
  * Hook for managing lesson progress state in the v2 /academy/** route.
  *
+ * Backed by SWR and the typed API client foundation (B10-C).
  * Uses stable les_XXXXXX lesson IDs and calls /api/v2/lessons/[lessonId]/*
- * endpoints which query the `lesson_id` column.
- *
- * This is the v2 replacement for useLessonProgress(slug) in hooks/use-lesson-progress.ts.
- * The old hook is preserved for backward compatibility with the v1 route.
+ * endpoints with optimistic updates and automatic cache deduplication.
  */
 export function useLessonProgressV2(lessonId: string, initialProgress?: LessonProgressV2 | null) {
-  const [progress, setProgress] = useState<LessonProgressV2 | null>(initialProgress ?? null)
-  const [loading, setLoading] = useState(!initialProgress)
-  const [error, setError] = useState<string | null>(null)
+  const endpoint = `/api/v2/lessons/${lessonId}/progress`
 
-  const fetchProgress = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/v2/lessons/${lessonId}/progress`)
-      if (!res.ok) throw new Error('Failed to fetch progress')
-      const data = await res.json()
-      setProgress(data)
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error fetching progress'
-      setError(errorMsg)
-    } finally {
-      setLoading(false)
+  const { data, error, isLoading, mutate } = useApiQuery<LessonProgressV2>(
+    lessonId ? endpoint : null,
+    {
+      fallbackData: initialProgress ?? undefined,
+      revalidateOnFocus: true,
     }
-  }, [lessonId])
+  )
 
-  useEffect(() => {
-    if (!initialProgress) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      void fetchProgress()
-    }
-  }, [fetchProgress, initialProgress])
+  const progress = data ?? initialProgress ?? null
+  const loading = isLoading && !progress
 
   const markInProgress = useCallback(async () => {
     try {
-      setProgress((prev) => (prev ? { ...prev, status: 'in_progress' } : prev))
-      const res = await fetch(`/api/v2/lessons/${lessonId}/progress`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'in_progress' }),
-      })
-      if (!res.ok) throw new Error('Failed to update status to in_progress')
-      const data = await res.json()
-      setProgress((prev) => (prev ? { ...prev, status: data.status } : data))
+      await mutate(
+        async () => {
+          const res = await apiPatch<LessonProgressV2>(endpoint, { status: 'in_progress' })
+          if (!res.ok) throw new Error(res.error.message)
+          return res.data
+        },
+        {
+          optimisticData: (current) => (current ? { ...current, status: 'in_progress' } : current!),
+          rollbackOnError: true,
+          revalidate: true,
+        }
+      )
     } catch (err) {
       console.error('[use-lesson-progress-v2] markInProgress error:', err)
     }
-  }, [lessonId])
+  }, [endpoint, mutate])
 
   const recordTheoryRead = useCallback(
     async (activeSeconds?: number, scrollPercentage?: number) => {
-      const prevProgress = progress
       const nowIso = new Date().toISOString()
-      setProgress((prev) => (prev ? { ...prev, theory_read_at: nowIso } : prev))
-
-      try {
-        const res = await fetch(`/api/v2/lessons/${lessonId}/theory-read`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            active_seconds: activeSeconds,
-            scroll_percentage: scrollPercentage,
-          }),
-        })
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to record theory read')
-        }
-        void fetchProgress()
-        return data
-      } catch (err) {
-        setProgress(prevProgress)
-        throw err
+      const res = await apiPost<{ xpEarned?: number }>(`/api/v2/lessons/${lessonId}/theory-read`, {
+        active_seconds: activeSeconds,
+        scroll_percentage: scrollPercentage,
+      })
+      if (!res.ok) {
+        throw new Error(res.error.message)
       }
+      void mutate(
+        (prev) => (prev ? { ...prev, theory_read_at: nowIso } : prev),
+        { revalidate: true }
+      )
+      return res.data
     },
-    [lessonId, progress, fetchProgress]
+    [lessonId, mutate]
   )
 
   const recordQuizAttempt = useCallback(
     async (
       attempts: { question_id: string; selected_option: number; is_correct: boolean }[]
-    ) => {
-      const prevProgress = progress
-      // Immediate optimistic unlock
+    ): Promise<QuizAttemptApiResponse> => {
       const nowIso = new Date().toISOString()
-      setProgress((prev) => (prev ? { ...prev, status: 'completed', completed_at: nowIso } : prev))
-
-      try {
-        const res = await fetch(`/api/v2/lessons/${lessonId}/quiz`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ attempts }),
-        })
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to record quiz attempt')
-        }
-
-        // Sync computed fields
-        setProgress((prev) => (prev ? {
-          ...prev,
-          status: 'completed',
-          quiz_score: typeof data.scorePercentage === 'number' ? data.scorePercentage : prev.quiz_score,
-          xp_earned: (prev.xp_earned || 0) + (data.xpEarned || 0),
-          completed_at: prev.completed_at || nowIso,
-        } : prev))
-
-        void fetchProgress()
-        return data
-      } catch (err) {
-        // Rollback optimistic state on API rejection
-        setProgress(prevProgress)
-        throw err
+      const res = await apiPost<QuizAttemptApiResponse>(
+        `/api/v2/lessons/${lessonId}/quiz`,
+        { attempts }
+      )
+      if (!res.ok) {
+        throw new Error(res.error.message)
       }
+      const raw = res.data
+      const data: QuizAttemptApiResponse = {
+        ...raw,
+        score: raw.score ?? raw.scorePercentage ?? 0,
+        xpEarned: raw.xpEarned ?? 0,
+      }
+      void mutate(
+        (prev) =>
+          prev
+            ? {
+                ...prev,
+                status: 'completed',
+                quiz_score:
+                  typeof data.scorePercentage === 'number' ? data.scorePercentage : prev.quiz_score,
+                xp_earned: (prev.xp_earned || 0) + (data.xpEarned || 0),
+                completed_at: prev.completed_at || nowIso,
+              }
+            : prev,
+        { revalidate: true }
+      )
+      return data
     },
-    [lessonId, progress, fetchProgress]
+    [lessonId, mutate]
   )
 
   return {
     progress,
     loading,
-    error,
-    refetch: fetchProgress,
+    error: error?.message ?? null,
+    refetch: () => mutate(),
     markInProgress,
     recordTheoryRead,
     recordQuizAttempt,

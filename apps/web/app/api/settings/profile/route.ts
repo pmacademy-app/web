@@ -1,33 +1,10 @@
 import { NextResponse } from 'next/server'
-import { z } from 'zod'
 
 import { RouteError, withRoute } from '@/lib/api/with-route'
-import { validateWritableUrl } from '@/lib/portfolio'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { profileUpdateSchema } from '@/lib/api/contracts/settings'
 
-/**
- * N-2: the URL fields are https-only on write. `validateWritableUrl` is separate
- * from the read-side `validateOptionalUrl` on purpose — see the comment on it.
- * Learners whose stored value is `http://` keep rendering; they are only asked
- * for https when they next save.
- */
-const urlField = (label: string) =>
-  z
-    .string()
-    .max(500, `${label} must be 500 characters or fewer.`)
-    .refine((url) => !url || validateWritableUrl(url), {
-      message: `${label} must start with https://`,
-    })
-    .optional()
-    .nullable()
-
-export const profileUpdateSchema = z.object({
-  name: z.string().max(100, 'Name must be 100 characters or fewer.').optional().nullable(),
-  bio: z.string().max(500, 'Bio must be 500 characters or fewer.').optional().nullable(),
-  linkedin_url: urlField('LinkedIn URL'),
-  github_url: urlField('GitHub URL'),
-  website_url: urlField('Website URL'),
-})
+export { profileUpdateSchema }
 
 export const GET = withRoute(
   {

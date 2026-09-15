@@ -1,9 +1,12 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { User, Globe, Save, Loader2, CheckCircle2, Sparkles } from 'lucide-react'
-import { useQuickStart } from '@/components/quick-start/QuickStartContext'
 import { AvatarUpload } from '@/components/profile/AvatarUpload'
+import { useQuickStart } from '@/components/quick-start/QuickStartContext'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPost } from '@/lib/api/client'
+import type { ProfileGetResponse, ProfileUpdateResponse } from '@/lib/api/contracts/settings'
 
 function LinkedInIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   return (
@@ -21,46 +24,26 @@ function GitHubIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   )
 }
 
-export function ProfileSettingsTab() {
+function ProfileFormContent({
+  profile,
+  onSaveSuccess,
+}: {
+  profile?: ProfileGetResponse['profile']
+  onSaveSuccess: () => void
+}) {
   const { openQuickStart } = useQuickStart()
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
-    name: '',
-    avatarUrl: '',
-    bio: '',
-    linkedinUrl: '',
-    githubUrl: '',
-    websiteUrl: '',
+    name: profile?.name || '',
+    avatarUrl: profile?.avatar_url || '',
+    bio: profile?.bio || '',
+    linkedinUrl: profile?.linkedin_url || '',
+    githubUrl: profile?.github_url || '',
+    websiteUrl: profile?.website_url || '',
   })
-
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        const res = await fetch('/api/settings/profile')
-        const data = await res.json()
-        if (data.success && data.profile) {
-          const p = data.profile
-          setFormData({
-            name: p.name || '',
-            avatarUrl: p.avatar_url || '',
-            bio: p.bio || '',
-            linkedinUrl: p.linkedin_url || '',
-            githubUrl: p.github_url || '',
-            websiteUrl: p.website_url || '',
-          })
-        }
-      } catch (err) {
-        console.error('[ProfileSettingsTab] Failed to load profile:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadProfile()
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,41 +51,29 @@ export function ProfileSettingsTab() {
     setSuccessMessage(false)
     setErrorMessage(null)
 
-    try {
-      const res = await fetch('/api/settings/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          bio: formData.bio,
-          linkedin_url: formData.linkedinUrl,
-          github_url: formData.githubUrl,
-          website_url: formData.websiteUrl,
-        }),
-      })
+    const result = await apiPost<ProfileUpdateResponse>('/api/settings/profile', {
+      name: formData.name,
+      bio: formData.bio,
+      linkedin_url: formData.linkedinUrl,
+      github_url: formData.githubUrl,
+      website_url: formData.websiteUrl,
+    })
 
-      const data = await res.json()
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to update profile.')
-      }
+    setSaving(false)
 
-      setSuccessMessage(true)
-      setTimeout(() => setSuccessMessage(false), 3000)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'An error occurred while saving.'
-      setErrorMessage(msg)
-    } finally {
-      setSaving(false)
+    if (!result.ok) {
+      setErrorMessage(result.error.message)
+      return
     }
-  }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12 text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin mr-2" />
-        <span>Loading profile settings...</span>
-      </div>
-    )
+    if (!result.data.success) {
+      setErrorMessage(result.data.error || 'Failed to update profile.')
+      return
+    }
+
+    setSuccessMessage(true)
+    onSaveSuccess()
+    setTimeout(() => setSuccessMessage(false), 3000)
   }
 
   return (
@@ -258,5 +229,26 @@ export function ProfileSettingsTab() {
         </div>
       </div>
     </form>
+  )
+}
+
+export function ProfileSettingsTab() {
+  const { data, isLoading, mutate } = useApiQuery<ProfileGetResponse>('/api/settings/profile')
+
+  if (isLoading && !data) {
+    return (
+      <div className="flex items-center justify-center py-12 text-muted-foreground">
+        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+        <span>Loading profile settings...</span>
+      </div>
+    )
+  }
+
+  return (
+    <ProfileFormContent
+      key={data?.profile?.name ?? 'empty'}
+      profile={data?.profile}
+      onSaveSuccess={() => void mutate()}
+    />
   )
 }

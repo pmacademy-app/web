@@ -8,8 +8,10 @@
  * completion or navigation.
  */
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { Star, CheckCircle, AlertCircle, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
+import React, { useState, useCallback } from 'react'
+import { Star, CheckCircle, AlertCircle, MessageSquare, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPost } from '@/lib/api/client'
 import { trackLessonFeedbackSubmitted } from '@/lib/analytics'
 
 interface LessonFeedbackWidgetProps {
@@ -32,47 +34,34 @@ const TAG_OPTIONS: TagOption[] = [
   { id: 'outdated', label: '⏳ Outdated Info', category: 'critical' },
 ]
 
-export function LessonFeedbackWidget({ lessonId, className = '' }: LessonFeedbackWidgetProps) {
-  const [rating, setRating] = useState<number | null>(null)
+function LessonFeedbackFormContent({
+  lessonId,
+  className = '',
+  initialFeedback,
+  endpoint,
+  onSaveSuccess,
+}: {
+  lessonId: string
+  className?: string
+  initialFeedback?: {
+    rating: number
+    tags?: string[]
+    comment?: string | null
+  }
+  endpoint: string
+  onSaveSuccess: () => void
+}) {
+  const [rating, setRating] = useState<number | null>(initialFeedback?.rating ?? null)
   const [hoverRating, setHoverRating] = useState<number | null>(null)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [comment, setComment] = useState('')
-  const [showCommentBox, setShowCommentBox] = useState(false)
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    Array.isArray(initialFeedback?.tags) ? initialFeedback.tags : []
+  )
+  const [comment, setComment] = useState(initialFeedback?.comment ?? '')
+  const [showCommentBox, setShowCommentBox] = useState(Boolean(initialFeedback?.comment))
   const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [isUpdate, setIsUpdate] = useState(false)
+  const [submitted, setSubmitted] = useState(Boolean(initialFeedback))
+  const [isUpdate, setIsUpdate] = useState(Boolean(initialFeedback))
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [initialLoading, setInitialLoading] = useState(true)
-
-  // Fetch existing feedback on mount
-  useEffect(() => {
-    let isMounted = true
-    async function loadExisting() {
-      try {
-        const res = await fetch(`/api/v2/lessons/${encodeURIComponent(lessonId)}/feedback`)
-        if (!res.ok) return
-        const data = await res.json()
-        if (isMounted && data?.feedback) {
-          setRating(data.feedback.rating)
-          setSelectedTags(Array.isArray(data.feedback.tags) ? data.feedback.tags : [])
-          if (data.feedback.comment) {
-            setComment(data.feedback.comment)
-            setShowCommentBox(true)
-          }
-          setSubmitted(true)
-          setIsUpdate(true)
-        }
-      } catch (err) {
-        console.warn('[LessonFeedbackWidget] Failed to load existing feedback:', err)
-      } finally {
-        if (isMounted) setInitialLoading(false)
-      }
-    }
-    loadExisting()
-    return () => {
-      isMounted = false
-    }
-  }, [lessonId])
 
   const toggleTag = (tagId: string) => {
     setSelectedTags((prev) =>
@@ -86,27 +75,31 @@ export function LessonFeedbackWidget({ lessonId, className = '' }: LessonFeedbac
       return
     }
 
+    if (!endpoint) return
+
     setSubmitting(true)
     setErrorMsg(null)
 
     try {
-      const res = await fetch(`/api/v2/lessons/${encodeURIComponent(lessonId)}/feedback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rating,
-          tags: selectedTags,
-          comment: comment.trim() || null,
-        }),
+      const res = await apiPost<{ success: boolean; error?: string }>(endpoint, {
+        rating,
+        tags: selectedTags,
+        comment: comment.trim() || null,
       })
 
-      const data = await res.json()
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit lesson feedback.')
+        setErrorMsg(res.error.message)
+        return
+      }
+
+      if (!res.data.success) {
+        setErrorMsg(res.data.error || 'Failed to submit lesson feedback.')
+        return
       }
 
       setSubmitted(true)
       setIsUpdate(true)
+      onSaveSuccess()
 
       // Track analytics with strictly ZERO PII
       trackLessonFeedbackSubmitted(
@@ -121,11 +114,7 @@ export function LessonFeedbackWidget({ lessonId, className = '' }: LessonFeedbac
     } finally {
       setSubmitting(false)
     }
-  }, [lessonId, rating, selectedTags, comment])
-
-  if (initialLoading) {
-    return null
-  }
+  }, [endpoint, lessonId, rating, selectedTags, comment, onSaveSuccess])
 
   return (
     <div
@@ -302,5 +291,38 @@ export function LessonFeedbackWidget({ lessonId, className = '' }: LessonFeedbac
         </div>
       )}
     </div>
+  )
+}
+
+export function LessonFeedbackWidget({ lessonId, className = '' }: LessonFeedbackWidgetProps) {
+  const endpoint = lessonId ? `/api/v2/lessons/${encodeURIComponent(lessonId)}/feedback` : null
+  const { data: feedbackData, isLoading, mutate: mutateFeedback } = useApiQuery<{
+    success: boolean
+    feedback?: {
+      rating: number
+      tags?: string[]
+      comment?: string | null
+    }
+  }>(endpoint)
+
+  if (!endpoint) return null
+
+  if (isLoading && !feedbackData) {
+    return (
+      <div className={`rounded-2xl border border-border/40 bg-card/60 p-6 backdrop-blur-xs flex items-center justify-center min-h-[120px] ${className}`}>
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  return (
+    <LessonFeedbackFormContent
+      key={feedbackData?.feedback ? 'submitted' : 'new'}
+      lessonId={lessonId}
+      className={className}
+      endpoint={endpoint}
+      initialFeedback={feedbackData?.feedback}
+      onSaveSuccess={() => void mutateFeedback()}
+    />
   )
 }

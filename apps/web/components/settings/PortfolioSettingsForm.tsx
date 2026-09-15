@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import type {
   PortfolioSettingsData,
   PortfolioSectionId,
@@ -15,6 +15,8 @@ import {
   trackPortfolioLayoutUpdated,
   trackPortfolioFeaturedCapstoneSet,
 } from '@/lib/analytics'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPost } from '@/lib/api/client'
 import { AvatarUpload } from '@/components/profile/AvatarUpload'
 import {
   User,
@@ -69,57 +71,36 @@ const SECTION_DESCRIPTIONS: Record<string, { label: string; description: string 
   },
 }
 
-export function PortfolioSettingsForm() {
+function PortfolioSettingsFormContent({
+  initialSettings,
+  initialSubmittedCapstones,
+  onSaveSuccess,
+}: {
+  initialSettings?: PortfolioSettingsData
+  initialSubmittedCapstones?: LearnerSubmittedCapstoneSummary[]
+  onSaveSuccess: () => void
+}) {
   const [formData, setFormData] = useState<PortfolioSettingsData>({
-    username: '',
-    name: '',
-    bio: '',
-    avatarUrl: '',
-    linkedinUrl: '',
-    githubUrl: '',
-    websiteUrl: '',
-    isPortfolioPublic: true,
-    portfolioLayout: DEFAULT_PORTFOLIO_LAYOUT,
-    featuredCapstoneId: null,
-    portfolioViewCount: 0,
-    verificationOverride: null,
+    username: initialSettings?.username || '',
+    name: initialSettings?.name || '',
+    bio: initialSettings?.bio || '',
+    avatarUrl: initialSettings?.avatarUrl || '',
+    linkedinUrl: initialSettings?.linkedinUrl || '',
+    githubUrl: initialSettings?.githubUrl || '',
+    websiteUrl: initialSettings?.websiteUrl || '',
+    isPortfolioPublic: initialSettings?.isPortfolioPublic ?? true,
+    portfolioLayout: initialSettings?.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT,
+    featuredCapstoneId: initialSettings?.featuredCapstoneId || null,
+    portfolioViewCount: initialSettings?.portfolioViewCount || 0,
+    verificationOverride: initialSettings?.verificationOverride || null,
   })
 
-  const [submittedCapstones, setSubmittedCapstones] = useState<LearnerSubmittedCapstoneSummary[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [submittedCapstones] = useState<LearnerSubmittedCapstoneSummary[]>(
+    initialSubmittedCapstones || []
+  )
   const [saving, setSaving] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
-
-  // Fetch initial portfolio settings on mount
-  useEffect(() => {
-    async function loadSettings() {
-      try {
-        setLoading(true)
-        const res = await fetch('/api/settings/portfolio')
-        if (res.ok) {
-          const data = await res.json()
-          if (data.settings) {
-            setFormData({
-              ...data.settings,
-              portfolioLayout: data.settings.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT,
-              featuredCapstoneId: data.settings.featuredCapstoneId || null,
-              portfolioViewCount: data.settings.portfolioViewCount || 0,
-            })
-          }
-          if (Array.isArray(data.submittedCapstones)) {
-            setSubmittedCapstones(data.submittedCapstones)
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load portfolio settings:', err)
-        setErrorMsg('Failed to load portfolio settings.')
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadSettings()
-  }, [])
 
   const handleChange = (field: keyof PortfolioSettingsData, value: unknown) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -148,46 +129,30 @@ export function PortfolioSettingsForm() {
     setErrorMsg(null)
     setSuccessMsg(null)
 
-    try {
-      const res = await fetch('/api/settings/portfolio', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
+    const result = await apiPost<{ settings: PortfolioSettingsData }>('/api/settings/portfolio', formData)
+    setSaving(false)
 
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to update portfolio settings.')
-      }
+    if (!result.ok) {
+      setErrorMsg(result.error.message)
+      return
+    }
 
+    if (result.data?.settings) {
       setFormData((prev) => ({
         ...prev,
-        ...data.settings,
+        ...result.data.settings,
       }))
-      setSuccessMsg('Portfolio settings and layout updated successfully!')
-
-      if (formData.featuredCapstoneId) {
-        const feat = submittedCapstones.find((c) => c.id === formData.featuredCapstoneId)
-        trackPortfolioFeaturedCapstoneSet(feat?.moduleSlug)
-      }
-      if (formData.portfolioLayout) {
-        trackPortfolioLayoutUpdated(formData.portfolioLayout)
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Error updating settings.'
-      setErrorMsg(msg)
-    } finally {
-      setSaving(false)
     }
-  }
+    setSuccessMsg('Portfolio settings and layout updated successfully!')
+    onSaveSuccess()
 
-  if (loading) {
-    return (
-      <div className="rounded-2xl border border-border bg-card p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        <span className="font-medium">Loading portfolio settings &amp; sharing readiness...</span>
-      </div>
-    )
+    if (formData.featuredCapstoneId) {
+      const feat = submittedCapstones.find((c) => c.id === formData.featuredCapstoneId)
+      trackPortfolioFeaturedCapstoneSet(feat?.moduleSlug)
+    }
+    if (formData.portfolioLayout) {
+      trackPortfolioLayoutUpdated(formData.portfolioLayout)
+    }
   }
 
   const publicCapstonesCount = submittedCapstones.filter((c) => c.isPublic).length
@@ -622,5 +587,30 @@ export function PortfolioSettingsForm() {
         </div>
       </div>
     </form>
+  )
+}
+
+export function PortfolioSettingsForm() {
+  const { data, isLoading, mutate } = useApiQuery<{
+    settings: PortfolioSettingsData
+    submittedCapstones: LearnerSubmittedCapstoneSummary[]
+  }>('/api/settings/portfolio')
+
+  if (isLoading && !data) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-12 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-3">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        <span className="font-medium">Loading portfolio settings &amp; sharing readiness...</span>
+      </div>
+    )
+  }
+
+  return (
+    <PortfolioSettingsFormContent
+      key={data?.settings?.username ?? 'loaded'}
+      initialSettings={data?.settings}
+      initialSubmittedCapstones={data?.submittedCapstones}
+      onSaveSuccess={() => void mutate()}
+    />
   )
 }

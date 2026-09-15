@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   Gift,
   Copy,
@@ -14,7 +14,6 @@ import {
 import { trackReferralLinkCopied, trackReferralShared } from '@/lib/analytics'
 import { BRAND } from '@/lib/brand'
 import { ReferralShareModal } from '@/components/referral/ReferralShareModal'
-import type { UserReferralStats } from '@/lib/referral/referral-service'
 
 function LinkedInIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   return (
@@ -32,34 +31,16 @@ function TwitterIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   )
 }
 
+import { useApiQuery } from '@/lib/api/hooks'
+import type { ReferralStatsResponse } from '@/lib/api/contracts/settings'
+
 export function ReferralSettingsTab() {
-  const [stats, setStats] = useState<UserReferralStats | null>(null)
-  const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
-  useEffect(() => {
-    let isMounted = true
-    async function loadStats() {
-      try {
-        const res = await fetch('/api/referrals')
-        if (!res.ok) return
-        const data = await res.json()
-        if (data?.success && data.stats && isMounted) {
-          setStats(data.stats)
-        }
-      } catch (err) {
-        console.warn('[ReferralSettingsTab] Failed to load stats:', err)
-      } finally {
-        if (isMounted) setLoading(false)
-      }
-    }
-
-    loadStats()
-    return () => {
-      isMounted = false
-    }
-  }, [])
+  const { data, isLoading } = useApiQuery<ReferralStatsResponse>('/api/referrals')
+  const stats = data?.stats ?? null
+  const loading = isLoading && !data
 
   const referralLink = stats?.referralLink || `${typeof window !== 'undefined' ? window.location.origin : ''}/signup`
   const referralCode = stats?.referralCode || ''

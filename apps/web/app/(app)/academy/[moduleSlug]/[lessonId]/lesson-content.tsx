@@ -16,6 +16,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { useLessonProgressV2 } from '@/hooks/use-lesson-progress-v2'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPost } from '@/lib/api/client'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { LessonContextProvider } from '@/contexts/lesson-context'
 import type { CompiledLesson, CompiledBlock } from '@/types'
@@ -127,33 +129,28 @@ function useTheoryEngagement(isActiveTab: boolean) {
 // ─── Reflection block wrapper — injects submission logic ─────────────────────
 // The compiled reflection block just holds `prompts[]`. We inject a form around it.
 
-function ReflectionTabContent({
+function ReflectionForm({
   lesson,
+  mainPrompt,
+  prompts,
+  initialContent = '',
+  initialIsPublic = false,
+  onSaveSuccess,
   onComplete,
 }: {
   lesson: CompiledLesson
+  mainPrompt: string
+  prompts: string[]
+  initialContent?: string
+  initialIsPublic?: boolean
+  onSaveSuccess: () => void
   onComplete: () => void
 }) {
-  const reflectionBlock = lesson.blocks.find((b) => b.type === 'reflection')
-  const prompts: string[] = reflectionBlock?.prompts ?? []
-  const mainPrompt = prompts[0] ?? 'Reflect on what you learned in this lesson.'
-
-  const [content, setContent] = useState('')
-  const [isPublic, setIsPublic] = useState(false)
+  const [content, setContent] = useState(initialContent)
+  const [isPublic, setIsPublic] = useState(initialIsPublic)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [xpEarned, setXpEarned] = useState<number | null>(null)
-
-  // Load existing reflection
-  useEffect(() => {
-    fetch(`/api/reflections?lesson_id=${lesson.id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.content) setContent(data.content)
-        if (data?.is_public) setIsPublic(data.is_public)
-      })
-      .catch(() => {})
-  }, [lesson.id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -162,25 +159,22 @@ function ReflectionTabContent({
     setSaving(true)
     setError(null)
 
-    try {
-      const res = await fetch('/api/reflections', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lesson_id: lesson.id,
-          content: content.trim(),
-          is_public: isPublic,
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to save reflection')
-      setXpEarned(data.xpEarned ?? 0)
-      setTimeout(() => onComplete(), 2000)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
-    } finally {
-      setSaving(false)
+    const res = await apiPost<{ xpEarned?: number }>('/api/reflections', {
+      lesson_id: lesson.id,
+      content: content.trim(),
+      is_public: isPublic,
+    })
+
+    setSaving(false)
+
+    if (!res.ok) {
+      setError(res.error.message)
+      return
     }
+
+    setXpEarned(res.data?.xpEarned ?? 0)
+    onSaveSuccess()
+    setTimeout(() => onComplete(), 2000)
   }
 
   return (
@@ -258,6 +252,45 @@ function ReflectionTabContent({
     </div>
   )
 }
+
+function ReflectionTabContent({
+  lesson,
+  onComplete,
+}: {
+  lesson: CompiledLesson
+  onComplete: () => void
+}) {
+  const reflectionBlock = lesson.blocks.find((b) => b.type === 'reflection')
+  const prompts: string[] = reflectionBlock?.prompts ?? []
+  const mainPrompt = prompts[0] ?? 'Reflect on what you learned in this lesson.'
+
+  const { data: reflectionData, isLoading, mutate: mutateReflection } = useApiQuery<{
+    content?: string
+    is_public?: boolean
+  }>(lesson?.id ? `/api/reflections?lesson_id=${lesson.id}` : null)
+
+  if (isLoading && !reflectionData) {
+    return (
+      <div className="py-8 text-center text-xs text-muted-foreground">
+        Loading reflection...
+      </div>
+    )
+  }
+
+  return (
+    <ReflectionForm
+      key={reflectionData?.content ? 'loaded' : 'empty'}
+      lesson={lesson}
+      mainPrompt={mainPrompt}
+      prompts={prompts}
+      initialContent={reflectionData?.content ?? ''}
+      initialIsPublic={reflectionData?.is_public ?? false}
+      onSaveSuccess={() => void mutateReflection()}
+      onComplete={onComplete}
+    />
+  )
+}
+
 
 // ─── Theory read completion button ──────────────────────────────────────────
 

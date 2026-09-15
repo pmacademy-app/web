@@ -75,6 +75,33 @@ export type ApiResult<T> =
   | { ok: true; data: T; status: number; requestId?: string }
   | { ok: false; error: ApiError }
 
+/**
+ * An Error subclass carrying a normalized ApiError.
+ *
+ * SWR and try/catch callers can catch this directly without discarding
+ * machine-readable codes, HTTP status, requestId, or errorId.
+ */
+export class ApiRequestError extends Error implements ApiError {
+  readonly kind: ApiFailureKind
+  readonly code: string
+  readonly status: number
+  readonly errorId?: string
+  readonly requestId?: string
+  readonly extra?: Record<string, unknown>
+
+  constructor(error: ApiError) {
+    super(error.message)
+    this.name = 'ApiRequestError'
+    this.kind = error.kind
+    this.code = error.code
+    this.status = error.status
+    this.errorId = error.errorId
+    this.requestId = error.requestId
+    this.extra = error.extra
+    Object.setPrototypeOf(this, ApiRequestError.prototype)
+  }
+}
+
 /** Synthetic codes for failures that never reached a route handler. */
 export const API_CLIENT_CODES = {
   network: 'NETWORK_ERROR',

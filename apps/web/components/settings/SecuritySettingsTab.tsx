@@ -1,11 +1,16 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Shield, Key, Lock, Loader2, CheckCircle2, AlertCircle, Eye, EyeOff, Mail, Send } from 'lucide-react'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPost } from '@/lib/api/client'
+import type {
+  ChangeEmailGetResponse,
+  ChangeEmailPostResponse,
+  SecurityUpdateResponse,
+} from '@/lib/api/contracts/settings'
 
 function ChangeEmailCard() {
-  const [currentEmail, setCurrentEmail] = useState<string | null>(null)
-  const [loadingEmail, setLoadingEmail] = useState(true)
   const [emailPassword, setEmailPassword] = useState('')
   const [showEmailPassword, setShowEmailPassword] = useState(false)
   const [newEmail, setNewEmail] = useState('')
@@ -13,24 +18,10 @@ function ChangeEmailCard() {
   const [emailSuccessMsg, setEmailSuccessMsg] = useState<string | null>(null)
   const [emailErrorMsg, setEmailErrorMsg] = useState<string | null>(null)
 
-  // The confirmation link redirects to the dedicated /email-verified page
-  // (success or error state shown there), then the user comes back here —
-  // so this card only ever needs to reflect the current, already-synced email.
-  useEffect(() => {
-    let isMounted = true
-    fetch('/api/settings/security/change-email')
-      .then((res) => res.json())
-      .then((json) => {
-        if (isMounted && json.success) setCurrentEmail(json.email)
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (isMounted) setLoadingEmail(false)
-      })
-    return () => {
-      isMounted = false
-    }
-  }, [])
+  const { data: emailData, isLoading: loadingEmail, mutate: mutateEmail } =
+    useApiQuery<ChangeEmailGetResponse>('/api/settings/security/change-email')
+
+  const currentEmail = emailData?.email ?? null
 
   const handleChangeEmail = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,27 +39,27 @@ function ChangeEmailCard() {
     setEmailSuccessMsg(null)
     setEmailErrorMsg(null)
 
-    try {
-      const res = await fetch('/api/settings/security/change-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword: emailPassword, newEmail }),
-      })
+    const result = await apiPost<ChangeEmailPostResponse>('/api/settings/security/change-email', {
+      currentPassword: emailPassword,
+      newEmail,
+    })
 
-      const data = await res.json()
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to start email change. Please try again.')
-      }
+    setSubmittingEmail(false)
 
-      setEmailSuccessMsg(data.message || `Confirmation link sent to ${newEmail}.`)
-      setEmailPassword('')
-      setNewEmail('')
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'An error occurred while changing your email.'
-      setEmailErrorMsg(msg)
-    } finally {
-      setSubmittingEmail(false)
+    if (!result.ok) {
+      setEmailErrorMsg(result.error.message)
+      return
     }
+
+    if (!result.data.success) {
+      setEmailErrorMsg(result.data.error || 'Failed to start email change. Please try again.')
+      return
+    }
+
+    setEmailSuccessMsg(result.data.message || `Confirmation link sent to ${newEmail}.`)
+    setEmailPassword('')
+    setNewEmail('')
+    void mutateEmail()
   }
 
   return (
@@ -205,33 +196,29 @@ export function SecuritySettingsTab() {
     setSuccessMessage(false)
     setErrorMessage(null)
 
-    try {
-      const res = await fetch('/api/settings/security', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-          confirmPassword,
-        }),
-      })
+    const result = await apiPost<SecurityUpdateResponse>('/api/settings/security', {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    })
 
-      const data = await res.json()
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to update password. Please try again.')
-      }
+    setSaving(false)
 
-      setSuccessMessage(true)
-      setCurrentPassword('')
-      setNewPassword('')
-      setConfirmPassword('')
-      setTimeout(() => setSuccessMessage(false), 4000)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'An error occurred while changing password.'
-      setErrorMessage(msg)
-    } finally {
-      setSaving(false)
+    if (!result.ok) {
+      setErrorMessage(result.error.message)
+      return
     }
+
+    if (!result.data.success) {
+      setErrorMessage(result.data.error || 'Failed to update password. Please try again.')
+      return
+    }
+
+    setSuccessMessage(true)
+    setCurrentPassword('')
+    setNewPassword('')
+    setConfirmPassword('')
+    setTimeout(() => setSuccessMessage(false), 4000)
   }
 
   return (

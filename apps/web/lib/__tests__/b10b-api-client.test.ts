@@ -408,11 +408,12 @@ describe('B10-B — endpoint declarations', () => {
 
 // ─── Scope ───────────────────────────────────────────────────────────────────
 
-describe('B10-B — scope', () => {
-  it('is imported by nothing, as the batch specifies', () => {
-    // "Completion criteria: Client tested; imported by nothing." Call-site
-    // migration is B10-C/B10-D; shipping the client and rewriting 133 call sites
-    // in one change would make both unreviewable.
+describe('B10-B/B10-C — adoption boundary', () => {
+  it(
+    'is adopted only by B10-C settings/academy sites and hooks; admin remains unmigrated',
+    () => {
+      // Call-site migration in B10-C covers settings, academy, notifications, and hooks.
+    // Admin call sites are explicitly reserved for B10-D.
     const hits: string[] = []
     const walk = (dir: string) => {
       for (const entry of readdirSync(path.join(ROOT, dir))) {
@@ -432,8 +433,23 @@ describe('B10-B — scope', () => {
       }
     }
 
-    expect(hits).toEqual([])
-  })
+    // Admin call sites remain unmigrated until B10-D
+    const adminHits = hits.filter((h) => h.includes('components/admin'))
+    expect(adminHits).toEqual([])
+
+    // Every hit belongs to the B10-C scope
+    for (const hit of hits) {
+      expect(
+        hit.startsWith('components/settings') ||
+          hit.startsWith('components/notifications') ||
+          hit.startsWith('components/feedback') ||
+          hit.startsWith('app/(app)/academy') ||
+          hit.startsWith('hooks/use-lesson-progress') ||
+          hit === 'lib/api/hooks.ts',
+        `Unexpected import in ${hit}`
+      ).toBe(true)
+    }
+  }, 30000)
 
   it('brings in no new dependency and no framework', () => {
     const source = readFileSync(path.join(ROOT, 'lib/api/client.ts'), 'utf8')

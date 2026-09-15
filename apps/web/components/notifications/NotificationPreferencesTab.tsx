@@ -1,12 +1,22 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Bell, Clock, Save, CheckCircle2 } from 'lucide-react'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPatch } from '@/lib/api/client'
+import type { NotificationPreferencesResponse } from '@/lib/api/contracts/settings'
 
-export function NotificationPreferencesTab() {
-  const [loading, setLoading] = useState<boolean>(true)
+function NotificationPreferencesForm({
+  initialPreferences,
+  onSaveSuccess,
+}: {
+  initialPreferences?: NotificationPreferencesResponse['preferences']
+  onSaveSuccess: () => void
+}) {
   const [saving, setSaving] = useState<boolean>(false)
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false)
+
+  const p = initialPreferences
   const [preferences, setPreferences] = useState<{
     inAppEnabled: boolean
     emailEnabled: boolean
@@ -18,56 +28,28 @@ export function NotificationPreferencesTab() {
       marketing: { inApp: boolean; email: boolean }
     }
   }>({
-    inAppEnabled: true,
-    emailEnabled: true,
-    reminderHour: 20,
+    inAppEnabled: p?.in_app_enabled ?? true,
+    emailEnabled: p?.email_enabled ?? true,
+    reminderHour: p?.preferred_reminder_hour ?? 20,
     categories: {
-      learning: { inApp: true, email: true },
-      achievements: { inApp: true, email: true },
-      security: { inApp: true, email: true },
-      marketing: { inApp: false, email: false },
+      learning: {
+        inApp: p?.learning_in_app ?? true,
+        email: p?.learning_email ?? true,
+      },
+      achievements: {
+        inApp: p?.achievements_in_app ?? true,
+        email: p?.achievements_email ?? true,
+      },
+      security: {
+        inApp: p?.security_in_app ?? true,
+        email: p?.security_email ?? true,
+      },
+      marketing: {
+        inApp: p?.marketing_in_app ?? false,
+        email: p?.marketing_email ?? false,
+      },
     },
   })
-
-  useEffect(() => {
-    const fetchPrefs = async () => {
-      try {
-        const res = await fetch('/api/settings/notifications')
-        const data = await res.json()
-        if (data.success && data.preferences) {
-          const p = data.preferences
-          setPreferences({
-            inAppEnabled: p.in_app_enabled ?? true,
-            emailEnabled: p.email_enabled ?? true,
-            reminderHour: p.preferred_reminder_hour ?? 20,
-            categories: {
-              learning: {
-                inApp: p.learning_in_app ?? true,
-                email: p.learning_email ?? true,
-              },
-              achievements: {
-                inApp: p.achievements_in_app ?? true,
-                email: p.achievements_email ?? true,
-              },
-              security: {
-                inApp: p.security_in_app ?? true,
-                email: p.security_email ?? true,
-              },
-              marketing: {
-                inApp: p.marketing_in_app ?? false,
-                email: p.marketing_email ?? false,
-              },
-            },
-          })
-        }
-      } catch (err) {
-        console.warn('[NotificationPreferencesTab] Error loading preferences:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchPrefs()
-  }, [])
 
   const handleSave = async () => {
     setSaving(true)
@@ -87,15 +69,11 @@ export function NotificationPreferencesTab() {
         marketing_email: preferences.categories.marketing.email,
       }
 
-      const res = await fetch('/api/settings/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+      const res = await apiPatch<NotificationPreferencesResponse>('/api/settings/notifications', payload)
 
-      const data = await res.json()
-      if (data.success) {
+      if (res.ok && res.data.success) {
         setSavedSuccess(true)
+        onSaveSuccess()
         setTimeout(() => setSavedSuccess(false), 3000)
       }
     } catch (err) {
@@ -103,10 +81,6 @@ export function NotificationPreferencesTab() {
     } finally {
       setSaving(false)
     }
-  }
-
-  if (loading) {
-    return <div className="p-8 text-center text-xs text-muted-foreground">Loading notification settings...</div>
   }
 
   return (
@@ -262,5 +236,21 @@ export function NotificationPreferencesTab() {
         </button>
       </div>
     </div>
+  )
+}
+
+export function NotificationPreferencesTab() {
+  const { data, isLoading, mutate } = useApiQuery<NotificationPreferencesResponse>('/api/settings/notifications')
+
+  if (isLoading && !data) {
+    return <div className="p-8 text-center text-xs text-muted-foreground">Loading notification settings...</div>
+  }
+
+  return (
+    <NotificationPreferencesForm
+      key={data?.preferences ? 'loaded' : 'loading'}
+      initialPreferences={data?.preferences}
+      onSaveSuccess={() => void mutate()}
+    />
   )
 }
