@@ -1,19 +1,36 @@
 import { NextResponse } from 'next/server'
-import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
+
+import { requireAdmin } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
+import { logAdminAction } from '@/lib/admin/guard'
 import { renderEmailTemplate } from '@/emails'
-import { sendEmail } from '@/lib/email'
 import { BRAND } from '@/lib/brand'
+import { sendEmail } from '@/lib/email'
 
-export async function POST(request: Request) {
-  const authGuard = await requireAdminUser(request)
-  if (!authGuard.authorized) {
-    return NextResponse.json({ error: authGuard.error }, { status: authGuard.statusCode || 403 })
-  }
+/**
+ * An admin route that happens to live outside `app/api/admin/`, so it falls in
+ * neither the G1 nor the G2 group. It is migrated here with the same admin actor
+ * policy those waves use — `requireAdminUser`'s database re-read of `is_admin` and
+ * its denial audit logging are reached through `resolveActor`, unchanged.
+ */
+export const POST = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'dev.send_test_email',
+    domain: 'email',
+    summary: 'Unexpected failure sending a developer test email',
+    errorMessage: 'Failed to send test email',
+  },
+  async ({ request, actor }) => {
+    const admin = requireAdmin(actor)
 
-  try {
-    const body = await request.json()
+    const body = (await request.json()) as {
+      templateKey?: string
+      toEmail?: string
+      variables?: Record<string, unknown>
+    }
     const templateKey = body.templateKey || 'auth.welcome'
-    const toEmail = body.toEmail || authGuard.email || 'admin@prodily.adityagangwani.me'
+    const toEmail = body.toEmail || admin.email || 'admin@prodily.adityagangwani.me'
 
     const sampleVariables: Record<string, unknown> = {
       userName: 'Prodily Admin Tester',
@@ -42,12 +59,13 @@ export async function POST(request: Request) {
     })
 
     if (!sendResult.success) {
-      return NextResponse.json({ success: false, error: sendResult.error || 'Failed to dispatch email' }, { status: 500 })
+      // Admin routes keep failure detail by decision (D-02).
+      throw new RouteError(500, 'SERVER_ERROR', sendResult.error || 'Failed to dispatch email')
     }
 
     await logAdminAction(
-      authGuard.userId!,
-      authGuard.email!,
+      admin.userId,
+      admin.email,
       'send_dev_test_email',
       'email_template',
       templateKey,
@@ -55,8 +73,5 @@ export async function POST(request: Request) {
     )
 
     return NextResponse.json({ success: true, resendId: sendResult.id })
-  } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Failed to send test email'
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 })
   }
-}
+)

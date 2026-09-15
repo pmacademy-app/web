@@ -1,40 +1,34 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { getUserFellowState, submitFellowRequest } from '@/lib/fellow-requests-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized. Authenticated session required.' }, { status: 401 })
-    }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'fellow_requests.state.read',
+    summary: 'Unexpected failure fetching Fellow request status',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const state = await getUserFellowState(supabase, user.id)
+    const state = await getUserFellowState(supabase, requireUserId(actor))
 
     return NextResponse.json({ success: true, ...state })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch Fellow request status.'
-    console.error('[API GET /api/fellow-requests] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized. Authenticated session required.' }, { status: 401 })
-    }
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'fellow_requests.submit',
+    summary: 'Unexpected failure submitting a Fellow request',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const result = await submitFellowRequest(supabase, user.id)
+    const result = await submitFellowRequest(supabase, requireUserId(actor))
 
     return NextResponse.json({ success: true, request: result.request })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to submit Fellow request.'
-    console.error('[API POST /api/fellow-requests] Error:', error)
-    return NextResponse.json({ error: message }, { status: 400 })
   }
-}
+)

@@ -10,6 +10,7 @@ import type { Database } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { generateCertificateCode } from '@/lib/certificates'
+import { PublicError } from '@/lib/errors/public-error'
 
 export type CertificateRow = Database['public']['Tables']['certificates']['Row']
 type UserRow = Database['public']['Tables']['users']['Row']
@@ -53,7 +54,7 @@ export async function issueCertificate(
     .single()) as unknown as { data: UserRow | null; error: unknown }
 
   if (userError || !user) {
-    throw new Error('User profile not found.')
+    throw new PublicError('User profile not found.', { status: 404, code: 'NOT_FOUND' })
   }
 
   // 2. Fetch total completed lessons count
@@ -103,7 +104,7 @@ export async function issueCertificate(
 
   if (insertError || !inserted) {
     console.error('[certificates-db] Error inserting certificate:', insertError)
-    throw new Error('Failed to issue certificate.')
+    throw new PublicError('Failed to issue certificate.', { status: 400, code: 'ISSUE_FAILED' })
   }
 
   return inserted

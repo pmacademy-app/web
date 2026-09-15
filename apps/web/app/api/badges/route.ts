@@ -1,54 +1,34 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { getUserBadgesData, evaluateAndAwardBadges } from '@/lib/badges-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'badges.read',
+    summary: 'Unexpected failure fetching learner badges',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const badgeData = await getUserBadgesData(supabase, user.id)
+    const badgeData = await getUserBadgesData(supabase, requireUserId(actor))
 
-    return NextResponse.json({
-      success: true,
-      ...badgeData,
-    })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch user badges.'
-    console.error('[API GET /api/badges] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ success: true, ...badgeData })
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'badges.evaluate',
+    summary: 'Unexpected failure evaluating learner badges',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const newlyAwarded = await evaluateAndAwardBadges(supabase, user.id)
+    const newlyAwarded = await evaluateAndAwardBadges(supabase, requireUserId(actor))
 
-    return NextResponse.json({
-      success: true,
-      newlyAwarded,
-    })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to evaluate badges.'
-    console.error('[API POST /api/badges] Error:', error)
-    return NextResponse.json({ error: message }, { status: 400 })
+    return NextResponse.json({ success: true, newlyAwarded })
   }
-}
+)

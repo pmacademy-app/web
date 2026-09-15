@@ -14,6 +14,7 @@ import { calculateWeekStart, calculateRankings, type LeaderboardEntry, type RawL
 // Generic page-walking helper. It lives under `lib/admin/` for historical reasons —
 // it has no admin-specific behaviour, and duplicating the loop here would be worse.
 import { fetchAllRows, type PageResult } from '@/lib/admin/fetch-all'
+import { PublicError } from '@/lib/errors/public-error'
 
 type UserRow = Database['public']['Tables']['users']['Row']
 type CohortRow = Database['public']['Tables']['cohorts']['Row']
@@ -514,15 +515,15 @@ export async function addFriend(
     .maybeSingle()) as unknown as { data: { id: string; username: string } | null; error: unknown }
 
   if (lookupError) {
-    throw new Error('Failed to look up learner. Please try again.')
+    throw new PublicError('Failed to look up learner. Please try again.', { status: 400, code: 'LOOKUP_FAILED' })
   }
 
   if (!targetUser) {
-    throw new Error(`Learner "${friendIdentifier}" not found.`)
+    throw new PublicError(`Learner "${friendIdentifier}" not found.`, { status: 404, code: 'NOT_FOUND' })
   }
 
   if (targetUser.id === userId) {
-    throw new Error('You cannot add yourself as a friend.')
+    throw new PublicError('You cannot add yourself as a friend.', { status: 400, code: 'VALIDATION' })
   }
 
   const { error } = await (supabase
@@ -611,7 +612,7 @@ export async function toggleCohortMembership(
     .eq('slug', cohortSlug)
     .single()) as unknown as { data: { id: string } | null }
 
-  if (!cohort) throw new Error('Cohort not found.')
+  if (!cohort) throw new PublicError('Cohort not found.', { status: 404, code: 'NOT_FOUND' })
 
   if (action === 'join') {
     await (supabase

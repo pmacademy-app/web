@@ -1,20 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
+import { NextResponse } from 'next/server'
+import { logAdminAction } from '@/lib/admin/guard'
+import { requireAdmin } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
 
 export const runtime = 'nodejs'
 
-export async function GET(request: NextRequest) {
+export const GET = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.system.alerts.get',
+    domain: 'admin',
+    summary: 'Unexpected failure in GET /api/admin/system/alerts',
+  },
+  async ({ request }) => {
   try {
-    const authResult = await requireAdminUser(request)
-    if (!authResult.authorized) {
-      return NextResponse.json(
-        { error: authResult.error || 'Unauthorized' },
-        { status: authResult.statusCode || 403 }
-      )
-    }
-
     const { searchParams } = new URL(request.url)
     const severity = searchParams.get('severity')
     const category = searchParams.get('category')
@@ -87,18 +88,19 @@ export async function GET(request: NextRequest) {
     console.error('[AdminSystemAlerts] Exception fetching system alerts:', err)
     return NextResponse.json({ error: 'Internal server error while fetching alerts.' }, { status: 500 })
   }
-}
+  }
+)
 
-export async function PATCH(request: NextRequest) {
+export const PATCH = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.system.alerts.patch',
+    domain: 'admin',
+    summary: 'Unexpected failure in PATCH /api/admin/system/alerts',
+  },
+  async ({ request, actor }) => {
+  const admin = requireAdmin(actor)
   try {
-    const authResult = await requireAdminUser(request)
-    if (!authResult.authorized || !authResult.userId || !authResult.email) {
-      return NextResponse.json(
-        { error: authResult.error || 'Unauthorized' },
-        { status: authResult.statusCode || 403 }
-      )
-    }
-
     const body = await request.json()
     const { alertId, fingerprint, newStatus } = body
 
@@ -123,12 +125,12 @@ export async function PATCH(request: NextRequest) {
     }
 
     const targetId = alertId || fingerprint || 'group'
-    await logAdminAction(authResult.userId, authResult.email, `system_alert_${newStatus}`, 'system_error', targetId, { newStatus, alertId, fingerprint })
+    await logAdminAction(admin.userId, admin.email, `system_alert_${newStatus}`, 'system_error', targetId, { newStatus, alertId, fingerprint })
 
     return NextResponse.json({ success: true, message: `Alert status updated to ${newStatus}` })
   } catch (err) {
     console.error('[AdminSystemAlerts] Exception updating alert status:', err)
     return NextResponse.json({ error: 'Internal server error while updating alert.' }, { status: 500 })
   }
-}
-
+  }
+)

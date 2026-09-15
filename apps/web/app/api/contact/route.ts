@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { evaluateRateLimit } from '@/lib/rate-limit'
 import { sendGovernedEmail } from '@/lib/email-governance'
 import { getClientIpBucket } from '@/lib/security/client-ip'
 
@@ -14,37 +13,50 @@ function escapeHtml(unsafe: string): string {
     .replace(/'/g, '&#039;')
 }
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    // Trusted IP, not the leftmost `X-Forwarded-For` value the caller supplies —
-    // otherwise the per-IP budget is refreshed by rotating a header.
+/**
+ * Open to `anonymous` — the contact form is on the public homepage.
+ *
+ * The bucket keeps its pre-migration key exactly: the learner id when signed in,
+ * otherwise the **trusted** IP rather than the leftmost `X-Forwarded-For` value the
+ * caller supplies, so the per-IP budget cannot be refreshed by rotating a header.
+ * It stays `failClosed` because this endpoint dispatches an email — a limiter
+ * outage must not open it up. No body schema is declared, which keeps the original
+ * order: throttle first, then read the body.
+ */
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner', 'anonymous'] },
+    operation: 'contact.submit',
+    summary: 'Unexpected failure recording a contact message',
+    errorMessage: 'Error submitting contact form.',
+    rateLimit: [
+      {
+        key: ({ request, actor }) =>
+          `contact_${actor.kind === 'learner' ? actor.userId : getClientIpBucket(request)}`,
+        limit: 3,
+        windowMs: 10 * 60 * 1000,
+        failClosed: true,
+      },
+    ],
+  },
+  async ({ request, actor }) => {
+    const user = actor.kind === 'learner' ? { id: actor.userId } : null
     const clientIp = getClientIpBucket(request)
-    const rateCheck = await evaluateRateLimit(`contact_${user ? user.id : clientIp}`, {
-      limit: 3,
-      windowMs: 10 * 60 * 1000,
-      // This endpoint dispatches an email, so a limiter outage must not open it up.
-      failClosed: true,
-    })
 
-    if (!rateCheck.success) {
-      return NextResponse.json({ error: 'Too many contact messages sent. Please try again later.' }, { status: 429 })
-    }
-
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
     const { name, email, subject, category, message } = body
 
     if (!name || typeof name !== 'string' || !name.trim()) {
-      return NextResponse.json({ error: 'Name is required.' }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'Name is required.')
     }
     if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return NextResponse.json({ error: 'Valid email address is required.' }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'Valid email address is required.')
     }
     if (!subject || typeof subject !== 'string' || !subject.trim()) {
-      return NextResponse.json({ error: 'Subject is required.' }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'Subject is required.')
     }
     if (!message || typeof message !== 'string' || !message.trim()) {
-      return NextResponse.json({ error: 'Message content is required.' }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'Message content is required.')
     }
 
     const cleanName = name.trim().substring(0, 100)
@@ -74,7 +86,7 @@ export async function POST(request: Request) {
     // If Database insert fails, NEVER return false success
     if (error || !data) {
       console.error('[contact/route] Error inserting contact message into Database:', error)
-      return NextResponse.json({ error: 'Failed to record contact message. Please try again.' }, { status: 500 })
+      throw new RouteError(500, 'SERVER_ERROR', 'Failed to record contact message. Please try again.')
     }
 
     // 2. Direct Resend email dispatch to pmacademyapp@gmail.com inbox
@@ -158,8 +170,5 @@ export async function POST(request: Request) {
       emailSent,
       ...(emailSent ? {} : { note: 'Your message was saved successfully. Support notification is queued.' }),
     })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Error submitting contact form.'
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)

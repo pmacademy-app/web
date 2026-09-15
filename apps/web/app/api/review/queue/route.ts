@@ -1,20 +1,19 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { getReviewQueueData } from '@/lib/flashcards-service'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'review.queue.read',
+    summary: 'Unexpected failure fetching the review queue',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const queueData = await getReviewQueueData(supabase, user.id)
+    const queueData = await getReviewQueueData(supabase, requireUserId(actor))
 
     return NextResponse.json({
       success: true,
@@ -22,11 +21,5 @@ export async function GET(request: Request) {
       stats: queueData.stats,
       totalUnlocked: queueData.allUnlockedCards.length,
     })
-  } catch (error) {
-    console.error('[API /api/review/queue] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error fetching review queue.' },
-      { status: 500 }
-    )
   }
-}
+)

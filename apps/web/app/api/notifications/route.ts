@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { globalFeatureFlagService } from '@/lib/notifications/feature-flags/service'
 import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
@@ -21,11 +22,15 @@ interface InAppNotificationRow {
   created_at: string
 }
 
-export async function GET(request: Request) {
-  const authUser = await getAuthenticatedUserFromRequest(request)
-  if (!authUser) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'notifications.read',
+    summary: 'Unexpected failure fetching in-app notifications',
+    errorMessage: 'Failed to fetch notifications',
+  },
+  async ({ request, actor }) => {
+  const userId = requireUserId(actor)
 
   // Feature flag check
   const inAppEnabled = await globalFeatureFlagService.isEnabledAsync('IN_APP_NOTIFICATIONS_ENABLED')
@@ -48,11 +53,10 @@ export async function GET(request: Request) {
 
   const supabase = createServiceRoleClient()
 
-  try {
     let query = supabase
       .from('in_app_notifications')
       .select('id, user_id, category, title, body, action_url, priority, is_read, created_at', { count: 'exact' })
-      .eq('user_id', authUser.id)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
     if (category && category !== 'all') {
@@ -74,7 +78,7 @@ export async function GET(request: Request) {
       supabase
         .from('in_app_notifications')
         .select('id', { count: 'exact', head: true })
-        .eq('user_id', authUser.id)
+        .eq('user_id', userId)
         .eq('is_read', false),
     ])
 
@@ -110,20 +114,23 @@ export async function GET(request: Request) {
       limit,
       grouped,
     })
-  } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Failed to fetch notifications'
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 })
   }
-}
+)
 
-export async function PATCH(request: Request) {
-  const authUser = await getAuthenticatedUserFromRequest(request)
-  if (!authUser) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  try {
-    const body = await request.json().catch(() => ({}))
+export const PATCH = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'notifications.mark_read',
+    summary: 'Unexpected failure updating notification read state',
+    errorMessage: 'Failed to update notification',
+  },
+  async ({ request, actor }) => {
+    const userId = requireUserId(actor)
+    const body = (await request.json().catch(() => ({}))) as {
+      action?: unknown
+      notificationId?: unknown
+      notificationIds?: unknown
+    }
     const { action, notificationId, notificationIds } = body
     const supabase = createServiceRoleClient()
 
@@ -131,7 +138,7 @@ export async function PATCH(request: Request) {
       const { error } = await (supabase
         .from('in_app_notifications') as unknown as DBChain)
         .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq('user_id', authUser.id)
+        .eq('user_id', userId)
         .eq('is_read', false)
 
       if (error) {
@@ -149,7 +156,7 @@ export async function PATCH(request: Request) {
           .from('in_app_notifications') as unknown as DBChain)
           .update({ is_read: true, read_at: new Date().toISOString() })
           .in('id', idsToMark)
-          .eq('user_id', authUser.id)
+          .eq('user_id', userId)
           .eq('is_read', false)
 
         if (error) {
@@ -161,7 +168,7 @@ export async function PATCH(request: Request) {
     }
 
     if (!notificationId) {
-      return NextResponse.json({ error: 'Missing notificationId or notificationIds' }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'Missing notificationId or notificationIds')
     }
 
     const isRead = action === 'mark_read'
@@ -171,18 +178,15 @@ export async function PATCH(request: Request) {
       .from('in_app_notifications') as unknown as DBChain)
       .update({ is_read: isRead, read_at: readAt })
       .eq('id', notificationId)
-      .eq('user_id', authUser.id)
+      .eq('user_id', userId)
 
     if (error) {
       console.error('[API:notifications] Error updating read state:', error)
     }
 
     return NextResponse.json({ success: true, notificationId, isRead })
-  } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Failed to update notification'
-    return NextResponse.json({ success: false, error: errorMsg }, { status: 500 })
   }
-}
+)
 
 function getDeepLinkForCategory(category?: string): string {
   switch (category) {

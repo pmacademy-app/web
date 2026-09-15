@@ -100,10 +100,22 @@ vi.mock('@/lib/email', () => ({
 
 vi.mock('@/lib/rate-limit', () => ({
   evaluateRateLimit: vi.fn(() => Promise.resolve(mockRateLimitResult)),
-  // The governed gateway evaluates its own recipient/IP/aggregate budgets through the
-  // persistent limiter. Left unmocked it is undefined here and the whole dispatch
-  // throws, which would report "email not sent" for reasons unrelated to this test.
-  evaluatePersistentRateLimit: vi.fn(() => Promise.resolve({ success: true, remaining: 10, resetInMs: 0 })),
+  // Since B7-E the contact route declares its bucket on `withRoute`, which charges
+  // it through `evaluatePersistentRateLimit`. This mock therefore has to honour
+  // `mockRateLimitResult` as well, or the refusal case below never reaches the
+  // limiter the route actually uses and the test passes vacuously.
+  //
+  // The governed gateway also evaluates its own recipient/IP/aggregate budgets
+  // through this function. Left unmocked it is undefined here and the whole
+  // dispatch throws, which would report "email not sent" for unrelated reasons —
+  // so the default stays "allowed".
+  evaluatePersistentRateLimit: vi.fn(() =>
+    Promise.resolve({
+      success: mockRateLimitResult.success,
+      remaining: mockRateLimitResult.remaining ?? 10,
+      resetInMs: 0,
+    })
+  ),
 }))
 
 vi.mock('@/lib/auth', () => ({
@@ -210,7 +222,11 @@ describe('Contact Flow & Inbound Webhook Unit Test Suite', () => {
     const res = await contactPOST(req)
     expect(res.status).toBe(429)
     const data = await res.json()
-    expect(data.error).toContain('Too many contact messages sent')
+    // B7-E: the refusal copy is now the wrapper's canonical, non-enumerating text.
+    // What matters to this test is unchanged and still asserted below — the request
+    // is refused, nothing is written, and no email is dispatched.
+    expect(data.code).toBe('RATE_LIMITED')
+    expect(data.error).toContain('Too many requests')
     expect(mockContactMessages.length).toBe(0)
     expect(mockSendEmail).not.toHaveBeenCalled()
   })

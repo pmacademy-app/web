@@ -1,23 +1,27 @@
-import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/admin/guard'
+
+import { withRoute } from '@/lib/api/with-route'
 import { FellowRequestAdminService } from '@/lib/admin/fellow-request-service'
+import { adminErrorMessage } from '@/lib/errors/api-response'
 
-export async function GET(request: Request) {
-  const auth = await requireAdminUser(request)
-  if (!auth.authorized) {
-    return NextResponse.json({ error: auth.error }, { status: auth.statusCode || 403 })
+export const GET = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.fellow_requests.get',
+    domain: 'admin',
+    summary: 'Unexpected failure in GET /api/admin/fellow-requests',
+  },
+  async ({ request }) => {
+    try {
+      const { searchParams } = new URL(request.url)
+      const status = searchParams.get('status') || undefined
+      const queue = await FellowRequestAdminService.getQueue(status)
+
+      return NextResponse.json({ success: true, requests: queue })
+    } catch (error: unknown) {
+      const message = adminErrorMessage(error, 'Failed to fetch Fellow request queue.')
+      console.error('[API GET /api/admin/fellow-requests] Error:', error)
+      return NextResponse.json({ error: message }, { status: 500 })
+    }
   }
-
-  try {
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status') || undefined
-    const queue = await FellowRequestAdminService.getQueue(status)
-
-    return NextResponse.json({ success: true, requests: queue })
-  } catch (error: unknown) {
-    const message = adminErrorMessage(error, 'Failed to fetch Fellow request queue.')
-    console.error('[API GET /api/admin/fellow-requests] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
-  }
-}
+)

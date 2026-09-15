@@ -1,32 +1,23 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { getUserReferralStats } from '@/lib/referral/referral-service'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'referrals.stats.read',
+    summary: 'Unexpected failure fetching referral stats',
+  },
+  async ({ request, actor }) => {
     const supabase = createServiceRoleClient()
     const origin = new URL(request.url).origin
-    const stats = await getUserReferralStats(supabase, user.id, origin)
+    const stats = await getUserReferralStats(supabase, requireUserId(actor), origin)
 
-    return NextResponse.json({
-      success: true,
-      stats,
-    })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch referral stats.'
-    console.error('[API GET /api/referrals] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ success: true, stats })
   }
-}
+)

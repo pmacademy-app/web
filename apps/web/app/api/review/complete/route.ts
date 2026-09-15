@@ -1,36 +1,44 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { recordReviewSessionCompletion } from '@/lib/flashcards-service'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'review.session.complete',
+    summary: 'Unexpected failure completing a review session',
+  },
+  async ({ request, actor }) => {
+    // Read here rather than via a declared schema: this route clamped whatever it
+    // was given and never refused a malformed body, and the clamp is the abuse
+    // control — a client cannot claim more than 500 cards or 5000 XP.
+    const body = (await request.json().catch(() => ({}))) as {
+      cardsReviewedCount?: unknown
+      xpEarned?: unknown
     }
-
-    const body = await request.json().catch(() => ({}))
-    const rawCards = typeof body.cardsReviewedCount === 'number' && Number.isFinite(body.cardsReviewedCount) ? Math.floor(body.cardsReviewedCount) : 0
-    const rawXp = typeof body.xpEarned === 'number' && Number.isFinite(body.xpEarned) ? Math.floor(body.xpEarned) : 0
+    const rawCards =
+      typeof body.cardsReviewedCount === 'number' && Number.isFinite(body.cardsReviewedCount)
+        ? Math.floor(body.cardsReviewedCount)
+        : 0
+    const rawXp =
+      typeof body.xpEarned === 'number' && Number.isFinite(body.xpEarned)
+        ? Math.floor(body.xpEarned)
+        : 0
 
     const cardsReviewedCount = Math.min(Math.max(0, rawCards), 500)
     const xpEarned = Math.min(Math.max(0, rawXp), 5000)
 
     const supabase = createServiceRoleClient()
-    const result = await recordReviewSessionCompletion(supabase, user.id, cardsReviewedCount, xpEarned)
-
-    return NextResponse.json({
-      success: result.success,
-    })
-  } catch (error) {
-    console.error('[API /api/review/complete] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error completing review session.' },
-      { status: 500 }
+    const result = await recordReviewSessionCompletion(
+      supabase,
+      requireUserId(actor),
+      cardsReviewedCount,
+      xpEarned
     )
+
+    return NextResponse.json({ success: result.success })
   }
-}
+)

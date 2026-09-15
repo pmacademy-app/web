@@ -283,14 +283,17 @@ describe('B7-D — auth route migration scope', () => {
     }
   })
 
-  // Scope beyond this wave is asserted in exactly one place —
-  // b7g1-admin-route-migration.test.ts owns the global migrated set — so a later
-  // wave updates one list rather than every wave's list.
-  it('migrated no learner or settings route in this wave', () => {
+  /**
+   * This wave used to assert that no learner or settings route had been migrated —
+   * a "nothing after us has started yet" check. B7-E has since migrated both, so
+   * the assertion is obsolete by design rather than broken. What B7-D actually owns
+   * is its own eight routes, and that is what stays asserted here; the global
+   * inventory and the exemption list moved to `b7h-wrapper-enforcement.test.ts`.
+   */
+  it('migrated exactly the eight auth routes in this wave', () => {
     const migrated = routeFilesImporting('@/lib/api/with-route')
 
-    expect(migrated.filter((f) => f.startsWith('user/'))).toEqual([])
-    expect(migrated.filter((f) => f.startsWith('capstones/'))).toEqual([])
+    expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(8)
   })
 
   it('every migrated auth route declares an explicit actor policy', () => {

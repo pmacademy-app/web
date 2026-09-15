@@ -1,31 +1,20 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { getModuleCapstonesOverview } from '@/lib/capstones-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'capstones.overview.read',
+    summary: 'Unexpected failure fetching the capstones overview',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const overview = await getModuleCapstonesOverview(supabase, user.id)
+    const overview = await getModuleCapstonesOverview(supabase, requireUserId(actor))
 
-    return NextResponse.json({
-      success: true,
-      overview,
-    })
-  } catch (error) {
-    console.error('[API GET /api/capstones] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error fetching capstones overview.' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: true, overview })
   }
-}
+)

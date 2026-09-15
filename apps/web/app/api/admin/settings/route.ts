@@ -1,7 +1,9 @@
-import { adminErrorMessage } from '@/lib/errors/api-response'
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
+import { NextResponse } from 'next/server'
+import { logAdminAction } from '@/lib/admin/guard'
 import { SettingsService } from '@/lib/admin/settings-service'
+import { requireAdmin } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import type { SettingsSectionKey } from '@/lib/admin/types'
 
 const VALID_SECTIONS: SettingsSectionKey[] = [
@@ -13,23 +15,22 @@ const VALID_SECTIONS: SettingsSectionKey[] = [
   'onboarding',
 ]
 
-function getSectionFromRequest(request: NextRequest): SettingsSectionKey | null {
-  const section = request.nextUrl.searchParams.get('section')
+function getSectionFromRequest(request: Request): SettingsSectionKey | null {
+  const section = new URL(request.url).searchParams.get('section')
   if (section && VALID_SECTIONS.includes(section as SettingsSectionKey)) {
     return section as SettingsSectionKey
   }
   return null
 }
 
-export async function GET(request: NextRequest) {
-  const authGuard = await requireAdminUser(request)
-  if (!authGuard.authorized) {
-    return NextResponse.json(
-      { error: authGuard.error },
-      { status: authGuard.statusCode || 403 }
-    )
-  }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.settings.get',
+    domain: 'admin',
+    summary: 'Unexpected failure in GET /api/admin/settings',
+  },
+  async ({ request }) => {
   const section = getSectionFromRequest(request)
 
   try {
@@ -66,17 +67,18 @@ export async function GET(request: NextRequest) {
     const message = adminErrorMessage(err, 'Failed to fetch settings')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
-}
-
-export async function PATCH(request: NextRequest) {
-  const authGuard = await requireAdminUser(request)
-  if (!authGuard.authorized) {
-    return NextResponse.json(
-      { error: authGuard.error },
-      { status: authGuard.statusCode || 403 }
-    )
   }
+)
 
+export const PATCH = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.settings.patch',
+    domain: 'admin',
+    summary: 'Unexpected failure in PATCH /api/admin/settings',
+  },
+  async ({ request, actor }) => {
+  const authGuard = requireAdmin(actor)
   const section = getSectionFromRequest(request)
   if (!section) {
     return NextResponse.json(
@@ -125,8 +127,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     await logAdminAction(
-      authGuard.userId!,
-      authGuard.email!,
+      authGuard.userId,
+      authGuard.email,
       action,
       'settings',
       section
@@ -137,4 +139,5 @@ export async function PATCH(request: NextRequest) {
     const message = adminErrorMessage(err, 'Failed to update settings')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
-}
+  }
+)

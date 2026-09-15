@@ -8,58 +8,42 @@
  * v2 counterpart to /api/lessons/[slug]/theory-read.
  */
 
-import { cookies } from 'next/headers'
-import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUser } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { recordTheoryReadAction } from '@/lib/lessons-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 const theoryReadSchema = z.object({
   active_seconds: z.number().int().min(0),
   scroll_percentage: z.number().min(0).max(100),
 })
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ lessonId: string }> }
-) {
-  try {
-    const { lessonId } = await params
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get('sb-access-token')?.value
+/** The ad-hoc 401 probe these three v2 routes carried, preserved through the wrapper. */
+const warnUnauthorized = () => {
+  console.warn('[auth-401-monitor] 401 Unauthorized in API v2')
+}
 
-    if (!accessToken) {
-      { console.warn('[auth-401-monitor] 401 Unauthorized in API v2'); return Response.json({ error: 'Unauthorized' }, { status: 401 }); }
-    }
-
-    const authClient = createAuthenticatedServerClient(accessToken)
-    const user = await getAuthenticatedUser(authClient)
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = await request.json()
-    const parsed = theoryReadSchema.safeParse(body)
-    if (!parsed.success) {
-      return Response.json({ error: parsed.error.flatten() }, { status: 400 })
-    }
-
-    const { active_seconds, scroll_percentage } = parsed.data
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'v2.lessons.theory_read',
+    summary: 'Unexpected failure recording a theory read',
+    body: theoryReadSchema,
+    onDenied: warnUnauthorized,
+  },
+  async ({ actor, body, params }) => {
     const serviceSupabase = createServiceRoleClient()
 
     const result = await recordTheoryReadAction(
       serviceSupabase,
-      user.id,
-      lessonId,
-      active_seconds,
-      scroll_percentage
+      requireUserId(actor),
+      params.lessonId,
+      body.active_seconds,
+      body.scroll_percentage
     )
 
     return Response.json(result)
-  } catch (err) {
-    console.error('[api/v2/lessons/[lessonId]/theory-read POST]', err)
-    const errorMsg = err instanceof Error ? err.message : 'Internal server error'
-    return Response.json({ error: errorMsg }, { status: 500 })
   }
-}
+)

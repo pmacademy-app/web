@@ -11,6 +11,7 @@ import type { Database } from '@/lib/supabase'
 import { getPortfolioSettings, getLearnerSubmittedCapstones } from '@/lib/portfolio-db'
 import { calculatePortfolioReadiness, type PortfolioReadinessSummary } from '@/lib/portfolio-readiness'
 import { deriveFellowRequestState, type FellowRequestRowStatus, type FellowRequestUiState } from '@/lib/fellow'
+import { PublicError } from '@/lib/errors/public-error'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -118,12 +119,12 @@ export async function submitFellowRequest(
 
   if (!current.canSubmit) {
     if (current.state === 'pending') {
-      throw new Error('You already have a pending Fellow request.')
+      throw new PublicError('You already have a pending Fellow request.', { status: 409, code: 'ALREADY_PENDING' })
     }
     if (current.state === 'approved') {
-      throw new Error('You already have Fellow status.')
+      throw new PublicError('You already have Fellow status.', { status: 409, code: 'ALREADY_FELLOW' })
     }
-    throw new Error('Your portfolio does not yet meet all Fellow eligibility requirements.')
+    throw new PublicError('Your portfolio does not yet meet all Fellow eligibility requirements.', { status: 403, code: 'NOT_ELIGIBLE' })
   }
 
   const { data, error } = (await (supabase.from('fellow_requests') as unknown as DBChain)
@@ -134,9 +135,12 @@ export async function submitFellowRequest(
   if (error || !data) {
     // Postgres unique_violation code, or a duplicate-key message from the partial unique index.
     if (error?.code === '23505' || /duplicate/i.test(error?.message || '')) {
-      throw new Error('You already have a pending Fellow request.')
+      throw new PublicError('You already have a pending Fellow request.', { status: 409, code: 'ALREADY_PENDING' })
     }
-    throw new Error(error?.message || 'Failed to submit Fellow request.')
+    // The driver message is logged, never published: before B7-E it was rethrown
+    // and the route sent it verbatim to the learner, which is the N-3 pattern.
+    console.error('[fellow-requests-db] Error inserting Fellow request:', error)
+    throw new PublicError('Failed to submit Fellow request.', { status: 400, code: 'SUBMIT_FAILED' })
   }
 
   return { success: true, request: mapRow(data) }

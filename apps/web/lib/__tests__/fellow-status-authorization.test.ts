@@ -225,7 +225,11 @@ describe('Unit 2: Fellow Identity & Admin Control Test Suite', () => {
       const res = await fellowStatusPost(req, { params: Promise.resolve({ id: 'usr-target' }) })
       expect(res.status).toBe(401)
       const data = await res.json()
-      expect(data.error).toBe('Authentication required')
+      // B7-G2: denials now use the wrapper's canonical, non-enumerating copy — a
+      // refusal must not tell the caller which check refused it. The status code is
+      // the contract that matters here and is unchanged.
+      expect(data.code).toBe('UNAUTHORIZED')
+      expect(data.error).toBe('Authentication required.')
     })
 
     it('rejects non-admin requests to fellow-status route with 403', async () => {
@@ -244,7 +248,10 @@ describe('Unit 2: Fellow Identity & Admin Control Test Suite', () => {
       const res = await fellowStatusPost(req, { params: Promise.resolve({ id: 'usr-target' }) })
       expect(res.status).toBe(403)
       const data = await res.json()
-      expect(data.error).toContain('Admin privileges required')
+      // B7-G2: see the note above — the guard's specific reason is deliberately no
+      // longer published. It is still recorded in the denial audit row.
+      expect(data.code).toBe('FORBIDDEN')
+      expect(data.error).toBe('You do not have permission to perform this action.')
     })
 
     it('rejects invalid or missing isFellow payload with 400', async () => {

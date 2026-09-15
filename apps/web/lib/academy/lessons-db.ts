@@ -7,6 +7,7 @@ import type { Database } from '../supabase'
 import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
 import { completeLesson } from '../lessons-completion-service'
+import { PublicError } from '@/lib/errors/public-error'
 
 export interface UserLessonProgressRecord {
   user_id: string
@@ -164,7 +165,7 @@ export async function recordTheoryReadAction(
   )
 
   if (!verifyResult.isEligible) {
-    throw new Error(verifyResult.reason || 'Engagement threshold not met.')
+    throw new PublicError(verifyResult.reason || 'Engagement threshold not met.', { status: 400, code: 'ENGAGEMENT_THRESHOLD' })
   }
 
   const existingRead = await hasXpEvent(supabase, userId, 'theory_read', lessonId)
@@ -179,7 +180,7 @@ export async function recordQuizAttemptAction(
 ) {
   const totalQuestions = attempts.length
   if (totalQuestions === 0) {
-    throw new Error('Attempts array cannot be empty')
+    throw new PublicError('Attempts array cannot be empty', { status: 400, code: 'VALIDATION' })
   }
 
   let lesson
@@ -188,12 +189,12 @@ export async function recordQuizAttemptAction(
     const raw = await readFile(filePath, 'utf-8')
     lesson = JSON.parse(raw)
   } catch {
-    throw new Error(`Lesson content file not found for ${lessonId}`)
+    throw new PublicError(`Lesson content file not found for ${lessonId}`, { status: 404, code: 'NOT_FOUND' })
   }
 
   const quizBlock = lesson?.blocks?.find((b: { type: string }) => b.type === 'quiz')
   if (!quizBlock) {
-    throw new Error(`Quiz block not found in lesson content for ${lessonId}`)
+    throw new PublicError(`Quiz block not found in lesson content for ${lessonId}`, { status: 404, code: 'NOT_FOUND' })
   }
 
   const quizQuestions = quizBlock.questions || []
@@ -205,7 +206,7 @@ export async function recordQuizAttemptAction(
   const validatedAttempts = attempts.map((a) => {
     const correctAnswer = questionMap.get(a.question_id)
     if (correctAnswer === undefined) {
-      throw new Error(`Question ID ${a.question_id} not found in quiz for lesson ${lessonId}`)
+      throw new PublicError(`Question ID ${a.question_id} not found in quiz for lesson ${lessonId}`, { status: 400, code: 'VALIDATION' })
     }
     return {
       question_id: a.question_id,

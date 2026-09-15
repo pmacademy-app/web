@@ -1,49 +1,44 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+
+import { withRoute } from '@/lib/api/with-route'
 import { AnnouncementsService } from '@/lib/admin/announcements-service'
-import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const url = new URL(request.url)
-    let cohortId = url.searchParams.get('cohortId') || undefined
-    let userId = url.searchParams.get('userId') || undefined
-
-    // If userId was not explicitly passed, attempt to resolve from authenticated session cookie
-    if (!userId) {
-      const cookieStore = await cookies()
-      const token = cookieStore.get('sb-access-token')?.value
-      if (token) {
-        try {
-          const authSupabase = createAuthenticatedServerClient(token)
-          const { data: { user } } = await authSupabase.auth.getUser()
-          if (user) {
-            userId = user.id
-            if (!cohortId) {
-              const serviceSupabase = createServiceRoleClient()
-              const { data: profile } = await serviceSupabase
-                .from('users')
-                .select('cohort_id')
-                .eq('id', user.id)
-                .maybeSingle()
-              cohortId = (profile as { cohort_id?: string | null })?.cohort_id || undefined
-            }
-          }
-        } catch {
-          // Token invalid or expired — treat as unauthenticated
-        }
-      }
-    }
-
+/**
+ * Open to `anonymous`, which answers with an empty list — the pre-migration
+ * behaviour for a caller with no session.
+ *
+ * **`?userId=` and `?cohortId=` are no longer read.** Before this batch the route
+ * took both straight off the query string and only fell back to the session when
+ * `userId` was absent, so `GET /api/announcements/active?userId=<someone-else>`
+ * returned that learner's targeted announcements to any caller, signed in or not.
+ * Identity now comes from the resolved actor and the cohort from that learner's own
+ * profile row; the parameters are ignored. `SystemAnnouncementBanner` still sends
+ * them and is unaffected, since it only ever sent the viewer's own ids.
+ */
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner', 'anonymous'] },
+    operation: 'announcements.active.read',
+    summary: 'Unexpected failure fetching active announcements',
+    errorMessage: 'Failed to fetch active announcements',
+  },
+  async ({ actor }) => {
     // Only authenticated learners are eligible for learner announcements
-    if (!userId) {
+    if (actor.kind !== 'learner') {
       return NextResponse.json({ success: true, announcements: [] })
     }
 
-    const announcements = await AnnouncementsService.getActiveAnnouncementsForUser(userId, cohortId)
+    const serviceSupabase = createServiceRoleClient()
+    const { data: profile } = await serviceSupabase
+      .from('users')
+      .select('cohort_id')
+      .eq('id', actor.userId)
+      .maybeSingle()
+
+    const cohortId = (profile as { cohort_id?: string | null })?.cohort_id || undefined
+
+    const announcements = await AnnouncementsService.getActiveAnnouncementsForUser(actor.userId, cohortId)
     return NextResponse.json({ success: true, announcements })
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch active announcements'
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
-}
+)

@@ -1,60 +1,61 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { issueCertificate, getUserCertificates } from '@/lib/certificates-db'
-import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
-import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { BRAND } from '@/lib/brand'
+import { issueCertificate, getUserCertificates } from '@/lib/certificates-db'
+import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
+import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'certificates.read',
+    summary: 'Unexpected failure fetching learner certificates',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const certificates = await getUserCertificates(supabase, user.id)
+    const certificates = await getUserCertificates(supabase, requireUserId(actor))
+
     return NextResponse.json({ success: true, certificates })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch certificates.'
-    console.error('[API GET /api/certificates] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'certificates.issue',
+    summary: 'Unexpected failure issuing a certificate',
+  },
+  async ({ request, actor }) => {
+    const userId = requireUserId(actor)
     const supabase = createServiceRoleClient()
-    const body = await request.json().catch(() => ({}))
+
+    // Read here rather than via a declared schema: the pre-migration route used
+    // `request.json().catch(() => ({}))`, so an absent or malformed body fell back
+    // to a full-curriculum certificate instead of returning 400.
+    const body = (await request.json().catch(() => ({}))) as { type?: string; moduleSlug?: string | null }
     const type = body.type || 'full_curriculum'
     const moduleSlug = body.moduleSlug || null
 
-    const certificate = await issueCertificate(supabase, user.id, type, moduleSlug)
+    const certificate = await issueCertificate(supabase, userId, type, moduleSlug)
 
-    // Dispatch certificate.generated event → in-app notification (primary channel) + email queue
+    // Dispatch certificate.generated event -> in-app notification (primary channel) + email queue
     try {
       initializeNotificationConnectors()
+      // Re-read for profile metadata only — authorization is already settled by the
+      // actor policy above. The call is memoized on this Request, so it is the same
+      // resolution `resolveActor` performed and costs nothing.
+      const user = await getAuthenticatedUserFromRequest(request)
       const siteOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl
       await globalNotificationDispatcher.dispatch({
         id: `cert-event-${Date.now()}`,
         event: 'certificate.generated',
-        userId: user.id,
-        userEmail: user.email || '',
-        userName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Learner',
+        userId,
+        userEmail: user?.email || '',
+        userName: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Learner',
         userTimezone: 'UTC',
         priority: 'high',
         category: 'certificates',
@@ -73,9 +74,5 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, certificate })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to issue certificate.'
-    console.error('[API POST /api/certificates] Error:', error)
-    return NextResponse.json({ error: message }, { status: 400 })
   }
-}
+)

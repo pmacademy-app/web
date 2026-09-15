@@ -1,61 +1,41 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { z } from 'zod'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { getCohortsData, toggleCohortMembership } from '@/lib/leaderboard-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
+const membershipSchema = z.object({
+  cohortSlug: z.string().min(1, 'Valid cohortSlug and action (join/leave) required.'),
+  action: z.enum(['join', 'leave'], { message: 'Valid cohortSlug and action (join/leave) required.' }),
+})
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'cohorts.read',
+    summary: 'Unexpected failure fetching learner cohorts',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const cohorts = await getCohortsData(supabase, user.id)
+    const cohorts = await getCohortsData(supabase, requireUserId(actor))
 
-    return NextResponse.json({
-      success: true,
-      cohorts,
-    })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch cohorts.'
-    console.error('[API GET /api/cohorts] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ success: true, cohorts })
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
-    const body = await request.json()
-    const { cohortSlug, action } = body ?? {}
-
-    if (!cohortSlug || !['join', 'leave'].includes(action)) {
-      return NextResponse.json({ error: 'Valid cohortSlug and action (join/leave) required.' }, { status: 400 })
-    }
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'cohorts.membership.update',
+    summary: 'Unexpected failure updating cohort membership',
+    body: membershipSchema,
+  },
+  async ({ actor, body }) => {
     const supabase = createServiceRoleClient()
-    const result = await toggleCohortMembership(supabase, user.id, cohortSlug, action as 'join' | 'leave')
+    const result = await toggleCohortMembership(supabase, requireUserId(actor), body.cohortSlug, body.action)
 
-    return NextResponse.json({
-      success: true,
-      isMember: result.isMember,
-    })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to update cohort membership.'
-    console.error('[API POST /api/cohorts] Error:', error)
-    return NextResponse.json({ error: message }, { status: 400 })
+    return NextResponse.json({ success: true, isMember: result.isMember })
   }
-}
+)

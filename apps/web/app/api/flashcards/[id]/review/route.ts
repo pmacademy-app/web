@@ -1,9 +1,9 @@
-import { cookies } from 'next/headers'
-import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUser } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { recordFlashcardReview } from '@/lib/flashcards-service'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 const reviewSchema = z.object({
   rating: z.union([
@@ -17,29 +17,17 @@ const reviewSchema = z.object({
   lessonId: z.string().optional(),
 })
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get('sb-access-token')?.value
-
-    if (!accessToken) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const authClient = createAuthenticatedServerClient(accessToken)
-    const user = await getAuthenticatedUser(authClient)
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = await request.json()
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'flashcards.review.submit',
+    summary: 'Unexpected failure recording a flashcard review',
+  },
+  async ({ request, actor, params }) => {
+    const body = await request.json().catch(() => null)
     const parsed = reviewSchema.safeParse(body)
     if (!parsed.success) {
-      return Response.json({ error: parsed.error.flatten() }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'rating must be an integer between 0 and 5.')
     }
 
     const { rating, lessonId } = parsed.data
@@ -47,19 +35,12 @@ export async function POST(
 
     const result = await recordFlashcardReview(
       serviceSupabase,
-      user.id,
-      id,
+      requireUserId(actor),
+      params.id,
       rating,
       lessonId
     )
 
     return Response.json(result)
-  } catch (err) {
-    console.error('[api/flashcards/[id]/review POST]', err)
-    const errorMsg = err instanceof Error ? err.message : 'Internal server error'
-    return Response.json(
-      { error: errorMsg },
-      { status: 500 }
-    )
   }
-}
+)

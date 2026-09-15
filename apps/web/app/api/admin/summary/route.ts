@@ -1,19 +1,23 @@
-import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/admin/guard'
+
+import { withRoute } from '@/lib/api/with-route'
 import { DashboardService } from '@/lib/admin/dashboard-service'
+import { adminErrorMessage } from '@/lib/errors/api-response'
 
-export async function GET(request: Request) {
-  const authGuard = await requireAdminUser(request)
-  if (!authGuard.authorized) {
-    return NextResponse.json({ error: authGuard.error }, { status: authGuard.statusCode || 403 })
+export const GET = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.summary.get',
+    domain: 'admin',
+    summary: 'Unexpected failure in GET /api/admin/summary',
+  },
+  async () => {
+    try {
+      const summary = await DashboardService.getDashboardSummary()
+      return NextResponse.json({ success: true, summary })
+    } catch (err) {
+      const message = adminErrorMessage(err, 'Failed to load dashboard summary')
+      return NextResponse.json({ success: false, error: message }, { status: 500 })
+    }
   }
-
-  try {
-    const summary = await DashboardService.getDashboardSummary()
-    return NextResponse.json({ success: true, summary })
-  } catch (err) {
-    const message = adminErrorMessage(err, 'Failed to load dashboard summary')
-    return NextResponse.json({ success: false, error: message }, { status: 500 })
-  }
-}
+)

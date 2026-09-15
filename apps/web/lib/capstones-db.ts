@@ -20,6 +20,7 @@ import { getRuntimeXpValues } from '@/lib/xp'
 import { updateUserStreak } from '@/lib/streaks-db'
 
 import { getLessonIdsForModule } from '@/lib/curriculum-registry'
+import { PublicError } from '@/lib/errors/public-error'
 
 type CapstoneSubmissionRow = Database['public']['Tables']['capstone_submissions']['Row']
 type ReflectionRow = Database['public']['Tables']['reflections']['Row']
@@ -216,7 +217,7 @@ export async function saveDraftAction(
       lessonsCompleted = progressRows?.length ?? 0
     }
     if (lessonsCompleted < 8) {
-      throw new Error(`Cannot save draft. Capstone is locked until at least 8 lessons in this module are completed (currently ${lessonsCompleted}/10 completed).`)
+      throw new PublicError(`Cannot save draft. Capstone is locked until at least 8 lessons in this module are completed (currently ${lessonsCompleted}/10 completed).`, { status: 403, code: 'CAPSTONE_LOCKED' })
     }
   }
 
@@ -226,7 +227,7 @@ export async function saveDraftAction(
     if (existing) {
       return { success: true, submission: existing }
     }
-    throw new Error(transition.reason || 'Cannot modify capstone in current state.')
+    throw new PublicError(transition.reason || 'Cannot modify capstone in current state.', { status: 409, code: 'INVALID_STATE' })
   }
 
   const now = new Date().toISOString()
@@ -320,7 +321,7 @@ export async function submitCapstoneAction(
       lessonsCompleted = progressRows?.length ?? 0
     }
     if (lessonsCompleted < 8) {
-      throw new Error(`Cannot submit capstone. You must complete at least 8 lessons in this module first (currently ${lessonsCompleted}/10 completed).`)
+      throw new PublicError(`Cannot submit capstone. You must complete at least 8 lessons in this module first (currently ${lessonsCompleted}/10 completed).`, { status: 403, code: 'CAPSTONE_LOCKED' })
     }
   }
 
@@ -371,13 +372,13 @@ export async function submitCapstoneAction(
   // 5. Validate submission content
   const validation = validateCapstoneSubmission(moduleSlug, content)
   if (!validation.isValid) {
-    throw new Error(validation.reason || 'Submission requirements not met.')
+    throw new PublicError(validation.reason || 'Submission requirements not met.', { status: 400, code: 'VALIDATION' })
   }
 
   // 6. Validate transition
   const transition = validateCapstoneTransition(existing?.status, 'submitted', 'learner')
   if (!transition.allowed) {
-    throw new Error(transition.reason || 'Cannot submit capstone in current state.')
+    throw new PublicError(transition.reason || 'Cannot submit capstone in current state.', { status: 409, code: 'INVALID_STATE' })
   }
 
   const now = new Date().toISOString()

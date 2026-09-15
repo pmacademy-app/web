@@ -1,6 +1,6 @@
+import { NextResponse } from 'next/server'
+import { withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminUser } from '@/lib/admin/guard'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
@@ -26,12 +26,14 @@ export interface AdminSearchResponse {
   }
 }
 
-export async function GET(request: NextRequest) {
-  const auth = await requireAdminUser(request)
-  if (!auth.authorized) {
-    return NextResponse.json({ error: auth.error }, { status: auth.statusCode || 403 })
-  }
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.search.get',
+    domain: 'admin',
+    summary: 'Unexpected failure in GET /api/admin/search',
+  },
+  async ({ request }) => {
   const { searchParams } = new URL(request.url)
   const query = (searchParams.get('q') || '').trim()
 
@@ -180,4 +182,5 @@ export async function GET(request: NextRequest) {
     const message = adminErrorMessage(error, 'Search failed')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
-}
+  }
+)

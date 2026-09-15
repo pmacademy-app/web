@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import type { ApiSuccess, ApiError } from '@/types'
 import { ROLE_OPTIONS } from '@/types'
 import { buildWaitlistConfirmationEmail } from '@/lib/email'
 import { sendGovernedEmail } from '@/lib/email-governance'
-import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
 
 // ─── Validation Schema ────────────────────────────────────────────────────────
@@ -42,35 +42,43 @@ const IP_WAITLIST_LIMIT = { windowMs: 60 * 60 * 1000, limit: 5, failClosed: true
 
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
-export async function POST(request: NextRequest): Promise<NextResponse<ApiSuccess | ApiError>> {
+/**
+ * Public by design — the waitlist form is on the marketing site.
+ *
+ * The limiter stays declared on the wrapper and the body stays undeclared, so the
+ * order this endpoint shipped with is unchanged: charge the trusted-IP bucket
+ * first, fail-closed, and only then read the body. Validation is also kept in the
+ * handler because a schema failure here answers **422**, not the wrapper's 400.
+ */
+export const POST = withRoute(
+  {
+    actor: { allow: ['anonymous', 'learner'] },
+    operation: 'waitlist.join',
+    summary: 'Unexpected failure recording a waitlist signup',
+    errorMessage: 'Something went wrong on our side. Try again in a moment.',
+    rateLimit: [
+      {
+        key: ({ request }) => `waitlist_ip:${getClientIpBucket(request)}`,
+        ...IP_WAITLIST_LIMIT,
+      },
+    ],
+  },
+  async ({ request }): Promise<NextResponse<ApiSuccess | ApiError>> => {
   const ipBucket = getClientIpBucket(request)
-  const ipLimit = await evaluatePersistentRateLimit(`waitlist_ip:${ipBucket}`, IP_WAITLIST_LIMIT)
-  if (!ipLimit.success) {
-    return NextResponse.json(
-      { error: 'Too many requests. Please try again in a moment.', code: 'SERVER_ERROR' },
-      { status: 429 }
-    )
-  }
 
   // Parse request body
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { error: 'Invalid request format.', code: 'VALIDATION' },
-      { status: 400 }
-    )
+    throw new RouteError(400, 'VALIDATION', 'Invalid request format.')
   }
 
   // Validate inputs
   const result = waitlistSchema.safeParse(body)
   if (!result.success) {
     const firstError = result.error.issues[0]?.message ?? 'Invalid input.'
-    return NextResponse.json(
-      { error: firstError, code: 'VALIDATION' },
-      { status: 422 }
-    )
+    throw new RouteError(422, 'VALIDATION', firstError)
   }
 
   const { name, email, career_position, utm_source, utm_medium, utm_campaign } = result.data
@@ -80,7 +88,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
   const source = utm_source ?? 'direct'
 
   // Supabase operations
-  try {
+  {
     const supabase = createServiceRoleClient()
 
     // Check for duplicate email
@@ -91,10 +99,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
       .maybeSingle()
 
     if (existing) {
-      return NextResponse.json(
-        { error: 'You are already on the waitlist. We will be in touch.', code: 'DUPLICATE' },
-        { status: 409 }
-      )
+      throw new RouteError(409, 'DUPLICATE', 'You are already on the waitlist. We will be in touch.')
     }
 
     // Insert new waitlist entry
@@ -112,17 +117,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
     if (insertError) {
       // Supabase unique constraint violation (race condition safety net)
       if (insertError.code === '23505') {
-        return NextResponse.json(
-          { error: 'You are already on the waitlist. We will be in touch.', code: 'DUPLICATE' },
-          { status: 409 }
-        )
+        throw new RouteError(409, 'DUPLICATE', 'You are already on the waitlist. We will be in touch.')
       }
 
       console.error('[waitlist] Insert error:', insertError.message)
-      return NextResponse.json(
-        { error: 'Something went wrong on our side. Try again in a moment.', code: 'SERVER_ERROR' },
-        { status: 500 }
-      )
+      throw new RouteError(500, 'SERVER_ERROR', 'Something went wrong on our side. Try again in a moment.')
     }
 
     // Send the confirmation through the governed gateway (asynchronous, non-blocking).
@@ -146,12 +145,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiSucces
       { message: 'You are on the waitlist.' },
       { status: 201 }
     )
-
-  } catch (error) {
-    console.error('[waitlist] Unexpected error:', error)
-    return NextResponse.json(
-      { error: 'Something went wrong on our side. Try again in a moment.', code: 'SERVER_ERROR' },
-      { status: 500 }
-    )
   }
-}
+  }
+)

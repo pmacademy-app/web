@@ -51,7 +51,11 @@ describe('Admin Portfolio Verification & Queue Test Suite', () => {
       const res = await fellowStatusPost(req, { params: Promise.resolve({ id: 'usr-1' }) })
       expect(res.status).toBe(401)
       const json = await res.json()
-      expect(json.error).toBe('Authentication required')
+      // B7-G2: denials now use the wrapper's canonical, non-enumerating copy — a
+      // refusal must not tell the caller which check refused it. The status code is
+      // the contract that matters here and is unchanged.
+      expect(json.code).toBe('UNAUTHORIZED')
+      expect(json.error).toBe('Authentication required.')
     })
 
     it('rejects non-admin user requests with 403', async () => {
@@ -70,7 +74,10 @@ describe('Admin Portfolio Verification & Queue Test Suite', () => {
       const res = await fellowStatusPost(req, { params: Promise.resolve({ id: 'usr-1' }) })
       expect(res.status).toBe(403)
       const json = await res.json()
-      expect(json.error).toContain('Admin privileges required')
+      // B7-G2: see the note above — the guard's specific reason is deliberately no
+      // longer published. It is still recorded in the denial audit row.
+      expect(json.code).toBe('FORBIDDEN')
+      expect(json.error).toBe('You do not have permission to perform this action.')
     })
 
     it('rejects requests with missing or non-boolean isFellow with 400', async () => {

@@ -1,48 +1,38 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
+import { z } from 'zod'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { recordTheoryReadAction } from '@/lib/lessons-db'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
+const verifyTheorySchema = z.object({
+  lessonId: z.string().min(1, 'Missing or invalid parameters: lessonId, activeSeconds, scrollPercentage.'),
+  activeSeconds: z.number({ message: 'Missing or invalid parameters: lessonId, activeSeconds, scrollPercentage.' }),
+  scrollPercentage: z.number({ message: 'Missing or invalid parameters: lessonId, activeSeconds, scrollPercentage.' }),
+})
 
-    const userId = user.id
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'xp.verify_theory',
+    summary: 'Unexpected failure recording a theory read',
+    body: verifyTheorySchema,
+  },
+  async ({ actor, body }) => {
     const supabase = createServiceRoleClient()
 
-    const body = await request.json()
-    const { lessonId, activeSeconds, scrollPercentage } = body
-
-    if (!lessonId || typeof activeSeconds !== 'number' || typeof scrollPercentage !== 'number') {
-      return NextResponse.json(
-        { error: 'Missing or invalid parameters: lessonId, activeSeconds, scrollPercentage.' },
-        { status: 400 }
-      )
-    }
-
+    // A failed engagement check raises `PublicError` from the service, so the
+    // learner still sees the specific reason ("Engagement threshold not met.")
+    // rather than generic copy. Anything else is a genuine fault.
     const result = await recordTheoryReadAction(
       supabase,
-      userId,
-      lessonId,
-      activeSeconds,
-      scrollPercentage
+      requireUserId(actor),
+      body.lessonId,
+      body.activeSeconds,
+      body.scrollPercentage
     )
 
-    return NextResponse.json({
-      success: true,
-      result,
-    })
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Engagement threshold not met.'
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 400 }
-    )
+    return NextResponse.json({ success: true, result })
   }
-}
+)

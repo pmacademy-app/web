@@ -1,66 +1,64 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { z } from 'zod'
+
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { getWeeklyLeaderboard, getCohortLeaderboard, toggleLeaderboardOptIn } from '@/lib/leaderboard-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
+const leaderboardQuerySchema = z.object({
+  scope: z.string().optional(),
+  cohortId: z.string().optional(),
+})
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
+/**
+ * The body is read in the handler rather than declared on the wrapper.
+ *
+ * Before migration this route parsed with `request.json().catch(() => ({}))` and
+ * then `Boolean(body.isOptedIn)`, so a missing or unparseable body opted the
+ * learner out — it never returned 400. Declaring a body schema would make the
+ * wrapper reject malformed JSON instead, which is a different contract for the
+ * privacy toggle than the one shipped. Same reasoning on `/api/certificates`.
+ */
+async function readOptIn(request: Request): Promise<boolean> {
+  const body = await request.json().catch(() => ({}))
+  return Boolean((body as { isOptedIn?: unknown })?.isOptedIn)
+}
 
-    const { searchParams } = new URL(request.url)
-    const scope = searchParams.get('scope') || 'global'
-    const cohortId = searchParams.get('cohortId')
-
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'leaderboard.read',
+    summary: 'Unexpected failure fetching the leaderboard',
+    query: leaderboardQuerySchema,
+  },
+  async ({ actor, query }) => {
+    const userId = requireUserId(actor)
     const supabase = createServiceRoleClient()
 
-    if (scope === 'cohort') {
-      if (!cohortId) {
-        return NextResponse.json({ error: 'cohortId is required for scope=cohort.' }, { status: 400 })
+    if ((query.scope || 'global') === 'cohort') {
+      if (!query.cohortId) {
+        throw new RouteError(400, 'VALIDATION', 'cohortId is required for scope=cohort.')
       }
-      const payload = await getCohortLeaderboard(supabase, user.id, cohortId)
+      const payload = await getCohortLeaderboard(supabase, userId, query.cohortId)
       return NextResponse.json({ success: true, scope: 'cohort', ...payload })
     }
 
-    const payload = await getWeeklyLeaderboard(supabase, user.id)
+    const payload = await getWeeklyLeaderboard(supabase, userId)
     return NextResponse.json({ success: true, scope: 'global', ...payload })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch leaderboard.'
-    console.error('[API GET /api/leaderboard] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
-    const body = await request.json().catch(() => ({}))
-    const isOptedIn = Boolean(body.isOptedIn)
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'leaderboard.opt_in.update',
+    summary: 'Unexpected failure updating leaderboard privacy',
+  },
+  async ({ request, actor }) => {
     const supabase = createServiceRoleClient()
-    const result = await toggleLeaderboardOptIn(supabase, user.id, isOptedIn)
+    const result = await toggleLeaderboardOptIn(supabase, requireUserId(actor), await readOptIn(request))
 
-    return NextResponse.json({
-      success: true,
-      isOptedIn: result.isOptedIn,
-    })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to update privacy settings.'
-    console.error('[API POST /api/leaderboard] Error:', error)
-    return NextResponse.json({ error: message }, { status: 400 })
+    return NextResponse.json({ success: true, isOptedIn: result.isOptedIn })
   }
-}
+)

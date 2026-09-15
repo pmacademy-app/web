@@ -1,18 +1,24 @@
-import { adminErrorMessage } from '@/lib/errors/api-response'
 import { NextResponse } from 'next/server'
-import { requireAdminUser, logAdminAction } from '@/lib/admin/guard'
+import { logAdminAction } from '@/lib/admin/guard'
+import { requireAdmin } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
+import { adminErrorMessage } from '@/lib/errors/api-response'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { issueCertificate } from '@/lib/certificates-db'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 import { BRAND } from '@/lib/brand'
 
-export async function POST(request: Request) {
-  // 1. Enforce RBAC
-  const authGuard = await requireAdminUser(request)
-  if (!authGuard.authorized) {
-    return NextResponse.json({ error: authGuard.error }, { status: authGuard.statusCode || 403 })
-  }
+export const POST = withRoute(
+  {
+    actor: { allow: ['admin'] },
+    operation: 'admin.dev.generate_test_certificate.post',
+    domain: 'admin',
+    summary: 'Unexpected failure in POST /api/admin/dev/generate-test-certificate',
+  },
+  async ({ request, actor }) => {
+  // 1. RBAC is enforced by the actor policy above.
+  const authGuard = requireAdmin(actor)
 
   try {
     const body = await request.json()
@@ -87,8 +93,8 @@ export async function POST(request: Request) {
 
     // 4. Record Audit Log
     await logAdminAction(
-      authGuard.userId!,
-      authGuard.email!,
+      authGuard.userId,
+      authGuard.email,
       'generate_test_certificate',
       'certificate',
       certRow.id,
@@ -112,4 +118,5 @@ export async function POST(request: Request) {
     const message = adminErrorMessage(err, 'Failed to generate test certificate')
     return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
-}
+  }
+)

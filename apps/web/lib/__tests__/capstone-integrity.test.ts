@@ -485,7 +485,19 @@ describe('Phase 8 — Capstone State Consistency, Progress Integrity & Submissio
       expect(res.status).toBe(401)
     })
 
-    it('returns HTTP 404 for invalid module slugs', async () => {
+    /**
+     * This asserted 404 before B7-E, because the route validated the module slug
+     * *before* authenticating. That ordering made the endpoint a slug oracle: an
+     * anonymous caller could tell a real module from a fake one by the 404/401
+     * split. `withRoute` resolves the actor first, so an unauthenticated caller now
+     * learns nothing either way.
+     *
+     * The authenticated case — a signed-in learner asking for a slug that does not
+     * exist still gets 404 — is covered in `b7e-learner-route-migration.test.ts`,
+     * which can mock an actor; this file has no auth mocks and can only exercise
+     * the anonymous path.
+     */
+    it('does not reveal whether a module slug exists to an unauthenticated caller', async () => {
       const req = createMockRequest('http://localhost:3000/api/capstones/invalid-slug/submit', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -493,7 +505,18 @@ describe('Phase 8 — Capstone State Consistency, Progress Integrity & Submissio
       })
 
       const res = await submitPostHandler(req, { params: Promise.resolve({ module: 'invalid-slug' }) })
-      expect(res.status).toBe(404)
+      expect(res.status).toBe(401)
+
+      // ...the same answer a real slug gives, which is the point.
+      const realSlugReq = createMockRequest('http://localhost:3000/api/capstones/foundations/submit', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ content: 'Content' }),
+      })
+      const realSlugRes = await submitPostHandler(realSlugReq, {
+        params: Promise.resolve({ module: 'foundations' }),
+      })
+      expect(realSlugRes.status).toBe(401)
     })
   })
 })

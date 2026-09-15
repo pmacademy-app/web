@@ -1,37 +1,36 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
-import { loadCapstoneSubmission } from '@/lib/capstones-db'
-import { getCapstoneDefinition } from '@/config/capstones'
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ module: string }> }
-) {
-  try {
-    const { module: moduleSlug } = await params
+import { getCapstoneDefinition } from '@/config/capstones'
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
+import { loadCapstoneSubmission } from '@/lib/capstones-db'
+import { createServiceRoleClient } from '@/lib/supabase'
+
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'capstones.module.read',
+    summary: 'Unexpected failure fetching capstone details',
+  },
+  async ({ actor, params }) => {
+    const moduleSlug = params.module
     const capstoneDef = getCapstoneDefinition(moduleSlug)
 
+    // The slug check now runs after authentication rather than before it. The
+    // wrapper resolves the actor first by design, which also stops an unauthenticated
+    // caller from enumerating valid module slugs off the 404/401 split.
     if (!capstoneDef) {
-      return NextResponse.json({ error: 'Invalid module capstone slug.' }, { status: 404 })
+      throw new RouteError(404, 'NOT_FOUND', 'Invalid module capstone slug.')
     }
 
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
+    const userId = requireUserId(actor)
     const supabase = createServiceRoleClient()
     const [result, userProfileRes] = await Promise.all([
-      loadCapstoneSubmission(supabase, user.id, moduleSlug),
+      loadCapstoneSubmission(supabase, userId, moduleSlug),
       supabase
         .from('users')
         .select('username, is_portfolio_public')
-        .eq('id', user.id)
+        .eq('id', userId)
         .maybeSingle(),
     ])
 
@@ -48,11 +47,5 @@ export async function GET(
       status: result.status,
       userProfile,
     })
-  } catch (error) {
-    console.error('[API GET /api/capstones/[module]] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error fetching capstone details.' },
-      { status: 500 }
-    )
   }
-}
+)

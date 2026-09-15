@@ -195,28 +195,27 @@ describe('B7-G1 — migration scope', () => {
   const migrated = routeFilesImporting('@/lib/api/with-route')
 
   it('migrates exactly the 37 G1 admin routes', () => {
-    const admin = migrated.filter((f) => f.startsWith('admin/'))
+    const g1 = migrated.filter((f) => /^admin\/(emails|notifications|announcements)\//.test(f))
 
-    expect(admin).toHaveLength(37)
-    expect(admin.every((f) => /^admin\/(emails|notifications|announcements)\//.test(f))).toBe(true)
+    expect(g1).toHaveLength(37)
   })
 
-  it('leaves every G2 admin group untouched', () => {
-    const G2 = [
-      'users', 'system', 'feedback', 'fellow-requests', 'capstones', 'content',
-      'settings', 'audit', 'search', 'summary', 'contact', 'feature-flags', 'verify', 'dev',
-    ]
-
-    for (const group of G2) {
-      expect(migrated.filter((f) => f.startsWith(`admin/${group}/`))).toEqual([])
-    }
-  })
-
-  it('owns the global migrated set, so earlier waves assert only their own', () => {
+  /**
+   * B7-G2 has since migrated the remaining admin groups, so "G2 is untouched" is
+   * obsolete by design. What still has to hold is that G1's own 37 stayed migrated
+   * and that G2 did not shrink G1 — asserted above and below.
+   */
+  it('leaves every earlier wave intact', () => {
     expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(6)
     expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(8)
     expect(migrated.filter((f) => f.startsWith('settings/'))).toHaveLength(11)
-    expect(migrated.filter((f) => f.startsWith('admin/'))).toHaveLength(37)
-    expect(migrated).toHaveLength(62)
   })
+
+  /**
+   * This suite used to assert the global total as well, on the rule that the newest
+   * wave owns it. B7-E and B7-G2 have since landed, so ownership moved with them:
+   * `b7h-wrapper-enforcement.test.ts` now pins the exact global inventory and the
+   * complete exemption list. The four per-group assertions above stay here because
+   * they are G1's own scope and no later wave may disturb them.
+   */
 })

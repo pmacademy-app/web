@@ -1,15 +1,28 @@
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { AvatarService, MAX_AVATAR_SIZE_BYTES, ALLOWED_AVATAR_MIME_TYPES } from '@/lib/avatar/avatar-service'
 
 export const runtime = 'nodejs'
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user) {
-      return Response.json({ error: 'Unauthorized. Authenticated session required.' }, { status: 401 })
-    }
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'user.avatar.upload',
+    summary: 'Unexpected failure uploading a learner avatar',
+    errorMessage: 'An error occurred during avatar upload.',
+    // N-4: an authenticated write that spends storage and had no ceiling before
+    // this batch. 10/hour is well past any real re-crop session and bounds a
+    // scripted upload flood. No body schema is declared — the handler owns the
+    // stream because the payload may be multipart.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `avatar_upload_${actor.userId}` : null),
+        limit: 10,
+        windowMs: 60 * 60 * 1000,
+      },
+    ],
+  },
+  async ({ request, actor }) => {
     let fileBuffer: Buffer | Uint8Array
     let mimeType: string
     let fileName: string = 'avatar.jpg'
@@ -20,7 +33,7 @@ export async function POST(request: Request) {
       const formData = await request.formData()
       const file = formData.get('file') as File | null
       if (!file || typeof file === 'string') {
-        return Response.json({ error: 'Image file is required.' }, { status: 400 })
+        throw new RouteError(400, 'VALIDATION', 'Image file is required.')
       }
 
       mimeType = file.type || 'image/jpeg'
@@ -29,9 +42,13 @@ export async function POST(request: Request) {
       fileBuffer = Buffer.from(arrayBuffer)
     } else {
       // JSON payload support (e.g. base64)
-      const body = await request.json().catch(() => ({}))
+      const body = (await request.json().catch(() => ({}))) as {
+        base64?: unknown
+        mimeType?: string
+        fileName?: string
+      }
       if (!body.base64 || typeof body.base64 !== 'string') {
-        return Response.json({ error: 'Image data or multipart file is required.' }, { status: 400 })
+        throw new RouteError(400, 'VALIDATION', 'Image data or multipart file is required.')
       }
 
       mimeType = body.mimeType || 'image/jpeg'
@@ -42,40 +59,33 @@ export async function POST(request: Request) {
 
     // Server-side validation
     if (!ALLOWED_AVATAR_MIME_TYPES.has(mimeType.toLowerCase())) {
-      return Response.json({ error: 'Unsupported image format. Allowed formats: PNG, JPG, WebP.' }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'Unsupported image format. Allowed formats: PNG, JPG, WebP.')
     }
 
     if (fileBuffer.byteLength > MAX_AVATAR_SIZE_BYTES) {
-      return Response.json({ error: 'Image file size exceeds maximum limit of 2MB.' }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'Image file size exceeds maximum limit of 2MB.')
     }
 
     const result = await AvatarService.uploadAndSetUserAvatar({
-      userId: user.id,
+      userId: requireUserId(actor),
       fileBuffer,
       mimeType,
       fileName,
     })
 
     return Response.json({ success: true, avatarUrl: result.avatarUrl }, { status: 200 })
-  } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'An error occurred during avatar upload.'
-    console.error('[POST /api/user/avatar] Upload exception:', err)
-    return Response.json({ success: false, error: errorMsg }, { status: 500 })
   }
-}
+)
 
-export async function DELETE(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    if (!user) {
-      return Response.json({ error: 'Unauthorized. Authenticated session required.' }, { status: 401 })
-    }
-
-    await AvatarService.removeUserAvatar(user.id)
+export const DELETE = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'user.avatar.remove',
+    summary: 'Unexpected failure removing a learner avatar',
+    errorMessage: 'An error occurred while removing avatar.',
+  },
+  async ({ actor }) => {
+    await AvatarService.removeUserAvatar(requireUserId(actor))
     return Response.json({ success: true, message: 'Avatar removed successfully.' }, { status: 200 })
-  } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : 'An error occurred while removing avatar.'
-    console.error('[DELETE /api/user/avatar] Removal exception:', err)
-    return Response.json({ success: false, error: errorMsg }, { status: 500 })
   }
-}
+)

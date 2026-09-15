@@ -1,8 +1,30 @@
 import { NextResponse } from 'next/server'
+import { withRoute } from '@/lib/api/with-route'
 import { BRAND } from '@/lib/brand'
 import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
+/**
+ * Deliberately open to every actor kind, and deliberately keeps its own catch.
+ *
+ * The caller is an unsubscribe link in an email client — there is no session to
+ * resolve, and the single-use `unsubscribe_token` is the credential. It is not
+ * modelled as an actor kind for the same reason the webhooks are not: the secret
+ * identifies a preference row, not a person.
+ *
+ * The internal try/catch stays because this route answers a browser with HTML and
+ * an API caller with JSON. Letting a fault reach the wrapper would hand a browser a
+ * JSON error envelope instead of the styled page, so every failure is still
+ * rendered here in the caller's format. The wrapper remains the envelope of last
+ * resort for anything that escapes.
+ */
+export const GET = withRoute(
+  {
+    actor: { allow: ['anonymous', 'learner', 'admin'] },
+    operation: 'email.unsubscribe',
+    domain: 'email',
+    summary: 'Unexpected failure processing an unsubscribe link',
+  },
+  async ({ request }) => {
   const { searchParams } = new URL(request.url)
   const token = searchParams.get('token')
   const format = searchParams.get('format')
@@ -106,9 +128,15 @@ export async function GET(request: Request) {
       { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
     )
   } catch (err) {
-    const errorMsg = err instanceof Error ? err.message : 'Unknown server error'
+    // The exception is logged, never published. The JSON branch used to return
+    // `err.message` to an unauthenticated caller — the N-3 pattern, on a public
+    // endpoint this time.
+    console.error('[email/unsubscribe] Unexpected failure:', err)
     if (isJson) {
-      return NextResponse.json({ success: false, error: errorMsg }, { status: 500 })
+      return NextResponse.json(
+        { success: false, error: 'An unexpected error occurred. Please try again later.' },
+        { status: 500 }
+      )
     }
     return new NextResponse(
       renderUnsubscribeHtml({
@@ -120,7 +148,8 @@ export async function GET(request: Request) {
       { status: 500, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
     )
   }
-}
+  }
+)
 
 function renderUnsubscribeHtml(opts: { title: string; heading: string; message: string; success: boolean }) {
   return `<!DOCTYPE html>

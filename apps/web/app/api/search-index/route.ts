@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
+import { NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
+
+import { RouteError, withRoute } from '@/lib/api/with-route'
 
 const getCachedSearchIndex = unstable_cache(
   async () => {
@@ -15,12 +17,22 @@ const getCachedSearchIndex = unstable_cache(
   { revalidate: 3600, tags: ['search-index'] }
 )
 
-export async function GET() {
-  try {
+/**
+ * Public: the search index is compiled lesson metadata served to the curriculum
+ * search box, and it is cached at the edge for an hour. Requiring a session here
+ * would make every response private and defeat that cache.
+ */
+export const GET = withRoute(
+  {
+    actor: { allow: ['anonymous', 'learner', 'admin'] },
+    operation: 'search_index.read',
+    summary: 'Unexpected failure serving the search index',
+  },
+  async () => {
     const raw = await getCachedSearchIndex()
 
     if (!raw) {
-      return NextResponse.json({ error: 'Search index not found' }, { status: 404 })
+      throw new RouteError(404, 'NOT_FOUND', 'Search index not found')
     }
 
     return new NextResponse(raw, {
@@ -30,8 +42,5 @@ export async function GET() {
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300',
       },
     })
-  } catch (err) {
-    console.error('[search-index] Failed to serve search index:', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
-}
+)

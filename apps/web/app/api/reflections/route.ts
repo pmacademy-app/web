@@ -8,12 +8,12 @@
  * Accepts both stable les_XXXXXX IDs (v2) and legacy slug strings (v1 backward compat).
  */
 
-import { cookies } from 'next/headers'
-import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUser } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { recordReflectionAction } from '@/lib/lessons-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 const reflectionPostSchema = z.object({
   lesson_id: z.string(),  // accepts stable les_XXXXXX IDs or legacy slugs
@@ -21,76 +21,70 @@ const reflectionPostSchema = z.object({
   is_public: z.boolean().default(false),
 })
 
-export async function GET(request: NextRequest) {
-  try {
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'reflections.read',
+    summary: 'Unexpected failure loading a reflection',
+  },
+  async ({ request, actor }) => {
     const { searchParams } = new URL(request.url)
     // Accept both ?lesson_id= (v2) and legacy ?lesson_slug= (v1 backward compat)
     const lessonId = searchParams.get('lesson_id') || searchParams.get('lesson_slug')
 
     if (!lessonId) {
-      return Response.json({ error: 'Missing lesson_id query parameter' }, { status: 400 })
-    }
-
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get('sb-access-token')?.value
-
-    if (!accessToken) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const authClient = createAuthenticatedServerClient(accessToken)
-    const user = await getAuthenticatedUser(authClient)
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+      throw new RouteError(400, 'VALIDATION', 'Missing lesson_id query parameter')
     }
 
     const serviceSupabase = createServiceRoleClient()
     const { data: reflection, error } = await serviceSupabase
       .from('reflections')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', requireUserId(actor))
       .eq('lesson_id', lessonId)
       .maybeSingle()
 
     if (error) {
       console.error(`[api/reflections] Error loading reflection:`, error)
-      return Response.json({ error: 'Database error' }, { status: 500 })
+      throw new RouteError(500, 'SERVER_ERROR', 'Database error')
     }
 
+    // The lesson page reads `data.content` and `data.is_public` off the top level,
+    // so the bare row (or null) stays the success shape.
     return Response.json(reflection || null)
-  } catch (err) {
-    console.error('[api/reflections GET]', err)
-    return Response.json({ error: 'Internal server error' }, { status: 500 })
   }
-}
+)
 
-export async function POST(request: NextRequest) {
-  try {
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get('sb-access-token')?.value
-
-    if (!accessToken) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const authClient = createAuthenticatedServerClient(accessToken)
-    const user = await getAuthenticatedUser(authClient)
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = await request.json()
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'reflections.write',
+    summary: 'Unexpected failure saving a reflection',
+    // N-4: an authenticated write with no ceiling before this batch. 20/hour is far
+    // above the one-per-lesson pace of real use and still bounds a scripted flood.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `reflections_write_${actor.userId}` : null),
+        limit: 20,
+        windowMs: 60 * 60 * 1000,
+      },
+    ],
+  },
+  async ({ request, actor }) => {
+    const body = await request.json().catch(() => null)
 
     // Support both v2 (lesson_id) and legacy (lesson_slug) clients during transition
-    const normalizedBody = {
-      ...body,
-      lesson_id: body.lesson_id ?? body.lesson_slug,
-    }
+    const raw = (body ?? {}) as Record<string, unknown>
+    const normalizedBody: Record<string, unknown> = { ...raw, lesson_id: raw.lesson_id ?? raw.lesson_slug }
     delete normalizedBody.lesson_slug
 
     const parsed = reflectionPostSchema.safeParse(normalizedBody)
     if (!parsed.success) {
-      return Response.json({ error: parsed.error.flatten() }, { status: 400 })
+      throw new RouteError(
+        400,
+        'VALIDATION',
+        parsed.error.issues[0]?.message || 'Invalid reflection.'
+      )
     }
 
     const { lesson_id, content, is_public } = parsed.data
@@ -98,19 +92,12 @@ export async function POST(request: NextRequest) {
 
     const result = await recordReflectionAction(
       serviceSupabase,
-      user.id,
+      requireUserId(actor),
       lesson_id,
       content,
       is_public
     )
 
     return Response.json(result)
-  } catch (err) {
-    console.error('[api/reflections POST]', err)
-    const errorMsg = err instanceof Error ? err.message : 'Internal server error'
-    return Response.json(
-      { error: errorMsg },
-      { status: 500 }
-    )
   }
-}
+)

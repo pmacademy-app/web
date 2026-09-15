@@ -1,90 +1,59 @@
 import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { z } from 'zod'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { getFriendLeaderboard, addFriend, removeFriend } from '@/lib/leaderboard-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
+const addFriendSchema = z.object({
+  username: z.string().min(1, 'Username is required to add friend.'),
+})
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
+const removeFriendSchema = z.object({
+  friendId: z.string().min(1, 'friendId parameter is required.'),
+})
 
+export const GET = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'friends.read',
+    summary: 'Unexpected failure fetching friend leaderboard',
+  },
+  async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const friendsEntries = await getFriendLeaderboard(supabase, user.id)
+    const friendsEntries = await getFriendLeaderboard(supabase, requireUserId(actor))
 
-    return NextResponse.json({
-      success: true,
-      friendsEntries,
-    })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch friends.'
-    console.error('[API GET /api/friends] Error:', error)
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ success: true, friendsEntries })
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
-    const body = await request.json()
-    const { username } = body ?? {}
-
-    if (!username || typeof username !== 'string') {
-      return NextResponse.json({ error: 'Username is required to add friend.' }, { status: 400 })
-    }
-
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'friends.add',
+    summary: 'Unexpected failure adding a study friend',
+    body: addFriendSchema,
+  },
+  async ({ actor, body }) => {
     const supabase = createServiceRoleClient()
-    const result = await addFriend(supabase, user.id, username.trim())
+    const result = await addFriend(supabase, requireUserId(actor), body.username.trim())
 
-    return NextResponse.json({
-      success: true,
-      message: result.message,
-    })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to add friend.'
-    console.error('[API POST /api/friends] Error:', error)
-    return NextResponse.json({ error: message }, { status: 400 })
+    return NextResponse.json({ success: true, message: result.message })
   }
-}
+)
 
-export async function DELETE(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Authenticated session required.' },
-        { status: 401 }
-      )
-    }
-
-    const { searchParams } = new URL(request.url)
-    const friendId = searchParams.get('friendId')
-
-    if (!friendId) {
-      return NextResponse.json({ error: 'friendId parameter is required.' }, { status: 400 })
-    }
-
+export const DELETE = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'friends.remove',
+    summary: 'Unexpected failure removing a study friend',
+    query: removeFriendSchema,
+  },
+  async ({ actor, query }) => {
     const supabase = createServiceRoleClient()
-    await removeFriend(supabase, user.id, friendId)
+    await removeFriend(supabase, requireUserId(actor), query.friendId)
 
     return NextResponse.json({ success: true })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to remove friend.'
-    console.error('[API DELETE /api/friends] Error:', error)
-    return NextResponse.json({ error: message }, { status: 400 })
   }
-}
+)

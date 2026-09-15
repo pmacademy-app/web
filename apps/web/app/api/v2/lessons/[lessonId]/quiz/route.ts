@@ -8,12 +8,12 @@
  * v2 counterpart to /api/lessons/[slug]/quiz.
  */
 
-import { cookies } from 'next/headers'
-import { NextRequest } from 'next/server'
 import { z } from 'zod'
-import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
-import { getAuthenticatedUser } from '@/lib/auth'
+
+import { requireUserId } from '@/lib/api/actor'
+import { withRoute } from '@/lib/api/with-route'
 import { recordQuizAttemptAction } from '@/lib/lessons-db'
+import { createServiceRoleClient } from '@/lib/supabase'
 
 const quizAttemptSchema = z.object({
   attempts: z.array(z.object({
@@ -23,51 +23,35 @@ const quizAttemptSchema = z.object({
   })).min(1),
 })
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ lessonId: string }> }
-) {
-  try {
-    const { lessonId } = await params
-    const cookieStore = await cookies()
-    const accessToken = cookieStore.get('sb-access-token')?.value
+/** The ad-hoc 401 probe these three v2 routes carried, preserved through the wrapper. */
+const warnUnauthorized = () => {
+  console.warn('[auth-401-monitor] 401 Unauthorized in API v2')
+}
 
-    if (!accessToken) {
-      { console.warn('[auth-401-monitor] 401 Unauthorized in API v2'); return Response.json({ error: 'Unauthorized' }, { status: 401 }); }
-    }
-
-    const authClient = createAuthenticatedServerClient(accessToken)
-    const user = await getAuthenticatedUser(authClient)
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = await request.json()
-    const parsed = quizAttemptSchema.safeParse(body)
-    if (!parsed.success) {
-      return Response.json({ error: parsed.error.flatten() }, { status: 400 })
-    }
-
-    const { attempts } = parsed.data
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner'] },
+    operation: 'v2.lessons.quiz.submit',
+    summary: 'Unexpected failure recording a quiz attempt',
+    body: quizAttemptSchema,
+    onDenied: warnUnauthorized,
+  },
+  async ({ actor, body, params }) => {
     const serviceSupabase = createServiceRoleClient()
 
     // Pass only the necessary fields to the service action so correctness validation is strictly server-side
-    const cleanAttempts = attempts.map(a => ({
+    const cleanAttempts = body.attempts.map((a) => ({
       question_id: a.question_id,
       selected_option: a.selected_option,
     }))
 
     const result = await recordQuizAttemptAction(
       serviceSupabase,
-      user.id,
-      lessonId,
+      requireUserId(actor),
+      params.lessonId,
       cleanAttempts
     )
 
     return Response.json(result)
-  } catch (err) {
-    console.error('[api/v2/lessons/[lessonId]/quiz POST]', err)
-    const errorMsg = err instanceof Error ? err.message : 'Internal server error'
-    return Response.json({ error: errorMsg }, { status: 500 })
   }
-}
+)

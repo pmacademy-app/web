@@ -1,25 +1,45 @@
 import { NextResponse } from 'next/server'
-import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+
+import { RouteError, withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { evaluateRateLimit } from '@/lib/rate-limit'
 
-export async function POST(request: Request) {
-  try {
-    const user = await getAuthenticatedUserFromRequest(request)
-    const rateCheck = await evaluateRateLimit(user ? user.id : 'anon_feedback', { limit: 5, windowMs: 60 * 1000 })
-    if (!rateCheck.success) {
-      return NextResponse.json({ error: 'Too many feedback submissions. Please wait a moment.' }, { status: 429 })
-    }
+/**
+ * Deliberately open to `anonymous` — feedback is collected from signed-out visitors
+ * too, and the row simply carries a null `user_id`.
+ *
+ * The bucket keeps its pre-migration shape exactly: per-learner when signed in, and
+ * one shared `anon_feedback` bucket otherwise. A shared anonymous bucket is a
+ * stricter ceiling than a per-IP one, so it is preserved rather than "improved".
+ * The rule is declared on the wrapper and no body schema is, which keeps the
+ * original order — authenticate, throttle, then parse.
+ */
+export const POST = withRoute(
+  {
+    actor: { allow: ['learner', 'anonymous'] },
+    operation: 'feedback.submit',
+    summary: 'Unexpected failure recording learner feedback',
+    errorMessage: 'Error submitting feedback.',
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? actor.userId : 'anon_feedback'),
+        limit: 5,
+        windowMs: 60 * 1000,
+      },
+    ],
+  },
+  async ({ request, actor }) => {
+    const userId = actor.kind === 'learner' ? actor.userId : null
 
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
     const { content, category, sourceEvent, rating, pageUrl, promptKey, action } = body
 
+    const supabase = createServiceRoleClient()
+
     // Handle prompt dismissal without content
-    if (action === 'dismiss' && promptKey && user) {
-      const supabase = createServiceRoleClient()
+    if (action === 'dismiss' && promptKey && userId) {
       await supabase.from('user_feedback_prompts')
         .upsert({
-          user_id: user.id,
+          user_id: userId,
           prompt_key: String(promptKey),
           action: 'dismissed',
         })
@@ -28,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     if (!content || typeof content !== 'string' || !content.trim()) {
-      return NextResponse.json({ error: 'Feedback content is required.' }, { status: 400 })
+      throw new RouteError(400, 'VALIDATION', 'Feedback content is required.')
     }
 
     const cleanContent = content.trim().substring(0, 3000)
@@ -37,12 +57,10 @@ export async function POST(request: Request) {
     const cleanRating = typeof rating === 'number' && rating >= 1 && rating <= 5 ? rating : null
     const cleanUrl = typeof pageUrl === 'string' ? pageUrl.trim().substring(0, 200) : null
 
-    const supabase = createServiceRoleClient()
-
     const { data, error } = await supabase
       .from('user_feedback')
       .insert({
-        user_id: user ? user.id : null,
+        user_id: userId,
         category: cleanCategory,
         source_event: cleanSource,
         content: cleanContent,
@@ -55,22 +73,19 @@ export async function POST(request: Request) {
 
     if (error || !data) {
       console.error('[api/feedback] Error inserting private feedback:', error)
-      return NextResponse.json({ error: 'Failed to record feedback.' }, { status: 500 })
+      throw new RouteError(500, 'SERVER_ERROR', 'Failed to record feedback.')
     }
 
     // Record prompt key submission if prompted
-    if (promptKey && user) {
+    if (promptKey && userId) {
       await supabase.from('user_feedback_prompts')
         .upsert({
-          user_id: user.id,
+          user_id: userId,
           prompt_key: String(promptKey),
           action: 'submitted',
         })
     }
 
     return NextResponse.json({ success: true, feedbackId: data.id })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Error submitting feedback.'
-    return NextResponse.json({ error: message }, { status: 500 })
   }
-}
+)

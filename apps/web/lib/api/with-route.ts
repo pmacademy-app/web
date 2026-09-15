@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 
 import { apiError, apiInternalError } from '@/lib/errors/api-response'
+import { PublicError } from '@/lib/errors/public-error'
 import type { ErrorDomain } from '@/lib/monitoring/error-taxonomy'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 
@@ -308,6 +309,17 @@ export function withRoute<
           code: cause.code,
           message: cause.message,
           extra: cause.extra,
+        })
+      }
+
+      // A service-layer refusal whose copy is ours. Same treatment as
+      // `RouteError` — the distinction between the two is only which layer
+      // raised it, and the client must not be able to tell.
+      if (cause instanceof PublicError) {
+        return apiError({
+          status: cause.status,
+          code: cause.code,
+          message: cause.message,
         })
       }
 

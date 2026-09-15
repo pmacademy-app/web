@@ -152,8 +152,11 @@ describe('System Monitoring & Error Instrumentation Unit Test Suite', () => {
   })
 
   it('GET /api/health returns operational status and telemetry headers', async () => {
+    const { NextRequest } = await import('next/server')
     const { GET: handleHealthCheck } = await import('../../app/api/health/route')
-    const res = await handleHealthCheck()
+    // B7-E: the route is behind `withRoute`, which needs the Request to resolve the
+    // (anonymous) actor. The assertions below are unchanged.
+    const res = await handleHealthCheck(new NextRequest('http://localhost:3000/api/health'))
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.status).toBe('ok')
