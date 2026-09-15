@@ -388,7 +388,15 @@ describe('B7-B — withRoute: error handling', () => {
     const body = await res.json()
 
     expect(res.status).toBe(409)
-    expect(body).toEqual({ success: false, error: 'That title is already taken.', code: 'DUPLICATE' })
+    // B9-B added `requestId` to every envelope. It is asserted by shape rather than
+    // value because it is generated per request; the rest of the body is still
+    // matched exactly.
+    expect(body).toEqual({
+      success: false,
+      error: 'That title is already taken.',
+      code: 'DUPLICATE',
+      requestId: expect.stringMatching(/^req_[0-9a-f]{32}$/),
+    })
     expect(body.errorId).toBeUndefined()
     expect(logErrorReport).not.toHaveBeenCalled()
   })
@@ -448,9 +456,12 @@ describe('B7-B — withRoute: error handling', () => {
     })
     const body = await (await route(get())).json()
 
-    expect(Object.keys(body).sort()).toEqual(['code', 'error', 'errorId', 'success'])
+    // `requestId` joined the envelope in B9-B. It sits alongside `errorId` rather
+    // than replacing it: `errorId` names the failure, `requestId` names the request.
+    expect(Object.keys(body).sort()).toEqual(['code', 'error', 'errorId', 'requestId', 'success'])
     expect(body.success).toBe(false)
     expect(typeof body.error).toBe('string')
+    expect(body.requestId).toMatch(/^req_[0-9a-f]{32}$/)
   })
 
   it('uses the route-declared incident summary when one is given', async () => {
@@ -586,8 +597,17 @@ describe('B7-B — withRoute: envelope is byte-compatible with lib/errors/api-re
     })
 
     const wrapped = await route(get())
-    const direct = apiError({ status: 409, code: 'DUPLICATE', message: 'That title is already taken.' })
+    // The id is generated per request, so it is read off the wrapper's own response
+    // and handed to the direct call. The comparison stays byte-exact.
+    const requestId = wrapped.headers.get('x-request-id') as string
+    const direct = apiError({
+      status: 409,
+      code: 'DUPLICATE',
+      message: 'That title is already taken.',
+      requestId,
+    })
 
+    expect(requestId).toMatch(/^req_[0-9a-f]{32}$/)
     expect(await bodyOf(wrapped)).toBe(await bodyOf(direct))
     expect(wrapped.status).toBe(direct.status)
   })
@@ -600,7 +620,12 @@ describe('B7-B — withRoute: envelope is byte-compatible with lib/errors/api-re
     )
 
     const wrapped = await route(get())
-    const direct = apiError({ status: 401, code: 'UNAUTHORIZED', message: 'Authentication required.' })
+    const direct = apiError({
+      status: 401,
+      code: 'UNAUTHORIZED',
+      message: 'Authentication required.',
+      requestId: wrapped.headers.get('x-request-id') as string,
+    })
 
     expect(await bodyOf(wrapped)).toBe(await bodyOf(direct))
   })
@@ -624,6 +649,7 @@ describe('B7-B — withRoute: envelope is byte-compatible with lib/errors/api-re
       status: 429,
       code: 'RATE_LIMITED',
       message: 'Too many requests. Please wait a while before trying again.',
+      requestId: wrapped.headers.get('x-request-id') as string,
       extra: { resetInMs: 4242 },
     })
 

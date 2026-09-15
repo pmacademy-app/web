@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { apiError, apiInternalError } from '@/lib/errors/api-response'
 import { PublicError } from '@/lib/errors/public-error'
 import type { ErrorDomain } from '@/lib/monitoring/error-taxonomy'
+import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 
 import { resolveActor, type Actor, type ActorDenial, type ActorPolicy } from './actor'
@@ -89,6 +90,15 @@ export interface RouteHandlerContext<TBody, TQuery, TRequest extends Request = N
   actor: Actor
   body: TBody
   query: TQuery
+  /**
+   * This request's correlation id (B9-B).
+   *
+   * Resolved once here and handed to the handler, rather than re-derived: a
+   * generated id differs on every call, so deriving it twice would produce two
+   * traces for one request. Safe to put in a log line — it is either ours or a
+   * caller-supplied value that passed a strict allowlist.
+   */
+  requestId: string
   /**
    * Resolved dynamic segment params, `{}` for a static route.
    *
@@ -217,6 +227,13 @@ export function withRoute<
   handler: (context: RouteHandlerContext<TBody, TQuery, TRequest>) => Promise<Response>
 ): (request: Request, context?: NextRouteContext) => Promise<Response> {
   return async function routeWithContract(request: Request, context?: NextRouteContext): Promise<Response> {
+    // Resolved before anything else so every exit path below — refusal, validation
+    // failure, throttle, handler response, unexpected fault — can carry it. The
+    // proxy stamps this header on the routes it matches; the routes it does not
+    // match (cron, the webhooks, health) still get an id here, which is the reason
+    // this cannot live in the proxy alone.
+    const requestId = resolveRequestId(request)
+
     try {
       // 1. Who is calling?
       const resolution = await resolveActor(request, config.actor)
@@ -238,6 +255,7 @@ export function withRoute<
           status: resolution.status,
           code: resolution.code,
           message: resolution.status === 401 ? UNAUTHORIZED_MESSAGE : FORBIDDEN_MESSAGE,
+          requestId,
         })
       }
       const actor = resolution.actor
@@ -250,7 +268,12 @@ export function withRoute<
         try {
           raw = await request.json()
         } catch {
-          return apiError({ status: 400, code: 'VALIDATION', message: 'Invalid request body. JSON object expected.' })
+          return apiError({
+            status: 400,
+            code: 'VALIDATION',
+            message: 'Invalid request body. JSON object expected.',
+            requestId,
+          })
         }
 
         const parsed = config.body.safeParse(raw)
@@ -259,6 +282,7 @@ export function withRoute<
             status: 400,
             code: 'VALIDATION',
             message: firstIssueMessage(parsed.error, 'Invalid request body.'),
+            requestId,
           })
         }
         body = parsed.data
@@ -275,6 +299,7 @@ export function withRoute<
             status: 400,
             code: 'VALIDATION',
             message: firstIssueMessage(parsed.error, 'Invalid query parameters.'),
+            requestId,
           })
         }
         query = parsed.data
@@ -288,19 +313,29 @@ export function withRoute<
             status: 429,
             code: 'RATE_LIMITED',
             message: RATE_LIMITED_MESSAGE,
+            requestId,
             extra: { resetInMs: verdict.resetInMs },
           })
         }
       }
 
       // 4. The route's own work.
-      return await handler({
+      const response = await handler({
         request: request as TRequest,
         actor,
         body,
         query,
+        requestId,
         params: await resolveParams(context),
       })
+
+      // Stamped on the success path too, so a request that behaved is as traceable
+      // as one that did not. The handler's own headers are preserved; only this one
+      // is added, and only when the handler did not already set it.
+      if (!response.headers.has(REQUEST_ID_HEADER)) {
+        response.headers.set(REQUEST_ID_HEADER, requestId)
+      }
+      return response
     } catch (cause) {
       // An expected refusal the handler raised: already-safe copy, no incident.
       if (cause instanceof RouteError) {
@@ -308,6 +343,7 @@ export function withRoute<
           status: cause.status,
           code: cause.code,
           message: cause.message,
+          requestId,
           extra: cause.extra,
         })
       }
@@ -320,6 +356,7 @@ export function withRoute<
           status: cause.status,
           code: cause.code,
           message: cause.message,
+          requestId,
         })
       }
 
@@ -330,6 +367,7 @@ export function withRoute<
         domain: config.domain ?? 'api',
         operation: config.operation,
         summary: config.summary ?? `Unhandled exception in ${config.operation}`,
+        requestId,
         ...(config.errorMessage ? { message: config.errorMessage } : {}),
         ...(config.errorCode ? { code: config.errorCode } : {}),
       })

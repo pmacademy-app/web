@@ -303,6 +303,10 @@ export async function logErrorReport(report: ErrorReport): Promise<string | null
 
   const details = sanitizeDetails({
     ...(resolved.details || {}),
+    // B9-B. In `details`, never in the fingerprint above: the fingerprint is what
+    // collapses repeats of one incident into a single alert, and a per-request value
+    // in it would give every occurrence a distinct hash.
+    ...(resolved.requestId ? { requestId: resolved.requestId } : {}),
     ...(resolved.provider
       ? {
           provider: resolved.provider.name,
@@ -317,7 +321,8 @@ export async function logErrorReport(report: ErrorReport): Promise<string | null
   }) as Record<string, unknown>
 
   console.error(
-    `[SystemError:${resolved.severity.toUpperCase()}:${resolved.domain}/${resolved.kind}] ${resolved.operation} - ${summary}`
+    `[SystemError:${resolved.severity.toUpperCase()}:${resolved.domain}/${resolved.kind}]` +
+      `${resolved.requestId ? ` [${resolved.requestId}]` : ''} ${resolved.operation} - ${summary}`
   )
 
   return persistIncident({

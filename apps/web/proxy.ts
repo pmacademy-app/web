@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminEmail } from '@/lib/admin/authorization'
+import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 // The proxy needs exactly one thing from the content pipeline: a slug -> lesson
 // mapping, to send an authenticated learner from a public /lessons/<slug> URL to
 // their interactive copy of that lesson.
@@ -77,7 +78,46 @@ interface ProxyUser {
   email_confirmed_at?: string
 }
 
+/**
+ * Forwards the request onward with the correlation id attached (B9-B).
+ *
+ * `NextResponse.next({ request: { headers } })` is the supported way to hand a
+ * mutated header set to the downstream handler; setting it on `request.headers`
+ * directly would not survive the hop. The id is also written to the response so a
+ * browser or a curl can read it back without parsing a body.
+ */
+function passThrough(request: NextRequest, requestId: string): NextResponse {
+  const headers = new Headers(request.headers)
+  headers.set(REQUEST_ID_HEADER, requestId)
+  const response = NextResponse.next({ request: { headers } })
+  response.headers.set(REQUEST_ID_HEADER, requestId)
+  return response
+}
+
+/**
+ * Entry point. Resolves the correlation id once, then runs the routing logic.
+ *
+ * The id is resolved here *and* independently in `withRoute`, which is deliberate
+ * rather than duplicated: the proxy's matcher excludes `api/cron`, `api/health`,
+ * `api/email/webhooks`, `api/email/unsubscribe`, `api/auth/callback`, `api/og` and
+ * `api/waitlist`, so a proxy-only implementation would leave exactly the scheduled
+ * and webhook traffic untraceable. Both sides call the same resolver, so when the
+ * proxy does run it stamps the header and the handler adopts that value instead of
+ * minting a second one.
+ */
 export async function proxy(request: NextRequest) {
+  const requestId = resolveRequestId(request)
+  const response = await routeRequest(request, requestId)
+
+  // Redirects and rewrites get the id on the way out too, so a redirected request
+  // is still traceable from the client's side.
+  if (!response.headers.has(REQUEST_ID_HEADER)) {
+    response.headers.set(REQUEST_ID_HEADER, requestId)
+  }
+  return response
+}
+
+async function routeRequest(request: NextRequest, requestId: string): Promise<NextResponse> {
   const path = request.nextUrl.pathname
   const refParam = request.nextUrl.searchParams.get('ref')
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co'
@@ -124,7 +164,7 @@ export async function proxy(request: NextRequest) {
 
   // Maintenance page must always be reachable so learners see the correct message
   if (path === '/maintenance') {
-    return withReferralCookie(NextResponse.next(), refParam)
+    return withReferralCookie(passThrough(request, requestId), refParam)
   }
 
   // Authenticated learners navigating to public /curriculum are routed to their interactive academy
@@ -159,7 +199,7 @@ export async function proxy(request: NextRequest) {
 
   // Fast path for non-guarded public routes
   if (!isPublicPage && !isAppPage && !isProtectedLearnerApi) {
-    return withReferralCookie(NextResponse.next(), refParam)
+    return withReferralCookie(passThrough(request, requestId), refParam)
   }
 
   const accessToken = request.cookies.get('sb-access-token')?.value
@@ -275,13 +315,13 @@ export async function proxy(request: NextRequest) {
       // If recovery session is missing or expired, redirect to request form
       return withReferralCookie(NextResponse.redirect(new URL('/reset-password?error=expired', request.url)), refParam)
     }
-    const response = newSession ? withSessionCookies(NextResponse.next(), newSession) : NextResponse.next()
+    const response = newSession ? withSessionCookies(passThrough(request, requestId), newSession) : passThrough(request, requestId)
     return withReferralCookie(response, refParam)
   }
 
   // ── Public auth pages (/login, /signup, /reset-password) ─────────────────
   if (isGeneralAuthPage) {
-    if (!user) return withReferralCookie(NextResponse.next(), refParam)
+    if (!user) return withReferralCookie(passThrough(request, requestId), refParam)
 
     // Authenticated users are routed away. Admins go straight to the console;
     // learners continue to their dashboard. This prevents onboarding from
@@ -295,7 +335,7 @@ export async function proxy(request: NextRequest) {
   // ── Admin login: guests see the form; authenticated users are routed by ──
   //    authorization (never to the learner dashboard).
   if (isAdminLoginPage) {
-    if (!user) return withReferralCookie(NextResponse.next(), refParam)
+    if (!user) return withReferralCookie(passThrough(request, requestId), refParam)
 
     const authorized = await isAdmin()
     const target = authorized ? '/admin' : ACCESS_DENIED_PAGE
@@ -306,7 +346,7 @@ export async function proxy(request: NextRequest) {
 
   // ── Access denied: always renderable ─────────────────────────────────────
   if (isAccessDeniedPage) {
-    return withReferralCookie(NextResponse.next(), refParam)
+    return withReferralCookie(passThrough(request, requestId), refParam)
   }
 
   // ── Protected learner API routes (maintenance & email verification) ─────
@@ -337,9 +377,9 @@ export async function proxy(request: NextRequest) {
     }
 
     if (newSession) {
-      return withReferralCookie(withSessionCookies(NextResponse.next(), newSession), refParam)
+      return withReferralCookie(withSessionCookies(passThrough(request, requestId), newSession), refParam)
     }
-    return withReferralCookie(NextResponse.next(), refParam)
+    return withReferralCookie(passThrough(request, requestId), refParam)
   }
 
   // ── Protected application routes ─────────────────────────────────────────
@@ -397,13 +437,13 @@ export async function proxy(request: NextRequest) {
     }
 
     if (newSession) {
-      return withReferralCookie(withSessionCookies(NextResponse.next(), newSession), refParam)
+      return withReferralCookie(withSessionCookies(passThrough(request, requestId), newSession), refParam)
     }
 
-    return withReferralCookie(NextResponse.next(), refParam)
+    return withReferralCookie(passThrough(request, requestId), refParam)
   }
 
-  return withReferralCookie(NextResponse.next(), refParam)
+  return withReferralCookie(passThrough(request, requestId), refParam)
 }
 
 /**

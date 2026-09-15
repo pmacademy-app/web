@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { classifyAuthError, type AuthErrorContext } from '@/lib/auth/errors'
 import type { ErrorDomain } from '@/lib/monitoring/error-taxonomy'
+import { REQUEST_ID_HEADER } from '@/lib/monitoring/request-id'
 import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
 
 /**
@@ -26,6 +27,14 @@ export interface ApiErrorBody {
   code: string
   /** Correlation id for an internal failure; quote it to support. */
   errorId?: string
+  /**
+   * The request's correlation id (B9-B).
+   *
+   * Distinct from `errorId`, which names one failure. This names the request, is
+   * present whether or not anything failed, and is the value an operator greps for
+   * to see everything that request touched.
+   */
+  requestId?: string
   /** Route-specific additions (e.g. `requiresVerification`, `email`). */
   [key: string]: unknown
 }
@@ -50,6 +59,7 @@ export function apiError(options: {
   code: string
   message: string
   errorId?: string
+  requestId?: string
   extra?: Record<string, unknown>
 }): NextResponse {
   const body: ApiErrorBody = {
@@ -62,9 +72,15 @@ export function apiError(options: {
     error: sanitizeErrorMessage(options.message),
     code: options.code,
     ...(options.errorId ? { errorId: options.errorId } : {}),
+    ...(options.requestId ? { requestId: options.requestId } : {}),
     ...(options.extra || {}),
   }
-  return NextResponse.json(body, { status: options.status })
+  // Echoed as a header too, so a caller can correlate a response it did not parse
+  // — a 500 during a fetch, or a request traced from the browser's network panel.
+  return NextResponse.json(body, {
+    status: options.status,
+    ...(options.requestId ? { headers: { [REQUEST_ID_HEADER]: options.requestId } } : {}),
+  })
 }
 
 /**
@@ -88,6 +104,8 @@ export async function apiInternalError(options: {
   code?: string
   message?: string
   subject?: { userId?: string; maskedEmail?: string; templateKey?: string }
+  /** The originating request's correlation id, recorded on the incident. */
+  requestId?: string
   extra?: Record<string, unknown>
 }): Promise<NextResponse> {
   const errorId = `err_${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`
@@ -100,6 +118,7 @@ export async function apiInternalError(options: {
       operation: options.operation,
       summary: options.summary,
       subject: options.subject,
+      requestId: options.requestId,
       details: {
         errorId,
         // Sanitized by the logger before it is persisted.
@@ -117,6 +136,7 @@ export async function apiInternalError(options: {
     code: options.code ?? 'SERVER_ERROR',
     message: options.message ?? GENERIC_SERVER_ERROR_MESSAGE,
     errorId,
+    requestId: options.requestId,
     extra: options.extra,
   })
 }

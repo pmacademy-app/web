@@ -205,6 +205,15 @@ export interface ErrorReport {
   allProvidersFailed?: boolean
   /** Free-form diagnostic context. Sanitized before it is persisted. */
   details?: Record<string, unknown>
+  /**
+   * The originating request's correlation id (B9-B).
+   *
+   * Recorded in `details` rather than as a column so no migration is needed, and
+   * deliberately kept out of the fingerprint — an id that changes per request would
+   * make every occurrence hash differently and defeat deduplication, which is the
+   * same failure mode `stabilizeForFingerprint` exists to prevent.
+   */
+  requestId?: string
 }
 
 /** An `ErrorReport` with every derived field filled in. */
