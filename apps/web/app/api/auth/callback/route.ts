@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
 import { applyPendingReferral } from '@/lib/referral/referral-service'
+import { log } from '@/lib/monitoring/log'
 
 /**
  * Redeems a referral code that was recorded at signup and deliberately deferred.
@@ -17,7 +18,7 @@ async function redeemPendingReferral(
   try {
     await applyPendingReferral(supabase, user)
   } catch (err) {
-    console.warn('[auth/callback] Pending referral attribution failed (non-fatal):', err)
+    log.warnException('auth.callback.referral_attribution_failed', err)
   }
 }
 
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
         return redirectWithSession(destination, data.session)
       }
     } catch (err) {
-      console.error('[auth/callback] Unexpected error during code exchange:', err)
+      log.exception('auth.callback.code_exchange_failed', err)
     }
   }
 
@@ -127,7 +128,7 @@ export async function GET(request: NextRequest) {
               .update({ email: data.user.email })
               .eq('id', data.user.id)
           } catch (syncErr) {
-            console.error('[auth/callback] Failed to sync public.users.email after email_change:', syncErr)
+            log.exception('auth.callback.email_sync_failed', syncErr)
           }
         }
 
@@ -151,7 +152,7 @@ export async function GET(request: NextRequest) {
               },
             })
           } catch (notifErr) {
-            console.warn('[auth/callback] user.verified notification dispatch warning:', notifErr)
+            log.warnException('auth.callback.verified_dispatch_failed', notifErr)
           }
         }
 
@@ -171,10 +172,10 @@ export async function GET(request: NextRequest) {
       }
 
       if (error) {
-        console.error('[auth/callback] verifyOtp error:', error.message)
+        log.error('auth.callback.verify_otp_rejected', { reason: error.message })
       }
     } catch (err) {
-      console.error('[auth/callback] Unexpected error during OTP verification:', err)
+      log.exception('auth.callback.verify_otp_failed', err)
     }
   }
 

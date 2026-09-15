@@ -6,7 +6,7 @@ import type {
   PortfolioSectionId,
   LearnerSubmittedCapstoneSummary,
 } from '@/lib/portfolio-db'
-import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio-db'
+import { DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio'
 import { calculatePortfolioReadiness, calculatePortfolioVerification } from '@/lib/portfolio-readiness'
 import { PortfolioReadinessCard } from '@/components/settings/PortfolioReadinessCard'
 import { PortfolioVerificationCard } from '@/components/settings/PortfolioVerificationCard'

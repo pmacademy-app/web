@@ -164,3 +164,32 @@ export function generateProfilePageJsonLd(options: PersonJsonLdOptions): Record<
   }
 }
 
+/**
+ * Portfolio section identity and the default section order.
+ *
+ * These live here, in the module with no imports, rather than in `portfolio-db.ts`
+ * with the queries. They are pure data that the settings form needs in the browser,
+ * and importing them from the data layer dragged the entire server graph into the
+ * client bundle — `portfolio-db` reaches the notification dispatcher, which reaches
+ * the email queue processor. That was invisible until B9-C put `node:async_hooks`
+ * at the end of that chain and the browser build refused it.
+ *
+ * `portfolio-db` re-exports both names, so existing server call sites are unchanged.
+ */
+export type PortfolioSectionId = 'hero' | 'radar' | 'progress' | 'capstones' | 'achievements'
+
+export const VALID_PORTFOLIO_SECTIONS: PortfolioSectionId[] = [
+  'hero',
+  'radar',
+  'progress',
+  'capstones',
+  'achievements',
+]
+
+export const DEFAULT_PORTFOLIO_LAYOUT: PortfolioSectionId[] = [
+  'hero',
+  'radar',
+  'progress',
+  'capstones',
+  'achievements',
+]

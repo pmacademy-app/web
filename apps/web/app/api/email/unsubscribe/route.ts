@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { withRoute } from '@/lib/api/with-route'
 import { BRAND } from '@/lib/brand'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { log } from '@/lib/monitoring/log'
 
 /**
  * Deliberately open to every actor kind, and deliberately keeps its own catch.
@@ -131,7 +132,7 @@ export const GET = withRoute(
     // The exception is logged, never published. The JSON branch used to return
     // `err.message` to an unauthenticated caller — the N-3 pattern, on a public
     // endpoint this time.
-    console.error('[email/unsubscribe] Unexpected failure:', err)
+    log.exception('email.unsubscribe.failed', err)
     if (isJson) {
       return NextResponse.json(
         { success: false, error: 'An unexpected error occurred. Please try again later.' },

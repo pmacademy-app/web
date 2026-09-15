@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { sendEmail } from '@/lib/email'
 import { EMAIL_HTTP_TIMEOUT_MS } from '@/lib/notifications/config'
+import { log } from '@/lib/monitoring/log'
 
 /**
  * True when a provider's bounce payload explicitly reports a TRANSIENT failure.
@@ -150,7 +151,7 @@ export async function POST(request: Request) {
         const isValid = verifyResendWebhookSignature(request, rawBody, resendSecret)
         if (!isValid) {
           const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id') || 'unknown'
-          console.warn('[ResendWebhook] Unauthorized webhook request: Svix signature verification failed.')
+          log.warn('email.webhook.signature_rejected', { provider: 'resend' })
           const { logSystemError } = await import('@/lib/monitoring/logger')
           void logSystemError({
             severity: 'warning',
@@ -166,7 +167,7 @@ export async function POST(request: Request) {
       if (brevoSecret) {
         const isValid = verifyBrevoWebhookAuth(request, brevoSecret)
         if (!isValid) {
-          console.warn('[BrevoWebhook] Unauthorized webhook request: Brevo secret verification failed.')
+          log.warn('email.webhook.signature_rejected', { provider: 'brevo' })
           const { logSystemError } = await import('@/lib/monitoring/logger')
           void logSystemError({
             severity: 'warning',
@@ -178,7 +179,7 @@ export async function POST(request: Request) {
         }
       } else if (resendSecret) {
         // If Resend secret is configured but request lacks Svix headers and no Brevo secret is configured, reject
-        console.warn('[EmailWebhook] Unauthorized webhook request: Missing authentication headers.')
+        log.warn('email.webhook.unauthenticated', { reason: 'missing_headers' })
         return NextResponse.json({ error: 'Unauthorized: Missing webhook authentication' }, { status: 401 })
       }
     }
@@ -235,7 +236,9 @@ export async function POST(request: Request) {
     if (eventType === 'email.bounced' && isTransientBounce(data)) {
       eventType = 'email.bounced_soft'
     }
-    console.log('[EmailWebhook] Inbound webhook received event type:', eventType, 'emailId:', emailId || 'none')
+    // Both values come from the provider payload, so they are caller-influenced
+    // and belong in fields rather than interpolated into the message.
+    log.info('email.webhook.received', { eventType, emailId: emailId || null })
 
     // Handle Outbound Delivery Events (sent, delivered, failed, bounced, complained)
     if (eventType !== 'email.received' && (eventType.startsWith('email.') || eventType.startsWith('brevo.'))) {
@@ -308,7 +311,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true, processed: true, outboundEventType: eventType })
       } catch (outboundErr) {
-        console.warn('[ResendWebhook] Non-fatal outbound event persistence warning:', outboundErr)
+        log.warnException('email.webhook.outbound_event_persist_failed', outboundErr)
         const { logSystemError } = await import('@/lib/monitoring/logger')
         void logSystemError({
           severity: 'error',
@@ -360,7 +363,7 @@ export async function POST(request: Request) {
         .single()
 
       if (error) {
-        console.warn('[ResendWebhook] Warning saving inbound message to DB:', error)
+        log.warn('email.webhook.inbound_persist_failed', { reason: error?.message })
         const { logSystemError } = await import('@/lib/monitoring/logger')
         void logSystemError({
           severity: 'warning',
@@ -372,7 +375,7 @@ export async function POST(request: Request) {
         insertedId = inserted.id
       }
     } catch (dbErr) {
-      console.warn('[ResendWebhook] Non-fatal DB warning (env or connection unavailable):', dbErr)
+      log.warnException('email.webhook.persist_unavailable', dbErr)
       const { logSystemError } = await import('@/lib/monitoring/logger')
       void logSystemError({
         severity: 'warning',
@@ -402,7 +405,7 @@ export async function POST(request: Request) {
         text: `Direct Inbound Email Received\n\nFrom: ${senderName} (${senderEmail})\nTo: hello@prodily.adityagangwani.me\nSubject: ${subject}\nRecord ID: ${insertedId || 'N/A'}\n\nContent:\n${finalMessageBody}`,
       })
     } catch (forwardErr) {
-      console.warn('[ResendWebhook] Non-fatal warning forwarding inbound email to Gmail:', forwardErr)
+      log.warnException('email.webhook.forward_failed', forwardErr)
       const { logSystemError } = await import('@/lib/monitoring/logger')
       void logSystemError({
         severity: 'warning',

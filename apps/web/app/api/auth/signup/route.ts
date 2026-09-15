@@ -10,6 +10,7 @@ import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/turnstile'
+import { log } from '@/lib/monitoring/log'
 
 export const runtime = 'nodejs'
 
@@ -333,7 +334,7 @@ export const POST = withRoute(
               newUserId: user.id,
             })
           } catch (refErr) {
-            console.warn('[signup] Referral attribution error in Flow B:', refErr)
+            log.warnException('auth.signup.referral_attribution_failed', refErr, { flow: 'B' })
           }
         }
 
@@ -381,7 +382,7 @@ export const POST = withRoute(
         return response
       }
     } catch (err) {
-      console.error('[api/auth/signup] Error:', err)
+      log.exception('auth.signup.failed', err)
       // Rethrown so the wrapper records the incident and returns the same envelope
       // this catch used to build by hand.
       throw err

@@ -12,6 +12,7 @@ import { EmailAutomationsService } from '../automations/service'
 import type { EmailAutomationKey } from '../automations/types'
 import { calculateRetryDelayMinutes } from './helpers'
 import { classifyProviderFailure } from '../providers/failure-classification'
+import { log } from '@/lib/monitoring/log'
 
 /** Backoff base used when the admin setting is unavailable or invalid. */
 const DEFAULT_RETRY_DELAY_MINUTES = 5
@@ -192,7 +193,7 @@ export async function enqueueNotificationItem(
     if ((priorityLevel === 'high' || priorityLevel === 'critical') && process.env.NODE_ENV !== 'test') {
       try {
         processEmailQueue(5).catch((err) => {
-          console.warn('[enqueueNotificationItem] Non-fatal background queue process error:', err)
+          log.warnException('queue.background_flush_failed', err)
         })
       } catch {
         // Non-fatal background trigger
@@ -268,7 +269,7 @@ export async function reclaimStaleProcessingItems(
       }
     }
   } catch (rpcErr) {
-    console.warn('[reclaimStaleProcessingItems] RPC reclaim_stale_processing_items unavailable, using fallback query:', rpcErr)
+    log.warnException('queue.reclaim_rpc_unavailable', rpcErr, { fallback: 'compare_and_swap' })
   }
 
   // 2. Degraded fallback using atomic compare-and-swap
@@ -347,7 +348,7 @@ export async function reclaimStaleProcessingItems(
       items: reclaimedItems,
     }
   } catch (fallbackErr) {
-    console.error('[reclaimStaleProcessingItems] Fallback query failed:', fallbackErr)
+    log.exception('queue.reclaim_fallback_failed', fallbackErr)
     return { reclaimedCount: 0, items: [] }
   }
 }
@@ -368,7 +369,7 @@ async function mapConcurrent<T, R>(
   async function worker() {
     while (nextIndex < items.length) {
       if (Date.now() - startTime > deadlineMs) {
-        console.warn(`[mapConcurrent] Execution deadline (${deadlineMs}ms) exceeded, stopping queue batch dispatch`)
+        log.warn('queue.dispatch_deadline_exceeded', { deadlineMs, dispatched: results.length })
         break
       }
       const currentIndex = nextIndex++
@@ -377,7 +378,7 @@ async function mapConcurrent<T, R>(
         const res = await fn(item)
         results.push(res)
       } catch (err) {
-        console.error('[mapConcurrent] Unhandled error in worker item:', err)
+        log.exception('queue.worker_item_failed', err)
       }
     }
   }
@@ -409,10 +410,10 @@ export async function processEmailQueue(
     const reclaimResult = await reclaimStaleProcessingItems(supabase)
     reclaimedCount = reclaimResult.reclaimedCount
     if (reclaimedCount > 0) {
-      console.info(`[processEmailQueue] Reclaimed ${reclaimedCount} stale processing queue items`)
+      log.info('queue.stale_items_reclaimed', { reclaimedCount })
     }
   } catch (reclaimErr) {
-    console.warn('[processEmailQueue] Non-fatal stale reclaim check error:', reclaimErr)
+    log.warnException('queue.stale_reclaim_check_failed', reclaimErr)
   }
 
   let claimedRows: Array<Record<string, unknown>> = []
@@ -423,7 +424,13 @@ export async function processEmailQueue(
     if (error || !data) {
       // The atomic RPC is the supported path. Falling back here is a degraded mode that
       // means a migration is missing, so make it loud instead of silently limping.
-      console.warn('[processEmailQueue] RPC claim_email_queue_items unavailable, using degraded fallback claim:', error?.message)
+      log.warn('queue.claim_rpc_unavailable', {
+        fallback: 'sequential_claim',
+        // The driver message is redacted by the logger before it is emitted; it
+        // used to reach the platform log verbatim, and a PostgREST error can carry
+        // connection details.
+        reason: error?.message,
+      })
       try {
         const { logErrorReport } = await import('@/lib/monitoring/logger')
         void logErrorReport({
@@ -479,7 +486,7 @@ export async function processEmailQueue(
       claimedRows = data as Array<Record<string, unknown>>
     }
   } catch (err) {
-    console.error('[processEmailQueue] Failed to claim queue items:', err)
+    log.exception('queue.claim_failed', err)
     return { processed: 0, delivered: 0, failed: 0, suppressed: 0, skipped: 0, reclaimed: reclaimedCount }
   }
 
@@ -563,7 +570,7 @@ export async function processEmailQueue(
           const { data: hasQuota } = await supabase.rpc('increment_daily_email_quota', { p_limit: automationsState.dailyLimit })
           quotaAvailable = hasQuota !== false
         } catch (quotaErr) {
-          console.warn('[processEmailQueue] Daily quota RPC check failed — proceeding without quota gate:', quotaErr)
+          log.warnException('queue.daily_quota_check_failed', quotaErr, { gated: false })
         }
 
         if (!quotaAvailable) {

@@ -7,6 +7,7 @@ import { ensureUserProfile } from '@/lib/auth'
 import { AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
+import { log } from '@/lib/monitoring/log'
 
 export const runtime = 'nodejs'
 
@@ -181,7 +182,7 @@ export const POST = withRoute(
 
       return response
     } catch (err) {
-      console.error('[api/auth/login] Error:', err)
+      log.exception('auth.login.failed', err)
       // Rethrown so the wrapper records the incident and returns the same envelope
       // this catch used to build by hand — safe copy plus an errorId, never
       // err.message on a public endpoint.

@@ -3,6 +3,7 @@ import { withRoute } from '@/lib/api/with-route'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { createAuthenticatedServerClient } from '@/lib/supabase'
 import { getAuthenticatedUserFromRequest } from '@/lib/auth'
+import { log } from '@/lib/monitoring/log'
 
 /**
  * GET /api/auth/session
@@ -196,7 +197,7 @@ export const POST = withRoute(
         },
       })
 
-      console.error('[api/auth/session] Error setting session cookies:', error)
+      log.exception('auth.session.cookie_write_failed', error)
       // Rethrown so the wrapper records the incident and returns the ADR-006
       // envelope with a correlating errorId; the auth-specific telemetry above is
       // preserved.

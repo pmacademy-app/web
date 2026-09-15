@@ -7,6 +7,7 @@ import { sendGovernedEmail, type GovernedEmailPurpose } from '@/lib/email-govern
 import { getClientIpBucket } from '@/lib/security/client-ip'
 import { secretMatchesAny } from '@/lib/security/constant-time'
 import { buildAuthCallbackUrl } from '@/lib/auth-url'
+import { log } from '@/lib/monitoring/log'
 
 export const runtime = 'nodejs'
 
@@ -226,7 +227,7 @@ export async function POST(request: NextRequest) {
   // 1. Verify hook secret if configured in environment (fail closed in production)
   if (!secret) {
     if (process.env.NODE_ENV === 'production') {
-      console.error('[send-email-hook] Unauthorized request: SEND_EMAIL_HOOK_SECRET is not configured in production.')
+      log.error('auth.hook.secret_not_configured', { environment: 'production' })
       try {
         const { logSystemError } = await import('@/lib/monitoring/logger')
         void logSystemError({
@@ -238,11 +239,11 @@ export async function POST(request: NextRequest) {
       } catch {}
       return jsonResponse({ error: 'Unauthorized: Missing hook secret configuration' }, 401)
     }
-    console.warn('[send-email-hook] Warning: SEND_EMAIL_HOOK_SECRET is not configured in environment. Proceeding in non-production mode.')
+    log.warn('auth.hook.secret_not_configured', { environment: 'non_production', failClosed: false })
   } else {
     const isValid = verifyHookSecret(request, rawBody, secret)
     if (!isValid) {
-      console.warn('[send-email-hook] Unauthorized request: signature/secret verification failed.')
+      log.warn('auth.hook.signature_rejected')
       try {
         const { logSystemError } = await import('@/lib/monitoring/logger')
         void logSystemError({
@@ -261,7 +262,7 @@ export async function POST(request: NextRequest) {
   try {
     payload = JSON.parse(rawBody)
   } catch (err) {
-    console.error('[send-email-hook] Invalid JSON payload:', err)
+    log.exception('auth.hook.payload_unparseable', err)
     try {
       const { logSystemError } = await import('@/lib/monitoring/logger')
       void logSystemError({
@@ -352,7 +353,10 @@ export async function POST(request: NextRequest) {
     }
 
     default: {
-      console.warn(`[send-email-hook] Unknown email_action_type: "${actionType}". Falling back to auth.verify_email.`)
+      // `actionType` comes from the hook payload, so it is caller-influenced: it is
+      // a field rather than part of the message, and the logger strips control
+      // characters from it before emitting.
+      log.warn('auth.hook.unknown_action_type', { actionType, fallbackTemplate: 'auth.verify_email' })
       templateKey = 'auth.verify_email'
       const verificationUrl = buildAuthCallbackUrl(siteUrl, tokenHash, actionType, email_data.redirect_to)
       templateVariables = { userName, verificationUrl }
@@ -365,7 +369,7 @@ export async function POST(request: NextRequest) {
   try {
     rendered = await renderEmailTemplate(templateKey, templateVariables)
   } catch (err) {
-    console.error(`[send-email-hook] Failed to render template "${templateKey}":`, err)
+    log.exception('auth.hook.template_render_failed', err, { templateKey })
     return jsonResponse({ error: `Template render failure: ${err instanceof Error ? err.message : 'Unknown'}` }, 500)
   }
 
@@ -397,7 +401,12 @@ export async function POST(request: NextRequest) {
     // A governance refusal is not a provider failure. Report it as a retryable
     // condition to Supabase Auth so GoTrue does not treat it as a hard error, and so
     // the learner's client can back off rather than hammering the endpoint.
-    console.warn(`[send-email-hook] Governed send blocked action="${actionType}" reason="${sendResult.blocked}" recipient="${masked}"`)
+    log.warn('auth.hook.send_blocked', {
+      actionType,
+      reason: sendResult.blocked,
+      // Already masked by `maskEmail`; the logger masks addresses again anyway.
+      recipient: masked,
+    })
     const blockedStatus = sendResult.blocked === 'duplicate' ? 200 : 429
     if (blockedStatus === 200) {
       // The identical message is already in flight or delivered. Reporting success is
@@ -408,7 +417,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (!sendResult.sent) {
-    console.error(`[send-email-hook] Email delivery failed for action="${actionType}" recipient="${masked}":`, sendResult.error)
+    // `sendResult.error` is provider text. It reached the platform log verbatim
+    // before B9-C, which is the F-SEC-14 leak on the highest-value path in the app.
+    log.error('auth.hook.delivery_failed', {
+      actionType,
+      recipient: masked,
+      reason: sendResult.error,
+    })
 
     // Signup verification and password reset ride this path. Without a persisted
     // incident an operator cannot tell that auth mail has stopped.

@@ -2,6 +2,7 @@ import { withRoute } from '@/lib/api/with-route'
 import { logSystemError, type ErrorSeverity } from '@/lib/monitoring/logger'
 import type { AuthErrorCode } from '@/lib/auth/errors'
 import { getClientIpBucket } from '@/lib/security/client-ip'
+import { log } from '@/lib/monitoring/log'
 
 export const runtime = 'nodejs'
 
@@ -187,7 +188,7 @@ export const POST = withRoute(
       // Deliberately not rethrown into the wrapper's incident path: this catch fires
       // when the incident sink itself failed, and reporting that failure through the
       // same sink would recurse.
-      console.warn('[auth-telemetry] Internal logging exception:', err)
+      log.warnException('auth.telemetry.persist_failed', err)
       return Response.json({ success: false }, { status: 500 })
     }
   }

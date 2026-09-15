@@ -13,7 +13,13 @@ import type { Database, TablesUpdate } from '@/lib/supabase'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { getSkillRadarSummary, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
-import { validateUsername, validateWritableUrl } from '@/lib/portfolio'
+import {
+  validateUsername,
+  validateWritableUrl,
+  DEFAULT_PORTFOLIO_LAYOUT,
+  VALID_PORTFOLIO_SECTIONS,
+  type PortfolioSectionId,
+} from '@/lib/portfolio'
 import { calculatePortfolioReadiness, calculatePortfolioVerification, type PortfolioVerificationOverride } from '@/lib/portfolio-readiness'
 import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
@@ -40,23 +46,11 @@ export interface PublicCapstoneItem {
   } | null
 }
 
-export type PortfolioSectionId = 'hero' | 'radar' | 'progress' | 'capstones' | 'achievements'
-
-export const VALID_PORTFOLIO_SECTIONS: PortfolioSectionId[] = [
-  'hero',
-  'radar',
-  'progress',
-  'capstones',
-  'achievements',
-]
-
-export const DEFAULT_PORTFOLIO_LAYOUT: PortfolioSectionId[] = [
-  'hero',
-  'radar',
-  'progress',
-  'capstones',
-  'achievements',
-]
+// Re-exported from the dependency-free module so server call sites are unchanged.
+// A browser consumer must import them from `@/lib/portfolio` directly — importing
+// them from here pulls the whole server data layer into the client bundle.
+export { VALID_PORTFOLIO_SECTIONS, DEFAULT_PORTFOLIO_LAYOUT } from '@/lib/portfolio'
+export type { PortfolioSectionId } from '@/lib/portfolio'
 
 export interface PublicPortfolioPayload {
   user: {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { withRoute } from '@/lib/api/with-route'
 import { logSystemError } from '@/lib/monitoring/logger'
+import { log } from '@/lib/monitoring/log'
 
 export const runtime = 'nodejs'
 
@@ -116,7 +117,7 @@ export const POST = withRoute(
         },
       })
 
-      console.error('[api/auth/refresh] Error refreshing session:', err)
+      log.exception('auth.refresh.failed', err)
       // Rethrown so the wrapper records the incident and returns the ADR-006
       // envelope with a correlating errorId. The route-specific telemetry above is
       // preserved.

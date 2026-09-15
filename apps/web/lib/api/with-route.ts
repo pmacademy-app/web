@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { apiError, apiInternalError } from '@/lib/errors/api-response'
 import { PublicError } from '@/lib/errors/public-error'
 import type { ErrorDomain } from '@/lib/monitoring/error-taxonomy'
+import { runWithRequestContext } from '@/lib/monitoring/request-context'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 
@@ -234,6 +235,10 @@ export function withRoute<
     // this cannot live in the proxy alone.
     const requestId = resolveRequestId(request)
 
+    // B9-C: publish the id as ambient context for the duration of the request, so
+    // structured logs raised deep in a call chain (the queue processor, four calls
+    // below a cron handler) carry it without every signature having to pass it.
+    return runWithRequestContext({ requestId }, async () => {
     try {
       // 1. Who is calling?
       const resolution = await resolveActor(request, config.actor)
@@ -372,5 +377,6 @@ export function withRoute<
         ...(config.errorCode ? { code: config.errorCode } : {}),
       })
     }
+    })
   }
 }
