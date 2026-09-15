@@ -4,10 +4,6 @@ import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { createDefaultNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
-
 export const GET = withRoute(
   {
     actor: { allow: ['learner'] },
@@ -38,14 +34,14 @@ export const GET = withRoute(
       return NextResponse.json({
         success: true,
         preferences: defaultPrefs,
-        timezone: (userRow as unknown as { timezone?: string })?.timezone || 'UTC',
+        timezone: (userRow)?.timezone || 'UTC',
       })
     }
 
     return NextResponse.json({
       success: true,
       preferences: prefRow,
-      timezone: (userRow as unknown as { timezone?: string })?.timezone || 'UTC',
+      timezone: (userRow)?.timezone || 'UTC',
     })
   } catch (err) {
     // Rethrown: the wrapper records the incident and returns generic copy with an
@@ -69,8 +65,8 @@ export const PATCH = withRoute(
     const body = await request.json()
     const supabase = createServiceRoleClient()
 
-    const { error } = await (supabase
-      .from('user_notification_preferences') as unknown as DBChain)
+    const { error } = await supabase
+      .from('user_notification_preferences')
       .upsert(
         {
           user_id: authUserId,

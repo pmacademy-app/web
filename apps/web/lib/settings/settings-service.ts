@@ -3,10 +3,6 @@ import type { Database } from '../supabase'
 import { getTotalXp } from '../xp/xp-service'
 import { getLessonIdsForModule } from '../curriculum-registry'
 
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
-
 /**
  * Resets user lesson progress, quiz attempts, flashcard SRS, reflections, and capstone submissions.
  * If moduleSlug is provided (and not 'all'), resets progress for canonical lessons in that module.
@@ -21,24 +17,24 @@ export async function resetProgress(
 
     // 1. Delete lesson progress for canonical lesson IDs in this module
     if (lessonIds.length > 0) {
-      const { error: pErr } = await (supabase
-        .from('user_lesson_progress') as unknown as DBChain)
+      const { error: pErr } = await supabase
+        .from('user_lesson_progress')
         .delete()
         .eq('user_id', userId)
         .in('lesson_id', lessonIds)
 
       if (pErr) console.warn('[settings-service] Reset module progress warning:', pErr)
 
-      const { error: qErr } = await (supabase
-        .from('quiz_attempts') as unknown as DBChain)
+      const { error: qErr } = await supabase
+        .from('quiz_attempts')
         .delete()
         .eq('user_id', userId)
         .in('lesson_id', lessonIds)
 
       if (qErr) console.warn('[settings-service] Reset module quiz attempts warning:', qErr)
 
-      const { error: fErr } = await (supabase
-        .from('user_flashcard_srs') as unknown as DBChain)
+      const { error: fErr } = await supabase
+        .from('user_flashcard_srs')
         .delete()
         .eq('user_id', userId)
         .in('lesson_id', lessonIds)
@@ -46,8 +42,8 @@ export async function resetProgress(
       if (fErr) console.warn('[settings-service] Reset module flashcards warning:', fErr)
 
       const reflectionKeys = [...lessonIds, `capstone-${moduleSlug}`]
-      const { error: rErr } = await (supabase
-        .from('reflections') as unknown as DBChain)
+      const { error: rErr } = await supabase
+        .from('reflections')
         .delete()
         .eq('user_id', userId)
         .in('lesson_id', reflectionKeys)
@@ -55,16 +51,16 @@ export async function resetProgress(
       if (rErr) console.warn('[settings-service] Reset module reflections warning:', rErr)
     } else {
       // Fallback for legacy slug pattern
-      await (supabase
-        .from('user_lesson_progress') as unknown as DBChain)
+      await supabase
+        .from('user_lesson_progress')
         .delete()
         .eq('user_id', userId)
         .ilike('lesson_id', `%${moduleSlug}%`)
     }
 
     // 2. Delete capstone submissions for this module specifically
-    const { error: cErr } = await (supabase
-      .from('capstone_submissions') as unknown as DBChain)
+    const { error: cErr } = await supabase
+      .from('capstone_submissions')
       .delete()
       .eq('user_id', userId)
       .eq('module_slug', moduleSlug)
@@ -72,36 +68,36 @@ export async function resetProgress(
     if (cErr) console.warn('[settings-service] Reset module capstones warning:', cErr)
   } else {
     // Delete all lesson progress and quiz attempts for full reset
-    const { error: pErr } = await (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
+    const { error: pErr } = await supabase
+      .from('user_lesson_progress')
       .delete()
       .eq('user_id', userId)
 
     if (pErr) console.warn('[settings-service] Reset all progress warning:', pErr)
 
-    const { error: qErr } = await (supabase
-      .from('quiz_attempts') as unknown as DBChain)
+    const { error: qErr } = await supabase
+      .from('quiz_attempts')
       .delete()
       .eq('user_id', userId)
 
     if (qErr) console.warn('[settings-service] Reset quiz attempts warning:', qErr)
 
-    const { error: cErr } = await (supabase
-      .from('capstone_submissions') as unknown as DBChain)
+    const { error: cErr } = await supabase
+      .from('capstone_submissions')
       .delete()
       .eq('user_id', userId)
 
     if (cErr) console.warn('[settings-service] Reset capstones warning:', cErr)
 
-    const { error: fErr } = await (supabase
-      .from('user_flashcard_srs') as unknown as DBChain)
+    const { error: fErr } = await supabase
+      .from('user_flashcard_srs')
       .delete()
       .eq('user_id', userId)
 
     if (fErr) console.warn('[settings-service] Reset flashcards warning:', fErr)
 
-    const { error: rErr } = await (supabase
-      .from('reflections') as unknown as DBChain)
+    const { error: rErr } = await supabase
+      .from('reflections')
       .delete()
       .eq('user_id', userId)
       
@@ -121,8 +117,8 @@ export async function resetXp(
 
   if (currentTotalXp > 0) {
     const negativeXp = -currentTotalXp
-    const { error } = await (supabase
-      .from('xp_events') as unknown as DBChain)
+    const { error } = await supabase
+      .from('xp_events')
       .insert({
         user_id: userId,
         source_type: 'user_reset',
@@ -137,8 +133,8 @@ export async function resetXp(
   }
 
   // Update denormalized total_xp cache to 0
-  await (supabase
-    .from('users') as unknown as DBChain)
+  await supabase
+    .from('users')
     .update({ total_xp: 0, level: 1 })
     .eq('id', userId)
 
@@ -152,8 +148,8 @@ export async function resetFlashcards(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<void> {
-  const { error } = await (supabase
-    .from('user_flashcard_srs') as unknown as DBChain)
+  const { error } = await supabase
+    .from('user_flashcard_srs')
     .delete()
     .eq('user_id', userId)
 
@@ -170,8 +166,8 @@ export async function resetStreak(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<void> {
-  const { error } = await (supabase
-    .from('users') as unknown as DBChain)
+  const { error } = await supabase
+    .from('users')
     .update({ current_streak: 0 })
     .eq('id', userId)
 
@@ -203,8 +199,8 @@ export async function deleteAccount(
 ): Promise<void> {
   // 1. Emit account.deleted event to drop queued notifications
   try {
-    await (supabase
-      .from('notification_events') as unknown as DBChain)
+    await supabase
+      .from('notification_events')
       .insert({
         user_id: userId,
         event_type: 'account.deleted',
@@ -212,8 +208,8 @@ export async function deleteAccount(
       })
 
     // Delete pending queued emails for this user
-    await (supabase
-      .from('email_queue') as unknown as DBChain)
+    await supabase
+      .from('email_queue')
       .delete()
       .eq('user_id', userId)
   } catch (err) {
@@ -222,8 +218,8 @@ export async function deleteAccount(
 
   // 2. Delink issued certificates from live profile (retained for legal/audit verification)
   try {
-    await (supabase
-      .from('certificates') as unknown as DBChain)
+    await supabase
+      .from('certificates')
       .update({ learner_name: 'Former Learner' })
       .eq('user_id', userId)
   } catch (err) {
@@ -255,7 +251,7 @@ export async function deleteAccount(
   for (const table of userTables) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from(table as any) as unknown as DBChain)
+      await supabase.from(table as any)
         .delete()
         .eq('user_id', userId)
     } catch (err) {
@@ -264,8 +260,8 @@ export async function deleteAccount(
   }
 
   // 4. Finally delete user row from users table
-  const { error: userErr } = await (supabase
-    .from('users') as unknown as DBChain)
+  const { error: userErr } = await supabase
+    .from('users')
     .delete()
     .eq('id', userId)
 

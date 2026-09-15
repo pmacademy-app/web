@@ -10,10 +10,6 @@ import {
 import { getRuntimeXpValues } from '../xp'
 import { awardXp, hasXpEvent } from '../xp-service'
 
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
-
 export interface WeeklySummaryData {
   daysStudied: number
   currentStreak: number
@@ -29,20 +25,11 @@ export async function updateUserStreak(
   userId: string
 ): Promise<void> {
   try {
-    const { data: userProfile, error: profileError } = (await (supabase
-      .from('users') as unknown as DBChain)
+    const { data: userProfile, error: profileError } = await supabase
+      .from('users')
       .select('timezone, current_streak, longest_streak, streak_freezes_available, last_streak_date')
       .eq('id', userId)
-      .single()) as unknown as {
-      data: {
-        timezone: string
-        current_streak: number
-        longest_streak: number
-        streak_freezes_available: number
-        last_streak_date?: string | null
-      } | null
-      error: unknown
-    }
+      .single()
 
     if (profileError || !userProfile) {
       console.error('[streaks-db] Error fetching user profile for streak:', profileError)
@@ -59,13 +46,13 @@ export async function updateUserStreak(
 
     let lastActivityDate = last_streak_date || ''
     if (!lastActivityDate) {
-      const { data: lastEvent } = (await (supabase
-        .from('xp_events') as unknown as DBChain)
+      const { data: lastEvent } = await supabase
+        .from('xp_events')
         .select('created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(1)
-        .maybeSingle()) as unknown as { data: { created_at: string } | null; error: unknown }
+        .maybeSingle()
 
       if (lastEvent?.created_at) {
         lastActivityDate = getLocalDateString(timezone, new Date(lastEvent.created_at))
@@ -83,8 +70,8 @@ export async function updateUserStreak(
     const result = recordActivityStreak(currentStreakData, timezone, now)
 
     if (result.streakIncremented || lastActivityDate !== result.todayStr) {
-      const { error: updateError } = await (supabase
-        .from('users') as unknown as DBChain)
+      const { error: updateError } = await supabase
+        .from('users')
         .update({
           current_streak: result.currentStreak,
           longest_streak: result.longestStreak,
@@ -119,11 +106,11 @@ export async function updateUserStreak(
         const milestoneDays = [3, 7, 14, 30, 60, 90, 100, 365]
         if (milestoneDays.includes(result.currentStreak)) {
           try {
-            const { data: userRec } = await (supabase
-              .from('users') as unknown as DBChain)
+            const { data: userRec } = await supabase
+              .from('users')
               .select('email, name')
               .eq('id', userId)
-              .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+              .maybeSingle()
 
             const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
             const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
@@ -159,20 +146,11 @@ export async function getUserStreakStatus(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<StreakStatusSummary> {
-  const { data: userProfile, error: profileError } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: userProfile, error: profileError } = await supabase
+    .from('users')
     .select('timezone, current_streak, longest_streak, streak_freezes_available, last_streak_date')
     .eq('id', userId)
-    .single()) as unknown as {
-    data: {
-      timezone: string
-      current_streak: number
-      longest_streak: number
-      streak_freezes_available: number
-      last_streak_date?: string | null
-    } | null
-    error: unknown
-  }
+    .single()
 
   if (profileError || !userProfile) {
     return {
@@ -191,13 +169,13 @@ export async function getUserStreakStatus(
 
   let lastActivityDate = last_streak_date || ''
   if (!lastActivityDate) {
-    const { data: lastEvent } = (await (supabase
-      .from('xp_events') as unknown as DBChain)
+    const { data: lastEvent } = await supabase
+      .from('xp_events')
       .select('created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
-      .maybeSingle()) as unknown as { data: { created_at: string } | null; error: unknown }
+      .maybeSingle()
 
     if (lastEvent?.created_at) {
       lastActivityDate = getLocalDateString(timezone, new Date(lastEvent.created_at))
@@ -220,11 +198,11 @@ export async function getWeeklySummary(
 ): Promise<WeeklySummaryData> {
   const statusSummary = await getUserStreakStatus(supabase, userId)
   
-  const { data: user } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: user } = await supabase
+    .from('users')
     .select('timezone')
     .eq('id', userId)
-    .single()) as unknown as { data: { timezone: string } | null }
+    .single()
 
   const timezone = user?.timezone || 'UTC'
   const now = new Date()
@@ -236,22 +214,18 @@ export async function getWeeklySummary(
   }
 
   const sevenDaysAgoIso = new Date(now.getTime() - 8 * 84600000).toISOString()
-  const { data: xpEvents } = (await (supabase
-    .from('xp_events') as unknown as DBChain)
+  const { data: xpEvents } = await supabase
+    .from('xp_events')
     .select('source_type, xp_amount, created_at')
     .eq('user_id', userId)
-    .gte('created_at', sevenDaysAgoIso)) as unknown as {
-    data: { source_type: string; xp_amount: number; created_at: string }[] | null
-  }
+    .gte('created_at', sevenDaysAgoIso)
 
-  const { data: progressRows } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: progressRows } = await supabase
+    .from('user_lesson_progress')
     .select('lesson_id, status, completed_at')
     .eq('user_id', userId)
     .eq('status', 'completed')
-    .gte('completed_at', sevenDaysAgoIso)) as unknown as {
-    data: { lesson_id: string; status: string; completed_at: string }[] | null
-  }
+    .gte('completed_at', sevenDaysAgoIso)
 
   const events = xpEvents || []
   const completedLessons = progressRows || []

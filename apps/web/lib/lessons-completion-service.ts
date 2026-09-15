@@ -1,11 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 
-type ProgressRow = Database['public']['Tables']['user_lesson_progress']['Row']
-
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
 
 /**
  * Service responsible for lesson completion verification and persistence.
@@ -25,12 +20,12 @@ export async function completeLesson(
   const now = new Date().toISOString()
 
   // 1. Fetch current progress
-  const { data: progress } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: progress } = await supabase
+    .from('user_lesson_progress')
     .select('*')
     .eq('user_id', userId)
     .eq('lesson_id', lessonId)
-    .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
+    .maybeSingle()
 
   const currentAttempts = progress?.quiz_attempts ?? 0
   const prevScore = progress?.quiz_score ?? 0
@@ -38,8 +33,8 @@ export async function completeLesson(
   const completedAt = progress?.completed_at ?? now
 
   // 2. Persist lesson completion progress
-  const { data: updated, error } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: updated, error } = await supabase
+    .from('user_lesson_progress')
     .upsert({
       user_id: userId,
       lesson_id: lessonId,
@@ -50,7 +45,7 @@ export async function completeLesson(
       completed_at: completedAt,
     }, { onConflict: 'user_id,lesson_id' })
     .select()
-    .single()) as unknown as { data: ProgressRow | null; error: unknown }
+    .single()
 
   if (error || !updated) {
     console.error(`[lessons-completion-service] Error marking lesson completed:`, error)
@@ -86,20 +81,20 @@ export async function isLessonUnlocked(
   if (!prevLessonId) return true
 
   // Check if user has curriculum_access_override set to true
-  const { data: user } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: user } = await supabase
+    .from('users')
     .select('curriculum_access_override')
     .eq('id', userId)
-    .maybeSingle()) as unknown as { data: { curriculum_access_override?: boolean } | null; error: unknown }
+    .maybeSingle()
 
   if (user?.curriculum_access_override) return true
 
-  const { data: prevProgress } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: prevProgress } = await supabase
+    .from('user_lesson_progress')
     .select('status')
     .eq('user_id', userId)
     .eq('lesson_id', prevLessonId)
-    .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
+    .maybeSingle()
 
   return !!prevProgress && prevProgress.status === 'completed'
 }
@@ -119,11 +114,11 @@ export async function isLessonUnlockedByOrderNumber(
 ): Promise<boolean> {
   if (lessonNumber <= 1) return true
 
-  const { data: user } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: user } = await supabase
+    .from('users')
     .select('curriculum_access_override')
     .eq('id', userId)
-    .maybeSingle()) as unknown as { data: { curriculum_access_override?: boolean } | null; error: unknown }
+    .maybeSingle()
 
   if (user?.curriculum_access_override) return true
 
@@ -131,12 +126,12 @@ export async function isLessonUnlockedByOrderNumber(
   // During Phase 1.3, old rows still have slug values in the lesson_id column
   const prevLessonSlug = `lesson-${String(prevNum).padStart(3, '0')}`
 
-  const { data: prevProgress } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: prevProgress } = await supabase
+    .from('user_lesson_progress')
     .select('status')
     .eq('user_id', userId)
     .eq('lesson_id', prevLessonSlug)
-    .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
+    .maybeSingle()
 
   return !!prevProgress && prevProgress.status === 'completed'
 }
@@ -156,20 +151,20 @@ export async function getFirstLockedLessonIndex(
   curriculumLessonIds: string[]
 ): Promise<number> {
   // Check if user has curriculum_access_override set to true
-  const { data: user } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: user } = await supabase
+    .from('users')
     .select('curriculum_access_override')
     .eq('id', userId)
-    .maybeSingle()) as unknown as { data: { curriculum_access_override?: boolean } | null; error: unknown }
+    .maybeSingle()
 
   if (user?.curriculum_access_override) return -1 // All unlocked
 
   // Fetch all completed lessons for user
-  const { data: progress } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: progress } = await supabase
+    .from('user_lesson_progress')
     .select('lesson_id')
     .eq('user_id', userId)
-    .eq('status', 'completed')) as unknown as { data: { lesson_id: string }[] | null; error: unknown }
+    .eq('status', 'completed')
 
   const completedIds = new Set(progress?.map((p) => p.lesson_id) || [])
 

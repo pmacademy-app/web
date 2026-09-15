@@ -5,10 +5,6 @@ import { RouteError, withRoute } from '@/lib/api/with-route'
 import { validateWritableUrl } from '@/lib/portfolio'
 import { createServiceRoleClient } from '@/lib/supabase'
 
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
-
 /**
  * N-2: the URL fields are https-only on write. `validateWritableUrl` is separate
  * from the read-side `validateOptionalUrl` on purpose — see the comment on it.
@@ -42,11 +38,11 @@ export const GET = withRoute(
   },
   async ({ actor }) => {
     const supabase = createServiceRoleClient()
-    const { data: profile, error } = (await (supabase
-      .from('users') as unknown as DBChain)
+    const { data: profile, error } = await supabase
+      .from('users')
       .select('name, avatar_url, bio, linkedin_url, github_url, website_url, is_portfolio_public, username')
       .eq('id', actor.kind === 'learner' ? actor.userId : '')
-      .maybeSingle()) as unknown as { data: Record<string, unknown> | null; error: unknown }
+      .maybeSingle()
 
     if (error) {
       throw new RouteError(500, 'SERVER_ERROR', 'Failed to fetch user profile.')
@@ -68,8 +64,8 @@ export const POST = withRoute(
     const { name, bio, linkedin_url, github_url, website_url } = body
 
     const supabase = createServiceRoleClient()
-    const { error } = await (supabase
-      .from('users') as unknown as DBChain)
+    const { error } = await supabase
+      .from('users')
       .update({
         name: typeof name === 'string' ? name.trim() : null,
         bio: typeof bio === 'string' ? bio.trim() : null,

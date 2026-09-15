@@ -6,6 +6,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Selected } from '@/lib/db'
 import type { Database } from '@/lib/supabase'
 import { BADGE_DEFINITIONS, type BadgeDefinition } from '@/config/badges'
 import {
@@ -17,13 +18,6 @@ import {
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 
-type UserRow = Database['public']['Tables']['users']['Row']
-type BadgeRow = Database['public']['Tables']['badges']['Row']
-type UserBadgeRow = Database['public']['Tables']['user_badges']['Row']
-
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
 
 export interface UserBadgesSummaryPayload {
   totalEarned: number
@@ -35,9 +29,12 @@ export interface UserBadgesSummaryPayload {
 
 export interface BadgeStatsPreloadedData {
   /** Already-fetched `user_lesson_progress` rows for this user — skips the internal query when provided. */
-  progressRows?: { lesson_id: string; status: string; quiz_score: number | null; quiz_attempts: number }[]
+  progressRows?: Selected<
+    'user_lesson_progress',
+    'lesson_id' | 'status' | 'quiz_score' | 'quiz_attempts'
+  >[]
   /** Already-fetched `capstone_submissions` rows (any status) for this user — filtered internally to submitted/reviewed. */
-  capstoneRows?: { status: string }[]
+  capstoneRows?: Selected<'capstone_submissions', 'status'>[]
 }
 
 /**
@@ -53,21 +50,15 @@ async function fetchUserStatsForBadges(
   preloaded?: BadgeStatsPreloadedData
 ): Promise<UserStatsForBadges> {
   // 1. Fetch user record
-  const { data: user } = (await (supabase
-    .from('users') as unknown as DBChain)
-    .select('*')
-    .eq('id', userId)
-    .single()) as unknown as { data: UserRow | null }
+  const { data: user } = await supabase.from('users').select('*').eq('id', userId).single()
 
   // 2. Completed lesson progress
   let progressRows = preloaded?.progressRows
   if (!progressRows) {
-    const { data } = (await (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
+    const { data } = await supabase
+      .from('user_lesson_progress')
       .select('lesson_id, status, quiz_score, quiz_attempts')
-      .eq('user_id', userId)) as unknown as {
-      data: { lesson_id: string; status: string; quiz_score: number | null; quiz_attempts: number }[] | null
-    }
+      .eq('user_id', userId)
     progressRows = data || []
   }
 
@@ -88,11 +79,11 @@ async function fetchUserStatsForBadges(
   if (preloaded?.capstoneRows) {
     capstonesSubmittedCount = preloaded.capstoneRows.filter((c) => c.status === 'submitted' || c.status === 'reviewed').length
   } else {
-    const { data: capstones } = (await (supabase
-      .from('capstone_submissions') as unknown as DBChain)
+    const { data: capstones } = await supabase
+      .from('capstone_submissions')
       .select('id')
       .eq('user_id', userId)
-      .in('status', ['submitted', 'reviewed'])) as unknown as { data: { id: string }[] | null }
+      .in('status', ['submitted', 'reviewed'])
     capstonesSubmittedCount = capstones?.length ?? 0
   }
 
@@ -124,9 +115,7 @@ export async function getUserBadgesData(
   const stats = await fetchUserStatsForBadges(supabase, userId, preloaded)
 
   // Fetch all badges definitions from DB
-  const { data: dbBadges } = (await (supabase
-    .from('badges') as unknown as DBChain)
-    .select('*')) as unknown as { data: BadgeRow[] | null }
+  const { data: dbBadges } = await supabase.from('badges').select('*')
 
   const badgeIdToKeyMap = new Map<string, string>()
   const keyToBadgeIdMap = new Map<string, string>()
@@ -138,11 +127,11 @@ export async function getUserBadgesData(
   }
 
   // Fetch user earned badges
-  const { data: userBadges } = (await (supabase
-    .from('user_badges') as unknown as DBChain)
+  const { data: userBadges } = await supabase
+    .from('user_badges')
     .select('badge_id, earned_at')
     .eq('user_id', userId)
-    .order('earned_at', { ascending: false })) as unknown as { data: UserBadgeRow[] | null }
+    .order('earned_at', { ascending: false })
 
   const earnedMap = new Map<string, string>() // key -> earned_at
   if (userBadges) {
@@ -196,9 +185,7 @@ export async function evaluateAndAwardBadges(
   const stats = await fetchUserStatsForBadges(supabase, userId)
 
   // Fetch db badges table map
-  const { data: dbBadges } = (await (supabase
-    .from('badges') as unknown as DBChain)
-    .select('id, key')) as unknown as { data: { id: string; key: string }[] | null }
+  const { data: dbBadges } = await supabase.from('badges').select('id, key')
 
   const keyToIdMap = new Map<string, string>()
   const idToKeyMap = new Map<string, string>()
@@ -210,10 +197,10 @@ export async function evaluateAndAwardBadges(
   }
 
   // Fetch user already earned badge IDs
-  const { data: userBadges } = (await (supabase
-    .from('user_badges') as unknown as DBChain)
+  const { data: userBadges } = await supabase
+    .from('user_badges')
     .select('badge_id')
-    .eq('user_id', userId)) as unknown as { data: { badge_id: string }[] | null }
+    .eq('user_id', userId)
 
   const earnedKeys = new Set<string>()
   if (userBadges) {
@@ -235,13 +222,11 @@ export async function evaluateAndAwardBadges(
     const badgeId = keyToIdMap.get(badgeDef.key)
     if (!badgeId) continue
 
-    const { error: insertErr } = await (supabase
-      .from('user_badges') as unknown as DBChain)
-      .insert({
-        user_id: userId,
-        badge_id: badgeId,
-        earned_at: new Date().toISOString(),
-      })
+    const { error: insertErr } = await supabase.from('user_badges').insert({
+      user_id: userId,
+      badge_id: badgeId,
+      earned_at: new Date().toISOString(),
+    })
 
     if (!insertErr) {
       newlyAwarded.push(badgeDef)

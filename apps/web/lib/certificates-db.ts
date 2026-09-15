@@ -13,11 +13,6 @@ import { generateCertificateCode } from '@/lib/certificates'
 import { PublicError } from '@/lib/errors/public-error'
 
 export type CertificateRow = Database['public']['Tables']['certificates']['Row']
-type UserRow = Database['public']['Tables']['users']['Row']
-
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
 
 export interface VerifiedCertificatePayload {
   id: string
@@ -47,22 +42,22 @@ export async function issueCertificate(
   moduleSlug: string | null = null
 ): Promise<CertificateRow> {
   // 1. Fetch user state
-  const { data: user, error: userError } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: user, error: userError } = await supabase
+    .from('users')
     .select('*')
     .eq('id', userId)
-    .single()) as unknown as { data: UserRow | null; error: unknown }
+    .single()
 
   if (userError || !user) {
     throw new PublicError('User profile not found.', { status: 404, code: 'NOT_FOUND' })
   }
 
   // 2. Fetch total completed lessons count
-  const { data: progressRows } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: progressRows } = await supabase
+    .from('user_lesson_progress')
     .select('lesson_id')
     .eq('user_id', userId)
-    .eq('status', 'completed')) as unknown as { data: { lesson_id: string }[] | null }
+    .eq('status', 'completed')
 
   const lessonsCompleted = progressRows?.length ?? 0
   const modulesCompleted = Math.min(9, Math.floor(lessonsCompleted / 10))
@@ -71,11 +66,11 @@ export async function issueCertificate(
   const certCode = generateCertificateCode(userId, type, moduleSlug)
 
   // 3. Check if certificate already exists
-  const { data: existing } = (await (supabase
-    .from('certificates') as unknown as DBChain)
+  const { data: existing } = await supabase
+    .from('certificates')
     .select('*')
     .eq('certificate_code', certCode)
-    .maybeSingle()) as unknown as { data: CertificateRow | null }
+    .maybeSingle()
 
   if (existing) {
     return existing
@@ -96,11 +91,11 @@ export async function issueCertificate(
     issued_at: new Date().toISOString(),
   }
 
-  const { data: inserted, error: insertError } = (await (supabase
-    .from('certificates') as unknown as DBChain)
+  const { data: inserted, error: insertError } = await supabase
+    .from('certificates')
     .insert(newCert)
     .select('*')
-    .single()) as unknown as { data: CertificateRow | null; error: unknown }
+    .single()
 
   if (insertError || !inserted) {
     console.error('[certificates-db] Error inserting certificate:', insertError)
@@ -135,18 +130,18 @@ export async function verifyCertificate(
   const cleanCode = codeOrId.trim()
 
   // 1. Query certificate by code or id
-  let { data: cert } = (await (supabase
-    .from('certificates') as unknown as DBChain)
+  let { data: cert } = await supabase
+    .from('certificates')
     .select('*')
     .ilike('certificate_code', cleanCode)
-    .maybeSingle()) as unknown as { data: CertificateRow | null }
+    .maybeSingle()
 
   if (!cert) {
-    const { data: certById } = (await (supabase
-      .from('certificates') as unknown as DBChain)
+    const { data: certById } = await supabase
+      .from('certificates')
       .select('*')
       .eq('id', cleanCode)
-      .maybeSingle()) as unknown as { data: CertificateRow | null }
+      .maybeSingle()
 
     cert = certById
   }
@@ -156,11 +151,11 @@ export async function verifyCertificate(
   }
 
   // 2. Resolve user info
-  const { data: user } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: user } = await supabase
+    .from('users')
     .select('username, name, avatar_url')
     .eq('id', cert.user_id)
-    .single()) as unknown as { data: { username: string | null; name: string | null; avatar_url: string | null } | null }
+    .single()
 
   const username = user?.username || `user_${cert.user_id.substring(0, 8)}`
   const learnerName = user?.name || cert.learner_name
@@ -203,11 +198,11 @@ export async function getUserCertificates(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<CertificateRow[]> {
-  const { data, error } = (await (supabase
-    .from('certificates') as unknown as DBChain)
+  const { data, error } = await supabase
+    .from('certificates')
     .select('*')
     .eq('user_id', userId)
-    .order('issued_at', { ascending: false })) as unknown as { data: CertificateRow[] | null; error: unknown }
+    .order('issued_at', { ascending: false })
 
   if (error) {
     console.error('[certificates-db] Error fetching user certificates:', error)

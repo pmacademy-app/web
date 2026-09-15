@@ -25,10 +25,6 @@ import { PublicError } from '@/lib/errors/public-error'
 type CapstoneSubmissionRow = Database['public']['Tables']['capstone_submissions']['Row']
 type ReflectionRow = Database['public']['Tables']['reflections']['Row']
 
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
-
 export interface ModuleCapstoneOverviewItem {
   moduleSlug: string
   moduleNumber: number
@@ -54,21 +50,21 @@ export async function getModuleCapstonesOverview(
   const definitions = getAllCapstoneDefinitions()
 
   // 1. Fetch user's capstone submissions
-  const { data: submissions, error: subError } = (await (supabase
-    .from('capstone_submissions') as unknown as DBChain)
+  const { data: submissions, error: subError } = await supabase
+    .from('capstone_submissions')
     .select('*')
-    .eq('user_id', userId)) as unknown as { data: CapstoneSubmissionRow[] | null; error: unknown }
+    .eq('user_id', userId)
 
   if (subError) {
     console.error('[capstones-db] Error fetching capstone submissions:', subError)
   }
 
   // 2. Fetch user's completed lesson progress to calculate unlock state
-  const { data: progressRows, error: progError } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: progressRows, error: progError } = await supabase
+    .from('user_lesson_progress')
     .select('lesson_id, status')
     .eq('user_id', userId)
-    .eq('status', 'completed')) as unknown as { data: { lesson_id: string; status: string }[] | null; error: unknown }
+    .eq('status', 'completed')
 
   if (progError) {
     console.error('[capstones-db] Error fetching lesson progress:', progError)
@@ -135,25 +131,25 @@ export async function loadCapstoneSubmission(
   reflection: ReflectionRow | null
   status: CapstoneStatus
 }> {
-  const { data: submissions, error: subError } = (await (supabase
-    .from('capstone_submissions') as unknown as DBChain)
+  const { data: submissions, error: subError } = await supabase
+    .from('capstone_submissions')
     .select('*')
     .eq('user_id', userId)
     .eq('module_slug', moduleSlug)
     .order('submitted_at', { ascending: false })
-    .limit(1)) as unknown as { data: CapstoneSubmissionRow[] | null; error: unknown }
+    .limit(1)
 
   if (subError) throw subError
   const submission = submissions && submissions.length > 0 ? submissions[0] : null
 
   // Fetch capstone reflection (keyed by `capstone-${moduleSlug}`)
   const reflectionKey = `capstone-${moduleSlug}`
-  const { data: reflections, error: refError } = (await (supabase
-    .from('reflections') as unknown as DBChain)
+  const { data: reflections, error: refError } = await supabase
+    .from('reflections')
     .select('*')
     .eq('user_id', userId)
     .eq('lesson_id', reflectionKey)
-    .limit(1)) as unknown as { data: ReflectionRow[] | null; error: unknown }
+    .limit(1)
 
   if (refError) {
     console.warn('[capstones-db] Non-fatal error loading capstone reflection:', refError)
@@ -165,12 +161,12 @@ export async function loadCapstoneSubmission(
   const moduleLessonIds = getLessonIdsForModule(moduleSlug)
   let lessonsCompleted = 0
   if (moduleLessonIds.length > 0) {
-    const { data: progressRows } = (await (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
+    const { data: progressRows } = await supabase
+      .from('user_lesson_progress')
       .select('lesson_id, status')
       .eq('user_id', userId)
       .eq('status', 'completed')
-      .in('lesson_id', moduleLessonIds)) as unknown as { data: { lesson_id: string }[] | null }
+      .in('lesson_id', moduleLessonIds)
     lessonsCompleted = progressRows?.length ?? 0
   }
 
@@ -193,13 +189,13 @@ export async function saveDraftAction(
   content: string
 ): Promise<{ success: boolean; submission: CapstoneSubmissionRow }> {
   // Check for existing draft or submission
-  const { data: existingList } = (await (supabase
-    .from('capstone_submissions') as unknown as DBChain)
+  const { data: existingList } = await supabase
+    .from('capstone_submissions')
     .select('*')
     .eq('user_id', userId)
     .eq('module_slug', moduleSlug)
     .order('submitted_at', { ascending: false })
-    .limit(1)) as unknown as { data: CapstoneSubmissionRow[] | null }
+    .limit(1)
 
   const existing = existingList && existingList.length > 0 ? existingList[0] : null
 
@@ -208,12 +204,12 @@ export async function saveDraftAction(
     const moduleLessonIds = getLessonIdsForModule(moduleSlug)
     let lessonsCompleted = 0
     if (moduleLessonIds.length > 0) {
-      const { data: progressRows } = (await (supabase
-        .from('user_lesson_progress') as unknown as DBChain)
+      const { data: progressRows } = await supabase
+        .from('user_lesson_progress')
         .select('lesson_id, status')
         .eq('user_id', userId)
         .eq('status', 'completed')
-        .in('lesson_id', moduleLessonIds)) as unknown as { data: { lesson_id: string }[] | null }
+        .in('lesson_id', moduleLessonIds)
       lessonsCompleted = progressRows?.length ?? 0
     }
     if (lessonsCompleted < 8) {
@@ -234,8 +230,8 @@ export async function saveDraftAction(
   let result: CapstoneSubmissionRow
 
   if (existing) {
-    const { data: updated, error: updateError } = (await (supabase
-      .from('capstone_submissions') as unknown as DBChain)
+    const { data: updated, error: updateError } = await supabase
+      .from('capstone_submissions')
       .update({
         content,
         status: 'draft',
@@ -243,13 +239,13 @@ export async function saveDraftAction(
       })
       .eq('id', existing.id)
       .select()
-      .single()) as unknown as { data: CapstoneSubmissionRow | null; error: unknown }
+      .single()
 
     if (updateError) throw updateError
     result = updated!
   } else {
-    const { data: inserted, error: insertError } = (await (supabase
-      .from('capstone_submissions') as unknown as DBChain)
+    const { data: inserted, error: insertError } = await supabase
+      .from('capstone_submissions')
       .insert({
         user_id: userId,
         module_slug: moduleSlug,
@@ -259,7 +255,7 @@ export async function saveDraftAction(
         submitted_at: now,
       })
       .select()
-      .single()) as unknown as { data: CapstoneSubmissionRow | null; error: unknown }
+      .single()
 
     if (insertError) throw insertError
     result = inserted!
@@ -287,13 +283,13 @@ export async function submitCapstoneAction(
   message?: string
 }> {
   // 1. Fetch existing row to preserve or update
-  const { data: existingList } = (await (supabase
-    .from('capstone_submissions') as unknown as DBChain)
+  const { data: existingList } = await supabase
+    .from('capstone_submissions')
     .select('*')
     .eq('user_id', userId)
     .eq('module_slug', moduleSlug)
     .order('submitted_at', { ascending: false })
-    .limit(1)) as unknown as { data: CapstoneSubmissionRow[] | null }
+    .limit(1)
 
   const existing = existingList && existingList.length > 0 ? existingList[0] : null
 
@@ -312,12 +308,12 @@ export async function submitCapstoneAction(
     const moduleLessonIds = getLessonIdsForModule(moduleSlug)
     let lessonsCompleted = 0
     if (moduleLessonIds.length > 0) {
-      const { data: progressRows } = (await (supabase
-        .from('user_lesson_progress') as unknown as DBChain)
+      const { data: progressRows } = await supabase
+        .from('user_lesson_progress')
         .select('lesson_id, status')
         .eq('user_id', userId)
         .eq('status', 'completed')
-        .in('lesson_id', moduleLessonIds)) as unknown as { data: { lesson_id: string }[] | null }
+        .in('lesson_id', moduleLessonIds)
       lessonsCompleted = progressRows?.length ?? 0
     }
     if (lessonsCompleted < 8) {
@@ -331,7 +327,7 @@ export async function submitCapstoneAction(
   let isPortfolioPublic: boolean | null = null
 
   try {
-    const userQuery = (supabase.from('users') as unknown as DBChain)
+    const userQuery = supabase.from('users')
       ?.select?.('email, name, is_portfolio_public')
       ?.eq?.('id', userId)
 
@@ -343,9 +339,9 @@ export async function submitCapstoneAction(
 
     let queryRes: { data: UserRecord | null } | null = null
     if (userQuery && typeof userQuery.maybeSingle === 'function') {
-      queryRes = (await userQuery.maybeSingle()) as unknown as { data: UserRecord | null }
+      queryRes = await userQuery.maybeSingle()
     } else if (userQuery && typeof userQuery.single === 'function') {
-      queryRes = (await userQuery.single()) as unknown as { data: UserRecord | null }
+      queryRes = await userQuery.single()
     }
 
     if (queryRes?.data) {
@@ -385,8 +381,8 @@ export async function submitCapstoneAction(
   let result: CapstoneSubmissionRow
 
   if (existing) {
-    const { data: updated, error: updateError } = (await (supabase
-      .from('capstone_submissions') as unknown as DBChain)
+    const { data: updated, error: updateError } = await supabase
+      .from('capstone_submissions')
       .update({
         content,
         status: 'submitted',
@@ -395,13 +391,13 @@ export async function submitCapstoneAction(
       })
       .eq('id', existing.id)
       .select()
-      .single()) as unknown as { data: CapstoneSubmissionRow | null; error: unknown }
+      .single()
 
     if (updateError) throw updateError
     result = updated!
   } else {
-    const { data: inserted, error: insertError } = (await (supabase
-      .from('capstone_submissions') as unknown as DBChain)
+    const { data: inserted, error: insertError } = await supabase
+      .from('capstone_submissions')
       .insert({
         user_id: userId,
         module_slug: moduleSlug,
@@ -411,7 +407,7 @@ export async function submitCapstoneAction(
         submitted_at: now,
       })
       .select()
-      .single()) as unknown as { data: CapstoneSubmissionRow | null; error: unknown }
+      .single()
 
     if (insertError) throw insertError
     result = inserted!
@@ -420,24 +416,24 @@ export async function submitCapstoneAction(
   // 5. Save associated reflection if provided
   if (reflectionContent && reflectionContent.trim().length > 0) {
     const reflectionKey = `capstone-${moduleSlug}`
-    const { data: existingRef } = (await (supabase
-      .from('reflections') as unknown as DBChain)
+    const { data: existingRef } = await supabase
+      .from('reflections')
       .select('id')
       .eq('user_id', userId)
       .eq('lesson_id', reflectionKey)
-      .limit(1)) as unknown as { data: { id: string }[] | null }
+      .limit(1)
 
     if (existingRef && existingRef.length > 0) {
-      await (supabase
-        .from('reflections') as unknown as DBChain)
+      await supabase
+        .from('reflections')
         .update({
           content: reflectionContent,
           is_public: reflectionIsPublic,
         })
         .eq('id', existingRef[0].id)
     } else {
-      await (supabase
-        .from('reflections') as unknown as DBChain)
+      await supabase
+        .from('reflections')
         .insert({
           user_id: userId,
           lesson_id: reflectionKey,

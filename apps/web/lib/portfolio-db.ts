@@ -9,7 +9,7 @@
 
 import { cache } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/lib/supabase'
+import type { Database, TablesUpdate } from '@/lib/supabase'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { getSkillRadarSummary, type SkillRadarSummary } from '@/lib/skillRadar'
 import { getCapstoneDefinition } from '@/config/capstones'
@@ -19,13 +19,7 @@ import { resolveAvatarPublicUrl } from '@/lib/avatar/avatar-service'
 import { globalNotificationDispatcher } from '@/lib/notifications/dispatcher'
 import { initializeNotificationConnectors } from '@/lib/notifications/events/connectors'
 
-type UserRow = Database['public']['Tables']['users']['Row']
-type CapstoneSubmissionRow = Database['public']['Tables']['capstone_submissions']['Row']
 type ReflectionRow = Database['public']['Tables']['reflections']['Row']
-
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
 
 export interface PublicCapstoneItem {
   id: string
@@ -136,11 +130,11 @@ export async function getPublicPortfolioData(
   const sanitizedUsername = username.trim().toLowerCase()
 
   // 1. Fetch user by username (or fallback to id if matches uuid)
-  const { data: users, error: userError } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: users, error: userError } = await supabase
+    .from('users')
     .select('*')
     .ilike('username', sanitizedUsername)
-    .limit(1)) as unknown as { data: UserRow[] | null; error: unknown }
+    .limit(1)
 
   if (userError || !users || users.length === 0) {
     return null
@@ -159,11 +153,11 @@ export async function getPublicPortfolioData(
   const skillRadar = await getSkillRadarSummary(supabase, userId)
 
   // 3. Fetch completed lesson progress
-  const { data: progressRows } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: progressRows } = await supabase
+    .from('user_lesson_progress')
     .select('lesson_id, status')
     .eq('user_id', userId)
-    .eq('status', 'completed')) as unknown as { data: { lesson_id: string; status: string }[] | null }
+    .eq('status', 'completed')
 
   const completedLessonsCount = progressRows?.length ?? 0
   const totalLessonsCount = 90
@@ -171,20 +165,20 @@ export async function getPublicPortfolioData(
   const progressPercentage = Math.min(100, Math.round((completedLessonsCount / totalLessonsCount) * 100))
 
   // 4. Fetch public submitted capstones (respecting individual is_public opt-out and admin moderation unpublish)
-  const { data: submissions } = (await (supabase
-    .from('capstone_submissions') as unknown as DBChain)
+  const { data: submissions } = await supabase
+    .from('capstone_submissions')
     .select('*')
     .eq('user_id', userId)
     .in('status', ['submitted', 'reviewed'])
     .neq('is_public', false)
-    .order('submitted_at', { ascending: false })) as unknown as { data: CapstoneSubmissionRow[] | null }
+    .order('submitted_at', { ascending: false })
 
   // 5. Fetch public reflections only
-  const { data: reflections } = (await (supabase
-    .from('reflections') as unknown as DBChain)
+  const { data: reflections } = await supabase
+    .from('reflections')
     .select('*')
     .eq('user_id', userId)
-    .eq('is_public', true)) as unknown as { data: ReflectionRow[] | null }
+    .eq('is_public', true)
 
   const publicReflectionMap = new Map<string, ReflectionRow>()
   if (reflections) {
@@ -224,7 +218,7 @@ export async function getPublicPortfolioData(
 
   const levelInfo = calculateLevel(user.total_xp || 0)
 
-  const rawLayout = (user as unknown as { portfolio_layout?: unknown }).portfolio_layout
+  const rawLayout = (user).portfolio_layout
   let portfolioLayout: PortfolioSectionId[] = DEFAULT_PORTFOLIO_LAYOUT
 
   if (Array.isArray(rawLayout) && rawLayout.length > 0) {
@@ -238,8 +232,8 @@ export async function getPublicPortfolioData(
     }
   }
 
-  const featuredCapstoneId = (user as unknown as { featured_capstone_id?: string | null }).featured_capstone_id || null
-  const portfolioViewCount = Number((user as unknown as { portfolio_view_count?: number }).portfolio_view_count || 0)
+  const featuredCapstoneId = (user).featured_capstone_id || null
+  const portfolioViewCount = Number((user).portfolio_view_count || 0)
 
   // Authoritative Privacy Invariant:
   // The featured capstone must strictly be resolved from the PUBLIC `capstones` list.
@@ -251,7 +245,7 @@ export async function getPublicPortfolioData(
 
   // Portfolio Verification: computed live from data already loaded above — no
   // extra query. Reuses the same readiness signals as the Settings checklist.
-  const verificationOverride = ((user as unknown as { portfolio_verification_override?: string | null })
+  const verificationOverride = ((user)
     .portfolio_verification_override ?? null) as PortfolioVerificationOverride
   const readinessForVerification = calculatePortfolioReadiness({
     name: user.name,
@@ -340,11 +334,26 @@ export async function incrementPortfolioViewCount(
   userId: string
 ): Promise<void> {
   try {
-    // 1. Try atomic RPC procedure if available
-    if (typeof (supabase as unknown as { rpc?: unknown }).rpc === 'function') {
-      const rpcRes = await (supabase as unknown as {
-        rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: unknown }>
-      }).rpc('increment_portfolio_view_count', { target_user_id: userId })
+    // 1. Try atomic RPC procedure if available.
+    //
+    // `increment_portfolio_view_count` is created by migration
+    // `20260827000001_phase5_portfolio_evolution.sql` and re-granted by
+    // `20260910000001_security_hardening_b1.sql`, but it is absent from the
+    // generated `types/database.ts` — the checked-in types are behind the
+    // migrations for functions. This is the one place in the batch where a cast is
+    // genuinely unavoidable: it is narrowed to the `rpc` method alone, names the
+    // argument shape rather than using `any`, and the surrounding fallback already
+    // covers the RPC being unavailable at runtime. Regenerating the types against
+    // the database removes the need for it.
+    const callRpc = supabase.rpc as unknown as (
+      fn: 'increment_portfolio_view_count',
+      args: { target_user_id: string }
+    ) => Promise<{ error: unknown } | null>
+
+    if (typeof supabase.rpc === 'function') {
+      const rpcRes = await callRpc.call(supabase, 'increment_portfolio_view_count', {
+        target_user_id: userId,
+      })
 
       if (!rpcRes?.error) {
         return
@@ -352,17 +361,15 @@ export async function incrementPortfolioViewCount(
     }
 
     // 2. Fallback to transactional select + update if RPC is not present
-    const { data: userRec } = (await (supabase
-      .from('users') as unknown as DBChain)
+    const { data: userRec } = await supabase
+      .from('users')
       .select('portfolio_view_count, is_portfolio_public')
       .eq('id', userId)
-      .maybeSingle()) as unknown as {
-        data: { portfolio_view_count: number | null; is_portfolio_public: boolean | null } | null
-      }
+      .maybeSingle()
 
     if (userRec && userRec.is_portfolio_public) {
-      await (supabase
-        .from('users') as unknown as DBChain)
+      await supabase
+        .from('users')
         .update({
           portfolio_view_count: (userRec.portfolio_view_count ?? 0) + 1,
         })
@@ -381,20 +388,12 @@ export async function getLearnerSubmittedCapstones(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<LearnerSubmittedCapstoneSummary[]> {
-  const { data: rows } = (await (supabase
-    .from('capstone_submissions') as unknown as DBChain)
+  const { data: rows } = await supabase
+    .from('capstone_submissions')
     .select('id, module_slug, is_public, submitted_at, status')
     .eq('user_id', userId)
     .in('status', ['submitted', 'reviewed'])
-    .order('submitted_at', { ascending: false })) as unknown as {
-      data: Array<{
-        id: string
-        module_slug: string
-        is_public: boolean
-        submitted_at: string
-        status: string
-      }> | null
-    }
+    .order('submitted_at', { ascending: false })
 
   return (rows ?? []).map((row) => {
     const def = getCapstoneDefinition(row.module_slug)
@@ -436,19 +435,11 @@ export async function getPortfolioSettings(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<PortfolioSettingsData> {
-  const { data: user, error } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: user, error } = await supabase
+    .from('users')
     .select('username, name, bio, avatar_url, linkedin_url, github_url, website_url, is_portfolio_public, portfolio_layout, featured_capstone_id, portfolio_view_count, portfolio_verification_override')
     .eq('id', userId)
-    .single()) as unknown as {
-    data: (UserRow & {
-      portfolio_layout?: unknown
-      featured_capstone_id?: string | null
-      portfolio_view_count?: number
-      portfolio_verification_override?: string | null
-    }) | null
-    error: unknown
-  }
+    .single()
 
   if (error || !user) {
     throw new Error('User profile not found.')
@@ -509,19 +500,19 @@ export async function updatePortfolioSettings(
   }
 
   // 3. Check for unique username collision
-  const { data: existingUsers } = (await (supabase
-    .from('users') as unknown as DBChain)
+  const { data: existingUsers } = await supabase
+    .from('users')
     .select('id')
     .ilike('username', cleanUsername)
     .neq('id', userId)
-    .limit(1)) as unknown as { data: { id: string }[] | null }
+    .limit(1)
 
   if (existingUsers && existingUsers.length > 0) {
     throw new PortfolioValidationError('This username is already taken by another user.')
   }
 
   // 4. Update user record
-  const updatePayload: Record<string, unknown> = {
+  const updatePayload: TablesUpdate<'users'> = {
     username: cleanUsername,
     name: settings.name.trim() || null,
     bio: settings.bio.trim() || null,
@@ -546,12 +537,12 @@ export async function updatePortfolioSettings(
   if ('featuredCapstoneId' in settings) {
     const featId = typeof settings.featuredCapstoneId === 'string' ? settings.featuredCapstoneId.trim() : null
     if (featId) {
-      const { data: capstoneRec } = (await (supabase
-        .from('capstone_submissions') as unknown as DBChain)
+      const { data: capstoneRec } = await supabase
+        .from('capstone_submissions')
         .select('id, user_id, status')
         .eq('id', featId)
         .eq('user_id', userId)
-        .maybeSingle()) as unknown as { data: { id: string; user_id: string; status: string } | null }
+        .maybeSingle()
 
       if (!capstoneRec) {
         throw new PortfolioValidationError('Selected featured capstone does not exist or does not belong to you.')
@@ -563,8 +554,8 @@ export async function updatePortfolioSettings(
     }
   }
 
-  const { error: updateError } = await (supabase
-    .from('users') as unknown as DBChain)
+  const { error: updateError } = await supabase
+    .from('users')
     .update(updatePayload)
     .eq('id', userId)
 
@@ -575,11 +566,11 @@ export async function updatePortfolioSettings(
 
   if (updatePayload.is_portfolio_public) {
     try {
-      const { data: userRec } = await (supabase
-        .from('users') as unknown as DBChain)
+      const { data: userRec } = await supabase
+        .from('users')
         .select('email, name')
         .eq('id', userId)
-        .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+        .maybeSingle()
 
       initializeNotificationConnectors()
       await globalNotificationDispatcher.dispatch({
@@ -636,15 +627,12 @@ export async function getPublicPortfolioSitemapEntries(
   supabase: SupabaseClient<Database>
 ): Promise<PublicPortfolioSitemapEntry[]> {
   try {
-    const { data: users, error } = (await (supabase
-      .from('users') as unknown as DBChain)
+    const { data: users, error } = await supabase
+      .from('users')
       .select('username, created_at')
       .eq('is_portfolio_public', true)
       .not('username', 'is', null)
-      .neq('username', '')) as unknown as {
-      data: { username: string; created_at?: string | null }[] | null
-      error: unknown
-    }
+      .neq('username', '')
 
     if (error || !users) {
       return []

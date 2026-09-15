@@ -9,16 +9,20 @@ import { awardXp, hasXpEvent } from '../xp-service'
 import { completeLesson } from '../lessons-completion-service'
 import { PublicError } from '@/lib/errors/public-error'
 
-export interface UserLessonProgressRecord {
-  user_id: string
-  lesson_id: string
-  completed: boolean
-  completed_at: string | null
-  quiz_score: number | null
-  quiz_attempts: number
-  reflection_text: string | null
-  updated_at: string
-}
+/**
+ * A `user_lesson_progress` row.
+ *
+ * Aliased to the generated type since B8-G. It was a hand-written duplicate, and it
+ * had drifted badly: it declared `completed: boolean`, `reflection_text` and
+ * `updated_at`, none of which are columns on that table — the real one records
+ * completion as `status` and carries `theory_read_at` / `xp_earned` instead.
+ *
+ * The drift was invisible because both readers cast the row through
+ * `as unknown as UserLessonProgressRecord`, and the writer below sent
+ * `updated_at`, which PostgREST rejects as an unknown column. Neither function has
+ * a caller outside this module, which is why nothing surfaced it.
+ */
+export type UserLessonProgressRecord = Database['public']['Tables']['user_lesson_progress']['Row']
 
 export async function getUserLessonProgress(
   userId: string,
@@ -33,7 +37,7 @@ export async function getUserLessonProgress(
     .single()
 
   if (error || !data) return null
-  return data as unknown as UserLessonProgressRecord
+  return data
 }
 
 export async function getUserCompletedLessonIds(userId: string): Promise<string[]> {
@@ -45,23 +49,19 @@ export async function getUserCompletedLessonIds(userId: string): Promise<string[
     .eq('status', 'completed')
 
   if (error || !data) return []
-  return (data as unknown as { lesson_id: string }[]).map((r) => r.lesson_id)
+  return data.map((r) => r.lesson_id)
 }
 
 export async function upsertUserLessonProgress(
   record: Partial<UserLessonProgressRecord> & { user_id: string; lesson_id: string }
 ): Promise<UserLessonProgressRecord | null> {
   const supabase = createServiceRoleClient()
-  const now = new Date().toISOString()
-  const { data, error } = await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
-    .upsert(
-      {
-        ...record,
-        updated_at: now,
-      },
-      { onConflict: 'user_id,lesson_id' }
-    )
+  // `updated_at` was written here until B8-G. `user_lesson_progress` has no such
+  // column, so PostgREST rejected every call — the error was logged and `null`
+  // returned, which read as "no progress row" rather than "the write failed".
+  const { data, error } = await supabase
+    .from('user_lesson_progress')
+    .upsert(record, { onConflict: 'user_id,lesson_id' })
     .select()
     .single()
 
@@ -69,15 +69,9 @@ export async function upsertUserLessonProgress(
     console.error('[lessons-db] Error upserting lesson progress:', error)
     return null
   }
-  return data as unknown as UserLessonProgressRecord
+  return data
 }
 
-type ProgressRow = Database['public']['Tables']['user_lesson_progress']['Row']
-type ReflectionRow = Database['public']['Tables']['reflections']['Row']
-
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
 
 const DIST_LESSONS_DIR = path.resolve(process.cwd(), '..', '..', 'content', 'dist', 'lessons')
 
@@ -92,12 +86,12 @@ export async function markTheoryRead(
   existingRead = false
 ): Promise<{ success: boolean; xpEarned: number; message?: string }> {
   // 1. Fetch current progress
-  const { data: progress, error: fetchError } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: progress, error: fetchError } = await supabase
+    .from('user_lesson_progress')
     .select('*')
     .eq('user_id', userId)
     .eq('lesson_id', lessonId)
-    .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
+    .maybeSingle()
 
   if (fetchError) throw fetchError
 
@@ -110,8 +104,8 @@ export async function markTheoryRead(
   const newStatus = progress?.status === 'completed' ? 'completed' : 'in_progress'
   const newXpEarned = (progress?.xp_earned ?? 0) + xpConfig.THEORY_READ
 
-  const { error: progressError } = await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { error: progressError } = await supabase
+    .from('user_lesson_progress')
     .upsert({
       user_id: userId,
       lesson_id: lessonId,
@@ -226,18 +220,18 @@ export async function recordQuizAttemptAction(
     is_correct: a.is_correct,
   }))
 
-  const { error: attemptsInsertError } = await (supabase
-    .from('quiz_attempts') as unknown as DBChain)
+  const { error: attemptsInsertError } = await supabase
+    .from('quiz_attempts')
     .insert(insertRows)
 
   if (attemptsInsertError) throw attemptsInsertError
 
-  const { data: progress, error: progressFetchError } = (await (supabase
-    .from('user_lesson_progress') as unknown as DBChain)
+  const { data: progress, error: progressFetchError } = await supabase
+    .from('user_lesson_progress')
     .select('*')
     .eq('user_id', userId)
     .eq('lesson_id', lessonId)
-    .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
+    .maybeSingle()
 
   if (progressFetchError) throw progressFetchError
 
@@ -245,12 +239,12 @@ export async function recordQuizAttemptAction(
 
   const xpConfig = await getRuntimeXpValues(supabase)
 
-  const { data: existingQuizEvents } = await (supabase
-    .from('xp_events') as unknown as DBChain)
+  const { data: existingQuizEvents } = await supabase
+    .from('xp_events')
     .select('xp_amount')
     .eq('user_id', userId)
     .eq('source_type', 'quiz_correct')
-    .eq('source_id', lessonId) as unknown as { data: { xp_amount: number }[] | null }
+    .eq('source_id', lessonId)
 
   const alreadyAwardedXp = existingQuizEvents?.reduce((sum, e) => sum + e.xp_amount, 0) ?? 0
   const maxPossibleXp = correctCount * xpConfig.QUIZ_CORRECT
@@ -307,11 +301,11 @@ export async function recordQuizAttemptAction(
   let totalCompletedLessons = 0
 
   try {
-    const { data: userRec } = await (supabase
-      .from('users') as unknown as DBChain)
+    const { data: userRec } = await supabase
+      .from('users')
       .select('email, name')
       .eq('id', userId)
-      .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+      .maybeSingle()
 
     const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
     const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
@@ -355,10 +349,10 @@ export async function recordQuizAttemptAction(
       },
     })
 
-    const { data: userProgress } = await (supabase
-      .from('user_lesson_progress') as unknown as DBChain)
+    const { data: userProgress } = await supabase
+      .from('user_lesson_progress')
       .select('lesson_id, status')
-      .eq('user_id', userId) as unknown as { data: { lesson_id: string; status: string }[] | null }
+      .eq('user_id', userId)
 
     totalCompletedLessons = userProgress?.filter((p) => p.status === 'completed').length || 0
 
@@ -418,12 +412,12 @@ export async function recordReflectionAction(
   content: string,
   isPublic: boolean
 ) {
-  const { data: existing, error: selectError } = (await (supabase
-    .from('reflections') as unknown as DBChain)
+  const { data: existing, error: selectError } = await supabase
+    .from('reflections')
     .select('*')
     .eq('user_id', userId)
     .eq('lesson_id', lessonId)
-    .maybeSingle()) as unknown as { data: ReflectionRow | null; error: unknown }
+    .maybeSingle()
 
   if (selectError) throw selectError
 
@@ -433,8 +427,8 @@ export async function recordReflectionAction(
   let result
 
   if (isFirstSubmission) {
-    const { data: inserted, error: insertError } = (await (supabase
-      .from('reflections') as unknown as DBChain)
+    const { data: inserted, error: insertError } = await supabase
+      .from('reflections')
       .insert({
         user_id: userId,
         lesson_id: lessonId,
@@ -442,7 +436,7 @@ export async function recordReflectionAction(
         is_public: isPublic,
       })
       .select()
-      .single()) as unknown as { data: ReflectionRow | null; error: unknown }
+      .single()
 
     if (insertError) throw insertError
     result = inserted
@@ -460,16 +454,16 @@ export async function recordReflectionAction(
         console.error(`[lessons-db] Error logging reflection XP:`, xpError)
       }
 
-      const { data: progress } = (await (supabase
-        .from('user_lesson_progress') as unknown as DBChain)
+      const { data: progress } = await supabase
+        .from('user_lesson_progress')
         .select('*')
         .eq('user_id', userId)
         .eq('lesson_id', lessonId)
-        .maybeSingle()) as unknown as { data: ProgressRow | null; error: unknown }
+        .maybeSingle()
 
       if (progress) {
-        await (supabase
-          .from('user_lesson_progress') as unknown as DBChain)
+        await supabase
+          .from('user_lesson_progress')
           .update({
             xp_earned: progress.xp_earned + xpConfig.REFLECTION_SUBMITTED,
           })
@@ -478,15 +472,15 @@ export async function recordReflectionAction(
       }
     }
   } else {
-    const { data: updated, error: updateError } = (await (supabase
-      .from('reflections') as unknown as DBChain)
+    const { data: updated, error: updateError } = await supabase
+      .from('reflections')
       .update({
         content,
         is_public: isPublic,
       })
       .eq('id', existing.id)
       .select()
-      .single()) as unknown as { data: ReflectionRow | null; error: unknown }
+      .single()
 
     if (updateError) throw updateError
     result = updated
