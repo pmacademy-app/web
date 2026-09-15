@@ -206,11 +206,24 @@ describe('B7-C — unauthorized-attempt logging survived the migration', () => {
 })
 
 describe('B7-C — success response shapes are unchanged', () => {
-  it('cleanup still reports the not-implemented retention no-op', async () => {
+  /**
+   * This asserted `implemented: false` until B9-D, when the route stopped being a
+   * no-op and became the retention sweep. What B7-C actually owns is that the
+   * scheduler's call still succeeds and still gets `cleanedRows` — the field the
+   * workflow and any dashboard read. That is what stays asserted; the no-op note
+   * it used to carry was a statement about B9-D's absence, not about B7-C.
+   *
+   * The sweep's own behaviour, including that it deletes nothing by default, is
+   * covered in `b9d-retention.test.ts`.
+   */
+  it('cleanup still answers the scheduler with the shape it reads', async () => {
     const body = await (await cleanup(schedulerRequest('https://prodily.app/api/cron/cleanup'))).json()
 
-    expect(body).toMatchObject({ success: true, implemented: false, cleanedRows: 0 })
-    expect(body.note).toContain('Retention cleanup is not implemented')
+    expect(body).toMatchObject({ success: true, implemented: true })
+    expect(typeof body.cleanedRows).toBe('number')
+    // Report-only unless a human has enabled deletion in the environment.
+    expect(body.dryRun).toBe(true)
+    expect(body.cleanedRows).toBe(0)
   })
 
   it('retry-failed still reports processed and its honesty note', async () => {
