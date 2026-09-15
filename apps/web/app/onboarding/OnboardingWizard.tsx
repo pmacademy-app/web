@@ -43,7 +43,7 @@ import {
   DEFAULT_TOPIC_OPTIONS,
   DEFAULT_PREFERENCE_OPTIONS,
   DEFAULT_ONBOARDING_STEPS,
-} from '@/lib/admin/settings-service'
+} from '@/lib/admin/onboarding-defaults'
 import type { OnboardingSettings, OnboardingFieldOption } from '@/lib/admin/types'
 
 interface OnboardingUser {

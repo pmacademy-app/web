@@ -331,6 +331,86 @@ describe('B9-D — partial failure is contained', () => {
   })
 })
 
+// ─── The migration is not applied yet ────────────────────────────────────────
+
+/**
+ * B9-D names B14-A (the migration deploy guard) as a dependency, and B14-A has
+ * not run. So the state that matters is: what happens if someone enables deletion
+ * while `retention_hold` does not exist in the database?
+ *
+ * It must fail closed. These pin that it does, because the answer is the whole
+ * reason the batch is safe to leave deferred.
+ */
+function dbMissingHoldColumn() {
+  const deleted: string[] = []
+  // Once a query touches `retention_hold` the error survives every subsequent
+  // chained filter, the way PostgREST's does.
+  const make = (op: string, poisoned: boolean): any => ({
+    lt: () => make(op, poisoned),
+    eq: (col: string) => make(op, poisoned || col === 'retention_hold'),
+    not: () => make(op, poisoned),
+    like: () => make(op, poisoned),
+    order: () => make(op, poisoned),
+    in: (_c: string, v: readonly unknown[]) => {
+      if (op === 'delete') {
+        deleted.push(...(v as string[]))
+        return Promise.resolve({ error: null })
+      }
+      return make(op, poisoned)
+    },
+    limit: () =>
+      Promise.resolve(
+        poisoned
+          ? { data: null, error: { message: 'column "retention_hold" does not exist' } }
+          : { data: [{ id: 'row-1', key: 'email_sent_count_2026_01_01' }], error: null }
+      ),
+  })
+
+  return {
+    db: {
+      from: () => ({ select: () => make('select', false), delete: () => make('delete', false) }),
+    } as any,
+    deleted,
+  }
+}
+
+describe('B9-D — an unapplied migration fails closed rather than deleting', () => {
+  it('deletes nothing from a hold-bearing table, even with deletion enabled', async () => {
+    const { db, deleted } = dbMissingHoldColumn()
+    const rule = RETENTION_RULES.find((r) => r.supportsHold)!
+
+    const outcome = await sweepRule(db, rule, { dryRun: false, now: NOW })
+
+    // The select errors before any id is collected, so the delete never runs.
+    expect(outcome.deleted).toBe(0)
+    expect(outcome.error).toContain('retention_hold')
+    expect(deleted).toEqual([])
+  })
+
+  it('fails every hold-bearing rule rather than silently skipping the hold check', async () => {
+    const { db } = dbMissingHoldColumn()
+
+    const result = await runRetentionSweep(db, { dryRun: false, now: NOW })
+    const failed = result.rules.filter((r) => r.error).map((r) => r.id)
+
+    for (const rule of RETENTION_RULES.filter((r) => r.supportsHold)) {
+      expect(failed, rule.id).toContain(rule.id)
+    }
+  })
+
+  it('only sweeps the two rules that have no hold semantics by design', async () => {
+    const { db } = dbMissingHoldColumn()
+
+    const result = await runRetentionSweep(db, { dryRun: false, now: NOW })
+    const swept = result.rules.filter((r) => r.deleted > 0).map((r) => r.id).sort()
+
+    // A rate-limit bucket and a dated daily counter are never subject to a legal
+    // hold, which is why neither has a hold column. Both are expired operational
+    // telemetry, so sweeping them without the migration loses nothing retainable.
+    expect(swept).toEqual(['rate_limits', 'system_settings.daily_counters'])
+  })
+})
+
 // ─── The cron route ──────────────────────────────────────────────────────────
 
 describe('B9-D — the cron route gates deletion behind two independent switches', () => {

@@ -34,7 +34,7 @@ import {
   DEFAULT_EXPERIENCE_OPTIONS,
   DEFAULT_TOPIC_OPTIONS,
   DEFAULT_PREFERENCE_OPTIONS,
-} from '@/lib/admin/settings-service'
+} from '@/lib/admin/onboarding-defaults'
 import type { OnboardingSettings, OnboardingStepConfig, OnboardingFieldOption, SettingsSectionKey } from '@/lib/admin/types'
 
 interface OnboardingSettingsSectionProps {
