@@ -11,17 +11,9 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { calculateLevel } from '@/lib/xp'
 import { calculateWeekStart, calculateRankings, type LeaderboardEntry, type RawLeaderboardUserMetric } from '@/lib/leaderboard'
-// Generic page-walking helper. It lives under `lib/admin/` for historical reasons —
-// it has no admin-specific behaviour, and duplicating the loop here would be worse.
-import { fetchAllRows, type PageResult } from '@/lib/admin/fetch-all'
+import * as db from '@/lib/db/leaderboard'
+import type { LeaderboardUserRow } from '@/lib/db/leaderboard'
 import { PublicError } from '@/lib/errors/public-error'
-
-type UserRow = Database['public']['Tables']['users']['Row']
-type CohortRow = Database['public']['Tables']['cohorts']['Row']
-
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
 
 export interface WeeklyLeaderboardPayload {
   weekStart: string
@@ -46,11 +38,7 @@ export async function getUserLeaderboardSettings(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<{ isOptedIn: boolean; allowFriendRequests: boolean }> {
-  const { data: settings } = (await (supabase
-    .from('user_leaderboard_settings') as unknown as DBChain)
-    .select('*')
-    .eq('user_id', userId)
-    .maybeSingle()) as unknown as { data: { is_opted_in: boolean; allow_friend_requests: boolean } | null }
+  const settings = await db.selectLeaderboardSettings(supabase, userId)
 
   if (!settings) {
     // Default to opted in
@@ -72,13 +60,7 @@ export async function toggleLeaderboardOptIn(
   isOptedIn: boolean
 ): Promise<{ success: boolean; isOptedIn: boolean }> {
   const now = new Date().toISOString()
-  const { error } = await (supabase
-    .from('user_leaderboard_settings') as unknown as DBChain)
-    .upsert({
-      user_id: userId,
-      is_opted_in: isOptedIn,
-      updated_at: now,
-    })
+  const { error } = await db.upsertLeaderboardOptIn(supabase, userId, isOptedIn, now)
 
   if (error) throw error
   return { success: true, isOptedIn }
@@ -87,25 +69,13 @@ export async function toggleLeaderboardOptIn(
 // In-memory cache for weekly leaderboard calculations (45-second TTL)
 interface LeaderboardCacheEntry {
   timestamp: number
-  users: UserRow[]
+  users: LeaderboardUserRow[]
   optedOutUserIds: Set<string>
   rawMetrics: RawLeaderboardUserMetric[]
 }
 
 const LEADERBOARD_CACHE = new Map<string, LeaderboardCacheEntry>()
 const CACHE_TTL_MS = 45 * 1000
-
-/**
- * Adapts a `DBChain` page query to the shape `fetchAllRows()` expects.
- *
- * `DBChain` is the module's existing escape hatch and resolves to `{ data: unknown }`,
- * which does not structurally satisfy `PageResult<T>`. The cast is confined here rather
- * than repeated at each of the four call sites. Removing it is B8-F's job, not this
- * batch's — see `lib/db/` in the roadmap.
- */
-function asPage<T>(query: unknown): PromiseLike<PageResult<T>> {
-  return query as unknown as PromiseLike<PageResult<T>>
-}
 
 /**
  * Records a failed weekly-aggregation query as a structured incident.
@@ -168,16 +138,9 @@ async function getOrBuildWeeklyRawMetrics(
     // Paged rather than issued as one unbounded select: PostgREST truncates at its row
     // cap without reporting an error, which silently drops everyone past it from the
     // board. F-COR-4.
-    let userList: UserRow[] = []
+    let userList: LeaderboardUserRow[] = []
     try {
-      userList = await fetchAllRows<UserRow>((from, to) =>
-        asPage<UserRow>(
-          (supabase.from('users') as unknown as DBChain)
-            .select('id, username, name, avatar_url, total_xp, current_streak, level')
-            .gt('total_xp', 0)
-            .range(from, to)
-        )
-      )
+      userList = await db.selectRankedUsers(supabase)
     } catch (usersError) {
       aggregationDegraded = true
       await reportLeaderboardQueryFailure(
@@ -192,14 +155,7 @@ async function getOrBuildWeeklyRawMetrics(
     // 2. Fetch opted-out users so we can exclude them.
     let optedOutRows: { user_id: string }[] = []
     try {
-      optedOutRows = await fetchAllRows<{ user_id: string }>((from, to) =>
-        asPage<{ user_id: string }>(
-          (supabase.from('user_leaderboard_settings') as unknown as DBChain)
-            .select('user_id')
-            .eq('is_opted_in', false)
-            .range(from, to)
-        )
-      )
+      optedOutRows = await db.selectOptedOutUserIds(supabase)
     } catch (optOutError) {
       aggregationDegraded = true
       // Failing open here would publish users who opted OUT of the leaderboard, so the
@@ -222,18 +178,9 @@ async function getOrBuildWeeklyRawMetrics(
     // base grows. The week bound already limits the row set to recent activity, and the
     // rows are matched against `userIds` in JS below, so the filter bought nothing that
     // the client-side join does not. F-COR-4.
-    let lessonProgress: { user_id: string; status: string; completed_at: string }[] = []
+    let lessonProgress: db.WeeklyLessonRow[] = []
     try {
-      lessonProgress = await fetchAllRows<{ user_id: string; status: string; completed_at: string }>(
-        (from, to) =>
-          asPage<{ user_id: string; status: string; completed_at: string }>(
-            (supabase.from('user_lesson_progress') as unknown as DBChain)
-              .select('user_id, status, completed_at')
-              .eq('status', 'completed')
-              .gte('completed_at', weekStartDate.toISOString())
-              .range(from, to)
-          )
-      )
+      lessonProgress = await db.selectWeeklyLessonProgress(supabase, weekStartDate.toISOString())
     } catch (lessonProgressError) {
       aggregationDegraded = true
       await reportLeaderboardQueryFailure(
@@ -250,17 +197,9 @@ async function getOrBuildWeeklyRawMetrics(
     // the error went nowhere, `data` came back null, and every user's weekly XP reduced
     // to 0 with no signal anywhere. Hence the check below: a failed read here must never
     // be indistinguishable from a week in which nobody earned XP. See F-COR-1.
-    let xpEvents: { user_id: string; xp_amount: number; created_at: string }[] = []
+    let xpEvents: db.WeeklyXpRow[] = []
     try {
-      xpEvents = await fetchAllRows<{ user_id: string; xp_amount: number; created_at: string }>(
-        (from, to) =>
-          asPage<{ user_id: string; xp_amount: number; created_at: string }>(
-            (supabase.from('xp_events') as unknown as DBChain)
-              .select('user_id, xp_amount, created_at')
-              .gte('created_at', weekStartDate.toISOString())
-              .range(from, to)
-          )
-      )
+      xpEvents = await db.selectWeeklyXpEvents(supabase, weekStartDate.toISOString())
     } catch (xpEventsError) {
       aggregationDegraded = true
       await reportLeaderboardQueryFailure(
@@ -278,13 +217,17 @@ async function getOrBuildWeeklyRawMetrics(
     const lessonDaysByUser = new Map<string, Set<string>>()
     const lessonCountByUser = new Map<string, number>()
     for (const lp of lessonProgress) {
-      if (!userIds.has(lp.user_id)) continue
-      lessonCountByUser.set(lp.user_id, (lessonCountByUser.get(lp.user_id) ?? 0) + 1)
+      // `user_id` is nullable in the schema. The local row shape this module used to
+      // declare said otherwise, so the null case was invisible; a null here would have
+      // keyed the maps under "null" and inflated one phantom learner's metrics.
+      const progressUserId = lp.user_id
+      if (!progressUserId || !userIds.has(progressUserId)) continue
+      lessonCountByUser.set(progressUserId, (lessonCountByUser.get(progressUserId) ?? 0) + 1)
       if (lp.completed_at) {
-        let days = lessonDaysByUser.get(lp.user_id)
+        let days = lessonDaysByUser.get(progressUserId)
         if (!days) {
           days = new Set<string>()
-          lessonDaysByUser.set(lp.user_id, days)
+          lessonDaysByUser.set(progressUserId, days)
         }
         days.add(lp.completed_at.split('T')[0])
       }
@@ -292,8 +235,10 @@ async function getOrBuildWeeklyRawMetrics(
 
     const xpByUser = new Map<string, number>()
     for (const xe of xpEvents) {
-      if (!userIds.has(xe.user_id)) continue
-      xpByUser.set(xe.user_id, (xpByUser.get(xe.user_id) ?? 0) + (xe.xp_amount || 0))
+      // Nullable for the same reason as above.
+      const xpUserId = xe.user_id
+      if (!xpUserId || !userIds.has(xpUserId)) continue
+      xpByUser.set(xpUserId, (xpByUser.get(xpUserId) ?? 0) + (xe.xp_amount || 0))
     }
 
     // Aggregate user weekly metrics
@@ -350,11 +295,7 @@ async function ensureUserPresent(
     return rawMetrics
   }
 
-  const { data: currentUser } = (await (supabase
-    .from('users') as unknown as DBChain)
-    .select('id, username, name, avatar_url, total_xp, current_streak, level')
-    .eq('id', userId)
-    .maybeSingle()) as unknown as { data: UserRow | null }
+  const currentUser = await db.selectSingleRankedUser(supabase, userId)
 
   if (!currentUser) return rawMetrics
 
@@ -424,19 +365,14 @@ export async function getCohortLeaderboard(
   const weekStart = targetWeekStart || calculateWeekStart()
   const { isOptedIn } = await getUserLeaderboardSettings(supabase, userId)
 
-  const [cached, cohortResult, memberRows] = await Promise.all([
+  const [cached, cohort, memberRows] = await Promise.all([
     getOrBuildWeeklyRawMetrics(supabase, weekStart),
-    (supabase.from('cohorts') as unknown as DBChain)
-      .select('id, name')
-      .eq('id', cohortId)
-      .maybeSingle() as unknown as Promise<{ data: { id: string; name: string } | null }>,
-    (supabase.from('cohort_members') as unknown as DBChain)
-      .select('user_id')
-      .eq('cohort_id', cohortId) as unknown as Promise<{ data: { user_id: string }[] | null }>,
+    db.selectCohortById(supabase, cohortId),
+    db.selectCohortMemberIds(supabase, cohortId),
   ])
 
-  const cohortName = cohortResult.data?.name ?? null
-  const memberIds = new Set<string>((memberRows.data || []).map((m) => m.user_id))
+  const cohortName = cohort?.name ?? null
+  const memberIds = new Set<string>(memberRows.map((m) => m.user_id))
   const isMember = memberIds.has(userId)
 
   let rawMetrics = cached.rawMetrics.filter((m) => memberIds.has(m.userId))
@@ -467,12 +403,7 @@ export async function getFriendLeaderboard(
   userId: string,
   existingEntries?: LeaderboardEntry[]
 ): Promise<LeaderboardEntry[]> {
-  const { data: friendsRows } = (await (supabase
-    .from('user_friends') as unknown as DBChain)
-    .select('user_id, friend_id')
-    .or(`user_id.eq.${userId},friend_id.eq.${userId}`)) as unknown as {
-    data: { user_id: string; friend_id: string }[] | null
-  }
+  const friendsRows = await db.selectFriendEdges(supabase, userId)
 
   const friendIds = new Set<string>([userId])
   if (friendsRows) {
@@ -508,11 +439,11 @@ export async function addFriend(
   const isUuid = UUID_PATTERN.test(friendIdentifier)
   const lookupColumn = isUuid ? 'id' : 'username'
 
-  const { data: targetUser, error: lookupError } = (await (supabase
-    .from('users') as unknown as DBChain)
-    .select('id, username')
-    .eq(lookupColumn, friendIdentifier)
-    .maybeSingle()) as unknown as { data: { id: string; username: string } | null; error: unknown }
+  const { row: targetUser, error: lookupError } = await db.selectUserByIdentifier(
+    supabase,
+    lookupColumn,
+    friendIdentifier
+  )
 
   if (lookupError) {
     throw new PublicError('Failed to look up learner. Please try again.', { status: 400, code: 'LOOKUP_FAILED' })
@@ -526,13 +457,7 @@ export async function addFriend(
     throw new PublicError('You cannot add yourself as a friend.', { status: 400, code: 'VALIDATION' })
   }
 
-  const { error } = await (supabase
-    .from('user_friends') as unknown as DBChain)
-    .insert({
-      user_id: userId,
-      friend_id: targetUser.id,
-      status: 'accepted',
-    })
+  const { error } = await db.insertFriendEdge(supabase, userId, targetUser.id)
 
   if (error && !error.toString().includes('duplicate')) {
     throw error
@@ -549,10 +474,7 @@ export async function removeFriend(
   userId: string,
   friendId: string
 ): Promise<{ success: boolean }> {
-  await (supabase
-    .from('user_friends') as unknown as DBChain)
-    .delete()
-    .or(`and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`)
+  await db.deleteFriendEdge(supabase, userId, friendId)
 
   return { success: true }
 }
@@ -564,30 +486,22 @@ export async function getCohortsData(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<CohortItemPayload[]> {
-  const { data: cohortsList } = (await (supabase
-    .from('cohorts') as unknown as DBChain)
-    .select('*')
-    .order('created_at', { ascending: true })) as unknown as { data: CohortRow[] | null }
+  const cohortsList = await db.selectAllCohorts(supabase)
+  const userMemberships = await db.selectUserCohortIds(supabase, userId)
 
-  const { data: userMemberships } = (await (supabase
-    .from('cohort_members') as unknown as DBChain)
-    .select('cohort_id')
-    .eq('user_id', userId)) as unknown as { data: { cohort_id: string }[] | null }
+  const joinedCohortIds = new Set<string>(userMemberships.map((m) => m.cohort_id))
 
-  const joinedCohortIds = new Set<string>((userMemberships || []).map((m) => m.cohort_id))
-
-  const { data: allMembers } = (await (supabase
-    .from('cohort_members') as unknown as DBChain)
-    .select('cohort_id')) as unknown as { data: { cohort_id: string }[] | null }
+  // Paged to completion since B8-F. A single unbounded select stopped at PostgREST's
+  // row cap, so every cohort's member count was quietly low once total memberships
+  // passed it — a wrong number presented as a fact.
+  const allMembers = await db.selectAllCohortMemberships(supabase)
 
   const countMap = new Map<string, number>()
-  if (allMembers) {
-    for (const m of allMembers) {
-      countMap.set(m.cohort_id, (countMap.get(m.cohort_id) || 0) + 1)
-    }
+  for (const m of allMembers) {
+    countMap.set(m.cohort_id, (countMap.get(m.cohort_id) || 0) + 1)
   }
 
-  return (cohortsList || []).map((c) => ({
+  return cohortsList.map((c) => ({
     id: c.id,
     slug: c.slug || c.id,
     name: c.name,
@@ -606,28 +520,15 @@ export async function toggleCohortMembership(
   cohortSlug: string,
   action: 'join' | 'leave'
 ): Promise<{ success: boolean; isMember: boolean }> {
-  const { data: cohort } = (await (supabase
-    .from('cohorts') as unknown as DBChain)
-    .select('id')
-    .eq('slug', cohortSlug)
-    .single()) as unknown as { data: { id: string } | null }
+  const cohort = await db.selectCohortBySlug(supabase, cohortSlug)
 
   if (!cohort) throw new PublicError('Cohort not found.', { status: 404, code: 'NOT_FOUND' })
 
   if (action === 'join') {
-    await (supabase
-      .from('cohort_members') as unknown as DBChain)
-      .insert({
-        cohort_id: cohort.id,
-        user_id: userId,
-      })
+    await db.insertCohortMember(supabase, cohort.id, userId)
     return { success: true, isMember: true }
-  } else {
-    await (supabase
-      .from('cohort_members') as unknown as DBChain)
-      .delete()
-      .eq('cohort_id', cohort.id)
-      .eq('user_id', userId)
-    return { success: true, isMember: false }
   }
+
+  await db.deleteCohortMember(supabase, cohort.id, userId)
+  return { success: true, isMember: false }
 }

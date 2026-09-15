@@ -1,10 +1,16 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../supabase'
+import { isUniqueViolation } from '@/lib/db'
+import {
+  type XpEvent,
+  findXpEvent,
+  insertXpEvent,
+  selectAuthoritativeTotalXp,
+  selectNotificationIdentity,
+  selectRecentXpEvents,
+  selectXpLedgerPage,
+} from '@/lib/db/xp'
 import { calculateLevel, type LevelInfo, type XpSourceType } from './xp'
-
-interface DBChain {
-  [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
-}
 
 /**
  * Page size for the ledger fallback in `getTotalXp()`. Matches the PostgREST default
@@ -13,34 +19,14 @@ interface DBChain {
  */
 const XP_LEDGER_FALLBACK_LIMIT = 1000
 
-/** Postgres `unique_violation`. PostgREST forwards it verbatim in `error.code`. */
-const PG_UNIQUE_VIOLATION = '23505'
-
 /**
- * Whether a Supabase error is a unique-constraint violation.
+ * The public shape of an XP event.
  *
- * Matches on the SQLSTATE code rather than the message, which is localised and carries
- * the index name. Kept tolerant of the error being an unexpected shape, because the
- * alternative — throwing from inside error handling — would turn a benign duplicate into
- * a failed request.
+ * Aliased to the generated row type rather than restated. It was a hand-written
+ * duplicate until B8-F, which is the same class of drift that let `amount` survive:
+ * a local copy of a table's shape stops being checked against the table.
  */
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code?: unknown }).code === PG_UNIQUE_VIOLATION
-  )
-}
-
-export interface XpEventRow {
-  id: string
-  user_id: string
-  source_type: string
-  source_id: string | null
-  xp_amount: number
-  created_at: string
-}
+export type XpEventRow = XpEvent
 
 export interface UserXpSummary {
   totalXp: number
@@ -62,14 +48,12 @@ export async function awardXp(
   const oldTotalXp = await getTotalXp(supabase, userId)
   const oldLevelInfo = calculateLevel(oldTotalXp)
 
-  const { error } = await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .insert({
-      user_id: userId,
-      source_type: sourceType,
-      xp_amount: xpAmount,
-      source_id: sourceId,
-    })
+  const { error } = await insertXpEvent(supabase, {
+    userId,
+    sourceType,
+    xpAmount,
+    sourceId,
+  })
 
   if (error) {
     // A unique violation means this exact award already exists. That is the concurrency
@@ -99,11 +83,7 @@ export async function awardXp(
 
   if (newLevelInfo.level > oldLevelInfo.level) {
     try {
-      const { data: userRec } = await (supabase
-        .from('users') as unknown as DBChain)
-        .select('email, name')
-        .eq('id', userId)
-        .maybeSingle() as unknown as { data: { email: string; name: string | null } | null }
+      const userRec = await selectNotificationIdentity(supabase, userId)
 
       const { globalNotificationDispatcher } = await import('../notifications/dispatcher')
       const { initializeNotificationConnectors } = await import('../notifications/events/connectors')
@@ -138,21 +118,14 @@ export async function hasXpEvent(
   sourceType: XpSourceType,
   sourceId: string
 ): Promise<boolean> {
-  const { data, error } = (await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .select('id')
-    .eq('user_id', userId)
-    .eq('source_type', sourceType)
-    .eq('source_id', sourceId)
-    .limit(1)
-    .maybeSingle()) as unknown as { data: { id: string } | null; error: unknown }
+  const { found, error } = await findXpEvent(supabase, userId, sourceType, sourceId)
 
   if (error) {
     console.error(`[xp-service] Error checking XP event existence:`, error)
     return false
   }
 
-  return !!data
+  return found
 }
 
 /**
@@ -178,14 +151,10 @@ export async function getTotalXp(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<number> {
-  const { data, error } = (await (supabase
-    .from('users') as unknown as DBChain)
-    .select('total_xp')
-    .eq('id', userId)
-    .maybeSingle()) as unknown as { data: { total_xp: number | null } | null; error: unknown }
+  const { row, error } = await selectAuthoritativeTotalXp(supabase, userId)
 
-  if (!error && data) {
-    return data.total_xp ?? 0
+  if (!error && row) {
+    return row.total_xp ?? 0
   }
 
   if (error) {
@@ -205,14 +174,7 @@ async function getTotalXpFromLedgerFallback(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<number> {
-  const { data, error } = (await (supabase
-    .from('xp_events') as unknown as DBChain)
-    .select('xp_amount')
-    .eq('user_id', userId)
-    .limit(XP_LEDGER_FALLBACK_LIMIT)) as unknown as {
-    data: { xp_amount: number }[] | null
-    error: unknown
-  }
+  const { rows: data, error } = await selectXpLedgerPage(supabase, userId, XP_LEDGER_FALLBACK_LIMIT)
 
   if (error || !data) {
     console.error(`[xp-service] Error fetching fallback total XP for user ${userId}:`, error)
@@ -233,14 +195,9 @@ export async function getUserXpSummary(
   userId: string,
   recentLimit: number = 10
 ): Promise<UserXpSummary> {
-  const [totalXp, { data: recentEvents }] = await Promise.all([
+  const [totalXp, { rows: recentEvents }] = await Promise.all([
     getTotalXp(supabase, userId),
-    (supabase
-      .from('xp_events') as unknown as DBChain)
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(recentLimit) as unknown as Promise<{ data: XpEventRow[] | null }>,
+    selectRecentXpEvents(supabase, userId, recentLimit),
   ])
 
   const levelInfo = calculateLevel(totalXp)
