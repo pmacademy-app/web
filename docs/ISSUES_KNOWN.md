@@ -62,12 +62,19 @@
   5. If email stops: the hook is not authenticating. Roll back the deploy; do not re-add the query-string path — reconfigure the hook to the bare endpoint URL with its `v1,whsec_...` secret instead.
 - **Note**: never paste the hook URI or the secret into a commit, an issue, a log or a chat. Verification is by observing email delivery and the absence of auth incidents, not by echoing configuration.
 
-#### ISSUE-28: `npm run build` rewrites lesson source files
-- **Status**: 🟠 Open — repository hygiene, no production impact
-- **Description**: `npm run build` runs `content:build`, and the content compiler writes back to the **source** files under `content/lessons/` rather than only emitting to `content/dist/`. Observed repeatedly on 2026-09-14: successive builds of the *same* commit reordered quiz answer options in a different set of lessons each time — 2 files, then 2 more, then 23. The shuffle is applied in place and is non-deterministic.
-- **Impact**: every local build dirties the working tree with unrelated content churn, which is easy to sweep into an unrelated commit. It also means two builds of the same commit do not produce the same source tree.
-- **Required Action**: make the compiler emit only to `content/dist/` and treat `content/lessons/**` as read-only input; if the shuffle is intentional it belongs in the emitted artifact, not the source. Until then, `git checkout content/` after a local build before staging.
-- **Note**: verified that no commit on the Phase 2 branch has swept this in — `git log --name-only 76b96e2..HEAD -- content/` is empty. Discovered during B7-G1; not caused by it.
+#### ISSUE-28: **WITHDRAWN** — misdiagnosed build churn
+- **Status**: ⚪ Withdrawn 2026-09-15 — the premise was wrong
+- **Original claim**: that `npm run build` rewrites lesson source files under `content/lessons/`, shuffling quiz options in place, because successive builds appeared to dirty 2, then 2 more, then 23 files.
+- **What was actually happening**: a **concurrent session** was editing lesson quiz content on this same branch (commits `fdc6e80`, `e2799dc`, `341e886`, `33cdef0`, `67fe3e7` — "rewrite lessons ... to remove answer-length and position cues"). The churn correlated with builds only by coincidence of timing.
+- **Verification**: `npm run content:build` was run on its own against a clean tree on 2026-09-15 and left the working tree **clean**. The compiler emits only to `content/dist/`, as designed.
+- **Correction notice**: commit `2af22c9` (B7-G1) carries this claim in its message and is therefore inaccurate on this one point. The history is not being rewritten to fix it; this entry is the correction of record.
+- **Real lesson recorded instead**: see ISSUE-29.
+
+#### ISSUE-29: Concurrent sessions on one branch
+- **Status**: 🟠 Open — process, no production impact
+- **Description**: On 2026-09-14/15 at least two sessions worked `b10a-b14b/error-boundaries-logout-ci-security` at the same time — the B7 route-migration work and a lesson-quiz content rewrite. Symptoms observed: files reverting under an active session (`docs/HARDENING_LEDGER.md` lost 571 committed lines in the working tree; `settings.test.ts` reverted to a pre-migration assertion), and repeated unexplained `content/lessons/**` churn.
+- **Impact**: the B7 session ran `git checkout content/` three times to clear what it believed was build churn. That discards **uncommitted** work in `content/`, so the content session may have lost in-progress edits at those moments. All committed work from both sessions survived and is present in HEAD.
+- **Required Action**: give concurrent sessions separate branches or worktrees. If one branch must be shared, each session should stage or commit before the other runs any `git checkout`, and neither should run a path-wide `git checkout` over directories it does not own.
 
 ---
 
