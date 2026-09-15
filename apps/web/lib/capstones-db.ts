@@ -324,7 +324,17 @@ export async function submitCapstoneAction(
   // 4. Fetch user to check portfolio privacy setting (mock-safe fallback)
   let userEmail = ''
   let userName = 'Learner'
-  let isPortfolioPublic: boolean | null = null
+  /**
+   * Whether the privacy setting was actually read — deliberately separate from its
+   * value.
+   *
+   * These were one nullable variable until this fix, which made "the learner is
+   * public", "the learner opted out" and "we could not find out" indistinguishable
+   * in the wrong direction: an unread setting fell through to the `true` default
+   * below and published the artifact. See the gate after this block.
+   */
+  let portfolioPrivacyKnown = false
+  let isPortfolioPublic = true
 
   try {
     const userQuery = supabase.from('users')
@@ -347,22 +357,45 @@ export async function submitCapstoneAction(
     if (queryRes?.data) {
       userEmail = queryRes.data.email || ''
       userName = queryRes.data.name || 'Learner'
-      isPortfolioPublic = queryRes.data.is_portfolio_public ?? null
+      portfolioPrivacyKnown = true
+      // A NULL column means "never set", which the rest of the app reads as public
+      // (`is_portfolio_public ?? true` in portfolio-db and badges-db). That
+      // convention is preserved — only an *unread* setting is treated as unknown.
+      isPortfolioPublic = queryRes.data.is_portfolio_public ?? true
     }
-  } catch {
-    // Non-fatal if table not mocked in specific test
+  } catch (privacyReadError) {
+    // Swallowed but no longer silent. The read failing now changes the outcome, so
+    // it must leave a trace; before this fix it was discarded and the artifact was
+    // published anyway.
+    console.error(
+      '[capstones-db] Portfolio privacy could not be read; capstone will not be published:',
+      privacyReadError
+    )
+  }
+
+  if (!portfolioPrivacyKnown) {
+    console.warn(
+      '[capstones-db] No portfolio privacy row for this learner; defaulting the capstone to private.'
+    )
   }
 
   // Authoritatively derive is_public:
-  // 1. Master privacy gate: If user's entire portfolio is private (is_portfolio_public === false),
-  //    the artifact must NEVER be marked public under any circumstances.
-  // 2. Individual privacy control: When portfolio is public, respect learner's explicit opt-in/opt-out choice.
-  // 3. Default: True when portfolio is public.
-  let effectiveIsPublic = true
-  if (isPortfolioPublic === false) {
+  // 1. Master privacy gate: unless the learner's portfolio is CONFIRMED public, the
+  //    artifact is never marked public. The gate used to test `=== false`, so an
+  //    unreadable or missing `users` row left the setting null, missed the gate, and
+  //    fell through to the `true` default — publishing the capstone of a learner who
+  //    may have opted out. A privacy control that fails open is worse than one that
+  //    refuses, so this fails closed: unknown is treated as private.
+  // 2. Individual privacy control: when the portfolio is public, respect the
+  //    learner's explicit opt-in/opt-out choice.
+  // 3. Default: true when the portfolio is confirmed public and no choice was made.
+  let effectiveIsPublic: boolean
+  if (!portfolioPrivacyKnown || !isPortfolioPublic) {
     effectiveIsPublic = false
   } else if (typeof isPublic === 'boolean') {
     effectiveIsPublic = isPublic
+  } else {
+    effectiveIsPublic = true
   }
 
   // 5. Validate submission content

@@ -339,12 +339,21 @@ export async function incrementPortfolioViewCount(
     // `increment_portfolio_view_count` is created by migration
     // `20260827000001_phase5_portfolio_evolution.sql` and re-granted by
     // `20260910000001_security_hardening_b1.sql`, but it is absent from the
-    // generated `types/database.ts` — the checked-in types are behind the
-    // migrations for functions. This is the one place in the batch where a cast is
-    // genuinely unavoidable: it is narrowed to the `rpc` method alone, names the
-    // argument shape rather than using `any`, and the surrounding fallback already
-    // covers the RPC being unavailable at runtime. Regenerating the types against
-    // the database removes the need for it.
+    // generated `types/database.ts`.
+    //
+    // Not because the types are stale, which an earlier version of this comment
+    // claimed. `types/database.ts` was regenerated on 2026-09-09, two weeks after
+    // that migration, and the same migration's `users.featured_capstone_id` and
+    // `users.portfolio_view_count` columns ARE present — so the migration was
+    // applied and `supabase gen types` simply did not emit the function.
+    // `get_admin_dashboard_summary` is missing for the same reason, and both are
+    // reached through the same narrow cast elsewhere in the codebase; it is the
+    // repository's existing convention for this situation, not a new workaround.
+    // Regenerating would therefore NOT remove this cast.
+    //
+    // The cast is narrowed to the `rpc` method alone, names the argument shape
+    // rather than using `any`, and the fallback below already covers the RPC being
+    // unavailable at runtime.
     const callRpc = supabase.rpc as unknown as (
       fn: 'increment_portfolio_view_count',
       args: { target_user_id: string }

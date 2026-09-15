@@ -260,6 +260,106 @@ Our primary user is the Early Career Product Manager and Senior PM transitioning
       expect(res.submission.is_public).toBe(false)
     })
 
+    /**
+     * The privacy gate fails closed.
+     *
+     * It used to test `is_portfolio_public === false`, so a `users` read that
+     * errored or matched no row left the setting null, missed the gate entirely,
+     * and fell through to the `true` default — publishing the capstone of a learner
+     * who may well have opted out. A privacy control that fails open is worse than
+     * one that refuses, so an unknown setting is now treated as private.
+     */
+    it('does not publish when the portfolio privacy read fails', async () => {
+      let insertedIsPublic: boolean | undefined
+      const mockSupabase = createMockSupabase({
+        existingInsertIsPublicCheck: (isPub) => {
+          insertedIsPublic = isPub
+        },
+      })
+
+      const usersTable = mockSupabase.from('users')
+      usersTable.maybeSingle = vi.fn().mockRejectedValue(new Error('connection reset'))
+      usersTable.single = vi.fn().mockRejectedValue(new Error('connection reset'))
+      const originalFrom = mockSupabase.from
+      mockSupabase.from = vi.fn((table: string) =>
+        table === 'users' ? usersTable : originalFrom(table)
+      )
+
+      const res = await submitCapstoneAction(
+        mockSupabase,
+        'usr-1',
+        'foundations',
+        validOpportunityBrief,
+        '',
+        false,
+        true // the client asks for public; an unverifiable portfolio still wins
+      )
+
+      expect(res.success).toBe(true)
+      expect(insertedIsPublic).toBe(false)
+      expect(res.submission.is_public).toBe(false)
+    })
+
+    it('does not publish when no portfolio privacy row exists for the learner', async () => {
+      let insertedIsPublic: boolean | undefined
+      const mockSupabase = createMockSupabase({
+        existingInsertIsPublicCheck: (isPub) => {
+          insertedIsPublic = isPub
+        },
+      })
+
+      const usersTable = mockSupabase.from('users')
+      usersTable.maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
+      const originalFrom = mockSupabase.from
+      mockSupabase.from = vi.fn((table: string) =>
+        table === 'users' ? usersTable : originalFrom(table)
+      )
+
+      const res = await submitCapstoneAction(
+        mockSupabase,
+        'usr-1',
+        'foundations',
+        validOpportunityBrief,
+        '',
+        false,
+        true
+      )
+
+      expect(insertedIsPublic).toBe(false)
+      expect(res.submission.is_public).toBe(false)
+    })
+
+    it('still publishes when the portfolio privacy column is NULL but readable', async () => {
+      // A NULL column means "never set", which the rest of the app reads as public
+      // (`is_portfolio_public ?? true`). Only an *unread* setting is unknown — this
+      // pins that distinction so the fail-closed gate does not over-reach.
+      let insertedIsPublic: boolean | undefined
+      const mockSupabase = createMockSupabase({
+        existingInsertIsPublicCheck: (isPub) => {
+          insertedIsPublic = isPub
+        },
+      })
+
+      const usersTable = mockSupabase.from('users')
+      usersTable.maybeSingle = vi.fn().mockResolvedValue({
+        data: { email: 'alex@example.com', name: 'Alex Rivera', is_portfolio_public: null },
+      })
+      const originalFrom = mockSupabase.from
+      mockSupabase.from = vi.fn((table: string) =>
+        table === 'users' ? usersTable : originalFrom(table)
+      )
+
+      const res = await submitCapstoneAction(
+        mockSupabase,
+        'usr-1',
+        'foundations',
+        validOpportunityBrief
+      )
+
+      expect(insertedIsPublic).toBe(true)
+      expect(res.submission.is_public).toBe(true)
+    })
+
     it('forces is_public: false when learner entire portfolio is private even if client requests isPublic: true', async () => {
       let insertedIsPublic: boolean | undefined
       const mockSupabase = createMockSupabase({
