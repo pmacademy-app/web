@@ -23,6 +23,7 @@ import { AdminStatusBadge } from './AdminStatusBadge'
 import { AdminSection } from './AdminSection'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { useAdminToast } from './admin-toast'
+import { apiPost, apiDelete } from '@/lib/api/client'
 import { AdminCreateInAppNotificationModal } from './AdminCreateInAppNotificationModal'
 import { AdminEditInAppNotificationModal } from './AdminEditInAppNotificationModal'
 import type { InAppBroadcastItem } from '@/lib/admin/in-app-manager-service'
@@ -82,15 +83,19 @@ export function AdminInAppNotificationView({
   const handleExecuteNow = async (id: string) => {
     setActionLoadingId(id)
     try {
-      const res = await fetch(`/api/admin/notifications/in-app/${id}/execute`, {
-        method: 'POST',
-      })
-      const json = await res.json()
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Execution failed')
+      const result = await apiPost<{
+        success: boolean
+        delivered?: number
+        targeted?: number
+        error?: string
+      }>(`/api/admin/notifications/in-app/${id}/execute`, {})
+
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Execution failed')
+        throw new Error(errorMsg)
       }
 
-      toast(`Notification dispatched to ${json.delivered} learners!`, 'success')
+      toast(`Notification dispatched to ${result.data.delivered} learners!`, 'success')
       setBroadcasts((prev) =>
         prev.map((b) =>
           b.id === id
@@ -98,8 +103,8 @@ export function AdminInAppNotificationView({
                 ...b,
                 status: 'completed',
                 sentAt: new Date().toISOString(),
-                totalTargeted: json.targeted,
-                totalDelivered: json.delivered,
+                totalTargeted: result.data.targeted ?? b.totalTargeted,
+                totalDelivered: result.data.delivered ?? b.totalDelivered,
               }
             : b
         )
@@ -114,9 +119,14 @@ export function AdminInAppNotificationView({
   const handlePause = async (id: string) => {
     setActionLoadingId(id)
     try {
-      const res = await fetch(`/api/admin/notifications/in-app/${id}/pause`, { method: 'POST' })
-      const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.error || 'Pause failed')
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/notifications/in-app/${id}/pause`,
+        {}
+      )
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Pause failed')
+        throw new Error(errorMsg)
+      }
 
       toast('Scheduled notification paused.', 'success')
       setBroadcasts((prev) => prev.map((b) => (b.id === id ? { ...b, status: 'paused' } : b)))
@@ -130,9 +140,14 @@ export function AdminInAppNotificationView({
   const handleResume = async (id: string) => {
     setActionLoadingId(id)
     try {
-      const res = await fetch(`/api/admin/notifications/in-app/${id}/resume`, { method: 'POST' })
-      const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.error || 'Resume failed')
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/notifications/in-app/${id}/resume`,
+        {}
+      )
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Resume failed')
+        throw new Error(errorMsg)
+      }
 
       toast('Scheduled notification resumed.', 'success')
       setBroadcasts((prev) => prev.map((b) => (b.id === id ? { ...b, status: 'scheduled' } : b)))
@@ -147,9 +162,14 @@ export function AdminInAppNotificationView({
     if (!confirm('Are you sure you want to cancel this scheduled notification?')) return
     setActionLoadingId(id)
     try {
-      const res = await fetch(`/api/admin/notifications/in-app/${id}/cancel`, { method: 'POST' })
-      const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.error || 'Cancel failed')
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/notifications/in-app/${id}/cancel`,
+        {}
+      )
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Cancel failed')
+        throw new Error(errorMsg)
+      }
 
       toast('Notification cancelled.', 'success')
       setBroadcasts((prev) => prev.map((b) => (b.id === id ? { ...b, status: 'cancelled', scheduledAt: null } : b)))
@@ -164,9 +184,13 @@ export function AdminInAppNotificationView({
     if (!confirm('Are you sure you want to delete this notification record?')) return
     setActionLoadingId(id)
     try {
-      const res = await fetch(`/api/admin/notifications/in-app/${id}`, { method: 'DELETE' })
-      const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.error || 'Delete failed')
+      const result = await apiDelete<{ success: boolean; error?: string }>(
+        `/api/admin/notifications/in-app/${id}`
+      )
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Delete failed')
+        throw new Error(errorMsg)
+      }
 
       toast('Notification deleted.', 'success')
       setBroadcasts((prev) => prev.filter((b) => b.id !== id))

@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { X, Send, AlertTriangle, ShieldAlert } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
+import { apiPost } from '@/lib/api/client'
 
 interface AdminBroadcastModalProps {
   open: boolean
@@ -46,10 +47,9 @@ export function AdminBroadcastModal({ open, onClose }: AdminBroadcastModalProps)
   const handleExecuteBroadcast = async () => {
     setIsSubmitting(true)
     try {
-      const res = await fetch('/api/admin/notifications/broadcast', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const result = await apiPost<{ success: boolean; message?: string; error?: string }>(
+        '/api/admin/notifications/broadcast',
+        {
           audience,
           targetUserId: targetUserId.trim() || undefined,
           cohortId: cohortId.trim() || undefined,
@@ -59,15 +59,15 @@ export function AdminBroadcastModal({ open, onClose }: AdminBroadcastModalProps)
           actionUrl: actionUrl.trim() || undefined,
           scheduledAt: scheduledAt || undefined,
           idempotencyKey,
-        }),
-      })
+        }
+      )
 
-      const json = await res.json()
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to dispatch broadcast')
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to dispatch broadcast')
+        throw new Error(errorMsg)
       }
 
-      toast(json.message || 'Notification broadcast sent successfully!', 'success')
+      toast(result.data.message || 'Notification broadcast sent successfully!', 'success')
       onClose()
       setIsConfirming(false)
       // Reset key for next send

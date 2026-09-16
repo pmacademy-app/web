@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react'
 import { Search, Loader2, UserCheck, UserX, AlertTriangle } from 'lucide-react'
 import { AdminModal } from './AdminModal'
 import { SendProductionEmailModal, type TargetUser } from './SendProductionEmailModal'
+import { apiGet } from '@/lib/api/client'
 
 interface AdminProductionSendModalProps {
   open: boolean
@@ -13,9 +14,9 @@ interface AdminProductionSendModalProps {
 interface UserSearchResult {
   id: string
   email: string
-  fullName: string
-  isVerified: boolean
+  fullName: string | null
   emailConfirmedAt: string | null
+  isVerified?: boolean
 }
 
 /**
@@ -43,12 +44,14 @@ export function AdminProductionSendModal({ open, onClose }: AdminProductionSendM
     setLoading(true)
     setErrorMsg(null)
     try {
-      const res = await fetch(`/api/admin/users?search=${encodeURIComponent(q)}&limit=10`)
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setResults((data.users || []) as UserSearchResult[])
+      const result = await apiGet<{ success: boolean; users?: UserSearchResult[]; error?: string }>(
+        `/api/admin/users?search=${encodeURIComponent(q)}&limit=10`
+      )
+      if (result.ok && result.data.success) {
+        setResults((result.data.users || []) as UserSearchResult[])
       } else {
-        setErrorMsg(data.error || 'Failed to search users.')
+        const error = !result.ok ? result.error.message : (result.data.error || 'Failed to search users.')
+        setErrorMsg(error)
       }
     } catch {
       setErrorMsg('Network error while searching users.')

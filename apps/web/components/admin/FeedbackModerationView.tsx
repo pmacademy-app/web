@@ -6,6 +6,7 @@ import { AdminPageHeader } from './AdminPageHeader'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { useAdminToast } from './admin-toast'
+import { apiPatch } from '@/lib/api/client'
 import type { TestimonialItem } from '@/lib/admin/feedback-service'
 
 interface FeedbackModerationViewProps {
@@ -30,14 +31,12 @@ export function FeedbackModerationView({ initialQueue, embedded = false }: Feedb
   const handleAction = async (id: string, action: 'approve' | 'publish' | 'unpublish' | 'reject' | 'edit', newContent?: string) => {
     setLoadingId(id)
     try {
-      const res = await fetch(`/api/admin/feedback/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, updatedContent: newContent }),
-      })
-      const data = await res.json()
+      const result = await apiPatch<{ success: boolean; error?: string }>(
+        `/api/admin/feedback/${id}`,
+        { action, updatedContent: newContent }
+      )
 
-      if (data.success) {
+      if (result.ok && result.data.success) {
         setQueue((prev) =>
           prev.map((item) => {
             if (item.id !== id) return item
@@ -68,7 +67,9 @@ export function FeedbackModerationView({ initialQueue, embedded = false }: Feedb
       } else {
         // Without this the row silently kept its old state and the admin had no way
         // to tell the action had been refused.
-        toast(data.error || `Could not ${action} this testimonial. Try again.`, 'error')
+        const fallback = `Could not ${action} this testimonial. Try again.`
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || fallback)
+        toast(errorMsg, 'error')
       }
     } catch (err) {
       console.error('Moderation action failed:', err)

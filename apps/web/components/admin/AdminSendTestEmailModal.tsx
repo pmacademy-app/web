@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Send, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { AdminModal } from './AdminModal'
 import { useAdminToast } from './admin-toast'
+import { apiPost } from '@/lib/api/client'
 
 export interface AdminSendTestEmailModalProps {
   open: boolean
@@ -38,23 +39,23 @@ export function AdminSendTestEmailModal({
     setLoading(true)
     setResult(null)
     try {
-      const res = await fetch('/api/admin/emails/test-send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const apiRes = await apiPost<{ success: boolean; message?: string; error?: string }>(
+        '/api/admin/emails/test-send',
+        {
           templateKey,
           toEmail: toEmail.trim(),
           subjectLine,
           bodyHtml,
           bodyText,
-        }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setResult({ type: 'success', text: data.message || `Test email sent to ${toEmail}.` })
+        }
+      )
+
+      if (apiRes.ok && apiRes.data.success) {
+        setResult({ type: 'success', text: apiRes.data.message || `Test email sent to ${toEmail}.` })
         toast(`Test email sent to ${toEmail}.`, 'success')
       } else {
-        setResult({ type: 'error', text: data.error || 'Failed to send test email.' })
+        const errorMsg = !apiRes.ok ? apiRes.error.message : (apiRes.data.error || 'Failed to send test email.')
+        setResult({ type: 'error', text: errorMsg })
       }
     } catch {
       setResult({ type: 'error', text: 'Network error sending test email.' })

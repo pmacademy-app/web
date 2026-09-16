@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
 import { AdminUserMultiSelectPicker, type SelectedUser } from './AdminUserMultiSelectPicker'
+import { apiPost } from '@/lib/api/client'
 import type {
   InAppPriorityLevel,
   InAppCategory,
@@ -83,19 +84,17 @@ export function AdminCreateInAppNotificationModal({
     const run = async () => {
       try {
         setCalculatingCount(true)
-        const res = await fetch('/api/admin/notifications/in-app/recipient-count', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+        const result = await apiPost<{ success?: boolean; count?: number }>(
+          '/api/admin/notifications/in-app/recipient-count',
+          {
             audience,
             targetUserId: targetUserId.trim() || undefined,
             targetCohortId: targetCohortId.trim() || undefined,
             recipientFilters: filters,
-          }),
-        })
-        const json = await res.json()
-        if (active && json.success) {
-          setRecipientCount(json.count)
+          }
+        )
+        if (active && result.ok && result.data.count !== undefined) {
+          setRecipientCount(result.data.count)
         }
       } catch {
         // ignore
@@ -113,20 +112,18 @@ export function AdminCreateInAppNotificationModal({
   const fetchSample = async () => {
     setLoadingSample(true)
     try {
-      const res = await fetch('/api/admin/notifications/in-app/recipient-sample', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const result = await apiPost<{ success?: boolean; users?: Array<{ id: string; email: string; name?: string }> }>(
+        '/api/admin/notifications/in-app/recipient-sample',
+        {
           audience,
           targetUserId: targetUserId.trim() || undefined,
           targetCohortId: targetCohortId.trim() || undefined,
           recipientFilters: filters,
           limit: 5,
-        }),
-      })
-      const json = await res.json()
-      if (json.success) {
-        setSampleUsers(json.users || [])
+        }
+      )
+      if (result.ok && result.data.users) {
+        setSampleUsers(result.data.users)
       }
     } catch {
       // ignore
@@ -183,15 +180,14 @@ export function AdminCreateInAppNotificationModal({
         status: submitType === 'immediate' ? 'sending' : submitType === 'schedule' ? 'scheduled' : 'draft',
       }
 
-      const res = await fetch('/api/admin/notifications/in-app', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+      const result = await apiPost<{ success?: boolean; item: InAppBroadcastItem; error?: string }>(
+        '/api/admin/notifications/in-app',
+        payload
+      )
 
-      const json = await res.json()
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Failed to create in-app notification')
+      if (!result.ok || !result.data?.item) {
+        const errorMsg = !result.ok ? result.error.message : (result.data?.error || 'Failed to create in-app notification')
+        throw new Error(errorMsg)
       }
 
       toast(
@@ -203,7 +199,7 @@ export function AdminCreateInAppNotificationModal({
         'success'
       )
 
-      onCreated(json.item)
+      onCreated(result.data.item)
       onClose()
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Action failed', 'error')

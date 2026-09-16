@@ -5,6 +5,7 @@ import { CheckCircle, XCircle, ExternalLink, AlertTriangle, X, Check } from 'luc
 import Link from 'next/link'
 import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
+import { apiPatch } from '@/lib/api/client'
 import type { AdminFellowRequestItem } from '@/lib/admin/fellow-request-service'
 
 interface FellowRequestsViewProps {
@@ -23,15 +24,14 @@ export function FellowRequestsView({ initialQueue }: FellowRequestsViewProps) {
     setLoadingId(id)
     setErrorMsg(null)
     try {
-      const res = await fetch(`/api/admin/fellow-requests/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ decision, rejectionReason: reason }),
-      })
-      const data = await res.json()
+      const result = await apiPatch<{ success: boolean; error?: string }>(
+        `/api/admin/fellow-requests/${id}`,
+        { decision, rejectionReason: reason }
+      )
 
-      if (!res.ok || !data.success) {
-        setErrorMsg(data.error || `Failed to ${decision === 'approved' ? 'approve' : 'reject'} request.`)
+      if (!result.ok || !result.data.success) {
+        const fallback = `Failed to ${decision === 'approved' ? 'approve' : 'reject'} request.`
+        setErrorMsg(!result.ok ? result.error.message : (result.data.error || fallback))
         return
       }
 

@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ShieldCheck, ShieldX, RotateCcw, Loader2, Check } from 'lucide-react'
 import { useAdminToast } from '@/components/admin/admin-toast'
+import { apiPost } from '@/lib/api/client'
 
 export interface UserPortfolioVerificationToggleProps {
   userId: string
@@ -35,14 +36,12 @@ export function UserPortfolioVerificationToggle({
     setSuccess(false)
 
     try {
-      const res = await fetch(`/api/admin/users/${userId}/portfolio-verification`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ override: next }),
-      })
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/users/${userId}/portfolio-verification`,
+        { override: next }
+      )
 
-      const data = await res.json()
-      if (res.ok && data.success) {
+      if (result.ok && result.data.success) {
         setOverride(next)
         setIsVerified(next === 'verified' ? true : next === 'rejected' ? false : isVerified)
         setSuccess(true)
@@ -55,7 +54,8 @@ export function UserPortfolioVerificationToggle({
         setTimeout(() => setSuccess(false), 3000)
         router.refresh()
       } else {
-        toast(data.error || 'Failed to update portfolio verification.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update portfolio verification.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error updating portfolio verification.', 'error')

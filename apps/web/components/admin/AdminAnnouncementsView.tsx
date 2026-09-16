@@ -18,6 +18,9 @@ import { AdminSearchInput } from './AdminSearchInput'
 import { AdminSection } from './AdminSection'
 import { AdminAnnouncementEditorModal } from './AdminAnnouncementEditorModal'
 import { useAdminToast } from './admin-toast'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPost, apiDelete } from '@/lib/api/client'
+import type { AdminAnnouncementsResponse } from '@/lib/api/contracts/admin'
 import type { SystemAnnouncementItem } from '@/lib/admin/announcements-service'
 
 interface AdminAnnouncementsViewProps {
@@ -28,33 +31,33 @@ const STATUS_TABS = ['all', 'active', 'scheduled', 'draft', 'paused', 'expired']
 
 export function AdminAnnouncementsView({ initialAnnouncements }: AdminAnnouncementsViewProps) {
   const { toast } = useAdminToast()
-  const [announcements, setAnnouncements] = useState<SystemAnnouncementItem[]>(initialAnnouncements)
   const [statusFilter, setStatusFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [editorOpen, setEditorOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<SystemAnnouncementItem | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
-  const reloadData = async () => {
-    try {
-      const res = await fetch('/api/admin/announcements')
-      const json = await res.json()
-      if (json.success && Array.isArray(json.announcements)) {
-        setAnnouncements(json.announcements)
-      }
-    } catch (err) {
-      console.error('Failed to reload announcements:', err)
+  const { data, mutate: reloadData } = useApiQuery<AdminAnnouncementsResponse>(
+    '/api/admin/announcements',
+    {
+      fallbackData: { success: true, announcements: initialAnnouncements },
+      revalidateOnMount: false,
+      dedupingInterval: 5_000,
     }
-  }
+  )
+  const announcements = data?.announcements ?? initialAnnouncements
 
   const handlePublish = async (item: SystemAnnouncementItem) => {
     setActionLoading(item.id)
     try {
-      const res = await fetch(`/api/admin/announcements/${item.id}/publish`, {
-        method: 'POST',
-      })
-      const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.error || 'Failed to publish')
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/announcements/${item.id}/publish`,
+        {}
+      )
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to publish')
+        throw new Error(errorMsg)
+      }
       toast('Announcement published successfully', 'success')
       await reloadData()
     } catch (err) {
@@ -68,13 +71,14 @@ export function AdminAnnouncementsView({ initialAnnouncements }: AdminAnnounceme
     const nextPaused = item.status !== 'paused'
     setActionLoading(item.id)
     try {
-      const res = await fetch(`/api/admin/announcements/${item.id}/pause`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paused: nextPaused }),
-      })
-      const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.error || 'Failed to update status')
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/announcements/${item.id}/pause`,
+        { paused: nextPaused }
+      )
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update status')
+        throw new Error(errorMsg)
+      }
       toast(`Announcement ${nextPaused ? 'paused' : 'resumed'} successfully`, 'success')
       await reloadData()
     } catch (err) {
@@ -89,11 +93,13 @@ export function AdminAnnouncementsView({ initialAnnouncements }: AdminAnnounceme
 
     setActionLoading(item.id)
     try {
-      const res = await fetch(`/api/admin/announcements/${item.id}`, {
-        method: 'DELETE',
-      })
-      const json = await res.json()
-      if (!res.ok || !json.success) throw new Error(json.error || 'Failed to delete')
+      const result = await apiDelete<{ success: boolean; error?: string }>(
+        `/api/admin/announcements/${item.id}`
+      )
+      if (!result.ok || !result.data.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to delete')
+        throw new Error(errorMsg)
+      }
       toast('Announcement deleted successfully', 'success')
       await reloadData()
     } catch (err) {

@@ -20,6 +20,7 @@ import { AdminStatusBadge } from './AdminStatusBadge'
 import { AdminSendTestEmailModal } from './AdminSendTestEmailModal'
 import { useAdminToast } from './admin-toast'
 import { cn } from '@/lib/utils'
+import { apiPatch, apiPost } from '@/lib/api/client'
 import type { AdminTemplateDetail } from '@/lib/admin/communications-service'
 import { TEMPLATE_SAMPLE_VARIABLES, findUnknownVariables } from '@/lib/admin/template-variables'
 
@@ -117,25 +118,26 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
   const handleSaveDraft = async () => {
     setIsSaving(true)
     try {
-      const res = await fetch(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subjectLine: subject,
-          bodyHtml: body,
-          bodyText: body.replace(/<[^>]+>/g, ''),
-          status: 'draft',
-        }),
+      const result = await apiPatch<{
+        success?: boolean
+        data?: { version: number }
+        message?: string
+        error?: string
+      }>(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}`, {
+        subjectLine: subject,
+        bodyHtml: body,
+        bodyText: body.replace(/<[^>]+>/g, ''),
+        status: 'draft',
       })
 
-      const json = await res.json()
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to save draft')
+      if (!result.ok || result.data.error) {
+        const errorMsg = !result.ok ? result.error.message : result.data.error!
+        throw new Error(errorMsg)
       }
 
-      if (json.data?.version) setCurrentVersion(json.data.version)
+      if (result.data.data?.version) setCurrentVersion(result.data.data.version)
       setVersionStatus('draft')
-      toast(json.message || 'Draft saved successfully.', 'success')
+      toast(result.data.message || 'Draft saved successfully.', 'success')
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Save draft failed', 'error')
     } finally {
@@ -146,25 +148,26 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
   const handlePublish = async () => {
     setIsPublishing(true)
     try {
-      const res = await fetch(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subjectLine: subject,
-          bodyHtml: body,
-          bodyText: body.replace(/<[^>]+>/g, ''),
-          status: 'published',
-        }),
+      const result = await apiPatch<{
+        success?: boolean
+        data?: { version: number }
+        message?: string
+        error?: string
+      }>(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}`, {
+        subjectLine: subject,
+        bodyHtml: body,
+        bodyText: body.replace(/<[^>]+>/g, ''),
+        status: 'published',
       })
 
-      const json = await res.json()
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to publish template')
+      if (!result.ok || result.data.error) {
+        const errorMsg = !result.ok ? result.error.message : result.data.error!
+        throw new Error(errorMsg)
       }
 
-      if (json.data?.version) setCurrentVersion(json.data.version)
+      if (result.data.data?.version) setCurrentVersion(result.data.data.version)
       setVersionStatus('published')
-      toast(json.message || 'Template version published to production.', 'success')
+      toast(result.data.message || 'Template version published to production.', 'success')
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Publish failed', 'error')
     } finally {
@@ -181,19 +184,21 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
     setIsTogglingPause(true)
     try {
       const targetPause = !isPaused
-      const res = await fetch(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}/toggle-pause`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paused: targetPause }),
+      const result = await apiPost<{
+        success?: boolean
+        message?: string
+        error?: string
+      }>(`/api/admin/notifications/templates/${encodeURIComponent(detail.key)}/toggle-pause`, {
+        paused: targetPause,
       })
 
-      const json = await res.json()
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to update template state')
+      if (!result.ok || result.data.error) {
+        const errorMsg = !result.ok ? result.error.message : result.data.error!
+        throw new Error(errorMsg)
       }
 
       setIsPaused(targetPause)
-      toast(json.message || `Template ${targetPause ? 'paused' : 'resumed'}.`, 'success')
+      toast(result.data.message || `Template ${targetPause ? 'paused' : 'resumed'}.`, 'success')
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Failed to update pause state', 'error')
     } finally {

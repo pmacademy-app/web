@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Search, X, User, Check, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { apiGet } from '@/lib/api/client'
+import type { AdminUsersQueryResponse } from '@/lib/api/contracts/admin'
 
 export interface SelectedUser {
   id: string
@@ -44,11 +46,12 @@ export function AdminUserMultiSelectPicker({
     const timer = setTimeout(async () => {
       setLoading(true)
       try {
-        const res = await fetch(`/api/admin/users?search=${encodeURIComponent(query.trim())}&limit=8`)
-        const data = await res.json()
-        if (data.success && Array.isArray(data.users)) {
+        const result = await apiGet<AdminUsersQueryResponse>(
+          `/api/admin/users?search=${encodeURIComponent(query.trim())}&limit=8`
+        )
+        if (result.ok && result.data.success && Array.isArray(result.data.users)) {
           setResults(
-            data.users.map((u: { id: string; fullName?: string; email?: string; username?: string }) => ({
+            result.data.users.map((u) => ({
               id: u.id,
               name: u.fullName || null,
               email: u.email || null,

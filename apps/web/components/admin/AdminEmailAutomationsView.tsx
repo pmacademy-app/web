@@ -13,6 +13,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
+import { apiPost } from '@/lib/api/client'
 import type {
   EmailAutomationsState,
   EmailAutomationMeta,
@@ -53,18 +54,17 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
     setError(null)
     const nextState = !state.globalPause
     try {
-      const res = await fetch('/api/admin/emails/automations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settingKey: 'global_pause', payload: { enabled: nextState } }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setState(data.state)
+      const result = await apiPost<{ success: boolean; state: EmailAutomationsState; error?: string }>(
+        '/api/admin/emails/automations',
+        { settingKey: 'global_pause', payload: { enabled: nextState } }
+      )
+      if (result.ok && result.data.success) {
+        setState(result.data.state)
         toast(nextState ? 'Global email pause enabled.' : 'Global email pause deactivated.', 'info')
       } else {
-        setError(data.error || 'Failed to update global pause.')
-        toast(data.error || 'Failed to update global pause.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update global pause.')
+        setError(errorMsg)
+        toast(errorMsg, 'error')
       }
     } catch {
       setError('Network error updating global pause.')
@@ -78,18 +78,17 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
     setLoadingKey(automationKey)
     setError(null)
     try {
-      const res = await fetch('/api/admin/emails/automations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settingKey: 'toggle', payload: { automationKey, enabled: !currentEnabled } }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setState(data.state)
+      const result = await apiPost<{ success: boolean; state: EmailAutomationsState; error?: string }>(
+        '/api/admin/emails/automations',
+        { settingKey: 'toggle', payload: { automationKey, enabled: !currentEnabled } }
+      )
+      if (result.ok && result.data.success) {
+        setState(result.data.state)
         toast(`Automation '${automationKey}' ${!currentEnabled ? 'enabled' : 'disabled'}.`, 'success')
       } else {
-        setError(data.error || 'Failed to toggle automation.')
-        toast(data.error || 'Failed to toggle automation.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to toggle automation.')
+        setError(errorMsg)
+        toast(errorMsg, 'error')
       }
     } catch {
       setError('Network error updating automation.')
@@ -103,18 +102,17 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
     setLoadingKey('daily_limit')
     setError(null)
     try {
-      const res = await fetch('/api/admin/emails/automations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settingKey: 'daily_limit', payload: { limit: newLimit } }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setState(data.state)
+      const result = await apiPost<{ success: boolean; state: EmailAutomationsState; error?: string }>(
+        '/api/admin/emails/automations',
+        { settingKey: 'daily_limit', payload: { limit: newLimit } }
+      )
+      if (result.ok && result.data.success) {
+        setState(result.data.state)
         toast(`Daily limit updated to ${newLimit} emails.`, 'success')
       } else {
-        setError(data.error || 'Failed to update daily limit.')
-        toast(data.error || 'Failed to update daily limit.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update daily limit.')
+        setError(errorMsg)
+        toast(errorMsg, 'error')
       }
     } catch {
       setError('Network error updating daily limit.')
@@ -127,20 +125,19 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
   const handleSaveSchedule = async (type: 'weekly' | 'daily') => {
     setSavingSchedule(type)
     try {
-      const res = await fetch('/api/admin/emails/automations/schedule', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const result = await apiPost<{ success: boolean; schedules: EmailDigestSchedules; error?: string }>(
+        '/api/admin/emails/automations/schedule',
+        {
           weeklyRecap: type === 'weekly' ? schedules.weeklyRecap : undefined,
           dailyReminder: type === 'daily' ? schedules.dailyReminder : undefined,
-        }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setSchedules(data.schedules)
+        }
+      )
+      if (result.ok && result.data.success) {
+        setSchedules(result.data.schedules)
         toast(`${type === 'weekly' ? 'Weekly Recap' : 'Daily Reminder'} schedule updated.`, 'success')
       } else {
-        toast(data.error || 'Failed to save schedule.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to save schedule.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error saving schedule.', 'error')
@@ -152,16 +149,15 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
   const handleRunNow = async (type: 'weekly_recap' | 'daily_reminder') => {
     setRunningType(type)
     try {
-      const res = await fetch('/api/admin/emails/automations/run-now', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        toast(data.message || `Dispatched ${data.queuedCount} email(s).`, 'success')
+      const result = await apiPost<{ success: boolean; message?: string; queuedCount?: number; error?: string }>(
+        '/api/admin/emails/automations/run-now',
+        { type }
+      )
+      if (result.ok && result.data.success) {
+        toast(result.data.message || `Dispatched ${result.data.queuedCount} email(s).`, 'success')
       } else {
-        toast(data.error || 'Manual dispatch failed.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Manual dispatch failed.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error triggering manual run.', 'error')

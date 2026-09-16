@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { GraduationCap, Loader2, Check } from 'lucide-react'
 import { AdminConfirmDialog } from '@/components/admin/AdminConfirmDialog'
 import { useAdminToast } from '@/components/admin/admin-toast'
+import { apiPost } from '@/lib/api/client'
 
 export interface UserFellowToggleProps {
   userId: string
@@ -29,14 +30,12 @@ export function UserFellowToggle({ userId, initialIsFellow, userEmail }: UserFel
     setSuccess(false)
 
     try {
-      const res = await fetch(`/api/admin/users/${userId}/fellow-status`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isFellow: nextState }),
-      })
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/users/${userId}/fellow-status`,
+        { isFellow: nextState }
+      )
 
-      const data = await res.json()
-      if (res.ok && data.success) {
+      if (result.ok && result.data.success) {
         setIsFellow(nextState)
         setSuccess(true)
         toast(
@@ -46,7 +45,8 @@ export function UserFellowToggle({ userId, initialIsFellow, userEmail }: UserFel
         setTimeout(() => setSuccess(false), 3000)
         router.refresh()
       } else {
-        toast(data.error || 'Failed to update Fellow status.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update Fellow status.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error updating Fellow status.', 'error')

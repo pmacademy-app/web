@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { SendTestEmailButton } from './SendTestEmailButton'
 import { SendProductionEmailModal } from './SendProductionEmailModal'
 import { Terminal, Award, CheckCircle, AlertCircle, Loader2, Send } from 'lucide-react'
+import { apiPost } from '@/lib/api/client'
 
 export interface DeveloperActionsProps {
   targetUserId: string
@@ -29,26 +30,27 @@ export function DeveloperActionsSection({ targetUserId, targetUserEmail }: Devel
     setResult(null)
 
     try {
-      const res = await fetch('/api/admin/dev/generate-test-certificate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetUserId,
-          type: 'full_curriculum',
-        }),
+      const result = await apiPost<{
+        success: boolean
+        certificateCode?: string
+        verificationUrl?: string
+        error?: string
+      }>('/api/admin/dev/generate-test-certificate', {
+        targetUserId,
+        type: 'full_curriculum',
       })
 
-      const data = await res.json()
-      if (res.ok && data.success) {
+      if (result.ok && result.data.success) {
         setResult({
           success: true,
-          certificateCode: data.certificateCode,
-          verificationUrl: data.verificationUrl,
+          certificateCode: result.data.certificateCode,
+          verificationUrl: result.data.verificationUrl,
         })
       } else {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to generate test certificate')
         setResult({
           success: false,
-          error: data.error || 'Failed to generate test certificate',
+          error: errorMsg,
         })
       }
     } catch (err) {

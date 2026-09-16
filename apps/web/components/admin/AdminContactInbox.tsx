@@ -19,6 +19,7 @@ import { AdminEmptyState } from './AdminEmptyState'
 import { AdminPagination } from './AdminPagination'
 import { useAdminToast } from './admin-toast'
 import { cn } from '@/lib/utils'
+import { apiPatch } from '@/lib/api/client'
 
 export interface ContactMessageItem {
   id: string
@@ -137,17 +138,13 @@ export function AdminContactInbox({ initialMessages }: AdminContactInboxProps) {
     setLoadingId(messageId)
     setErrorMsg(null)
     try {
-      const res = await fetch('/api/admin/contact', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messageId,
-          status: newStatus,
-          adminNotes: notes ?? adminNotesText,
-        }),
+      const result = await apiPatch<{ success: boolean; error?: string }>('/api/admin/contact', {
+        messageId,
+        status: newStatus,
+        adminNotes: notes ?? adminNotesText,
       })
-      const data = await res.json()
-      if (res.ok && data.success) {
+
+      if (result.ok && result.data.success) {
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === messageId
@@ -157,7 +154,8 @@ export function AdminContactInbox({ initialMessages }: AdminContactInboxProps) {
         )
         toast(`Message marked as ${newStatus.replace('_', ' ')}.`, 'success')
       } else {
-        setErrorMsg(data.error || 'Failed to update contact message status.')
+        const error = !result.ok ? result.error.message : (result.data.error || 'Failed to update contact message status.')
+        setErrorMsg(error)
       }
     } catch {
       setErrorMsg('An unexpected network error occurred.')

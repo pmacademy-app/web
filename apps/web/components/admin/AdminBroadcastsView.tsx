@@ -1,9 +1,12 @@
 'use client'
 
-import React, { useState, useTransition } from 'react'
+import React, { useState } from 'react'
 import { Send, Plus, Play, XCircle, Clock, CheckCircle, AlertTriangle, RotateCcw } from 'lucide-react'
 import { AdminCreateBroadcastModal } from './AdminCreateBroadcastModal'
-import type { BroadcastRecord, BroadcastListResult } from '@/lib/admin/broadcast-service'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPost } from '@/lib/api/client'
+import type { AdminBroadcastsResponse } from '@/lib/api/contracts/admin'
+import type { BroadcastListResult } from '@/lib/admin/broadcast-service'
 import type { AdminTemplateListItem } from '@/lib/admin/communications-service'
 
 interface AdminBroadcastsViewProps {
@@ -46,32 +49,46 @@ function ProgressBar({ sent, total }: { sent: number; total: number | null }) {
 
 export function AdminBroadcastsView({ initialData, templates }: AdminBroadcastsViewProps) {
   const [showCreate, setShowCreate] = useState(false)
-  const [broadcasts, setBroadcasts] = useState<BroadcastRecord[]>(initialData?.broadcasts ?? [])
-  const [total] = useState(initialData?.total ?? 0)
   const [executing, setExecuting] = useState<string | null>(null)
   const [cancelling, setCancelling] = useState<string | null>(null)
-  const [, startTransition] = useTransition()
   const [actionMsg, setActionMsg] = useState<{ id: string; msg: string; type: 'success' | 'error' } | null>(null)
 
+  const { data, mutate: revalidateBroadcasts } = useApiQuery<AdminBroadcastsResponse>(
+    '/api/admin/emails/broadcasts',
+    {
+      fallbackData: initialData ? { success: true, data: initialData } : undefined,
+      revalidateOnMount: false,
+      dedupingInterval: 5_000,
+    }
+  )
+
+  const broadcasts = data?.data?.broadcasts ?? initialData?.broadcasts ?? []
+  const total = data?.data?.total ?? initialData?.total ?? 0
+
   const refresh = () => {
-    startTransition(async () => {
-      const res = await fetch('/api/admin/emails/broadcasts')
-      const json = await res.json()
-      if (json.data?.broadcasts) setBroadcasts(json.data.broadcasts)
-    })
+    void revalidateBroadcasts()
   }
 
   const handleExecute = async (id: string) => {
     setExecuting(id)
     setActionMsg(null)
     try {
-      const res = await fetch(`/api/admin/emails/broadcasts/${id}/execute`, { method: 'POST' })
-      const json = await res.json()
-      if (json.success) {
-        setActionMsg({ id, msg: `Batch sent: ${json.data.sent} emails, ${json.data.failed} failed. ${json.data.isComplete ? 'Broadcast complete!' : 'More batches remaining.'}`, type: 'success' })
+      const result = await apiPost<{
+        success: boolean
+        data?: { sent: number; failed: number; isComplete: boolean }
+        error?: string
+      }>(`/api/admin/emails/broadcasts/${id}/execute`, {})
+
+      if (result.ok && result.data.success && result.data.data) {
+        setActionMsg({
+          id,
+          msg: `Batch sent: ${result.data.data.sent} emails, ${result.data.data.failed} failed. ${result.data.data.isComplete ? 'Broadcast complete!' : 'More batches remaining.'}`,
+          type: 'success',
+        })
         refresh()
       } else {
-        setActionMsg({ id, msg: json.error || 'Execution failed.', type: 'error' })
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Execution failed.')
+        setActionMsg({ id, msg: errorMsg, type: 'error' })
       }
     } catch {
       setActionMsg({ id, msg: 'Network error.', type: 'error' })
@@ -84,10 +101,16 @@ export function AdminBroadcastsView({ initialData, templates }: AdminBroadcastsV
     if (!confirm('Cancel this broadcast? It will be moved back to draft.')) return
     setCancelling(id)
     try {
-      const res = await fetch(`/api/admin/emails/broadcasts/${id}/cancel`, { method: 'POST' })
-      const json = await res.json()
-      if (json.success) refresh()
-      else setActionMsg({ id, msg: json.error || 'Cancel failed.', type: 'error' })
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/emails/broadcasts/${id}/cancel`,
+        {}
+      )
+      if (result.ok && result.data.success) {
+        refresh()
+      } else {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Cancel failed.')
+        setActionMsg({ id, msg: errorMsg, type: 'error' })
+      }
     } catch {
       setActionMsg({ id, msg: 'Network error.', type: 'error' })
     } finally {

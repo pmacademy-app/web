@@ -14,6 +14,7 @@ import { AdminCreateTemplateModal } from './AdminCreateTemplateModal'
 import { AdminBroadcastModal } from './AdminBroadcastModal'
 import { useAdminToast } from './admin-toast'
 import { cn } from '@/lib/utils'
+import { apiPost } from '@/lib/api/client'
 import type { AdminTemplateListItem } from '@/lib/admin/communications-service'
 
 interface AdminTemplateListProps {
@@ -75,19 +76,18 @@ export function AdminTemplateList({ templates, category, search }: AdminTemplate
     setTogglingKey(tpl.key)
 
     try {
-      const res = await fetch(`/api/admin/notifications/templates/${encodeURIComponent(tpl.key)}/toggle-pause`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paused: targetPaused }),
-      })
+      const result = await apiPost<{ success?: boolean; message?: string; error?: string }>(
+        `/api/admin/notifications/templates/${encodeURIComponent(tpl.key)}/toggle-pause`,
+        { paused: targetPaused }
+      )
 
-      const json = await res.json()
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to toggle pause')
+      if (!result.ok || result.data.error) {
+        const errorMsg = !result.ok ? result.error.message : result.data.error!
+        throw new Error(errorMsg)
       }
 
       setPausedMap((prev) => ({ ...prev, [tpl.key]: targetPaused }))
-      toast(json.message || `Template ${targetPaused ? 'paused' : 'resumed'}.`, 'success')
+      toast(result.data.message || `Template ${targetPaused ? 'paused' : 'resumed'}.`, 'success')
       router.refresh()
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Error updating state', 'error')
@@ -265,4 +265,4 @@ export function AdminTemplateList({ templates, category, search }: AdminTemplate
       <AdminBroadcastModal open={broadcastOpen} onClose={() => setBroadcastOpen(false)} />
     </div>
   )
-}
+}

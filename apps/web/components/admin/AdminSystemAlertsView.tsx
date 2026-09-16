@@ -1,10 +1,13 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { AlertCircle, AlertTriangle, ShieldAlert, Filter, RefreshCw, Clock, Inbox } from 'lucide-react'
 import { useIsMounted } from '@/lib/admin/use-is-mounted'
 import { AdminErrorState } from './AdminErrorState'
 import { AdminEmptyState } from './AdminEmptyState'
+import { useApiQuery } from '@/lib/api/hooks'
+import { apiPatch } from '@/lib/api/client'
+import type { AdminSystemAlertsResponse } from '@/lib/api/contracts/admin'
 
 export interface SystemErrorAlert {
   id: string
@@ -70,21 +73,36 @@ function alertContext(alert: SystemErrorAlert): Array<{ label: string; value: st
 }
 
 export function AdminSystemAlertsView() {
-  const [alerts, setAlerts] = useState<SystemErrorAlert[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
   const [statusFilter, setStatusFilter] = useState<string>('new')
   const [severityFilter, setSeverityFilter] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  const [unackCriticalCount, setUnackCriticalCount] = useState<number>(0)
-  // A failed alerts query must never render as the green "no alerts" state — that made
-  // a broken monitoring pipeline look identical to a healthy system.
-  const [error, setError] = useState<string | null>(null)
   const [kindFilter, setKindFilter] = useState<string>('all')
   const [retryabilityFilter, setRetryabilityFilter] = useState<string>('all')
   const [providerFilter, setProviderFilter] = useState<string>('all')
-  const [requestId, setRequestId] = useState<number>(0)
-  const refresh = React.useCallback(() => setRequestId((n) => n + 1), [])
   const mounted = useIsMounted()
+
+  const query = new URLSearchParams({
+    status: statusFilter,
+    severity: severityFilter,
+    category: categoryFilter,
+    limit: '100',
+  })
+  const swrKey = `/api/admin/system/alerts?${query.toString()}`
+  const { data, error: queryError, isLoading, mutate: revalidateAlerts } = useApiQuery<AdminSystemAlertsResponse>(
+    swrKey,
+    {
+      refreshInterval: 30_000,
+      dedupingInterval: 5_000,
+    }
+  )
+
+  const alerts = data?.success ? (data.alerts || []) : []
+  const unackCriticalCount = data?.success ? (data.unacknowledgedCriticalCount || 0) : 0
+  const error = queryError?.message || (data && !data.success ? data.error || 'The alerts service returned an unexpected response.' : null)
+  const loading = isLoading
+  const refresh = React.useCallback(() => {
+    void revalidateAlerts()
+  }, [revalidateAlerts])
 
   const formatDateTime = (iso: string) => {
     if (!mounted || !iso) return ''
@@ -94,52 +112,6 @@ export function AdminSystemAlertsView() {
       return iso
     }
   }
-
-  // Inline effect + `requestId` refresh counter, matching AdminSystemErrorsView.
-  // A `useCallback` loader invoked from the effect trips the lint rule against
-  // synchronous setState inside an effect body.
-  useEffect(() => {
-    let isMounted = true
-    const run = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const query = new URLSearchParams({
-          status: statusFilter,
-          severity: severityFilter,
-          category: categoryFilter,
-          // Facets below are applied client-side, so pull the API's maximum window.
-          limit: '100',
-        })
-        const res = await fetch(`/api/admin/system/alerts?${query.toString()}`)
-        const data = await res.json()
-        if (!isMounted) return
-
-        if (data.success) {
-          setAlerts(data.alerts || [])
-          setUnackCriticalCount(data.unacknowledgedCriticalCount || 0)
-        } else {
-          // Never fall back to an empty list: an empty list renders as the green
-          // all-clear, which is indistinguishable from a healthy system.
-          setAlerts([])
-          setError(data.error || 'The alerts service returned an unexpected response.')
-        }
-      } catch (err) {
-        console.error('[AdminSystemAlertsView] Error loading alerts:', err)
-        if (isMounted) {
-          setAlerts([])
-          setError('Could not reach the alerts service. Check your connection and try again.')
-        }
-      } finally {
-        if (isMounted) setLoading(false)
-      }
-    }
-
-    void run()
-    return () => {
-      isMounted = false
-    }
-  }, [statusFilter, severityFilter, categoryFilter, requestId])
 
   const providerOptions = React.useMemo(() => {
     const found = new Set<string>()
@@ -166,15 +138,12 @@ export function AdminSystemAlertsView() {
 
   const handleUpdateStatus = async (alertId: string, newStatus: 'acknowledged' | 'resolved') => {
     try {
-      const res = await fetch('/api/admin/system/alerts', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ alertId, newStatus }),
+      const result = await apiPatch<{ success: boolean; error?: string }>('/api/admin/system/alerts', {
+        alertId,
+        newStatus,
       })
-      const data = await res.json()
-      if (data.success) {
-        setAlerts((prev) => prev.filter((a) => a.id !== alertId))
-        refresh()
+      if (result.ok && result.data.success) {
+        await revalidateAlerts()
       }
     } catch (err) {
       console.error('[AdminSystemAlertsView] Error updating status:', err)

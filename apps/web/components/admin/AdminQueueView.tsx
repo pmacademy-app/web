@@ -16,6 +16,7 @@ import { AdminPagination } from './AdminPagination'
 import { AdminDrawer } from './AdminDrawer'
 import { useAdminToast } from './admin-toast'
 import { cn } from '@/lib/utils'
+import { apiPost } from '@/lib/api/client'
 import type { AdminEmailHistoryItem, AdminEmailHistoryResult } from '@/lib/admin/communications-service'
 
 interface AdminQueueViewProps {
@@ -99,13 +100,19 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
   const handleProcessQueue = async () => {
     setIsProcessing(true)
     try {
-      const res = await fetch('/api/admin/emails/queue', { method: 'POST' })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        toast(`Queue processed: ${data.result?.delivered || 0} delivered, ${data.result?.failed || 0} failed.`, 'success')
+      const result = await apiPost<{ success: boolean; result?: { delivered: number; failed: number }; error?: string }>(
+        '/api/admin/emails/queue',
+        {}
+      )
+      if (result.ok && result.data.success) {
+        toast(
+          `Queue processed: ${result.data.result?.delivered || 0} delivered, ${result.data.result?.failed || 0} failed.`,
+          'success'
+        )
         router.refresh()
       } else {
-        toast(data.error || 'Failed to process queue', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to process queue')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error processing queue', 'error')
@@ -118,18 +125,19 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
   const handleRetrySingle = async (id: string) => {
     setIsRetryingSingle(true)
     try {
-      const res = await fetch(`/api/admin/emails/queue/${encodeURIComponent(id)}/retry`, {
-        method: 'POST',
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        toast(data.message || 'Item requeued for delivery.', 'success')
+      const result = await apiPost<{ success: boolean; message?: string; error?: string }>(
+        `/api/admin/emails/queue/${encodeURIComponent(id)}/retry`,
+        {}
+      )
+      if (result.ok && result.data.success) {
+        toast(result.data.message || 'Item requeued for delivery.', 'success')
         if (selected && selected.id === id) {
           setSelected({ ...selected, status: 'pending', attemptCount: 0, errorMessage: null })
         }
         router.refresh()
       } else {
-        toast(data.error || 'Retry failed', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Retry failed')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error retrying email', 'error')
@@ -143,18 +151,17 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
     if (selectedIds.length === 0) return
     setIsRetrying(true)
     try {
-      const res = await fetch('/api/admin/emails/queue/retry-selected', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: selectedIds }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        toast(data.message || `Requeued ${data.retried} email(s).`, 'success')
+      const result = await apiPost<{ success: boolean; message?: string; retried?: number; error?: string }>(
+        '/api/admin/emails/queue/retry-selected',
+        { ids: selectedIds }
+      )
+      if (result.ok && result.data.success) {
+        toast(result.data.message || `Requeued ${result.data.retried} email(s).`, 'success')
         setSelectedIds([])
         router.refresh()
       } else {
-        toast(data.error || 'Batch retry failed', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Batch retry failed')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error during batch retry', 'error')
@@ -167,17 +174,16 @@ export function AdminQueueView({ history }: AdminQueueViewProps) {
   const handleRetryAll = async () => {
     setIsRetrying(true)
     try {
-      const res = await fetch('/api/admin/emails/queue/retry-all', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ statusFilter: status }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        toast(data.message || `Requeued ${data.retried} email(s).`, 'success')
+      const result = await apiPost<{ success: boolean; message?: string; retried?: number; error?: string }>(
+        '/api/admin/emails/queue/retry-all',
+        { statusFilter: status }
+      )
+      if (result.ok && result.data.success) {
+        toast(result.data.message || `Requeued ${result.data.retried} email(s).`, 'success')
         router.refresh()
       } else {
-        toast(data.error || 'Retry all failed', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Retry all failed')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error retrying all', 'error')

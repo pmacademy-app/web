@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { AdminDatePicker } from './AdminDatePicker'
 import { AdminUserMultiSelectPicker, type SelectedUser } from './AdminUserMultiSelectPicker'
+import { apiPost } from '@/lib/api/client'
 import type { AdminUserFilters } from '@/lib/admin/types'
 import type { AdminTemplateListItem } from '@/lib/admin/communications-service'
 
@@ -123,21 +124,22 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
     setLoadingPreview(true)
     setErrorMsg(null)
     try {
-      const res = await fetch('/api/admin/emails/preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          template_key: templateKey,
-          subject_override: subjectOverride || undefined,
-        }),
+      const result = await apiPost<{
+        success: boolean
+        data?: { html: string; subject: string }
+        error?: string
+      }>('/api/admin/emails/preview', {
+        template_key: templateKey,
+        subject_override: subjectOverride || undefined,
       })
-      const json = await res.json()
-      if (json.success && json.data) {
-        setPreviewHtml(json.data.html)
-        setPreviewSubject(json.data.subject)
+
+      if (result.ok && result.data.success && result.data.data) {
+        setPreviewHtml(result.data.data.html)
+        setPreviewSubject(result.data.data.subject)
         setShowEmailPreview(true)
       } else {
-        setErrorMsg(json.error || 'Failed to generate preview')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to generate preview')
+        setErrorMsg(errorMsg)
       }
     } catch {
       setErrorMsg('Failed to connect to preview service')
@@ -150,16 +152,19 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
     setCalculating(true)
     setErrorMsg(null)
     try {
-      const res = await fetch('/api/admin/emails/broadcasts/recipient-count', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filters: customFilters ?? effectiveFilters }),
+      const result = await apiPost<{
+        success: boolean
+        count: number
+        error?: string
+      }>('/api/admin/emails/broadcasts/recipient-count', {
+        filters: customFilters ?? effectiveFilters,
       })
-      const json = await res.json()
-      if (json.success) {
-        setRecipientCount(json.count)
+
+      if (result.ok && result.data.success) {
+        setRecipientCount(result.data.count)
       } else {
-        setErrorMsg(json.error || 'Failed to calculate recipients')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to calculate recipients')
+        setErrorMsg(errorMsg)
       }
     } catch {
       setErrorMsg('Network error while estimating recipients')
@@ -171,14 +176,16 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
   const fetchSample = async () => {
     setLoadingSample(true)
     try {
-      const res = await fetch('/api/admin/emails/broadcasts/recipient-sample', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filters: effectiveFilters, limit: 20 }),
+      const result = await apiPost<{
+        success: boolean
+        sample?: Array<{ id: string; name: string | null; email: string; career_role: string | null; onboarding_completed: boolean }>
+      }>('/api/admin/emails/broadcasts/recipient-sample', {
+        filters: effectiveFilters,
+        limit: 20,
       })
-      const json = await res.json()
-      if (json.success) {
-        setSampleUsers(json.sample)
+
+      if (result.ok && result.data.success && result.data.sample) {
+        setSampleUsers(result.data.sample)
       }
     } catch {
       // ignore
@@ -204,42 +211,42 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
 
     try {
       // 1. Create the broadcast
-      const res = await fetch('/api/admin/emails/broadcasts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          description,
-          template_key: templateKey,
-          subject_override: subjectOverride || undefined,
-          batch_size: batchSize,
-          recipient_filters: effectiveFilters,
-        }),
+      const result = await apiPost<{
+        success: boolean
+        data?: { id: string }
+        error?: string
+      }>('/api/admin/emails/broadcasts', {
+        name,
+        description,
+        template_key: templateKey,
+        subject_override: subjectOverride || undefined,
+        batch_size: batchSize,
+        recipient_filters: effectiveFilters,
       })
 
-      const json = await res.json()
-      if (!json.success || !json.data?.id) {
-        throw new Error(json.error || 'Failed to create broadcast')
+      if (!result.ok || !result.data.success || !result.data.data?.id) {
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to create broadcast')
+        throw new Error(errorMsg)
       }
 
-      const broadcastId = json.data.id
+      const broadcastId = result.data.data.id
 
       // 2. Perform schedule or execute if requested
       if (sendTiming === 'immediate') {
-        const execRes = await fetch(`/api/admin/emails/broadcasts/${broadcastId}/execute`, {
-          method: 'POST',
-        })
-        const execJson = await execRes.json()
-        if (!execJson.success) {
-          console.warn('Initial batch execution warning:', execJson.error)
+        const execResult = await apiPost<{ success: boolean; error?: string }>(
+          `/api/admin/emails/broadcasts/${broadcastId}/execute`,
+          {}
+        )
+        if (!execResult.ok || !execResult.data.success) {
+          const warnMsg = !execResult.ok ? execResult.error.message : execResult.data.error
+          console.warn('Initial batch execution warning:', warnMsg)
         }
       } else if (sendTiming === 'schedule') {
         const dt = new Date(`${scheduledDate}T${scheduledTime}:00`)
-        await fetch(`/api/admin/emails/broadcasts/${broadcastId}/schedule`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ scheduledAt: dt.toISOString() }),
-        })
+        await apiPost<{ success: boolean; error?: string }>(
+          `/api/admin/emails/broadcasts/${broadcastId}/schedule`,
+          { scheduledAt: dt.toISOString() }
+        )
       }
 
       onCreated()
@@ -615,7 +622,7 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
               {/* Onboarding Persona Targeting */}
               <div className="space-y-3 pt-2 border-t border-admin-border">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-admin-accent">Onboarding & Persona</h3>
-                
+
                 <div className="grid grid-cols-2 gap-3">
                   <label className="space-y-1">
                     <span className="text-[11px] font-semibold text-admin-fg-muted">Onboarding Status</span>

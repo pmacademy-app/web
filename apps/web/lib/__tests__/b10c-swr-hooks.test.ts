@@ -301,15 +301,18 @@ describe('B10-C — Client/Server Architectural Boundaries', () => {
     }
   })
 
-  it('components/admin remaining unmigrated until B10-D', () => {
+  it('components/admin adopts lib/api/hooks in B10-D', () => {
     const adminDir = path.join(ROOT, 'components/admin')
     const files = readdirSync(adminDir).filter((f) => statSync(path.join(adminDir, f)).isFile())
 
-    for (const file of files) {
+    const swrHits = files.filter((file) => {
       const source = readFileSync(path.join(adminDir, file), 'utf8')
-      expect(source, `${file} should not use lib/api/hooks until B10-D`).not.toContain(
-        '@/lib/api/hooks'
-      )
-    }
+      return source.includes('@/lib/api/hooks')
+    })
+    expect(swrHits).toContain('AdminSystemAlertsView.tsx')
+    expect(swrHits).toContain('AdminSystemErrorsView.tsx')
+    expect(swrHits).toContain('AdminSystemAuditView.tsx')
+    expect(swrHits).toContain('AdminAnnouncementsView.tsx')
+    expect(swrHits).toContain('AdminBroadcastsView.tsx')
   })
 })

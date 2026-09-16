@@ -3,6 +3,7 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { X, Plus, FileCode, Code2, Eye, AlertTriangle } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
+import { apiPost } from '@/lib/api/client'
 import { cn } from '@/lib/utils'
 import { TEMPLATE_SAMPLE_VARIABLES, TEMPLATE_VARIABLE_CATALOG, findUnknownVariables } from '@/lib/admin/template-variables'
 
@@ -68,24 +69,22 @@ export function AdminCreateTemplateModal({ open, onClose, onCreated }: AdminCrea
 
     setIsSubmitting(true)
     try {
-      const res = await fetch('/api/admin/notifications/templates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const result = await apiPost<{ success?: boolean; message?: string; error?: string }>(
+        '/api/admin/notifications/templates',
+        {
           key: key.trim(),
           name: name.trim() || key.trim(),
           category: category.trim(),
           subjectLine: subjectLine.trim(),
           bodyHtml: bodyHtml.trim(),
-        }),
-      })
+        }
+      )
 
-      const json = await res.json()
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to create template')
+      if (!result.ok) {
+        throw new Error(result.error.message)
       }
 
-      toast(json.message || 'Email template created successfully!', 'success')
+      toast(result.data?.message || 'Email template created successfully!', 'success')
       onClose()
       onCreated?.()
     } catch (err) {

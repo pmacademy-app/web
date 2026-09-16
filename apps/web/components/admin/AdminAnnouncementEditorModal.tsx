@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { X, Megaphone, Eye, Save, Send, AlertTriangle, Info, CheckCircle2, ShieldAlert } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
+import { apiPost, apiPatch } from '@/lib/api/client'
 import type { SystemAnnouncementItem, AnnouncementType, AnnouncementStatus, AnnouncementTarget } from '@/lib/admin/announcements-service'
 
 interface AdminAnnouncementEditorModalProps {
@@ -67,20 +68,13 @@ export function AdminAnnouncementEditorModal({
         priority: Number(priority) || 1,
       }
 
-      const url = isEditing
-        ? `/api/admin/announcements/${announcement?.id}`
-        : '/api/admin/announcements'
-      const method = isEditing ? 'PATCH' : 'POST'
+      const result = isEditing
+        ? await apiPatch<{ success?: boolean; error?: string }>(`/api/admin/announcements/${announcement?.id}`, payload)
+        : await apiPost<{ success?: boolean; error?: string }>('/api/admin/announcements', payload)
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-
-      const json = await res.json()
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Failed to save announcement')
+      if (!result.ok || !result.data?.success) {
+        const errorMsg = !result.ok ? result.error.message : (result.data?.error || 'Failed to save announcement')
+        throw new Error(errorMsg)
       }
 
       toast(

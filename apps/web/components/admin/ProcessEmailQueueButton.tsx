@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Play, Loader2, Check, AlertCircle } from 'lucide-react'
+import { apiPost } from '@/lib/api/client'
 
 export function ProcessEmailQueueButton() {
   const [loading, setLoading] = useState(false)
@@ -12,16 +13,17 @@ export function ProcessEmailQueueButton() {
     setResult(null)
 
     try {
-      const res = await fetch('/api/admin/emails/queue', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
+      const apiRes = await apiPost<{
+        success: boolean
+        result?: { processed?: number; delivered?: number; failed?: number }
+        error?: string
+      }>('/api/admin/emails/queue', {})
 
-      const data = await res.json()
-      if (res.ok && data.success) {
-        setResult(data.result)
+      if (apiRes.ok && apiRes.data.success) {
+        setResult(apiRes.data.result || {})
       } else {
-        setResult({ error: data.error || 'Failed to process email queue.' })
+        const errorMsg = !apiRes.ok ? apiRes.error.message : (apiRes.data.error || 'Failed to process email queue.')
+        setResult({ error: errorMsg })
       }
     } catch {
       setResult({ error: 'Network error trigger processing queue.' })

@@ -7,6 +7,7 @@ import { AdminDrawer } from './AdminDrawer'
 import { AdminEmptyState } from './AdminEmptyState'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { useAdminToast } from './admin-toast'
+import { apiPatch } from '@/lib/api/client'
 
 export interface AdminFeedbackItem {
   id: string
@@ -31,13 +32,12 @@ export function FeedbackListView({ initialFeedback }: { initialFeedback: AdminFe
   const handleStatusChange = async (feedbackId: string, newStatus: string) => {
     setIsUpdating(true)
     try {
-      const res = await fetch(`/api/admin/feedback/${feedbackId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'update_status', status: newStatus }),
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
+      const result = await apiPatch<{ success: boolean; error?: string }>(
+        `/api/admin/feedback/${feedbackId}`,
+        { action: 'update_status', status: newStatus }
+      )
+
+      if (result.ok && result.data.success) {
         toast(`Feedback marked as ${newStatus}.`, 'success')
         setFeedbackList((prev) =>
           prev.map((item) => (item.id === feedbackId ? { ...item, status: newStatus } : item))
@@ -46,7 +46,8 @@ export function FeedbackListView({ initialFeedback }: { initialFeedback: AdminFe
           setSelected((prev) => (prev ? { ...prev, status: newStatus } : null))
         }
       } else {
-        toast(data.error || 'Failed to update status.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update status.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error updating feedback status.', 'error')
@@ -246,4 +247,4 @@ export function FeedbackListView({ initialFeedback }: { initialFeedback: AdminFe
       </AdminDrawer>
     </div>
   )
-}
+}

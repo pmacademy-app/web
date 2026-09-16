@@ -5,6 +5,7 @@ import { AdminDrawer } from './AdminDrawer'
 import { AdminDetailItem } from './AdminDetailItem'
 import { AdminErrorSeverityBadge, AdminErrorStatusBadge } from './AdminErrorBadges'
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import { apiPatch } from '@/lib/api/client'
 import type { AdminErrorGroup } from '@/lib/admin/types'
 
 interface AdminErrorDetailDrawerProps {
@@ -27,17 +28,16 @@ export function AdminErrorDetailDrawer({ group, open, onOpenChange, onStatusChan
     setUpdating(newStatus)
     setError(null)
     try {
-      const res = await fetch('/api/admin/system/errors', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fingerprint: group.fingerprint, newStatus }),
-      })
-      const data = await res.json()
-      if (data.success) {
+      const result = await apiPatch<{ success?: boolean; error?: string }>(
+        '/api/admin/system/errors',
+        { fingerprint: group.fingerprint, newStatus }
+      )
+      if (result.ok && result.data.success) {
         onStatusChange?.(group.fingerprint, newStatus)
         onOpenChange(false)
       } else {
-        setError(data.error || 'Failed to update status.')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update status.')
+        setError(errorMsg)
       }
     } catch {
       setError('Network error while updating error status.')
@@ -118,4 +118,4 @@ export function AdminErrorDetailDrawer({ group, open, onOpenChange, onStatusChan
       ) : null}
     </AdminDrawer>
   )
-}
+}

@@ -20,8 +20,9 @@ import {
 } from 'lucide-react'
 import { getAdminSectionLabel } from '@/lib/admin/navigation'
 import { signOutAdmin } from '@/lib/admin/session'
+import { apiGet } from '@/lib/api/client'
 import type { AdminConsoleUser } from './AdminConsoleShell'
-import type { AdminSearchResponse } from '@/app/api/admin/search/route'
+import type { AdminSearchResponse } from '@/lib/api/contracts/admin'
 
 interface AdminHeaderProps {
   onToggleMobileMenu?: () => void
@@ -154,12 +155,9 @@ export function AdminHeader({
     const timer = setTimeout(async () => {
       setSearching(true)
       try {
-        const res = await fetch(`/api/admin/search?q=${encodeURIComponent(trimmed)}`)
-        if (res.ok) {
-          const data: AdminSearchResponse = await res.json()
-          if (data.success) {
-            setSearchResults(data.results)
-          }
+        const result = await apiGet<AdminSearchResponse>(`/api/admin/search?q=${encodeURIComponent(trimmed)}`)
+        if (result.ok && result.data.success) {
+          setSearchResults(result.data.results)
         }
       } catch (err) {
         console.error('Search failed:', err)

@@ -433,16 +433,17 @@ describe('B10-B/B10-C — adoption boundary', () => {
       }
     }
 
-    // Admin call sites remain unmigrated until B10-D
+    // Admin call sites migrated in B10-D
     const adminHits = hits.filter((h) => h.includes('components/admin'))
-    expect(adminHits).toEqual([])
+    expect(adminHits.length).toBeGreaterThanOrEqual(30)
 
-    // Every hit belongs to the B10-C scope
+    // Every hit belongs to the B10-C / B10-D scope
     for (const hit of hits) {
       expect(
         hit.startsWith('components/settings') ||
           hit.startsWith('components/notifications') ||
           hit.startsWith('components/feedback') ||
+          hit.startsWith('components/admin') ||
           hit.startsWith('app/(app)/academy') ||
           hit.startsWith('hooks/use-lesson-progress') ||
           hit === 'lib/api/hooks.ts',

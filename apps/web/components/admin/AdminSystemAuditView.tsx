@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Info, RefreshCw } from 'lucide-react'
 import { AdminDataTable, type Column } from './AdminDataTable'
 import { AdminStatusBadge } from './AdminStatusBadge'
@@ -10,7 +10,9 @@ import { AdminSearchInput } from './AdminSearchInput'
 import { AdminDatePicker } from './AdminDatePicker'
 import { AdminAuditEntryDrawer } from './AdminAuditEntryDrawer'
 import { useIsMounted } from '@/lib/admin/use-is-mounted'
+import { useApiQuery } from '@/lib/api/hooks'
 import type { AdminAuditEntry, AdminAuditLogResult } from '@/lib/admin/types'
+import type { AdminSystemAuditLogResponse } from '@/lib/api/contracts/admin'
 
 interface AdminSystemAuditViewProps {
   initial: AdminAuditLogResult
@@ -29,23 +31,8 @@ export function AdminSystemAuditView({ initial }: AdminSystemAuditViewProps) {
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
   const [page, setPage] = useState(1)
-  const [requestId, setRequestId] = useState(0)
-  const [data, setData] = useState<AdminAuditLogResult>(initial)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<AdminAuditEntry | null>(null)
   const mounted = useIsMounted()
-
-  const refresh = useCallback(() => setRequestId((n) => n + 1), [])
-
-  const formatDateTime = (iso: string) => {
-    if (!mounted || !iso) return ''
-    try {
-      return new Date(iso).toLocaleString()
-    } catch {
-      return iso
-    }
-  }
 
   // Convert local date string (YYYY-MM-DD) to UTC ISO range for API.
   // The AdminDatePicker returns local dates; we convert to UTC midnight boundaries.
@@ -56,40 +43,45 @@ export function AdminSystemAuditView({ initial }: AdminSystemAuditViewProps) {
     return date.toISOString()
   }
 
-  useEffect(() => {
-    let isMounted = true
-    const run = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const query = new URLSearchParams({
-          admin,
-          action,
-          target,
-          from: toUtcRange(from, false),
-          to: toUtcRange(to, true),
-          page: String(page),
-          pageSize: '25',
-        })
-        const res = await fetch(`/api/admin/system/audit?${query.toString()}`)
-        const json = await res.json()
-        if (!isMounted) return
-        if (json.success) {
-          setData(json)
-        } else {
-          setError(json.error || 'Failed to load the audit log.')
-        }
-      } catch {
-        if (isMounted) setError('Network error while loading the audit log.')
-      } finally {
-        if (isMounted) setLoading(false)
-      }
+  const query = new URLSearchParams({
+    admin,
+    action,
+    target,
+    from: toUtcRange(from, false),
+    to: toUtcRange(to, true),
+    page: String(page),
+    pageSize: '25',
+  })
+  const swrKey = `/api/admin/system/audit?${query.toString()}`
+  const {
+    data: queryData,
+    error: apiError,
+    isLoading,
+    mutate: revalidateAudit,
+  } = useApiQuery<AdminSystemAuditLogResponse>(swrKey, {
+    fallbackData: initial,
+    revalidateOnMount: false,
+    dedupingInterval: 5_000,
+  })
+
+  const data = queryData || initial
+  const loading = isLoading
+  const error =
+    apiError?.message ||
+    (data && 'success' in data && !data.success ? (data as AdminSystemAuditLogResponse).error || 'Failed to load the audit log.' : null)
+
+  const refresh = useCallback(() => {
+    void revalidateAudit()
+  }, [revalidateAudit])
+
+  const formatDateTime = (iso: string) => {
+    if (!mounted || !iso) return ''
+    try {
+      return new Date(iso).toLocaleString()
+    } catch {
+      return iso
     }
-    void run()
-    return () => {
-      isMounted = false
-    }
-  }, [admin, action, target, from, to, page, requestId])
+  }
 
   const columns: Column<AdminAuditEntry>[] = [
     {

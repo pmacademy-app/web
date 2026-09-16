@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils'
 import { AdminPageHeader } from './AdminPageHeader'
 import { AdminConfirmDialog } from './AdminConfirmDialog'
 import { useAdminToast } from './admin-toast'
+import { apiPatch } from '@/lib/api/client'
 import { ProductSettingsSection } from './ProductSettingsSection'
 import { LearningSettingsSection } from './LearningSettingsSection'
 import { EmailSettingsSection } from './EmailSettingsSection'
@@ -144,17 +145,16 @@ export function SettingsWorkspace({
     async (section: Exclude<SettingsSectionKey, 'feature-flags'>) => {
       setSavingSection(section)
       try {
-        const res = await fetch(`/api/admin/settings?section=${section}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sectionData[section]),
-        })
-        const data = await res.json()
-        if (res.ok && data.success) {
+        const result = await apiPatch<{ success: boolean; error?: string }>(
+          `/api/admin/settings?section=${section}`,
+          sectionData[section]
+        )
+        if (result.ok && result.data.success) {
           markClean(section)
           toast(`${section.charAt(0).toUpperCase() + section.slice(1)} settings saved.`, 'success')
         } else {
-          toast(data.error || 'Failed to save settings.', 'error')
+          const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to save settings.')
+          toast(errorMsg, 'error')
         }
       } catch {
         toast('Network error saving settings.', 'error')

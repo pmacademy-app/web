@@ -9,6 +9,7 @@ import {
   Link as LinkIcon,
 } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
+import { apiPatch } from '@/lib/api/client'
 import type {
   InAppPriorityLevel,
   InAppCategory,
@@ -80,19 +81,18 @@ function EditForm({
         expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
       }
 
-      const res = await fetch(`/api/admin/notifications/in-app/${broadcast.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+      const result = await apiPatch<{ success?: boolean; item: InAppBroadcastItem; error?: string }>(
+        `/api/admin/notifications/in-app/${broadcast.id}`,
+        payload
+      )
 
-      const json = await res.json()
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Failed to update in-app notification')
+      if (!result.ok || !result.data?.item) {
+        const errorMsg = !result.ok ? result.error.message : (result.data?.error || 'Failed to update in-app notification')
+        throw new Error(errorMsg)
       }
 
       toast('In-App notification updated successfully!', 'success')
-      onUpdated(json.item)
+      onUpdated(result.data.item)
       onClose()
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Update failed', 'error')

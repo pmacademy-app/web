@@ -9,6 +9,7 @@ import { AdminConfirmDialog } from './AdminConfirmDialog'
 import { AdminEmptyState } from './AdminEmptyState'
 import { AdminStatusBadge } from './AdminStatusBadge'
 import { useAdminToast } from './admin-toast'
+import { apiPost } from '@/lib/api/client'
 import type { AdminCapstoneRow } from '@/lib/admin/achievements-aggregation'
 
 interface CapstoneReviewDrawerProps {
@@ -28,13 +29,12 @@ export function CapstoneReviewDrawer({ capstoneId, capstone, isOpen, onClose }: 
     if (!capstone) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/admin/capstones/${capstone.id}/review`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action }),
-      })
-      const data = await res.json()
-      if (data.success) {
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/capstones/${capstone.id}/review`,
+        { action }
+      )
+
+      if (result.ok && result.data.success) {
         toast(
           action === 'approve'
             ? `Capstone approved and published to ${capstone.learnerName}'s portfolio.`
@@ -45,7 +45,8 @@ export function CapstoneReviewDrawer({ capstoneId, capstone, isOpen, onClose }: 
         onClose()
         router.refresh()
       } else {
-        toast(data.error || 'Review action failed. Please try again.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Review action failed. Please try again.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Review action failed. Please try again.', 'error')

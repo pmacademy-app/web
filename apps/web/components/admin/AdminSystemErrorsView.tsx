@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Filter, RefreshCw } from 'lucide-react'
 import { AdminDataTable, type Column } from './AdminDataTable'
 import { AdminPagination } from './AdminPagination'
@@ -8,7 +8,9 @@ import { AdminErrorState } from './AdminErrorState'
 import { AdminErrorSeverityBadge, AdminErrorStatusBadge } from './AdminErrorBadges'
 import { AdminErrorDetailDrawer } from './AdminErrorDetailDrawer'
 import { useIsMounted } from '@/lib/admin/use-is-mounted'
+import { useApiQuery } from '@/lib/api/hooks'
 import type { AdminErrorGroup, AdminErrorGroupResult } from '@/lib/admin/types'
+import type { AdminSystemErrorsResponse } from '@/lib/api/contracts/admin'
 import type { ErrorCategory } from '@/lib/monitoring/logger'
 
 interface AdminSystemErrorsViewProps {
@@ -22,22 +24,44 @@ const STATUSES = ['all', 'new', 'acknowledged', 'resolved'] as const
 /**
  * Errors tab (spec §7.5): grouped operational failures from `system_errors`,
  * filterable by severity, category and status, with pagination. Rows open a
- * detail drawer. Initial data is server-rendered; filters refetch client-side.
+ * detail drawer; lifecycle status can be updated from there.
  */
 export function AdminSystemErrorsView({ initial }: AdminSystemErrorsViewProps) {
   const [severity, setSeverity] = useState('all')
   const [category, setCategory] = useState('all')
   const [status, setStatus] = useState('all')
   const [page, setPage] = useState(1)
-  const [requestId, setRequestId] = useState(0)
-  const [data, setData] = useState<AdminErrorGroupResult>(initial)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [selected, setSelected] = useState<AdminErrorGroup | null>(null)
   const mounted = useIsMounted()
-  const isFirstRender = useRef(true)
 
-  const refresh = useCallback(() => setRequestId((n) => n + 1), [])
+  const query = new URLSearchParams({
+    severity,
+    category,
+    status,
+    page: String(page),
+    pageSize: '25',
+  })
+  const swrKey = `/api/admin/system/errors?${query.toString()}`
+  const {
+    data: queryData,
+    error: apiError,
+    isLoading,
+    mutate: revalidateErrors,
+  } = useApiQuery<AdminSystemErrorsResponse>(swrKey, {
+    fallbackData: initial,
+    revalidateOnMount: false,
+    dedupingInterval: 5_000,
+  })
+
+  const data = queryData || initial
+  const loading = isLoading
+  const error =
+    apiError?.message ||
+    (data && 'success' in data && !data.success ? (data as AdminSystemErrorsResponse).error || 'Failed to load system errors.' : null)
+
+  const refresh = useCallback(() => {
+    void revalidateErrors()
+  }, [revalidateErrors])
 
   const formatDateTime = (iso: string) => {
     if (!mounted || !iso) return ''
@@ -47,44 +71,6 @@ export function AdminSystemErrorsView({ initial }: AdminSystemErrorsViewProps) {
       return iso
     }
   }
-
-  useEffect(() => {
-    // Skip the initial fetch on mount since we have server-rendered initial data.
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
-    }
-    let isMounted = true
-    const run = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const query = new URLSearchParams({
-          severity,
-          category,
-          status,
-          page: String(page),
-          pageSize: '25',
-        })
-        const res = await fetch(`/api/admin/system/errors?${query.toString()}`)
-        const json = await res.json()
-        if (!isMounted) return
-        if (json.success) {
-          setData(json)
-        } else {
-          setError(json.error || 'Failed to load system errors.')
-        }
-      } catch {
-        if (isMounted) setError('Network error while loading system errors.')
-      } finally {
-        if (isMounted) setLoading(false)
-      }
-    }
-    void run()
-    return () => {
-      isMounted = false
-    }
-  }, [severity, category, status, page, requestId])
 
   const columns: Column<AdminErrorGroup>[] = [
     {

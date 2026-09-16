@@ -18,6 +18,7 @@ import { AdminDataTable, Column } from './AdminDataTable'
 import { AdminEmptyState } from './AdminEmptyState'
 import { AdminConfirmDialog } from './AdminConfirmDialog'
 import { useAdminToast } from './admin-toast'
+import { apiPost } from '@/lib/api/client'
 import type { AdminPortfolioRow } from '@/lib/admin/achievements-aggregation'
 
 interface PortfoliosViewProps {
@@ -66,15 +67,12 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
     setUnverifyTarget(null)
 
     try {
-      const res = await fetch(`/api/admin/users/${targetUser.userId}/fellow-status`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isFellow: nextFellowState }),
-      })
+      const result = await apiPost<{ success: boolean; error?: string }>(
+        `/api/admin/users/${targetUser.userId}/fellow-status`,
+        { isFellow: nextFellowState }
+      )
 
-      const data = await res.json()
-
-      if (res.ok && data.success) {
+      if (result.ok && result.data.success) {
         setPortfolios((prev) =>
           prev.map((item) =>
             item.userId === targetUser.userId ? { ...item, isFellow: nextFellowState } : item
@@ -87,7 +85,8 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
           'success'
         )
       } else {
-        toast(data.error || 'Failed to update portfolio verification status.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update portfolio verification status.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error updating portfolio verification status.', 'error')
@@ -405,4 +404,4 @@ export function PortfoliosView({ initialPortfolios }: PortfoliosViewProps) {
       )}
     </div>
   )
-}
+}

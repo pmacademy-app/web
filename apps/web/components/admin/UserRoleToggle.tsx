@@ -6,6 +6,7 @@ import { Shield, Loader2, Check } from 'lucide-react'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminConfirmDialog } from '@/components/admin/AdminConfirmDialog'
 import { useAdminToast } from '@/components/admin/admin-toast'
+import { apiPatch } from '@/lib/api/client'
 
 export interface UserRoleToggleProps {
   userId: string
@@ -30,17 +31,12 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
     setSuccess(false)
 
     try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetUserId: userId,
-          makeAdmin: nextRole,
-        }),
+      const result = await apiPatch<{ success: boolean; error?: string }>('/api/admin/users', {
+        targetUserId: userId,
+        makeAdmin: nextRole,
       })
 
-      const data = await res.json()
-      if (res.ok && data.success) {
+      if (result.ok && result.data.success) {
         setIsAdmin(nextRole)
         setSuccess(true)
         toast(`User ${userEmail} is now ${nextRole ? 'an Admin' : 'a Learner'}.`, 'success')
@@ -48,7 +44,8 @@ export function UserRoleToggle({ userId, initialIsAdmin, userEmail }: UserRoleTo
         // Re-fetch the server-rendered list so the table's role badge stays in sync.
         router.refresh()
       } else {
-        toast(data.error || 'Failed to update user role.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to update user role.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error updating user role.', 'error')

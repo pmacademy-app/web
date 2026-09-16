@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { AdminToggle } from './AdminToggle'
 import { useAdminToast } from '@/components/admin/admin-toast'
+import { apiPatch } from '@/lib/api/client'
 
 export interface FeatureFlagToggleProps {
   flagKey: string
@@ -21,21 +22,17 @@ export function FeatureFlagToggle({ flagKey, initialEnabled, disabled = false }:
     setLoading(true)
 
     try {
-      const res = await fetch('/api/admin/feature-flags', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          key: flagKey,
-          enabled: nextState,
-        }),
+      const result = await apiPatch<{ success: boolean; error?: string }>('/api/admin/feature-flags', {
+        key: flagKey,
+        enabled: nextState,
       })
 
-      const data = await res.json()
-      if (res.ok && data.success) {
+      if (result.ok && result.data.success) {
         setEnabled(nextState)
         toast(`Feature flag "${flagKey}" ${nextState ? 'enabled' : 'disabled'}.`, 'success')
       } else {
-        toast(data.error || 'Failed to toggle feature flag.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to toggle feature flag.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error toggling feature flag.', 'error')

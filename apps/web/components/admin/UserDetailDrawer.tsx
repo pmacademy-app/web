@@ -16,6 +16,7 @@ import { DeveloperActionsSection } from './DeveloperActionsSection'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { USER_DETAIL_TABS, UserTabPanels, type UserDetailTabKey } from './UserTabPanels'
 import { useAdminToast } from './admin-toast'
+import { apiPost, apiDelete } from '@/lib/api/client'
 import type { AdminUserDetail } from '@/lib/admin/types'
 
 interface UserDetailDrawerProps {
@@ -73,13 +74,14 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
     setPendingAction(null)
     setBusy(action)
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
-        method: action === 'delete' ? 'DELETE' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: action === 'reset' ? JSON.stringify({ action: 'reset_progress' }) : undefined,
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
+      const result =
+        action === 'delete'
+          ? await apiDelete<{ success: boolean; error?: string }>(`/api/admin/users/${user.id}`)
+          : await apiPost<{ success: boolean; error?: string }>(`/api/admin/users/${user.id}`, {
+              action: 'reset_progress',
+            })
+
+      if (result.ok && result.data.success) {
         toast(
           action === 'delete'
             ? `Deleted user account for ${user.email}.`
@@ -91,7 +93,9 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
         // progress is reflected in the table immediately.
         router.refresh()
       } else {
-        toast(data.error || (action === 'delete' ? 'Failed to delete account.' : 'Failed to reset progress.'), 'error')
+        const fallback = action === 'delete' ? 'Failed to delete account.' : 'Failed to reset progress.'
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || fallback)
+        toast(errorMsg, 'error')
       }
     } catch {
       toast(action === 'delete' ? 'Network error deleting account.' : 'Network error resetting progress.', 'error')
@@ -103,20 +107,16 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
   const resendVerification = async () => {
     if (!user) return
     try {
-      const res = await fetch('/api/admin/emails/production-send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetUserId: user.id,
-          templateKey: 'auth.verify_email',
-          confirmProductionSend: true,
-        }),
+      const result = await apiPost<{ success: boolean; error?: string }>('/api/admin/emails/production-send', {
+        targetUserId: user.id,
+        templateKey: 'auth.verify_email',
+        confirmProductionSend: true,
       })
-      const data = await res.json()
-      if (res.ok && data.success) {
+      if (result.ok && result.data.success) {
         toast(`Verification email resent to ${user.email}.`, 'success')
       } else {
-        toast(data.error || 'Failed to resend verification email.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to resend verification email.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error resending verification email.', 'error')
@@ -130,18 +130,17 @@ export function UserDetailDrawer({ userId, user, isOpen, onClose }: UserDetailDr
     setResetModuleTarget(null)
     setBusy('reset')
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reset_module', moduleSlug }),
+      const result = await apiPost<{ success: boolean; error?: string }>(`/api/admin/users/${user.id}`, {
+        action: 'reset_module',
+        moduleSlug,
       })
-      const data = await res.json()
-      if (res.ok && data.success) {
+      if (result.ok && result.data.success) {
         toast(`Reset progress for module "${moduleSlug}" for ${user.email}.`, 'success')
         onClose()
         router.refresh()
       } else {
-        toast(data.error || 'Failed to reset module progress.', 'error')
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to reset module progress.')
+        toast(errorMsg, 'error')
       }
     } catch {
       toast('Network error resetting module progress.', 'error')

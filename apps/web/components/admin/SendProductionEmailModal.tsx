@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Send, AlertTriangle, CheckCircle2, X, ShieldAlert, Mail } from 'lucide-react'
+import { apiPost } from '@/lib/api/client'
 
 export interface TargetUser {
   id: string
@@ -65,23 +66,21 @@ export function SendProductionEmailModal({
         if (customActionUrl.trim()) customVariables.actionUrl = customActionUrl.trim()
       }
 
-      const res = await fetch('/api/admin/emails/production-send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const result = await apiPost<{ success: boolean; message?: string; error?: string }>(
+        '/api/admin/emails/production-send',
+        {
           targetUserId: targetUser.id,
           templateKey: selectedTemplate,
           customVariables: Object.keys(customVariables).length > 0 ? customVariables : undefined,
-        }),
-      })
+        }
+      )
 
-      const data = await res.json()
-
-      if (res.ok && data.success) {
-        setResultMessage({ type: 'success', text: data.message || 'Production email sent successfully!' })
+      if (result.ok && result.data.success) {
+        setResultMessage({ type: 'success', text: result.data.message || 'Production email sent successfully!' })
         onSuccess?.()
       } else {
-        setResultMessage({ type: 'error', text: data.error || 'Failed to dispatch production email.' })
+        const errorMsg = !result.ok ? result.error.message : (result.data.error || 'Failed to dispatch production email.')
+        setResultMessage({ type: 'error', text: errorMsg })
       }
     } catch (err) {
       console.error('[SendProductionEmailModal] Network error:', err)
