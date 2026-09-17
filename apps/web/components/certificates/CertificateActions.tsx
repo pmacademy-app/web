@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { Printer, Copy, Check, Share2, ExternalLink } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { buildLinkedInCertificationUrl } from '@/lib/certificates/linkedin-url'
 
 interface CertificateActionsProps {
@@ -78,14 +79,15 @@ export function CertificateActions({
     <div className="no-print flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl border border-border bg-card/80 shadow-xs">
       {/* Left: Print & LinkedIn Add-to-Profile */}
       <div className="flex items-center gap-2.5 flex-wrap">
-        <button
+        <Button
           type="button"
+          size="sm"
           onClick={handlePrint}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+          className="rounded-xl font-bold gap-2"
         >
           <Printer className="w-4 h-4" />
           <span>Print / Download PDF</span>
-        </button>
+        </Button>
 
         {/* Add to LinkedIn Profile Button */}
         <a
@@ -102,19 +104,23 @@ export function CertificateActions({
 
       {/* Right: Share, Copy Link & View Portfolio */}
       <div className="flex items-center gap-3 flex-wrap">
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={handleShare}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-background hover:bg-secondary text-foreground font-bold text-xs transition-colors cursor-pointer"
+          className="rounded-xl font-bold gap-1.5"
         >
           <Share2 className="w-3.5 h-3.5 text-primary" />
           <span>{hasNativeShare ? 'Share Certificate' : 'Share'}</span>
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={handleCopyLink}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="rounded-xl font-semibold text-muted-foreground hover:text-foreground gap-1.5"
         >
           {copied ? (
             <>
@@ -127,7 +133,7 @@ export function CertificateActions({
               <span>Copy Link</span>
             </>
           )}
-        </button>
+        </Button>
 
         <Link
           href={portfolioUrl}

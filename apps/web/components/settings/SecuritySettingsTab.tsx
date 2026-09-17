@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react'
 import { Shield, Key, Lock, Loader2, CheckCircle2, AlertCircle, Eye, EyeOff, Mail, Send } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
 import type {
@@ -93,7 +95,7 @@ function ChangeEmailCard() {
             Current Password
           </label>
           <div className="relative">
-            <input
+            <Input
               id="settings-email-password"
               type={showEmailPassword ? 'text' : 'password'}
               required
@@ -101,7 +103,7 @@ function ChangeEmailCard() {
               value={emailPassword}
               onChange={(e) => setEmailPassword(e.target.value)}
               placeholder="Confirm it's you"
-              className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-xl pr-10"
             />
             <button
               type="button"
@@ -118,7 +120,7 @@ function ChangeEmailCard() {
           <label htmlFor="settings-new-email" className="block text-xs font-semibold text-foreground">
             New Email Address
           </label>
-          <input
+          <Input
             id="settings-new-email"
             type="email"
             required
@@ -126,7 +128,7 @@ function ChangeEmailCard() {
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
             placeholder="you@newdomain.com"
-            className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-xl"
           />
         </div>
       </div>
@@ -145,14 +147,16 @@ function ChangeEmailCard() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
+          loading={submittingEmail}
           disabled={submittingEmail || !emailPassword || !newEmail}
-          className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          size="sm"
+          className="rounded-xl"
         >
-          {submittingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          {!submittingEmail && <Send className="w-4 h-4" />}
           {submittingEmail ? 'Sending...' : 'Send Confirmation Link'}
-        </button>
+        </Button>
       </div>
     </form>
   )
@@ -247,7 +251,7 @@ export function SecuritySettingsTab() {
               Current Password
             </label>
             <div className="relative">
-              <input
+              <Input
                 id="settings-current-password"
                 type={showCurrentPassword ? 'text' : 'password'}
                 required
@@ -255,7 +259,7 @@ export function SecuritySettingsTab() {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="Enter current password"
-                className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-xl pr-10"
               />
               <button
                 type="button"
@@ -275,7 +279,7 @@ export function SecuritySettingsTab() {
                 New Password
               </label>
               <div className="relative">
-                <input
+                <Input
                   id="settings-new-password"
                   type={showNewPassword ? 'text' : 'password'}
                   required
@@ -283,7 +287,7 @@ export function SecuritySettingsTab() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Minimum 6 characters"
-                  className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-xl pr-10"
                 />
                 <button
                   type="button"
@@ -305,7 +309,7 @@ export function SecuritySettingsTab() {
                 Confirm New Password
               </label>
               <div className="relative">
-                <input
+                <Input
                   id="settings-confirm-password"
                   type={showConfirmPassword ? 'text' : 'password'}
                   required
@@ -313,7 +317,7 @@ export function SecuritySettingsTab() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter new password"
-                  className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-xl pr-10"
                 />
                 <button
                   type="button"
@@ -342,14 +346,16 @@ export function SecuritySettingsTab() {
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
+            loading={saving}
             disabled={saving || !currentPassword || !newPassword || !confirmPassword}
-            className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            size="sm"
+            className="rounded-xl"
           >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+            {!saving && <Lock className="w-4 h-4" />}
             {saving ? 'Updating...' : 'Update Password'}
-          </button>
+          </Button>
         </div>
       </form>
 

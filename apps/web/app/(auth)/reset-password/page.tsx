@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Eye, EyeOff, CheckCircle2, KeyRound } from 'lucide-react'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
@@ -176,15 +178,14 @@ function ResetPasswordFormContent() {
             <label htmlFor="reset-email" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
               Email Address
             </label>
-            <input
+            <Input
               id="reset-email"
               type="email"
               required
               disabled={isLoading}
-              aria-invalid={!!requestForm.formState.errors.email}
+              error={!!requestForm.formState.errors.email}
               aria-describedby={requestForm.formState.errors.email ? 'email-error' : undefined}
               placeholder="jane@example.com"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
               {...requestForm.register('email')}
             />
             {requestForm.formState.errors.email && (
@@ -194,13 +195,14 @@ function ResetPasswordFormContent() {
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
+            loading={isPending}
             disabled={isLoading}
-            className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full"
           >
             {isPending ? 'Sending Link...' : 'Send Reset Link →'}
-          </button>
+          </Button>
         </form>
       ) : (
         <form onSubmit={updateForm.handleSubmit(handlePasswordUpdate)} className="space-y-4" noValidate>
@@ -209,15 +211,15 @@ function ResetPasswordFormContent() {
               New Password
             </label>
             <div className="relative">
-              <input
+              <Input
                 id="new-password"
                 type={showNewPassword ? 'text' : 'password'}
                 required
                 disabled={isLoading || isSuccess}
-                aria-invalid={!!updateForm.formState.errors.newPassword}
+                error={!!updateForm.formState.errors.newPassword}
                 aria-describedby={updateForm.formState.errors.newPassword ? 'password-error' : 'password-hint'}
                 placeholder="Min. 6 characters"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 pr-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+                className="pr-10"
                 {...updateForm.register('newPassword')}
               />
               <button
@@ -244,15 +246,15 @@ function ResetPasswordFormContent() {
               Confirm New Password
             </label>
             <div className="relative">
-              <input
+              <Input
                 id="confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 required
                 disabled={isLoading || isSuccess}
-                aria-invalid={!!updateForm.formState.errors.confirmPassword}
+                error={!!updateForm.formState.errors.confirmPassword}
                 aria-describedby={updateForm.formState.errors.confirmPassword ? 'confirm-error' : undefined}
                 placeholder="Re-enter your new password"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 pr-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
+                className="pr-10"
                 {...updateForm.register('confirmPassword')}
               />
               <button
@@ -271,10 +273,11 @@ function ResetPasswordFormContent() {
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
+            loading={isPending}
             disabled={isLoading || isSuccess}
-            className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full"
           >
             {isPending ? (
               'Updating Password...'
@@ -287,7 +290,7 @@ function ResetPasswordFormContent() {
                 <KeyRound className="w-4 h-4" /> Update Password
               </>
             )}
-          </button>
+          </Button>
         </form>
       )}
 

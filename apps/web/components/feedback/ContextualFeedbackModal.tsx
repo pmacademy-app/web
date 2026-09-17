@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { MessageSquare, Star, X, Send, CheckCircle2, Loader2, Award } from 'lucide-react'
+import { MessageSquare, Star, X, Send, CheckCircle2, Award } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 interface ContextualFeedbackModalProps {
   isOpen: boolean
@@ -132,14 +134,16 @@ export function ContextualFeedbackModal({
       aria-labelledby="feedback-modal-title"
     >
       <div className="w-full max-w-lg bg-background border border-border rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 relative">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={handleDismiss}
           aria-label="Dismiss feedback prompt"
-          className="absolute top-3 right-3 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg transition-colors cursor-pointer"
+          className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"
         >
           <X className="w-4 h-4" />
-        </button>
+        </Button>
 
         {success ? (
           <div className="py-8 text-center space-y-3">
@@ -223,14 +227,15 @@ export function ContextualFeedbackModal({
                   <label htmlFor="review-name" className="text-xs font-bold text-foreground">
                     Your Full Name <span className="text-destructive">*</span>
                   </label>
-                  <input
+                  <Input
                     id="review-name"
                     type="text"
+                    inputSize="sm"
                     required={feedbackType === 'public'}
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
                     placeholder="e.g. Alex Rivera"
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="rounded-xl"
                   />
                 </div>
 
@@ -238,13 +243,14 @@ export function ContextualFeedbackModal({
                   <label htmlFor="review-headline" className="text-xs font-bold text-foreground">
                     Headline
                   </label>
-                  <input
+                  <Input
                     id="review-headline"
                     type="text"
+                    inputSize="sm"
                     value={headline}
                     onChange={(e) => setHeadline(e.target.value)}
                     placeholder="e.g. Best structured PM curriculum I've taken"
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="rounded-xl"
                   />
                 </div>
 
@@ -252,13 +258,14 @@ export function ContextualFeedbackModal({
                   <label htmlFor="review-role" className="text-xs font-bold text-foreground">
                     Your Title / Role
                   </label>
-                  <input
+                  <Input
                     id="review-role"
                     type="text"
+                    inputSize="sm"
                     value={authorRole}
                     onChange={(e) => setAuthorRole(e.target.value)}
                     placeholder="e.g. Associate PM at Tech Startup"
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="rounded-xl"
                   />
                 </div>
               </>
@@ -298,21 +305,25 @@ export function ContextualFeedbackModal({
             )}
 
             <div className="flex items-center justify-end gap-2 pt-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={handleDismiss}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                className="rounded-xl"
               >
                 Maybe Later
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                loading={loading}
                 disabled={loading}
-                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                size="sm"
+                className="rounded-xl"
               >
-                {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                {!loading && <Send className="w-3.5 h-3.5" />}
                 <span>{feedbackType === 'public' ? 'Submit Review' : 'Submit Feedback'}</span>
-              </button>
+              </Button>
             </div>
           </form>
         )}

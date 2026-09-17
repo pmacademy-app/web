@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { BRAND } from '@/lib/brand'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { ResendVerificationCard } from '@/components/auth/ResendVerificationCard'
@@ -156,15 +158,14 @@ function LoginForm() {
           <label htmlFor="login-email" className="block text-xs font-semibold uppercase text-foreground/80 mb-1">
             Email Address
           </label>
-          <input
+          <Input
             id="login-email"
             type="email"
             required
             disabled={isLoading}
-            aria-invalid={!!errors.email}
+            error={!!errors.email}
             aria-describedby={errors.email ? 'email-error' : undefined}
             placeholder="jane@example.com"
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
             {...register('email')}
           />
           {errors.email && (
@@ -186,14 +187,13 @@ function LoginForm() {
               Forgot?
             </Link>
           </div>
-          <input
+          <Input
             id="login-password"
             type="password"
             required
             disabled={isLoading}
-            aria-invalid={!!errors.password}
+            error={!!errors.password}
             aria-describedby={errors.password ? 'password-error' : undefined}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none"
             {...register('password')}
           />
           {errors.password && (
@@ -203,13 +203,14 @@ function LoginForm() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
+          loading={isPending}
           disabled={isLoading}
-          className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full"
         >
           {isPending ? 'Logging in...' : 'Log In'}
-        </button>
+        </Button>
       </form>
 
       <div className="mt-6 text-center text-xs text-muted-foreground border-t border-border pt-4">

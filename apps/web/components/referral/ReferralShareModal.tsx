@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Copy, Check, X, Share2, MessageCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { trackReferralLinkCopied, trackReferralShared } from '@/lib/analytics'
 import { BRAND } from '@/lib/brand'
 
@@ -69,13 +70,16 @@ export function ReferralShareModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs animate-fade-in">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl space-y-6 animate-scale-in relative">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground p-1 rounded-lg transition-colors cursor-pointer"
+          aria-label="Close dialog"
+          className="absolute top-4 right-4"
         >
           <X className="w-5 h-5" />
-        </button>
+        </Button>
 
         <div className="space-y-2">
           <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -99,10 +103,11 @@ export function ReferralShareModal({
               value={referralLink}
               className="flex-1 bg-transparent text-xs font-mono text-foreground focus:outline-hidden px-1 select-all"
             />
-            <button
+            <Button
               type="button"
+              size="sm"
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer shrink-0"
+              className="rounded-lg shrink-0 gap-1.5"
             >
               {copied ? (
                 <>
@@ -115,7 +120,7 @@ export function ReferralShareModal({
                   Copy
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -123,43 +128,51 @@ export function ReferralShareModal({
         <div className="space-y-2">
           <label className="text-xs font-semibold text-foreground">Quick Share to Socials</label>
           <div className="grid grid-cols-3 gap-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => handleSocialShare('linkedin')}
-              className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-border bg-card/60 hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/30 text-xs font-semibold text-foreground hover:text-[#0A66C2] transition-all cursor-pointer"
+              className="rounded-xl bg-card/60 hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/30 hover:text-[#0A66C2]"
             >
               <LinkedInIcon className="w-4 h-4 text-[#0A66C2]" />
               LinkedIn
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => handleSocialShare('twitter')}
-              className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-border bg-card/60 hover:bg-foreground/10 hover:border-foreground/30 text-xs font-semibold text-foreground transition-all cursor-pointer"
+              className="rounded-xl bg-card/60 hover:bg-foreground/10 hover:border-foreground/30"
             >
               <TwitterIcon className="w-4 h-4" />
               X / Twitter
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => handleSocialShare('whatsapp')}
-              className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-border bg-card/60 hover:bg-[#25D366]/10 hover:border-[#25D366]/30 text-xs font-semibold text-foreground hover:text-[#25D366] transition-all cursor-pointer"
+              className="rounded-xl bg-card/60 hover:bg-[#25D366]/10 hover:border-[#25D366]/30 hover:text-[#25D366]"
             >
               <MessageCircle className="w-4 h-4 text-[#25D366]" />
               WhatsApp
-            </button>
+            </Button>
           </div>
         </div>
 
         <div className="pt-2 border-t border-border flex justify-end">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-secondary/60 transition-colors cursor-pointer"
+            className="rounded-xl"
           >
             Done
-          </button>
+          </Button>
         </div>
       </div>
     </div>

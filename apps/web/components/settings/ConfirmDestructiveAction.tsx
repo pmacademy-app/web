@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { AlertTriangle, X, Loader2 } from 'lucide-react'
+import { AlertTriangle, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export interface ConfirmDestructiveActionProps {
   isOpen: boolean
@@ -85,15 +87,16 @@ export function ConfirmDestructiveAction({
               <p className="text-xs text-muted-foreground">{description}</p>
             </div>
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={handleClose}
             disabled={loading}
-            className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors disabled:opacity-50"
             aria-label="Close dialog"
           >
             <X className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
 
         {/* Plain Language Summary Box */}
@@ -110,7 +113,7 @@ export function ConfirmDestructiveAction({
             <label htmlFor="confirmation-input" className="block text-xs font-semibold text-foreground">
               To confirm, type <span className="font-mono font-bold text-destructive">{confirmationKeyword}</span> below:
             </label>
-            <input
+            <Input
               id="confirmation-input"
               type="text"
               value={typedInput}
@@ -121,7 +124,8 @@ export function ConfirmDestructiveAction({
               placeholder={`Type "${confirmationKeyword}" to confirm`}
               disabled={loading}
               autoFocus
-              className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-destructive/50 disabled:opacity-50"
+              error={!!errorMessage}
+              className="rounded-xl font-mono"
             />
             {errorMessage && (
               <p className="text-xs text-destructive font-medium animate-in fade-in-0">
@@ -132,26 +136,24 @@ export function ConfirmDestructiveAction({
 
           {/* Action Buttons */}
           <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={handleClose}
               disabled={loading}
-              className="w-full sm:w-auto rounded-xl border border-border px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
+              className="w-full sm:w-auto rounded-xl"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant={isDestructive ? 'destructive' : 'default'}
+              loading={loading}
               disabled={!isExactMatch || loading}
-              className={`w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-all shadow-sm ${
-                isDestructive
-                  ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-40 disabled:hover:bg-destructive'
-                  : 'bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40'
-              }`}
+              className="w-full sm:w-auto rounded-xl"
             >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {confirmButtonText}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

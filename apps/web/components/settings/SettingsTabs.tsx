@@ -3,6 +3,7 @@
 import React from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { User, Shield, Briefcase, Bell, Gift, AlertTriangle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { ProfileSettingsTab } from '@/components/settings/ProfileSettingsTab'
 import { SecuritySettingsTab } from '@/components/settings/SecuritySettingsTab'
 import { PortfolioSettingsForm } from '@/components/settings/PortfolioSettingsForm'
@@ -28,83 +29,75 @@ export function SettingsTabs() {
     <div className="space-y-6">
       {/* 6-Tab Navigation */}
       <div className="flex items-center gap-1.5 border-b border-border pb-2 overflow-x-auto scrollbar-none max-w-full">
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'profile' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => handleTabChange('profile')}
-          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-            activeTab === 'profile'
-              ? 'bg-primary text-primary-foreground shadow-xs'
-              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
-          }`}
+          className="rounded-xl font-bold"
         >
           <User className="w-4 h-4" />
           Profile
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'security' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => handleTabChange('security')}
-          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-            activeTab === 'security'
-              ? 'bg-primary text-primary-foreground shadow-xs'
-              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
-          }`}
+          className="rounded-xl font-bold"
         >
           <Shield className="w-4 h-4" />
           Security
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'portfolio' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => handleTabChange('portfolio')}
-          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-            activeTab === 'portfolio'
-              ? 'bg-primary text-primary-foreground shadow-xs'
-              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
-          }`}
+          className="rounded-xl font-bold"
         >
           <Briefcase className="w-4 h-4" />
           Portfolio
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'notifications' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => handleTabChange('notifications')}
-          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-            activeTab === 'notifications'
-              ? 'bg-primary text-primary-foreground shadow-xs'
-              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
-          }`}
+          className="rounded-xl font-bold"
         >
           <Bell className="w-4 h-4" />
           Notifications
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'referrals' ? 'default' : 'ghost'}
+          size="sm"
           onClick={() => handleTabChange('referrals')}
-          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-            activeTab === 'referrals'
-              ? 'bg-primary text-primary-foreground shadow-xs'
-              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
-          }`}
+          className="rounded-xl font-bold"
         >
           <Gift className="w-4 h-4" />
           Referrals
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'danger-zone' ? 'destructive' : 'ghost'}
+          size="sm"
           onClick={() => handleTabChange('danger-zone')}
-          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+          className={
             activeTab === 'danger-zone'
-              ? 'bg-destructive text-destructive-foreground shadow-xs'
-              : 'text-destructive/80 hover:text-destructive hover:bg-destructive/10'
-          }`}
+              ? 'rounded-xl font-bold'
+              : 'rounded-xl font-bold text-destructive hover:text-destructive hover:bg-destructive/10'
+          }
         >
           <AlertTriangle className="w-4 h-4" />
           Danger Zone
-        </button>
+        </Button>
       </div>
 
       {/* Active Tab View */}

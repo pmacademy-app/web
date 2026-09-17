@@ -1,10 +1,7 @@
-'use client'
-
-import { motion } from 'framer-motion'
-import { useReducedMotion } from '@/hooks/use-reduced-motion'
+import * as React from 'react'
 import { cn } from '@/lib/utils'
 
-interface ProgressBarProps {
+export interface ProgressBarProps {
   value: number
   max?: number
   label?: string
@@ -16,7 +13,7 @@ interface ProgressBarProps {
  * Accessible ProgressBar component.
  * Props: value, max, label, variant.
  * ARIA: role="progressbar", aria-valuenow, aria-valuemin, aria-valuemax.
- * Framer Motion fill animation. Reduced motion instant fill.
+ * Fluid CSS width transition with reduced-motion support.
  */
 export function ProgressBar({
   value,
@@ -25,8 +22,7 @@ export function ProgressBar({
   variant = 'linear',
   className,
 }: ProgressBarProps) {
-  const prefersReducedMotion = useReducedMotion()
-  const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
+  const percentage = Math.min(Math.max(Math.round((value / max) * 100), 0), 100)
 
   return (
     <div className={cn('w-full', className)}>
@@ -45,20 +41,14 @@ export function ProgressBar({
         aria-label={label ?? 'Progress'}
         className="h-2 w-full bg-surface-muted rounded-full overflow-hidden"
       >
-        <motion.div
+        <div
           className={cn(
-            'h-full rounded-full',
+            'h-full rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none',
             variant === 'linear' && 'bg-primary',
             variant === 'accent' && 'bg-accent',
             variant === 'skill' && 'bg-primary',
           )}
-          initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={
-            prefersReducedMotion
-              ? { duration: 0 }
-              : { type: 'spring', stiffness: 100, damping: 20 }
-          }
+          style={{ width: `${percentage}%` }}
         />
       </div>
     </div>
