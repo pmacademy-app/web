@@ -110,11 +110,116 @@ jobs:
       - name: Next.js Production Build
         run: npm run build
 
+  # Critical-path E2E (B14-C). A separate job from build-and-validate for two reasons.
+  #
+  # Cost: E2E installs a browser and boots the production server, and the roadmap is
+  # explicit that CI time grows — "run E2E on `main` and on PRs touching auth". It used
+  # to run on every push of every PR, including documentation-only ones. The gate below
+  # keeps it on `main` and on the changes it actually protects.
+  #
+  # Visibility: an E2E failure should be its own line in the checks list rather than the
+  # last step of a job that has already done a build, so it is obvious what broke.
+  #
+  # The two flows this runs — signup → verify → first lesson → XP, and login → session
+  # persistence → protected route → logout — are write-heavy. They self-skip with a
+  # stated reason unless E2E_ALLOW_WRITES and staging credentials are present, and
+  # `e2e/support/env.ts` refuses outright to run against the production host. The
+  # remaining specs need no account and run here on every triggered build.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      SEND_EMAIL_HOOK_SECRET: ${{ secrets.SEND_EMAIL_HOOK_SECRET }}
+      # The same published always-pass Turnstile dummies the build job documents. The
+      # signup spec depends on them: without a solvable challenge the form never submits.
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
+      TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA' }}
+      # Staging only, and only when configured. Absent, the write flows skip rather than
+      # fail — a red E2E job nobody can act on is worse than one that says why it idled.
+      PLAYWRIGHT_TEST_BASE_URL: ${{ secrets.E2E_BASE_URL }}
+      E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
+      E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
+      E2E_ALLOW_WRITES: ${{ secrets.E2E_ALLOW_WRITES }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # The auth-path filter diffs against the base branch, which needs its history.
+          fetch-depth: 0
+
+      # Decides whether this run exercises the critical paths. `main` always does.
+      # A pull request does when it touches auth, the session model, the proxy, the
+      # specs themselves, or the dependency lockfile.
+      - name: Decide whether E2E runs
+        id: decide
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_EVENT_NAME}" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Not a pull request — running the critical paths."
+            exit 0
+          fi
+          base="origin/${GITHUB_BASE_REF}"
+          git fetch --no-tags --depth=0 origin "${GITHUB_BASE_REF}" >/dev/null 2>&1 || true
+          changed="$(git diff --name-only "${base}...HEAD" || true)"
+          echo "Changed files:"; echo "${changed}"
+          if echo "${changed}" | grep -qE '^apps/web/(app/\(auth\)/|app/api/auth/|app/api/user/|lib/auth/|lib/api/actor|proxy\.ts|e2e/|playwright\.config\.ts|package-lock\.json)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Auth-relevant paths changed — running the critical paths."
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No auth-relevant paths changed — skipping E2E for this pull request."
+          fi
+
+      - name: Setup Node.js
+        if: steps.decide.outputs.run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        if: steps.decide.outputs.run == 'true'
+        working-directory: ./apps/web
+        run: npm ci
+
+      - name: Parse & validate content pipeline
+        if: steps.decide.outputs.run == 'true'
+        working-directory: ./apps/web
+        run: npm run content:build
+
       - name: Install Playwright Browsers
+        if: steps.decide.outputs.run == 'true'
+        working-directory: ./apps/web
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright E2E Tests
+      # Only built when no external base URL is supplied; with one, the specs run
+      # against that deployment and Playwright's webServer is not used.
+      - name: Next.js Production Build
+        if: steps.decide.outputs.run == 'true' && env.PLAYWRIGHT_TEST_BASE_URL == ''
+        working-directory: ./apps/web
+        run: npm run build
+
+      - name: Run critical-path E2E
+        if: steps.decide.outputs.run == 'true'
+        working-directory: ./apps/web
         run: npm run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure() && steps.decide.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/test-results/
+          retention-days: 7
 
   # Dependency and secret gates (B14-B). Deliberately a separate job from
   # build-and-validate: a security finding must be visible on its own line in the

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 
 import {
@@ -38,6 +38,50 @@ function code(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '')
 }
 
+/**
+ * Every source file under the app, read once.
+ *
+ * Four of the tests below scan the whole tree, and each used to do its own recursive
+ * walk — re-reading every file in `app`, `components`, `lib` and `hooks` four times over.
+ * Standalone that finished in well under a second; inside the full parallel suite, with
+ * 160 other files competing for the disk, it crossed the 15s `testTimeout` and failed
+ * intermittently on a machine under load. A test that fails because the machine is busy
+ * teaches everyone to re-run rather than to look, which is worse than no test.
+ *
+ * Built lazily on first use so a `-t` filtered run that needs none of the scanning tests
+ * does not pay for the walk at all.
+ */
+let sourceIndexCache: Array<{ rel: string; source: string }> | null = null
+
+function sourceIndex(): Array<{ rel: string; source: string }> {
+  if (sourceIndexCache) return sourceIndexCache
+
+  const files: Array<{ rel: string; source: string }> = []
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(path.join(ROOT, dir), { withFileTypes: true })) {
+      // Pruned at the directory rather than filtered after reading. `lib/__tests__`
+      // holds the largest files in the repository, and reading all of them only to
+      // discard them was most of this walk's cost.
+      if (entry.name === '__tests__' || entry.name === 'node_modules') continue
+      const rel = `${dir}/${entry.name}`
+      if (entry.isDirectory()) walk(rel)
+      else if (/\.tsx?$/.test(entry.name)) files.push({ rel, source: read(rel) })
+    }
+  }
+  for (const dir of ['app', 'components', 'lib', 'hooks']) walk(dir)
+
+  sourceIndexCache = files
+  return files
+}
+
+/**
+ * The production sources. `__tests__` is already pruned by the walk, so this is the
+ * index itself — kept as a named function because that is what the assertions mean.
+ */
+function productionSources(): Array<{ rel: string; source: string }> {
+  return sourceIndex()
+}
+
 function headers(map: Record<string, string>) {
   return {
     headers: {
@@ -61,36 +105,19 @@ describe('B13-A — the browser holds no session', () => {
   })
 
   it('nothing references the deleted bridge', () => {
-    const offenders: string[] = []
-    const walk = (dir: string) => {
-      for (const entry of readdirSync(path.join(ROOT, dir))) {
-        const rel = `${dir}/${entry}`
-        if (statSync(path.join(ROOT, rel)).isDirectory()) walk(rel)
-        // Comments stripped: two modules document in prose what the bridge used to do
-        // and why it went away, which is the opposite of referencing it.
-        else if (/\.tsx?$/.test(entry) && code(read(rel)).includes('AuthStateListener')) {
-          offenders.push(rel)
-        }
-      }
-    }
-    for (const dir of ['app', 'components', 'lib', 'hooks']) walk(dir)
+    // Comments stripped: two modules document in prose what the bridge used to do and
+    // why it went away, which is the opposite of referencing it.
+    const offenders = productionSources()
+      .filter((f) => code(f.source).includes('AuthStateListener'))
+      .map((f) => f.rel)
 
-    // This test file names it, which is the only legitimate mention left.
-    expect(offenders.filter((f) => !f.includes('__tests__'))).toEqual([])
+    expect(offenders).toEqual([])
   })
 
   it('no client component subscribes to provider auth state changes', () => {
-    const offenders: string[] = []
-    const walk = (dir: string) => {
-      for (const entry of readdirSync(path.join(ROOT, dir))) {
-        const rel = `${dir}/${entry}`
-        if (statSync(path.join(ROOT, rel)).isDirectory()) walk(rel)
-        else if (/\.tsx?$/.test(entry) && !rel.includes('__tests__')) {
-          if (code(read(rel)).includes('onAuthStateChange')) offenders.push(rel)
-        }
-      }
-    }
-    for (const dir of ['app', 'components', 'lib', 'hooks']) walk(dir)
+    const offenders = productionSources()
+      .filter((f) => code(f.source).includes('onAuthStateChange'))
+      .map((f) => f.rel)
 
     expect(offenders).toEqual([])
   })
@@ -104,17 +131,10 @@ describe('B13-A — the browser-session consumer sweep is complete', () => {
    * rather than left to a changelog.
    */
   it('only the anonymous password-reset call still uses the browser client', () => {
-    const consumers: string[] = []
-    const walk = (dir: string) => {
-      for (const entry of readdirSync(path.join(ROOT, dir))) {
-        const rel = `${dir}/${entry}`
-        if (statSync(path.join(ROOT, rel)).isDirectory()) walk(rel)
-        else if (/\.tsx?$/.test(entry) && !rel.includes('__tests__') && rel !== 'lib/supabase.ts') {
-          if (code(read(rel)).includes('createBrowserSupabaseClient')) consumers.push(rel)
-        }
-      }
-    }
-    for (const dir of ['app', 'components', 'lib', 'hooks']) walk(dir)
+    const consumers = productionSources()
+      .filter((f) => f.rel !== 'lib/supabase.ts')
+      .filter((f) => code(f.source).includes('createBrowserSupabaseClient'))
+      .map((f) => f.rel)
 
     // `resetPasswordForEmail` is an anonymous provider call. It needs no session, and
     // it is the only thing the browser client is still for.
@@ -275,17 +295,9 @@ describe('B13-A — the cookie contract has one definition', () => {
   it('nothing outside the helper writes a session cookie', () => {
     // Seven call sites used to set these names with their own hand-copied options.
     // A session model with one owner should have one writer.
-    const offenders: string[] = []
-    const walk = (dir: string) => {
-      for (const entry of readdirSync(path.join(ROOT, dir))) {
-        const rel = `${dir}/${entry}`
-        if (statSync(path.join(ROOT, rel)).isDirectory()) walk(rel)
-        else if (/\.tsx?$/.test(entry) && !rel.includes('__tests__')) {
-          if (code(read(rel)).includes("cookies.set('sb-")) offenders.push(rel)
-        }
-      }
-    }
-    for (const dir of ['app', 'lib', 'components', 'hooks']) walk(dir)
+    const offenders = productionSources()
+      .filter((f) => code(f.source).includes("cookies.set('sb-"))
+      .map((f) => f.rel)
     if (code(read('proxy.ts')).includes("cookies.set('sb-")) offenders.push('proxy.ts')
 
     // Empty rather than naming the helper: the helper writes through the exported
