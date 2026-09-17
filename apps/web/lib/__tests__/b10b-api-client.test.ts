@@ -446,6 +446,13 @@ describe('B10-B/B10-C — adoption boundary', () => {
           hit.startsWith('components/admin') ||
           hit.startsWith('app/(app)/academy') ||
           hit.startsWith('hooks/use-lesson-progress') ||
+          // B13-A: retiring the client session bridge moved two call sites onto the
+          // typed client. `app/admin/login` used to sign in with the browser Supabase
+          // client and POST the session to the bridge; `QuickStartContext` used to write
+          // user metadata with a browser-held session. Both now call server routes, and
+          // the typed client is how this codebase calls a server route.
+          hit === 'app/admin/login/page.tsx' ||
+          hit === 'components/quick-start/QuickStartContext.tsx' ||
           hit === 'lib/api/hooks.ts',
         `Unexpected import in ${hit}`
       ).toBe(true)

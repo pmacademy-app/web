@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { requireUserId } from '@/lib/api/actor'
 import { RouteError, withRoute } from '@/lib/api/with-route'
+import { setSessionCookies } from '@/lib/auth/session-cookies'
 import { logSystemError } from '@/lib/monitoring/logger'
 
 export const runtime = 'nodejs'
@@ -134,21 +135,7 @@ export const POST = withRoute(
 
     // If verification generated a fresh session, refresh auth cookies
     if (newSessionAfterAuth) {
-      const isProd = process.env.NODE_ENV === 'production'
-      response.cookies.set('sb-access-token', newSessionAfterAuth.access_token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: newSessionAfterAuth.expires_in,
-      })
-      response.cookies.set('sb-refresh-token', newSessionAfterAuth.refresh_token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 30,
-      })
+      setSessionCookies(response, newSessionAfterAuth)
     }
 
     return response

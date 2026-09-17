@@ -4,9 +4,9 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ShieldCheck, Lock, Mail, Loader2, ArrowRight } from 'lucide-react'
-import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { apiGet, apiPost } from '@/lib/api/client'
 import { BRAND } from '@/lib/brand'
-import { classifyAuthError } from '@/lib/auth/errors'
+import { classifyAuthError, resolveApiAuthError } from '@/lib/auth/errors'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 
 /**
@@ -19,8 +19,18 @@ import { recordAuthTelemetry } from '@/lib/auth/telemetry'
  *   - authorized  -> /admin
  *   - unauthorized-> /admin/access-denied
  *
- * Session cookies are persisted via /api/auth/session so tokens stay
- * httpOnly (never exposed to document.cookie / XSS).
+ * ## B13-A — the browser no longer authenticates
+ *
+ * This page used to call `supabase.auth.signInWithPassword()` on the browser client and
+ * then POST the resulting session to `/api/auth/session` so the server could mirror it
+ * into cookies. That is the bridge F-02 describes, and it meant the admin console's
+ * tokens passed through JavaScript on their way to being "httpOnly".
+ *
+ * It now posts credentials to `POST /api/auth/login`, the same route the learner side
+ * uses, which authenticates server-side and sets the cookies directly. The session never
+ * exists in this page. Authorization is unchanged: `/api/admin/verify` still runs the
+ * server-side RBAC guard (ADMIN_EMAILS OR users.is_admin) before the console opens, and
+ * a successful login is not by itself admin access.
  */
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -35,47 +45,27 @@ export default function AdminLoginPage() {
     setError(null)
 
     try {
-      const supabase = createBrowserSupabaseClient()
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      // Authenticate server-side. The response sets the httpOnly cookies and, for a
+      // browser caller, carries no tokens at all.
+      const result = await apiPost('/api/auth/login', { email, password })
 
-      if (authError || !data.session) {
-        const classified = classifyAuthError(authError || new Error('Invalid credentials'), 'admin_login')
+      if (!result.ok) {
+        const classified = resolveApiAuthError(
+          { error: result.error.message, code: result.error.code },
+          'admin_login'
+        )
         setError(classified.message)
         recordAuthTelemetry(classified, 'login')
         setLoading(false)
         return
       }
 
-      // Persist the session as httpOnly server-side cookies so the middleware
-      // and server components can verify the request.
-      const syncRes = await fetch('/api/auth/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session: data.session }),
-      })
-
-      if (!syncRes.ok) {
-        const syncError = classifyAuthError(new Error('Session sync failed'), 'session_sync')
-        setError(syncError.message)
-        recordAuthTelemetry(syncError, 'session_sync')
-        setLoading(false)
-        return
-      }
-
       // Verify authorization before entering the console. This endpoint runs
       // the server-side RBAC guard (ADMIN_EMAILS OR users.is_admin).
-      let authorized = false
-      try {
-        const verifyRes = await fetch('/api/admin/verify')
-        const verifyData = (await verifyRes.json()) as { authorized?: boolean }
-        authorized = Boolean(verifyData.authorized)
-      } catch {
-        // Fall back to middleware routing if the verification call fails.
-        authorized = false
-      }
+      const verify = await apiGet<{ authorized?: boolean }>('/api/admin/verify')
+      // A failed verification call is not authorization; fall through to the
+      // access-denied page and let the proxy have the final say.
+      const authorized = verify.ok && Boolean(verify.data?.authorized)
 
       router.push(authorized ? '/admin' : '/admin/access-denied')
       router.refresh()

@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminEmail } from '@/lib/admin/authorization'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
+import { setSessionCookies } from '@/lib/auth/session-cookies'
 // The proxy needs exactly one thing from the content pipeline: a slug -> lesson
 // mapping, to send an authenticated learner from a public /lessons/<slug> URL to
 // their interactive copy of that lesson.
@@ -31,27 +32,18 @@ const ACCESS_DENIED_PAGE = '/admin/access-denied'
 /**
  * Attaches refreshed session cookies to a redirect/next response so a token
  * exchange performed here is not lost on the client redirect.
+ *
+ * B13-A: the cookie names and options moved to `lib/auth/session-cookies.ts`. This is
+ * the path that keeps a session alive past the one-hour access-token lifetime now that
+ * the browser no longer auto-refreshes, so it and the auth routes must agree on exactly
+ * what a session cookie is — which is easier to guarantee with one definition than with
+ * seven copies.
  */
 function withSessionCookies(
   response: NextResponse,
   session: { access_token: string; refresh_token: string; expires_in?: number }
 ) {
-  const isProd = process.env.NODE_ENV === 'production'
-  response.cookies.set('sb-access-token', session.access_token, {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: session.expires_in,
-  })
-  response.cookies.set('sb-refresh-token', session.refresh_token, {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-  })
-  return response
+  return setSessionCookies(response, session)
 }
 
 /**

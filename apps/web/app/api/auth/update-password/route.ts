@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { withRoute } from '@/lib/api/with-route'
+import { clearSessionCookies } from '@/lib/auth/session-cookies'
 import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import { createAuthenticatedServerClient } from '@/lib/supabase'
@@ -40,10 +41,7 @@ function resolveUserRateLimitKey(accessToken: string | null | undefined, refresh
 
 /** Helper to delete recovery cookies cleanly across all response paths */
 function clearRecoveryCookies(response: NextResponse): void {
-  response.cookies.delete('sb-access-token')
-  response.cookies.delete('sb-refresh-token')
-  response.cookies.set('sb-access-token', '', { path: '/', maxAge: 0 })
-  response.cookies.set('sb-refresh-token', '', { path: '/', maxAge: 0 })
+  clearSessionCookies(response)
 }
 
 /** Determines if an auth error is a confirmed, expected client token/session lifecycle state */

@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { withRoute } from '@/lib/api/with-route'
 import { logSystemError } from '@/lib/monitoring/logger'
 import { log } from '@/lib/monitoring/log'
+import { sessionForClient } from '@/lib/auth/client-type'
+import { clearSessionCookies, setSessionCookies } from '@/lib/auth/session-cookies'
 
 export const runtime = 'nodejs'
 
@@ -22,7 +24,6 @@ export const POST = withRoute(
     summary: 'Unhandled exception in /api/auth/refresh',
   },
   async ({ request }) => {
-    const isProd = process.env.NODE_ENV === 'production'
     try {
       const body = await request.json().catch(() => ({}))
       const bodyRefreshToken = body && typeof body.refresh_token === 'string' ? body.refresh_token.trim() : null
@@ -59,27 +60,17 @@ export const POST = withRoute(
           { status: 401 }
         )
         // Invalidate stale session cookies on failed refresh
-        response.cookies.set('sb-access-token', '', {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: 'lax',
-          path: '/',
-          maxAge: -1,
-        })
-        response.cookies.set('sb-refresh-token', '', {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: 'lax',
-          path: '/',
-          maxAge: -1,
-        })
+        clearSessionCookies(response)
         return response
       }
 
+      // B13-A: §15 of the plan allows tokens in a refresh response body for a native
+      // client — that is how a native client gets its rotated pair, since it has no
+      // cookie jar. A browser gets the rotated cookies below and nothing readable.
       const response = NextResponse.json(
         {
           success: true,
-          session: data.session,
+          ...sessionForClient(request, data.session),
           user: {
             id: data.user.id,
             email: data.user.email,
@@ -88,21 +79,7 @@ export const POST = withRoute(
         { status: 200 }
       )
 
-      response.cookies.set('sb-access-token', data.session.access_token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: data.session.expires_in || 3600,
-      })
-
-      response.cookies.set('sb-refresh-token', data.session.refresh_token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-      })
+      setSessionCookies(response, data.session)
 
       return response
     } catch (err) {

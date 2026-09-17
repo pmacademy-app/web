@@ -177,57 +177,21 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
     })
   })
 
-  describe('Invariant 2: /api/auth/session Session Fixation & Validation', () => {
-    it('7. Empty / missing payload -> returns 400 Validation Error', async () => {
-      const req = new NextRequest('https://prodily.app/api/auth/session', {
-        method: 'POST',
-        body: JSON.stringify({}),
-      })
-      const res = await sessionPost(req)
-      expect(res.status).toBe(400)
-      const data = await res.json()
-      expect(data.error).toContain('Invalid request payload')
-    })
+  describe('Invariant 2: /api/auth/session is sign-out only (B13-A)', () => {
+    /**
+     * Tests 7–11 used to exercise the client session bridge: the browser held a
+     * Supabase session, posted it here, and the route verified the access token,
+     * cross-checked the refresh token against the same user (anti-fixation), and wrote
+     * the cookies. B13-A removed that ingest path entirely, so those tests no longer
+     * describe behaviour this route has.
+     *
+     * The anti-fixation property they protected is now structural rather than checked:
+     * a session cannot be fixed through an endpoint that does not accept one. The tests
+     * below pin exactly that — a session in the body is inert — plus the sign-out
+     * behaviour that replaced it.
+     */
 
-    it('8. Malformed session payload (missing access_token) -> returns 400', async () => {
-      const req = new NextRequest('https://prodily.app/api/auth/session', {
-        method: 'POST',
-        body: JSON.stringify({ session: { expires_in: 3600 } }),
-      })
-      const res = await sessionPost(req)
-      expect(res.status).toBe(400)
-      const data = await res.json()
-      expect(data.error).toContain('Access token required')
-    })
-
-    it('9. Invalid / expired access token -> returns 401 Unauthorized', async () => {
-      const req = new NextRequest('https://prodily.app/api/auth/session', {
-        method: 'POST',
-        body: JSON.stringify({ session: { access_token: EXPIRED_TOKEN } }),
-      })
-      const res = await sessionPost(req)
-      expect(res.status).toBe(401)
-      const data = await res.json()
-      expect(data.error).toContain('Invalid or expired access token')
-    })
-
-    it('10. Valid access token but mismatched / attacker-controlled refresh token -> returns 401 (anti-fixation)', async () => {
-      const req = new NextRequest('https://prodily.app/api/auth/session', {
-        method: 'POST',
-        body: JSON.stringify({
-          session: {
-            access_token: VALID_LEARNER_TOKEN,
-            refresh_token: ATTACKER_REFRESH, // belongs to attacker-uuid, not usr_learner_1
-          },
-        }),
-      })
-      const res = await sessionPost(req)
-      expect(res.status).toBe(401)
-      const data = await res.json()
-      expect(data.error).toContain('Invalid or mismatched refresh token')
-    })
-
-    it('11. Valid session with matching valid credentials -> establishes verified cookies', async () => {
+    it('7. A session in the body establishes nothing — the ingest path is gone', async () => {
       const req = new NextRequest('https://prodily.app/api/auth/session', {
         method: 'POST',
         body: JSON.stringify({
@@ -239,11 +203,71 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
         }),
       })
       const res = (await sessionPost(req)) as NextResponse
+
       expect(res.status).toBe(200)
+      // The supplied token is never written back as a cookie; the route signs out.
+      expect(res.cookies.get('sb-access-token')?.value).toBe('')
+      expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
+    })
+
+    it('8. An attacker-controlled session cannot be fixed onto the browser', async () => {
+      const req = new NextRequest('https://prodily.app/api/auth/session', {
+        method: 'POST',
+        body: JSON.stringify({
+          session: { access_token: VALID_LEARNER_TOKEN, refresh_token: ATTACKER_REFRESH },
+        }),
+      })
+      const res = (await sessionPost(req)) as NextResponse
+
+      expect(res.cookies.get('sb-access-token')?.value).not.toBe(VALID_LEARNER_TOKEN)
+      expect(res.cookies.get('sb-refresh-token')?.value).not.toBe(ATTACKER_REFRESH)
+      expect(res.cookies.get('sb-refresh-token')?.value).not.toBe('rotated-attacker-refresh')
+    })
+
+    it('9. Sign-out clears both session cookies', async () => {
+      const req = new NextRequest('https://prodily.app/api/auth/session', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'sign_out' }),
+        headers: { cookie: `sb-refresh-token=${VALID_LEARNER_REFRESH}` },
+      })
+      const res = (await sessionPost(req)) as NextResponse
+
+      expect(res.status).toBe(200)
+      expect(res.cookies.get('sb-access-token')?.value).toBe('')
+      expect(res.cookies.get('sb-refresh-token')?.value).toBe('')
+      // An empty value with a non-positive max-age is what actually removes the
+      // cookie; asserting the value alone would pass on a cookie that still lives.
+      expect(res.cookies.get('sb-access-token')?.maxAge ?? 0).toBeLessThanOrEqual(0)
+      expect(res.cookies.get('sb-refresh-token')?.maxAge ?? 0).toBeLessThanOrEqual(0)
+    })
+
+    it('10. Sign-out revokes the refresh token at the provider when one is present', async () => {
+      const req = new NextRequest('https://prodily.app/api/auth/session', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'sign_out' }),
+        headers: { cookie: `sb-refresh-token=${VALID_LEARNER_REFRESH}` },
+      })
+      const res = await sessionPost(req)
       const data = await res.json()
-      expect(data.user.id).toBe('usr_learner_1')
-      expect(res.cookies.get('sb-access-token')?.value).toBe(VALID_LEARNER_TOKEN)
-      expect(res.cookies.get('sb-refresh-token')?.value).toBe('rotated-learner-refresh-token')
+
+      // Reported rather than silent: a cleared cookie with a live refresh token behind
+      // it is a different outcome from a clean logout, and the caller can surface it.
+      expect(data.revocation).toBe('revoked')
+    })
+
+    it('11. Sign-out succeeds with no cookies at all, and reports nothing to revoke', async () => {
+      const req = new NextRequest('https://prodily.app/api/auth/session', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'sign_out' }),
+      })
+      const res = (await sessionPost(req)) as NextResponse
+      const data = await res.json()
+
+      // Signing out must work when the access token has already expired — which is
+      // exactly when a learner is most likely to be clicking it.
+      expect(res.status).toBe(200)
+      expect(data.revocation).toBe('skipped')
+      expect(res.cookies.get('sb-access-token')?.value).toBe('')
     })
 
     it('12. GET /api/auth/session returns user identity for active session', async () => {
@@ -301,7 +325,10 @@ describe('Batch B3: Authentication & Session Hardening Test Suite', () => {
       expect(res.status).toBe(200)
       const data = await res.json()
       expect(data.success).toBe(true)
-      expect(data.session.access_token).toBe(VALID_LEARNER_TOKEN)
+      // B13-A / F-SEC-8: a browser caller gets the rotated pair as httpOnly cookies and
+      // nothing readable. The body carries no `session` key at all — not an empty one,
+      // so there is no token for a script to find.
+      expect(data.session).toBeUndefined()
       expect(res.cookies.get('sb-access-token')?.value).toBe(VALID_LEARNER_TOKEN)
       expect(res.cookies.get('sb-refresh-token')?.value).toBe('rotated-learner-refresh-token')
     })

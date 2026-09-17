@@ -4,7 +4,6 @@ import Script from 'next/script'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Analytics } from '@vercel/analytics/react'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import AuthStateListener from '@/components/layout/AuthStateListener'
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { ApiClientProvider } from '@/lib/api/hooks'
@@ -140,7 +139,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ApiClientProvider>
           <TooltipProvider>
-            <AuthStateListener />
             {children}
           </TooltipProvider>
         </ApiClientProvider>

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { apiPost } from '@/lib/api/client'
 import { QUICK_START_STEPS, QuickStartStep } from './quick-start-steps'
 import {
   trackQuickStartOpened,
@@ -71,21 +71,19 @@ export function QuickStartProvider({
     setIsOpen(false)
   }, [])
 
+  /**
+   * B13-A: this used to call `supabase.auth.updateUser()` on the browser client and then
+   * `refreshSession()` to pull the new metadata into the local session. Both needed a
+   * session in browser JavaScript, which no longer exists — the server owns it.
+   *
+   * `POST /api/user/quick-start` does the write with the actor resolved from the
+   * httpOnly cookie, and the explicit `refreshSession()` is gone with it: the flag is
+   * read server-side in `app/(app)/layout.tsx`, so the next navigation sees it.
+   */
   const persistCompletion = useCallback(async () => {
-    try {
-      const supabase = createBrowserSupabaseClient()
-      const { error } = await supabase.auth.updateUser({
-        data: { quick_start_completed: true },
-      })
-
-      if (error) {
-        console.error('[QuickStart] Persistence error updating user metadata:', error.message)
-      } else {
-        // Refresh session token so client session reflects new user_metadata
-        await supabase.auth.refreshSession()
-      }
-    } catch (err) {
-      console.error('[QuickStart] Unexpected persistence error:', err)
+    const result = await apiPost('/api/user/quick-start')
+    if (!result.ok) {
+      console.error('[QuickStart] Could not persist completion:', result.error.code)
     }
   }, [])
 

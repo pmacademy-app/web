@@ -177,9 +177,12 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
     expect(unmigrated).toEqual([...EXEMPT].sort())
   })
 
-  it('accounts for all 127 routes', () => {
-    expect(files).toHaveLength(127)
-    expect(migrated).toHaveLength(124)
+  // 128 since B13-A added `user/quick-start/route.ts`: `QuickStartContext` used to
+  // write the completion flag with a browser-held Supabase session, which B13-A
+  // removed, so the write needed a server route. It uses `withRoute` like the rest.
+  it('accounts for all 128 routes', () => {
+    expect(files).toHaveLength(128)
+    expect(migrated).toHaveLength(125)
   })
 
   it('keeps each wave at the size its own suite asserts', () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useEffect, Suspense } from 'react'
+import { useState, useTransition, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -62,28 +62,19 @@ function ResetPasswordFormContent() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  // Listen for hash fragment token exchange if redirected directly by Supabase
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const hash = window.location.hash
-    if (hash && hash.includes('type=recovery')) {
-      const params = new URLSearchParams(hash.replace(/^#/, ''))
-      const access_token = params.get('access_token')
-      const refresh_token = params.get('refresh_token')
-      if (access_token && refresh_token) {
-        try {
-          const supabase = createBrowserSupabaseClient()
-          void supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
-            if (!error) {
-              router.replace('/reset-password?mode=update')
-            }
-          })
-        } catch (err) {
-          console.warn('[reset-password] Hash token session hydration error:', err)
-        }
-      }
-    }
-  }, [router])
+  // B13-A removed an implicit-flow hash handler that used to live here. It read
+  // `access_token`/`refresh_token` out of `window.location.hash`, called
+  // `supabase.auth.setSession()`, and relied on `AuthStateListener` noticing the
+  // resulting SIGNED_IN event and POSTing the session to the bridge so the cookies got
+  // set — because the password update itself is server-side and reads those cookies.
+  //
+  // It was unreachable. This app sends recovery mail through its own Send Email Hook,
+  // which builds a `token_hash` link to `/api/auth/callback` (see
+  // `buildAuthCallbackUrl` in `app/api/auth/send-email-hook/route.ts`). The callback
+  // calls `verifyOtp` server-side and sets the cookies on the redirect, so no token
+  // ever reaches this page's URL. Keeping a `setSession()` call against a client with
+  // `persistSession: false` would have been worse than removing it: it would silently
+  // do nothing and leave the learner on a page that could not update their password.
 
   // Form for sending reset email
   const requestForm = useForm<RequestFormValues>({
@@ -103,6 +94,8 @@ function ResetPasswordFormContent() {
 
     startTransition(async () => {
       try {
+        // The one legitimate remaining use of the browser client: requesting a reset
+        // email is an anonymous provider call that needs no session at all.
         const supabase = createBrowserSupabaseClient()
         const origin = window.location.origin
         const { error } = await supabase.auth.resetPasswordForEmail(values.email, {

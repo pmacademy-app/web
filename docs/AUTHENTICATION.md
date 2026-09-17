@@ -10,12 +10,53 @@
 
 Authentication is powered by Supabase Auth with PKCE flow, custom email rendering via the Send Email Hook, and edge-level request interception.
 
-The system uses `@supabase/supabase-js` with a custom session bridge:
-- **Client Session Management:** `createBrowserSupabaseClient()` (`lib/supabase.ts`) handles browser session persistence and local tokens.
-- **Server Session Bridge:** On sign-in, the client sends session tokens to `/api/auth/session`, setting HTTP-only `sb-access-token` and `sb-refresh-token` cookies.
-- **Server Session Validation:** `createServerSupabaseClient()` reads cookies to authenticate server-side requests.
-- **Service-Role Operations:** `createServiceRoleClient()` is strictly server-side, bypassing RLS for admin user discovery and system-level operations.
-- **Request Interception (`apps/web/proxy.ts`):** Edge-level proxy inspects cookies, validates JWT tokens, and enforces platform controls.
+### The session has one owner (B13-A)
+
+httpOnly cookies are the **only** session store for the web. There is no client session
+bridge and no `localStorage` session.
+
+Before B13-A the refresh token lived in `localStorage` *and* in an httpOnly cookie
+(`F-02`), which made the cookie protection decorative — the same credential sat in a
+store any script on the origin could read — and let the two copies drift apart. The auth
+routes also returned the full session in their JSON bodies (`F-SEC-8`).
+
+| Concern | Web | Native |
+|---|---|---|
+| Access token | httpOnly `sb-access-token`, `SameSite=Lax`, `Secure` in production | `Authorization: Bearer` |
+| Refresh token | httpOnly `sb-refresh-token`, rotated **server-side only** | `POST /api/auth/refresh` |
+| Token in a response body | **Never** | Login, signup and refresh only, on opt-in |
+| Session store | Cookies. `persistSession: false` on the browser client | Platform secure storage |
+| Refresh trigger | `proxy.ts`, on the first request after the access token expires | Explicit call to `/api/auth/refresh` |
+| Logout | `POST /api/auth/session` revokes server-side, then clears the cookies | Same route, or `POST /api/auth/logout` with a bearer token |
+
+- **Client Session Management:** none. `createBrowserSupabaseClient()` (`lib/supabase.ts`)
+  runs with `persistSession: false`, `autoRefreshToken: false` and
+  `detectSessionInUrl: false`. Its one remaining use is `resetPasswordForEmail()`, an
+  anonymous provider call that needs no session.
+- **Session issuance:** `POST /api/auth/login`, `POST /api/auth/signup` and
+  `GET /api/auth/callback` set the cookies directly. The browser never handles a token.
+- **Session refresh:** `proxy.ts` exchanges an expired access token for a fresh pair
+  using the refresh cookie and writes the rotated pair onto the response. This replaces
+  what supabase-js `autoRefreshToken` plus the bridge used to do, on the side that
+  actually holds the credential.
+- **`POST /api/auth/session`:** sign-out only. It no longer accepts a session; the
+  ingest path that made session fixation conceivable does not exist.
+- **Native clients:** a caller that sends `X-Client-Type: native` receives the session in
+  the login, signup and refresh response bodies, because it has no cookie jar the server
+  can write to. The header is **never** an authorization input — `resolveActor()` owns
+  that, Bearer-first then cookie — and a browser sending it would receive only its own
+  tokens. See `lib/auth/client-type.ts`.
+- **Cookie definition:** `lib/auth/session-cookies.ts` is the single definition of the
+  cookie names and their `httpOnly`/`secure`/`sameSite`/`path` options.
+- **Server Session Validation:** server code reads cookies to authenticate requests.
+- **Service-Role Operations:** `createServiceRoleClient()` is strictly server-side,
+  bypassing RLS for admin user discovery and system-level operations.
+- **Request Interception (`apps/web/proxy.ts`):** Edge-level proxy inspects cookies,
+  validates JWT tokens, refreshes expired sessions, and enforces platform controls.
+
+> **Deploying B13-A logs every existing user out once.** Sessions established under the
+> old model live in `localStorage`, which the new client does not read. Ship it at a low
+> traffic hour and say so in the release note.
 
 ---
 
@@ -112,12 +153,22 @@ consumers call it and differ only in destination: `components/layout/Topbar.tsx`
 sends the learner to `/login`, and `lib/admin/session.ts` (`signOutAdmin()`, shared
 by `AdminHeader` and `AdminSidebar`) sends the admin to `/admin/login`.
 
-Logging out is two independent network calls:
+Since B13-A, logging out is **one** server call: `POST /api/auth/session` with
+`{ action: 'sign_out' }`. The route revokes the refresh token at the provider using the
+httpOnly cookie, then clears both cookies, and reports the revocation outcome in the
+response body as `revocation: 'revoked' | 'skipped' | 'failed'`.
 
-1. `supabase.auth.signOut()` revokes the browser-held Supabase session.
-2. `POST /api/auth/session` with `{ action: 'sign_out', session: null }` clears the
-   httpOnly `sb-access-token` / `sb-refresh-token` cookies, which are what the
-   server actually trusts.
+Revocation moved server-side because it had to. With `persistSession` disabled there is
+no browser-held session for `supabase.auth.signOut()` to revoke, so the old client call
+would have become a no-op that still reported success — and the refresh token would have
+stayed valid at the provider for its full thirty days after the user had visibly logged
+out. The side that holds the credential is the side that can end it.
+
+Clearing the cookies is not conditional on revocation succeeding. It is the part the
+user can observe and the part that ends the session for this browser; refusing to clear
+because the provider was unreachable would leave someone logged in at a shared machine
+over a network blip. A `revocation: 'failed'` is surfaced as a `provider_sign_out`
+failure instead.
 
 Three properties the helper guarantees, and why each exists:
 
@@ -129,14 +180,15 @@ Three properties the helper guarantees, and why each exists:
 - **Failures are returned, not swallowed.** `logout()` never throws; it returns
   `{ ok, failures }`, where each failure names the step (`provider_sign_out` or
   `session_cookie_clear`) and a short, non-sensitive reason. A non-2xx response to
-  the cookie-clearing call counts as a failure — `fetch` rejects only on transport
+  the sign-out call counts as a failure — `fetch` rejects only on transport
   errors, so a 5xx would otherwise read as a successful logout.
 
 `POST /api/auth/logout` is a separate server route that additionally revokes the
 session server-side from a bearer token. No client currently calls it; it exists
 for non-browser consumers.
 
-Covered by `apps/web/lib/__tests__/b10a-error-boundaries-and-logout.test.ts`.
+Covered by `apps/web/lib/__tests__/b10a-error-boundaries-and-logout.test.ts` and
+`apps/web/lib/__tests__/b13a-single-session-owner.test.ts`.
 
 ---
 

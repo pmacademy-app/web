@@ -1,5 +1,3 @@
-import { createBrowserSupabaseClient } from '@/lib/supabase'
-
 /**
  * The one place logout happens on the client.
  *
@@ -12,6 +10,19 @@ import { createBrowserSupabaseClient } from '@/lib/supabase'
  *
  * Here each step is settled on its own, navigation happens in `finally` so it
  * cannot be skipped, and the outcome is returned rather than swallowed.
+ *
+ * ## B13-A — one call, not two
+ *
+ * The provider sign-out used to happen here, via `createBrowserSupabaseClient()`.
+ * With `persistSession` disabled there is no browser-held session left to revoke, so
+ * that call would have become a no-op that still reported success — the worst kind of
+ * security control. Revocation moved server-side into `POST /api/auth/session`, which
+ * holds the refresh token in an httpOnly cookie and can actually invalidate it.
+ *
+ * That is a strengthening, not a simplification: previously a failed browser
+ * `signOut()` left a valid refresh token at the provider and the code recorded it as a
+ * `provider_sign_out` failure the user could do nothing about. Now the side that owns
+ * the credential revokes it, and the step names below reflect where the work happens.
  */
 
 /** Learner-facing destination after logout. */
@@ -77,25 +88,17 @@ export async function logout(
   const failures: LogoutFailure[] = []
 
   try {
-    // 1. Revoke the browser-held Supabase session.
-    try {
-      const supabase = createBrowserSupabaseClient()
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        failures.push({ step: 'provider_sign_out', reason: describe(error.message) })
-      }
-    } catch (err) {
-      failures.push({ step: 'provider_sign_out', reason: describe(err) })
-    }
-
-    // 2. Clear the httpOnly server-side session cookies. This runs even when
-    //    step 1 failed: the cookies are what the server actually trusts.
+    // One server call now does both halves: it revokes the refresh token at the
+    // provider using the httpOnly cookie, then clears the cookies. The response
+    // reports the revocation outcome separately, because a cleared cookie with a
+    // live refresh token behind it is a different situation from a clean logout.
     try {
       const response = await fetch('/api/auth/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'sign_out', session: null }),
+        body: JSON.stringify({ action: 'sign_out' }),
       })
+
       if (!response.ok) {
         // fetch only rejects on transport errors, so a 5xx would otherwise read
         // as a successful logout while the cookies are still set.
@@ -103,6 +106,13 @@ export async function logout(
           step: 'session_cookie_clear',
           reason: `server responded ${response.status}`,
         })
+      } else {
+        const body = (await response.json().catch(() => null)) as { revocation?: string } | null
+        if (body?.revocation === 'failed') {
+          // The cookies are gone, so this browser is logged out; the refresh token may
+          // still be live at the provider. Surfaced rather than swallowed.
+          failures.push({ step: 'provider_sign_out', reason: 'provider revocation failed' })
+        }
       }
     } catch (err) {
       failures.push({ step: 'session_cookie_clear', reason: describe(err) })

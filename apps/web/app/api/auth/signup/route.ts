@@ -11,6 +11,8 @@ import { getClientIpBucket, getTrustedClientIp } from '@/lib/security/client-ip'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/turnstile'
 import { log } from '@/lib/monitoring/log'
+import { sessionForClient } from '@/lib/auth/client-type'
+import { setSessionCookies } from '@/lib/auth/session-cookies'
 
 export const runtime = 'nodejs'
 
@@ -355,29 +357,17 @@ export const POST = withRoute(
         }
 
         // 4. Attach HTTP-only session cookies
+        // F-SEC-8 / B13-A: no `session` in the body for a browser caller. The cookies
+        // below are the session; a native caller opts in via `x-client-type`.
         const response = NextResponse.json({
           success: true,
           verificationRequired: false,
           user: authData.user,
-          session: authData.session,
+          ...sessionForClient(request, authData.session),
           redirect: '/dashboard',
         })
 
-        const isProd = process.env.NODE_ENV === 'production'
-        response.cookies.set('sb-access-token', authData.session.access_token, {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: 'lax',
-          path: '/',
-          maxAge: authData.session.expires_in || 3600,
-        })
-        response.cookies.set('sb-refresh-token', authData.session.refresh_token, {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: 'lax',
-          path: '/',
-          maxAge: 60 * 60 * 24 * 30, // 30 days
-        })
+        setSessionCookies(response, authData.session)
 
         return response
       }

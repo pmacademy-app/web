@@ -4,7 +4,9 @@
  * - createServiceRoleClient() — uses SERVICE_ROLE_KEY (server-only, bypasses RLS)
  *   Use ONLY in app/api/ route handlers. Never import in client components.
  *
- * - createBrowserSupabaseClient() — uses ANON_KEY (safe for browser)
+ * - createBrowserSupabaseClient() — uses ANON_KEY (safe for browser). Holds no session:
+ *   B13-A disabled `persistSession`, so this client is for anonymous provider calls
+ *   only (password-reset requests). Anything needing a session goes through the server.
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -65,7 +67,33 @@ export function createBrowserSupabaseClient() {
   }
 
   if (!globalBrowserSupabaseClient) {
-    globalBrowserSupabaseClient = createClient<Database>(supabaseUrl, anonKey)
+    globalBrowserSupabaseClient = createClient<Database>(supabaseUrl, anonKey, {
+      // B13-A — httpOnly cookies are the only session store for the web.
+      //
+      // supabase-js defaults to `persistSession: true`, which writes the access *and*
+      // refresh token into localStorage. F-02: that made the httpOnly cookie
+      // decorative — the same refresh token sat in a store any script on the origin
+      // could read — and let the two copies drift apart, with no way for a native
+      // client to participate in either.
+      //
+      // With persistence off there is no second store to diverge from. The server
+      // owns the session end to end: the auth routes set the cookies, and `proxy.ts`
+      // exchanges an expired access token for a fresh pair on the next request, which
+      // is what `autoRefreshToken` used to do in the browser. Turning that off here is
+      // not a loss of refresh — it is a move of refresh to the side that holds the
+      // credential.
+      //
+      // `detectSessionInUrl` is off because this app never completes an auth flow in
+      // the browser. Recovery and verification links are `token_hash` URLs pointing at
+      // `/api/auth/callback`, which calls `verifyOtp` server-side and sets the cookies
+      // on the redirect. Leaving it on would have the client try to claim a session
+      // from a URL it will never see.
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    })
   }
 
   return globalBrowserSupabaseClient

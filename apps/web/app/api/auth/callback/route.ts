@@ -4,6 +4,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { ensureUserProfile } from '@/lib/auth'
 import { applyPendingReferral } from '@/lib/referral/referral-service'
 import { log } from '@/lib/monitoring/log'
+import { setSessionCookies } from '@/lib/auth/session-cookies'
 
 /**
  * Redeems a referral code that was recorded at signup and deliberately deferred.
@@ -27,25 +28,7 @@ function redirectWithSession(
   destination: URL,
   session: { access_token: string; refresh_token: string; expires_in: number },
 ): NextResponse {
-  const response = NextResponse.redirect(destination)
-  const isProd = process.env.NODE_ENV === 'production'
-
-  response.cookies.set('sb-access-token', session.access_token, {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: session.expires_in,
-  })
-  response.cookies.set('sb-refresh-token', session.refresh_token, {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-  })
-
-  return response
+  return setSessionCookies(NextResponse.redirect(destination), session)
 }
 
 /**

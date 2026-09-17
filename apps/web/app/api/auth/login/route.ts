@@ -8,6 +8,8 @@ import { AUTH_SERVICE_UNAVAILABLE_MESSAGE } from '@/lib/errors/api-response'
 import { evaluatePersistentRateLimit } from '@/lib/rate-limit'
 import { getClientIpBucket } from '@/lib/security/client-ip'
 import { log } from '@/lib/monitoring/log'
+import { sessionForClient } from '@/lib/auth/client-type'
+import { setSessionCookies } from '@/lib/auth/session-cookies'
 
 export const runtime = 'nodejs'
 
@@ -156,29 +158,21 @@ export const POST = withRoute(
       // 4. Ensure public.users profile exists
       await ensureUserProfile(supabase, authData.user)
 
-      // 5. Attach secure HTTP-only cookies
+      // 5. Attach secure HTTP-only cookies.
+      //
+      // F-SEC-8 / B13-A: `session` is no longer in the body for a browser caller. It
+      // carried the access *and* refresh token alongside the httpOnly cookies, which
+      // made the cookie protection decorative — the refresh token was readable by any
+      // script on the origin. A native client still receives it, because it has no
+      // cookie jar the server can write to; see `lib/auth/client-type.ts`.
       const response = NextResponse.json({
         success: true,
         user: authData.user,
-        session: authData.session,
+        ...sessionForClient(request, authData.session),
         redirect: '/dashboard',
       })
 
-      const isProd = process.env.NODE_ENV === 'production'
-      response.cookies.set('sb-access-token', authData.session.access_token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: authData.session.expires_in || 3600,
-      })
-      response.cookies.set('sb-refresh-token', authData.session.refresh_token, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-      })
+      setSessionCookies(response, authData.session)
 
       return response
     } catch (err) {

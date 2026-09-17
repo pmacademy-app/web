@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { withRoute } from '@/lib/api/with-route'
+import { clearSessionCookies } from '@/lib/auth/session-cookies'
 import { createAuthenticatedServerClient } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
@@ -21,7 +22,6 @@ export const POST = withRoute(
     summary: 'Unhandled exception in /api/auth/logout',
   },
   async ({ request }) => {
-    const isProd = process.env.NODE_ENV === 'production'
 
     const authHeader = request.headers.get('Authorization')
     let accessToken: string | null = null
@@ -48,21 +48,7 @@ export const POST = withRoute(
     )
 
     // Clear HTTP-only session cookies
-    response.cookies.set('sb-access-token', '', {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: -1,
-    })
-
-    response.cookies.set('sb-refresh-token', '', {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: -1,
-    })
+    clearSessionCookies(response)
 
     return response
   }
