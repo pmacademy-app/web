@@ -1,15 +1,20 @@
 # Canonical Documentation Index & Reading Map — Prodily PM Academy
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
-**Framework:** Next.js 16.2.12 (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)  
-**Test Suite:** 142 Test Files · 1745 Unit & Integration Tests (100% Passing)  
-**Database Migrations:** 48 Applied Migrations in `supabase/migrations/`  
-**Last Updated:** September 14, 2026  
+**Framework:** Next.js 16.3.5 (Turbopack) / React 19.2.4 / PostgreSQL (Supabase)  
+**Test Suite:** 160 Test Files · 2180 Unit, Integration & Component Tests (100% Passing) · 17 Playwright E2E tests across 5 spec files  
+**Database Migrations:** 49 Migrations in `supabase/migrations/`  
+**Last Updated:** September 18, 2026  
 
 > **Where the work stands.** [`HARDENING_LEDGER.md`](HARDENING_LEDGER.md) is the
 > authoritative record of implementation status; [`FINAL_IMPLEMENTATION_PLAN.md`](FINAL_IMPLEMENTATION_PLAN.md)
 > remains the locked specification. Where they disagree about *status*, the ledger
-> wins; about *scope*, the plan wins. **B0–B6 and Phase 1 (B8-A…B8-E, B9-A) are complete and deployed. Phase 2 is in progress on `b10a-b14b/error-boundaries-logout-ci-security` (not merged): the Next.js 16.3.5 security prerequisite, B10-A, B14-B, B7-A–B7-D, B7-F and B7-G1 are complete in code. Remaining: B7-E (skipped), B7-G2, B7-H.**
+> wins; about *scope*, the plan wins. **B0–B6 and Phase 1 (B8-A…B8-E, B9-A) are complete
+> and deployed. Phase 2 — B7-A…B7-H, B8-F/B8-G, B9-B…B9-D, B10-A…B10-D, B11-A…B11-C,
+> B12-A/B12-B, B13-A/B13-B and B14-A…B14-C — is complete in code on
+> `b10a-b14b/error-boundaries-logout-ci-security` (@ `208b5ec`, **not merged**) and awaits
+> merge plus production verification. B13-A needs a monitored deploy: it logs every
+> existing user out once.**
 
 ---
 
@@ -17,8 +22,8 @@
 
 1. **Current Production Behavior** (Live deployed runtime behavior)
 2. **Current Source Code** (TypeScript routes, services, React components, compilation scripts)
-3. **Database Migrations & Schema** (48 SQL DDL files in `supabase/migrations/`)
-4. **Automated Unit & Integration Tests** (142 test files, 1745 passed unit tests in `apps/web/lib/__tests__/`)
+3. **Database Migrations & Schema** (49 SQL DDL files in `supabase/migrations/`)
+4. **Automated Tests** (160 vitest files in `apps/web/lib/__tests__/` and `apps/web/components/__tests__/`; 17 Playwright tests across 5 spec files in `apps/web/e2e/`)
 5. **Operating Manuals & Workspaces** (`docs/admin/*.md`)
 6. **Detailed Architectural Documentation** (`docs/*.md`)
 7. **Historical Implementation Records** (Previous session logs and stale plans)
@@ -45,11 +50,11 @@ All primary architectural documentation lives directly under `docs/`:
 | **Admin Console Reference** | [`ADMIN_PANEL.md`](ADMIN_PANEL.md) | Technical reference for Admin Panel architecture, RBAC, services, and APIs | 🟢 Current |
 | **Notifications** | [`NOTIFICATIONS.md`](NOTIFICATIONS.md) | In-app notification center, mobile viewport positioning, broadcasts, delivery logs | 🟢 Current |
 | **Email Infrastructure**| [`EMAIL_SYSTEM.md`](EMAIL_SYSTEM.md) | Auth Hook, email queue, queue processor, Resend delivery, broadcasts, templates | 🟢 Current |
-| **Authentication** | [`AUTHENTICATION.md`](AUTHENTICATION.md) | Supabase Auth, signup flow, 60s rate limit, session bridge, platform settings | 🟢 Current |
+| **Authentication** | [`AUTHENTICATION.md`](AUTHENTICATION.md) | Supabase Auth, signup flow, 60s rate limit, the B13-A single session owner (httpOnly cookies only; the client bridge is deleted), platform settings | 🟢 Current |
 | **Error Monitoring** | [`ERROR_MONITORING.md`](ERROR_MONITORING.md) | `logSystemError()`, secret sanitization, 15m fingerprint dedup, alerts UI | 🟢 Current |
 | **Architecture Decisions** | [`decisions/`](decisions/) | ADRs for significant, expensive-to-reverse decisions (email failover, failure classification, config control plane, error taxonomy, redaction, API error contract) | 🟢 Current |
 | **Observability** | [`OBSERVABILITY.md`](OBSERVABILITY.md) | Resend usage vs application quota, queue/delivery metrics, telemetry sources | 🟢 Current |
-| **Database & Schema** | [`DATABASE.md`](DATABASE.md) | PostgreSQL schema, 41 migration files, table definitions, RLS policies, types | 🟢 Current |
+| **Database & Schema** | [`DATABASE.md`](DATABASE.md) | PostgreSQL schema, 49 migration files, table definitions, RLS policies, types | 🟢 Current |
 | **Security & RBAC** | [`SECURITY.md`](SECURITY.md) | Threat model, RBAC authorization, webhook HMAC signatures, secret safety | 🟢 Current |
 | **Cron & Scheduling** | [`CRON_AND_SCHEDULING.md`](CRON_AND_SCHEDULING.md) | GitHub Actions workflows (`notification-scheduler.yml`), `CRON_SECRET` endpoints | 🟢 Current |
 | **Design System** | [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | Prodily palette, typography, glassmorphism, responsive viewports, header feedback | 🟢 Current |
@@ -61,7 +66,7 @@ All primary architectural documentation lives directly under `docs/`:
 | **Leaderboard & Social** | [`LEADERBOARD.md`](LEADERBOARD.md) | Global/Cohort/Friends ranking modes, cohorts, Friend Accountability | 🟢 Current |
 | **External Services** | [`INTEGRATIONS.md`](INTEGRATIONS.md) | External service matrix (Supabase, Resend, GitHub Actions), test mocks | 🟢 Current |
 | **Deployment & Hosting**| [`DEPLOYMENT.md`](DEPLOYMENT.md) | Vercel deployment, Next.js build config, environment variable reference | 🟢 Current |
-| **Testing & CI/CD** | [`TESTING.md`](TESTING.md) | Vitest unit/integration suites (100 files, 1029 tests), Playwright E2E, CI | 🟢 Current |
+| **Testing & CI/CD** | [`TESTING.md`](TESTING.md) | Vitest unit/integration/component suites (160 files, 2180 tests), Playwright E2E (17 tests, 5 spec files), CI gates | 🟢 Current |
 | **Changelog History** | [`CHANGELOG.md`](CHANGELOG.md) | Chronological commit and release history | 🟢 Current |
 
 ---

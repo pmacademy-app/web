@@ -50,7 +50,18 @@ function code(source: string): string {
  *
  * Built lazily on first use so a `-t` filtered run that needs none of the scanning tests
  * does not pay for the walk at all.
+ *
+ * ## Why these tests carry an explicit timeout
+ *
+ * The walk itself is ~35 ms; reading the 623 files it finds costs ~4-6 s on Windows,
+ * where the on-access virus scanner pays a fixed price per file open. On Linux CI the
+ * same read is tens of milliseconds. That is real work proportional to repository size,
+ * not a hang — but vitest's default 15 s is tuned for unit tests, and under a loaded
+ * full-suite run this crossed it and failed intermittently. `SCAN_TIMEOUT_MS` matches
+ * the 30 s the equivalent scan in `b10b-api-client.test.ts` already uses. A genuine hang
+ * still fails; a busy machine no longer does.
  */
+const SCAN_TIMEOUT_MS = 30_000
 let sourceIndexCache: Array<{ rel: string; source: string }> | null = null
 
 function sourceIndex(): Array<{ rel: string; source: string }> {
@@ -112,7 +123,7 @@ describe('B13-A — the browser holds no session', () => {
       .map((f) => f.rel)
 
     expect(offenders).toEqual([])
-  })
+  }, SCAN_TIMEOUT_MS)
 
   it('no client component subscribes to provider auth state changes', () => {
     const offenders = productionSources()
@@ -120,7 +131,7 @@ describe('B13-A — the browser holds no session', () => {
       .map((f) => f.rel)
 
     expect(offenders).toEqual([])
-  })
+  }, SCAN_TIMEOUT_MS)
 })
 
 describe('B13-A — the browser-session consumer sweep is complete', () => {
@@ -140,7 +151,7 @@ describe('B13-A — the browser-session consumer sweep is complete', () => {
     // it is the only thing the browser client is still for.
     expect(consumers).toEqual(['app/(auth)/reset-password/page.tsx'])
     expect(code(read('app/(auth)/reset-password/page.tsx'))).toContain('resetPasswordForEmail')
-  })
+  }, SCAN_TIMEOUT_MS)
 
   it('the admin console authenticates server-side, not in the browser', () => {
     const source = code(read('app/admin/login/page.tsx'))
@@ -304,5 +315,5 @@ describe('B13-A — the cookie contract has one definition', () => {
     // `ACCESS_TOKEN_COOKIE` / `REFRESH_TOKEN_COOKIE` constants, so the literal prefix
     // appears nowhere. A hit here is by definition a hand-rolled copy.
     expect(offenders).toEqual([])
-  })
+  }, SCAN_TIMEOUT_MS)
 })

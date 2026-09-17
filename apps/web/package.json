@@ -38,7 +38,6 @@
     "test:dev-cert": "vitest run lib/__tests__/dev-certificate.test.ts",
     "test:settings": "vitest run lib/__tests__/settings.test.ts",
     "test:send-email-hook": "vitest run lib/__tests__/send-email-hook.test.ts lib/__tests__/email-hook-reliability.test.ts",
-    "test:remediation": "vitest run lib/__tests__/remediation-unit-invariants.test.ts",
     "test:contact": "vitest run lib/__tests__/contact.test.ts",
     "test:admin-email": "vitest run lib/__tests__/admin-email-test-send.test.ts",
     "test:automations": "vitest run lib/__tests__/email-automations.test.ts",

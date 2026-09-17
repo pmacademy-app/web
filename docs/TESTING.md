@@ -2,8 +2,8 @@
 
 **Repository:** `prodily-monorepo` (app code at `apps/web/`)
 **Test Runner:** Vitest (Unit & Integration) / Playwright (E2E)  
-**Total Test Files:** 100 Test Suites  
-**Total Tests:** 1029 Unit & Integration Tests (100% Passing)  
+**Total Test Files:** 160 Vitest suites (2,180 tests) · 17 Playwright E2E tests across 5 spec files  
+**Total Tests:** 2,180 Unit, Integration & Component Tests (100% Passing)  
 **Last Updated:** September 6, 2026  
 
 ---
@@ -22,9 +22,9 @@ The repository uses **Vitest** for fast, high-coverage unit and integration test
 
 ---
 
-## 2. Test Suite Inventory (100 Suites, 1029 Tests)
+## 2. Test Suite Inventory (160 Suites, 2,180 Tests)
 
-The list below is a representative sample of `apps/web/lib/__tests__/` grouped by domain, not an exhaustive file-by-file index — the directory has grown to 100 files and includes many additional suites (e.g. `dashboard.test.ts`, `analytics-aggregation.test.ts`, `onboarding.test.ts`, `system-monitoring.test.ts`, `portfolio-verification.test.ts`, `friend-accountability.test.ts`, `auth-callback-email-change.test.ts`, several `phaseN-*.test.ts` files) not individually listed here.
+The list below is a representative sample of `apps/web/lib/__tests__/` grouped by domain, not an exhaustive file-by-file index — the directory has grown to 159 files (plus one component suite under `apps/web/components/__tests__/`) and includes many additional suites (e.g. `dashboard.test.ts`, `analytics-aggregation.test.ts`, `onboarding.test.ts`, `system-monitoring.test.ts`, `portfolio-verification.test.ts`, `friend-accountability.test.ts`, `auth-callback-email-change.test.ts`, several `phaseN-*.test.ts` files) not individually listed here.
 
 ### Core Domain, Learning & Gamification Suites
 - `xp.test.ts` — XP formulas, level thresholds, and ledger mutations.
@@ -97,7 +97,7 @@ The list below is a representative sample of `apps/web/lib/__tests__/` grouped b
 ```bash
 # From apps/web/
 
-# Run complete Vitest suite (100 test suites, 1029 tests)
+# Run complete Vitest suite (160 suites, 2,180 tests)
 npm test
 
 # Run TypeScript typecheck (0 errors)
@@ -119,7 +119,7 @@ npx playwright test
 
 GitHub Actions (`.github/workflows/ci.yml`) enforces the following gates on every pull request and push to `main`:
 1. **Content Compilation:** `npm run content:compile` (validates 90 markdown lessons).
-2. **Vitest Unit & Integration Suite:** 100% pass rate required across all 100 test suites.
+2. **Vitest Unit, Integration & Component Suite:** 100% pass rate required across all 160 test suites.
 3. **TypeScript Typecheck:** `tsc --noEmit` must pass with 0 errors.
 4. **ESLint:** Must pass with 0 errors.
 5. **Next.js Production Build:** Full static and dynamic route compilation.
