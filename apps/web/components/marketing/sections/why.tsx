@@ -1,10 +1,5 @@
-'use client'
-
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
 import { FeatureCard } from '@/components/marketing/feature-card'
-import { useReducedMotion } from '@/hooks/use-reduced-motion'
-import { STAGGER_CONTAINER } from '@/lib/animation'
+import { Reveal } from '@/components/marketing/motion/reveal'
 
 const COMPARISON_CARDS = [
   {
@@ -29,12 +24,15 @@ const COMPARISON_CARDS = [
 
 /**
  * Why PM Academy section — Sprint 2 §9 + Sprint 3 why copy.
+ *
+ * ## B12-B — server component
+ *
+ * Two `motion.div` wrappers, one `useInView` and a `STAGGER_CONTAINER`, all to fade the
+ * header in and stagger three cards. `<Reveal>` does both: once for the header, once per
+ * card with a `delay` that reproduces `staggerChildren: 0.08`. `FeatureCard` was already
+ * a server component, so nothing in this section reaches the client bundle now.
  */
 export function WhySection() {
-  const prefersReducedMotion = useReducedMotion()
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, amount: 0.2 })
-
   return (
     <section
       id="why"
@@ -43,13 +41,7 @@ export function WhySection() {
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
-          className="max-w-[760px] mx-auto text-center mb-14"
-        >
+        <Reveal amount={0.3} className="max-w-[760px] mx-auto text-center mb-14">
           <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
             THE TRADE-OFF YOU SHOULDN&apos;T HAVE TO MAKE
           </div>
@@ -62,26 +54,21 @@ export function WhySection() {
           <p className="text-body-lg text-locked leading-relaxed">
             Product management is easy to study badly. You can collect hundreds of videos, frameworks, and opinions without ever building a coherent mental model or producing work of your own. Paid programs solve some of the structure problem, but they can be expensive. Prodily combines a structured curriculum with applied practice and portfolio output — without putting the core learning path behind a paywall.
           </p>
-        </motion.div>
+        </Reveal>
 
         {/* Comparison cards */}
-        <motion.div
-          ref={ref}
-          variants={prefersReducedMotion ? undefined : STAGGER_CONTAINER}
-          initial={prefersReducedMotion ? false : 'hidden'}
-          animate={inView ? 'visible' : 'hidden'}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-          {COMPARISON_CARDS.map((card) => (
-            <FeatureCard
-              key={card.title}
-              icon={card.icon}
-              title={card.title}
-              description={card.description}
-              variant={card.variant}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {COMPARISON_CARDS.map((card, i) => (
+            <Reveal key={card.title} amount={0.2} delay={i * 80} className="h-full">
+              <FeatureCard
+                icon={card.icon}
+                title={card.title}
+                description={card.description}
+                variant={card.variant}
+              />
+            </Reveal>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   )

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import {
   BookOpen,
@@ -149,10 +148,9 @@ export function ExperienceSection() {
                 >
                   {/* Left Active Indicator Bar */}
                   {isActive && (
-                    <motion.span
-                      layoutId="activeFormatIndicator"
-                      className="absolute left-0 top-0 bottom-0 w-1 bg-primary"
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 top-0 bottom-0 w-1 bg-primary animate-in fade-in duration-200 fill-mode-both motion-reduce:animate-none"
                     />
                   )}
 
@@ -206,17 +204,12 @@ export function ExperienceSection() {
 
               {/* Dynamic Simulated Preview Body */}
               <div className="flex-1 flex flex-col justify-center">
-                <AnimatePresence mode="wait">
                   
                   {/* PREVIEW 1: LESSON */}
                   {activeFormat === 'lesson' && (
-                    <motion.div
+                    <div
                       key="lesson-preview"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.18 }}
-                      className="space-y-4"
+                      className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-both motion-reduce:animate-none"
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] text-foreground px-2.5 py-0.5 rounded font-semibold">
@@ -247,18 +240,14 @@ export function ExperienceSection() {
                           Forces teams to explicitly quantify confidence before over-investing engineering time (Lesson 29).
                         </p>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* PREVIEW 2: QUIZ */}
                   {activeFormat === 'quiz' && (
-                    <motion.div
+                    <div
                       key="quiz-preview"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.18 }}
-                      className="space-y-4"
+                      className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-both motion-reduce:animate-none"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-mono text-primary bg-[#EAF5EF] px-2 py-0.5 rounded font-semibold">
@@ -302,18 +291,14 @@ export function ExperienceSection() {
                           <strong>Correct:</strong> MoSCoW makes strategic exclusion an explicit, visible category (&ldquo;Won&apos;t Have&rdquo;), directly enforcing Lesson 10&apos;s discipline that a real strategy must say no.
                         </div>
                       )}
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* PREVIEW 3: FLASHCARD */}
                   {activeFormat === 'flashcard' && (
-                    <motion.div
+                    <div
                       key="flashcard-preview"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.18 }}
-                      className="space-y-4"
+                      className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-both motion-reduce:animate-none"
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] px-2 py-0.5 rounded font-semibold text-foreground">
@@ -363,18 +348,14 @@ export function ExperienceSection() {
                           Easy · 7d
                         </span>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* PREVIEW 4: ASSIGNMENT */}
                   {activeFormat === 'assignment' && (
-                    <motion.div
+                    <div
                       key="assignment-preview"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.18 }}
-                      className="space-y-4"
+                      className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-both motion-reduce:animate-none"
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#EAF5EF] text-primary px-2 py-0.5 rounded font-semibold">
@@ -412,18 +393,14 @@ export function ExperienceSection() {
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* PREVIEW 5: CASE STUDY */}
                   {activeFormat === 'casestudy' && (
-                    <motion.div
+                    <div
                       key="casestudy-preview"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.18 }}
-                      className="space-y-4"
+                      className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200 fill-mode-both motion-reduce:animate-none"
                     >
                       <div className="flex items-center justify-between text-xs text-[#70685A]">
                         <span className="font-mono bg-[#F2EFE7] text-foreground px-2 py-0.5 rounded font-semibold">
@@ -451,10 +428,9 @@ export function ExperienceSection() {
                           Investing in an open developer marketplace before establishing reliable, versioned developer surfaces breaks cross-side trust and stalls ecosystem growth (Lesson 61).
                         </p>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
-                </AnimatePresence>
               </div>
 
               {/* Sandbox Footer Action */}

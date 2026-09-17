@@ -222,6 +222,35 @@ Re-measure with this same method and compare against these numbers:
 | Accessibility | 96 | **must not regress** |
 | SEO | 100 | **must not regress** |
 
+### B12-B result — measured against this baseline
+
+Re-measured with the identical method after B12-B. Lighthouse figures are the **median
+of three runs** (a single local run varies by up to 20 Performance points; the baseline
+above was a single run, which is the one methodological weakness in this report).
+
+| Metric | B12-A baseline | After B12-B | Delta |
+|---|---:|---:|---|
+| `/` JS gzip | 529.1 KB | **321.2 KB** | **−207.9 KB (−39%)** |
+| Chunks unique to `/` | 184.1 KB | **16.5 KB** | **−91%** |
+| framer-motion on `/` | 171.7 KB | **0** | eliminated |
+| Mobile Performance | 44 | **78** | **+34** |
+| Mobile LCP | 7.7 s | **4.1 s** | **−3.6 s** |
+| Mobile TBT | 1,100 ms | **416 ms** | **−684 ms** |
+| Mobile FCP | 3.1 s | **1.1 s** | −2.0 s |
+| Mobile Speed Index | 5.1 s | **1.2 s** | −3.9 s |
+| Mobile CLS | 0 | **0** | held |
+| Accessibility | 96 | **98** | **+2** |
+| SEO | 100 | **100** | held |
+| Desktop Performance | 93 | **99** | +6 |
+
+`/about` also fell from 345.0 KB to 304.7 KB, because the navbar — shared by every
+marketing page — was part of the change.
+
+LCP at 4.1 s is still above the 2.5 s "good" threshold, and Performance 78 is still under
+the ≥ 90 budget. Both are now dominated by the shared ~305 KB app baseline that every
+route carries, which this report explicitly placed out of B12-B's scope. That baseline is
+the next measurement worth taking, and it is a larger question than one page.
+
 ### Out of scope for B12-B
 
 Image work · font work · analytics/GTM · ISR or caching · the shared 345 KB app baseline

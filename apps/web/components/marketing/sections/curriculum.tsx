@@ -1,28 +1,24 @@
-'use client'
-
-import { useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
-import { useReducedMotion } from '@/hooks/use-reduced-motion'
+import { ArrowRight } from 'lucide-react'
+
 import { ModuleCard } from '@/components/marketing/module-card'
 import { MODULES } from '@/config/content'
-import { trackCurriculumView } from '@/lib/analytics'
-import { ArrowRight } from 'lucide-react'
+import { Reveal } from '@/components/marketing/motion/reveal'
+import { CurriculumViewTracker } from '@/components/marketing/sections/curriculum-view-tracker'
 
 /**
  * Curriculum section — Sprint 2 §11 + Sprint 3 curriculum copy.
  * 3×3 ModuleCard grid with stats bar.
+ *
+ * ## B12-B — server component
+ *
+ * Three `motion.div` wrappers plus a `useInView` that was doing double duty: driving the
+ * grid's stagger and firing the GA4 curriculum-view event. Those are now separate
+ * concerns — `<Reveal>` for the animation, `<CurriculumViewTracker>` for the event — so
+ * the nine `ModuleCard`s and all the copy render on the server. The stagger keeps its
+ * original row/column shape: 100 ms per row, 50 ms per column.
  */
 export function CurriculumSection() {
-  const prefersReducedMotion = useReducedMotion()
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, amount: 0.15 })
-
-  // GA4 event — fires once on viewport entry
-  useEffect(() => {
-    if (inView) trackCurriculumView()
-  }, [inView])
-
   return (
     <section
       id="curriculum"
@@ -31,13 +27,7 @@ export function CurriculumSection() {
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
-          className="text-center mb-10"
-        >
+        <Reveal amount={0.3} className="text-center mb-10">
           <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
             COMPLETE LEARNING PATH
           </div>
@@ -50,33 +40,28 @@ export function CurriculumSection() {
           <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
             Start with product thinking fundamentals and build toward discovery, execution, strategy, leadership, and technical fluency. Each module builds on the last and ends with applied work.
           </p>
-        </motion.div>
+        </Reveal>
+
+        <CurriculumViewTracker />
 
         {/* Module grid */}
-        <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10 items-stretch">
           {MODULES.map((module, index) => (
-            <motion.div
+            <Reveal
               key={module.number}
+              amount={0.15}
+              delay={Math.floor(index / 3) * 100 + (index % 3) * 50}
               className="h-full"
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-              transition={{
-                duration: prefersReducedMotion ? 0 : 0.24,
-                delay: prefersReducedMotion ? 0 : Math.floor(index / 3) * 0.1 + (index % 3) * 0.05,
-                ease: [0, 0, 0.2, 1],
-              }}
             >
               <ModuleCard module={module} className="h-full" />
-            </motion.div>
+            </Reveal>
           ))}
         </div>
 
         {/* CTAs */}
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.18, delay: 0.1 }}
+        <Reveal
+          amount={0.5}
+          delay={100}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center"
         >
           <Link
@@ -104,7 +89,7 @@ export function CurriculumSection() {
           >
             or preview a free lesson →
           </Link>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   )

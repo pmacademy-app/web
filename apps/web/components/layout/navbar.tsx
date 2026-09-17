@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Menu, X, Coffee, ArrowRight } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useScrolled } from '@/hooks/use-scrolled'
-import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { trackHeroCTAClick } from '@/lib/analytics'
 import { NAV_LINKS } from '@/config/navigation'
 import { BRAND } from '@/lib/brand'
@@ -103,7 +101,6 @@ function CTAButton({
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const isScrolled = useScrolled(16)
-  const prefersReducedMotion = useReducedMotion()
 
   const closeMenu = () => setMenuOpen(false)
 
@@ -120,13 +117,11 @@ export function Navbar() {
 
   return (
     <>
-      <motion.header
+      <header
         role="banner"
-        initial={prefersReducedMotion ? false : { opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.18, ease: [0, 0, 0.2, 1] }}
         className={cn(
           'fixed top-0 left-0 right-0 z-[50]',
+          'animate-in fade-in slide-in-from-top-2 duration-200 fill-mode-both motion-reduce:animate-none',
           'h-16 lg:h-[72px]',
           'transition-all duration-[180ms]',
           isScrolled
@@ -167,37 +162,30 @@ export function Navbar() {
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-      </motion.header>
+      </header>
 
       {/* Mobile Menu Sheet */}
-      <AnimatePresence>
-        {menuOpen && (
+      {menuOpen && (
           <>
             {/* Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: prefersReducedMotion ? 0 : 0.18 }}
-              className="fixed inset-0 z-[45] bg-foreground/20 backdrop-blur-sm lg:hidden"
+            <div
+              className="fixed inset-0 z-[45] bg-foreground/20 backdrop-blur-sm lg:hidden animate-in fade-in duration-200 fill-mode-both motion-reduce:animate-none"
               onClick={closeMenu}
               aria-hidden="true"
             />
 
             {/* Sheet */}
-            <motion.div
+            <div
               id="mobile-menu"
               role="dialog"
               aria-label="Navigation menu"
-              initial={prefersReducedMotion ? false : { x: '100%' }}
-              animate={{ x: 0 }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { x: '100%' }}
-              transition={{ duration: prefersReducedMotion ? 0 : 0.24, ease: [0, 0, 0.2, 1] }}
               className="
                 fixed top-0 right-0 bottom-0 z-[60]
                 w-72 bg-surface border-l border-border
                 flex flex-col pt-16 pb-8 px-6
                 lg:hidden
+                animate-in slide-in-from-right duration-[240ms] fill-mode-both
+                motion-reduce:animate-none
               "
             >
               {/* Close */}
@@ -263,10 +251,9 @@ export function Navbar() {
 
                 <CTAButton size="md" location="nav" onClick={closeMenu} />
               </div>
-            </motion.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
     </>
   )
 }

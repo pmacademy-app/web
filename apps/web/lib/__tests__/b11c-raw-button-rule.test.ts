@@ -116,8 +116,6 @@ const EXEMPT_COMPONENTS = [
   'marketing/faq-explorer.tsx',
   'marketing/reviews-explorer.tsx',
   'marketing/sections/experience.tsx',
-  'marketing/sections/journey.tsx',
-  'marketing/sections/portfolio.tsx',
   'marketing/sections/testimonials.tsx',
   'notifications/NotificationBell.tsx',
   'notifications/NotificationCenterDrawer.tsx',

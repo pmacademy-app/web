@@ -1,8 +1,3 @@
-'use client'
-
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { SKILL_COLORS, SKILL_LABELS } from '@/lib/design/tokens'
 import { SKILL_CLUSTER_IDS } from '@/lib/skillRadar'
 import type { SkillValues } from '@/types'
@@ -24,8 +19,19 @@ const DEFAULT_SIZE = 320
 
 /**
  * Custom SVG Skill Radar implementing Sprint 1 §12 + Sprint 2 §13.
- * 7 axes, competency colors, ghost polygon, Framer Motion path animation.
+ * 7 axes, competency colors, ghost polygon, CSS entry animation.
  * Screen-reader accessible via text summary.
+ *
+ * ## B12-B — server component
+ *
+ * This rendered inside the landing hero and was one of the imports holding
+ * framer-motion on the critical path (B12-A: 171.7 KB gzip). The animation it needed
+ * was an opacity fade on the polygon and a staggered fade on seven dots, gated on
+ * `useInView` — but on the landing page it sits in the hero and is in view on mount,
+ * so the observer only ever delayed it. Both are now `animate-in` CSS with per-dot
+ * `animation-delay`, which removes the client boundary entirely: no `'use client'`,
+ * no hooks, no engine. `motion-reduce:animate-none` replaces the `prefersReducedMotion`
+ * branch.
  */
 export function SkillRadar({
   values,
@@ -34,10 +40,6 @@ export function SkillRadar({
   showLegend = true,
   className,
 }: SkillRadarProps) {
-  const ref = useRef<SVGSVGElement>(null)
-  const inView = useInView(ref, { once: true, amount: 0.3 })
-  const prefersReducedMotion = useReducedMotion()
-
   const cx = size / 2
   const cy = size / 2
   const maxRadius = (size / 2) * 0.75
@@ -67,8 +69,6 @@ export function SkillRadar({
     }).join(' ')
   }
 
-  const shouldAnimate = inView && !prefersReducedMotion
-
   return (
     <div className={cn('flex flex-col gap-6', className)}>
       {/* Screen-reader text summary */}
@@ -79,7 +79,6 @@ export function SkillRadar({
 
       {/* SVG Radar */}
       <svg
-        ref={ref}
         width={size}
         height={size}
         viewBox={`0 0 ${size} ${size}`}
@@ -150,36 +149,31 @@ export function SkillRadar({
         )}
 
         {/* Main filled polygon */}
-        <motion.polygon
+        <polygon
           points={buildPolygon(values)}
           fill="var(--color-primary)"
-          fillOpacity={shouldAnimate ? 0 : 0.15}
+          fillOpacity={0.15}
           stroke="var(--color-primary)"
           strokeWidth="2"
           strokeLinejoin="round"
-          animate={
-            shouldAnimate
-              ? { fillOpacity: 0.15, strokeOpacity: 1 }
-              : undefined
-          }
-          initial={prefersReducedMotion ? undefined : { fillOpacity: 0, strokeOpacity: 0 }}
-          transition={{ duration: 0.6, ease: [0, 0, 0.2, 1], delay: 0.2 }}
+          className="animate-in fade-in duration-[600ms] delay-200 fill-mode-both motion-reduce:animate-none"
         />
 
         {/* Value dots */}
         {SKILL_CLUSTER_IDS.map((cluster, i) => {
           const point = getPoint(i, values[cluster])
           return (
-            <motion.circle
+            <circle
               key={cluster}
               cx={point.x}
               cy={point.y}
               r="5"
               fill={SKILL_COLORS[cluster]}
-              initial={prefersReducedMotion ? undefined : { opacity: 0, scale: 0 }}
-              animate={shouldAnimate ? { opacity: 1, scale: 1 } : undefined}
-              transition={{ duration: 0.3, delay: 0.4 + i * 0.05 }}
-              style={{ transformOrigin: `${point.x}px ${point.y}px` }}
+              className="animate-in fade-in zoom-in duration-300 fill-mode-both motion-reduce:animate-none"
+              style={{
+                transformOrigin: `${point.x}px ${point.y}px`,
+                animationDelay: `${400 + i * 50}ms`,
+              }}
             />
           )
         })}

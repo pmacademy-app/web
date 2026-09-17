@@ -1,10 +1,8 @@
-'use client'
-
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
-import { useReducedMotion } from '@/hooks/use-reduced-motion'
-import { trackHeroCTAClick } from '@/lib/analytics'
+import { CheckCircle2 } from 'lucide-react'
+
+import { Reveal } from '@/components/marketing/motion/reveal'
+import { FinalCtaLink } from '@/components/marketing/sections/final-cta-link'
 
 interface FinalCTASectionProps {
   showTrustStrip?: boolean
@@ -12,10 +10,16 @@ interface FinalCTASectionProps {
 
 /**
  * Final CTA section — Minimalist, elegant layout with direct action controls.
+ *
+ * ## B12-B — server component
+ *
+ * The whole section was `'use client'` for two things: a `whileInView` fade on the
+ * container and a `whileHover`/`whileTap` scale on the primary button. The first is now
+ * `<Reveal>` (IntersectionObserver plus a CSS transition), the second is CSS
+ * `hover:scale`. The analytics click handler is the only genuine client requirement and
+ * lives in `FinalCtaLink`; the event it fires is unchanged.
  */
 export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps) {
-  const prefersReducedMotion = useReducedMotion()
-
   return (
     <section
       id="final-cta"
@@ -31,11 +35,8 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
       </div>
 
       <div className="relative max-w-[1120px] mx-auto px-5 lg:px-8">
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.24, ease: [0, 0, 0.2, 1] }}
+        <Reveal
+          amount={0.3}
           className="max-w-[720px] mx-auto text-center flex flex-col items-center"
         >
           {/* Trust Strip — only shown when specified */}
@@ -61,36 +62,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
 
           {/* CTA Action Group */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-            <motion.div
-              whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-              className="w-full sm:w-auto"
-            >
-              <Link
-                href="/signup"
-                onClick={() => trackHeroCTAClick('final_cta')}
-                className="
-                  group relative inline-flex items-center justify-center gap-2.5 w-full sm:w-auto
-                  px-8 py-4 bg-primary text-white font-semibold text-sm rounded-xl
-                  shadow-[0_4px_20px_rgba(31,107,78,0.25)]
-                  hover:bg-[#18553E] hover:shadow-[0_6px_25px_rgba(31,107,78,0.35)]
-                  transition-all duration-200 overflow-hidden
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
-                "
-              >
-                {/* Shimmer sweep */}
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none"
-                />
-                <span>Start Learning Free</span>
-                <ArrowRight
-                  size={16}
-                  className="transition-transform duration-200 group-hover:translate-x-1"
-                  aria-hidden="true"
-                />
-              </Link>
-            </motion.div>
+            <FinalCtaLink />
 
             <Link
               href="/curriculum"
@@ -121,7 +93,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
               Public portfolio
             </span>
           </div>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   )
