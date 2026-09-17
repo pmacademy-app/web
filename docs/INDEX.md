@@ -53,6 +53,7 @@ All primary architectural documentation lives directly under `docs/`:
 | **Security & RBAC** | [`SECURITY.md`](SECURITY.md) | Threat model, RBAC authorization, webhook HMAC signatures, secret safety | 🟢 Current |
 | **Cron & Scheduling** | [`CRON_AND_SCHEDULING.md`](CRON_AND_SCHEDULING.md) | GitHub Actions workflows (`notification-scheduler.yml`), `CRON_SECRET` endpoints | 🟢 Current |
 | **Design System** | [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | Prodily palette, typography, glassmorphism, responsive viewports, header feedback | 🟢 Current |
+| **Marketing Performance** | [`B12A_MARKETING_PERFORMANCE_BASELINE.md`](B12A_MARKETING_PERFORMANCE_BASELINE.md) | B12-A measured baseline for `/`: per-route bundle payloads, Lighthouse mobile/desktop, `/about` control, and the gate decision that unlocked B12-B | 🟢 Current |
 | **Content Pipeline** | [`CONTENT_SYSTEM.md`](CONTENT_SYSTEM.md) | Markdown source, Compiler v2, build-time Mermaid SVGs, FlexSearch | 🟢 Current |
 | **User Progress & XP** | [`USER_SYSTEM.md`](USER_SYSTEM.md) | Progress tracking, SM-2 flashcards, XP ledger, streaks, badges, referrals | 🟢 Current |
 | **Portfolio & Certs** | [`PORTFOLIO.md`](PORTFOLIO.md) | Public portfolio (`/p/[username]`), Automatic Portfolio Verification, dynamic OG card, certificates | 🟢 Current |
