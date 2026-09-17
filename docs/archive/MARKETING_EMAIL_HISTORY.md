@@ -6,7 +6,7 @@ This document serves as the authoritative internal historical record of all mark
 
 ## Executive Summary & Historical Overview
 
-Between **August 11, 2026** and **August 31, 2026**, Prodily executed six targeted email campaigns directed at registered learners, fellows, and inactive users. In addition, the platform maintains automated waitlist confirmations and a database-backed broadcast and transactional template infrastructure.
+Between **August 11, 2026** and **September 15, 2026**, Prodily executed ten targeted email campaigns directed at registered learners, fellows, and inactive users. In addition, the platform maintains automated waitlist confirmations, a database-backed broadcast scheduler, and transactional template infrastructure.
 
 ### Summary of Campaigns
 
@@ -18,30 +18,44 @@ Between **August 11, 2026** and **August 31, 2026**, Prodily executed six target
 | **4** | `reengagement_pm_journey_aug_2026` | `apps/web/scripts/local-campaigns/reengagement_pm_journey_aug_2026/` | Resend | Aug 24–25, 2026 | All eligible learners partitioned into 3 deterministic batches | 121 sent (40 Batch 1, 41 Batch 2, 40 Batch 3) | **Delivered** |
 | **5** | `pm_fellow_linkedin_aug_2026` (`fellow_linkedin_aug_2026`) | `apps/web/scripts/local-campaigns/fellow_linkedin_aug_2026/` | Resend | August 2026 | Active Product Management Fellows (`is_fellow = true`) in 5 batches | Prepared in codebase (`marketing.pm_fellow`) | **Configured / Scripted** |
 | **6** | `portfolio_fellow_campaign_aug_2026` | `apps/web/scripts/local-campaigns/portfolio_fellow_campaign_aug_2026/` | Brevo & Resend | Aug 30–31, 2026 | Remaining eligible learners & Fellows (portfolio showcase) | 234 sent | **Delivered** |
+| **7** | `website_usage_sep_2026` | `apps/web/scripts/local-campaigns/website_usage_sep_2026/` | Brevo | Sep 2–3, 2026 | Mutually exclusive cohorts: Inactive (0 lessons/0 XP) vs Existing Learners (>=1 lesson or >0 XP) | 265 sent (222 Segment 1, 43 Segment 2) | **Delivered** |
+| **8** | `portfolio_activation_sep_2026` | `apps/web/scripts/local-campaigns/portfolio_activation_sep_2026/` | Brevo & Resend (Cron scheduled) | Sep 6, 2026 | Registered learners with 0 submitted capstones | Automated Server-Side Scheduler | **Configured / Scripted** |
+| **9** | `prodily_one_month_sep_2026` | `apps/web/scripts/local-campaigns/prodily_one_month_sep_2026/` | Brevo (250) & Resend (64) | Sep 13, 2026 | All registered eligible learners (One-Month Community Celebration) | 314 sent (250 Brevo, 64 Resend) | **Delivered (100% Success)** |
+| **10** | `reengagement_inactive_sep_2026` | `apps/web/scripts/local-campaigns/reengagement_inactive_sep_2026/` | Brevo (250) & Resend (27) | Sep 15, 2026 | Registered inactive learners (0 completed lessons, 0 total XP) | 277 sent (250 Brevo, 27 Resend) | **Delivered (100% Success)** |
 
 ---
 
 ## Infrastructure, Sending Architecture & Safety Controls
 
-### 1. Delivery Providers
-- **Resend API:** Primary provider for campaigns 1, 2, 3, 4, 5, and fallback for campaign 6. Outbound API endpoint: `https://api.resend.com/emails`.
-- **Brevo API (formerly Sendinblue):** Primary SMTP relay provider configured for campaign 6 and platform failover. Outbound API endpoint: `https://api.brevo.com/v3/smtp/email`.
+### 1. Delivery Providers & Dynamic Split Routing
+- **Resend API:** Primary provider for campaigns 1, 2, 3, 4, 5, and fallback / spillover provider for later campaigns. Outbound API endpoint: `https://api.resend.com/emails`.
+- **Brevo API (formerly Sendinblue):** Primary SMTP relay / REST provider configured starting in campaign 6. Outbound API endpoint: `https://api.brevo.com/v3/smtp/email`.
+- **Deterministic 250 Brevo + Remainder Resend Dynamic Split:** Established in Campaign 9 (`prodily_one_month_sep_2026`) and standardized in Campaign 10 (`reengagement_inactive_sep_2026`). Registered learners are deterministically ordered by `created_at ASC`, `id ASC`. The first 250 recipients are allocated strictly to Brevo (`BREVO_MAX_ALLOCATION = 250`) to maximize deliverability within daily free tier boundaries, and all remaining eligible recipients are routed to Resend. Strict provider isolation guarantees mutual exclusivity (zero duplicate overlap across providers).
+- **Failover Architecture (ADR-001):** Shared provider resolution and single-secondary-attempt failover managed by `apps/web/lib/notifications/providers/`.
 
-### 2. Sender Identities & Addresses
-- **Default System Sender:** `Prodily <welcome@prodily.adityagangwani.me>` (Derived from `BRAND.emailFromName` and `BRAND.emailFromAddress` / `RESEND_FROM_EMAIL`).
-- **Dedicated Campaign Sender (Campaign 6):** `Prodily <noreply@prodily.adityagangwani.me>` (`REQUIRED_FROM_EMAIL`).
-- **Support / Inquiries:** `hello@prodily.adityagangwani.me`.
-- **Sign-off Persona:**
-  - Standard campaigns: `Team Prodily` / `The Prodily Team`.
-  - Campaign 4 (`reengagement_pm_journey_aug_2026`): `Aditya Gangwani (Founder, Prodily)`.
+### 2. Sender Identities & Header Conventions
+- **Default System Sender:** `Prodily <welcome@prodily.adityagangwani.me>` (Configurable via `FROM_EMAIL` / `BRAND.emailFromAddress`).
+- **Dedicated Campaign Sender (Campaign 6):** `Prodily <noreply@prodily.adityagangwani.me>`.
+- **Founder Identity (Campaigns 4, 7, 8, 9):** `Aditya Gangwani <aditya@prodily.adityagangwani.me>` / `Aditya from Prodily`.
+- **Team / Organization Identity (Campaign 10):** `Prodily <welcome@prodily.adityagangwani.me>`.
+- **Reply-To Addresses:**
+  - `hello@prodily.adityagangwani.me`
+  - `prodilypm@gmail.com` (Dedicated marketing campaign inbox).
+- **RFC Compliance:** All outbound providers automatically attach RFC-compliant `List-Unsubscribe` headers pointing to `<https://prodily.adityagangwani.me/settings?tab=notifications>`.
 
-### 3. Safety & Idempotency Architecture
+### 3. Deliverability Standards & Anti-Promotions Formatting
+- **Text-Forward Presentation:** Starting in Campaign 10, re-engagement emails transitioned from heavy HTML card wrappers (drop shadows, borders, hero graphics) to clean, native typography on white canvas (`#ffffff`).
+- **Text-Link CTAs:** Prominent block buttons were replaced with clean text links (e.g. `Continue your journey →`).
+- **Clean Canonical Destination URLs:** Elimination of aggressive commercial tracking strings (`utm_medium=marketing`) in favor of direct canonical links (`https://prodily.adityagangwani.me/academy`) to prevent automated sorting into Gmail's Promotions tab.
+- **Link Hygiene:** Maintaining a low total link count (only primary journey link and discreet footer preference link) to optimize inbox placement.
+
+### 4. Safety & Idempotency Architecture
 - **Local Isolation:** Execution scripts reside under `apps/web/scripts/local-campaigns/` (isolated from public version control via `.gitignore`).
-- **Real-Time Eligibility Queries:** Real-time pre-send verification queries against Supabase (`public.users`, `public.user_lesson_progress`, `public.xp_events`, and `public.user_notification_preferences`).
+- **Real-Time Eligibility & State Verification:** Real-time pre-send verification queries against Supabase (`public.users`, `public.user_lesson_progress`, `public.xp_events`, and `public.user_notification_preferences`). Before dispatching to each recipient, the script re-verifies that the user has not opted out or completed a lesson in the interim.
 - **Deterministic Partitioning:** User cohorts are deterministically partitioned by `created_at` and `id` sorting to guarantee consistent batching across multi-day rollouts.
-- **Suppression & Preference Checks:** Strict enforcement of unsubscribes (`user_notification_preferences.all_notifications = false`, `all_email = false`, `marketing_email = false`), `email_suppressions`, and auth metadata flags.
-- **Two-Phase Confirmation Gate:** Interactive CLI confirmation gate requiring explicit operator confirmation (`yes` / `YES`) before production dispatch.
-- **Idempotency Logs:** JSON / JSONL state persistence recording `userId`, `email`, `status`, `sentAt`, and provider IDs (`resendId` / Brevo `messageId`).
+- **Suppression & Preference Checks:** Strict enforcement of unsubscribes (`user_notification_preferences.all_notifications = false`, `all_email = false`, `marketing_email = false`), `email_suppressions` (bounces and flags), and auth metadata flags.
+- **Two-Phase Confirmation Gate:** Interactive CLI confirmation gate requiring explicit operator confirmation (`yes` / `YES`) or explicit CLI flag (`--confirm-send --yes`) before production dispatch.
+- **Dual Idempotency:** Synced local JSON logs (`campaign_sent_<campaign_id>.json`) and Supabase database audit records (`public.email_queue`).
 
 ---
 
@@ -115,75 +129,6 @@ Prodily PM Academy · 90 lessons. 9 modules. Free forever.
 Manage Preferences / Unsubscribe: ${siteUrl}/settings?tab=notifications
 ```
 
-#### HTML Source
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charSet="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>You signed up. Now let's get started 🚀</title>
-    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-      Your first Product Management lesson is waiting for you.
-    </div>
-  </head>
-  <body style="margin:0; padding:32px 16px; background-color:#FBFAF6; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#171A17; line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellPadding="0" cellSpacing="0" style="width:100%; max-width:560px; margin:0 auto;">
-      <!-- Header (matching Confirm Email Address design) -->
-      <tr>
-        <td style="padding-bottom:24px; text-align:left;">
-          <table role="presentation" border="0" cellPadding="0" cellSpacing="0">
-            <tr>
-              <td style="vertical-align:middle; padding-right:12px;">
-                <img src="${siteUrl}/brand/logo-mark.png" alt="Prodily" height="36" style="display:block; border:none; border-radius:6px; width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px; font-weight:bold; color:#1F6B4E; letter-spacing:-0.02em; display:block; line-height:1.2;">Prodily</span>
-                <span style="font-size:11px; font-weight:600; color:#70685A; text-transform:uppercase; letter-spacing:0.05em; display:block;">PM Academy</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF; border-radius:16px; padding:36px 32px; border:1px solid #DED8CB; box-shadow:0 2px 8px rgba(31, 107, 78, 0.04);">
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Hey ${firstName},</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You signed up for Prodily, but you haven't started your first lesson yet.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">No worries — getting started is usually the hardest part.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">PM Academy is built to help you learn Product Management step by step, without having to piece everything together from random videos, articles, and courses.</p>
-          <p style="margin:0 0 24px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Take a few minutes today and start your first lesson.</p>
-          
-          <!-- CTA Button -->
-          <div style="margin:28px 0;">
-            <a href="${ctaUrl}" target="_blank" style="display:inline-block; background-color:#1F6B4E; color:#ffffff !important; font-weight:700; font-size:15px; padding:12px 24px; border-radius:8px; text-decoration:none; text-align:center;">Start Learning →</a>
-          </div>
-
-          <p style="margin:24px 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">And if you're not sure where to begin or there's something stopping you from getting started, just reply to this email. We'd love to hear from you.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">We're still building Prodily, and your feedback genuinely helps us make it better.</p>
-          <p style="margin:0; font-size:15px; color:#2B2F2B; line-height:1.6;">— Team Prodily</p>
-        </td>
-      </tr>
-
-      <!-- Footer (matching Confirm Email Address design) -->
-      <tr>
-        <td style="padding-top:28px; text-align:center; font-size:12px; color:#70685A; line-height:1.5;">
-          <p style="margin:0 0 8px 0; font-weight:600; color:#171A17;">Prodily PM Academy · 90 lessons. 9 modules. Free forever.</p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#1F6B4E; text-decoration:none; font-weight:600; margin-right:10px;">Manage Preferences</a>
-            ·
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#70685A; text-decoration:underline; margin-left:10px;">Unsubscribe</a>
-          </p>
-          <p style="margin:12px 0 0 0; color:#9EA59D; font-size:11px;">© ${new Date().getFullYear()} Prodily PM Academy. All rights reserved.</p>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
-```
-
 ---
 
 ### Email 1.2 — Audience B (1–5 Completed Lessons)
@@ -223,74 +168,6 @@ Learn Product Management. Build your career.
 
 Prodily PM Academy · 90 lessons. 9 modules. Free forever.
 Manage Preferences / Unsubscribe: ${siteUrl}/settings?tab=notifications
-```
-
-#### HTML Source
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charSet="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>You're already started. Keep going 💪</title>
-    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-      Pick up where you left off in PM Academy.
-    </div>
-  </head>
-  <body style="margin:0; padding:32px 16px; background-color:#FBFAF6; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#171A17; line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellPadding="0" cellSpacing="0" style="width:100%; max-width:560px; margin:0 auto;">
-      <!-- Header (matching Confirm Email Address design) -->
-      <tr>
-        <td style="padding-bottom:24px; text-align:left;">
-          <table role="presentation" border="0" cellPadding="0" cellSpacing="0">
-            <tr>
-              <td style="vertical-align:middle; padding-right:12px;">
-                <img src="${siteUrl}/brand/logo-mark.png" alt="Prodily" height="36" style="display:block; border:none; border-radius:6px; width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px; font-weight:bold; color:#1F6B4E; letter-spacing:-0.02em; display:block; line-height:1.2;">Prodily</span>
-                <span style="font-size:11px; font-weight:600; color:#70685A; text-transform:uppercase; letter-spacing:0.05em; display:block;">PM Academy</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF; border-radius:16px; padding:36px 32px; border:1px solid #DED8CB; box-shadow:0 2px 8px rgba(31, 107, 78, 0.04);">
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Hey ${firstName},</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You've already started your journey on Prodily — now let's keep it going.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You've completed <strong>${completedCount} ${lessonNoun}</strong> so far, and there's a lot more waiting for you in PM Academy.</p>
-          <p style="margin:0 0 24px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Each lesson builds on the previous one, so even a little progress every day can take you a long way.</p>
-          
-          <!-- CTA Button -->
-          <div style="margin:28px 0;">
-            <a href="${ctaUrl}" target="_blank" style="display:inline-block; background-color:#1F6B4E; color:#ffffff !important; font-weight:700; font-size:15px; padding:12px 24px; border-radius:8px; text-decoration:none; text-align:center;">Continue Learning →</a>
-          </div>
-
-          <p style="margin:24px 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Got feedback, found something confusing, or have a topic you'd like us to cover?</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Just reply to this email. We're building Prodily with learners, and we'd love to hear from you.</p>
-          <p style="margin:0; font-size:15px; color:#2B2F2B; line-height:1.6;">— Team Prodily</p>
-        </td>
-      </tr>
-
-      <!-- Footer (matching Confirm Email Address design) -->
-      <tr>
-        <td style="padding-top:28px; text-align:center; font-size:12px; color:#70685A; line-height:1.5;">
-          <p style="margin:0 0 8px 0; font-weight:600; color:#171A17;">Prodily PM Academy · 90 lessons. 9 modules. Free forever.</p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#1F6B4E; text-decoration:none; font-weight:600; margin-right:10px;">Manage Preferences</a>
-            ·
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#70685A; text-decoration:underline; margin-left:10px;">Unsubscribe</a>
-          </p>
-          <p style="margin:12px 0 0 0; color:#9EA59D; font-size:11px;">© ${new Date().getFullYear()} Prodily PM Academy. All rights reserved.</p>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
 ```
 
 ---
@@ -361,76 +238,6 @@ ${BRAND.fullName} · ${BRAND.positioning}
 Manage Preferences / Unsubscribe: ${siteUrl}/settings?tab=notifications
 ```
 
-#### HTML Source
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charSet="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Prodily journey is already underway 🚀</title>
-    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-      You have already earned XP on Prodily — keep the momentum going.
-    </div>
-  </head>
-  <body style="margin:0; padding:32px 16px; background-color:#FBFAF6; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#171A17; line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellPadding="0" cellSpacing="0" style="width:100%; max-width:560px; margin:0 auto;">
-
-      <!-- Header -->
-      <tr>
-        <td style="padding-bottom:24px; text-align:left;">
-          <table role="presentation" border="0" cellPadding="0" cellSpacing="0">
-            <tr>
-              <td style="vertical-align:middle; padding-right:12px;">
-                <img src="${siteUrl}${BRAND.assets.logoMarkPng}" alt="${BRAND.company}" height="36" style="display:block; border:none; border-radius:6px; width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px; font-weight:bold; color:#1F6B4E; letter-spacing:-0.02em; display:block; line-height:1.2;">${BRAND.company}</span>
-                <span style="font-size:11px; font-weight:600; color:#70685A; text-transform:uppercase; letter-spacing:0.05em; display:block;">${BRAND.product}</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF; border-radius:16px; padding:36px 32px; border:1px solid #DED8CB; box-shadow:0 2px 8px rgba(31, 107, 78, 0.04);">
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Hi ${firstName},</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You've already started your Product Management journey with Prodily — and you've earned XP along the way. 🚀</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Now's a great time to keep that momentum going.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Prodily's PM Academy is designed to help you build practical Product Management skills through structured lessons, quizzes, XP, streaks, badges, and more.</p>
-          <p style="margin:0 0 24px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Your progress is already there. <strong>Pick up where you left off and keep building.</strong></p>
-
-          <!-- CTA Button -->
-          <div style="margin:28px 0;">
-            <a href="${ctaUrl}" target="_blank" style="display:inline-block; background-color:#1F6B4E; color:#ffffff !important; font-weight:700; font-size:15px; padding:12px 24px; border-radius:8px; text-decoration:none; text-align:center;">Continue Learning →</a>
-          </div>
-
-          <p style="margin:0; font-size:15px; color:#2B2F2B; line-height:1.6;">Keep learning. Keep building. Keep growing.</p>
-          <p style="margin:16px 0 0 0; font-size:15px; color:#2B2F2B; line-height:1.6;">— Team Prodily</p>
-        </td>
-      </tr>
-
-      <!-- Footer -->
-      <tr>
-        <td style="padding-top:28px; text-align:center; font-size:12px; color:#70685A; line-height:1.5;">
-          <p style="margin:0 0 8px 0; font-weight:600; color:#171A17;">${BRAND.fullName} · ${BRAND.positioning}</p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#1F6B4E; text-decoration:none; font-weight:600; margin-right:10px;">Manage Preferences</a>
-            ·
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#70685A; text-decoration:underline; margin-left:10px;">Unsubscribe</a>
-          </p>
-          <p style="margin:12px 0 0 0; color:#9EA59D; font-size:11px;">© ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.</p>
-        </td>
-      </tr>
-
-    </table>
-  </body>
-</html>
-```
-
 ---
 
 ### Email 2.2 — Batches 2 & 3 (Learners with XP = 0)
@@ -468,76 +275,6 @@ Your Product Management journey starts with the first lesson.
 
 ${BRAND.fullName} · ${BRAND.positioning}
 Manage Preferences / Unsubscribe: ${siteUrl}/settings?tab=notifications
-```
-
-#### HTML Source
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charSet="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ready to start your Product Management journey? 🚀</title>
-    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-      Your first PM lesson is waiting — and the core course is completely free.
-    </div>
-  </head>
-  <body style="margin:0; padding:32px 16px; background-color:#FBFAF6; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#171A17; line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellPadding="0" cellSpacing="0" style="width:100%; max-width:560px; margin:0 auto;">
-
-      <!-- Header -->
-      <tr>
-        <td style="padding-bottom:24px; text-align:left;">
-          <table role="presentation" border="0" cellPadding="0" cellSpacing="0">
-            <tr>
-              <td style="vertical-align:middle; padding-right:12px;">
-                <img src="${siteUrl}${BRAND.assets.logoMarkPng}" alt="${BRAND.company}" height="36" style="display:block; border:none; border-radius:6px; width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px; font-weight:bold; color:#1F6B4E; letter-spacing:-0.02em; display:block; line-height:1.2;">${BRAND.company}</span>
-                <span style="font-size:11px; font-weight:600; color:#70685A; text-transform:uppercase; letter-spacing:0.05em; display:block;">${BRAND.product}</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF; border-radius:16px; padding:36px 32px; border:1px solid #DED8CB; box-shadow:0 2px 8px rgba(31, 107, 78, 0.04);">
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Hi ${firstName},</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You signed up for Prodily — now it's time to take the first step. 🚀</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Prodily's PM Academy gives you a structured way to learn Product Management from the fundamentals, with practical lessons, quizzes, XP, streaks, badges, and more.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">And the best part? <strong>The core Product Management course is completely free.</strong></p>
-          <p style="margin:0 0 24px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You can start learning today and build your PM knowledge one lesson at a time.</p>
-
-          <!-- CTA Button -->
-          <div style="margin:28px 0;">
-            <a href="${ctaUrl}" target="_blank" style="display:inline-block; background-color:#1F6B4E; color:#ffffff !important; font-weight:700; font-size:15px; padding:12px 24px; border-radius:8px; text-decoration:none; text-align:center;">Start Learning →</a>
-          </div>
-
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Your Product Management journey starts with the first lesson.</p>
-          <p style="margin:0; font-size:15px; color:#2B2F2B; line-height:1.6;">— Team Prodily</p>
-        </td>
-      </tr>
-
-      <!-- Footer -->
-      <tr>
-        <td style="padding-top:28px; text-align:center; font-size:12px; color:#70685A; line-height:1.5;">
-          <p style="margin:0 0 8px 0; font-weight:600; color:#171A17;">${BRAND.fullName} · ${BRAND.positioning}</p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#1F6B4E; text-decoration:none; font-weight:600; margin-right:10px;">Manage Preferences</a>
-            ·
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#70685A; text-decoration:underline; margin-left:10px;">Unsubscribe</a>
-          </p>
-          <p style="margin:12px 0 0 0; color:#9EA59D; font-size:11px;">© ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.</p>
-        </td>
-      </tr>
-
-    </table>
-  </body>
-</html>
 ```
 
 ---
@@ -621,89 +358,6 @@ ${BRAND.fullName} · ${BRAND.positioning}
 Manage Preferences / Unsubscribe: ${siteUrl}/settings?tab=notifications
 ```
 
-#### HTML Source
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charSet="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>You signed up. But did you actually become a PM?</title>
-    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-      Did you actually start becoming a better Product Manager? Start your first lesson today.
-    </div>
-  </head>
-  <body style="margin:0; padding:32px 16px; background-color:#FBFAF6; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#171A17; line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellPadding="0" cellSpacing="0" style="width:100%; max-width:560px; margin:0 auto;">
-
-      <!-- Header -->
-      <tr>
-        <td style="padding-bottom:24px; text-align:left;">
-          <table role="presentation" border="0" cellPadding="0" cellSpacing="0">
-            <tr>
-              <td style="vertical-align:middle; padding-right:12px;">
-                <img src="${siteUrl}${BRAND.assets.logoMarkPng}" alt="${BRAND.company}" height="36" style="display:block; border:none; border-radius:6px; width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px; font-weight:bold; color:#1F6B4E; letter-spacing:-0.02em; display:block; line-height:1.2;">${BRAND.company}</span>
-                <span style="font-size:11px; font-weight:600; color:#70685A; text-transform:uppercase; letter-spacing:0.05em; display:block;">${BRAND.product}</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF; border-radius:16px; padding:36px 32px; border:1px solid #DED8CB; box-shadow:0 2px 8px rgba(31, 107, 78, 0.04);">
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Hi ${firstName},</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You signed up for Prodily.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">But here's the uncomfortable question:</p>
-          <p style="margin:0 0 16px 0; font-size:16px; font-weight:700; color:#171A17; line-height:1.5;">Did you actually start becoming a better Product Manager?</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">If the answer is no — that's okay.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Most people don't need another 50-hour course sitting on their to-do list.</p>
-          <p style="margin:0 0 20px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">They just need to start.</p>
-          <p style="margin:0 0 20px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Prodily is built to help you learn Product Management <strong>one practical lesson at a time</strong>, without overwhelming you.</p>
-
-          <p style="margin:0 0 20px 0; font-size:14px; color:#50574F; line-height:1.8; background-color:#F5F3ED; padding:12px 16px; border-radius:8px;">
-            No deadlines.<br />
-            No 3-hour lectures.<br />
-            No complicated learning path.
-          </p>
-
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Just open Prodily, pick a lesson, and start.</p>
-          <p style="margin:0 0 24px 0; font-size:15px; color:#2B2F2B; line-height:1.6;"><strong>Your first step can take just a few minutes.</strong></p>
-
-          <!-- CTA Button -->
-          <div style="margin:28px 0;">
-            <a href="${ctaUrl}" target="_blank" style="display:inline-block; background-color:#1F6B4E; color:#ffffff !important; font-weight:700; font-size:15px; padding:12px 24px; border-radius:8px; text-decoration:none; text-align:center;">→ Start Learning</a>
-          </div>
-
-          <p style="margin:0 0 8px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Maybe this time, don't just sign up.</p>
-          <p style="margin:0 0 20px 0; font-size:15px; font-weight:700; color:#171A17; line-height:1.6;">Actually start.</p>
-          <p style="margin:0; font-size:15px; color:#2B2F2B; line-height:1.6;">— Team Prodily</p>
-        </td>
-      </tr>
-
-      <!-- Footer -->
-      <tr>
-        <td style="padding-top:28px; text-align:center; font-size:12px; color:#70685A; line-height:1.5;">
-          <p style="margin:0 0 8px 0; font-weight:600; color:#171A17;">${BRAND.fullName} · ${BRAND.positioning}</p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#1F6B4E; text-decoration:none; font-weight:600; margin-right:10px;">Manage Preferences</a>
-            ·
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#70685A; text-decoration:underline; margin-left:10px;">Unsubscribe</a>
-          </p>
-          <p style="margin:12px 0 0 0; color:#9EA59D; font-size:11px;">© ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.</p>
-        </td>
-      </tr>
-
-    </table>
-  </body>
-</html>
-```
-
 ---
 
 ```
@@ -771,76 +425,6 @@ Founder, Prodily
 
 ${BRAND.fullName} · ${BRAND.positioning}
 Manage Preferences / Unsubscribe: ${siteUrl}/settings?tab=notifications
-```
-
-#### HTML Source
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charSet="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>You left something unfinished</title>
-    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-      Your progress is still there. If you’ve got 10 minutes today, come back and pick up where you left off.
-    </div>
-  </head>
-  <body style="margin:0; padding:32px 16px; background-color:#FBFAF6; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#171A17; line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellPadding="0" cellSpacing="0" style="width:100%; max-width:560px; margin:0 auto;">
-
-      <!-- Header -->
-      <tr>
-        <td style="padding-bottom:24px; text-align:left;">
-          <table role="presentation" border="0" cellPadding="0" cellSpacing="0">
-            <tr>
-              <td style="vertical-align:middle; padding-right:12px;">
-                <img src="${siteUrl}${BRAND.assets.logoMarkPng}" alt="${BRAND.company}" height="36" style="display:block; border:none; border-radius:6px; width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px; font-weight:bold; color:#1F6B4E; letter-spacing:-0.02em; display:block; line-height:1.2;">${BRAND.company}</span>
-                <span style="font-size:11px; font-weight:600; color:#70685A; text-transform:uppercase; letter-spacing:0.05em; display:block;">${BRAND.product}</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF; border-radius:16px; padding:36px 32px; border:1px solid #DED8CB; box-shadow:0 2px 8px rgba(31, 107, 78, 0.04);">
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Hey ${firstName},</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">You started learning PM with Prodily — and I noticed you haven’t been back in a while.</p>
-          <p style="margin:0 0 16px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">Your progress is still there.</p>
-          <p style="margin:0 0 20px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">If you’ve got 10 minutes today, come back and pick up where you left off. There’s always one more concept, lesson, or idea that can make you a better product manager.</p>
-
-          <!-- CTA Button -->
-          <div style="margin:28px 0;">
-            <a href="${ctaUrl}" target="_blank" style="display:inline-block; background-color:#1F6B4E; color:#ffffff !important; font-weight:700; font-size:15px; padding:12px 24px; border-radius:8px; text-decoration:none; text-align:center;">Continue where you left off →</a>
-          </div>
-
-          <p style="margin:0 0 24px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">No big commitment. Just 10 minutes.</p>
-          <p style="margin:0 0 4px 0; font-size:15px; color:#2B2F2B; line-height:1.6;">— <a href="https://adityagangwani.me/" target="_blank" style="color:#171A17; text-decoration:underline; font-weight:600;">Aditya Gangwani</a></p>
-          <p style="margin:0; font-size:14px; font-weight:600; color:#70685A; line-height:1.4;">Founder, Prodily</p>
-        </td>
-      </tr>
-
-      <!-- Footer -->
-      <tr>
-        <td style="padding-top:28px; text-align:center; font-size:12px; color:#70685A; line-height:1.5;">
-          <p style="margin:0 0 8px 0; font-weight:600; color:#171A17;">${BRAND.fullName} · ${BRAND.positioning}</p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#1F6B4E; text-decoration:none; font-weight:600; margin-right:10px;">Manage Preferences</a>
-            ·
-            <a href="${siteUrl}/settings?tab=notifications" style="color:#70685A; text-decoration:underline; margin-left:10px;">Unsubscribe</a>
-          </p>
-          <p style="margin:12px 0 0 0; color:#9EA59D; font-size:11px;">© ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.</p>
-        </td>
-      </tr>
-
-    </table>
-  </body>
-</html>
 ```
 
 ---
@@ -958,190 +542,6 @@ Unsubscribe: ${unsubscribeUrl}
 © ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.
 ```
 
-#### HTML Source
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${BRAND.fullName}</title>
-    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-      Congratulations on earning it — here's how to add it to your LinkedIn profile in a few minutes.
-    </div>
-  </head>
-  <body style="margin:0;padding:32px 16px;background-color:#FBFAF6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#171A17;line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;margin:0 auto;">
-      <!-- Header -->
-      <tr>
-        <td style="padding-bottom:24px;text-align:left;">
-          <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-            <tr>
-              <td style="vertical-align:middle;padding-right:12px;">
-                <img src="${appUrl}${BRAND.assets.logoMarkPng}" alt="${BRAND.company}" height="36" style="display:block;border:none;border-radius:6px;width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px;font-weight:bold;color:#1F6B4E;letter-spacing:-0.02em;display:block;">
-                  ${BRAND.company}
-                </span>
-                <span style="font-size:11px;font-weight:600;color:#70685A;text-transform:uppercase;letter-spacing:0.05em;">
-                  ${BRAND.product}
-                </span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF;border-radius:16px;padding:36px 32px;border:1px solid #DED8CB;box-shadow:0 2px 8px rgba(31,107,78,0.04);">
-          <h2 style="font-size:20px;color:#171A17;margin-top:0;margin-bottom:16px;font-weight:700;line-height:1.3;">
-            Hi ${firstName},
-          </h2>
-
-          <p style="font-size:14px;color:#3F3A33;line-height:1.6;margin:0 0 16px 0;">
-            Congratulations on earning the <strong>Product Management Fellow</strong> designation at Prodily. This wasn't handed to you — it reflects real work, real judgment calls, and real growth over the course of the program. Take a minute to actually sit with that.
-          </p>
-
-          <p style="font-size:14px;color:#3F3A33;line-height:1.6;margin:0 0 20px 0;">
-            Now that it's official, there's a simple way to make sure it's part of your professional record, not just something you know about yourself: putting it on LinkedIn.
-          </p>
-
-          <p style="font-size:14px;color:#171A17;font-weight:600;margin:0 0 12px 0;">
-            Here's what we'd suggest, in order of impact:
-          </p>
-
-          <!-- Step 1 -->
-          <div style="margin-bottom:14px;padding-left:12px;border-left:3px solid #1F6B4E;">
-            <p style="font-size:14px;font-weight:700;color:#171A17;margin:0 0 4px 0;">
-              1. Add it to your Experience section
-            </p>
-            <p style="font-size:13px;color:#70685A;margin:0;line-height:1.5;">
-              So it sits alongside the rest of your career history — not just a line item, but a real entry with what you actually did.
-            </p>
-          </div>
-
-          <!-- Step 2 -->
-          <div style="margin-bottom:14px;padding-left:12px;border-left:3px solid #1F6B4E;">
-            <p style="font-size:14px;font-weight:700;color:#171A17;margin:0 0 4px 0;">
-              2. Add it to your headline
-            </p>
-            <p style="font-size:13px;color:#70685A;margin:0;line-height:1.5;">
-              So it's the first thing people see when your profile comes up.
-            </p>
-          </div>
-
-          <!-- Step 3 -->
-          <div style="margin-bottom:20px;padding-left:12px;border-left:3px solid #1F6B4E;">
-            <p style="font-size:14px;font-weight:700;color:#171A17;margin:0 0 4px 0;">
-              3. Post about the experience
-            </p>
-            <p style="font-size:13px;color:#70685A;margin:0;line-height:1.5;">
-              A short, honest post about what the Fellowship involved, what stretched you, or what you'd tell someone starting it. Tag Prodily — we'd genuinely love to see it and celebrate it with you.
-            </p>
-          </div>
-
-          <p style="font-size:14px;color:#3F3A33;line-height:1.6;margin:0 0 16px 0;">
-            We've drafted some starting language below for all three, so this takes minutes, not an afternoon. Edit freely — your version will always be better than a template.
-          </p>
-
-          <p style="font-size:14px;color:#3F3A33;line-height:1.6;margin:0 0 24px 0;">
-            This is your win. We just want to make sure it's visible where it belongs.
-          </p>
-
-          <!-- CTA Button -->
-          <div style="margin:24px 0 32px 0;text-align:center;">
-            <a href="https://www.linkedin.com/in/me/" style="display:inline-block;background-color:#1F6B4E;color:#FFFFFF;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
-              Update My LinkedIn Profile &rarr;
-            </a>
-          </div>
-
-          <p style="font-size:14px;color:#3F3A33;line-height:1.6;margin:0 0 28px 0;">
-            Proud of you,<br />
-            <strong>The Prodily Team</strong>
-          </p>
-
-          <!-- Examples Section -->
-          <div style="border-top:1px solid #E6E1D6;padding-top:24px;margin-top:24px;">
-            <h3 style="font-size:15px;color:#171A17;font-weight:700;margin:0 0 12px 0;">
-              LinkedIn Experience Example
-            </h3>
-            <div style="background-color:#FBFAF6;border:1px solid #DED8CB;border-radius:10px;padding:16px;margin-bottom:20px;font-size:13px;color:#3F3A33;line-height:1.6;">
-              <p style="margin:0 0 4px 0;"><strong>Title:</strong> Product Management Fellow</p>
-              <p style="margin:0 0 10px 0;"><strong>Company:</strong> Prodily</p>
-              <p style="margin:0 0 8px 0;"><strong>Description:</strong></p>
-              <p style="margin:0;color:#575046;font-style:italic;">
-                Selected for Prodily's Product Management Fellowship, a hands-on program focused on [product strategy / roadmap execution / cross-functional collaboration — adjust to program specifics]. Worked on [brief project description] and developed practical experience in [1–2 specific skills].
-              </p>
-              <p style="margin:8px 0 0 0;font-size:11px;color:#70685A;">
-                (Make sure to personalize this based on what you actually did!)
-              </p>
-            </div>
-
-            <h3 style="font-size:15px;color:#171A17;font-weight:700;margin:0 0 12px 0;">
-              LinkedIn Headline Examples
-            </h3>
-            <div style="background-color:#FBFAF6;border:1px solid #DED8CB;border-radius:10px;padding:16px;margin-bottom:20px;font-size:13px;color:#3F3A33;line-height:1.6;">
-              <p style="margin:0 0 6px 0;">&bull; Product Management Fellow at Prodily</p>
-              <p style="margin:0 0 6px 0;">&bull; Aspiring Product Manager | Prodily PM Fellow</p>
-              <p style="margin:0;">&bull; [Current Role/Title] | Product Management Fellow, Prodily</p>
-            </div>
-
-            <h3 style="font-size:15px;color:#171A17;font-weight:700;margin:0 0 12px 0;">
-              LinkedIn Post Template
-            </h3>
-            <div style="background-color:#FBFAF6;border:1px solid #DED8CB;border-radius:10px;padding:16px;font-size:13px;color:#3F3A33;line-height:1.6;">
-              <p style="margin:0 0 10px 0;">
-                I just completed Prodily's Product Management Fellowship — and I wanted to share a bit about what that actually looked like.
-              </p>
-              <p style="margin:0 0 10px 0;">
-                Going in, I expected [expectation]. What I didn't expect was [honest, specific detail — a challenge, a shift in thinking, a skill you didn't know you needed].
-              </p>
-              <p style="margin:0 0 6px 0;">Some of what stuck with me:</p>
-              <p style="margin:0 0 4px 0;">&bull; [Specific thing learned or practiced]</p>
-              <p style="margin:0 0 4px 0;">&bull; [Specific thing learned or practiced]</p>
-              <p style="margin:0 0 10px 0;">&bull; [A moment or project that stood out]</p>
-              <p style="margin:0 0 10px 0;">
-                Grateful to [mentors/cohort/program team] for the experience, and proud to now hold the Product Management Fellow designation at Prodily.
-              </p>
-              <p style="margin:0 0 10px 0;color:#70685A;font-style:italic;">
-                [Optional: what's next for you]
-              </p>
-              <p style="margin:0;color:#1F6B4E;font-weight:600;">
-                @Prodily #ProductManagement #ProdilyFellow
-              </p>
-            </div>
-          </div>
-        </td>
-      </tr>
-
-      <!-- Footer -->
-      <tr>
-        <td style="padding-top:28px;text-align:center;font-size:12px;color:#70685A;line-height:1.5;">
-          <p style="margin:0 0 8px 0;font-weight:600;color:#171A17;">
-            ${BRAND.fullName} · ${BRAND.positioning}
-          </p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${appUrl}/settings?tab=notifications" style="color:#1F6B4E;text-decoration:none;font-weight:600;margin-right:10px;">
-              Manage Preferences
-            </a>
-            ·
-            <a href="${unsubscribeUrl}" style="color:#70685A;text-decoration:underline;margin-left:10px;">
-              Unsubscribe
-            </a>
-          </p>
-          <p style="margin:12px 0 0 0;color:#9EA59D;font-size:11px;">
-            &copy; ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.
-          </p>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
-```
-
 ---
 
 ```
@@ -1232,129 +632,383 @@ Unsubscribe: ${unsubscribeUrl}
 © ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.
 ```
 
-#### HTML Source
+---
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${BRAND.fullName}</title>
-    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-      Add your Prodily portfolio and Fellow designation to LinkedIn in a few minutes.
-    </div>
-  </head>
-  <body style="margin:0;padding:32px 16px;background-color:#FBFAF6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#171A17;line-height:1.6;">
-    <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;margin:0 auto;">
-      <!-- Header -->
-      <tr>
-        <td style="padding-bottom:24px;text-align:left;">
-          <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-            <tr>
-              <td style="vertical-align:middle;padding-right:12px;">
-                <img src="${appUrl}${BRAND.assets.logoMarkPng}" alt="${BRAND.company}" height="36" style="display:block;border:none;border-radius:6px;width:auto;" />
-              </td>
-              <td style="vertical-align:middle;">
-                <span style="font-size:18px;font-weight:bold;color:#1F6B4E;letter-spacing:-0.02em;display:block;">
-                  ${BRAND.company}
-                </span>
-                <span style="font-size:11px;font-weight:600;color:#70685A;text-transform:uppercase;letter-spacing:0.05em;">
-                  ${BRAND.product}
-                </span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+```
+================================================================================
+CAMPAIGN 7: website_usage_sep_2026
+================================================================================
+```
 
-      <!-- Body Card -->
-      <tr>
-        <td style="background-color:#FFFFFF;border-radius:16px;padding:36px 32px;border:1px solid #DED8CB;box-shadow:0 2px 8px rgba(31,107,78,0.04);">
-          <h2 style="font-size:20px;color:#171A17;margin-top:0;margin-bottom:16px;font-weight:700;line-height:1.3;">
-            Hi ${user.firstName},
-          </h2>
+### Campaign Metadata
+- **Campaign Name:** Website Usage & Daily PM Routine Campaign (September 2026)
+- **Campaign Identifier:** `website_usage_sep_2026`
+- **Source Folder:** `apps/web/scripts/local-campaigns/website_usage_sep_2026/`
+- **Script Path:** `apps/web/scripts/local-campaigns/website_usage_sep_2026/send-website-usage-campaign.ts`
+- **Log Path:** `apps/web/scripts/local-campaigns/website_usage_sep_2026/logs/campaign_sent_website_usage_sep_2026.json`
+- **Platform:** Brevo (Primary SMTP relay & REST API)
+- **Campaign Purpose:** Transform learner mental model from *"Prodily is a course I need to finish"* to *"Prodily is something I can use regularly to build my PM skills"* (*"You don't need to finish Prodily. You need to use it."*).
+- **Audience Segmentation:** Two mutually exclusive cohorts based on real-time database progress:
+  - **Segment 1 (Registered Inactive):** Registered learners who have not completed any lessons (`0` completed lessons in `user_lesson_progress` and `0` total XP).
+  - **Segment 2 (Existing Learners):** Registered learners who have already started (`>= 1` completed lessons in `user_lesson_progress` or `> 0` total XP).
+- **Date Sent:** September 2–3, 2026 (`2026-09-02T13:06:48.651Z` to `2026-09-03T05:45:39.151Z`)
+- **Sender Name:** Aditya Gangwani
+- **Sender Email:** `aditya@prodily.adityagangwani.me`
+- **Reply-To Address:** `hello@prodily.adityagangwani.me`
+- **Sign-off Persona:** `Aditya (Founder, Prodily)`
+- **Unsubscribe URL:** `${siteUrl}/settings?tab=notifications`
+- **Logged Deliveries:** 265 successful dispatches (222 Segment 1, 43 Segment 2)
 
-          <p style="font-size:14px;color:#3F3A33;line-height:1.6;margin:0 0 16px 0;">
-            Building product judgment is hard work. Whether you are actively working through modules or refining applied capstones on Prodily, your progress represents practical, proof-of-work experience.
-          </p>
+---
 
-          <!-- Section 1: Fellowship Recognition -->
-          <div style="background-color:#FBFAF6;border:1px solid #DED8CB;border-radius:10px;padding:16px;margin:20px 0;">
-            <h3 style="font-size:15px;color:#171A17;font-weight:700;margin:0 0 8px 0;">
-              🎓 Product Management Fellow Recognition
-            </h3>
-            <p style="font-size:13px;color:#575046;margin:0 0 10px 0;line-height:1.5;">
-              If you have been designated as a <strong>Product Management Fellow at Prodily</strong>, make sure this milestone is visible across your professional record:
-            </p>
-            <ul style="margin:0;padding-left:20px;font-size:13px;color:#3F3A33;line-height:1.6;">
-              <li style="margin-bottom:4px;"><strong>Experience:</strong> Add <em>Product Management Fellow at Prodily</em> to your LinkedIn Experience section.</li>
-              <li style="margin-bottom:4px;"><strong>Headline:</strong> Feature it in your LinkedIn headline (e.g., <em>Aspiring Product Manager | Prodily PM Fellow</em>).</li>
-              <li><strong>Share &amp; Tag:</strong> Share a post about what stretched you or what you built, and tag <strong>@Prodily</strong> so we can celebrate with you.</li>
-            </ul>
-          </div>
+### Email 7.1 — Segment 1: Registered but Inactive
 
-          <!-- Section 2: Prodily Portfolio -->
-          <h3 style="font-size:16px;color:#171A17;font-weight:700;margin:24px 0 10px 0;">
-            💼 Your Public Prodily Portfolio
-          </h3>
-          <p style="font-size:14px;color:#3F3A33;line-height:1.6;margin:0 0 12px 0;">
-            Every Prodily member has a live, shareable Product Management Portfolio that showcases your applied capstones, skill radar breakdown, and earned credentials. For Fellows, your portfolio automatically displays the official <strong>Product Management Fellow</strong> verification check in your hero profile.
-          </p>
+**Campaign:** `website_usage_sep_2026`  
+**Platform:** Brevo  
+**Sequence position:** Segment Variant 1  
+**Date:** September 2–3, 2026  
+**Audience:** Registered users with `0` completed lessons and `0` total XP  
+**Sender:** Aditya Gangwani <aditya@prodily.adityagangwani.me>  
+**Reply-To:** hello@prodily.adityagangwani.me  
+**Subject:** `I wanted to reach out personally`  
+**Preview text:** `A small thought about learning Product Management.`  
+**CTA:** `→ Open Prodily`  
+**Destination:** `${siteUrl}/academy?utm_source=email&utm_medium=marketing&utm_campaign=website_usage_sep_2026&utm_content=inactive_routine`  
+**Status:** Delivered (222 recipients logged)  
 
-          <!-- How-to Guide -->
-          <div style="margin:16px 0 20px 0;padding-left:12px;border-left:3px solid #1F6B4E;">
-            <p style="font-size:13px;color:#171A17;margin:0 0 6px 0;">
-              <strong>1. View your portfolio:</strong> Open <a href="${portfolioUrl}" style="color:#1F6B4E;text-decoration:none;font-weight:600;">${appUrl}/p/${user.username}</a> to inspect your live page.
-            </p>
-            <p style="font-size:13px;color:#171A17;margin:0 0 6px 0;">
-              <strong>2. Edit &amp; customize:</strong> Go to <a href="${settingsPortfolioUrl}" style="color:#1F6B4E;text-decoration:none;font-weight:600;">Settings &rarr; Portfolio</a> to update your bio, customize section visibility, and select featured capstones.
-            </p>
-            <p style="font-size:13px;color:#171A17;margin:0 0 6px 0;">
-              <strong>3. Copy your link:</strong> Click the green <em>Share Portfolio</em> button on your page to copy your link.
-            </p>
-            <p style="font-size:13px;color:#171A17;margin:0;">
-              <strong>4. Add to LinkedIn:</strong> Paste your portfolio link into your LinkedIn intro section or add it as a link in your <em>Featured</em> section.
-            </p>
-          </div>
+#### Exact Email Content (Plain Text)
 
-          <!-- Primary CTA -->
-          <div style="margin:28px 0 32px 0;text-align:center;">
-            <a href="${settingsPortfolioUrl}" style="display:inline-block;background-color:#1F6B4E;color:#FFFFFF;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
-              View &amp; Edit My Portfolio &rarr;
-            </a>
-          </div>
+```text
+Hi {{firstName}},
 
-          <p style="font-size:14px;color:#3F3A33;line-height:1.6;margin:0;">
-            Proud of your growth,<br />
-            <strong>The Prodily Team</strong>
-          </p>
-        </td>
-      </tr>
+I was looking at how people are getting started with Prodily, and it made me think about something.
 
-      <!-- Footer -->
-      <tr>
-        <td style="padding-top:28px;text-align:center;font-size:12px;color:#70685A;line-height:1.5;">
-          <p style="margin:0 0 8px 0;font-weight:600;color:#171A17;">
-            ${BRAND.fullName} · ${BRAND.positioning}
-          </p>
-          <p style="margin:0 0 8px 0;">
-            <a href="${appUrl}/settings?tab=notifications" style="color:#1F6B4E;text-decoration:none;font-weight:600;margin-right:10px;">
-              Manage Preferences
-            </a>
-            ·
-            <a href="${unsubscribeUrl}" style="color:#70685A;text-decoration:underline;margin-left:10px;">
-              Unsubscribe
-            </a>
-          </p>
-          <p style="margin:12px 0 0 0;color:#9EA59D;font-size:11px;">
-            &copy; ${new Date().getFullYear()} ${BRAND.fullName}. All rights reserved.
-          </p>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
+A lot of us wait for the “right time” to learn something.
+
+An hour when we're free.
+A quiet weekend.
+A time when everything else is done.
+
+That time rarely comes.
+
+When I started building Prodily, one thing I wanted to make possible was the opposite — you should be able to learn even when you only have a few minutes.
+
+So if you've signed up but haven't really started yet, don't worry about finishing anything.
+
+Just open one lesson today.
+
+Read it. Think about it. That's enough.
+
+→ Open Prodily: https://prodily.adityagangwani.me/academy?utm_source=email&utm_medium=marketing&utm_campaign=website_usage_sep_2026&utm_content=inactive_routine
+
+I'd genuinely love for you to give it a try.
+
+— Aditya
+Founder, Prodily
+
+Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
+```
+
+---
+
+### Email 7.2 — Segment 2: Existing Learners
+
+**Campaign:** `website_usage_sep_2026`  
+**Platform:** Brevo  
+**Sequence position:** Segment Variant 2  
+**Date:** September 2–3, 2026  
+**Audience:** Users with `>= 1` completed lessons or `> 0` total XP  
+**Sender:** Aditya Gangwani <aditya@prodily.adityagangwani.me>  
+**Reply-To:** hello@prodily.adityagangwani.me  
+**Subject:** `I noticed you already got started`  
+**Preview text:** `Don't worry about how much is left. Think about what's next.`  
+**CTA:** `→ Continue where you left off`  
+**Destination:** `${siteUrl}/academy?utm_source=email&utm_medium=marketing&utm_campaign=website_usage_sep_2026&utm_content=existing_learners_routine`  
+**Status:** Delivered (43 recipients logged)  
+
+#### Exact Email Content (Plain Text)
+
+```text
+Hi {{firstName}},
+
+I noticed you've already spent some time learning on Prodily.
+
+That made me want to send you a quick note.
+
+One thing I've learned while building this is that learning Product Management isn't really about how quickly you finish.
+
+It's about how your thinking changes over time.
+
+You learn something today.
+
+Then a few days later, you see a product differently.
+
+You question a decision.
+
+You ask a better question.
+
+That's the part that matters.
+
+So don't worry about how much of Prodily you have left.
+
+Just pick up where you stopped.
+
+→ Continue where you left off: https://prodily.adityagangwani.me/academy?utm_source=email&utm_medium=marketing&utm_campaign=website_usage_sep_2026&utm_content=existing_learners_routine
+
+I'll see you inside.
+
+— Aditya
+Founder, Prodily
+
+Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
+```
+
+---
+
+```
+================================================================================
+CAMPAIGN 8: portfolio_activation_sep_2026
+================================================================================
+```
+
+### Campaign Metadata
+- **Campaign Name:** Public Portfolio & First Capstone Activation
+- **Campaign Identifier:** `portfolio_activation_sep_2026`
+- **Source Folder:** `apps/web/scripts/local-campaigns/portfolio_activation_sep_2026/`
+- **Script Path:** `apps/web/scripts/local-campaigns/portfolio_activation_sep_2026/send-portfolio-activation-campaign.ts`
+- **Service Runner:** `apps/web/lib/campaigns/portfolio-activation-runner.ts`
+- **Platform:** Brevo (`aditya@prodily.adityagangwani.me`) with Resend failover
+- **Campaign Purpose:** Re-engage learners by highlighting their live public portfolio URL (`/p/[username]`) and motivating them to submit their first capstone deliverable to unlock their visual Skill Radar.
+- **Audience:** Current registered Prodily learners with `0` submitted capstones.
+- **Server-Side Scheduled Execution:** Uses Supabase `email_broadcasts` persistence + Prodily's existing 5-minute automated cron runner (`/api/cron/process-broadcasts` triggered 24/7 by GitHub Actions and/or Vercel Cron).
+- **Date Prepared:** September 6, 2026
+- **Sender Name:** Aditya from Prodily
+- **Sender Email:** `aditya@prodily.adityagangwani.me`
+- **Reply-To Address:** `prodilypm@gmail.com`
+- **Canonical CTA URL:** `https://prodily.adityagangwani.me/capstones` (Clean URL, no marketing UTMs)
+- **Unsubscribe URL:** `https://prodily.adityagangwani.me/settings?tab=notifications`
+- **Status:** Configured / Scripted in repository
+
+---
+
+### Email 8.1 — Portfolio Activation ("Your Prodily portfolio is ready")
+
+**Campaign:** `portfolio_activation_sep_2026`  
+**Platform:** Brevo & Resend  
+**Sequence position:** 1 of 1  
+**Audience:** Registered learners with 0 submitted capstones  
+**Sender:** Aditya from Prodily <aditya@prodily.adityagangwani.me>  
+**Reply-To:** prodilypm@gmail.com  
+**Subject:** `Your Prodily portfolio is ready`  
+**Preview text:** `I wanted to point out something that's already available on your Prodily account.`  
+**CTA:** `Add your first capstone`  
+**Destination:** `https://prodily.adityagangwani.me/capstones`  
+**Status:** Configured / Scripted  
+
+#### Exact Email Content (Plain Text)
+
+```text
+Hi {{firstName}},
+
+I wanted to point out something that's already available on your Prodily account.
+
+You have a public portfolio page that you can use on LinkedIn, your resume, or share directly with a recruiter:
+
+{{portfolioUrl}}
+
+At the moment, your portfolio is still empty because you haven't added a capstone yet.
+
+Once you add your first capstone, your portfolio can start showing the work you've done on Prodily, along with your skill breakdown and skill radar.
+
+You don't need to complete the entire curriculum before you can start building it. Your first capstone is enough to get things started.
+
+If you'd like to set it up, you can add your first capstone here:
+
+Add your first capstone: https://prodily.adityagangwani.me/capstones
+
+Your portfolio is already there. It just needs something to show.
+
+— Aditya
+Prodily
+
+Manage Preferences / Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
+```
+
+---
+
+```
+================================================================================
+CAMPAIGN 9: prodily_one_month_sep_2026
+================================================================================
+```
+
+### Campaign Metadata
+- **Campaign Name:** Prodily One-Month Celebration Campaign
+- **Campaign Identifier:** `prodily_one_month_sep_2026`
+- **Source Folder:** `apps/web/scripts/local-campaigns/prodily_one_month_sep_2026/`
+- **Script Path:** `apps/web/scripts/local-campaigns/prodily_one_month_sep_2026/send-prodily-one-month-campaign.ts`
+- **Log Path:** `apps/web/scripts/local-campaigns/prodily_one_month_sep_2026/logs/campaign_sent_prodily_one_month_sep_2026.json`
+- **Platform:** Brevo (first 250) & Resend (remaining 64)
+- **Campaign Purpose:** Celebrate one month of Prodily with existing registered learners, thank them for being part of the early community, and invite honest feedback and referrals.
+- **Audience Allocation (Dynamic Split):**
+  - Deterministically ordered by `created_at ASC`, `id ASC` from `public.users`.
+  - First 250 eligible recipients &rarr; **Brevo** (`BREVO_MAX_ALLOCATION = 250`).
+  - Remaining 64 eligible recipients &rarr; **Resend**.
+  - Strict provider isolation (zero overlap across providers).
+- **Date Sent:** September 13, 2026 (`2026-09-13T11:57:02.091Z` to `2026-09-13T12:06:04.650Z`)
+- **Sender Name:** Aditya Gangwani
+- **Sender Email:** `aditya@prodily.adityagangwani.me`
+- **Reply-To Address:** `prodilypm@gmail.com`
+- **Sign-off Persona:** `Aditya Gangwani (Founder, Prodily)`
+- **Primary CTA:** `Bring a friend to Prodily` &rarr; `https://prodily.adityagangwani.me/settings?tab=referrals`
+- **Unsubscribe URL:** `${siteUrl}/settings?tab=notifications`
+- **Logged Deliveries:** **314 successful dispatches** (250 Brevo, 64 Resend) — **100% Success Rate, 0 Failures**
+
+---
+
+### Email 9.1 — Founder Note: One Month of Prodily
+
+**Campaign:** `prodily_one_month_sep_2026`  
+**Platform:** Brevo & Resend  
+**Sequence position:** 1 of 1  
+**Date:** September 13, 2026  
+**Audience:** All eligible registered learners  
+**Sender:** Aditya Gangwani <aditya@prodily.adityagangwani.me>  
+**Reply-To:** prodilypm@gmail.com  
+**Subject:** `One month of Prodily.`  
+**Preview text:** `Prodily turned one month old this week — a founder note from Aditya.`  
+**CTA:** `Bring a friend to Prodily`  
+**Destination:** `https://prodily.adityagangwani.me/settings?tab=referrals`  
+**Status:** Delivered (314 recipients logged)  
+
+#### Exact Email Content (Plain Text)
+
+```text
+Hey {{firstName}},
+
+Prodily turned one month old this week.
+
+And honestly, I didn’t know what to expect when we launched.
+
+One month later, 300+ people have started learning product management with us — completely free.
+
+That number means a lot to me. But what means even more is seeing people actually use Prodily, build things, share their work, and tell me what we could do better.
+
+Over the past month, we’ve added Product Management Fellow verification, public portfolios, badges, leaderboards, and referrals — all with the same goal:
+
+A course completion doesn't get someone a PM job. Proof of work does.
+
+We’re still figuring out a lot. Some of the feedback I’ve received this month has genuinely changed what I think Prodily should become.
+
+So I want to hear from you.
+
+What’s working? What feels missing? What should we build next?
+
+Just reply to this email. I read every response myself, and your feedback will directly shape what comes next.
+
+And one small favour:
+
+If you know someone trying to break into product management, learning PM, or simply wanting to get better at thinking about products, bring them along.
+
+You can refer a friend from Settings → Refer a Friend:
+
+Bring a friend to Prodily
+https://prodily.adityagangwani.me/settings?tab=referrals
+
+Referral URL:
+https://prodily.adityagangwani.me/settings?tab=referrals
+
+No complicated pitch. Just share something you think could genuinely help someone.
+
+Thank you for being here in month one.
+
+We’re just getting started.
+
+— Aditya Gangwani
+Founder, Prodily
+
+Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
+```
+
+---
+
+```
+================================================================================
+CAMPAIGN 10: reengagement_inactive_sep_2026
+================================================================================
+```
+
+### Campaign Metadata
+- **Campaign Name:** Inactive User Re-engagement Campaign (September 2026)
+- **Campaign Identifier:** `reengagement_inactive_sep_2026`
+- **Source Folder:** `apps/web/scripts/local-campaigns/reengagement_inactive_sep_2026/`
+- **Script Path:** `apps/web/scripts/local-campaigns/reengagement_inactive_sep_2026/send-inactive-reengagement-campaign.ts`
+- **Test Suite Path:** `apps/web/scripts/local-campaigns/reengagement_inactive_sep_2026/test_campaign.ts`
+- **Log Path:** `apps/web/scripts/local-campaigns/reengagement_inactive_sep_2026/logs/campaign_sent_reengagement_inactive_sep_2026.json`
+- **Platform:** Brevo (first 250) & Resend (remaining 27)
+- **Campaign Purpose:** Re-engage registered users who signed up for Prodily but have remained inactive (`0` completed lessons in `user_lesson_progress` and `0` total XP), with a supportive, low-pressure, text-first message reassuring them that their progress is right where they left it.
+- **Audience Allocation (Dynamic Split):**
+  - Evaluated against live database `public.users` (347 registered users).
+  - Excluded 60 active learners (`> 0` lessons or `> 0` XP), 3 internal admins, 7 suppressions, 0 opt-outs.
+  - Deterministically ordered by `created_at ASC`, `id ASC`.
+  - **First 250 recipients &rarr; Brevo** (`BREVO_MAX_ALLOCATION = 250`).
+  - **Remaining 27 recipients &rarr; Resend**.
+  - Strict mutual exclusivity (zero duplicate overlap across providers).
+- **Date Sent:** September 15, 2026 (`2026-09-15T16:07:49.900Z` to `2026-09-15T16:15:04.535Z`)
+- **Sender Name:** Prodily
+- **Sender Email:** `welcome@prodily.adityagangwani.me`
+- **Reply-To Address:** `prodilypm@gmail.com`
+- **Sign-off Persona:** `Team Prodily`
+- **Primary CTA:** `Continue your journey →` &rarr; `https://prodily.adityagangwani.me/academy` (Clean canonical destination, zero commercial UTMs)
+- **Unsubscribe URL:** `https://prodily.adityagangwani.me/settings?tab=notifications`
+- **Anti-Promotions Tab Optimization:**
+  - 100% text-forward presentation on native white canvas (`#ffffff`).
+  - Eliminated hero graphic, outer container boxes, drop shadows, and heavy bordered cards.
+  - Replaced bulky block button with clean text link (`Continue your journey →`).
+  - Removed commercial UTM query strings (`utm_medium=marketing`) to avoid algorithmic filtering into Gmail's Promotions tab.
+  - Retained compliant CAN-SPAM / GDPR footer and RFC-compliant `List-Unsubscribe` headers.
+- **Logged Deliveries:** **277 successful dispatches** (250 Brevo, 27 Resend) — **100% Success Rate, 0 Failures**
+
+---
+
+### Email 10.1 — Inactive Learner Re-engagement ("Ready to pick up where you left off?")
+
+**Campaign:** `reengagement_inactive_sep_2026`  
+**Platform:** Brevo & Resend  
+**Sequence position:** 1 of 1  
+**Date:** September 15, 2026  
+**Audience:** Inactive registered learners (0 completed lessons, 0 total XP)  
+**Sender:** Prodily <welcome@prodily.adityagangwani.me>  
+**Reply-To:** prodilypm@gmail.com  
+**Subject:** `Ready to pick up where you left off?`  
+**Preview text:** `Your progress is still here. Take your next step when you're ready.`  
+**CTA:** `Continue your journey →`  
+**Destination:** `https://prodily.adityagangwani.me/academy`  
+**Status:** Delivered (277 recipients logged)  
+
+#### Exact Email Content (Plain Text)
+
+```text
+Hey {{firstName}},
+
+It’s been a while.
+
+While you’ve been away, your progress on Prodily is still right where you left it.
+
+No catching up. No starting over.
+
+Just pick up where you left off and take your next step.
+
+Whether it’s one lesson, one new skill, or one more step toward your goals, small progress still counts.
+
+Continue your journey →
+https://prodily.adityagangwani.me/academy
+
+See you on Prodily.
+
+— Team Prodily
+
+Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
 ```
 
 ---
@@ -1381,38 +1035,6 @@ Hi ${firstName},
 You're on the list for PM Academy! We'll notify you as soon as early access opens.
 
 Prodily PM Academy - 90 lessons. 9 modules. Free forever.
-```
-
-#### HTML Source
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <style>
-      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #171A17; background-color: #FBFAF6; padding: 20px; }
-      .container { max-width: 560px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px; border: 1px solid #e5e5e5; }
-      .logo { margin-bottom: 24px; }
-      .footer { margin-top: 32px; font-size: 12px; color: #737373; border-top: 1px solid #f5f5f5; padding-top: 16px; }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="logo">
-        <img src="${BRAND.siteUrl}${BRAND.assets.logoFullPng}" alt="${BRAND.fullName}" width="192" height="48" style="display:block; max-width:192px; width:100%; height:auto;" />
-      </div>
-      <h2>You're on the list, ${firstName}!</h2>
-      <p>Thank you for joining the ${BRAND.shortName} waitlist.</p>
-      <p>We're building a structured, free 90-lesson Product Management curriculum designed to take you from foundational principles to portfolio-ready artifacts - completely free.</p>
-      <p>We'll notify you as soon as early access opens.</p>
-      <div class="footer">
-        ${BRAND.fullName} - ${BRAND.positioning}<br>
-        If you didn't sign up for this waitlist, you can safely ignore this email.
-      </div>
-    </div>
-  </body>
-</html>
 ```
 
 ---
