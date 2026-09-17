@@ -1,4 +1,5 @@
 import { Activity, BookOpen, CheckCircle, Zap, Flame } from 'lucide-react'
+import { EmptyState } from '@/components/ui/empty-state'
 
 export interface ActivityItem {
   id: string
@@ -77,10 +78,12 @@ export function RecentActivityCard({ activities }: RecentActivityCardProps) {
           ))}
         </div>
       ) : (
-        <div className="py-6 text-center text-xs text-muted-foreground space-y-1">
-          <p className="font-semibold text-foreground">No recent activity logged yet.</p>
-          <p>Complete your first lesson to record learning milestones!</p>
-        </div>
+        <EmptyState
+          icon={Activity}
+          title="No recent activity logged yet"
+          description="Complete your first lesson to record learning milestones!"
+          className="py-8 border-0 bg-transparent"
+        />
       )}
     </div>
   )

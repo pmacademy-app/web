@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Award, ArrowRight } from 'lucide-react'
 import { BadgeCard } from '@/components/badges/BadgeCard'
+import { EmptyState } from '@/components/ui/empty-state'
 import type { BadgeProgressItem } from '@/lib/badges'
 
 interface BadgeShowcaseCardProps {
@@ -50,9 +51,12 @@ export function BadgeShowcaseCard({ unlockedCount, totalBadges, badges }: BadgeS
       </div>
 
       {displayBadges.length === 0 ? (
-        <div className="py-8 text-center text-xs text-muted-foreground">
-          Complete lessons, quizzes, and capstones to start earning badges.
-        </div>
+        <EmptyState
+          icon={Award}
+          title="No badges earned yet"
+          description="Complete lessons, quizzes, and capstones to start earning badges."
+          className="py-8 border-0 bg-transparent"
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {displayBadges.map((badge) => (

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Bell, ArrowRight } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { NotificationItemCard, type NotificationItem } from './NotificationItemCard'
 
 export function DashboardNotificationsWidget() {
@@ -28,9 +29,9 @@ export function DashboardNotificationsWidget() {
 
   if (loading) {
     return (
-      <div className="p-4 rounded-2xl border border-border bg-card/60 space-y-3">
-        <div className="h-4 bg-secondary/80 rounded w-1/3 animate-pulse" />
-        <div className="h-16 bg-secondary/40 rounded-xl animate-pulse" />
+      <div className="p-4 rounded-2xl border border-border bg-card/60 space-y-3" role="status" aria-busy="true">
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="h-16 rounded-xl" />
       </div>
     )
   }

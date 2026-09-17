@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { X, Bell, RefreshCw, Layers, Settings, AlertTriangle } from 'lucide-react'
+import { X, Bell, RefreshCw, Layers, Settings } from 'lucide-react'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ErrorState } from '@/components/ui/error-state'
 import { NotificationItemCard, type NotificationItem } from './NotificationItemCard'
 
 interface NotificationCenterDrawerProps {
@@ -270,31 +272,18 @@ export function NotificationCenterDrawer({
             <span className="text-xs font-medium">Loading updates...</span>
           </div>
         ) : error ? (
-          <div className="py-12 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <p className="text-xs text-foreground font-medium max-w-xs">{error}</p>
-            <button
-              type="button"
-              onClick={() => void refreshNotifications()}
-              className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary font-bold text-xs hover:bg-primary/20 transition-colors cursor-pointer"
-            >
-              Retry
-            </button>
-          </div>
+          <ErrorState
+            error={error}
+            onRetry={() => void refreshNotifications()}
+            className="py-12"
+          />
         ) : items.length === 0 ? (
-          <div className="py-16 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-secondary/80 flex items-center justify-center text-foreground/50">
-              <Layers className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-foreground mb-1">No notifications yet</h4>
-              <p className="text-xs max-w-xs text-muted-foreground leading-relaxed">
-                You&apos;re completely up to date! Check back as you complete lessons, maintain streaks, and earn achievements.
-              </p>
-            </div>
-          </div>
+          <EmptyState
+            icon={Layers}
+            title="No notifications yet"
+            description="You're completely up to date! Check back as you complete lessons, maintain streaks, and earn achievements."
+            className="py-16"
+          />
         ) : (
           <>
             {/* Today */}
