@@ -1,7 +1,15 @@
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
-import prodily from "./eslint-rules/require-with-route.mjs";
+import requireWithRoute from "./eslint-rules/require-with-route.mjs";
+import noRawButton from "./eslint-rules/no-raw-button.mjs";
+
+const prodily = {
+  rules: {
+    "require-with-route": requireWithRoute.rules["require-with-route"],
+    "no-raw-button": noRawButton.rules["no-raw-button"],
+  },
+};
 
 /**
  * B7-H — routes that deliberately do not use `withRoute`.
@@ -29,6 +37,133 @@ const WRAPPER_EXEMPT_ROUTES = [
   "email/webhooks/route.ts",
 ];
 
+/**
+ * B11-C — legacy components permitted to retain raw <button> during migration.
+ *
+ * B11-A adopted the Button primitive in the 10 highest-traffic components and
+ * established standard variants. This allowlist captures pre-existing legacy
+ * call sites so that all new components and converted feature surfaces are
+ * strictly enforced, while unmigrated files are converted as they are touched.
+ *
+ * `components/ui/button.tsx` defines the primitive and is inherently exempt.
+ */
+const RAW_BUTTON_ALLOWLIST = [
+  "admin/AdminAnnouncementEditorModal.tsx",
+  "admin/AdminAnnouncementsView.tsx",
+  "admin/AdminBadgeCard.tsx",
+  "admin/AdminBroadcastModal.tsx",
+  "admin/AdminBroadcastsView.tsx",
+  "admin/AdminContactInbox.tsx",
+  "admin/AdminCreateBroadcastModal.tsx",
+  "admin/AdminCreateInAppNotificationModal.tsx",
+  "admin/AdminCreateTemplateModal.tsx",
+  "admin/AdminCurriculumWorkspace.tsx",
+  "admin/AdminDashboardRefreshButton.tsx",
+  "admin/AdminDataTable.tsx",
+  "admin/AdminDrawer.tsx",
+  "admin/AdminEditInAppNotificationModal.tsx",
+  "admin/AdminEmailAutomationsView.tsx",
+  "admin/AdminEmailDashboard.tsx",
+  "admin/AdminErrorDetailDrawer.tsx",
+  "admin/AdminErrorState.tsx",
+  "admin/AdminHeader.tsx",
+  "admin/AdminInAppNotificationView.tsx",
+  "admin/AdminLeaderboardView.tsx",
+  "admin/AdminLearningActivityChart.tsx",
+  "admin/AdminLessonDetailView.tsx",
+  "admin/AdminLessonPreview.tsx",
+  "admin/AdminModal.tsx",
+  "admin/AdminModuleDetailView.tsx",
+  "admin/AdminPagination.tsx",
+  "admin/AdminProductionSendModal.tsx",
+  "admin/AdminQueueView.tsx",
+  "admin/AdminRangeSelector.tsx",
+  "admin/AdminRetryButton.tsx",
+  "admin/AdminSearchInput.tsx",
+  "admin/AdminSendTestEmailModal.tsx",
+  "admin/AdminSidebar.tsx",
+  "admin/AdminSystemAlertsView.tsx",
+  "admin/AdminSystemAuditView.tsx",
+  "admin/AdminSystemErrorsView.tsx",
+  "admin/AdminSystemHealthWorkspace.tsx",
+  "admin/AdminTemplateEditor.tsx",
+  "admin/AdminTemplateList.tsx",
+  "admin/AdminToggle.tsx",
+  "admin/AdminUserMultiSelectPicker.tsx",
+  "admin/AnalyticsWorkspace.tsx",
+  "admin/BadgesWorkspace.tsx",
+  "admin/CapstoneReviewDrawer.tsx",
+  "admin/CapstonesView.tsx",
+  "admin/CertificatesWorkspace.tsx",
+  "admin/DeveloperActionsSection.tsx",
+  "admin/EmailSettingsSection.tsx",
+  "admin/FeedbackListView.tsx",
+  "admin/FeedbackModerationView.tsx",
+  "admin/FellowRequestsView.tsx",
+  "admin/LearningSettingsSection.tsx",
+  "admin/ModerationWorkspace.tsx",
+  "admin/OnboardingSettingsSection.tsx",
+  "admin/PortfoliosView.tsx",
+  "admin/ProcessEmailQueueButton.tsx",
+  "admin/ProductSettingsSection.tsx",
+  "admin/SendProductionEmailModal.tsx",
+  "admin/SendTestEmailButton.tsx",
+  "admin/SettingsWorkspace.tsx",
+  "admin/UserDetailDrawer.tsx",
+  "admin/UserFellowToggle.tsx",
+  "admin/UserPortfolioVerificationToggle.tsx",
+  "admin/UserRoleToggle.tsx",
+  "admin/UserTabPanels.tsx",
+  "admin/UsersFilterBar.tsx",
+  "admin/UsersWorkspace.tsx",
+  "admin/admin-toast.tsx",
+  "auth/ResendVerificationCard.tsx",
+  "badges/BadgeNotification.tsx",
+  "capstones/CapstoneCard.tsx",
+  "capstones/RichEditor.tsx",
+  "capstones/SubmitConfirmationModal.tsx",
+  "feedback/ContextualFeedbackModal.tsx",
+  "feedback/LessonFeedbackWidget.tsx",
+  "feedback/error-state.tsx",
+  "layout/Sidebar.tsx",
+  "layout/SystemAnnouncementBanner.tsx",
+  "layout/Topbar.tsx",
+  "layout/navbar.tsx",
+  "leaderboard/CohortsSection.tsx",
+  "leaderboard/FriendAccountabilitySection.tsx",
+  "leaderboard/LeaderboardHeader.tsx",
+  "leaderboard/LeaderboardScopeSwitcher.tsx",
+  "leaderboard/LeaderboardTable.tsx",
+  "leaderboard/ProfileComparisonModal.tsx",
+  "marketing/faq-explorer.tsx",
+  "marketing/reviews-explorer.tsx",
+  "marketing/sections/experience.tsx",
+  "marketing/sections/journey.tsx",
+  "marketing/sections/portfolio.tsx",
+  "marketing/sections/testimonials.tsx",
+  "notifications/NotificationBell.tsx",
+  "notifications/NotificationCenterDrawer.tsx",
+  "notifications/NotificationItemCard.tsx",
+  "notifications/NotificationPreferencesTab.tsx",
+  "notifications/NotificationToast.tsx",
+  "portfolio/FeaturedCapstoneCard.tsx",
+  "portfolio/PortfolioCapstones.tsx",
+  "portfolio/ShareButton.tsx",
+  "quick-start/QuickStartModal.tsx",
+  "quiz/QuizOption.tsx",
+  "review/QualitySelector.tsx",
+  "review/ReviewComplete.tsx",
+  "search/SearchOverlay.tsx",
+  "settings/DangerZoneTab.tsx",
+  "settings/FellowRequestCard.tsx",
+  "settings/PortfolioReadinessCard.tsx",
+  "settings/PortfolioSettingsForm.tsx",
+  "settings/ProfileSettingsTab.tsx",
+  "settings/ReferralSettingsTab.tsx",
+  "settings/SecuritySettingsTab.tsx",
+  "ui/accordion.tsx",
+];
+
 const eslintConfig = [
   ...nextVitals,
   ...nextTs,
@@ -48,6 +183,14 @@ const eslintConfig = [
     plugins: { prodily },
     rules: {
       "prodily/require-with-route": ["error", { allow: WRAPPER_EXEMPT_ROUTES }],
+    },
+  },
+  {
+    // B11-C — ban raw <button> in components/ in favor of the shared Button primitive.
+    files: ["components/**/*.{tsx,jsx}"],
+    plugins: { prodily },
+    rules: {
+      "prodily/no-raw-button": ["error", { allow: RAW_BUTTON_ALLOWLIST }],
     },
   },
   {
