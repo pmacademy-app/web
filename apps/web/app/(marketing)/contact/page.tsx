@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ContactForm } from '@/components/contact/ContactForm'
+import { SocialLinks } from '@/components/brand/SocialLinks'
 import { BRAND } from '@/lib/brand'
 import { Mail, Heart, ArrowRight } from 'lucide-react'
 
@@ -74,6 +75,11 @@ export default function ContactPage() {
             <span>{BRAND.supportEmail}</span>
             <ArrowRight className="w-4 h-4" />
           </a>
+
+          <div className="pt-4 border-t border-border space-y-3">
+            <p className="text-xs font-bold text-foreground">Follow along</p>
+            <SocialLinks />
+          </div>
         </div>
 
         {/* Support Creator Box */}

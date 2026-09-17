@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { FOOTER_LINK_GROUPS } from '@/config/navigation'
 import { BRAND } from '@/lib/brand'
 import { BrandLogo } from '@/components/brand/BrandLogo'
+import { SocialLinks } from '@/components/brand/SocialLinks'
 
 /**
  * Marketing site footer — Sprint 2 §20 + Sprint 3 footer copy.
@@ -50,6 +51,13 @@ export function Footer() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 mb-10">
+          <h3 className="text-caption font-semibold text-foreground uppercase tracking-wide">
+            Follow Prodily
+          </h3>
+          <SocialLinks />
         </div>
 
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

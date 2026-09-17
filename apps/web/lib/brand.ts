@@ -10,7 +10,8 @@ export const BRAND = {
   domain: 'prodily.adityagangwani.me',
   social: {
     linkedin: 'https://www.linkedin.com/company/prodilypmacademy',
-    twitter: 'https://x.com/prodily',
+    twitter: 'https://x.com/prodily_pm',
+    instagram: 'https://www.instagram.com/prodily_pm/',
     buyMeACoffee: 'https://buymeacoffee.com/prodily',
   },
   legalEntity: 'Prodily',

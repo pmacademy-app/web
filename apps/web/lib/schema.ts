@@ -27,6 +27,7 @@ export function getEducationalOrganizationSchema() {
     sameAs: [
       BRAND.social.linkedin,
       BRAND.social.twitter,
+      BRAND.social.instagram,
       BRAND.social.buyMeACoffee,
       'https://adityagangwani.me',
     ],
