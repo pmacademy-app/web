@@ -41,20 +41,33 @@ export class FellowRequestAdminService {
   /**
    * Fetches the Fellow request queue with eligibility/readiness context for admin review.
    * Batches user + capstone lookups (no N+1 per-request queries).
+   *
+   * B13-B: `window` replaces a hard-coded `.limit(500)`. That bound was not a page — it
+   * was a ceiling with nothing above it, so the 501st request was unreachable through
+   * the API rather than merely on a later page. The count is returned alongside so the
+   * route can report a real `total`; the per-page user and capstone lookups stay batched.
    */
-  public static async getQueue(statusFilter?: string): Promise<AdminFellowRequestItem[]> {
+  public static async getQueue(
+    statusFilter?: string,
+    window?: { from: number; to: number }
+  ): Promise<{ items: AdminFellowRequestItem[]; total: number | null }> {
     const supabase = createServiceRoleClient()
+    const range = window ?? { from: 0, to: 499 }
 
-    let query = supabase.from('fellow_requests').select('*').order('requested_at', { ascending: false }).limit(500)
+    let query = supabase
+      .from('fellow_requests')
+      .select('*', { count: 'exact' })
+      .order('requested_at', { ascending: false })
+      .range(range.from, range.to)
     if (statusFilter && statusFilter !== 'all') {
       query = query.eq('status', statusFilter)
     }
 
-    const { data, error } = await query
-    if (error || !data) return []
+    const { data, error, count } = await query
+    if (error || !data) return { items: [], total: 0 }
 
     const rows = data as unknown as FellowRequestRow[]
-    if (rows.length === 0) return []
+    if (rows.length === 0) return { items: [], total: count ?? 0 }
 
     const userIds = Array.from(new Set(rows.map((r) => r.user_id)))
 
@@ -88,7 +101,7 @@ export class FellowRequestAdminService {
       publicCapstoneCounts.set(row.user_id, (publicCapstoneCounts.get(row.user_id) || 0) + 1)
     }
 
-    return rows.map((row) => {
+    const items = rows.map((row) => {
       const user = userMap.get(row.user_id)
       const readiness = calculatePortfolioReadiness({
         name: user?.name,
@@ -120,6 +133,8 @@ export class FellowRequestAdminService {
         isFellow: Boolean(user?.is_fellow),
       }
     })
+
+    return { items, total: count ?? null }
   }
 
   /**

@@ -4,6 +4,7 @@ import { logAdminAction } from '@/lib/admin/guard'
 import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { BroadcastService } from '@/lib/admin/broadcast-service'
+import { clampPagination, paginated } from '@/lib/api/pagination'
 
 export const runtime = 'nodejs'
 
@@ -18,11 +19,31 @@ export const GET = withRoute(
   async ({ request }) => {
     try {
       const { searchParams } = new URL(request.url)
-      const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
-      const pageSize = Math.min(100, Math.max(5, parseInt(searchParams.get('pageSize') || '25', 10)))
+      // B13-B: this route used `page`/`pageSize` while every other list used
+      // `page`/`limit`. Both legacy names are still accepted so an already-deployed
+      // admin console keeps working through the rollout, but the bound and the
+      // envelope are now the shared ones.
+      const legacyPage = Number(searchParams.get('page'))
+      const legacyPageSize = searchParams.get('pageSize')
+      const requestedLimit = searchParams.get('limit') ?? legacyPageSize
 
-      const result = await BroadcastService.listBroadcasts(page, pageSize)
-      return NextResponse.json({ success: true, data: result })
+      const window = clampPagination({
+        limit: requestedLimit,
+        offset:
+          searchParams.get('offset') ??
+          (Number.isFinite(legacyPage) && legacyPage > 1
+            ? (legacyPage - 1) * clampPagination({ limit: requestedLimit }).limit
+            : null),
+      })
+
+      const pageNumber = Math.floor(window.offset / window.limit) + 1
+      const result = await BroadcastService.listBroadcasts(pageNumber, window.limit)
+
+      // `data` keeps its original shape — AdminBroadcastsView reads
+      // `data.broadcasts`/`data.totalPages` — and the contract envelope is added
+      // alongside it rather than replacing it.
+      const body = paginated(result.broadcasts, window, result.total)
+      return NextResponse.json({ success: true, ...body, data: result })
     } catch (err) {
       return NextResponse.json(
         { error: adminErrorMessage(err, 'Internal server error') },

@@ -5,6 +5,7 @@ import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { adminErrorMessage } from '@/lib/errors/api-response'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { clampPagination, paginated, toRange } from '@/lib/api/pagination'
 
 export const GET = withRoute(
   {
@@ -17,21 +18,36 @@ export const GET = withRoute(
     try {
       const { searchParams } = new URL(request.url)
       const statusFilter = searchParams.get('status')
+      // B13-B: a hard-coded `.limit(100)` with no parameter meant the 101st message was
+      // unreachable through the API rather than merely on a later page.
+      const page = clampPagination({
+        limit: searchParams.get('limit'),
+        offset: searchParams.get('offset'),
+      })
+      const { from, to } = toRange(page)
 
       const supabase = createServiceRoleClient()
       let query = supabase.from('contact_messages')
-        .select('*')
+        .select('*', { count: 'exact' })
         .order('created_at', { ascending: false })
-        .limit(100)
+        .range(from, to)
 
       if (statusFilter && statusFilter !== 'all') {
         query = query.eq('status', statusFilter)
       }
 
-      const { data, error } = await query
-      if (error || !data) return NextResponse.json({ messages: [] })
+      const { data, error, count } = await query
+      if (error || !data) {
+        const empty = paginated<never>([], page, 0)
+        return NextResponse.json({ ...empty, messages: empty.items })
+      }
 
-      return NextResponse.json({ messages: data })
+      // `messages` is kept as an alias of `items`. Nothing in the app reads this route
+      // today — the inbox is server-rendered through CommunicationsService — but
+      // dropping a documented response key is a contract break whether or not a caller
+      // happens to exist right now.
+      const body = paginated(data, page, count)
+      return NextResponse.json({ ...body, messages: body.items })
     } catch (error: unknown) {
       const message = adminErrorMessage(error, 'Failed to fetch contact messages.')
       return NextResponse.json({ error: message }, { status: 500 })

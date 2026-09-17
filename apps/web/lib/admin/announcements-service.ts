@@ -70,6 +70,16 @@ function mapRowToItem(r: Record<string, unknown>): SystemAnnouncementItem {
   }
 }
 
+/**
+ * How many active announcements are scanned before audience filtering (B13-B).
+ *
+ * Generous on purpose: this is a safety bound on a query, not a business limit. An
+ * install with more than this many simultaneously-active announcements has a content
+ * problem, and the bound makes that visible instead of silently dropping rows at
+ * PostgREST's invisible 1,000-row cap.
+ */
+export const ACTIVE_ANNOUNCEMENT_SCAN_LIMIT = 500
+
 export class AnnouncementsService {
   /**
    * List announcements for Admin console with filtering & sorting.
@@ -319,14 +329,26 @@ export class AnnouncementsService {
     const supabase = createServiceRoleClient()
     const nowIso = new Date().toISOString()
 
-    // 1. Fetch active announcements within validity window
+    // 1. Fetch active announcements within validity window.
+    //
+    // B13-B: the explicit `.limit()` replaces an unbounded select. Unbounded is not
+    // "all rows" — PostgREST silently truncates at 1,000 and reports no error, so a
+    // truncated answer was indistinguishable from a complete one (the F-COR-2 class).
+    // The bound is stated so the truncation point is a decision rather than an
+    // inherited default.
+    //
+    // It cannot become a `.range()` page: audience targeting is filtered in memory
+    // below, so a database-level page would be taken *before* filtering and would
+    // return short or empty pages that are not the caller's page at all. Paging
+    // happens on the filtered result, at the route.
     const { data: rawList, error } = (await (supabase.from('system_announcements') as unknown as DBChain)
       .select('*')
       .eq('status', 'active')
       .or(`scheduled_at.is.null,scheduled_at.lte.${nowIso}`)
       .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
       .order('priority', { ascending: false })
-      .order('created_at', { ascending: false })) as unknown as {
+      .order('created_at', { ascending: false })
+      .limit(ACTIVE_ANNOUNCEMENT_SCAN_LIMIT)) as unknown as {
       data: Record<string, unknown>[] | null
       error: unknown
     }

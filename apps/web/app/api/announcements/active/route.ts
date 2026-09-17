@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { withRoute } from '@/lib/api/with-route'
 import { AnnouncementsService } from '@/lib/admin/announcements-service'
 import { createServiceRoleClient } from '@/lib/supabase'
+import { clampPagination, paginated } from '@/lib/api/pagination'
 
 /**
  * Open to `anonymous`, which answers with an empty list — the pre-migration
@@ -23,10 +24,17 @@ export const GET = withRoute(
     summary: 'Unexpected failure fetching active announcements',
     errorMessage: 'Failed to fetch active announcements',
   },
-  async ({ actor }) => {
+  async ({ request, actor }) => {
+    const { searchParams } = new URL(request.url)
+    const page = clampPagination({
+      limit: searchParams.get('limit'),
+      offset: searchParams.get('offset'),
+    })
+
     // Only authenticated learners are eligible for learner announcements
     if (actor.kind !== 'learner') {
-      return NextResponse.json({ success: true, announcements: [] })
+      const empty = paginated<never>([], page, 0)
+      return NextResponse.json({ success: true, ...empty, announcements: empty.items })
     }
 
     const serviceSupabase = createServiceRoleClient()
@@ -39,6 +47,14 @@ export const GET = withRoute(
     const cohortId = (profile as { cohort_id?: string | null })?.cohort_id || undefined
 
     const announcements = await AnnouncementsService.getActiveAnnouncementsForUser(actor.userId, cohortId)
-    return NextResponse.json({ success: true, announcements })
+
+    // Paged after audience filtering, not before — see the note in the service. The
+    // filtered set is small by construction, so slicing it is the correct place to
+    // apply the window and `total` is exact.
+    const windowed = announcements.slice(page.offset, page.offset + page.limit)
+    // `announcements` stays as an alias of `items` so SystemAnnouncementBanner keeps
+    // reading the key it already reads.
+    const body = paginated(windowed, page, announcements.length)
+    return NextResponse.json({ success: true, ...body, announcements: body.items })
   }
 )

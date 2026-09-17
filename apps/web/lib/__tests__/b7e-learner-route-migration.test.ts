@@ -129,7 +129,14 @@ describe('B7-E — the announcement routes no longer take identity from the call
     const res = await activeGet(request)
 
     expect(res.status).toBe(200)
-    expect(await res.json()).toEqual({ success: true, announcements: [] })
+    const body = await res.json()
+    // B13-B added the pagination envelope to this route, so the body is a superset of
+    // what it was. The B7-E guarantee is unchanged and is what is asserted: an
+    // anonymous caller gets an empty list, and the service is never consulted with a
+    // caller-supplied identity.
+    expect(body.success).toBe(true)
+    expect(body.announcements).toEqual([])
+    expect(body.items).toEqual([])
     expect(getActiveAnnouncementsForUser).not.toHaveBeenCalled()
   })
 })

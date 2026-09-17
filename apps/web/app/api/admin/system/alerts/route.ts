@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
 import { createServiceRoleClient } from '@/lib/supabase'
 import { sanitizeErrorMessage } from '@/lib/monitoring/redaction'
+import { clampPagination, paginated, toRange } from '@/lib/api/pagination'
 
 export const runtime = 'nodejs'
 
@@ -20,14 +21,20 @@ export const GET = withRoute(
     const severity = searchParams.get('severity')
     const category = searchParams.get('category')
     const status = searchParams.get('status') || 'new'
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '30', 10)))
+    // B13-B: `limit` with no `offset` meant an operator could widen the page but never
+    // page past it — older alerts were simply unreachable.
+    const page = clampPagination({
+      limit: searchParams.get('limit'),
+      offset: searchParams.get('offset'),
+    })
+    const { from, to } = toRange(page)
 
     const supabase = createServiceRoleClient()
 
     let query = supabase.from('system_errors')
-      .select('*')
+      .select('*', { count: 'exact' })
       .order('timestamp', { ascending: false })
-      .limit(limit)
+      .range(from, to)
 
     if (status && status !== 'all') {
       query = query.eq('status', status)
@@ -39,7 +46,7 @@ export const GET = withRoute(
       query = query.eq('category', category)
     }
 
-    const { data: errors, error: queryErr } = await query
+    const { data: errors, error: queryErr, count } = await query
 
     if (queryErr) {
       // A failed alerts query must NEVER be rendered as "no alerts". Returning an
@@ -79,9 +86,13 @@ export const GET = withRoute(
       .eq('status', 'new')
       .eq('severity', 'critical')
 
+    // `alerts` is kept alongside the contract envelope so AdminSystemAlertsView keeps
+    // reading the key it already reads; `items` is the contract, `alerts` is the alias.
+    const body = paginated(errors || [], page, count)
     return NextResponse.json({
       success: true,
-      alerts: errors || [],
+      ...body,
+      alerts: body.items,
       unacknowledgedCriticalCount: unackCritical || 0,
     })
   } catch (err) {

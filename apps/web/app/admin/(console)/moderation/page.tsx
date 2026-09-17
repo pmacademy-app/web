@@ -42,7 +42,7 @@ export default async function AdminModerationPage({ searchParams }: AdminModerat
       initialCapstoneStatus={params.status || 'all'}
       selectedCapstoneId={params.capstone || null}
       selectedCapstoneDetail={capstoneDetail}
-      initialFellowRequests={fellowRequests}
+      initialFellowRequests={fellowRequests.items}
     />
   )
 }

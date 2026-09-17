@@ -5,6 +5,7 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { globalFeatureFlagService } from '@/lib/notifications/feature-flags/service'
 import { PRIORITY_MATRIX } from '@/lib/notifications/constants'
 import type { NotificationPriorityLevel } from '@/lib/notifications/types'
+import { clampPagination, paginated, toRange, DEFAULT_PAGE_SIZE } from '@/lib/api/pagination'
 
 interface DBChain {
   [method: string]: (...args: unknown[]) => DBChain & Promise<{ data: unknown; error: unknown }>
@@ -37,8 +38,7 @@ export const GET = withRoute(
   if (!inAppEnabled) {
     return NextResponse.json({
       success: true,
-      items: [],
-      total: 0,
+      ...paginated([], { limit: DEFAULT_PAGE_SIZE, offset: 0 }, 0),
       unreadCount: 0,
       grouped: { today: [], yesterday: [], thisWeek: [], earlier: [] },
       message: 'In-App notifications are currently disabled via Feature Flags',
@@ -48,8 +48,17 @@ export const GET = withRoute(
   const { searchParams } = new URL(request.url)
   const category = searchParams.get('category')
   const unreadOnly = searchParams.get('unreadOnly') === 'true'
-  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20', 10)))
-  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
+  // B13-B: the shared contract. `page` is still accepted so an already-deployed client
+  // does not break mid-rollout — it is translated to an offset, and `offset` wins when
+  // both are given. The cap now comes from MAX_PAGE_SIZE rather than a local literal.
+  const legacyPage = Number(searchParams.get('page'))
+  const legacyOffsetFromPage =
+    Number.isFinite(legacyPage) && legacyPage > 1 ? (legacyPage - 1) * DEFAULT_PAGE_SIZE : null
+
+  const page = clampPagination({
+    limit: searchParams.get('limit'),
+    offset: searchParams.get('offset') ?? legacyOffsetFromPage,
+  })
 
   const supabase = createServiceRoleClient()
 
@@ -67,10 +76,8 @@ export const GET = withRoute(
       query = query.eq('is_read', false)
     }
 
-    const fromOffset = (page - 1) * limit
-    const toOffset = fromOffset + limit - 1
-
-    query = query.range(fromOffset, toOffset)
+    const { from, to } = toRange(page)
+    query = query.range(from, to)
 
     // Execute item query and unread count query concurrently in parallel
     const [itemsResult, unreadResult] = await Promise.all([
@@ -107,11 +114,8 @@ export const GET = withRoute(
 
     return NextResponse.json({
       success: true,
-      items: formattedItems,
-      total: count || formattedItems.length,
+      ...paginated(formattedItems, page, count),
       unreadCount: unreadCount || formattedItems.filter((i) => !i.isRead).length,
-      page,
-      limit,
       grouped,
     })
   }

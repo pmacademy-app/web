@@ -47,6 +47,14 @@ const createTableChain = (table: string) => {
     lte: vi.fn(() => chain),
     order: vi.fn(() => chain),
     limit: vi.fn(() => chain),
+    // B13-B: the contact list route pages with `.range()` instead of a hard-coded
+    // `.limit(100)`, so the fake has to model the window. Recording it rather than
+    // ignoring it keeps the test honest about which rows the route actually asked for.
+    range: vi.fn((from: number, to: number) => {
+      chain._rangeFrom = from
+      chain._rangeTo = to
+      return chain
+    }),
     insert: vi.fn((payload: any) => {
       const inserted = {
         id: `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
@@ -75,9 +83,14 @@ const createTableChain = (table: string) => {
         if (chain._eqField && chain._eqVal) {
           res = res.filter((m) => m[chain._eqField] === chain._eqVal)
         }
-        resolve({ data: res, error: null })
+        const total = res.length
+        if (typeof chain._rangeFrom === 'number') {
+          // PostgREST `.range()` is inclusive at both ends.
+          res = res.slice(chain._rangeFrom, chain._rangeTo + 1)
+        }
+        resolve({ data: res, error: null, count: total })
       } else {
-        resolve({ data: [], error: null })
+        resolve({ data: [], error: null, count: 0 })
       }
     },
   }
