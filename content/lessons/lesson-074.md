@@ -308,12 +308,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why does land-and-expand require deliberate packaging design rather than just a sales strategy?**
-A) Sales strategy alone is always sufficient regardless of packaging structure
-B) The packaging itself must create a low-friction land and genuine natural expansion triggers, both requiring intentional structure
-C) Packaging design has no meaningful relationship to go-to-market motion
-D) Land-and-expand only applies to consumer products, not B2B products
+A) The packaging itself must create a low-friction land and genuine natural expansion triggers, both requiring intentional structure
+B) Sales strategy alone is generally sufficient regardless of packaging structure
+C) Packaging design is said to have no meaningful relationship to go-to-market motion
+D) Land-and-expand is described as applying only to consumer products, not B2B ones
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The lesson's central argument is that packaging structure, not sales execution alone, determines whether land-and-expand actually works.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -321,10 +321,10 @@ D) Land-and-expand only applies to consumer products, not B2B products
 ---
 
 **2. What are the three components of the Expansion Wedge?**
-A) Marketing, Sales, Support
+A) Trial, Subscription, Renewal
 B) Land Tier, Expansion Triggers, Enterprise Tier
 C) Free, Paid, Premium
-D) Trial, Subscription, Renewal
+D) Marketing, Sales, Support
 
 *Correct answer: B*
 *Explanation: These three components structure the packaging progression introduced in the Theory section.*
@@ -334,12 +334,12 @@ D) Trial, Subscription, Renewal
 ---
 
 **3. What is a seat-based expansion trigger?**
-A) A trigger based on API call volume
-B) A trigger where pricing expands as more individual users are added
-C) A trigger based on access to specific premium features
-D) A trigger unrelated to any measurable customer behavior
+A) A trigger unrelated to any measurable customer behavior
+B) A trigger based on access to specific premium features
+C) A trigger where pricing expands as more individual users are added
+D) A trigger based on API call volume
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Seat-based triggers specifically expand pricing in proportion to the number of individual users added.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -347,12 +347,12 @@ D) A trigger unrelated to any measurable customer behavior
 ---
 
 **4. What is a key trade-off of usage-based triggers, according to this lesson?**
-A) They never align cost with value delivered
-B) They align cost directly with value delivered but can create unpredictable budgeting friction for the Economic Buyer
-C) They are always easier for customers to predict than seat-based triggers
-D) They cannot be combined with any other trigger type
+A) They cannot be combined with any other trigger type under any circumstances
+B) They are generally easier for customers to predict than seat-based triggers
+C) They never actually align cost with the value a customer receives
+D) They align cost directly with value delivered but can create unpredictable budgeting friction for the Economic Buyer
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Theory section explicitly identifies this trade-off between value alignment and budgeting predictability.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -360,12 +360,12 @@ D) They cannot be combined with any other trigger type
 ---
 
 **5. What risk does an overly generous Land Tier create?**
-A) It always prevents the initial land motion from succeeding
-B) It eliminates the natural pressure to expand, potentially producing strong adoption metrics that mask a failing business model
-C) It has no meaningful impact on long-term revenue growth
-D) It always leads to immediate customer churn
+A) It eliminates the natural pressure to expand, potentially producing strong adoption metrics that mask a failing business model
+B) It always leads to immediate customer churn once the free period ends
+C) It has essentially no meaningful impact on long-term revenue growth
+D) It always prevents the initial land motion from succeeding in the first place
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This is the exact failure mode illustrated in the Land That Never Expanded case study.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -373,10 +373,10 @@ D) It always leads to immediate customer churn
 ---
 
 **6. What risk does an overly restrictive Land Tier create?**
-A) It always leads to excessive revenue growth
+A) It only ever affects Enterprise Tier customers, not initial land-stage customers
 B) It can prevent the initial land motion from succeeding at all, since Rung 1 of the Enterprise Adoption Ladder requires genuine standalone value
-C) It has no meaningful relationship to Rung 1 adoption
-D) It only affects Enterprise Tier customers, not initial land-stage customers
+C) It generally leads to excessive, hard-to-manage revenue growth
+D) It has essentially no meaningful relationship to Rung 1 adoption
 
 *Correct answer: B*
 *Explanation: An overly restrictive land tier prevents the core product from delivering the standalone value Rung 1 requires.*
@@ -386,12 +386,12 @@ D) It only affects Enterprise Tier customers, not initial land-stage customers
 ---
 
 **7. In the Case Study, what specifically caused the low paid conversion rate despite strong free-tier adoption?**
-A) The product had poor core functionality
-B) The free tier had unlimited seats and nearly the full feature set, eliminating every natural expansion trigger before it could form
-C) The sales team failed to market the paid tier at all
-D) Customers were unaware the paid tier existed
+A) Customers were largely unaware that a paid tier even existed
+B) The sales team failed to market the paid tier to anyone at all
+C) The free tier had unlimited seats and nearly the full feature set, eliminating every natural expansion trigger before it could form
+D) The product itself suffered from poor core functionality
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The case study's root cause was a packaging design failure, not a product quality or awareness issue.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
@@ -399,12 +399,12 @@ D) Customers were unaware the paid tier existed
 ---
 
 **8. Why should Enterprise Tier capability match Rung 3/4 needs from Lesson 72 specifically?**
-A) Rung 3/4 needs are irrelevant to enterprise tier design
-B) The Enterprise Tier must satisfy the Technical Evaluator and Economic Buyer roles, whose actual needs are security, admin control, reliability, and integration
-C) Enterprise Tier design should be based purely on what's cheapest for the vendor to provide
-D) Rung 1 and 2 needs are more important than Rung 3/4 needs for Enterprise Tier design
+A) Rung 1 and 2 needs are generally more important than Rung 3/4 needs for Enterprise Tier design
+B) Enterprise Tier design should be based purely on what's cheapest for the vendor to provide
+C) Rung 3/4 needs are treated as essentially irrelevant to enterprise tier design
+D) The Enterprise Tier must satisfy the Technical Evaluator and Economic Buyer roles, whose actual needs are security, admin control, reliability, and integration
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson explicitly connects Enterprise Tier design to satisfying the specific stakeholder roles and adoption rung requirements established in Lessons 72 and 73.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
@@ -412,12 +412,12 @@ D) Rung 1 and 2 needs are more important than Rung 3/4 needs for Enterprise Tier
 ---
 
 **9. According to the Packaging Design Checklist, what does a "no" on Land Tier Restraint indicate?**
-A) A minor issue with no significant business impact
-B) A packaging structure that can appear successful by adoption metrics while never creating a path to expansion, as in the Case Study
-C) That the packaging structure is ready to launch as-is
+A) A packaging structure that can appear successful by adoption metrics while never creating a path to expansion, as in the Case Study
+B) That the packaging structure is generally ready to launch as-is
+C) A minor issue with no significant business impact
 D) That the Land Tier is too restrictive rather than too generous
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The lesson specifically warns that this gap can mask a failing business model behind seemingly strong adoption numbers.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
@@ -425,12 +425,12 @@ D) That the Land Tier is too restrictive rather than too generous
 ---
 
 **10. Why might early-stage B2B companies reasonably start with a simple two-tier packaging structure, per the Real World Perspective section?**
-A) Simple structures are always superior regardless of company stage
-B) Detailed Expansion Wedge design across many tiers can represent premature optimization before there's evidence of natural customer expansion points
-C) Two-tier structures are legally required for early-stage companies
-D) Multi-tier structures are technically impossible to implement at any company size
+A) Multi-tier structures are described as technically impossible to implement at any company size
+B) Two-tier structures are described as a legal requirement for early-stage companies
+C) Detailed Expansion Wedge design across many tiers can represent premature optimization before there's evidence of natural customer expansion points
+D) Simple structures are described as always superior regardless of company stage
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Real World Perspective section frames simple early-stage packaging as a reasonable trade-off given limited data on actual expansion patterns.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -438,12 +438,12 @@ D) Multi-tier structures are technically impossible to implement at any company 
 ---
 
 **11. What typically becomes possible for mid-size companies designing a more deliberate Expansion Wedge, per the Real World Perspective section?**
-A) Access to unlimited engineering resources
-B) Real usage data from a growing base of Rung 2 accounts, informing more precise trigger placement than could be guessed earlier
-C) Complete independence from any customer feedback
-D) The ability to skip Rung 1 and 2 entirely
+A) The ability to skip Rung 1 and Rung 2 of the Enterprise Adoption Ladder entirely
+B) Complete independence from any further customer feedback
+C) Real usage data from a growing base of Rung 2 accounts, informing more precise trigger placement than could be guessed earlier
+D) Access to functionally unlimited engineering resources
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Real World Perspective section describes this data-informed trigger design as characteristic of the mid-size company stage.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -451,10 +451,10 @@ D) The ability to skip Rung 1 and 2 entirely
 ---
 
 **12. (Scenario) A company's packaging includes unlimited usage and nearly all features in its lowest tier, with only a small price increase for a "premium" tier offering minor cosmetic customization. What packaging design flaw does this most likely represent?**
-A) A well-designed Expansion Wedge with appropriate triggers
+A) A packaging structure that this lesson would treat as having no identifiable flaws
 B) A Land Tier likely too generous, with an Enterprise Tier that doesn't correspond to genuine Rung 3/4 needs
-C) An appropriately restrictive Land Tier
-D) A packaging structure with no identifiable flaws
+C) A well-designed Expansion Wedge with genuinely appropriate triggers
+D) An appropriately restrictive Land Tier, matched well to its intended audience
 
 *Correct answer: B*
 *Explanation: Both halves of the Expansion Wedge appear miscalibrated here: an overly generous land tier and an enterprise tier not aligned with genuine enterprise-readiness needs.*
@@ -464,12 +464,12 @@ D) A packaging structure with no identifiable flaws
 ---
 
 **13. (Product Thinking) A PM is evaluating whether to gate a specific administrative feature behind a higher pricing tier. Using this lesson's frameworks, what is the most relevant question to ask?**
-A) Whether the feature is expensive for the company to build
-B) Whether the feature corresponds to a genuine constraint or need customers naturally encounter as they grow, such as a Rung 3 enterprise-readiness requirement
-C) Whether competitors have ever offered a similar feature
-D) Whether the feature was requested by the engineering team
+A) Whether the feature corresponds to a genuine constraint or need customers naturally encounter as they grow, such as a Rung 3 enterprise-readiness requirement
+B) Whether competitors have ever offered a broadly similar feature
+C) Whether the feature is expensive for the company itself to build
+D) Whether the feature was specifically requested by the engineering team
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Expansion Wedge's core discipline ties feature-gating decisions to genuine customer constraints and adoption-ladder needs, not internal cost or arbitrary competitive comparison.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
@@ -477,10 +477,10 @@ D) Whether the feature was requested by the engineering team
 ---
 
 **14. (Interview Reasoning) A candidate, asked how they'd design a free tier, focuses entirely on maximizing adoption metrics with no mention of expansion triggers or eventual monetization path. What does this most likely signal, per the Interview Perspective section?**
-A) A strong and complete understanding of packaging design
+A) Nothing meaningful; adoption metrics are treated as the only relevant free-tier consideration
 B) A gap in recognizing the risk of an overly generous land tier eliminating any natural path to expansion
 C) That the candidate is ready for a senior pricing strategy role immediately
-D) Nothing meaningful; adoption metrics are the only relevant consideration for free tier design
+D) A strong and complete understanding of packaging design
 
 *Correct answer: B*
 *Explanation: The Interview Perspective section specifically listens for recognition of the Land That Never Expanded risk, which this answer omits entirely.*
@@ -490,12 +490,12 @@ D) Nothing meaningful; adoption metrics are the only relevant consideration for 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A company's current single-tier packaging has plateaued, with smaller prospects finding the price too high and larger existing customers wanting more advanced administrative and security capability. Using only the frameworks in this lesson, what is the most defensible packaging redesign approach?**
-A) Lower the single tier's price for everyone, without adding any additional tiers or capability
-B) Restructure into a Land Tier appropriately scoped for smaller teams, sequential Expansion Triggers tied to genuine growth signals, and an Enterprise Tier specifically built around Rung 3/4 administrative and security needs
-C) Eliminate the product's free or low-cost options entirely to focus only on the largest accounts
-D) Add an arbitrary "premium" tier with cosmetic features unrelated to genuine customer needs
+A) Add an arbitrary "premium" tier built around cosmetic features unrelated to genuine customer needs
+B) Eliminate the product's free or low-cost options entirely to focus only on the largest accounts
+C) Lower the single tier's price for everyone, without adding any additional tiers or capability
+D) Restructure into a Land Tier appropriately scoped for smaller teams, sequential Expansion Triggers tied to genuine growth signals, and an Enterprise Tier specifically built around Rung 3/4 administrative and security needs
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This mirrors the Reflection Exercise: the correct response designs a full Expansion Wedge addressing both ends of the current plateau — an appropriately scoped land tier for smaller prospects and a genuinely needs-aligned enterprise tier for larger customers — rather than a single-dimension price change or an arbitrary tier addition.*
 *Learning objective tested: #2, #3, #4, #5*
 *Difficulty: Hard*

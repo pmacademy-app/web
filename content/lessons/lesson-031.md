@@ -389,196 +389,196 @@ There is no single correct answer to the prompts below — the goal is to practi
 
 ## Quiz
 
-**1. What is the primary problem Agile was designed to solve, relative to Waterfall?**
-A) Waterfall was too expensive in tooling costs
-B) Waterfall made discovering wrong assumptions late and costly, after large sequential commitments were already built
-C) Waterfall required too many meetings
-D) Waterfall did not allow for documentation
+**1. What core problem did Agile emerge to address, relative to Waterfall's sequential model?**
+A) A lack of standardized time-tracking software
+B) Wrong assumptions surfacing only after large, costly commitments
+C) An excess of unnecessary internal documentation
+D) An inability to adopt modern version control tools
 
 *Correct answer: B*
-*Explanation: The lesson's Theory section frames Agile as a direct response to the high cost of late-discovered wrong assumptions under Waterfall's sequential, all-up-front commitment model.*
+*Explanation: Waterfall's build-everything-then-test sequence meant a flawed assumption was only discovered after the whole thing had already been built, making the fix expensive.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. According to the Agile Manifesto, which of the following best describes the relationship between "responding to change" and "following a plan"?**
-A) Plans should never be made under Agile
-B) Following a plan is prioritized over responding to change
-C) Responding to change is valued more than following a plan, but plans still have value
-D) The two are unrelated to each other
+**2. According to the Manifesto, how should "responding to change" and "following a plan" be understood together?**
+A) Plans should never be written under a genuine Agile process
+B) The two values apply only to larger, established teams
+C) Following a plan is prioritized once conditions grow uncertain
+D) Responding to change wins the tie, though plans keep value
 
-*Correct answer: C*
-*Explanation: The Manifesto's values are stated as "X over Y," meaning X is prioritized when the two conflict — not that Y (plans, documentation, contracts, process) has zero value.*
+*Correct answer: D*
+*Explanation: The Manifesto's values are stated as "X over Y" — X wins when the two conflict, not that Y has no worth at all.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**3. In the Iteration Loop mental model, what does the dotted feedback arrow represent?**
-A) An optional step most teams skip
-B) Feedback from a demo/release shaping the next batch of work
-C) A requirement to repeat the exact same batch of work
-D) The point where the PM hands off to the Scrum Master
+**3. In the Iteration Loop diagram, what does the dotted arrow returning to "Small Batch of Work" represent?**
+A) Feedback from a release shaping the next batch of work
+B) A checkpoint where the Scrum Master approves new work
+C) A rule requiring each batch to repeat the last exactly
+D) An optional step most mature teams eventually drop
 
-*Correct answer: B*
-*Explanation: The dotted arrow in the Iteration Loop diagram explicitly represents feedback informing the next batch — the mechanism that makes the loop a loop rather than a straight line.*
+*Correct answer: A*
+*Explanation: The dotted arrow is the loop's defining feature — feedback from what shipped directly shapes what gets built next.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. How does the Iteration Loop relate to the Decision Chain introduced in Lesson 1?**
-A) They are the same model with different names
-B) The Iteration Loop replaces the Decision Chain entirely once a team adopts Agile
-C) The Iteration Loop operates inside the Execution link of the Decision Chain, structuring how execution generates and uses feedback
-D) The Decision Chain only applies to Waterfall teams
+**4. How does the Iteration Loop relate to the Decision Chain from Lesson 1?**
+A) The two models are just different names for one idea
+B) The Decision Chain applies only once Waterfall is dropped
+C) It sits inside Execution, breaking it into small increments
+D) It replaces the Decision Chain once a team goes Agile
 
 *Correct answer: C*
-*Explanation: The lesson explicitly states the Iteration Loop operates inside the "Execution" link of the Decision Chain, breaking it into small, feedback-generating increments rather than one large feedback-blind push.*
+*Explanation: The lesson places the Iteration Loop inside the Decision Chain's Execution step, turning one big push into small increments that generate feedback.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**5. A team runs standups, two-week sprints, and retrospectives exactly on schedule, but treats every sprint plan as fixed regardless of what is learned mid-sprint. What would this lesson call this pattern?**
-A) Being Agile
+**5. A team runs standups and retrospectives on schedule but never changes a sprint plan even after learning something important mid-sprint. What does this lesson call that pattern?**
+A) A well-functioning Scrum process worth leaving alone
 B) Doing Agile without being Agile
-C) A correctly functioning Scrum process
-D) An example of Kanban
+C) A Kanban team mistakenly running Scrum ceremonies
+D) Being Agile in its most disciplined possible form
 
 *Correct answer: B*
-*Explanation: The lesson defines this exact pattern — ceremonies present, underlying responsiveness-to-change value absent — as "doing Agile" without "being Agile," sometimes called "Waterfall in sprint's clothing."*
+*Explanation: Ceremonies present without genuine responsiveness to new evidence is exactly the "doing Agile without being Agile" pattern this lesson names.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**6. Which role in an Agile team is responsible for facilitating ceremonies and removing team-level blockers, without deciding what gets built?**
+**6. Which role facilitates ceremonies and removes team-level blockers, without deciding what gets built?**
 A) Product Manager
-B) Scrum Master / Agile Coach
-C) Individual engineer
-D) Executive sponsor
+B) An individual engineer on the team
+C) An executive sponsor
+D) Scrum Master / Agile Coach
 
-*Correct answer: B*
-*Explanation: The Theory section's role table assigns process facilitation and blocker removal to the Scrum Master/Agile Coach, explicitly distinct from the PM's ownership of what gets built and why.*
+*Correct answer: D*
+*Explanation: The role table assigns process facilitation and blocker removal to the Scrum Master, distinct from the PM's ownership of what gets built.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
-**7. A new PM spends most of their time running standups and tracking a velocity chart, while the backlog goes unprioritized and unrefined. According to this lesson, what has likely happened?**
-A) The PM is doing their job correctly
-B) The PM has drifted into the Scrum Master's role and away from their own distinctive responsibility
-C) The PM should be commended for supporting the team
-D) This is the correct division of labor in any Agile team
+**7. A PM spends most of their time running standups and tracking a velocity chart while the backlog sits unprioritized. What has most likely happened?**
+A) The PM has drifted into the Scrum Master's role
+B) This is the expected division of labor on a healthy team
+C) The team should be praised for such an involved PM
+D) The PM is performing exactly the job Lesson 1 describes
 
-*Correct answer: B*
-*Explanation: The lesson explicitly warns that a PM who focuses on ceremony facilitation rather than backlog quality and outcome clarity has drifted into project-coordination work, echoing the role-confusion trap first raised in Lesson 1.*
+*Correct answer: A*
+*Explanation: Ceremony facilitation at the expense of backlog quality is the role-confusion trap the lesson warns new PMs against.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**8. Which of the following is NOT one of the four values stated in the Agile Manifesto?**
-A) Individuals and interactions over processes and tools
-B) Working software over comprehensive documentation
-C) Maximizing team headcount over lean staffing
-D) Responding to change over following a plan
+**8. Which of these is NOT one of the four Agile Manifesto values?**
+A) Working software over comprehensive documentation
+B) Responding to change over following a plan
+C) Maximizing headcount over lean staffing
+D) Individuals and interactions over processes and tools
 
 *Correct answer: C*
-*Explanation: Team headcount is not one of the four Manifesto values; the four are individuals/interactions, working software, customer collaboration, and responding to change.*
+*Explanation: Headcount is not part of the Manifesto; its four values are individuals/interactions, working software, customer collaboration, and responding to change.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
-**9. Why does the lesson caution against treating "we're Agile" as a justification for giving stakeholders no forward-looking commitment at all?**
-A) Because Agile requires fixed, unchangeable delivery dates
-B) Because this is a misuse of the philosophy — Agile changes how confidently and how far ahead you commit, not whether you communicate direction at all
-C) Because stakeholders have no right to ask about timing
-D) Because only Waterfall teams are allowed to give estimates
+**9. Why does this lesson warn against using "we're Agile" as a reason to give stakeholders no forward-looking information at all?**
+A) Every delivery date must be fixed at project kickoff
+B) It misuses the philosophy, which only changes commitment confidence
+C) Stakeholders forfeit any right to ask about timing
+D) Only Waterfall teams are permitted to give estimates
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #5 explicitly identifies this as a misuse of Agile, noting the philosophy governs commitment confidence and revision, not an exemption from communicating direction to stakeholders.*
+*Explanation: Common Beginner Mistake #5 frames this as a misuse — Agile changes how confidently and how far ahead a team commits, not whether it communicates direction.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
 
 ---
 
-**10. (Scenario) A team has adopted small batch sizes and closes each iteration with a working demo, but the retrospective consistently surfaces the same three complaints with no resulting change in behavior. Using the Agile Fit Checklist, which specific check is this team most clearly failing?**
-A) Batch size
-B) Feedback loop closure
-C) Working software as truth
-D) PM backlog ownership
+**10. A team keeps small batches and demos working software each cycle, but its retrospectives raise the same three complaints every time with no resulting change. Which Agile Fit Checklist item is this team failing most clearly?**
+A) Working software as truth
+B) PM backlog ownership
+C) Batch size
+D) Feedback loop closure
 
-*Correct answer: B*
-*Explanation: The Agile Fit Checklist defines "feedback loop closure" as whether feedback demonstrably changes future increments — a retrospective producing the same unaddressed complaints repeatedly is the checklist's stated warning sign for this exact check.*
+*Correct answer: D*
+*Explanation: Feedback loop closure asks whether feedback actually changes future increments; recurring, unaddressed complaints are the checklist's named warning sign for this check.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**11. In the Detailed Case Study, what was the PM's central mistake?**
-A) Running a two-week sprint instead of a one-week sprint
-B) Prioritizing the appearance of a kept commitment over acting on new evidence discovered mid-sprint
-C) Failing to hold a sprint planning meeting
-D) Assigning too many items to the sprint
+**11. In the Case Study, what was the PM's central mistake?**
+A) Protecting a commitment instead of acting on new evidence
+B) Assigning too many backlog items to a single sprint
+C) Skipping the sprint planning meeting entirely
+D) Choosing a two-week cadence over a one-week cycle
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong?" section identifies the PM's mistake as treating the sprint commitment as a fixed contract even after learning the underlying assumption behind one item was false — inverting Agile's actual purpose.*
+*Correct answer: A*
+*Explanation: The PM treated the sprint commitment as fixed even after learning one item rested on a false assumption, inverting Agile's actual purpose.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
-**12. A team member says, "Agile means we never plan more than two weeks ahead." How would this lesson characterize that statement?**
-A) An accurate description of Agile
-B) A common misreading — Agile treats plans as revisable hypotheses, not something to avoid altogether, and does not eliminate longer-horizon planning disciplines like roadmapping
-C) The correct definition used by the Agile Manifesto
-D) A description of Waterfall, not Agile
+**12. A teammate claims "Agile means never planning more than two weeks out." How does this lesson characterize that claim?**
+A) The exact definition used in the Agile Manifesto itself
+B) A description that actually applies to Waterfall, not Agile
+C) A common misreading; plans stay revisable, never absent
+D) An accurate account of how genuinely Agile teams operate
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #2 and #4 both address this directly: Agile does not reject planning, and does not remove the need for longer-horizon prioritization and roadmapping work covered elsewhere in the curriculum.*
+*Correct answer: C*
+*Explanation: Common Beginner Mistakes #2 and #4 both correct this: Agile treats plans as revisable, not absent, and doesn't remove the need for longer-horizon planning.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) Two teams both run standups and two-week sprints. Team A adjusts its sprint plan whenever significant new user evidence appears mid-cycle, even if that means an uncomfortable conversation about a changed commitment. Team B always finishes what was originally committed, regardless of new evidence, and addresses learnings only in the next planning session. Which team is "being Agile" according to this lesson, and why does the distinction matter practically, not just semantically?**
-A) Team B, because consistency builds stakeholder trust
-B) Team A, because responding to significant new evidence is the practical expression of the Manifesto's core value — and Team B's approach risks repeating the Case Study's outcome of shipping something known to be wrong
-C) Both teams equally, since both use the same ceremonies
-D) Neither team, since both use sprints instead of Kanban
+**13. (Product Thinking) Team A changes its sprint plan whenever major new evidence appears mid-cycle, even if that means an awkward conversation about a broken commitment. Team B always finishes exactly what it committed to, addressing learnings only in the next planning session. Which team is "being Agile," and why does this matter beyond semantics?**
+A) Neither team, since both rely on sprints over flow
+B) Team A, since responding to real evidence is the actual value
+C) Team B, since consistency earns stakeholder trust over time
+D) Both teams equally, since both run the same ceremonies
 
 *Correct answer: B*
-*Explanation: The lesson's "Doing vs. Being Agile" section and the Detailed Case Study together establish that genuine responsiveness to significant new evidence — even at the cost of a changed commitment — is what distinguishes real Agile practice from ceremony alone.*
+*Explanation: Genuine responsiveness to significant new evidence, even at the cost of a broken commitment, is what separates real Agile practice from ceremony alone, per the Case Study.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate answers "Do you prefer Scrum or Kanban?" with: "Scrum, because it's more structured and I like structure." Based on this lesson's Interview Perspective section, what does this answer most likely signal?**
-A) Strong Agile fluency, since a clear preference was stated
-B) A ceremony-first rather than values-first understanding of Agile, since no reasoning was given about what problem each framework solves or when each is a better fit
-C) That the candidate is better suited for Kanban instead
-D) Nothing meaningful, since framework preference is purely a matter of taste
+**14. (Interview Reasoning) A candidate asked "Scrum or Kanban?" answers: "Scrum, because it's more structured and I like structure." What does this response most likely signal?**
+A) Strong Agile fluency, since the answer sounded confident
+B) That the candidate would fit a Kanban team better
+C) Nothing meaningful, since framework choice is personal taste
+D) A ceremony-first view, since no reasoning about fit was given
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section explicitly states that a weak answer states a framework preference with no reasoning, while a strong answer explains what problem each framework solves and under what conditions each fits — this candidate's answer is the described weak pattern.*
+*Correct answer: D*
+*Explanation: A strong answer explains what problem each framework solves and when each fits; this answer states a preference with no such reasoning.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A VP asks a PM to guarantee an exact feature list and ship date six months out, "so leadership can plan around it." The PM's team runs a genuine, iterative Agile process. Using only this lesson's frameworks, what is the best way for the PM to respond?**
-A) Refuse entirely, stating that Agile teams never commit to dates
-B) Agree to the exact list and date as requested, since satisfying the VP is the priority
-C) Offer a directionally confident forward view with explicit caveats about which parts are more and less certain, explaining that specifics will sharpen as iteration loops generate real evidence — reflecting Agile's actual stance on planning, not an excuse to withhold commitment
-D) Suggest the VP speak to the Scrum Master instead, since ceremonies are not the PM's responsibility
+**15. (Product Thinking, Highest Difficulty) A VP asks a PM to guarantee an exact feature list and ship date six months out, "so leadership can plan around it." The team runs a genuinely iterative process. What is the best response, using only this lesson's frameworks?**
+A) Give a confident direction with caveats on what's least certain
+B) Agree to the exact list and date to satisfy the VP
+C) Refuse to discuss the request, since Agile gives no dates
+D) Redirect the VP to the Scrum Master instead of answering
 
-*Correct answer: C*
-*Explanation: This mirrors Common Beginner Mistake #5 and the broader lesson theme that Agile does not reject planning or stakeholder commitments — it changes how confidently and how far ahead commitments are made, and expects them to sharpen as iteration loops produce evidence, a skill developed fully in Lesson 47 (Stakeholder Management).*
+*Correct answer: A*
+*Explanation: Agile does not reject forward commitments; it changes how confidently and how far ahead they're made, and expects them to sharpen as evidence arrives.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
 

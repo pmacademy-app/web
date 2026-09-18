@@ -408,195 +408,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What three elements must a precise metric definition specify, according to this lesson?**
-A) The team name, the reporting tool, and the dashboard color scheme
-B) What counts, what time window applies, and what data source is authoritative
-C) The metric's target value, its owner's job title, and its historical average
+A) What counts, what time window applies, and what data source is authoritative
+B) The metric's target value, its owner's job title, and its historical average
+C) The team name, the reporting tool, and the dashboard color scheme
 D) Only the time window; the other elements are optional
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly lists these three elements as required for a precise metric definition.*
+*Correct answer: A*
+*Explanation: A precise metric definition requires these three elements to be computed identically by anyone working independently.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the key test for identifying a vanity metric, according to this lesson?**
-A) Whether the metric is expensive to compute
-B) Whether an unexpected move in the metric would tell you roughly where to look and what to investigate or change
-C) Whether the metric always increases over time
-D) Whether leadership finds the metric impressive
+A) Whether the metric always increases over time
+B) Whether leadership finds the metric impressive
+C) Whether an unexpected move in the metric would tell you roughly where to look and what to investigate
+D) Whether the metric is expensive to compute
 
-*Correct answer: B*
-*Explanation: The Theory section presents this exact test for distinguishing vanity from actionable metrics.*
+*Correct answer: C*
+*Explanation: This is exactly the test for distinguishing vanity from actionable metrics.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Why are cumulative totals like "total signups over all time" often poor vanity metrics?**
-A) Because they are always inaccurate
-B) Because they almost always trend upward regardless of underlying business health, providing false reassurance
-C) Because they require advanced statistical methods to compute
-D) Because they can only be computed once per year
+A) Because they require advanced statistical methods to compute
+B) They almost always trend upward regardless of underlying business health, providing false reassurance
+C) Because they can only be computed once per year
+D) Because they are always inaccurate
 
 *Correct answer: B*
-*Explanation: The Theory section explains that cumulative totals can't decrease, making their upward trend uninformative about actual business health.*
+*Explanation: Cumulative totals can't decrease, making their upward trend uninformative about actual business health.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. What is the difference between a leading and a lagging indicator?**
-A) Leading indicators are always more accurate than lagging indicators
-B) A leading indicator predicts a future outcome; a lagging indicator measures an outcome that has already occurred
-C) Lagging indicators are only used in Kanban teams
-D) There is no meaningful difference between the two
+A) There is no meaningful difference between the two
+B) Lagging indicators are only used in Kanban teams
+C) Leading indicators are always more accurate than lagging indicators
+D) A leading indicator predicts a future outcome; a lagging indicator measures an outcome that has already occurred
 
-*Correct answer: B*
-*Explanation: The Theory section defines these terms exactly this way.*
+*Correct answer: D*
+*Explanation: This is precisely how the two terms are defined.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. According to Goodhart's Law, what tends to happen once a measure becomes a target?**
-A) The measure automatically becomes more accurate
-B) People tend to optimize for the metric itself rather than the underlying outcome it was meant to represent, potentially undermining that outcome
+A) People tend to optimize for the metric itself rather than the underlying outcome it was meant to represent
+B) The measure automatically becomes more accurate
 C) The measure becomes legally binding
 D) Nothing changes; targets have no effect on measured behavior
 
-*Correct answer: B*
-*Explanation: The Theory section states Goodhart's Law exactly this way — a measure ceases to be a good measure once it becomes a target, since behavior shifts toward optimizing it directly.*
+*Correct answer: A*
+*Explanation: A measure ceases to be a good measure once it becomes a target, since behavior shifts toward optimizing it directly.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. What is the primary defense against Goodhart's Law dynamics, according to this lesson?**
-A) Never setting any metric targets at all
-B) Pairing a target metric with guardrail metrics specifically chosen to catch its most predictable form of gaming
-C) Changing the metric's definition every quarter
-D) Only using lagging indicators, never leading ones
+A) Only using lagging indicators, never leading ones
+B) Changing the metric's definition every quarter
+C) Pairing a target metric with guardrail metrics specifically chosen to catch its most predictable form of gaming
+D) Never setting any metric targets at all
 
-*Correct answer: B*
-*Explanation: The Theory section and Case Study both identify guardrail metrics, chosen for the specific predictable gaming risk, as the primary defense.*
+*Correct answer: C*
+*Explanation: Guardrail metrics, chosen for the specific predictable gaming risk, are the primary defense.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, why did the support team's "time to first response" metric improve while customer satisfaction declined?**
-A) The metric's definition was mathematically incorrect
+A) The satisfaction survey was flawed and should be ignored
 B) Agents began sending quick, low-effort acknowledgment replies to satisfy the metric, while genuine issue resolution was frequently delayed
 C) Customers became less satisfied for reasons entirely unrelated to the support team
-D) The satisfaction survey was flawed and should be ignored
+D) The metric's definition was mathematically incorrect
 
 *Correct answer: B*
-*Explanation: The Case Study explicitly attributes the metric's improvement to this specific behavior change, a textbook Goodhart's Law dynamic.*
+*Explanation: This specific behavior change is a textbook Goodhart's Law dynamic — the metric improved while the underlying outcome worsened.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. Why doesn't a correlation between feature usage and retention, by itself, prove the feature causes better retention?**
-A) Because correlation and causation are always identical
-B) Because a confounding variable (like overall user engagement level) may independently drive both feature usage and retention, or reverse causation may be at play
-C) Because retention can never be measured accurately
-D) Because features never actually affect retention in any product
+A) Because features never actually affect retention in any product
+B) Because retention can never be measured accurately
+C) Because correlation and causation are always identical
+D) A confounding variable, like overall engagement level, may independently drive both feature usage and retention, or reverse causation may be at play
 
-*Correct answer: B*
-*Explanation: The Theory section explains this exact reasoning error — confounding variables and reverse causation can produce a correlation without genuine causation.*
+*Correct answer: D*
+*Explanation: Confounding variables and reverse causation can produce a correlation without genuine causation.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. What generally resolves the correlation-versus-causation question, according to this lesson?**
-A) Observing the correlation over a longer time period
-B) A controlled experiment, the subject of Lesson 45, rather than observational correlation alone
-C) Asking users directly whether they believe the feature caused their retention
-D) Nothing can resolve this question definitively
+A) A controlled experiment, the subject of Lesson 45, rather than observational correlation alone
+B) Asking users directly whether they believe the feature caused their retention
+C) Nothing can resolve this question definitively
+D) Observing the correlation over a longer time period
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly states that distinguishing correlation from causation typically requires a controlled experiment, previewing Lesson 45.*
+*Correct answer: A*
+*Explanation: Distinguishing correlation from causation typically requires a controlled experiment, not observational correlation alone.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **10. (Scenario) A team proposes evaluating engineers on "number of pull requests merged per week." Using Goodhart's Law, what is the most likely risk?**
-A) There is no risk; this metric cannot be gamed
-B) Engineers may split work into many small, low-value pull requests to increase the count, without necessarily improving actual code quality or delivered value
-C) This metric will always perfectly reflect engineering productivity
-D) This metric is a leading indicator with no lagging indicator equivalent
+A) This metric will always perfectly reflect engineering productivity
+B) This metric is a leading indicator with no lagging indicator equivalent
+C) Engineers may split work into many small, low-value pull requests to increase the count, without improving actual code quality or delivered value
+D) There is no risk; this metric cannot be gamed
 
-*Correct answer: B*
-*Explanation: This is a direct application of Goodhart's Law reasoning — a metric like pull-request count is highly gameable through low-value behavior that technically improves the number.*
+*Correct answer: C*
+*Explanation: A metric like pull-request count is highly gameable through low-value behavior that technically improves the number.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**11. Using the Metric Definition Test, what should happen if a proposed metric's definition is not yet precise (what counts, time window, data source)?**
-A) It should be reported to leadership immediately regardless
+**11. Using the Metric Definition Test, what should happen if a proposed metric's definition is not yet precise?**
+A) It should be classified automatically as a lagging indicator
 B) It is not yet ready to be reported or adopted; the definition should be made precise first
-C) It should be classified automatically as a lagging indicator
-D) It should be assumed to be a vanity metric permanently
+C) It should be assumed to be a vanity metric permanently
+D) It should be reported to leadership immediately regardless
 
 *Correct answer: B*
-*Explanation: The Mental Model section's Metric Definition Test explicitly routes an imprecisely-defined metric back to definitional work before proceeding further.*
+*Explanation: The Metric Definition Test routes an imprecisely-defined metric back to definitional work before proceeding further.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
-**12. (Interview Reasoning) A candidate is asked to define "engagement" for a product and answers: "Engagement means users are engaged with the product." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; this is a complete and sufficient definition
-B) It restates the term rather than specifying what counts, what time window applies, and what data source would be used to compute it
-C) It correctly avoids overcomplicating the definition
-D) It demonstrates strong technical fluency
+**12. (Interview Reasoning) A candidate is asked to define "engagement" for a product and answers: "Engagement means users are engaged with the product." What is the weakness in this answer?**
+A) It demonstrates strong technical fluency
+B) It correctly avoids overcomplicating the definition
+C) There is no weakness; this is a complete and sufficient definition
+D) It restates the term rather than specifying what counts, what time window applies, and what data source would be used
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer produces a precise, specific definition rather than a vague restatement of the term itself.*
+*Correct answer: D*
+*Explanation: A strong answer produces a precise, specific definition rather than a vague restatement of the term itself.*
 *Learning objective tested: #1*
 *Difficulty: Hard*
 
 ---
 
-**13. (Product Thinking) A dashboard includes only lagging indicators (quarterly revenue, quarterly churn), with no leading indicators. What is the most likely consequence, according to this lesson?**
-A) The dashboard will be perfectly sufficient for all decision-making needs
-B) The team will be unable to course-correct early, since by the time a lagging indicator moves, the underlying behavior that caused it is already in the past
+**13. (Product Thinking) A dashboard includes only lagging indicators (quarterly revenue, quarterly churn), with no leading indicators. What is the most likely consequence?**
+A) The team will be unable to course-correct early, since by the time a lagging indicator moves, the underlying behavior that caused it is already in the past
+B) This has no meaningful consequence for decision-making speed
 C) Lagging indicators are inherently more accurate than leading indicators
-D) This has no meaningful consequence for decision-making speed
+D) The dashboard will be perfectly sufficient for all decision-making needs
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #3 explicitly describes this consequence — an all-lagging dashboard leaves a team unable to act early.*
+*Correct answer: A*
+*Explanation: An all-lagging dashboard leaves a team unable to act early on emerging problems.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
-**14. Why does this lesson recommend documenting a metric's "known limitations" as part of its definition card, rather than presenting it as a perfectly complete measurement?**
-A) Because all metrics are equally flawed and this makes no real difference
-B) Because an honest account of what a metric does and doesn't capture (e.g., excluding certain user segments or activity types) helps future readers correctly interpret the number rather than over-trusting it as fully comprehensive
-C) Because known limitations are legally required disclosures
-D) Because metrics without documented limitations cannot be computed at all
+**14. Why does this lesson recommend documenting a metric's "known limitations" as part of its definition card?**
+A) Because metrics without documented limitations cannot be computed at all
+B) Because known limitations are legally required disclosures
+C) An honest account of what a metric does and doesn't capture helps future readers correctly interpret the number rather than over-trusting it as fully comprehensive
+D) Because all metrics are equally flawed and this makes no real difference
 
-*Correct answer: B*
-*Explanation: The Framework Explanation section's Metric Definition Card includes "known limitations" specifically so future readers understand what the metric does and doesn't capture, supporting honest interpretation.*
+*Correct answer: C*
+*Explanation: The Metric Definition Card includes "known limitations" so future readers understand what the metric does and doesn't capture.*
 *Learning objective tested: #1*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM notices that a metric showing improved "average session length" has been used to justify a recent product change, but suspects the increase might reflect users struggling to complete a task rather than genuine increased engagement. Using this lesson's frameworks, what is the most defensible next step?**
-A) Accept the metric's improvement at face value and continue promoting the change based on it
-B) Apply the vanity-versus-actionable test and the correlation-versus-causation caution together: investigate what specifically is driving the increased session length (e.g., check for a corresponding change in task completion rate or a confusion-related guardrail metric) before concluding the product change caused a genuinely positive outcome
-C) Assume the metric must be miscalculated and discard it without further investigation
-D) Increase the target for average session length further, since the metric is already trending in the desired direction
+**15. (Product Thinking, Highest Difficulty) A PM notices "average session length" has improved and was used to justify a recent product change, but suspects the increase reflects users struggling to complete a task rather than genuine engagement. What is the most defensible next step?**
+A) Increase the target for average session length further, since the metric is already trending in the desired direction
+B) Investigate what specifically is driving the increase, such as a corresponding change in task completion rate, before concluding the change caused a genuinely positive outcome
+C) Accept the metric's improvement at face value and continue promoting the change based on it
+D) Assume the metric must be miscalculated and discard it without further investigation
 
 *Correct answer: B*
-*Explanation: This combines multiple lesson themes correctly — session length could be a vanity or ambiguous metric here (longer isn't necessarily better), and its correlation with the product change doesn't establish that the change caused a genuinely positive outcome without investigating a guardrail metric like task completion, exactly the discipline this lesson recommends before trusting a metric's apparent improvement.*
+*Explanation: Session length could be an ambiguous metric here, and its correlation with the product change doesn't establish causation without checking a guardrail metric like task completion.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
 

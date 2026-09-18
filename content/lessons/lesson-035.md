@@ -354,26 +354,26 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the primary problem with a roadmap that lists specific features against fixed calendar dates many months out?**
-A) It is too difficult for stakeholders to understand
+A) It requires too much engineering effort to produce
 B) It manufactures a level of certainty about the future that rarely holds, reliably producing broken promises
-C) It requires too much engineering effort to produce
-D) It is only usable by Kanban teams
+C) It is only usable by Kanban teams
+D) It is too difficult for stakeholders to understand
 
 *Correct answer: B*
-*Explanation: The Theory section explains that fixed-date, far-future feature roadmaps manufacture false certainty, directly contradicting Lesson 31's premise that far-future specifics are rarely knowable with confidence.*
+*Explanation: Fixed-date, far-future feature roadmaps manufacture false certainty, contradicting Lesson 31's premise that far-future specifics are rarely knowable with confidence.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. In the Now-Next-Later format, what should happen to specificity and confidence as the time horizon extends?**
-A) They should increase, since later items deserve more detail
-B) They should decrease, with "Now" being specific and high-confidence and "Later" being thematic and low-confidence
-C) They should stay exactly the same across all three horizons
-D) Only "Now" items should have any confidence level assigned at all
+A) Only "Now" items should have any confidence level assigned at all
+B) They should stay exactly the same across all three horizons
+C) They should increase, since later items deserve more detail
+D) They should decrease, with "Now" being specific and high-confidence and "Later" being thematic and low-confidence
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly states that specificity and confidence are meant to decrease as the horizon extends in the Now-Next-Later format.*
+*Correct answer: D*
+*Explanation: Specificity and confidence are meant to decrease as the horizon extends in the Now-Next-Later format.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -381,168 +381,168 @@ D) Only "Now" items should have any confidence level assigned at all
 
 **3. What distinguishes an outcome-based roadmap row from a feature-based one?**
 A) Outcome-based rows describe problems to be solved or metrics to move, leaving the specific solution open; feature-based rows describe specific things to build
-B) There is no meaningful difference between the two
+B) Feature-based roadmaps are only used by Kanban teams
 C) Outcome-based roadmaps never include any engineering input
-D) Feature-based roadmaps are only used by Kanban teams
+D) There is no meaningful difference between the two
 
 *Correct answer: A*
-*Explanation: The Theory section's table defines exactly this distinction between feature-based and outcome-based roadmap rows.*
+*Explanation: This is exactly the distinction between feature-based and outcome-based roadmap rows.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. According to this lesson, what should a roadmap's "Now" horizon items be traceable to?**
-A) The company's five-year financial plan
-B) The team's actual current Sprint Backlog work
-C) A competitor's public roadmap
+A) A competitor's public roadmap
+B) The company's five-year financial plan
+C) The team's actual current Sprint Backlog work
 D) Nothing — "Now" items should stand alone
 
-*Correct answer: B*
-*Explanation: The Theory section states that a roadmap's "Now" items should be traceable down into the current Sprint's actual work, and a Sprint Goal should be explainable in terms of which roadmap theme it serves.*
+*Correct answer: C*
+*Explanation: A roadmap's "Now" items should trace down into the current Sprint's actual work, and a Sprint Goal should trace up into which roadmap theme it serves.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**5. Why is refusing to publish any forward-looking roadmap at all considered a mistake in this lesson, rather than a "safe" choice?**
-A) Because stakeholders are legally entitled to a roadmap
-B) Because it leaves stakeholders with no useful directional information to plan around, repeating a mistake already flagged in Lesson 31
+**5. Why is refusing to publish any forward-looking roadmap at all considered a mistake, rather than a "safe" choice?**
+A) Because it violates the Definition of Ready
+B) It leaves stakeholders with no useful directional information to plan around, repeating a mistake already flagged in Lesson 31
 C) Because roadmaps are required by the Scrum Guide
-D) Because it violates the Definition of Ready
+D) Because stakeholders are legally entitled to a roadmap
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #3 explicitly connects this to Lesson 31's Mistake 5 — withholding all forward-looking information under the excuse of uncertainty leaves stakeholders unable to plan.*
+*Explanation: Withholding all forward-looking information under the excuse of uncertainty leaves stakeholders unable to plan around the team at all.*
 *Learning objective tested: #1, #5*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Detailed Case Study, what was the PM's primary mistake?**
-A) Deprioritizing five features in favor of better-validated opportunities
-B) Presenting a full year of specific features at specific dates, manufacturing false certainty about items that were still early-stage ideas
-C) Refusing to build any roadmap at all
-D) Using an outcome-based format for all twelve items
+A) Using an outcome-based format for all twelve items
+B) Refusing to build any roadmap at all
+C) Deprioritizing five features in favor of better-validated opportunities
+D) Presenting a full year of specific features at specific dates, manufacturing false certainty about early-stage ideas
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong?" section explicitly identifies the roadmap's format — false specificity for uncertain items — as the primary failure, not the underlying prioritization decisions.*
+*Correct answer: D*
+*Explanation: The roadmap's format — false specificity for uncertain items — was the primary failure, not the underlying prioritization decisions.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. Using the Roadmap Format Selector, what specificity level is recommended for external, customer-facing "Next"/"Later" horizon items?**
-A) High — specific features and exact dates
-B) Low — themes only, explicitly framed as directional, no specific dates
-C) Identical to what is shared with engineering
-D) No information should ever be shared externally
-
-*Correct answer: B*
-*Explanation: The Roadmap Format Selector table specifies low specificity (themes only, no fixed dates) for external audiences at the Next/Later horizon.*
-*Learning objective tested: #5*
-*Difficulty: Medium*
-
----
-
-**8. Why does this lesson recommend different roadmap specificity levels for different audiences (e.g., engineering vs. external customers)?**
-A) Because different audiences have different needs and because broken specific promises carry a different, often higher, reputational cost externally than internally
-B) Because external audiences are not entitled to any roadmap information
-C) Because engineering teams should never see roadmap themes, only Sprint Backlogs
-D) Because all audiences should receive identical information regardless of context
+A) Low — themes only, explicitly framed as directional, no specific dates
+B) High — specific features and exact dates
+C) No information should ever be shared externally
+D) Identical to what is shared with engineering
 
 *Correct answer: A*
-*Explanation: Common Beginner Mistake #5 and the Roadmap Format Selector both explain that audience needs differ and that reputational cost for broken promises is higher for some audiences (like external customers) than others.*
+*Explanation: The Roadmap Format Selector specifies low specificity — themes only, no fixed dates — for external audiences at the Next/Later horizon.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**9. (Scenario) A "Later" horizon roadmap item is described externally as "Launching a five-step onboarding wizard with screens A, B, and C in Q3." What is the most likely problem with this description, using the Confidence Gradient?**
-A) There is no problem; this is exactly how "Later" items should be described
-B) It presents "Later"-level (low-confidence, early-stage) content with "Now"-level (high-confidence, specific) detail, misrepresenting how much is actually known
-C) It should have included even more specific implementation details
+**8. Why does this lesson recommend different roadmap specificity levels for different audiences?**
+A) Because external audiences are not entitled to any roadmap information
+B) Because engineering teams should never see roadmap themes, only Sprint Backlogs
+C) Different audiences have different needs, and broken specific promises carry a higher reputational cost externally than internally
+D) Because all audiences should receive identical information regardless of context
+
+*Correct answer: C*
+*Explanation: Audience needs differ, and the reputational cost for a broken promise is higher for some audiences, like external customers, than others.*
+*Learning objective tested: #5*
+*Difficulty: Medium*
+
+---
+
+**9. (Scenario) A "Later" horizon item is described externally as "Launching a five-step onboarding wizard with screens A, B, and C in Q3." What is the most likely problem, using the Confidence Gradient?**
+A) It should have included even more specific implementation details
+B) It presents "Later"-level, low-confidence content with "Now"-level specificity, misrepresenting how much is actually known
+C) There is no problem; this is exactly how "Later" items should be described
 D) "Later" items should never be shared externally under any circumstances
 
 *Correct answer: B*
-*Explanation: This is a direct violation of the Confidence Gradient — a "Later"-horizon idea is being described with false, "Now"-level specificity, the exact failure illustrated in the Detailed Case Study.*
+*Explanation: This is a direct violation of the Confidence Gradient — an early-stage idea described with false, "Now"-level detail, the exact failure in the Case Study.*
 *Learning objective tested: #1, #2*
 *Difficulty: Medium-Hard*
 
 ---
 
-**10. A Sprint Goal has no clear connection to any theme on the team's published roadmap. According to this lesson, what does this suggest?**
-A) This is normal and requires no attention
-B) The roadmap and Sprint Backlog have become disconnected, and one of them has likely lost sight of its intended purpose
-C) The team should immediately switch from Scrum to Kanban
-D) The roadmap needs more specific fixed dates
+**10. A Sprint Goal has no clear connection to any theme on the team's published roadmap. What does this suggest?**
+A) The roadmap needs more specific fixed dates
+B) The team should immediately switch from Scrum to Kanban
+C) This is normal and requires no attention
+D) The roadmap and Sprint Backlog have become disconnected, and one has likely lost sight of its purpose
 
-*Correct answer: B*
-*Explanation: The Theory section states that a Sprint Backlog with no visible connection to any roadmap theme has lost sight of its longer-horizon purpose, and this disconnection signals dysfunction.*
+*Correct answer: D*
+*Explanation: A Sprint Backlog with no visible connection to any roadmap theme has lost sight of its longer-horizon purpose, and the disconnection signals dysfunction.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
-**11. (Interview Reasoning) A sales leader pressures a PM to commit to a specific ship date for a feature still in early exploration. Based on this lesson's Interview Perspective section, what is the strongest response?**
-A) Agree to the specific date to avoid conflict with sales
+**11. (Interview Reasoning) A sales leader pressures a PM to commit to a specific ship date for a feature still in early exploration. What is the strongest response?**
+A) Offer a themed, appropriately hedged commitment that gives sales something useful without manufacturing false certainty
 B) Refuse to discuss the feature at all
-C) Offer a themed, appropriately hedged commitment that gives sales something useful without manufacturing false certainty about a date that isn't actually known
-D) Tell sales the feature will never be built
+C) Tell sales the feature will never be built
+D) Agree to the specific date to avoid conflict with sales
 
-*Correct answer: C*
-*Explanation: The Interview Perspective section states that a strong answer holds a principled line on honest specificity while offering a useful alternative, rather than caving to false precision or refusing to engage.*
+*Correct answer: A*
+*Explanation: A strong answer holds a principled line on honest specificity while offering a useful alternative, rather than caving to false precision or refusing to engage.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson recommend blending feature-based and outcome-based formats within a single roadmap, rather than choosing only one?**
-A) Because feature-based format fits well-groomed "Now" items with earned specificity, while outcome-based format better preserves flexibility for less-certain "Next"/"Later" items
-B) Because outcome-based roadmaps are illegal in most organizations
-C) Because a roadmap must always use exactly one format throughout
+A) Because outcome-based roadmaps are illegal in most organizations
+B) Because a roadmap must always use exactly one format throughout
+C) Feature-based format fits well-groomed "Now" items with earned specificity, while outcome-based format preserves flexibility for less-certain items
 D) Because feature-based formats are only appropriate for Kanban teams
 
-*Correct answer: A*
-*Explanation: The Theory section explains that most healthy roadmaps blend both formats, matching feature-based specificity to the "Now" horizon and outcome-based flexibility to "Next"/"Later," mirroring the Confidence Gradient.*
+*Correct answer: C*
+*Explanation: Most healthy roadmaps blend both formats, matching feature-based specificity to "Now" and outcome-based flexibility to "Next"/"Later," mirroring the Confidence Gradient.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A customer holds a company to a specific roadmap date presented a year earlier, which was not met due to a validated pivot in approach. Using this lesson's frameworks, what is the most defensible root-cause diagnosis?**
-A) The pivot itself was the mistake, and the team should have avoided changing course
-B) The original roadmap format presented an uncertain, early-stage idea with false, date-specific certainty — the pivot itself may have been a reasonable, evidence-driven decision, consistent with Lesson 31's values
+**13. (Product Thinking) A customer holds a company to a specific roadmap date presented a year earlier, which was not met due to a validated pivot in approach. What is the most defensible root-cause diagnosis?**
+A) The roadmap should have included even more specific technical detail to prevent this
+B) The original format presented an uncertain, early-stage idea with false, date-specific certainty — the pivot itself may have been a reasonable, evidence-driven decision
 C) The customer is wrong to feel misled under any circumstances
-D) The roadmap should have included even more specific technical detail to prevent this
+D) The pivot itself was the mistake, and the team should have avoided changing course
 
 *Correct answer: B*
-*Explanation: This mirrors the Case Study's core distinction: a sound, evidence-driven pivot (Lesson 31's values) is different from a format failure that presented uncertain information as a fixed promise in the first place.*
+*Explanation: A sound, evidence-driven pivot is different from a format failure that presented uncertain information as a fixed promise in the first place.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. Which of the following roadmap practices best reflects the Roadmap Format Selector's general rule that "specificity should be earned by confidence"?**
-A) Using identical specificity for every audience and time horizon, regardless of how well-groomed the underlying work is
-B) Describing "Now" items with real feature-level detail because they are already groomed and in active development, while describing "Later" items only as themes
-C) Describing "Later" items with maximum feature-level detail to generate stakeholder excitement
-D) Refusing to describe "Now" items at all, since the future is inherently uncertain
+**14. Which practice best reflects the rule that "specificity should be earned by confidence"?**
+A) Refusing to describe "Now" items at all, since the future is inherently uncertain
+B) Describing "Later" items with maximum feature-level detail to generate stakeholder excitement
+C) Using identical specificity for every audience and time horizon regardless of how well-groomed the work is
+D) Describing "Now" items with real feature-level detail because they're already groomed, while describing "Later" items only as themes
 
-*Correct answer: B*
-*Explanation: This directly reflects the Roadmap Format Selector's underlying rule and the Confidence Gradient mental model — specificity should track how much is genuinely known, which is highest for well-groomed "Now" items.*
+*Correct answer: D*
+*Explanation: This reflects the Confidence Gradient — specificity should track how much is genuinely known, which is highest for well-groomed "Now" items.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM is asked to build a single roadmap document to be shared, unmodified, with engineering, sales, and external customers simultaneously. Using this lesson's frameworks, what is the most likely risk of this approach, and what would a better alternative look like?**
-A) There is no risk; a single roadmap document is always the most efficient choice
-B) A single undifferentiated roadmap risks either overwhelming external/customer audiences with premature technical specificity, or under-informing internal audiences like engineering who need more detail — a better alternative tailors format and specificity per audience while keeping the underlying themes and Now-Next-Later structure consistent
-C) The best alternative is to give every audience only fixed dates with no thematic framing
-D) The best alternative is to give every audience only vague themes with no specifics at all, even for "Now" items
+**15. (Product Thinking, Highest Difficulty) A PM is asked to build a single roadmap document shared unmodified with engineering, sales, and external customers simultaneously. What is the most likely risk, and what would a better alternative look like?**
+A) A single undifferentiated roadmap risks overwhelming customer audiences with premature specificity or under-informing engineering — a better alternative tailors format per audience while keeping the underlying structure consistent
+B) The best alternative is to give every audience only fixed dates with no thematic framing
+C) The best alternative is to give every audience only vague themes with no specifics at all, even for "Now" items
+D) There is no risk; a single roadmap document is always the most efficient choice
 
-*Correct answer: B*
-*Explanation: This applies Common Beginner Mistake #5 and the Roadmap Format Selector together: different audiences warrant different specificity levels, and a single undifferentiated document risks failing multiple audiences at once, while a well-tailored approach preserves a consistent underlying structure across differentiated presentations.*
+*Correct answer: A*
+*Explanation: Different audiences warrant different specificity levels; a single undifferentiated document risks failing multiple audiences, while a tailored approach preserves a consistent underlying structure.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 

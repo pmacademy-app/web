@@ -309,12 +309,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why is enterprise readiness described as a distinct category from "more features"?**
-A) Enterprise readiness features are simply a larger quantity of the same type of feature
-B) It establishes organizational trust and control — security, administrative oversight, reliability, integration — rather than serving individual user tasks directly
-C) Enterprise readiness has no meaningful distinction from consumer product features
-D) Enterprise readiness only applies to products with no individual users at all
+A) Enterprise readiness only applies to products with no individual users at all
+B) Enterprise readiness features are essentially a larger quantity of the same type of feature
+C) It establishes organizational trust and control — security, administrative oversight, reliability, integration — rather than serving individual user tasks directly
+D) Enterprise readiness has, in practice, no meaningful distinction from consumer product features
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The lesson explicitly distinguishes enterprise readiness as a different category of capability serving organizational trust rather than individual task completion.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -322,12 +322,12 @@ D) Enterprise readiness only applies to products with no individual users at all
 ---
 
 **2. What is the correct order of the Enterprise Adoption Ladder?**
-A) Mission-Critical Entrenchment, Organization-Wide Rollout, Departmental Adoption, Pilot
-B) Pilot, Departmental Adoption, Organization-Wide Rollout, Mission-Critical Entrenchment
-C) Departmental Adoption, Pilot, Mission-Critical Entrenchment, Organization-Wide Rollout
-D) Organization-Wide Rollout, Mission-Critical Entrenchment, Pilot, Departmental Adoption
+A) Departmental Adoption, Pilot, Mission-Critical Entrenchment, Organization-Wide Rollout
+B) Organization-Wide Rollout, Mission-Critical Entrenchment, Pilot, Departmental Adoption
+C) Pilot, Departmental Adoption, Organization-Wide Rollout, Mission-Critical Entrenchment
+D) Mission-Critical Entrenchment, Organization-Wide Rollout, Departmental Adoption, Pilot
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This is the sequential order introduced in the Theory section, from individual pilot to organizational entrenchment.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -335,12 +335,12 @@ D) Organization-Wide Rollout, Mission-Critical Entrenchment, Pilot, Departmental
 ---
 
 **3. What typically becomes necessary for the first time at Rung 3, Organization-Wide Rollout?**
-A) Basic core product functionality
-B) Enterprise-grade security certifications, single sign-on, and granular role-based access control, requiring central IT and security sign-off
-C) An individual user's initial enthusiasm for the product
-D) A marketing campaign targeting new individual users
+A) Enterprise-grade security certifications, single sign-on, and granular role-based access control, requiring central IT and security sign-off
+B) An individual user's initial enthusiasm for the product
+C) Basic core product functionality that a pilot user relies on daily
+D) A marketing campaign aimed at attracting new individual users
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Theory section specifically identifies this tier of capability as necessary starting at Rung 3, engaging gatekeepers not involved at earlier rungs.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -348,12 +348,12 @@ D) A marketing campaign targeting new individual users
 ---
 
 **4. Name the four categories of enterprise readiness capability.**
-A) Marketing, sales, engineering, and design
-B) Security and compliance, administrative control, reliability and support commitments, integration capability
-C) User interface, pricing, onboarding, and documentation
+A) Security and compliance, administrative control, reliability and support commitments, integration capability
+B) User interface, pricing, onboarding, and documentation
+C) Marketing, sales, engineering, and design
 D) Revenue, growth, retention, and referrals
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: These four categories are explicitly named in the Theory section as the core dimensions of enterprise readiness.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -361,12 +361,12 @@ D) Revenue, growth, retention, and referrals
 ---
 
 **5. Why can a single missing enterprise readiness category block an entire deal, regardless of strength elsewhere?**
-A) Enterprise buyers always prioritize price above all other factors
-B) Procurement and security review processes typically treat each category as a separate, non-negotiable gate
-C) Enterprise deals are never actually blocked by any single capability gap
-D) Strength in one category always fully compensates for weakness in another
+A) Procurement and security review processes typically treat each category as a separate, non-negotiable gate
+B) Enterprise deals are, in practice, rarely blocked by any single capability gap
+C) Enterprise buyers are described as prioritizing price above all other factors
+D) Strength in one category is generally said to fully compensate for weakness in another
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The lesson explicitly describes these categories as distinct, non-negotiable gates rather than compensating dimensions.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
@@ -374,10 +374,10 @@ D) Strength in one category always fully compensates for weakness in another
 ---
 
 **6. What distinguishes isolated enthusiasm from genuine organizational rollout progress?**
-A) There is no meaningful distinction between the two
+A) Organizational rollout is described as never requiring stakeholder engagement beyond initial pilot users
 B) Isolated enthusiasm reflects individual or departmental success, while organizational rollout requires engagement from gatekeepers like central IT and security who evaluate different criteria
-C) Isolated enthusiasm is always a stronger signal of rollout progress than gatekeeper engagement
-D) Organizational rollout never requires any additional stakeholder engagement beyond initial pilot users
+C) Isolated enthusiasm is generally treated as a stronger signal of rollout progress than gatekeeper engagement
+D) There is, in this lesson's account, no meaningful distinction between the two
 
 *Correct answer: B*
 *Explanation: This distinction is central to the Enterprise Adoption Ladder's diagnostic value, as illustrated in the Case Study.*
@@ -387,12 +387,12 @@ D) Organizational rollout never requires any additional stakeholder engagement b
 ---
 
 **7. In the Case Study, why didn't strong user satisfaction metrics unblock the stalled enterprise deals?**
-A) The metrics were inaccurate and did not reflect true user sentiment
-B) Security review criteria were entirely separate from user satisfaction, and the relevant gatekeepers had never been part of the original grassroots adoption
-C) The sales team failed to present the metrics to the customer at all
-D) Enterprise customers never consider user satisfaction relevant to any purchasing decision
+A) Enterprise customers were said to never consider user satisfaction relevant to any purchase
+B) The sales team reportedly failed to present the metrics to the customer at all
+C) Security review criteria were entirely separate from user satisfaction, and the relevant gatekeepers had never been part of the original grassroots adoption
+D) The metrics themselves were inaccurate and did not reflect true user sentiment
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The case study specifically shows that security review evaluates different criteria than user satisfaction, and the security stakeholders were disconnected from the original adoption.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
@@ -400,10 +400,10 @@ D) Enterprise customers never consider user satisfaction relevant to any purchas
 ---
 
 **8. What was the actual root cause of the stalled deals in the Case Study, using the Enterprise Adoption Ladder?**
-A) The core product lacked genuine value for individual users
+A) The sales team had not adequately marketed the product to individual users
 B) The company had never invested in the security and administrative control capabilities specifically required at Rung 3
-C) The sales team had not adequately marketed the product to individual users
-D) The company had too many features rather than too few
+C) The core product lacked genuine value for the individual users piloting it
+D) The company had simply built too many features rather than too few
 
 *Correct answer: B*
 *Explanation: The failure was a specific, locatable capability gap at exactly the rung the deals were stalled at, not a core product deficiency.*
@@ -413,12 +413,12 @@ D) The company had too many features rather than too few
 ---
 
 **9. According to the Enterprise Readiness Checklist, what risk does a missing Security & Compliance capability carry?**
-A) A minor inconvenience easily overcome by strong core product value
-B) Security review blocking the deal regardless of product quality or user satisfaction
-C) No practical risk, since security certifications are optional in enterprise sales
-D) A risk only relevant to consumer products, not B2B products
+A) No real practical risk, since security certifications are treated as optional in enterprise sales
+B) A risk that is described as relevant only to consumer products, not B2B products
+C) Security review blocking the deal regardless of product quality or user satisfaction
+D) A minor inconvenience easily overcome by strong core product value
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The lesson treats missing security and compliance capability as an especially significant blocker, largely independent of other product strengths.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
@@ -426,12 +426,12 @@ D) A risk only relevant to consumer products, not B2B products
 ---
 
 **10. Why might early-stage B2B startups reasonably deprioritize Rung 3 and 4 capabilities, per the Real World Perspective section?**
-A) Rung 3 and 4 capabilities are never relevant to any B2B company
-B) Building these capabilities before there is evidence of genuine demand for organization-wide deployment can represent a premature and costly investment
-C) Early-stage startups are legally prohibited from pursuing security certifications
-D) Rung 1 and 2 capabilities are always sufficient for the entire lifecycle of a B2B product
+A) Building these capabilities before there is evidence of genuine demand for organization-wide deployment can represent a premature and costly investment
+B) Early-stage startups are described as legally prohibited from pursuing security certifications
+C) Rung 3 and 4 capabilities are treated as never relevant to any B2B company
+D) Rung 1 and 2 capabilities are said to be sufficient for the entire lifecycle of a B2B product
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Real World Perspective section frames this as a reasonable prioritization trade-off given limited early-stage resources.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -439,10 +439,10 @@ D) Rung 1 and 2 capabilities are always sufficient for the entire lifecycle of a
 ---
 
 **11. What typically shifts as the strategic priority for mid-size B2B companies, per the Real World Perspective section?**
-A) Abandoning departmental adoption entirely in favor of enterprise-only sales
+A) Focusing exclusively on individual user acquisition with no organizational considerations
 B) Converting accumulated departmental adoption traction into larger, IT-sanctioned enterprise deals by investing in Rung 3 capabilities
-C) Focusing exclusively on individual user acquisition with no organizational considerations
-D) Eliminating the need for any security or compliance investment
+C) Abandoning departmental adoption entirely in favor of enterprise-only sales
+D) Eliminating the need for any further security or compliance investment
 
 *Correct answer: B*
 *Explanation: The Real World Perspective section identifies this Rung 2-to-3 transition as the characteristic mid-size company strategic priority.*
@@ -452,12 +452,12 @@ D) Eliminating the need for any security or compliance investment
 ---
 
 **12. (Scenario) A B2B product has excellent departmental adoption across many teams within an account, but has never engaged the account's central IT function. Using the Enterprise Adoption Ladder, what is the most likely next step required for progression?**
-A) Focus exclusively on acquiring more individual users within existing teams
-B) Proactively engage central IT and security stakeholders and assess enterprise readiness gaps before assuming rollout will happen automatically
-C) Assume rollout will proceed automatically given strong departmental traction
-D) Reduce investment in the product entirely, since departmental adoption has already succeeded
+A) Reduce investment in the product entirely, since departmental adoption has already succeeded
+B) Assume rollout will proceed automatically given the strong departmental traction already achieved
+C) Focus exclusively on acquiring more individual users within the existing teams
+D) Proactively engage central IT and security stakeholders and assess enterprise readiness gaps before assuming rollout will happen automatically
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Rung 3 progression specifically requires engaging gatekeepers who were not part of departmental adoption, and this should be done proactively rather than assumed.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Medium-Hard*
@@ -465,12 +465,12 @@ D) Reduce investment in the product entirely, since departmental adoption has al
 ---
 
 **13. (Product Thinking) A company's internal narrative describes an account as "clearly winning" based on strong departmental usage metrics, while formal enterprise contract negotiations have stalled with no clear explanation. Using this lesson's frameworks, what should a PM investigate first?**
-A) Whether the departmental usage metrics are being calculated correctly
-B) Whether central IT or security stakeholders have been engaged, and whether a specific enterprise readiness capability gap exists
-C) Whether the sales team is using the correct marketing materials
-D) Whether individual users would benefit from additional core features
+A) Whether individual users would benefit from additional core features
+B) Whether the sales team is using the correct marketing materials
+C) Whether the departmental usage metrics are being calculated correctly
+D) Whether central IT or security stakeholders have been engaged, and whether a specific enterprise readiness capability gap exists
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This directly applies the lesson's core diagnostic: isolated enthusiasm doesn't indicate rollout progress, so gatekeeper engagement and readiness gaps should be investigated first.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
@@ -478,10 +478,10 @@ D) Whether individual users would benefit from additional core features
 ---
 
 **14. (Interview Reasoning) A candidate, asked how they'd expand a product within a large account, describes only plans for additional core feature development. What does this most likely signal, per the Interview Perspective section?**
-A) A strong and complete understanding of enterprise expansion strategy
+A) That the candidate is ready for a senior enterprise PM role immediately
 B) A gap in recognizing that Rung 3 progression typically requires security, administrative, and reliability capabilities beyond core feature development
-C) That the candidate is ready for a senior enterprise PM role immediately
-D) Nothing meaningful; core feature development is always sufficient for enterprise expansion
+C) Nothing meaningful; core feature development is generally sufficient for enterprise expansion
+D) A strong and complete understanding of enterprise expansion strategy
 
 *Correct answer: B*
 *Explanation: The Interview Perspective section specifically listens for recognition of the distinct capability categories required at later rungs, which this answer omits.*
@@ -491,12 +491,12 @@ D) Nothing meaningful; core feature development is always sufficient for enterpr
 ---
 
 **15. (Product Thinking, Highest Difficulty) A product has strong departmental traction across a large account, but formal enterprise-wide rollout has stalled with the customer providing no clear explanation. Using only the frameworks in this lesson, what is the most defensible diagnostic approach?**
-A) Assume the core product needs additional features and prioritize further feature development
-B) Investigate whether central IT and security stakeholders have been engaged, assess the account against the Enterprise Readiness Checklist's four categories, and identify the specific capability gap most likely blocking progression
-C) Conclude the deal is simply taking longer than expected and take no further action
-D) Discount the account's potential value and redirect resources elsewhere without further investigation
+A) Discount the account's potential value and redirect resources elsewhere without further investigation
+B) Conclude the deal is simply taking longer than expected and take no further action
+C) Assume the core product needs additional features and prioritize further feature development
+D) Investigate whether central IT and security stakeholders have been engaged, assess the account against the Enterprise Readiness Checklist's four categories, and identify the specific capability gap most likely blocking progression
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This mirrors the Reflection Exercise and Case Study: the correct response systematically investigates gatekeeper engagement and readiness gaps rather than assuming a core product issue, dismissing the stall as normal, or abandoning the account without diagnosis.*
 *Learning objective tested: #2, #3, #4, #5*
 *Difficulty: Hard*

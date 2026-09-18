@@ -384,91 +384,91 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What are Scrum's three pillars of empiricism?**
-A) Planning, Estimation, Reporting
-B) Transparency, Inspection, Adaptation
-C) Speed, Quality, Cost
-D) Backlog, Sprint, Increment
+A) Speed, Quality, Cost
+B) Backlog, Sprint, Increment
+C) Transparency, Inspection, Adaptation
+D) Planning, Estimation, Reporting
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly names transparency, inspection, and adaptation as Scrum's three pillars of empiricism.*
+*Correct answer: C*
+*Explanation: The Theory section names transparency, inspection, and adaptation as Scrum's three pillars of empiricism.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. Which Scrum event is most directly responsible for generating the "feedback" step of Lesson 31's Iteration Loop?**
-A) Daily Scrum
-B) Sprint Review
+**2. Which Scrum event most directly generates the "feedback" step of Lesson 31's Iteration Loop?**
+A) Sprint Review
+B) Daily Scrum
 C) Sprint Planning
-D) None of the events relate to the Iteration Loop
+D) None of the events tie back to the Iteration Loop
 
-*Correct answer: B*
-*Explanation: The lesson explicitly ties the Sprint Review to Lesson 31's Iteration Loop feedback step, since it's where the team and stakeholders inspect the Increment together and adapt the Product Backlog.*
+*Correct answer: A*
+*Explanation: The Sprint Review is where the team and stakeholders inspect the Increment together and adapt the Product Backlog, ties directly to the Iteration Loop's feedback step.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. Which artifact is paired with the Definition of Done?**
-A) Product Backlog
-B) Sprint Backlog
-C) Increment
-D) Sprint Goal
+A) Sprint Backlog
+B) Sprint Goal
+C) Product Backlog
+D) Increment
 
-*Correct answer: C*
-*Explanation: The Theory section's artifacts table pairs the Increment with the Definition of Done as its associated commitment.*
+*Correct answer: D*
+*Explanation: The artifacts table pairs the Increment with the Definition of Done as its associated commitment.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Why does the lesson caution against conflating a Sprint Backlog with a Sprint Goal?**
-A) Because a Sprint Backlog is always shorter than a Sprint Goal
-B) Because without a coherent Sprint Goal, a Sprint Backlog is just a list of tickets with no shared objective, making mid-sprint trade-offs unanswerable
-C) Because Sprint Goals are optional in the Scrum Guide
-D) Because only the Scrum Master is allowed to set a Sprint Goal
+A) Sprint Goals are described as fully optional in Scrum
+B) Without a Sprint Goal, trade-offs have no shared "why"
+C) A Sprint Backlog is always shorter than a Sprint Goal
+D) Only the Scrum Master may set a team's Sprint Goal
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #2 explains that without a real Sprint Goal, there is no shared "why" to weigh a dropped or added item against, making trade-offs unanswerable.*
+*Explanation: Without a real Sprint Goal there's no shared "why" to weigh a dropped or added item against, making mid-sprint trade-offs unanswerable.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**5. A team runs all five Scrum events every Sprint, but retrospective action items are never actually resolved, and Sprint Reviews never change the Product Backlog's order. What does this lesson call this pattern?**
-A) Healthy Scrum
-B) Zombie Scrum
-C) Kanban
-D) Waterfall in disguise
+**5. A team runs all five Scrum events every Sprint, but retrospective action items are never resolved and Sprint Reviews never change the Product Backlog's order. What does this lesson call this pattern?**
+A) A healthy, well-functioning Scrum team
+B) Waterfall running in disguise
+C) Zombie Scrum
+D) Kanban applied to a Scrum board
 
-*Correct answer: B*
-*Explanation: The lesson defines Zombie Scrum as exactly this pattern — events running on schedule without genuine transparency, inspection, or adaptation.*
+*Correct answer: C*
+*Explanation: Zombie Scrum is exactly this pattern — events running on schedule without genuine transparency, inspection, or adaptation.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. Who does the Daily Scrum primarily belong to, according to this lesson?**
-A) The Product Owner, for status collection
-B) The Developers, for their own re-planning toward the Sprint Goal
-C) The Scrum Master, as a personal check-in tool
-D) Stakeholders outside the team
+A) The Developers, for their own re-planning toward the Sprint Goal
+B) The Product Owner, for collecting individual status updates
+C) Stakeholders outside the team
+D) The Scrum Master, as a personal check-in tool
 
-*Correct answer: B*
-*Explanation: The lesson explicitly states the Daily Scrum belongs to the Developers for their own re-planning of the next 24 hours, not as a status briefing for the PM.*
+*Correct answer: A*
+*Explanation: The Daily Scrum belongs to the Developers for their own re-planning of the next 24 hours, not as a status briefing for the PM.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **7. What is the Product Owner's primary accountability, according to this lesson?**
-A) Facilitating all Scrum events and removing impediments
-B) Maximizing the value of the product resulting from the team's work by owning and ordering the Product Backlog
-C) Writing all the code for the Increment
-D) Tracking the team's velocity chart
+A) Facilitating all five Scrum events for the team
+B) Tracking and maintaining the team's velocity chart
+C) Writing the code behind each Sprint's Increment
+D) Maximizing product value by owning the Product Backlog
 
-*Correct answer: B*
-*Explanation: The Theory section's roles table defines the Product Owner's accountability as maximizing product value through Product Backlog ownership and ordering.*
+*Correct answer: D*
+*Explanation: The roles table defines the Product Owner's accountability as maximizing product value through Product Backlog ownership and ordering.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
@@ -476,103 +476,103 @@ D) Tracking the team's velocity chart
 
 **8. Which role is accountable for establishing Scrum as defined in the Scrum Guide and removing impediments to the team's progress?**
 A) Product Owner
-B) Developers
-C) Scrum Master
+B) Scrum Master
+C) Developers
 D) Executive sponsor
 
-*Correct answer: C*
+*Correct answer: B*
 *Explanation: The roles table assigns this accountability specifically to the Scrum Master.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
 
 ---
 
-**9. In the Detailed Case Study, why couldn't the team resolve the design-resource blocker on its own, unlike the Definition of Done issue?**
-A) Because the Scrum Master refused to help
-B) Because it was a cross-team resourcing constraint requiring the Product Owner to escalate it outward, rather than an internal process problem the team could fix through willpower
-C) Because the team didn't hold enough retrospectives
-D) Because the issue was not actually real
+**9. In the Case Study, why couldn't the team resolve the design-resource blocker on its own, unlike the Definition of Done issue?**
+A) The Scrum Master had explicitly refused to get involved
+B) The team wasn't holding enough retrospectives to surface it
+C) It was a cross-team resourcing issue needing PO escalation
+D) The blocker, on closer inspection, turned out not to be real
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong?" analysis explicitly distinguishes the cross-team resourcing issue, which required PO escalation, from the Definition of Done issue, which was entirely within the team's control.*
+*Correct answer: C*
+*Explanation: The Case Study distinguishes the cross-team resourcing issue, which required PO escalation, from the Definition of Done issue, which was entirely within the team's control.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
-**10. (Scenario) A Sprint Review is well-attended, but afterward the Product Backlog's order never changes based on what stakeholders said. Using the Scrum Health Diagnostic, which signal is this team most clearly failing?**
-A) Transparency
-B) Daily Scrum inspection
-C) Sprint Review inspection
-D) Sprint Goal coherence
+**10. A Sprint Review is well-attended, but afterward the Product Backlog's order never changes based on what stakeholders said. Using the Scrum Health Diagnostic, which signal is this team most clearly failing?**
+A) Sprint Review inspection
+B) Sprint Goal coherence
+C) Daily Scrum inspection
+D) Transparency
 
-*Correct answer: C*
-*Explanation: The Scrum Health Diagnostic table defines the healthy signal for Sprint Review inspection as stakeholder reactions visibly changing the Product Backlog's order — the warning sign is exactly a one-way demo with no resulting backlog changes.*
+*Correct answer: A*
+*Explanation: The healthy signal for Sprint Review inspection is stakeholder reactions visibly changing the Product Backlog's order; a one-way demo with no resulting change is the named warning sign.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. Why does the lesson describe recording a retrospective action item as insufficient on its own?**
-A) Because action items should never be written down
-B) Because recording an action item is not the same as executing an adaptation — the same issue can recur if the action item is never actually acted on
-C) Because only the Scrum Master is allowed to write action items
-D) Because retrospectives should not identify any problems
+A) Only the Scrum Master may write down an action item
+B) Action items aren't a recognized part of the Scrum Guide
+C) Retrospectives should never surface any real problems
+D) Recording an item isn't the same as executing an adaptation
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly makes this distinction: the team recorded action items every retrospective, but the same two problems persisted because adaptation, not just recording, never actually followed.*
+*Correct answer: D*
+*Explanation: The Case Study team recorded action items every retrospective, but the same two problems persisted because adaptation, not just recording, never actually followed.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **12. A new PM insists on running the Daily Scrum as a personal status briefing, asking each Developer to report to them individually. According to this lesson, what is the likely effect?**
-A) It has no effect, since the meeting format doesn't matter
-B) It subtly converts a peer-coordination ritual into a supervisory one, tending to make the meeting slower, more guarded, and less useful for the people doing the work
-C) It correctly follows the Scrum Guide's intended purpose for the Daily Scrum
-D) It improves transparency by centralizing all information with the PM
+A) It improves transparency by centralizing information
+B) It turns a peer ritual into a slower, guarded briefing
+C) It has no meaningful effect on the team at all
+D) It follows the Scrum Guide's intended purpose exactly
 
 *Correct answer: B*
-*Explanation: The Theory section's "Daily Scrum Is Not a Status Meeting for the PM" subsection describes exactly this effect.*
+*Explanation: The "Daily Scrum Is Not a Status Meeting for the PM" subsection describes exactly this effect — the meeting becomes slower, more guarded, and less useful.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A Product Owner spends most of their time each Sprint updating a burndown chart and tracking ticket status, with the Product Backlog left unrefined and unreordered for weeks. Using this lesson's frameworks, what is the most likely underlying problem?**
-A) The PO is performing their role correctly, since tracking progress is central to the job
-B) The PO has drifted into project-coordination work, neglecting the backlog ownership and value-maximization accountability that actually defines the role
-C) The team needs a Scrum Master instead of a PO
-D) This indicates the team should switch to Kanban
+**13. (Product Thinking) A Product Owner spends most of their time each Sprint updating a burndown chart and tracking ticket status, with the Product Backlog left unrefined for weeks. Using this lesson's frameworks, what is the most likely underlying problem?**
+A) The PO is correctly performing the role's core duties
+B) The team simply needs a Scrum Master alongside its PO
+C) The PO has drifted into project-coordination work instead
+D) This means the team should abandon Scrum for Kanban
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #1 and the roles table both establish that the PO's defining accountability is backlog ownership and value maximization, not status tracking — spending most effort on the latter while neglecting the former is the specific role-confusion this lesson warns against.*
+*Correct answer: C*
+*Explanation: The PO's defining accountability is backlog ownership and value maximization, not status tracking — spending most effort on the latter is the role-confusion this lesson warns against.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate is asked to describe a dysfunctional Scrum team they've worked with, and answers: "We just didn't have enough meetings — if we'd had more standups, it would have gone better." Based on this lesson's Interview Perspective section, what does this answer signal?**
-A) A sophisticated diagnosis of the team's process
-B) A superficial diagnosis that doesn't identify which of the three pillars (transparency, inspection, adaptation) was actually breaking down
-C) Correct reasoning, since more meetings always improve Scrum teams
-D) That the candidate should have suggested Kanban instead
+**14. (Interview Reasoning) A candidate describes a dysfunctional Scrum team and answers: "We just didn't have enough meetings — more standups would have fixed it." What does this signal, per the Interview Perspective section?**
+A) A superficial diagnosis that doesn't identify which of the three pillars was actually breaking down
+B) A sophisticated, well-reasoned diagnosis of the team's underlying process
+C) That the candidate should have proposed switching to Kanban instead
+D) Correct reasoning, since additional meetings reliably improve any Scrum team
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer names which specific pillar was breaking down and why; "not enough meetings" fails to diagnose at the level of transparency, inspection, or adaptation at all.*
+*Correct answer: A*
+*Explanation: A strong answer names which specific pillar — transparency, inspection, or adaptation — was breaking down; "not enough meetings" fails to diagnose at that level.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A Scrum team's Sprint Reviews consistently surface strong stakeholder interest in a specific unplanned feature, and the team's retrospectives consistently surface the same recurring blocker involving a shared resource from another team. Using this lesson's frameworks, how should the Product Owner most appropriately respond to these two different signals?**
-A) Treat both signals identically, since both come from Scrum events
-B) Ignore both, since Sprint commitments should never change based on new information
-C) Use the Sprint Review feedback to reorder and adapt the Product Backlog (since this is squarely within the PO's authority), while escalating the recurring cross-team resource blocker outward as a structural issue requiring intervention beyond the team's own retrospective process
-D) Ask the Scrum Master to handle both issues, since process issues and backlog issues are identical in Scrum
+**15. (Product Thinking, Highest Difficulty) A Scrum team's Sprint Reviews consistently surface strong stakeholder interest in a specific unplanned feature, and the team's retrospectives consistently surface the same recurring blocker involving a shared resource from another team. How should the Product Owner most appropriately respond to these two different signals?**
+A) Treat both signals identically, since both surfaced formally
+B) Ignore both, since Sprint commitments shouldn't ever change
+C) Ask the Scrum Master to handle both types of issue
+D) Reorder the backlog on the review feedback; escalate the blocker
 
-*Correct answer: C*
-*Explanation: This mirrors the lesson's Detailed Case Study distinction directly: Sprint Review feedback about product direction falls within the PO's backlog-ownership authority and should drive adaptation there, while a cross-team structural blocker recurring across retrospectives requires PO escalation outward, since it cannot be solved by the team's internal process alone.*
+*Correct answer: D*
+*Explanation: Sprint Review feedback about product direction falls within the PO's backlog-ownership authority, while a cross-team structural blocker recurring across retrospectives requires PO escalation, since the team can't solve it alone.*
 *Learning objective tested: #1, #4, #5*
 *Difficulty: Hard*
 

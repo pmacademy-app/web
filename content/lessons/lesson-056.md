@@ -376,11 +376,11 @@ There is no single correct answer to the prompts below — the goal is to practi
 
 ## Quiz
 
-**1. What is the dual-ladder career structure?**
-A) A structure with only a single path to seniority, through management
-B) A framework offering both a management track and an individual-contributor track, both leading to comparable levels of seniority and influence
-C) A structure exclusive to engineering roles, never applicable to product management
-D) A synonym for the Scope Ladder with no meaningful difference
+**1. What is the dual-ladder career structure, as defined in this lesson?**
+A) A ranking system based purely on tenure and years of service
+B) A framework offering both a management and IC track to comparable seniority
+C) A rule requiring every PM to eventually move into management
+D) A single ladder combining management and IC duties into one role
 
 *Correct answer: B*
 *Explanation: The Theory section defines the dual-ladder structure exactly this way.*
@@ -390,12 +390,12 @@ D) A synonym for the Scope Ladder with no meaningful difference
 ---
 
 **2. What does the Scope Ladder frame career progression as?**
-A) Simply a title change with no other meaningful dimension
-B) Increasing scope of ownership and impact — from a single feature, to a product, to a portfolio, to company-wide strategy
-C) A measure of how many people directly report to someone
-D) A ranking based solely on years of tenure
+A) A count of how many direct reports a person manages
+B) A ranking based solely on years of tenure at a company
+C) A title change with no other meaningful dimension attached
+D) Increasing scope of ownership, from a single feature to company strategy
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Theory section explicitly defines the Scope Ladder this way.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -403,12 +403,12 @@ D) A ranking based solely on years of tenure
 ---
 
 **3. Why does this lesson caution against treating management as the only legitimate marker of career progress?**
-A) Because management roles do not actually exist in most organizations
-B) Because this risks pushing genuinely excellent individual contributors into a role that doesn't match their actual strengths, at cost to both their fulfillment and the organization's talent
-C) Because IC-track roles always pay more than management roles
-D) Because management is illegal in some countries
+A) It risks pushing strong individual contributors into a mismatched role
+B) Because IC-track roles always pay more than management roles do
+C) Because most organizations have eliminated management roles entirely
+D) Because management positions are genuinely rare in product orgs
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Theory section and Common Beginner Mistake #1 explain this exact risk.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -416,12 +416,12 @@ D) Because management is illegal in some countries
 ---
 
 **4. What key question does the IC vs. Management Track Fit Table use to distinguish genuine interest from prestige-seeking?**
-A) Whether the person has a college degree
-B) Whether the primary motivation for a management move is genuine interest in coaching/organizational work, versus prestige, compensation signaling, or unexamined assumption
-C) Whether the person has more years of tenure than their peers
-D) Whether the person prefers working remotely or in an office
+A) Whether the person holds a specific academic degree or credential
+B) Whether the person has more tenure at the company than their peers
+C) Whether the motivation for a move is genuine interest or unexamined assumption
+D) Whether the person prefers working remotely rather than in an office
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Framework Explanation section's Fit Table includes this exact motivation question.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -429,10 +429,10 @@ D) Whether the person prefers working remotely or in an office
 ---
 
 **5. In the Detailed Case Study, why did the senior IC PM accept the management promotion?**
-A) Because they had genuinely reflected on their interest in coaching and organizational work beforehand
-B) Because they assumed, without much genuine reflection, that this was simply "the next step," since no one had suggested continuing as an IC was a comparably legitimate path
-C) Because they were forced to accept it by their organization
-D) Because they had extensive prior management experience
+A) They had already led a team successfully in an earlier role
+B) They assumed, without much reflection, it was simply the next step
+C) Leadership explicitly required them to accept the offer
+D) They had long expressed strong interest in coaching other PMs
 
 *Correct answer: B*
 *Explanation: The Case Study explicitly describes this unexamined assumption as the reason for accepting the promotion.*
@@ -442,12 +442,12 @@ D) Because they had extensive prior management experience
 ---
 
 **6. What specific signs of mismatch did the PM in the Detailed Case Study exhibit after the promotion?**
-A) Increased engagement and effectiveness compared to before
-B) Gravitating toward hands-on product work themselves, finding coaching and organizational conversations draining, and missing the depth of their prior IC role
-C) A strong preference for organizational design work over any hands-on product involvement
-D) No noticeable change in behavior or engagement at all
+A) A steady rise in energy for coaching and organizational planning
+B) No noticeable change at all in behavior or engagement
+C) A new preference for org design work over hands-on involvement
+D) Gravitating back to hands-on work and missing their prior IC depth
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Case Study explicitly describes these specific signs of mismatch.*
 *Learning objective tested: #4, #5*
 *Difficulty: Easy*
@@ -455,12 +455,12 @@ D) No noticeable change in behavior or engagement at all
 ---
 
 **7. What was the corrective response in the Detailed Case Study once the mismatch was identified?**
-A) The PM was terminated from the organization entirely
-B) A candid conversation with leadership led to a transition to an IC-track Staff PM role, a genuine lateral move rather than a demotion
-C) The PM was forced to remain in the management role indefinitely
-D) The organization eliminated its IC track entirely in response
+A) A talk with leadership led to a lateral move into an IC-track Staff role
+B) The organization eliminated its IC track entirely in response
+C) The PM was required to remain in the management role indefinitely
+D) The PM left the organization rather than address the mismatch
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Case Study explicitly describes this corrective transition as a genuine lateral move, illustrating the dual-ladder structure's value.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -468,12 +468,12 @@ D) The organization eliminated its IC track entirely in response
 ---
 
 **8. Why does this lesson describe the corrective outcome in the Case Study as illustrating "the core value of the dual-ladder structure"?**
-A) Because it shows that management is always the superior choice
-B) Because it shows that a mismatched initial choice can be corrected without loss of career standing, when both tracks are genuinely available and respected
-C) Because it shows that IC roles are only available to those who fail at management
-D) Because it shows that career changes are always easy and consequence-free
+A) Because it proves career changes are always simple and painless
+B) Because it shows IC roles exist only for those who fail at management
+C) A mismatched choice could be corrected without losing career standing
+D) Because it proves management is always the objectively better track
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Case Study explicitly frames this correction as illustrating the dual-ladder structure's value in allowing genuine course-correction.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -481,10 +481,10 @@ D) Because it shows that career changes are always easy and consequence-free
 ---
 
 **9. What does Google's APM program illustrate about PM career development, according to this lesson?**
-A) That PM judgment cannot be developed through any structured program
-B) That deliberate, structured development — mentorship, varied rotations, explicit skill-building — accelerates genuine judgment development more reliably than unstructured, incidental experience alone
-C) That only Google has ever successfully developed PM talent
-D) That APM programs guarantee eventual promotion to CEO
+A) That only Google has ever successfully developed strong PM talent
+B) Structured mentorship and rotation build judgment faster than incidental learning
+C) That APM alumni are guaranteed an eventual promotion to CEO
+D) That structured programs cannot meaningfully accelerate judgment
 
 *Correct answer: B*
 *Explanation: The Theory section and Real Company Example both explain this exact principle about structured development.*
@@ -494,25 +494,25 @@ D) That APM programs guarantee eventual promotion to CEO
 ---
 
 **10. Why does this lesson caution against assuming IC-track seniority is a "consolation prize"?**
-A) Because IC-track roles do not actually exist in most organizations
-B) Because Staff and Principal-level IC PMs often carry organizational influence and scope comparable to management-track leaders, exercised through different mechanisms, not through a lesser path
-C) Because IC-track roles are always more prestigious than management-track roles
-D) Because management-track roles are always harder to obtain
+A) Because management-track roles are always harder to obtain than IC roles
+B) Because IC-track roles are consistently viewed as more prestigious
+C) Because IC-track roles rarely exist inside larger organizations
+D) Staff and Principal IC PMs often carry scope comparable to management leaders
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Common Beginner Mistake #4 explains this exact mischaracterization and the genuine comparable scope of senior IC roles.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked whether they're interested in a management or IC track long-term, and answers: "Management, obviously — that's the only way to keep growing." Based on this lesson's Interview Perspective section, what does this answer signal?**
-A) Strong, well-reasoned career planning
-B) A lack of genuine self-assessment, defaulting to management as the assumed correct answer rather than reflecting on actual fit and interest, per the Fit Table
-C) Correct understanding of PM career structures, since management is indeed the only path to growth
-D) Appropriate ambition that should be viewed entirely positively
+**11. (Interview Reasoning) A candidate is asked whether they're interested in a management or IC track long-term, and answers: "Management, obviously — that's the only way to keep growing." What does this answer signal?**
+A) A lack of genuine self-assessment, defaulting to management by assumption
+B) Correct understanding, since management is indeed the sole growth path
+C) Appropriate ambition that interviewers view as an entirely positive sign
+D) Strong, well-reasoned long-term career planning
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Interview Perspective section states that a strong answer reflects genuine self-assessment, not an assumption that management is the only path, which this answer fails to demonstrate.*
 *Learning objective tested: #1, #3*
 *Difficulty: Hard*
@@ -520,23 +520,23 @@ D) Appropriate ambition that should be viewed entirely positively
 ---
 
 **12. Using the Scope Ladder, which of the following would represent genuine career progression for an IC-track PM?**
-A) Receiving a new title with no change in the actual scope of products or influence
-B) Taking on ownership of a broader portfolio of related products, requiring higher-altitude judgment while still not managing direct reports
-C) Managing a team of three PMs, requiring a shift to the management track
-D) Remaining in an identical role with identical scope for an extended period, regardless of title
+A) Remaining in an identical role with identical scope for years on end
+B) Receiving a new title with no change in actual scope or influence
+C) Taking on ownership of a broader portfolio while still not managing reports
+D) Managing a team of three PMs, which requires shifting to the management track
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This reflects genuine IC-track scope expansion (portfolio-level ownership) as described in the Scope Ladder, distinct from either a title-only change or a management-track move.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A PM is offered a management-track promotion and, using the Fit Table, finds that their honest answers lean consistently toward valuing hands-on product work and finding extensive coaching/organizational conversations draining. What is the most defensible next step, according to this lesson?**
-A) Accept the promotion regardless, since declining might appear unambitious
-B) Seriously consider declining the management-track offer in favor of continued or expanded IC-track responsibility, recognizing that a mismatch between genuine fit and the offered role risks the disengagement illustrated in this lesson's Case Study
-C) Accept the promotion but plan to do as little management work as possible
-D) Leave the organization entirely rather than address the mismatch directly
+**13. (Product Thinking) A PM is offered a management-track promotion and, using the Fit Table, finds that their honest answers lean consistently toward valuing hands-on product work and finding extensive coaching/organizational conversations draining. What is the most defensible next step?**
+A) Leave the organization entirely rather than address the mismatch directly
+B) Seriously consider declining the offer in favor of continued IC-track growth
+C) Accept the promotion regardless, since declining might appear unambitious
+D) Accept the role but privately plan to minimize actual management duties
 
 *Correct answer: B*
 *Explanation: This reflects the lesson's core recommendation — using honest self-assessment to guide the choice, rather than defaulting to acceptance out of assumption or fear of appearing unambitious.*
@@ -546,25 +546,25 @@ D) Leave the organization entirely rather than address the mismatch directly
 ---
 
 **14. Which of the following best reflects a career move motivated by genuine self-assessment, rather than assumption or prestige-seeking, per this lesson?**
-A) Accepting a management role solely because it comes with a more senior-sounding title
-B) Carefully considering, using a structured framework like the Fit Table, whether the actual day-to-day work of a prospective role (whether IC or management track) genuinely energizes rather than drains, before deciding
-C) Accepting any promotion offered without further reflection, to avoid seeming difficult
-D) Declining every promotion offer by default, regardless of genuine interest or fit
+A) Declining every promotion offered by default, regardless of genuine fit
+B) Accepting any promotion offered without reflection, to avoid seeming difficult
+C) Accepting a management role solely for its more senior-sounding title
+D) Weighing, via the Fit Table, whether the daily work would truly energize or drain
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This reflects genuine, structured self-assessment as recommended throughout this lesson, in contrast to either automatic acceptance or automatic refusal.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) An organization has historically offered only a management track, with no formal IC-track option beyond a senior individual-contributor title with limited scope growth. A highly capable IC PM is being pushed toward management despite expressing hesitation. Using this lesson's frameworks, what is the most defensible organizational response?**
-A) Insist the PM accept the management role regardless of their hesitation, since no alternative path exists
-B) Recognize the absence of a genuine dual-ladder structure as an organizational gap, and consider developing a genuine IC-track path with real scope growth (echoing the Scope Ladder) as an alternative to management, rather than forcing a potentially mismatched choice due to a structural gap in the organization's career framework
-C) Eliminate the individual's role entirely if they decline the management promotion
-D) Assume no IC-track alternative could ever be developed, regardless of the organization's specific circumstances
+**15. (Product Thinking, Highest Difficulty) An organization has historically offered only a management track, with no formal IC-track option beyond a senior title with limited scope growth. A highly capable IC PM is being pushed toward management despite expressing hesitation. What is the most defensible organizational response?**
+A) Recognize the missing dual-ladder as a structural gap and build a genuine IC-track path
+B) Insist the PM accept the management role, since no alternative currently exists
+C) Eliminate the individual's role entirely if they decline the promotion
+D) Assume no IC-track alternative could ever fit the organization's needs
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This applies the lesson's dual-ladder principle at the organizational level — recognizing that forcing a mismatched choice due to a missing genuine IC track is itself a fixable structural gap, not an unavoidable constraint, echoing the lesson's broader argument for legitimate dual-ladder structures.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*

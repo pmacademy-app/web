@@ -384,12 +384,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why do AI features often require evaluation methods beyond standard manual spot-checks?**
-A) Because AI features are always bug-free by design
-B) Because many AI systems are probabilistic — the same input can produce different outputs across invocations — so a small number of manually-tested examples provides weak assurance about the system's true output distribution
-C) Because manual testing is illegal for AI products
-D) Because AI features never need to be tested at all
+A) Many AI systems are probabilistic, so a few examples give weak assurance
+B) Manual testing is formally prohibited for any AI-powered product
+C) AI features are always completely bug-free by design
+D) AI features technically require no testing before launch
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Theory section explains this exact reasoning about probabilistic systems and the weakness of anecdotal spot-checks.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -397,10 +397,10 @@ D) Because AI features never need to be tested at all
 ---
 
 **2. What is an evaluation set (eval set)?**
-A) A list of every user who has ever used an AI feature
-B) A curated, representative collection of test inputs, covering common and known difficult edge cases, scored systematically against defined quality criteria
-C) A synonym for an A/B test control group
-D) A legal document required before launching any AI feature
+A) A list naming every user who has ever tried an AI feature
+B) A curated, representative set of test inputs scored against quality criteria
+C) A synonym for an A/B test's control group in a live experiment
+D) A legal filing required before any AI feature can launch
 
 *Correct answer: B*
 *Explanation: The Theory section defines an eval set exactly this way.*
@@ -410,25 +410,25 @@ D) A legal document required before launching any AI feature
 ---
 
 **3. What is "over-trust," in the context of AI feature design?**
-A) A user having no opinion about an AI feature's reliability
-B) A user treating AI outputs as more reliable than they actually are, potentially acting on incorrect information without verification
-C) A synonym for a well-calibrated trust relationship
-D) A term that only applies to traditional deterministic software
+A) A user holding no particular opinion about a feature's reliability
+B) A term that applies only to traditional, deterministic software
+C) Treating AI outputs as more reliable than they actually are
+D) A synonym for a healthy, well-calibrated trust relationship
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Theory section defines over-trust exactly this way, as one of Trust Calibration's two failure modes.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. What is "under-trust," and why is it also a problem, not just over-trust?**
-A) Under-trust is not a real phenomenon and has no product implications
-B) Under-trust occurs when users discount genuinely useful and accurate AI outputs due to skepticism or a prior bad experience, causing real value to be lost
-C) Under-trust only affects traditional software, never AI features
-D) Under-trust is always preferable to over-trust in every context
+**4. What is "under-trust," and why does it matter alongside over-trust?**
+A) Under-trust is not a real phenomenon with any product implications
+B) Under-trust is always preferable to over-trust in every context
+C) Under-trust affects only traditional software, never AI features
+D) Users discount genuinely useful AI outputs, and real value is lost
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Theory section explains under-trust as a distinct, genuine problem — lost value from discounting useful outputs — alongside over-trust.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -436,12 +436,12 @@ D) Under-trust is always preferable to over-trust in every context
 ---
 
 **5. How does this lesson extend Lesson 1's output-versus-outcome discipline to AI features?**
-A) It argues AI features should never be evaluated using output/outcome thinking
-B) It frames adding AI capability as itself an output, not an outcome, recommending PMs ask whether a problem genuinely requires AI's specific capabilities rather than building AI for competitive signaling alone
-C) It claims AI features are always outcomes, never outputs
-D) It has no connection to Lesson 1's framework at all
+A) Adding AI capability is itself an output, so a PM should ask if it's truly needed
+B) AI features, this lesson argues, should never be judged by output/outcome thinking
+C) It claims AI features are always outcomes, never outputs, by definition
+D) It states this framework has no connection to AI feature decisions
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Theory section explicitly extends this distinction to AI feature decisions.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -449,10 +449,10 @@ D) It has no connection to Lesson 1's framework at all
 ---
 
 **6. In the Detailed Case Study, why did the customer support assistant generate a sharp rise in escalations after launch?**
-A) The assistant refused to answer any questions at all
-B) The assistant confidently generated plausible-sounding but factually incorrect answers to less-common questions outside the twenty scenarios manually tested pre-launch, and users trusted its fluent tone and acted on incorrect information
-C) The assistant was too slow to respond to user questions
-D) The assistant was shut down immediately after launch
+A) The assistant refused outright to answer any user questions
+B) It confidently produced incorrect answers on less-common questions, and users trusted its tone
+C) The assistant responded far too slowly for users to stay engaged
+D) The assistant was disabled entirely soon after its initial launch
 
 *Correct answer: B*
 *Explanation: The Case Study explicitly describes this exact failure pattern — confident but incorrect answers on less-common questions, combined with unwarranted user trust.*
@@ -462,12 +462,12 @@ D) The assistant was shut down immediately after launch
 ---
 
 **7. What specific design gap contributed to the Case Study's Trust Calibration failure?**
-A) The assistant had too many confidence signals, confusing users
-B) The assistant's uniformly confident, fluent tone gave users no signal to distinguish reliable answers from unreliable ones
-C) The assistant refused to provide any answers without human review
-D) The assistant only worked for a small subset of users
+A) The assistant displayed too many confidence signals, confusing users
+B) The assistant refused to answer without first securing human review
+C) Its uniformly confident tone gave no signal distinguishing reliable answers
+D) The assistant was only ever available to a small subset of users
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Case Study explicitly identifies uniform confidence presentation, with no reliability signaling, as the specific design gap.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
@@ -475,12 +475,12 @@ D) The assistant only worked for a small subset of users
 ---
 
 **8. What corrective design change did the team implement in the Detailed Case Study?**
-A) Removing the assistant entirely with no replacement
-B) Building a genuine eval set and introducing explicit confidence signaling with a low-confidence escalation trigger routing uncertain responses to human review
-C) Increasing the assistant's confidence level uniformly across all responses
-D) Removing all human review from the process entirely
+A) Removing the assistant entirely, with no feature replacing it
+B) Raising the assistant's confidence level uniformly across all responses
+C) Removing human review from the escalation process altogether
+D) Building an eval set and adding confidence signaling with human escalation
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Case Study explicitly describes this two-part corrective response — systematic evaluation plus trust-calibrated design with human-in-the-loop escalation.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -488,10 +488,10 @@ D) Removing all human review from the process entirely
 ---
 
 **9. How does this lesson connect the Case Study's original shortcut (twenty anecdotal tests) to Lesson 57's ethical debt concept?**
-A) There is no connection between the two concepts
-B) The shortcut of shipping on limited anecdotal testing deferred real evaluation cost, which then compounded into actual user harm and support burden once the feature reached real-world scale — mirroring ethical debt's principal-and-interest structure
-C) Ethical debt only applies to non-AI features
-D) The Case Study explicitly denies any relationship to ethical debt
+A) There is no meaningful connection between the two concepts at all
+B) The shortcut deferred evaluation cost, which compounded into real harm
+C) Ethical debt, the lesson states, applies only to non-AI product features
+D) The Case Study explicitly denies any relation to ethical debt
 
 *Correct answer: B*
 *Explanation: The Case Study explicitly draws this parallel to Lesson 57's ethical debt framework in its concluding analysis.*
@@ -501,25 +501,25 @@ D) The Case Study explicitly denies any relationship to ethical debt
 ---
 
 **10. Why does this lesson argue that hallucination and bias are genuine product responsibilities, not purely technical concerns?**
-A) Because PMs are legally required to personally fix all AI model errors
-B) Because a PM shipping an AI feature bears responsibility for the human-in-the-loop safeguards, transparency, and appropriate use-case scoping that mitigate these known risks — product judgment a PM is specifically positioned to contribute, echoing Lesson 37's context-not-commands principle
-C) Because engineers are incapable of addressing hallucination or bias at all
-D) Because this is purely a marketing concern, unrelated to product design
+A) A PM bears responsibility for the safeguards that mitigate these risks
+B) PMs are legally required to personally rewrite any flawed AI model
+C) Engineers are entirely incapable of addressing hallucination or bias
+D) This is purely a marketing concern, unrelated to product design
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Common Beginner Mistake #5 explains this exact reasoning about product-level responsibility for AI-specific risk mitigation.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked how they'd evaluate an AI feature before launch, and answers: "I'd try it myself a few times and see if the outputs look good." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; personal spot-checking is always sufficient for AI features
-B) It describes exactly the weak, anecdotal assurance this lesson warns against, rather than systematic eval set construction covering common and edge cases
-C) It correctly demonstrates strong hands-on product involvement
-D) It shows an appropriate level of caution before launch
+**11. (Interview Reasoning) A candidate is asked how they'd evaluate an AI feature before launch, and answers: "I'd try it myself a few times and see if the outputs look good." What is the weakness in this answer?**
+A) There is no weakness; personal spot-checking is always sufficient
+B) It correctly demonstrates strong, appropriately hands-on involvement
+C) It describes weak, anecdotal assurance rather than systematic evaluation
+D) It shows an appropriately cautious approach before any launch
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Interview Perspective section states that a strong answer reaches for systematic eval set construction, not a small number of manual spot-checks.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
@@ -528,24 +528,24 @@ D) It shows an appropriate level of caution before launch
 
 **12. Using the AI Feature Readiness Checklist, what does "correction mechanism" refer to?**
 A) A legal document users must sign before using an AI feature
-B) A design allowing users to easily flag or correct an incorrect AI output, rather than being forced into a binary trust-or-abandon choice
-C) A technical process for retraining the underlying model
-D) A feature only relevant to non-AI software
+B) A technical process solely for retraining the underlying model
+C) A feature relevant only to non-AI, traditional software products
+D) A design letting users easily flag or correct an incorrect output
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Framework Explanation section's checklist defines this exact concept.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A team wants to add an AI chatbot to answer simple, well-defined questions with a small, fixed set of correct answers (e.g., "what are your business hours?"). Using the "AI for AI's sake" discipline, what should the team consider?**
-A) Immediately build the AI-powered chatbot, since AI is always the best solution for any user-facing question
-B) Consider whether a simpler, deterministic solution (like a rules-based FAQ lookup) would serve this narrow, well-defined need with less complexity and risk than a probabilistic AI system, reserving AI for cases genuinely requiring its specific capabilities (ambiguous input, novel content generation)
-C) Avoid answering the question at all, since no solution is appropriate
-D) Build both an AI and a non-AI solution simultaneously with no further analysis
+**13. (Product Thinking) A team wants to add an AI chatbot to answer simple, well-defined questions with a small, fixed set of correct answers (e.g., "what are your business hours?"). What should the team consider?**
+A) Whether a simpler, deterministic FAQ lookup would serve this narrow need better
+B) Immediately building the AI chatbot, since AI suits any user-facing question
+C) Avoiding the question entirely, since no solution is ever appropriate
+D) Building both an AI and non-AI version simultaneously, without analysis
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This directly applies the lesson's core discipline — a well-defined, narrow question with fixed correct answers is a strong candidate for a simpler deterministic solution rather than an AI system, consistent with Lesson 1's output-vs-outcome reasoning extended here.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
@@ -553,25 +553,25 @@ D) Build both an AI and a non-AI solution simultaneously with no further analysi
 ---
 
 **14. Which of the following best reflects a well-calibrated Trust Calibration design, per this lesson?**
-A) Presenting all AI outputs with identical, high confidence regardless of the underlying request's actual difficulty or the system's measured reliability for that type of request
-B) Signaling lower confidence and encouraging verification for request types where the eval set shows lower actual reliability, while presenting higher confidence for well-tested, reliably-handled request types
-C) Never providing any confidence signaling under any circumstances, to keep the interface simple
-D) Always defaulting to the lowest possible confidence signal regardless of actual reliability
+A) Presenting every output with identical high confidence regardless of reliability
+B) Never providing any confidence signaling, to keep the interface simple
+C) Signaling lower confidence for request types the eval set shows are less reliable
+D) Defaulting to the lowest possible confidence signal regardless of actual accuracy
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This reflects the Trust Calibration Curve's core principle — confidence signaling should track actual, measured reliability, not be uniform or arbitrary.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM is under pressure to ship an AI-powered feature quickly to match a competitor's recent announcement, with limited time for full eval set construction. Using this lesson's frameworks, what is the most defensible approach?**
-A) Ship immediately with no evaluation at all, relying entirely on competitive pressure as justification
-B) Build a reduced but still representative eval set prioritizing the highest-risk and highest-volume use cases first (informed by Lesson 57's Harm Radius), implement conservative trust-calibration design (clear low-confidence signaling, human-in-the-loop fallback for uncertain cases) as a safeguard given the necessarily limited pre-launch testing, and communicate the trade-off honestly to stakeholders (echoing Lesson 54's no-surprises principle) rather than presenting a rushed feature as fully validated
-C) Delay the launch indefinitely until a completely exhaustive eval set covering every conceivable case has been built
-D) Ship the feature exactly as originally planned, but rename it to avoid appearing to compete directly with the competitor's announcement
+**15. (Product Thinking, Highest Difficulty) A PM is under pressure to ship an AI-powered feature quickly to match a competitor's recent announcement, with limited time for full eval set construction. What is the most defensible approach?**
+A) Ship immediately with no evaluation, relying on competitive pressure alone
+B) Delay launch indefinitely until an exhaustive eval set covers every case
+C) Ship exactly as planned, but rename the feature to avoid comparison
+D) Build a reduced eval set on the highest-risk cases and add conservative safeguards
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This reflects a sophisticated, risk-prioritized application of the lesson's frameworks under real time pressure — rather than either skipping evaluation entirely or demanding impossible perfection, focusing limited evaluation effort on the highest-risk cases while compensating with conservative trust-calibration design and honest stakeholder communication is the most defensible middle path.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*

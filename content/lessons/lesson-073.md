@@ -312,194 +312,194 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why do B2B purchasing decisions typically involve multiple distinct stakeholder roles?**
-A) B2B products always require more features than consumer products
-B) The functions of using, deciding, and paying for a product are frequently distributed across different people with different incentives
-C) B2B companies are legally required to have multiple decision-makers for every purchase
-D) There is no meaningful difference between B2B and consumer purchasing decisions
+A) Because the functions of using, deciding, and paying for the product are typically split across different people
+B) Because procurement regulations in most industries mandate multi-person approval for any purchase
+C) Because B2B software is generally more technically complex to evaluate than consumer software
+D) Because B2B vendors are said to intentionally involve more people to slow competitors' sales cycles
 
-*Correct answer: B*
-*Explanation: This distribution of functions across different people is the central distinguishing feature of B2B purchasing versus consumer purchasing.*
+*Correct answer: A*
+*Explanation: The lesson's Theory section locates the central difference from consumer purchasing in this split: the person using, the person deciding, and the person paying are frequently not the same individual.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the four roles in the Stakeholder Compass?**
-A) Marketing, Sales, Engineering, Design
+A) Decision Maker, Influencer, Gatekeeper, User
 B) Champion, Economic Buyer, Technical Evaluator, End User
-C) CEO, CFO, CTO, CMO
-D) Founder, Investor, Board Member, Advisor
+C) Sponsor, Procurement Lead, IT Admin, Power User
+D) Advocate, Budget Holder, Security Reviewer, Daily Operator
 
 *Correct answer: B*
-*Explanation: These are the four roles explicitly mapped by the Stakeholder Compass introduced in this lesson.*
+*Explanation: These are the four roles the Stakeholder Compass explicitly names. The other options describe similar-sounding but generic labels that are not the lesson's actual terminology.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What does the Technical Evaluator primarily assess?**
-A) Return on investment relative to cost
-B) Security, compliance, integration, and technical risk
-C) Personal internal advocacy credibility
-D) Day-to-day task fit and usability
+A) Return on investment relative to other budget priorities
+B) Day-to-day task fit and ease of use for the person using the product
+C) Security, compliance, integration, and technical risk
+D) Personal credibility with internal peers and leadership
 
-*Correct answer: B*
-*Explanation: The Technical Evaluator's role, connected directly to Lesson 72's Rung 3 gatekeepers, focuses on risk and compliance assessment.*
+*Correct answer: C*
+*Explanation: The Technical Evaluator, connected directly to Lesson 72's Rung 3 gatekeepers, is defined by this risk and compliance assessment role, distinct from ROI (Economic Buyer) or usability (End User).*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. What is the Champion-Without-Authority Trap?**
-A) A Champion who has too much budget authority relative to their role
-B) Over-relying on an enthusiastic Champion's account of deal progress without directly engaging the Economic Buyer or Technical Evaluator
-C) A situation where no Champion exists at all in a given account
-D) A technical vulnerability in enterprise software systems
+A) A Champion who loses interest in the product once the pilot phase ends
+B) A situation where a Champion secretly holds more budget authority than the vendor realizes
+C) A technical flaw discovered late in a security review process
+D) Treating an enthusiastic Champion's account of progress as a substitute for direct engagement with the Economic Buyer or Technical Evaluator
 
-*Correct answer: B*
-*Explanation: This trap specifically describes mistaking Champion enthusiasm for overall deal progress without engaging the roles with actual approval authority.*
+*Correct answer: D*
+*Explanation: The trap specifically describes mistaking a Champion's genuine enthusiasm for overall deal progress, without engaging the roles that actually hold approval authority.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. What does the Economic Buyer primarily care about?**
-A) Day-to-day usability of the product
-B) Return on investment and total cost relative to alternatives
-C) Security certifications and compliance requirements
-D) Personal credibility among their internal peers
+A) Return on investment and total cost relative to alternative uses of the budget
+B) Whether the vendor's security certifications meet compliance requirements
+C) Whether the interface is easy for daily users to learn
+D) Whether the Champion has enough internal credibility to advocate for the deal
 
-*Correct answer: B*
-*Explanation: The Economic Buyer's defining concern, as described in the Theory section, is ROI and cost relative to alternative uses of the same budget.*
+*Correct answer: A*
+*Explanation: The Theory section defines the Economic Buyer by this cost and ROI lens, distinct from the End User's usability concern or the Technical Evaluator's compliance concern.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **6. Why might a pitch optimized for an End User's concerns fail to resonate with an Economic Buyer?**
-A) End Users and Economic Buyers always have identical concerns
-B) The Economic Buyer evaluates the purchase primarily in terms of ROI and cost, which task-fit-focused messaging may not address
-C) Economic Buyers never have any interest in product functionality
-D) End Users always have more purchasing authority than Economic Buyers
+A) Because end users are said to typically hold more purchasing authority than economic buyers do
+B) Because the economic buyer weighs return on investment and cost, which usability-focused messaging may not speak to
+C) Because economic buyers rarely have any awareness that a purchasing decision is happening
+D) Because economic buyers and end users are generally said to share identical priorities
 
 *Correct answer: B*
-*Explanation: Each role's distinct success criteria means a narrative tailored to one role may not address another's actual concerns.*
+*Explanation: Each role's distinct success criteria means a narrative tailored to task fit may leave the Economic Buyer's actual ROI question unanswered.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Case Study, what was the actual root cause of the stalled deal?**
-A) The Champion was not genuinely enthusiastic about the product
-B) The startup had invested exclusively in the Champion role, never directly engaging the Economic Buyer or Technical Evaluator, both of whom held actual approval authority
-C) The product itself was technically deficient
-D) The sales team never spoke with the Champion at all
+A) The startup's sales team had failed to provide the champion with adequate product training
+B) The retail company's IT department had rejected the product outright during a formal review
+C) The startup relied entirely on the champion's account of progress, never directly engaging the Economic Buyer or Technical Evaluator
+D) The data analyst champion had exaggerated her enthusiasm for the product from the start
 
-*Correct answer: B*
-*Explanation: The failure was a specific engagement gap with the two roles holding real authority, not a flaw in the Champion's genuine enthusiasm or the product itself.*
+*Correct answer: C*
+*Explanation: The failure traced to an engagement gap with the two roles holding real authority, not to a flaw in the Champion's sincerity or an outright IT rejection, since IT was never actually engaged.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
 **8. Why didn't the Champion in the Case Study raise the need for IT security review earlier?**
-A) She was not genuinely invested in the purchase succeeding
-B) She did not know engaging IT was necessary or was not confident in how to initiate that process herself
-C) IT security review was not actually required at her company
-D) The startup explicitly told her not to contact IT
+A) She had already confirmed informally with IT that no review would be required
+B) The startup's sales team had explicitly told her to avoid contacting IT
+C) Her company's IT department reportedly had no formal security review policy at all
+D) She was uncertain how to initiate the process and didn't realize engaging IT was necessary
 
-*Correct answer: B*
-*Explanation: The case study describes the Champion's limited visibility into and confidence navigating the security review process as part of why this gap went unaddressed.*
+*Correct answer: D*
+*Explanation: The case study attributes the gap to the Champion's limited visibility into, and confidence navigating, the security review process, not to an absent policy or explicit instruction to avoid it.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
 **9. According to the Stakeholder Engagement Checklist, what should a "no" on direct Economic Buyer engagement signal?**
-A) A minor and inconsequential gap
-B) A significant risk to deal progress, given how consistently this role holds effective veto authority
-C) That the Champion's advocacy is sufficient to proceed without further concern
-D) That the deal should be immediately abandoned
+A) A significant risk to deal progress, given how consistently this role holds effective veto authority
+B) Evidence that the Economic Buyer role simply doesn't apply to this particular account
+C) Confirmation that the deal should nonetheless proceed straight to contract
+D) A negligible concern as long as the Champion remains enthusiastic about the deal
 
-*Correct answer: B*
-*Explanation: The lesson explicitly treats missing direct engagement with the Economic Buyer as a significant risk warranting further action, not abandonment or dismissal.*
+*Correct answer: A*
+*Explanation: The checklist explicitly treats missing direct Economic Buyer engagement as a significant risk warranting further action, not as something Champion enthusiasm can offset.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **10. Why might a single person occupy multiple Stakeholder Compass roles simultaneously in smaller organizations?**
-A) Smaller organizations are legally prohibited from having distinct stakeholder roles
-B) A small business owner, for example, may serve as Economic Buyer, Technical Evaluator, and End User all at once
-C) The Stakeholder Compass framework does not apply to any organization with fewer than four employees
-D) Smaller organizations never make B2B purchasing decisions
+A) Smaller organizations are described as always assigning a single Champion who also controls the budget
+B) A small business owner, for instance, may simultaneously be the Economic Buyer, Technical Evaluator, and End User
+C) The Stakeholder Compass framework is described as applying only once a company exceeds fifty employees
+D) Smaller organizations are treated as legally prohibited from having distinct stakeholder roles
 
 *Correct answer: B*
-*Explanation: The Real World Perspective section explicitly describes this consolidation of roles as common and reasonable at small organizational scale.*
+*Explanation: The Real World Perspective section describes this consolidation of roles as common and reasonable at small organizational scale, not as a legal restriction or a framework limitation.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **11. What do large enterprise sales organizations typically maintain, per the Real World Perspective section?**
-A) No formal process for identifying stakeholder roles
-B) Formal account-mapping processes explicitly identifying and tracking engagement status for each Stakeholder Compass role
-C) A policy of engaging only the End User throughout the entire sales process
-D) A prohibition on engaging Economic Buyers directly
+A) A rule against engaging Technical Evaluators until a contract is nearly finalized
+B) Reliance on informal, verbally-reported updates from a single account executive
+C) Formal account-mapping processes that explicitly track engagement status for each Compass role
+D) A policy of engaging only the Champion and End User throughout the deal cycle
 
-*Correct answer: B*
-*Explanation: The Real World Perspective section describes formal, structured account mapping as characteristic of large-scale enterprise sales organizations.*
+*Correct answer: C*
+*Explanation: The Real World Perspective section describes structured, tracked account mapping as characteristic of large-scale enterprise sales organizations, the opposite of relying on a single informal source.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **12. (Scenario) A sales team has strong End User feedback and Champion enthusiasm for a deal, but has never spoken directly with the account's IT security team. Using the Stakeholder Compass, what should the team do next?**
-A) Proceed to close the deal, since End User and Champion enthusiasm indicate strong overall progress
-B) Proactively engage the Technical Evaluator directly, given their typical veto authority, rather than assuming their approval will follow automatically
-C) Wait for the Champion to independently handle all remaining stakeholder engagement
-D) Conclude that Technical Evaluator engagement is unnecessary if End User feedback is strong enough
+A) Treat IT engagement as optional, since technical evaluators rarely block deals with strong internal support
+B) Move forward to closing, since strong Champion and End User feedback typically predicts IT approval
+C) Ask the Champion to represent the deal to IT security on the sales team's behalf going forward
+D) Proactively engage the Technical Evaluator directly, rather than assuming their approval will follow automatically
 
-*Correct answer: B*
-*Explanation: This directly applies the lesson's core diagnostic: strong performance with two roles does not substitute for direct engagement with the Technical Evaluator, who holds separate veto authority.*
+*Correct answer: D*
+*Explanation: Strong performance with two roles does not substitute for direct engagement with the Technical Evaluator, who holds separate veto authority regardless of internal enthusiasm elsewhere.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A PM is told a deal is "clearly on track" based on a Champion's repeated assurances, despite no direct contact with the Economic Buyer in over two months. What is the most defensible response, using this lesson's frameworks?**
-A) Accept the Champion's assurances at face value and continue current momentum
-B) Treat the deal's status with appropriate skepticism and work to establish direct engagement with the Economic Buyer before considering it genuinely on track
-C) Escalate the deal for immediate closing based on Champion enthusiasm alone
-D) Assume the Economic Buyer's approval is a formality that doesn't require direct engagement
+A) Treat the deal's status with appropriate skepticism and work to establish direct engagement with the Economic Buyer
+B) Reassign the account to a different salesperson who might get a faster response from the buyer
+C) Escalate the deal internally for immediate closing based on the Champion's account
+D) Accept the Champion's repeated assurances, since consistency over time is generally a strong indicator of progress
 
-*Correct answer: B*
-*Explanation: This mirrors the Case Study's core lesson: secondhand assurances from a Champion are not a substitute for confirmed direct engagement with roles holding actual approval authority.*
+*Correct answer: A*
+*Explanation: This mirrors the Case Study's core lesson: secondhand assurances from a Champion are not a substitute for confirmed direct engagement with the role holding actual approval authority.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
 **14. (Interview Reasoning) A candidate, asked how they'd manage a complex B2B sales process, describes focusing entirely on maximizing End User satisfaction throughout. What does this most likely signal, per the Interview Perspective section?**
-A) A strong and complete understanding of B2B sales dynamics
-B) A gap in recognizing that Economic Buyer and Technical Evaluator engagement, with their distinct success criteria, are equally necessary for deal progress
-C) That the candidate is ready for a senior enterprise sales leadership role immediately
-D) Nothing meaningful; End User satisfaction is the only relevant factor in B2B deals
+A) Evidence the candidate is prepared to lead an enterprise sales organization immediately
+B) A gap in recognizing that the Economic Buyer and Technical Evaluator, with their own distinct success criteria, also require direct engagement
+C) A complete and well-rounded grasp of what drives complex B2B sales outcomes
+D) An accurate read of B2B sales, since End User satisfaction is said to ultimately drive every decision
 
 *Correct answer: B*
-*Explanation: The Interview Perspective section specifically listens for recognition of all four Compass roles, not exclusive focus on the End User.*
+*Explanation: The Interview Perspective section specifically listens for recognition of all four Compass roles; exclusive focus on the End User omits two roles that hold real approval authority.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
 
 ---
 
 **15. (Product Thinking, Highest Difficulty) A B2B deal has strong Champion and End User enthusiasm but has stalled in "review" for two months with no clear explanation, and neither the Economic Buyer nor Technical Evaluator has been directly engaged. Using only the frameworks in this lesson, what is the most defensible next step?**
-A) Continue relying on the Champion's updates and wait for the review process to resolve on its own
-B) Proactively work to establish direct engagement with both the Economic Buyer and Technical Evaluator, preparing differentiated materials matched to each role's distinct success criteria, without undermining the Champion's internal credibility
-C) Escalate pressure on the Champion to personally resolve the review process faster
-D) Conclude the deal is unlikely to close and deprioritize the account entirely without further investigation
+A) Deprioritize the account, since a two-month stall without explanation usually indicates the deal is dead
+B) Continue relying on the Champion's updates and wait for the internal review process to resolve itself
+C) Proactively establish direct engagement with both the Economic Buyer and Technical Evaluator, using materials matched to each role's concerns, without undermining the Champion's credibility
+D) Apply pressure directly on the Champion to personally push the review process through faster
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This mirrors the Reflection Exercise and Case Study: the correct response neither passively waits nor abandons the account, but proactively establishes engagement with the roles holding actual authority, using appropriately differentiated materials.*
 *Learning objective tested: #2, #3, #4, #5*
 *Difficulty: Hard*

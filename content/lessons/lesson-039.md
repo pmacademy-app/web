@@ -397,195 +397,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What are the two cost components of technical debt, per its financial metaphor?**
-A) Interest and dividends
+A) Revenue and expense
 B) Principal and interest
-C) Revenue and expense
+C) Interest and dividends
 D) Assets and liabilities
 
 *Correct answer: B*
-*Explanation: The Theory section defines technical debt's cost as principal (eventual proper-implementation cost) plus ongoing interest (extra cost on future changes).*
+*Explanation: Technical debt's cost is principal (eventual proper-implementation cost) plus ongoing interest (extra cost on future changes).*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the two axes of the Technical Debt Quadrant?**
-A) Cheap vs. expensive, and fast vs. slow
-B) Deliberate vs. inadvertent, and reckless vs. prudent
-C) Frontend vs. backend, and small vs. large
-D) Scrum vs. Kanban, and Now vs. Later
+A) Frontend vs. backend, and small vs. large
+B) Cheap vs. expensive, and fast vs. slow
+C) Scrum vs. Kanban, and Now vs. Later
+D) Deliberate vs. inadvertent, and reckless vs. prudent
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly names these two axes as defining Fowler's Technical Debt Quadrant.*
+*Correct answer: D*
+*Explanation: These two axes define Fowler's Technical Debt Quadrant.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. Which quadrant of the Technical Debt Quadrant represents debt that is being managed well?**
-A) Inadvertent + Reckless
+A) Deliberate + Prudent
 B) Deliberate + Reckless
-C) Deliberate + Prudent
+C) Inadvertent + Reckless
 D) All quadrants represent equally poor management
 
-*Correct answer: C*
-*Explanation: The Theory section identifies Deliberate + Prudent as the only quadrant representing well-managed debt — a conscious trade-off, ideally with a repayment plan.*
+*Correct answer: A*
+*Explanation: Deliberate + Prudent is the only quadrant representing well-managed debt — a conscious trade-off, ideally with a repayment plan.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**4. How does unmanaged technical debt typically affect a team's effective throughput over time, according to this lesson?**
-A) It has no effect on throughput as long as team size stays constant
-B) It quietly degrades throughput, since an increasing share of future work must navigate past shortcuts, increasing cycle time even without any explicit decision to slow down
-C) It always increases throughput by simplifying future work
-D) It only affects throughput if the team switches from Scrum to Kanban
+**4. How does unmanaged technical debt typically affect a team's effective throughput over time?**
+A) It always increases throughput by simplifying future work
+B) It only affects throughput if the team switches from Scrum to Kanban
+C) It quietly degrades throughput, since an increasing share of future work must navigate past shortcuts, increasing cycle time
+D) It has no effect on throughput as long as team size stays constant
 
-*Correct answer: B*
-*Explanation: The Theory section explains this compounding dynamic directly, connecting it to Lesson 33's Little's Law reasoning about cycle time and throughput.*
+*Correct answer: C*
+*Explanation: This compounding dynamic connects directly to Lesson 33's Little's Law reasoning about cycle time and throughput.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Whose responsibility is it, according to this lesson, to judge the technical severity of a specific code shortcut?**
-A) The PM's, exclusively
+A) Sales leadership's
 B) Engineering's — the PM owns the business trade-off judgment, not the technical severity assessment
-C) Sales leadership's
+C) The PM's, exclusively
 D) No one; technical debt severity cannot be assessed by anyone
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #4 explicitly states that assessing a shortcut's technical severity is engineering's domain, echoing Lesson 37's context-not-commands principle, while the PM owns the business trade-off decision.*
+*Explanation: Assessing a shortcut's technical severity is engineering's domain, echoing Lesson 37's context-not-commands principle, while the PM owns the business trade-off decision.*
 *Learning objective tested: #4, #5*
 *Difficulty: Easy*
 
 ---
 
-**6. According to the Debt Paydown Prioritization Table, why does debt in a high-change-frequency code area deserve higher paydown priority than debt in a stable, rarely-touched area?**
-A) High-change-frequency areas are always more expensive to fix
-B) The interest cost compounds faster in areas touched often by future work, making the ongoing cost of leaving it unaddressed higher
-C) Stable areas never accumulate any technical debt
-D) There is no difference in priority based on change frequency
+**6. Why does debt in a high-change-frequency code area deserve higher paydown priority than debt in a stable, rarely-touched area?**
+A) Stable areas never accumulate any technical debt
+B) High-change-frequency areas are always more expensive to fix
+C) There is no difference in priority based on change frequency
+D) The interest cost compounds faster in areas touched often by future work, raising the ongoing cost of leaving it unaddressed
 
-*Correct answer: B*
-*Explanation: The Framework Explanation section explains that interest rate — how much a debt slows down frequent, ordinary work — is a key prioritization factor, and high-change-frequency areas compound interest faster.*
+*Correct answer: D*
+*Explanation: Interest rate — how much a debt slows down frequent, ordinary work — is a key prioritization factor, and high-change-frequency areas compound interest faster.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, why did leadership initially suspect a motivation or performance problem rather than technical debt?**
-A) The engineers explicitly told leadership they were unmotivated
-B) No single decision along the way was flagged as the cause of the slowdown, since the compounding interest cost was invisible in any single Sprint but glaring only in aggregate over time
-C) The team had switched frameworks from Scrum to Kanban
-D) Leadership had no visibility into the team's Sprint reports at all
+A) No single decision along the way was flagged as the cause of the slowdown, since the compounding cost was invisible Sprint-to-Sprint but glaring in aggregate
+B) The team had switched frameworks from Scrum to Kanban
+C) Leadership had no visibility into the team's Sprint reports at all
+D) The engineers explicitly told leadership they were unmotivated
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this as the reason for leadership's mistaken initial diagnosis — the compounding cost was invisible Sprint-to-Sprint.*
+*Correct answer: A*
+*Explanation: This is the reason for leadership's mistaken initial diagnosis — the compounding interest cost was invisible in any single Sprint.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **8. Why does this lesson caution against treating "we'll clean it up later" as a sufficient plan for technical debt?**
-A) Because cleanup should always happen immediately, with zero exceptions
-B) Because without a credible, concrete plan and dedicated capacity, "later" often never arrives, functioning as de facto Deliberate + Reckless debt regardless of good intentions
-C) Because engineering teams are never willing to do cleanup work
-D) Because this violates the Scrum Guide directly
+A) Because this violates the Scrum Guide directly
+B) Because engineering teams are never willing to do cleanup work
+C) Without a credible, concrete plan and dedicated capacity, "later" often never arrives, functioning as de facto reckless debt regardless of good intentions
+D) Because cleanup should always happen immediately, with zero exceptions
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #2 explicitly describes this exact dynamic — vague deferral without a real plan tends to function as reckless debt in practice.*
+*Correct answer: C*
+*Explanation: Vague deferral without a real plan tends to function as reckless debt in practice, regardless of the original good intentions.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. Why is reactive, crisis-driven debt paydown typically more expensive than steady, incremental paydown?**
-A) Because crisis-driven paydown always involves hiring new staff
-B) Because a crisis often requires halting new feature work entirely, rather than simply allocating a modest, sustained share of capacity over time as debt is created
+A) There is no cost difference between the two approaches
+B) A crisis often requires halting new feature work entirely, rather than allocating a modest, sustained share of capacity over time
 C) Because incremental paydown is always slower than crisis paydown
-D) There is no cost difference between the two approaches
+D) Because crisis-driven paydown always involves hiring new staff
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #5 explains that reactive paydown, often requiring a full halt to feature work, tends to be far more disruptive and costly than steady, incremental paydown.*
+*Explanation: Reactive paydown, often requiring a full halt to feature work, tends to be far more disruptive and costly than steady, incremental paydown.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
-**10. (Scenario) A team takes on a data-model shortcut to hit a genuinely fixed, consequential competitive deadline, with an explicit, tracked plan for repaying it within two Sprints after launch. Using the Technical Debt Quadrant, how would this debt most likely be classified, assuming the plan is followed?**
-A) Inadvertent + Reckless
-B) Deliberate + Prudent
-C) Inadvertent + Prudent
-D) This cannot be classified using the Technical Debt Quadrant
+**10. (Scenario) A team takes on a data-model shortcut to hit a genuinely fixed, consequential competitive deadline, with an explicit, tracked plan for repaying it within two Sprints after launch. How would this debt most likely be classified, assuming the plan is followed?**
+A) Inadvertent + Prudent
+B) This cannot be classified using the Technical Debt Quadrant
+C) Inadvertent + Reckless
+D) Deliberate + Prudent
 
-*Correct answer: B*
-*Explanation: A conscious trade-off (deliberate) made with a credible, tracked repayment plan in service of a real deadline (prudent) is a textbook example of Deliberate + Prudent debt.*
+*Correct answer: D*
+*Explanation: A conscious trade-off made with a credible, tracked repayment plan in service of a real deadline is a textbook example of Deliberate + Prudent debt.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked "how do you think about technical debt as a PM?" and answers: "I try to avoid it entirely — any shortcut is a bad idea." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; all technical debt should always be avoided
-B) It fails to recognize that Deliberate + Prudent debt can be a legitimate, sometimes wise trade-off tool, reflecting an overly rigid rather than nuanced understanding of the concept
+**11. (Interview Reasoning) A candidate is asked how they think about technical debt as a PM, and answers: "I try to avoid it entirely — any shortcut is a bad idea." What is the weakness in this answer?**
+A) It fails to recognize that Deliberate + Prudent debt can be a legitimate, sometimes wise trade-off tool, reflecting an overly rigid understanding
+B) It shows strong technical expertise
 C) It correctly reflects the only defensible position on technical debt
-D) It shows strong technical expertise
+D) There is no weakness; all technical debt should always be avoided
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a nuanced answer recognizes debt as a legitimate trade-off tool in some cases, rather than uniformly opposing it, which this answer fails to do.*
+*Correct answer: A*
+*Explanation: A nuanced answer recognizes debt as a legitimate trade-off tool in some cases, rather than uniformly opposing it.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson recommend translating technical debt into "principal and interest" language when advocating to non-technical leadership?**
-A) Because leadership only understands financial terminology and nothing else
-B) Because this framing makes an otherwise abstract, engineering-jargon-heavy concept legible and compellingly comparable to other business trade-offs leadership already reasons about
-C) Because engineering teams require this specific language to do their jobs
-D) Because this framing is required by the Scrum Guide
+A) Because this framing is required by the Scrum Guide
+B) Because engineering teams require this specific language to do their jobs
+C) This framing makes an otherwise abstract, jargon-heavy concept legible and comparable to other business trade-offs leadership already reasons about
+D) Because leadership only understands financial terminology and nothing else
 
-*Correct answer: B*
-*Explanation: The Case Study and Interview Perspective both recommend this translation specifically because it makes the trade-off legible and comparable to trade-offs leadership already understands, rather than relying on engineering jargon.*
+*Correct answer: C*
+*Explanation: This translation makes the trade-off legible and comparable to trade-offs leadership already understands, rather than relying on engineering jargon.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A team has two competing technical debt items: Item A affects a rarely-touched legacy reporting module and would take significant effort to fix; Item B affects a core, frequently-modified checkout flow and would take modest effort to fix. Using the Debt Paydown Prioritization Table, which item most likely deserves priority for limited paydown capacity?**
-A) Item A, because it has existed longer
-B) Item B, because it combines a high interest rate (frequently touched) with a lower principal cost (modest effort), likely a stronger return on limited paydown capacity than Item A's high-effort fix in a rarely-touched area
+**13. (Product Thinking) Item A affects a rarely-touched legacy reporting module and would take significant effort to fix; Item B affects a core, frequently-modified checkout flow and would take modest effort to fix. Which item most likely deserves priority for limited paydown capacity?**
+A) Item A, because legacy code should always be addressed first regardless of context
+B) Item B, because it combines a high interest rate with a lower principal cost, a likely stronger return than Item A's high-effort fix in a rarely-touched area
 C) Neither item should ever be prioritized over new feature work
-D) Item A, because legacy code should always be addressed first regardless of context
+D) Item A, because it has existed longer
 
 *Correct answer: B*
-*Explanation: This directly applies the Debt Paydown Prioritization Table's logic — high interest rate and lower principal cost together suggest a stronger return on paydown investment than a high-effort fix in a low-interest area.*
+*Explanation: High interest rate and lower principal cost together suggest a stronger return on paydown investment than a high-effort fix in a low-interest area.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
-**14. Why does this lesson describe the Deliberate + Prudent quadrant as requiring "a credible plan for eventual repayment," rather than simply requiring the decision to be conscious?**
-A) Because a conscious decision alone, without any repayment plan, risks drifting into the same functional outcome as reckless, unaccounted-for debt, as shown in the Case Study
-B) Because repayment plans are legally required for all technical decisions
-C) Because engineering always insists on a repayment plan before agreeing to any shortcut
-D) Because "conscious" and "prudent" mean exactly the same thing in this framework
+**14. Why does this lesson describe the Deliberate + Prudent quadrant as requiring "a credible plan for eventual repayment," rather than just a conscious decision?**
+A) Because "conscious" and "prudent" mean exactly the same thing in this framework
+B) Because engineering always insists on a repayment plan before agreeing to any shortcut
+C) Because repayment plans are legally required for all technical decisions
+D) A conscious decision alone, without any repayment plan, risks drifting into the same functional outcome as reckless, unaccounted-for debt
 
-*Correct answer: A*
-*Explanation: The Theory section explicitly notes that even deliberate debt without a real repayment plan risks functioning like reckless debt in practice — consciousness alone isn't sufficient for prudent management.*
+*Correct answer: D*
+*Explanation: Even deliberate debt without a real repayment plan risks functioning like reckless debt in practice — consciousness alone isn't sufficient.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM is asked by leadership to justify dedicating an entire upcoming Sprint to technical debt paydown instead of new features, with no specific customer-facing deliverable to show for it. Using this lesson's frameworks, what is the most defensible way to make this case?**
-A) Simply assert that "engineering says we need it," without further explanation
-B) Frame the request using principal-and-interest language, citing specific evidence of compounding cycle-time increases or velocity decline (echoing the Case Study), and connect the investment to future feature delivery capacity rather than treating it as unrelated to business goals
+**15. (Product Thinking, Highest Difficulty) A PM is asked to justify dedicating an entire upcoming Sprint to technical debt paydown instead of new features, with no specific customer-facing deliverable to show for it. What is the most defensible way to make this case?**
+A) Frame the request using principal-and-interest language, citing specific evidence of compounding cycle-time increases or velocity decline, and connect the investment to future feature delivery capacity
+B) Argue that all technical debt is inherently unacceptable and should never have been allowed to accumulate
 C) Avoid raising the topic with leadership entirely, and quietly ask engineering to squeeze in paydown work informally
-D) Argue that all technical debt is inherently unacceptable and should never have been allowed to accumulate in the first place
+D) Simply assert that "engineering says we need it," without further explanation
 
-*Correct answer: B*
-*Explanation: This combines the lesson's core translation principle (principal/interest framing) with concrete evidence (the Case Study's velocity-decline pattern) to make a business case that connects debt paydown directly to future delivery capacity, rather than treating it as a disconnected or purely technical concern.*
+*Correct answer: A*
+*Explanation: Combining the principal/interest framing with concrete evidence connects debt paydown directly to future delivery capacity, rather than treating it as a disconnected concern.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 

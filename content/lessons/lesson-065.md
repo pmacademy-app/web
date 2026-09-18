@@ -348,12 +348,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why can a model with high technical accuracy still be the wrong choice for a product decision?**
-A) High accuracy always indicates a poorly built model
-B) The technical metric is a proxy for the business outcome, and proxies can diverge from that outcome
-C) Accuracy is not a valid metric under any circumstances
-D) Data science teams never measure accuracy correctly
+A) High accuracy, in practice, always indicates a poorly built model
+B) Accuracy, as a metric, is never valid under any circumstances at all
+C) The technical metric is a proxy that can diverge from the business outcome
+D) Data science teams, generally, never measure accuracy correctly
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The lesson's core point is that optimization targets are proxies, and a model can score well on its proxy while still misserving the actual business need.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -361,12 +361,12 @@ D) Data science teams never measure accuracy correctly
 ---
 
 **2. In the Ownership Zones Model, who owns Zone 1, Problem Framing?**
-A) Data science
-B) The PM
-C) Neither party; it emerges automatically from the data
-D) Executive leadership exclusively
+A) The PM
+B) Data science
+C) Neither party; it emerges automatically from the underlying data
+D) Executive leadership, exclusively, in every organization
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Problem Framing — defining the business decision, error costs, and minimum threshold — is explicitly a PM responsibility in this model.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -374,12 +374,12 @@ D) Executive leadership exclusively
 ---
 
 **3. What does "recall" measure?**
-A) The fraction of flagged positives that were actually positive
-B) The fraction of actual positives that the model successfully flagged
-C) The overall accuracy of a model regardless of class balance
-D) The speed at which a model produces predictions
+A) The overall accuracy of a model regardless of class balance
+B) The speed at which a model is able to produce predictions
+C) The fraction of flagged positives that were actually positive
+D) The fraction of actual positives that the model successfully flagged
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Recall specifically measures coverage of true positives — how many actual positive cases the model successfully caught.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -387,10 +387,10 @@ D) The speed at which a model produces predictions
 ---
 
 **4. Why is the precision/recall trade-off described as a product decision rather than a purely technical one?**
-A) Because data scientists are not capable of understanding precision and recall
-B) Because it depends on the relative business cost of false positives versus false negatives, which only the PM typically has visibility into
-C) Because precision and recall are actually the same metric
-D) Because the trade-off has no real business impact
+A) Data scientists are, in general, incapable of understanding either metric
+B) It depends on the relative business cost of the two error types
+C) Precision and recall are, mathematically, actually the same metric
+D) The trade-off, in practice, carries no real business impact at all
 
 *Correct answer: B*
 *Explanation: The relative cost of the two error types is business context that must inform the technical choice, making it fundamentally a product decision.*
@@ -400,12 +400,12 @@ D) Because the trade-off has no real business impact
 ---
 
 **5. What is the base-rate problem, as illustrated by the churn example?**
-A) A model that only works when the base rate of the target class is very high
-B) When the positive class is rare, a model predicting "never positive" can still score deceptively high on raw accuracy
-C) A statistical requirement that all models must be retrained monthly
-D) An error unique to fraud-detection models specifically
+A) A model that only functions when its target class is very common
+B) A statistical requirement that every model be retrained monthly
+C) A rare positive class lets a model predicting "never positive" score high
+D) An error pattern that is, in practice, unique to fraud-detection models
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: With only 5% of customers churning, a model predicting no churn at all would already be 95% accurate, showing why accuracy alone misleads on imbalanced classes.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -413,12 +413,12 @@ D) An error unique to fraud-detection models specifically
 ---
 
 **6. What must a PM supply before model development begins, per the Collaboration Checklist?**
-A) The exact algorithm data science should use
-B) The business decision, error costs, capacity constraints, and a minimum performance threshold
-C) A complete technical specification of the model's architecture
-D) Nothing; data science should independently determine all of this
+A) The business decision, error costs, capacity constraints, and a threshold
+B) The exact algorithm data science should use to build the model
+C) A complete technical specification of the model's internal architecture
+D) Nothing; data science should independently determine all of this itself
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: These four items constitute Zone 1 responsibilities that only the PM can supply, based on business context.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -426,12 +426,12 @@ D) Nothing; data science should independently determine all of this
 ---
 
 **7. In the Case Study, what was the root cause of the Overzealous Churn Model's failure?**
-A) The model's recall was too low
-B) The recall-oriented framing was chosen without quantifying customer success's actual outreach capacity
-C) The model was never tested before deployment
-D) Customer success representatives refused to use the model's output
+A) The model's recall, on reflection, turned out to be too low overall
+B) The model, in fact, was never tested at all before deployment
+C) Customer success representatives simply refused to use its output
+D) Recall-oriented framing was chosen without quantifying real capacity
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The failure was a Zone 1 gap — real operational capacity data was never supplied to inform the precision/recall trade-off.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
@@ -439,10 +439,10 @@ D) Customer success representatives refused to use the model's output
 ---
 
 **8. Why shouldn't a model's probabilistic output be treated as a fact?**
-A) Probabilistic outputs are always inaccurate
-B) An estimate like "churn probability of 0.7" requires interpretation and is not equivalent to certainty about a specific customer's behavior
-C) Probabilities are only meaningful in aggregate, never for individuals
-D) Data science teams do not produce probabilistic outputs
+A) Probabilistic outputs, in general, are always fundamentally inaccurate
+B) An estimate like "0.7" requires interpretation, not literal acceptance
+C) Probabilities, this lesson claims, are only meaningful in the aggregate
+D) Data science teams, as a rule, do not produce probabilistic outputs
 
 *Correct answer: B*
 *Explanation: Zone 3 (Output Interpretation) exists precisely because a probability requires translation into product meaning, not literal acceptance as fact.*
@@ -452,12 +452,12 @@ D) Data science teams do not produce probabilistic outputs
 ---
 
 **9. According to the Real World Perspective section, why do mid-size companies typically need explicit Ownership Zone agreements for the first time?**
-A) Mid-size companies are legally required to document all model decisions
-B) Dedicated data science teams emerge as a distinct function from product, removing the tight informal loop a founding team previously had by default
-C) Mid-size companies never build models before this stage
-D) Explicit agreements are only needed once a company reaches Big Tech scale
+A) Mid-size companies are, by law, required to document all model decisions
+B) Mid-size companies, in general, never build any models before this stage
+C) A dedicated data science team removes the founding team's informal loop
+D) Explicit agreements, in practice, are only needed at Big Tech scale
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The informal, tight collaboration of an early-stage team no longer exists by default once data science becomes a distinct function, making explicit agreements necessary.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
@@ -465,12 +465,12 @@ D) Explicit agreements are only needed once a company reaches Big Tech scale
 ---
 
 **10. What is Zone 4 in the Ownership Zones Model?**
-A) Model Development
-B) Output Interpretation
-C) Product Decision and Deployment
+A) Product Decision and Deployment
+B) Model Development
+C) Output Interpretation
 D) Problem Framing
 
-*Correct answer: C*
+*Correct answer: A*
 *Explanation: Zone 4 is the PM-owned decision of what the product actually does with a model's output.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
@@ -478,23 +478,23 @@ D) Problem Framing
 ---
 
 **11. Why is Output Interpretation (Zone 3) described as shared rather than owned by either PM or data science alone?**
-A) It requires both statistical literacy and product judgment to correctly translate a model's output into practical meaning
-B) It is the least important zone and doesn't require clear ownership
-C) Data science always makes this decision unilaterally in practice
-D) PMs are legally prohibited from participating in this zone
+A) It is, in practice, the least important zone and needs no clear owner
+B) Data science, in every case, makes this decision unilaterally
+C) PMs are, under this model, formally barred from this zone
+D) It requires both statistical literacy and product judgment together
 
-*Correct answer: A*
+*Correct answer: D*
 *Explanation: Interpreting what a statistical output actually means for a real decision draws on both technical understanding and business/product context.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium*
 
 ---
 
-**12. (Scenario) A PM commissions a fraud-detection model but never specifies the relative cost of blocking a legitimate transaction versus missing actual fraud. What is the most likely consequence, per this lesson's frameworks?**
-A) Data science will automatically choose the business-optimal trade-off without guidance
-B) Data science will default to a generic technical metric that may not reflect the actual, asymmetric business costs involved
-C) The model will be equally accurate regardless of this omission
-D) No consequence; error costs are irrelevant to model performance
+**12. (Scenario) A PM commissions a fraud-detection model but never specifies the relative cost of blocking a legitimate transaction versus missing actual fraud. What is the most likely consequence?**
+A) Data science will, on its own, automatically choose the optimal trade-off
+B) Data science will default to a generic metric that may not fit reality
+C) The model, in practice, will be equally accurate regardless of the omission
+D) No consequence follows; error costs are, in this view, irrelevant to performance
 
 *Correct answer: B*
 *Explanation: Without explicit Zone 1 input on error costs, data science has no way to know the actual business trade-off and will default to a generic optimization target.*
@@ -507,7 +507,7 @@ D) No consequence; error costs are irrelevant to model performance
 A) Zone 1, Problem Framing
 B) Zone 2, Model Development
 C) Zone 4, Product Decision and Deployment
-D) None; this is a normal and acceptable outcome
+D) None; this is, in fact, a normal and acceptable outcome
 
 *Correct answer: C*
 *Explanation: A model without a defined downstream action plan reflects a gap in Zone 4, regardless of how well Zones 1–3 were handled.*
@@ -516,26 +516,26 @@ D) None; this is a normal and acceptable outcome
 
 ---
 
-**14. (Interview Reasoning) A candidate, told a model has 95% accuracy, responds with enthusiasm and no follow-up questions. What does this most likely signal, per the Interview Perspective section?**
-A) Strong technical judgment
-B) A failure to probe for the base-rate problem and the actual precision/recall trade-off underlying the headline accuracy figure
+**14. (Interview Reasoning) A candidate, told a model has 95% accuracy, responds with enthusiasm and no follow-up questions. What does this most likely signal?**
+A) A failure to probe for the base-rate problem underlying the figure
+B) Strong, well-regarded technical judgment on the candidate's part
 C) That the candidate is ready for a senior data science leadership role
-D) Nothing meaningful; 95% accuracy is always a strong result regardless of context
+D) Nothing meaningful; 95% accuracy is, in every context, a strong result
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Interview Perspective section specifically flags follow-up questions about precision, recall, and error cost as the desired response to a bare accuracy claim.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A fraud-detection model must balance customer frustration from false positives against financial and regulatory risk from false negatives, two costs affecting different stakeholders. Using only the frameworks in this lesson, what is the most defensible approach?**
+**15. (Product Thinking, Highest Difficulty) A fraud-detection model must balance customer frustration from false positives against financial and regulatory risk from false negatives, two costs affecting different stakeholders. What is the most defensible approach?**
 A) Optimize purely for whichever error type is technically easier to reduce
-B) Quantify and compare both costs explicitly in Zone 1, supply this framing to data science, and design a Zone 4 action plan that may use tiered responses rather than a single binary decision
-C) Let data science decide the trade-off independently, since they understand the model best
-D) Avoid deploying any fraud-detection model until both error costs can be reduced to zero
+B) Let data science decide the trade-off independently, since they know the model best
+C) Avoid deploying any model until both error costs can be reduced to zero
+D) Quantify both costs explicitly in Zone 1, then design a tiered Zone 4 plan
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This mirrors the Reflection Exercise: the correct approach requires explicit Zone 1 cost quantification across differently-affected stakeholders, and a nuanced Zone 4 plan rather than a simplistic binary decision or indefinite delay.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*

@@ -389,39 +389,39 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. According to this lesson, what is the biggest risk of treating design as something applied only after a solution has already been decided?**
-A) It makes the interface look worse
-B) It skips design's ability to meaningfully shape problem framing and solution exploration, reducing the relationship to visual-polish execution
-C) It takes longer than involving design early
-D) It violates the Definition of Done
+A) It violates the Definition of Done
+B) It takes longer than involving design early
+C) It makes the interface look worse
+D) It skips design's ability to meaningfully shape problem framing and solution exploration, reducing the relationship to visual-polish execution
 
-*Correct answer: B*
-*Explanation: The Theory section explains that treating design as decoration wastes its ability to explore and pressure-test the solution space during the Double Diamond's divergent phases.*
+*Correct answer: D*
+*Explanation: Treating design as decoration wastes its ability to explore and pressure-test the solution space during the Double Diamond's divergent phases.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the two divergent phases in the Double Diamond framework?**
-A) Discover and Deliver
+A) There is only one divergent phase
 B) Discover and Develop
 C) Define and Deliver
-D) There is only one divergent phase
+D) Discover and Deliver
 
 *Correct answer: B*
-*Explanation: The Theory section identifies Discover (diverging on the problem) and Develop (diverging on solutions) as the framework's two divergent phases, each followed by a convergent phase (Define, Deliver).*
+*Explanation: Discover (diverging on the problem) and Develop (diverging on solutions) are the framework's two divergent phases, each followed by a convergent phase.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **3. What should a design artifact's fidelity level track, according to the Fidelity Ladder?**
-A) How much time is available before the deadline
-B) The actual validation status of the underlying idea — low fidelity for unvalidated ideas, high fidelity only after real user validation
-C) The seniority of the designer assigned to the project
-D) The size of the engineering team involved
+A) The size of the engineering team involved
+B) How much time is available before the deadline
+C) The actual validation status of the underlying idea — low fidelity for unvalidated ideas, high fidelity only after real user validation
+D) The seniority of the designer assigned to the project
 
-*Correct answer: B*
-*Explanation: The Theory section explains that fidelity should track actual certainty/validation status, mirroring Lesson 35's Confidence Gradient principle.*
+*Correct answer: C*
+*Explanation: Fidelity should track actual certainty and validation status, mirroring Lesson 35's Confidence Gradient principle.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -429,155 +429,155 @@ D) The size of the engineering team involved
 
 **4. What is "premature high-fidelity"?**
 A) Producing polished visual design before an idea has been validated with real users, creating false confidence and attachment
-B) Producing sketches too early in a project
+B) A design system component that hasn't been finalized
 C) A term describing engineering technical debt
-D) A design system component that hasn't been finalized
+D) Producing sketches too early in a project
 
 *Correct answer: A*
-*Explanation: The Theory and Case Study sections define this term exactly as described in option A.*
+*Explanation: This term describes polished design produced before validation, which creates false confidence and psychological attachment.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **5. In the Detailed Case Study, why was it so difficult for stakeholders to abandon the original onboarding mockup once user testing revealed a problem?**
-A) The mockup had been legally approved and could not be changed
-B) The team had become emotionally attached to a specific, polished artifact before the underlying concept had earned that level of commitment, making the pivot feel like a loss
-C) The designer refused to make any changes
-D) There was no actual problem with the original design
+A) There was no actual problem with the original design
+B) The designer refused to make any changes
+C) The mockup had been legally approved and could not be changed
+D) The team had become emotionally attached to a specific, polished artifact before the concept had earned that level of commitment, making the pivot feel like a loss
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong?" analysis explicitly identifies premature emotional attachment to a polished, unvalidated artifact as the reason the pivot felt costly.*
+*Correct answer: D*
+*Explanation: Premature emotional attachment to a polished, unvalidated artifact is the reason the pivot felt costly.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. What was the actual root cause of the onboarding flow's failure in the Case Study?**
-A) The visual design was ugly
-B) A structural information-architecture problem in the underlying flow concept, which no amount of visual polish could fix
-C) The mockup used the wrong color scheme
-D) The designer did not follow the brand guidelines
+A) A structural information-architecture problem in the underlying flow concept, which no amount of visual polish could fix
+B) The mockup used the wrong color scheme
+C) The designer did not follow the brand guidelines
+D) The visual design was ugly
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly states the problem was structural (information architecture), not visual, meaning visual polish could never have fixed it regardless of fidelity level.*
+*Correct answer: A*
+*Explanation: The problem was structural, not visual, meaning polish could never have fixed it regardless of fidelity level.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. Applying Lesson 37's "context, not commands" principle to design, which of the following is squarely the PM's domain to specify precisely?**
-A) The exact pixel layout of a screen
-B) The user problem, constraints, and success criteria
-C) Which icon style to use
+A) Which icon style to use
+B) The exact pixel layout of a screen
+C) The user problem, constraints, and success criteria
 D) The specific interaction animation for a button
 
-*Correct answer: B*
-*Explanation: The Theory section's table places user problem, constraints, and success criteria in the PM's domain, while layout, visual hierarchy, and interaction pattern belong to design.*
+*Correct answer: C*
+*Explanation: User problem, constraints, and success criteria sit in the PM's domain, while layout, visual hierarchy, and interaction pattern belong to design.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **8. Why is internal team enthusiasm for a mockup not, by itself, evidence that the design is good?**
-A) Because teams are never enthusiastic about good designs
-B) Because polished visuals are persuasive regardless of underlying validation, and enthusiasm reflects the artifact's polish rather than confirmation that real users will succeed with it
-C) Because only external customers are allowed to evaluate design quality
+A) Polished visuals are persuasive regardless of underlying validation, and enthusiasm reflects the artifact's polish rather than confirming real users will succeed with it
+B) Because only external customers are allowed to evaluate design quality
+C) Because teams are never enthusiastic about good designs
 D) Because enthusiasm is always a sign of groupthink
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #5 and the Case Study both make this exact point — internal enthusiasm and user validation are separate things that are easily, and dangerously, conflated.*
+*Correct answer: A*
+*Explanation: Internal enthusiasm and user validation are separate things that are easily, and dangerously, conflated.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. Using the Design Involvement Timing Table, what is a warning sign that design is being involved too late in a project?**
-A) Design participates in user research during the Discover phase
-B) Design first hears about the project once a specific solution is already assumed, with no real alternatives considered
-C) Design helps frame the problem statement during Define
-D) Design produces low-fidelity concepts during Develop
+A) Design produces low-fidelity concepts during Develop
+B) Design helps frame the problem statement during Define
+C) Design participates in user research during the Discover phase
+D) Design first hears about the project once a specific solution is already assumed, with no real alternatives considered
 
-*Correct answer: B*
-*Explanation: The Design Involvement Timing Table explicitly lists this as a warning sign of late involvement, corresponding to design being excluded from both divergent phases.*
+*Correct answer: D*
+*Explanation: This is the table's explicit warning sign of late involvement, corresponding to design being excluded from both divergent phases.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
 **10. (Scenario) A PM asks a designer to produce a fully polished, pixel-perfect mockup of a brand-new feature concept before any user testing has occurred, "just to see how it could look." Using the Fidelity Ladder, what is the most likely risk?**
-A) There is no risk; polished mockups are always beneficial regardless of timing
-B) The team may become falsely confident in and attached to the concept before it has been validated, making a needed pivot later feel like a loss — premature high-fidelity
+A) The mockup will automatically be tested with users as part of the request
+B) The team may become falsely confident in and attached to the concept before it has been validated, making a needed pivot later feel like a loss
 C) The designer will refuse the request outright
-D) The mockup will automatically be tested with users as part of the request
+D) There is no risk; polished mockups are always beneficial regardless of timing
 
 *Correct answer: B*
-*Explanation: This is a direct instance of premature high-fidelity as defined in this lesson, mirroring the Detailed Case Study's exact scenario.*
+*Explanation: This is a direct instance of premature high-fidelity, mirroring the Detailed Case Study's exact scenario.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked "how do you give feedback on a design without micromanaging the designer?" and answers: "I usually just tell them exactly what layout and colors I want." Based on this lesson's Interview Perspective section, what does this answer reveal?**
-A) Strong design fluency and clear communication
-B) A failure to apply "context, not commands" to design — dictating specific visual choices instead of framing feedback around user problems and constraints
-C) An appropriate level of PM involvement in design decisions
-D) That the candidate should be a designer instead of a PM
+**11. (Interview Reasoning) A candidate is asked how they give design feedback without micromanaging, and answers: "I usually just tell them exactly what layout and colors I want." What does this answer reveal?**
+A) That the candidate should be a designer instead of a PM
+B) An appropriate level of PM involvement in design decisions
+C) A failure to apply "context, not commands" — dictating specific visual choices instead of framing feedback around user problems and constraints
+D) Strong design fluency and clear communication
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer frames feedback around user problems and constraints, not specific visual dictates — this answer does the opposite.*
+*Correct answer: C*
+*Explanation: A strong answer frames feedback around user problems and constraints, not specific visual dictates — this answer does the opposite.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
-**12. Why does this lesson recommend low-fidelity or mid-fidelity prototypes specifically for testing an unvalidated flow concept with users, rather than high-fidelity mockups?**
-A) Because users cannot understand high-fidelity mockups at all
-B) Because low/mid-fidelity artifacts are cheap to produce and discard, inviting genuine feedback and revision without the false sense of finality high-fidelity work creates
+**12. Why does this lesson recommend low- or mid-fidelity prototypes specifically for testing an unvalidated flow concept with users, rather than high-fidelity mockups?**
+A) Low/mid-fidelity artifacts are cheap to produce and discard, inviting genuine feedback without the false sense of finality high-fidelity work creates
+B) Because designers refuse to create low-fidelity work
 C) Because high-fidelity mockups are illegal to test with users
-D) Because designers refuse to create low-fidelity work
+D) Because users cannot understand high-fidelity mockups at all
 
-*Correct answer: B*
-*Explanation: The Theory section explains that low-fidelity artifacts are cheap and discardable, appropriate for genuine exploration, in contrast to high-fidelity work's costly finality.*
+*Correct answer: A*
+*Explanation: Low-fidelity artifacts are cheap and discardable, appropriate for genuine exploration, unlike high-fidelity work's costly finality.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A PM wants to build leadership excitement for an early-stage idea without risking premature high-fidelity attachment. Using this lesson's frameworks, what is the most defensible approach?**
-A) Commission a fully polished, final-looking mockup to maximize excitement regardless of validation status
-B) Share a low- or mid-fidelity concept, explicitly framed as an early, unvalidated exploration, and pair it with a plan for how it will be tested with real users before further investment
-C) Avoid discussing the idea with leadership at all until it is fully built
-D) Ask engineering to build a complete working version before showing anyone
+**13. (Product Thinking) A PM wants to build leadership excitement for an early-stage idea without risking premature high-fidelity attachment. What is the most defensible approach?**
+A) Avoid discussing the idea with leadership at all until it is fully built
+B) Ask engineering to build a complete working version before showing anyone
+C) Commission a fully polished, final-looking mockup to maximize excitement regardless of validation status
+D) Share a low- or mid-fidelity concept, explicitly framed as an early exploration, paired with a plan for testing it with real users first
 
-*Correct answer: B*
-*Explanation: This directly applies the Fidelity Ladder and premature high-fidelity caution — building excitement is possible without dishonest, misleadingly polished artifacts, by being explicit about the idea's actual validation status.*
+*Correct answer: D*
+*Explanation: Building excitement is possible without misleadingly polished artifacts, by being explicit about the idea's actual validation status.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
 
 ---
 
-**14. Which of the following best reflects genuine design involvement during the "Develop" phase, according to the Design Involvement Timing Table?**
-A) Design executes a single, PM-specified layout with no real alternatives considered
+**14. Which of the following best reflects genuine design involvement during the "Develop" phase?**
+A) Design only reviews the final, already-shipped product
 B) Design produces low/mid-fidelity concepts and tests multiple directions
 C) Design is not consulted at all during this phase
-D) Design only reviews the final, already-shipped product
+D) Design executes a single, PM-specified layout with no real alternatives considered
 
 *Correct answer: B*
-*Explanation: The Design Involvement Timing Table explicitly describes genuine "Develop" phase involvement as producing and testing multiple low/mid-fidelity concepts, not executing a single predetermined layout.*
+*Explanation: Genuine "Develop"-phase involvement is producing and testing multiple concepts, not executing a single predetermined layout.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM has a strong personal preference for a specific visual layout for a new feature, based on products they've personally enjoyed using elsewhere. Using this lesson's and Lesson 37's frameworks together, what is the most defensible way to raise this preference with the design team?**
-A) Direct the designer to implement the exact layout as a firm requirement, since the PM has already decided it's the right approach
-B) Share the underlying user need or interaction quality the preferred layout seems to address, as context and inspiration, while explicitly leaving the specific solution open for design to explore and potentially improve upon
-C) Say nothing at all, to avoid any appearance of influencing the design process
-D) Insist the designer copy the other product's layout exactly, citing the PM's positive personal experience with it
+**15. (Product Thinking, Highest Difficulty) A PM has a strong personal preference for a specific visual layout, based on a product they personally enjoyed elsewhere. What is the most defensible way to raise this preference with the design team?**
+A) Insist the designer copy the other product's layout exactly, citing the PM's positive personal experience
+B) Say nothing at all, to avoid any appearance of influencing the design process
+C) Share the underlying user need or quality the preferred layout seems to address, as context, while leaving the specific solution open for design to explore
+D) Direct the designer to implement the exact layout as a firm requirement, since the PM has already decided it's right
 
-*Correct answer: B*
-*Explanation: This applies "context, not commands" correctly — sharing the underlying need or quality as useful context and inspiration, while preserving design's ownership of the actual solution space, rather than converting a personal preference into a directive.*
+*Correct answer: C*
+*Explanation: This applies "context, not commands" — sharing the underlying need as useful context while preserving design's ownership of the actual solution space.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 

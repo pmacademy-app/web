@@ -363,10 +363,10 @@ There is no single correct answer to any of the prompts below — the explicit g
 ## Quiz
 
 **1. Why does this lesson argue that memorized frameworks alone are insufficient for good PM judgment?**
-A) Because frameworks are always incorrect
-B) Because real situations rarely map cleanly onto a single framework, and a PM who hasn't examined the underlying beliefs those frameworks serve has no guidance when a genuinely novel situation arises
-C) Because frameworks should never be taught in any curriculum
-D) Because judgment and frameworks are entirely unrelated concepts
+A) Because frameworks are inherently incorrect and should be avoided
+B) Real situations rarely map onto one framework, leaving no guidance in novel cases
+C) Frameworks should never be taught within any structured curriculum
+D) Judgment and frameworks are entirely unrelated, disconnected concepts
 
 *Correct answer: B*
 *Explanation: The Theory section explains this exact reasoning about frameworks being inputs to, not substitutes for, genuine judgment.*
@@ -375,13 +375,13 @@ D) Because judgment and frameworks are entirely unrelated concepts
 
 ---
 
-**2. What three founding concepts from Lesson 1 does this lesson identify as the source of most of the curriculum's later frameworks?**
-A) Scrum, Kanban, and A/B testing
-B) The Decision Chain, Output vs. Outcome, and responsibility without authority
-C) The Iron Triangle, BATNA, and the Trust Ladder
-D) North Star Metrics, funnels, and cohort analysis
+**2. What three founding concepts from Lesson 1 does this lesson identify as the source of most later frameworks?**
+A) The Decision Chain, Output vs. Outcome, and responsibility without authority
+B) Scrum, Kanban, and structured A/B testing methodology
+C) The Iron Triangle, BATNA, and the Trust Ladder specifically
+D) North Star Metrics, funnel analysis, and cohort retention
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Theory section explicitly identifies these three concepts as the curriculum's foundational throughline.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -389,36 +389,36 @@ D) North Star Metrics, funnels, and cohort analysis
 ---
 
 **3. What are the six sections of the Product Philosophy Canvas?**
-A) Now, Next, Later, Never, Someday, Maybe
-B) Beliefs about users, beliefs about evidence, beliefs about trade-offs, beliefs about people, non-negotiables, and open questions
-C) Discover, Define, Develop, Deliver, Done, Retrospective
-D) Input, action, output, reinvestment, decay, revival
+A) Now, Next, Later, Never, Someday, and Maybe
+B) Discover, Define, Develop, Deliver, Done, Retrospective
+C) Input, action, output, reinvestment, decay, and revival
+D) Users, evidence, trade-offs, people, non-negotiables, open questions
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Theory section explicitly names these six sections.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. Why does this lesson recommend that a genuine philosophy include explicit open questions, not only confident positions?**
-A) Because open questions are required by law in all business documents
-B) Because performed certainty is not genuine reflection, and including honest uncertainty models the same epistemic honesty this curriculum has practiced throughout
-C) Because a philosophy with any confident positions is automatically invalid
-D) Because open questions make a philosophy longer, which is inherently better
+**4. Why does this lesson recommend that a genuine philosophy include explicit open questions?**
+A) Open questions are formally required within every business document
+B) A philosophy containing any confident position is automatically invalid
+C) Performed certainty isn't genuine reflection; honesty about doubt matters
+D) Longer philosophies, including open questions, are inherently superior
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Common Beginner Mistake #3 and the Theory section explain this exact reasoning about epistemic honesty.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
-**5. Why should a product philosophy be treated as a living document rather than a permanent, fixed one?**
-A) Because philosophies expire automatically after one year
-B) Because as real experience accumulates, parts of the philosophy will be confirmed and parts will need revision, echoing the revision discipline this curriculum modeled for roadmaps and North Star Metrics
-C) Because a fixed philosophy is illegal to maintain
-D) Because living documents are always shorter than fixed ones
+**5. Why should a product philosophy be treated as a living document rather than a fixed one?**
+A) Because personal philosophies formally expire after one year
+B) As real experience accumulates, parts get confirmed and parts need revision
+C) Because a fixed philosophy is not permitted under this curriculum
+D) Because living documents are inherently shorter than fixed ones
 
 *Correct answer: B*
 *Explanation: The Theory section explains this exact reasoning, connecting it to Lesson 35 and Lesson 42's revision principles.*
@@ -427,50 +427,50 @@ D) Because living documents are always shorter than fixed ones
 
 ---
 
-**6. In the Detailed Case Study, why did the first PM act quickly and consistently despite facing a genuinely novel situation?**
-A) They had memorized more specific lesson content than the second PM
-B) They had genuinely examined and internalized underlying principles (protecting users, disclosing proactively) that directly applied even though no single framework precisely matched the situation
-C) They were simply more experienced in years of tenure
-D) They had access to additional frameworks the second PM did not have
+**6. In the Detailed Case Study, why did the first PM act quickly despite facing a genuinely novel situation?**
+A) They had internalized principles that applied without a perfect framework match
+B) They had simply memorized more specific lesson content than the other PM
+C) They happened to have more years of tenure at their organization
+D) They had access to frameworks the second PM genuinely lacked
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Case Study explicitly attributes the difference to genuinely internalized principles, not superior technical framework knowledge.*
 *Learning objective tested: #1, #5*
 *Difficulty: Easy*
 
 ---
 
-**7. Why did the second PM in the Detailed Case Study hesitate, despite having access to the same curriculum's frameworks?**
-A) Because they lacked any technical knowledge of relevant frameworks
-B) Because they were uncertain which specific lesson's playbook applied and had never done the deeper work of examining which underlying beliefs those frameworks served
-C) Because they were explicitly instructed to delay disclosure
-D) Because the situation was not actually serious enough to warrant any action
+**7. Why did the second PM in the Detailed Case Study hesitate, despite having access to the same frameworks?**
+A) They lacked any technical familiarity with the relevant frameworks
+B) They were explicitly instructed by leadership to delay any disclosure
+C) The situation, in fact, wasn't serious enough to warrant real action
+D) They'd never examined which underlying beliefs the frameworks served
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Case Study explicitly attributes the hesitation to a lack of internalized, examined principles, not a lack of technical framework knowledge.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. Why does this lesson caution against adopting someone else's stated philosophy (a mentor's or a famous leader's) wholesale?**
-A) Because all published philosophies are factually incorrect
-B) Because a borrowed philosophy wasn't built from your own examined beliefs and experience, and tends to fail exactly when genuinely tested under pressure the original author never actually faced themselves
-C) Because reading about other people's philosophies is never useful
-D) Because only original, entirely self-invented ideas have any value
+**8. Why does this lesson caution against adopting someone else's stated philosophy wholesale?**
+A) Because all published philosophies are factually mistaken
+B) Because reading about other people's philosophies is never useful
+C) A borrowed philosophy wasn't built from your own tested experience
+D) Because only entirely self-invented ideas hold any real value
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Common Beginner Mistake #2 explains this exact risk of an unexamined, borrowed philosophy.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**9. What does Amazon's publicly published "Leadership Principles" illustrate, according to this lesson's Real Company Example?**
-A) That writing down principles has no practical value
-B) That writing down genuine, specific guiding principles creates a shared, referenceable standard that can actually be invoked in real decisions, at an organizational scale — the same function the Product Philosophy Canvas serves individually
+**9. What does Amazon's publicly published "Leadership Principles" illustrate, per the Real Company Example?**
+A) That writing down principles carries no genuine practical value
+B) Writing specific principles creates a referenceable standard for real decisions
 C) That only very large companies benefit from articulated principles
-D) That Amazon has never actually used its Leadership Principles in any real decision
+D) That Amazon has never actually applied its principles to real decisions
 
 *Correct answer: B*
 *Explanation: The Real Company Example explains this exact parallel between organizational and individual articulated principles.*
@@ -479,26 +479,26 @@ D) That Amazon has never actually used its Leadership Principles in any real dec
 
 ---
 
-**10. Why does this lesson caution against a philosophy phrased so abstractly that it could justify almost any decision?**
-A) Because abstract language is always grammatically incorrect
-B) Because a philosophy vague enough to accommodate whatever was already decided provides little real guidance — the most useful philosophies are specific enough to genuinely constrain and clarify behavior in concrete situations
-C) Because abstract philosophies are illegal to write down
-D) Because specificity has no relationship to a philosophy's usefulness
+**10. Why does this lesson caution against a philosophy phrased so abstractly it could justify almost any decision?**
+A) Vague language accommodates whatever was already decided, guiding little
+B) Because abstract language is, in every case, grammatically incorrect
+C) Because writing an abstract philosophy down is prohibited outright
+D) Because specificity has no real relationship to a philosophy's usefulness
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Common Beginner Mistake #5 explains this exact risk of overly abstract, unconstraining philosophy statements.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked "what's your product philosophy?" and answers by reciting several famous frameworks (the Pyramid Principle, the Iron Triangle) without connecting them to any personally examined belief. Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; reciting well-known frameworks is always a sufficient answer
-B) It demonstrates technical familiarity with frameworks but not the genuine internalization and personal examination this lesson identifies as the actual substance of a real philosophy
-C) It correctly demonstrates the candidate has read extensively
-D) It shows an appropriate level of humility by not claiming any personal beliefs
+**11. (Interview Reasoning) A candidate answers "what's your product philosophy?" by reciting several famous frameworks without connecting them to any personally examined belief. What is the weakness in this answer?**
+A) There is no weakness; reciting well-known frameworks is always sufficient
+B) It correctly demonstrates that the candidate has read extensively
+C) It shows an appropriate humility by avoiding any personal claims
+D) It shows familiarity with frameworks but not genuine internalization
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Interview Perspective section states that a strong answer demonstrates genuine internalization, not a recitation of famous frameworks or borrowed language.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
@@ -506,22 +506,22 @@ D) It shows an appropriate level of humility by not claiming any personal belief
 ---
 
 **12. Using the throughline this lesson traces, how does Lesson 42's North Star Metric criteria connect back to Lesson 1?**
-A) There is no meaningful connection between the two lessons
-B) Both apply the same underlying Output vs. Outcome discipline — a North Star Metric must reflect genuine value (outcome), not just exposure or activity (output), the same distinction Lesson 1 first established
-C) Lesson 42 replaced Lesson 1's framework entirely with an unrelated one
-D) Only Lesson 1 discusses metrics at all; Lesson 42 is unrelated to metrics
+A) There is no meaningful connection between these two lessons at all
+B) Lesson 42 replaced Lesson 1's framework entirely with something new
+C) Both apply the same Output vs. Outcome discipline to a new domain
+D) Only Lesson 1 discusses metrics; Lesson 42 is unrelated to metrics
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Theory section explicitly traces this exact connection between Lesson 42's NSM criteria and Lesson 1's Output vs. Outcome distinction.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A PM faces a genuinely novel situation that touches elements of three different lessons (a launch-tier question, an ethical question, and a stakeholder communication question) with no single framework providing complete guidance. Using this lesson's frameworks, what should guide the PM's decision?**
-A) Refuse to act until a framework is found that precisely matches the exact situation
-B) Fall back on genuinely examined, internalized underlying principles (from a personal Product Philosophy Canvas) that connect and inform all three touched domains, rather than searching for a single perfectly-matching framework
-C) Flip a coin, since no framework applies cleanly
+**13. (Product Thinking) A PM faces a genuinely novel situation touching three different lessons at once, with no single framework providing complete guidance. What should guide the PM's decision?**
+A) Refuse to act until a framework precisely matching the situation appears
+B) Fall back on internalized principles connecting all three touched domains
+C) Flip a coin, since no framework applies cleanly to the situation
 D) Ignore the situation entirely until it resolves on its own
 
 *Correct answer: B*
@@ -531,26 +531,26 @@ D) Ignore the situation entirely until it resolves on its own
 
 ---
 
-**14. Which of the following best reflects the "living document" discipline this lesson recommends for a product philosophy?**
-A) Writing a philosophy once and never revisiting it under any circumstances
-B) Setting a specific point in the future to honestly revisit the philosophy, assessing what's held up, what's changed, and what new open questions have emerged based on accumulated real experience
-C) Rewriting the entire philosophy from scratch every single week regardless of whether anything has actually changed
-D) Treating the first draft as permanently correct and defending it unchanged regardless of contradicting experience
+**14. Which of the following best reflects the "living document" discipline this lesson recommends?**
+A) Setting a specific point to honestly revisit and reassess the philosophy
+B) Writing a philosophy once and never revisiting it under any circumstance
+C) Rewriting the entire philosophy weekly regardless of what's changed
+D) Treating the first draft as permanently correct despite new experience
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This reflects the lesson's explicit recommendation (echoed in the Reflection Exercise) to set a genuine future revisiting point and honestly assess the philosophy's evolution.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM has completed a first draft of their Product Philosophy Canvas and notices one stated non-negotiable directly conflicts with a decision their organization's leadership is pressuring them to make. Using this lesson's and earlier lessons' frameworks together, what is the most defensible approach?**
-A) Immediately abandon the stated non-negotiable to avoid organizational conflict, since personal philosophy should never take precedence over leadership direction
-B) Recognize this as a genuine values tension worth taking seriously (echoing Lesson 56's self-assessment discipline), and use Lesson 51's structured communication and Lesson 53's negotiation frameworks to raise the concern transparently and substantively with leadership, rather than either silently complying or unilaterally refusing without engaging in genuine dialogue
-C) Quietly comply without ever raising the concern, treating the philosophy as purely a private document with no real-world application
-D) Resign immediately without any attempt at constructive dialogue or escalation
+**15. (Product Thinking, Highest Difficulty) A PM's stated non-negotiable directly conflicts with a decision their organization's leadership is pressuring them to make. What is the most defensible approach?**
+A) Immediately abandon the non-negotiable to avoid organizational conflict
+B) Quietly comply, treating the philosophy as a purely private document
+C) Resign immediately without attempting any constructive dialogue first
+D) Raise the concern transparently through structured, substantive dialogue
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This combines this lesson's philosophy-as-genuine-guide principle with earlier lessons' communication and negotiation frameworks — a genuinely examined non-negotiable deserves to be raised substantively and transparently, not silently abandoned or acted on unilaterally without engaging the organization in dialogue first.*
 *Learning objective tested: #5*
 *Difficulty: Hard*

@@ -316,12 +316,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why is "detect and remove" described as an insufficient governance strategy on its own?**
-A) Detection systems are always too slow to be useful
-B) No detection system achieves perfect accuracy, so treating removal as the only response converts every false positive into full, often irreversible harm
-C) Removal is technically impossible to implement at scale
-D) Bad actors never actually get detected by automated systems
+A) No detector is perfectly accurate, so removal-only turns every false positive into full harm
+B) It costs more engineering effort than most platforms are willing to fund
+C) Most jurisdictions no longer permit account removal as a governance tool
+D) It cannot run at the volume most platforms operate at today
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The core insight is that imperfect detection combined with a single severe response maximizes the damage from false positives.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -329,10 +329,10 @@ D) Bad actors never actually get detected by automated systems
 ---
 
 **2. What is the correct order of the Escalation Staircase?**
-A) Termination, Suspension, Restriction, Soft Signal
+A) Restriction, Termination, Soft Signal, Suspension
 B) Soft Signal, Restriction, Suspension, Termination
-C) Restriction, Termination, Soft Signal, Suspension
-D) Suspension, Soft Signal, Termination, Restriction
+C) Suspension, Soft Signal, Termination, Restriction
+D) Termination, Restriction, Suspension, Soft Signal
 
 *Correct answer: B*
 *Explanation: This is the graduated order from lowest to highest severity introduced in the Theory section.*
@@ -342,12 +342,12 @@ D) Suspension, Soft Signal, Termination, Restriction
 ---
 
 **3. Why should escalation to Termination generally require high confidence or a documented pattern of repeated violations?**
-A) Termination is the cheapest response for a platform to implement
-B) Termination is irreversible, so it should be reserved for cases where the underlying signal is strong enough to justify that irreversibility
-C) Termination is always required by law regardless of confidence level
-D) Lower-confidence signals are always more accurate than high-confidence ones
+A) Termination draws more regulatory scrutiny than any other Staircase step
+B) Termination is the step cheapest for a support team to process
+C) Termination is irreversible, so it should require signals strong enough to justify that
+D) Lower-confidence signals tend to be more reliable than high-confidence ones
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Because Termination cannot be easily undone, the model reserves it for the highest-confidence, highest-severity cases specifically to limit irreversible harm from false positives.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -355,12 +355,12 @@ D) Lower-confidence signals are always more accurate than high-confidence ones
 ---
 
 **4. How does trust and safety enforcement relate to the precision/recall trade-off from Lesson 65?**
-A) It is entirely unrelated; enforcement decisions are purely legal matters
-B) It is a high-stakes application of the same trade-off, where maximizing catch rate mechanically increases false positives against honest participants
-C) Precision and recall only apply to recommender systems, not enforcement
-D) Enforcement systems never involve any trade-offs
+A) It is a high-stakes case of that trade-off: raising catch rate raises false positives too
+B) The trade-off stops applying once a model is trained on enough data
+C) Precision and recall apply to ranking systems, not to enforcement decisions
+D) The two ideas are unrelated, since enforcement is a legal review question
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The lesson explicitly frames enforcement as a direct, high-stakes instance of the error-cost trade-off introduced for models generally in Lesson 65.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -368,12 +368,12 @@ D) Enforcement systems never involve any trade-offs
 ---
 
 **5. Why is an appeals process considered structural rather than optional?**
-A) Appeals processes are required only in certain countries by regulation
-B) Any system that acknowledges its own imperfect accuracy must provide a path to correct the false positives it will inevitably produce
-C) Appeals processes are primarily a public relations tool with no functional purpose
-D) Honest participants never actually get wrongly flagged in practice
+A) Honest accounts are flagged so rarely that appeals are just a low-cost formality
+B) Appeals exist mainly to reassure regulators, not to correct real mistakes
+C) A system that admits imperfect accuracy needs a way to correct its false positives
+D) Most jurisdictions require appeals only for a platform's top-revenue accounts
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Given that detection is never perfect, an appeals process is the necessary mechanism for correcting the resulting false positives.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -381,23 +381,23 @@ D) Honest participants never actually get wrongly flagged in practice
 ---
 
 **6. In the Case Study, what specifically caused the Automated Seller Purge to fail?**
-A) The fraud-detection model had extremely poor catch rate
-B) A moderate-confidence signal was connected directly to permanent termination with no intermediate steps, paired with a non-functional appeals process
-C) The platform received no complaints from affected sellers
-D) The model was never actually deployed to production
+A) The platform had never actually deployed a fraud-detection model at all
+B) Sellers were given several weeks of warning before suspension
+C) A moderate-confidence signal was routed straight to termination, with a non-functioning appeals channel
+D) The fraud model's catch rate stayed too low to justify production use
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The failure was a design choice — skipping graduated steps and pairing aggressive detection with an ineffective appeals channel — not a purely technical detection failure.*
 *Learning objective tested: #2, #4*
-*Difficulty: Easy*
+*Difficulty: Medium*
 
 ---
 
 **7. How did the Automated Seller Purge case study connect to marketplace liquidity concepts from Lesson 63?**
-A) It had no connection to liquidity at all
-B) Damage to supply-side trust from wrongful terminations reduced new seller sign-ups, directly threatening the marketplace's liquidity
-C) Liquidity only concerns demand-side behavior, never supply-side trust
-D) The case study showed liquidity improving as a direct result of the purge
+A) The case study found liquidity actually improved once suspected fraud was removed
+B) Wrongful terminations damaged supply-side trust, and new sign-ups declined as a result
+C) Liquidity concerns in this lesson apply only to buyers, not to seller trust
+D) The purge had no measurable effect on sign-ups or platform reputation
 
 *Correct answer: B*
 *Explanation: Honest sellers' public complaints and declining new sign-ups directly illustrate the cross-side trust dependency central to marketplace liquidity.*
@@ -407,12 +407,12 @@ D) The case study showed liquidity improving as a direct result of the purge
 ---
 
 **8. According to the Trust and Safety Program Checklist, what does a "no" on Functional Appeals Process indicate?**
-A) A minor issue that can be addressed at a later date
-B) A serious deficiency, since a theoretical appeals process that doesn't function in practice offers no real protection against false positives
-C) That the enforcement system is ready to deploy as-is
-D) That appeals processes are unnecessary if detection accuracy is high enough
+A) A concern that can reasonably wait for the next planning cycle
+B) An acceptable trade-off as long as catch rate stays high
+C) Mainly a sign the detection model itself needs retraining
+D) A serious deficiency, since a non-functioning appeals process offers no real protection
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson explicitly treats a non-functional appeals process as equivalent in practice to having no appeals process at all.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
@@ -420,12 +420,12 @@ D) That appeals processes are unnecessary if detection accuracy is high enough
 ---
 
 **9. Why might a mid-size company be especially tempted to skip graduated enforcement steps, per the Real World Perspective section?**
-A) Mid-size companies are legally prohibited from using graduated enforcement
-B) Growing flag volume relative to team size creates pressure toward a single binary flag-and-remove pipeline
-C) Graduated enforcement is only relevant for very small platforms
-D) Mid-size companies never experience meaningful fraud or abuse
+A) Mid-size platforms typically see too little abuse to justify a staged response
+B) Contractual terms at this stage generally bar graduated enforcement models
+C) Graduated enforcement is framed as relevant only at Big Tech scale
+D) Growing flag volume relative to team size pushes toward one binary pipeline
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Real World Perspective section identifies this specific pressure as the reason mid-size companies are prone to skipping graduated steps.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
@@ -433,25 +433,25 @@ D) Mid-size companies never experience meaningful fraud or abuse
 ---
 
 **10. What should a mature, Big Tech-scale trust and safety organization include, according to the Real World Perspective section?**
-A) A single automated system with no human oversight
-B) Formal escalation policies, documented appeals processes, and ongoing bias and fairness monitoring
-C) No monitoring of enforcement outcomes, since detection accuracy is assumed to be sufficient
-D) Enforcement policies that are never revisited once established
+A) One automated pipeline with minimal human review, kept lean for speed
+B) Formal escalation policies, documented appeals, and ongoing bias monitoring
+C) Enforcement policies fixed at launch and left largely unchanged
+D) Reliance on user self-reporting instead of automated detection
 
 *Correct answer: B*
-*Explanation: The Real World Perspective section describes these three elements as characteristic of mature, large-scale trust and safety organizations.*
+*Explanation: The Real World Perspective section describes these elements as characteristic of mature, large-scale trust and safety organizations.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **11. Why should enforcement outcomes be monitored over a long time horizon?**
-A) Long-horizon monitoring is only relevant to recommender systems, not enforcement
-B) Patterns of disproportionate or biased enforcement against specific participant segments can take considerable time to surface
-C) Enforcement outcomes never change over time once a system is deployed
-D) Short-term monitoring is always sufficient to detect any governance issue
+A) Biased enforcement against specific segments can take a long time to surface
+B) Long-horizon monitoring is framed as relevant to recommenders, not enforcement
+C) Short-term dashboards are generally sufficient to capture enforcement bias
+D) Enforcement systems need frequent retraining regardless of what monitoring shows
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This mirrors the long-horizon monitoring discipline from Lesson 66, applied specifically to detecting bias in enforcement patterns.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -459,12 +459,12 @@ D) Short-term monitoring is always sufficient to detect any governance issue
 ---
 
 **12. (Scenario) A trust and safety model flags an account with moderate confidence for a first-time, moderate-severity violation. Per the Escalation Staircase, what is the most appropriate initial response?**
-A) Immediate permanent termination
-B) A Soft Signal or Restriction step, reserving Suspension or Termination for higher-confidence signals or repeated violations
-C) No response at all, since moderate confidence is not actionable
-D) Immediate suspension with no appeals option
+A) Immediate suspension, handling any appeal afterward only if the account contests it
+B) No response at all, since moderate-confidence signals aren't yet worth acting on
+C) Immediate permanent termination, to set a strong deterrent early
+D) A Soft Signal or Restriction step, reserving Suspension or Termination for higher-confidence or repeated violations
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Moderate confidence and severity call for a lower, reversible step on the Escalation Staircase, not an irreversible response.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium-Hard*
@@ -472,12 +472,12 @@ D) Immediate suspension with no appeals option
 ---
 
 **13. (Product Thinking) A PM is told that a fraud-detection model's catch rate has improved significantly. What follow-up question does this lesson suggest is essential?**
-A) None; an improved catch rate is unambiguously good news requiring no further inquiry
-B) What has happened to the false positive rate against honest participants, and is the enforcement response proportionate to the confidence of each flag?
-C) How quickly can the model be deployed to production without further review?
-D) Whether the model can be made even more aggressive with no other considerations
+A) What happened to the false positive rate against honest participants, and is the response proportionate to each flag's confidence?
+B) Whether the improvement can be announced publicly before it has been independently verified
+C) How quickly the more aggressive model can reach production without further review
+D) Nothing further is really needed; an improved catch rate is good news on its own
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: An improved catch rate, per the precision/recall trade-off, likely comes with a corresponding change in false positive rate, which must be weighed against enforcement proportionality.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
@@ -485,12 +485,12 @@ D) Whether the model can be made even more aggressive with no other consideratio
 ---
 
 **14. (Interview Reasoning) A candidate describes a fraud detection system with a single flag-and-remove response and no mention of an appeals process. What does this most likely signal, per the Interview Perspective section?**
-A) A strong, complete understanding of platform governance
-B) A significant gap — the interviewer is specifically listening for graduated responses and an appeals process as structural requirements
-C) That the candidate is ready for a senior trust and safety leadership role immediately
-D) Nothing meaningful; a single flag-and-remove response is the most efficient possible design
+A) Readiness for a senior trust and safety leadership role without further coaching
+B) Little of concern, since a single flag-and-remove response is the most efficient design available
+C) A thorough answer that covers everything interviewers in this area actually look for
+D) A significant gap — the interviewer is specifically listening for graduated responses and an appeals process as structural requirements
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Interview Perspective section explicitly flags the absence of graduated responses and an appeals process as signals of an incomplete understanding of governance.*
 *Learning objective tested: #2, #4*
 *Difficulty: Hard*
@@ -498,12 +498,12 @@ D) Nothing meaningful; a single flag-and-remove response is the most efficient p
 ---
 
 **15. (Product Thinking, Highest Difficulty) A marketplace must design an enforcement system for a new category of abuse, balancing the harm of false negatives (undetected bad actors) against false positives (wrongly restricted honest participants) whose livelihoods depend on the platform. Using only the frameworks in this lesson, what is the most defensible approach?**
-A) Connect all detection signals directly to permanent termination to maximize deterrence
-B) Design a graduated Escalation Staircase with reversible lower steps, reserve Termination for high-confidence or repeated violations, and pair the system with a genuinely functional, timely appeals process
-C) Avoid building any enforcement system at all, since any detection system will produce some errors
-D) Rely exclusively on honest participants to self-report bad actors, with no automated detection
+A) Rely exclusively on honest participants to self-report bad actors, without any automated detection
+B) Connect every detection signal directly to permanent termination, to maximize deterrence
+C) Design a graduated Escalation Staircase with reversible lower steps, reserve Termination for high-confidence or repeated violations, and pair it with a genuinely functional, timely appeals process
+D) Avoid building any enforcement system at all, since any detection system will produce some errors
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This mirrors the Reflection Exercise and Case Study: the correct response neither ignores the error trade-off nor avoids enforcement altogether, but designs a graduated, proportionate, and appealable system.*
 *Learning objective tested: #2, #3, #4*
 *Difficulty: Hard*

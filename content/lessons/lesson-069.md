@@ -317,179 +317,179 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why do internal platforms require the same product discipline as external-facing platforms?**
-A) Internal platforms have no meaningful Developer Surface
-B) Their Layer 2 Developer Surface serves internal engineers just as an external platform's serves outside developers, with the same underlying promise and friction dynamics
-C) Internal platforms never have any real "customers"
-D) Product discipline is only relevant for consumer-facing products
+A) Internal engineering teams are generally less sensitive to friction than outside developers
+B) Their Developer Surface serves internal engineers under the same promise and friction dynamics as an external one
+C) Internal platforms typically operate without any meaningful Layer 2 developer surface
+D) Product discipline is described as only relevant once a platform serves paying, external customers
 
 *Correct answer: B*
-*Explanation: The lesson explicitly extends the Leverage Stack's Layer 2 concept from Lesson 61 to internal platforms, treating internal engineers as genuine platform customers.*
+*Explanation: The lesson extends the Leverage Stack's Layer 2 concept from Lesson 61 to internal platforms, treating internal engineers as genuine platform customers subject to the same promise and friction dynamics.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. Why does the assumption "internal engineers have no choice but to use our platform" fail?**
-A) Internal engineers are legally required to use only officially sanctioned tools
-B) Internal engineers do have an alternative — building their own workaround — which imposes real, often invisible costs on the company
-C) This assumption never actually occurs in practice
-D) Internal platforms are always mandatory by company policy with no exceptions
+**2. Why does the assumption that internal engineers have "no choice" but to use the official platform tend to fail in practice?**
+A) Every internal platform is described as mandatory by default, leaving no alternative path
+B) This assumption is rarely made by internal platform teams in the first place
+C) Internal engineers can quietly build their own workaround, which imposes real costs the platform team never sees
+D) Company policy in most organizations legally binds engineers to sanctioned tooling
 
-*Correct answer: B*
-*Explanation: The lesson's central point is that internal teams can and do build workarounds when friction exceeds the perceived cost of doing so.*
+*Correct answer: C*
+*Explanation: The lesson's central point is that internal teams can and do build workarounds when friction exceeds the perceived cost of doing so, and this exit carries no visible switching cost for the platform team to notice.*
 *Learning objective tested: #1, #3*
 *Difficulty: Easy*
 
 ---
 
 **3. What is a shadow platform?**
-A) A backup system maintained by the official platform team
-B) Parallel, duplicated infrastructure quietly built by internal teams frustrated with an official platform's friction
-C) A publicly documented alternative tool officially sanctioned by leadership
-D) A feature of the official internal platform used for testing purposes
+A) Parallel, duplicated infrastructure quietly built by teams frustrated with the official platform's friction
+B) A staging environment the platform team uses to test upcoming releases
+C) A documented backup system the platform team maintains for disaster recovery
+D) An officially sanctioned alternative tool leadership approves for specific teams
 
-*Correct answer: B*
-*Explanation: Shadow platforms are specifically unofficial, quietly-built duplicates arising from unaddressed internal friction.*
+*Correct answer: A*
+*Explanation: Shadow platforms are specifically unofficial, quietly-built duplicates arising from unaddressed internal friction, not sanctioned or documented alternatives.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. Why is the absence of formal complaints not reliable evidence of a healthy internal platform?**
-A) Complaints are always filed immediately regardless of platform quality
-B) Silence can indicate that frustrated teams have quietly disengaged and built around the problem instead of raising it
-C) Formal complaint systems are technically incapable of tracking internal platform issues
-D) The absence of complaints always indicates genuine satisfaction
+**4. Why is a low volume of formal complaints not reliable evidence that an internal platform is healthy?**
+A) Silence can mean frustrated teams disengaged and built around the problem rather than raising it
+B) Most internal engineers are described as filing a complaint the moment any friction appears
+C) Formal complaint channels are typically reserved for external customers rather than internal engineers
+D) Complaint volume is tracked by a separate team and rarely reaches the platform team anyway
 
-*Correct answer: B*
-*Explanation: The lesson explicitly warns against reading low complaint volume as evidence of health, given the shadow platform risk.*
+*Correct answer: A*
+*Explanation: The lesson explicitly warns against reading low complaint volume as evidence of health, since silence can indicate quiet disengagement rather than satisfaction.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
-**5. What is "time-to-first-success" a measure of?**
-A) The total revenue generated by an internal platform
-B) How long it takes a new team or engineer to complete a first meaningful task using the platform
-C) The number of internal support tickets filed per month
-D) The uptime percentage of the platform's infrastructure
+**5. What does the "time-to-first-success" metric measure?**
+A) The average number of support tickets closed within a single business day
+B) The percentage of internal engineers who respond to a satisfaction survey
+C) How long it takes a new team or engineer to complete a first meaningful task on the platform
+D) The total infrastructure cost savings an internal platform generates each quarter
 
-*Correct answer: B*
-*Explanation: This metric specifically measures onboarding friction from the perspective of a new user of the internal platform.*
+*Correct answer: C*
+*Explanation: This metric specifically measures onboarding friction from the perspective of a new user of the internal platform, distinct from cost savings, survey response rates, or ticket throughput.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**6. In the Case Study, why didn't the platform team know two teams had built workaround deployment scripts?**
-A) The workaround teams filed detailed complaints that were ignored
-B) Neither team filed a formal complaint, and the platform team had no active monitoring process to detect duplicated infrastructure elsewhere in the organization
-C) The platform team deliberately chose to ignore known workarounds
-D) The workarounds were publicly announced but no one at the platform team noticed
+**6. In the Duplicated Deployment Pipeline case study, why didn't the platform team know two teams had built their own deployment scripts?**
+A) An earlier internal audit had already flagged the workarounds with no follow-up
+B) Neither team complained, and the platform team had no process for monitoring duplicated infrastructure elsewhere
+C) The platform team knew but lacked the budget to intervene at the time
+D) Both teams filed detailed complaints that the platform team chose to disregard
 
 *Correct answer: B*
 *Explanation: The absence of complaints combined with no active shadow-platform monitoring meant the duplication went undetected for nearly a year.*
 *Learning objective tested: #3, #5*
-*Difficulty: Easy*
+*Difficulty: Medium*
 
 ---
 
-**7. What ultimately revealed the duplicated deployment pipelines in the Case Study?**
-A) A routine internal satisfaction survey
-B) A company-wide security audit that found undocumented deployment mechanisms outside the central pipeline's controls
-C) The two teams voluntarily disclosed their workarounds to the platform team
-D) The official platform's usage metrics directly flagged the duplication
+**7. What ultimately surfaced the duplicated deployment pipelines in the case study?**
+A) One of the two teams eventually disclosed its workaround during a retrospective
+B) The platform's own usage dashboard flagged an unexplained drop in adoption
+C) A company-wide security audit that found undocumented deployment mechanisms outside official controls
+D) A scheduled internal developer satisfaction survey conducted that quarter
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The duplication was discovered by chance during an unrelated security audit, illustrating how invisible this failure mode can be without active monitoring.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. According to the DevEx Investment Checklist, what does a "no" on Shadow Platform Monitoring indicate?**
-A) A minor and inconsequential gap
-B) A significant blind spot, since this specific failure mode tends to remain invisible until discovered by chance
-C) That the platform is definitely free of any duplicated infrastructure
-D) That shadow platforms are not a genuine risk for well-run organizations
+**8. On the DevEx Investment Checklist, what does answering "no" to Shadow Platform Monitoring signal?**
+A) Confirmation that no shadow infrastructure currently exists anywhere in the organization
+B) A concern that is described as applying only to platforms serving external, third-party developers
+C) A minor gap that rarely affects an otherwise well-run internal platform
+D) A significant blind spot, since this failure mode tends to stay invisible until discovered by chance
 
-*Correct answer: B*
-*Explanation: The lesson explicitly treats this as a significant, often-overlooked risk given how the Case Study's duplication went undetected for so long.*
+*Correct answer: D*
+*Explanation: The lesson treats this as a significant, often-overlooked risk given how the Case Study's duplication went undetected for so long.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**9. Why might early-stage startups reasonably rely on informal, ad hoc internal tooling rather than a dedicated internal platform?**
-A) Startups are legally prohibited from having internal platforms
-B) Too few engineers and too little infrastructure complexity typically exist to justify a dedicated internal platform team at this stage
-C) Internal platforms are only relevant for companies with over ten thousand employees
-D) Informal tooling is always superior to dedicated internal platforms regardless of scale
+**9. According to this lesson, why can early-stage startups reasonably rely on informal, ad hoc internal tooling?**
+A) Too few engineers and too little infrastructure complexity yet exist to justify a dedicated platform team
+B) Startups typically lack any engineers capable of building shared internal tools
+C) Regulatory requirements exempt small companies from internal platform obligations
+D) Informal tooling is described as outperforming dedicated platforms at every stage of growth
 
-*Correct answer: B*
-*Explanation: The Real World Perspective section describes this as a reasonable trade-off at small scale, with risk emerging as the organization grows.*
+*Correct answer: A*
+*Explanation: The Real World Perspective section describes this as a reasonable trade-off at small scale, with shadow platform risk emerging only as the organization grows.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
-**10. What risk does the Real World Perspective section identify for mid-size companies with newly formed internal platform teams?**
-A) Mid-size companies never form dedicated internal platform teams
-B) Treating the new team as a pure cost center, judged solely on infrastructure savings rather than genuine developer productivity impact
-C) Internal platform teams at this stage are always adequately resourced by default
-D) Mid-size companies face no shadow platform risk whatsoever
+**10. What risk does this lesson identify for a newly formed internal platform team at a mid-size company?**
+A) Being merged permanently into the external developer relations function
+B) Being judged solely on infrastructure cost savings rather than genuine developer productivity impact
+C) Having no internal engineers willing to adopt any of its tooling
+D) Being disbanded before it can establish a Friction Ledger
 
 *Correct answer: B*
-*Explanation: The Real World Perspective section specifically identifies this cost-center framing as a driver of the friction and shadow platform risks described in the lesson.*
+*Explanation: The Real World Perspective section identifies this cost-center framing as a driver of the friction and shadow platform risks described in the lesson.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
 ---
 
-**11. What do mature, Big Tech-scale organizations typically do regarding internal developer experience, per the Real World Perspective section?**
-A) Treat it as an unmeasurable, purely qualitative concern
-B) Treat it as a first-class product discipline with dedicated PM roles and rigor comparable to external-facing products
-C) Eliminate internal platform teams entirely in favor of fully decentralized tooling
-D) Rely exclusively on informal feedback with no dedicated measurement
+**11. How do mature, Big Tech-scale organizations typically treat internal developer experience, per the Real World Perspective section?**
+A) As a first-class product discipline with dedicated PM roles and rigor comparable to external products
+B) As a lower priority than external developer experience, given limited resources
+C) As a function best left entirely to individual product teams to manage themselves
+D) As an informal concern addressed only when engineers raise it directly
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Real World Perspective section describes dedicated internal DevEx product management and rigorous measurement as characteristic of mature organizations.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**12. (Scenario) An internal platform team notices unusually low support ticket volume and interprets this as strong evidence of a healthy platform. What alternative explanation should this lesson prompt them to consider?**
-A) Low ticket volume always and exclusively indicates genuine platform health
-B) Low ticket volume could indicate that frustrated teams have quietly disengaged and built their own workarounds rather than engaging with support
-C) Ticket volume is entirely unrelated to platform friction
-D) This pattern is impossible to interpret without additional context of any kind
+**12. (Scenario) A platform team sees unusually low support ticket volume and concludes the platform is healthy. What should this lesson prompt them to also consider?**
+A) The support team is likely under-resourced and failing to log tickets correctly
+B) Ticket volume is a purely random signal with no real connection to platform friction
+C) Teams may have quietly disengaged and built workarounds instead of filing tickets
+D) Low ticket volume is treated as conclusive proof of a well-functioning platform
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This mirrors the lesson's central warning against mistaking silence for satisfaction, given the shadow platform risk.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A platform team wants to prioritize which of several known friction points to address first. Using the Friction Ledger, what is the correct basis for prioritization?**
-A) Whichever complaint was most recently received
-B) A systematic score combining frequency and severity of each friction point, similar to prioritizing a product backlog
-C) Alphabetical order of the friction points as documented
-D) Exclusively the preferences of the most senior engineer on the platform team
+**13. (Product Thinking) Using the Friction Ledger, what should determine which friction point a platform team addresses first?**
+A) The order in which friction points were originally documented
+B) The preference of whichever engineer has been at the company the longest
+C) Whichever friction point was reported most recently by any single team
+D) A combined score of frequency and severity, prioritized similarly to a product backlog
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Friction Ledger explicitly prioritizes using a frequency-times-severity score, analogous to systematic product backlog prioritization.*
 *Learning objective tested: #2*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked about building an internal platform, states that adoption will happen naturally because using the shared platform is company policy. What does this most likely signal, per the Interview Perspective section?**
-A) A sound and complete understanding of internal platform adoption dynamics
-B) A failure to recognize that policy mandates alone don't prevent shadow platforms from forming when genuine friction exists
-C) That the candidate is ready for a senior internal platform leadership role immediately
-D) Nothing meaningful; policy mandates are always sufficient to ensure adoption
+**14. (Interview Reasoning) A candidate claims adoption of an internal platform will happen naturally because using it is company policy. What does this response most likely signal?**
+A) Readiness for a senior internal platform leadership role
+B) A gap in recognizing that policy mandates don't prevent shadow platforms when real friction exists
+C) An accurate read of how most engineering organizations actually operate
+D) A mature understanding that policy alone reliably drives sustained adoption
 
 *Correct answer: B*
 *Explanation: The Interview Perspective section specifically flags reliance on organizational mandate, rather than genuine friction reduction, as an incomplete understanding of adoption.*
@@ -498,13 +498,13 @@ D) Nothing meaningful; policy mandates are always sufficient to ensure adoption
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM suspects, based on an informal hallway conversation, that at least one team has built shadow infrastructure to bypass their internal platform, and worries there may be additional undiscovered cases. Using only the frameworks in this lesson, what is the most defensible next step?**
-A) Wait for formal complaints before taking any action, since informal information is not reliable enough to act on
-B) Proactively investigate the scope of potential shadow infrastructure across teams, build a Friction Ledger from confirmed cases, and institute ongoing metrics and monitoring to catch similar situations earlier in the future
-C) Publicly reprimand the team known to have built the workaround to discourage similar behavior elsewhere
-D) Assume the single known case is an isolated incident with no broader implications for the platform's health
+**15. (Product Thinking, Highest Difficulty) A PM learns informally that one team built shadow infrastructure and suspects other undiscovered cases exist. What is the most defensible next step, using only this lesson's frameworks?**
+A) Treat the single known case as isolated, since one instance rarely indicates a broader pattern
+B) Publicly reprimand the team that built the workaround to discourage similar behavior
+C) Wait for formal complaints before investigating further, since hallway information is unreliable
+D) Investigate the likely scope across teams, build a Friction Ledger from confirmed cases, and add ongoing monitoring
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This mirrors the Reflection Exercise: the correct response neither waits passively nor punishes the discovered team, but proactively investigates, builds systematic tracking, and improves ongoing monitoring.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*

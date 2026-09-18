@@ -412,195 +412,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What does "give context, not commands" mean, according to this lesson?**
-A) PMs should never communicate any technical details to engineering
-B) PMs should convey the problem, user need, and real constraints precisely, while trusting engineering to own the technical solution space
-C) PMs should always specify the exact technical solution to be built
-D) Engineers should never ask PMs any clarifying questions
+A) PMs should convey the problem, user need, and real constraints precisely, while trusting engineering to own the technical solution space
+B) PMs should always specify the exact technical solution to be built
+C) Engineers should never ask PMs any clarifying questions
+D) PMs should never communicate any technical details to engineering
 
-*Correct answer: B*
-*Explanation: The Theory section defines this principle exactly as conveying problem and constraints while leaving the solution space to engineering.*
+*Correct answer: A*
+*Explanation: This principle means conveying the problem and constraints precisely while leaving the solution space to engineering.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. Why does specifying a fully-detailed technical solution often produce a worse outcome than specifying the problem and constraints?**
-A) Because engineers dislike detailed documents on principle
-B) Because engineering typically has more relevant information about the technical trade-off space, and a PM substituting their own solution overrides that expertise advantage
-C) Because detailed documents take longer to write
-D) Because Scrum forbids PMs from writing technical specifications
+A) Because detailed documents take longer to write
+B) Because Scrum forbids PMs from writing technical specifications
+C) Engineering typically has more relevant information about the technical trade-off space, and a PM substituting their own solution overrides that expertise advantage
+D) Because engineers dislike detailed documents on principle
 
-*Correct answer: B*
-*Explanation: The Theory section explains this as an asymmetry-of-expertise argument — engineering typically knows the technical trade-off space better than the PM does.*
+*Correct answer: C*
+*Explanation: This is an asymmetry-of-expertise argument — engineering typically knows the technical trade-off space better than the PM does.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. According to the Trust Ladder, which of these behaviors builds trust rather than eroding it?**
-A) Handing over tickets with no context, expecting silent execution
+A) Presenting an uncertain plan as a firm commitment, then quietly walking it back
 B) Escalating blockers the team can't solve on its own
 C) Second-guessing every estimate without new information
-D) Presenting an uncertain plan as a firm commitment, then quietly walking it back
+D) Handing over tickets with no context, expecting silent execution
 
 *Correct answer: B*
-*Explanation: The Theory section's builds/erodes trust table lists escalating unsolvable blockers as a trust-building behavior; the other three options are explicitly listed as trust-eroding.*
+*Explanation: The builds/erodes trust table lists escalating unsolvable blockers as trust-building; the other three options are explicitly trust-eroding.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. What is the correct order of questions when resolving a technical disagreement, according to this lesson?**
-A) Debate the technical approach first, then discuss the problem if needed
-B) First confirm alignment on the problem, user need, and constraints; then discuss which technical approach best satisfies them
-C) Always defer to whichever party has more seniority
-D) Skip discussing the problem entirely and vote on the technical approach
+A) Always defer to whichever party has more seniority
+B) Skip discussing the problem entirely and vote on the technical approach
+C) Debate the technical approach first, then discuss the problem if needed
+D) First confirm alignment on the problem, user need, and constraints; then discuss which technical approach best satisfies them
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly presents this as a two-step, ordered framework — problem/constraints alignment first, technical approach second.*
+*Correct answer: D*
+*Explanation: This is a two-step, ordered framework — problem/constraints alignment first, technical approach second.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Why does this lesson claim that many unproductive PM-engineering disagreements are "conflated"?**
-A) Because PMs and engineers never actually disagree about anything real
-B) Because an unresolved disagreement about the underlying problem or constraints often surfaces indirectly as an argument about implementation details, which resolves the wrong layer
-C) Because engineers always agree with PMs once given enough data
-D) Because technical disagreements are always about code style only
+A) An unresolved disagreement about the underlying problem or constraints often surfaces indirectly as an argument about implementation details, resolving the wrong layer
+B) Because engineers always agree with PMs once given enough data
+C) Because technical disagreements are always about code style only
+D) Because PMs and engineers never actually disagree about anything real
 
-*Correct answer: B*
-*Explanation: The Theory section explains that disagreements about problem/constraints frequently get mistaken for, and fought out as, disagreements about technical implementation.*
+*Correct answer: A*
+*Explanation: Disagreements about problem or constraints frequently get mistaken for, and fought out as, disagreements about technical implementation.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
 **6. Using the Escalation Decision Table, which signal suggests a blocker likely requires PM escalation rather than being team-solvable?**
-A) It's the first time this specific issue has come up
-B) It involves another team, external vendor, or organizational resourcing decision outside the team's authority
-C) The team hasn't yet attempted an internal process fix
-D) It is within the team's existing decision-making authority
+A) The team hasn't yet attempted an internal process fix
+B) It is within the team's existing decision-making authority
+C) It involves another team, external vendor, or organizational resourcing decision outside the team's authority
+D) It's the first time this specific issue has come up
 
-*Correct answer: B*
-*Explanation: The Escalation Decision Table explicitly lists involvement of another team, external party, or organizational resourcing as a signal pointing toward PM escalation.*
+*Correct answer: C*
+*Explanation: Involvement of another team, external party, or organizational resourcing points toward PM escalation.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. What are the three dimensions of the Iron Triangle?**
-A) Backlog, Sprint, Increment
+A) Transparency, Inspection, Adaptation
 B) Scope, Time, Quality/Resources
-C) Transparency, Inspection, Adaptation
+C) Backlog, Sprint, Increment
 D) Now, Next, Later
 
 *Correct answer: B*
-*Explanation: The Theory section explicitly defines the Iron Triangle as scope, time, and quality/resources.*
+*Explanation: The Iron Triangle is defined as scope, time, and quality/resources.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **8. What does the Iron Triangle imply about demanding more scope, faster delivery, and unchanged quality simultaneously?**
-A) This is always achievable with enough motivation
-B) This violates the triangle's basic interdependence — fixing two of the three dimensions effectively determines the third, so demanding all three fixed forces one to give way, often invisibly
-C) This is only a problem for Kanban teams
-D) This has no relationship to the Iron Triangle at all
+A) This is only a problem for Kanban teams
+B) This has no relationship to the Iron Triangle at all
+C) This is always achievable with enough motivation
+D) It violates the triangle's interdependence — fixing two of the three dimensions determines the third, so demanding all three forces one to give way, often invisibly
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly frames this demand as a violation of the triangle's interdependence, typically resulting in quality or technical debt quietly absorbing the difference.*
+*Correct answer: D*
+*Explanation: This demand violates the triangle's interdependence, typically resulting in quality or technical debt quietly absorbing the difference.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. In the Detailed Case Study, why did the two engineers stay silent about the unhandled concurrent-update edge case?**
-A) They did not notice the issue at all
-B) They assumed the PM's detailed, specific schema reflected a deliberate, informed technical decision, and didn't want to seem like they were overriding the PM's stated plan
-C) They agreed the edge case did not matter
-D) They were not part of the design review process
+A) They assumed the PM's detailed, specific schema reflected a deliberate, informed decision, and didn't want to seem like they were overriding the plan
+B) They agreed the edge case did not matter
+C) They were not part of the design review process
+D) They did not notice the issue at all
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly states the engineers noticed the issue during review but assumed the specificity of the PM's schema signaled a deliberate, final decision.*
+*Correct answer: A*
+*Explanation: The engineers noticed the issue during review but assumed the specificity of the PM's schema signaled a deliberate, final decision.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
 ---
 
 **10. What is the recommended fix from the Detailed Case Study, for how a PM should write a specification document?**
-A) Include no technical detail whatsoever, under any circumstances
-B) Clearly separate hard, precisely-stated requirements (like handling concurrent updates correctly) from proposed technical approaches explicitly labeled as open, negotiable suggestions
-C) Always let engineering write the entire specification independently
-D) Always specify the exact database schema to avoid ambiguity
+A) Always specify the exact database schema to avoid ambiguity
+B) Always let engineering write the entire specification independently
+C) Clearly separate hard, precisely-stated requirements from proposed technical approaches explicitly labeled as open, negotiable suggestions
+D) Include no technical detail whatsoever, under any circumstances
 
-*Correct answer: B*
-*Explanation: The Case Study's resolution explicitly recommends this distinction between hard requirements and open, negotiable suggested approaches.*
+*Correct answer: C*
+*Explanation: The Case Study's resolution recommends this distinction between hard requirements and open, negotiable suggested approaches.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
 ---
 
-**11. (Scenario) A team has been blocked for three consecutive Sprints by the same dependency on another team's unavailable resource, and retrospective action items about it have gone unresolved each time. Using the Escalation Decision Table, what should the PM most likely do?**
-A) Continue asking the team to solve it internally through better planning
-B) Recognize this as a structural, escalation-worthy blocker (recurrence, cross-team source, authority required) and take ownership of escalating it outward
+**11. (Scenario) A team has been blocked for three consecutive Sprints by the same dependency on another team's unavailable resource, and retrospective action items about it have gone unresolved each time. What should the PM most likely do?**
+A) Wait for the issue to resolve itself naturally over time
+B) Recognize this as a structural, escalation-worthy blocker and take ownership of escalating it outward
 C) Remove the blocked item from the backlog permanently without further discussion
-D) Wait for the issue to resolve itself naturally over time
+D) Continue asking the team to solve it internally through better planning
 
 *Correct answer: B*
-*Explanation: This matches the Escalation Decision Table's clearest signals for PM escalation: cross-team source and unresolved recurrence across multiple Sprints, directly echoing Lesson 32's Case Study.*
+*Explanation: This matches the clearest signals for PM escalation: cross-team source and unresolved recurrence across multiple Sprints.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**12. (Interview Reasoning) A candidate is asked how they handle a technical disagreement with an engineer, and answers: "I usually just trust my gut and go with what I think is right, since I'm the PM." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; PM authority should always prevail in a disagreement
-B) It fails to describe a structured approach (confirming problem/constraint alignment first, then deferring to engineering's technical judgment) and instead asserts positional authority in a domain where the PM often has less relevant expertise
-C) It correctly demonstrates strong decision-making under uncertainty
-D) It shows appropriate confidence and should be viewed positively
+**12. (Interview Reasoning) A candidate handles a technical disagreement by answering: "I usually just trust my gut and go with what I think is right, since I'm the PM." What is the weakness in this answer?**
+A) It shows appropriate confidence and should be viewed positively
+B) It correctly demonstrates strong decision-making under uncertainty
+C) There is no weakness; PM authority should always prevail in a disagreement
+D) It skips a structured approach — confirming problem alignment first, then deferring to engineering — and instead asserts positional authority in a domain where the PM often knows less
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section explicitly states that a weak answer asserts preference without structured reasoning, echoing the lesson's broader point that a PM's authority is not positional (Lesson 1) and technical trade-offs are typically better judged by engineering.*
+*Correct answer: D*
+*Explanation: A weak answer asserts preference without structured reasoning, echoing the lesson's point that a PM's authority is not positional and technical trade-offs are usually better judged by engineering.*
 *Learning objective tested: #1, #3*
 *Difficulty: Hard*
 
 ---
 
-**13. (Product Thinking) A PM notices that engineers on their team have started silently implementing exactly what's written in specs, even when they privately have concerns, rather than raising objections. Using the Trust Ladder and the Detailed Case Study, what is the most likely underlying cause?**
-A) The engineers are simply not skilled enough to raise concerns
-B) The PM's specifications may be signaling technical decisions as final and fully-specified rather than open, inviting engineers to defer rather than push back — echoing the Case Study's core failure
-C) This is a sign of a perfectly healthy, high-trust relationship
-D) The team should be given even more detailed specifications to prevent further silence
+**13. (Product Thinking) A PM notices that engineers have started silently implementing exactly what's written in specs, even when they privately have concerns, rather than raising objections. What is the most likely underlying cause?**
+A) The PM's specifications may be signaling decisions as final and fully-specified rather than open, inviting engineers to defer rather than push back
+B) This is a sign of a perfectly healthy, high-trust relationship
+C) The team should be given even more detailed specifications to prevent further silence
+D) The engineers are simply not skilled enough to raise concerns
 
-*Correct answer: B*
-*Explanation: This directly mirrors the Detailed Case Study's dynamic — overly specific, final-seeming specifications can suppress engineers' willingness to raise legitimate concerns, exactly the failure mode this lesson warns against.*
+*Correct answer: A*
+*Explanation: This mirrors the Case Study directly — overly specific, final-seeming specifications can suppress engineers' willingness to raise legitimate concerns.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. Why does the lesson recommend asking clarifying questions about a technical approach ("does this handle the edge case we identified") rather than avoiding all technical engagement entirely?**
-A) Because PMs should have no involvement in technical conversations at all
-B) Because these questions test whether a proposed approach serves the stated problem and constraints, without substituting the PM's own preferred implementation for engineering's judgment
-C) Because asking questions is only appropriate once a decision has already shipped
-D) Because engineers expect PMs to propose alternative technical solutions directly
+**14. Why does the lesson recommend asking clarifying questions about a technical approach rather than avoiding all technical engagement entirely?**
+A) Because engineers expect PMs to propose alternative technical solutions directly
+B) Because asking questions is only appropriate once a decision has already shipped
+C) These questions test whether a proposed approach serves the stated problem and constraints, without substituting the PM's own preferred implementation
+D) Because PMs should have no involvement in technical conversations at all
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly distinguishes appropriate PM engagement (testing whether an approach serves the problem/constraints) from inappropriate engagement (substituting a preferred implementation).*
+*Correct answer: C*
+*Explanation: Appropriate PM engagement tests whether an approach serves the problem and constraints, distinct from substituting a preferred implementation.*
 *Learning objective tested: #1, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM is under significant pressure from leadership to ship more scope in less time than the engineering team believes is realistic, without any discussion of reduced quality or additional resources. Using the Iron Triangle and the Trust Ladder together, what is the most defensible response?**
-A) Silently pass the pressure on to engineering and demand they simply work harder to hit both targets
-B) Use the Iron Triangle to make the trade-off explicit with leadership — naming that scope, time, and quality are interdependent — while using the Trust Ladder's principles (honest communication, advocating outward) to represent engineering's realistic assessment rather than absorbing the pressure silently and passing it downward
-C) Tell engineering to quietly cut corners on testing without informing leadership of the change
-D) Refuse to discuss the request with leadership at all
+**15. (Product Thinking, Highest Difficulty) A PM is under significant pressure from leadership to ship more scope in less time than engineering believes is realistic, without any discussion of reduced quality or added resources. What is the most defensible response?**
+A) Tell engineering to quietly cut corners on testing without informing leadership of the change
+B) Use the Iron Triangle to make the trade-off explicit with leadership, while representing engineering's realistic assessment upward rather than absorbing the pressure and passing it downward
+C) Refuse to discuss the request with leadership at all
+D) Silently pass the pressure on to engineering and demand they simply work harder to hit both targets
 
 *Correct answer: B*
-*Explanation: This combines both frameworks as intended: the Iron Triangle names the actual trade-off explicitly to leadership, while the Trust Ladder's "advocates outward" principle means the PM represents engineering's honest assessment upward rather than passing unreasonable pressure downward or letting quality erode invisibly.*
+*Explanation: The Iron Triangle names the actual trade-off explicitly to leadership, while "advocating outward" means representing engineering's honest assessment rather than passing unreasonable pressure downward.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 

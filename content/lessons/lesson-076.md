@@ -311,12 +311,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why is poor integration considered the more common cause of M&A value destruction, according to this lesson?**
-A) Strategic rationale is never actually a relevant factor in acquisition success
-B) An acquisition's value is realized or destroyed over the integration process following the deal's close, not at the moment of signing
-C) Integration is always technically impossible regardless of planning
-D) Poor integration only affects small acquisitions, never large ones
+A) An acquisition's value is realized or destroyed over the integration process following the deal's close, not at the moment of signing
+B) Strategic rationale is treated as essentially never a relevant factor in acquisition success
+C) Poor integration is said to affect only small acquisitions, never large ones
+D) Integration is described as always technically impossible regardless of planning
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The lesson's central argument is that strategic rationale and integration execution are separate questions, with value realized primarily during the latter.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -324,10 +324,10 @@ D) Poor integration only affects small acquisitions, never large ones
 ---
 
 **2. What is the correct order of the Integration Continuum, from least to most integrated?**
-A) Full Absorption, Sunset and Migrate, Preserve, Selective Integration
+A) Sunset and Migrate, Full Absorption, Selective Integration, Preserve
 B) Preserve, Selective Integration, Full Absorption, Sunset and Migrate
-C) Sunset and Migrate, Full Absorption, Selective Integration, Preserve
-D) Selective Integration, Preserve, Sunset and Migrate, Full Absorption
+C) Selective Integration, Preserve, Sunset and Migrate, Full Absorption
+D) Full Absorption, Sunset and Migrate, Preserve, Selective Integration
 
 *Correct answer: B*
 *Explanation: This is the sequence introduced in the Theory section, from minimal to complete integration.*
@@ -337,12 +337,12 @@ D) Selective Integration, Preserve, Sunset and Migrate, Full Absorption
 ---
 
 **3. What is an "acqui-hire"?**
-A) An acquisition made purely to remove a competitor from the market
-B) An acquisition pursued primarily to obtain specific talent, with the acquired product itself often secondary
-C) An acquisition focused exclusively on acquiring proprietary technology
-D) A type of merger that always results in full product absorption
+A) A type of merger that is said to always result in full product absorption
+B) An acquisition focused exclusively on acquiring a company's proprietary technology
+C) An acquisition pursued primarily to obtain specific talent, with the acquired product itself often secondary
+D) An acquisition made purely to remove a competitor from the market
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This term specifically describes talent-focused acquisitions where the product itself is often not the primary value driver.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -350,12 +350,12 @@ D) A type of merger that always results in full product absorption
 ---
 
 **4. Name the four common strategic rationales for an acquisition.**
-A) Marketing, sales, legal, and finance
-B) Talent acquisition, technology acquisition, customer base acquisition, market consolidation
-C) Revenue growth, cost reduction, brand building, and geographic expansion
-D) Product design, engineering, research, and operations
+A) Product design, engineering, research, and operations
+B) Revenue growth, cost reduction, brand building, and geographic expansion
+C) Marketing, sales, legal, and finance
+D) Talent acquisition, technology acquisition, customer base acquisition, market consolidation
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: These four rationales are explicitly named in the Theory section as the common reasons acquisitions are pursued.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -363,12 +363,12 @@ D) Product design, engineering, research, and operations
 ---
 
 **5. Why is premature Full Absorption described as a common and damaging mistake?**
-A) Full Absorption is always the technically superior integration approach regardless of context
-B) Internal preference for a unified structure can push toward full integration even when the acquisition's actual rationale doesn't call for it, destroying the value being sought
-C) Full Absorption is never actually attempted in real M&A situations
-D) Premature integration only affects the acquiring company, never the acquired one
+A) Internal preference for a unified structure can push toward full integration even when the acquisition's actual rationale doesn't call for it, destroying the value being sought
+B) Full Absorption is described as never actually attempted in real M&A situations
+C) Premature integration is said to affect only the acquiring company, never the acquired one
+D) Full Absorption is treated as always the technically superior integration approach regardless of context
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The lesson explicitly identifies organizational preference for unification, rather than genuine strategic fit, as the driver of this common mistake.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -376,10 +376,10 @@ D) Premature integration only affects the acquiring company, never the acquired 
 ---
 
 **6. Why should acquired customer migration follow the same discipline as the Sunset Runway from Lesson 68?**
-A) Acquired customers are legally required to migrate on the same timeline as external API dependents
+A) Customer migration and API migration are described as having no meaningful similarities
 B) Acquired customers are genuine dependents whose specific loyalty drivers and needs must be understood before setting a migration timeline
-C) Sunset Runway discipline only applies to technical API migrations, never customer migrations
-D) Customer migration and API migration have no meaningful similarities
+C) Sunset Runway discipline is said to apply only to technical API migrations, never customer migrations
+D) Acquired customers are legally required to migrate on the same timeline as external API dependents
 
 *Correct answer: B*
 *Explanation: The lesson explicitly draws this parallel, treating acquired customers as dependents requiring the same dependency-aware migration discipline.*
@@ -389,12 +389,12 @@ D) Customer migration and API migration have no meaningful similarities
 ---
 
 **7. In the Rushed Absorption case study, what was the acquisition's actual strategic rationale?**
-A) Acquiring specific proprietary technology
-B) Retaining the acquired company's loyal, established customer base in an underpenetrated market segment
-C) Acquiring a specific talented engineering team
-D) Removing a competitor from the market entirely with no interest in its customers
+A) Removing a competitor from the market entirely with no interest in its customers
+B) Acquiring a specific talented engineering team
+C) Retaining the acquired company's loyal, established customer base in an underpenetrated market segment
+D) Acquiring a specific piece of proprietary technology
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The case study specifically describes customer-base retention as the acquisition's rationale, which the rushed integration then undermined.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
@@ -402,12 +402,12 @@ D) Removing a competitor from the market entirely with no interest in its custom
 ---
 
 **8. What specifically caused significant customer churn in the Rushed Absorption case study?**
-A) The acquired product was technically inferior from the start
-B) A rushed migration forced customers onto a core product lacking workflow-specific capabilities they relied on, without adequate notice or dependency inventory
-C) The acquiring company raised prices immediately after the acquisition
-D) Customers were never informed that an acquisition had occurred
+A) Customers were reportedly never informed that an acquisition had occurred at all
+B) The acquiring company raised prices immediately following the acquisition
+C) The acquired product had been technically inferior to the acquirer's from the start
+D) A rushed migration forced customers onto a core product lacking workflow-specific capabilities they relied on, without adequate notice or dependency inventory
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The failure was a rushed, under-researched migration that didn't account for the specific workflow needs driving customer loyalty.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
@@ -415,10 +415,10 @@ D) Customers were never informed that an acquisition had occurred
 ---
 
 **9. According to the M&A Integration Readiness Checklist, what does a "no" on Rationale Documented indicate?**
-A) A minor administrative oversight with no real consequence
+A) That Full Absorption is automatically the correct default approach in that case
 B) A fundamental planning gap, since there is no genuine basis for selecting the correct Integration Continuum position without an explicit, agreed-upon rationale
-C) That the acquisition should be immediately reversed
-D) That Full Absorption is automatically the correct default approach
+C) That the acquisition should, on this basis alone, be immediately reversed
+D) A minor administrative oversight with no real consequence
 
 *Correct answer: B*
 *Explanation: The lesson treats an undocumented rationale as undermining the entire basis for a sound integration decision.*
@@ -428,12 +428,12 @@ D) That Full Absorption is automatically the correct default approach
 ---
 
 **10. Why might early-stage companies typically favor the Preserve or Selective Integration end of the Continuum, per the Real World Perspective section?**
-A) Early-stage companies are legally prohibited from pursuing Full Absorption
-B) Their acquisitions are almost always small, talent-focused acqui-hires, given limited organizational capacity for complex full-absorption processes
-C) Early-stage companies never pursue any acquisitions at all
-D) Preserve is always the objectively superior approach regardless of company stage
+A) Their acquisitions are almost always small, talent-focused acqui-hires, given limited organizational capacity for complex full-absorption processes
+B) Early-stage companies are described as never pursuing any acquisitions at all
+C) Early-stage companies are described as legally prohibited from pursuing Full Absorption
+D) Preserve is treated as always the objectively superior approach regardless of company stage
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Real World Perspective section connects this preference to the typical scale and rationale of early-stage acquisitions.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -441,12 +441,12 @@ D) Preserve is always the objectively superior approach regardless of company st
 ---
 
 **11. What do large, serially-acquisitive organizations typically develop, per the Real World Perspective section?**
-A) A single universal integration approach applied identically to every acquisition
-B) Formal, repeatable integration playbooks matched to different acquisition rationales, often with dedicated integration management functions
-C) A policy of never integrating any acquired products or teams
-D) No formal process at all, relying entirely on ad hoc decisions
+A) No formal process at all, relying entirely on ad hoc decisions
+B) A policy of never integrating any acquired products or teams
+C) Formal, repeatable integration playbooks matched to different acquisition rationales, often with dedicated integration management functions
+D) A single universal integration approach applied identically to every acquisition
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Real World Perspective section describes this kind of rationale-matched, repeatable playbook approach as characteristic of mature, frequent acquirers.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -454,10 +454,10 @@ D) No formal process at all, relying entirely on ad hoc decisions
 ---
 
 **12. (Scenario) A company acquires a competitor primarily for its proprietary machine learning technology, with a small, secondary customer base and team as incidental assets. Using the Integration Continuum, what is the most defensible approach for the core technology?**
-A) Preserve the technology as a fully separate, standalone product indefinitely
+A) Apply Full Absorption uniformly across the technology, customer base, and team without differentiation
 B) Selectively integrate the specific technology component into the core product, treating the customer base and team as separate considerations with their own appropriately matched approaches
-C) Immediately sunset the technology without extracting any value from it
-D) Apply Full Absorption uniformly across the technology, customer base, and team without differentiation
+C) Immediately sunset the technology without extracting any value from it first
+D) Preserve the technology as a fully separate, standalone product indefinitely
 
 *Correct answer: B*
 *Explanation: The technology-focused rationale calls for Selective Integration of that specific component, while other assets (customers, team) may warrant separate, independently matched approaches.*
@@ -467,12 +467,12 @@ D) Apply Full Absorption uniformly across the technology, customer base, and tea
 ---
 
 **13. (Product Thinking) A PM notices that a planned integration defaults to Full Absorption despite the acquisition's documented rationale being primarily talent retention. What is the strongest response, using this lesson's frameworks?**
-A) Proceed with Full Absorption regardless, since organizational unification is always preferable
-B) Flag the mismatch between the documented rationale and the proposed Continuum position, advocating for an approach (such as Preserve or Selective Integration) better matched to talent retention specifically
-C) Cancel the acquisition entirely at this late stage
+A) Flag the mismatch between the documented rationale and the proposed Continuum position, advocating for an approach (such as Preserve or Selective Integration) better matched to talent retention specifically
+B) Cancel the acquisition entirely at this late stage in the process
+C) Proceed with Full Absorption regardless, since organizational unification is generally preferable
 D) Ignore the documented rationale and let engineering leadership decide unilaterally
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The correct response identifies and addresses the mismatch between rationale and integration approach, rather than defaulting to Full Absorption or taking an extreme unrelated action.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
@@ -480,12 +480,12 @@ D) Ignore the documented rationale and let engineering leadership decide unilate
 ---
 
 **14. (Interview Reasoning) A candidate, asked how they'd integrate a newly acquired product, describes a plan to fully merge it into the core platform within one quarter, regardless of the acquisition's stated rationale. What does this most likely signal, per the Interview Perspective section?**
-A) A strong and complete understanding of M&A integration
-B) A gap in recognizing that integration approach should be matched to the acquisition's actual strategic rationale, not defaulted to Full Absorption
-C) That the candidate is ready for a senior M&A integration leadership role immediately
-D) Nothing meaningful; rapid Full Absorption is always the correct approach regardless of rationale
+A) Nothing meaningful; rapid Full Absorption is treated as always correct regardless of rationale
+B) That the candidate is ready for a senior M&A integration leadership role immediately
+C) A strong and complete understanding of M&A integration
+D) A gap in recognizing that integration approach should be matched to the acquisition's actual strategic rationale, not defaulted to Full Absorption
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Interview Perspective section specifically listens for rationale-matched integration thinking, which this candidate's answer omits entirely.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
@@ -493,12 +493,12 @@ D) Nothing meaningful; rapid Full Absorption is always the correct approach rega
 ---
 
 **15. (Product Thinking, Highest Difficulty) A company has acquired a competitor specifically to retain its loyal customer base, but leadership is pushing for rapid Full Absorption within one quarter to demonstrate synergy value to the board. Using only the frameworks in this lesson, what is the most defensible response?**
-A) Comply with the rapid timeline as requested, prioritizing the appearance of quick synergy over careful integration
-B) Advocate for an integration approach matched to the customer-retention rationale, applying Sunset Runway-style dependency-aware migration planning, even if this requires a longer timeline than leadership initially requested
-C) Refuse to integrate the acquisition at all under any circumstances
-D) Immediately migrate all customers with no advance notice or dependency investigation, to meet the quarterly deadline regardless of consequences
+A) Refuse to integrate the acquisition at all under any circumstances
+B) Immediately migrate all customers with no advance notice or dependency investigation, to meet the quarterly deadline regardless of consequences
+C) Advocate for an integration approach matched to the customer-retention rationale, applying Sunset Runway-style dependency-aware migration planning, even if this requires a longer timeline than leadership initially requested
+D) Comply with the rapid timeline as requested, prioritizing the appearance of quick synergy over careful integration
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This mirrors the Reflection Exercise and the Rushed Absorption case study: the correct response advocates for a rationale-matched, dependency-aware approach even under organizational pressure for speed, rather than complying with an ill-matched timeline or taking an extreme unproductive stance.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*

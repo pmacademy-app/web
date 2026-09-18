@@ -6,7 +6,7 @@ This document serves as the authoritative internal historical record of all mark
 
 ## Executive Summary & Historical Overview
 
-Between **August 11, 2026** and **September 15, 2026**, Prodily executed ten targeted email campaigns directed at registered learners, fellows, and inactive users. In addition, the platform maintains automated waitlist confirmations, a database-backed broadcast scheduler, and transactional template infrastructure.
+Between **August 11, 2026** and **September 18, 2026**, Prodily executed eleven targeted email campaigns directed at registered learners, fellows, and inactive users. In addition, the platform maintains automated waitlist confirmations, a database-backed broadcast scheduler, and transactional template infrastructure.
 
 ### Summary of Campaigns
 
@@ -22,6 +22,7 @@ Between **August 11, 2026** and **September 15, 2026**, Prodily executed ten tar
 | **8** | `portfolio_activation_sep_2026` | `apps/web/scripts/local-campaigns/portfolio_activation_sep_2026/` | Brevo & Resend (Cron scheduled) | Sep 6, 2026 | Registered learners with 0 submitted capstones | Automated Server-Side Scheduler | **Configured / Scripted** |
 | **9** | `prodily_one_month_sep_2026` | `apps/web/scripts/local-campaigns/prodily_one_month_sep_2026/` | Brevo (250) & Resend (64) | Sep 13, 2026 | All registered eligible learners (One-Month Community Celebration) | 314 sent (250 Brevo, 64 Resend) | **Delivered (100% Success)** |
 | **10** | `reengagement_inactive_sep_2026` | `apps/web/scripts/local-campaigns/reengagement_inactive_sep_2026/` | Brevo (250) & Resend (27) | Sep 15, 2026 | Registered inactive learners (0 completed lessons, 0 total XP) | 277 sent (250 Brevo, 27 Resend) | **Delivered (100% Success)** |
+| **11** | `follow_prodily_sep_2026` | `apps/web/scripts/local-campaigns/follow_prodily_sep_2026/` | Brevo (280) & Resend (72) | Sep 18, 2026 | All registered eligible learners (Social Channels Follow Campaign) | 352 sent (280 Brevo, 72 Resend) | **Delivered (100% Success)** |
 
 ---
 
@@ -1007,6 +1008,89 @@ https://prodily.adityagangwani.me/academy
 See you on Prodily.
 
 — Team Prodily
+
+Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
+```
+
+---
+
+```
+================================================================================
+CAMPAIGN 11: follow_prodily_sep_2026
+================================================================================
+```
+
+### Campaign Metadata
+- **Campaign Name:** Follow Prodily Beyond the App (Social Channels Announcement)
+- **Campaign Identifier:** `follow_prodily_sep_2026`
+- **Source Folder:** `apps/web/scripts/local-campaigns/follow_prodily_sep_2026/`
+- **Script Path:** `apps/web/scripts/local-campaigns/follow_prodily_sep_2026/send-follow-prodily-campaign.ts`
+- **Log Path:** `apps/web/scripts/local-campaigns/follow_prodily_sep_2026/logs/campaign_sent_follow_prodily_sep_2026.json`
+- **Platform:** Brevo (280 recipients) & Resend (72 recipients)
+- **Campaign Purpose:** Invite registered learners to follow Prodily across social channels (LinkedIn, X, Instagram) for product frameworks, building updates, and new feature announcements outside the app.
+- **Campaign Type:** Community & Social Activation Broadcast
+- **Audience Allocation (Dynamic Split):**
+  - Evaluated against live database `public.users` (362 registered users).
+  - Excluded 3 internal admins, 7 suppressions, 0 opt-outs.
+  - Deterministically ordered by `created_at ASC`, `id ASC`.
+  - **First 280 recipients → Brevo** (`BREVO_MAX_ALLOCATION = 280`).
+  - **Remaining 72 recipients → Resend**.
+  - Strict mutual exclusivity (zero duplicate overlap across providers).
+- **Date Sent:** September 18, 2026 (`2026-09-17T20:12:00Z` to `2026-09-17T20:24:47Z` UTC / September 18 IST)
+- **Sender Name:** Aditya Gangwani
+- **Sender Email:** `aditya@prodily.adityagangwani.me`
+- **Reply-To Address:** `prodilypm@gmail.com`
+- **Sign-off Persona:** `Aditya (Founder, Prodily)`
+- **Destination URLs:**
+  - LinkedIn: `https://www.linkedin.com/company/prodilypmacademy`
+  - X: `https://x.com/prodily_pm`
+  - Instagram: `https://www.instagram.com/prodily_pm/`
+- **Unsubscribe URL:** `https://prodily.adityagangwani.me/settings?tab=notifications`
+- **UI & Presentation Design:**
+  - Zero raw URLs displayed in HTML body — replaced with clean, touch-friendly dedicated action buttons.
+  - Embedded Retina-sharp white brand glyphs for LinkedIn, X, and Instagram.
+  - Platform-specific brand colors:
+    - LinkedIn: `#0A66C2` (LinkedIn Blue)
+    - X: `#000000` (X Black)
+    - Instagram: `#E1306C` / Multi-stop gradient
+  - Plain-text fallback preserves full URLs for accessibility and non-HTML email clients.
+  - Compliant CAN-SPAM / GDPR footer and RFC-compliant `List-Unsubscribe` headers.
+- **Logged Deliveries:** **352 successful dispatches** (280 Brevo, 72 Resend) — **100% Success Rate, 0 Failures**
+
+---
+
+### Email 11.1 — Follow Prodily Beyond the App
+
+**Campaign:** `follow_prodily_sep_2026`  
+**Platform:** Brevo (280) & Resend (72)  
+**Sequence position:** 1 of 1  
+**Date:** September 18, 2026  
+**Audience:** All registered eligible learners  
+**Sender:** Aditya Gangwani <aditya@prodily.adityagangwani.me>  
+**Reply-To:** prodilypm@gmail.com  
+**Subject:** `Follow Prodily beyond the app`  
+**Preview text:** `LinkedIn, X, and Instagram — for when you're not logged in.`  
+**Primary CTAs:**
+- `Follow on LinkedIn` → `https://www.linkedin.com/company/prodilypmacademy`
+- `Follow on X` → `https://x.com/prodily_pm`
+- `Follow on Instagram` → `https://www.instagram.com/prodily_pm/`
+**Status:** Delivered (352 recipients logged: 280 Brevo, 72 Resend)  
+
+#### Exact Email Content (Plain Text)
+
+```text
+Hey {{firstName}},
+
+We're starting to share more outside the app — real product frameworks, what we're building, and updates as new things ship.
+
+LinkedIn: https://www.linkedin.com/company/prodilypmacademy
+X: https://x.com/prodily_pm
+Instagram: https://www.instagram.com/prodily_pm/
+
+No extra noise — just product.
+
+— Aditya
+Founder, Prodily
 
 Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
 ```

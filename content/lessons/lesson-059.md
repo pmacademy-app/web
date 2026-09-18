@@ -417,12 +417,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the key difference between internationalization (i18n) and localization (l10n)?**
-A) They are identical concepts with different names
-B) Internationalization is the technical work of building a product to support multiple markets; localization is the actual, market-specific adaptation for a given market
-C) Internationalization only applies to European markets; localization only applies to Asian markets
-D) Localization always precedes internationalization in every project
+A) They are identical concepts described under two different names
+B) Localization always happens before internationalization in a project
+C) Internationalization is technical readiness; localization is market-specific adaptation
+D) Internationalization applies only to European markets, localization elsewhere
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Theory section defines these two terms exactly this way.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -430,12 +430,12 @@ D) Localization always precedes internationalization in every project
 ---
 
 **2. What are the four levels of the Localization Depth Ladder, in order?**
-A) Now, Next, Later, Never
-B) Surface text translation, formats, cultural adaptation, structural adaptation
-C) Discover, Define, Develop, Deliver
+A) Surface text translation, formats, cultural adaptation, structural adaptation
+B) Discover, define, develop, deliver
+C) Now, next, later, never
 D) Input, action, output, reinvestment
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Theory section explicitly names these four levels in this order.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -443,12 +443,12 @@ D) Input, action, output, reinvestment
 ---
 
 **3. Why is text translation alone frequently insufficient for genuine market localization?**
-A) Because translation is always technically inaccurate
-B) Because it addresses only the shallowest level of the Depth Ladder, missing format, cultural, and structural adaptation a market genuinely requires
-C) Because translation should never be part of any localization effort
-D) Because translated text is always more expensive than the original
+A) Because translation is inherently and always technically inaccurate
+B) Because translation should never be part of any localization effort
+C) Because translated text always costs more than the original content
+D) It addresses only the shallowest level, missing format and cultural gaps
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Theory section explains that text translation is the shallowest level, and genuine readiness requires descending further.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -457,9 +457,9 @@ D) Because translated text is always more expensive than the original
 
 **4. How does this lesson extend Lesson 47's structural bias concept?**
 A) It argues structural bias has no relevance to international expansion
-B) It extends the concept from customer-channel filtering to geographic and cultural filtering — a PM's own market-of-origin assumptions are frequently specific, not universal, and can silently shape product decisions if not deliberately examined
-C) It claims structural bias only applies within a single market, never across markets
-D) It argues that structural bias disappears once a product is internationalized technically
+B) It extends bias from customer-channel filtering to geographic and cultural filtering
+C) It claims structural bias only ever applies within a single market
+D) It argues bias disappears once a product is technically internationalized
 
 *Correct answer: B*
 *Explanation: The Theory section explicitly extends Lesson 47's concept to this new geographic and cultural dimension.*
@@ -469,12 +469,12 @@ D) It argues that structural bias disappears once a product is internationalized
 ---
 
 **5. What four factors does the Market Prioritization Matrix weigh when comparing candidate markets?**
-A) Language difficulty, time zone, currency exchange rate, and population density
-B) Total addressable market (TAM), regulatory complexity, competitive intensity, and genuine execution capacity
+A) TAM, regulatory complexity, competitive intensity, and execution capacity
+B) Language difficulty, time zone, exchange rate, and population density
 C) Only total addressable market, with no other factors considered
-D) The PM's personal familiarity with the market, exclusively
+D) The PM's own personal familiarity with the candidate market
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Theory section and Framework Explanation both list these four factors.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -482,12 +482,12 @@ D) The PM's personal familiarity with the market, exclusively
 ---
 
 **6. Why might a market with large TAM still be a lower initial priority than a smaller market, according to this lesson?**
-A) Large-TAM markets are always illegal to enter
-B) If regulatory complexity is high relative to the company's genuine execution capacity, a large-TAM market may risk a costly compliance failure or an under-resourced, shallow entry, making deferral sometimes preferable
-C) TAM is the only factor that should ever matter in market prioritization
-D) Smaller markets always have larger genuine opportunity than larger ones
+A) Large-TAM markets are always illegal for a company to enter
+B) TAM is the only factor that should ever matter in prioritization
+C) Smaller markets always carry more genuine opportunity than larger ones
+D) High regulatory complexity relative to capacity can favor deferral
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Theory section and Framework Explanation explain this exact reasoning about weighing TAM against regulatory complexity and execution capacity.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -496,11 +496,11 @@ D) Smaller markets always have larger genuine opportunity than larger ones
 
 **7. In the Detailed Case Study, what three specific gaps caused the international launch to underperform, despite accurate text translation?**
 A) Slow loading times, server outages, and a lack of customer support
-B) Culturally mismatched imagery, an unfamiliar default payment method, and unreviewed data handling practices leading to a regulatory inquiry
-C) Incorrect currency symbols only, with no other issues
-D) The product was never actually translated at all
+B) Incorrect currency symbols only, with no other issues present
+C) Mismatched imagery, an unfamiliar payment default, unreviewed data practices
+D) The product's interface was never actually translated at all
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Case Study explicitly identifies these three specific gaps as the causes of underperformance.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -508,12 +508,12 @@ D) The product was never actually translated at all
 ---
 
 **8. Why does this lesson describe the Case Study's launch as having addressed "only the first of four necessary levels"?**
-A) Because the team never actually translated any text
-B) Because the team completed surface-level text translation but never descended to format, cultural, or structural adaptation, which is where the actual failures originated
-C) Because the team completed all four levels perfectly
-D) Because the Depth Ladder only has one level in total
+A) The team completed surface translation but never descended further
+B) The team completed all four levels of the ladder perfectly
+C) The team never actually translated any of the interface text
+D) The Depth Ladder, as this lesson defines it, has only one level
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Case Study explicitly frames the failure as stopping at the shallowest ladder level while believing this constituted complete localization.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
@@ -521,12 +521,12 @@ D) Because the Depth Ladder only has one level in total
 ---
 
 **9. Why does this lesson recommend involving people genuinely familiar with a target market in cultural review, beyond a translation service?**
-A) Because translation services are always inaccurate
-B) Because even skilled, accurate text translation can miss cultural nuance, connotation, or contextual appropriateness that a broader cultural review process would catch
-C) Because translation services are illegal in most countries
-D) Because cultural review is only relevant for legal compliance, not translation quality
+A) Because professional translation services are always inaccurate
+B) Because translation services are illegal to use in most countries
+C) Because cultural review only matters for legal compliance, not language
+D) Skilled translation can still miss nuance a cultural review would catch
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Common Beginner Mistake #5 explains this exact reasoning about the limits of translation-only review.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -534,10 +534,10 @@ D) Because cultural review is only relevant for legal compliance, not translatio
 ---
 
 **10. Using the Market Prioritization Matrix, what does a market scoring well on TAM but poorly on execution capacity suggest?**
-A) The market should be entered immediately regardless of execution capacity
-B) The market is a strong candidate for deferral, since a shallow, under-resourced launch risks damaging the market's long-term receptiveness to a future, better-executed attempt
-C) TAM is irrelevant once execution capacity is considered
-D) This combination never actually occurs in practice
+A) The market should be entered immediately regardless of capacity gaps
+B) The market is a strong candidate for deferral until capacity improves
+C) TAM becomes irrelevant once execution capacity enters consideration
+D) This particular combination essentially never occurs in practice
 
 *Correct answer: B*
 *Explanation: The Framework Explanation section explicitly recommends deferral in this exact scenario, to avoid the Case Study's failure pattern.*
@@ -546,13 +546,13 @@ D) This combination never actually occurs in practice
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked the difference between internationalization and localization, and answers: "They're basically the same thing — both just mean translating the product." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; the two terms are indeed interchangeable
-B) It fails to distinguish technical readiness (i18n) from actual, deeper market-specific adaptation (l10n), and reduces both concepts to translation alone, missing the Depth Ladder's further levels
-C) It correctly demonstrates strong technical understanding
-D) It shows an appropriate simplification for a general audience
+**11. (Interview Reasoning) A candidate is asked the difference between internationalization and localization, and answers: "They're basically the same thing — both just mean translating the product." What is the weakness in this answer?**
+A) There is no weakness; the two terms are genuinely interchangeable
+B) It correctly demonstrates strong technical understanding of the terms
+C) It reduces both concepts to translation, missing the Depth Ladder entirely
+D) It shows an appropriate simplification suited for a general audience
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Interview Perspective section states that a strong answer clearly distinguishes these two concepts, neither of which reduces to translation alone.*
 *Learning objective tested: #1, #2*
 *Difficulty: Hard*
@@ -560,25 +560,25 @@ D) It shows an appropriate simplification for a general audience
 ---
 
 **12. Why does this lesson highlight Netflix's deep localization investment as a relevant example?**
-A) Because Netflix only operates in a single market
-B) Because a media product whose value depends heavily on cultural resonance has a specific, heightened need to descend the full Localization Depth Ladder, since surface translation alone would be entirely insufficient for such a product
-C) Because Netflix has never invested in any localization at all
-D) Because Netflix's localization efforts are irrelevant to other types of products
+A) A product depending on cultural resonance needs the full Depth Ladder
+B) Because Netflix has never invested in any localization work at all
+C) Because Netflix's localization is irrelevant to other kinds of products
+D) Because Netflix currently operates within a single market only
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Real Company Example explains this exact reasoning about cultural-resonance-dependent products needing deep localization.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A team notices their product's default form layout, which places the most "important" field first based on their home market's convention, performs poorly in a new market during early testing. Using this lesson's frameworks, what should the team investigate?**
-A) Assume the new market's users are simply using the product incorrectly
-B) Investigate whether this specific layout convention reflects a structural-bias assumption from their home market rather than genuinely researched behavior in the new market, per this lesson's extension of Lesson 47
-C) Ignore the finding, since form layout is not related to localization
-D) Assume the finding is a data error with no further investigation
+**13. (Product Thinking) A team notices their product's default form layout, which places the most "important" field first based on their home market's convention, performs poorly in a new market during early testing. What should the team investigate?**
+A) Assume the new market's users are simply misusing the product
+B) Ignore the finding, since form layout has no bearing on localization
+C) Assume the finding is a data error requiring no further investigation
+D) Whether the layout reflects an unvalidated home-market assumption
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This directly applies the lesson's core extension of structural bias — questioning whether a "natural" home-market assumption has been genuinely validated for the new market, rather than assuming user error.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
@@ -587,9 +587,9 @@ D) Assume the finding is a data error with no further investigation
 
 **14. Which of the following best reflects genuine, deep localization work, per the Localization Depth Ladder?**
 A) Translating all interface text accurately and considering the work complete
-B) Translating text, adapting date/currency formats, reviewing imagery and tone with people familiar with the target market, and integrating locally preferred payment methods and legal compliance
-C) Only adapting currency formats, with no other changes made
-D) Only reviewing legal compliance, with no attention to translation or cultural adaptation
+B) Adapting formats, imagery, payment methods, and legal compliance together
+C) Only adapting currency formats, with no other changes made anywhere
+D) Only reviewing legal compliance, with no translation or cultural work
 
 *Correct answer: B*
 *Explanation: This reflects genuine progression through all four levels of the Depth Ladder, in contrast to the shallow, single-level approaches in the other options.*
@@ -598,13 +598,13 @@ D) Only reviewing legal compliance, with no attention to translation or cultural
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A company has limited resources and is choosing between deeply localizing for one promising but regulatorily complex market versus quickly, shallowly entering three markets with simpler compliance requirements but smaller individual TAM. Using this lesson's frameworks, what is the most defensible approach?**
-A) Always choose the largest-TAM market regardless of regulatory complexity or execution capacity
-B) Use the Market Prioritization Matrix to weigh all four factors together — TAM, regulatory complexity, competitive intensity, and genuine execution capacity — recognizing that deep, genuine localization (per the Depth Ladder) for a smaller number of well-chosen markets is likely preferable to shallow, translation-only entry into multiple markets, given this lesson's caution about the long-term cost of under-resourced launches
-C) Enter all four markets shallowly and simultaneously, regardless of resource constraints
-D) Avoid international expansion entirely rather than make this trade-off decision
+**15. (Product Thinking, Highest Difficulty) A company has limited resources and is choosing between deeply localizing for one promising but regulatorily complex market versus quickly, shallowly entering three markets with simpler compliance requirements but smaller individual TAM. What is the most defensible approach?**
+A) Always choose the largest-TAM market regardless of other factors
+B) Enter all four markets shallowly and simultaneously regardless of resources
+C) Weigh all four Matrix factors, favoring deep work in fewer markets
+D) Avoid international expansion entirely rather than make this trade-off
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This reflects the lesson's core teaching that deep, genuine localization for well-chosen markets, guided by the full Market Prioritization Matrix, is generally preferable to shallow, resource-spread entry into multiple markets — directly applying both the Depth Ladder and prioritization frameworks together to a genuine resource-constrained trade-off.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*

@@ -314,10 +314,10 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why does platform-scale technical debt differ in kind from team-level technical debt, per this lesson?**
-A) Platform-scale debt is always smaller in absolute size
+A) Team-level technical debt never involves any external parties at all
 B) Dependents at platform scale are frequently external, numerous, and hard to fully enumerate, unlike team-level debt where the affected parties are usually known colleagues
-C) There is no meaningful difference between the two
-D) Team-level technical debt never involves any external parties
+C) Platform-scale debt is, by definition, always smaller in absolute size
+D) The two categories of debt are essentially interchangeable once a company reaches meaningful scale
 
 *Correct answer: B*
 *Explanation: The lesson's central distinction is that platform-scale debt involves external dependents who are harder to identify and coordinate with than internal colleagues.*
@@ -327,12 +327,12 @@ D) Team-level technical debt never involves any external parties
 ---
 
 **2. What is the correct order of the Sunset Runway's phases?**
-A) Decommission, Dependency Inventory, Announcement & Dual-Run, Active Migration Support
-B) Dependency Inventory, Announcement & Dual-Run, Active Migration Support, Decommission
-C) Announcement & Dual-Run, Decommission, Dependency Inventory, Active Migration Support
-D) Active Migration Support, Dependency Inventory, Decommission, Announcement & Dual-Run
+A) Active Migration Support, Decommission, Dependency Inventory, Announcement & Dual-Run
+B) Decommission, Announcement & Dual-Run, Dependency Inventory, Active Migration Support
+C) Dependency Inventory, Announcement & Dual-Run, Active Migration Support, Decommission
+D) Announcement & Dual-Run, Active Migration Support, Decommission, Dependency Inventory
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This is the sequential order introduced in the Theory section, from initial discovery through final removal.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -340,12 +340,12 @@ D) Active Migration Support, Dependency Inventory, Decommission, Announcement & 
 ---
 
 **3. Why is Phase 1 (Dependency Inventory) described as determining whether subsequent phases are planned realistically?**
-A) Phase 1 has no real bearing on later phases
-B) The inventory's completeness directly determines whether the runway length and communication plan account for the true scope of affected dependents
-C) Phase 1 is purely a formality with no practical impact
-D) Later phases can always compensate for an incomplete Phase 1 without any negative consequences
+A) The inventory's completeness directly determines whether the runway length and communication plan account for the true scope of affected dependents
+B) Later phases can generally compensate for an incomplete Phase 1 without much practical consequence
+C) Phase 1 functions mainly as a formality with little bearing on how later phases unfold
+D) Phase 1's outcome rarely changes what a reasonable runway or communication plan looks like
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: An incomplete inventory leads to a runway and communication plan that look adequate on paper but don't actually cover the true dependent population.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -353,12 +353,12 @@ D) Later phases can always compensate for an incomplete Phase 1 without any nega
 ---
 
 **4. What is a common cause of an incomplete dependency inventory?**
-A) Relying only on easily observable, registered integrations, missing undocumented or intermediary-based usage
-B) Spending too much time researching dependents before announcing a migration
-C) Including too many dependents in the initial inventory
-D) Dependency inventories are always complete by default
+A) Spending too much time researching dependents before announcing a migration
+B) Including far more dependents in the initial inventory than actually exist
+C) Assuming dependency inventories are complete by default once registration exists
+D) Relying only on easily observable, registered integrations, missing undocumented or intermediary-based usage
 
-*Correct answer: A*
+*Correct answer: D*
 *Explanation: The lesson specifically identifies reliance on registered integrations alone as the common source of undercounting true dependency.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -366,12 +366,12 @@ D) Dependency inventories are always complete by default
 ---
 
 **5. What is the purpose of a dual-run period?**
-A) To force all dependents to migrate simultaneously on a fixed schedule
-B) To decouple the platform's readiness to retire something from each dependent's individual readiness to migrate
-C) To permanently maintain both old and new versions indefinitely
-D) To avoid ever having to announce a deprecation publicly
+A) To decouple the platform's readiness to retire something from each dependent's individual readiness to migrate
+B) To force every dependent to migrate simultaneously on one fixed schedule
+C) To maintain both the old and new versions permanently, with no eventual retirement
+D) To avoid ever having to publicly announce a deprecation at all
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: A dual-run period allows dependents to migrate according to their own constraints and timelines, rather than all at once.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -379,12 +379,12 @@ D) To avoid ever having to announce a deprecation publicly
 ---
 
 **6. In the Case Study, what specifically caused the migration to fail for a significant population of affected businesses?**
-A) The 90-day runway was too short for even the directly registered dependents
-B) The dependency inventory, based only on registered API keys, missed hundreds of downstream customers behind a third-party vendor's shared integration
-C) The new API version was technically inferior to the old one
-D) No deprecation notice was ever published at all
+A) The dependency inventory, based only on registered API keys, missed hundreds of downstream customers behind a third-party vendor's shared integration
+B) The company never published any deprecation notice for the old API version
+C) The new API version performed noticeably worse than the version it replaced
+D) The announced 90-day runway proved too short even for the directly registered dependents
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The failure specifically stemmed from an incomplete Phase 1 inventory that missed a substantial hidden dependent population.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
@@ -392,12 +392,12 @@ D) No deprecation notice was ever published at all
 ---
 
 **7. According to the Migration Readiness Checklist, what does a "no" on Beyond Registered Integrations indicate?**
-A) A minor, low-priority gap
-B) A serious planning gap, since the most damaging migration failures often come from dependents the platform team never knew existed
-C) That the migration is ready to proceed as planned
-D) That registered integrations are the only dependents that matter
+A) That registered integrations are effectively the only dependents worth tracking
+B) Confirmation that the migration is otherwise ready to proceed as planned
+C) A serious planning gap, since the most damaging migration failures often come from dependents the platform team never knew existed
+D) A minor, low-priority item that rarely affects overall migration outcomes
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The lesson explicitly treats this as a serious risk given the Case Study's illustration of hidden dependency consequences.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
@@ -405,10 +405,10 @@ D) That registered integrations are the only dependents that matter
 ---
 
 **8. Why should Phase 4 (Decommission) ideally be gated on measured migration progress rather than solely a calendar date?**
-A) Calendar dates are always inaccurate measures of time
+A) Calendar-based decommissioning is generally the safer of the two available approaches
 B) A fixed date regardless of actual completion can convert a planned transition into a forced, disruptive cutover for dependents who haven't finished migrating
-C) Migration progress can never actually be measured in practice
-D) Calendar-based decommissioning is always safer than progress-based decommissioning
+C) Migration progress is essentially impossible to measure in any practical way
+D) Calendar dates are inherently unreliable measures of elapsed time
 
 *Correct answer: B*
 *Explanation: Proceeding by calendar date alone, without checking actual migration completion, risks harming dependents who are still in progress.*
@@ -418,12 +418,12 @@ D) Calendar-based decommissioning is always safer than progress-based decommissi
 ---
 
 **9. Why do mid-size companies typically experience their first genuinely painful migration, per the Real World Perspective section?**
-A) Mid-size companies never have any external dependents
-B) A growing developer base was never comprehensively inventoried, so a deprecation planned for a small known set turns out to affect a much larger population
-C) Mid-size companies are legally required to migrate systems more frequently than other company sizes
-D) Migrations are always painless regardless of company size
+A) Migrations are described as essentially painless once a company reaches mid-size scale
+B) Mid-size companies face legal requirements to migrate systems more often than companies of other sizes
+C) Mid-size companies, per the lesson, rarely accumulate any external dependents worth inventorying
+D) A growing developer base was never comprehensively inventoried, so a deprecation planned for a small known set turns out to affect a much larger population
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Real World Perspective section specifically attributes this to inventory gaps that emerge as the developer base grows past what founding-era informal communication can cover.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -431,12 +431,12 @@ D) Migrations are always painless regardless of company size
 ---
 
 **10. What do mature, Big Tech-scale platforms typically require before any deprecation announcement, per the Real World Perspective section?**
-A) No formal process; deprecations are handled entirely case by case with no governance
-B) A mandatory dependency-impact assessment and dedicated migration-support engineering resources
-C) Immediate decommissioning with no dual-run period, to move as quickly as possible
-D) Approval solely from a single internal engineering team, with no cross-functional review
+A) A mandatory dependency-impact assessment and dedicated migration-support engineering resources
+B) Sign-off from a single internal engineering team, with no cross-functional review required
+C) Immediate decommissioning with no dual-run period, to move through the process quickly
+D) No formal process at all; deprecations are handled case by case with no governance
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Real World Perspective section describes formal impact assessments and dedicated migration support as characteristic of mature platform governance.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -444,10 +444,10 @@ D) Approval solely from a single internal engineering team, with no cross-functi
 ---
 
 **11. Why is Phase 3 (Active Migration Support) distinct from simply publishing a deprecation announcement?**
-A) It involves no additional effort beyond what Phase 2 already requires
+A) It replaces the need for a dependency inventory in Phase 1 entirely
 B) It requires direct outreach to known high-impact dependents and concrete migration tooling, rather than passively waiting for dependents to act on their own
-C) It is only relevant for migrations affecting fewer than ten dependents
-D) It replaces the need for a dependency inventory entirely
+C) It applies only to migrations affecting fewer than ten known dependents
+D) It involves essentially no additional effort beyond what Phase 2 already requires
 
 *Correct answer: B*
 *Explanation: The lesson distinguishes passive announcement from the active, resourced support described in Phase 3.*
@@ -457,12 +457,12 @@ D) It replaces the need for a dependency inventory entirely
 ---
 
 **12. (Scenario) A platform team has identified 150 registered API integrations for an upcoming deprecation, but has not investigated whether any of them are used by intermediaries on behalf of further downstream customers. What is the most significant risk here?**
-A) There is no meaningful risk; 150 is already a comprehensive count
-B) The true dependent population could be substantially larger and less visible than the registered count suggests, similar to the Case Study
-C) Intermediary usage is always accounted for automatically in registered integration counts
-D) This risk only applies to platforms with fewer than 100 registered integrations
+A) This particular risk is described as relevant only to platforms with fewer than 100 registered integrations
+B) Intermediary usage is generally accounted for automatically within registered integration counts
+C) There is little meaningful risk here, since 150 already represents a comprehensive count
+D) The true dependent population could be substantially larger and less visible than the registered count suggests, similar to the Case Study
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This mirrors the Case Study's core failure mode — registered counts can significantly understate true dependency when intermediaries are involved.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
@@ -470,10 +470,10 @@ D) This risk only applies to platforms with fewer than 100 registered integratio
 ---
 
 **13. (Product Thinking) A migration's announced runway was generous relative to its Promise Tier classification from Lesson 62, yet still caused significant disruption. What is the most likely explanation, using this lesson's frameworks?**
-A) The Promise Tiers model from Lesson 62 is fundamentally incompatible with migration planning
+A) Runway length is described as having little actual bearing on how a migration unfolds
 B) A generous runway calculated from an incomplete dependency inventory does not protect dependents who were never accounted for and never received the communication in the first place
-C) Runway length has no actual bearing on migration outcomes
-D) The migration should have been announced with no runway at all
+C) The migration would have gone more smoothly with no runway announced at all
+D) The Promise Tiers model from Lesson 62 is fundamentally incompatible with migration planning
 
 *Correct answer: B*
 *Explanation: A nominally generous runway is only meaningful for dependents who are actually aware of it; an incomplete inventory undermines even a well-intentioned timeline.*
@@ -483,12 +483,12 @@ D) The migration should have been announced with no runway at all
 ---
 
 **14. (Interview Reasoning) A candidate asked how they'd plan an API deprecation immediately describes an announcement timeline and communication plan, without mentioning how they'd identify affected dependents. What does this signal, per the Interview Perspective section?**
-A) A strong, complete understanding of migration planning
-B) A gap in prioritizing dependency inventory as the foundational first step, which the interviewer is specifically listening for
-C) That the candidate should be hired for a senior platform PM role immediately
-D) Nothing meaningful; announcement timeline is the only relevant consideration
+A) That the candidate should be considered for a senior platform PM role without further discussion
+B) Little of concern, since announcement timeline is described as the only relevant consideration
+C) A strong, complete understanding of how migration planning should proceed
+D) A gap in prioritizing dependency inventory as the foundational first step, which the interviewer is specifically listening for
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Interview Perspective section specifically flags dependency-inventory-first thinking as the desired response, which this candidate's answer skips.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
@@ -496,12 +496,12 @@ D) Nothing meaningful; announcement timeline is the only relevant consideration
 ---
 
 **15. (Product Thinking, Highest Difficulty) A platform team must deprecate an older API version, and has just learned that a major third-party vendor uses a shared integration key on behalf of an unknown number of its own downstream customers. Using only the frameworks in this lesson, what is the most defensible approach?**
-A) Proceed with the originally planned 90-day runway and registered-key-based communication, since the vendor is technically responsible for its own customers
-B) Investigate the scope of downstream dependency behind the shared key, extend the runway and communication plan to realistically account for this hidden population, and gate final decommission on evidence of actual migration progress rather than calendar date alone
-C) Immediately decommission the old API version to avoid further complexity
-D) Permanently maintain the old API version indefinitely to avoid any risk of disruption
+A) Permanently maintain the old API version indefinitely to avoid any risk of disrupting the vendor's customers
+B) Immediately decommission the old API version now, to avoid the complexity of tracking the vendor's customers
+C) Investigate the scope of downstream dependency behind the shared key, extend the runway and communication plan to realistically account for this hidden population, and gate final decommission on evidence of actual migration progress rather than calendar date alone
+D) Proceed with the originally planned 90-day runway and registered-key-based communication, since the vendor is technically responsible for its own customers
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This mirrors the Reflection Exercise and Case Study: the correct response actively investigates the hidden dependency, adjusts the plan accordingly, and gates the final step on real progress rather than either rigid adherence to the original plan or indefinite avoidance of the migration.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*

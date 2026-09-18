@@ -392,12 +392,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is a dark pattern?**
-A) A visually dark-themed user interface
-B) An interface or interaction design deliberately structured to manipulate users into a choice they wouldn't make with full, clear information
-C) A synonym for any A/B test variant
-D) A type of technical debt unrelated to user experience
+A) A UI theme using dark color schemes for better accessibility
+B) A synonym for any randomized A/B test variant a team runs
+C) A type of technical debt unrelated to user experience
+D) A design deliberately structured to manipulate users into an uninformed choice
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Theory section defines dark patterns exactly this way.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -405,12 +405,12 @@ D) A type of technical debt unrelated to user experience
 ---
 
 **2. What does the Harm Radius model extend, and what does it ask?**
-A) It extends Lesson 41's Goodhart's Law and asks about metric definitions
-B) It extends Lesson 36's Blast Radius model and asks who could be harmed by a decision, how severely, and how reversibly
-C) It extends Lesson 45's experimentation rigor and asks only about statistical significance
-D) It is an entirely new concept with no connection to any earlier lesson
+A) It extends Goodhart's Law and asks only about metric definitions
+B) It is an entirely new concept with no connection to any earlier lesson
+C) It extends Blast Radius, asking who's harmed, how severely, how reversibly
+D) It extends experimentation rigor and asks only about statistical significance
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Theory section explicitly describes the Harm Radius as extending Lesson 36's Blast Radius model to ethical harm.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -418,23 +418,23 @@ D) It is an entirely new concept with no connection to any earlier lesson
 ---
 
 **3. Why does the Harm Radius specifically consider whether harm falls disproportionately on vulnerable users?**
-A) Because vulnerable users are irrelevant to ethical consideration
-B) Because a decision producing modest average harm across a broad user base may still be seriously harmful if that harm concentrates severely on users with less financial resilience, digital literacy, or capacity to resist manipulation
-C) Because vulnerable users are always a majority of any user base
-D) Because this consideration only applies to technical risk, not ethical harm
+A) Modest average harm can be serious if it concentrates on a less-resourced group
+B) Vulnerable users are always a clear majority of any given user base
+C) This consideration only applies to technical risk, not ethical harm
+D) Vulnerable users are excluded entirely from ethical consideration
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Theory section explains this exact reasoning about disproportionate harm on vulnerable subgroups.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**4. Why is legal compliance (broad terms-of-service consent) not equivalent to genuine informed consent, according to this lesson?**
-A) They are identical standards with no meaningful difference
-B) Legal sufficiency and ethical adequacy are related but distinct standards, and the gap between them matters more as an experiment's or decision's potential for real harm increases
-C) Terms of service are never legally binding
-D) Informed consent only applies to medical research, never to product experimentation
+**4. Why is legal compliance (broad terms-of-service consent) not equivalent to genuine informed consent?**
+A) Terms of service are never legally binding in any jurisdiction
+B) Legal sufficiency and ethical adequacy are related but distinct standards
+C) Informed consent applies only to formal medical research, never products
+D) The two standards are identical, with no meaningful difference
 
 *Correct answer: B*
 *Explanation: The Theory section explains this exact distinction and its increasing relevance as potential harm grows.*
@@ -444,12 +444,12 @@ D) Informed consent only applies to medical research, never to product experimen
 ---
 
 **5. What is the "sunlight test"?**
-A) A test for whether a product works well in outdoor lighting conditions
-B) A heuristic asking whether a decision would survive being described accurately and in full detail in a prominent news article, with the decision-maker's name attached
-C) A synonym for the Van Westendorp price sensitivity test
-D) A formal legal requirement for all product launches
+A) A check for whether a product performs well in bright outdoor lighting
+B) A formal legal requirement attached to every product launch
+C) A synonym for the Van Westendorp price sensitivity method
+D) Asking whether a decision would survive accurate, public description
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Theory section defines the sunlight test exactly this way.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -457,12 +457,12 @@ D) A formal legal requirement for all product launches
 ---
 
 **6. How does "ethical debt" extend the technical debt framework from Lesson 39?**
-A) It has no relationship to technical debt whatsoever
-B) It applies the same principal-and-interest, compounding-cost structure to ethical shortcuts, but with the key difference that ethical debt's interest often falls on users and society rather than primarily on the company
-C) It argues that ethical shortcuts never carry any real cost
-D) It claims ethical debt and technical debt are identical in every respect, including who bears the cost
+A) It claims ethical shortcuts never carry any measurable cost
+B) It has no meaningful relationship to technical debt at all
+C) It applies the same principal-plus-interest structure, but interest falls on users
+D) It argues ethical and technical debt are identical in who bears the cost
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Theory section explicitly extends the technical debt structure while highlighting this key asymmetry.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
@@ -470,12 +470,12 @@ D) It claims ethical debt and technical debt are identical in every respect, inc
 ---
 
 **7. In the Detailed Case Study, why did the redesigned cancellation flow eventually generate regulatory scrutiny?**
-A) The flow was too simple and made cancellation too easy
-B) The flow added friction specifically designed to suppress cancellation, generating real user harm and public complaints that eventually drew regulatory attention to the company's cancellation practices
+A) Added friction suppressed cancellation, generating harm and complaints
+B) The flow made cancellation too simple and easy for users to complete
 C) The flow had no measurable effect on churn at all
-D) The company voluntarily reported itself to regulators
+D) The company proactively reported the redesign to regulators itself
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Case Study explicitly describes this sequence — friction-driven churn reduction leading to user harm, public complaints, and regulatory inquiry.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
@@ -483,9 +483,9 @@ D) The company voluntarily reported itself to regulators
 ---
 
 **8. Why does this lesson describe the cancellation flow redesign as a "textbook instance of Goodhart's Law"?**
-A) Because the churn metric was miscalculated
-B) Because churn (the target metric) improved while the underlying value it was meant to represent — genuine customer satisfaction and trust — actually declined, exactly the dynamic Lesson 41 describes
-C) Because Goodhart's Law only applies to engineering metrics
+A) Because the churn metric itself was calculated incorrectly
+B) Churn improved while the underlying value it represented actually declined
+C) Because Goodhart's Law only ever applies to engineering metrics
 D) Because the company never tracked churn as a metric at all
 
 *Correct answer: B*
@@ -496,12 +496,12 @@ D) Because the company never tracked churn as a metric at all
 ---
 
 **9. What was the recommended corrective design change in the Detailed Case Study?**
-A) Removing the ability to cancel entirely
-B) Redesigning the flow to genuinely simplify cancellation while still offering retention incentives transparently and without obstruction
-C) Increasing the number of steps required to cancel even further
-D) Eliminating all retention offers entirely, with no further consideration of the underlying business goal
+A) Removing the ability to cancel from the product entirely
+B) Adding even more confirmation steps to the cancellation flow
+C) Eliminating retention offers with no further consideration of the goal
+D) Simplifying cancellation while offering retention incentives transparently
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Case Study explicitly describes this corrective approach — preserving the legitimate retention goal without relying on friction and confusion.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -509,25 +509,25 @@ D) Eliminating all retention offers entirely, with no further consideration of t
 ---
 
 **10. Why does this lesson caution against treating "everyone in the industry does this" as sufficient ethical justification?**
-A) Because industry practices are always illegal
-B) Because industry prevalence of a practice doesn't establish its ethical acceptability, and regulatory/public scrutiny has repeatedly shown that widespread adoption doesn't protect against eventual serious consequences
-C) Because no company has ever faced consequences for following industry-standard practices
-D) Because this reasoning is only relevant to technical debt, not ethical decisions
+A) Because industry-standard practices are always outright illegal
+B) Because no company has ever faced consequences for following norms
+C) Prevalence doesn't establish acceptability, and scrutiny has shown that
+D) Because this reasoning only ever applies to technical debt, not ethics
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Common Beginner Mistake #5 explains this exact reasoning about industry prevalence not establishing ethical acceptability.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked how they'd balance a legitimate churn-reduction goal against manipulative design risk, and answers: "I'd just implement whatever reduces churn the most, since that's the business priority." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; churn reduction should always be the only consideration
-B) It fails to distinguish genuine persuasion from manipulation, and doesn't consider whether an alternative design could achieve the legitimate goal without the ethically questionable mechanism, echoing this lesson's Case Study resolution
-C) It correctly demonstrates strong business prioritization
-D) It shows appropriate focus on metrics over all other considerations
+**11. (Interview Reasoning) A candidate is asked how they'd balance a churn-reduction goal against manipulative design risk, and answers: "I'd implement whatever reduces churn the most, since that's the priority." What is the weakness in this answer?**
+A) It skips checking whether a less-harmful path reaches the same goal
+B) It correctly demonstrates strong, appropriate business prioritization
+C) There is no weakness; churn should always be the sole consideration
+D) It shows appropriate focus on metrics above all other concerns
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Interview Perspective section states that a strong answer articulates the persuasion/manipulation distinction and seeks a less harmful alternative path to the same legitimate goal.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
@@ -535,10 +535,10 @@ D) It shows appropriate focus on metrics over all other considerations
 ---
 
 **12. Why does this lesson recommend applying the Harm Radius and Ethical Decision Checklist during the design process, rather than only after a decision has already been implemented?**
-A) Because ethical review has no value at any stage
-B) Because ethical review conducted only as a final check faces the same sunk-cost pressure that makes genuine reconsideration difficult once significant investment has already occurred
-C) Because design processes never involve any ethical considerations
-D) Because post-implementation review is always more effective than pre-implementation review
+A) Ethical review carries no genuine value at any stage of a project
+B) A final-only check faces the same sunk-cost pressure as late reconsideration
+C) Design processes never actually involve any ethical considerations
+D) Post-implementation review is always more effective than early review
 
 *Correct answer: B*
 *Explanation: Common Beginner Mistake #4 explains this exact sunk-cost risk of delaying ethical consideration until after implementation.*
@@ -547,40 +547,40 @@ D) Because post-implementation review is always more effective than pre-implemen
 
 ---
 
-**13. (Product Thinking) A team proposes an A/B test manipulating the framing of a financial decision (e.g., a loan repayment option) to see which framing increases uptake. Using this lesson's frameworks, what distinguishes this from a low-stakes UI color test?**
-A) There is no meaningful difference; all A/B tests carry identical ethical weight regardless of subject matter
-B) The financial decision test carries meaningfully higher potential for real harm and involves a domain where genuine informed consent matters more, warranting greater ethical scrutiny than a low-stakes, easily reversible UI test
-C) Only the color test requires any ethical consideration, since financial products are exempt from ethical review
-D) The financial test should be run with an even larger sample size, with no other differences in ethical treatment
+**13. (Product Thinking) A team proposes an A/B test manipulating the framing of a financial decision (e.g., a loan repayment option). Using this lesson's frameworks, what distinguishes this from a low-stakes UI color test?**
+A) There is no meaningful difference; all tests carry identical ethical weight
+B) Only the color test requires any ethical consideration whatsoever
+C) The financial test should simply use a larger sample size, nothing else
+D) The financial test carries higher harm potential, warranting more scrutiny
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This applies the lesson's core distinction — informed consent and harm-potential considerations scale with the actual stakes and subject matter of the experiment, not treated identically regardless of context.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
-**14. Which of the following best reflects a decision that would likely pass the sunlight test?**
-A) A cancellation flow deliberately obscuring the cancel option behind multiple confusing steps, justified internally as "giving users a chance to reconsider"
-B) A clear, easy-to-find cancellation option paired with a transparent, honestly-presented retention offer the user can freely accept or decline
-C) A pre-checked box adding an unwanted recurring charge that most users don't notice
-D) Confusing language designed to make an unwanted option seem like the default choice
+**14. Which of the following would most likely pass the sunlight test?**
+A) A cancellation flow obscuring the cancel option behind confusing steps
+B) A pre-checked box quietly adding an unwanted recurring charge
+C) A clear cancellation option paired with a transparent retention offer
+D) Language designed to make an unwanted option look like the default
 
-*Correct answer: B*
-*Explanation: Option B represents a transparent mechanism whose actual design and justification could be described accurately and publicly without generating the kind of scrutiny the other three dark-pattern-style options would likely draw.*
+*Correct answer: C*
+*Explanation: Option C represents a transparent mechanism whose actual design and justification could be described accurately and publicly without generating the kind of scrutiny the other three dark-pattern-style options would likely draw.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM discovers that a shipped feature, while not violating any law or explicit company policy, is generating disproportionate financial harm to a specific vulnerable user segment (e.g., users with limited financial literacy triggering unexpected charges). Using this lesson's frameworks, what is the most defensible course of action?**
-A) Take no action, since the feature is technically legal and compliant with company policy
-B) Apply the Harm Radius and Ethical Decision Checklist to formally assess and document the disproportionate harm, escalate the finding through appropriate channels (echoing Lesson 47's stakeholder and Lesson 54's no-surprises principles), and advocate for a redesign addressing the specific vulnerable-user harm, even though no formal rule currently requires this action
-C) Quietly ignore the issue to avoid raising concerns that might slow down the product roadmap
-D) Wait for a regulator or journalist to identify the issue before taking any internal action
+**15. (Product Thinking, Highest Difficulty) A PM discovers that a shipped feature, while not violating any law or explicit company policy, is generating disproportionate financial harm to a specific vulnerable user segment. What is the most defensible course of action?**
+A) Assess and document the harm, then escalate and advocate for a redesign
+B) Take no action, since the feature is technically legal and compliant
+C) Quietly ignore the issue to avoid slowing down the product roadmap
+D) Wait for a regulator or journalist to surface the issue before acting
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core teaching that ethical responsibility extends beyond mere legal or policy compliance — genuine harm to a vulnerable population warrants proactive escalation and action, integrating this lesson's frameworks with the proactive-disclosure principles from Lesson 54, rather than waiting for external pressure or ignoring the issue because no formal rule technically requires action.*
+*Correct answer: A*
+*Explanation: This reflects the lesson's core teaching that ethical responsibility extends beyond mere legal or policy compliance — genuine harm to a vulnerable population warrants proactive escalation and action, rather than waiting for external pressure or ignoring the issue because no formal rule technically requires action.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 

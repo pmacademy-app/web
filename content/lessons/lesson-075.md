@@ -308,196 +308,196 @@ There is no single correct answer to the prompts below — the goal is to practi
 
 ## Quiz
 
-**1. Why is a current market advantage not automatically evidence of a durable competitive moat?**
-A) Market advantages are always temporary regardless of any structural factors
-B) A genuine moat requires structural difficulty of replication, even for well-resourced competitors, not merely an unchallenged lead
-C) Competitive moats do not actually exist in real markets
-D) Market leadership always indicates the presence of a genuine moat
+**1. What must a competitive advantage demonstrate to count as a genuine moat, per this lesson?**
+A) That it produced one strong quarter of revenue growth
+B) That no rival has yet chosen to challenge it directly
+C) That it resists replication even by a well-resourced rival
+D) That customers rate the brand highly in outside surveys
 
-*Correct answer: B*
-*Explanation: The lesson's central distinction is between a temporary, unchallenged lead and a structurally defensible position.*
+*Correct answer: C*
+*Explanation: A moat requires structural difficulty of replication that holds even against a well-resourced competitor, not merely an unchallenged lead.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the two dimensions of the Moat Durability Matrix?**
-A) Revenue and market share
-B) Replication difficulty and natural erosion risk
-C) Brand awareness and customer satisfaction
-D) Company size and founding date
+A) Replication difficulty and natural erosion risk
+B) Customer satisfaction and net promoter score
+C) Market share and total employee headcount
+D) Founding date and total capital raised
 
-*Correct answer: B*
-*Explanation: These are the two dimensions explicitly introduced in the Theory section for evaluating a claimed moat's genuine durability.*
+*Correct answer: A*
+*Explanation: These two axes are what the Theory section introduces for plotting a claimed advantage's genuine durability.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**3. What describes an advantage in the least favorable quadrant of the Moat Durability Matrix?**
-A) High replication difficulty and low erosion risk
-B) Low replication difficulty and high erosion risk
-C) High replication difficulty and high erosion risk
-D) An advantage that cannot be plotted on the Matrix at all
+**3. Which quadrant of the Moat Durability Matrix describes an advantage that should not be called a moat at all?**
+A) High replication difficulty, low erosion risk
+B) High replication difficulty, high erosion risk
+C) Low replication difficulty, low erosion risk
+D) Low replication difficulty, high erosion risk
 
-*Correct answer: B*
-*Explanation: This quadrant, combining ease of replication with high erosion risk, represents an advantage that should not be described as a genuine moat.*
+*Correct answer: D*
+*Explanation: This combination pairs ease of replication with rapid erosion, and the lesson says such an advantage should not be called a moat at all.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**4. Name the five common categories of competitive moat.**
-A) Marketing, sales, product, engineering, support
-B) Network effects, switching costs, economies of scale, brand and trust, proprietary assets
-C) Revenue, growth rate, market share, valuation, headcount
-D) Speed, quality, price, service, innovation
+**4. Which five categories does this lesson identify as common types of moat?**
+A) Talent density, capital reserves, market timing, and founder reputation
+B) Network effects, switching costs, economies of scale, brand trust, and proprietary assets
+C) Pricing strategy, channel promotion, product placement, and positioning
+D) Revenue growth, retention rate, referral volume, and customer satisfaction
 
 *Correct answer: B*
-*Explanation: These five categories are explicitly introduced in the Theory section as the common moat types this lesson examines.*
+*Explanation: These five categories are laid out in the Theory section as the common moat types this lesson examines.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**5. Why are network effects more fragile than their common reputation suggests?**
-A) Network effects never provide any real competitive advantage
-B) Multi-homing allows participants to use a competing platform with minimal cost, undermining the incumbent's exclusive advantage
-C) Network effects only apply to consumer products, never B2B products
-D) Network effects always strengthen over time with no possible vulnerability
+**5. What specifically weakens a network-effect moat, per this lesson?**
+A) A shrinking total addressable market for the category
+B) Declining venture funding across the technology sector
+C) Multi-homing, where users adopt a rival platform at low cost
+D) A competitor entering at a noticeably lower price point
 
-*Correct answer: B*
-*Explanation: The lesson explicitly identifies multi-homing as the mechanism that weakens network-effect moats in contexts where switching or dual participation is low-cost.*
+*Correct answer: C*
+*Explanation: The lesson identifies multi-homing as the specific mechanism that weakens network-effect moats wherever dual participation is low-cost.*
 *Learning objective tested: #3, #4*
 *Difficulty: Easy*
 
 ---
 
-**6. Why should switching costs be evaluated from the customer's perspective rather than the vendor's?**
-A) The vendor's perspective is always more accurate than the customer's
-B) A switching cost that feels significant internally to the vendor may feel much smaller to a genuinely dissatisfied customer
-C) Switching costs are never relevant to competitive strategy
-D) Customers never actually consider switching costs when evaluating competitors
+**6. Why should switching costs be assessed from the customer's perspective rather than the vendor's?**
+A) A cost that feels significant internally may feel minor to a dissatisfied customer
+B) Customers never actually weigh switching costs when facing a competitor
+C) Vendors are legally required to publish switching-cost estimates
+D) Switching costs apply only to consumer products, not enterprise deals
 
-*Correct answer: B*
-*Explanation: The Common Beginner Mistakes section explicitly warns against this perspective mismatch as a source of overestimated moat strength.*
+*Correct answer: A*
+*Explanation: The Common Beginner Mistakes section warns against this exact perspective mismatch as a source of overestimated moat strength.*
 *Learning objective tested: #4*
-*Difficulty: Easy*
+*Difficulty: Medium*
 
 ---
 
-**7. In the Multi-Homed Marketplace case study, what specifically allowed the new entrant to succeed despite not matching the incumbent's total scale?**
-A) The new entrant offered significantly lower prices than the incumbent
-B) Low-cost multi-homing allowed freelancers and clients to use both platforms simultaneously, letting the entrant capture valuable participants without needing to displace the incumbent entirely
-C) The incumbent's platform experienced a major technical outage
-D) The new entrant acquired the incumbent's user data through a data breach
+**7. What is the specific difference between brand recognition and brand trust as a moat, per this lesson?**
+A) Recognition is measured by revenue, while trust is measured by headcount
+B) Recognition matters only in B2B markets, while trust matters only in B2C
+C) Recognition requires regulatory approval, while trust never does
+D) Recognition is mere awareness, while trust resists a comparable rival's offer
+
+*Correct answer: D*
+*Explanation: Awareness of a brand does not guarantee the deep customer confidence needed to resist a comparable competitor's offer; only trust functions as a real moat.*
+*Learning objective tested: #3, #4*
+*Difficulty: Medium*
+
+---
+
+**8. In the Multi-Homed Marketplace case study, what let the new entrant capture value without matching the incumbent's total scale?**
+A) The entrant acquired the incumbent's core matching technology
+B) Low-cost multi-homing let both sides use both platforms at once
+C) The incumbent's platform suffered a prolonged security breach
+D) The entrant undercut pricing across every service tier at once
 
 *Correct answer: B*
-*Explanation: The case study's core mechanism was low-cost multi-homing, not pricing, technical failure, or data acquisition.*
+*Explanation: The case study's core mechanism was low-cost multi-homing, not acquired technology, an outage, or pricing.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. What was the incumbent's core strategic error in the Multi-Homed Marketplace case study?**
-A) Failing to build any network effect at all
-B) Assuming its network effect sat in the most favorable quadrant (high difficulty, low erosion) without examining its specific vulnerability to multi-homing
-C) Investing too heavily in defensive strategies against a threat that never materialized
-D) Failing to raise sufficient funding to compete
+**9. What was the incumbent's core strategic error in the Multi-Homed Marketplace case study?**
+A) Assuming its network effect was durable without examining its multi-homing risk
+B) Failing to build any meaningful freelancer or client base in its early years
+C) Spending too heavily on defenses against a threat that never appeared
+D) Losing access to its own proprietary matching algorithm entirely
 
-*Correct answer: B*
-*Explanation: The failure was a mismatch between assumed and actual moat durability, specifically regarding the market's multi-homing dynamics.*
+*Correct answer: A*
+*Explanation: The failure was a mismatch between assumed and actual moat durability, specifically the unexamined multi-homing dynamics of its own market.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
 
 ---
 
-**9. According to the Competitive Moat Audit Checklist, what is a red flag for a claimed "brand and trust" moat?**
-A) Deep customer resistance to switching even when offered a comparable competitor
-B) Brand strength measured only by awareness metrics, not by resistance to a comparable competitor's offer
-C) A brand that has existed for many decades
-D) A brand associated with a specific product category
+**10. Per the Competitive Moat Audit Checklist, what counts as a red flag for a claimed "brand and trust" moat?**
+A) A brand that has operated in its category for over a decade
+B) Customers who name the brand first in unprompted surveys
+C) A brand that has expanded into several adjacent categories
+D) Brand strength measured only by awareness, not resistance to a rival's offer
 
-*Correct answer: B*
-*Explanation: The checklist explicitly distinguishes broad awareness from genuine trust-based resistance to switching as the meaningful diagnostic.*
+*Correct answer: D*
+*Explanation: The checklist distinguishes broad awareness from genuine trust-based resistance to switching, and treats awareness-only evidence as the meaningful red flag.*
 *Learning objective tested: #3, #4*
 *Difficulty: Medium*
 
 ---
 
-**10. Why might early-stage startups be cautioned against claiming they already have a genuine moat, per the Real World Perspective section?**
-A) Startups are legally prohibited from having competitive advantages
-B) Claiming a moat prematurely can create dangerous overconfidence, when the honest priority is usually building toward a genuine moat rather than assuming one exists
-C) Moats are only relevant to companies with over ten thousand employees
-D) Early-stage companies never face any competitive pressure
+**11. Per the Real World Perspective section, why does it caution early-stage startups against claiming a genuine moat already exists?**
+A) Moats are legally reserved for companies past a Series C round
+B) The claim creates overconfidence when building toward one is the honest priority
+C) Early-stage companies face no competitive pressure worth naming
+D) Early-stage companies are too small for rivals to bother studying
 
 *Correct answer: B*
-*Explanation: The Real World Perspective section explicitly warns against premature moat claims at the early stage, given the lack of genuine structural advantage typically present.*
+*Explanation: The section warns that premature moat claims create false security, given the lack of genuine structural advantage typically present this early.*
 *Learning objective tested: #1*
-*Difficulty: Medium*
-
----
-
-**11. What typically becomes empirically testable for mid-size companies regarding their claimed moat, per the Real World Perspective section?**
-A) Whether the company should raise additional funding
-B) Whether the previously assumed advantage is genuinely structural or merely a temporary lead, as competitors with real resources begin challenging the position directly
-C) Whether the company's brand logo needs to be redesigned
-D) Whether the company should relocate its headquarters
-
-*Correct answer: B*
-*Explanation: The Real World Perspective section describes this stage as the point where a moat claim first faces genuine competitive testing.*
-*Learning objective tested: #1, #4*
-*Difficulty: Medium*
-
----
-
-**12. (Scenario) A company describes its large existing customer base as an "unassailable" network-effect moat, but has never examined whether customers could easily use a competing product simultaneously. What should this company investigate first, per this lesson's frameworks?**
-A) Whether its marketing budget is sufficiently large
-B) Whether multi-homing is genuinely costly or impractical for its specific customer base, using the Competitive Moat Audit Checklist's network effects diagnostic
-C) Whether its logo and branding need updating
-D) Whether its pricing is competitive with alternatives
-
-*Correct answer: B*
-*Explanation: This directly applies the lesson's core diagnostic for network-effect moats: examining multi-homing cost and practicality before assuming durability.*
-*Learning objective tested: #2, #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A PM is asked to justify why a company's current market leadership should be trusted to persist. Using this lesson's frameworks, what is the strongest response?**
-A) Cite the company's current revenue and user count as sufficient evidence of a durable moat
-B) Conduct an honest Moat Durability Matrix assessment, examining specific replication difficulty and erosion risk for the company's actual competitive advantages, rather than assuming current leadership is self-sustaining
-C) Assume all five moat categories automatically apply equally to the company's situation
-D) Decline to examine the question, since current leadership is sufficient justification on its own
+**12. What typically becomes empirically testable for a mid-size company's claimed moat, per the Real World Perspective section?**
+A) Whether the company should relocate near its major customers
+B) Whether the founding team should be replaced with professionals
+C) Whether the assumed advantage is genuinely structural, as resourced rivals test it
+D) Whether the company's valuation multiple matches its public peers
 
-*Correct answer: B*
-*Explanation: The correct response applies the Matrix honestly rather than treating current market position itself as sufficient evidence of durability.*
-*Learning objective tested: #2, #4, #5*
+*Correct answer: C*
+*Explanation: This stage is described as the point where a moat claim first faces genuine competitive testing rather than remaining an internal assumption.*
+*Learning objective tested: #1, #4*
+*Difficulty: Medium-Hard*
+
+---
+
+**13. (Scenario) A company calls its large customer base an "unassailable" network-effect moat but has never checked whether customers could easily use a rival product too. What should it investigate first, per this lesson's frameworks?**
+A) Whether its advertising spend matches the broader market
+B) Whether its visual branding and logo need a refresh
+C) Whether its subscription pricing tiers align with rivals
+D) Whether multi-homing is genuinely costly for its customer base
+
+*Correct answer: D*
+*Explanation: This applies the lesson's core network-effect diagnostic directly: examine multi-homing cost and practicality before assuming durability.*
+*Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked whether network effects are always a strong moat, answers simply "yes" with no further elaboration. What does this most likely signal, per the Interview Perspective section?**
-A) A strong and complete understanding of competitive strategy
-B) A gap in recognizing the multi-homing vulnerability that significantly weakens network-effect moats in many contexts
-C) That the candidate is ready for a senior competitive strategy role immediately
-D) Nothing meaningful; network effects are in fact always an unconditionally strong moat
+**14. (Interview Reasoning) Asked whether network effects are always a strong moat, a candidate answers simply "yes" with no elaboration. What does this most likely signal, per the Interview Perspective section?**
+A) A gap in recognizing the multi-homing risk that weakens many moats
+B) A complete and sophisticated grasp of competitive strategy overall
+C) Readiness for a senior competitive-strategy role right away
+D) An accurate answer, since network effects are unconditionally durable
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section specifically listens for recognition of multi-homing as a key qualifying factor, which this answer omits.*
+*Correct answer: A*
+*Explanation: The Interview Perspective section specifically listens for recognition of multi-homing as a qualifying factor, which this answer omits entirely.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A company has long described its large user base as an unassailable moat, but a new competitor is successfully capturing valuable participants who now use both platforms simultaneously. Using only the frameworks in this lesson, what is the most defensible response?**
-A) Continue describing the position as unassailable and take no action, trusting the network effect will self-correct
-B) Honestly recalibrate the internal assessment to recognize the advantage as real but requiring active defense (quadrant B), and invest in reducing the appeal of multi-homing while improving competitiveness on the specific dimension the entrant is winning
-C) Abandon the existing platform entirely and attempt to rebuild from scratch with a different business model
-D) Dismiss the competitor's traction as temporary and insignificant without further investigation
+**15. (Product Thinking, Highest Difficulty) A company has long called its large user base an unassailable moat, but a rival is successfully capturing participants who now use both platforms at once. Using only this lesson's frameworks, what is the most defensible response?**
+A) Keep describing the position as unassailable and let it self-correct on its own
+B) Recalibrate honestly to quadrant B, reducing multi-homing's appeal and matching the rival
+C) Abandon the existing platform entirely and rebuild under a new business model
+D) Dismiss the rival's early traction as insignificant without further investigation
 
 *Correct answer: B*
-*Explanation: This mirrors the Case Study and Reflection Exercise: the correct response neither assumes automatic permanence nor overreacts with abandonment, but honestly recalibrates the moat assessment and invests in targeted, active defense.*
+*Explanation: This mirrors the Case Study and Reflection Exercise: the correct response neither assumes automatic permanence nor overreacts with abandonment, but recalibrates honestly and invests in targeted, active defense.*
 *Learning objective tested: #2, #3, #4, #5*
 *Difficulty: Hard*
 

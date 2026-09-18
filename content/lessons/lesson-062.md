@@ -356,12 +356,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. According to this lesson, what should an API primarily be understood as?**
-A) A purely internal technical artifact
-B) A promise made to developers about what will and will not change
-C) A marketing asset
-D) A one-time deliverable with no ongoing obligations
+A) A purely internal technical artifact with no external implications
+B) A one-time deliverable carrying no further ongoing obligations
+C) A promise made to developers about what will and will not change
+D) A marketing asset used mainly to attract investor attention
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The lesson reframes an API as a commitment to developers who build on the assumption that today's behavior will continue to hold.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -369,12 +369,12 @@ D) A one-time deliverable with no ongoing obligations
 ---
 
 **2. In the Promise Tiers model, which tier can change or be removed at any time, as long as it is explicitly labeled?**
-A) Stable Core
+A) Experimental/Beta
 B) Versioned Standard
-C) Experimental/Beta
-D) None — all tiers require the same notice period
+C) Stable Core
+D) None; every tier requires the same fixed notice period
 
-*Correct answer: C*
+*Correct answer: A*
 *Explanation: Experimental/Beta is the tier where change is expected and permitted at any time, provided it is clearly labeled as such.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -382,12 +382,12 @@ D) None — all tiers require the same notice period
 ---
 
 **3. What is the danger of labeling something "beta" without actually enforcing its instability?**
-A) There is no danger; the label alone protects the company
-B) Developers may adopt it heavily anyway, making it a de facto Tier 1 promise even though it was never classified as one
-C) Beta labels automatically expire after 90 days
-D) Beta features cannot be used by external developers by definition
+A) Beta labels, by rule, automatically expire after ninety days
+B) There is no danger; the label alone fully protects the company
+C) Beta features, by definition, cannot be used by external developers
+D) Heavy adoption can make it a de facto Tier 1 promise regardless
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Heavy adoption converts an unclassified or mislabeled surface into a real dependency, regardless of what label was applied.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -395,12 +395,12 @@ D) Beta features cannot be used by external developers by definition
 ---
 
 **4. What does semantic versioning's MAJOR version number typically signal?**
-A) A bug fix with no behavior change
-B) An additive change that doesn't break existing usage
-C) A change that may break existing usage and require developer action
-D) A purely cosmetic documentation update
+A) A routine bug fix that carries no behavior change at all
+B) A change that may break existing usage and require developer action
+C) An additive change that never breaks any existing usage
+D) A purely cosmetic update to the published documentation
 
-*Correct answer: C*
+*Correct answer: B*
 *Explanation: Major version bumps signal changes that may require developers to take action, as opposed to minor (additive) or patch (bug fix) changes.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -408,12 +408,12 @@ D) A purely cosmetic documentation update
 ---
 
 **5. Why does idempotency matter for API design?**
-A) It makes API responses load faster
-B) It ensures repeated operations after a network failure don't produce unintended duplicate side effects
-C) It is required for an API to be considered RESTful
-D) It has no practical impact on developer experience
+A) It is, by definition, required for any API to be called RESTful
+B) It generally makes API responses return somewhat faster
+C) It stops retries after network failures from duplicating side effects
+D) It has, in practice, no real impact on developer experience
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Idempotency protects against duplicate actions when a developer's retry logic re-sends a request after an uncertain network failure.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -421,12 +421,12 @@ D) It has no practical impact on developer experience
 ---
 
 **6. In the Case Study, why didn't engineering realize the webhook field rename would cause problems?**
-A) They had tested the change with all external partners beforehand
-B) No inventory existed of which external partners depended on the field, and all internal consumers had been updated in the same change
-C) The change was announced with six months' notice
-D) The field had never been used by any partner
+A) No inventory existed of external partners depending on the field
+B) The change had been announced with six months of advance notice
+C) The team had tested the change with every external partner first
+D) The field, in fact, had never actually been used by any partner
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The team updated internal consumers in the same pull request and had no visibility into external dependency on the field, since no inventory existed.*
 *Learning objective tested: #1, #5*
 *Difficulty: Easy*
@@ -434,12 +434,12 @@ D) The field had never been used by any partner
 ---
 
 **7. What converts an abstract "we won't surprise you" stability claim into an operational guarantee?**
-A) A press release
-B) Semantic versioning combined with a published, enforced deprecation policy
-C) A verbal agreement with the largest partner only
-D) Renaming the endpoint periodically
+A) A company press release announcing its general commitment to stability
+B) A verbal agreement made privately with only the largest partner
+C) Periodically renaming the endpoint to signal ongoing active development
+D) Semantic versioning combined with a published deprecation policy
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: These two mechanisms together are what make a stability promise concrete and plannable rather than just a marketing claim.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
@@ -447,10 +447,10 @@ D) Renaming the endpoint periodically
 ---
 
 **8. According to the API Design Checklist, what is the cost of inconsistent error formats across endpoints?**
-A) Slightly slower response times
-B) Developers must write duplicate, endpoint-specific error-handling code across every integration
-C) It has no measurable cost
-D) It only affects internal teams, never external developers
+A) A generally minor, barely noticeable slowdown in response times
+B) Developers must write duplicate, endpoint-specific error-handling code
+C) The cost, in practice, is negligible and rarely worth addressing
+D) It affects only internal teams, never any external developers
 
 *Correct answer: B*
 *Explanation: Inconsistent error shapes prevent developers from writing reusable error-handling logic, multiplying integration cost.*
@@ -460,12 +460,12 @@ D) It only affects internal teams, never external developers
 ---
 
 **9. Why do early-stage startups often skip formal API versioning, according to the Real World Perspective section?**
-A) Versioning is technically impossible for small teams
-B) They reason that with few external developers, changes can be coordinated manually
-C) Investors explicitly prohibit versioning at early stages
-D) Formal versioning is only relevant for hardware products
+A) Versioning is, in a technical sense, simply impossible for small teams
+B) Investors, as a rule, explicitly prohibit versioning at early stages
+C) With few external developers, changes can be coordinated manually
+D) Formal versioning, this lesson claims, only matters for hardware products
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: With a small developer base, manual coordination can substitute for formal versioning in the short term — though this becomes unmanageable as the developer base grows.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -473,12 +473,12 @@ D) Formal versioning is only relevant for hardware products
 ---
 
 **10. What role do dedicated API governance teams play at Big Tech scale?**
-A) They approve marketing copy for API documentation
-B) They enforce Promise Tier discipline across many internal teams shipping changes, since no one person can track all dependencies by memory
-C) They exist only to reduce headcount elsewhere
-D) They have no interaction with external developers
+A) They enforce Promise Tier discipline across many internal teams
+B) They exist mainly to approve marketing copy for developer docs
+C) They exist, in practice, only to reduce headcount elsewhere
+D) They have, by design, no interaction with external developers
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: At scale, no single person can track every external dependency, so dedicated governance enforces consistent tier discipline across teams.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
@@ -486,12 +486,12 @@ D) They have no interaction with external developers
 ---
 
 **11. (Scenario) An engineering team proposes changing a Tier 2 (Versioned Standard) endpoint's response format. What does the Promise Tiers model say is required?**
-A) No process is required since Tier 2 allows unlimited change
-B) Advance notice and a migration path must be provided before the change takes effect
-C) The change must never be made under any circumstances
-D) Only internal teams need to be notified
+A) No process at all is required, since Tier 2 allows unlimited change
+B) The change, under this model, must never be made under any circumstance
+C) Only internal teams need to be informed before the change ships
+D) Advance notice and a migration path must precede the change
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Tier 2 explicitly permits change, but only with advance notice and a migration path — unlike Tier 1 (near-immutable) or Tier 3 (change anytime).*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium-Hard*
@@ -499,10 +499,10 @@ D) Only internal teams need to be notified
 ---
 
 **12. (Product Thinking) A field in an API response was never formally documented or classified, but analytics show 40 external companies parse it in production. Which tier does this field effectively occupy, regardless of internal labeling?**
-A) Tier 3, because it was never formally documented
-B) Tier 1, because heavy real-world dependency makes it a de facto stable promise
-C) No tier applies to undocumented fields
-D) Tier 2, because 40 is a moderate number of dependents
+A) Tier 3, since the field was never formally documented anywhere
+B) Tier 1, because heavy real-world dependency makes it a de facto promise
+C) No tier applies at all to a field that was never documented
+D) Tier 2, because forty is judged a moderate number of dependents
 
 *Correct answer: B*
 *Explanation: As established in the lesson, real-world dependency — not internal documentation status — determines the effective promise tier a surface occupies.*
@@ -511,12 +511,13 @@ D) Tier 2, because 40 is a moderate number of dependents
 
 ---
 
-**13. (Interview Reasoning) A candidate asked how they'd decide whether an API change is safe to ship responds by describing how the change "feels" relative to engineering's intuition, without mentioning any structured framework. What does this signal, per the Interview Perspective section?**
-A) Strong engineering collaboration skills
-B) A lack of a structured approach to classifying the change against an explicit stability promise, which the interviewer is specifically listening for
-C) That the candidate is ready for a senior platform PM role
-D) Nothing meaningful — intuition is the primary criterion interviewers evaluate
-*Correct answer: B*
+**13. (Interview Reasoning) A candidate asked how they'd decide whether an API change is safe to ship responds by describing how the change "feels" relative to engineering's intuition, without mentioning any structured framework. What does this signal?**
+A) Strong, well-regarded collaboration skills with the engineering team
+B) That the candidate is, on this basis, ready for a senior platform role
+C) A lack of a structured approach to classifying the change's stability
+D) Nothing meaningful; intuition is the primary criterion interviewers use
+
+*Correct answer: C*
 *Explanation: The Interview Perspective section notes the interviewer wants to see a structured model like Promise Tiers applied, not reliance on unstructured engineering intuition.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
@@ -524,25 +525,25 @@ D) Nothing meaningful — intuition is the primary criterion interviewers evalua
 ---
 
 **14. (Product Thinking) Which of the following best explains why the Silent Webhook Change caused a multi-day detection delay for partners?**
-A) The webhook system had built-in error alerts that partners ignored
-B) The field simply stopped appearing, so partner systems had nothing to throw an error against, making the failure silent rather than loud
-C) Partners were notified but chose not to act
-D) The change only affected a single partner
+A) The field simply stopped appearing, so nothing threw an error at all
+B) Built-in error alerts existed, but partners chose to ignore them
+C) Partners were notified in advance but chose not to act on it
+D) The change, in fact, only ever affected a single partner integration
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Because the field disappeared rather than producing an error, partner reconciliation systems failed silently, delaying detection.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A mid-size company must change an unversioned endpoint that 40 external companies depend on, but has incomplete visibility into exactly how each of them parses the response. Using only the frameworks in this lesson, what is the best course of action?**
-A) Ship the change immediately, since incomplete visibility makes a careful rollout impractical
-B) Treat the endpoint as Tier 1 given its real-world dependency, build the best available inventory of consumers, and design a rollout with advance notice and a migration path, even though the endpoint was never formally classified
-C) Refuse to ever change the endpoint again under any circumstances
-D) Change the endpoint only for new integrations, leaving existing ones on an undocumented legacy path indefinitely
+**15. (Product Thinking, Highest Difficulty) A mid-size company must change an unversioned endpoint that 40 external companies depend on, but has incomplete visibility into exactly how each of them parses the response. What is the best course of action?**
+A) Ship the change immediately, since incomplete visibility makes care impractical
+B) Refuse to ever change the endpoint again under any circumstances
+C) Change it only for new integrations, leaving old ones on a legacy path
+D) Treat it as Tier 1, build the best inventory available, and roll out with notice
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This mirrors the Reflection Exercise: the correct response combines the effective-tier judgment (real-world dependency determines the tier, not formal labeling) with a practical, notice-based rollout process, rather than either reckless shipping or permanent paralysis.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*

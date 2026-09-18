@@ -292,196 +292,196 @@ There is no single correct answer. Work through the following before reading fur
 
 ## Quiz
 
-**1. Why does reactive headcount addition fail to solve overextended PM scope?**
-A) It always immediately splits overextended ownership
-B) It tends to preserve an existing PM's scope while adding new PMs only for new initiatives
-C) Headcount addition is never actually related to ownership scope
-D) Reactive addition always improves decision-making speed
+**1. Why does adding PMs reactively as work grows fail to solve overextended scope?**
+A) It always results in an immediate ownership split
+B) Reactive hiring is prohibited at most mid-size companies
+C) It tends to preserve an existing PM's scope while adding new PMs only for brand-new initiatives
+D) It automatically increases decision-making speed across the board
 
-*Correct answer: B*
-*Explanation: Reactive headcount addition tends to preserve an existing PM's scope while adding new PMs only for new initiatives, leaving the overextension unaddressed.*
+*Correct answer: C*
+*Explanation: Adding PMs reactively tends to preserve an existing PM's overall scope while adding new PMs alongside them for entirely new initiatives, rather than splitting the original PM's now-overgrown scope.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. What does the Coherence Span Model track?**
-A) Revenue per PM
-B) A PM's ownership span by initiative count and interdependency complexity
-C) The number of years a PM has been employed
-D) Customer satisfaction scores
+**2. What does the Coherence Span Model plot a PM's ownership against?**
+A) Initiative count and interdependency complexity
+B) Years of tenure and team headcount
+C) Revenue generated and customer satisfaction scores
+D) Number of direct reports and meeting frequency
 
-*Correct answer: B*
-*Explanation: The Coherence Span Model tracks a PM's ownership span by initiative count and interdependency complexity, not just a simple initiative count.*
+*Correct answer: A*
+*Explanation: The Coherence Span Model plots a PM's ownership scope by initiative count against interdependency complexity, not a simple headcount or tenure measure.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**3. What is a signal that a PM has moved past their coherence span?**
-A) Increasingly fast decision-making
-B) Delayed decisions and shallow engagement with owned initiatives
-C) A shrinking number of owned initiatives
-D) Increased team satisfaction
+**3. Which of the following is named in the lesson as a signal that a PM has moved past their coherence limit?**
+A) A steadily shrinking list of owned initiatives
+B) Rising customer satisfaction scores across owned areas
+C) Faster-than-usual decision turnaround times
+D) Decisions increasingly deferred or delayed, and decreasing depth of engagement with any one initiative
 
-*Correct answer: B*
-*Explanation: Delayed decisions and shallow engagement with owned initiatives are the specific signals that a PM has moved past their coherence span.*
+*Correct answer: D*
+*Explanation: The Coherence Span Model watches for decisions increasingly deferred or delayed and decreasing depth of engagement, among other signals, rather than waiting for an obvious crisis.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. Why is adding support insufficient for an overextended PM?**
-A) Support roles always fully resolve overextension
-B) The original PM remains the single point of prioritization and decision-making judgment across an unchanged scope
-C) Support roles are illegal in most organizations
-D) Support roles always cause additional overextension
+**4. Why is adding a supporting analyst or associate PM insufficient for resolving overextension?**
+A) Support roles are more expensive than splitting ownership
+B) The original PM remains the single point of prioritization judgment across an unchanged scope
+C) Analysts are not permitted to report to PMs in most organizations
+D) Support roles always increase, rather than reduce, an overextended PM's workload
 
 *Correct answer: B*
-*Explanation: The original PM remains the single point of prioritization and decision-making judgment across an unchanged scope, so support doesn't address the underlying coherence problem.*
+*Explanation: Support roles can help with execution capacity, but the original PM remains the single point of prioritization and decision-making judgment across an unchanged, overextended scope.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**5. What was the root cause of the Overextended Owner case study's problems?**
-A) The founding PM lacked sufficient technical skill
-B) New initiatives were added to the same PM's scope reactively, without ever revisiting or splitting their now-overextended ownership
-C) The company never hired any additional PMs at all
-D) The founding PM refused to communicate with their team
+**5. What was the underlying cause of the problems in the Overextended Owner case study?**
+A) The founding PM lacked the technical background needed for the role
+B) The company refused to hire any additional PMs as it scaled
+C) New initiatives kept being added to the founding PM's scope without ever revisiting or splitting it
+D) The founding PM was replaced too early in the company's growth
 
-*Correct answer: B*
-*Explanation: New initiatives were added to the same PM's scope reactively, without ever revisiting or splitting their now-overextended ownership.*
+*Correct answer: C*
+*Explanation: New initiatives were added to the founding PM's scope one at a time, each addition seeming individually reasonable, without the scope ever being revisited or split.*
 *Learning objective tested: #1, #5*
 *Difficulty: Easy*
 
 ---
 
-**6. What specific signals were present before the Overextended Owner situation became acute?**
-A) No signals were present at all
-B) Delayed decisions and teams reporting they had to make significant decisions without adequate PM input
-C) Immediate, obvious crisis with no early warning
-D) Declining company revenue
+**6. What early signals were present in the Overextended Owner case study before the situation became acute?**
+A) Delayed decisions and teams making significant calls without adequate PM input
+B) A sudden and total halt to all product development
+C) Declining company-wide revenue with no other symptoms
+D) An unusually low volume of decision requests
 
-*Correct answer: B*
-*Explanation: Delayed decisions and teams reporting they had to make significant decisions without adequate PM input were the specific early warning signals.*
+*Correct answer: A*
+*Explanation: Decision requests began taking noticeably longer to resolve, and several teams reported feeling under-supported and having to make significant decisions without adequate PM input.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
-**7. What did the recovery in the Overextended Owner case study involve?**
-A) Adding a single support analyst under the founding PM
-B) Splitting the founding PM's scope into three genuinely independent, non-overlapping ownership areas
-C) Eliminating the founding PM's role entirely
-D) Consolidating even more initiatives under the founding PM
+**7. What did the recovery in the Overextended Owner case study actually involve?**
+A) Hiring a single analyst to support the founding PM
+B) Reducing the founding PM's initiatives without reassigning ownership to anyone else
+C) Leaving the ownership structure unchanged but adding weekly check-ins
+D) Splitting the founding PM's scope into three genuinely independent, non-overlapping ownership areas
 
-*Correct answer: B*
-*Explanation: The recovery involved splitting the founding PM's scope into three genuinely independent, non-overlapping ownership areas.*
+*Correct answer: D*
+*Explanation: Recovery involved splitting the founding PM's scope into three genuinely independent, non-overlapping ownership areas, each led by a dedicated PM with clear decision rights.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. According to the Product Org Scaling Checklist, what risk does skipping "Split, Not Support" create?**
-A) No risk; adding support always resolves overextension
-B) The underlying coherence problem persists despite the appearance of addressing it
-C) A risk only relevant to very large organizations
-D) A risk only relevant to early-stage startups
+**8. According to the Product Org Scaling Checklist, what risk arises from skipping "Split, Not Support"?**
+A) No risk, since adding support always resolves overextension fully
+B) The underlying coherence problem persists even though the org appears to have addressed it
+C) This risk applies only to organizations with fewer than ten employees
+D) Support roles become mandatory in every future hiring decision
 
 *Correct answer: B*
-*Explanation: The underlying coherence problem persists despite the appearance of addressing it when support is added instead of splitting ownership.*
+*Explanation: When overextension is identified but only supported rather than genuinely split, the underlying coherence problem persists behind the appearance of a fix.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**9. Why is span of coherence not a fixed number of initiatives?**
-A) It depends heavily on how interdependent the owned initiatives are
-B) All initiatives always carry identical complexity regardless of relationship
-C) Span of coherence is legally defined and identical for every organization
-D) Initiative count never actually affects decision-making quality
+**9. Why isn't span of coherence a fixed number of initiatives, per the Theory section?**
+A) Every organization is legally required to define its own fixed number
+B) Initiative count has no bearing on how coherent a PM's ownership feels
+C) It depends heavily on how interdependent the owned initiatives actually are
+D) It changes only when a PM's title changes, regardless of workload
 
-*Correct answer: A*
-*Explanation: Span of coherence depends heavily on how interdependent the owned initiatives are, so it cannot be reduced to a fixed initiative count.*
+*Correct answer: C*
+*Explanation: A PM's span of coherence depends heavily on how interdependent the owned initiatives are — a few tightly related initiatives may be easier to own than the same number of unrelated ones.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
-**10. Why is a single PM owning the entire product normal at very early stages, per the Real World Perspective section?**
-A) Early-stage companies are legally required to have only one PM
-B) Initiative count and complexity are both genuinely low at this stage
-C) Coherence span never actually matters for early-stage companies
-D) Early-stage PMs never make any real decisions
+**10. Per the Real World Perspective section, why is a single PM owning the entire product normal at very early stages?**
+A) Initiative count and complexity are both genuinely low, so coherent ownership across the full scope is achievable
+B) Early-stage companies are exempt from any coherence-span considerations
+C) Founders are always better decision-makers than hired PMs
+D) Startups rarely have more than one product initiative in their first year
 
-*Correct answer: B*
-*Explanation: Initiative count and complexity are both genuinely low at early stages, making a single PM's coherence span sufficient.*
+*Correct answer: A*
+*Explanation: At very early stages, initiative count and complexity are both genuinely low, so a single PM's coherent decision-making across the full scope is achievable.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
-**11. What do large organizations typically maintain regarding ownership boundaries, per the Real World Perspective section?**
-A) No formal ownership documentation
-B) Formal, deliberately-designed ownership boundaries and decision-rights documentation
-C) A policy of maximizing ambiguity in ownership
-D) Ownership boundaries only for engineering, never product
+**11. What do large organizations typically maintain regarding ownership, per the Real World Perspective section?**
+A) Deliberately ambiguous boundaries to encourage cross-team collaboration
+B) A policy against ever splitting an existing PM's scope
+C) No formal documentation, relying instead on informal norms
+D) Formal, deliberately-designed ownership boundaries and decision-rights documentation
 
-*Correct answer: B*
-*Explanation: Large organizations typically maintain formal, deliberately-designed ownership boundaries and decision-rights documentation.*
+*Correct answer: D*
+*Explanation: Large organizations typically maintain formal, deliberately-designed ownership boundaries and decision-rights documentation, often paired with a regular organizational design review cadence.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**12. (Scenario) A PM's decision requests are taking noticeably longer to resolve, and teams report making significant decisions without adequate PM input. What does this indicate?**
-A) No issue; this is normal for any product organization
-B) A likely coherence-span overextension signal requiring investigation
-C) A sign the PM should be given even more initiatives
-D) A sign that the PM should be immediately replaced with no investigation
+**12. (Scenario) A PM's decision requests are taking noticeably longer to resolve, and teams increasingly report making significant calls without adequate PM input. What does this most likely indicate?**
+A) Normal, expected behavior that requires no further attention
+B) A coherence-span overextension signal worth investigating
+C) A sign the PM should be given additional, unrelated initiatives
+D) Evidence the PM should be removed without further review
 
 *Correct answer: B*
-*Explanation: This is a likely coherence-span overextension signal requiring investigation, as delayed decisions and unguided team actions indicate the PM has exceeded their span.*
+*Explanation: Delayed decisions and teams acting without adequate PM input are exactly the signals the Coherence Span Model uses to identify overextension worth investigating.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A head of product wants to add a support analyst to help an overextended PM rather than splitting their scope. What is the strongest response?**
-A) Agree, since support roles always resolve overextension
-B) Explain that support roles don't address the underlying coherence problem, since the PM remains the single decision-making bottleneck
-C) Reject any additional resourcing at all
-D) Eliminate the PM's role entirely
+**13. (Product Thinking) A head of product proposes adding a support analyst to an overextended PM instead of splitting their scope. What is the strongest response?**
+A) Agree immediately, since support roles always resolve the underlying problem
+B) Recommend eliminating the PM's role rather than adding any resourcing
+C) Explain that support roles don't address the core problem, since the PM still remains the sole point of prioritization judgment
+D) Reject any additional resourcing of any kind for the team
 
-*Correct answer: B*
-*Explanation: Support roles don't address the underlying coherence problem, since the PM remains the single decision-making bottleneck across an unchanged scope.*
+*Correct answer: C*
+*Explanation: Support roles help with execution capacity but leave the original PM as the sole point of prioritization judgment across an unchanged, overextended scope.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked how they'd decide whether to split a PM's ownership, cites only a fixed initiative count with no mention of interdependency complexity or specific signals. What does this signal?**
-A) A strong and complete understanding of organizational scaling
-B) A gap in recognizing that coherence span depends on interdependency, not just count, and specific signals matter
-C) Readiness for a senior organizational design role immediately
-D) Nothing meaningful; a fixed count is always sufficient
+**14. (Interview Reasoning) A candidate, asked how they'd decide whether to split a PM's ownership, cites only a flat rule like "no more than three initiatives," with no mention of interdependency or specific signals. What does this reveal?**
+A) A gap in recognizing that coherence span depends on interdependency and specific signals, not a fixed count
+B) A strong, complete grasp of organizational design
+C) Readiness to lead organizational design at a large company immediately
+D) Nothing meaningful, since a flat rule is always an adequate substitute for judgment
 
-*Correct answer: B*
-*Explanation: A gap in recognizing that coherence span depends on interdependency, not just count, and specific signals like delayed decisions matter for diagnosing overextension.*
+*Correct answer: A*
+*Explanation: A flat, fixed-count rule ignores that span of coherence depends on interdependency complexity and on specific signals like delayed decisions, not a universal number.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A senior PM's ownership has grown to five increasingly disconnected initiatives, decisions are being delayed, and leadership is considering adding a support analyst. Using only this lesson's frameworks, what is the most defensible response?**
-A) Add the support analyst as leadership proposes
-B) Genuinely split the PM's ownership into independently-accountable areas with clear, non-overlapping decision rights, rather than adding support alone
-C) Take no action, since delayed decisions are a normal part of scaling
-D) Eliminate two of the five initiatives entirely without addressing ownership structure
+**15. (Product Thinking, Highest Difficulty) A senior PM's ownership has grown to five increasingly disconnected initiatives, decisions are being delayed, and leadership is considering adding a support analyst. What is the most defensible response, using this lesson's frameworks?**
+A) Add the support analyst leadership is proposing
+B) Take no action, since delayed decisions are a normal part of scaling
+C) Eliminate two of the five initiatives without addressing the ownership structure
+D) Genuinely split the PM's ownership into independently-accountable areas with clear, non-overlapping decision rights
 
-*Correct answer: B*
-*Explanation: The most defensible response is to genuinely split the PM's ownership into independently-accountable areas with clear, non-overlapping decision rights, rather than adding support alone.*
+*Correct answer: D*
+*Explanation: The most defensible response genuinely splits the PM's ownership into independently-accountable areas with clear, non-overlapping decision rights, rather than adding support that leaves the coherence problem unresolved.*
 *Learning objective tested: #1, #2, #3, #4, #5*
 *Difficulty: Hard*
 

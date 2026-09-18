@@ -369,13 +369,13 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is Kanban's central, counterintuitive claim about work in progress?**
-A) More work in progress always means faster delivery
-B) Limiting work in progress tends to increase overall throughput by reducing context-switching costs
-C) WIP limits should always be set as high as possible
-D) Work in progress has no effect on delivery speed
+A) Limiting it raises throughput by cutting context-switching
+B) WIP limits should be set as high as the team tolerates
+C) It has no measurable effect on delivery speed at all
+D) More work in progress always means faster delivery
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly derives this claim: limiting WIP removes the hidden cost of context-switching, allowing in-progress items to finish faster and raising overall throughput.*
+*Correct answer: A*
+*Explanation: Limiting WIP removes the hidden cost of context-switching, letting in-progress items finish faster and raising overall throughput.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
@@ -388,176 +388,176 @@ C) Hold a fixed two-week Sprint
 D) Make process policies explicit
 
 *Correct answer: C*
-*Explanation: A fixed two-week Sprint is a Scrum concept (Lesson 32), not one of Kanban's six core practices listed in this lesson's Theory section.*
+*Explanation: A fixed two-week Sprint is a Scrum concept (Lesson 32), not one of Kanban's six core practices.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. What does cycle time measure, as distinct from lead time?**
-A) The total time from request to delivery, including time waiting unstarted
+A) The number of items a team completes per week
 B) The time from when work actually begins on an item to when it's delivered
-C) The number of items completed per week
-D) The number of engineers assigned to a project
+C) The number of engineers currently assigned to a project
+D) The total time from request to delivery, including time waiting unstarted
 
 *Correct answer: B*
-*Explanation: The Theory section defines cycle time specifically as the time from when work begins to delivery, distinct from lead time's inclusion of unstarted wait time.*
+*Explanation: Cycle time is the time from when work begins to delivery, distinct from lead time's inclusion of unstarted wait time.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. A team has a short cycle time but stakeholders report long waits before their requests are even started. What does this pattern indicate?**
-A) The team's execution speed is the problem
-B) The team likely has a lead time problem driven by how long items sit in the backlog before being picked up, not an execution speed problem
-C) This pattern is impossible under Kanban
-D) The WIP limit is set too low
+A) This pattern cannot occur on a real Kanban team
+B) The team's actual execution speed is the problem
+C) The WIP limit has almost certainly been set too low
+D) A lead time problem, driven by backlog wait rather than speed
 
-*Correct answer: B*
-*Explanation: The lesson explicitly describes this exact pattern — short cycle time but long lead time — as common and driven by backlog wait time rather than execution speed, often requiring a prioritization rather than an execution fix.*
+*Correct answer: D*
+*Explanation: This is the classic short-cycle-time, long-lead-time pattern, driven by backlog wait time rather than execution speed, often requiring a prioritization fix.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What does a widening band for one specific stage in a cumulative flow diagram indicate?**
-A) That stage is operating efficiently
-B) A bottleneck — work is accumulating in that stage faster than it's being cleared
-C) The team needs more Sprints
-D) The WIP limit is set correctly
+A) A bottleneck — work is piling up faster than it clears
+B) That the team needs to run additional Sprints
+C) That every stage's WIP limit is currently set correctly
+D) That the stage in question is operating efficiently
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly defines a widening band relative to other stages as the visual signature of a bottleneck.*
+*Correct answer: A*
+*Explanation: A widening band relative to other stages is the visual signature of a bottleneck.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
 **6. Why is a WIP limit that never actually blocks anyone considered a problem?**
-A) It isn't a problem; a WIP limit's purpose is purely cosmetic
-B) A limit set high enough to never bind isn't actually constraining behavior — it's decorative rather than disciplinary
-C) It means the team is working too slowly
-D) It means the team should switch to Scrum
+A) It means the team is working through its backlog too slowly
+B) It isn't a problem; a WIP limit's purpose is cosmetic
+C) A limit set too high to ever bind is decorative, not real
+D) It means the team should switch to Scrum instead
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #2 explicitly states that a WIP limit only works if it's occasionally binding; one that's never hit defeats the entire mechanism.*
+*Correct answer: C*
+*Explanation: A WIP limit only works if it's occasionally binding; one that's never hit defeats the entire mechanism.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **7. According to the Scrum vs. Kanban Fit Assessment, which condition favors Kanban over Scrum?**
-A) Work can be reasonably planned two-plus weeks ahead
-B) Stakeholders benefit from regular, scheduled commitments
-C) Work arrives continuously and unpredictably, such as incidents or support requests
-D) The team wants a fixed planning cadence
+A) The team wants a fixed, predictable planning cadence
+B) Work arrives continuously and unpredictably, like incidents
+C) Stakeholders benefit from regular, scheduled commitments
+D) Work can be reasonably planned two-plus weeks ahead
 
-*Correct answer: C*
-*Explanation: The Fit Assessment table explicitly lists unpredictable, continuously arriving work as a condition favoring Kanban.*
+*Correct answer: B*
+*Explanation: The Fit Assessment table lists unpredictable, continuously arriving work as a condition favoring Kanban.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
-**8. In the Detailed Case Study, what was the specific missing element that allowed the Code Review bottleneck to go unnoticed?**
-A) A missing Daily Scrum
-B) A missing WIP limit specifically on the Code Review stage, allowing engineers to keep starting new work instead of clearing the review queue
-C) A missing Sprint Goal
-D) Too few engineers on the team
+**8. In the Case Study, what was the specific missing element that allowed the Code Review bottleneck to go unnoticed?**
+A) The absence of a Sprint Goal for the current cycle
+B) Too few engineers assigned to the platform team
+C) A missing Daily Scrum ceremony for the team
+D) A missing WIP limit on the Code Review stage itself
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong?" section identifies the absence of a WIP limit on Code Review specifically as what allowed the bottleneck to accumulate invisibly.*
+*Correct answer: D*
+*Explanation: The absence of a WIP limit on Code Review is what allowed the bottleneck to accumulate invisibly behind a busy-looking board.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does the lesson caution against measuring "team busyness" as a proxy for healthy flow?**
-A) Because busyness and flow are always identical
-B) Because a team can be fully occupied working on many half-finished items while completion (flow) is actually poor, as shown in the Case Study
-C) Because busy teams are always underperforming
-D) Because Kanban discourages teams from working hard
+A) A team can look fully occupied while actual flow is poor
+B) Busyness and flow always move in the same direction
+C) Kanban actively discourages teams from working hard
+D) Busy teams are, by definition, always underperforming
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #3 and the Case Study both illustrate that apparent busyness (many active cards) can mask poor actual flow (a bottleneck accumulating behind the scenes).*
+*Correct answer: A*
+*Explanation: Apparent busyness (many active cards) can mask poor actual flow, as the Case Study's hidden bottleneck illustrates.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
 
 ---
 
-**10. (Scenario) A PM reports "cycle time improved 20% this quarter" as evidence the team is now faster to deliver to stakeholders. What critical check is this claim missing, according to this lesson?**
-A) Whether the team held enough retrospectives
-B) Whether lead time also improved, since a cycle time improvement alone doesn't address how long items wait unstarted in the backlog
-C) Whether the WIP limit was removed entirely
-D) Whether the team switched from Kanban to Scrum
+**10. A PM reports "cycle time improved 20% this quarter" as evidence the team is now faster to deliver to stakeholders. What critical check is this claim missing?**
+A) Whether the team held enough retrospectives that quarter
+B) Whether the team switched from Kanban back to Scrum
+C) Whether lead time also improved, not just cycle time
+D) Whether the WIP limit was removed entirely that quarter
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #4 explicitly warns that reporting cycle time improvements without checking lead time may be incomplete or may mask a worsening backlog wait problem.*
+*Correct answer: C*
+*Explanation: Reporting cycle time improvements without checking lead time may be incomplete, or may mask a worsening backlog wait problem.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
 **11. Which real-world type of team does this lesson suggest is naturally better suited to Kanban's flow-based model?**
-A) A team building a single large planned feature release over one quarter
+A) A team that ships only once per year on a fixed schedule
 B) A team handling continuous, unpredictable incident response and support work
-C) A team that only ships once per year
-D) A team with no stakeholders at all
+C) A team building a single large, fully planned feature release over one quarter
+D) A team with no external stakeholders of any kind
 
 *Correct answer: B*
-*Explanation: The Real Company Example and Fit Assessment both point to operations/infrastructure-style teams handling continuous, unpredictable work as the natural fit for Kanban.*
+*Explanation: Operations and infrastructure-style teams handling continuous, unpredictable work are the natural fit for Kanban's flow model.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **12. What is the relationship between Kanban's six practices and Lesson 31's Iteration Loop?**
-A) They are unrelated concepts from different disciplines
-B) Kanban's practices (especially "implement feedback loops" and "improve collaboratively") are a specific, flow-based implementation of the same feedback-driven logic behind the Iteration Loop
-C) Kanban replaces the need for any feedback loop entirely
-D) The Iteration Loop only applies to Scrum, not Kanban
+A) Unrelated concepts drawn from different disciplines
+B) Kanban replaces the need for any feedback loop
+C) The Iteration Loop applies only to Scrum teams
+D) A flow-based version of the same feedback logic
 
-*Correct answer: B*
-*Explanation: The lesson frames Kanban throughout as philosophically consistent with Lesson 31's Iteration Loop, just implemented through continuous flow rather than fixed Sprints.*
+*Correct answer: D*
+*Explanation: The lesson frames Kanban as philosophically consistent with the Iteration Loop, just implemented through continuous flow rather than fixed Sprints.*
 *Learning objective tested: #1, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
 **13. (Product Thinking) A team's cumulative flow diagram shows all bands widening in roughly parallel, steady bands over time. What does this indicate?**
-A) A severe, hidden bottleneck
-B) Healthy flow, with no single stage accumulating work disproportionately faster than others
-C) That the team should immediately add more WIP limits
-D) That the team is not using Kanban correctly
+A) Healthy flow, with no stage accumulating work faster than others
+B) A severe, hidden bottleneck somewhere in the workflow
+C) That the team is not using Kanban correctly
+D) That the team should immediately add new WIP limits
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly describes roughly parallel, steadily widening bands as the visual signature of healthy flow, in contrast to one disproportionately widening band, which signals a bottleneck.*
+*Correct answer: A*
+*Explanation: Roughly parallel, steadily widening bands are the visual signature of healthy flow, in contrast to one disproportionately widening band.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) An interviewer asks a candidate when they'd recommend Kanban over Scrum, and the candidate answers: "I always prefer Kanban, it's less bureaucratic." Based on this lesson's Interview Perspective section, what does this answer signal?**
-A) Strong, well-reasoned framework judgment
-B) A preference-based rather than conditions-based answer, since it doesn't reference the actual predictability or batch-ability of the team's work
-C) That the candidate should have said Scrum instead
+**14. (Interview Reasoning) An interviewer asks when a candidate would recommend Kanban over Scrum, and the candidate answers: "I always prefer Kanban, it's less bureaucratic." What does this answer signal?**
+A) Strong, well-reasoned framework judgment worth noting
+B) That the candidate should instead have said Scrum
+C) A preference-based answer that skips real work conditions
 D) Nothing meaningful, since framework choice is arbitrary
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a weak answer expresses a blanket preference, while a strong answer references specific conditions like predictability and batch-ability, which this answer fails to do.*
+*Correct answer: C*
+*Explanation: A strong answer references specific conditions like predictability and batch-ability, which this blanket-preference answer fails to do.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A platform team has adopted Kanban, but stakeholders complain about unpredictable delivery timing, and the team's cumulative flow diagram shows a steadily widening "QA" band while other stages stay flat. Using only this lesson's frameworks, what is the most defensible next step, and why?**
-A) Switch the entire team back to Scrum immediately, since Kanban has clearly failed
-B) Introduce or tighten a WIP limit specifically on the QA stage, since the widening band identifies QA as the accumulating bottleneck — and investigate why work isn't being pulled through QA fast enough, rather than assuming more incoming request throttling elsewhere would help
-C) Ignore the diagram, since stakeholder complaints about timing are a lead time issue unrelated to workflow stages
-D) Add more WIP limit slots to "In Progress" so more work can start simultaneously
+**15. (Product Thinking, Highest Difficulty) A platform team using Kanban gets complaints about unpredictable delivery timing, and its cumulative flow diagram shows a steadily widening "QA" band while other stages stay flat. What is the most defensible next step, and why?**
+A) Switch the entire team back to Scrum immediately
+B) Constrain and investigate QA, since it's the bottleneck
+C) Ignore the diagram, since timing is a lead time issue
+D) Add more WIP slots to "In Progress" to start more work
 
 *Correct answer: B*
-*Explanation: This mirrors the Detailed Case Study's exact reasoning: a widening band at one specific stage identifies precisely where the bottleneck lives, and the appropriate response is to constrain and address that stage directly (via a WIP limit and investigation into why QA is under-clearing work), not to loosen limits elsewhere or abandon the framework entirely.*
+*Explanation: This mirrors the Case Study's reasoning: a widening band at one stage identifies precisely where the bottleneck lives, so the response should constrain and investigate that stage directly.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 

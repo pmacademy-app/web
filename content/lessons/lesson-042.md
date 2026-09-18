@@ -360,195 +360,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the defining purpose of a North Star Metric?**
-A) To measure total company revenue directly
-B) To represent the genuine customer value an organization delivers, chosen because it also reliably predicts long-term business success
-C) To track engineering team velocity exclusively
-D) To replace the need for any other metrics
+A) To track engineering team velocity exclusively
+B) To measure total company revenue directly
+C) To replace the need for any other metrics
+D) To represent the genuine customer value an organization delivers, chosen because it also reliably predicts long-term business success
 
-*Correct answer: B*
-*Explanation: The Theory section defines the NSM exactly this way — representing genuine value while predicting business success.*
+*Correct answer: D*
+*Explanation: The NSM represents genuine customer value while also predicting business success.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. Which of the following is NOT one of the five criteria for a good NSM candidate, according to this lesson?**
-A) Reflects customer value
-B) Resistant to easy gaming
-C) Must be the same metric used by every competitor in the industry
-D) Actionable
+**2. Which of the following is NOT one of the five criteria for a good NSM candidate?**
+A) Actionable
+B) Must be the same metric used by every competitor in the industry
+C) Resistant to easy gaming
+D) Reflects customer value
 
-*Correct answer: C*
-*Explanation: The Theory section's criteria table lists reflects value, leading indicator, actionable, understandable, and resistant to gaming — not matching competitors' metrics.*
+*Correct answer: B*
+*Explanation: The five criteria are reflects value, leading indicator, actionable, understandable, and resistant to gaming — not matching competitors' metrics.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **3. Why did YouTube's view-count metric create a problematic incentive, according to this lesson?**
-A) View count was too difficult to measure accurately
-B) View count could be improved through misleading thumbnails and clickbait titles that generated clicks without genuine viewer satisfaction
-C) View count was a leading indicator with no lagging indicator equivalent
-D) View count was actually a perfectly good NSM that never needed to change
+A) View count was actually a perfectly good NSM that never needed to change
+B) View count was too difficult to measure accurately
+C) View count could be improved through misleading thumbnails and clickbait titles that generated clicks without genuine viewer satisfaction
+D) View count was a leading indicator with no lagging indicator equivalent
 
-*Correct answer: B*
-*Explanation: The Theory section explains this exact gaming vector as the reason YouTube's original metric was problematic.*
+*Correct answer: C*
+*Explanation: This exact gaming vector is the reason YouTube's original metric was problematic.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**4. What does watch time better reflect, compared to view count, according to this lesson?**
-A) Nothing; the two metrics are functionally identical
-B) Genuine viewer engagement and satisfaction, since it captures how long people actually spent watching rather than just whether they clicked
-C) Only the total number of videos uploaded
-D) Advertising revenue exclusively
+**4. What does watch time better reflect, compared to view count?**
+A) Genuine viewer engagement and satisfaction, since it captures how long people actually spent watching rather than just whether they clicked
+B) Only the total number of videos uploaded
+C) Advertising revenue exclusively
+D) Nothing; the two metrics are functionally identical
 
-*Correct answer: B*
-*Explanation: The Theory section explains that watch time much more directly reflects genuine engagement than a simple click-based view count.*
+*Correct answer: A*
+*Explanation: Watch time much more directly reflects genuine engagement than a simple click-based view count.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **5. What is a metric tree?**
-A) A visual chart showing revenue over time
-B) A hierarchy decomposing a North Star Metric into specific input metrics that individual teams can actually influence and own
-C) A list of every metric a company has ever tracked, in no particular order
-D) A tool exclusively used in Kanban-based teams
+A) A tool exclusively used in Kanban-based teams
+B) A list of every metric a company has ever tracked, in no particular order
+C) A visual chart showing revenue over time
+D) A hierarchy decomposing a North Star Metric into specific input metrics that individual teams can actually influence
 
-*Correct answer: B*
-*Explanation: The Theory section defines a metric tree exactly this way.*
+*Correct answer: D*
+*Explanation: A metric tree breaks the NSM down into team-ownable input metrics.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**6. What makes a metric tree branch well-built, according to this lesson, rather than poorly-built?**
-A) It uses an impressive-sounding name
+**6. What makes a metric tree branch well-built, rather than poorly-built?**
+A) It changes every quarter regardless of evidence
 B) Its connection to the North Star Metric above it is rigorously, quantifiably verified, not just assumed based on thematic similarity
 C) It is owned by the most senior team in the organization
-D) It changes every quarter regardless of evidence
+D) It uses an impressive-sounding name
 
 *Correct answer: B*
-*Explanation: The Theory section and Mistake 3 both emphasize that genuine, verified quantitative connection — not thematic association — is what makes a metric tree branch well-built.*
+*Explanation: Genuine, verified quantitative connection — not thematic association — is what makes a branch well-built.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Detailed Case Study, why did "total registered accounts" fail as a North Star Metric even though the company's metric tree was well-executed in a narrow sense?**
-A) The metric tree branches were not connected to the NSM at all
-B) The NSM itself measured exposure (signups) rather than genuine value, and could be improved through loosened signup friction and sales qualification without any real increase in customer value
-C) The company did not have enough engineers to support the metric
+A) The company did not have enough engineers to support the metric
+B) The metric tree branches were not connected to the NSM at all
+C) The NSM itself measured exposure rather than genuine value, and could be improved through loosened signup friction and sales qualification without any real increase in customer value
 D) The metric was too difficult to compute accurately
 
-*Correct answer: B*
-*Explanation: The Case Study's "What went wrong?" analysis attributes the failure to the NSM's own poor selection, not to any flaw in how the metric tree was built beneath it.*
+*Correct answer: C*
+*Explanation: The failure traces back to the NSM's own poor selection, not to any flaw in how the metric tree was built beneath it.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **8. What replacement metric did the Case Study company consider adopting, and why was it more resistant to gaming than the original?**
-A) Total marketing spend, because it directly measures investment
-B) Accounts reaching a defined activation milestone within their first 30 days, because a low-intent signup that never activates would not move this metric, unlike simple registration counts
-C) Total number of support tickets, because it measures customer frustration directly
-D) Number of sales calls made, because it measures sales team effort
+A) Accounts reaching a defined activation milestone within their first 30 days, because a low-intent signup that never activates would not move this metric
+B) Total number of support tickets, because it measures customer frustration directly
+C) Number of sales calls made, because it measures sales team effort
+D) Total marketing spend, because it directly measures investment
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly proposes this activation-based replacement metric and explains why it resists the same gaming vector that undermined the original NSM.*
+*Correct answer: A*
+*Explanation: The Case Study proposes this activation-based metric and explains why it resists the gaming vector that undermined the original NSM.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
 
 ---
 
 **9. Why does this lesson caution against choosing a North Star Metric that is simply a restated revenue or business outcome metric?**
-A) Because revenue metrics are always inaccurate
-B) Because a lagging business outcome doesn't give teams an actionable, upstream signal to work toward — an NSM should sit further upstream, representing the value that produces revenue as a downstream consequence
-C) Because revenue should never be tracked by any team
-D) Because this violates Lesson 41's definition of a vanity metric directly
+A) Because revenue should never be tracked by any team
+B) Because this violates Lesson 41's definition of a vanity metric directly
+C) Because revenue metrics are always inaccurate
+D) A lagging business outcome doesn't give teams an actionable, upstream signal to work toward — an NSM should represent the value that produces revenue as a downstream consequence
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #1 explains this exact reasoning — a restated lagging outcome fails to give teams an actionable upstream target.*
+*Correct answer: D*
+*Explanation: A restated lagging outcome fails to give teams an actionable, upstream target.*
 *Learning objective tested: #1, #4*
 *Difficulty: Medium*
 
 ---
 
-**10. (Scenario) A company chooses "total marketing impressions" as its North Star Metric. Using the North Star Candidate Evaluation Table, what is the most likely weakness of this choice?**
-A) It scores perfectly on all five criteria
-B) It likely fails "reflects customer value" and "resistant to easy gaming," since impressions can be purchased or increased without any genuine value being delivered to customers
+**10. (Scenario) A company chooses "total marketing impressions" as its North Star Metric. What is the most likely weakness of this choice?**
+A) It cannot be measured using any existing data source
+B) It likely fails "reflects customer value" and "resistant to easy gaming," since impressions can be purchased without any genuine value delivered to customers
 C) It is too specific and narrow to be useful at all
-D) It cannot be measured using any existing data source
+D) It scores perfectly on all five criteria
 
 *Correct answer: B*
-*Explanation: Impressions, like view count in the YouTube example, can be increased through spend or exposure tactics disconnected from genuine customer value, failing the same criteria that undermined view count.*
+*Explanation: Impressions, like view count in the YouTube example, can be increased through spend or exposure tactics disconnected from genuine customer value.*
 *Learning objective tested: #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked how they would choose a North Star Metric for a new product and answers: "I'd just pick whichever metric is currently growing the fastest." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; fast-growing metrics are always the best choice
-B) It skips structured evaluation against the five NSM criteria entirely, risking the selection of a metric that grows fast precisely because it's easy to game rather than because it reflects genuine value
-C) It correctly identifies the only factor that matters in metric selection
-D) It demonstrates strong quantitative reasoning
+**11. (Interview Reasoning) A candidate is asked how they'd choose a North Star Metric for a new product and answers: "I'd just pick whichever metric is currently growing the fastest." What is the weakness in this answer?**
+A) It demonstrates strong quantitative reasoning
+B) It correctly identifies the only factor that matters in metric selection
+C) It skips structured evaluation against the five NSM criteria, risking a metric that grows fast precisely because it's easy to game rather than because it reflects genuine value
+D) There is no weakness; fast-growing metrics are always the best choice
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer applies structured evaluation criteria, not just intuitive appeal or current growth trend, which can itself be a symptom of gaming rather than genuine value.*
+*Correct answer: C*
+*Explanation: A strong answer applies structured evaluation criteria, not just current growth trend, which can itself be a symptom of gaming.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
 **12. Why does this lesson recommend periodically revisiting a chosen North Star Metric rather than treating it as permanently fixed?**
-A) Because metrics should be changed randomly to keep teams alert
-B) Because the right NSM for an early-stage product exploring value may no longer be the right NSM once the business matures and different dynamics become more central to genuine value, as YouTube's own shift demonstrates
+A) The right NSM for an early-stage product exploring value may no longer be the right NSM once the business matures and different dynamics become central, as YouTube's own shift demonstrates
+B) Because changing metrics frequently improves data science team morale
 C) Because North Star Metrics are only valid for exactly one calendar year
-D) Because changing metrics frequently improves data science team morale
+D) Because metrics should be changed randomly to keep teams alert
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #5 and the Summary explicitly recommend periodic revisiting as a sign of good metric discipline, using YouTube's shift as the illustrative precedent.*
+*Correct answer: A*
+*Explanation: Periodic revisiting is a sign of good metric discipline, using YouTube's shift as the illustrative precedent.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A team reports that their local metric (in-app notification open rate) has improved 20%, and claims this proves they're contributing meaningfully to the company's North Star Metric (weekly active users). Using this lesson's Metric Tree mental model, what should a PM ask first?**
-A) Nothing further; a 20% improvement is self-evidently valuable
-B) What is the quantified, verified relationship between notification open rate and weekly active users — has this connection actually been established with real evidence, or is it assumed based on thematic plausibility?
-C) Whether the team used Scrum or Kanban to achieve this improvement
-D) Whether the notification design used the correct brand colors
+**13. (Product Thinking) A team reports that their local metric (notification open rate) has improved 20%, and claims this proves they're contributing meaningfully to the company's North Star Metric (weekly active users). What should a PM ask first?**
+A) Whether the notification design used the correct brand colors
+B) Whether the team used Scrum or Kanban to achieve this improvement
+C) Nothing further; a 20% improvement is self-evidently valuable
+D) What is the quantified, verified relationship between notification open rate and weekly active users — has it actually been established with real evidence, or just assumed?
 
-*Correct answer: B*
-*Explanation: This directly applies the Metric Tree mental model's core diagnostic question — verifying a real, quantified connection rather than accepting a plausible-sounding but unverified claim.*
+*Correct answer: D*
+*Explanation: This applies the Metric Tree mental model's core diagnostic question — verifying a real, quantified connection rather than accepting a plausible-sounding claim.*
 *Learning objective tested: #3*
 *Difficulty: Hard*
 
 ---
 
 **14. Which of the following best reflects a metric tree branch that is rigorously connected, rather than merely thematically related, to its NSM?**
-A) A team asserts their metric "feels important" to overall company success without further evidence
-B) A team demonstrates, through actual data analysis, that increases in their specific input metric are statistically associated with subsequent increases in the North Star Metric, controlling for other factors
-C) A team's metric is included in the tree simply because a senior leader requested it
+A) A team's metric is included in the tree simply because a senior leader requested it
+B) A team demonstrates, through actual data analysis, that increases in their input metric are statistically associated with subsequent increases in the NSM
+C) A team asserts their metric "feels important" to overall company success without further evidence
 D) A team's metric shares a similar-sounding name to the NSM
 
 *Correct answer: B*
-*Explanation: This reflects the kind of rigorous, evidence-based verification this lesson requires for a genuinely well-built metric tree branch, in contrast to the several weaker, unverified justifications listed in the other options.*
+*Explanation: This is the kind of rigorous, evidence-based verification a genuinely well-built metric tree branch requires.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A mature company's original North Star Metric, chosen five years ago during early growth, still rewards raw user acquisition, but the company's business has since shifted toward monetization and retention among an already-large user base. Using this lesson's frameworks, what is the most defensible response?**
-A) Continue using the original NSM indefinitely, since changing it would be disruptive
-B) Recognize this as a case warranting NSM revision (per Mistake 5): re-evaluate a new candidate metric against the five criteria, reflecting the business's current stage (retention/monetization-oriented value) rather than its early-growth stage, and rebuild the metric tree accordingly once a better candidate is validated
-C) Abandon the use of any North Star Metric entirely, since the original choice turned out to be temporary
-D) Add "raw user acquisition" as a permanent guardrail metric with no further changes to the primary NSM
+**15. (Product Thinking, Highest Difficulty) A mature company's original North Star Metric, chosen five years ago during early growth, still rewards raw user acquisition, but the business has since shifted toward monetization and retention among an already-large user base. What is the most defensible response?**
+A) Add "raw user acquisition" as a permanent guardrail metric with no further changes to the primary NSM
+B) Continue using the original NSM indefinitely, since changing it would be disruptive
+C) Recognize this as a case warranting NSM revision: re-evaluate a new candidate against the five criteria, reflecting the business's current stage, and rebuild the metric tree accordingly
+D) Abandon the use of any North Star Metric entirely, since the original choice turned out to be temporary
 
-*Correct answer: B*
-*Explanation: This applies the lesson's explicit guidance on periodic NSM revision — recognizing that a metric appropriate for one business stage may no longer be appropriate for a later one, and that revising it (rather than either stubbornly keeping it or abandoning metric discipline altogether) is the correct response, followed by rebuilding the metric tree around the newly validated choice.*
+*Correct answer: C*
+*Explanation: A metric appropriate for one business stage may no longer fit a later one; revising it and rebuilding the metric tree around a validated choice is the correct response.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 

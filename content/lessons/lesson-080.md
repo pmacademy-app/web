@@ -334,11 +334,11 @@ There is no single correct answer to the prompts below — the goal is to practi
 
 ## Quiz
 
-**1. What is the primary purpose of the Strategic Judgment Radar?**
-A) To replace all nine prior Module 8 models with a single new model
-B) To assess a strategic situation across all nine Module 8 dimensions simultaneously, rather than applying one model in isolation
-C) To measure only a company's revenue performance
-D) To eliminate the need for the Cross-Lesson Strategic Diagnostic Protocol
+**1. What is the primary purpose of the Strategic Judgment Radar introduced in this lesson?**
+A) To rank the nine Module 8 models by how often each applies
+B) To assess a strategic situation across all nine dimensions simultaneously
+C) To measure a company's quarterly revenue across business units
+D) To replace the diagnostic protocol with a simpler checklist
 
 *Correct answer: B*
 *Explanation: The Strategic Judgment Radar is explicitly an integrating tool, not a replacement for the individual models it draws together.*
@@ -347,26 +347,26 @@ D) To eliminate the need for the Cross-Lesson Strategic Diagnostic Protocol
 
 ---
 
-**2. According to this lesson, why do real strategic problems often resist single-model diagnosis?**
-A) Real strategic problems are always simpler than they initially appear
-B) Real problems are frequently multi-dimensional, involving compounding failures across more than one diagnostic axis
-C) Single-model diagnosis is always sufficient for any real-world strategic issue
-D) Multi-dimensional strategic problems do not actually occur in practice
+**2. Why does this lesson argue that real strategic problems often resist diagnosis through a single model?**
+A) Strategic problems are almost always simpler once examined closely
+B) Every strategic problem maps cleanly onto exactly one of the nine models
+C) Multi-dimensional strategic problems are rare enough to ignore
+D) Real problems often involve compounding failures across several axes
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson's central argument is that strategic incidents are often the product of failures across multiple axes at once.*
 *Learning objective tested: #1, #3*
 *Difficulty: Easy*
 
 ---
 
-**3. How does the Enterprise Adoption Ladder (Lesson 72) relate to the Stakeholder Compass (Lesson 73)?**
-A) The two models are entirely unrelated
-B) They describe the same B2B adoption process from complementary angles — organizational progress rungs and the stakeholders who gate that progress
-C) The Stakeholder Compass replaces the Enterprise Adoption Ladder entirely
-D) The Enterprise Adoption Ladder only applies to consumer products, unlike the Stakeholder Compass
+**3. How does this lesson describe the relationship between the Enterprise Adoption Ladder (Lesson 72) and the Stakeholder Compass (Lesson 73)?**
+A) The Stakeholder Compass fully replaces the Enterprise Adoption Ladder
+B) The two models apply to unrelated stages of the customer lifecycle
+C) They describe the same adoption process from complementary angles
+D) The Adoption Ladder applies only to consumer products, unlike the Compass
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Theory section explicitly connects these two models as complementary views of the same underlying process.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -374,36 +374,36 @@ D) The Enterprise Adoption Ladder only applies to consumer products, unlike the 
 ---
 
 **4. How does the Moat Durability Matrix (Lesson 75) relate to the Capability Sourcing Matrix (Lesson 78)?**
-A) They are unrelated models covering entirely separate topics
-B) Genuine competitive differentiation, assessed by the Moat Durability Matrix, is one of the two core axes the Capability Sourcing Matrix uses
-C) The Capability Sourcing Matrix replaces the need for the Moat Durability Matrix entirely
-D) The Moat Durability Matrix only applies to marketplace problems, unlike the Capability Sourcing Matrix
+A) Differentiation, assessed by the Moat Matrix, feeds the Sourcing Matrix's axes
+B) The Sourcing Matrix makes the Moat Durability Matrix unnecessary
+C) The two models address entirely separate, unrelated questions
+D) The Moat Matrix applies only to marketplace businesses, unlike the other
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The lesson explicitly frames the Moat Durability Matrix's differentiation assessment as feeding directly into the Sourcing Matrix's evaluation.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**5. In the Cross-Lesson Strategic Diagnostic Protocol, what should be checked using the Portfolio Health Grid?**
-A) Whether a negotiation concession was efficient or precedent-setting
-B) Whether a bet is being judged against evidence appropriate to its actual maturity stage
-C) Whether a marketplace has a binding supply-side or demand-side constraint
-D) Whether an acquisition's integration matches its original rationale
+**5. Within the Cross-Lesson Strategic Diagnostic Protocol, what does the Portfolio Health Grid step check?**
+A) Whether a negotiation concession was traded efficiently or costly
+B) Whether an acquisition's integration approach matches its rationale
+C) Whether a marketplace has a binding supply-side constraint
+D) Whether a bet is judged against evidence fit for its maturity stage
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Portfolio Health Grid step checks stage-appropriate evaluation, a foundational concern distinct from the other axes.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**6. In the Multi-Front Strategic Stall case study, what did the stalled acquisition integration have in common with the stalled enterprise accounts and the pressured product line?**
-A) Nothing; the three symptoms were entirely unrelated
-B) A shared underlying pattern of unmatched rigor: mismatched integration rationale, incomplete stakeholder engagement, and premature evaluation against inappropriate metrics
-C) All three problems were caused by a single technical bug
-D) All three symptoms were resolved by the same single fix with no further investigation needed
+**6. In the Multi-Front Strategic Stall case study, what did the stalled acquisition, the stalled accounts, and the pressured product line ultimately share?**
+A) All three were caused by the same underlying technical outage
+B) A shared pattern: mismatched rationale, weak engagement, and bad metrics
+C) Nothing meaningful; the three symptoms turned out to be unrelated
+D) All three resolved once the acquisition was more deeply integrated
 
 *Correct answer: B*
 *Explanation: The case study's core lesson is that a shared underlying pattern connected three seemingly unrelated symptoms, discoverable only through multi-axis investigation.*
@@ -412,50 +412,50 @@ D) All three symptoms were resolved by the same single fix with no further inves
 
 ---
 
-**7. Why might treating each of the three symptoms in the case study as entirely separate problems have failed to resolve the underlying issue?**
-A) Separate treatment would have been equally effective as connected diagnosis
-B) A shared underlying pattern connected all three symptoms, meaning symptom-by-symptom fixes would likely have left the root cause unaddressed
-C) The three symptoms had no actual connection to each other
-D) Separate treatment is always superior to connected diagnosis in any strategic situation
+**7. Why might treating the case study's three symptoms as entirely separate problems have failed to fix the underlying issue?**
+A) Separate treatment would have worked just as well as connected diagnosis
+B) The three symptoms had no meaningful connection to begin with
+C) A shared root cause meant symptom-by-symptom fixes would miss it
+D) Separate treatment is always superior in strategic diagnosis
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The case study demonstrates that addressing symptoms individually, without recognizing the shared pattern, would have missed the actual root cause.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. What does the Concession Exchange Map check within the Cross-Lesson Strategic Diagnostic Protocol specifically investigate?**
-A) Whether an acquisition's integration matches its rationale
-B) Whether negotiation concessions have been traded efficiently or have set a costly precedent
-C) Whether a marketplace's supply side is under-resourced
-D) Whether a recommender system has fallen into a filter bubble
+**8. What does the Concession Exchange Map step specifically investigate within the Cross-Lesson Strategic Diagnostic Protocol?**
+A) Whether concessions were traded efficiently or set a costly precedent
+B) Whether an acquisition's integration approach matches its rationale
+C) Whether a recommender system has fallen into a filter bubble
+D) Whether a marketplace's supply side is under-resourced
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Concession Exchange Map's role in the protocol is specifically to check pricing and negotiation efficiency, distinct from the other axes.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
-**9. According to the Real World Perspective section, why might a Big Tech-scale organization's strategic synthesis role look different from that of a mid-size company's?**
-A) Big Tech organizations never need to understand any of the nine models personally
-B) Dedicated specialist teams typically handle different axes, so the strategist's synthesis role shifts toward coordinating those specialists around a shared, integrated understanding
-C) Mid-size companies are the only ones who ever need to apply these models
-D) There is no meaningful difference between the two contexts
+**9. Per the Real World Perspective section, how does a Big Tech-scale strategist's synthesis role typically differ from a mid-size company's?**
+A) Big Tech strategists rarely need any familiarity with the models
+B) Mid-size companies are the only context where models are relevant
+C) There is no meaningful difference between the two contexts
+D) Specialist teams handle different axes, shifting the role to coordination
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Real World Perspective section describes this shift from personal application to cross-team coordination as scale increases, mirroring Module 7's synthesis lesson.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**10. What is "advanced strategic judgment," as defined in this lesson's Key Takeaways?**
-A) The ability to memorize all nine models' names and definitions
-B) The applied skill of recognizing which combination of models fits a real, ambiguous strategic situation
-C) A formal certification awarded after completing Module 8
-D) The ability to build a company strategy without any need for diagnostic frameworks
+**10. How does this lesson's Key Takeaways define "advanced strategic judgment"?**
+A) The ability to recite all nine models' names from memory
+B) The skill of recognizing which model combination fits a real situation
+C) A formal certification awarded upon completing Module 8
+D) The ability to build strategy without any diagnostic framework
 
 *Correct answer: B*
 *Explanation: The lesson explicitly distinguishes memorization from the applied, situational skill of correctly combining models.*
@@ -464,50 +464,50 @@ D) The ability to build a company strategy without any need for diagnostic frame
 
 ---
 
-**11. Why is checking the Strategy Cascade's falsifiability considered foundational to any other diagnostic step, per the Common Beginner Mistakes section?**
-A) It is the most complex of the nine models and therefore the most important
-B) A bet that was never made falsifiable in the first place cannot be genuinely evaluated using any of the other eight models, since there is no clear success criterion
-C) The other eight models cannot function without first applying the Strategy Cascade
-D) The Strategy Cascade is only relevant to enterprise sales problems specifically
+**11. Per the Common Beginner Mistakes section, why is checking the Strategy Cascade's falsifiability considered foundational to the other diagnostic steps?**
+A) It is the most technically complex of the nine models
+B) None of the other models can ever be applied without it first
+C) An unfalsifiable bet has no clear success criterion to evaluate against
+D) The Strategy Cascade only applies to enterprise sales problems
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Common Beginner Mistakes section explicitly warns that skipping this check undermines the ability to evaluate progress through any other model.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
-**12. (Scenario) A strategist observes a stalled acquisition, several stalled enterprise accounts, and pressure to cancel a promising product line, and immediately proposes three separate, unrelated fixes for each. What does this lesson suggest as the appropriate first response?**
-A) Approve all three separate fixes immediately, since each symptom clearly requires its own distinct solution
-B) Run the situation through the Cross-Lesson Strategic Diagnostic Protocol to check for a shared underlying pattern before committing to three separate, uncoordinated fixes
-C) Reject all three proposed fixes outright without any further investigation
-D) Assume the three symptoms are purely coincidental and require no action
+**12. (Scenario) A strategist observes a stalled acquisition, several stalled accounts, and pressure to cancel a product line, then proposes three separate, unrelated fixes. What does this lesson suggest as the appropriate first response?**
+A) Run the protocol to check for a shared pattern before three fixes
+B) Approve all three fixes immediately, since each symptom is distinct
+C) Reject all three proposed fixes without any further investigation
+D) Assume the three symptoms are coincidental and take no action
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This mirrors the Case Study's core lesson: symptoms that appear unrelated may share a common root cause, discoverable only through the full diagnostic protocol.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A strategist notices three seemingly unrelated symptoms across acquisition integration, enterprise sales, and portfolio evaluation. Using this lesson's frameworks, what is the most defensible first step?**
-A) Treat each symptom as an entirely separate problem requiring three unrelated investigations
-B) Investigate whether these symptoms share a common root cause using the Cross-Lesson Strategic Diagnostic Protocol, checking relevant axes for each symptom in parallel
-C) Address only the acquisition integration issue, since M&A problems are always the most urgent
-D) Wait for additional symptoms to appear before taking any action
+**13. (Product Thinking) A strategist notices seemingly unrelated symptoms across acquisition integration, enterprise sales, and portfolio evaluation. What is the most defensible first step, per this lesson's frameworks?**
+A) Address only the acquisition, since M&A problems are always urgent
+B) Wait for more symptoms to appear before taking any action
+C) Treat each symptom as three entirely separate investigations
+D) Check each axis in parallel for a shared root cause via the protocol
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This mirrors the Reflection Exercise: multiple seemingly separate symptoms may share a common underlying cause, and the protocol supports investigating them together rather than in isolation.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked to diagnose a complex strategic problem, applies a single model thoroughly and concludes their investigation once that model produces a plausible explanation. What does this most likely signal, per the Interview Perspective section?**
+**14. (Interview Reasoning) A candidate, asked to diagnose a complex strategic problem, applies a single model and stops once it produces a plausible explanation. What does this most likely signal, per the Interview Perspective section?**
 A) A complete and sufficient diagnostic approach
-B) A potential gap in checking for compounding causes across other axes, which the interviewer is specifically listening for
-C) That the candidate is ready for a senior strategy leadership role immediately
-D) Nothing meaningful; a single plausible explanation is always sufficient
+B) A potential gap in checking for compounding causes elsewhere
+C) Readiness for a senior strategy leadership role immediately
+D) Nothing meaningful, since one explanation is generally sufficient
 
 *Correct answer: B*
 *Explanation: The Interview Perspective section specifically listens for evidence of considering multiple contributing causes, not stopping at the first plausible single-model explanation.*
@@ -516,13 +516,13 @@ D) Nothing meaningful; a single plausible explanation is always sufficient
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A company faces a stalled acquisition integration, several stalled enterprise accounts just short of company-wide rollout, and pressure to cancel a maturing exploratory product line. Using only the frameworks in this lesson, what is the most defensible response?**
-A) Address only the single symptom that seems most urgent, and assume the others will resolve themselves once that one is fixed
-B) Investigate all three symptoms for a shared underlying pattern using the Cross-Lesson Strategic Diagnostic Protocol, and address any common root cause alongside symptom-specific fixes
-C) Launch a broad reorganization to address all symptoms simultaneously without further diagnosis
-D) Conclude that the situation is too complex to address and take no action
+**15. (Product Thinking, Highest Difficulty) A company faces a stalled acquisition integration, several stalled accounts short of company-wide rollout, and pressure to cancel a maturing product line. Using only this lesson's frameworks, what is the most defensible response?**
+A) Address only the symptom that seems most urgent, hoping others resolve
+B) Launch a broad reorganization to address everything without diagnosis
+C) Investigate all three for a shared pattern, then fix root and symptoms
+D) Conclude the situation is too complex to address and take no action
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This mirrors the Multi-Front Strategic Stall case study directly: a compounding, multi-axis pattern requires a coordinated, root-cause-informed response, not a single-symptom fix, an undiagnosed broad reorganization, or inaction.*
 *Learning objective tested: #2, #3, #4, #5*
 *Difficulty: Hard*

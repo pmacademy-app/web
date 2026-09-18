@@ -310,36 +310,36 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why does hardware development carry a fundamentally different risk profile than software, per this lesson?**
-A) Hardware products are always more expensive to manufacture than software is to develop
-B) Software assumes mistakes can typically be corrected through a subsequent deployment, while hardware has genuine, irreversible commitment points
-C) Hardware products never require any testing before launch
-D) There is no meaningful difference between hardware and software risk profiles
+A) Hardware has genuine commitment points where a flaw becomes fixed reality
+B) Hardware companies never conduct any user research before launch
+C) Software products cost more to test than hardware products do
+D) Both hardware and software share the exact same correction model
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The lesson's central argument is that hardware breaks software's implicit "ship and iterate" assumption at specific, irreversible commitment points.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. What is the correct order of the Commitment Curve?**
-A) Shipped, Mass Production, Tooling Commitment, Prototype, Concept
-B) Concept, Prototype, Tooling Commitment, Mass Production, Shipped
-C) Tooling Commitment, Concept, Shipped, Prototype, Mass Production
-D) Mass Production, Concept, Tooling Commitment, Shipped, Prototype
+**2. Which sequence correctly reflects the Commitment Curve's stages, from cheapest to most expensive to reverse?**
+A) Prototype, Concept, Shipped, Mass Production, Tooling Commitment
+B) Mass Production, Tooling Commitment, Concept, Prototype, Shipped
+C) Concept, Prototype, Tooling Commitment, Mass Production, Shipped
+D) Shipped, Tooling Commitment, Mass Production, Prototype, Concept
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This is the sequential order introduced in the Theory section, from cheap-to-change to essentially unchangeable.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**3. What can an OTA (over-the-air) update correct?**
-A) Any flaw in a physical device, including hardware component defects
-B) Firmware and software issues, but not genuinely physical hardware flaws
-C) Only issues discovered before tooling commitment
-D) Nothing; OTA updates are purely cosmetic and cannot change device behavior
+**3. What category of flaw can an OTA (over-the-air) update actually correct, per this lesson?**
+A) Any defect whatsoever, including a structurally weak component
+B) Firmware and software issues, but not the physical hardware itself
+C) Only flaws discovered before the device reaches mass production
+D) Nothing; OTA updates only change cosmetic device settings
 
 *Correct answer: B*
 *Explanation: The Theory section explicitly limits OTA update capability to software-correctable issues, distinct from physical hardware flaws.*
@@ -348,50 +348,50 @@ D) Nothing; OTA updates are purely cosmetic and cannot change device behavior
 
 ---
 
-**4. Why should validation rigor scale with proximity to a Commitment Curve stage?**
-A) Validation rigor should always remain constant throughout development regardless of stage
-B) The cost of reversing a decision increases sharply near commitment points, making additional scrutiny more valuable immediately before these thresholds
-C) Validation is only relevant after a product has already shipped
-D) Validation rigor should decrease as a product approaches tooling commitment
+**4. According to this lesson, how should validation rigor change as a hardware decision approaches an irreversible commitment point?**
+A) It should stay exactly the same as at the Concept stage always
+B) It should decrease, since later issues are cheaper to fix
+C) It becomes irrelevant once a product enters Prototype testing
+D) It should intensify, since reversal cost rises sharply near tooling
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This directly reflects the Commitment Curve's core discipline of scaling scrutiny to match reversal cost.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**5. What is "Tooling Commitment"?**
-A) The point at which a product is first conceived as an idea
-B) The point at which custom manufacturing equipment for a specific design is committed to, after which changes become expensive and slow
-C) The point at which a product is delivered to a customer's home
-D) A marketing milestone unrelated to manufacturing decisions
+**5. What happens at the point this lesson calls "Tooling Commitment"?**
+A) Manufacturing equipment for a design is committed, locking in changes
+B) A device is delivered into a customer's home for the first time
+C) A product idea is first sketched out on paper by the team
+D) A marketing campaign begins ahead of a public launch date
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This is the specific manufacturing commitment stage explicitly defined in the Theory section.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**6. In the Unfixable Battery Flaw case study, what was the core mistake made by the team?**
-A) The team applied excessive validation rigor to a minor issue
-B) The team assumed a physical battery design flaw was firmware-correctable, applying a software-oriented "fix it later" assumption to a genuinely physical issue
-C) The team refused to proceed to tooling commitment under any circumstances
-D) The team never identified any issue during prototype testing at all
+**6. In the Unfixable Battery Flaw case study, what specifically went wrong?**
+A) The team over-validated a battery issue that posed no real risk
+B) The team could not set a launch date and delayed for years
+C) A physical battery flaw was wrongly assumed firmware-fixable, so it got too little validation before tooling
+D) The team recalled the product before any customer complained
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The case study's central failure was misclassifying a physical flaw as firmware-correctable, leading to insufficient validation before an irreversible commitment.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
-**7. Why couldn't the overheating issue in the case study be fixed through a firmware update?**
-A) The company never actually attempted to develop a firmware fix
-B) The underlying issue existed in the physical battery cell's own thermal characteristics, not in the software governing device behavior
-C) The device had no firmware capability at all
-D) Firmware updates are always incapable of addressing any device issue
+**7. Why did the overheating issue in the case study ultimately prove impossible to fix through a firmware update?**
+A) The company had never built any firmware into the device
+B) The cause was the battery cell's own thermal characteristics
+C) The firmware team simply refused to release an update in time
+D) Firmware is categorically incapable of changing charging behavior
 
 *Correct answer: B*
 *Explanation: The case study specifically attributes the flaw to physical battery cell characteristics, entirely outside firmware's ability to correct.*
@@ -400,50 +400,50 @@ D) Firmware updates are always incapable of addressing any device issue
 
 ---
 
-**8. According to the Hardware Product Readiness Checklist, what does a "no" on Physical vs. Firmware Classification indicate?**
-A) A minor administrative gap with no real consequence
-B) A significant risk, given that this specific confusion directly caused the costly recall in the Case Study
-C) That the product is definitely ready to proceed to mass production
-D) That firmware updates are unnecessary for this product
+**8. Per the Hardware Product Readiness Checklist, what does a "no" answer on Physical vs. Firmware Classification indicate?**
+A) A routine documentation gap that rarely affects the roadmap
+B) That the device should proceed to mass production without review
+C) That firmware capability is unnecessary for this product
+D) A risk deserving urgency, since this exact gap caused the recall
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson explicitly treats this classification gap as urgent, given its direct role in the case study's failure.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**9. Why might early-stage hardware companies face especially acute Commitment Curve risk, per the Real World Perspective section?**
-A) Early-stage hardware companies never need to make any tooling commitments
-B) A single tooling commitment or mass production run can represent a substantial fraction of the company's total available capital, making pre-commitment validation genuinely existential
-C) Early-stage companies are legally exempt from hardware safety regulations
-D) Hardware risk only applies to companies with over ten thousand employees
+**9. Per the Real World Perspective section, why do early-stage hardware companies face especially acute Commitment Curve risk?**
+A) A single tooling run can consume a huge share of total capital
+B) Early-stage companies are required to skip regulatory certifications
+C) Early-stage companies never encounter a Tooling Commitment stage
+D) Investors typically forbid testing prototypes before launch
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Real World Perspective section connects this heightened risk specifically to capital constraints typical of early-stage hardware companies.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
-**10. What do mid-size hardware companies typically establish, per the Real World Perspective section?**
-A) No formal validation process of any kind
-B) Formal, staged validation gates tied to specific Commitment Curve stages, requiring documented sign-off before proceeding to more expensive stages
-C) A policy of skipping all validation to move faster than competitors
-D) Validation processes only after a product has already shipped
+**10. What typically becomes standard practice at mid-size hardware companies, per the Real World Perspective section?**
+A) Abandoning validation entirely to ship as fast as possible
+B) Outsourcing Tooling Commitment decisions with no internal review
+C) Formal, staged validation gates requiring documented sign-off
+D) Treating every design review with identical urgency regardless of stage
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Real World Perspective section describes these staged validation gates as characteristic of mid-size hardware companies' formalized practices.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**11. Why should firmware update capability be designed into a product from the outset, per this lesson?**
-A) Firmware update capability is legally required for all hardware products
-B) Retrofitting OTA update capability into a device not originally designed to support it is considerably more difficult than building it in from the start
-C) Firmware updates are never actually useful once a product has shipped
-D) Products without firmware capability are always safer than those with it
+**11. Why does this lesson argue firmware update capability should be designed into a product from the outset?**
+A) Regulators require every physical device to support OTA updates
+B) Retrofitting OTA capability later is considerably harder than building it in
+C) Devices without firmware capability cannot legally ship to consumers
+D) Firmware capability is only useful once a device is already recalled
 
 *Correct answer: B*
 *Explanation: This mirrors the same early-architecture-decision principle established for regulatory and privacy considerations in Lessons 81 and 82.*
@@ -452,50 +452,50 @@ D) Products without firmware capability are always safer than those with it
 
 ---
 
-**12. (Scenario) A hardware team identifies a minor connectivity issue during prototype testing and assumes, without further investigation, that a firmware update will resolve it after shipment. Using this lesson's frameworks, what should happen before proceeding to tooling commitment?**
-A) Proceed directly to tooling commitment, since firmware updates can address any issue after shipment
-B) Conduct a Physical vs. Firmware Classification investigation to confirm whether the issue is genuinely firmware-correctable before committing to tooling
-C) Cancel the product entirely due to the identified issue
-D) Ignore the issue since it was only observed during prototype testing
+**12. (Scenario) A hardware team observes a minor connectivity issue during prototype testing and assumes, without further investigation, that firmware will resolve it after shipment. What does this lesson's framework suggest should happen before tooling commitment?**
+A) Proceed to tooling commitment, trusting firmware can always help
+B) Shelve the entire line until the issue is completely eliminated
+C) Disregard the issue, since it surfaced only during prototype testing
+D) Investigate whether the issue is genuinely physical before committing to tooling
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This directly applies the lesson's core diagnostic: confirming classification before assuming firmware correctability, especially immediately before an irreversible commitment.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A hardware team under schedule pressure wants to skip additional validation testing immediately before tooling commitment. What is the strongest response, using this lesson's frameworks?**
-A) Agree to skip validation to maintain the schedule, since validation can always occur after shipment
-B) Explain that validation rigor should scale with proximity to an irreversible commitment point, and that insufficient testing immediately before tooling commitment risks a costly, unfixable flaw like the one in the Case Study
-C) Cancel the tooling commitment indefinitely regardless of the validation results
-D) Apply the same validation rigor used during the Concept stage, since all stages require identical scrutiny
+**13. (Product Thinking) A hardware team under schedule pressure wants to skip additional testing right before tooling commitment. What is the strongest response using this lesson's frameworks?**
+A) Explain that rigor should scale with irreversibility, and skipping risks a costly flaw like the Case Study's
+B) Allow it, since any flaw can be corrected with a later firmware patch
+C) Postpone tooling commitment indefinitely no matter what tests find
+D) Apply Concept-stage validation, since every stage carries equal risk
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The correct response explains the Commitment Curve's core logic, connecting schedule pressure to the specific, elevated risk of underinvesting in validation near an irreversible threshold.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked about validating a hardware design decision, describes only checking whether the feature works as intended, with no mention of proximity to tooling commitment or physical-versus-firmware classification. What does this most likely signal, per the Interview Perspective section?**
-A) A strong and complete understanding of hardware product management
-B) A gap in recognizing that validation rigor should scale with irreversibility, and that physical versus firmware classification is a critical distinction
-C) That the candidate is ready for a senior hardware PM role immediately
-D) Nothing meaningful; basic functional testing is always sufficient for hardware products
+**14. (Interview Reasoning) A candidate describes validating a hardware design only by confirming the feature works as intended, without mentioning proximity to tooling commitment or physical-versus-firmware classification. What does this most likely signal, per the Interview Perspective section?**
+A) A thorough, senior-level grasp of hardware product management
+B) That the candidate has memorized the Commitment Curve stages
+C) A gap in recognizing that rigor should scale with irreversibility
+D) Nothing of note, since functional testing is always sufficient
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Interview Perspective section specifically listens for recognition of the Commitment Curve's escalating validation discipline and the physical/firmware distinction, both absent from this answer.*
 *Learning objective tested: #1, #3, #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A hardware team identifies a connectivity issue during prototype testing, assumes it's firmware-correctable, and is under pressure to proceed to tooling commitment on schedule. Using only the frameworks in this lesson, what is the most defensible course of action?**
-A) Proceed to tooling commitment as scheduled, trusting the firmware assumption without further investigation
-B) Conduct a rigorous Physical vs. Firmware Classification investigation before tooling commitment, applying validation rigor proportional to the stage's irreversibility, even if this requires a schedule delay
-C) Cancel the entire product line due to the identified issue
-D) Proceed to tooling commitment but plan a full product recall in advance as a contingency
+**15. (Product Thinking, Highest Difficulty) A hardware team identifies a connectivity issue during prototype testing, assumes it's firmware-correctable, and faces pressure to proceed to tooling commitment on schedule. What is the most defensible course of action using only this lesson's frameworks?**
+A) Proceed on schedule, trusting the firmware assumption unverified
+B) Conduct a rigorous classification and scale rigor to the stage's risk
+C) Cancel the whole line over a single prototype-stage issue
+D) Proceed as planned but prepare a recall plan as a contingency
 
 *Correct answer: B*
 *Explanation: This mirrors the Reflection Exercise and Case Study: the correct response conducts genuine classification and proportional validation before an irreversible commitment, rather than proceeding on an unverified assumption, abandoning the product entirely, or planning for a recall instead of preventing one.*

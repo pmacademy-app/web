@@ -359,12 +359,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the "who creates the value" test used to determine?**
-A) Whether a product is profitable
-B) Whether a product is a feature product or a platform
-C) Whether a product should be open source
-D) Whether a product needs a mobile app
+A) Whether a product should be priced using a subscription model
+B) Whether a product needs a dedicated mobile application
+C) Whether a product qualifies for open-source licensing
+D) Whether a product is a feature product or a platform
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The test asks who built the thing responsible for a good user experience — your own team, or a third party — to classify the product.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -372,12 +372,12 @@ D) Whether a product needs a mobile app
 ---
 
 **2. In the Leverage Stack, which layer sits directly above the Core Product?**
-A) Ecosystem
+A) Developer Surface
 B) Marketplace
-C) Developer Surface
+C) Ecosystem
 D) End Users
 
-*Correct answer: C*
+*Correct answer: A*
 *Explanation: The Leverage Stack order is Core Product, then Developer Surface, then Marketplace, then Ecosystem.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -385,12 +385,12 @@ D) End Users
 ---
 
 **3. Why can a platform's end-user engagement metrics remain healthy even after its Developer Surface has begun to decay?**
-A) End users do not care about third-party integrations
-B) Existing integrations continue functioning while new developer investment quietly stalls
-C) Engagement metrics automatically adjust for developer issues
-D) Developer Surface decay always shows up immediately in end-user metrics
+A) End users, this lesson notes, never care about integrations at all
+B) Engagement metrics automatically adjust for any developer-side issues
+C) Existing integrations keep working while new building quietly stalls
+D) Developer Surface decay always shows up immediately in dashboards
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Old integrations keep working for a time even as new building on the platform grinds to a halt, so the decay is initially invisible to end-user dashboards.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -398,10 +398,10 @@ D) Developer Surface decay always shows up immediately in end-user metrics
 ---
 
 **4. What is a cross-side network effect?**
-A) A loop where a single user's engagement affects only their own experience
-B) A loop where growth in the builder population and the end-user population reinforce each other
-C) A pricing model unique to marketplaces
-D) A technical architecture pattern for APIs
+A) A loop where one user's activity affects only their own experience
+B) A loop where growth in builders and end users reinforces each other
+C) A pricing model that applies uniquely to two-sided marketplaces
+D) A technical architecture pattern used specifically for APIs
 
 *Correct answer: B*
 *Explanation: Cross-side network effects describe how growth in one population (builders or end users) increases the platform's value to the other population.*
@@ -411,12 +411,12 @@ D) A technical architecture pattern for APIs
 ---
 
 **5. Which of the following is a structural risk unique to platform businesses, not feature products?**
-A) The risk of shipping a feature no one wants
-B) The risk that a cross-side network effect can collapse in reverse across two populations at once
-C) The risk of missing a project deadline
-D) The risk of a poorly worded error message
+A) The risk of shipping a feature that ultimately no one wants
+B) The general risk of missing an internal project deadline
+C) The risk of a confusing or poorly worded error message
+D) A cross-side network effect collapsing across two populations at once
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Feature products don't have a second population (builders) whose departure can trigger a reinforcing collapse with the end-user population; this risk is specific to platforms.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -424,12 +424,12 @@ D) The risk of a poorly worded error message
 ---
 
 **6. According to this lesson, what is typically in tension between developers and end users?**
-A) Developers want frequent change; end users want stability
-B) Developers want stability and advance notice; end users often want frequent, visible change
-C) There is no meaningful tension between the two groups
-D) Developers and end users always want identical things
+A) Developers want stability and notice; end users want visible change
+B) Developers and end users, in practice, always want identical things
+C) There is, per this lesson, no meaningful tension between the groups
+D) Developers want frequent change; end users want strict stability
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Developers need predictability to build reliably; end users often expect and reward visible iteration, creating a structural tension platform PMs must manage.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -437,12 +437,12 @@ D) Developers and end users always want identical things
 ---
 
 **7. In the Case Study, what was the root cause of the Marketplace's failure?**
-A) The revenue-sharing terms were too generous to developers
-B) A Layer 3 investment (public Marketplace) was made while Layer 2 (the API) was unstable and undocumented
-C) The launch event was poorly attended
-D) The company chose the wrong third-party developers to recruit first
+A) The launch event itself was poorly organized and sparsely attended
+B) The company recruited the wrong third-party developers at first
+C) A Layer 3 investment was made while Layer 2 remained unstable
+D) The revenue-sharing terms offered to developers were too generous
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Leverage Stack diagnosis is precise: Layer 3 investment cannot succeed if Layer 2 beneath it is untrustworthy.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
@@ -450,10 +450,10 @@ D) The company chose the wrong third-party developers to recruit first
 ---
 
 **8. What does the Platform Readiness Checklist help a PM assess?**
-A) Whether the core product has product-market fit
-B) Whether the Developer Surface is stable enough to support Marketplace or Ecosystem investment
-C) Whether a company should IPO
-D) Whether an end-user feature should be prioritized
+A) Whether the core product has reached genuine product-market fit
+B) Whether the Developer Surface is stable enough to support expansion
+C) Whether a company is financially ready to pursue an IPO
+D) Whether a specific end-user feature deserves roadmap priority
 
 *Correct answer: B*
 *Explanation: The checklist evaluates versioning, deprecation notice, documentation currency, reliability SLA, and support channels — all Layer 2 concerns.*
@@ -463,12 +463,12 @@ D) Whether an end-user feature should be prioritized
 ---
 
 **9. Why is premature platform investment a common mistake at early-stage startups specifically?**
-A) Startups lack the legal resources to run a marketplace
-B) It substitutes "let's make it extensible" for the harder work of proving the core feature product works first
-C) Startups are legally prohibited from having APIs
-D) Investors always discourage platform thinking at any stage
+A) Startups typically lack the legal resources to run a marketplace
+B) Startups are, as a rule, prohibited from offering any public API
+C) Investors, this lesson states, always discourage platform thinking
+D) It substitutes "let's make it extensible" for proving the core works
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Real World Perspective section identifies this as a platform-specific variant of the Build Trap, where extensibility work displaces the harder task of nailing product-market fit.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -476,12 +476,12 @@ D) Investors always discourage platform thinking at any stage
 ---
 
 **10. At a mid-size company, what typically triggers the transition from feature product to platform?**
-A) A mandate from the board with no customer input
-B) A handful of large customers or partners requesting integrations the core team can't build individually
-C) A decision to reduce headcount
-D) A change in company logo or branding
+A) A handful of large customers requesting integrations the team can't build
+B) A mandate from the board issued with no customer input at all
+C) A decision made primarily to reduce overall company headcount
+D) A change in the company's logo or broader brand identity
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Real World Perspective section describes this as the typical mid-size-company trigger for platform investment.*
 *Learning objective tested: #1, #3*
 *Difficulty: Medium*
@@ -489,12 +489,12 @@ D) A change in company logo or branding
 ---
 
 **11. What is a "take rate" in the context of platform value capture?**
-A) The speed at which a platform ships new features
-B) The percentage of transaction value a platform captures from ecosystem activity
-C) The rate at which developers abandon a platform
-D) The interest rate charged on platform loans
+A) The speed at which a platform team ships new features to users
+B) The rate at which developers abandon a platform over time
+C) The share of transaction value a platform captures from activity
+D) The interest rate a platform charges on developer financing
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Take rate refers to the platform's mechanism for capturing a share of the value generated by ecosystem transactions, such as app store commissions.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
@@ -502,9 +502,9 @@ D) The interest rate charged on platform loans
 ---
 
 **12. (Scenario) A platform team wants to launch a public developer conference and co-marketing campaign (Layer 4) while its API still changes unpredictably every release (Layer 2 issue). Using the Leverage Stack, what should the PM recommend?**
-A) Proceed with the conference as planned, since marketing and engineering are unrelated concerns
-B) Pause the Layer 4 investment and prioritize Layer 2 stability first, since higher layers depend on the layer beneath them
-C) Cancel the API entirely and rebuild the product from scratch
+A) Proceed with the conference, since marketing and engineering differ
+B) Pause the Layer 4 investment and prioritize Layer 2 stability first
+C) Cancel the API outright and rebuild the entire product from scratch
 D) Proceed with the conference, but ask developers to sign a waiver
 
 *Correct answer: B*
@@ -515,35 +515,35 @@ D) Proceed with the conference, but ask developers to sign a waiver
 ---
 
 **13. (Product Thinking) A Big Tech platform PM is evaluated primarily on third-party integration counts and API reliability SLAs rather than end-user engagement metrics. What does this reflect about platform accountability?**
-A) Platform PMs are never accountable for end users
-B) Platform PMs have an accountability structure that includes a second population — developers — whose success is measured differently than end-user success
-C) Big Tech companies do not track end-user metrics
-D) API reliability SLAs are irrelevant to platform success
+A) Platform PMs, in this model, are never accountable for end users
+B) Big Tech companies, as a rule, do not track end-user metrics
+C) API reliability SLAs are, in practice, irrelevant to platform success
+D) Platform accountability includes a second population measured differently
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Real World Perspective section notes platform PMs are accountable to developers as a distinct population, measured through different metrics than the ones dominating Module 5.*
 *Learning objective tested: #3, #4*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked how they'd decide whether to invest in a public API, immediately describes an ambitious ecosystem vision without mentioning current API stability. What does this most likely signal, per this lesson's Interview Perspective section?**
-A) Strong strategic vision with no weaknesses
-B) A failure to apply the Leverage Stack's sequencing logic — jumping to Layer 3/4 enthusiasm without assessing Layer 2 readiness first
-C) That the candidate should be hired immediately
+**14. (Interview Reasoning) A candidate, asked how they'd decide whether to invest in a public API, immediately describes an ambitious ecosystem vision without mentioning current API stability. What does this most likely signal?**
+A) A failure to apply the Leverage Stack's sequencing logic properly
+B) Strong strategic vision that shows no meaningful weaknesses at all
+C) That the candidate should, on this answer alone, be hired immediately
 D) Nothing meaningful; ecosystem vision is the only relevant factor
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Interview Perspective section identifies this exact gap — enthusiasm about ecosystem potential without Layer 2 readiness assessment — as a weak signal.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A VP has committed to three external partners that they will receive API access within one quarter, but engineering reports the internal API has no versioning and changes almost every release. Using only the frameworks in this lesson, what is the PM's best course of action?**
-A) Proceed as promised, since a VP commitment overrides internal readiness concerns
-B) Refuse outright and cancel the partnership without offering any alternative
-C) Assess the Developer Surface against the Platform Readiness Checklist, communicate the specific gaps and risks to the VP, and propose a lower-risk interim commitment while Layer 2 stability work proceeds
+**15. (Product Thinking, Highest Difficulty) A VP has committed to three external partners that they will receive API access within one quarter, but engineering reports the internal API has no versioning and changes almost every release. What is the PM's best course of action?**
+A) Proceed exactly as promised, since a VP's commitment overrides concerns
+B) Refuse outright and cancel the partnership with no alternative offered
+C) Assess against the Readiness Checklist, communicate gaps, and propose an interim path
 D) Immediately launch a public Marketplace to satisfy the partners' urgency
 
 *Correct answer: C*

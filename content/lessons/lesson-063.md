@@ -317,12 +317,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What condition distinguishes a two-sided marketplace from a product with two different user types?**
-A) Having more than 1,000 total users
-B) Each population derives no value from the platform without sufficient presence of the other
-C) Charging both sides a subscription fee
-D) Operating in more than one country
+A) Each population derives no value without sufficient presence of the other
+B) Charging both populations an identical subscription fee structure
+C) Operating the product across more than a single country
+D) Having more than a thousand total registered users overall
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Mutual dependency for the core value proposition is the defining condition of a two-sided marketplace, not merely having distinct user categories.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -330,12 +330,12 @@ D) Operating in more than one country
 ---
 
 **2. What is the chicken-and-egg problem?**
-A) A pricing dispute between two sides of a marketplace
-B) Neither side wants to join a marketplace until the other side is already present in sufficient numbers
-C) A technical issue with database schema design
-D) A legal issue unique to food delivery marketplaces
+A) A pricing dispute that arises between two sides of a marketplace
+B) A technical issue specific to database schema design choices
+C) Neither side joins a marketplace until the other is already present
+D) A legal issue unique specifically to food delivery marketplaces
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This is the foundational bootstrapping challenge specific to two-sided marketplaces.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -343,10 +343,10 @@ D) A legal issue unique to food delivery marketplaces
 ---
 
 **3. Which of the following is NOT one of the strategies described for solving the chicken-and-egg problem?**
-A) Single-player mode
-B) Geographic or niche concentration
-C) Subsidizing one side temporarily
-D) Launching simultaneously in every major global market
+A) Building single-player mode value for one side on its own
+B) Concentrating liquidity-building efforts in one geography or niche
+C) Temporarily subsidizing the harder-to-acquire side of the market
+D) Launching simultaneously across every major global market at once
 
 *Correct answer: D*
 *Explanation: Broad simultaneous global launch is the opposite of the concentration strategy recommended for solving the chicken-and-egg problem.*
@@ -357,9 +357,9 @@ D) Launching simultaneously in every major global market
 
 **4. What is marketplace liquidity?**
 A) The total amount of cash a marketplace company has raised
-B) The probability that a participant showing up with genuine intent successfully completes a transaction within an acceptable time or effort threshold
-C) The number of registered users on the larger side of the marketplace
-D) The speed at which a marketplace's app loads
+B) The probability a participant successfully completes a timely match
+C) The number of registered users on the marketplace's larger side
+D) The speed at which the marketplace's mobile app loads content
 
 *Correct answer: B*
 *Explanation: Liquidity is specifically about successful, timely matching, not raw scale or technical performance.*
@@ -369,12 +369,12 @@ D) The speed at which a marketplace's app loads
 ---
 
 **5. Why is liquidity a better health metric than registered-user count?**
-A) Registered-user count is harder to measure than liquidity
-B) A marketplace can have large registered-user counts on both sides while producing very few successful matches
-C) Liquidity and registered-user count always move together
-D) Registered-user count is not tracked by most marketplaces
+A) Large registered counts can coexist with very few successful matches
+B) Registered-user count is, in practice, harder to measure than liquidity
+C) Liquidity and registered-user count, this lesson claims, always move together
+D) Registered-user count, per this lesson, isn't tracked by most marketplaces
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: High registration with low liquidity indicates the marketplace isn't actually delivering its core value proposition, despite appearing large.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -382,12 +382,12 @@ D) Registered-user count is not tracked by most marketplaces
 ---
 
 **6. In the Two-Sided Balance Model, what should a PM do before launching a growth initiative?**
-A) Apply the same initiative to both sides simultaneously for fairness
-B) Identify which side's leading indicators are currently weak, and target that side specifically
-C) Always prioritize the demand side, since more demand is always beneficial
-D) Skip diagnosis and rely on total revenue as the only signal
+A) Apply the identical initiative to both sides simultaneously for fairness
+B) Always prioritize the demand side, since more demand helps in general
+C) Identify which side's leading indicators are currently weak, and target it
+D) Skip diagnosis entirely and rely on total revenue as the only signal
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Two-Sided Balance Model requires diagnosing the binding constraint before directing growth resources.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -395,12 +395,12 @@ D) Skip diagnosis and rely on total revenue as the only signal
 ---
 
 **7. In the Case Study, what caused client satisfaction to decline despite a successful demand-generation campaign?**
-A) The marketing campaign used misleading messaging
-B) Supply had not grown proportionally, so the increased demand could not be adequately served, degrading fill rate and response time
-C) Clients found the app too difficult to use
-D) The company raised prices at the same time as the campaign
+A) The marketing campaign itself relied on misleading messaging
+B) Clients, in the end, found the marketplace's app too hard to use
+C) The company raised its prices at the same time as the campaign
+D) Supply hadn't grown proportionally, so demand outpaced fulfillment
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The campaign flooded the constrained supply side with more demand than it could serve, directly harming liquidity and client experience.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
@@ -408,10 +408,10 @@ D) The company raised prices at the same time as the campaign
 ---
 
 **8. According to the Liquidity Diagnostic Table, what does a weak fill rate most directly indicate?**
-A) A demand-side trust issue
-B) Supply is likely the binding constraint
-C) The marketplace's pricing is too low
-D) The marketplace needs a redesigned homepage
+A) A trust issue specific to the demand side of the marketplace
+B) Supply is likely the binding constraint at that particular moment
+C) The marketplace's overall pricing is currently set too low
+D) The marketplace, overall, needs a redesigned homepage layout
 
 *Correct answer: B*
 *Explanation: Fill rate specifically measures whether demand requests are being matched to available supply; a weak reading points to a supply-side constraint.*
@@ -421,12 +421,12 @@ D) The marketplace needs a redesigned homepage
 ---
 
 **9. Why should supply-side and demand-side signals never be blended into a single aggregate marketplace health score?**
-A) Blending is technically impossible with most analytics tools
-B) It obscures which specific side actually needs attention, leading to misdirected investment
-C) Aggregate scores are illegal in most jurisdictions
-D) Blended scores always overstate marketplace health
+A) Blending obscures which specific side actually needs attention
+B) Blending, as a technical matter, is impossible with most analytics tools
+C) Aggregate scores are, in most jurisdictions, considered illegal
+D) Blended scores, this lesson claims, always overstate marketplace health
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Separate side-specific signals are necessary to correctly diagnose and address the actual binding constraint.*
 *Learning objective tested: #3, #4*
 *Difficulty: Medium*
@@ -434,12 +434,12 @@ D) Blended scores always overstate marketplace health
 ---
 
 **10. According to the Real World Perspective section, what is a common mistake for mid-size marketplace companies?**
-A) Focusing too narrowly on a single city for too long
-B) Premature geographic or category expansion that dilutes the concentrated effort needed to achieve liquidity in new markets
-C) Refusing to ever expand beyond the first market
-D) Charging both sides identical fees
+A) Focusing too narrowly on a single city for far too long overall
+B) Refusing, as a matter of policy, to ever expand beyond the first market
+C) Premature expansion that dilutes the effort needed for new liquidity
+D) Charging both sides of the marketplace an identical flat fee
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Expanding before achieving strong liquidity risks diluting effort and achieving weak liquidity everywhere instead.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
@@ -447,12 +447,12 @@ D) Charging both sides identical fees
 ---
 
 **11. What does the "active-supplier ratio" signal in the Liquidity Diagnostic Table measure?**
-A) The percentage of registered supply-side participants actively transacting in a given period
-B) The total number of registered suppliers ever, regardless of activity
-C) The average rating given to suppliers by demand-side users
-D) The percentage of suppliers who have completed onboarding paperwork
+A) The average rating demand-side users give to individual suppliers
+B) The total number of suppliers ever registered, regardless of activity
+C) The percentage of suppliers who have completed onboarding paperwork
+D) The share of registered suppliers actively transacting in a period
 
-*Correct answer: A*
+*Correct answer: D*
 *Explanation: This metric distinguishes actual engagement from raw supply headcount, which can be misleadingly large even with low real participation.*
 *Learning objective tested: #3, #4*
 *Difficulty: Medium*
@@ -460,10 +460,10 @@ D) The percentage of suppliers who have completed onboarding paperwork
 ---
 
 **12. (Scenario) A marketplace has excellent demand-side conversion and repeat rates, but supply-side response time has tripled over the past quarter. Which initiative should be prioritized first, per the Two-Sided Balance Model?**
-A) A demand-side referral incentive program
-B) Supply-side recruitment, onboarding improvements, or incentives targeting response time
-C) A price increase on the demand side
-D) A redesign of the demand-side search interface
+A) A referral incentive program aimed specifically at the demand side
+B) Supply-side recruitment, onboarding, or incentives targeting response time
+C) A price increase applied specifically to the demand side of the market
+D) A redesign of the demand-side search and discovery interface
 
 *Correct answer: B*
 *Explanation: Supply-side signals are the weak ones here, so the initiative should target supply specifically rather than further investing in the already-strong demand side.*
@@ -472,39 +472,39 @@ D) A redesign of the demand-side search interface
 
 ---
 
-**13. (Product Thinking) A marketplace founder argues that acquiring more of both sides simultaneously and equally is always the safest growth strategy. Using this lesson's frameworks, what is the strongest counterargument?**
-A) There is no meaningful counterargument; symmetric growth is always correct
-B) Symmetric growth ignores the fact that one side is typically the actual binding constraint, and growing the already-abundant side can worsen liquidity for the constrained side
-C) Symmetric growth is illegal under most marketplace regulations
-D) Only demand-side growth ever matters in a two-sided marketplace
+**13. (Product Thinking) A marketplace founder argues that acquiring more of both sides simultaneously and equally is always the safest growth strategy. What is the strongest counterargument?**
+A) One side is typically the actual constraint, so symmetric growth can worsen liquidity
+B) Symmetric growth is, under most marketplace regulations, actually illegal
+C) There is no meaningful counterargument; symmetric growth is always correct
+D) Only demand-side growth, in fact, ever matters in a two-sided marketplace
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Two-Sided Balance Model's core insight is that growth must target the actual constraint, not be applied symmetrically regardless of which side is scarce.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate asked "What's the most important metric for a two-sided marketplace?" answers "total registered users," with no further explanation. What does this most likely signal, per the Interview Perspective section?**
-A) A sophisticated understanding of marketplace economics
-B) A misunderstanding of the Output vs. Outcome distinction as applied to marketplaces — registered users is an output, liquidity is the outcome that matters
-C) That the candidate should be hired for a senior marketplace role immediately
-D) Nothing meaningful; registered users is in fact the single correct answer
+**14. (Interview Reasoning) A candidate asked "What's the most important metric for a two-sided marketplace?" answers "total registered users," with no further explanation. What does this most likely signal?**
+A) A sophisticated, well-developed understanding of marketplace economics
+B) That the candidate should be hired for a senior marketplace role right away
+C) A misunderstanding of Output vs. Outcome as applied to marketplaces
+D) Nothing meaningful; registered users is, in fact, the single correct answer
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Interview Perspective section specifically flags liquidity, not raw registration counts, as the metric a well-prepared candidate should name and justify.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A marketplace shows a healthy 85% fill rate but a declining demand-side repeat request rate, with contractor response times also creeping upward. Using only the frameworks in this lesson, what is the most defensible next step?**
-A) Conclude fill rate alone proves the marketplace is healthy and take no further action
-B) Immediately launch a large demand-side acquisition campaign, since fill rate is strong
-C) Investigate further using both supply-side (response time) and demand-side (repeat rate) signals together, since the mixed signal set suggests a possible early supply-side constraint not yet fully reflected in fill rate
-D) Expand to a second city immediately to diversify the risk
+**15. (Product Thinking, Highest Difficulty) A marketplace shows a healthy 85% fill rate but a declining demand-side repeat request rate, with contractor response times also creeping upward. What is the most defensible next step?**
+A) Conclude fill rate alone proves the marketplace is healthy overall
+B) Immediately launch a large demand-side acquisition campaign right away
+C) Expand to a second city immediately in order to diversify the risk
+D) Investigate further using both supply- and demand-side signals together
 
-*Correct answer: C*
+*Correct answer: D*
 *Explanation: This mirrors the Reflection Exercise: a single healthy top-line metric (fill rate) can mask an emerging constraint visible in other side-specific signals (rising response time, declining repeat rate), and the correct response is further diagnosis, not premature action in either direction.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*

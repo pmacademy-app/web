@@ -309,24 +309,24 @@ There is no single correct answer to the prompts below — the goal is to practi
 
 ## Quiz
 
-**1. Why is a direct price discount often a poor negotiation trade compared to other concessions?**
-A) Price discounts are always illegal in enterprise contracts
-B) It establishes a new baseline expectation for future renewals and can become a credible anchor for other customers' negotiations
-C) Customers never actually value price discounts
-D) Price discounts have no measurable cost to the vendor
+**1. According to this lesson, why does a direct price discount typically cost the vendor more over time than other concessions of similar value to the customer?**
+A) Sales teams are contractually barred from ever reversing a discount
+B) Discounts reduce contract value but never affect future deal pricing
+C) Procurement teams are the only ones who ever notice a discount
+D) It sets an expected renewal floor and gives other buyers a reference point
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson's central argument is that price discounts carry a specific, compounding precedent cost that many other concessions avoid.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. What are the two dimensions of the Concession Exchange Map?**
-A) Contract length and deal size
-B) Vendor cost and customer value
-C) Sales team size and quota attainment
-D) Customer industry and geography
+**2. What two dimensions define the Concession Exchange Map introduced in this lesson?**
+A) The size of the deal and the length of the contract term
+B) The cost a concession imposes on the vendor and its value to the customer
+C) The sales rep's tenure and their quarterly quota attainment
+D) The customer's industry sector and the negotiation timeline
 
 *Correct answer: B*
 *Explanation: These two dimensions are explicitly introduced in the Theory section as the Map's evaluative axes.*
@@ -335,50 +335,50 @@ D) Customer industry and geography
 
 ---
 
-**3. Which quadrant of the Concession Exchange Map represents the ideal trade to offer first?**
-A) High vendor cost, low customer value
-B) Low vendor cost, high customer value
+**3. Which quadrant of the Concession Exchange Map should a negotiator generally offer first?**
+A) Low vendor cost, high customer value
+B) High vendor cost, low customer value
 C) High vendor cost, high customer value
 D) Low vendor cost, low customer value
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This quadrant delivers genuine customer value at minimal cost to the vendor, making it the priority trade before resorting to price discounts.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**4. What is a "non-price lever" in enterprise negotiation?**
-A) A concession that always costs the vendor more than a price discount
-B) A concession addressing a customer's underlying concern without directly reducing headline price
-C) A negotiation tactic that is illegal in most jurisdictions
-D) A concession only available to the largest possible customers
+**4. How does this lesson define a "non-price lever" in an enterprise negotiation?**
+A) A concession category reserved exclusively for renewal negotiations
+B) Any concession costing the vendor more than an equivalent discount would
+C) A concession addressing an underlying concern without cutting headline price
+D) A discount applied only after procurement has formally signed off
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Non-price levers address underlying concerns like cash flow or risk without the compounding precedent cost of a direct price reduction.*
 *Learning objective tested: #3, #4*
 *Difficulty: Easy*
 
 ---
 
-**5. Why might a customer's stated concern about "cost" actually reflect a different underlying issue?**
-A) Customers never have genuine concerns about price
-B) The real issue might be cash flow timing, contract risk, or implementation confidence, which a non-price lever could address
-C) All customer concerns are always genuinely about headline price with no exceptions
-D) Price concerns are always resolved by increasing the price, not decreasing it
+**5. A customer says their objection is about "cost." Per this lesson, what should a negotiator consider before assuming this means the headline price?**
+A) The objection should be taken at face value and cut through price alone
+B) Cost objections raised by an Economic Buyer are never truly about price
+C) The customer is testing whether the vendor will refuse to negotiate
+D) The concern may really be cash-flow timing, risk, or implementation confidence
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson explicitly identifies these alternative underlying concerns as frequently masquerading as a simple price objection.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**6. What is "precedent cost," as described in this lesson?**
-A) The immediate revenue lost from a single discount
-B) The compounding risk that a concession becomes an expected baseline for future renewals or other customers who learn of it
-C) The legal cost of drafting a new contract
-D) A cost that only applies to non-price concessions, never price discounts
+**6. How does this lesson define "precedent cost"?**
+A) The one-time revenue lost when a single discount is granted
+B) The compounding risk a concession becomes an expected baseline elsewhere
+C) The administrative cost of redrafting a contract after a concession
+D) A cost that applies only to non-price concessions, never to discounts
 
 *Correct answer: B*
 *Explanation: Precedent cost specifically describes this compounding, forward-looking risk beyond the immediate deal.*
@@ -387,63 +387,63 @@ D) A cost that only applies to non-price concessions, never price discounts
 
 ---
 
-**7. In the Discount That Became the Floor case study, what specifically caused the discount to compound in cost?**
-A) The customer immediately churned after receiving the discount
-B) The customer expected the same rate at renewal, and other prospective customers in the same industry vertical referenced the known discount level in their own negotiations
-C) The discount was reversed within one month with no lasting effect
-D) No other customers ever learned about the discount
+**7. In the Discount That Became the Floor case study, what specifically made the original discount expensive beyond the single deal?**
+A) The customer expected the same rate at renewal, and rivals cited the discount
+B) A competitor used the discount to undercut the vendor elsewhere
+C) The customer canceled the contract within the first quarter
+D) Finance refused to approve the discount after it was already offered
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The case study explicitly describes both the renewal expectation and the cross-customer precedent effect as the compounding mechanisms.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. What did the sales team fail to do before granting the discount in the case study?**
-A) Close the deal within the fiscal quarter
-B) Explore lower-cost, high-value non-price alternatives that might have addressed the same underlying concern
-C) Communicate with the customer at all before the negotiation
-D) Offer a discount of any kind
+**8. According to the case study, what step did the sales team skip before granting the discount?**
+A) Getting the customer to sign a multi-year commitment
+B) Confirming the customer's total contract value with finance
+C) Exploring lower-cost, non-price alternatives to the same concern
+D) Notifying other customers in the same industry vertical
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The failure was defaulting directly to the highest-cost concession quadrant without considering cheaper, non-price alternatives first.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**9. According to the Enterprise Contract Negotiation Checklist, what does a "no" on Non-Price Alternatives Explored indicate?**
-A) A minor procedural gap with no real consequence
-B) A significant gap, since defaulting straight to price discounting produces compounding long-term costs that can far exceed the value of a single deal
-C) That the negotiation is ready to be finalized as-is
-D) That price discounts are always the correct choice regardless of alternatives
+**9. Per the Enterprise Contract Negotiation Checklist, what does a "no" answer on Non-Price Alternatives Explored signal?**
+A) A minor procedural note that rarely affects deal outcomes
+B) That the deal is ready to close without further review
+C) That a price discount is now the only remaining option
+D) A significant gap, since defaulting to a discount outweighs the deal's value
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson treats this omission as a significant risk given the compounding cost illustrated throughout the lesson.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**10. Why should concessions be matched to the specific stakeholder motivating the request, per this lesson?**
-A) All stakeholders always have identical concerns in any negotiation
-B) A concession satisfying the Economic Buyer's concern may not address a Technical Evaluator's separate concern, leaving the actual objection unresolved
-C) Stakeholder identity is irrelevant to concession design
-D) Only the Champion's concerns matter in enterprise negotiations
+**10. Why does this lesson recommend matching a concession to the specific stakeholder who raised the concern?**
+A) A concession for the Economic Buyer may leave a Technical Evaluator unaddressed
+B) Every stakeholder in a buying committee shares identical priorities
+C) Only the Champion's objections are ever worth addressing directly
+D) Stakeholder identity has no bearing on which concession resolves anything
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This connects directly to the Stakeholder Compass from Lesson 73, where different roles have genuinely distinct success criteria.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**11. Why might early-stage companies be especially susceptible to granting large, precedent-setting discounts, per the Real World Perspective section?**
-A) Early-stage companies are legally required to offer discounts to all customers
-B) They often lack established pricing discipline and face pressure to land a marquee early customer, without appreciating how the discount complicates future negotiations
-C) Early-stage companies never negotiate with enterprise customers at all
-D) Discounts are always beneficial regardless of company stage
+**11. Per the Real World Perspective section, why are early-stage companies especially prone to granting large, precedent-setting discounts?**
+A) They must contractually match any discount a competitor offers
+B) They lack established pricing discipline and feel pressure to land a marquee customer
+C) Their sales teams are larger and harder to coordinate than mid-size ones
+D) Their customers are exclusively large firms with dedicated procurement
 
 *Correct answer: B*
 *Explanation: The Real World Perspective section connects this vulnerability to the lack of established discount governance typical at the early stage.*
@@ -452,50 +452,50 @@ D) Discounts are always beneficial regardless of company stage
 
 ---
 
-**12. (Scenario) A customer requests a significant discount, citing a "tight budget this year." Using the Concession Exchange Map, what should be investigated before granting a price reduction?**
-A) Whether the customer's request should simply be denied outright with no further discussion
-B) Whether the underlying concern is genuinely about total contract value or about cash flow timing within the year, which a non-price lever like extended payment terms could address
-C) Whether the sales team can close the deal faster by offering an even larger discount
-D) Whether competitors have ever offered a similar discount to any customer
+**12. (Scenario) A customer cites a "tight budget this year" while requesting a discount. What should be investigated first, using the Concession Exchange Map?**
+A) Whether a rival has ever discounted a comparable deal
+B) Whether the deal closes faster by increasing the requested discount
+C) Whether the concern is about total value or about timing within the year
+D) Whether the request should be declined outright without discussion
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This directly applies the lesson's core diagnostic: distinguishing a genuine price concern from a timing-related concern addressable through a non-price lever.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A sales team argues that granting a large discount to a strategically significant customer is justified by the value of the customer's public profile. Using this lesson's frameworks, what is the strongest counterargument?**
-A) Strategic value never justifies any form of concession under any circumstances
-B) The discount's compounding precedent cost across future renewals and other customers' negotiations should be explicitly weighed against the immediate strategic benefit before proceeding
-C) Strategic customers should always receive the maximum possible discount without question
-D) Precedent cost is irrelevant when a customer's public profile is sufficiently prominent
+**13. (Product Thinking) A sales team argues that a large discount is justified by a strategically significant customer's public profile. What is the strongest counterargument from this lesson's frameworks?**
+A) Weigh the discount's compounding precedent cost against the strategic benefit
+B) Strategic value should always override any concern about precedent
+C) Precedent cost only matters for customers with no public profile
+D) The counterargument is irrelevant once a fiscal quarter is closing
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The correct response neither dismisses strategic value entirely nor ignores precedent cost, but insists on weighing both explicitly, as the Case Study's recovery process ultimately required.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked how they'd respond to enterprise price pushback, immediately proposes a specific discount percentage with no discussion of underlying customer concerns or non-price alternatives. What does this most likely signal, per the Interview Perspective section?**
-A) A strong and complete understanding of enterprise negotiation
-B) A gap in recognizing that underlying concerns and non-price alternatives should be explored before defaulting to a price-based concession
-C) That the candidate is ready for a senior enterprise sales leadership role immediately
-D) Nothing meaningful; a specific discount percentage is always the correct first response
+**14. (Interview Reasoning) A candidate, asked how they'd handle enterprise price pushback, immediately names a discount percentage without discussing the customer's underlying concern or any non-price alternative. What does this signal, per the Interview Perspective section?**
+A) A thorough grasp of enterprise negotiation fundamentals
+B) Readiness for a senior enterprise sales leadership role
+C) Nothing meaningful, since naming a number first is expected
+D) A gap in exploring concerns and alternatives before defaulting to price
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Interview Perspective section specifically listens for exploration of underlying concerns and non-price alternatives, which this answer skips entirely.*
 *Learning objective tested: #1, #3, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A large prospective customer requests a 30% discount citing fiscal-year budget constraints, and the sales team is under quarter-end pressure to close quickly. Using only the frameworks in this lesson, what is the most defensible approach?**
-A) Grant the full 30% discount immediately to ensure the deal closes before quarter-end
-B) Investigate whether the underlying concern is genuinely about total price or about budget timing, explore non-price alternatives like extended payment terms or a phased start date, and document any precedent risk before finalizing terms
-C) Refuse any concession at all and risk losing the deal entirely
-D) Grant the discount but make no effort to document or consider its effect on future negotiations
+**15. (Product Thinking, Highest Difficulty) A large prospective customer requests a 30% discount citing fiscal-year budget constraints, and the sales team faces quarter-end pressure to close quickly. What is the most defensible approach using only this lesson's frameworks?**
+A) Grant the full discount immediately so the deal closes before quarter-end
+B) Investigate the concern, explore non-price alternatives, and document precedent risk
+C) Decline any concession and accept the risk of losing the deal
+D) Grant the discount, but skip documenting its effect on future negotiations
 
 *Correct answer: B*
 *Explanation: This mirrors the Reflection Exercise and Case Study: the correct response investigates the genuine underlying concern, explores lower-cost alternatives first, and explicitly considers precedent risk, rather than defaulting immediately to the discount or refusing to negotiate at all.*

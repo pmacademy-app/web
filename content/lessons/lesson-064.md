@@ -310,12 +310,12 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. According to this lesson, what is the actual constraint on data-informed decision-making at scale?**
-A) The total volume of data collected
-B) Organizational metric trust
-C) The number of dashboards a company maintains
-D) The speed of the company's data infrastructure
+A) The total volume of data a company has collected over time
+B) The number of dashboards a company happens to maintain
+C) The raw speed of the company's underlying data infrastructure
+D) Organizational metric trust across teams
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson argues that abundant, inconsistently-defined data is often worse than no data at all, since it invites confident decisions on numbers that quietly disagree.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -323,12 +323,12 @@ D) The speed of the company's data infrastructure
 ---
 
 **2. What is the correct order of the Metric Provenance Chain?**
-A) Decision, Trusted Metric, Definition Consensus, Validation, Instrumentation
-B) Instrumentation, Validation, Definition Consensus, Trusted Metric, Decision
+A) Instrumentation, Validation, Definition Consensus, Trusted Metric, Decision
+B) Decision, Trusted Metric, Definition Consensus, Validation, Instrumentation
 C) Validation, Instrumentation, Trusted Metric, Decision, Definition Consensus
 D) Definition Consensus, Instrumentation, Decision, Validation, Trusted Metric
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: This is the five-stage order introduced in the Theory section, from raw event to decision-ready trusted metric.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -336,12 +336,12 @@ D) Definition Consensus, Instrumentation, Decision, Validation, Trusted Metric
 ---
 
 **3. What does "Validation" specifically check in the Metric Provenance Chain?**
-A) Whether the metric formula has been documented
-B) Whether the underlying logged event actually corresponds to the real-world action it claims to represent
-C) Whether a dashboard has a visually appealing design
-D) Whether the metric has been shared with executives
+A) Whether a metric's underlying formula has been formally documented
+B) Whether a given dashboard has a visually clean and appealing design
+C) Whether a logged event actually reflects the real-world action it claims
+D) Whether the metric has, at some point, been shared with executives
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Validation confirms the technical event genuinely reflects the intended real-world action, distinct from documenting its formula (Definition Consensus).*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -349,10 +349,10 @@ D) Whether the metric has been shared with executives
 ---
 
 **4. What is metric definition drift?**
-A) A deliberate, well-documented change to a metric's formula
-B) The silent divergence between a metric's original intended meaning and what it currently measures
-C) A type of statistical significance test
-D) A feature of dashboard software that automatically corrects errors
+A) A deliberate, thoroughly documented change to a metric's formula
+B) The silent divergence between a metric's original meaning and its current one
+C) A specific type of statistical significance test used in experimentation
+D) A dashboard feature that automatically corrects reporting errors
 
 *Correct answer: B*
 *Explanation: Drift is specifically the silent, often undocumented divergence in meaning over time, distinguishing it from a deliberate, documented redefinition.*
@@ -362,12 +362,12 @@ D) A feature of dashboard software that automatically corrects errors
 ---
 
 **5. Which of the following is a common cause of metric definition drift?**
-A) A feature launch changing what "engagement" practically consists of, without the metric being revisited
-B) Adding a single new column to a spreadsheet
-C) Renaming a dashboard without changing any underlying logic
-D) Increasing the font size on a chart
+A) Adding a single new column to an otherwise unrelated spreadsheet
+B) Renaming a dashboard without altering any of its underlying logic
+C) Increasing the font size used on a dashboard's chart display
+D) A feature launch shifting what "engagement" means without revisiting it
 
-*Correct answer: A*
+*Correct answer: D*
 *Explanation: Product or platform changes that shift the real-world meaning of an event, without a corresponding metric review, are a primary driver of drift.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -375,12 +375,12 @@ D) Increasing the font size on a chart
 ---
 
 **6. What does widespread disagreement across dashboards claiming to show the same metric indicate?**
-A) Nothing significant; some variation is expected and harmless
-B) That the organization's Metric Provenance Chain is likely broken somewhere between Definition Consensus and Trusted Metric status
-C) That the company has too much data
-D) That the metric in question is not important enough to govern
+A) The Provenance Chain is likely broken between Consensus and Trust
+B) Nothing significant; some variation across dashboards is expected
+C) That the company, in general, has accumulated too much raw data
+D) That the metric in question isn't important enough to govern
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Dashboard fragmentation is a direct diagnostic signal of broken metric governance, not a benign or expected variation.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -388,12 +388,12 @@ D) That the metric in question is not important enough to govern
 ---
 
 **7. In the Case Study, what was the actual root cause of the conflicting retention numbers?**
-A) One team made a calculation error
-B) Two teams had each internally validated their own retention definition, but no company-wide Definition Consensus or Trusted Metric designation existed
-C) The data infrastructure had a bug that randomly altered numbers
-D) The VP of Product deliberately misrepresented the data
+A) One of the two teams had simply made a calculation error somewhere
+B) The underlying data infrastructure had a bug that randomly altered numbers
+C) Both teams had valid definitions, but no company-wide consensus existed
+D) The VP of Product had deliberately misrepresented the retention data
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Both dashboards were internally valid; the failure was organizational — no consensus process ever reconciled the two independently developed definitions.*
 *Learning objective tested: #2, #4*
 *Difficulty: Medium*
@@ -402,9 +402,9 @@ D) The VP of Product deliberately misrepresented the data
 
 **8. According to the Metric Health Checklist, what does a "no" on Single Source of Truth indicate?**
 A) A minor cosmetic issue that can be addressed whenever convenient
-B) An active organizational risk, since decisions may currently rest on incompatible versions of the same nominal number
-C) That the metric should be deleted entirely
-D) That the metric is too complex to ever be trusted
+B) An active organizational risk, since decisions may rest on incompatible numbers
+C) That the metric in question should simply be deleted outright
+D) That the metric is too complex ever to be genuinely trusted
 
 *Correct answer: B*
 *Explanation: The lesson explicitly frames a missing single source of truth as an active risk requiring attention, not a low-priority issue.*
@@ -414,12 +414,12 @@ D) That the metric is too complex to ever be trusted
 ---
 
 **9. Why is an executive's personally-maintained dashboard not automatically a Trusted Metric?**
-A) Executives are not permitted to view dashboards under most data governance policies
-B) Organizational seniority is not a substitute for provenance; any metric must pass through Validation and Definition Consensus regardless of source
-C) Executive dashboards are always technically inferior to team dashboards
-D) Trusted Metric status is assigned solely based on job title
+A) Executives, under most policies, are not permitted to view dashboards
+B) Executive dashboards are, in practice, always technically inferior
+C) Trusted Metric status, per this lesson, is assigned based on job title
+D) Seniority is not a substitute for provenance regardless of source
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The lesson explicitly warns against conflating a stakeholder's seniority with a metric's actual governance status.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
@@ -427,12 +427,12 @@ D) Trusted Metric status is assigned solely based on job title
 ---
 
 **10. According to the Real World Perspective section, why do startups often tolerate informal, undocumented metric definitions?**
-A) Startups are legally exempt from data governance requirements
-B) The same one or two people who instrumented the event are typically also the ones interpreting it, making informal definitions tolerable at small scale
-C) Startups never look at metrics at all
-D) Informal definitions are always more accurate than documented ones
+A) The same people instrumenting an event are also interpreting it early on
+B) Startups are, under most regulations, legally exempt from data governance
+C) Startups, this lesson claims, never actually look closely at metrics
+D) Informal definitions are, in general, always more accurate than formal ones
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Small team size and shared context make informal definitions workable early on, a luxury that disappears as teams and dashboards proliferate.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -440,12 +440,12 @@ D) Informal definitions are always more accurate than documented ones
 ---
 
 **11. What kind of team do mature, Big Tech-scale organizations typically build to address metric governance?**
-A) A team solely focused on dashboard visual design
-B) A dedicated data-governance or metrics-platform team responsible for maintaining Trusted Metric status for key company-wide numbers
-C) A team whose only function is deleting old dashboards
-D) No specialized team is typically needed at this scale
+A) A team focused solely on the visual design of dashboards
+B) A team whose only real function is deleting old, unused dashboards
+C) A dedicated data-governance team maintaining Trusted Metric status
+D) No specialized team of this kind is typically needed at this scale
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The Real World Perspective section describes dedicated governance teams as the typical Big Tech response to this challenge.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
@@ -455,8 +455,8 @@ D) No specialized team is typically needed at this scale
 **12. (Scenario) A PM notices that a key metric has never been re-validated since a major platform migration six months ago. Which stage of the Metric Provenance Chain is most directly at risk?**
 A) Decision
 B) Validation
-C) Instrumentation naming conventions only
-D) None — migrations never affect metric validity
+C) Instrumentation naming conventions specifically, and nothing else
+D) None; migrations, as a rule, never affect metric validity
 
 *Correct answer: B*
 *Explanation: A platform migration can silently alter underlying event logic, meaning the metric's Validation status should be re-confirmed rather than assumed to still hold.*
@@ -465,37 +465,37 @@ D) None — migrations never affect metric validity
 
 ---
 
-**13. (Product Thinking) A company has abundant, frequently-updated dashboards, but three different teams cannot agree on a single number for "active users." Using this lesson's frameworks, what is the most likely underlying issue?**
-A) The company simply doesn't have enough data
-B) A missing Definition Consensus and Single Source of Truth, despite the abundance of dashboards
-C) The dashboards are updated too frequently
-D) Active users is an inherently unmeasurable concept
+**13. (Product Thinking) A company has abundant, frequently-updated dashboards, but three different teams cannot agree on a single number for "active users." What is the most likely underlying issue?**
+A) The company, in a basic sense, simply doesn't have enough data
+B) The dashboards in question are updated too frequently to trust
+C) "Active users," as a concept, is inherently unmeasurable in practice
+D) A missing Definition Consensus and Single Source of Truth
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Abundant dashboards do not substitute for governance; the described symptom is a classic sign of missing consensus and ownership, not a data volume problem.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate asked how they'd resolve two disagreeing data sources responds by simply choosing whichever number is more favorable to the current initiative. What does this signal, per the Interview Perspective section?**
-A) Strong business judgment
-B) A failure to diagnose the actual governance root cause, instead defaulting to convenience over rigor — the opposite of what the interviewer is listening for
+**14. (Interview Reasoning) A candidate asked how they'd resolve two disagreeing data sources responds by simply choosing whichever number is more favorable to the current initiative. What does this signal?**
+A) A failure to diagnose the real governance cause, favoring convenience
+B) Strong, decisive business judgment under real time pressure
 C) That the candidate is ready for a senior data leadership role
-D) Nothing meaningful; either number is equally valid to cite
+D) Nothing meaningful; either number is, in fact, equally valid to cite
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Interview Perspective section specifically flags diagnosing the root governance cause, not convenient number-picking, as the desired response.*
 *Learning objective tested: #2, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM discovers that Product, Marketing, and Customer Success each maintain separate "engagement" dashboards that disagree, and all three teams are attached to their own version. Using only the frameworks in this lesson, what is the best course of action?**
-A) Ignore the discrepancy since all three teams are performing well individually
-B) Immediately delete two of the three dashboards without consulting the teams involved
-C) Run each team's definition through the Metric Provenance Chain, facilitate a Definition Consensus process across all three, and designate a single Trusted Metric source with clear ownership going forward
-D) Allow each team to keep using their own definition indefinitely, since consensus is too politically difficult to achieve
+**15. (Product Thinking, Highest Difficulty) A PM discovers that Product, Marketing, and Customer Success each maintain separate "engagement" dashboards that disagree, and all three teams are attached to their own version. What is the best course of action?**
+A) Ignore the discrepancy, since all three teams are performing well individually
+B) Immediately delete two of the three dashboards without consulting anyone
+C) Trace each definition, facilitate consensus, and designate a single source
+D) Let each team keep its own definition indefinitely, since consensus is hard
 
 *Correct answer: C*
 *Explanation: This mirrors the Reflection Exercise and the Case Study: the correct response neither ignores the fragmentation nor resolves it unilaterally without input, but methodically traces each definition, builds consensus, and establishes clear ongoing ownership.*

@@ -386,196 +386,196 @@ There is no single correct answer to the prompts below — the goal is to practi
 
 ## Quiz
 
-**1. What is the core shift required when moving from individual-contributor PM work to leading a team of PMs?**
-A) Making faster individual decisions than before
-B) Shifting from personally making decisions to coaching and enabling reports to make good decisions themselves
-C) Working longer hours to cover more ground personally
-D) Focusing exclusively on one's own product area rather than the team's
+**1. What is the central shift required when moving from individual-contributor PM work to leading a team of PMs?**
+A) Personally reviewing every decision to guarantee consistent quality
+B) Shifting focus from stakeholder meetings toward writing detailed specs
+C) Moving from personally deciding to coaching reports toward good decisions
+D) Spending less time understanding the product areas reports own
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly defines this shift as the core requirement of the leadership transition.*
+*Correct answer: C*
+*Explanation: The Theory section frames the transition as a change in what a leader is evaluated on — the team's collective judgment and growth, not the leader's own individual calls.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. What are the three common product organization structures covered in this lesson?**
-A) Now, Next, Later
-B) Functional, platform-based, customer-segment-based
-C) Startup, mid-size, Big Tech
-D) Stream-aligned, platform, enabling
+**2. Which three organizational structures does this lesson compare for organizing multiple product teams?**
+A) Functional, platform-based, and customer-segment-based structures
+B) Centralized reporting, matrixed reporting, and fully outsourced teams
+C) Agile-based, waterfall-based, and hybrid delivery team models
+D) Squad-based, tribe-based, and guild-based team structures
 
-*Correct answer: B*
-*Explanation: The Theory section explicitly names these three structures and their trade-offs.*
+*Correct answer: A*
+*Explanation: The Theory section's comparison table lays out functional, platform-based, and customer-segment-based structures along with their respective trade-offs.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**3. According to Team Topologies, what is a stream-aligned team?**
-A) A team providing shared infrastructure to other teams
-B) A team organized around continuous delivery toward a specific customer or business outcome, with broad end-to-end autonomy
-C) A team focused exclusively on internal tooling
-D) A synonym for a platform team
+**3. If multiple teams are each independently rebuilding similar underlying capability, what does the lesson's Team Topologies diagnostic suggest?**
+A) The teams should be rewarded for parallel innovation efforts
+B) The organization should eliminate all platform team roles
+C) Stream-aligned teams need less autonomy going forward
+D) The platform layer is likely under-invested and should be consolidated
 
-*Correct answer: B*
-*Explanation: The Theory section defines a stream-aligned team exactly this way, distinct from a platform team.*
+*Correct answer: D*
+*Explanation: The Theory section's diagnostic identifies duplicated capability-building across teams as a signal of an under-invested platform layer worth consolidating.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. What does it suggest when multiple teams are independently rebuilding similar underlying capabilities?**
-A) The organization has too many platform teams
-B) An under-invested platform layer, suggesting shared capability should be consolidated
-C) This is always a sign of healthy, appropriate team autonomy
-D) The organization should eliminate all stream-aligned teams
+**4. Per Team Topologies as applied in this lesson, how does a platform team differ from a stream-aligned team?**
+A) A platform team always carries more headcount than any stream-aligned team
+B) Platform teams supply shared capability; stream-aligned teams deliver end-to-end
+C) A stream-aligned team exists only among senior executive roles
+D) The two terms are functionally interchangeable in most organizations
 
 *Correct answer: B*
-*Explanation: The Theory section's Team Topologies diagnostic identifies this exact pattern as suggesting an under-invested platform layer.*
+*Explanation: The Theory section draws this exact distinction — platform teams supply shared capability, stream-aligned teams deliver autonomously toward a specific customer or business outcome.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**5. Why does continuing to personally decide everything a report brings forward create a bottleneck, according to this lesson?**
-A) Because decisions made by a leader are always lower quality
-B) Because it prevents reports from developing their own judgment and trains the team to escalate decisions rather than resolve them independently
-C) Because leaders are legally prohibited from making decisions for their reports
-D) Because this practice has no effect on team development over time
+**5. Why does a leader who keeps resolving every decision reports bring forward eventually become a bottleneck?**
+A) It prevents reports from building judgment and trains the team to escalate decisions
+B) Company policy caps how many decisions a single leader may approve
+C) Personally-made decisions are inherently worse than delegated ones
+D) It breaks the formal reporting structure defined by HR systems
 
-*Correct answer: B*
-*Explanation: The Theory section and Case Study both explain this exact bottleneck-creating dynamic.*
+*Correct answer: A*
+*Explanation: The Theory section and Case Study both trace the bottleneck directly to this dynamic — constant rescue teaches escalation instead of independent judgment.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**6. In the Detailed Case Study, what happened when the overloaded leader took a two-week vacation?**
-A) The team made faster decisions than usual in the leader's absence
-B) Several important decisions stalled, since no one on the team had developed the habit or confidence to resolve them independently
-C) The team's performance improved significantly
-D) Nothing changed at all in the team's decision-making pace
+**6. In the Detailed Case Study, what happened while the overloaded leader was away on a two-week vacation?**
+A) Nothing changed, since the reports had already learned to decide independently
+B) The team quietly escalated everything to the leader's own manager instead
+C) Several decisions stalled, since the team hadn't built independent confidence
+D) The team's decision quality and throughput both improved noticeably
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this stalling effect as evidence of the bottleneck the leader had created.*
+*Correct answer: C*
+*Explanation: The Case Study uses the vacation as direct evidence that the team had never developed independent decision-making capability under the bottlenecked leader.*
 *Learning objective tested: #4, #5*
 *Difficulty: Easy*
 
 ---
 
-**7. What specific coaching practice did the leader adopt as a corrective response in the Detailed Case Study?**
-A) Making every decision even faster than before
-B) Consistently asking "what would you recommend, and why?" before offering their own view, shifting from directly deciding to coaching
-C) Refusing to engage with any decisions brought by reports
-D) Delegating all decisions with no guidance or context whatsoever
+**7. What specific practice did the leader in the Case Study adopt once the bottleneck was recognized?**
+A) Scheduling more frequent check-ins without changing how decisions were made
+B) Hiring an extra layer of management to absorb the decision volume
+C) Delegating every decision immediately with no further involvement
+D) Asking each report what they'd recommend and why before sharing a view
 
-*Correct answer: B*
-*Explanation: The Case Study explicitly describes this specific coaching question as the corrective practice adopted.*
+*Correct answer: D*
+*Explanation: The Case Study describes this specific coaching question as the corrective habit that gradually shifted the team toward independent judgment.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. What important nuance does this lesson add to the widely circulated "Spotify model" example?**
-A) That the model is entirely fabricated and has no basis in reality
-B) That Spotify itself has publicly clarified the model was more aspirational than a literal, rigidly implemented description even at the time, and shouldn't be treated as a literal blueprint to copy exactly
-C) That every company should copy the model exactly as originally described
-D) That the model has remained completely unchanged and accurately describes Spotify's current structure
+**8. What nuance does the Real Company Example add to the popular Spotify "squads and tribes" model?**
+A) A rival company invented the model, and it was later misattributed to Spotify
+B) Its own author later called it an aspirational snapshot, not a literal blueprint
+C) Spotify has confirmed the model remains its structure unchanged today
+D) The model holds no relevance to any team-structure discussion
 
 *Correct answer: B*
-*Explanation: The Real Company Example explicitly includes this nuance about Spotify's own public clarification regarding the model's aspirational nature.*
+*Explanation: The Real Company Example cites both Kniberg's own clarification and later reporting indicating the model was aspirational and didn't survive Spotify's later growth as originally described.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
-**9. Using the Structural vs. Individual Diagnostic, what signal suggests a structural (org design) problem rather than an individual leadership problem?**
-A) Complaints specific to one team's leadership style
-B) Consistent complaints about unclear ownership or excessive cross-team coordination, across multiple teams
-C) One leader failing to delegate decisions clearly belonging to their own reports
-D) New team members struggling under one specific leader's unclear expectations
+**9. Per the Structural vs. Individual Diagnostic, which signal points more toward a structural problem than an individual leadership one?**
+A) Multiple teams under different leaders report unclear ownership and heavy coordination
+B) A single team quietly redoing its own prior work due to poor internal planning
+C) One leader's reports specifically describing unclear expectations from that leader
+D) One leader consistently failing to delegate decisions that clearly belong to their reports
 
-*Correct answer: B*
-*Explanation: The Framework Explanation section's diagnostic table identifies widespread, multi-team ownership confusion as a structural signal, distinct from individual leadership signals.*
+*Correct answer: A*
+*Explanation: The Framework Explanation table treats a pattern spread across multiple teams and leaders as evidence of a structural, org-design issue rather than one leader's habits.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**10. Why does this lesson caution against choosing an organizational structure based on what's popular or familiar elsewhere?**
-A) Because popular structures are always illegal to implement
-B) Because no structure is universally correct — the right choice depends on the product's actual architecture and customer base, and copying a popular model without genuine fit assessment risks coordination friction
-C) Because only completely novel, untested structures should ever be used
-D) Because organizational structure has no real effect on team performance
+**10. Why does this lesson warn against adopting an organizational structure mainly because it's well known or common elsewhere?**
+A) Only privately-held companies are permitted to choose their own structures
+B) Novelty alone is what makes a structure effective
+C) Fit depends on the product's actual architecture and customer base, not popularity
+D) Well-known structures are inherently outdated compared to newer ones
 
-*Correct answer: B*
-*Explanation: Common Beginner Mistake #2 explains this exact risk of choosing structure based on popularity rather than genuine fit.*
+*Correct answer: C*
+*Explanation: Common Beginner Mistake #2 explains that structural fit depends on the product's actual architecture and customer base, not on a structure's popularity elsewhere.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
-**11. (Interview Reasoning) A candidate is asked how they approached the transition from individual contributor to team leader, and answers: "I just kept doing what made me successful as an IC, since it worked well before." Based on this lesson's Interview Perspective section, what is the weakness in this answer?**
-A) There is no weakness; IC success always transfers directly to leadership success
-B) It fails to recognize the genuine shift required — from personally deciding to coaching and delegating — risking the exact bottleneck failure illustrated in this lesson's Case Study
-C) It correctly demonstrates strong consistency in approach
-D) It shows appropriate confidence in one's own proven methods
+**11. (Interview Reasoning) A candidate describes their transition into leadership by saying, "I just kept operating the way I always had as an IC, since that approach had clearly worked." What weakness does this reveal?**
+A) It shows the candidate values stability over unnecessary disruption
+B) It demonstrates an unusually strong grasp of organizational design
+C) None — consistency in approach is always the strongest answer
+D) It fails to name the shift toward coaching, risking the same bottleneck pattern
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section states that a strong answer articulates the specific shift required, not an assumption that IC habits transfer automatically.*
+*Correct answer: D*
+*Explanation: The Interview Perspective section notes that a strong answer names the specific coaching shift; simply continuing IC habits reproduces the Case Study's bottleneck failure.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
-**12. Why does effective delegation require explicit guidance about the level of autonomy being granted, rather than silent hand-off?**
-A) Because silent hand-off is always faster and equally effective
-B) Because delegating without guidance, then only providing feedback after a decision has been made, undermines a report's ability to succeed and erodes trust
-C) Because guidance is only necessary for the most junior team members
-D) Because explicit guidance is legally required in most organizations
+**12. Why does effective delegation require explicit guidance about the scope of autonomy being granted, rather than a silent hand-off?**
+A) Autonomy levels must be documented for legal recordkeeping purposes
+B) Delegating without guidance, then critiquing afterward, undermines success and trust
+C) Explicit guidance only matters for reports new to the company
+D) Silent hand-offs are equally effective and simply save the leader time
 
 *Correct answer: B*
-*Explanation: Common Beginner Mistake #4 explains this exact risk of ungrounded delegation followed only by after-the-fact criticism.*
+*Explanation: Common Beginner Mistake #4 identifies exactly this risk — ungrounded delegation followed only by after-the-fact criticism erodes trust and sets reports up to fail.*
 *Learning objective tested: #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A product organization shows consistent complaints about unclear ownership and duplicated effort across five different teams, all led by different, well-regarded leaders. Using the Structural vs. Individual Diagnostic, what is the most likely root cause?**
-A) All five leaders are individually failing at delegation simultaneously, by coincidence
-B) A structural (org design) problem, likely involving unclear team boundaries or a missing/overloaded platform layer, since the pattern is widespread across multiple teams and leaders rather than concentrated around one
-C) The organization should immediately replace all five leaders
-D) There is no way to diagnose this pattern using any available framework
+**13. Which response best reflects the Leadership Shift mental model applied correctly to a report's decision?**
+A) The leader asks what the report would recommend, coaching toward their own judgment
+B) The leader quietly overrides the report's eventual decision without explanation
+C) The leader declines to discuss the decision, leaving the report without input
+D) The leader answers immediately with a preferred solution, the fastest path
 
-*Correct answer: B*
-*Explanation: The Structural vs. Individual Diagnostic identifies widespread, multi-team, multi-leader dysfunction as a structural signal rather than an individual leadership one.*
+*Correct answer: A*
+*Explanation: This is the lesson's core recommended practice — coaching toward the report's own judgment — distinct from either over-deciding or disengaging entirely.*
+*Learning objective tested: #4*
+*Difficulty: Medium-Hard*
+
+---
+
+**14. (Product Thinking) Five teams led by five different, well-regarded leaders all report unclear ownership and duplicated effort. Using the Structural vs. Individual Diagnostic, what is the most likely explanation?**
+A) The organization should replace all five leaders immediately without further diagnosis
+B) All five leaders happen to be failing at delegation in exactly the same way
+C) A structural issue, likely a missing or overloaded platform layer, given its breadth
+D) No framework in this lesson applies to a pattern this widespread
+
+*Correct answer: C*
+*Explanation: A pattern this widespread across leaders and teams points toward a structural cause per the diagnostic table, rather than five coincidental, unrelated individual failures.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. Which of the following best reflects the Leadership Shift mental model applied correctly?**
-A) A leader personally resolving every decision a report brings forward, regardless of whether the report is capable of resolving it themselves
-B) A leader asking a report what they would recommend and why, before offering a view, coaching the report toward their own good decision
-C) A leader refusing to engage with any decisions brought by reports under any circumstances
-D) A leader making decisions in secret without informing the team of the reasoning
+**15. (Product Thinking, Highest Difficulty) A newly promoted leader inherits both a delegation gap left by the prior leader and a genuine structural overlap between two teams' ownership of a shared capability. What does this lesson recommend?**
+A) Wait several quarters before addressing either issue during the transition
+B) Resolve the structural overlap only; delegation habits become irrelevant once boundaries clarify
+C) Fix the delegation gap only, assuming the overlap resolves itself once reports are empowered
+D) Address both on their own terms, since fixing only one likely leaves dysfunction unaddressed
 
-*Correct answer: B*
-*Explanation: This reflects the lesson's core recommended coaching practice, in contrast to either over-deciding or completely disengaging.*
-*Learning objective tested: #4*
-*Difficulty: Medium-Hard*
-
----
-
-**15. (Product Thinking, Highest Difficulty) A newly promoted PM leader inherits a team experiencing both individual leadership gaps (the previous leader rarely delegated) and a genuine structural mismatch (two teams have overlapping ownership of a shared capability). Using this lesson's frameworks together, what is the most defensible approach?**
-A) Address only the individual leadership gap, assuming the structural issue will resolve itself once delegation improves
-B) Diagnose and address both issues explicitly and somewhat independently — improving delegation practice (the Leadership Shift) while also considering a structural redesign (informed by Team Topologies) to resolve the overlapping ownership, recognizing that fixing one without the other will likely leave meaningful dysfunction unaddressed
-C) Address only the structural issue, assuming delegation problems are irrelevant once team boundaries are clarified
-D) Take no action on either issue, since diagnosing both simultaneously is too complex
-
-*Correct answer: B*
-*Explanation: This reflects the lesson's core teaching that structural and individual leadership problems are genuinely distinct and often coexist, each requiring its own specific fix — addressing only one risks leaving the other's dysfunction fully intact.*
+*Correct answer: D*
+*Explanation: The lesson treats structural and individual leadership problems as genuinely distinct and frequently coexisting, each needing its own fix rather than assuming one will resolve the other.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*
 
