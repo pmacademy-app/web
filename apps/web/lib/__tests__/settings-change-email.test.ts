@@ -20,14 +20,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const {
   mockCookieGet,
   mockSignInWithPassword,
-  mockUsersIlikeMaybeSingle,
+  mockUsersEqMaybeSingle,
+  mockUsersEq,
+  mockUsersIlike,
   mockSetSession,
   mockUpdateUser,
   mockEvaluateRateLimit,
 } = vi.hoisted(() => ({
   mockCookieGet: vi.fn(),
   mockSignInWithPassword: vi.fn(),
-  mockUsersIlikeMaybeSingle: vi.fn(),
+  mockUsersEqMaybeSingle: vi.fn(),
+  mockUsersEq: vi.fn(),
+  mockUsersIlike: vi.fn(),
   mockSetSession: vi.fn(),
   mockUpdateUser: vi.fn(),
   mockEvaluateRateLimit: vi.fn(),
@@ -59,8 +63,13 @@ vi.mock('@/lib/supabase', () => ({
     },
     from: vi.fn(() => ({
       select: vi.fn(() => ({
-        ilike: vi.fn(() => ({
-          maybeSingle: mockUsersIlikeMaybeSingle,
+        eq: mockUsersEq.mockImplementation(() => ({
+          maybeSingle: mockUsersEqMaybeSingle,
+        })),
+        // Kept in the mock so a test can assert the route never falls back to
+        // an ILIKE wildcard match for the duplicate-email check (D-2 audit fix).
+        ilike: mockUsersIlike.mockImplementation(() => ({
+          maybeSingle: mockUsersEqMaybeSingle,
         })),
       })),
     })),
@@ -98,7 +107,7 @@ describe('Change Email API Endpoint', () => {
       mockUser as unknown as import('@supabase/supabase-js').User
     )
     mockEvaluateRateLimit.mockResolvedValue({ success: true, remaining: 4, resetInMs: 60000 })
-    mockUsersIlikeMaybeSingle.mockResolvedValue({ data: null, error: null })
+    mockUsersEqMaybeSingle.mockResolvedValue({ data: null, error: null })
     mockCookieGet.mockImplementation((name: string) => {
       if (name === 'sb-access-token') return { value: 'valid-access-token' }
       if (name === 'sb-refresh-token') return { value: 'valid-refresh-token' }
@@ -167,13 +176,41 @@ describe('Change Email API Endpoint', () => {
 
   it('rejects a new email already associated with another account (server-side, before Supabase call)', async () => {
     mockSignInWithPassword.mockResolvedValue({ data: { user: mockUser, session: null }, error: null })
-    mockUsersIlikeMaybeSingle.mockResolvedValue({ data: { id: 'some-other-user-id' }, error: null })
+    mockUsersEqMaybeSingle.mockResolvedValue({ data: { id: 'some-other-user-id' }, error: null })
 
     const res = await POST(makeRequest({ currentPassword: 'correct', newEmail: 'taken@example.com' }))
     expect(res.status).toBe(409)
     const json = await res.json()
     expect(json.error).toContain('already associated with another account')
     expect(mockUpdateUser).not.toHaveBeenCalled()
+
+    // D-2 audit fix: the duplicate-email check must be an exact match, not an
+    // ILIKE wildcard pattern.
+    expect(mockUsersEq).toHaveBeenCalledWith('email', 'taken@example.com')
+    expect(mockUsersIlike).not.toHaveBeenCalled()
+  })
+
+  it('does not treat "%"/"_" in the new email as an ILIKE wildcard pattern (D-2: enumeration via pattern injection)', async () => {
+    mockSignInWithPassword.mockResolvedValue({ data: { user: mockUser, session: null }, error: null })
+    // No stored row matches this literal string, so the duplicate check must pass
+    // through to the Supabase-level update rather than reporting a false collision.
+    mockUsersEqMaybeSingle.mockResolvedValue({ data: null, error: null })
+    mockSetSession.mockResolvedValue({ data: {}, error: null })
+    mockUpdateUser.mockResolvedValue({ data: { user: mockUser }, error: null })
+
+    const wildcardEmail = 'vic%tim_@example.com'
+    const res = await POST(makeRequest({ currentPassword: 'correct', newEmail: wildcardEmail }))
+
+    expect(res.status).toBe(200)
+    // The literal string — "%" and "_" included — must reach the query unescaped
+    // and un-interpreted as a pattern: it is passed to `.eq()`, which treats it as
+    // an opaque value, never `.ilike()`, which would treat it as a wildcard.
+    expect(mockUsersEq).toHaveBeenCalledWith('email', wildcardEmail)
+    expect(mockUsersIlike).not.toHaveBeenCalled()
+    expect(mockUpdateUser).toHaveBeenCalledWith(
+      { email: wildcardEmail },
+      expect.objectContaining({ emailRedirectTo: expect.stringContaining('/email-verified') })
+    )
   })
 
   it('returns 401 when session cookies are missing even after password verification', async () => {
@@ -214,5 +251,36 @@ describe('Change Email API Endpoint', () => {
     expect(res.status).toBe(400)
     const json = await res.json()
     expect(json.error).toContain('already associated with another account')
+  })
+
+  it('maps a known "email_exists" provider code to the same friendly duplicate copy', async () => {
+    mockSignInWithPassword.mockResolvedValue({ data: { user: mockUser, session: null }, error: null })
+    mockSetSession.mockResolvedValue({ data: {}, error: null })
+    mockUpdateUser.mockResolvedValue({ data: null, error: { code: 'email_exists', message: 'internal driver text' } })
+
+    const res = await POST(makeRequest({ currentPassword: 'correct', newEmail: 'new@example.com' }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toContain('already associated with another account')
+    expect(json.error).not.toContain('internal driver text')
+  })
+
+  it('D-4 audit fix: an unrecognized updateUser failure never reaches the client as raw provider text', async () => {
+    mockSignInWithPassword.mockResolvedValue({ data: { user: mockUser, session: null }, error: null })
+    mockSetSession.mockResolvedValue({ data: {}, error: null })
+    mockUpdateUser.mockResolvedValue({
+      data: null,
+      error: { code: 'unexpected_failure', message: 'relation "auth.users" constraint violated at 10.0.0.5' },
+    })
+
+    const res = await POST(makeRequest({ currentPassword: 'correct', newEmail: 'new@example.com' }))
+    const json = await res.json()
+
+    expect(res.status).toBe(500)
+    expect(json.success).toBe(false)
+    expect(json.code).toBe('SERVER_ERROR')
+    expect(json.errorId).toMatch(/^err_[0-9a-f]{16}$/)
+    expect(JSON.stringify(json)).not.toContain('constraint violated')
+    expect(JSON.stringify(json)).not.toContain('10.0.0.5')
   })
 })

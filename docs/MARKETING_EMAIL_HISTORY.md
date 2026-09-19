@@ -6,7 +6,7 @@ This document serves as the authoritative internal historical record of all mark
 
 ## Executive Summary & Historical Overview
 
-Between **August 11, 2026** and **September 18, 2026**, Prodily executed eleven targeted email campaigns directed at registered learners, fellows, and inactive users. In addition, the platform maintains automated waitlist confirmations, a database-backed broadcast scheduler, and transactional template infrastructure.
+Between **August 11, 2026** and **September 18, 2026**, Prodily executed twelve targeted email campaigns directed at registered learners, fellows, and inactive users. In addition, the platform maintains automated waitlist confirmations, a database-backed broadcast scheduler, and transactional template infrastructure.
 
 ### Summary of Campaigns
 
@@ -23,6 +23,8 @@ Between **August 11, 2026** and **September 18, 2026**, Prodily executed eleven 
 | **9** | `prodily_one_month_sep_2026` | `apps/web/scripts/local-campaigns/prodily_one_month_sep_2026/` | Brevo (250) & Resend (64) | Sep 13, 2026 | All registered eligible learners (One-Month Community Celebration) | 314 sent (250 Brevo, 64 Resend) | **Delivered (100% Success)** |
 | **10** | `reengagement_inactive_sep_2026` | `apps/web/scripts/local-campaigns/reengagement_inactive_sep_2026/` | Brevo (250) & Resend (27) | Sep 15, 2026 | Registered inactive learners (0 completed lessons, 0 total XP) | 277 sent (250 Brevo, 27 Resend) | **Delivered (100% Success)** |
 | **11** | `follow_prodily_sep_2026` | `apps/web/scripts/local-campaigns/follow_prodily_sep_2026/` | Brevo (280) & Resend (72) | Sep 18, 2026 | All registered eligible learners (Social Channels Follow Campaign) | 352 sent (280 Brevo, 72 Resend) | **Delivered (100% Success)** |
+| **12** | `email_1_junior_pms_sep_2026` | `apps/web/scripts/local-campaigns/email_1_junior_pms_sep_2026/` | Brevo (280) & Resend (7) | Sep 18, 2026 | Zero-progress learners (0 completed lessons, 0 total XP) | 287 sent (280 Brevo, 7 Resend) | **Delivered (100% Success)** |
+| **13** | `whats_actually_stopping_you_sep_2026` | `apps/web/scripts/local-campaigns/whats_actually_stopping_you_sep_2026/` | Resend (90) & Brevo (196) | Sep 19, 2026 | Zero-progress learners (0 completed lessons, 0 total XP) | 286 eligible (90 Resend, 196 Brevo) | **Configured / Scripted** |
 
 ---
 
@@ -1090,6 +1092,168 @@ Instagram: https://www.instagram.com/prodily_pm/
 No extra noise — just product.
 
 — Aditya
+Founder, Prodily
+
+Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
+```
+
+---
+
+```
+================================================================================
+CAMPAIGN 12: email_1_junior_pms_sep_2026
+================================================================================
+```
+
+### Campaign Metadata
+- **Campaign Name:** Email #1 — “A question most junior PMs can't answer”
+- **Campaign Identifier:** `email_1_junior_pms_sep_2026`
+- **Source Folder:** `apps/web/scripts/local-campaigns/email_1_junior_pms_sep_2026/`
+- **Script Path:** `apps/web/scripts/local-campaigns/email_1_junior_pms_sep_2026/send-email-1-junior-pms-campaign.ts`
+- **Log Path:** `apps/web/scripts/local-campaigns/email_1_junior_pms_sep_2026/logs/campaign_sent_email_1_junior_pms_sep_2026.json`
+- **Platform:** Brevo (280 recipients) & Resend (7 recipients)
+- **Campaign Purpose:** Deliver Email #1 to registered users with zero recorded progress (0 completed lessons and 0 XP). The email shares a punchy, authentic founding question from Lesson 1 of Prodily ("What is Product Management?") with no sales pitch, reframing what the PM role is truly accountable for and inviting them to open the academy.
+- **Campaign Type:** Educational Value / Zero-Progress Activation Broadcast
+- **Audience Allocation (Dynamic Split):**
+  - Evaluated against live database `public.users` (365 registered users).
+  - Filtered strictly for **zero-progress learners**: `0` completed lessons in `user_lesson_progress` AND `0` total XP in `users.total_xp`.
+  - Excluded 68 active learners (`> 0` lessons or `> 0` XP), 3 internal admins, 7 suppressions, 0 opt-outs.
+  - Deterministically ordered by `created_at ASC`, `id ASC`.
+  - **First 280 recipients → Brevo** (`BREVO_MAX_ALLOCATION = 280`).
+  - **Remaining 7 recipients → Resend** (Rank 281 to 287).
+  - Strict mutual exclusivity (zero duplicate overlap across providers).
+- **Date Sent:** September 18, 2026 (`2026-09-18T14:52:58.506Z` to `2026-09-18T14:56:20.023Z` UTC)
+- **Sender Name:** Prodily
+- **Sender Email:** `welcome@prodily.adityagangwani.me`
+- **Display From:** `Prodily <welcome@prodily.adityagangwani.me>`
+- **Reply-To Address:** `prodilypm@gmail.com`
+- **Sign-off Persona:** `— The Prodily Team`
+- **Primary CTA:** `Open Prodily →` → `https://prodily.adityagangwani.me/academy`
+- **Unsubscribe URL:** `https://prodily.adityagangwani.me/settings?tab=notifications`
+- **Lesson 1 Excerpt (Curriculum-Accredited):**
+  - *Source:* `content/lessons/lesson-001.md` (Lesson 1 of 90: "What is Product Management?", lines 5–11, 51–55).
+  - *Question:* *"If a PM doesn’t write code, design the interface, or manage engineers — what are they accountable for?"*
+  - *Takeaway:* *"Most say “managing the roadmap.” But the real job is deciding, with evidence, which problem is worth solving."*
+- **Presentation Design & Anti-Promotions Controls:**
+  - Lightweight branded container (`#FBFAF6` canvas with crisp `#FFFFFF` card, subtle 1px border `#DED8CB`).
+  - Styled branded CTA button with Prodily green (`#1F6B4E`).
+  - Real-time pre-send re-verification of opt-outs (`isFreshOptOut`) and lesson progress (`hasUserBecameActive`).
+  - Compliant CAN-SPAM / GDPR footer and RFC-compliant `List-Unsubscribe` headers.
+- **Logged Deliveries:** **287 successful dispatches** (280 Brevo, 7 Resend) — **100% Success Rate, 0 Failures**
+
+---
+
+### Email 12.1 — Email #1: A question most junior PMs can't answer
+
+**Campaign:** `email_1_junior_pms_sep_2026`  
+**Platform:** Brevo (280) & Resend (7)  
+**Sequence position:** 1 of 1  
+**Date:** September 18, 2026  
+**Audience:** Zero-progress registered learners (0 completed lessons, 0 total XP)  
+**Sender:** Prodily <welcome@prodily.adityagangwani.me>  
+**Reply-To:** prodilypm@gmail.com  
+**Subject:** `A question most junior PMs can't answer`  
+**Preview text:** `No pitch — just something from inside the course.`  
+**Primary CTA:** `Open Prodily →` → `https://prodily.adityagangwani.me/academy`  
+**Sign-off:** `— The Prodily Team`  
+**Status:** Delivered (287 recipients logged: 280 Brevo, 7 Resend — 0 failures)  
+
+#### Exact Email Content (Plain Text)
+
+```text
+Hey {{firstName}},
+
+Not asking you to start anything today. Just sharing one idea from inside Prodily.
+
+If a PM doesn’t write code, design the interface, or manage engineers — what are they accountable for?
+
+Most say “managing the roadmap.” But the real job is deciding, with evidence, which problem is worth solving.
+
+That’s one idea, from one lesson, out of 90.
+
+Open Prodily: https://prodily.adityagangwani.me/academy
+
+— The Prodily Team
+
+Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
+```
+
+---
+
+```
+================================================================================
+CAMPAIGN 13: whats_actually_stopping_you_sep_2026
+================================================================================
+```
+
+### Campaign Metadata
+- **Campaign Name:** Email — “What's actually stopping you?”
+- **Campaign Identifier:** `whats_actually_stopping_you_sep_2026`
+- **Source Folder:** `apps/web/scripts/local-campaigns/whats_actually_stopping_you_sep_2026/`
+- **Script Path:** `apps/web/scripts/local-campaigns/whats_actually_stopping_you_sep_2026/send-whats-actually-stopping-you-campaign.ts`
+- **Log Path:** `apps/web/scripts/local-campaigns/whats_actually_stopping_you_sep_2026/logs/campaign_sent_whats_actually_stopping_you_sep_2026.json`
+- **Platform:** Resend (first 90 recipients) & Brevo (remaining 196 recipients)
+- **Campaign Purpose:** Deliver an authentic, personal, reply-driven inquiry to registered users with zero recorded progress (0 completed lessons and 0 XP). The email genuinely asks what is stopping them from starting, avoiding promotional reminders or marketing CTAs and inviting direct email replies.
+- **Campaign Type:** Founder Outreach / Personal Reply-Driven Lifecycle Broadcast
+- **Audience Allocation (Dynamic Split):**
+  - Evaluated against live database `public.users` (366 registered users).
+  - Filtered strictly for **zero-progress learners**: `0` completed lessons in `user_lesson_progress` AND `0` total XP in `users.total_xp`.
+  - Excluded 70 active learners (`> 0` lessons or `> 0` XP), 3 internal admins, 7 suppressions, 0 opt-outs.
+  - Deterministically ordered by `created_at ASC`, `id ASC`.
+  - **First 90 recipients → Resend** (`RESEND_MAX_ALLOCATION = 90`, Rank 1 to 90).
+  - **Remaining 196 recipients → Brevo** (Rank 91 to 286).
+  - Strict mutual exclusivity (zero duplicate overlap across providers).
+- **Date Prepared:** September 19, 2026
+- **Sender Name:** Aditya Gangwani (supports `Aditya | Prodily` via `--sender-name`)
+- **Sender Email:** `aditya@prodily.adityagangwani.me`
+- **Display From:** `Aditya Gangwani <aditya@prodily.adityagangwani.me>`
+- **Reply-To Address:** `prodilypm@gmail.com`
+- **Sign-off Persona:** `— Aditya Gangwani` / `Founder, Prodily`
+- **Primary CTA:** None — intentionally reply-only.
+- **Unsubscribe URL:** `https://prodily.adityagangwani.me/settings?tab=notifications`
+- **Presentation Design & Anti-Promotions Controls:**
+  - Lightweight, personal text-first presentation on native `#ffffff` canvas with no marketing cards, hero images, or buttons.
+  - Real-time pre-send re-verification of opt-outs (`isFreshOptOut`) and lesson progress (`hasUserBecameActive`).
+  - Compliant CAN-SPAM / GDPR footer and RFC-compliant `List-Unsubscribe` headers.
+- **Status:** **Scripted & Validated (Pending Operator Send)**
+
+---
+
+### Email 13.1 — What's actually stopping you?
+
+**Campaign:** `whats_actually_stopping_you_sep_2026`  
+**Platform:** Resend (90) & Brevo (196)  
+**Sequence position:** 1 of 1  
+**Date Prepared:** September 19, 2026  
+**Audience:** Zero-progress registered learners (0 completed lessons, 0 total XP)  
+**Sender:** Aditya Gangwani <aditya@prodily.adityagangwani.me>  
+**Reply-To:** prodilypm@gmail.com  
+**Subject:** `What's actually stopping you?`  
+**Preview text:** `Genuinely asking — not another reminder.`  
+**Primary CTA:** None (Reply-only)  
+**Sign-off:** `— Aditya Gangwani` <br> `Founder, Prodily`  
+**Status:** Prepared & Validated (286 eligible recipients: 90 Resend, 196 Brevo)  
+
+#### Exact Email Content (Plain Text)
+
+```text
+Hey {{firstName}},
+
+Can I ask you something?
+
+You signed up for Prodily a while ago, but haven't started a lesson yet. I'm not going to send you another reminder to come back.
+
+I'm more interested in understanding why you haven't started.
+
+Maybe you're too busy right now. Maybe you're learning PM somewhere else. Maybe you're not sure Prodily is what you're looking for.
+
+Or maybe it's something completely different.
+
+If you have a minute, just reply to this email and tell me. Even a couple of words is enough.
+
+I'm asking because I'd rather understand what's getting in the way than keep sending you reminders that aren't useful.
+
+— Aditya Gangwani
 Founder, Prodily
 
 Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications

@@ -302,49 +302,49 @@ There is no single correct answer. Work through the following before reading fur
 ## Quiz
 
 **1. Why can't a generative model's quality be reduced to a single "good enough" judgment?**
-A) Models never actually vary in performance
-B) Capability and reliability are distinct properties that can diverge sharply
-C) All models perform identically regardless of task
-D) Quality is irrelevant to AI product decisions
+A) Capability and reliability are distinct properties that can diverge sharply
+B) Every model performs identically once it reaches production
+C) Reliability is a purely legal concept with no technical meaning
+D) Model quality has no real bearing on product decisions
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Capability (how good the model can be) and reliability (how consistently it performs) are separate properties that can diverge, so a single rating misses the reliability dimension entirely.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. What does the Capability-Reliability Matrix recommend for high capability, low reliability tasks?**
-A) Full automation
-B) Human-in-the-loop assist mode
-C) Immediate cancellation of the feature
-D) No monitoring is needed
+**2. What does the Capability-Reliability Matrix recommend for a task with high capability but low reliability?**
+A) Immediate cancellation of the feature regardless of its potential
+B) Human-in-the-loop assist mode rather than full automation
+C) No monitoring at all, since capability alone is sufficient
+D) Full automation, since capability is the dominant factor
 
 *Correct answer: B*
-*Explanation: The matrix prescribes human-in-the-loop assist mode for quadrant B (high capability, low reliability), keeping a human explicitly in the loop rather than automating fully.*
+*Explanation: The matrix prescribes human-in-the-loop assist mode for quadrant B, keeping a human explicitly in the loop rather than automating fully.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**3. Why must evals run continuously rather than once?**
-A) Models never change after launch
-B) Model and prompt updates shift behavior, requiring ongoing re-evaluation
-C) Continuous evals are legally required in all jurisdictions
-D) One-time evals are always sufficient
+**3. Why must evals run continuously rather than just once before launch?**
+A) Model and prompt updates shift behavior, requiring ongoing re-evaluation
+B) One-time evals are always sufficient for any generative feature
+C) Continuous evals are described as a purely legal requirement
+D) Models never change meaningfully once they reach production
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Model and prompt changes shift behavior over time, so a one-time pre-launch evaluation cannot guarantee ongoing quality — continuous re-evaluation is required.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. Why does per-inference cost matter for AI-native products?**
-A) It never actually affects business viability
-B) Generative AI features carry real, scaling marginal costs unlike most traditional software
-C) Per-inference cost is identical across all AI providers
-D) Cost only matters for hardware products
+**4. Why does per-inference cost matter for AI-native products in a way it usually doesn't for traditional software?**
+A) Per-inference cost is identical across every model provider
+B) Generative AI features carry real, scaling marginal costs per use
+C) Cost only ever matters for hardware products, not software
+D) Inference cost is said to never actually affect business viability
 
 *Correct answer: B*
 *Explanation: Unlike traditional software with near-zero marginal cost, each generative AI inference carries a real cost that scales directly with usage, which can make a popular feature economically unsustainable.*
@@ -354,12 +354,12 @@ D) Cost only matters for hardware products
 ---
 
 **5. What was the root cause of the Automated Refund Assistant case study's failure?**
-A) The model had no capability at the task at all
-B) A quadrant-B task was shipped at full automation without human review
-C) The company never tested the model at all
-D) The refund threshold was set too low
+A) The refund dollar threshold had simply been set too low
+B) The company had never tested the model in any capacity
+C) A quadrant-B task was shipped at full automation without human review
+D) The model had essentially no capability at the refund task at all
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: The refund assistant was a quadrant B task (high capability, imperfect reliability) but was shipped at full automation without human review, leading to hallucination-driven errors.*
 *Learning objective tested: #2, #5*
 *Difficulty: Easy*
@@ -367,62 +367,62 @@ D) The refund threshold was set too low
 ---
 
 **6. Why is a model's confident tone not evidence of correctness?**
-A) Models never sound confident
-B) Hallucinated outputs are frequently delivered with the same fluency as correct ones
-C) Confidence is always a reliable indicator of accuracy
-D) This is not actually a concern in practice
+A) Models are described as incapable of ever sounding confident
+B) Confidence is treated as always a reliable indicator of accuracy
+C) This concern is described as not actually relevant in practice
+D) Hallucinated outputs are delivered with the same fluency as correct ones
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Hallucinated outputs are delivered with the same fluent confidence as correct ones, so a model's tone provides no signal about whether the output is actually accurate.*
 *Learning objective tested: #1, #5*
 *Difficulty: Easy*
 
 ---
 
-**7. What connects quadrant-B automation decisions to Lesson 65?**
-A) No connection exists
-B) The Ownership Zones Model's Zone 4 discipline requires human review of model outputs before action, which quadrant B tasks specifically need
-C) Lesson 65 only applies to recommender systems
-D) Ownership Zones only applies to hardware products
+**7. How does quadrant-B automation connect to the Ownership Zones Model from Lesson 65?**
+A) The two frameworks are described as having no meaningful connection
+B) Lesson 65's Ownership Zones Model is described as applying only to recommenders
+C) Ownership Zones is described as relevant only to hardware products
+D) Zone 4 requires human review before action, which quadrant B tasks need
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Ownership Zones Model's Zone 4 requires human review of model outputs before action, which is exactly what quadrant B (high capability, low reliability) tasks demand.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. What should happen for a task in the low-capability quadrant regardless of reliability?**
-A) Full automation should proceed anyway
-B) The use case should not ship yet
-C) Human review is unnecessary
-D) Cost modeling is irrelevant
+**8. What should happen for a task landing in the low-capability quadrant, regardless of its reliability?**
+A) Full automation should proceed anyway, since capability rarely matters
+B) The use case should generally not ship for that purpose yet
+C) Human review becomes unnecessary once capability is confirmed low
+D) Cost modeling can safely be skipped for this quadrant
 
 *Correct answer: B*
-*Explanation: If capability itself is insufficient (low capability), the use case should not ship regardless of how reliable the model is at that low level of performance.*
+*Explanation: If capability itself is insufficient, the use case should not ship regardless of how reliable the model is at that low level of performance.*
 *Learning objective tested: #2*
 *Difficulty: Medium*
 
 ---
 
 **9. Why is demo performance an unreliable indicator of production reliability?**
-A) Demos are always representative of all real-world inputs
-B) Demos showcase capability under curated conditions, not reliability across the full range of real inputs
-C) Demos never actually use the real model
-D) There is no meaningful difference between demos and production use
+A) Demos are generally representative of the full range of real-world inputs
+B) There is essentially no meaningful difference between demos and production
+C) Demos showcase capability under curated conditions, not full-range reliability
+D) Demos never actually run against the real underlying model
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Demos showcase capability under curated, favorable conditions, but production use involves a much broader range of inputs where reliability may be significantly lower.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
 ---
 
-**10. What is a recommended recovery step from the Automated Refund Assistant case study?**
-A) Removing all human oversight entirely
-B) Adding human review above a threshold and instituting continuous evals for hallucination rate
-C) Shutting down the support feature entirely
-D) Increasing the refund threshold without any other changes
+**10. What was a recommended recovery step from the Automated Refund Assistant case study?**
+A) Removing all human oversight to speed up refund processing
+B) Adding human review above a threshold and running continuous hallucination evals
+C) Shutting down the customer support feature altogether
+D) Raising the refund threshold with no other changes made
 
 *Correct answer: B*
 *Explanation: Adding human review above a threshold and instituting continuous evals tracking hallucination rate directly addresses the quadrant B mismatch and enables ongoing quality monitoring.*
@@ -431,37 +431,37 @@ D) Increasing the refund threshold without any other changes
 
 ---
 
-**11. (Scenario) A model performs excellently in curated demo tests but shows inconsistent quality on a broader eval set. What does this indicate?**
-A) The feature is definitely quadrant A and ready for full automation
-B) A likely quadrant-B position — high capability, lower reliability — requiring human-in-the-loop consideration
-C) The eval set is flawed and should be ignored
-D) No further action is needed
+**11. (Scenario) A model performs excellently in curated demo tests but shows inconsistent quality on a broader eval set drawn from real inputs. What does this most likely indicate?**
+A) A likely quadrant-B position requiring human-in-the-loop consideration
+B) The feature is definitely quadrant A and ready for full automation
+C) The eval set is flawed and its results should be disregarded
+D) No further action is needed, since the demo already looked strong
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Excellent demo performance but inconsistent quality on a broader eval set indicates high capability with lower reliability — a quadrant B position requiring human-in-the-loop consideration.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**12. (Product Thinking) A team wants to skip ongoing evals after a successful launch. What is the strongest response?**
-A) Agree, since pre-launch evals are always sufficient
-B) Explain that model and prompt changes require continuous re-evaluation to catch silent quality drift
-C) Cancel the feature entirely
-D) Increase automation instead of adding evals
+**12. (Product Thinking) A team wants to skip ongoing evals after a successful launch, citing the time savings. What is the strongest response?**
+A) Explain that model and prompt changes require continuous re-evaluation
+B) Agree, since pre-launch evals are generally sufficient on their own
+C) Cancel the feature entirely rather than negotiate over evals
+D) Increase automation instead of continuing to run evals
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Model and prompt changes shift behavior over time, so stopping evals after launch risks silent quality drift going undetected in production.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Interview Reasoning) A candidate says a model is "good enough to ship" based solely on demo results. What does this signal?**
-A) Strong understanding of AI product management
+**13. (Interview Reasoning) A candidate says a model is "good enough to ship" based solely on how well it performed in a demo. What does this response signal?**
+A) A strong and complete understanding of AI product management
 B) A gap in distinguishing capability from reliability
-C) Readiness for a senior AI PM role immediately
-D) Nothing meaningful
+C) Readiness for a senior AI PM role without further development
+D) Nothing meaningful about the candidate's judgment either way
 
 *Correct answer: B*
 *Explanation: Judging a model as "good enough" based solely on demo results conflates capability with reliability, revealing a gap in understanding that these are distinct properties requiring separate assessment.*
@@ -470,26 +470,26 @@ D) Nothing meaningful
 
 ---
 
-**14. (Product Thinking) A high-stakes automated decision has never had its per-inference cost modeled. What risk does this create?**
-A) No risk; cost is irrelevant to product decisions
-B) A popular feature could prove economically unsustainable at scale
-C) This only matters for low-stakes features
-D) Cost modeling is only relevant post-shutdown
+**14. (Product Thinking) A high-stakes automated decision feature has never had its per-inference cost modeled before launch. What risk does this create?**
+A) No risk, since cost modeling is generally irrelevant to product decisions
+B) This concern only ever matters for low-stakes, low-usage features
+C) A popular feature could prove economically unsustainable at scale
+D) Cost modeling only becomes relevant after a feature is shut down
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Without modeling per-inference cost before launch, a feature can become popular and widespread while its unit economics prove unsustainable at scale.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A financial AI assistant shows high capability but inconsistent reliability on edge cases, and leadership wants full automation to compete on speed. What is the most defensible response?**
-A) Proceed with full automation to match competitor speed
-B) Classify the task's quadrant honestly, implement human-in-the-loop review matched to actual reliability evidence, and continue eval-driven improvement before considering further automation
-C) Cancel the feature entirely
-D) Automate only the easiest cases with no broader evaluation
+**15. (Product Thinking, Highest Difficulty) A financial AI assistant shows high capability but inconsistent reliability on edge cases, and leadership wants full automation to match a competitor's speed. What is the most defensible response?**
+A) Proceed with full automation to match the competitor's speed
+B) Automate only the simplest cases with no further evaluation
+C) Cancel the feature entirely rather than negotiate the automation level
+D) Classify the quadrant honestly, add human review, and keep improving via evals
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The defensible response is honest quadrant classification, human-in-the-loop review matched to actual reliability evidence, and continued eval-driven improvement — resisting launch pressure to over-automate.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*

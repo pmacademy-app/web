@@ -310,25 +310,25 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is "not invented here" syndrome?**
-A) An organizational tendency to prefer building a capability internally over acquiring it externally, often for reasons unrelated to genuine strategic advantage
-B) A legal restriction preventing companies from using external software
-C) A technical limitation preventing certain capabilities from ever being built internally
-D) A marketing strategy used to differentiate a company's products
+A) A legal rule barring firms from using outside vendors
+B) Preferring internal builds over buying, for non-strategic reasons
+C) A budgeting method that always favors the cheapest vendor
+D) A hiring policy limiting external contractor use
 
-*Correct answer: A*
-*Explanation: This term specifically describes the organizational and individual incentives favoring internal build regardless of genuine strategic return.*
+*Correct answer: B*
+*Explanation: This term describes the organizational and individual incentives favoring internal build regardless of genuine strategic return.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the two axes of the Capability Sourcing Matrix?**
-A) Company size and industry vertical
-B) Genuine competitive differentiation and external market maturity
-C) Time-to-market and initial development cost
-D) Revenue and headcount
+A) Competitive differentiation and external market maturity
+B) Team headcount and quarterly revenue growth
+C) Time-to-market and initial development budget
+D) Customer satisfaction and support ticket volume
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: These two dimensions are explicitly introduced in the Theory section as the Matrix's evaluative axes.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -336,10 +336,10 @@ D) Revenue and headcount
 ---
 
 **3. When does the Capability Sourcing Matrix recommend Build?**
-A) Whenever competitors have already built a broadly similar capability
-B) Whenever a capability is relatively easy and cheap to build
-C) When a capability is genuinely central to the company's moat and no mature external solution exists
-D) Whenever a company happens to have sufficient engineering resources available
+A) Whenever a rival already built something similar
+B) Whenever engineering has free capacity that quarter
+C) High differentiation and an immature external market
+D) Low differentiation but a mature external market
 
 *Correct answer: C*
 *Explanation: Build is recommended specifically for the high-differentiation, immature-market quadrant.*
@@ -349,10 +349,10 @@ D) Whenever a company happens to have sufficient engineering resources available
 ---
 
 **4. How does the Moat Durability Matrix from Lesson 75 factor into the Capability Sourcing Matrix?**
-A) It is described as applying only to Buy decisions, never Build decisions
-B) It is described as replacing the need for the Capability Sourcing Matrix entirely
-C) It has, per the lesson, essentially no relevance to sourcing decisions
-D) It provides the basis for assessing whether a capability is genuinely differentiating, one of the two Sourcing Matrix axes
+A) It replaces the Capability Sourcing Matrix entirely
+B) It applies only when a company is evaluating a Buy
+C) It has no real bearing on sourcing choices at all
+D) It supplies the differentiation axis used in the Matrix
 
 *Correct answer: D*
 *Explanation: The lesson explicitly draws on the Moat Durability Matrix to assess the differentiation axis of the Capability Sourcing Matrix.*
@@ -362,25 +362,25 @@ D) It provides the basis for assessing whether a capability is genuinely differe
 ---
 
 **5. Why does evaluating a build decision using only initial development cost understate the true cost of building?**
-A) It ignores ongoing Friction Ledger maintenance burden and eventual Sunset Runway retirement cost over the capability's full lifecycle
-B) Initial development cost is described as technically impossible to measure accurately
-C) Ongoing maintenance costs are described as generally negligible regardless of capability type
-D) Initial development cost is treated as always the largest component of total cost
+A) Initial development cost is impossible to estimate accurately
+B) It excludes ongoing maintenance and eventual retirement cost
+C) Maintenance costs are usually negligible for most software
+D) Initial cost is always the largest component of total cost
 
-*Correct answer: A*
-*Explanation: The lesson explicitly connects total cost of ownership to the ongoing maintenance and eventual retirement concerns raised in Lessons 68 and 69.*
+*Correct answer: B*
+*Explanation: The lesson connects total cost of ownership to the ongoing maintenance and eventual retirement concerns raised in Lessons 68 and 69.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. In the Custom Analytics Platform case study, why was the original build decision reasonable at the time it was made?**
-A) Competitors had not yet built any comparable analytics capability of their own
-B) The external market for analytics solutions was genuinely immature, making Build a defensible choice under the Capability Sourcing Matrix's logic at that time
-C) The decision is described as never actually reasonable, even at the time it was made
-D) The company reportedly had unlimited engineering resources at the time
+A) The external analytics market was genuinely immature then
+B) Competitors had not yet built any analytics tooling at all
+C) The decision was never actually defensible, even at the time
+D) The company had unlimited engineering budget available
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The case study explicitly frames the original decision as defensible given the genuinely immature external market at that time.*
 *Learning objective tested: #2, #5*
 *Difficulty: Easy*
@@ -388,10 +388,10 @@ D) The company reportedly had unlimited engineering resources at the time
 ---
 
 **7. What was the actual root cause of the Custom Analytics Platform's ongoing problem?**
-A) External analytics vendors reportedly never developed any genuinely viable competing solutions
-B) The company reportedly never invested any resources in maintaining the platform at all
-C) The sourcing decision was never revisited as the external market matured, allowing a non-differentiating capability to consume growing resources unnecessarily
-D) The internal platform had always been technically inferior to available alternatives
+A) External vendors never developed any viable competing tools
+B) The company stopped investing in the platform entirely
+C) The sourcing decision was never revisited as the market matured
+D) The internal platform had always been technically broken
 
 *Correct answer: C*
 *Explanation: The failure was a lack of periodic reassessment, not an inherently flawed original decision or technical failure.*
@@ -401,25 +401,25 @@ D) The internal platform had always been technically inferior to available alter
 ---
 
 **8. According to the Build-Buy-Partner Decision Checklist, what does a "no" on Periodic Reassessment indicate?**
-A) That the capability in question should be immediately discontinued
-B) That the original sourcing decision must necessarily have been incorrect
-C) A minor administrative gap with no real consequence
-D) A meaningful long-term risk, since even a genuinely correct original decision can become costly over time if never revisited
+A) That the capability must be discontinued immediately
+B) A minor gap with essentially no real consequence
+C) Proof the original build decision was always wrong
+D) A meaningful long-term risk even for a once-correct decision
 
 *Correct answer: D*
-*Explanation: The lesson explicitly treats the absence of periodic reassessment as a meaningful risk given how sourcing decisions can become outdated.*
+*Explanation: The lesson treats the absence of periodic reassessment as a meaningful risk given how sourcing decisions can become outdated.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **9. What sourcing approach does the Capability Sourcing Matrix recommend when a capability is genuinely differentiating but mature external solutions already exist?**
-A) A nuanced Partner approach, often integrating an external provider's capability while retaining differentiation through application or combination rather than underlying ownership
-B) Immediately abandon the capability entirely
-C) Always Build regardless of the external market's maturity
-D) Always Buy regardless of the capability's differentiation level
+A) Always Build, regardless of how mature the market has become
+B) A nuanced Partner approach, not a simple Build-or-Buy choice
+C) Immediately abandon the capability rather than source it
+D) Always Buy, regardless of the differentiation involved
 
-*Correct answer: A*
+*Correct answer: B*
 *Explanation: This specific quadrant calls for the more nuanced Partner recommendation rather than a simple Build-or-Buy binary.*
 *Learning objective tested: #2, #3*
 *Difficulty: Medium*
@@ -427,12 +427,12 @@ D) Always Buy regardless of the capability's differentiation level
 ---
 
 **10. Why might early-stage startups typically default toward buying or partnering for non-core capabilities, per the Real World Perspective section?**
-A) Startups are described as never needing any non-core capabilities at all
-B) Building non-differentiating infrastructure represents a particularly costly opportunity cost relative to a startup's limited resources
-C) Off-the-shelf solutions are treated as always technically superior regardless of company stage
-D) Startups are described as legally prohibited from building any internal capabilities
+A) Building non-core infrastructure wastes scarce engineering time
+B) Startups are legally barred from building infrastructure
+C) Off-the-shelf tools are always technically superior somehow
+D) Startups typically have no real need for infrastructure
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Real World Perspective section frames this as a reasonable resource-allocation trade-off given a startup's limited engineering capacity.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -440,10 +440,10 @@ D) Startups are described as legally prohibited from building any internal capab
 ---
 
 **11. Why does "not invented here" syndrome become a genuine organizational risk at mid-size companies specifically, per the Real World Perspective section?**
-A) This risk is described as affecting only Big Tech-scale organizations
-B) Mid-size companies are described as legally required to build all capabilities internally
-C) Growing engineering headcount and organizational structure create internal pressure to build capabilities in-house that could reasonably be bought or partnered for
-D) Mid-size companies are described as never having meaningful engineering resources at all
+A) Mid-size firms are legally required to build everything in-house
+B) This risk only ever appears at the largest tech companies
+C) Growing headcount creates pressure to build what could be bought
+D) Mid-size firms rarely have engineering resources to spare
 
 *Correct answer: C*
 *Explanation: The Real World Perspective section connects this specific risk to the organizational dynamics typical of growing mid-size companies.*
@@ -453,10 +453,10 @@ D) Mid-size companies are described as never having meaningful engineering resou
 ---
 
 **12. (Scenario) A company built a payment processing system internally three years ago, when external options were limited, but mature, well-regarded external payment providers have since emerged. Using the Capability Sourcing Matrix, what should the company investigate?**
-A) Whether competitors have also built similar internal payment systems of their own
-B) Whether to immediately abandon the payment system with no transition planning
-C) Whether the original decision should be permanently locked in regardless of market changes
-D) Whether payment processing was ever genuinely a source of competitive differentiation, and whether the capability's classification has shifted from its original quadrant as the external market matured
+A) Whether any competitor has built a similar payment system
+B) Whether the original decision should be locked in forever
+C) Whether to abandon the system with no transition plan
+D) Whether the capability's quadrant has shifted since the build
 
 *Correct answer: D*
 *Explanation: This directly applies the lesson's periodic reassessment discipline to a capability whose external market maturity has likely shifted since the original decision.*
@@ -466,12 +466,12 @@ D) Whether payment processing was ever genuinely a source of competitive differe
 ---
 
 **13. (Product Thinking) A PM is told that reassessing a five-year-old internal build would be organizationally uncomfortable given the team already dedicated to maintaining it. Using this lesson's frameworks, what is the most defensible response?**
-A) Conduct an honest Capability Sourcing Matrix and total-cost-of-ownership reassessment regardless of the discomfort, since sunk cost and organizational comfort shouldn't substitute for genuine strategic evaluation
-B) Immediately disband the team without any transition planning
-C) Avoid the reassessment entirely to prevent organizational discomfort
-D) Assume the original decision must still be correct simply because it was made deliberately at the time
+A) Disband the team immediately with no transition planning
+B) Run an honest reassessment despite the discomfort involved
+C) Skip the reassessment entirely to avoid any friction
+D) Assume the old decision is still correct without checking
 
-*Correct answer: A*
+*Correct answer: B*
 *Explanation: The correct response conducts an honest reassessment despite organizational discomfort, mirroring the Case Study's recovery process.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
@@ -479,12 +479,12 @@ D) Assume the original decision must still be correct simply because it was made
 ---
 
 **14. (Interview Reasoning) A candidate, asked how they'd decide whether to build or buy a new capability, focuses entirely on which option is cheaper in the short term, with no mention of differentiation or long-term maintenance cost. What does this most likely signal, per the Interview Perspective section?**
-A) That the candidate is ready for a senior sourcing strategy role immediately
-B) A gap in recognizing that genuine differentiation and total cost of ownership, not just short-term cost, are necessary considerations
-C) Nothing meaningful; short-term cost is treated as the only relevant factor in sourcing decisions
-D) A strong and complete understanding of sourcing decisions
+A) Missing differentiation and total-cost-of-ownership thinking
+B) Readiness for a senior sourcing-strategy role right away
+C) Nothing notable, since short-term cost is the only factor
+D) A complete and well-rounded grasp of sourcing decisions
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The Interview Perspective section specifically listens for recognition of differentiation and total cost of ownership, which this answer omits.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
@@ -492,10 +492,10 @@ D) A strong and complete understanding of sourcing decisions
 ---
 
 **15. (Product Thinking, Highest Difficulty) A company's internally-built analytics platform, once justified by an immature external market, now competes against mature, superior external alternatives, but the internal team maintaining it resists any suggestion of change. Using only the frameworks in this lesson, what is the most defensible course of action?**
-A) Continue building even more features into the internal platform to justify the team's continued existence
-B) Immediately terminate the internal platform with no transition period or migration planning
-C) Conduct an honest Capability Sourcing Matrix and Moat Durability Matrix reassessment, and if the capability is confirmed non-differentiating with mature external alternatives available, plan a careful Sunset Runway transition while redeploying the team's capacity toward genuinely differentiating work
-D) Preserve the internal platform indefinitely to avoid any organizational conflict
+A) Add more features to justify the team's continued existence
+B) Terminate the platform immediately with no migration plan
+C) Reassess honestly, then plan a careful Sunset Runway transition
+D) Preserve the platform indefinitely to avoid team conflict
 
 *Correct answer: C*
 *Explanation: This mirrors the Reflection Exercise and Case Study: the correct response conducts an honest, evidence-based reassessment and executes a careful, Sunset-Runway-disciplined transition rather than either preserving the status quo indefinitely or making an abrupt, poorly-planned change.*

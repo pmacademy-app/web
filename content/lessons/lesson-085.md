@@ -301,12 +301,12 @@ There is no single correct answer. Work through the following before reading fur
 ## Quiz
 
 **1. Why can aggregate accuracy metrics mask disparity?**
-A) Aggregate metrics are always inaccurate
-B) A model can perform very differently across subgroups while the overall number looks fine
-C) Disparity never actually affects accuracy metrics
-D) Aggregate metrics are illegal to use
+A) A model can score well overall while failing one subgroup
+B) A group's underrepresentation dominates the headline number
+C) Aggregate metrics are always technically inaccurate
+D) Aggregate metrics are prohibited under most regulations
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: A model can achieve high overall accuracy while performing very differently across subgroups, and the aggregate number alone does not reveal this disparity.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -314,10 +314,10 @@ D) Aggregate metrics are illegal to use
 ---
 
 **2. What are the four steps of the Fairness Audit Loop?**
-A) Test, Ship, Monitor, Retire
-B) Define equity metric, measure across groups, diagnose disparity source, remediate
-C) Collect, Store, Process, Share
-D) Concept, Prototype, Pilot, Scale
+A) Test, ship, monitor usage, then retire the model
+B) Define a metric, measure by group, diagnose, then remediate
+C) Collect data, store it, process it, then share results
+D) Draft a concept, build a prototype, pilot, then scale
 
 *Correct answer: B*
 *Explanation: The Fairness Audit Loop follows four steps — define equity metric, measure across groups, diagnose disparity source, and remediate — as a structured, repeatable cycle.*
@@ -327,12 +327,12 @@ D) Concept, Prototype, Pilot, Scale
 ---
 
 **3. Why is the Fairness Audit Loop continuous rather than one-time?**
-A) Disparity can decay, re-emerge, or shift as data and usage change over time
-B) One-time audits are always sufficient
-C) Continuous audits are legally unnecessary
-D) Fairness never changes once established
+A) One-time audits are always fully sufficient on their own
+B) Fairness, once verified, cannot meaningfully change again
+C) Disparity can decay, re-emerge, or shift as data changes
+D) Continuous audits are considered legally unnecessary
 
-*Correct answer: A*
+*Correct answer: C*
 *Explanation: A fix applied once can itself introduce new disparity or decay as data and usage patterns shift, so re-measurement after remediation is essential.*
 *Learning objective tested: #2, #5*
 *Difficulty: Easy*
@@ -340,12 +340,12 @@ D) Fairness never changes once established
 ---
 
 **4. Why is adjusting output thresholds by group often an insufficient fix?**
-A) It always improves fairness completely
-B) It addresses the symptom, not the root cause, such as biased training data
-C) Threshold adjustment is illegal in all cases
-D) It has no effect on outcomes at all
+A) It always improves fairness completely and permanently
+B) Threshold adjustment is prohibited in most jurisdictions
+C) Adjusting thresholds has no measurable effect on outcomes
+D) It addresses the symptom, not a root cause like biased data
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Adjusting thresholds is a superficial output patch that does not address the underlying root cause, such as biased training data, and can mask the real problem or introduce new complications.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -353,12 +353,12 @@ D) It has no effect on outcomes at all
 ---
 
 **5. What role does an appeal mechanism play in responsible AI deployment?**
-A) It has no meaningful role
-B) It provides recourse for individuals affected by a decision, per Lesson 67's structural requirement
-C) It replaces the need for any fairness measurement
-D) It is only relevant for hardware products
+A) It gives affected individuals recourse, per Lesson 67
+B) It replaces the need for any subgroup fairness measurement
+C) It matters only for physical, hardware-based products
+D) It exists mainly to satisfy an internal audit requirement
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: An appeal mechanism gives affected individuals a genuine path to contest an AI-driven decision, which is a structural requirement established in Lesson 67's Escalation Staircase.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
@@ -366,9 +366,9 @@ D) It is only relevant for hardware products
 ---
 
 **6. What was the root cause of disparity in the Biased Hiring Screener case study?**
-A) The model architecture itself was flawed
-B) Historical training data reflected the company's own past biased hiring patterns
-C) The model was never tested at all
+A) The underlying model architecture was fundamentally flawed
+B) Historical data reflected the company's own past hiring bias
+C) The tool was deployed without ever being tested at all
 D) The screening tool had no access to any resume data
 
 *Correct answer: B*
@@ -379,12 +379,12 @@ D) The screening tool had no access to any resume data
 ---
 
 **7. Why is removing a protected characteristic from model inputs insufficient to eliminate disparity risk?**
-A) Protected characteristics are never actually correlated with other variables
-B) Proxy variables correlated with the protected characteristic can still produce disparate outcomes
-C) This step always eliminates all disparity risk completely
-D) Protected characteristics cannot be removed from any dataset
+A) Protected characteristics can never be removed from a dataset
+B) Removing an input always eliminates disparity completely
+C) Correlated proxy variables can still reproduce the disparity
+D) Protected traits are never correlated with any other field
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Other seemingly neutral variables can be correlated with the protected characteristic, acting as proxy variables that still produce disparate outcomes even when the protected trait is excluded.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
@@ -392,12 +392,12 @@ D) Protected characteristics cannot be removed from any dataset
 ---
 
 **8. According to the Responsible AI Deployment Checklist, what does skipping Subgroup Measurement risk?**
-A) Nothing significant
-B) Disparity remaining invisible despite acceptable aggregate performance
-C) Immediate legal action regardless of actual outcomes
-D) Guaranteed model failure
+A) Nothing significant, provided aggregate accuracy stays high
+B) An automatic legal penalty regardless of actual outcomes
+C) A guaranteed and immediate failure of the entire model
+D) Disparity staying invisible despite acceptable aggregate scores
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Without measuring outcomes separately by group, disparity can remain completely hidden even when aggregate performance metrics look acceptable.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
@@ -405,12 +405,12 @@ D) Guaranteed model failure
 ---
 
 **9. Why might early-stage AI products be especially likely to skip subgroup measurement, per the Real World Perspective section?**
-A) Subgroup measurement is legally prohibited for small companies
-B) Small user bases and limited resources make this measurement easy to defer, though risk compounds with scale
-C) Early-stage products never have any subgroups within their user base
-D) This is never actually a concern for early-stage products
+A) Small samples and limited resources make it easy to defer
+B) Subgroup measurement is legally prohibited for small firms
+C) Early-stage products never actually contain any subgroups
+D) This concern applies only once a product reaches Big Tech scale
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Small user bases and limited resources make subgroup measurement easy to defer at early stages, but this risk compounds as the product scales and disparities become harder to remediate.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -418,10 +418,10 @@ D) This is never actually a concern for early-stage products
 ---
 
 **10. What do large organizations typically maintain regarding fairness, per the Real World Perspective section?**
-A) No formal fairness process
-B) Dedicated responsible AI teams running the Fairness Audit Loop continuously
-C) A policy of ignoring subgroup disparities
-D) Fairness checks only once at company founding
+A) No formal process, relying on individual engineers' judgment
+B) Dedicated teams running the Fairness Audit Loop continuously
+C) A single fairness check run only once, at company founding
+D) A general policy of disregarding subgroup disparities
 
 *Correct answer: B*
 *Explanation: Large organizations typically maintain dedicated responsible AI teams that run the Fairness Audit Loop continuously across many models, treating fairness as an ongoing practice.*
@@ -431,12 +431,12 @@ D) Fairness checks only once at company founding
 ---
 
 **11. (Scenario) A model shows 95% aggregate accuracy but has never been measured by subgroup. What should happen next?**
-A) Nothing; 95% accuracy is sufficient evidence of fairness
-B) Subgroup measurement should be conducted before concluding the model is fair
-C) The model should be immediately shut down without investigation
-D) Aggregate accuracy alone is legally sufficient in all jurisdictions
+A) Treat 95% accuracy as sufficient proof the model is fair
+B) Shut the model down immediately without investigating
+C) Assume aggregate accuracy alone satisfies every regulator
+D) Conduct subgroup measurement before concluding it's fair
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: High aggregate accuracy does not guarantee fairness; subgroup measurement must be conducted before concluding the model is fair, since disparity can hide behind strong overall numbers.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Medium-Hard*
@@ -444,12 +444,12 @@ D) Aggregate accuracy alone is legally sufficient in all jurisdictions
 ---
 
 **12. (Product Thinking) A team discovers disparity and proposes simply adjusting output thresholds differently by group. What is the strongest response?**
-A) Approve the fix immediately as sufficient
-B) Investigate root cause first, since a superficial threshold adjustment may mask rather than resolve the underlying issue
-C) Ignore the disparity entirely
-D) Remove the feature immediately with no further investigation
+A) Investigate root cause first, since a threshold patch may mask it
+B) Approve the threshold fix immediately as fully sufficient
+C) Ignore the disparity and proceed with the existing model
+D) Remove the feature immediately with no further diagnosis
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: A superficial threshold adjustment masks the real issue; the root cause must be diagnosed first to determine whether it stems from biased data, a proxy variable, or something else entirely.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium-Hard*
@@ -457,12 +457,12 @@ D) Remove the feature immediately with no further investigation
 ---
 
 **13. (Interview Reasoning) A candidate says a model is "fair" because its aggregate accuracy is high, with no mention of subgroup analysis. What does this signal?**
-A) A strong and complete understanding of fairness
-B) A gap in recognizing that aggregate metrics can mask disparity
-C) Readiness for a senior responsible AI role immediately
-D) Nothing meaningful
+A) A strong and genuinely complete grasp of fairness
+B) Readiness for a senior responsible AI role immediately
+C) A gap in recognizing that aggregate metrics can hide disparity
+D) Nothing meaningful, since aggregate accuracy settles it
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Claiming fairness based solely on aggregate accuracy without subgroup analysis reveals a gap in understanding that aggregate metrics can systematically mask disparity across populations.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
@@ -470,10 +470,10 @@ D) Nothing meaningful
 ---
 
 **14. (Product Thinking) An AI decision system has no appeal mechanism for affected individuals. What risk does this represent?**
-A) No risk; appeal mechanisms are optional in all contexts
-B) A structural gap, since affected individuals have no recourse for a potentially wrong decision
-C) This only matters for enforcement decisions, not AI decisions
-D) Appeal mechanisms are irrelevant to fairness
+A) No risk, since appeal mechanisms are always optional
+B) A structural gap, leaving affected people no real recourse
+C) A risk relevant only to enforcement, never AI decisions
+D) No risk, since appeal mechanisms don't affect fairness
 
 *Correct answer: B*
 *Explanation: Without an appeal mechanism, affected individuals have no way to contest a potentially wrong AI-driven decision, creating a structural gap in recourse per Lesson 67's requirements.*
@@ -483,12 +483,12 @@ D) Appeal mechanisms are irrelevant to fairness
 ---
 
 **15. (Product Thinking, Highest Difficulty) An AI hiring tool shows strong aggregate accuracy but has never been checked for subgroup disparity, and leadership is skeptical that fairness auditing is necessary given strong performance. Using only this lesson's frameworks, what is the most defensible response?**
-A) Trust the aggregate accuracy and proceed without further investigation
-B) Conduct subgroup measurement, diagnose any disparity's root cause rather than superficially patching it, and institute an ongoing Fairness Audit Loop with a genuine appeal mechanism
-C) Cancel the tool entirely without investigation
-D) Adjust output thresholds by group without further diagnosis
+A) Trust the aggregate accuracy and proceed without further work
+B) Cancel the hiring tool entirely without investigating first
+C) Adjust output thresholds by group without further diagnosis
+D) Measure by subgroup, find the root cause, then run the audit loop
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Aggregate accuracy is insufficient evidence of fairness; the defensible response combines subgroup measurement, root-cause diagnosis, ongoing re-measurement through the Fairness Audit Loop, and a genuine appeal mechanism.*
 *Learning objective tested: #1, #2, #3, #4, #5*
 *Difficulty: Hard*

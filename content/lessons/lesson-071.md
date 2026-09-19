@@ -318,65 +318,65 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. Why is a vision statement alone insufficient to guide product execution?**
-A) Its necessary abstraction leaves it unable to specify what evidence would count as success or failure
-B) It tends to change too frequently for teams to plan a quarter of work around
-C) It focuses so narrowly on one segment that most teams struggle to recognize themselves in it
-D) It requires formal board sign-off before any team may cite it in planning documents
+A) Its necessary abstraction can't specify what counts as success or failure
+B) It requires board sign-off before any team can cite it in planning
+C) It changes too often for teams to plan a quarter of work around
+D) It focuses so narrowly that most teams can't recognize themselves in it
 
 *Correct answer: A*
-*Explanation: The lesson's core argument is that a vision's necessary abstraction and stability are precisely what make it unsuitable as a direct guide for near-term execution decisions.*
+*Explanation: The lesson's core argument is that a vision's necessary abstraction and stability make it unsuitable as a direct guide for near-term execution decisions.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What is the correct order of the Strategy Cascade?**
-A) Strategic Bets, Vision, Roadmap Initiatives, Success Metrics
-B) Vision, Strategic Bets, Roadmap Initiatives, Success Metrics
-C) Vision, Roadmap Initiatives, Strategic Bets, Success Metrics
+A) Vision, Roadmap Initiatives, Strategic Bets, Success Metrics
+B) Strategic Bets, Vision, Roadmap Initiatives, Success Metrics
+C) Vision, Strategic Bets, Roadmap Initiatives, Success Metrics
 D) Vision, Strategic Bets, Success Metrics, Roadmap Initiatives
 
-*Correct answer: B*
-*Explanation: This is the top-down sequence introduced in the Theory section, with a feedback loop flowing from measured metrics back into future bets.*
+*Correct answer: C*
+*Explanation: This is the top-down sequence from the Theory section, with a feedback loop flowing from measured metrics back into future bets.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What are the three properties of a genuinely falsifiable Strategic Bet?**
-A) A competitive analysis, a pricing model, and a defined launch date
+A) A specific hypothesis, committed resources, and pre-defined criteria
 B) A named owner, a fixed deadline, and a dedicated budget line
-C) A specific hypothesis, committed resources, and pre-defined success criteria
+C) A competitive analysis, a pricing model, and a launch date
 D) A committed team, a public announcement, and leadership sponsorship
 
-*Correct answer: C*
-*Explanation: These three properties, established in the Theory section, are what distinguish a genuine bet from a vague aspiration dressed up in specific-sounding language.*
+*Correct answer: A*
+*Explanation: These three properties distinguish a genuine bet from a vague aspiration dressed up in specific-sounding language.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is pre-committed success criteria specifically important for a Strategic Bet?**
-A) They determine which department is formally accountable for the resulting work
-B) Without them, any outcome can be retroactively framed as validating the bet
-C) They are described as relevant only for bets classified under Horizon 3
-D) They let a bet's budget be finalized before the roadmap itself is drafted
+A) They let a bet's budget be finalized before the roadmap is drafted
+B) They determine which department is accountable for the work
+C) Without them, any outcome can be framed as validating the bet
+D) They are relevant only for bets classified under Horizon 3
 
-*Correct answer: B*
-*Explanation: Pre-commitment is what prevents an outcome from being justified after the fact as success, which is central to genuine falsifiability.*
+*Correct answer: C*
+*Explanation: Pre-commitment is what prevents an outcome from being justified after the fact as success, central to genuine falsifiability.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What does Horizon 1 represent in the Three Horizons framework?**
-A) The core, existing business — defending and extending current strength
-B) A proven-demand opportunity adjacent to the core that hasn't yet been executed at scale
-C) A small, deliberately protected share of transformational investment
-D) The riskiest tier of bets, reserved for territory with no proven demand
+A) A small, deliberately protected share of transformational investment
+B) The core, existing business, defended and extended for its strength
+C) A proven-demand opportunity adjacent to the core, unproven at scale
+D) The riskiest tier of bets, reserved for territory with no demand
 
-*Correct answer: A*
-*Explanation: Horizon 1 specifically covers the low-risk, well-understood core business, which the Theory section notes typically receives the majority of resources.*
+*Correct answer: B*
+*Explanation: Horizon 1 covers the low-risk, well-understood core business, which typically receives the majority of resources.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
@@ -384,129 +384,129 @@ D) The riskiest tier of bets, reserved for territory with no proven demand
 
 **6. What risk does over-concentration in Horizon 3 carry, according to this lesson?**
 A) Long-term stagnation from never pursuing an adjacent opportunity
-B) Horizon 3 bets automatically failing once their budget exceeds a defined cap
-C) Running out of resources before any transformational bet has time to prove itself
-D) The core business losing customers directly as a result of Horizon 3 spending
+B) The core business losing customers directly because of the spending
+C) Running out of resources before a transformational bet can prove itself
+D) Horizon 3 bets automatically failing once their budget exceeds a cap
 
 *Correct answer: C*
-*Explanation: The Theory section identifies this resource-depletion risk from over-investing in the highest-risk horizon; stagnation (A) is instead the characteristic risk of over-concentrating in Horizon 1.*
+*Explanation: The Theory section identifies this resource-depletion risk; stagnation is instead the characteristic risk of over-concentrating in Horizon 1.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Unfalsifiable Pivot case study, which level of the Strategy Cascade was skipped?**
-A) Strategic Bets — the vague vision led straight to initiatives with no falsifiable claim in between
-B) Vision — leadership reportedly never articulated one for the collaboration push
-C) Success Metrics — dashboards existed, but nobody ever reviewed them
-D) Roadmap Initiatives — teams never actually began any workstreams at all
+A) Success Metrics — dashboards existed, but nobody reviewed them
+B) Roadmap Initiatives — teams never actually began any workstreams
+C) Strategic Bets — the vague vision led straight to initiatives
+D) Vision — leadership never articulated one for the collaboration push
 
-*Correct answer: A*
-*Explanation: The organization had a Vision and a set of Roadmap Initiatives but jumped between them without ever making a genuine, falsifiable Strategic Bet explicit.*
+*Correct answer: C*
+*Explanation: The organization had a Vision and Roadmap Initiatives but jumped between them without ever making a falsifiable Strategic Bet explicit.*
 *Learning objective tested: #2, #5*
 *Difficulty: Medium*
 
 ---
 
 **8. Why couldn't the board member get a clear answer about whether the collaboration pivot was working?**
-A) Each team was reportedly using a different internal definition of "collaboration"
-B) The company's metrics dashboard had been offline for several weeks
-C) No pre-committed metric existed to indicate whether the underlying hypothesis was correct
-D) The board member had asked about the wrong product line by mistake
+A) The board member had asked about the wrong product line
+B) No pre-committed metric existed to judge the hypothesis
+C) The company's metrics dashboard had been offline for weeks
+D) Each team used a different internal definition of "collaboration"
 
-*Correct answer: C*
+*Correct answer: B*
 *Explanation: Without a falsifiable bet and pre-defined success criteria, there was nothing genuine for any team to measure its progress against.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**9. According to the Three Horizons Portfolio Table, what is a red flag for Horizon 3 bets specifically?**
-A) Being judged by the same near-term metrics used for Horizon 1 bets
-B) Receiving a smaller overall share of resources than Horizon 1 bets
-C) Being reviewed by leadership less frequently than Horizon 2 bets
-D) Requiring a longer internal approval process than Horizon 1 initiatives
+**9. Per the Three Horizons Portfolio Table, what is a red flag for Horizon 3 bets specifically?**
+A) Requiring a longer internal approval process than Horizon 1 does
+B) Receiving a smaller overall share of resources than Horizon 1 does
+C) Being reviewed by leadership less often than Horizon 2 bets are
+D) Being judged by the same near-term metrics used for Horizon 1
 
-*Correct answer: A*
-*Explanation: The Framework Explanation table identifies premature judgment against short-term performance metrics as the characteristic Horizon 3 red flag, since it causes premature cancellation.*
+*Correct answer: D*
+*Explanation: The table identifies premature judgment against short-term metrics as the characteristic Horizon 3 red flag, since it causes early cancellation.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**10. According to the Real World Perspective section, why might mid-size companies experience the vision-execution gap especially painfully?**
-A) Mid-size companies are described as inheriting Big Tech's planning processes wholesale, regardless of fit
-B) Regulatory requirements reportedly force mid-size companies to formalize every initiative in writing
-C) Growing teams working somewhat independently need an explicit, shared cascade to avoid pursuing initiatives that don't trace to a coherent bet
-D) Mid-size companies generally stop publishing a vision statement once they pass a certain size
+**10. Per the Real World Perspective section, why might mid-size companies feel the vision-execution gap especially painfully?**
+A) Mid-size companies stop publishing a vision statement past a size
+B) Regulation forces mid-size companies to formalize every initiative
+C) Growing teams need a shared cascade to avoid untethered work
+D) Mid-size companies inherit Big Tech's planning processes wholesale
 
 *Correct answer: C*
-*Explanation: The Real World Perspective section identifies this scale transition as the point where an informal, shared understanding of the current bet can no longer be assumed by default.*
+*Explanation: The section identifies this scale transition as the point where informal shared understanding of the current bet can no longer be assumed.*
 *Learning objective tested: #1, #5*
 *Difficulty: Medium*
 
 ---
 
-**11. Why might an early-stage startup reasonably operate with an implicit rather than explicitly documented Strategy Cascade?**
-A) Formal strategy documentation is said to slow down a startup's fundraising process
-B) A small, tightly aligned founding team may share an understanding of the current bet without needing a formal document
-C) Investors reportedly prefer that a company's early bets remain undocumented
-D) Startups are generally described as too resource-constrained to define any success criteria at all
+**11. Why might an early-stage startup reasonably operate with an implicit Strategy Cascade?**
+A) Startups are too resource-constrained to define success criteria
+B) A small, aligned founding team may share the bet without a document
+C) Formal documentation is said to slow down fundraising efforts
+D) Investors reportedly prefer that early bets stay undocumented
 
 *Correct answer: B*
-*Explanation: The Real World Perspective section frames this as a reasonable trade-off at small scale, one that becomes a liability once the team grows too large for shared understanding to be assumed.*
+*Explanation: The section frames this as reasonable at small scale, becoming a liability once the team grows too large for shared understanding to be assumed.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
-**12. (Scenario) A company's leadership proposes three seemingly unrelated initiatives, each justified as "supporting our vision." What question, per the Strategy Cascade, should a PM ask first?**
-A) Whether the vision statement itself should be rewritten to better fit the initiatives
-B) What specific, falsifiable bet does each initiative actually trace back to, and is it the same bet across all three?
-C) Which of the three initiatives has the earliest planned launch date
-D) Which initiative does the CEO personally favor the most
+**12. (Scenario) Leadership proposes three seemingly unrelated initiatives, each justified as "supporting our vision." What should a PM ask first?**
+A) Which initiative has the earliest planned launch date of the three
+B) Whether the vision itself should be rewritten to fit the initiatives
+C) Which initiative the CEO personally favors the most right now
+D) What falsifiable bet each initiative traces back to, and is it shared
 
-*Correct answer: B*
-*Explanation: This applies the Strategy Cascade's discipline directly: tracing initiatives back to an explicit, falsifiable bet, rather than accepting vague vision-alignment as sufficient justification.*
+*Correct answer: D*
+*Explanation: This applies the Cascade's discipline directly: tracing initiatives to an explicit bet, rather than accepting vague vision-alignment as sufficient.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A team leader argues that defining pre-committed success criteria now would "constrain creativity" during an early exploratory phase. Using this lesson's frameworks, what is the strongest response?**
-A) Cancel the initiative outright rather than negotiate over its success criteria
-B) Insist on the exact same rigid success thresholds used for Horizon 1 bets, regardless of context
-C) Agree that early-stage exploration should proceed without any defined criteria at all
-D) Explain that without pre-defined criteria the initiative becomes unfalsifiable, while noting that a Horizon 3 bet's criteria can still be calibrated to its exploratory stage
+**13. (Product Thinking) A team leader argues pre-committed success criteria would "constrain creativity" during early exploration. What is the strongest response?**
+A) Cancel the initiative outright rather than negotiate its criteria
+B) Agree that early exploration should proceed with no criteria at all
+C) Insist on the same rigid thresholds used for Horizon 1 bets
+D) Explain the bet becomes unfalsifiable without criteria, calibrated to its stage
 
 *Correct answer: D*
-*Explanation: The lesson's discipline acknowledges the exploratory nature of early-stage work while still requiring some form of falsifiability, rather than abandoning criteria entirely or forcing inappropriately rigid Horizon 1 standards onto it.*
+*Explanation: The lesson's discipline acknowledges exploratory work while still requiring some falsifiability, rather than abandoning criteria or forcing Horizon 1 rigor onto it.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked how they'd evaluate a company's strategy, focuses entirely on whether the vision statement is inspiring and well-written. What does this most likely signal, per the Interview Perspective section?**
-A) That the candidate is ready to lead strategic planning without any further coaching
-B) A neutral answer, since vision quality is said to have little bearing on how interviewers assess strategic thinking
-C) A complete answer, since crafting a compelling vision is widely considered the hardest part of the job
-D) A gap in recognizing that a vision's quality says nothing about whether falsifiable, resourced bets exist beneath it
+**14. (Interview Reasoning) A candidate evaluating a company's strategy focuses entirely on whether the vision statement is inspiring and well-written. What does this signal?**
+A) A complete answer, since crafting a vision is the hardest part
+B) A gap in recognizing that vision quality says nothing about falsifiable bets beneath it
+C) A neutral answer, since vision quality rarely affects strategic assessment
+D) Readiness to lead strategic planning without further coaching
 
-*Correct answer: D*
-*Explanation: The Interview Perspective section specifically listens for recognition of the Strategic Bet layer, not just vision quality, as the real test of a coherent strategy.*
+*Correct answer: B*
+*Explanation: The Interview Perspective section specifically listens for recognition of the Strategic Bet layer, not just vision quality.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A company has announced a new vision and several teams have begun proposing loosely related initiatives, none yet connected to any falsifiable bet. Using only the frameworks in this lesson, what is the most defensible next step?**
-A) Fund all of the proposed initiatives at once without any further strategic discussion
-B) Pause every proposed initiative until a fully detailed five-year roadmap can be produced
-C) Let each team proceed independently, trusting that vision alignment alone is sufficient coordination
-D) Work with leadership to articulate the falsifiable bets the vision implies, and require each initiative to trace to a specific bet with pre-defined success criteria before major resourcing
+**15. (Product Thinking, Highest Difficulty) A company's new vision has spawned loosely related initiatives, none yet connected to a falsifiable bet. What is the most defensible next step?**
+A) Fund all proposed initiatives at once without further discussion
+B) Let each team proceed independently, trusting vision alignment alone
+C) Pause everything until a fully detailed five-year roadmap exists
+D) Articulate the bets the vision implies, requiring each initiative to trace to one
 
 *Correct answer: D*
-*Explanation: This mirrors the Reflection Exercise and the Case Study: the defensible response neither proceeds on vague vision-alignment alone nor demands excessive upfront planning, but inserts the missing, falsifiable Strategic Bet layer before committing significant resources.*
+*Explanation: This mirrors the Case Study: the defensible response neither proceeds on vague alignment nor demands excessive planning, but inserts the missing bet layer.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Hard*
 

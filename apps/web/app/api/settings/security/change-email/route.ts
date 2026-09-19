@@ -13,6 +13,35 @@ export const runtime = 'nodejs'
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /**
+ * Maps a Supabase Auth `updateUser({ email })` failure to safe, authored copy.
+ * Returns `null` for anything not recognized so the caller can rethrow it — an
+ * unmapped error is a genuine fault, not a user-facing one, and must go through
+ * `withRoute`'s generic handling rather than reach the client as raw provider text.
+ */
+function describeEmailUpdateError(error: { code?: string; message?: string }): string | null {
+  switch (error.code) {
+    case 'email_exists':
+    case 'identity_already_exists':
+    case 'email_conflict_identity_not_deletable':
+      return 'This email address is already associated with another account.'
+    case 'email_address_invalid':
+    case 'validation_failed':
+      return 'Please enter a valid email address.'
+    case 'over_email_send_rate_limit':
+      return 'Too many email change attempts. Please try again later.'
+    default:
+      break
+  }
+
+  // Some providers/mocks report the same conditions without a stable `code`.
+  if (/already.*registered|already.*exists/i.test(error.message || '')) {
+    return 'This email address is already associated with another account.'
+  }
+
+  return null
+}
+
+/**
  * GET returns the authenticated user's current email (for display in Settings → Security).
  */
 export const GET = withRoute(
@@ -115,10 +144,18 @@ export const POST = withRoute(
     // 2. Reject if the new email is already associated with another account.
     // (Supabase Auth independently enforces this too — this is the faster,
     // friendlier error path; defense in depth, not the only check.)
+    //
+    // Exact match on the already-lowercased `newEmail`, not `.ilike()`: an ILIKE
+    // pattern treats `%`/`_` in the caller-supplied value as wildcards, which
+    // would let an authenticated caller probe for other accounts' email
+    // addresses via the 409 response. Emails are stored lowercase at signup, so
+    // an exact match on the canonicalized value preserves the intended
+    // case-insensitive comparison without passing user input through as a
+    // pattern.
     const { data: existing } = await supabase
       .from('users')
       .select('id')
-      .ilike('email', newEmail)
+      .eq('email', newEmail)
       .maybeSingle()
 
     if (existing && existing.id !== userId) {
@@ -169,16 +206,13 @@ export const POST = withRoute(
         message: updateError.message,
       })
 
-      const alreadyRegistered = /already.*registered|already.*exists/i.test(updateError.message)
-      return NextResponse.json(
-        {
-          success: false,
-          error: alreadyRegistered
-            ? 'This email address is already associated with another account.'
-            : updateError.message || 'Failed to initiate email change.',
-        },
-        { status: 400 }
-      )
+      const safeMessage = describeEmailUpdateError(updateError)
+      if (safeMessage) {
+        return NextResponse.json({ success: false, error: safeMessage }, { status: 400 })
+      }
+      // Unrecognized failure: rethrown so the wrapper genericizes it rather than
+      // forwarding raw provider text (N-3 / audit finding D-4).
+      throw updateError
     }
 
     return NextResponse.json({

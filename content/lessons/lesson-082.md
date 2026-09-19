@@ -311,195 +311,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is data minimization?**
-A) Collecting only data genuinely necessary for a specific, disclosed purpose, retained only as long as needed
-B) Reducing the total number of features a product offers
-C) A technique for compressing data to save storage costs
-D) A requirement to delete all user data within 24 hours of collection
+A) Collecting only data genuinely necessary for a specific, disclosed purpose
+B) A technique for compressing stored files to reduce hosting costs
+C) A requirement to delete every user's data within one day
+D) Reducing how many features a product ships at launch
 
 *Correct answer: A*
-*Explanation: This is the foundational privacy principle explicitly defined in the Theory section.*
+*Explanation: This is the foundational privacy principle defined in the Theory section, distinct from technical compression or an unrelated feature-count reduction.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. What is the correct order of the Data Flow Risk Map?**
+**2. What is the correct order of the Data Flow Risk Map's four stages?**
 A) Storage, Collection, Sharing, Processing
-B) Collection, Storage, Processing, Sharing
-C) Processing, Sharing, Collection, Storage
+B) Processing, Sharing, Collection, Storage
+C) Collection, Storage, Processing, Sharing
 D) Sharing, Processing, Storage, Collection
 
-*Correct answer: B*
-*Explanation: This is the sequential order introduced in the Theory section, tracing data from initial gathering through eventual sharing.*
+*Correct answer: C*
+*Explanation: This is the sequential order introduced in the Theory section, tracing data from initial gathering through eventual sharing with third parties.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What does the "least privilege" principle refer to at the Storage stage?**
-A) A legal requirement to encrypt data only once per year
-B) Giving every employee broad access to all data for convenience
-C) Restricting data access to only those who need it for a legitimate, specific purpose
-D) Storing the minimum possible amount of data regardless of purpose
+A) Storing the smallest possible dataset regardless of its purpose
+B) Restricting data access to only those who need it for a legitimate purpose
+C) A rule requiring encryption keys to be rotated once per year
+D) Giving every employee broad access for day-to-day convenience
 
-*Correct answer: C*
-*Explanation: Least privilege specifically concerns restricting access appropriately, distinct from the minimization principle applied at Collection.*
+*Correct answer: B*
+*Explanation: Least privilege concerns restricting who can access stored data appropriately, distinct from the minimization principle applied at Collection.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **4. Why is a data processing agreement insufficient protection on its own when sharing data with a third party?**
-A) Data processing agreements are described as not legally enforceable in most jurisdictions
-B) Third parties are described as never actually bound by any contractual terms at all
-C) Data processing agreements are described as applying only to government entities
-D) A contract establishes legal recourse after a failure but does not technically prevent the third party's own security failure from occurring
+A) Such agreements are rarely enforceable in most jurisdictions
+B) Third parties are generally not bound by any contractual terms
+C) These agreements apply only to government entities, not vendors
+D) A contract gives legal recourse after a failure but doesn't prevent it
 
 *Correct answer: D*
-*Explanation: The lesson explicitly distinguishes contractual recourse from technical prevention as two different, both-necessary forms of protection.*
+*Explanation: The lesson distinguishes contractual recourse from technical prevention as two separate, both-necessary forms of protection against a third party's own security failure.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. What is "purpose creep"?**
-A) Using data collected for one stated purpose for an unrelated purpose later, without updated disclosure or consent
-B) A technical vulnerability found in some data storage systems
-C) The natural growth of a company's customer base over time
-D) A legal requirement to expand data collection purposes annually
+A) A technical vulnerability specific to certain storage systems
+B) Using data collected for one purpose for an unrelated purpose later
+C) The normal growth of a company's user base over time
+D) A legal mandate to broaden data collection each year
 
-*Correct answer: A*
-*Explanation: Purpose creep specifically describes this violation of purpose limitation, even when original collection was legitimate.*
+*Correct answer: B*
+*Explanation: Purpose creep specifically describes this violation of purpose limitation, even when the original collection of the data was entirely legitimate.*
 *Learning objective tested: #1, #4*
 *Difficulty: Easy*
 
 ---
 
 **6. What is the "right to deletion"?**
-A) A technical feature that lets users delete their own social media posts
-B) A legal requirement allowing individuals to request removal of their personal data across an organization's systems
-C) A company's own right to delete data it no longer wants to store
-D) A right that is described as applying only to financial data, never health data
+A) A legal right letting individuals request removal of their personal data
+B) A company's own discretion to delete data it no longer wants
+C) A right described as applying only to financial records, never health data
+D) A technical feature limited to deleting a user's own social posts
 
-*Correct answer: B*
-*Explanation: This is the specific individual right described in the Theory section, with implications extending across a product's entire data architecture.*
+*Correct answer: A*
+*Explanation: This is the individual right described in the Theory section, with implications reaching across a product's entire data architecture, not just one app feature.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **7. In the Third-Party Data Exposure case study, what specifically caused the company to be found liable?**
-A) The vendor is described as never actually experiencing any security breach
-B) The company had reportedly never signed any data processing agreement with the vendor
-C) The company shared far more data than the analytics purpose required, relying solely on contractual safeguards with no accompanying technical protections
-D) The company's own initial data collection practices were themselves deficient
+A) The company had reportedly never signed any data processing agreement
+B) The company shared far more data than needed, with no added safeguards
+C) The vendor never actually experienced any security breach at all
+D) The company's own initial collection practices were themselves deficient
 
-*Correct answer: C*
-*Explanation: The case study specifically attributes liability to the Sharing stage failure — over-broad data sharing with insufficient technical safeguards.*
+*Correct answer: B*
+*Explanation: The case study attributes liability to the Sharing stage: over-broad data sharing backed only by contractual language, with no accompanying technical protections.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
 **8. According to the case study, what would have reduced the company's risk at the Sharing stage?**
-A) Relying exclusively on the vendor's own internal security practices with no oversight
+A) Relying solely on the vendor's own internal security practices
 B) Eliminating the data processing agreement with the vendor entirely
-C) Sharing an even larger dataset with the vendor to support redundancy
-D) Sharing only the minimum data genuinely necessary for the analytics purpose, combined with additional technical safeguards beyond the contract alone
+C) Sharing only what the purpose required, plus added technical safeguards
+D) Sharing a larger dataset with the vendor to support redundancy
+
+*Correct answer: C*
+*Explanation: This reflects the company's actual recovery approach — minimizing shared data to genuine need and adding technical safeguards beyond the contract alone.*
+*Learning objective tested: #3, #5*
+*Difficulty: Medium*
+
+---
+
+**9. Per the Privacy and Security Compliance Checklist, what does a "no" on Third-Party Safeguards indicate?**
+A) That third-party sharing should, on this basis alone, never occur
+B) A minor issue that is typically resolved easily after the fact
+C) That the organization's own internal security must also be deficient
+D) A significant risk, since contracts alone don't defend against vendor failure
 
 *Correct answer: D*
-*Explanation: This reflects the company's actual recovery approach described in the case study — minimizing shared data and adding technical safeguards.*
+*Explanation: The checklist treats this gap as significant, connecting directly to the case study's core failure of relying on contractual protection alone.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**9. According to the Privacy and Security Compliance Checklist, what does a "no" on Third-Party Safeguards indicate?**
-A) A significant risk, given that contractual protection alone provides no defense against a third party's own security failure
-B) That the organization's own internal security is automatically deficient as well
-C) That third-party data sharing should, on this basis alone, never occur at all
-D) A minor issue that is generally resolved easily after the fact
-
-*Correct answer: A*
-*Explanation: The lesson explicitly treats this gap as significant, directly connecting to the case study's core failure.*
-*Learning objective tested: #3, #5*
-*Difficulty: Medium*
-
----
-
-**10. Why might early-stage companies reasonably delay establishing formal data governance practices, per the Real World Perspective section?**
-A) Early-stage companies are described as never collecting any personal data at all
-B) It may represent a reasonable short-term trade-off given limited resources, though this becomes more expensive to correct as data collection accumulates
-C) Data governance is described as relevant only for companies operating in the European Union
-D) Formal governance is described as legally prohibited for companies below a certain size
+**10. Why might early-stage companies reasonably delay establishing formal data governance, per the Real World Perspective section?**
+A) Data governance is described as relevant only within the European Union
+B) A reasonable short-term trade-off, though correcting it grows costlier later
+C) Formal governance is legally prohibited for companies below a certain size
+D) Early-stage companies are described as never collecting personal data
 
 *Correct answer: B*
-*Explanation: The Real World Perspective section frames this as a reasonable but increasingly risky trade-off as data volume and liability surface grow.*
+*Explanation: The section frames this as a reasonable but increasingly risky trade-off as data volume and liability surface accumulate with company growth.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
 **11. What do large organizations typically maintain regarding privacy and security, per the Real World Perspective section?**
-A) Privacy processes limited to data belonging to their own employees
-B) A policy of collecting as much data as technically possible regardless of purpose
-C) Dedicated privacy engineering functions and systematic Data Flow Risk Map-style review requirements for new features involving personal data
+A) Dedicated privacy engineering running systematic Risk Map-style review
+B) Privacy processes limited to their own employees' data
+C) A policy of collecting as much data as technically possible
 D) No formal privacy processes, relying entirely on ad hoc decisions
 
-*Correct answer: C*
-*Explanation: The Real World Perspective section describes this systematic, dedicated approach as characteristic of large organizations given the scale of potential harm.*
+*Correct answer: A*
+*Explanation: The section describes this systematic, dedicated approach as characteristic of large organizations, given the scale of harm a failure could cause.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**12. (Scenario) A company wants to use data originally collected for a budgeting feature to build an unrelated credit-scoring product. What concern does this raise, per this lesson's frameworks?**
-A) No concern, since credit scoring and budgeting are treated as identical purposes under most regulations
-B) A concern that is described as relevant only to the Storage stage, not Processing
-C) No concern, since the data in question was already legitimately collected
-D) A potential purpose creep violation, since using data for a new, undisclosed purpose requires updated disclosure or consent even when original collection was legitimate
+**12. (Scenario) A company wants to reuse data originally collected for a budgeting feature to build an unrelated credit-scoring product. What concern does this raise?**
+A) No concern, since budgeting and credit scoring are identical purposes
+B) A concern relevant only to the Storage stage, not to Processing
+C) No concern, since the data was already legitimately collected
+D) A potential purpose creep violation requiring updated disclosure or consent
 
 *Correct answer: D*
-*Explanation: This directly applies the purpose limitation principle to a new use of previously collected data.*
+*Explanation: This applies purpose limitation directly to a new use of previously collected data, regardless of how legitimately the original collection occurred.*
 *Learning objective tested: #1, #4, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A PM is designing a new feature and instinctively wants to collect additional data "in case it's useful later." What is the strongest response, using this lesson's frameworks?**
-A) Apply data minimization directly: collect only what the feature's specific, current purpose genuinely requires, treating "might need it later" as an insufficient justification
-B) Collect the data but store it in a separate system to avoid any privacy concerns
-C) Collect the additional data as planned, since more data is generally beneficial for future development
-D) Collect the data only if it can be encrypted, regardless of whether it's genuinely necessary
+**13. (Product Thinking) A PM instinctively wants to collect additional data "in case it's useful later." What is the strongest response using this lesson's frameworks?**
+A) Collect the data but isolate it in a separate database to limit exposure
+B) Collect it only if it can be encrypted, regardless of actual need
+C) Collect it as planned, since more data generally helps future development
+D) Apply data minimization: collect only what the current purpose genuinely needs
 
-*Correct answer: A*
-*Explanation: The correct response applies data minimization directly, rejecting speculative future use as sufficient justification for collection.*
+*Correct answer: D*
+*Explanation: The correct response applies minimization directly, treating "might need it later" as insufficient justification for collection.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked how they'd design a data-sharing arrangement with a third-party vendor, describes only the contractual data processing agreement with no mention of technical safeguards. What does this most likely signal, per the Interview Perspective section?**
-A) That the candidate is ready for a senior privacy engineering role immediately
-B) A gap in recognizing that contracts alone don't prevent a third party's technical security failure, and additional safeguards are often necessary
-C) A strong and complete understanding of data sharing risk
-D) Nothing meaningful; contractual agreements are treated as always sufficient protection on their own
+**14. (Interview Reasoning) A candidate, asked how they'd design a third-party data-sharing arrangement, describes only the contract with no mention of technical safeguards. What does this signal?**
+A) That the candidate is ready for a senior privacy engineering role
+B) A strong and complete understanding of data-sharing risk
+C) A gap in recognizing that contracts alone don't prevent a vendor's own failure
+D) Nothing meaningful, since contracts are generally sufficient on their own
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section specifically listens for recognition of the need for technical safeguards beyond contractual protection alone.*
+*Correct answer: C*
+*Explanation: The Interview Perspective section listens specifically for recognition that technical safeguards are needed beyond contractual protection alone.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A fintech company wants to reuse data originally collected for budgeting to build a new credit-scoring product, potentially sharing some of this data with a third-party credit bureau. Using only the frameworks in this lesson, what is the most defensible approach?**
-A) Share the complete original dataset with the credit bureau to maximize accuracy, relying solely on the bureau's own security practices
-B) Avoid using any previously collected data for any new purpose under any circumstances
-C) Address the purpose creep concern by obtaining updated disclosure or consent for the new use, apply data minimization to any data shared with the credit bureau, and implement both contractual and technical safeguards for that sharing arrangement
-D) Proceed with the new use and third-party sharing immediately, since the data was already legitimately collected
+**15. (Product Thinking, Highest Difficulty) A fintech company wants to reuse budgeting data for a new credit-scoring product and share some of it with a third-party bureau. What is the most defensible approach?**
+A) Get updated consent, minimize shared data, and add technical safeguards too
+B) Share the full original dataset with the bureau to maximize model accuracy
+C) Avoid reusing any previously collected data under any circumstances
+D) Proceed with the reuse and sharing immediately, since the data was legitimately collected
 
-*Correct answer: C*
-*Explanation: This mirrors the Reflection Exercise: the correct response addresses purpose limitation through updated disclosure, applies minimization to any newly shared data, and layers technical safeguards alongside contractual ones, rather than either proceeding unexamined or refusing any reuse at all.*
+*Correct answer: A*
+*Explanation: This mirrors the Reflection Exercise: address purpose creep with updated consent, minimize any newly shared data, and combine technical safeguards with contractual ones.*
 *Learning objective tested: #1, #3, #4, #5*
 *Difficulty: Hard*
 

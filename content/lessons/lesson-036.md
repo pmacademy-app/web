@@ -365,195 +365,195 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the core trade-off between a big-bang release and a staged rollout?**
-A) Engineering effort versus design effort
-B) There is no meaningful trade-off between the two
-C) Speed versus exposure/contained risk
-D) Cost versus quality
+A) Speed versus contained exposure to any problem that surfaces
+B) Engineering cost versus how much design polish is possible
+C) The number of Sprints required versus code quality
+D) Whether a feature flag can technically be used at all
 
-*Correct answer: C*
-*Explanation: Big-bang maximizes speed but exposes everyone to any problem at once; a staged rollout limits exposure to a small group first.*
+*Correct answer: A*
+*Explanation: A big-bang release maximizes speed but exposes everyone at once; a staged rollout trades some speed for catching problems in a small group first.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. What does a feature flag primarily decouple?**
-A) Deploying code from releasing a feature to users
-B) Sprint Planning from Sprint Review
-C) Frontend code from backend code
-D) Engineering from design
+**2. What does a feature flag primarily allow a team to decouple?**
+A) Frontend work from backend work on the same feature
+B) Deploying code from releasing a feature to users
+C) Sprint Planning from the team's daily standup
+D) A Sprint Goal from the roadmap theme behind it
 
-*Correct answer: A*
-*Explanation: A feature flag decouples code deployment from user-facing release, allowing independent control of exposure.*
+*Correct answer: B*
+*Explanation: A feature flag separates deploying code from making a feature visible to users, so exposure can be controlled independently of the deploy itself.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
 **3. What is a canary release specifically designed to do?**
-A) Guarantee a feature will never contain bugs
-B) Speed up a big-bang release
-C) Replace the need for a rollback plan entirely
-D) Release a change to a small, early-warning subset first, so a problem is caught before wider exposure
+A) Guarantee that a shipped feature contains no remaining bugs
+B) Replace the need for any rollback plan whatsoever
+C) Expose a small subset first as an early-warning check
+D) Speed up how quickly a big-bang release reaches everyone
 
-*Correct answer: D*
-*Explanation: A canary release exposes a small subset first, explicitly as an early-warning mechanism before wider rollout.*
+*Correct answer: C*
+*Explanation: A canary release exposes a small, often random subset first, explicitly to catch a problem before it reaches everyone else.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**4. According to this lesson's launch tiering system, what generally determines a release's tier?**
-A) The number of Sprint cycles it took to build
-B) The release's potential impact/blast radius if something goes wrong
-C) How much the engineering team enjoyed building it
-D) Whether the release includes any UI changes at all
+**4. What primarily determines a release's tier in this lesson's launch tiering system?**
+A) How many Sprints the underlying work actually took
+B) Whether the release includes any visual design changes
+C) How enthusiastic the engineering team feels about the launch
+D) The release's potential blast radius if something goes wrong
 
-*Correct answer: B*
-*Explanation: The launch tiering table classifies releases by potential impact, matching required coordination to that impact level.*
+*Correct answer: D*
+*Explanation: The tiering table classifies releases by potential impact, assigning proportional coordination based on that blast radius, not on effort or visual scope.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
 **5. Why is "we'll fix it in the next release" generally not an acceptable rollback plan?**
-A) Because rollback plans are only required for Tier 3 releases
-B) Because engineering teams are never able to revert code
-C) A live, actively-harming issue often cannot wait for a full new release cycle, and a genuine rollback plan requires a fast, independent way to revert
-D) Because release cycles are always exactly one day long
+A) A live issue can't wait days; rollback needs a fast, independent revert
+B) Because rollback plans are legally required only for Tier 3 releases
+C) Because most engineering teams are structurally unable to revert code
+D) Because every release cycle at every company lasts exactly one day
 
-*Correct answer: C*
-*Explanation: Waiting for a new release cycle is too slow for an actively harmful issue, which is why a real rollback plan must be faster and independent of it.*
+*Correct answer: A*
+*Explanation: Waiting for the next release cycle is too slow for a live, harmful issue, which is why a genuine rollback plan must be fast and independent of it.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**6. Which stakeholders does this lesson's Launch Readiness Checklist explicitly include, beyond engineering?**
-A) Support/Customer Success, Sales/customer-facing teams, a monitoring owner, and Legal/Compliance where relevant
-B) Only the CEO
-C) Only external customers
-D) No one; the checklist is engineering-only
+**6. Which stakeholders does the Launch Readiness Checklist name beyond engineering?**
+A) Only the company's board of directors
+B) Support, sales, a monitoring owner, and legal/compliance where relevant
+C) No one; the checklist covers engineering topics only
+D) Only external customers who opt into a beta program
 
-*Correct answer: A*
-*Explanation: The Launch Readiness Checklist lists these specific stakeholder categories beyond engineering.*
+*Correct answer: B*
+*Explanation: The checklist explicitly names these stakeholder categories, since a launch's risk extends well beyond the engineering team building it.*
 *Learning objective tested: #5*
 *Difficulty: Easy*
 
 ---
 
-**7. In the Detailed Case Study, why did the data-formatting bug go undetected until after the full rollout?**
-A) The company had no engineers available that day
-B) The bug was actually caused by the support team
-C) The team never tested the change at all
-D) The bug manifested only for customers with unusually large report volumes, invisible in the smaller staging dataset, and there was no staged rollout to catch it first
+**7. In the Detailed Case Study, why did the data-formatting bug go undetected until the full rollout?**
+A) The engineering team never ran any tests before shipping
+B) The bug had actually been introduced by the support team
+C) It hit large report volumes staging missed, and no staged rollout caught it
+D) No engineers were reachable on the day of the release
 
-*Correct answer: D*
-*Explanation: The bug was specific to large data volumes not represented in staging, and the absence of a staged rollout meant it wasn't caught before reaching all affected customers.*
+*Correct answer: C*
+*Explanation: The bug was tied to a data-volume profile missing from staging, and without a staged rollout it reached every affected customer at once.*
 *Learning objective tested: #1, #4*
 *Difficulty: Medium*
 
 ---
 
-**8. Why did the support team's lack of advance notice make the Case Study's incident worse, specifically?**
-A) Support refused to help once informed
-B) Support confidently told confused customers that "reports have always looked this way," escalating frustration rather than helping triage the real issue
-C) Support was responsible for writing the buggy code
-D) It had no effect on the outcome
+**8. Why did the support team's lack of advance notice make the Case Study's incident worse?**
+A) It had essentially no measurable effect on the outcome
+B) Support was the team that had actually written the buggy code
+C) Support told customers reports "always looked this way," deepening frustration
+D) Support refused to respond to any customer messages at all
 
-*Correct answer: B*
-*Explanation: Support's confused, incorrect responses to customers actively worsened the situation, due to their lack of advance awareness.*
+*Correct answer: C*
+*Explanation: Without advance notice, support gave customers confidently wrong answers, which worsened rather than helped triage the real issue.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**9. (Scenario) A release is described as "a minor copy change to a settings page tooltip." Using the launch tiering table, which tier does this most likely belong to?**
-A) Tier 2, requiring a canary release
-B) It cannot be classified without additional information about the marketing calendar
-C) Tier 3, requiring standard engineering release process with no special coordination
-D) Tier 1, requiring full cross-functional review
+**9. A release is described as "a minor copy change to a settings page tooltip." Which tier does this most likely belong to?**
+A) Tier 3, needing only the standard engineering release process
+B) Tier 2, requiring a canary release and stakeholder notice
+C) It cannot be classified without the current marketing calendar
+D) Tier 1, requiring a full cross-functional launch review
 
-*Correct answer: C*
-*Explanation: Minor UI/copy changes are classified as Tier 3, requiring only the standard release process, consistent with their low blast radius.*
+*Correct answer: A*
+*Explanation: Minor copy and UI tweaks sit at Tier 3, matching their genuinely low blast radius with no special coordination required.*
 *Learning objective tested: #3*
 *Difficulty: Medium-Hard*
 
 ---
 
-**10. Why does this lesson caution against mechanically advancing a staged rollout through its stages on a fixed schedule, regardless of signal?**
-A) A staged rollout only provides real protection if its early stages are genuinely monitored closely enough to catch a problem before proceeding
-B) Because staged rollouts should never include more than two stages
-C) Because fixed schedules are illegal under most company policies
-D) Because staged rollouts should always move as fast as possible
+**10. Why does this lesson caution against mechanically advancing a staged rollout on a fixed schedule?**
+A) Staged rollouts should always move through every stage as fast as possible
+B) It only helps if each stage is truly monitored, not simply passed through
+C) Fixed rollout schedules violate most companies' internal policy
+D) A staged rollout should never include more than two stages total
 
-*Correct answer: A*
-*Explanation: A staged rollout's protection depends on genuine monitoring at each stage, not just the appearance of a staged process.*
+*Correct answer: B*
+*Explanation: The protective value of a staged rollout depends entirely on genuine monitoring at each stage, not the mere appearance of a staged process.*
 *Learning objective tested: #1, #4*
 *Difficulty: Medium*
 
 ---
 
-**11. (Interview Reasoning) A candidate describes a launch that didn't go as planned and answers: "It just didn't work out — bad luck, I guess." What is the weakness in this answer?**
-A) It demonstrates strong technical fluency
-B) It correctly avoids overexplaining a minor issue
-C) There is no weakness; sometimes launches simply fail for unpredictable reasons
-D) It fails to name the specific missing safeguard (staged rollout, feature flag, rollback plan, or communication) that could have prevented the failure
+**11. (Interview Reasoning) A candidate describes a failed launch only as "bad luck, I guess." What is the weakness in this answer?**
+A) It fails to name the specific missing safeguard that could have prevented it
+B) It demonstrates unusually strong technical fluency
+C) There is no weakness; some launches simply fail unpredictably
+D) It correctly avoids overexplaining a minor, low-stakes incident
 
-*Correct answer: D*
-*Explanation: A strong answer identifies the specific missing safeguard, rather than describing the failure only vaguely as bad luck.*
+*Correct answer: A*
+*Explanation: A strong answer names the specific missing safeguard — staged rollout, feature flag, rollback plan, or communication — rather than describing bad luck.*
 *Learning objective tested: #4*
 *Difficulty: Hard*
 
 ---
 
-**12. Why does the lesson describe feature flags and canary releases as "complementary" rather than interchangeable?**
-A) Because canary releases apply only to marketing changes
-B) A feature flag controls who sees a feature, while a canary release strategy controls how underlying infrastructure changes are validated, at different layers of exposure control
-C) Because only one of the two tools can be used at a time
-D) Because they are actually the same tool with different names
+**12. Why does this lesson describe feature flags and canary releases as complementary rather than interchangeable?**
+A) Only one of the two tools can technically be active at a time
+B) They are actually the same underlying tool with two different names
+C) Canary releases apply only to marketing and copy changes
+D) A flag controls who sees a feature; a canary validates infrastructure separately
 
-*Correct answer: B*
-*Explanation: Each tool controls a different thing — feature visibility versus infrastructure validation — while serving the same underlying exposure-control principle.*
+*Correct answer: D*
+*Explanation: Each tool governs a different layer of exposure — user-facing visibility versus infrastructure validation — while sharing the same underlying principle.*
 *Learning objective tested: #2*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A team wants to ship a Tier 1 change under significant deadline pressure, without a feature flag, reasoning that building one would take too long. What is the most defensible response?**
-A) Cancel the release entirely with no further discussion
-B) Downgrade the release to Tier 3 to avoid the extra requirements
-C) Recognize that skipping a feature flag on a high-blast-radius release removes the fastest rollback mechanism, and either build the flag or explicitly compensate with extra safeguards
-D) Proceed exactly as planned, since deadlines should always take priority over process
+**13. (Product Thinking) A team wants to ship a Tier 1 change under deadline pressure, skipping a feature flag because building one would take too long. What is the most defensible response?**
+A) Proceed exactly as planned, since deadlines should always outrank process
+B) Downgrade the release to Tier 3 simply to avoid the extra requirements
+C) Recognize the fast rollback path is gone; build the flag or add safeguards
+D) Cancel the release outright with no further discussion of alternatives
 
 *Correct answer: C*
-*Explanation: A genuine trade-off exists between deadline pressure and safeguard investment; the responsible path is investing in it or explicitly accepting and compensating for the risk, not proceeding as if it doesn't exist.*
+*Explanation: A real trade-off exists between deadline pressure and safeguard investment; the responsible path funds the safeguard or explicitly compensates for its absence.*
 *Learning objective tested: #2, #3, #4*
 *Difficulty: Hard*
 
 ---
 
-**14. Which of the following best reflects this lesson's Blast Radius mental model in practice?**
-A) Asking, for every proposed release, how bad the worst plausible outcome could be and how quickly it could be contained, then matching ceremony to that answer
-B) Skipping any consideration of risk for releases the team feels confident about
-C) Applying identical launch ceremony to every release regardless of potential impact
-D) Assuming all releases are equally risky until proven otherwise through a lengthy legal review
+**14. Which of the following best reflects the Blast Radius mental model in practice?**
+A) Applying identical ceremony to every release regardless of its potential impact
+B) Asking how bad the worst outcome could be and how containable it is
+C) Skipping any risk discussion for releases the team already feels confident about
+D) Treating every release as equally risky until a lengthy legal review clears it
 
-*Correct answer: A*
-*Explanation: The Blast Radius question — scope and containability of potential harm — is the guiding first step that should drive every subsequent release decision.*
+*Correct answer: B*
+*Explanation: The Blast Radius question — scope and containability of potential harm — is meant to drive every subsequent release decision, not a fixed default.*
 *Learning objective tested: #1, #3*
 *Difficulty: Medium-Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A PM inherits a team that ships every release as a big-bang deployment with no feature flags, reasoning that "we've always shipped this way and it's usually been fine." What is the most defensible first step?**
-A) Require legal sign-off on every release regardless of content
-B) Leave the existing practice entirely unchanged, since it has "usually been fine" so far
-C) Immediately mandate staged rollouts and feature flags for every future release without exception
-D) Introduce a lightweight launch tiering system, matching ceremony to each release's actual blast radius rather than applying it uniformly or not at all
+**15. (Product Thinking, Highest Difficulty) A PM inherits a team that ships every release big-bang with no feature flags, reasoning "it's usually been fine." What is the most defensible first step?**
+A) Leave the existing practice untouched, since it has usually worked out
+B) Require full legal sign-off on every future release regardless of content
+C) Mandate staged rollouts and feature flags for every release without exception
+D) Introduce a lightweight tiering system matching ceremony to actual blast radius
 
 *Correct answer: D*
-*Explanation: The goal is proportional ceremony matched to risk via a tiering system; "usually fine" does not account for the tail risk of the releases that aren't.*
+*Explanation: The goal is proportional ceremony driven by a tiering system; "usually fine" ignores the tail risk carried by the releases that eventually aren't.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 

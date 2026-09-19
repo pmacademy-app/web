@@ -362,8 +362,8 @@ There is no single correct answer to the prompts below — the goal is to practi
 **1. What specific organizational problem does Product Operations exist to solve?**
 A) The need for a single company-wide programming language
 B) The need to eliminate all Agile ceremonies
-C) The breakdown of informal, proximity-based consistency (shared definitions, processes, infrastructure) as an organization scales to many teams
-D) The need for more engineering headcount
+C) Informal, proximity-based consistency breaking down at scale
+D) The need for additional engineering headcount overall
 
 *Correct answer: C*
 *Explanation: Product Ops exists to solve this specific scale-driven consistency problem.*
@@ -373,10 +373,10 @@ D) The need for more engineering headcount
 ---
 
 **2. Which of the following is NOT typically a core functional area of Product Ops?**
-A) Setting individual teams' feature prioritization decisions
-B) Metric definition standardization
-C) Launch coordination infrastructure
-D) Research operations infrastructure
+A) Setting individual teams' feature prioritization calls
+B) Standardizing metric definitions across teams
+C) Launch coordination infrastructure and checklists
+D) Research operations infrastructure and tooling
 
 *Correct answer: A*
 *Explanation: Individual prioritization decisions remain the domain of individual PMs, not Product Ops, per the Multiplier Layer distinction.*
@@ -386,10 +386,10 @@ D) Research operations infrastructure
 ---
 
 **3. Why do inconsistent metric definitions across teams create a particularly insidious organizational problem?**
-A) Because they only affect engineering teams, not leadership
-B) Because they are illegal under most corporate governance rules
-C) Because they make dashboards look ugly
-D) They produce numbers that appear precise and comparable while actually being computed under meaningfully different definitions
+A) They only affect engineering teams, never leadership
+B) They are illegal under most corporate governance rules
+C) They make dashboards look visually unappealing
+D) Numbers look precise and comparable but actually aren't
 
 *Correct answer: D*
 *Explanation: This exact failure mode — numbers that look authoritative and comparable while not actually being so — is what makes it so insidious.*
@@ -399,10 +399,10 @@ D) They produce numbers that appear precise and comparable while actually being 
 ---
 
 **4. What are the four stages of the Product Ops Maturity Ladder, in order?**
-A) Now, Next, Later, Never
-B) Informal, Emerging, Formalized, Embedded
-C) Discover, Define, Develop, Deliver
-D) Startup, Growth, Maturity, Decline
+A) Now, next, later, and never as ordered stages
+B) Informal, emerging, formalized, and embedded
+C) Discover, define, develop, and deliver phases
+D) Startup, growth, maturity, and decline stages
 
 *Correct answer: B*
 *Explanation: These four stages are named in this order.*
@@ -412,10 +412,10 @@ D) Startup, Growth, Maturity, Decline
 ---
 
 **5. According to the Multiplier Layer mental model, what is the correct relationship between Product Ops and individual PM judgment?**
-A) Individual PMs should ignore any standards Product Ops establishes
+A) Individual PMs should ignore any Product Ops standard
 B) Product Ops and individual PMs should never interact
-C) Product Ops should standardize shared infrastructure and definitions, multiplying PM practice, without replacing individual judgment on strategic decisions
-D) Product Ops should make prioritization and strategic decisions on behalf of individual PMs
+C) Product Ops standardizes infrastructure, not judgment
+D) Product Ops should make every strategic decision itself
 
 *Correct answer: C*
 *Explanation: This is the correct relationship — multiplying practice through shared infrastructure, not replacing judgment.*
@@ -425,10 +425,10 @@ D) Product Ops should make prioritization and strategic decisions on behalf of i
 ---
 
 **6. In the Detailed Case Study, why did twelve teams end up with five different definitions of "active user"?**
-A) Each team's PM made a locally reasonable choice for their own feature, with no centrally maintained shared standard or awareness of other teams' definitions
+A) Each PM made a reasonable choice with no shared glossary
 B) The analytics team refused to define the term at all
-C) The company's CEO mandated five different definitions deliberately
-D) Each team acted carelessly and ignored existing company standards
+C) The CEO mandated five different definitions deliberately
+D) Each team acted carelessly and ignored existing standards
 
 *Correct answer: A*
 *Explanation: Each team's choice was locally reasonable; the failure was the absence of a centrally shared standard, not carelessness.*
@@ -441,7 +441,7 @@ D) Each team acted carelessly and ignored existing company standards
 A) All teams had actually used the same definition all along
 B) The CEO refused to approve the reconciliation project
 C) The company decided reconciliation wasn't worth the effort
-D) The underlying raw data needed to retroactively recompute a consistent definition had never been captured for some teams
+D) The raw data needed to recompute it was never captured
 
 *Correct answer: D*
 *Explanation: Some historical data could not be recomputed because the necessary raw data was never captured under a consistent definition.*
@@ -451,10 +451,10 @@ D) The underlying raw data needed to retroactively recompute a consistent defini
 ---
 
 **8. Using the Product Ops Investment Checklist, which signal suggests formal investment in a shared process is warranted right now?**
-A) All teams already use identical tools and definitions without any coordination effort
-B) Multiple teams are currently defining the same core term or metric differently, or a cross-team process failure has already occurred
+A) All teams already use identical tools without coordination
+B) Multiple teams define the same term differently already
 C) Only one team currently exists in the organization
-D) The organization has never experienced any process inconsistency
+D) The organization has never experienced any inconsistency
 
 *Correct answer: B*
 *Explanation: This checklist item signals that formal investment is warranted now rather than later.*
@@ -464,10 +464,10 @@ D) The organization has never experienced any process inconsistency
 ---
 
 **9. Why does this lesson caution against a two-team startup building a fully "Embedded" Product Ops function immediately?**
-A) Because small companies are not permitted to have any process standardization at all
-B) Because Product Ops only applies to companies with over 1,000 employees
-C) This level of investment is very likely disproportionate to the coordination needs of an organization small enough for informal, proximity-based consistency to work fine
-D) Because Embedded-stage Product Ops is illegal for small companies
+A) Small companies cannot standardize any process at all
+B) Product Ops only applies past 1,000 employees in size
+C) This scale of investment outpaces real coordination needs
+D) Embedded-stage Product Ops is legally barred for startups
 
 *Correct answer: C*
 *Explanation: The Maturity Ladder cautions against over-investing relative to actual organizational scale and coordination needs.*
@@ -477,10 +477,10 @@ D) Because Embedded-stage Product Ops is illegal for small companies
 ---
 
 **10. (Scenario) A mid-size organization's Product Ops function established a shared metric glossary a year ago, but three new teams that joined since then have each started using their own definitions again without consulting it. What does this lesson say about this situation?**
-A) This illustrates that standardizing a definition once is necessary but not sufficient — without ongoing maintenance, definitions drift back into inconsistency
-B) This means the original glossary was incorrect and should be abandoned
-C) This means Product Ops should be eliminated entirely, since it clearly failed
-D) This is expected and requires no further action, since the glossary was already established once
+A) Standardizing once isn't enough without ongoing upkeep
+B) The original glossary must have been incorrect somehow
+C) Product Ops should be eliminated since it clearly failed
+D) This is expected and needs no further action at all
 
 *Correct answer: A*
 *Explanation: Standardization drifts back without continued effort as new teams join, per this exact ongoing-maintenance requirement.*
@@ -491,9 +491,9 @@ D) This is expected and requires no further action, since the glossary was alrea
 
 **11. (Interview Reasoning) A candidate is asked what Product Operations is and when an organization needs it, and answers: "Every company should have a fully staffed Product Ops team from day one, regardless of size." What is the weakness in this answer?**
 A) It shows strong understanding of organizational scaling
-B) It correctly identifies the universal need for Product Ops regardless of context
-C) There is no weakness; this is always the correct approach for every organization
-D) It fails to recognize that Product Ops investment should scale with organizational size, per the Maturity Ladder
+B) It correctly identifies a universal need regardless of size
+C) There is no weakness; this fits every organization
+D) It ignores that investment should scale with org size
 
 *Correct answer: D*
 *Explanation: A nuanced answer recognizes Product Ops as scale-dependent, not universally necessary at maximum investment from day one.*
@@ -504,9 +504,9 @@ D) It fails to recognize that Product Ops investment should scale with organizat
 
 **12. Why does this lesson connect inconsistent metric definitions directly to Lesson 41 (Product Metrics Fundamentals)?**
 A) There is no meaningful connection between the two lessons
-B) Lesson 41 establishes precise, shared metric definitions, and Product Ops is the function responsible for ensuring those definitions stay used consistently across teams
-C) Because Lesson 41 replaces the need for Product Ops entirely
-D) Because Lesson 41 will cover engineering deployment practices, unrelated to metrics
+B) Lesson 41 sets shared definitions Product Ops must maintain
+C) Lesson 41 fully replaces the need for Product Ops
+D) Lesson 41 covers deployment practices, unrelated to metrics
 
 *Correct answer: B*
 *Explanation: The lesson connects this metric-consistency problem to Lesson 41's upcoming definitional work, framing Product Ops as the ongoing-maintenance function.*
@@ -516,10 +516,10 @@ D) Because Lesson 41 will cover engineering deployment practices, unrelated to m
 ---
 
 **13. (Product Thinking) A PM notices that three different teams have each independently built similar user-research recruiting infrastructure, each somewhat clumsily and unaware of the others' efforts. What is the most defensible next step?**
-A) Instruct all three teams to stop doing user research entirely to avoid duplication
-B) Ignore the issue, since it does not affect metric definitions specifically
-C) Recognize this as a signal that centralizing this infrastructure into a shared, well-built tool would eliminate wasteful duplication
-D) Let each team continue building its own version independently, since research infrastructure is a purely local concern
+A) Instruct all three teams to stop research entirely
+B) Ignore it, since it isn't a metric-definition issue
+C) Centralize the duplicated effort into one shared tool
+D) Let each team keep building its own version separately
 
 *Correct answer: C*
 *Explanation: This matches the Investment Checklist's signal of independently-built, duplicative infrastructure, and research operations is one of Product Ops' core functional areas.*
@@ -529,10 +529,10 @@ D) Let each team continue building its own version independently, since research
 ---
 
 **14. Which of the following best reflects the Multiplier Layer mental model in practice?**
-A) Product Ops publishes and maintains a single shared definition of "conversion rate" that every team's dashboard references, while leaving each team's prioritization choices to its own PM
-B) Product Ops requires every team to use identical feature roadmaps regardless of their specific user base
-C) Product Ops eliminates the need for any individual PM roles across the organization
-D) Product Ops overrides a team's prioritization decision because it disagrees with the team's chosen approach
+A) Product Ops maintains one shared conversion definition
+B) Product Ops requires identical roadmaps for every team
+C) Product Ops eliminates the need for individual PM roles
+D) Product Ops overrides a team's own prioritization call
 
 *Correct answer: A*
 *Explanation: This reflects the correct Multiplier Layer relationship — standardizing shared infrastructure while leaving genuine prioritization judgment to individual PMs.*
@@ -542,10 +542,10 @@ D) Product Ops overrides a team's prioritization decision because it disagrees w
 ---
 
 **15. (Product Thinking, Highest Difficulty) A rapidly growing organization has five different teams maintaining five different definitions of a key metric, causing real confusion in leadership reviews. A PM is asked to fix this, but has no formal authority over other teams' PMs. What is the most defensible approach?**
-A) Wait for a company-wide crisis to force the issue, rather than proactively addressing it
-B) Unilaterally declare one definition correct and mandate all other teams adopt it immediately, without any cross-team discussion
-C) Avoid raising the issue at all, since it falls outside the PM's formal job description
-D) Propose a shared definition collaboratively, build the case with concrete evidence of the confusion it's causing, and drive adoption through influence rather than formal authority
+A) Wait for a larger crisis to eventually force the issue
+B) Unilaterally mandate one definition without any discussion
+C) Avoid raising the issue, since it falls outside the role
+D) Propose a shared definition and build buy-in with evidence
 
 *Correct answer: D*
 *Explanation: A PM proposing cross-team standards typically lacks formal authority over other teams, so fixing the inconsistency requires genuine buy-in built through evidence and influence, not just a technically correct definition.*

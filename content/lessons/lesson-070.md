@@ -330,127 +330,127 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What is the primary purpose of the Platform Health Radar?**
-A) To assess a platform across all nine Module 7 dimensions simultaneously, rather than applying one model alone
-B) To measure only a platform's marketing performance in isolation
-C) To eliminate the need for the Cross-Lesson Diagnostic Protocol
-D) To replace all eight prior Module 7 models with a single new one
+A) To eliminate the need for the Cross-Lesson Diagnostic Protocol entirely
+B) To assess a platform across all nine Module 7 dimensions at once
+C) To replace all eight prior Module 7 models with one new model
+D) To measure only a platform's marketing performance in isolation
 
-*Correct answer: A*
-*Explanation: The Platform Health Radar is explicitly an integrating tool, not a replacement for the individual models it draws together.*
+*Correct answer: B*
+*Explanation: The Radar is explicitly an integrating tool that assesses all nine dimensions together, not a replacement for the models it draws on.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**2. According to this lesson, why do real platform problems often resist single-model diagnosis?**
-A) Single-model diagnosis is generally sufficient for any real-world platform issue
-B) Real problems are frequently multi-dimensional, involving compounding failures across more than one diagnostic axis
-C) Multi-dimensional problems are described as rarely occurring in actual practice
-D) Real platform problems tend to be simpler than they initially appear
+**2. Why do real platform problems often resist single-model diagnosis, per this lesson?**
+A) Real problems are frequently multi-dimensional, involving more than one axis
+B) Single-model diagnosis is generally sufficient for most real-world issues
+C) Multi-dimensional problems are described as rarely occurring in practice
+D) Platform problems tend to be simpler than they first appear to be
 
-*Correct answer: B*
-*Explanation: The lesson's central argument is that platform incidents are often the product of failures across multiple axes at once.*
+*Correct answer: A*
+*Explanation: The lesson's central argument is that platform incidents are often produced by failures across multiple axes at once, not a single cause.*
 *Learning objective tested: #1, #3*
 *Difficulty: Easy*
 
 ---
 
 **3. How does Promise Tiers (Lesson 62) relate to the Leverage Stack (Lesson 61)?**
-A) Promise Tiers specifically governs Layer 2, the Developer Surface, of the Leverage Stack
-B) The two models are treated as entirely unrelated to one another
-C) Promise Tiers is presented as a full replacement for the Leverage Stack
-D) Promise Tiers is described as applying only to Layer 4, the Ecosystem
+A) Promise Tiers specifically governs Layer 2, the Developer Surface
+B) Promise Tiers is presented as a full replacement for the Leverage Stack
+C) Promise Tiers is described as applying only to Layer 4, the Ecosystem
+D) The two models are treated as entirely unrelated to one another
 
 *Correct answer: A*
-*Explanation: The Theory section explicitly connects Promise Tiers to Layer 2 specifically, illustrating the interconnected structure of the models.*
+*Explanation: The Theory section explicitly connects Promise Tiers to Layer 2 specifically, illustrating how the nine models interconnect.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **4. How does the Discovery Frontier (Lesson 66) relate to the Ownership Zones Model (Lesson 65)?**
-A) The Ownership Zones Model is described as applying only to marketplace problems, unlike the Discovery Frontier
-B) The Discovery Frontier is a specialized application of the Ownership Zones Model's error-cost logic to ranking and personalization decisions
-C) The two models are presented as unrelated, covering entirely separate topics
-D) The Discovery Frontier is described as replacing the need for the Ownership Zones Model entirely
+A) The two models are presented as unrelated, covering separate topics
+B) It is a specialized application of Ownership Zones' error-cost logic
+C) The Discovery Frontier replaces the Ownership Zones Model entirely
+D) Ownership Zones is described as applying only to marketplace problems
 
 *Correct answer: B*
-*Explanation: The lesson explicitly frames the Discovery Frontier as a high-stakes, specific case of the general error-cost reasoning introduced in the Ownership Zones Model.*
+*Explanation: The lesson frames the Discovery Frontier as a high-stakes, specific case of the general error-cost reasoning from the Ownership Zones Model.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**5. In the Cross-Lesson Diagnostic Protocol, what should be checked using the Metric Provenance Chain?**
-A) Whether an API has a documented Promise Tier
-B) Whether a marketplace has a binding supply-side or demand-side constraint
-C) Whether the data being used to diagnose a problem is itself trustworthy
-D) Whether an enforcement action taken was proportionate to the violation
-
-*Correct answer: C*
-*Explanation: The Metric Provenance Chain step checks the reliability of the data underlying any other diagnosis, a foundational concern regardless of which other axes are also relevant.*
-*Learning objective tested: #3*
-*Difficulty: Easy*
-
----
-
-**6. In the Multi-Front Ecosystem Decline case study, what did the initial, marketing-focused response fail to address?**
-A) A single, simple technical bug that was described as the sole cause of the decline
-B) The company's advertising budget, which turned out to be the true root cause
-C) Nothing; the marketing response would, on its own, have fully resolved the situation
-D) The broken API promise, the governance enforcement failure, and the metric drift that were the actual underlying causes
+**5. In the Cross-Lesson Diagnostic Protocol, what does the Metric Provenance Chain step check?**
+A) Whether an enforcement action taken was proportionate to the violation
+B) Whether a marketplace has a binding supply-side or demand-side limit
+C) Whether an API has a documented, formally versioned Promise Tier
+D) Whether the data used to diagnose a problem is itself trustworthy
 
 *Correct answer: D*
-*Explanation: The case study's core lesson is that a single-lever fix (marketing) would have left the actual compounding causes unaddressed.*
+*Explanation: This step checks the reliability of the data underlying any other diagnosis, a foundational concern regardless of which other axes apply.*
+*Learning objective tested: #3*
+*Difficulty: Easy*
+
+---
+
+**6. In the Multi-Front Ecosystem Decline case study, what did the initial marketing-focused response fail to address?**
+A) The advertising budget, which had actually caused the decline
+B) A single technical bug leadership believed was the sole cause
+C) The broken API promise, enforcement failure, and metric drift
+D) Nothing; the marketing plan would have fully resolved things
+
+*Correct answer: C*
+*Explanation: The case study's core lesson is that a single-lever fix would have left the actual compounding causes entirely unaddressed.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
-**7. Why might attracting new developers through marketing have potentially worsened the situation in the case study, rather than helping?**
-A) New developer sign-ups are described as always decreasing ecosystem health regardless of context
-B) New developers would have entered an ecosystem whose existing trust problems (broken promises, poor enforcement) had not yet been fixed
-C) Marketing campaigns are described as generally ineffective for developer platforms
-D) The company reportedly had no budget available for marketing at the time
+**7. Why might attracting new developers through marketing have worsened the case study's situation rather than helping?**
+A) The company reportedly had no marketing budget available at the time
+B) Marketing campaigns are described as generally ineffective at scale
+C) New developers would enter an ecosystem whose trust issues remained
+D) New sign-ups are said to always lower ecosystem health regardless
 
-*Correct answer: B*
-*Explanation: Attracting more participants into an untrusted ecosystem, without fixing the underlying trust issues, risks compounding rather than resolving the problem.*
+*Correct answer: C*
+*Explanation: Attracting more participants into an untrusted ecosystem, without fixing the underlying trust issues, risks compounding the problem.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. What does the Friction Ledger check within the Cross-Lesson Diagnostic Protocol specifically investigate?**
-A) Whether external developers currently trust the platform's API
-B) Whether a marketplace's supply side is presently under-resourced
-C) Whether internal engineering teams could be quietly working around the platform rather than raising issues
-D) Whether a recommender system has fallen into a filter bubble
+**8. What does the Friction Ledger check specifically investigate within the Cross-Lesson Diagnostic Protocol?**
+A) Whether a recommender system has fallen into a filter bubble
+B) Whether external developers currently trust the platform's API
+C) Whether internal teams could be quietly working around the platform
+D) Whether a marketplace's supply side is currently under-resourced
 
 *Correct answer: C*
-*Explanation: The Friction Ledger's role in the protocol is specifically to check for internal, rather than external, friction and workaround behavior.*
+*Explanation: The Friction Ledger's role in the protocol is specifically to check for internal, rather than external, workaround behavior.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
-**9. According to the Real World Perspective section, why might a Big Tech-scale platform PM's synthesis role look different from that of a startup PM?**
-A) Dedicated specialist teams typically handle different axes, so the PM's synthesis role shifts toward coordinating those specialists around a shared, integrated understanding
-B) Startup PMs are described as the only ones who ever need to apply these models
-C) Big Tech PMs are described as never needing to understand any of the nine models personally
-D) There is described as being no meaningful difference between the two contexts
+**9. Per the Real World Perspective section, why might a Big Tech PM's synthesis role differ from a startup PM's?**
+A) Big Tech PMs are described as never needing to understand any model
+B) There is described as being no meaningful difference between the two
+C) Startup PMs alone are said to ever need to apply these models
+D) Specialist teams handle different axes, shifting the PM toward coordination
 
-*Correct answer: A*
-*Explanation: The Real World Perspective section describes this shift from personal application to cross-team coordination as scale increases.*
+*Correct answer: D*
+*Explanation: The section describes this shift from personal application to cross-team coordination as scale increases, not the absence of a role.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
 **10. What is "platform judgment," as defined in this lesson's Key Takeaways?**
-A) A formal certification awarded upon completion of Module 7
-B) The ability to memorize all nine models' names and definitions accurately
-C) The applied skill of recognizing which combination of models fits a real, ambiguous situation
-D) The ability to build a platform without needing any diagnostic frameworks at all
+A) A formal certification awarded on completion of Module 7
+B) The ability to memorize all nine models' names precisely
+C) The skill of recognizing which combination of models fits a situation
+D) The ability to build a platform without any diagnostic framework
 
 *Correct answer: C*
 *Explanation: The lesson explicitly distinguishes memorization from the applied, situational skill of correctly combining models.*
@@ -460,65 +460,65 @@ D) The ability to build a platform without needing any diagnostic frameworks at 
 ---
 
 **11. Why is checking the Metric Provenance Chain considered foundational to any other diagnostic step?**
-A) Metric Provenance Chain is described as relevant only to marketplace-specific problems
-B) The other eight models are said to be unable to function without it applied first
-C) Any diagnosis built on untrustworthy data inherits that foundational error, regardless of how sound the reasoning about other axes is
-D) It is simply the most complex of the nine models, and therefore the most important
+A) It is described as relevant only to marketplace-specific problems
+B) A diagnosis built on untrustworthy data inherits that same error
+C) The other eight models cannot function without it applied first
+D) It is simply the most complex of the nine models by design
 
-*Correct answer: C*
-*Explanation: The Common Beginner Mistakes section explicitly warns that skipping this check undermines any other diagnosis built on the same faulty data.*
+*Correct answer: B*
+*Explanation: The Common Beginner Mistakes section warns that skipping this check undermines any other diagnosis built on the same faulty data.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
 
 ---
 
-**12. (Scenario) A platform PM observes a decline in developer engagement and immediately proposes a single fix: increased marketing spend. What does this lesson suggest as the appropriate first response?**
-A) Run the situation through the Cross-Lesson Diagnostic Protocol to check for other contributing causes (broken promises, enforcement issues, metric drift) before committing to a single-lever fix
-B) Reject the marketing proposal outright, with no further investigation of the cause
-C) Approve the marketing spend immediately, since engagement problems are usually solved by more awareness
-D) Assume the decline is purely coincidental and that no action is really required
+**12. (Scenario) A PM observes declining developer engagement and immediately proposes more marketing spend. What is the appropriate first response?**
+A) Approve the spend, since engagement problems are usually about awareness
+B) Assume the decline is coincidental and take no action at all
+C) Reject the proposal outright with no further investigation
+D) Run the Cross-Lesson Diagnostic Protocol before committing to one fix
 
-*Correct answer: A*
-*Explanation: This mirrors the Case Study's core lesson: a single-cause assumption should be checked against the full diagnostic protocol before committing resources to a single fix.*
+*Correct answer: D*
+*Explanation: This mirrors the Case Study's core lesson: a single-cause assumption should be checked against the full protocol before committing resources.*
 *Learning objective tested: #2, #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) A PM notices three seemingly unrelated symptoms: declining third-party submissions, a rise in support tickets after an internal update, and an internal team building its own workaround tool. Using this lesson's frameworks, what is the most defensible first step?**
-A) Wait for additional symptoms to appear before taking any real action
-B) Address only the internal team's workaround, treating internal issues as inherently more urgent
-C) Treat each symptom as an entirely separate problem needing three unrelated investigations
-D) Investigate whether these symptoms share a common root cause using the Cross-Lesson Diagnostic Protocol, checking relevant axes for each symptom in parallel
+**13. (Product Thinking) A PM notices declining submissions, a rise in support tickets, and a team quietly building its own tool. What is the most defensible first step?**
+A) Address only the internal workaround as inherently the most urgent
+B) Treat each symptom as three entirely separate investigations
+C) Investigate a shared root cause using the full diagnostic protocol
+D) Wait for further symptoms before taking any real action at all
 
-*Correct answer: D*
-*Explanation: This mirrors the Reflection Exercise: multiple seemingly separate symptoms may share a common underlying cause, and the protocol supports investigating them together rather than in isolation.*
+*Correct answer: C*
+*Explanation: This mirrors the Reflection Exercise: multiple symptoms may share a root cause, and the protocol supports investigating them together.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked to diagnose a complex platform problem, applies a single model thoroughly and concludes their investigation once that model produces a plausible explanation. What does this most likely signal, per the Interview Perspective section?**
-A) That the candidate is ready for a senior platform PM role right away
-B) A potential gap in checking for compounding causes across other axes, which the interviewer is specifically listening for
-C) Nothing of real concern; a single plausible explanation is usually sufficient
-D) A complete and sufficient diagnostic approach to the problem
+**14. (Interview Reasoning) A candidate applies one model thoroughly and stops once it yields a plausible explanation. What does this most likely signal?**
+A) A complete and sufficient diagnostic approach to the problem
+B) A gap in checking for compounding causes across other axes
+C) Readiness for a senior platform PM role right away
+D) Nothing of concern; one plausible explanation usually suffices
 
 *Correct answer: B*
-*Explanation: The Interview Perspective section specifically listens for evidence of considering multiple contributing causes, not stopping at the first plausible single-model explanation.*
+*Explanation: The Interview Perspective section specifically listens for evidence of checking multiple causes, not stopping at one plausible explanation.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A platform experiences a compounding decline involving a broken API promise, an overly aggressive enforcement system, and a metric definition that partially obscured the true scope of the problem. Using only the frameworks in this lesson, what is the most defensible response?**
-A) Conclude the situation is too complex to address and take no action for now
-B) Launch a marketing campaign to attract new developers before addressing any underlying cause
-C) Address only the single cause that seems most severe, assuming the others will resolve on their own
-D) Address all three identified causes in parallel — correcting the metric, repairing the broken promise with a concrete stability commitment, and redesigning enforcement with graduated, appealable steps
+**15. (Product Thinking, Highest Difficulty) A platform faces a broken API promise, aggressive enforcement, and a metric drift that obscured the true scope. What is the most defensible response?**
+A) Launch a marketing campaign before addressing any underlying cause
+B) Address the single cause that seems worst, assuming others resolve
+C) Take no action for now, since the situation seems too complex
+D) Address all three causes in parallel with a coordinated response
 
 *Correct answer: D*
-*Explanation: This mirrors the Multi-Front Ecosystem Decline case study directly: a compounding, multi-axis failure requires a coordinated, multi-front response, not a single-lever fix or inaction.*
+*Explanation: This mirrors the case study directly: a compounding, multi-axis failure requires a coordinated response, not a single lever or inaction.*
 *Learning objective tested: #2, #3, #4, #5*
 *Difficulty: Hard*
 

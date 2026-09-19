@@ -408,10 +408,10 @@ There is no single correct answer to the prompts below — the goal is to practi
 ## Quiz
 
 **1. What three elements must a precise metric definition specify, according to this lesson?**
-A) What counts, what time window applies, and what data source is authoritative
-B) The metric's target value, its owner's job title, and its historical average
-C) The team name, the reporting tool, and the dashboard color scheme
-D) Only the time window; the other elements are optional
+A) What counts, what window applies, what source is used
+B) Target value, owner's job title, historical average
+C) Team name, reporting tool, dashboard color scheme
+D) Only the time window; other elements are optional
 
 *Correct answer: A*
 *Explanation: A precise metric definition requires these three elements to be computed identically by anyone working independently.*
@@ -423,7 +423,7 @@ D) Only the time window; the other elements are optional
 **2. What is the key test for identifying a vanity metric, according to this lesson?**
 A) Whether the metric always increases over time
 B) Whether leadership finds the metric impressive
-C) Whether an unexpected move in the metric would tell you roughly where to look and what to investigate
+C) Whether an unexpected move tells you what to check
 D) Whether the metric is expensive to compute
 
 *Correct answer: C*
@@ -434,10 +434,10 @@ D) Whether the metric is expensive to compute
 ---
 
 **3. Why are cumulative totals like "total signups over all time" often poor vanity metrics?**
-A) Because they require advanced statistical methods to compute
-B) They almost always trend upward regardless of underlying business health, providing false reassurance
-C) Because they can only be computed once per year
-D) Because they are always inaccurate
+A) They require advanced statistics to compute at all
+B) They trend upward regardless of underlying health
+C) They can only be computed once per calendar year
+D) They are consistently inaccurate as raw counts
 
 *Correct answer: B*
 *Explanation: Cumulative totals can't decrease, making their upward trend uninformative about actual business health.*
@@ -449,8 +449,8 @@ D) Because they are always inaccurate
 **4. What is the difference between a leading and a lagging indicator?**
 A) There is no meaningful difference between the two
 B) Lagging indicators are only used in Kanban teams
-C) Leading indicators are always more accurate than lagging indicators
-D) A leading indicator predicts a future outcome; a lagging indicator measures an outcome that has already occurred
+C) Leading indicators are always more accurate overall
+D) Leading predicts ahead; lagging confirms after the fact
 
 *Correct answer: D*
 *Explanation: This is precisely how the two terms are defined.*
@@ -460,10 +460,10 @@ D) A leading indicator predicts a future outcome; a lagging indicator measures a
 ---
 
 **5. According to Goodhart's Law, what tends to happen once a measure becomes a target?**
-A) People tend to optimize for the metric itself rather than the underlying outcome it was meant to represent
+A) People optimize the metric, not the outcome itself
 B) The measure automatically becomes more accurate
-C) The measure becomes legally binding
-D) Nothing changes; targets have no effect on measured behavior
+C) The measure becomes legally binding on the team
+D) Nothing changes; targets have no effect at all
 
 *Correct answer: A*
 *Explanation: A measure ceases to be a good measure once it becomes a target, since behavior shifts toward optimizing it directly.*
@@ -475,7 +475,7 @@ D) Nothing changes; targets have no effect on measured behavior
 **6. What is the primary defense against Goodhart's Law dynamics, according to this lesson?**
 A) Only using lagging indicators, never leading ones
 B) Changing the metric's definition every quarter
-C) Pairing a target metric with guardrail metrics specifically chosen to catch its most predictable form of gaming
+C) Pairing a target with a guardrail metric for gaming
 D) Never setting any metric targets at all
 
 *Correct answer: C*
@@ -486,10 +486,10 @@ D) Never setting any metric targets at all
 ---
 
 **7. In the Detailed Case Study, why did the support team's "time to first response" metric improve while customer satisfaction declined?**
-A) The satisfaction survey was flawed and should be ignored
-B) Agents began sending quick, low-effort acknowledgment replies to satisfy the metric, while genuine issue resolution was frequently delayed
-C) Customers became less satisfied for reasons entirely unrelated to the support team
-D) The metric's definition was mathematically incorrect
+A) The satisfaction survey was flawed and ignored
+B) Agents sent quick replies without resolving issues
+C) Customers grew unhappy for unrelated reasons
+D) The metric's definition was mathematically wrong
 
 *Correct answer: B*
 *Explanation: This specific behavior change is a textbook Goodhart's Law dynamic — the metric improved while the underlying outcome worsened.*
@@ -499,10 +499,10 @@ D) The metric's definition was mathematically incorrect
 ---
 
 **8. Why doesn't a correlation between feature usage and retention, by itself, prove the feature causes better retention?**
-A) Because features never actually affect retention in any product
+A) Because features never actually affect retention
 B) Because retention can never be measured accurately
-C) Because correlation and causation are always identical
-D) A confounding variable, like overall engagement level, may independently drive both feature usage and retention, or reverse causation may be at play
+C) Because correlation and causation are identical
+D) A confounder may drive both, or causation runs reverse
 
 *Correct answer: D*
 *Explanation: Confounding variables and reverse causation can produce a correlation without genuine causation.*
@@ -512,10 +512,10 @@ D) A confounding variable, like overall engagement level, may independently driv
 ---
 
 **9. What generally resolves the correlation-versus-causation question, according to this lesson?**
-A) A controlled experiment, the subject of Lesson 45, rather than observational correlation alone
-B) Asking users directly whether they believe the feature caused their retention
+A) A controlled experiment, not correlation alone
+B) Asking users if they believe the feature caused it
 C) Nothing can resolve this question definitively
-D) Observing the correlation over a longer time period
+D) Observing the correlation over a longer period
 
 *Correct answer: A*
 *Explanation: Distinguishing correlation from causation typically requires a controlled experiment, not observational correlation alone.*
@@ -525,9 +525,9 @@ D) Observing the correlation over a longer time period
 ---
 
 **10. (Scenario) A team proposes evaluating engineers on "number of pull requests merged per week." Using Goodhart's Law, what is the most likely risk?**
-A) This metric will always perfectly reflect engineering productivity
-B) This metric is a leading indicator with no lagging indicator equivalent
-C) Engineers may split work into many small, low-value pull requests to increase the count, without improving actual code quality or delivered value
+A) This metric will always perfectly reflect output
+B) This metric is leading with no lagging counterpart
+C) Engineers may split work into many low-value PRs
 D) There is no risk; this metric cannot be gamed
 
 *Correct answer: C*
@@ -538,10 +538,10 @@ D) There is no risk; this metric cannot be gamed
 ---
 
 **11. Using the Metric Definition Test, what should happen if a proposed metric's definition is not yet precise?**
-A) It should be classified automatically as a lagging indicator
-B) It is not yet ready to be reported or adopted; the definition should be made precise first
-C) It should be assumed to be a vanity metric permanently
-D) It should be reported to leadership immediately regardless
+A) It should be classified automatically as lagging
+B) It isn't ready to report; define it precisely first
+C) It should be assumed a vanity metric permanently
+D) It should be reported to leadership immediately
 
 *Correct answer: B*
 *Explanation: The Metric Definition Test routes an imprecisely-defined metric back to definitional work before proceeding further.*
@@ -551,10 +551,10 @@ D) It should be reported to leadership immediately regardless
 ---
 
 **12. (Interview Reasoning) A candidate is asked to define "engagement" for a product and answers: "Engagement means users are engaged with the product." What is the weakness in this answer?**
-A) It demonstrates strong technical fluency
+A) It demonstrates strong technical fluency overall
 B) It correctly avoids overcomplicating the definition
-C) There is no weakness; this is a complete and sufficient definition
-D) It restates the term rather than specifying what counts, what time window applies, and what data source would be used
+C) There is no weakness; this definition is sufficient
+D) It restates the term instead of specifying details
 
 *Correct answer: D*
 *Explanation: A strong answer produces a precise, specific definition rather than a vague restatement of the term itself.*
@@ -564,10 +564,10 @@ D) It restates the term rather than specifying what counts, what time window app
 ---
 
 **13. (Product Thinking) A dashboard includes only lagging indicators (quarterly revenue, quarterly churn), with no leading indicators. What is the most likely consequence?**
-A) The team will be unable to course-correct early, since by the time a lagging indicator moves, the underlying behavior that caused it is already in the past
-B) This has no meaningful consequence for decision-making speed
-C) Lagging indicators are inherently more accurate than leading indicators
-D) The dashboard will be perfectly sufficient for all decision-making needs
+A) The team can't course-correct before it's too late
+B) This has no meaningful effect on decision speed
+C) Lagging indicators are inherently more accurate
+D) The dashboard is perfectly sufficient regardless
 
 *Correct answer: A*
 *Explanation: An all-lagging dashboard leaves a team unable to act early on emerging problems.*
@@ -577,10 +577,10 @@ D) The dashboard will be perfectly sufficient for all decision-making needs
 ---
 
 **14. Why does this lesson recommend documenting a metric's "known limitations" as part of its definition card?**
-A) Because metrics without documented limitations cannot be computed at all
-B) Because known limitations are legally required disclosures
-C) An honest account of what a metric does and doesn't capture helps future readers correctly interpret the number rather than over-trusting it as fully comprehensive
-D) Because all metrics are equally flawed and this makes no real difference
+A) Metrics without documented limitations can't be computed
+B) Known limitations are legally required disclosures
+C) It helps future readers interpret the number correctly
+D) All metrics are equally flawed, so it makes no difference
 
 *Correct answer: C*
 *Explanation: The Metric Definition Card includes "known limitations" so future readers understand what the metric does and doesn't capture.*
@@ -590,10 +590,10 @@ D) Because all metrics are equally flawed and this makes no real difference
 ---
 
 **15. (Product Thinking, Highest Difficulty) A PM notices "average session length" has improved and was used to justify a recent product change, but suspects the increase reflects users struggling to complete a task rather than genuine engagement. What is the most defensible next step?**
-A) Increase the target for average session length further, since the metric is already trending in the desired direction
-B) Investigate what specifically is driving the increase, such as a corresponding change in task completion rate, before concluding the change caused a genuinely positive outcome
-C) Accept the metric's improvement at face value and continue promoting the change based on it
-D) Assume the metric must be miscalculated and discard it without further investigation
+A) Increase the target further since it's trending up
+B) Check what's driving it, like task completion rate
+C) Accept the improvement and keep promoting the change
+D) Assume the metric is miscalculated, discard it fully
 
 *Correct answer: B*
 *Explanation: Session length could be an ambiguous metric here, and its correlation with the product change doesn't establish causation without checking a guardrail metric like task completion.*

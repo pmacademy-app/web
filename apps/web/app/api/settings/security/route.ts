@@ -7,12 +7,45 @@ import { logSystemError } from '@/lib/monitoring/logger'
 
 export const runtime = 'nodejs'
 
+/**
+ * Maps a Supabase Auth Admin `updateUserById` password-change failure to safe,
+ * authored copy. Returns `null` for anything not recognized so the caller can
+ * rethrow it — an unmapped error is a genuine fault, not a user-facing one, and
+ * must go through `withRoute`'s generic handling rather than reach the client
+ * as raw provider text.
+ */
+function describePasswordUpdateError(error: { code?: string; message?: string }): string | null {
+  switch (error.code) {
+    case 'weak_password':
+      return 'That password does not meet the minimum security requirements. Please choose a different one.'
+    case 'same_password':
+      return 'New password must be different from your current password.'
+    case 'over_request_rate_limit':
+      return 'Too many attempts. Please wait a while before trying again.'
+    default:
+      return null
+  }
+}
+
 export const POST = withRoute(
   {
     actor: { allow: ['learner'] },
     operation: 'settings.security.change_password',
     domain: 'auth',
     summary: 'Unexpected failure changing a learner password',
+    // High-severity audit finding: this route re-verifies the caller's current
+    // password via `signInWithPassword`, which is an authenticated password-guessing
+    // oracle without a limit. Fail-closed because it gates a privileged auth-provider
+    // call — an outage must refuse rather than grant unlimited attempts. Values match
+    // the per-user limit already used by /api/auth/update-password.
+    rateLimit: [
+      {
+        key: ({ actor }) => (actor.kind === 'learner' ? `settings_change_password_${actor.userId}` : null),
+        limit: 5,
+        windowMs: 15 * 60 * 1000,
+        failClosed: true,
+      },
+    ],
   },
   async ({ request, actor }) => {
   try {
@@ -122,10 +155,44 @@ export const POST = withRoute(
         message: updateError.message,
       })
 
-      return NextResponse.json(
-        { success: false, error: updateError.message || 'Failed to update password.' },
-        { status: 400 }
-      )
+      const safeMessage = describePasswordUpdateError(updateError)
+      if (safeMessage) {
+        return NextResponse.json({ success: false, error: safeMessage }, { status: 400 })
+      }
+      // Unrecognized failure: rethrown so the wrapper genericizes it rather than
+      // forwarding raw provider text (N-3 / audit finding D-4).
+      throw updateError
+    }
+
+    // Invalidate every other active session/refresh token for this user now that
+    // the password has changed — the point of changing a password is moot if a
+    // session opened under the old one stays valid. Scoped to "others" so the
+    // session this request is about to refresh (below) is deliberately spared:
+    // the caller stays logged in here, matching the existing UX.
+    if (newSessionAfterAuth) {
+      try {
+        const { error: signOutError } = await supabase.auth.admin.signOut(
+          newSessionAfterAuth.access_token,
+          'others'
+        )
+        if (signOutError) {
+          void logSystemError({
+            severity: 'warning',
+            category: 'auth',
+            operation: 'settings_password_change_session_revocation_failed',
+            message: signOutError.message,
+          })
+        }
+      } catch (revokeError) {
+        // Never let session revocation block a password change that already
+        // succeeded — logged for observability, not surfaced to the learner.
+        void logSystemError({
+          severity: 'warning',
+          category: 'auth',
+          operation: 'settings_password_change_session_revocation_failed',
+          message: revokeError instanceof Error ? revokeError.message : String(revokeError),
+        })
+      }
     }
 
     const response = NextResponse.json({

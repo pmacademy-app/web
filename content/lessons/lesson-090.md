@@ -268,12 +268,12 @@ This is the curriculum's final reflection. There is no single correct answer —
 ## Quiz
 
 **1. What does this final lesson primarily ask you to do?**
-A) Learn a twentieth new mental model
-B) Integrate everything already built across the curriculum into a single practice
-C) Forget everything learned before Module 9
+A) Learn a twentieth brand-new mental model
+B) Forget everything learned before Module 9
+C) Integrate everything already built into one practice
 D) Memorize every model's name in alphabetical order
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: This final lesson primarily asks you to integrate everything already built across the curriculum into a single practice, not learn a new model.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -281,10 +281,10 @@ D) Memorize every model's name in alphabetical order
 ---
 
 **2. What are the three outer rings of the Integrated Practice Wheel?**
-A) Vision, Strategy, Execution
-B) Platform Health Radar, Strategic Judgment Radar, Module 9's specialized domain lenses
-C) Startup, Mid-size, Big Tech
-D) Concept, Prototype, Scale
+A) Vision, strategy, and day-to-day execution work
+B) The Platform, Strategic Judgment, and Module 9 lenses
+C) Startup, mid-size company, and Big Tech stages
+D) Concept, working prototype, and full scale
 
 *Correct answer: B*
 *Explanation: The three outer rings are the Platform Health Radar, Strategic Judgment Radar, and Module 9's specialized domain lenses.*
@@ -294,12 +294,12 @@ D) Concept, Prototype, Scale
 ---
 
 **3. What sits at the center of the Integrated Practice Wheel?**
-A) The Strategy Cascade from Lesson 71
-B) The personal product philosophy first articulated in Lesson 60
-C) The Leverage Stack from Lesson 61
+A) The personal product philosophy first stated in Lesson 60
+B) The Strategy Cascade first introduced in Lesson 71
+C) The Leverage Stack first introduced in Lesson 61
 D) The Concession Exchange Map from Lesson 79
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The personal product philosophy first articulated in Lesson 60 sits at the center of the Integrated Practice Wheel.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -307,12 +307,12 @@ D) The Concession Exchange Map from Lesson 79
 ---
 
 **4. What does the Platform Health Radar diagnose, per the Integrated Practice Wheel?**
-A) Strategic direction
-B) Mechanism — whether a platform's underlying systems are healthy
-C) Domain-specific regulatory context only
-D) Personal accountability exclusively
+A) Strategic direction across a company's major bets
+B) Domain-specific regulatory context exclusively
+C) Personal accountability, and nothing beyond that
+D) Mechanism — whether underlying systems are healthy
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The Platform Health Radar diagnoses mechanism — whether a platform's underlying systems are healthy.*
 *Learning objective tested: #2, #4*
 *Difficulty: Easy*
@@ -321,9 +321,9 @@ D) Personal accountability exclusively
 
 **5. What does the Strategic Judgment Radar diagnose, per the Integrated Practice Wheel?**
 A) Direction — whether bets, moats, and deals are sound
-B) Only platform mechanism issues
-C) Only hardware-specific constraints
-D) Only crisis communication timing
+B) Only platform-level mechanism issues in isolation
+C) Only constraints that are specific to hardware
+D) Only the timing of crisis communication
 
 *Correct answer: A*
 *Explanation: The Strategic Judgment Radar diagnoses direction — whether bets, moats, and deals are sound.*
@@ -333,12 +333,12 @@ D) Only crisis communication timing
 ---
 
 **6. What do Module 9's lenses diagnose, per the Integrated Practice Wheel?**
-A) Nothing; Module 9 introduced no diagnostic value
-B) Domain-specific context — regulation, AI, hardware, fairness, international scaling, crisis, and organizational structure
-C) Only strategic bet falsifiability
-D) Only platform marketplace liquidity
+A) Nothing; Module 9 added no diagnostic value at all
+B) Only whether a strategic bet is falsifiable
+C) Domain-specific context, such as regulation, AI, or crisis
+D) Only how liquid a platform's marketplace is
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Module 9's lenses diagnose domain-specific context — regulation, AI, hardware, fairness, international scaling, crisis, and organizational structure.*
 *Learning objective tested: #2, #4*
 *Difficulty: Easy*
@@ -346,12 +346,12 @@ D) Only platform marketplace liquidity
 ---
 
 **7. How should a product philosophy from Lesson 60 have changed by Lesson 90, per this lesson?**
-A) It should have been entirely discarded and replaced
-B) It should have been extended and specified through stress-testing, not discarded or left unchanged
-C) It should remain completely identical with no development
-D) It should be forgotten entirely in favor of memorized frameworks
+A) It should remain completely identical, with no change
+B) It should be forgotten in favor of memorized frameworks
+C) It should have been extended, not discarded or frozen
+D) It should have been entirely discarded and replaced
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: It should have been extended and specified through stress-testing, not discarded or left unchanged.*
 *Learning objective tested: #3*
 *Difficulty: Medium*
@@ -359,12 +359,12 @@ D) It should be forgotten entirely in favor of memorized frameworks
 ---
 
 **8. In the Full-Spectrum Incident case study, how many rings of the Integrated Practice Wheel were genuinely required?**
-A) Only one, the Strategic Judgment Radar
-B) Multiple rings simultaneously: crisis response, AI reliability/fairness, regulatory compliance, and international adaptation
-C) None; the incident required no framework at all
-D) Only the Platform Health Radar
+A) Only one ring, the Strategic Judgment Radar alone
+B) None; the incident required no framework at all
+C) Only the Platform Health Radar, on its own
+D) Multiple rings at once: crisis, fairness, and compliance
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Multiple rings were simultaneously required: crisis response, AI reliability/fairness, regulatory compliance, and international adaptation.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
@@ -372,10 +372,10 @@ D) Only the Platform Health Radar
 ---
 
 **9. What would a single-lens diagnosis have missed in the Full-Spectrum Incident case study?**
-A) Nothing; a single lens would have been fully sufficient
-B) The full picture, since the incident spanned crisis communication, technical reliability/fairness, regulatory compliance, and adaptation depth simultaneously
-C) Only the crisis communication dimension
-D) Only the hardware dimension, which wasn't actually relevant
+A) Nothing; one single lens would have been fully sufficient
+B) The full picture, since several dimensions overlapped at once
+C) Only the crisis communication dimension specifically
+D) Only a hardware dimension that wasn't even relevant
 
 *Correct answer: B*
 *Explanation: The full picture, since the incident spanned crisis communication, technical reliability/fairness, regulatory compliance, and adaptation depth simultaneously.*
@@ -385,12 +385,12 @@ D) Only the hardware dimension, which wasn't actually relevant
 ---
 
 **10. What is "mastery" of this curriculum defined as, per the Key Takeaways?**
-A) The ability to recite every named model from memory
-B) The fluent judgment to select the right combination of tools for a real, ambiguous situation
-C) Completing all ninety lessons without ever reviewing the material again
-D) Memorizing only the Module 9 lenses, since they are most recent
+A) Reciting every named model from memory on demand
+B) Completing all ninety lessons without reviewing again
+C) Fluent judgment to select the right tools for a situation
+D) Memorizing only the newest, Module 9 domain lenses
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Mastery is defined as the fluent judgment to select the right combination of tools for a real, ambiguous situation, not memorization.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Medium*
@@ -398,12 +398,12 @@ D) Memorizing only the Module 9 lenses, since they are most recent
 ---
 
 **11. Why does this capstone lesson introduce no new diagnostic model, unlike Lessons 61-89?**
-A) All useful models had already been exhausted by prior lessons
-B) Following the same synthesis principle as Lessons 60, 70, and 80: at a close, the highest-value work is integration, not addition
-C) New models are prohibited after Lesson 89 for arbitrary reasons
-D) This lesson actually does introduce a new diagnostic model, contrary to the question's premise
+A) Every possibly useful model had already been exhausted
+B) New models were arbitrarily prohibited after Lesson 89
+C) It actually does introduce one, despite the premise here
+D) It follows Lessons 60, 70, 80's principle: integrate, don't add
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Following the same synthesis principle as Lessons 60, 70, and 80: at a close, the highest-value work is integration, not addition.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
@@ -411,12 +411,12 @@ D) This lesson actually does introduce a new diagnostic model, contrary to the q
 ---
 
 **12. (Scenario) A PM faces a situation involving a live technical incident, a regulatory compliance question, and an international market difference simultaneously. What does the Integrated Practice Wheel suggest?**
-A) Apply only the single framework that feels most familiar
-B) Recognize this as a multi-ring situation requiring the Crisis Response Timeline, a domain-specific regulatory lens, and the Adaptation Depth Model together
-C) Ignore all frameworks and rely purely on instinct
-D) Apply only the Strategic Judgment Radar, since it is the most comprehensive single tool
+A) Apply only the single framework that feels familiar
+B) Ignore every framework and rely purely on instinct
+C) Apply only the Strategic Judgment Radar, as most complete
+D) Combine the Crisis, regulatory, and Adaptation Depth lenses
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: This is a multi-ring situation requiring the Crisis Response Timeline, a domain-specific regulatory lens, and the Adaptation Depth Model together.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Medium-Hard*
@@ -424,12 +424,12 @@ D) Apply only the Strategic Judgment Radar, since it is the most comprehensive s
 ---
 
 **13. (Product Thinking) A PM insists a single favorite framework from earlier in the curriculum can fully explain a genuinely complex, multi-domain situation. What is the strongest response?**
-A) Agree, since one framework is always sufficient regardless of complexity
-B) Suggest checking whether other rings of the Integrated Practice Wheel — mechanism, direction, or domain context — might also be relevant before concluding a single lens is sufficient
-C) Dismiss the PM's framework entirely without further discussion
-D) Introduce an entirely new, twentieth framework to resolve the disagreement
+A) Check whether other Wheel rings might also apply first
+B) Agree, since one framework is always fully sufficient
+C) Dismiss the PM's framework without any real discussion
+D) Introduce a brand-new, twentieth framework to settle it
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Suggest checking whether other rings of the Integrated Practice Wheel — mechanism, direction, or domain context — might also be relevant before concluding a single lens is sufficient.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
@@ -437,12 +437,12 @@ D) Introduce an entirely new, twentieth framework to resolve the disagreement
 ---
 
 **14. (Interview Reasoning) A candidate, asked about the most complex situation they've navigated, describes it entirely through a single framework with no acknowledgment of other contributing dimensions. What does this signal?**
-A) A strong and complete understanding of integrated practice
-B) A potential gap in demonstrating fluent movement across multiple levels of diagnosis
-C) Readiness for the most senior possible PM role immediately
-D) Nothing meaningful; single-framework explanations are always sufficient
+A) A strong and complete grasp of integrated practice
+B) Readiness for the most senior PM role immediately
+C) A gap in showing fluent movement across diagnosis levels
+D) Nothing meaningful; single-framework accounts are fine
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: A potential gap in demonstrating fluent movement across multiple levels of diagnosis — describing a complex situation through only a single framework.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
@@ -450,12 +450,12 @@ D) Nothing meaningful; single-framework explanations are always sufficient
 ---
 
 **15. (Product Thinking, Highest Difficulty) A fintech company's AI-powered lending feature causes a sudden spike in denials in a newly-entered international market. Using the full scope of this curriculum's frameworks, what is the most defensible integrated response?**
-A) Apply only the Crisis Response Timeline and consider the incident resolved once communication has occurred
-B) Address the situation across all relevant rings simultaneously: parallel crisis communication, technical capability/reliability and fairness diagnosis, regulatory compliance investigation specific to the new market, and a revised international adaptation review process for future launches
-C) Apply only a technical fix to the AI model with no communication or regulatory investigation
-D) Treat the incident as purely a public relations matter requiring no technical or regulatory investigation
+A) Apply only a technical fix, skipping any other investigation
+B) Treat this as purely a public relations matter to manage
+C) Consider it resolved once initial communication has gone out
+D) Run crisis, fairness, regulatory, and adaptation review together
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The most defensible integrated response addresses the situation across all relevant rings simultaneously: parallel crisis communication, technical capability/reliability and fairness diagnosis, regulatory compliance investigation specific to the new market, and a revised international adaptation review process for future launches.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*

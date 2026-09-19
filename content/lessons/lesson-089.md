@@ -296,12 +296,12 @@ There is no single correct answer. Work through the following before reading fur
 ## Quiz
 
 **1. Why doesn't AI capability at drafting eliminate the need for PM judgment?**
-A) AI tools are never actually capable of producing useful drafts
-B) A fluent draft can still miss the accountability and context-dependent judgment that made the task worth doing
+A) A fluent draft can still miss the judgment the task required
+B) AI tools always incorporate full business context alone
 C) PM judgment is no longer relevant in any context
-D) AI tools always incorporate full business context automatically
+D) AI tools are never actually capable of useful drafts
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: A fluent draft can still miss the accountability and context-dependent judgment that made the task worth doing, so AI capability at drafting doesn't eliminate the need for PM judgment.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
@@ -309,12 +309,12 @@ D) AI tools always incorporate full business context automatically
 ---
 
 **2. What are the four quadrants of the PM Judgment Reserve model?**
-A) Concept, Prototype, Pilot, Scale
-B) Execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, judgment/irreducibly human
-C) Data, Process, Outcome, Liability
-D) Land, Expand, Retain, Grow
+A) Two execution tiers and two judgment tiers, split by automation
+B) Data intake, process design, product outcome, and liability
+C) Land the deal, expand usage, retain accounts, then grow it
+D) Initial concept, working prototype, market pilot, full scale
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The four quadrants are execution/high-automatability, execution/low-automatability, judgment/AI-augmentable, and judgment/irreducibly human.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -322,12 +322,12 @@ D) Land, Expand, Retain, Grow
 ---
 
 **3. What defines the "Judgment Reserve" quadrant specifically?**
-A) Tasks that are easily automated by AI tools
-B) Trust-building, ethical tradeoffs, and ambiguous prioritization that don't shrink as tools improve
-C) Tasks that require no human involvement at all
-D) Only tasks related to spec-writing
+A) Tasks that are easily automated by any AI tool
+B) Tasks that require no human involvement at all
+C) Trust-building and ethics that don't shrink as tools improve
+D) Only tasks strictly related to spec-writing
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Trust-building, ethical tradeoffs, and ambiguous prioritization don't shrink as tools improve — these are the irreducibly human responsibilities.*
 *Learning objective tested: #2, #4*
 *Difficulty: Easy*
@@ -336,9 +336,9 @@ D) Only tasks related to spec-writing
 
 **4. Why is polish not the same as correctness?**
 A) Polished outputs are always correct by definition
-B) A fluent, well-organized output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment
-C) Polish and correctness are identical concepts
-D) Correctness never actually matters for PM artifacts
+B) A fluent output can still hide an error a reviewer misses
+C) Correctness never actually matters for PM artifacts
+D) Polish and correctness are actually identical concepts
 
 *Correct answer: B*
 *Explanation: A fluent, well-organized output can still contain a judgment error invisible to a reviewer who stops actively exercising judgment.*
@@ -348,12 +348,12 @@ D) Correctness never actually matters for PM artifacts
 ---
 
 **5. What was the root cause of the Unreviewed Roadmap case study's failure?**
-A) The AI tool refused to generate any roadmap at all
-B) The PM treated an AI-drafted synthesis as though it had already incorporated strategic judgment about account importance, which the tool had no visibility into
-C) The PM never used any AI tool at all
-D) The roadmap was rejected immediately by leadership
+A) The PM treated the draft as already strategically weighted
+B) The PM never used any AI tool during the process
+C) The roadmap was rejected immediately by leadership
+D) The AI tool refused to generate any roadmap at all
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: The PM treated an AI-drafted synthesis as though it had already incorporated strategic judgment about account importance, which the tool had no visibility into.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
@@ -361,10 +361,10 @@ D) The roadmap was rejected immediately by leadership
 ---
 
 **6. What specific nuance did the AI-generated roadmap miss in the case study?**
-A) A high-volume, low-importance customer concern
-B) A low-volume but high-stakes concern from the company's largest enterprise account
-C) All customer feedback entirely
-D) A purely cosmetic formatting issue
+A) All customer feedback themes were missed entirely
+B) A low-volume but high-stakes enterprise account concern
+C) A high-volume but genuinely low-importance concern
+D) A purely cosmetic formatting issue in the document
 
 *Correct answer: B*
 *Explanation: A low-volume but high-stakes concern from the company's largest enterprise account was missed because the tool lacked visibility into strategic account importance.*
@@ -375,11 +375,11 @@ D) A purely cosmetic formatting issue
 
 **7. Why does trust-building remain a durably human PM responsibility, per the Future-Ready PM Skills Checklist?**
 A) Trust is generatable by any sufficiently advanced AI tool
-B) Trust is relational and accountability-based, not something a tool can hold
-C) Trust-building is irrelevant to product management
-D) AI tools have already fully replaced trust-building in most organizations
+B) Trust-building is genuinely irrelevant to product work
+C) Trust is relational and accountability-based, not tool-held
+D) AI tools have already fully replaced trust-building
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Trust is relational and accountability-based, not something a tool can hold, making it a durably human PM responsibility.*
 *Learning objective tested: #4*
 *Difficulty: Medium*
@@ -387,12 +387,12 @@ D) AI tools have already fully replaced trust-building in most organizations
 ---
 
 **8. According to the checklist, what risk does neglecting "Judgment Under Ambiguity" create?**
-A) No risk; ambiguous decisions are always resolved automatically
-B) Decisions default to whatever an AI tool weights most heavily, missing strategic nuance
-C) This skill is irrelevant to modern product management
-D) Ambiguity never actually occurs in real product decisions
+A) No risk; ambiguity always resolves itself automatically
+B) This skill carries no relevance to modern product work
+C) Ambiguity never actually occurs in real product decisions
+D) Decisions default to whatever the AI tool weights most
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Decisions default to whatever an AI tool weights most heavily, missing strategic nuance when judgment under ambiguity is neglected.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
@@ -400,10 +400,10 @@ D) Ambiguity never actually occurs in real product decisions
 ---
 
 **9. Why might early-stage, solo PMs face especially acute pressure to over-delegate to AI tools, per the Real World Perspective section?**
-A) Early-stage PMs never use AI tools at all
-B) Limited time as the only PM at the company creates pressure to delegate execution tasks, making deliberate Judgment Reserve protection especially important
-C) Early-stage companies are legally prohibited from using AI tools
-D) This pressure only exists at large, mature organizations
+A) Early-stage PMs never actually use AI tools at all
+B) Limited time as the only PM pressures delegating execution
+C) This specific pressure only exists at mature, large firms
+D) Early companies are barred by law from AI tool use
 
 *Correct answer: B*
 *Explanation: Limited time as the only PM at the company creates pressure to delegate execution tasks, making deliberate Judgment Reserve protection especially important.*
@@ -413,12 +413,12 @@ D) This pressure only exists at large, mature organizations
 ---
 
 **10. What are large organizations increasingly formalizing, per the Real World Perspective section?**
-A) A complete ban on all AI tool usage
-B) Guidance on where AI tools should assist versus where human judgment must remain primary
-C) A policy requiring full AI automation of all PM tasks
-D) No guidance of any kind regarding AI tool use
+A) A complete and blanket ban on all AI tool usage
+B) A policy demanding full AI automation of all tasks
+C) Guidance on where AI assists versus where judgment leads
+D) No guidance whatsoever regarding AI tool use
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: Large organizations are increasingly formalizing guidance on where AI tools should assist versus where human judgment must remain primary.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -426,10 +426,10 @@ D) No guidance of any kind regarding AI tool use
 ---
 
 **11. How does the PM Judgment Reserve connect to the Ownership Zones Model from Lesson 65?**
-A) There is no meaningful connection between the two
-B) It applies the same Zone 4 discipline — that a model's output shouldn't substitute for human judgment — to the PM's own artifacts
-C) The Ownership Zones Model only applies to customer-facing decisions, never PM work
-D) The PM Judgment Reserve replaces the need for the Ownership Zones Model entirely
+A) There is no meaningful connection between the two ideas
+B) It applies Zone 4's discipline to the PM's own artifacts
+C) The Zones Model only ever applies to customer decisions
+D) The Judgment Reserve replaces the Zones Model entirely
 
 *Correct answer: B*
 *Explanation: It applies the same Zone 4 discipline — that a model's output shouldn't substitute for human judgment — to the PM's own artifacts.*
@@ -439,12 +439,12 @@ D) The PM Judgment Reserve replaces the need for the Ownership Zones Model entir
 ---
 
 **12. (Scenario) A PM presents an AI-generated roadmap to leadership with only minor edits, treating it as essentially finished. What risk does this represent?**
-A) No risk; AI-generated content is always ready for immediate presentation
-B) The risk that quadrant D judgment (strategic weighting) was never actually applied, despite the artifact's polished appearance
-C) A risk only relevant to hardware roadmaps
-D) No risk, since leadership will catch any errors themselves
+A) No risk; AI content is always ready to present
+B) A risk that only ever applies to hardware roadmaps
+C) No risk, since leadership always catches errors
+D) That strategic weighting judgment was never applied
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: The risk is that quadrant D judgment (strategic weighting) was never actually applied, despite the artifact's polished appearance.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
@@ -452,12 +452,12 @@ D) No risk, since leadership will catch any errors themselves
 ---
 
 **13. (Product Thinking) A PM wants to use AI tools to draft all future specs with minimal review, citing time savings. What is the strongest response?**
-A) Agree entirely, since time savings are always the top priority
-B) Explain that drafts should be treated as inputs requiring judgment review, not finished substitutes, particularly regarding context the tool couldn't have known
-C) Prohibit any AI tool use entirely
-D) Agree, but only for specs under a certain word count
+A) Treat drafts as inputs needing review, not finished output
+B) Prohibit any AI tool use across the team entirely
+C) Agree, but only for specs under a set word count
+D) Agree fully, since time savings are the top priority
 
-*Correct answer: B*
+*Correct answer: A*
 *Explanation: Drafts should be treated as inputs requiring judgment review, not finished substitutes, particularly regarding context the tool couldn't have known.*
 *Learning objective tested: #3, #5*
 *Difficulty: Hard*
@@ -465,12 +465,12 @@ D) Agree, but only for specs under a certain word count
 ---
 
 **14. (Interview Reasoning) A candidate, asked how AI tools affect their PM work, describes using them to fully automate stakeholder prioritization decisions with no further review. What does this signal?**
-A) A strong and complete understanding of future-ready PM practice
-B) A gap in recognizing that ambiguous, stakeholder-sensitive prioritization belongs in the irreducibly human Judgment Reserve
-C) Readiness for a senior PM role immediately
-D) Nothing meaningful; full automation of prioritization is always appropriate
+A) A strong and complete grasp of future-ready practice
+B) Readiness for a senior PM role right away
+C) A gap in placing ambiguous prioritization outside judgment
+D) Nothing meaningful; full automation is always fine here
 
-*Correct answer: B*
+*Correct answer: C*
 *Explanation: A gap in recognizing that ambiguous, stakeholder-sensitive prioritization belongs in the irreducibly human Judgment Reserve.*
 *Learning objective tested: #2, #4, #5*
 *Difficulty: Hard*
@@ -478,12 +478,12 @@ D) Nothing meaningful; full automation of prioritization is always appropriate
 ---
 
 **15. (Product Thinking, Highest Difficulty) A PM organization is adopting AI tools widely, and some PMs have begun presenting AI-drafted artifacts with minimal review, citing efficiency gains. Using only this lesson's frameworks, what is the most defensible organizational response?**
-A) Encourage full delegation to AI tools across all PM tasks to maximize efficiency
-B) Establish clear guidance distinguishing automatable execution work from the Judgment Reserve, requiring deliberate human review of AI-assisted artifacts before use in judgment-sensitive contexts
-C) Ban all AI tool usage across the organization entirely
-D) Take no action, since efficiency gains are the only relevant consideration
+A) Encourage full delegation to AI across every PM task
+B) Ban all AI tool usage across the organization entirely
+C) Take no action, since efficiency is the only factor
+D) Require deliberate human review before judgment-sensitive use
 
-*Correct answer: B*
+*Correct answer: D*
 *Explanation: Establish clear guidance distinguishing automatable execution work from the Judgment Reserve, requiring deliberate human review of AI-assisted artifacts before use in judgment-sensitive contexts.*
 *Learning objective tested: #1, #2, #3, #4, #5*
 *Difficulty: Hard*

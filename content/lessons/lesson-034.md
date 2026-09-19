@@ -412,196 +412,196 @@ There is no single correct answer to the prompts below — the goal is to practi
 
 ## Quiz
 
-**1. What is the key structural difference between backlog grooming and Sprint Planning?**
-A) Grooming is optional and Sprint Planning is mandatory
-B) Grooming only happens on Kanban, not Scrum, teams
-C) They are the same activity at different times of day
-D) Grooming is continuous; Planning acts only on ready items
+**1. What is the core structural difference between backlog grooming and Sprint Planning?**
+A) Grooming happens only for bugs, while Planning covers new features
+B) Grooming is continuous; Planning acts only on already-ready items
+C) Grooming is run by engineering, while Planning is run by the PM alone
+D) Grooming replaces the need for a Sprint Goal entirely
 
-*Correct answer: D*
-*Explanation: Grooming is an ongoing activity, while Sprint Planning is a discrete event that should only operate on already-groomed, ready items.*
+*Correct answer: B*
+*Explanation: Grooming continuously clarifies, splits, and estimates items, while Sprint Planning is the discrete event that selects already-ready items into a Sprint Backlog.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
-**2. Which INVEST criterion is violated when a backlog item is written as a specific technical solution rather than a problem or need?**
+**2. Which of the following is NOT one of the six INVEST criteria?**
 A) Small
-B) Negotiable
-C) Independent
-D) Testable
+B) Testable
+C) Estimable
+D) Scalable
 
-*Correct answer: B*
-*Explanation: Pre-specifying a technical solution removes the team's ability to propose a better approach, violating the "Negotiable" criterion.*
+*Correct answer: D*
+*Explanation: INVEST stands for Independent, Negotiable, Valuable, Estimable, Small, and Testable. Scalability is a technical concern, not part of the mnemonic.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
 
 ---
 
-**3. What does a Definition of Ready guard, in contrast to a Definition of Done?**
-A) Whether a Sprint Retrospective is scheduled
-B) Code quality alone, not requirement clarity
-C) Entry into a Sprint, not completion out of it
-D) The same thing as a Definition of Done
+**3. A backlog item reads "add a Redis cache layer to the search endpoint." Which INVEST criterion does this most clearly violate?**
+A) Negotiable, because it pre-specifies the technical solution
+B) Testable, because no one can verify caching worked
+C) Independent, because caching depends on another team
+D) Small, because caching is too minor a change to plan
+
+*Correct answer: A*
+*Explanation: The item states a technical solution rather than the underlying need, removing the team's room to propose a different or better approach.*
+*Learning objective tested: #2*
+*Difficulty: Easy*
+
+---
+
+**4. What does a Definition of Ready require before an item can enter Sprint Planning?**
+A) That the item has already been coded by an engineer in advance
+B) That leadership has personally reviewed and approved the item
+C) Clear criteria, an estimate, resolved dependencies, and joint review
+D) That the item has previously appeared in at least one earlier Sprint
 
 *Correct answer: C*
-*Explanation: A Definition of Ready guards entry into a Sprint, complementing the Definition of Done, which guards completion out of it.*
+*Explanation: A typical Definition of Ready requires clear acceptance criteria, an estimate, resolved dependencies, and joint review before an item is eligible for Sprint Planning.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. What is the recommended formula for capacity-based Sprint planning?**
-A) Sprint Capacity ≈ Historical Velocity × Focus Factor
-B) Sprint Capacity ≈ Number of backlog items regardless of size
-C) Sprint Capacity ≈ Whatever the PM believes the team can achieve with maximum effort
-D) Sprint Capacity ≈ Total available hours in the Sprint
-
-*Correct answer: A*
-*Explanation: This formula anchors capacity to disciplined, historical performance rather than optimism or raw hours available.*
-*Learning objective tested: #4*
-*Difficulty: Easy*
-
----
-
-**5. What is the planning fallacy, as described in this lesson?**
-A) A flaw specific to the INVEST criteria
-B) A term that applies only to Kanban teams
-C) The tendency to always overestimate task duration
-D) Underestimating duration by favoring best-case scenarios
+**5. How does a Definition of Ready relate to a Definition of Done?**
+A) They are two names for the same checklist used at different points
+B) A Definition of Done replaced the need for a Definition of Ready
+C) A Definition of Ready is optional once a Definition of Done exists
+D) Ready guards entry into a Sprint; Done guards completion out of it
 
 *Correct answer: D*
-*Explanation: The planning fallacy is defined as systematically underestimating duration by focusing on best-case scenarios instead of historical base rates.*
-*Learning objective tested: #4*
+*Explanation: The two standards guard opposite ends of an item's lifecycle — Ready governs what may enter a Sprint, and Done governs what may count as finished.*
+*Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**6. Why does anchoring Sprint capacity to historical velocity help defend against the planning fallacy?**
-A) Velocity has nothing to do with estimation accuracy
-B) It grounds planning in past performance, not fresh optimism
-C) It removes the need for a Sprint Goal entirely
-D) Historical velocity is always higher than a fresh estimate
+**6. What is velocity, as used in capacity-based Sprint planning?**
+A) The number of stakeholders attending Sprint Planning each cycle
+B) A rolling average of story points a team completed in recent Sprints
+C) The total number of engineers currently assigned to a team
+D) The speed at which a single ticket moves through a Kanban board
 
 *Correct answer: B*
-*Explanation: Anchoring to historical velocity, rather than each Sprint's fresh optimism, is the primary structural defense against the planning fallacy.*
+*Explanation: Velocity is a rolling average of completed story points across recent Sprints, used to anchor how much work a team commits to next.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
-**7. In Lesson 31's original Case Study, what specific gap allowed the PM to force the flawed sprint plan through rather than adjusting it?**
-A) The Sprint was scheduled too short for the work
-B) The team was using Kanban instead of Scrum
-C) No mid-sprint change protocol existed for the team
-D) The team had no Scrum Master assigned to it
-
-*Correct answer: C*
-*Explanation: This lesson's Case Study frames the original PM's mistake as the absence of a mid-sprint change protocol, which this lesson then resolves.*
-*Learning objective tested: #5*
-*Difficulty: Medium*
-
----
-
-**8. What are the two conditions of this lesson's mid-sprint change protocol?**
-A) Evidence threatens the Sprint Goal, and the change is announced the same day
-B) The change is minor and needs no stakeholder communication
-C) The change waits until next Sprint Planning, regardless of urgency
-D) An executive requests it, and the Scrum Master approves it
-
-*Correct answer: A*
-*Explanation: The protocol requires Sprint-Goal-threatening evidence and same-day transparent communication, not any lesser or unrelated bar.*
-*Learning objective tested: #5*
-*Difficulty: Medium*
-
----
-
-**9. (Scenario) A backlog item reads: "Migrate the checkout service to a new microservice architecture using Kubernetes." Using INVEST, what is the most likely problem with this item as written?**
-A) It fails only the "Testable" criterion
-B) It is too small to matter
-C) It is perfectly well-formed and ready for Sprint Planning as written
-D) It is written as a pre-specified technical solution rather than a problem or need, and is very likely also too large to be "Small"
+**7. What is the recommended formula for capacity-based Sprint planning?**
+A) Sprint Capacity equals the number of engineers times their hourly rate
+B) Sprint Capacity equals every backlog item marked high priority
+C) Sprint Capacity equals total calendar hours in the Sprint, unadjusted
+D) Sprint Capacity equals Historical Velocity multiplied by a Focus Factor
 
 *Correct answer: D*
-*Explanation: This item pre-specifies a solution (violating Negotiable) and is very likely far too large for a single Sprint (violating Small).*
-*Learning objective tested: #2*
+*Explanation: This formula anchors commitments to actual past performance, adjusted by a Focus Factor that accounts for meetings and unplanned work.*
+*Learning objective tested: #4*
+*Difficulty: Medium*
+
+---
+
+**8. What does the planning fallacy describe?**
+A) Underestimating duration by focusing on best-case scenarios
+B) A team's tendency to overestimate every task it plans
+C) A failure to assign a Scrum Master to a new team
+D) Confusing a Sprint Backlog with a product roadmap
+
+*Correct answer: A*
+*Explanation: The planning fallacy is the systematic tendency to underestimate how long work will take by focusing on the best case rather than historical base rates.*
+*Learning objective tested: #4*
+*Difficulty: Medium*
+
+---
+
+**9. Why does a Focus Factor typically sit below 1.0 (often 0.7-0.85) in the capacity formula?**
+A) Because velocity itself is always measured incorrectly
+B) Because story points overstate the size of most items
+C) Because meetings and unplanned work consume real time
+D) Because it accounts for holidays but nothing else
+
+*Correct answer: C*
+*Explanation: Not all of a team's nominal time converts into delivery work; the Focus Factor discounts capacity for meetings, support interruptions, and unplanned work.*
+*Learning objective tested: #4*
+*Difficulty: Medium*
+
+---
+
+**10. What are the two conditions of this lesson's mid-sprint change protocol?**
+A) A manager approves it, and it is logged in the retrospective notes
+B) The Sprint Goal is threatened, and the change is announced same-day
+C) The change is small, and no communication is required at all
+D) The team votes unanimously, and the Scrum Master breaks any tie
+
+*Correct answer: B*
+*Explanation: A mid-sprint change is only warranted when new evidence threatens the Sprint Goal itself, and it must be communicated transparently to stakeholders that same day.*
+*Learning objective tested: #5*
+*Difficulty: Medium*
+
+---
+
+**11. In Lesson 31's original Case Study, what specific gap led the PM to force a flawed sprint plan through rather than adjusting it?**
+A) The team lacked a defined Sprint Goal from the start
+B) The team had switched frameworks mid-Sprint without warning
+C) No mid-sprint change protocol existed to guide the decision
+D) Engineering refused to discuss the false assumption at all
+
+*Correct answer: C*
+*Explanation: This lesson frames the original PM's mistake as the absence of any established process for handling mid-sprint changes, a gap this lesson's protocol directly resolves.*
+*Learning objective tested: #5*
+*Difficulty: Medium*
+
+---
+
+**12. According to this lesson's Real Company Example, how does Atlassian frame its Definition of Ready guidance?**
+A) As a checklist an item must clear before entering Sprint Planning
+B) As an optional suggestion most teams should skip for speed
+C) As a rule that applies only to Kanban boards, not Scrum sprints
+D) As a replacement for the INVEST criteria rather than a companion to it
+
+*Correct answer: A*
+*Explanation: Atlassian publishes its Definition of Ready as a checklist — description, acceptance criteria, estimate, dependencies, validated problem — paired explicitly with INVEST.*
+*Learning objective tested: #3*
+*Difficulty: Medium*
+
+---
+
+**13. Using the Sprint Planning Readiness Checklist, what does it mean if several items were estimated for the first time during the Sprint Planning meeting itself?**
+A) The team's Sprint Goal was written incorrectly this cycle
+B) The "Estimate freshness" check failed, showing insufficient grooming
+C) This is expected behavior and requires no further action
+D) The team's velocity calculation must be recalculated immediately
+
+*Correct answer: B*
+*Explanation: Estimates given live during Planning, rather than calmly during grooming, specifically flag a failed "Estimate freshness" check and point to insufficient upstream grooming.*
+*Learning objective tested: #1, #4*
 *Difficulty: Medium-Hard*
 
 ---
 
-**10. Using the Sprint Planning Readiness Checklist, what does it mean if several proposed Sprint Backlog items were only estimated for the first time during the Sprint Planning meeting itself?**
-A) It means the team's velocity is too high
-B) It indicates the "Estimate freshness" check has failed, meaning insufficient upstream grooming occurred before Planning
-C) It means the Sprint Goal is unclear
-D) This is the correct, expected way estimation should happen
-
-*Correct answer: B*
-*Explanation: Rushed, in-meeting estimation specifically flags a failure of the "Estimate freshness" check, pointing to insufficient prior grooming.*
-*Learning objective tested: #1, #4*
-*Difficulty: Medium*
-
----
-
-**11. A team has a well-enforced Definition of Done but no Definition of Ready. What dysfunction does this lesson predict?**
-A) The team will be forced to adopt Kanban instead
-B) The team will have no way of measuring velocity
-C) Poorly-specified, oversized items will enter Sprints undetected, surfacing their ambiguity as a mid-Sprint surprise
-D) The team will never finish any Increments
+**14. (Interview Reasoning) A candidate says they decide if a backlog item is ready for Sprint Planning "purely by gut feel, based on experience." What is the weakness in this answer, based on this lesson's Interview Perspective section?**
+A) It reveals the candidate has never worked on a Scrum team before
+B) It correctly avoids the overhead of formal checklists like INVEST
+C) It lacks a repeatable standard such as INVEST or a Definition of Ready
+D) It shows strong technical depth but weak stakeholder communication
 
 *Correct answer: C*
-*Explanation: Without a Definition of Ready, ambiguity that should have been caught during grooming instead surfaces mid-Sprint, echoing Lesson 32's Case Study.*
-*Learning objective tested: #3*
-*Difficulty: Medium*
-
----
-
-**12. (Interview Reasoning) A candidate is asked "how do you decide if a backlog item is ready for Sprint Planning?" and answers: "I just use my judgment based on experience." What is the weakness in this answer?**
-A) It lacks a concrete, repeatable standard (such as INVEST or a written Definition of Ready) that could be applied consistently across a team
-B) It shows the candidate understands velocity planning
-C) It correctly avoids over-engineering the grooming process
-D) There is no weakness; judgment is the only tool that matters
-
-*Correct answer: A*
-*Explanation: A strong answer offers a concrete, repeatable standard, while a purely intuitive, case-by-case answer is harder to apply consistently.*
+*Explanation: A strong answer offers a concrete, repeatable standard that others on the team could apply consistently, rather than a purely intuitive, case-by-case judgment.*
 *Learning objective tested: #2, #3*
 *Difficulty: Hard*
 
 ---
 
-**13. (Product Thinking) A team consistently completes only 60% of its committed story points each Sprint, despite a clear Sprint Goal and a written Definition of Done. What should a PM most likely investigate first?**
-A) Whether the Definition of Done is too strict
-B) Whether the team should switch to Waterfall
-C) Whether the team needs more meetings
-D) Whether grooming quality (INVEST compliance, a genuine Definition of Ready) and velocity-anchored capacity planning are actually being practiced upstream
+**15. (Product Thinking, Highest Difficulty) Mid-Sprint, a PM learns a competitor just launched a feature resembling one committed item, but that item's scope and design remain fundamentally sound. What should the PM do?**
+A) Capture the news for next grooming, since the Sprint Goal isn't threatened
+B) Halt the Sprint immediately and re-plan the entire backlog around the news
+C) Ask engineering to work unpaid overtime to beat the competitor this Sprint
+D) Quietly drop the item from the Sprint without telling any stakeholders
 
-*Correct answer: D*
-*Explanation: Upstream grooming and capacity-planning discipline are the most likely root cause of chronic under-delivery, rather than an effort or Definition of Done problem.*
-*Learning objective tested: #4, #5*
-*Difficulty: Hard*
-
----
-
-**14. Why does this lesson recommend against re-planning a Sprint for every new piece of information that arrives mid-Sprint?**
-A) Because only the Scrum Master is allowed to propose changes
-B) Constant re-planning for every minor new input destabilizes the team's focus and undermines the protective function of a Sprint Goal
-C) Because Scrum forbids any changes once a Sprint begins, under all circumstances
-D) Because new information should always be ignored entirely
-
-*Correct answer: B*
-*Explanation: A narrow, deliberate threshold protects Sprint stability while still letting genuinely important, Sprint-Goal-threatening changes through.*
-*Learning objective tested: #5*
-*Difficulty: Medium-Hard*
-
----
-
-**15. (Product Thinking, Highest Difficulty) Partway through a Sprint, a PM learns that a competitor has just launched a feature closely resembling one item in the current Sprint Backlog — interesting news, but the committed item's scope and design remain fundamentally sound. What is the most appropriate response?**
-A) Ask engineering to work overtime to ship faster than the competitor within the same Sprint
-B) Immediately halt the Sprint and re-plan everything around competitive response
-C) Capture the competitive information for the next grooming session, since it doesn't threaten the validity of the current Sprint Goal
-D) Ignore the information entirely and never revisit it
-
-*Correct answer: C*
-*Explanation: The mid-sprint change protocol's first condition requires the evidence to threaten the Sprint Goal itself; notable but non-invalidating news should feed future prioritization instead.*
+*Correct answer: A*
+*Explanation: The mid-sprint change protocol only triggers when evidence threatens the Sprint Goal itself; notable but non-invalidating news belongs in the next grooming session instead.*
 *Learning objective tested: #5*
 *Difficulty: Hard*
 

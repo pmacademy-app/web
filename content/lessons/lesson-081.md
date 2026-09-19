@@ -311,196 +311,196 @@ There is no single correct answer to the prompts below — the goal is to practi
 
 ## Quiz
 
-**1. Why must regulatory compliance often shape product architecture from the outset in regulated industries?**
-A) Structural requirements like audit trails and mandatory human review steps are far more costly to retrofit than to design in from the beginning
-B) Regulatory review is generally faster when done early rather than late
-C) Regulations in healthcare, finance, and government are said to never change once established
-D) Product architecture is treated as having no meaningful relationship to regulatory compliance
+**1. Why must regulatory compliance in healthcare, finance, and government often shape a product's architecture from the outset?**
+A) Audit trails and similar structural requirements cost far more to retrofit later
+B) Legal teams prefer reviewing wireframes before any code gets written
+C) Regulators require every product roadmap to be published in advance
+D) Compliance staff are traditionally assigned directly to the design team
 
 *Correct answer: A*
-*Explanation: The lesson's central argument is that structural regulatory requirements are far more expensive to add after significant development than to design in from the start.*
+*Explanation: The lesson's central argument is that structural requirements — audit trails, mandatory review steps — are far more expensive to bolt on after development than to design in from the start.*
 *Learning objective tested: #1*
 *Difficulty: Easy*
 
 ---
 
 **2. What are the four layers of the Regulatory Surface Map?**
-A) Startup, Growth, Maturity, Decline
+A) Concept, Prototype, Pilot, Scale
 B) Data, Process, Outcome, Liability
-C) Concept, Prototype, Pilot, Scale
+C) Startup, Growth, Maturity, Decline
 D) Marketing, Sales, Engineering, Support
 
 *Correct answer: B*
-*Explanation: These four layers are explicitly introduced in the Theory section as the Map's core dimensions.*
+*Explanation: These four layers are introduced in the Theory section as the Map's core dimensions, each governing a different kind of regulatory constraint.*
 *Learning objective tested: #2, #3*
 *Difficulty: Easy*
 
 ---
 
-**3. What does the Process Layer govern?**
-A) What data can be collected and how it must be stored
-B) Who is legally accountable when something goes wrong
-C) The specific steps, approvals, or audit trails a decision-making workflow must include
-D) What results are permissible regardless of the steps taken
+**3. What does the Process Layer of the Regulatory Surface Map govern?**
+A) Who is legally accountable once a decision causes harm
+B) What results are permissible regardless of the steps taken
+C) The specific steps, approvals, or audit trails a workflow must include
+D) What categories of data may be collected or shared
 
 *Correct answer: C*
-*Explanation: The Process Layer specifically concerns the workflow steps and documentation required for a decision, distinct from the other three layers.*
+*Explanation: The Process Layer concerns the documented steps and approvals a decision-making workflow must include, distinct from the Data, Outcome, and Liability layers.*
 *Learning objective tested: #3*
 *Difficulty: Easy*
 
 ---
 
-**4. Why can a well-documented decision process still violate regulation?**
-A) Regulators are described as only ever checking documentation, never actual outcomes
-B) Documentation is treated as never actually required by any regulatory framework
-C) Well-documented processes are treated as always automatically compliant with every layer
-D) Process Layer compliance doesn't guarantee Outcome Layer compliance — a well-documented process can still produce an impermissible result
+**4. Why can a carefully documented decision process still violate regulation?**
+A) Regulators only ever review documentation, never actual results
+B) Well-documented processes are automatically compliant at every layer
+C) Documentation requirements do not apply to automated systems
+D) Process Layer compliance doesn't guarantee Outcome Layer compliance
 
 *Correct answer: D*
-*Explanation: This is the exact failure mode illustrated in the Undocumented Lending Decision case study.*
+*Explanation: A process can be scrupulously documented and still produce an impermissible result, exactly the failure the Undocumented Lending Decision case study illustrates.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
 **5. How do human-in-the-loop requirements in regulated industries connect to the Ownership Zones Model from Lesson 65?**
-A) The Ownership Zones Model is described as applying only to unregulated industries
-B) They formalize the Ownership Zones Model's Zone 4 discipline — that a model's output shouldn't be treated as an automatic action — into a legal obligation
-C) Human-in-the-loop requirements are said to replace the need for the Ownership Zones Model entirely
-D) The two concepts are treated as having no meaningful relationship to each other
+A) They formalize Zone 4's discipline into a binding legal obligation
+B) They replace the need for the Ownership Zones Model entirely
+C) The Ownership Zones Model applies only outside regulated industries
+D) The two ideas describe unrelated parts of product work
 
-*Correct answer: B*
-*Explanation: The lesson explicitly connects these regulatory requirements to the earlier Zone 4 discipline, now made mandatory rather than optional.*
+*Correct answer: A*
+*Explanation: Regulators codify the same caution the Ownership Zones Model raised about treating a model's output as an automatic action, making it mandatory rather than optional judgment.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
 
 ---
 
 **6. Why does the Liability Layer often shape a product's core architecture directly?**
-A) Liability requirements are described as always satisfied automatically by any properly functioning system
-B) The Liability Layer is treated as having no practical influence on product architecture
-C) A system that cannot reconstruct its own decision history after the fact cannot support the accountability assignment regulation frequently requires
-D) Liability concerns are described as always addressed through insurance rather than product design
+A) Liability concerns are generally resolved through insurance, not design
+B) Undocumented decisions can't support the accountability regulation requires
+C) Every regulated system automatically satisfies liability requirements
+D) Liability requirements rarely affect engineering decisions in practice
 
-*Correct answer: C*
-*Explanation: The lesson explicitly identifies this as one of the clearest instances of a regulatory requirement shaping core architecture from the beginning.*
+*Correct answer: B*
+*Explanation: Demonstrating who was responsible for a specific decision requires the system to log and reconstruct that decision, a structural property that is hard to add after the fact.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
 
 ---
 
-**7. In the Undocumented Lending Decision case study, what specifically did the Outcome Layer review reveal?**
-A) No regulatory issue was found at the Outcome Layer at all
-B) The model's documentation itself was found to be incomplete
-C) The model's approval rates produced a statistically significant disparity across demographic groups, despite never explicitly using protected characteristics as inputs
-D) The model had generally poor technical accuracy overall
+**7. In the Undocumented Lending Decision case study, what did the Outcome Layer review reveal?**
+A) The model's technical accuracy was generally poor across all applicants
+B) No issue was found; the model's documentation was entirely sufficient
+C) Approval rates were significantly skewed despite no protected inputs used
+D) The company had never actually deployed the lending model in production
 
 *Correct answer: C*
-*Explanation: This is the specific Outcome Layer violation described in the case study, independent of the model's input variables.*
+*Explanation: The disparity existed even though the model never explicitly used a protected characteristic as an input, illustrating that removing such inputs does not by itself guarantee a permissible outcome.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**8. What second regulatory gap did the case study reveal, beyond the Outcome Layer issue?**
-A) No second gap was found; only the Outcome Layer issue existed
-B) A missing customer support contact option for denied applicants
-C) A missing Data Layer encryption requirement for stored applications
-D) A missing mandatory human review step for denied loan applications, a Liability Layer requirement
+**8. What second regulatory gap did the case study's review uncover, beyond the demographic disparity?**
+A) A missing mandatory human review step for denied loan applications
+B) A missing customer support phone line for applicants
+C) No second gap existed beyond the Outcome Layer issue
+D) An unrelated marketing claim about approval speed
 
-*Correct answer: D*
-*Explanation: The case study explicitly describes two distinct gaps: the Outcome Layer disparity and the missing Liability Layer human review step.*
+*Correct answer: A*
+*Explanation: The fully automated denial flow had never incorporated the human review step certain credit decisions specifically require, a distinct Liability Layer failure.*
 *Learning objective tested: #4, #5*
 *Difficulty: Medium*
 
 ---
 
-**9. According to the Regulated Product Readiness Checklist, what does a "no" on Outcome Layer Verification indicate?**
-A) A significant risk, since thorough Process Layer documentation alone provides no assurance of Outcome Layer compliance
-B) That the product is, on this basis alone, definitely non-compliant with every regulatory requirement
-C) A minor issue that can reasonably be addressed after launch with no urgency
-D) That Outcome Layer verification is unnecessary once Process Layer documentation is thorough
+**9. Per the Regulated Product Readiness Checklist, what does a "no" on Outcome Layer Verification indicate?**
+A) A minor issue that can reasonably wait until sometime after launch
+B) That Process Layer documentation alone is sufficient going forward
+C) That the product is automatically noncompliant with every requirement
+D) A significant risk, since process documentation alone gives no outcome assurance
 
-*Correct answer: A*
-*Explanation: The lesson explicitly treats this gap as urgent, given the case study's illustration of how process quality alone doesn't guarantee outcome compliance.*
+*Correct answer: D*
+*Explanation: The checklist treats this gap with urgency, since the case study shows careful process documentation provides no guarantee that the resulting outcomes are themselves permissible.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
 
 ---
 
-**10. Why might early-stage companies entering a regulated industry underestimate how early regulatory architecture decisions must be made, per the Real World Perspective section?**
-A) Early-stage companies are described as always having dedicated compliance teams from their founding
-B) Regulatory requirements are described as never applying to companies with fewer than one hundred employees
-C) The instinct to move fast and iterate, well-suited to unregulated consumer products, can lead to costly rearchitecture once a structural compliance gap is discovered later
-D) Early-stage companies are described as legally exempt from all regulatory requirements
+**10. Per the Real World Perspective section, why do early-stage companies entering a regulated industry often underestimate how early architecture decisions must be made?**
+A) Early-stage companies are typically exempt from regulatory review
+B) A fast-iterate instinct, fine elsewhere, can force costly rearchitecture later
+C) Regulators generally waive requirements for companies under a certain size
+D) Startups are described as always hiring compliance staff before engineers
 
-*Correct answer: C*
-*Explanation: The Real World Perspective section connects this specific risk to a mismatch between fast-iteration instincts and the structural nature of many regulatory requirements.*
+*Correct answer: B*
+*Explanation: The instinct to move fast and iterate, well suited to unregulated consumer products, collides with the structural nature of many regulatory requirements once a gap is finally discovered.*
 *Learning objective tested: #1*
 *Difficulty: Medium*
 
 ---
 
-**11. What do large organizations operating in regulated industries typically maintain, per the Real World Perspective section?**
-A) Dedicated regulatory affairs and compliance engineering functions with structured, Regulatory Surface Map-style review processes
-B) A policy of avoiding any automated decision-making entirely
-C) No formal compliance processes, relying entirely on ad hoc review
-D) Compliance processes reserved only for their most senior executives
+**11. What do large organizations in regulated industries typically maintain, per the Real World Perspective section?**
+A) A general preference for avoiding any form of automated decision-making
+B) Compliance review handled solely by senior executives alone
+C) No formal compliance process beyond occasional, ad hoc legal review
+D) Dedicated regulatory affairs functions with Map-style review before launch
 
-*Correct answer: A*
-*Explanation: The Real World Perspective section describes this kind of structured, dedicated function as characteristic of mature organizations in regulated industries.*
+*Correct answer: D*
+*Explanation: The scale of potential harm and liability makes late-discovered compliance gaps prohibitively expensive, so large organizations invest in structured review well before a feature ships.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
 
 ---
 
-**12. (Scenario) A healthtech company has built a symptom-checker tool with thorough process documentation but has not independently verified whether its recommendations differ in accuracy across different patient demographics. What risk does this represent, per this lesson's frameworks?**
-A) A risk that is described as relevant only to lending products, not healthcare products
-B) A potential Outcome Layer compliance gap, since process quality alone does not verify whether results are permissible across different groups
-C) A risk described as relevant only to the Data Layer, not the Outcome Layer
-D) No risk, since thorough process documentation is said to guarantee regulatory compliance
+**12. (Scenario) A healthtech company has thorough process documentation for its symptom-checker but has never checked whether recommendation accuracy differs across patient demographics. What risk does this represent?**
+A) No risk, since thorough documentation is generally sufficient evidence of fairness
+B) A risk relevant only to lending products, not to healthcare products
+C) A potential Outcome Layer gap, since process quality doesn't verify outcomes
+D) A risk confined entirely to the Data Layer rather than the Outcome Layer
 
-*Correct answer: B*
-*Explanation: This directly mirrors the case study's core lesson: process documentation alone doesn't verify outcome permissibility, a concern equally applicable to healthcare contexts.*
+*Correct answer: C*
+*Explanation: This mirrors the case study directly: documenting a process carefully says nothing about whether its results are equally reliable or permissible across different groups.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium-Hard*
 
 ---
 
-**13. (Product Thinking) An engineering team wants to launch a fully automated healthcare recommendation flow quickly, arguing that a human review step would slow down the product unnecessarily. What is the strongest response, using this lesson's frameworks?**
-A) Investigate whether applicable regulation requires human-in-the-loop review for this category of health recommendation before finalizing the automated flow, since this may be a legal obligation rather than a design preference
-B) Build the human review step only after a regulatory violation has already occurred
-C) Agree to launch fully automated, since speed is generally the primary consideration
-D) Refuse to build the product at all under any circumstances
+**13. (Product Thinking) An engineering team argues a mandated human review step would slow down a healthcare recommendation flow unnecessarily. What is the strongest response using this lesson's frameworks?**
+A) Check whether regulation actually requires human review before finalizing the design
+B) Launch fully automated first, then add review only if a violation later occurs
+C) Refuse to build any part of the feature until legal signs off unconditionally
+D) Agree to skip the review step, since speed is usually the deciding factor
 
 *Correct answer: A*
-*Explanation: The correct response investigates the actual regulatory requirement proactively, rather than assuming speed should override an unverified legal obligation, or waiting until a violation has occurred.*
+*Explanation: The correct response verifies the actual legal requirement before assuming speed should override an obligation that hasn't yet been checked, rather than waiting for a violation to force the issue.*
 *Learning objective tested: #4, #5*
 *Difficulty: Hard*
 
 ---
 
-**14. (Interview Reasoning) A candidate, asked how they'd build an automated financial decision product, focuses entirely on model accuracy with no mention of process, outcome, or liability considerations. What does this most likely signal, per the Interview Perspective section?**
-A) Nothing meaningful; model accuracy is treated as the only relevant consideration
-B) A gap in recognizing that regulatory compliance requires systematic attention across multiple layers, not just technical model performance
-C) A strong and complete understanding of regulated product management
-D) That the candidate is ready for a senior regulated-industry PM role immediately
+**14. (Interview Reasoning) A candidate, asked how they'd build an automated financial decision product, discusses only model accuracy and never mentions process, outcome, or liability considerations. What does this most likely signal?**
+A) A complete and generally sufficient grasp of regulated product management
+B) Readiness for a senior regulated-industry role without further development
+C) A gap in recognizing compliance requires attention across several distinct layers
+D) Nothing meaningful, since model accuracy is the only factor interviewers weigh
 
-*Correct answer: B*
-*Explanation: The Interview Perspective section specifically listens for systematic, multi-layer regulatory thinking, which this candidate's answer omits entirely.*
+*Correct answer: C*
+*Explanation: The Interview Perspective section listens for systematic, multi-layer regulatory thinking; a candidate fixated solely on accuracy has left the other three layers unaddressed.*
 *Learning objective tested: #1, #2, #5*
 *Difficulty: Hard*
 
 ---
 
-**15. (Product Thinking, Highest Difficulty) A fintech company's automated lending model has thorough process documentation but has never been checked for demographic disparity in outcomes, and its fully automated denial flow has no human review step. Using only the frameworks in this lesson, what is the most defensible response?**
-A) Add a human review step only for approved applications, leaving denials fully automated
-B) Discontinue the automated model entirely with no further investigation
-C) Continue as-is, since thorough process documentation is treated as sufficient evidence of compliance
-D) Conduct an Outcome Layer audit for demographic disparity, and add a mandatory human review step for denials if applicable regulation requires it, treating both as necessary regardless of the cost of retrofitting them
+**15. (Product Thinking, Highest Difficulty) A fintech's automated lending model has solid process documentation but has never been audited for demographic disparity, and its denial flow has no human review step. What is the most defensible response?**
+A) Continue as-is, since documented process is generally treated as adequate evidence of compliance
+B) Discontinue the model entirely without further investigation of either gap
+C) Add human review only to approvals, leaving the fully automated denial flow untouched
+D) Audit for demographic disparity and add human review to denials if regulation requires it
 
 *Correct answer: D*
-*Explanation: This mirrors the Reflection Exercise and Case Study: the correct response addresses both the Outcome Layer and Liability Layer gaps directly, rather than assuming process documentation is sufficient, abandoning the model entirely, or addressing only part of the actual regulatory requirement.*
+*Explanation: Both gaps need to be addressed on their own terms — an Outcome Layer audit for disparity and a Liability Layer review step for denials — rather than assuming documentation is enough or abandoning the model outright.*
 *Learning objective tested: #3, #4, #5*
 *Difficulty: Hard*
 

@@ -298,9 +298,9 @@ There is no single correct answer. Work through the following before reading fur
 ## Quiz
 
 **1. According to the lesson, why should a PM communicate with users during a crisis before the technical fix is complete?**
-A) Regulatory bodies require simultaneous disclosure in nearly all cases
-B) Silence is read as evidence the company isn't working the problem
-C) Engineering teams work faster once a public update is posted
+A) Regulators require simultaneous disclosure in nearly all cases
+B) Silence reads as evidence the company isn't working the issue
+C) Engineering teams work faster once an update goes public
 D) Users typically don't notice outages unless told about them
 
 *Correct answer: B*
@@ -313,10 +313,10 @@ D) Users typically don't notice outages unless told about them
 **2. What is the correct sequence of phases in the Crisis Response Timeline?**
 A) Contain and Communicate, Detect and Triage, Resolve, Prevent
 B) Detect and Triage, Resolve, Contain and Communicate, Prevent
-C) Postmortem and Prevent, Detect, Contain and Communicate, Resolve
-D) Detect and Triage, Contain and Communicate, Resolve, Prevent
+C) Detect and Triage, Contain and Communicate, Resolve, Prevent
+D) Postmortem and Prevent, Detect, Communicate, then Resolve
 
-*Correct answer: D*
+*Correct answer: C*
 *Explanation: The timeline moves through Detect and Triage, then Contain and Communicate in parallel, then Resolve, then Postmortem and Prevent.*
 *Learning objective tested: #2*
 *Difficulty: Easy*
@@ -324,10 +324,10 @@ D) Detect and Triage, Contain and Communicate, Resolve, Prevent
 ---
 
 **3. Why does giving a confident resolution timeline before the cause is understood tend to backfire?**
-A) It's frequently missed under uncertainty, creating a second broken promise
-B) Users generally prefer no communication at all over a timeline
-C) Timelines are only relevant once a postmortem has published
-D) Engineering teams are barred from committing to timelines
+A) It's often missed under uncertainty, breaking a promise
+B) Users generally prefer no communication over any timeline
+C) Timelines only matter once a postmortem has published
+D) Engineering teams are barred from naming any timeline
 
 *Correct answer: A*
 *Explanation: A confident timeline offered before the cause is understood is frequently missed under crisis uncertainty, and the resulting broken promise damages trust more than an honest "no firm timeline yet" would have.*
@@ -337,12 +337,12 @@ D) Engineering teams are barred from committing to timelines
 ---
 
 **4. What does a public post-incident transparency report demonstrate, per the lesson?**
-A) That the incident was minor enough to skip executive involvement
-B) That engineering resolved the issue faster than competitors would
-C) Genuine accountability, unlike a quiet, unexplained return to normal
-D) That the company followed every regulatory requirement to the letter
+A) That the incident was minor enough to skip executives
+B) That engineering beat competitors' resolution speed
+C) That every regulatory requirement was followed exactly
+D) Genuine accountability, unlike a quiet return to normal
 
-*Correct answer: C*
+*Correct answer: D*
 *Explanation: A public post-incident report explaining cause, impact, and preventive changes demonstrates genuine accountability rather than a quiet, unexplained return to normal operation.*
 *Learning objective tested: #4*
 *Difficulty: Easy*
@@ -350,10 +350,10 @@ D) That the company followed every regulatory requirement to the letter
 ---
 
 **5. In the Silent Outage case study, what was the team's first mistake?**
-A) They published a postmortem before the outage was resolved
-B) They withheld external communication for hours while investigating
-C) They over-communicated before understanding the severity
-D) They assigned the incident to the wrong engineering team
+A) They published a postmortem before the outage resolved
+B) They withheld communication for hours while investigating
+C) They assigned the incident to the wrong engineering team
+D) They over-communicated before understanding severity
 
 *Correct answer: B*
 *Explanation: No external communication was issued for several hours while the team wanted to understand the root cause before saying anything definitive, letting silence compound customer anxiety.*
@@ -364,11 +364,11 @@ D) They assigned the incident to the wrong engineering team
 
 **6. What was the second mistake in the Silent Outage case study?**
 A) The company never issued any update at all to customers
-B) The postmortem was published without naming a root cause
-C) Support tickets were closed before customers got a response
-D) The eventual update gave a timeline that was then missed
+B) Support tickets were closed before customers got a reply
+C) The eventual update gave a timeline that was then missed
+D) The postmortem was published without naming a cause
 
-*Correct answer: D*
+*Correct answer: C*
 *Explanation: When a status update finally appeared, it provided an optimistic, specific resolution timeline that was missed by several hours, creating a second, avoidable broken promise.*
 *Learning objective tested: #3, #5*
 *Difficulty: Easy*
@@ -376,8 +376,8 @@ D) The eventual update gave a timeline that was then missed
 ---
 
 **7. Per the Incident Communication Checklist, what happens if Rapid Acknowledgment is skipped?**
-A) Silence compounds anxiety and trust erosion among users
-B) Nothing significant, since acknowledgment is mostly a formality
+A) Silence compounds anxiety and erodes trust among users
+B) Nothing significant, since acknowledgment is a formality
 C) The postmortem process becomes formally invalid
 D) Engineering containment automatically slows down
 
@@ -390,11 +390,11 @@ D) Engineering containment automatically slows down
 
 **8. Why does the checklist call for distinguishing known facts from ongoing investigation in every update?**
 A) Because regulators require this exact three-part structure
-B) Because customers cannot process more than one topic at once
-C) Because blurring the two can overstate or understate progress
-D) Because it shortens the length of the eventual postmortem
+B) Because customers cannot process more than one topic
+C) Because it shortens the length of the final postmortem
+D) Blurring the two can overstate or understate progress
 
-*Correct answer: C*
+*Correct answer: D*
 *Explanation: Blurring known facts, working hypotheses, and genuine unknowns into one update can overstate confidence or understate progress, and either error erodes credibility once contradicted by events.*
 *Learning objective tested: #3, #5*
 *Difficulty: Medium*
@@ -402,10 +402,10 @@ D) Because it shortens the length of the eventual postmortem
 ---
 
 **9. Per the Real World Perspective section, what is a specific downside of the improvised communication common at startups?**
-A) It's less effective in the moment than a formal escalation process
-B) It leaves no institutional memory, so the next incident starts fresh
-C) It requires far more executive sign-off than larger companies use
-D) It's typically slower than a mid-size company's formal process
+A) It's less effective than a formal escalation process
+B) It leaves no institutional memory for the next incident
+C) It needs far more sign-off than larger companies use
+D) It's typically slower than a mid-size company's process
 
 *Correct answer: B*
 *Explanation: Improvised communication can work adequately at small scale, but it leaves no institutional memory — the next incident, potentially handled by a different person, starts from the same improvisation.*
@@ -415,12 +415,12 @@ D) It's typically slower than a mid-size company's formal process
 ---
 
 **10. What do large organizations typically maintain, per the Real World Perspective section, that helps the Contain and Communicate phase avoid stalling?**
-A) A policy routing every incident through executive approval first
-B) Reliance on a single spokesperson for every incident type
-C) A rule against publishing a postmortem until legal review ends
-D) Dedicated incident teams with pre-approved communication templates
+A) A policy routing every incident through executives first
+B) Reliance on one single spokesperson for every incident
+C) Incident teams with pre-approved communication templates
+D) A rule blocking any postmortem until legal review ends
 
-*Correct answer: D*
+*Correct answer: C*
 *Explanation: Large organizations typically maintain dedicated incident response teams with formal severity classification and pre-approved communication templates, so the phase doesn't stall waiting for language to be drafted from scratch.*
 *Learning objective tested: #5*
 *Difficulty: Medium*
@@ -428,10 +428,10 @@ D) Dedicated incident teams with pre-approved communication templates
 ---
 
 **11. How does the Crisis Response Timeline's communication discipline connect to Lesson 62's Promise Tiers?**
-A) An unfulfillable timeline is a broken promise, echoing the point about unkeepable commitments
-B) Promise Tiers applies only to API contracts, not crisis communication
-C) The two concepts address entirely unrelated aspects of product work
-D) Crisis communication replaces the need for any promise framework
+A) An unfulfillable timeline echoes a broken promise
+B) Promise Tiers applies only to API contracts, not crises
+C) The two concepts address entirely unrelated topics
+D) Crisis communication replaces any promise framework
 
 *Correct answer: A*
 *Explanation: An unfulfillable resolution timeline is a broken promise, directly echoing Lesson 62's discipline that an unkeepable commitment is worse than no committed timeline at all.*
@@ -443,10 +443,10 @@ D) Crisis communication replaces the need for any promise framework
 **12. (Scenario) A company's engineering team has been investigating a major outage for an hour with no confirmed root cause. What should its communication do?**
 A) Wait until the root cause is confirmed before saying anything
 B) Provide a specific resolution timeline to reassure customers
-C) Acknowledge honestly without committing to an unconfident timeline
-D) Delay any statement until the postmortem is ready to publish
+C) Delay any statement until the postmortem is ready to publish
+D) Acknowledge honestly without committing to a firm timeline
 
-*Correct answer: C*
+*Correct answer: D*
 *Explanation: A calm, honest, symptom-level acknowledgment — without a specific timeline the team isn't yet confident in — follows the parallel communication and containment principle.*
 *Learning objective tested: #1, #3, #5*
 *Difficulty: Medium-Hard*
@@ -455,9 +455,9 @@ D) Delay any statement until the postmortem is ready to publish
 
 **13. (Product Thinking) A team wants to delay all communication until they are fully certain about the root cause. What is the strongest response?**
 A) Agree, since certainty should always precede any statement
-B) Explain that acknowledgment can happen immediately, apart from resolving uncertainty
-C) Suggest skipping communication and moving straight to the postmortem
-D) Recommend canceling the incident response process until next quarter
+B) Explain acknowledgment can happen apart from resolving uncertainty
+C) Recommend canceling incident response until next quarter
+D) Suggest skipping communication and going straight to a postmortem
 
 *Correct answer: B*
 *Explanation: Acknowledgment can and should happen immediately, separate from resolving technical uncertainty, since silence during a visible failure compounds the longer it persists.*
@@ -467,12 +467,12 @@ D) Recommend canceling the incident response process until next quarter
 ---
 
 **14. (Interview Reasoning) A candidate, describing how they'd handle a major outage, talks only about supporting engineering and never mentions communicating with users. What does this reveal?**
-A) A complete and well-rounded understanding of crisis management
+A) A complete and well-rounded grasp of crisis management
 B) Readiness for a senior incident-response leadership role
-C) Nothing meaningful, since engineering support is the only factor
-D) A gap in recognizing communication must run parallel to containment
+C) A gap in recognizing communication runs parallel to containment
+D) Nothing meaningful, since engineering is the only factor
 
-*Correct answer: D*
+*Correct answer: C*
 *Explanation: Focusing only on engineering support misses the lesson's central point that communication must run in parallel with containment, since silence compounds trust erosion.*
 *Learning objective tested: #1, #5*
 *Difficulty: Hard*
@@ -480,10 +480,10 @@ D) A gap in recognizing communication must run parallel to containment
 ---
 
 **15. (Product Thinking, Highest Difficulty) A major outage is underway with no confirmed root cause, and leadership wants to reassure customers with a specific resolution timeline. What is the most defensible response, using this lesson's frameworks?**
-A) Acknowledge immediately and honestly, decline the unconfident timeline, and prepare a postmortem once resolved
-B) Give leadership the specific timeline they're requesting to keep customers calm
+A) Acknowledge honestly, decline the timeline, postmortem later
+B) Give leadership the timeline they're requesting to stay calm
 C) Say nothing publicly until the root cause is fully understood
-D) Withhold any acknowledgment until the incident is completely resolved
+D) Withhold acknowledgment until the incident is fully resolved
 
 *Correct answer: A*
 *Explanation: The most defensible response combines immediate honest acknowledgment, avoidance of an unconfirmed timeline, and a transparent postmortem once resolved — the full Crisis Response Timeline discipline applied together.*
