@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Trophy, Flame, Zap, ArrowUp, ArrowDown, Minus, ExternalLink, Shield } from 'lucide-react'
+import { Trophy, Flame, Zap, ArrowUp, ArrowDown, ExternalLink, Shield } from 'lucide-react'
 import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
 import { cn } from '@/lib/utils'
 
@@ -143,7 +143,7 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
                         <span className="text-sm text-muted-foreground font-mono">#{entry.rank}</span>
                       )}
 
-                      {/* Rank Change Arrow */}
+                      {/* Rank Change Arrow (only show on positive/negative movement) */}
                       {entry.positionChange > 0 && (
                         <span className="text-[10px] text-emerald-500 font-bold flex items-center" title={`Up ${entry.positionChange} ranks`}>
                           <ArrowUp className="w-3 h-3" />
@@ -152,11 +152,6 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
                       {entry.positionChange < 0 && (
                         <span className="text-[10px] text-rose-500 font-bold flex items-center" title={`Down ${Math.abs(entry.positionChange)} ranks`}>
                           <ArrowDown className="w-3 h-3" />
-                        </span>
-                      )}
-                      {entry.positionChange === 0 && (
-                        <span className="text-[10px] text-muted-foreground/50" title="Same rank">
-                          <Minus className="w-2.5 h-2.5" />
                         </span>
                       )}
                     </div>

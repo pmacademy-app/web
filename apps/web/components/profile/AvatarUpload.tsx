@@ -106,22 +106,25 @@ export function AvatarUpload({ currentAvatarUrl, onUploadSuccess, onRemove }: Av
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-5">
-      <div className="relative group w-20 h-20 rounded-full border-2 border-border bg-card overflow-hidden flex items-center justify-center shadow-xs">
-        {avatarUrl ? (
-          <Image src={avatarUrl} alt="Avatar Preview" className="w-full h-full object-cover" width={80} height={80} unoptimized />
-        ) : (
-          <User className="w-8 h-8 text-muted-foreground/60" />
-        )}
+    <div className="flex flex-col sm:flex-row items-center gap-4">
+      <div className="relative group w-16 h-16 rounded-full p-[2.5px] overflow-hidden flex items-center justify-center shadow-xs hover:shadow-[0_0_14px_rgba(16,185,129,0.45)] transition-shadow shrink-0">
+        <div className="absolute inset-[-100%] animate-spin-gradient bg-[conic-gradient(from_0deg,#1F6B4E,#10b981,#34d399,#6ee7b7,#10b981,#047857,#1F6B4E)]" />
+        <div className="relative w-full h-full rounded-full bg-card overflow-hidden flex items-center justify-center">
+          {avatarUrl ? (
+            <Image src={avatarUrl} alt="Avatar Preview" className="w-full h-full object-cover" width={64} height={64} unoptimized />
+          ) : (
+            <User className="w-6 h-6 text-muted-foreground/60" />
+          )}
 
-        {/* Hover overlay for upload */}
-        <label
-          htmlFor="avatar-upload-input"
-          className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center cursor-pointer transition-opacity text-white"
-          title="Upload new image"
-        >
-          {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
-        </label>
+          {/* Hover overlay for upload */}
+          <label
+            htmlFor="avatar-upload-input"
+            className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center cursor-pointer transition-opacity text-white"
+            title="Upload new image"
+          >
+            {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+          </label>
+        </div>
         <input
           id="avatar-upload-input"
           ref={fileInputRef}

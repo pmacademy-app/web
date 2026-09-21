@@ -199,23 +199,23 @@ export function SearchOverlay() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       aria-modal="true"
       role="dialog"
       aria-label="Search curriculum"
     >
-      {/* Click-outside backdrop */}
+      {/* Click-outside backdrop (blur removed) */}
       <div
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 dark:bg-black/75"
         onClick={closeSearch}
         aria-hidden="true"
       />
 
       {/* Panel */}
-      <div className="relative w-full max-w-xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="relative w-full max-w-xl bg-card border border-border rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
 
         {/* Search Input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
           <Search className="w-4 h-4 text-muted-foreground shrink-0" />
           <input
             ref={inputRef}
@@ -225,7 +225,7 @@ export function SearchOverlay() {
             onChange={(e) => dispatch({ type: 'SET_QUERY', query: e.target.value })}
             onKeyDown={handleKeyDown}
             placeholder="Search 90 lessons, flashcards, glossary…"
-            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 border-0"
             aria-label="Search query"
             autoComplete="off"
             spellCheck="false"

@@ -16,6 +16,7 @@ interface AppShellProps {
     email: string
     level: number
     cohort_id?: string | null
+    avatar_url?: string | null
   }
 }
 

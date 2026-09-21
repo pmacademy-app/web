@@ -3,7 +3,7 @@
 import React from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { User, Shield, Briefcase, Bell, Gift, AlertTriangle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { ProfileSettingsTab } from '@/components/settings/ProfileSettingsTab'
 import { SecuritySettingsTab } from '@/components/settings/SecuritySettingsTab'
 import { PortfolioSettingsForm } from '@/components/settings/PortfolioSettingsForm'
@@ -12,6 +12,21 @@ import { ReferralSettingsTab } from '@/components/settings/ReferralSettingsTab'
 import { DangerZoneTab } from '@/components/settings/DangerZoneTab'
 
 export type SettingsTabKey = 'profile' | 'security' | 'portfolio' | 'notifications' | 'referrals' | 'danger-zone'
+
+interface TabItem {
+  key: SettingsTabKey
+  label: string
+  icon: React.ElementType
+}
+
+const TABS: TabItem[] = [
+  { key: 'profile', label: 'Profile', icon: User },
+  { key: 'security', label: 'Security', icon: Shield },
+  { key: 'portfolio', label: 'Portfolio', icon: Briefcase },
+  { key: 'notifications', label: 'Notifications', icon: Bell },
+  { key: 'referrals', label: 'Referrals', icon: Gift },
+  { key: 'danger-zone', label: 'Danger Zone', icon: AlertTriangle },
+]
 
 export function SettingsTabs() {
   const searchParams = useSearchParams()
@@ -26,78 +41,35 @@ export function SettingsTabs() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* 6-Tab Navigation */}
-      <div className="flex items-center gap-1.5 border-b border-border pb-2 overflow-x-auto scrollbar-none max-w-full">
-        <Button
-          type="button"
-          variant={activeTab === 'profile' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => handleTabChange('profile')}
-          className="rounded-xl font-bold"
-        >
-          <User className="w-4 h-4" />
-          Profile
-        </Button>
+    <div className="space-y-4">
+      {/* Option B: Sleek Recessed Segmented Control Strip */}
+      <div className="inline-flex max-w-full items-center p-0.5 bg-muted/60 dark:bg-muted/40 rounded-lg border border-border/60 gap-0.5 overflow-x-auto scrollbar-none shadow-2xs">
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.key
+          const isDanger = tab.key === 'danger-zone'
+          const Icon = tab.icon
 
-        <Button
-          type="button"
-          variant={activeTab === 'security' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => handleTabChange('security')}
-          className="rounded-xl font-bold"
-        >
-          <Shield className="w-4 h-4" />
-          Security
-        </Button>
-
-        <Button
-          type="button"
-          variant={activeTab === 'portfolio' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => handleTabChange('portfolio')}
-          className="rounded-xl font-bold"
-        >
-          <Briefcase className="w-4 h-4" />
-          Portfolio
-        </Button>
-
-        <Button
-          type="button"
-          variant={activeTab === 'notifications' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => handleTabChange('notifications')}
-          className="rounded-xl font-bold"
-        >
-          <Bell className="w-4 h-4" />
-          Notifications
-        </Button>
-
-        <Button
-          type="button"
-          variant={activeTab === 'referrals' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => handleTabChange('referrals')}
-          className="rounded-xl font-bold"
-        >
-          <Gift className="w-4 h-4" />
-          Referrals
-        </Button>
-
-        <Button
-          type="button"
-          variant={activeTab === 'danger-zone' ? 'destructive' : 'ghost'}
-          size="sm"
-          onClick={() => handleTabChange('danger-zone')}
-          className={
-            activeTab === 'danger-zone'
-              ? 'rounded-xl font-bold'
-              : 'rounded-xl font-bold text-destructive hover:text-destructive hover:bg-destructive/10'
-          }
-        >
-          <AlertTriangle className="w-4 h-4" />
-          Danger Zone
-        </Button>
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => handleTabChange(tab.key)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-all cursor-pointer whitespace-nowrap select-none',
+                isActive
+                  ? isDanger
+                    ? 'bg-card text-destructive shadow-2xs border border-destructive/20 font-semibold'
+                    : 'bg-card text-foreground shadow-2xs border border-border/50 font-semibold'
+                  : isDanger
+                    ? 'text-destructive/70 hover:text-destructive hover:bg-destructive/10 font-medium'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-background/40 font-medium'
+              )}
+            >
+              <Icon className={cn('w-3.5 h-3.5 shrink-0', isActive && !isDanger && 'text-primary')} />
+              <span>{tab.label}</span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Active Tab View */}

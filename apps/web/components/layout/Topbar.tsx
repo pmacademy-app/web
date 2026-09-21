@@ -18,6 +18,7 @@ interface TopbarProps {
     name: string | null
     email: string
     level: number
+    avatar_url?: string | null
   }
 }
 
@@ -184,10 +185,24 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
             aria-expanded={dropdownOpen}
             aria-haspopup="menu"
             aria-label="Open user profile menu"
-            className="flex items-center justify-center p-1.5 min-w-[44px] min-h-[44px] rounded-full border border-border bg-card hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer"
+            className="flex items-center justify-center p-1 min-w-[44px] min-h-[44px] rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all cursor-pointer group"
           >
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-              {userProfile.name ? userProfile.name[0].toUpperCase() : <User className="w-4 h-4" />}
+            {/* Moving Animated Theme Green Gradient Border */}
+            <div className="relative w-9 h-9 rounded-full p-[2px] overflow-hidden flex items-center justify-center shadow-xs group-hover:shadow-[0_0_14px_rgba(16,185,129,0.5)] transition-shadow">
+              <div className="absolute inset-[-100%] animate-spin-gradient bg-[conic-gradient(from_0deg,#1F6B4E,#10b981,#34d399,#6ee7b7,#10b981,#047857,#1F6B4E)]" />
+              <div className="relative w-full h-full rounded-full bg-card dark:bg-background p-0.5 flex items-center justify-center overflow-hidden">
+                {userProfile.avatar_url ? (
+                  <img
+                    src={userProfile.avatar_url}
+                    alt={userProfile.name || 'User avatar'}
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs select-none">
+                    {userProfile.name ? userProfile.name[0].toUpperCase() : <User className="w-3.5 h-3.5" />}
+                  </div>
+                )}
+              </div>
             </div>
           </button>
 

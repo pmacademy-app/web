@@ -1,16 +1,26 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BookOpen, Award, RotateCw, BarChart3, Trophy, Settings, X } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutDashboard, BookOpen, Award, RotateCw, BarChart3, Trophy, Settings, X, ChevronDown, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
-import { BRAND } from '@/lib/brand'
+import { createBrowserSupabaseClient } from '@/lib/supabase'
 
 interface SidebarProps {
   isOpen: boolean
   onClose: () => void
 }
+
+const PROGRESS_SUBSECTIONS = [
+  { label: 'Next Milestone', href: '/progress/milestones', tag: 'NEW' },
+  { label: 'Skill Radar', href: '/progress/radar', tag: 'NEW' },
+  { label: 'Core Metrics', href: '/progress/metrics', tag: 'NEW' },
+  { label: 'Badge Showcase', href: '/progress/badges', tag: 'NEW' },
+  { label: 'Capstones', href: '/progress/capstones', tag: 'NEW' },
+  { label: 'Certificates', href: '/progress/certificates', tag: 'NEW' },
+]
 
 const SIDEBAR_LINKS = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, quickStartTarget: undefined },
@@ -24,7 +34,40 @@ const SIDEBAR_LINKS = [
 ]
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const router = useRouter()
   const pathname = usePathname()
+  const isProgressRoute = pathname === '/progress' || pathname.startsWith('/progress')
+  const [progressExpanded, setProgressExpanded] = useState(isProgressRoute)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleSignOut = async () => {
+    try {
+      setIsLoggingOut(true)
+      const supabase = createBrowserSupabaseClient()
+      await supabase.auth.signOut()
+
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'sign_out', session: null }),
+      })
+
+      onClose()
+      router.push('/login')
+      router.refresh()
+    } catch (err) {
+      console.error('[Sidebar] Sign out error:', err)
+      setIsLoggingOut(false)
+    }
+  }
+
+  useEffect(() => {
+    if (isProgressRoute) {
+      setProgressExpanded(true)
+    }
+  }, [isProgressRoute])
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-card border-r border-border py-6 px-4">
@@ -55,6 +98,65 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           const isActive =
             pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href))
 
+          if (link.label === 'Progress') {
+            const isProgressActive = isProgressRoute
+            return (
+              <div key={link.label} className="space-y-1">
+                <button
+                  type="button"
+                  aria-expanded={progressExpanded}
+                  aria-label="Toggle Progress menu"
+                  onClick={() => setProgressExpanded((prev) => !prev)}
+                  className={cn(
+                    'w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer group select-none text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1',
+                    isProgressActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-secondary/40 hover:text-foreground'
+                  )}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Icon className="w-5 h-5 shrink-0" />
+                    <span className="truncate">{link.label}</span>
+                  </div>
+
+                  <ChevronDown
+                    className={cn(
+                      'w-3.5 h-3.5 transition-transform duration-200 shrink-0 text-muted-foreground group-hover:text-foreground',
+                      progressExpanded && 'rotate-180 text-primary'
+                    )}
+                  />
+                </button>
+
+                {/* Dropdown sections with NEW tag */}
+                {progressExpanded && (
+                  <div className="ml-5 pl-3 border-l border-border/70 space-y-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                    {PROGRESS_SUBSECTIONS.map((sub) => {
+                      const isSubActive = pathname === sub.href
+                      return (
+                        <Link
+                          key={sub.href}
+                          href={sub.href}
+                          onClick={onClose}
+                          className={cn(
+                            'flex items-center justify-between py-1.5 px-2 rounded-md text-xs transition-colors group select-none',
+                            isSubActive
+                              ? 'bg-primary/15 text-primary font-semibold shadow-2xs'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50 font-medium'
+                          )}
+                        >
+                          <span className="truncate">{sub.label}</span>
+                          <span className="px-1.5 py-0.2 rounded text-[8px] font-bold font-mono tracking-wide bg-primary/10 text-primary border border-primary/20 shrink-0">
+                            {sub.tag}
+                          </span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          }
+
           return (
             <Link
               key={link.href}
@@ -75,11 +177,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         })}
       </nav>
 
-      {/* Footer / Built with tag */}
-      <div className="border-t border-border pt-4 px-2">
-        <p className="text-[10px] text-muted-foreground/60 uppercase font-semibold tracking-wider">
-          Built with {BRAND.shortName}
-        </p>
+      {/* Footer / Logout Button */}
+      <div className="border-t border-border pt-3 mt-auto">
+        <button
+          type="button"
+          onClick={handleSignOut}
+          disabled={isLoggingOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-1 cursor-pointer disabled:opacity-50"
+        >
+          <LogOut className="w-5 h-5 shrink-0" />
+          <span>{isLoggingOut ? 'Logging out...' : 'Log out'}</span>
+        </button>
       </div>
     </div>
   )
