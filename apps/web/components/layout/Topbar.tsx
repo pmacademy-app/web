@@ -178,8 +178,9 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
                 <defs>
                   <linearGradient id="topbarGreenAura" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#10b981" />
-                    <stop offset="50%" stopColor="#34d399" />
-                    <stop offset="100%" stopColor="#059669" />
+                    <stop offset="35%" stopColor="#34d399" />
+                    <stop offset="70%" stopColor="#059669" />
+                    <stop offset="100%" stopColor="#10b981" />
                   </linearGradient>
                 </defs>
                 <circle
@@ -188,9 +189,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
                   r="18"
                   fill="none"
                   stroke="url(#topbarGreenAura)"
-                  strokeWidth="2"
-                  strokeDasharray="80 32"
-                  strokeLinecap="round"
+                  strokeWidth="2.5"
                 />
               </svg>
 
