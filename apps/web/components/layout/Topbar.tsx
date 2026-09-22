@@ -172,15 +172,15 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
             <div className="relative w-10 h-10 flex items-center justify-center">
               {/* Ultra-crisp vector rotating gradient ring */}
               <svg
-                className="absolute inset-0 w-full h-full animate-[spin_3s_linear_infinite] motion-reduce:animate-none pointer-events-none drop-shadow-[0_0_6px_rgba(16,185,129,0.45)]"
+                className="absolute inset-0 w-full h-full animate-[spin_3s_linear_infinite] motion-reduce:animate-none pointer-events-none drop-shadow-[0_0_6px_rgba(31,107,78,0.5)]"
                 viewBox="0 0 40 40"
               >
                 <defs>
                   <linearGradient id="topbarGreenAura" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#10b981" />
-                    <stop offset="35%" stopColor="#34d399" />
-                    <stop offset="70%" stopColor="#059669" />
-                    <stop offset="100%" stopColor="#10b981" />
+                    <stop offset="0%" stopColor="#1F6B4E" />
+                    <stop offset="35%" stopColor="#2E8B67" />
+                    <stop offset="70%" stopColor="#16543D" />
+                    <stop offset="100%" stopColor="#1F6B4E" />
                   </linearGradient>
                 </defs>
                 <circle

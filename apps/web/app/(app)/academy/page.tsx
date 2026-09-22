@@ -165,7 +165,7 @@ export default async function AcademyPage() {
                   ? `Continue: Lesson ${nextIncompleteLesson.order} - ${nextIncompleteLesson.title}`
                   : 'Curriculum Completed'
               }
-              className="group relative rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs flex items-center gap-4.5 hover:border-emerald-500/50 hover:bg-card/90 hover:shadow-md transition-all block focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
+              className="group relative rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs flex items-center gap-4.5 hover:border-primary/50 hover:bg-card/90 hover:shadow-md transition-all block focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
             >
               {/* Pie Chart Circle -> Dynamic Green Progress, Transforms to Play button on hover */}
               <div className="relative flex items-center justify-center shrink-0">
@@ -183,7 +183,7 @@ export default async function AcademyPage() {
                     cx="50"
                     cy="50"
                     r="40"
-                    className="text-emerald-500 dark:text-emerald-400 transition-all duration-700 ease-out"
+                    className="text-primary transition-all duration-700 ease-out"
                     stroke="currentColor"
                     strokeWidth="8"
                     strokeDasharray={251.3}
@@ -205,16 +205,16 @@ export default async function AcademyPage() {
 
                 {/* Hover State: Play Button to Continue Lesson */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-200 pointer-events-none">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 group-hover:scale-110 transition-transform">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
                     <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-0.5" />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1.5 min-w-[120px]">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                   <span>{nextIncompleteLesson ? 'Continue Lesson' : 'Review Curriculum'}</span>
-                  <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-emerald-600 dark:text-emerald-400" />
+                  <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-primary" />
                 </div>
                 {nextIncompleteLesson && (
                   <div className="text-[11px] text-muted-foreground line-clamp-1 max-w-[160px]">
@@ -300,7 +300,7 @@ export default async function AcademyPage() {
                           <span
                             title="Completed"
                             aria-label="Completed"
-                            className="inline-flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0"
+                            className="inline-flex items-center justify-center text-primary shrink-0"
                           >
                             <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
                           </span>
