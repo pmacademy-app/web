@@ -1,8 +1,8 @@
-﻿import { BrandMarkProdily } from '@/components/brand/BrandLogo'
+import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Under Maintenance — Prodily',
+  title: 'Under Maintenance | Prodily',
   description: 'Prodily is currently undergoing scheduled maintenance. We will be back shortly.',
   robots: { index: false, follow: false },
 }

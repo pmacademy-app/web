@@ -102,10 +102,10 @@ export function AdminDataTable<T>({
 
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="bg-admin-surface border border-admin-border rounded-xl overflow-hidden shadow-xl backdrop-blur">
+      <div className="bg-admin-surface border border-admin-border rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto scrollbar-thin">
           <table className="w-full text-left text-xs text-admin-fg-muted min-w-[640px]">
-            <thead className="bg-admin-surface-raised text-admin-fg-subtle uppercase tracking-wider text-[10px] font-bold border-b border-admin-border sticky top-0 z-10 backdrop-blur">
+            <thead className="bg-admin-surface-raised text-admin-fg-subtle uppercase tracking-wider text-[10px] font-bold border-b border-admin-border sticky top-0 z-10">
               <tr>
                 {columns.map((col, idx) => renderHeader(col, idx))}
                 {rowActions && <th className="px-5 py-3.5 text-right">Actions</th>}

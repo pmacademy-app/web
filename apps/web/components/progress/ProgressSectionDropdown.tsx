@@ -17,8 +17,6 @@ interface SectionItem {
   id: string
   label: string
   icon: React.ElementType
-  tag: string
-  tagColor?: string
 }
 
 const SECTIONS: SectionItem[] = [
@@ -26,43 +24,31 @@ const SECTIONS: SectionItem[] = [
     id: 'section-recommended',
     label: 'Next Milestone',
     icon: Sparkles,
-    tag: 'NEW',
-    tagColor: 'bg-primary/10 text-primary border-primary/20',
   },
   {
     id: 'section-radar',
     label: 'Skill Radar',
     icon: Radar,
-    tag: 'NEW',
-    tagColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
   },
   {
     id: 'section-metrics',
     label: 'Performance Metrics',
     icon: BarChart3,
-    tag: 'NEW',
-    tagColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
   },
   {
     id: 'section-badges',
     label: 'Badge Showcase',
     icon: Award,
-    tag: 'NEW',
-    tagColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
   },
   {
     id: 'section-capstones',
     label: 'Capstone Projects',
     icon: Briefcase,
-    tag: 'NEW',
-    tagColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
   },
   {
     id: 'section-certificates',
     label: 'Certificates',
     icon: GraduationCap,
-    tag: 'NEW',
-    tagColor: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
   },
 ]
 
@@ -151,20 +137,10 @@ export function ProgressSectionDropdown() {
                   type="button"
                   role="menuitem"
                   onClick={() => scrollToSection(section.id)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-secondary/70 transition-colors cursor-pointer group text-left"
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-secondary/70 transition-colors cursor-pointer group text-left"
                 >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Icon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                    <span className="truncate">{section.label}</span>
-                  </div>
-                  <span
-                    className={cn(
-                      'ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold font-mono tracking-wide border shrink-0',
-                      section.tagColor || 'bg-primary/10 text-primary border-primary/20'
-                    )}
-                  >
-                    {section.tag}
-                  </span>
+                  <Icon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                  <span className="truncate">{section.label}</span>
                 </button>
               )
             })}

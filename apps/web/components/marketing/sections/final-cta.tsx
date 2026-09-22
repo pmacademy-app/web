@@ -27,13 +27,6 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
       className="relative py-24 lg:py-32 overflow-hidden border-t border-[#DED8CB]/80 bg-background scroll-mt-24 lg:scroll-mt-28"
     >
       {/* Subtle ambient light vignette for soft depth */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-30"
-      >
-        <div className="w-[600px] h-[300px] rounded-full bg-primary/10 blur-[90px]" />
-      </div>
-
       <div className="relative max-w-[1120px] mx-auto px-5 lg:px-8">
         <Reveal
           amount={0.3}
@@ -41,7 +34,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
         >
           {/* Trust Strip — only shown when specified */}
           {showTrustStrip && (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DED8CB] text-xs text-[#70685A] font-medium mb-4 shadow-2xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-card border border-border text-xs text-muted-foreground font-medium mb-4 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-primary inline-block" />
               Built for the first wave of learners. Help shape what comes next.
             </div>

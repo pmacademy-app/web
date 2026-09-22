@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, BookOpen, Award, RotateCw, BarChart3, Trophy, Settings, X, ChevronDown, LogOut } from 'lucide-react'
+import { LayoutDashboard, BookOpen, Award, RotateCw, BarChart3, Trophy, Settings, X, ChevronDown, LogOut, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { useSearch } from '@/components/search/SearchOverlayProvider'
 
 interface SidebarProps {
   isOpen: boolean
@@ -14,12 +15,12 @@ interface SidebarProps {
 }
 
 const PROGRESS_SUBSECTIONS = [
-  { label: 'Next Milestone', href: '/progress/milestones', tag: 'NEW' },
-  { label: 'Skill Radar', href: '/progress/radar', tag: 'NEW' },
-  { label: 'Core Metrics', href: '/progress/metrics', tag: 'NEW' },
-  { label: 'Badge Showcase', href: '/progress/badges', tag: 'NEW' },
-  { label: 'Capstones', href: '/progress/capstones', tag: 'NEW' },
-  { label: 'Certificates', href: '/progress/certificates', tag: 'NEW' },
+  { label: 'Next Milestone', href: '/progress/milestones' },
+  { label: 'Skill Radar', href: '/progress/radar' },
+  { label: 'Core Metrics', href: '/progress/metrics' },
+  { label: 'Badge Showcase', href: '/progress/badges' },
+  { label: 'Capstones', href: '/progress/capstones' },
+  { label: 'Certificates', href: '/progress/certificates' },
 ]
 
 const SIDEBAR_LINKS = [
@@ -36,6 +37,7 @@ const SIDEBAR_LINKS = [
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const { openSearch } = useSearch()
   const isProgressRoute = pathname === '/progress' || pathname.startsWith('/progress')
   const [progressExpanded, setProgressExpanded] = useState(isProgressRoute)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -72,7 +74,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-card border-r border-border py-6 px-4">
       {/* Logo: Logo Mark + Prodily */}
-      <div className="flex items-center justify-between px-2 mb-8">
+      <div className="flex items-center justify-between px-2 mb-5">
         <Link
           href="/dashboard"
           className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
@@ -88,6 +90,29 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           aria-label="Close navigation"
         >
           <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Search Trigger */}
+      <div className="mb-4">
+        <button
+          type="button"
+          id="sidebar-search-trigger-btn"
+          onClick={() => {
+            onClose()
+            openSearch()
+          }}
+          aria-label="Search curriculum (Ctrl+K)"
+          aria-keyshortcuts="Control+k Meta+k"
+          className="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg bg-secondary/40 hover:bg-secondary/70 border border-border/60 hover:border-border text-xs text-muted-foreground hover:text-foreground transition-all duration-150 cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-2xs"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Search className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
+            <span className="truncate text-xs font-medium">Search...</span>
+          </div>
+          <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground/70 bg-background/80 border border-border/50 rounded shadow-2xs">
+            ⌘K
+          </kbd>
         </button>
       </div>
 
@@ -127,7 +152,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   />
                 </button>
 
-                {/* Dropdown sections with NEW tag */}
+                {/* Dropdown sections */}
                 {progressExpanded && (
                   <div className="ml-5 pl-3 border-l border-border/70 space-y-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
                     {PROGRESS_SUBSECTIONS.map((sub) => {
@@ -138,16 +163,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                           href={sub.href}
                           onClick={onClose}
                           className={cn(
-                            'flex items-center justify-between py-1.5 px-2 rounded-md text-xs transition-colors group select-none',
+                            'flex items-center py-1.5 px-2 rounded-md text-xs transition-colors group select-none',
                             isSubActive
                               ? 'bg-primary/15 text-primary font-semibold shadow-2xs'
                               : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50 font-medium'
                           )}
                         >
                           <span className="truncate">{sub.label}</span>
-                          <span className="px-1.5 py-0.2 rounded text-[8px] font-bold font-mono tracking-wide bg-primary/10 text-primary border border-primary/20 shrink-0">
-                            {sub.tag}
-                          </span>
                         </Link>
                       )
                     })}
@@ -204,7 +226,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="fixed inset-0 z-40 lg:hidden flex">
           {/* Overlay backdrop */}
           <div
-            className="fixed inset-0 bg-black/45 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/50 transition-opacity"
             onClick={onClose}
             aria-hidden="true"
           />

@@ -79,7 +79,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="admin-console min-h-screen bg-admin-bg text-admin-fg flex items-center justify-center p-4 antialiased selection:bg-admin-accent/30 selection:text-admin-accent">
-      <div className="max-w-md w-full p-8 rounded-2xl bg-admin-surface border border-admin-border space-y-6 shadow-2xl backdrop-blur">
+      <div className="max-w-md w-full p-8 rounded-2xl bg-admin-surface border border-admin-border space-y-6 shadow-xl">
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-xl bg-admin-accent/20 text-admin-accent border border-admin-accent/30 flex items-center justify-center font-bold mx-auto shadow-inner">

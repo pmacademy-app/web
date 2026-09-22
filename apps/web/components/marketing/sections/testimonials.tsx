@@ -107,7 +107,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Quote className="w-6 h-6 text-primary/40" />
-                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                         Verified Review
                       </span>
                     </div>

@@ -78,7 +78,7 @@ export function AdminNotificationListView({ events }: AdminNotificationListViewP
         <div className="text-[11px] text-admin-fg leading-relaxed space-y-1">
           <p className="font-bold text-admin-info uppercase tracking-wider">Notification Management</p>
           <p>
-            Creating, scheduling and sending in-app notifications is not yet available — the notification
+            Creating, scheduling and sending in-app notifications is not yet available; the notification
             platform currently dispatches events automatically from learning activity. This view is a
             read-only diagnostic of those events.
           </p>

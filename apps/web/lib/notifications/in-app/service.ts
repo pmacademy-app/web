@@ -145,7 +145,7 @@ export function buildInAppContentFromEvent(event: EventEnvelope<Record<string, u
       return { title: `Level ${payload.newLevel} reached!`, body: `You advanced to level ${payload.newLevel} (${String(payload.levelTitle || 'PM')}). Keep it up!`, actionUrl: '/progress' }
     }
     case 'streak.updated': {
-      return { title: `Welcome back — day ${payload.currentStreak || 1}!`, body: 'Your study streak continues. Keep the momentum going.', actionUrl: '/dashboard' }
+      return { title: `Welcome back: Day ${payload.currentStreak || 1}!`, body: 'Your study streak continues. Keep the momentum going.', actionUrl: '/dashboard' }
     }
     case 'portfolio.published': {
       return { title: 'Public portfolio published', body: `Your public portfolio is live at /${String(payload.username || '')}.`, actionUrl: `/p/${String(payload.username || '')}` }

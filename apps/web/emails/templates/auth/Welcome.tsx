@@ -24,9 +24,9 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
         Here is what awaits you:
       </p>
       <ul style={{ fontSize: '14px', color: '#70685A', paddingLeft: '20px', lineHeight: 1.8 }}>
-        <li><strong>9 Structured Modules</strong> — From PM foundations to product strategy &amp; execution.</li>
-        <li><strong>Interactive Quizzes &amp; Spaced Repetition</strong> — Retain core concepts.</li>
-        <li><strong>Real-World Capstones &amp; Portfolio</strong> — Build verifiable PM project credentials.</li>
+        <li><strong>9 Structured Modules</strong>: From PM foundations to product strategy &amp; execution.</li>
+        <li><strong>Interactive Quizzes &amp; Spaced Repetition</strong>: Retain core concepts.</li>
+        <li><strong>Real-World Capstones &amp; Portfolio</strong>: Build verifiable PM project credentials.</li>
       </ul>
       <Button href={`${appUrl}/dashboard`}>Start Lesson 1</Button>
     </EmailWrapper>

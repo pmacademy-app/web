@@ -92,7 +92,7 @@ export function PortfolioCapstones({ capstones }: PortfolioCapstonesProps) {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/50 pb-3.5">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                    Module {String(cap.moduleNumber).padStart(2, '0')} — {cap.moduleTitle}
+                    Module {String(cap.moduleNumber).padStart(2, '0')}: {cap.moduleTitle}
                   </span>
                   {cap.competencyCluster && (
                     <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-secondary text-secondary-foreground border border-border">
@@ -106,12 +106,12 @@ export function PortfolioCapstones({ capstones }: PortfolioCapstonesProps) {
 
                 <div className="flex items-center gap-3 self-start sm:self-auto">
                   {cap.status === 'reviewed' ? (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-[11px] font-semibold text-emerald-500 border border-emerald-500/20">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-[11px] font-semibold text-emerald-500 border border-emerald-500/20">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Reviewed by Prodily</span>
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-muted/60 text-[11px] font-medium text-muted-foreground border border-border/50">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-muted/60 text-[11px] font-medium text-muted-foreground border border-border/50">
                       <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground/60" />
                       <span>Submitted to Prodily</span>
                     </div>

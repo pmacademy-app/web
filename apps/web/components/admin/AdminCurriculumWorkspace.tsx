@@ -168,7 +168,7 @@ export function AdminCurriculumWorkspace({
       }
     >
       {initialLoadFailed && (
-        <AdminLoadWarning message="Live completion stats could not be fetched — showing curriculum content without them. Check that the database is reachable." />
+        <AdminLoadWarning message="Live completion stats could not be fetched, showing curriculum content without them. Check that the database is reachable." />
       )}
 
       {filtered.length === 0 ? (

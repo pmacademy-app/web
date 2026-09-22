@@ -399,7 +399,7 @@ function PortfolioSettingsFormContent({
               <option value="">None (Display standard chronological portfolio)</option>
               {submittedCapstones.map((cap) => (
                 <option key={cap.id} value={cap.id}>
-                  Module {cap.moduleNumber.toString().padStart(2, '0')}: {cap.title} ({cap.deliverableType}) {cap.isPublic ? '' : '— [Private]'}
+                  Module {cap.moduleNumber.toString().padStart(2, '0')}: {cap.title} ({cap.deliverableType}) {cap.isPublic ? '' : '[Private]'}
                 </option>
               ))}
             </select>

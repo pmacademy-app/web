@@ -179,7 +179,7 @@ export function AdminHeader({
 
   return (
     <>
-      <header className="no-print h-16 bg-admin-surface/80 backdrop-blur border-b border-admin-border px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
+      <header className="no-print h-16 bg-admin-surface border-b border-admin-border px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-3 min-w-0">
           {onToggleMobileMenu && (
             <button
@@ -372,7 +372,7 @@ export function AdminHeader({
       {searchOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/50 transition-opacity"
             onClick={handleCloseSearch}
             aria-hidden="true"
           />

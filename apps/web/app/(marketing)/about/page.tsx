@@ -63,7 +63,7 @@ export default function AboutPage() {
           </p>
 
           <p className="text-sm md:text-base">
-            Prodily brings the structure of a complete curriculum together with interactive practice and applied capstones, so learning doesn&apos;t stop at understanding a framework — it continues into doing the work.
+            Prodily brings the structure of a complete curriculum together with interactive practice and applied capstones, so learning doesn&apos;t stop at understanding a framework: it continues into doing the work.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export default function AboutPage() {
                 <span>3. Proof of skill</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Learning should leave you with work you can explain, refine, and showcase — not only a completion credential.
+                Learning should leave you with work you can explain, refine, and showcase, not only a completion credential.
               </p>
             </div>
 

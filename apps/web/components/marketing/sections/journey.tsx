@@ -30,7 +30,7 @@ export function JourneySection() {
             Six stages. Each one builds on the last.
           </h2>
           <p className="text-body-lg text-locked max-w-[540px] mx-auto leading-relaxed">
-            Move from first principles to increasingly complex product decisions — building the judgment, work, and portfolio evidence that accumulate throughout the journey.
+            Move from first principles to increasingly complex product decisions, building the judgment, work, and portfolio evidence that accumulate throughout the journey.
           </p>
         </Reveal>
 

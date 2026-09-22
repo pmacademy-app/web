@@ -34,7 +34,7 @@ export function PortfolioSection() {
             Finish with work you can show, not just a course you completed.
           </h2>
           <p className="text-base sm:text-lg text-[#70685A] leading-relaxed">
-            Every applied capstone becomes a tangible product artifact — from PRDs and opportunity briefs to roadmaps, metrics work, and strategy case studies. Publish your strongest work to a public portfolio and give people something concrete to see.
+            Every applied capstone becomes a tangible product artifact, from PRDs and opportunity briefs to roadmaps, metrics work, and strategy case studies. Publish your strongest work to a public portfolio and give people something concrete to see.
           </p>
         </div>
 

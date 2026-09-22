@@ -37,6 +37,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
 import { CURRICULUM_MODULE_META, CurriculumModuleMeta } from '@/lib/admin/curriculum-meta'
+import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
 import {
   DEFAULT_GOAL_OPTIONS,
   DEFAULT_EXPERIENCE_OPTIONS,
@@ -446,9 +447,6 @@ export default function OnboardingWizard({ user, profile, onboardingSettings }: 
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-10 relative overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-
       <div className="max-w-2xl w-full space-y-6 relative z-10">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center space-y-2">
@@ -865,8 +863,8 @@ export default function OnboardingWizard({ user, profile, onboardingSettings }: 
                 </p>
 
                 <div className={`p-5 rounded-2xl border bg-card shadow-xs flex flex-col sm:flex-row items-start gap-4 ${recommendedModule.accentBorder} border-l-4`}>
-                  <div className="text-3xl shrink-0 p-3 rounded-2xl bg-muted/60 flex items-center justify-center">
-                    {recommendedModule.icon}
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 text-primary shrink-0 flex items-center justify-center">
+                    <CurriculumModuleIcon slugOrIcon={recommendedModule.slug} className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">

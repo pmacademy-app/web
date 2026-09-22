@@ -1,6 +1,19 @@
 import { cn } from '@/lib/utils'
 import { SKILL_COLORS } from '@/lib/design/tokens'
 import type { MarketingModule } from '@/types'
+import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
+
+const MODULE_SLUG_MAP: Record<number, string> = {
+  1: 'foundations',
+  2: 'discovery',
+  3: 'strategy',
+  4: 'execution',
+  5: 'design',
+  6: 'growth',
+  7: 'technical',
+  8: 'leadership',
+  9: 'capstone',
+}
 
 interface ModuleCardProps {
   module: MarketingModule
@@ -13,6 +26,7 @@ interface ModuleCardProps {
  */
 export function ModuleCard({ module, className }: ModuleCardProps) {
   const numberStr = String(module.number).padStart(2, '0')
+  const moduleSlug = MODULE_SLUG_MAP[module.number] || 'foundations'
 
   return (
     <article
@@ -26,21 +40,24 @@ export function ModuleCard({ module, className }: ModuleCardProps) {
       )}
     >
       {/* Module number badge & Time */}
-      <div className="flex items-start justify-between gap-3 mb-3.5">
-        <div
-          className="
-            w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0
-            bg-surface-muted group-hover:bg-primary group-hover:text-primary-foreground
-            transition-colors duration-[180ms]
-          "
-        >
-          <span className="text-caption font-bold text-locked group-hover:text-primary-foreground">
-            {numberStr}
+      <div className="flex items-center justify-between gap-3 mb-3.5">
+        <div className="flex items-center gap-2.5">
+          <div
+            className="
+              w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
+              bg-primary/10 border border-primary/20 text-primary group-hover:bg-primary group-hover:text-primary-foreground
+              transition-colors duration-[180ms]
+            "
+          >
+            <CurriculumModuleIcon slugOrIcon={moduleSlug} className="w-4 h-4" />
+          </div>
+          <span className="text-caption font-mono font-bold text-locked uppercase tracking-wider">
+            Module {numberStr}
           </span>
         </div>
 
         {/* Time */}
-        <span className="text-caption text-locked font-medium flex-shrink-0">{module.estimatedTime}</span>
+        <span className="text-caption text-locked font-mono font-medium flex-shrink-0">{module.estimatedTime}</span>
       </div>
 
       {/* Title with consistent height */}
@@ -56,7 +73,7 @@ export function ModuleCard({ module, className }: ModuleCardProps) {
           return (
             <span
               key={label}
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption font-medium"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption font-medium"
               style={
                 color
                   ? {

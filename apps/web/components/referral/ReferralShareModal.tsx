@@ -68,7 +68,7 @@ export function ReferralShareModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl space-y-6 animate-scale-in relative">
         <Button
           type="button"

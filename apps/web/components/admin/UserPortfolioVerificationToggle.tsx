@@ -98,7 +98,7 @@ export function UserPortfolioVerificationToggle({
             <p className="text-[11px] text-admin-fg-muted mt-0.5">
               {override
                 ? 'Automatic re-evaluation is paused while an override is active.'
-                : 'Automatic — computed live from profile completeness.'}
+                : 'Automatic: computed live from profile completeness.'}
             </p>
           </div>
         </div>

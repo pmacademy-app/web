@@ -106,7 +106,7 @@ export const GET = withRoute(
       priority: priorityLevelFromNumber(item.priority),
       isRead: Boolean(item.is_read),
       deepLink: item.action_url || getDeepLinkForCategory(item.category),
-      icon: item.category ? getIconForCategory(item.category) : '🔔',
+      icon: item.category ? getIconForCategory(item.category) : 'bell',
       createdAt: item.created_at,
     }))
 
@@ -210,15 +210,25 @@ function getDeepLinkForCategory(category?: string): string {
 function getIconForCategory(category?: string): string {
   switch (category) {
     case 'achievements':
-      return '🏆'
+      return 'trophy'
     case 'learning':
-      return '📚'
+      return 'book-open'
     case 'certificates':
-      return '🎓'
+      return 'graduation-cap'
     case 'security':
-      return '🔒'
+      return 'shield'
+    case 'portfolio':
+      return 'briefcase'
+    case 'capstones':
+    case 'capstone':
+      return 'folder-check'
+    case 'announcement':
+    case 'announcements':
+      return 'megaphone'
+    case 'product_updates':
+      return 'sparkles'
     default:
-      return '🔔'
+      return 'bell'
   }
 }
 

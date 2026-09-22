@@ -27,7 +27,7 @@ function EmailVerifiedContent() {
           <div className="space-y-2">
             <h1 className="text-3xl font-bold font-serif text-foreground">Link Expired or Invalid</h1>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
-              This email confirmation link is no longer valid — it may have expired or already been used. Your email address has not been changed.
+              This email confirmation link is no longer valid, as it may have expired or already been used. Your email address has not been changed.
             </p>
           </div>
 

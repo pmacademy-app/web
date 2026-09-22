@@ -125,7 +125,7 @@ export function Navbar() {
           'h-16 lg:h-[72px]',
           'transition-all duration-[180ms]',
           isScrolled
-            ? 'bg-background/92 backdrop-blur-sm border-b border-border'
+            ? 'bg-background border-b border-border'
             : 'bg-transparent',
         )}
       >
@@ -169,7 +169,7 @@ export function Navbar() {
           <>
             {/* Overlay */}
             <div
-              className="fixed inset-0 z-[45] bg-foreground/20 backdrop-blur-sm lg:hidden animate-in fade-in duration-200 fill-mode-both motion-reduce:animate-none"
+              className="fixed inset-0 z-[45] bg-black/50 lg:hidden animate-in fade-in duration-200 fill-mode-both motion-reduce:animate-none"
               onClick={closeMenu}
               aria-hidden="true"
             />

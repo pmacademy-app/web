@@ -186,7 +186,7 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
 
                   {/* Days Studied */}
                   <td className="py-3 px-4 text-center">
-                    <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold font-mono text-xs">
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold font-mono text-xs">
                       <span>{entry.daysStudied} / 7 Days</span>
                     </div>
                   </td>

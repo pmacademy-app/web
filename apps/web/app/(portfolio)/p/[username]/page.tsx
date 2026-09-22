@@ -41,13 +41,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const ogImageUrl = `${SITE_ORIGIN}/api/og/portfolio/${username}`
 
   const metaTitle = isFellow
-    ? `${name} — Product Management Fellow at Prodily | Portfolio`
-    : `${name} — Product Portfolio`
+    ? `${name} | Product Management Fellow at Prodily | Portfolio`
+    : `${name} | Product Portfolio`
 
   const metaDesc = isFellow
     ? (bio
-        ? `${name} — Product Management Fellow at Prodily. ${bio}`
-        : `${name} — Product Management Fellow at Prodily. Explore applied Product Management capstones, continuous skill radar, and case studies on ${BRAND.fullName}.`)
+        ? `${name}, Product Management Fellow at Prodily. ${bio}`
+        : `${name}, Product Management Fellow at Prodily. Explore applied Product Management capstones, continuous skill radar, and case studies on ${BRAND.fullName}.`)
     : (bio
         ? `${name}'s Product Management portfolio and applied capstones on ${BRAND.fullName}. ${bio}`
         : `Explore ${name}'s Product Management portfolio, continuous skill radar, and applied case studies on ${BRAND.fullName}.`)

@@ -365,7 +365,7 @@ export function QuickStartModal() {
       ) : (
         /* Plain backdrop when no spotlight target (Steps 1/8 or mobile) */
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+          className="fixed inset-0 bg-black/60 transition-opacity"
           style={{ zIndex: 48 }}
           onClick={() => skipTour()}
           aria-hidden="true"
@@ -406,7 +406,7 @@ export function QuickStartModal() {
           <div className="flex items-center gap-2">
             <BrandMarkProdily size="sm" />
             {currentStep.featureBadge && (
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2.5 py-1 rounded-full border border-primary/20">
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2.5 py-1 rounded-md border border-primary/20">
                 {currentStep.featureBadge}
               </span>
             )}

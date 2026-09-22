@@ -78,8 +78,8 @@ export function BadgeCard({ badge }: BadgeCardProps) {
       className={cn(
         'rounded-xl border p-5 space-y-3 flex flex-col justify-between transition-all shadow-xs',
         isEarned
-          ? 'border-primary/40 bg-card hover:border-primary/60 shadow-sm'
-          : 'border-border/60 bg-card/40 opacity-75'
+          ? 'border-primary/40 bg-card hover:border-primary/60 shadow-xs'
+          : 'border-border/60 bg-card opacity-75'
       )}
     >
       <div className="space-y-3">
@@ -96,7 +96,7 @@ export function BadgeCard({ badge }: BadgeCardProps) {
 
           <span
             className={cn(
-              'text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border',
+              'text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md border',
               isEarned
                 ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                 : 'bg-secondary text-muted-foreground border-border'

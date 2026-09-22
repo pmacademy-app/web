@@ -35,12 +35,12 @@ export const BRAND = {
     background: TOKENS.colors.background,
   },
   metadata: {
-    homeTitle: 'Prodily PM Academy — Learn Product Management by Building',
+    homeTitle: 'Prodily PM Academy | Learn Product Management by Building',
     titleTemplate: '%s | Prodily PM Academy',
     description:
       'A structured, free path to learn product management, practice through applied capstones, and build a public portfolio that proves your product thinking.',
     shortDescription:
-      'Learn product management through 90 structured lessons, applied capstones, and interactive practice — then turn the work you create into a public portfolio you can show.',
+      'Learn product management through 90 structured lessons, applied capstones, and interactive practice, then turn the work you create into a public portfolio you can show.',
   },
   assets: {
     dir: '/brand',

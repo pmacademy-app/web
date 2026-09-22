@@ -40,7 +40,7 @@ export function FeatureCard({
       {/* Highlighted badge */}
       {variant === 'comparison-highlighted' && (
         <div className="absolute -top-3 left-5">
-          <span className="text-caption font-semibold text-primary-foreground bg-primary px-2.5 py-0.5 rounded-full">
+          <span className="text-caption font-semibold text-primary-foreground bg-primary px-2.5 py-0.5 rounded-md">
             Free forever
           </span>
         </div>

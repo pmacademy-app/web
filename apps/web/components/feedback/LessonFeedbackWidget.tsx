@@ -26,12 +26,12 @@ interface TagOption {
 }
 
 const TAG_OPTIONS: TagOption[] = [
-  { id: 'great_breakdown', label: '✨ Great Breakdown', category: 'positive' },
-  { id: 'clear_and_actionable', label: '🎯 Clear & Actionable', category: 'positive' },
-  { id: 'too_technical', label: '🧠 Too Technical', category: 'critical' },
-  { id: 'confusing_example', label: '❓ Confusing Example', category: 'critical' },
-  { id: 'pacing_too_fast', label: '⚡ Pacing Too Fast', category: 'critical' },
-  { id: 'outdated', label: '⏳ Outdated Info', category: 'critical' },
+  { id: 'great_breakdown', label: 'Great Breakdown', category: 'positive' },
+  { id: 'clear_and_actionable', label: 'Clear & Actionable', category: 'positive' },
+  { id: 'too_technical', label: 'Too Technical', category: 'critical' },
+  { id: 'confusing_example', label: 'Confusing Example', category: 'critical' },
+  { id: 'pacing_too_fast', label: 'Pacing Too Fast', category: 'critical' },
+  { id: 'outdated', label: 'Outdated Info', category: 'critical' },
 ]
 
 function LessonFeedbackFormContent({
@@ -309,7 +309,7 @@ export function LessonFeedbackWidget({ lessonId, className = '' }: LessonFeedbac
 
   if (isLoading && !feedbackData) {
     return (
-      <div className={`rounded-2xl border border-border/40 bg-card/60 p-6 backdrop-blur-xs flex items-center justify-center min-h-[120px] ${className}`}>
+      <div className={`rounded-2xl border border-border bg-card p-6 shadow-xs flex items-center justify-center min-h-[120px] ${className}`}>
         <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
       </div>
     )

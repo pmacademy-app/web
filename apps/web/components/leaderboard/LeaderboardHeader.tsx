@@ -92,7 +92,7 @@ export function LeaderboardHeader({
                 <span>Cohorts</span>
                 <span
                   className={cn(
-                    'px-1.5 py-0.2 rounded-full text-[10px] font-mono leading-none',
+                    'px-1.5 py-0.5 rounded-md text-[10px] font-mono leading-none',
                     activeModal === 'cohorts'
                       ? 'bg-primary-foreground/20 text-primary-foreground font-bold'
                       : 'bg-muted text-muted-foreground'
@@ -126,7 +126,7 @@ export function LeaderboardHeader({
                 <span>Friends</span>
                 <span
                   className={cn(
-                    'px-1.5 py-0.2 rounded-full text-[10px] font-mono leading-none',
+                    'px-1.5 py-0.5 rounded-md text-[10px] font-mono leading-none',
                     activeModal === 'friends'
                       ? 'bg-white/20 text-white font-bold'
                       : 'bg-muted text-muted-foreground'

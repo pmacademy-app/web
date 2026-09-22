@@ -155,8 +155,8 @@ export function generateProfilePageJsonLd(options: PersonJsonLdOptions): Record<
     '@id': `${profileUrl}#profilepage`,
     url: profileUrl,
     name: options.isFellow
-      ? `${options.name || options.username} — Product Management Fellow at Prodily | Portfolio`
-      : `${options.name || options.username} — Product Portfolio`,
+      ? `${options.name || options.username} | Product Management Fellow at Prodily | Portfolio`
+      : `${options.name || options.username} | Product Portfolio`,
     mainEntity: {
       ...personProps,
       '@id': `${profileUrl}#person`,

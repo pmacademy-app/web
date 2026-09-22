@@ -11,7 +11,7 @@ const COMPARISON_CARDS = [
   {
     icon: 'GraduationCap',
     title: 'Expensive Bootcamps',
-    description: 'Structured and guided, but often costly — with the price of a program becoming a barrier to getting started.',
+    description: 'Structured and guided, but often costly, with the price of a program becoming a barrier to getting started.',
     variant: 'default' as const,
   },
   {
@@ -52,7 +52,7 @@ export function WhySection() {
             Self-study gives you information. Bootcamps give you structure. Prodily gives you a path to practice and proof.
           </h2>
           <p className="text-body-lg text-locked leading-relaxed">
-            Product management is easy to study badly. You can collect hundreds of videos, frameworks, and opinions without ever building a coherent mental model or producing work of your own. Paid programs solve some of the structure problem, but they can be expensive. Prodily combines a structured curriculum with applied practice and portfolio output — without putting the core learning path behind a paywall.
+            Product management is easy to study badly. You can collect hundreds of videos, frameworks, and opinions without ever building a coherent mental model or producing work of your own. Paid programs solve some of the structure problem, but they can be expensive. Prodily combines a structured curriculum with applied practice and portfolio output, without putting the core learning path behind a paywall.
           </p>
         </Reveal>
 

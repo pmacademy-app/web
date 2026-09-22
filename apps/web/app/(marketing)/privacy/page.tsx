@@ -12,13 +12,13 @@ export const metadata: Metadata = {
     canonical: `${siteUrl}/privacy`,
   },
   openGraph: {
-    title: 'Privacy Policy — Prodily PM Academy',
+    title: 'Privacy Policy | Prodily PM Academy',
     description: 'Prodily PM Academy privacy policy, data protection, and learner rights.',
     url: `${siteUrl}/privacy`,
     type: 'website',
     images: [{ url: BRAND.assets.ogImage, width: BRAND.assets.ogImageDimensions.width, height: BRAND.assets.ogImageDimensions.height, alt: 'Prodily PM Academy' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Privacy Policy — Prodily PM Academy', images: [BRAND.assets.ogImage] },
+  twitter: { card: 'summary_large_image', title: 'Privacy Policy | Prodily PM Academy', images: [BRAND.assets.ogImage] },
 }
 
 export default function PrivacyPage() {

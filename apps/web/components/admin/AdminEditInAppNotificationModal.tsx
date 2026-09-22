@@ -23,13 +23,13 @@ interface AdminEditInAppNotificationModalProps {
   onUpdated: (item: InAppBroadcastItem) => void
 }
 
-const CATEGORIES: Array<{ key: InAppCategory; label: string; icon: string }> = [
-  { key: 'announcement', label: 'Announcement', icon: '📢' },
-  { key: 'learning', label: 'Learning & Curriculum', icon: '📚' },
-  { key: 'achievements', label: 'Achievements & Badges', icon: '🏆' },
-  { key: 'product_updates', label: 'Product Update', icon: '✨' },
-  { key: 'security', label: 'Security & Account', icon: '🔒' },
-  { key: 'marketing', label: 'Marketing & Community', icon: '🚀' },
+const CATEGORIES: Array<{ key: InAppCategory; label: string }> = [
+  { key: 'announcement', label: 'Announcement' },
+  { key: 'learning', label: 'Learning & Curriculum' },
+  { key: 'achievements', label: 'Achievements & Badges' },
+  { key: 'product_updates', label: 'Product Update' },
+  { key: 'security', label: 'Security & Account' },
+  { key: 'marketing', label: 'Marketing & Community' },
 ]
 
 const PRIORITIES: Array<{ key: InAppPriorityLevel; label: string }> = [
@@ -161,7 +161,7 @@ function EditForm({
             >
               {CATEGORIES.map((c) => (
                 <option key={c.key} value={c.key}>
-                  {c.icon} {c.label}
+                  {c.label}
                 </option>
               ))}
             </select>
@@ -250,7 +250,7 @@ export function AdminEditInAppNotificationModal({
   if (!open || !broadcast) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
       <EditForm key={broadcast.id} broadcast={broadcast} onClose={onClose} onUpdated={onUpdated} />
     </div>
   )

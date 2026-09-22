@@ -30,17 +30,17 @@ export function PersonalizedGoalBanner({ path, milestone }: PersonalizedGoalBann
         <div className="space-y-2">
           {/* Top badges */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/25 text-primary text-xs font-bold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-primary/15 border border-primary/25 text-primary text-xs font-semibold uppercase tracking-wider">
               <Compass className="w-3.5 h-3.5" />
               Personalized Path
             </span>
             {path.goalBadge && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold">
                 <Target className="w-3 h-3" />
                 {path.goalBadge}
               </span>
             )}
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-muted border border-border text-muted-foreground text-xs font-medium">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-muted border border-border text-muted-foreground text-xs font-medium">
               <BookOpen className="w-3 h-3 text-primary" />
               Focus: {path.recommendedModule.name}
             </span>

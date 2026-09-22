@@ -364,7 +364,7 @@ export function AdminTemplateEditor({ detail, initialMode = 'code' }: AdminTempl
                 <p className="flex items-center gap-1.5 text-[11px] text-admin-warning">
                   <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                   Unrecognized variable{unknownInBody.length > 1 ? 's' : ''}:{' '}
-                  {unknownInBody.map((n) => `{{${n}}}`).join(', ')} — this won&apos;t be replaced when sent.
+                  {unknownInBody.map((n) => `{{${n}}}`).join(', ')}: this won&apos;t be replaced when sent.
                 </p>
               )}
             </div>

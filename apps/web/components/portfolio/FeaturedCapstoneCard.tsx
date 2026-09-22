@@ -44,21 +44,18 @@ export function FeaturedCapstoneCard({ capstone }: FeaturedCapstoneCardProps) {
     <section
       id={`featured-project-${capstone.id}`}
       aria-label="Featured Applied Project"
-      className="relative rounded-2xl border-2 border-primary/40 bg-card/80 p-6 md:p-8 backdrop-blur-xs shadow-lg space-y-6 overflow-hidden transition-all scroll-mt-24"
+      className="relative rounded-2xl border border-primary/40 bg-card p-6 md:p-8 shadow-xs space-y-6 overflow-hidden transition-all scroll-mt-24"
     >
-      {/* Ambient background glow */}
-      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-
       {/* Header Badges */}
       <div className="flex flex-wrap items-center justify-between gap-3 relative z-10">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30 text-xs font-bold uppercase tracking-wider shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 text-xs font-semibold uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             Featured Artifact
           </span>
 
           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2.5 py-0.5 rounded bg-muted/60">
-            Module {capstone.moduleNumber.toString().padStart(2, '0')} — {capstone.moduleTitle}
+            Module {capstone.moduleNumber.toString().padStart(2, '0')}: {capstone.moduleTitle}
           </span>
 
           {capstone.competencyCluster && (

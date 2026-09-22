@@ -105,7 +105,7 @@ export function AdminModuleDetailView({ module, initialLoadFailed = false }: Adm
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title={`Module ${module.number} — ${module.name}`}
+        title={`Module ${module.number}: ${module.name}`}
         description={module.description}
         icon={BookOpen}
         actions={
@@ -156,7 +156,7 @@ export function AdminModuleDetailView({ module, initialLoadFailed = false }: Adm
       </div>
 
       {initialLoadFailed && (
-        <AdminLoadWarning message="Live completion stats could not be fetched — showing the lesson list without them. Check that the database is reachable." />
+        <AdminLoadWarning message="Live completion stats could not be fetched, showing the lesson list without them. Check that the database is reachable." />
       )}
 
       <div className="flex items-center gap-2">

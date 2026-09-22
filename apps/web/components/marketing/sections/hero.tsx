@@ -74,7 +74,7 @@ export function HeroSection() {
 
             {/* Subheadline */}
             <p className={`${ENTER_OPAQUE} delay-150 text-base sm:text-lg text-[#70685A] leading-relaxed max-w-[540px]`}>
-              Learn product management through 90 structured lessons, applied capstones, and interactive practice — then turn the work you create into a public portfolio you can show. Built for career switchers and anyone building product judgment from scratch.
+              Learn product management through 90 structured lessons, applied capstones, and interactive practice, then turn the work you create into a public portfolio you can show. Built for career switchers and anyone building product judgment from scratch.
             </p>
 
             {/* Action Buttons */}

@@ -194,13 +194,17 @@ export function HeroWorkbench() {
             <div key="portfolio" className={`space-y-4 ${PANEL_ENTER}`}>
               <div className="flex items-center justify-between border-b border-[#DED8CB] pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
-                    AG
+                  <div className="relative w-10 h-10 rounded-full border border-border overflow-hidden flex items-center justify-center shrink-0">
+                    <img
+                      src="/avatars/aditya.png"
+                      alt="Aditya Gangwani"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <div className="font-semibold text-sm text-foreground">Aditya Gangwani</div>
-                      <span className="text-[10px] font-semibold bg-[#EAF5EF] text-primary px-2 py-0.5 rounded-full border border-primary/20">
+                      <span className="text-[10px] font-semibold bg-[#EAF5EF] text-primary px-2 py-0.5 rounded-md border border-primary/20">
                         Fellow
                       </span>
                     </div>

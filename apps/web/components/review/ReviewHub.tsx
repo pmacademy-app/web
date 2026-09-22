@@ -161,7 +161,7 @@ export function ReviewHub({
               Daily Spaced Repetition Practice
             </h2>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary">
+          <span className="text-xs font-medium px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20">
             SM-2 Spaced Repetition
           </span>
         </div>

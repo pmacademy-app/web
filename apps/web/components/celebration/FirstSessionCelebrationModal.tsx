@@ -39,12 +39,6 @@ export function FirstSessionCelebrationModal({
         data-testid="first-session-celebration-modal"
         className="sm:max-w-md p-6 text-center overflow-hidden"
       >
-        {/* Glow backdrop */}
-        <div
-          className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-primary/20 blur-3xl"
-          aria-hidden="true"
-        />
-
         {/* Celebration Trophy Icon */}
         <div className="flex justify-center pt-2 pb-1">
           <div className="relative flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500 via-primary to-primary text-white shadow-xl ring-4 ring-primary/20 animate-bounce">

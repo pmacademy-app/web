@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const globalOrder = globalIdx >= 0 ? globalIdx + 1 : (parseInt(slug.replace(/^lesson-/, ''), 10) || lesson.order)
   const canonicalUrl = `${siteUrl}/lessons/${slug}`
   const pageTitle = `Lesson ${globalOrder}: ${lesson.title}`
-  const description = `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} — Module: ${formatModuleName(lesson.module)}.`
+  const description = `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} (Module: ${formatModuleName(lesson.module)}).`
 
   return {
     title: pageTitle,

@@ -44,7 +44,7 @@ export function LeaderboardPopoverModal({
     <>
       {/* Click-outside backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/25 dark:bg-black/45 backdrop-blur-[1px] animate-in fade-in duration-150"
+        className="fixed inset-0 z-40 bg-black/40 animate-in fade-in duration-150"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -63,7 +63,7 @@ export function LeaderboardPopoverModal({
         )}
       >
         {/* Modal Header */}
-        <div className="p-4 border-b border-border flex items-center justify-between bg-card/80">
+        <div className="p-4 border-b border-border flex items-center justify-between bg-card">
           <div className="flex items-center gap-3">
             <div
               className={cn(
@@ -77,7 +77,7 @@ export function LeaderboardPopoverModal({
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold font-serif text-foreground">{title}</h3>
                 {badgeText && (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-semibold">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-semibold">
                     {badgeText}
                   </span>
                 )}
