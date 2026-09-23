@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
-import { ShieldCheck, Lock, Database, Mail, Cookie, RefreshCw, ArrowLeft } from 'lucide-react'
+import { ShieldCheck, Lock, Database, Cookie, RefreshCw, ArrowLeft, Scale } from 'lucide-react'
+import { GRIEVANCE_CONTACT, LEGAL_OPERATOR, operatorAddressLabel, operatorDescription } from '@/lib/legal/legal-config'
+import { LEGAL_DOCS_REVISION_LABEL, PRIVACY_VERSION } from '@/lib/legal/consent'
+import { OPTIONAL_COOKIE_DISCLOSURES } from '@/lib/legal/cookie-consent'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
@@ -41,7 +44,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="text-xs text-muted-foreground">
-          Last updated: August 2026 • Published by {BRAND.legalEntity} ({BRAND.fullName})
+          Last updated: {LEGAL_DOCS_REVISION_LABEL} • Version {PRIVACY_VERSION} • {BRAND.fullName}
         </p>
       </div>
 
@@ -62,7 +65,19 @@ export default function PrivacyPage() {
             1. Data Controller & Scope
           </h2>
           <p>
-            This Privacy Policy applies to the web application, APIs, and educational services operated under {BRAND.fullName} (&quot;the Service&quot;, &quot;we&quot;, &quot;us&quot;, &quot;our&quot;), an initiative of {BRAND.legalEntity}. It explains what information we collect when you access our platform ({BRAND.siteUrl}), how that data is stored and used, and the rights you have regarding your information.
+            This Privacy Policy applies to the web application, APIs, and educational services operated under {BRAND.fullName} (&quot;the Service&quot;, &quot;we&quot;, &quot;us&quot;, &quot;our&quot;). It explains what information we collect when you access our platform ({BRAND.siteUrl}), how that data is stored and used, and the rights you have regarding your information.
+          </p>
+          <div className="p-3 rounded-lg border border-border bg-card/60 space-y-1 text-xs">
+            <p className="font-bold text-foreground">Who controls your data</p>
+            <p>
+              {operatorDescription(BRAND.fullName)}
+              {LEGAL_OPERATOR.registrationId ? ` Registration number: ${LEGAL_OPERATOR.registrationId}.` : ''}
+              {LEGAL_OPERATOR.address ? ` ${operatorAddressLabel()}: ${LEGAL_OPERATOR.address}.` : ''}
+            </p>
+          </div>
+          <p className="text-xs">
+            Accounts are created only by individuals who confirm at signup that they accept these documents and are of the minimum age stated in the{' '}
+            <Link href="/terms" className="font-semibold text-primary hover:underline">Terms of Service</Link>. The acceptance is recorded with a timestamp and the version of the documents shown.
           </p>
         </section>
 
@@ -85,7 +100,7 @@ export default function PrivacyPage() {
               <strong className="text-foreground">Learning Activity & Progress:</strong> Completed lesson records, quiz attempt scores, total XP earned (recorded via an immutable progress ledger), active streaks, spaced-repetition (SRS) flashcard schedules, lesson bookmarks, and private self-reflection notes.
             </li>
             <li>
-              <strong className="text-foreground">Capstones & Certificates:</strong> Draft and submitted module capstone projects, earned achievement badges, and issued completion certificates (`PMA-2026-XXXXXX`) with cryptographic verification hashes.
+              <strong className="text-foreground">Capstones & Certificates:</strong> Draft and submitted module capstone projects, earned achievement badges, and issued completion certificates. Each certificate is identified by a unique, randomly generated certificate code (`PMA-2026-XXXXXX`). Verification works by looking that code up against our certificate registry — there is no cryptographic hash or signature embedded in a certificate, and the code itself is the identifier.
             </li>
             <li>
               <strong className="text-foreground">Support & Feedback:</strong> Messages and ratings submitted through our feedback tools or direct support communications.
@@ -146,22 +161,34 @@ export default function PrivacyPage() {
             </div>
             <div className="p-3 rounded-lg border border-border bg-card/60 space-y-1">
               <span className="font-bold text-xs text-foreground">Google Analytics 4 (Aggregate Usage Metrics)</span>
-              <p className="text-xs">Measures anonymous navigation flows (`curriculum_view`, `hero_cta_click`). GA4 is configured with default IP anonymization and collects <strong className="text-foreground">zero PII</strong> (no emails, names, quiz responses, or reflection text).</p>
+              <p className="text-xs">Measures anonymous navigation flows (`curriculum_view`, `hero_cta_click`). GA4 is configured with default IP anonymization and collects <strong className="text-foreground">zero PII</strong> (no emails, names, quiz responses, or reflection text). GA4 and Google Tag Manager are <strong className="text-foreground">not loaded at all</strong> unless you accept optional cookies — see §6.</p>
             </div>
           </div>
         </section>
 
         {/* 6. Cookies */}
-        <section className="space-y-3">
+        <section id="cookies" className="space-y-3 scroll-mt-24">
           <h2 className="text-xl font-bold font-serif text-foreground flex items-center gap-2">
             <Cookie className="w-5 h-5 text-primary inline" /> 6. Cookies & Local Storage
           </h2>
-          <p>
-            We use minimal cookies and local browser storage essential for service operation:
+
+          <p className="text-xs font-bold text-foreground">Strictly necessary — always on</p>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li><strong className="text-foreground">Authentication session cookies</strong> (`sb-access-token`, `sb-refresh-token`): HTTP-only cookies required to keep you signed in. Without them the Service cannot function, so they are not subject to consent.</li>
+            <li><strong className="text-foreground">Cookie preference cookie</strong> (`prodily_cookie_consent`): Records the choice you make in the cookie banner, for 180 days, so we do not ask again.</li>
+            <li><strong className="text-foreground">Local storage preferences:</strong> UI theme selection (`dark`, `light`, `system`), active tab state, and a client-side curriculum search index cache. Stored in your browser only and never sent to us.</li>
+          </ul>
+
+          <p className="text-xs font-bold text-foreground pt-2">Optional — set only after you accept</p>
+          <p className="text-xs">
+            None of the following is loaded or set until you choose &quot;Accept optional&quot; in the cookie banner. If you reject, the scripts are never injected and the cookies are never written. You can change your choice at any time using the <strong className="text-foreground">Cookie preferences</strong> control in the site footer.
           </p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li><strong className="text-foreground">Essential Session Cookies:</strong> Encrypted authentication session cookies required to maintain your logged-in state across browser sessions.</li>
-            <li><strong className="text-foreground">Local Storage Preferences:</strong> Storing UI theme selection (`dark`, `light`, `system`), active tab state, and client-side curriculum search index cache for fast search.</li>
+            {OPTIONAL_COOKIE_DISCLOSURES.map((cookie) => (
+              <li key={cookie.name}>
+                <strong className="text-foreground">{cookie.name}:</strong> {cookie.purpose} Duration: {cookie.duration}.
+              </li>
+            ))}
           </ul>
         </section>
 
@@ -183,26 +210,40 @@ export default function PrivacyPage() {
           </ul>
         </section>
 
-        {/* 8. Support Contact */}
-        <section className="space-y-3 pt-4 border-t border-border">
+        {/* 8. Grievance & Privacy Contact */}
+        <section id="grievance" className="space-y-3 pt-4 border-t border-border scroll-mt-24">
           <h2 className="text-xl font-bold font-serif text-foreground flex items-center gap-2">
-            <Mail className="w-5 h-5 text-primary inline" /> 8. Contact & Privacy Inquiries
+            <Scale className="w-5 h-5 text-primary inline" /> 8. Grievance & Privacy Contact
           </h2>
           <p>
-            If you have any questions regarding this Privacy Policy or wish to exercise your privacy rights, please reach out directly:
+            Questions about this Privacy Policy, requests to access, correct or delete your data, and complaints about how your data has been handled all go to the contact below. We acknowledge every request within {GRIEVANCE_CONTACT.acknowledgementDays} days of receipt and aim to resolve it within {GRIEVANCE_CONTACT.resolutionDays} days.
           </p>
-          <div className="p-4 rounded-xl border border-border bg-card flex items-center justify-between">
+          <div className="p-4 rounded-xl border border-border bg-card space-y-2">
             <div>
-              <p className="text-xs font-bold text-foreground">Support & Privacy Office</p>
-              <p className="text-xs text-muted-foreground">{BRAND.fullName} ({BRAND.legalEntity})</p>
+              <p className="text-xs font-bold text-foreground">
+                {GRIEVANCE_CONTACT.officerTitle ?? 'Grievance & Privacy Contact'}
+              </p>
+              {GRIEVANCE_CONTACT.officerName ? (
+                <p className="text-xs text-muted-foreground">{GRIEVANCE_CONTACT.officerName}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  A named grievance officer has not yet been designated. Until one is, requests are handled directly by the Platform operator at the address below.
+                </p>
+              )}
+              {LEGAL_OPERATOR.address && (
+                <p className="text-xs text-muted-foreground">{LEGAL_OPERATOR.address}</p>
+              )}
             </div>
             <a
-              href={`mailto:${BRAND.supportEmail}`}
-              className="text-xs font-bold text-primary hover:underline px-3 py-2 rounded-lg bg-primary/10 border border-primary/20"
+              href={`mailto:${GRIEVANCE_CONTACT.email ?? BRAND.supportEmail}`}
+              className="inline-block text-xs font-bold text-primary hover:underline px-3 py-2 rounded-lg bg-primary/10 border border-primary/20"
             >
-              {BRAND.supportEmail}
+              {GRIEVANCE_CONTACT.email ?? BRAND.supportEmail}
             </a>
           </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            This Privacy Policy reflects a September 2026 internal legal and privacy audit and is pending review by qualified counsel before the Platform&apos;s final public launch. It is the operator&apos;s current, good-faith description of how the Service handles data, not legal advice.
+          </p>
         </section>
       </div>
 

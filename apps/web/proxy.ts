@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { isAdminEmail } from '@/lib/admin/authorization'
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/lib/monitoring/request-id'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
+import { COOKIE_CONSENT_COOKIE, hasOptionalCookieConsent } from '@/lib/legal/cookie-consent'
 // The proxy needs exactly one thing from the content pipeline: a slug -> lesson
 // mapping, to send an authenticated learner from a public /lessons/<slug> URL to
 // their interactive copy of that lesson.
@@ -47,7 +48,11 @@ function withSessionCookies(
 }
 
 /**
- * Attaches referral attribution cookie (30 days) when ?ref=CODE is detected.
+ * Attaches the referral attribution cookie (30 days) when ?ref=CODE is detected
+ * AND the visitor has consented to optional cookies.
+ *
+ * The consent check happens once where `refCode` is derived, so a `null` here means
+ * either no code was present or consent was absent — both are "do not set".
  */
 function withReferralCookie(response: NextResponse, refCode?: string | null) {
   if (!refCode) return response
@@ -111,7 +116,14 @@ export async function proxy(request: NextRequest) {
 
 async function routeRequest(request: NextRequest, requestId: string): Promise<NextResponse> {
   const path = request.nextUrl.pathname
-  const refParam = request.nextUrl.searchParams.get('ref')
+  // `prodily_referrer` is attribution, not a strictly-necessary cookie, so it is
+  // only set once the visitor has accepted optional cookies. Dropping the code here
+  // — rather than at each of the ~20 `withReferralCookie` call sites — keeps a
+  // single gate that no future branch can forget. Attribution is not lost for a
+  // consenting visitor who signs up in the same visit either way: the signup form
+  // reads `?ref` from the URL directly and posts it in the request body.
+  const hasCookieConsent = hasOptionalCookieConsent(request.cookies.get(COOKIE_CONSENT_COOKIE)?.value)
+  const refParam = hasCookieConsent ? request.nextUrl.searchParams.get('ref') : null
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co'
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key'
 

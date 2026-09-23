@@ -381,6 +381,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         email: 'registered@example.com',
         password: 'securePassword123',
         turnstileToken: 'valid-turnstile-token',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
 
       const res = await signupPOST(req)
@@ -406,6 +408,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         email: 'fresh@example.com',
         password: 'securePassword123',
         turnstileToken: 'valid-turnstile-token',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
 
       const res = await signupPOST(req)
@@ -430,6 +434,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         password: 'securePassword123',
         refCode: 'REF123',
         turnstileToken: 'valid-turnstile-token',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
 
       await signupPOST(req)
@@ -470,6 +476,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         email: 'bot@example.com',
         password: 'password123',
         turnstileToken: 'invalid_token',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
 
       const res = await signupPOST(req)
@@ -492,6 +500,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         email: 'learner@example.com',
         password: 'password123',
         turnstileToken: 'token_during_outage',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
 
       const res = await signupPOST(req)
@@ -514,6 +524,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         password: 'securePassword123',
         refCode: 'REF999',
         turnstileToken: 'forged_bad_token',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
 
       const res = await signupPOST(req)
@@ -543,6 +555,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         email: 'learner@example.com',
         password: 'securePassword123',
         turnstileToken: 'valid-turnstile-token',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
 
       await signupPOST(req)
@@ -562,6 +576,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         email: 'victim@example.com',
         password: 'securePassword123',
         turnstileToken: 'any_token',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
 
       const res = await signupPOST(req)
@@ -587,6 +603,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
           email: 'resolved@example.com',
           password: 'securePassword123',
           turnstileToken: 'valid-turnstile-token',
+          acceptedTerms: true,
+          confirmedMinimumAge: true,
         },
         { 'x-real-ip': '203.0.113.55' }
       )
@@ -602,6 +620,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
         email: 'unresolved@example.com',
         password: 'securePassword123',
         turnstileToken: 'valid-turnstile-token',
+        acceptedTerms: true,
+        confirmedMinimumAge: true,
       })
       await signupPOST(unresolved)
       expect(mockVerifyTurnstileToken).toHaveBeenLastCalledWith('valid-turnstile-token', undefined)
@@ -626,6 +646,8 @@ describe('Batch B5 — Abuse Controls & Atomic Rate Limiting', () => {
           email: 'flooder@example.com',
           password: 'password123',
           turnstileToken: 'any_token',
+          acceptedTerms: true,
+          confirmedMinimumAge: true,
         },
         { 'x-real-ip': '198.51.100.77' }
       )

@@ -109,7 +109,7 @@ function signupRequest(body: Record<string, unknown>, headers: Record<string, st
   return new NextRequest('https://prodily.app/api/auth/signup', {
     method: 'POST',
     headers: { 'content-type': 'application/json', ...headers },
-    body: JSON.stringify({ turnstileToken: 'test-turnstile-token', ...body }),
+    body: JSON.stringify({ turnstileToken: 'test-turnstile-token', acceptedTerms: true, confirmedMinimumAge: true, ...body }),
   })
 }
 

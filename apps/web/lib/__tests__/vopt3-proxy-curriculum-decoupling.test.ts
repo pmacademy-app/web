@@ -30,6 +30,11 @@ vi.mock('@supabase/supabase-js', () => ({
 
 const AUTHED = { headers: { cookie: 'sb-access-token=some-token' } }
 
+// The referral cookie is non-essential and now gated on cookie consent, so any
+// assertion about it has to arrive as a consenting visitor would.
+const CONSENT_COOKIE = `prodily_cookie_consent=${encodeURIComponent('accepted|2026-09-23|2026-09-23T00:00:00.000Z')}`
+const AUTHED_WITH_CONSENT = { headers: { cookie: `sb-access-token=some-token; ${CONSENT_COOKIE}` } }
+
 async function run(url: string, init?: { headers?: Record<string, string> }) {
   const { proxy } = await import('../../proxy')
   return proxy(new NextRequest(url, init))
@@ -75,8 +80,8 @@ describe('V-OPT-3: /lessons routing behaviour is unchanged', () => {
     expect(res.status).toBe(200)
   })
 
-  it('the referral cookie is still attached to the lesson redirect', async () => {
-    const res = await run('https://prodily.app/lessons/lesson-001?ref=ABC123', AUTHED)
+  it('the referral cookie is still attached to the lesson redirect (with cookie consent)', async () => {
+    const res = await run('https://prodily.app/lessons/lesson-001?ref=ABC123', AUTHED_WITH_CONSENT)
     expect(res.status).toBe(307)
     expect(res.cookies.get('prodily_referrer')?.value).toBe('ABC123')
   })

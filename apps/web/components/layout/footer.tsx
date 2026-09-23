@@ -3,6 +3,8 @@ import { FOOTER_LINK_GROUPS } from '@/config/navigation'
 import { BRAND } from '@/lib/brand'
 import { BrandLogo } from '@/components/brand/BrandLogo'
 import { SocialLinks } from '@/components/brand/SocialLinks'
+import { CookiePreferencesButton } from '@/components/legal/CookiePreferencesButton'
+import { GRIEVANCE_CONTACT, LEGAL_OPERATOR, operatorAddressLabel, operatorDescription } from '@/lib/legal/legal-config'
 
 /**
  * Marketing site footer — Sprint 2 §20 + Sprint 3 footer copy.
@@ -73,8 +75,41 @@ export function Footer() {
             </Link>{' '}
             to make serious product management education more accessible.
           </p>
-          <p className="text-body-sm text-locked">
-            Free core curriculum. No paywalled lessons.
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <p className="text-body-sm text-locked">
+              Free core curriculum. No paywalled lessons.
+            </p>
+            <CookiePreferencesButton className="text-body-sm text-locked hover:text-foreground" />
+          </div>
+        </div>
+
+        {/* Operator identity & grievance contact.
+            Rendered from lib/legal/legal-config.ts so the site never presents the
+            brand name as a registered company. Until real operator details are
+            supplied, the honest default below is what visitors see. */}
+        <div className="pt-6 mt-6 border-t border-border space-y-1.5">
+          <p className="text-caption text-locked leading-relaxed max-w-[720px]">
+            {operatorDescription(BRAND.fullName)}
+            {LEGAL_OPERATOR.registrationId ? ` Registration: ${LEGAL_OPERATOR.registrationId}.` : ''}
+            {LEGAL_OPERATOR.address ? ` ${operatorAddressLabel()}: ${LEGAL_OPERATOR.address}.` : ''}
+          </p>
+          <p className="text-caption text-locked leading-relaxed">
+            {GRIEVANCE_CONTACT.officerName
+              ? `${GRIEVANCE_CONTACT.officerTitle ?? 'Grievance Officer'}: ${GRIEVANCE_CONTACT.officerName} — `
+              : 'Grievances and privacy requests: '}
+            <a
+              href={`mailto:${GRIEVANCE_CONTACT.email ?? BRAND.supportEmail}`}
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              {GRIEVANCE_CONTACT.email ?? BRAND.supportEmail}
+            </a>
+            {'. '}
+            Acknowledged within {GRIEVANCE_CONTACT.acknowledgementDays} days, resolved within{' '}
+            {GRIEVANCE_CONTACT.resolutionDays} days. See the{' '}
+            <Link href="/privacy#grievance" className="underline underline-offset-4 hover:text-foreground">
+              grievance process
+            </Link>
+            .
           </p>
         </div>
       </div>

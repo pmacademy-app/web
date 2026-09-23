@@ -31,11 +31,13 @@ describe('Integrity Verification', () => {
       expect(proxyModule.config.matcher.length).toBeGreaterThan(0)
     })
 
-    it('proxy executes and attaches referral cookie when ?ref= is present', async () => {
+    it('proxy executes and attaches referral cookie when ?ref= is present and cookies are accepted', async () => {
       const { proxy } = await import('../../proxy')
       const { NextRequest } = await import('next/server')
 
       const req = new NextRequest('https://prodily.app/signup?ref=growth_hacker')
+      // Non-essential cookie: only set once optional cookies have been accepted.
+      req.cookies.set('prodily_cookie_consent', 'accepted|2026-09-23|2026-09-23T00:00:00.000Z')
       const res = await proxy(req)
 
       expect(res).toBeDefined()

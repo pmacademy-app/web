@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BRAND } from '@/lib/brand'
-import { FileText, CheckCircle2, ShieldAlert, Award, FileCode, AlertCircle, Mail, ArrowLeft } from 'lucide-react'
+import { FileText, CheckCircle2, ShieldAlert, Award, FileCode, AlertCircle, ArrowLeft, Scale } from 'lucide-react'
+import { GRIEVANCE_CONTACT, LEGAL_OPERATOR, operatorAddressLabel, operatorDescription } from '@/lib/legal/legal-config'
+import { LEGAL_DOCS_REVISION_LABEL, MINIMUM_SIGNUP_AGE, TERMS_VERSION } from '@/lib/legal/consent'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
@@ -41,7 +43,7 @@ export default function TermsPage() {
           Terms of Service
         </h1>
         <p className="text-xs text-muted-foreground">
-          Last updated: August 2026 • Published by {BRAND.legalEntity} ({BRAND.fullName})
+          Last updated: {LEGAL_DOCS_REVISION_LABEL} • Version {TERMS_VERSION} • {BRAND.fullName}
         </p>
       </div>
 
@@ -63,8 +65,21 @@ export default function TermsPage() {
             1. Acceptance of Terms
           </h2>
           <p>
-            By creating an account, accessing, or using {BRAND.fullName} (&quot;the Service&quot;, &quot;the Platform&quot;), operated by {BRAND.legalEntity} (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), you agree to comply with and be legally bound by these Terms of Service (&quot;Terms&quot;). If you do not agree with these Terms, you must not access or use the Platform.
+            By creating an account, accessing, or using {BRAND.fullName} (&quot;the Service&quot;, &quot;the Platform&quot;, &quot;we&quot;, &quot;us&quot;, &quot;our&quot;), you agree to comply with and be legally bound by these Terms of Service (&quot;Terms&quot;). If you do not agree with these Terms, you must not access or use the Platform.
           </p>
+          <p>
+            Agreement is captured explicitly: the signup form requires you to tick a box confirming you have read and accept these Terms and the{' '}
+            <Link href="/privacy" className="font-semibold text-primary hover:underline">Privacy Policy</Link>{' '}
+            before an account can be created, and that acceptance is recorded with a timestamp and the version of the documents you were shown.
+          </p>
+          <div className="p-3 rounded-lg border border-border bg-card/60 space-y-1 text-xs">
+            <p className="font-bold text-foreground">Who operates this Service</p>
+            <p>
+              {operatorDescription(BRAND.fullName)}
+              {LEGAL_OPERATOR.registrationId ? ` Registration number: ${LEGAL_OPERATOR.registrationId}.` : ''}
+              {LEGAL_OPERATOR.address ? ` ${operatorAddressLabel()}: ${LEGAL_OPERATOR.address}.` : ''}
+            </p>
+          </div>
         </section>
 
         {/* 2. Eligibility & Accounts */}
@@ -74,7 +89,7 @@ export default function TermsPage() {
           </h2>
           <ul className="list-disc pl-5 space-y-2 text-xs">
             <li>
-              <strong className="text-foreground">Minimum Age:</strong> You must be at least 13 years of age (or the minimum legal age required in your jurisdiction) to register for an account.
+              <strong className="text-foreground">Minimum Age ({MINIMUM_SIGNUP_AGE}+):</strong> Self-service registration is available only to individuals who are at least {MINIMUM_SIGNUP_AGE} years of age, or older where your jurisdiction requires a higher age. You must confirm this at signup. We do not knowingly create accounts for anyone under {MINIMUM_SIGNUP_AGE} and we do not operate a verifiable parental-consent process, so the Platform is not available to under-{MINIMUM_SIGNUP_AGE} learners at this time. If we learn that an account belongs to someone under {MINIMUM_SIGNUP_AGE}, we will delete it.
             </li>
             <li>
               <strong className="text-foreground">Registration Accuracy:</strong> You agree to provide accurate, current information when creating an account.
@@ -109,7 +124,7 @@ export default function TermsPage() {
           </h2>
           <div className="space-y-3 text-xs">
             <p>
-              <strong className="text-foreground font-semibold">Platform Materials:</strong> All 90 curriculum lessons, structured text, interactive quiz banks, SVG diagrams, compiler code, site graphics, trademarks ({BRAND.company}, {BRAND.product}), and brand assets are the exclusive intellectual property of {BRAND.legalEntity} and protected by copyright and intellectual property laws.
+              <strong className="text-foreground font-semibold">Platform Materials:</strong> All 90 curriculum lessons, structured text, interactive quiz banks, SVG diagrams, compiler code, site graphics, trademarks ({BRAND.company}, {BRAND.product}), and brand assets are the exclusive intellectual property of the Platform operator and protected by copyright and intellectual property laws.
             </p>
             <p>
               <strong className="text-foreground font-semibold">Learner-Generated Content:</strong> You retain 100% ownership of your written capstone projects, self-reflection responses, and portfolio summaries. By setting your portfolio to public, you grant {BRAND.fullName} a non-exclusive, worldwide license to render and display your public portfolio page.
@@ -137,10 +152,10 @@ export default function TermsPage() {
               <strong className="text-foreground">Educational Nature:</strong> The Service provides self-paced educational materials for professional development. Completion of lessons or earning certificates does not constitute formal university accreditation or guarantee employment, job placement, or salary increases.
             </li>
             <li>
-              <strong className="text-foreground">&quot;As-Is&quot; Provision:</strong> The Service is provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind, whether express or implied. To the maximum extent permitted by law, {BRAND.legalEntity} disclaims all warranties.
+              <strong className="text-foreground">&quot;As-Is&quot; Provision:</strong> The Service is provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind, whether express or implied. To the maximum extent permitted by law, the Platform operator disclaims all warranties.
             </li>
             <li>
-              <strong className="text-foreground">Limitation of Liability:</strong> In no event shall {BRAND.legalEntity} or its contributors be liable for any indirect, incidental, or consequential damages arising out of your access to or inability to access the Platform.
+              <strong className="text-foreground">Limitation of Liability:</strong> In no event shall the Platform operator or its contributors be liable for any indirect, incidental, or consequential damages arising out of your access to or inability to access the Platform.
             </li>
           </ul>
         </section>
@@ -155,26 +170,40 @@ export default function TermsPage() {
           </p>
         </section>
 
-        {/* 8. Support Contact */}
-        <section className="space-y-3 pt-4 border-t border-border">
+        {/* 8. Grievance & Legal Contact */}
+        <section id="grievance" className="space-y-3 pt-4 border-t border-border scroll-mt-24">
           <h2 className="text-xl font-bold font-serif text-foreground flex items-center gap-2">
-            <Mail className="w-5 h-5 text-primary inline" /> 8. Support & Legal Inquiries
+            <Scale className="w-5 h-5 text-primary inline" /> 8. Grievance & Legal Contact
           </h2>
           <p className="text-xs">
-            If you have questions or concerns regarding these Terms, please contact our support team:
+            Complaints about these Terms, about content on the Platform, or about how your data is handled go to the contact below. We acknowledge every grievance within {GRIEVANCE_CONTACT.acknowledgementDays} days of receipt and aim to resolve it within {GRIEVANCE_CONTACT.resolutionDays} days.
           </p>
-          <div className="p-4 rounded-xl border border-border bg-card flex items-center justify-between">
+          <div className="p-4 rounded-xl border border-border bg-card space-y-2">
             <div>
-              <p className="text-xs font-bold text-foreground">Legal & Support Office</p>
-              <p className="text-xs text-muted-foreground">{BRAND.fullName} ({BRAND.legalEntity})</p>
+              <p className="text-xs font-bold text-foreground">
+                {GRIEVANCE_CONTACT.officerTitle ?? 'Grievance & Legal Contact'}
+              </p>
+              {GRIEVANCE_CONTACT.officerName ? (
+                <p className="text-xs text-muted-foreground">{GRIEVANCE_CONTACT.officerName}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  A named grievance officer has not yet been designated. Until one is, grievances are handled directly by the Platform operator at the address below.
+                </p>
+              )}
+              {LEGAL_OPERATOR.address && (
+                <p className="text-xs text-muted-foreground">{LEGAL_OPERATOR.address}</p>
+              )}
             </div>
             <a
-              href={`mailto:${BRAND.supportEmail}`}
-              className="text-xs font-bold text-primary hover:underline px-3 py-2 rounded-lg bg-primary/10 border border-primary/20"
+              href={`mailto:${GRIEVANCE_CONTACT.email ?? BRAND.supportEmail}`}
+              className="inline-block text-xs font-bold text-primary hover:underline px-3 py-2 rounded-lg bg-primary/10 border border-primary/20"
             >
-              {BRAND.supportEmail}
+              {GRIEVANCE_CONTACT.email ?? BRAND.supportEmail}
             </a>
           </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            These Terms reflect a September 2026 internal legal and privacy audit and are pending review by qualified counsel before the Platform&apos;s final public launch. They are the operator&apos;s current, good-faith statement of how the Service works, not legal advice.
+          </p>
         </section>
       </div>
 

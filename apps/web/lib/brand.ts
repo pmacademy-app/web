@@ -14,7 +14,11 @@ export const BRAND = {
     instagram: 'https://www.instagram.com/prodily_pm/',
     buyMeACoffee: 'https://buymeacoffee.com/prodily',
   },
-  legalEntity: 'Prodily',
+  // NOTE: there is deliberately no `legalEntity` here. Presenting the brand name as
+  // the registered operating entity was a misrepresentation flagged by the September
+  // 2026 legal audit. Operator identity, registration details and the grievance
+  // contact now live in `lib/legal/legal-config.ts`, where they are explicitly
+  // configured rather than inferred from branding.
   certificateIssuer: 'Prodily',
   adminName: 'Prodily PM Academy Admin',
   // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
