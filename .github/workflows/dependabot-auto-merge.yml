@@ -1,0 +1,170 @@
+# Enables GitHub's native auto-merge on low-risk Dependabot pull requests.
+#
+# This workflow never merges anything itself. It asks GitHub to merge the PR
+# *later*, once branch protection is satisfied — so every required status check
+# in ci.yml, including the security-audit job that runs scripts/ci/audit-gate.ts,
+# still has to go green on the PR head before the merge happens. If a required
+# check fails, auto-merge simply never fires and the PR sits there for a human.
+# There is no path through this file that bypasses a check, a review, or the
+# audit gate.
+#
+# Why `pull_request_target` rather than `pull_request`:
+#   Dependabot branches live in this repository, not in a fork. Under
+#   `pull_request` the workflow *definition* is read from the PR's head ref, so a
+#   PR that edits this file would run its own edited version — and this file
+#   holds `contents: write`. `pull_request_target` always reads the definition
+#   from the base branch, so the rules below are the ones on main, whatever the
+#   PR contains. The trade-off of `pull_request_target` is that it runs with a
+#   writable token, which is only safe if the job never executes code from the
+#   PR. This job never checks the PR out and never runs an install, a build, or
+#   any script from the head ref. Keep it that way.
+#
+# Deliberately NOT auto-merged (each stays a manual review):
+#   - major version bumps
+#   - the github-actions ecosystem, because those PRs edit .github/workflows/**
+#     and a self-approving workflow change is exactly the escalation this file
+#     is meant to prevent
+#   - anything touching a file other than a package manifest or lockfile
+name: Dependabot auto-merge
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+# Minimum required to call the enablePullRequestAutoMerge mutation. No packages,
+# no id-token, no actions, no deployments.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: dependabot-auto-merge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Cheap identity gate before the job is even scheduled. `user.login` is set by
+    # GitHub and cannot be spoofed by PR content; the head_ref prefix is checked
+    # again below as defence in depth.
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.draft == false
+    steps:
+      - name: Verify the head ref is a Dependabot branch
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          case "${HEAD_REF}" in
+            dependabot/*) echo "Head ref ${HEAD_REF} looks like a Dependabot branch." ;;
+            *)
+              echo "::error::Head ref ${HEAD_REF} is not a dependabot/* branch. Refusing."
+              exit 1
+              ;;
+          esac
+
+      - name: Fetch Dependabot metadata
+        id: metadata
+        # Pinned to the commit behind dependabot/fetch-metadata v2.5.0, which is also
+        # where the floating v2 tag currently points. A mutable tag on the action that
+        # decides what counts as "patch or minor" here is a supply-chain hole: whoever
+        # can move the tag can change this workflow's merge criteria without a PR.
+        # Re-pin deliberately when bumping, and re-verify the SHA against the tag.
+        uses: dependabot/fetch-metadata@21025c705c08248db411dc16f3619e6b5f9ea21a # v2.5.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restrict to the npm ecosystem
+        env:
+          ECOSYSTEM: ${{ steps.metadata.outputs.package-ecosystem }}
+        run: |
+          set -euo pipefail
+          if [ "${ECOSYSTEM}" != "npm" ]; then
+            echo "Ecosystem '${ECOSYSTEM}' is not auto-merged (github-actions bumps edit workflow files and stay manual)."
+            echo "SKIP=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Require a patch or minor update
+        if: env.SKIP != 'true'
+        env:
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          UPDATED_JSON: ${{ steps.metadata.outputs.updated-dependencies-json }}
+        run: |
+          set -euo pipefail
+
+          # fetch-metadata reports the largest bump in the PR, so for the grouped
+          # PRs configured in .github/dependabot.yml this single value already
+          # covers every dependency in the group.
+          case "${UPDATE_TYPE}" in
+            version-update:semver-patch|version-update:semver-minor)
+              echo "Update type ${UPDATE_TYPE} is eligible."
+              ;;
+            *)
+              echo "Update type '${UPDATE_TYPE}' is not eligible for auto-merge. Leaving this PR for manual review."
+              echo "SKIP=true" >> "$GITHUB_ENV"
+              exit 0
+              ;;
+          esac
+
+          # Belt and braces for grouped PRs: refuse if any individual entry is a
+          # major, even when the aggregate above disagreed.
+          if printf '%s' "${UPDATED_JSON}" | jq -e 'any(.[]; .updateType == "version-update:semver-major")' >/dev/null 2>&1; then
+            echo "::warning::A dependency in this group is a major bump. Leaving this PR for manual review."
+            echo "SKIP=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Require that only manifests and lockfiles changed
+        if: env.SKIP != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          # Reading the file list over the API rather than checking the branch out
+          # keeps PR content off this runner entirely.
+          files="$(gh pr view "${PR_NUMBER}" --json files --jq '.files[].path')"
+          echo "Changed files:"
+          echo "${files}"
+
+          if [ -z "${files}" ]; then
+            echo "::error::Could not read the changed-file list. Refusing."
+            exit 1
+          fi
+
+          while IFS= read -r file; do
+            [ -z "${file}" ] && continue
+            case "${file}" in
+              package.json|package-lock.json|apps/web/package.json|apps/web/package-lock.json)
+                ;;
+              *)
+                echo "::warning::${file} is outside the dependency manifests. Leaving this PR for manual review."
+                echo "SKIP=true" >> "$GITHUB_ENV"
+                exit 0
+                ;;
+            esac
+          done <<< "${files}"
+
+          echo "Only dependency manifests and lockfiles changed."
+
+      - name: Enable auto-merge
+        if: env.SKIP != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          # `--auto` queues the merge behind branch protection. GitHub performs it
+          # only once every required status check has passed and every required
+          # review is in place; until then the request just sits on the PR, and a
+          # later failing check cancels it. Nothing here forces a merge.
+          if ! gh pr merge "${PR_NUMBER}" --auto --squash; then
+            echo "::error::Could not enable auto-merge. Confirm that 'Allow auto-merge' is enabled in the repository settings and that branch protection on main requires at least one status check."
+            exit 1
+          fi
+          echo "Auto-merge requested. GitHub will merge once branch protection is satisfied."
