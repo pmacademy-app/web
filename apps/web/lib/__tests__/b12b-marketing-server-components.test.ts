@@ -35,6 +35,13 @@ const LANDING_MODULES = [
   'components/marketing/sections/why.tsx',
   'components/marketing/sections/curriculum.tsx',
   'components/marketing/sections/curriculum-view-tracker.tsx',
+  // Phase 0.C sections. The landing page no longer composes `experience` or `journey`,
+  // but both stay in this list: they remain in the repository, and the property under
+  // test — no animation engine in a marketing section — is worth keeping pinned for
+  // whatever page composes them next.
+  'components/marketing/sections/sample-lesson.tsx',
+  'components/marketing/sections/how-it-works.tsx',
+  'components/marketing/sections/published-testimonials.tsx',
   'components/marketing/sections/experience.tsx',
   'components/marketing/sections/journey.tsx',
   'components/marketing/sections/journey-timeline.tsx',
@@ -63,6 +70,13 @@ const SERVER_SECTIONS = [
   'components/marketing/sections/journey.tsx',
   'components/marketing/sections/final-cta.tsx',
   'components/marketing/product-mockup/skill-radar.tsx',
+  // Phase 0.C. `sample-lesson` and `published-testimonials` read data on the server and
+  // `how-it-works` is static, so none of the three has a client requirement. Pinning
+  // them here is what stops the next edit from reaching for state and quietly putting a
+  // third of the landing page back into the client bundle.
+  'components/marketing/sections/sample-lesson.tsx',
+  'components/marketing/sections/how-it-works.tsx',
+  'components/marketing/sections/published-testimonials.tsx',
 ]
 
 /** Strips comments so a doc note naming framer-motion is not mistaken for an import. */

@@ -18,7 +18,7 @@ export function PortfolioSection() {
     <section
       id="portfolio"
       aria-labelledby="portfolio-heading"
-      className="py-20 lg:py-28 bg-white border-t border-[#DED8CB]/80 scroll-mt-24 lg:scroll-mt-28"
+      className="py-20 lg:py-28 bg-surface border-t border-border/80 scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8 space-y-10">
 
@@ -33,13 +33,41 @@ export function PortfolioSection() {
           >
             Finish with work you can show, not just a course you completed.
           </h2>
-          <p className="text-base sm:text-lg text-[#70685A] leading-relaxed">
-            Every applied capstone becomes a tangible product artifact, from PRDs and opportunity briefs to roadmaps, metrics work, and strategy case studies. Publish your strongest work to a public portfolio and give people something concrete to see.
+          <p className="text-base sm:text-lg text-locked leading-relaxed">
+            Every capstone produces a real product artifact — opportunity briefs, PRDs,
+            roadmaps, metrics work, strategy case studies. Publish your strongest pieces
+            and give people something concrete to look at.
           </p>
         </div>
 
         {/* ── Single Sliding PPT-Style Showcase Card ────────────────────── */}
         <PortfolioShowcase />
+
+        {/* ── What you leave with ───────────────────────────────────────────
+            The audit found the two shipping outcome surfaces — the public portfolio at
+            /p/[username] and the verified certificate at /verify/[id] — were never
+            mentioned on the homepage. Three short facts, no new section. */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-border rounded-sm overflow-hidden border border-border">
+          {[
+            {
+              title: 'Nine capstone artifacts',
+              body: 'One applied deliverable per module, written to a real brief with stated requirements.',
+            },
+            {
+              title: 'A public portfolio page',
+              body: 'Your own URL, showing the work you choose to publish. Private until you decide otherwise.',
+            },
+            {
+              title: 'A verifiable certificate',
+              body: 'Issued on completion, with a public verification link anyone can check.',
+            },
+          ].map((item) => (
+            <div key={item.title} className="bg-surface p-6 space-y-1.5">
+              <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+              <p className="text-sm text-locked leading-relaxed">{item.body}</p>
+            </div>
+          ))}
+        </div>
 
       </div>
     </section>

@@ -73,50 +73,54 @@ export function HeroSection() {
             </h1>
 
             {/* Subheadline */}
-            <p className={`${ENTER_OPAQUE} delay-150 text-base sm:text-lg text-[#70685A] leading-relaxed max-w-[540px]`}>
-              Learn product management through 90 structured lessons, applied capstones, and interactive practice, then turn the work you create into a public portfolio you can show. Built for career switchers and anyone building product judgment from scratch.
+            <p className={`${ENTER_OPAQUE} delay-150 text-base sm:text-lg text-locked leading-relaxed max-w-[520px]`}>
+              Ninety lessons that build product judgment, and nine capstone deliverables
+              that turn it into work you can show. Free, permanently.
             </p>
 
             {/* Action Buttons */}
             <div className={`${ENTER} delay-200 flex flex-wrap items-center gap-3.5 pt-1`}>
               <HeroCtaLink />
 
+              {/* Secondary CTA points at a real lesson rather than the curriculum index.
+                  All 90 lessons are already public, and reading one is a lower-commitment,
+                  higher-evidence second step than scanning a module list. */}
               <Link
-                href="/curriculum"
+                href="/lessons/lesson-001"
                 className="
                   group inline-flex items-center gap-2 px-5 py-3.5
-                  bg-white text-foreground font-semibold text-sm rounded-lg
-                  border border-[#DED8CB] hover:border-[#BDB4A2] hover:bg-[#F2EFE7]
+                  bg-surface text-foreground font-semibold text-sm rounded-lg
+                  border border-border hover:border-border-strong hover:bg-surface-muted
                   transition-all duration-150
                   hover:scale-[1.015] active:scale-[0.98]
                   motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F80ED]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
                 "
               >
-                <span>Explore Curriculum</span>
-                <span className="transition-transform duration-200 group-hover:translate-x-1 text-[#70685A] group-hover:text-foreground motion-reduce:transition-none">
+                <span>Read a sample lesson</span>
+                <span className="transition-transform duration-200 group-hover:translate-x-1 text-locked group-hover:text-foreground motion-reduce:transition-none">
                   →
                 </span>
               </Link>
             </div>
 
             {/* Key Value Anchors */}
-            <div className={`${ENTER} delay-300 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#DED8CB]/80`}>
+            <div className={`${ENTER} delay-300 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-border/80`}>
               <div className="space-y-0.5">
                 <div className="text-sm font-bold text-foreground font-mono">90 Lessons</div>
-                <div className="text-[11px] text-[#70685A]">9 complete modules</div>
+                <div className="text-[11px] text-locked">9 complete modules</div>
               </div>
               <div className="space-y-0.5">
                 <div className="text-sm font-bold text-foreground font-mono">9 Capstones</div>
-                <div className="text-[11px] text-[#70685A]">Real PM deliverables</div>
+                <div className="text-[11px] text-locked">Real PM deliverables</div>
               </div>
               <div className="space-y-0.5">
                 <div className="text-sm font-bold text-foreground font-mono">7 Competencies</div>
-                <div className="text-[11px] text-[#70685A]">Skill progress tracking</div>
+                <div className="text-[11px] text-locked">Skill progress tracking</div>
               </div>
               <div className="space-y-0.5">
                 <div className="text-sm font-bold text-primary font-mono">₹0 Tuition</div>
-                <div className="text-[11px] text-[#70685A]">Free, permanently</div>
+                <div className="text-[11px] text-locked">Free, permanently</div>
               </div>
             </div>
           </div>

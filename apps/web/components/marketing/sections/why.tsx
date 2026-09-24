@@ -37,7 +37,7 @@ export function WhySection() {
     <section
       id="why"
       aria-labelledby="why-heading"
-      className="bg-surface-muted py-20 lg:py-28 scroll-mt-24 lg:scroll-mt-28"
+      className="bg-background py-20 lg:py-28 border-t border-border/80 scroll-mt-24 lg:scroll-mt-28"
     >
       <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
         {/* Header */}

@@ -24,7 +24,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
     <section
       id="final-cta"
       aria-labelledby="cta-heading"
-      className="relative py-24 lg:py-32 overflow-hidden border-t border-[#DED8CB]/80 bg-background scroll-mt-24 lg:scroll-mt-28"
+      className="relative py-24 lg:py-32 overflow-hidden border-t border-border/80 bg-background scroll-mt-24 lg:scroll-mt-28"
     >
       {/* Subtle ambient light vignette for soft depth */}
       <div className="relative max-w-[1120px] mx-auto px-5 lg:px-8">
@@ -49,30 +49,32 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
           </h2>
 
           {/* Subtitle */}
-          <p className="mt-4 text-base sm:text-lg text-[#70685A] leading-relaxed max-w-[560px]">
-            Work through 90 lessons, complete applied capstones, and turn your strongest product work into a public portfolio. Start building for free, permanently.
+          <p className="mt-4 text-base sm:text-lg text-locked leading-relaxed max-w-[560px]">
+            Ninety lessons, nine applied capstones, and a portfolio you keep. No fee, no
+            trial, no card.
           </p>
 
           {/* CTA Action Group */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
             <FinalCtaLink />
 
+            {/* Same secondary as the hero: read the product before committing to it. */}
             <Link
-              href="/curriculum"
+              href="/lessons/lesson-001"
               className="
                 inline-flex items-center justify-center gap-2 w-full sm:w-auto
-                px-6 py-4 bg-white text-foreground font-semibold text-sm rounded-xl
-                border border-[#DED8CB] hover:border-[#BDB4A2] hover:bg-[#F2EFE7]
+                px-6 py-4 bg-surface text-foreground font-semibold text-sm rounded-xl
+                border border-border hover:border-border-strong hover:bg-surface-muted
                 shadow-2xs active:scale-[0.98] transition-all duration-150
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
               "
             >
-              <span>Explore Curriculum</span>
+              <span>Read a sample lesson</span>
             </Link>
           </div>
 
           {/* Minimalist Trust Features */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#70685A]">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-locked">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={13} className="text-primary" />
               90 lessons
