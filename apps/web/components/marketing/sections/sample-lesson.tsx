@@ -150,7 +150,7 @@ export async function SampleLessonSection() {
           </h2>
           <p className="text-body-lg text-locked leading-relaxed">
             Three lessons are open to read in full, no account needed. This is how every
-            lesson opens — with the question it exists to answer.
+            lesson opens: with the question it exists to answer.
           </p>
         </Reveal>
 

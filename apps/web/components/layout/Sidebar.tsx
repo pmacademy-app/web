@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { LayoutDashboard, BookOpen, Award, RotateCw, BarChart3, Trophy, Settings, X, ChevronDown, LogOut, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandMarkProdily } from '@/components/brand/BrandLogo'
-import { createBrowserSupabaseClient } from '@/lib/supabase'
+import { formatLogoutFailures, logout, LEARNER_LOGIN_PATH } from '@/lib/auth/logout'
 import { useSearch } from '@/components/search/SearchOverlayProvider'
 
 interface SidebarProps {
@@ -42,34 +42,56 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [progressExpanded, setProgressExpanded] = useState(isProgressRoute)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  const handleSignOut = async () => {
-    try {
-      setIsLoggingOut(true)
-      const supabase = createBrowserSupabaseClient()
-      await supabase.auth.signOut()
-
-      await fetch('/api/auth/session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'sign_out', session: null }),
-      })
-
-      onClose()
-      router.push('/login')
-      router.refresh()
-    } catch (err) {
-      console.error('[Sidebar] Sign out error:', err)
-      setIsLoggingOut(false)
-    }
+  /**
+   * Auto-expand the Progress submenu when the learner navigates into a `/progress/*`
+   * route.
+   *
+   * `useState(isProgressRoute)` above only covers the first render, so a client-side
+   * navigation from, say, `/dashboard` to `/progress/radar` still needs to open the
+   * submenu. That used to be a `useEffect` calling `setProgressExpanded(true)`, which
+   * React flags because a synchronous setState inside an effect renders the sidebar
+   * twice on every such navigation — once collapsed, once expanded.
+   *
+   * This is React's documented "adjust state when a prop changes" pattern instead: the
+   * comparison runs during render, so the corrected value is used in the same pass and
+   * the intermediate collapsed frame never reaches the DOM. Tracking the previous route
+   * flag (rather than writing `progressExpanded || isProgressRoute`) is what keeps a
+   * manual collapse working — the learner can still close the submenu while standing on
+   * a progress page, and it only re-opens when they navigate into one again.
+   */
+  const [wasProgressRoute, setWasProgressRoute] = useState(isProgressRoute)
+  if (isProgressRoute !== wasProgressRoute) {
+    setWasProgressRoute(isProgressRoute)
+    if (isProgressRoute) setProgressExpanded(true)
   }
 
-  useEffect(() => {
-    if (isProgressRoute) {
-      setProgressExpanded(true)
+  /**
+   * Sign out through the shared helper, exactly as the Topbar does.
+   *
+   * This used to be a hand-rolled copy that called `createBrowserSupabaseClient()` and
+   * `auth.signOut()` before clearing the cookies. B13-A removed that call from the
+   * canonical path on purpose: `persistSession` is disabled, so the browser client holds
+   * no session and the revocation was a no-op that still reported success. The real
+   * revocation happens in `POST /api/auth/session`, server-side, where the refresh token
+   * actually lives.
+   *
+   * The copy also put the navigation inside the `try`, so a throw from either request
+   * left the learner on an authenticated-looking page with the drawer still open.
+   * `logout()` settles each step independently and navigates in a `finally`, and returns
+   * the outcome instead of swallowing it.
+   */
+  const handleSignOut = async () => {
+    setIsLoggingOut(true)
+    onClose()
+
+    const result = await logout(router, { redirectTo: LEARNER_LOGIN_PATH })
+
+    if (!result.ok) {
+      // Navigation has already happened; this records which step failed so a session
+      // that survived the click is diagnosable.
+      console.error('[Sidebar] Sign out completed with failures:', formatLogoutFailures(result))
     }
-  }, [isProgressRoute])
+  }
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-card border-r border-border py-6 px-4">

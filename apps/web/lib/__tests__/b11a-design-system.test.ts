@@ -170,28 +170,59 @@ describe('B11-A — Design System Foundation: Client/Server Boundary Safety', ()
   })
 })
 
-describe('B11-A — Design System Foundation: 10 High-Traffic Adoption Files', () => {
+describe('B11-A — Design System Foundation: High-Traffic Adoption Files', () => {
   const webRoot = path.resolve(import.meta.dirname, '../..')
+
+  /**
+   * The files B11-A migrated to the shared primitives, minus one.
+   *
+   * `components/settings/SettingsTabs.tsx` was part of the original ten. Commit 4525e85
+   * later rebuilt it as a compact segmented control and dropped the primitive, which is
+   * what made this assertion fail. It is not restored here, for two reasons:
+   *
+   *   1. The same commit added the file to the B11-C raw-button allowlist mirror below,
+   *      so opting it out was deliberate rather than accidental.
+   *   2. These controls are tabs, not buttons. The primitive's size tokens (h-8 / h-10,
+   *      its own border and radius) do not fit inside a 2px-padded segmented strip, so
+   *      re-adopting it to satisfy a test would be a visual regression driven by the
+   *      test rather than by the design.
+   *
+   * Coverage moves rather than disappears: the file is still governed, by the B11-C lint
+   * rule's documented allowlist, and the assertion below pins that. If the segmented
+   * control is ever rebuilt on the primitive, move the path back into `adoptionFiles`
+   * and drop it from both allowlists.
+   */
   const adoptionFiles = [
     'app/(auth)/login/page.tsx',
     'app/(auth)/signup/page.tsx',
     'app/(auth)/reset-password/page.tsx',
     'components/settings/SecuritySettingsTab.tsx',
     'components/settings/ConfirmDestructiveAction.tsx',
-    'components/settings/SettingsTabs.tsx',
     'components/feedback/ContextualFeedbackModal.tsx',
     'components/contact/ContactForm.tsx',
     'components/referral/ReferralShareModal.tsx',
     'components/certificates/CertificateActions.tsx',
   ]
 
-  it('verifies all 10 adoption files import Button or Input from components/ui', () => {
+  /** Migrated by B11-A, later redesigned away from the primitive. See the note above. */
+  const REDESIGNED_SINCE_ADOPTION = 'components/settings/SettingsTabs.tsx'
+
+  it('verifies the remaining adoption files import Button or Input from components/ui', () => {
     for (const relativePath of adoptionFiles) {
       const fullPath = path.join(webRoot, relativePath)
       const content = readFileSync(fullPath, 'utf8')
       const importsButton = content.includes('@/components/ui/button')
       const importsInput = content.includes('@/components/ui/input')
-      expect(importsButton || importsInput).toBe(true)
+      expect(importsButton || importsInput, `${relativePath} dropped the primitive`).toBe(true)
     }
+  })
+
+  it('keeps the one redesigned file governed by the B11-C allowlist instead', () => {
+    // An un-adopted file that is also un-allowlisted would be an unreviewed escape
+    // hatch. This is what stops the exception above from becoming one.
+    const eslintConfig = readFileSync(path.join(webRoot, 'eslint.config.mjs'), 'utf8')
+    const allowlistPath = REDESIGNED_SINCE_ADOPTION.replace('components/', '')
+
+    expect(eslintConfig).toContain(`"${allowlistPath}"`)
   })
 })

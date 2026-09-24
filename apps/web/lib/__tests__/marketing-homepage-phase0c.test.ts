@@ -215,6 +215,37 @@ describe('Phase 0.C — design tokens replace ad-hoc hex', () => {
   })
 })
 
+describe('Phase 0.C — copy follows the house separator convention', () => {
+  /**
+   * Commit 4525e85 removed em dashes from user-facing copy across the product under the
+   * stated intent "Remove emojis and AI em-dashes", and every pre-existing marketing
+   * section has none. The convention had no enforcement, and the first draft of the
+   * Phase 0.C sections reintroduced three of them, which only a manual read caught.
+   *
+   * Scoped to rendered copy in the marketing sections: comments are exempt, because the
+   * repository's own documentation style uses em dashes throughout.
+   */
+  const stripComments = (source: string) =>
+    source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '')
+
+  const HOMEPAGE_SECTIONS = [
+    'components/marketing/sections/hero.tsx',
+    'components/marketing/sections/sample-lesson.tsx',
+    'components/marketing/sections/how-it-works.tsx',
+    'components/marketing/sections/portfolio.tsx',
+    'components/marketing/sections/curriculum.tsx',
+    'components/marketing/sections/why.tsx',
+    'components/marketing/sections/published-testimonials.tsx',
+    'components/marketing/sections/final-cta.tsx',
+  ]
+
+  it.each(HOMEPAGE_SECTIONS)('%s uses no em dashes in rendered copy', (rel) => {
+    const copy = stripComments(read(rel))
+    const offenders = copy.split('\n').filter((line) => line.includes('—'))
+    expect(offenders, `${rel} has em dashes in copy:\n${offenders.join('\n')}`).toEqual([])
+  })
+})
+
 describe('Phase 0.C — accessibility and motion floors', () => {
   const sections = [
     ['components/marketing/sections/sample-lesson.tsx', 'sample-heading'],

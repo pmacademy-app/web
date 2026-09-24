@@ -56,7 +56,7 @@ const LOOP: LoopStep[] = [
     verb: 'Apply',
     title: 'Capstone deliverables, not exercises',
     description:
-      'Each module ends in real product work — an opportunity brief, a PRD, a metrics tree — written to a brief and kept in your portfolio.',
+      'Each module ends in real product work: an opportunity brief, a PRD, a metrics tree, written to a brief and kept in your portfolio.',
     icon: PenTool,
   },
   {
@@ -97,13 +97,15 @@ export function HowItWorksSection() {
           {LOOP.map((item, index) => {
             const Icon = item.icon
             return (
-              <Reveal
-                key={item.step}
-                amount={0.2}
-                delay={index * 70}
-                className="h-full bg-surface"
-              >
-                <li className="h-full p-6 lg:p-7 flex flex-col gap-4">
+              // `Reveal` renders a div, so it sits *inside* the list item rather than
+              // wrapping it: an <ol> may only contain <li>, and a div in between costs
+              // the list its semantics for a screen reader.
+              <li key={item.step} className="h-full bg-surface">
+                <Reveal
+                  amount={0.2}
+                  delay={index * 70}
+                  className="h-full p-6 lg:p-7 flex flex-col gap-4"
+                >
                   <div className="flex items-center justify-between">
                     <span
                       className="inline-flex h-9 w-9 items-center justify-center rounded-sm bg-primary/8 text-primary"
@@ -131,8 +133,8 @@ export function HowItWorksSection() {
                   <p className="text-body-sm text-locked leading-relaxed mt-auto">
                     {item.description}
                   </p>
-                </li>
-              </Reveal>
+                </Reveal>
+              </li>
             )
           })}
         </ol>

@@ -34,7 +34,7 @@ export function PortfolioSection() {
             Finish with work you can show, not just a course you completed.
           </h2>
           <p className="text-base sm:text-lg text-locked leading-relaxed">
-            Every capstone produces a real product artifact — opportunity briefs, PRDs,
+            Every capstone produces a real product artifact: opportunity briefs, PRDs,
             roadmaps, metrics work, strategy case studies. Publish your strongest pieces
             and give people something concrete to look at.
           </p>

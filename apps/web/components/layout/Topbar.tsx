@@ -176,11 +176,16 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
                 viewBox="0 0 40 40"
               >
                 <defs>
+                  {/* The two endpoint stops read the brand primary from the design
+                      tokens rather than repeating its hex. CI blocks the brand
+                      literals outside theme/tokens.ts, and the variable also keeps
+                      the ring correct if the token is ever retuned. The two interior
+                      stops are shades specific to this gradient and have no token. */}
                   <linearGradient id="topbarGreenAura" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#1F6B4E" />
+                    <stop offset="0%" stopColor="var(--color-primary)" />
                     <stop offset="35%" stopColor="#2E8B67" />
                     <stop offset="70%" stopColor="#16543D" />
-                    <stop offset="100%" stopColor="#1F6B4E" />
+                    <stop offset="100%" stopColor="var(--color-primary)" />
                   </linearGradient>
                 </defs>
                 <circle
