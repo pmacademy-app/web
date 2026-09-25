@@ -188,7 +188,7 @@ export function SkillRadar({
                 className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                 style={{ backgroundColor: SKILL_COLORS[cluster] }}
               />
-              <span className="text-body-sm text-locked">{SKILL_LABELS[cluster]}</span>
+              <span className="text-body-sm text-ink-muted">{SKILL_LABELS[cluster]}</span>
               <span className="ml-auto text-caption font-medium text-foreground">
                 {values[cluster]}%
               </span>

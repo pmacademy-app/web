@@ -194,6 +194,8 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
           email: 'jane@example.com',
           password: 'securePassword123',
           turnstileToken: 'test-turnstile-token',
+          acceptedTerms: true,
+          confirmedMinimumAge: true,
         }),
       })
       const res = await signupPOST(req)
@@ -214,6 +216,8 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
           email: 'jane@example.com',
           password: 'securePassword123',
           turnstileToken: 'test-turnstile-token',
+          acceptedTerms: true,
+          confirmedMinimumAge: true,
         }),
       })
       const res = await signupPOST(req)
@@ -286,6 +290,8 @@ describe('Platform Behavior Controls — Backend Enforcement Tests', () => {
           email: 'jane@example.com',
           password: 'securePassword123',
           turnstileToken: 'test-turnstile-token',
+          acceptedTerms: true,
+          confirmedMinimumAge: true,
         }),
       })
       const res = await signupPOST(req)

@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const metaTitle = `Verified Certificate: ${cert.learnerName} — ${cert.levelInfo.title}`
+  const metaTitle = `Verified Certificate: ${cert.learnerName} | ${cert.levelInfo.title}`
   const metaDesc = `Official ${BRAND.fullName} Certificate of Completion for ${cert.learnerName} (${cert.levelInfo.title}, ${cert.lessonsCompleted} lessons completed). Certificate ID: ${cert.certificateCode}.`
 
   return {

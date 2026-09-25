@@ -17,9 +17,9 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Stops teams from shipping engineering marvels that nobody buys.',
     schematic: (
       <div className="grid grid-cols-3 gap-1.5 text-center font-mono text-[11px]">
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] text-primary font-bold">Desirability</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] text-[#0284C7] font-bold">Feasibility</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] text-[#D97706] font-bold">Viability</span>
+        <span className="p-1.5 rounded bg-surface border border-border text-primary font-bold">Desirability</span>
+        <span className="p-1.5 rounded bg-surface border border-border text-skill-strategy font-bold">Feasibility</span>
+        <span className="p-1.5 rounded bg-surface border border-border text-skill-leadership font-bold">Viability</span>
       </div>
     ),
   },
@@ -28,13 +28,13 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Evaluates PMs on user behavior change rather than raw output velocity.',
     schematic: (
       <div className="flex items-center justify-between text-center font-mono text-[10px] py-0.5">
-        <span className="px-2 py-1 rounded bg-white border border-[#DED8CB] font-semibold">Problem</span>
-        <span className="text-[#8A8174]">→</span>
-        <span className="px-2 py-1 rounded bg-white border border-[#DED8CB] font-semibold">Insight</span>
-        <span className="text-[#8A8174]">→</span>
-        <span className="px-2 py-1 rounded bg-white border border-[#DED8CB] font-semibold">Tradeoff</span>
-        <span className="text-[#8A8174]">→</span>
-        <span className="px-2 py-1 rounded bg-[#EAF5EF] border border-primary/30 font-bold text-primary">Outcome</span>
+        <span className="px-2 py-1 rounded bg-surface border border-border font-semibold">Problem</span>
+        <span className="text-ink-muted">→</span>
+        <span className="px-2 py-1 rounded bg-surface border border-border font-semibold">Insight</span>
+        <span className="text-ink-muted">→</span>
+        <span className="px-2 py-1 rounded bg-surface border border-border font-semibold">Tradeoff</span>
+        <span className="text-ink-muted">→</span>
+        <span className="px-2 py-1 rounded bg-primary-soft border border-primary/30 font-bold text-primary">Outcome</span>
       </div>
     ),
   },
@@ -43,13 +43,13 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Prevents churn caused by pleasing enterprise buyers while alienating daily users.',
     schematic: (
       <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-        <div className="p-2 rounded bg-white border border-[#DED8CB] flex items-center justify-between">
+        <div className="p-2 rounded bg-surface border border-border flex items-center justify-between">
           <span className="font-bold text-primary">User</span>
-          <span className="text-[10px] text-[#70685A]">Workflow Speed</span>
+          <span className="text-[10px] text-ink-muted">Workflow Speed</span>
         </div>
-        <div className="p-2 rounded bg-white border border-[#DED8CB] flex items-center justify-between">
-          <span className="font-bold text-[#D97706]">Buyer</span>
-          <span className="text-[10px] text-[#70685A]">ROI &amp; Security</span>
+        <div className="p-2 rounded bg-surface border border-border flex items-center justify-between">
+          <span className="font-bold text-skill-leadership">Buyer</span>
+          <span className="text-[10px] text-ink-muted">ROI &amp; Security</span>
         </div>
       </div>
     ),
@@ -59,10 +59,10 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Enforces discovery rigor before committing engineering sprint capacity.',
     schematic: (
       <div className="grid grid-cols-4 gap-1 text-center font-mono text-[10px]">
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-semibold text-primary">1. Evidence</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-semibold">2. Target Who</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-semibold text-[#0284C7]">3. Metric</span>
-        <span className="p-1.5 rounded bg-[#FFF7ED] border border-[#FED7AA] font-bold text-[#C2410C]">4. Non-Goals</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-semibold text-primary">1. Evidence</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-semibold">2. Target Who</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-semibold text-skill-strategy">3. Metric</span>
+        <span className="p-1.5 rounded bg-danger-bg border border-danger/25 font-bold text-danger">4. Non-Goals</span>
       </div>
     ),
   },
@@ -71,10 +71,10 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Kills premature solution-bias by keeping problems grounded in verified user pain.',
     schematic: (
       <div className="grid grid-cols-4 gap-1 text-center font-mono text-[10px]">
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-bold text-primary">Who</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-semibold">Friction</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-semibold">Workaround</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-bold text-[#0284C7]">Impact</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-bold text-primary">Who</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-semibold">Friction</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-semibold">Workaround</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-bold text-skill-strategy">Impact</span>
       </div>
     ),
   },
@@ -83,11 +83,11 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Prevents discovery research from gathering dust in unused slide decks.',
     schematic: (
       <div className="flex items-center justify-between text-center font-mono text-[10px] py-0.5">
-        <span className="flex-1 p-1.5 rounded bg-white border border-[#DED8CB] font-bold text-primary">User Research</span>
-        <span className="text-[#8A8174] px-1">⇄</span>
-        <span className="flex-1 p-1.5 rounded bg-white border border-[#DED8CB] font-semibold">Backlog Items</span>
-        <span className="text-[#8A8174] px-1">⇄</span>
-        <span className="flex-1 p-1.5 rounded bg-white border border-[#DED8CB] font-bold text-[#0284C7]">Sprint Goals</span>
+        <span className="flex-1 p-1.5 rounded bg-surface border border-border font-bold text-primary">User Research</span>
+        <span className="text-ink-muted px-1">⇄</span>
+        <span className="flex-1 p-1.5 rounded bg-surface border border-border font-semibold">Backlog Items</span>
+        <span className="text-ink-muted px-1">⇄</span>
+        <span className="flex-1 p-1.5 rounded bg-surface border border-border font-bold text-skill-strategy">Sprint Goals</span>
       </div>
     ),
   },
@@ -96,10 +96,10 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Stops roadmaps from devolving into reactive compromises for the loudest voices.',
     schematic: (
       <div className="grid grid-cols-4 gap-1 text-center font-mono text-[10px]">
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB]">Sales</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB]">Support</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB]">Legal</span>
-        <span className="p-1.5 rounded bg-[#EAF5EF] border border-primary/30 font-bold text-primary">PM Weight</span>
+        <span className="p-1.5 rounded bg-surface border border-border">Sales</span>
+        <span className="p-1.5 rounded bg-surface border border-border">Support</span>
+        <span className="p-1.5 rounded bg-surface border border-border">Legal</span>
+        <span className="p-1.5 rounded bg-primary-soft border border-primary/30 font-bold text-primary">PM Weight</span>
       </div>
     ),
   },
@@ -108,9 +108,9 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Eliminates micromanagement and territorial friction across the core triad.',
     schematic: (
       <div className="grid grid-cols-3 gap-1.5 text-center font-mono text-[10px]">
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-bold text-primary">PM: Value</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-bold text-[#0284C7]">Eng: Feasibility</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB] font-bold text-[#7C3AED]">Design: UX</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-bold text-primary">PM: Value</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-bold text-skill-strategy">Eng: Feasibility</span>
+        <span className="p-1.5 rounded bg-surface border border-border font-bold text-ai">Design: UX</span>
       </div>
     ),
   },
@@ -119,9 +119,9 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Prevents costly late-stage launch blockers and compliance liabilities.',
     schematic: (
       <div className="grid grid-cols-3 gap-1.5 text-center font-mono text-[10px]">
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB]">Privacy (GDPR)</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB]">WCAG 2.1 AA</span>
-        <span className="p-1.5 rounded bg-white border border-[#DED8CB]">Auth / Security</span>
+        <span className="p-1.5 rounded bg-surface border border-border">Privacy (GDPR)</span>
+        <span className="p-1.5 rounded bg-surface border border-border">WCAG 2.1 AA</span>
+        <span className="p-1.5 rounded bg-surface border border-border">Auth / Security</span>
       </div>
     ),
   },
@@ -130,13 +130,13 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     whyItMatters: 'Provides a non-defensive protocol to resolve cross-functional deadlocks fast.',
     schematic: (
       <div className="flex items-center justify-between text-center font-mono text-[10px] py-0.5">
-        <span className="px-1.5 py-1 rounded bg-white border border-[#DED8CB]">1. Data</span>
-        <span className="text-[#8A8174]">→</span>
-        <span className="px-1.5 py-1 rounded bg-white border border-[#DED8CB]">2. Tradeoff</span>
-        <span className="text-[#8A8174]">→</span>
-        <span className="px-1.5 py-1 rounded bg-white border border-[#DED8CB]">3. Context</span>
-        <span className="text-[#8A8174]">→</span>
-        <span className="px-1.5 py-1 rounded bg-[#EAF5EF] border border-primary/30 font-bold text-primary">4. Exec</span>
+        <span className="px-1.5 py-1 rounded bg-surface border border-border">1. Data</span>
+        <span className="text-ink-muted">→</span>
+        <span className="px-1.5 py-1 rounded bg-surface border border-border">2. Tradeoff</span>
+        <span className="text-ink-muted">→</span>
+        <span className="px-1.5 py-1 rounded bg-surface border border-border">3. Context</span>
+        <span className="text-ink-muted">→</span>
+        <span className="px-1.5 py-1 rounded bg-primary-soft border border-primary/30 font-bold text-primary">4. Exec</span>
       </div>
     ),
   },
@@ -146,7 +146,7 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     schematic: (
       <div className="grid grid-cols-6 gap-1 text-center font-mono text-[9px]">
         {['Strategy', 'Discovery', 'Execution', 'Lead', 'Design', 'Tech'].map((d) => (
-          <span key={d} className="p-1 rounded bg-white border border-[#DED8CB] font-semibold text-primary">
+          <span key={d} className="p-1 rounded bg-surface border border-border font-semibold text-primary">
             {d}
           </span>
         ))}
@@ -157,7 +157,7 @@ const COMPACT_DATA: Record<string, { coreRule: string; whyItMatters: string; sch
     coreRule: 'Synthesis of all 90 lessons into instinctual, real-world product judgment.',
     whyItMatters: 'Knowing exactly which diagnostic framework to trigger in ambiguous scenarios.',
     schematic: (
-      <div className="p-1.5 rounded bg-white border border-[#DED8CB] text-center font-mono text-[10px] font-bold text-primary">
+      <div className="p-1.5 rounded bg-surface border border-border text-center font-mono text-[10px] font-bold text-primary">
         90 Lessons Unified ➔ Instinctual PM Craft
       </div>
     ),
@@ -176,7 +176,7 @@ export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
         className="
           absolute top-4 bottom-4
           left-5 md:left-1/2 -translate-x-1/2
-          w-0.5 bg-gradient-to-b from-primary/80 via-[#DED8CB] to-primary/80
+          w-0.5 bg-gradient-to-b from-primary/80 via-border to-primary/80
           pointer-events-none z-0
         "
       />
@@ -209,7 +209,7 @@ export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
                   'absolute z-20 flex items-center justify-center transition-transform duration-200',
                   'left-5 -translate-x-1/2 top-6', // Mobile
                   'md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:-translate-y-1/2', // Desktop
-                  'w-9 h-9 rounded-full bg-white border-2 border-primary shadow-xs ring-4 ring-primary/10',
+                  'w-9 h-9 rounded-full bg-surface border-2 border-primary shadow-xs ring-4 ring-primary/10',
                 )}
               >
                 <span className="text-[10px] font-mono font-bold text-primary">
@@ -227,7 +227,7 @@ export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
                 )}
               >
                 <article className="
-                  group bg-white border border-[#DED8CB] rounded-xl p-4 sm:p-5 shadow-xs
+                  group bg-surface border border-border rounded-xl p-4 sm:p-5 shadow-xs
                   hover:border-primary/50 hover:shadow-[0_8px_24px_-6px_rgba(23,26,23,0.06)] hover:-translate-y-0.5
                   transition-all duration-150 space-y-3 relative
                 ">
@@ -236,17 +236,17 @@ export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
                   <div
                     aria-hidden="true"
                     className={cn(
-                      'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-[#DED8CB]',
+                      'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-border',
                       isRight ? '-left-8' : '-right-8',
                     )}
                   />
 
                   {/* Header Row */}
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-[#F2EFE7] text-foreground">
+                    <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-surface-muted text-foreground">
                       M0{fw.moduleNumber} · {fw.moduleTitle.split('&')[0].trim()}
                     </span>
-                    <span className="text-[10px] font-mono font-semibold text-primary bg-[#EAF5EF] px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-mono font-semibold text-primary bg-primary-soft px-1.5 py-0.5 rounded">
                       Lesson {fw.lessonNumber}
                     </span>
                   </div>
@@ -256,18 +256,18 @@ export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
                     <h2 className="text-base sm:text-lg font-semibold text-foreground tracking-tight leading-snug">
                       <dfn className="not-italic">{fw.name}</dfn>
                     </h2>
-                    <p className="text-xs text-[#70685A] leading-relaxed">
+                    <p className="text-xs text-ink-muted leading-relaxed">
                       {details.coreRule}
                     </p>
                   </div>
 
                   {/* Visual Diagnostic Schematic */}
-                  <div className="p-2.5 bg-background border border-[#DED8CB]/80 rounded-lg">
+                  <div className="p-2.5 bg-background border border-border/80 rounded-lg">
                     {details.schematic}
                   </div>
 
                   {/* Why It Matters Callout */}
-                  <div className="p-2 rounded-lg bg-[#EAF5EF]/60 border border-primary/20 text-xs">
+                  <div className="p-2 rounded-lg bg-primary-soft/60 border border-primary/20 text-xs">
                     <span className="font-semibold text-primary">Why it matters: </span>
                     <span className="text-foreground">{details.whyItMatters}</span>
                   </div>
@@ -276,7 +276,7 @@ export function FrameworksExplorer({ frameworks }: FrameworksExplorerProps) {
                   <div className="pt-1 flex items-center justify-end">
                     <Link
                       href={`/lessons/${fw.lessonSlug}`}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-[#18553E] transition-colors"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-primary-hover transition-colors"
                     >
                       <span>Open Lesson Guide</span>
                       <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />

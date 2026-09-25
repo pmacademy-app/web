@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Trophy, Flame, Zap, ArrowUp, ArrowDown, Minus, ExternalLink, Shield } from 'lucide-react'
+import { Trophy, Flame, Zap, ArrowUp, ArrowDown, ExternalLink, Shield } from 'lucide-react'
 import { type LeaderboardEntry, getLeaderboardTier } from '@/lib/leaderboard'
 import { cn } from '@/lib/utils'
 
@@ -143,7 +143,7 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
                         <span className="text-sm text-muted-foreground font-mono">#{entry.rank}</span>
                       )}
 
-                      {/* Rank Change Arrow */}
+                      {/* Rank Change Arrow (only show on positive/negative movement) */}
                       {entry.positionChange > 0 && (
                         <span className="text-[10px] text-emerald-500 font-bold flex items-center" title={`Up ${entry.positionChange} ranks`}>
                           <ArrowUp className="w-3 h-3" />
@@ -152,11 +152,6 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
                       {entry.positionChange < 0 && (
                         <span className="text-[10px] text-rose-500 font-bold flex items-center" title={`Down ${Math.abs(entry.positionChange)} ranks`}>
                           <ArrowDown className="w-3 h-3" />
-                        </span>
-                      )}
-                      {entry.positionChange === 0 && (
-                        <span className="text-[10px] text-muted-foreground/50" title="Same rank">
-                          <Minus className="w-2.5 h-2.5" />
                         </span>
                       )}
                     </div>
@@ -191,7 +186,7 @@ export function LeaderboardTable({ entries, onCompare }: LeaderboardTableProps) 
 
                   {/* Days Studied */}
                   <td className="py-3 px-4 text-center">
-                    <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold font-mono text-xs">
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold font-mono text-xs">
                       <span>{entry.daysStudied} / 7 Days</span>
                     </div>
                   </td>

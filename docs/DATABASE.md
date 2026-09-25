@@ -66,6 +66,7 @@ All database schema definitions are managed through versioned SQL DDL migration 
 | `20260907000001_email_provider_failover.sql` | `email_queue.provider`, `email_queue.provider_attempts` — provider failover tracking |
 | `20260908000001_error_taxonomy.sql` | `system_errors` taxonomy columns (`domain`, `kind`, `retryability`, `next_action`, `occurrence_count`, `first_seen_at`); widens the `category` CHECK to accept `brevo` and domain values |
 | `20260908000002_quota_key_utc.sql` | Pins `increment_daily_email_quota()` and `get_current_daily_email_count()` to the UTC day, matching the application side |
+| `20260923000001_signup_legal_consent.sql` | Signup consent columns on `public.users` (`terms_accepted_at`, `terms_version`, `privacy_version`, `age_confirmed_at`, `age_confirmed_minimum`) — all nullable, no backfill: NULL means the account predates consent capture and is **not** retroactively blocked |
 
 ---
 
@@ -74,7 +75,7 @@ All database schema definitions are managed through versioned SQL DDL migration 
 This section reflects the current `public` schema as generated in `apps/web/types/database.ts` (42 tables + 2 functions). Where an earlier version of this document used a different table name, the correction is noted.
 
 ### Core User & Learning Tables
-- **`public.users`** — Main profile entity: `id`, `name`, `username`, `email`, `avatar_url`, `bio`, `total_xp`, `level`, `is_admin`, `is_fellow`, `is_portfolio_public`, `portfolio_layout`, `featured_capstone_id`, `portfolio_view_count`, `curriculum_access_override`, streak columns (`current_streak`, `longest_streak`, `last_streak_date`, `streak_freezes_available`), `portfolio_verification_override`.
+- **`public.users`** — Main profile entity: `id`, `name`, `username`, `email`, `avatar_url`, `bio`, `total_xp`, `level`, `is_admin`, `is_fellow`, `is_portfolio_public`, `portfolio_layout`, `featured_capstone_id`, `portfolio_view_count`, `curriculum_access_override`, streak columns (`current_streak`, `longest_streak`, `last_streak_date`, `streak_freezes_available`), `portfolio_verification_override`, and signup-consent columns (`terms_accepted_at`, `terms_version`, `privacy_version`, `age_confirmed_at`, `age_confirmed_minimum` — nullable; populated only for accounts created from 2026-09-23 onward).
 - **`public.xp_events`** — Append-only XP ledger (`id`, `user_id`, `amount`, `source_type`, `description`, `created_at`).
 - **`public.user_lesson_progress`** — Lesson completion records (`user_id`, `lesson_id`, `status`, `completed_at`, `quiz_score`).
 - **`public.reflections`** — Qualitative learner reflections on lesson theory. (Previously mislabeled `user_reflections` in this doc.)

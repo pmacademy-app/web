@@ -294,7 +294,7 @@ Manage Preferences / Unsubscribe: ${unsubscribeUrl}`
       </p>
       
       <p style="margin:0 0 24px 0; line-height:1.4;">
-        &mdash; Aditya<br>
+        Aditya<br>
         <span style="color:#70685A;">Prodily</span>
       </p>
 

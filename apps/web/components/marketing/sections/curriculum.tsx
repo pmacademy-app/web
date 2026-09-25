@@ -4,6 +4,16 @@ import { ArrowRight } from 'lucide-react'
 import { ModuleCard } from '@/components/marketing/module-card'
 import { MODULES } from '@/config/content'
 import { Reveal } from '@/components/marketing/motion/reveal'
+import {
+  ARROW_NUDGE,
+  BUTTON_PRIMARY,
+  CONTAINER,
+  EYEBROW,
+  EYEBROW_RULE,
+  SECTION_LEAD,
+  SECTION_TITLE,
+  SECTION_Y,
+} from '@/components/marketing/styles'
 import { CurriculumViewTracker } from '@/components/marketing/sections/curriculum-view-tracker'
 
 /**
@@ -23,21 +33,22 @@ export function CurriculumSection() {
     <section
       id="curriculum"
       aria-labelledby="curriculum-heading"
-      className="bg-surface-muted py-20 lg:py-28 scroll-mt-24 lg:scroll-mt-28"
+      className={`bg-surface-muted ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
-      <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
+      <div className={CONTAINER}>
         {/* Header */}
-        <Reveal amount={0.3} className="text-center mb-10">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
+        <Reveal amount={0.3} className="text-center mb-12 flex flex-col items-center">
+          <div className={`${EYEBROW} mb-4`}>
+            <span aria-hidden="true" className={EYEBROW_RULE} />
             COMPLETE LEARNING PATH
           </div>
           <h2
             id="curriculum-heading"
-            className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
+            className={`${SECTION_TITLE} mb-4 max-w-[760px]`}
           >
             Nine modules. Ninety lessons. One coherent path.
           </h2>
-          <p className="text-body-lg text-locked max-w-[560px] mx-auto leading-relaxed">
+          <p className={`${SECTION_LEAD} max-w-[600px]`}>
             Start with product thinking fundamentals and build toward discovery, execution, strategy, leadership, and technical fluency. Each module builds on the last and ends with applied work.
           </p>
         </Reveal>
@@ -64,25 +75,16 @@ export function CurriculumSection() {
           delay={100}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center"
         >
-          <Link
-            href="/curriculum"
-            className="
-              inline-flex items-center gap-2 px-6 py-3
-              bg-primary text-white hover:text-white
-              text-body-sm font-semibold rounded-sm
-              shadow-xs hover:shadow-sm
-              hover:opacity-90 active:scale-[0.98]
-              transition-all duration-[120ms]
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:text-white
-            "
-          >
-            Explore Full Curriculum <ArrowRight size={16} aria-hidden="true" />
+          <Link href="/curriculum" className={BUTTON_PRIMARY}>
+            Explore Full Curriculum
+            <ArrowRight size={16} aria-hidden="true" className={ARROW_NUDGE} />
           </Link>
           <Link
             href="/lessons/lesson-001"
             className="
-              text-body-sm font-medium text-locked hover:text-foreground
-              transition-colors duration-[120ms]
+              text-body-sm font-medium text-ink-muted hover:text-foreground
+              underline-offset-4 hover:underline
+              transition-colors duration-200
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-xs
               px-2 py-1
             "

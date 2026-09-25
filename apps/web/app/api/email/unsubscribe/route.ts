@@ -66,7 +66,7 @@ export const GET = withRoute(
       }
       return new NextResponse(
         renderUnsubscribeHtml({
-          title: 'Invalid Link — ' + BRAND.fullName,
+          title: 'Invalid Link | ' + BRAND.fullName,
           heading: 'Invalid or Expired Link',
           message: 'This unsubscribe link is invalid or has expired. You can manage your preferences directly from settings.',
           success: false,
@@ -121,7 +121,7 @@ export const GET = withRoute(
 
     return new NextResponse(
       renderUnsubscribeHtml({
-        title: `Unsubscribed — ${BRAND.fullName}`,
+        title: `Unsubscribed | ${BRAND.fullName}`,
         heading: 'You have been unsubscribed',
         message: 'You will no longer receive non-essential notification emails from Prodily PM Academy. Essential security and account updates will still be delivered.',
         success: true,
@@ -141,7 +141,7 @@ export const GET = withRoute(
     }
     return new NextResponse(
       renderUnsubscribeHtml({
-        title: 'Error — ' + BRAND.fullName,
+        title: 'Error | ' + BRAND.fullName,
         heading: 'Unable to Unsubscribe',
         message: 'An unexpected error occurred. Please try again later or manage preferences in your account settings.',
         success: false,

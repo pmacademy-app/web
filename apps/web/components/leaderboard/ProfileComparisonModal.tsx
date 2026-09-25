@@ -29,7 +29,7 @@ export function ProfileComparisonModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <div className="max-w-lg w-full rounded-2xl border border-border bg-card p-6 shadow-xl space-y-6 animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border pb-4">

@@ -70,7 +70,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
           >
             What learners say
           </h2>
-          <p className="text-body-lg text-locked max-w-[640px] mx-auto leading-relaxed">
+          <p className="text-body-lg text-ink-muted max-w-[640px] mx-auto leading-relaxed">
             Verified reviews from people who&apos;ve completed modules, submitted through the product and moderated before publishing.
           </p>
         </motion.div>
@@ -107,7 +107,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Quote className="w-6 h-6 text-primary/40" />
-                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                         Verified Review
                       </span>
                     </div>
@@ -135,7 +135,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="text-body-sm text-locked hover:text-foreground transition-colors duration-[120ms] underline underline-offset-4 cursor-pointer mt-6"
+              className="text-body-sm text-ink-muted hover:text-foreground transition-colors duration-[120ms] underline underline-offset-4 cursor-pointer mt-6"
             >
               Submit a review
             </button>
@@ -181,7 +181,7 @@ export function TestimonialsSection({ initialTestimonials }: TestimonialsSection
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="text-body-sm text-locked hover:text-foreground transition-colors duration-[120ms] underline underline-offset-4 cursor-pointer mt-6"
+              className="text-body-sm text-ink-muted hover:text-foreground transition-colors duration-[120ms] underline underline-offset-4 cursor-pointer mt-6"
             >
               Submit a review
             </button>

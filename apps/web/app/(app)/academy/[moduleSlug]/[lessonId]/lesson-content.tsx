@@ -308,7 +308,7 @@ function TheoryReadButton({
       <div className="mt-8 flex flex-col items-center gap-4">
         <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
           <Award className="h-5 w-5" />
-          Theory section completed — quiz is now unlocked!
+          Theory section completed. Quiz is now unlocked!
         </div>
         <Button onClick={onComplete} variant="outline" size="lg" className="font-semibold">
           Proceed to Quiz →
@@ -477,17 +477,14 @@ export default function LessonPageContent({
       return (
         <div className="max-w-lg mx-auto text-center py-12 space-y-8 animate-scale-up">
           <div className="flex justify-center">
-            <div className="relative">
-              <div className="absolute -inset-2 rounded-full bg-amber-500/30 blur-lg animate-pulse" />
-              <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-xl">
-                <Trophy className="h-12 w-12" />
-              </div>
+            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 shadow-sm">
+              <Trophy className="h-10 w-10" />
             </div>
           </div>
 
           <div className="space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
-              🏆 Module Achievement Unlocked
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold uppercase tracking-wider">
+              Module Achievement Unlocked
             </span>
             <h1 className="text-3xl md:text-4xl font-bold font-serif text-foreground">
               Module {moduleNumber} Completed!
@@ -562,11 +559,8 @@ export default function LessonPageContent({
     return (
       <div className="max-w-md mx-auto text-center py-16 space-y-8 animate-scale-up">
         <div className="flex justify-center">
-          <div className="relative">
-            <div className="absolute -inset-1 rounded-full bg-primary blur opacity-35 animate-pulse" />
-            <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-primary text-white shadow-xl">
-              <Award className="h-12 w-12" />
-            </div>
+          <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 border border-primary/25 text-primary shadow-sm">
+            <Award className="h-10 w-10" />
           </div>
         </div>
 

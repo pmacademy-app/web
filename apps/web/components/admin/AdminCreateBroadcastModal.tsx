@@ -261,7 +261,7 @@ export function AdminCreateBroadcastModal({ templates, onClose, onCreated }: Adm
     'h-9 rounded-lg border border-admin-border bg-admin-surface px-3 text-xs text-admin-fg transition-colors outline-none focus-visible:border-admin-accent/60 focus-visible:ring-2 focus-visible:ring-admin-accent/30'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-in fade-in duration-200">
       <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-2xl bg-admin-surface border border-admin-border shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-admin-border bg-admin-surface-raised/40">

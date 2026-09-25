@@ -5,21 +5,22 @@ import { BRAND } from '@/lib/brand'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getCourseSchema } from '@/lib/schema'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
-import { ArrowRight, BookOpen, Clock } from 'lucide-react'
+import { ArrowRight, BookOpen, Clock, Layers, Sparkles } from 'lucide-react'
+import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
 
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Product Management Curriculum — 90 Lessons | Prodily',
+  title: 'Product Management Curriculum: 90 Lessons | Prodily',
   description:
     "Explore Prodily's 90-lesson Product Management curriculum across nine structured modules, with applied capstones and portfolio-ready work.",
   alternates: {
     canonical: `${siteUrl}/curriculum`,
   },
   openGraph: {
-    title: 'Product Management Curriculum — 90 Lessons | Prodily',
+    title: 'Product Management Curriculum: 90 Lessons | Prodily',
     description:
       "Explore Prodily's 90-lesson Product Management curriculum across nine structured modules, with applied capstones and portfolio-ready work.",
     url: `${siteUrl}/curriculum`,
@@ -67,16 +68,16 @@ export default async function CurriculumPage() {
 
       {/* Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <span className="text-xs font-bold uppercase tracking-wider text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-          Complete Learning Path
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary px-3 py-1 rounded-md bg-primary/10 border border-primary/20">
+          <Layers className="w-3.5 h-3.5" /> Complete Learning Path
         </span>
         <h1 className="text-3xl md:text-5xl font-bold font-serif text-foreground">
           Learn Product Management from first principles to applied practice.
         </h1>
-        <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+        <p className="text-base md:text-lg text-ink-muted leading-relaxed">
           A structured 90-lesson curriculum across nine modules, designed to build product judgment step by step and turn learning into tangible work.
         </p>
-        <p className="text-sm md:text-base text-muted-foreground leading-relaxed pt-1">
+        <p className="text-sm md:text-base text-ink-muted leading-relaxed pt-1">
           You don&apos;t need prior PM experience. Start with the foundations, build your product thinking, and progressively work toward real product deliverables.
         </p>
       </div>
@@ -97,24 +98,29 @@ export default async function CurriculumPage() {
             >
               {/* Module Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border">
-                <div>
-                  <span className="text-xs uppercase tracking-wider font-bold text-primary">
-                    Module {String(module.number).padStart(2, '0')}
-                  </span>
-                  <h2
-                    id={`heading-module-${module.number}`}
-                    className="text-2xl md:text-3xl font-bold font-serif text-foreground mt-1"
-                  >
-                    {module.title}
-                  </h2>
+                <div className="flex items-start sm:items-center gap-4 min-w-0">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shrink-0">
+                    <CurriculumModuleIcon slugOrIcon={moduleSlug} className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-mono uppercase tracking-wider font-bold text-ink-muted">
+                      Module {String(module.number).padStart(2, '0')}
+                    </span>
+                    <h2
+                      id={`heading-module-${module.number}`}
+                      className="text-2xl md:text-3xl font-bold font-serif text-foreground mt-0.5"
+                    >
+                      {module.title}
+                    </h2>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-xs md:text-sm text-muted-foreground font-medium">
-                  <span className="flex items-center gap-1">
+                <div className="flex items-center gap-3 text-xs md:text-sm text-ink-muted font-medium">
+                  <span className="flex items-center gap-1 font-mono">
                     <Clock className="w-3.5 h-3.5 text-primary" />
                     {module.estimatedTime}
                   </span>
                   <span>•</span>
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 font-mono">
                     <BookOpen className="w-3.5 h-3.5 text-primary" />
                     10 Lessons
                   </span>
@@ -122,10 +128,10 @@ export default async function CurriculumPage() {
               </div>
 
               {/* Module Metadata */}
-              <div className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs text-muted-foreground border-b border-border/50">
+              <div className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs text-ink-muted border-b border-border/50">
                 <p className="font-medium text-foreground/90">
                   Learning Outcome:{' '}
-                  <span className="font-normal text-muted-foreground">{module.outcome}</span>
+                  <span className="font-normal text-ink-muted">{module.outcome}</span>
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {module.skillLabels.map((label) => (
@@ -141,7 +147,7 @@ export default async function CurriculumPage() {
 
               {/* All 10 Lessons Grid for this Module */}
               <div className="pt-6 space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-ink-muted mb-3">
                   Module Lessons (10 Direct Links)
                 </h3>
 
@@ -162,7 +168,7 @@ export default async function CurriculumPage() {
                             {lesson.title}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-2 flex-shrink-0 text-xs text-ink-muted">
                           <span>{lesson.estimatedReadingTime || 20}m</span>
                           <ArrowRight className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
@@ -182,7 +188,7 @@ export default async function CurriculumPage() {
           <h2 className="text-2xl md:text-3xl font-bold font-serif text-foreground">
             Ready to start building?
           </h2>
-          <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl mx-auto">
+          <p className="text-sm md:text-base text-ink-muted leading-relaxed max-w-xl mx-auto">
             Work through the curriculum at your own pace and build your portfolio as you go.
           </p>
         </div>

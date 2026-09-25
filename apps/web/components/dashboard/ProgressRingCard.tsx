@@ -36,7 +36,7 @@ export function ProgressRingCard({
             Curriculum Progress
           </h3>
         </div>
-        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
+        <span className="text-xs font-medium px-2.5 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
           {percentage}% Complete
         </span>
       </div>

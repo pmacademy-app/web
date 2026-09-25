@@ -106,12 +106,12 @@ export function AvatarUpload({ currentAvatarUrl, onUploadSuccess, onRemove }: Av
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-5">
-      <div className="relative group w-20 h-20 rounded-full border-2 border-border bg-card overflow-hidden flex items-center justify-center shadow-xs">
+    <div className="flex flex-col sm:flex-row items-center gap-4">
+      <div className="relative group w-16 h-16 rounded-full border border-border bg-muted/40 overflow-hidden flex items-center justify-center shadow-xs transition-colors shrink-0">
         {avatarUrl ? (
-          <Image src={avatarUrl} alt="Avatar Preview" className="w-full h-full object-cover" width={80} height={80} unoptimized />
+          <Image src={avatarUrl} alt="Avatar Preview" className="w-full h-full object-cover" width={64} height={64} unoptimized />
         ) : (
-          <User className="w-8 h-8 text-muted-foreground/60" />
+          <User className="w-6 h-6 text-muted-foreground/60" />
         )}
 
         {/* Hover overlay for upload */}

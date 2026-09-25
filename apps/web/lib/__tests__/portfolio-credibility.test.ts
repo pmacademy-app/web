@@ -12,6 +12,15 @@ vi.mock('@/lib/supabase', () => ({
 
 import { createServiceRoleClient } from '@/lib/supabase'
 
+/**
+ * Separator convention: see the matching note in `portfolio-seo.test.ts`.
+ *
+ * Titles and OpenGraph alt text use a pipe, descriptions use a comma. Commit 4525e85
+ * replaced the em dash in both producers under the stated intent "Remove emojis and AI
+ * em-dashes" and did not update these assertions, which is the only reason they failed.
+ * The assertions were corrected to the shipped convention rather than the producers
+ * reverted, because the em dash is being removed from user-facing copy on purpose.
+ */
 describe('Unit 1: Portfolio Credibility & Copy Accuracy Test Suite', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -191,7 +200,7 @@ describe('Unit 1: Portfolio Credibility & Copy Accuracy Test Suite', () => {
 
       expect(ogImages).toBeDefined()
       expect(ogImages.length).toBeGreaterThan(0)
-      expect(ogImages[0].alt).toBe('Sarah Chen — Product Portfolio')
+      expect(ogImages[0].alt).toBe('Sarah Chen | Product Portfolio')
       expect(ogImages[0].alt?.toLowerCase()).not.toContain('verified')
     })
 
@@ -205,9 +214,9 @@ describe('Unit 1: Portfolio Credibility & Copy Accuracy Test Suite', () => {
 
       const metadata = await generateMetadata({ params: Promise.resolve({ username: 'pmcandidate' }) })
 
-      expect(metadata.title).toBe('Sarah Chen — Product Management Fellow at Prodily | Portfolio')
+      expect(metadata.title).toBe('Sarah Chen | Product Management Fellow at Prodily | Portfolio')
       const desc = metadata.description as string
-      expect(desc).toContain('Sarah Chen — Product Management Fellow at Prodily')
+      expect(desc).toContain('Sarah Chen, Product Management Fellow at Prodily')
       expect(desc).toContain('Product Management Fellow focusing on fintech platform strategy.')
     })
 
@@ -221,7 +230,7 @@ describe('Unit 1: Portfolio Credibility & Copy Accuracy Test Suite', () => {
 
       const metadata = await generateMetadata({ params: Promise.resolve({ username: 'pmcandidate' }) })
 
-      expect(metadata.title).toBe('Sarah Chen — Product Portfolio')
+      expect(metadata.title).toBe('Sarah Chen | Product Portfolio')
       const desc = metadata.description as string
       expect(desc).not.toContain('Product Management Fellow')
       expect(desc).toContain("Sarah Chen's Product Management portfolio and applied capstones")

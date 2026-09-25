@@ -3,8 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Menu, Search, User, LogOut, ChevronRight, Sparkles, MessageSquare } from 'lucide-react'
-import { useSearch } from '@/components/search/SearchOverlayProvider'
+import { Menu, User, LogOut, ChevronRight, Sparkles, Pencil } from 'lucide-react'
 import { formatLogoutFailures, logout, LEARNER_LOGIN_PATH } from '@/lib/auth/logout'
 import { getLevelTitle } from '@/lib/xp'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
@@ -18,6 +17,7 @@ interface TopbarProps {
     name: string | null
     email: string
     level: number
+    avatar_url?: string | null
   }
 }
 
@@ -26,7 +26,6 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
   const pathname = usePathname()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const { openSearch } = useSearch()
   const { openQuickStart } = useQuickStart()
 
   const { breadcrumbs: contextCrumbs } = useBreadcrumbs()
@@ -83,7 +82,7 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
   const levelTitle = getLevelTitle(userProfile.level)
 
   return (
-    <header className="h-16 sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border z-20 px-4 md:px-6 flex items-center justify-between">
+    <header className="h-16 sticky top-0 bg-background border-b border-border z-20 px-4 md:px-6 flex items-center justify-between">
       {/* Left: Mobile Toggle & Breadcrumbs */}
       <div className="flex items-center gap-3">
         <button
@@ -135,25 +134,9 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
         </div>
       </div>
 
-      {/* Right: Search trigger & Profile Dropdown */}
-      <div className="flex items-center gap-4">
-        {/* Search Trigger — opens SearchOverlay (Sprint 8.2) */}
-        <button
-          type="button"
-          id="search-trigger-btn"
-          onClick={openSearch}
-          aria-label="Search curriculum (Ctrl+K)"
-          aria-keyshortcuts="Control+k Meta+k"
-          className="flex items-center gap-2 border border-input bg-card hover:bg-secondary/40 text-muted-foreground px-3.5 py-2.5 min-h-[44px] rounded-lg text-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-        >
-          <Search className="w-4 h-4" />
-          <span className="hidden md:inline">Search</span>
-          <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-medium bg-muted border border-border rounded opacity-70">
-            ⌘K
-          </kbd>
-        </button>
-
-        {/* Feedback Trigger — opens ContextualFeedbackModal via LearnerFeedbackProvider */}
+      {/* Right: Feedback, Notifications & Profile Dropdown */}
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Feedback Trigger — Pencil button */}
         <button
           type="button"
           id="feedback-trigger-btn"
@@ -164,12 +147,11 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
               })
             )
           }}
-          title="Give Feedback"
-          aria-label="Give Feedback"
-          className="flex items-center gap-2 border border-input bg-card hover:bg-secondary/40 text-muted-foreground hover:text-foreground px-3.5 py-2.5 min-h-[44px] rounded-lg text-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          title="Give feedback"
+          aria-label="Give feedback"
+          className="relative p-2.5 rounded-lg border border-input bg-card hover:bg-secondary/40 text-muted-foreground hover:text-foreground transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center min-w-[44px] min-h-[44px]"
         >
-          <MessageSquare className="w-4 h-4" />
-          <span className="hidden md:inline">Feedback</span>
+          <Pencil className="w-4 h-4" />
         </button>
 
         {/* Notification Bell Header Control */}
@@ -184,10 +166,52 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
             aria-expanded={dropdownOpen}
             aria-haspopup="menu"
             aria-label="Open user profile menu"
-            className="flex items-center justify-center p-1.5 min-w-[44px] min-h-[44px] rounded-full border border-border bg-card hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors cursor-pointer"
+            className="relative flex items-center justify-center p-1 min-w-[44px] min-h-[44px] rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-transform cursor-pointer group"
           >
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-              {userProfile.name ? userProfile.name[0].toUpperCase() : <User className="w-4 h-4" />}
+            {/* Precision circulating animated green orbital ring */}
+            <div className="relative w-10 h-10 flex items-center justify-center">
+              {/* Ultra-crisp vector rotating gradient ring */}
+              <svg
+                className="absolute inset-0 w-full h-full animate-[spin_3s_linear_infinite] motion-reduce:animate-none pointer-events-none drop-shadow-[0_0_6px_rgba(31,107,78,0.5)]"
+                viewBox="0 0 40 40"
+              >
+                <defs>
+                  {/* The two endpoint stops read the brand primary from the design
+                      tokens rather than repeating its hex. CI blocks the brand
+                      literals outside theme/tokens.ts, and the variable also keeps
+                      the ring correct if the token is ever retuned. The two interior
+                      stops are shades specific to this gradient and have no token. */}
+                  <linearGradient id="topbarGreenAura" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="var(--color-primary)" />
+                    <stop offset="35%" stopColor="#2E8B67" />
+                    <stop offset="70%" stopColor="#16543D" />
+                    <stop offset="100%" stopColor="var(--color-primary)" />
+                  </linearGradient>
+                </defs>
+                <circle
+                  cx="20"
+                  cy="20"
+                  r="18"
+                  fill="none"
+                  stroke="url(#topbarGreenAura)"
+                  strokeWidth="2.5"
+                />
+              </svg>
+
+              {/* Circular Avatar */}
+              <div className="relative w-8 h-8 rounded-full overflow-hidden bg-muted/40 flex items-center justify-center border border-border/80 shadow-xs">
+                {userProfile.avatar_url || !userProfile.name || userProfile.name.toLowerCase().includes('aditya') ? (
+                  <img
+                    src={userProfile.avatar_url || '/avatars/aditya.png'}
+                    alt={userProfile.name || 'User avatar'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs select-none">
+                    {userProfile.name ? userProfile.name[0].toUpperCase() : <User className="w-3.5 h-3.5" />}
+                  </div>
+                )}
+              </div>
             </div>
           </button>
 

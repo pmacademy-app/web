@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const globalOrder = globalIdx >= 0 ? globalIdx + 1 : (parseInt(slug.replace(/^lesson-/, ''), 10) || lesson.order)
   const canonicalUrl = `${siteUrl}/lessons/${slug}`
   const pageTitle = `Lesson ${globalOrder}: ${lesson.title}`
-  const description = `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} — Module: ${formatModuleName(lesson.module)}.`
+  const description = `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} (Module: ${formatModuleName(lesson.module)}).`
 
   return {
     title: pageTitle,
@@ -138,19 +138,19 @@ export default async function PublicLessonPage({ params }: PageProps) {
       <div className="space-y-4">
         {/* Visible Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="mb-2">
-          <ol className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          <ol className="flex flex-wrap items-center gap-1.5 text-xs text-ink-muted">
             <li>
               <Link href="/" className="hover:text-primary transition-colors">
                 Home
               </Link>
             </li>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" aria-hidden="true" />
+            <ChevronRight className="w-3.5 h-3.5 text-ink-muted/60" aria-hidden="true" />
             <li>
               <Link href="/curriculum" className="hover:text-primary transition-colors">
                 Curriculum
               </Link>
             </li>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" aria-hidden="true" />
+            <ChevronRight className="w-3.5 h-3.5 text-ink-muted/60" aria-hidden="true" />
             <li>
               <Link
                 href={`/curriculum#module-${lesson.module}`}
@@ -159,7 +159,7 @@ export default async function PublicLessonPage({ params }: PageProps) {
                 {moduleTitle}
               </Link>
             </li>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" aria-hidden="true" />
+            <ChevronRight className="w-3.5 h-3.5 text-ink-muted/60" aria-hidden="true" />
             <li>
               <span className="font-semibold text-foreground" aria-current="page">
                 Lesson {globalOrder}
@@ -175,7 +175,7 @@ export default async function PublicLessonPage({ params }: PageProps) {
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Curriculum</span>
         </Link>
-        <div className="flex flex-wrap items-center gap-3 pt-1 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-3 pt-1 text-sm text-ink-muted">
           <span className="font-semibold text-primary">Module: {moduleTitle}</span>
           <span>•</span>
           <span>Lesson {globalOrder}</span>
@@ -198,7 +198,7 @@ export default async function PublicLessonPage({ params }: PageProps) {
         <h2 className="text-2xl font-bold font-serif text-foreground leading-tight">
           Ready to test your product judgment?
         </h2>
-        <p className="text-muted-foreground text-sm max-w-md mx-auto leading-relaxed">
+        <p className="text-ink-muted text-sm max-w-md mx-auto leading-relaxed">
           Take the interactive practice quiz for Lesson {globalOrder} and build your skill radar dashboard.
         </p>
         <div className="flex justify-center">

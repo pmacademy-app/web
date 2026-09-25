@@ -51,7 +51,7 @@ export default function AboutPage() {
         <h1 className="text-4xl md:text-5xl font-bold font-serif text-foreground">
           Make serious product management education accessible to everyone.
         </h1>
-        <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+        <p className="text-base md:text-lg text-ink-muted leading-relaxed">
           Prodily PM Academy exists to give aspiring product managers a structured way to learn, practice, and build proof of their product thinking without putting the core curriculum behind a paywall.
         </p>
       </div>
@@ -63,7 +63,7 @@ export default function AboutPage() {
           </p>
 
           <p className="text-sm md:text-base">
-            Prodily brings the structure of a complete curriculum together with interactive practice and applied capstones, so learning doesn&apos;t stop at understanding a framework — it continues into doing the work.
+            Prodily brings the structure of a complete curriculum together with interactive practice and applied capstones, so learning doesn&apos;t stop at understanding a framework: it continues into doing the work.
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export default function AboutPage() {
                 <CheckCircle2 className="w-4 h-4" />
                 <span>1. Depth over gimmicks</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs text-ink-muted leading-relaxed">
                 Interactive mechanics support serious product thinking. The goal is better judgment, not more badges.
               </p>
             </div>
@@ -88,7 +88,7 @@ export default function AboutPage() {
                 <CheckCircle2 className="w-4 h-4" />
                 <span>2. Free access to the core curriculum</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs text-ink-muted leading-relaxed">
                 The core 90-lesson curriculum is free, permanently, without paywalled lessons blocking the learning path.
               </p>
             </div>
@@ -98,8 +98,8 @@ export default function AboutPage() {
                 <CheckCircle2 className="w-4 h-4" />
                 <span>3. Proof of skill</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Learning should leave you with work you can explain, refine, and showcase — not only a completion credential.
+              <p className="text-xs text-ink-muted leading-relaxed">
+                Learning should leave you with work you can explain, refine, and showcase, not only a completion credential.
               </p>
             </div>
 
@@ -108,7 +108,7 @@ export default function AboutPage() {
                 <CheckCircle2 className="w-4 h-4" />
                 <span>4. Respect the learner&apos;s time</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs text-ink-muted leading-relaxed">
                 Clear progression, estimated reading times, and focused learning formats help learners make steady progress without unnecessary friction.
               </p>
             </div>
@@ -121,7 +121,7 @@ export default function AboutPage() {
             <h3 className="text-sm font-bold text-foreground font-serif">
               Built by Aditya Gangwani
             </h3>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-ink-muted">
               Prodily is an independent effort to make serious product management education more accessible and more practical.
             </p>
           </div>

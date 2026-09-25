@@ -18,6 +18,7 @@ import { AuthErrorNotice } from '@/components/auth/AuthErrorNotice'
 import { recordAuthTelemetry } from '@/lib/auth/telemetry'
 import { trackReferralSignupCompleted } from '@/lib/analytics'
 import { TurnstileWidget, type TurnstileWidgetRef } from '@/components/auth/TurnstileWidget'
+import { MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
 
 const signupSchema = z.object({
   name: z
@@ -36,6 +37,14 @@ const signupSchema = z.object({
     .string()
     .min(1, 'Password is required.')
     .min(6, 'Password must be at least 6 characters.'),
+  // Mirrors the server schema in app/api/auth/signup/route.ts. The client copy is
+  // for the inline error; the server's is the one that actually blocks the account.
+  acceptedTerms: z.literal(true, {
+    error: 'Please accept the Terms of Service and Privacy Policy to continue.',
+  }),
+  confirmedMinimumAge: z.literal(true, {
+    error: `Please confirm you are at least ${MINIMUM_SIGNUP_AGE} years old to continue.`,
+  }),
 })
 
 type SignupFormValues = z.infer<typeof signupSchema>
@@ -63,6 +72,10 @@ function SignupFormContent() {
       name: '',
       email: '',
       password: '',
+      // Unchecked by default and never pre-filled: a pre-ticked consent box is not
+      // consent, and the zod literal below makes an unticked box a hard block.
+      acceptedTerms: false as unknown as true,
+      confirmedMinimumAge: false as unknown as true,
     },
   })
 
@@ -330,6 +343,69 @@ function SignupFormContent() {
                   {errors.password.message}
                 </p>
               )}
+            </div>
+
+            {/* Legal acknowledgements — required before an account can be created. */}
+            <div className="space-y-3 pt-1">
+              <div>
+                <label htmlFor="signup-accept-terms" className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    id="signup-accept-terms"
+                    type="checkbox"
+                    disabled={isLoading}
+                    aria-describedby={errors.acceptedTerms ? 'accept-terms-error' : undefined}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-primary accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+                    {...register('acceptedTerms')}
+                  />
+                  <span className="text-xs leading-relaxed text-muted-foreground">
+                    I have read and agree to the{' '}
+                    <Link
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-primary hover:underline"
+                    >
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-primary hover:underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </span>
+                </label>
+                {errors.acceptedTerms && (
+                  <p id="accept-terms-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+                    {errors.acceptedTerms.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="signup-confirm-age" className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    id="signup-confirm-age"
+                    type="checkbox"
+                    disabled={isLoading}
+                    aria-describedby={errors.confirmedMinimumAge ? 'confirm-age-error' : undefined}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-primary accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+                    {...register('confirmedMinimumAge')}
+                  />
+                  <span className="text-xs leading-relaxed text-muted-foreground">
+                    I confirm I am at least {MINIMUM_SIGNUP_AGE} years old.
+                  </span>
+                </label>
+                {errors.confirmedMinimumAge && (
+                  <p id="confirm-age-error" className="mt-1 text-xs text-destructive font-medium" role="alert">
+                    {errors.confirmedMinimumAge.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="py-1">

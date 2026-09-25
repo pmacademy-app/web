@@ -125,6 +125,8 @@ describe('POST /api/auth/signup — error contract', () => {
     password: 'hunter2222',
     confirmPassword: 'hunter2222',
     turnstileToken: 'test-turnstile-token',
+    acceptedTerms: true,
+    confirmedMinimumAge: true,
   }
 
   it('classifies a provider error instead of forwarding its message', async () => {

@@ -12,34 +12,74 @@
  */
 
 import { PortfolioShowcase } from '@/components/marketing/sections/portfolio-showcase'
+import { Reveal } from '@/components/marketing/motion/reveal'
+import {
+  CONTAINER,
+  EYEBROW,
+  EYEBROW_RULE,
+  SECTION_LEAD,
+  SECTION_TITLE,
+  SECTION_Y,
+} from '@/components/marketing/styles'
 
 export function PortfolioSection() {
   return (
     <section
       id="portfolio"
       aria-labelledby="portfolio-heading"
-      className="py-20 lg:py-28 bg-white border-t border-[#DED8CB]/80 scroll-mt-24 lg:scroll-mt-28"
+      className={`${SECTION_Y} bg-surface border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
-      <div className="max-w-[1120px] mx-auto px-5 lg:px-8 space-y-10">
+      <div className={`${CONTAINER} space-y-12`}>
 
         {/* ── Section Header ────────────────────────────────────────────── */}
-        <div className="max-w-3xl space-y-3">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary">
+        <Reveal amount={0.25} className="max-w-3xl">
+          <div className={`${EYEBROW} mb-4`}>
+            <span aria-hidden="true" className={EYEBROW_RULE} />
             PROOF OF WORK
           </div>
           <h2
             id="portfolio-heading"
-            className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-foreground tracking-[-0.03em] leading-tight"
+            className={`${SECTION_TITLE} mb-4`}
           >
             Finish with work you can show, not just a course you completed.
           </h2>
-          <p className="text-base sm:text-lg text-[#70685A] leading-relaxed">
-            Every applied capstone becomes a tangible product artifact — from PRDs and opportunity briefs to roadmaps, metrics work, and strategy case studies. Publish your strongest work to a public portfolio and give people something concrete to see.
+          <p className={SECTION_LEAD}>
+            Every capstone produces a real product artifact: opportunity briefs, PRDs,
+            roadmaps, metrics work, strategy case studies. Publish your strongest pieces
+            and give people something concrete to look at.
           </p>
-        </div>
+        </Reveal>
 
         {/* ── Single Sliding PPT-Style Showcase Card ────────────────────── */}
-        <PortfolioShowcase />
+        <Reveal amount={0.15}>
+          <PortfolioShowcase />
+        </Reveal>
+
+        {/* ── What you leave with ───────────────────────────────────────────
+            The audit found the two shipping outcome surfaces — the public portfolio at
+            /p/[username] and the verified certificate at /verify/[id] — were never
+            mentioned on the homepage. Three short facts, no new section. */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-border rounded-xl overflow-hidden border border-border">
+          {[
+            {
+              title: 'Nine capstone artifacts',
+              body: 'One applied deliverable per module, written to a real brief with stated requirements.',
+            },
+            {
+              title: 'A public portfolio page',
+              body: 'Your own URL, showing the work you choose to publish. Private until you decide otherwise.',
+            },
+            {
+              title: 'A verifiable certificate',
+              body: 'Issued on completion, with a public verification link anyone can check.',
+            },
+          ].map((item, index) => (
+            <Reveal key={item.title} amount={0.3} delay={index * 70} className="bg-surface p-6 lg:p-7 space-y-1.5">
+              <h3 className="text-body font-semibold text-foreground">{item.title}</h3>
+              <p className="text-sm text-ink-muted leading-relaxed">{item.body}</p>
+            </Reveal>
+          ))}
+        </div>
 
       </div>
     </section>

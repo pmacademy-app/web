@@ -56,7 +56,7 @@ export function NotificationBell() {
         aria-label={`Notifications (${unreadCount} unread update${unreadCount === 1 ? '' : 's'})`}
         aria-expanded={drawerOpen}
         aria-haspopup="dialog"
-        className="relative p-2 rounded-full border border-border bg-card hover:bg-secondary/40 text-foreground transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center"
+        className="relative p-2.5 rounded-lg border border-input bg-card hover:bg-secondary/40 text-foreground transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center min-w-[44px] min-h-[44px]"
       >
         <Bell className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
         {unreadCount > 0 && (

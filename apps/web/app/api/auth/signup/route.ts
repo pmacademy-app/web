@@ -13,6 +13,7 @@ import { verifyTurnstileToken, evaluateSiteverifyBudget } from '@/lib/security/t
 import { log } from '@/lib/monitoring/log'
 import { sessionForClient } from '@/lib/auth/client-type'
 import { setSessionCookies } from '@/lib/auth/session-cookies'
+import { buildConsentRecord, MINIMUM_SIGNUP_AGE } from '@/lib/legal/consent'
 
 export const runtime = 'nodejs'
 
@@ -22,6 +23,15 @@ const signupSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters.'),
   refCode: z.string().optional().nullable(),
   turnstileToken: z.string().min(1, 'Security verification is required.'),
+  // Both are required and must be literally `true`. A missing or false value is a
+  // 400 from the wrapper's body validation, so an account cannot be created
+  // without the agreement the Terms claim is given "by creating an account".
+  acceptedTerms: z.literal(true, {
+    error: 'You must accept the Terms of Service and Privacy Policy to create an account.',
+  }),
+  confirmedMinimumAge: z.literal(true, {
+    error: `You must confirm you are at least ${MINIMUM_SIGNUP_AGE} years old to create an account.`,
+  }),
 })
 
 // Signup abuse controls.
@@ -100,6 +110,10 @@ export const POST = withRoute(
   async ({ request, body: parsedBody }) => {
     try {
       const { name, email, password, turnstileToken } = parsedBody
+
+      // Timestamps and document versions are minted server-side. A client-supplied
+      // version would let a caller claim consent to a document that was never shown.
+      const consent = buildConsentRecord()
       const refCode = parsedBody.refCode || request.cookies.get('prodily_referrer')?.value || null
 
       // Check both platform behavior controls in a single DB call. This is the
@@ -229,7 +243,14 @@ export const POST = withRoute(
             // here: attribution needs a `public.users` row, creating that row dispatches
             // the welcome email, and doing so for an unverified account turned a request
             // field into an email-sending trigger.
-            data: safeRefCode ? { full_name: name, pending_ref_code: safeRefCode } : { full_name: name },
+            // Consent rides in auth metadata alongside the referral code: under Flow A
+            // the `public.users` row is not created until verification, and
+            // `ensureUserProfile` recovers both at that point.
+            data: {
+              full_name: name,
+              ...consent,
+              ...(safeRefCode ? { pending_ref_code: safeRefCode } : {}),
+            },
             emailRedirectTo: `${origin}/api/auth/callback?next=/verified`,
           },
         })
@@ -285,7 +306,7 @@ export const POST = withRoute(
           email,
           password,
           email_confirm: true,
-          user_metadata: { full_name: name },
+          user_metadata: { full_name: name, ...consent },
         })
 
         if (createError) {
@@ -328,7 +349,7 @@ export const POST = withRoute(
         // confirmed account. That IS the required registration milestone under this
         // configuration, so creating the profile (and with it the welcome email) here
         // is correct. Flow A's milestone is the verification click instead.
-        await ensureUserProfile(supabase, user, { name })
+        await ensureUserProfile(supabase, user, { name, consent })
         if (safeRefCode) {
           try {
             await createReferralAttribution(supabase, {

@@ -6,8 +6,6 @@ import { getWeeklyLeaderboard, getFriendLeaderboard, getCohortsData } from '@/li
 import { calculateRankings } from '@/lib/leaderboard'
 import { LeaderboardHeader } from '@/components/leaderboard/LeaderboardHeader'
 import { LeaderboardScopeSwitcher } from '@/components/leaderboard/LeaderboardScopeSwitcher'
-import { FriendAccountabilitySection } from '@/components/leaderboard/FriendAccountabilitySection'
-import { CohortsSection } from '@/components/leaderboard/CohortsSection'
 import { Trophy } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -36,10 +34,13 @@ export default async function LeaderboardPage() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-12">
-      {/* Header & Personal Metrics */}
+      {/* Header, Personal Metrics, & Sophisticated Action Modals */}
       <LeaderboardHeader
         personalEntry={personalEntry}
         initialOptedIn={isOptedIn}
+        cohortsList={cohortsList}
+        friendEntries={friendScopedEntries}
+        currentUserId={user.id}
       />
 
       {/* Main Leaderboard Table */}
@@ -59,18 +60,6 @@ export default async function LeaderboardPage() {
           weekStart={weeklyPayload.weekStart}
           joinedCohorts={cohortsList.filter((c) => c.isMember)}
           friendEntries={friendScopedEntries}
-        />
-      </div>
-
-      {/* Cohorts & Friends Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-        {/* Cohorts Section */}
-        <CohortsSection initialCohorts={cohortsList} />
-
-        {/* Friends Accountability Section */}
-        <FriendAccountabilitySection
-          initialFriends={friendEntries}
-          currentUserId={user.id}
         />
       </div>
     </div>

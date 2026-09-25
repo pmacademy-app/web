@@ -13,6 +13,14 @@ import {
   Megaphone,
   Briefcase,
   Sparkles,
+  GraduationCap,
+  FolderCheck,
+  Award,
+  Flame,
+  Zap,
+  CheckCircle2,
+  Rocket,
+  Star,
 } from 'lucide-react'
 
 export interface NotificationItem {
@@ -54,8 +62,8 @@ export function NotificationItemCard({
     <div className="flex items-start gap-3">
       {/* Category / Custom Icon */}
       <div
-        className={`w-8 h-8 rounded-lg flex items-center justify-center text-base shrink-0 ${
-          item.isRead ? 'bg-secondary/60' : 'bg-primary/15 text-primary'
+        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border border-border/50 ${
+          item.isRead ? 'bg-secondary/40 opacity-75' : 'bg-secondary/80 shadow-xs'
         }`}
         aria-hidden="true"
       >
@@ -118,7 +126,7 @@ export function NotificationItemCard({
             }}
             title="Mark as read"
             aria-label="Mark notification as read"
-            className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 hover:bg-primary/20 text-muted-foreground hover:text-primary rounded-full transition-opacity cursor-pointer"
+            className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 hover:bg-secondary text-muted-foreground hover:text-foreground rounded-md transition-opacity cursor-pointer"
           >
             <Check className="w-3 h-3" />
           </button>
@@ -184,6 +192,12 @@ function getCategoryBadge(category?: string): { label: string; className: string
         label: 'Achievement',
         className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
       }
+    case 'certificates':
+    case 'certificate':
+      return {
+        label: 'Certificate',
+        className: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+      }
     case 'learning':
     case 'curriculum':
       return {
@@ -194,6 +208,12 @@ function getCategoryBadge(category?: string): { label: string; className: string
       return {
         label: 'Portfolio',
         className: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+      }
+    case 'capstones':
+    case 'capstone':
+      return {
+        label: 'Capstone',
+        className: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
       }
     case 'security':
     case 'account':
@@ -220,10 +240,97 @@ function getCategoryBadge(category?: string): { label: string; className: string
   }
 }
 
-function getCategoryIcon(category?: string, customIcon?: string) {
-  if (customIcon && customIcon.length > 0 && customIcon !== '🔔') {
-    return <span>{customIcon}</span>
+function getCategoryIcon(category?: string, customIcon?: string): React.ReactNode {
+  const normalizedIcon = customIcon?.trim().toLowerCase()
+
+  // 1. Explicit emoji or icon-name matching (replaces all emoji strings with Lucide React icons)
+  if (normalizedIcon) {
+    switch (normalizedIcon) {
+      case '🏆':
+      case 'trophy':
+      case 'achievement':
+      case 'achievements':
+        return <Trophy className="w-4 h-4 text-amber-500" />
+      case '🎓':
+      case 'graduation-cap':
+      case 'graduationcap':
+      case 'certificate':
+      case 'certificates':
+        return <GraduationCap className="w-4 h-4 text-teal-500" />
+      case '📚':
+      case 'book-open':
+      case 'bookopen':
+      case 'book':
+      case 'learning':
+      case 'curriculum':
+        return <BookOpen className="w-4 h-4 text-emerald-500" />
+      case '💼':
+      case '🗳️':
+      case '🗳':
+      case '📦':
+      case '📁':
+      case '📂':
+      case 'briefcase':
+      case 'portfolio':
+        return <Briefcase className="w-4 h-4 text-blue-500" />
+      case 'capstone':
+      case 'capstones':
+      case 'folder-check':
+      case 'foldercheck':
+        return <FolderCheck className="w-4 h-4 text-sky-500" />
+      case '🔒':
+      case '🛡️':
+      case 'shield':
+      case 'security':
+      case 'account':
+      case 'lock':
+        return <Shield className="w-4 h-4 text-rose-500" />
+      case '📢':
+      case '📣':
+      case 'megaphone':
+      case 'announcement':
+      case 'announcements':
+        return <Megaphone className="w-4 h-4 text-purple-500" />
+      case '✨':
+      case '🎉':
+      case '🎊':
+      case 'sparkles':
+      case 'update':
+      case 'product_updates':
+        return <Sparkles className="w-4 h-4 text-indigo-500" />
+      case '🚀':
+      case 'rocket':
+      case 'marketing':
+        return <Rocket className="w-4 h-4 text-cyan-500" />
+      case '🔥':
+      case 'flame':
+      case 'streak':
+        return <Flame className="w-4 h-4 text-orange-500" />
+      case '🎖️':
+      case '🎖':
+      case '🏅':
+      case '📜':
+      case 'award':
+      case 'badge':
+        return <Award className="w-4 h-4 text-amber-500" />
+      case '✅':
+      case '✔️':
+      case 'check':
+      case 'check-circle':
+        return <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+      case '⭐':
+      case 'star':
+        return <Star className="w-4 h-4 text-amber-400" />
+      case '⚡':
+      case 'zap':
+        return <Zap className="w-4 h-4 text-yellow-500" />
+      case '🔔':
+      case 'bell':
+        break
+    }
   }
+
+  // 2. Category fallback matching
   switch (category?.toLowerCase()) {
     case 'announcement':
     case 'announcements':
@@ -231,11 +338,17 @@ function getCategoryIcon(category?: string, customIcon?: string) {
     case 'achievements':
     case 'achievement':
       return <Trophy className="w-4 h-4 text-amber-500" />
+    case 'certificates':
+    case 'certificate':
+      return <GraduationCap className="w-4 h-4 text-teal-500" />
     case 'learning':
     case 'curriculum':
       return <BookOpen className="w-4 h-4 text-emerald-500" />
     case 'portfolio':
       return <Briefcase className="w-4 h-4 text-blue-500" />
+    case 'capstones':
+    case 'capstone':
+      return <FolderCheck className="w-4 h-4 text-sky-500" />
     case 'security':
     case 'account':
       return <Shield className="w-4 h-4 text-rose-500" />

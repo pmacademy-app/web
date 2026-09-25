@@ -4,11 +4,15 @@ import React, { useState } from 'react'
 import { Users, Loader2, LogIn, LogOut, Check } from 'lucide-react'
 import type { CohortItemPayload } from '@/lib/leaderboard-db'
 
+import { cn } from '@/lib/utils'
+
 interface CohortsSectionProps {
   initialCohorts: CohortItemPayload[]
+  className?: string
+  hideHeader?: boolean
 }
 
-export function CohortsSection({ initialCohorts }: CohortsSectionProps) {
+export function CohortsSection({ initialCohorts, className, hideHeader }: CohortsSectionProps) {
   const [cohorts, setCohorts] = useState<CohortItemPayload[]>(initialCohorts)
   const [togglingSlug, setTogglingSlug] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -54,15 +58,17 @@ export function CohortsSection({ initialCohorts }: CohortsSectionProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
-      <div className="flex items-center justify-between border-b border-border pb-3">
-        <div className="flex items-center gap-2 text-foreground font-bold font-serif text-base">
-          <Users className="w-5 h-5 text-primary" /> Learning Cohorts
+    <div className={cn('space-y-4', !hideHeader && 'rounded-2xl border border-border bg-card p-6 shadow-xs', className)}>
+      {!hideHeader && (
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="flex items-center gap-2 text-foreground font-bold font-serif text-base">
+            <Users className="w-5 h-5 text-primary" /> Learning Cohorts
+          </div>
+          <span className="text-xs text-muted-foreground font-mono">
+            {cohorts.length} Spaces
+          </span>
         </div>
-        <span className="text-xs text-muted-foreground font-mono">
-          {cohorts.length} Spaces
-        </span>
-      </div>
+      )}
 
       {errorMsg && (
         <div className="p-2.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs">

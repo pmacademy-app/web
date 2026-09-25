@@ -10,7 +10,7 @@ export const metadata = {
 export default function AccessDeniedPage() {
   return (
     <div className="admin-console min-h-screen bg-admin-bg text-admin-fg flex items-center justify-center p-4 antialiased selection:bg-admin-accent/30 selection:text-admin-accent">
-      <div className="max-w-md w-full p-8 rounded-2xl bg-admin-surface border border-admin-border space-y-6 text-center shadow-2xl backdrop-blur">
+      <div className="max-w-md w-full p-8 rounded-2xl bg-admin-surface border border-admin-border space-y-6 text-center shadow-xl">
         <div className="w-14 h-14 rounded-2xl bg-admin-danger/10 border border-admin-danger/20 text-admin-danger flex items-center justify-center mx-auto shadow-inner">
           <ShieldAlert className="w-7 h-7" />
         </div>

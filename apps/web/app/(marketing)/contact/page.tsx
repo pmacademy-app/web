@@ -45,7 +45,7 @@ export default function ContactPage() {
         <h1 className="text-4xl md:text-5xl font-bold font-serif text-foreground">
           Have a question? Let&apos;s talk.
         </h1>
-        <p className="text-base text-muted-foreground leading-relaxed">
+        <p className="text-base text-ink-muted leading-relaxed">
           Questions about the curriculum, a technical issue, feedback, or something else? Send us a message and we&apos;ll get back to you.
         </p>
       </div>
@@ -63,7 +63,7 @@ export default function ContactPage() {
             <h2 className="text-xl font-bold font-serif text-foreground">
               Need direct support?
             </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs text-ink-muted leading-relaxed">
               Email us if you&apos;re stuck, found a problem, or have a question about the curriculum.
             </p>
           </div>
@@ -91,7 +91,7 @@ export default function ContactPage() {
             <h2 className="text-xl font-bold font-serif text-foreground">
               Support Our Mission
             </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs text-ink-muted leading-relaxed">
               {BRAND.fullName} is 100% free. If our curriculum helped you build product skills or start your career, consider supporting us.
             </p>
           </div>
@@ -112,7 +112,7 @@ export default function ContactPage() {
         <h3 className="text-base font-bold text-foreground">
           Looking for a quick answer?
         </h3>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-ink-muted">
           Browse the most common questions about Prodily.
         </p>
         <Link

@@ -43,13 +43,13 @@ export function PortfolioVerificationCard({ verification, hasAvatar, hasBio }: P
           <div>
             <h3 className="text-sm font-bold font-serif text-foreground">Portfolio Verification</h3>
             <p className="text-xs text-muted-foreground">
-              Automatic — no approval needed once your profile meets every requirement below.
+              Automatic: no approval needed once your profile meets every requirement below.
             </p>
           </div>
         </div>
         <span
           className={cn(
-            'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0',
+            'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border shrink-0',
             isVerified
               ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
               : 'bg-muted text-muted-foreground border-border'

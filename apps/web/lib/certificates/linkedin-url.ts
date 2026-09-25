@@ -24,8 +24,8 @@ export function buildLinkedInCertificationUrl({
 }: LinkedInCertOptions): string {
   const name =
     type === 'full_curriculum'
-      ? `${BRAND.fullName} — Product Management Certificate (${careerTitle || 'Graduate'})`
-      : `${BRAND.fullName} — Module Completion Credential`
+      ? `${BRAND.fullName}: Product Management Certificate (${careerTitle || 'Graduate'})`
+      : `${BRAND.fullName}: Module Completion Credential`
 
   const dateObj = issuedAt ? new Date(issuedAt) : new Date()
   const year = dateObj.getFullYear()

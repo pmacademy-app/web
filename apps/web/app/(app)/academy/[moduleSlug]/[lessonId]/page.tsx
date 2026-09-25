@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const globalIndex = curriculum?.lessons.findIndex((l) => l.id === lessonId) ?? -1
   const globalOrder = globalIndex >= 0 ? globalIndex + 1 : lesson.order
   const lessonUrl = `${siteUrl}/academy/${lesson.module}/${lessonId}`
-  const description = `Lesson ${globalOrder}: ${lesson.title} — part of the ${MODULE_LABEL[lesson.module] ?? lesson.module} module. Includes theory, interactive quiz, spaced repetition flashcards, and reflection exercise.`
+  const description = `Lesson ${globalOrder}: ${lesson.title}, part of the ${MODULE_LABEL[lesson.module] ?? lesson.module} module. Includes theory, interactive quiz, spaced repetition flashcards, and reflection exercise.`
   const isSample = SAMPLE_LESSON_IDS.includes(lessonId)
 
   return {
@@ -310,7 +310,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: lesson.title,
-    description: `Learn about ${lesson.title} — part of the free ${MODULE_LABEL[lesson.module] ?? lesson.module} curriculum.`,
+    description: `Learn about ${lesson.title}, part of the free ${MODULE_LABEL[lesson.module] ?? lesson.module} curriculum.`,
     url: lessonUrl,
     image: `${siteUrl}${BRAND.assets.ogImage}`,
     author: {

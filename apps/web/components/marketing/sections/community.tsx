@@ -33,7 +33,7 @@ export function CommunitySection() {
           >
             Built for consistency.
           </h2>
-          <p className="text-body-lg text-locked max-w-[640px] mx-auto leading-relaxed">
+          <p className="text-body-lg text-ink-muted max-w-[640px] mx-auto leading-relaxed">
             Structured discussion, peer review on your assignments and capstones, and opt-in cohort leaderboards focused on consistency, not competition. Community features are rolling out gradually as the learner base grows.
           </p>
         </motion.div>
@@ -57,7 +57,7 @@ export function CommunitySection() {
                   </div>
                 )}
                 <h3 className="text-h4 font-semibold text-foreground mb-2">{feature.title}</h3>
-                <p className="text-body-sm text-locked leading-relaxed">{feature.description}</p>
+                <p className="text-body-sm text-ink-muted leading-relaxed">{feature.description}</p>
               </motion.div>
             )
           })}

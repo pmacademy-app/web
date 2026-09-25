@@ -272,6 +272,8 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
           email: 'sarah@example.com',
           password: 'Password123!',
           turnstileToken: 'test-turnstile-token',
+          acceptedTerms: true,
+          confirmedMinimumAge: true,
         }),
       })
 
@@ -304,6 +306,8 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
           email: 'john@example.com',
           password: 'Password123!',
           turnstileToken: 'test-turnstile-token',
+          acceptedTerms: true,
+          confirmedMinimumAge: true,
         }),
       })
 
@@ -344,6 +348,8 @@ describe('Phase 1 — Email Confirmation Requirement Control', () => {
           email: 'duplicate@example.com',
           password: 'Password123!',
           turnstileToken: 'test-turnstile-token',
+          acceptedTerms: true,
+          confirmedMinimumAge: true,
         }),
       })
 

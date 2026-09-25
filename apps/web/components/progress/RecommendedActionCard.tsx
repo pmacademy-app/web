@@ -55,13 +55,13 @@ export function RecommendedActionCard({ personalizedPath, milestone }: Recommend
             Lesson {order} of 90
           </span>
           {personalizedPath.isPersonalized && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-semibold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-semibold">
               <Target className="w-3 h-3" />
               {personalizedPath.goalBadge || 'Personalized'}
             </span>
           )}
           {isTargetModuleLesson && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground text-[10px] font-medium">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted border border-border text-muted-foreground text-[10px] font-medium">
               <Compass className="w-3 h-3 text-primary" />
               Focus: {personalizedPath.recommendedModule.name}
             </span>

@@ -38,7 +38,7 @@ export function FAQExplorer() {
       <div className="relative max-w-xl">
         <Search
           size={16}
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#70685A] pointer-events-none"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted pointer-events-none"
           aria-hidden="true"
         />
         <input
@@ -47,8 +47,8 @@ export function FAQExplorer() {
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search questions (e.g. certificate, free, timeline, PRDs)..."
           className="
-            w-full pl-10 pr-10 py-3 bg-white border border-[#DED8CB] rounded-xl text-sm text-foreground
-            placeholder:text-[#8A8174] shadow-2xs
+            w-full pl-10 pr-10 py-3 bg-surface border border-border rounded-xl text-sm text-foreground
+            placeholder:text-ink-muted shadow-2xs
             focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10
             transition-all
           "
@@ -58,7 +58,7 @@ export function FAQExplorer() {
             type="button"
             onClick={() => setSearchQuery('')}
             aria-label="Clear search"
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#70685A] hover:text-foreground p-0.5"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted hover:text-foreground p-0.5"
           >
             <X size={15} />
           </button>
@@ -67,15 +67,15 @@ export function FAQExplorer() {
 
       {/* ── Accordion List ──────────────────────────────────────────────── */}
       {filteredItems.length === 0 ? (
-        <div className="text-center py-14 px-6 bg-white border border-dashed border-[#DED8CB] rounded-2xl space-y-3">
+        <div className="text-center py-14 px-6 bg-surface border border-dashed border-border rounded-2xl space-y-3">
           <p className="text-base font-semibold text-foreground">No questions found</p>
-          <p className="text-sm text-[#70685A]">
+          <p className="text-sm text-ink-muted">
             No answers matched &quot;{searchQuery}&quot;. Try searching with a different term.
           </p>
           <button
             type="button"
             onClick={() => setSearchQuery('')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-semibold rounded-lg hover:bg-[#18553E] transition-colors mt-2"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-semibold rounded-lg hover:bg-primary-hover transition-colors mt-2"
           >
             Reset Search
           </button>
@@ -89,10 +89,10 @@ export function FAQExplorer() {
               <div
                 key={item.question}
                 className={cn(
-                  'rounded-2xl border transition-all duration-180 bg-white overflow-hidden',
+                  'rounded-2xl border transition-all duration-180 bg-surface overflow-hidden',
                   isOpen
                     ? 'border-primary/40 shadow-xs'
-                    : 'border-[#DED8CB] hover:border-[#BDB4A2]',
+                    : 'border-border hover:border-border-strong',
                 )}
               >
                 <button
@@ -108,8 +108,8 @@ export function FAQExplorer() {
                   </span>
                   <div
                     className={cn(
-                      'w-8 h-8 rounded-full border border-[#DED8CB] flex items-center justify-center shrink-0 transition-transform duration-200',
-                      isOpen ? 'rotate-180 bg-primary text-white border-transparent' : 'bg-background text-[#70685A]',
+                      'w-8 h-8 rounded-full border border-border flex items-center justify-center shrink-0 transition-transform duration-200',
+                      isOpen ? 'rotate-180 bg-primary text-white border-transparent' : 'bg-background text-ink-muted',
                     )}
                   >
                     <ChevronDown size={16} />
@@ -128,7 +128,7 @@ export function FAQExplorer() {
                       transition={{ duration: prefersReducedMotion ? 0 : 0.22, ease: [0, 0, 0.2, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="px-5 sm:px-6 pb-6 pt-1 text-sm sm:text-base text-[#70685A] leading-relaxed border-t border-[#DED8CB]/60">
+                      <div className="px-5 sm:px-6 pb-6 pt-1 text-sm sm:text-base text-ink-muted leading-relaxed border-t border-border/60">
                         {item.answer}
                       </div>
                     </motion.div>

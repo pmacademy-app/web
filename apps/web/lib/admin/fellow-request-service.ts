@@ -202,7 +202,7 @@ export class FellowRequestAdminService {
         title: decision === 'approved' ? 'You are now a PM Fellow!' : 'Fellow request update',
         body:
           decision === 'approved'
-            ? 'Congratulations — your PM Fellow request has been approved. Your Fellow badge is now live on your portfolio.'
+            ? 'Congratulations! Your PM Fellow request has been approved. Your Fellow badge is now live on your portfolio.'
             : `Your PM Fellow request was not approved${cleanReason ? `: ${cleanReason}` : '.'}`,
         actionUrl: '/settings',
         priority: 'medium',

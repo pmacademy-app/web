@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ChevronRight, Users, BookOpen } from 'lucide-react'
 import { AdminProgressBar } from './AdminProgressBar'
 import { AdminStatusBadge } from './AdminStatusBadge'
+import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
 import type { AdminModuleOverview } from '@/lib/admin/types'
 
 /**
@@ -18,8 +19,8 @@ export function AdminModuleCard({ module, href }: { module: AdminModuleOverview;
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-admin-surface-raised border border-admin-border text-xl shrink-0">
-            <span aria-hidden="true">{module.icon}</span>
+          <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-admin-surface-raised border border-admin-border text-admin-fg shrink-0">
+            <CurriculumModuleIcon slugOrIcon={module.icon || module.slug} className="w-5 h-5 text-admin-fg" />
           </div>
           <div className="min-w-0">
             <p className="text-[10px] font-mono font-bold text-admin-fg-subtle uppercase tracking-wider">

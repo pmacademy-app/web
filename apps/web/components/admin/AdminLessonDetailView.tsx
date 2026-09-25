@@ -128,7 +128,7 @@ export function AdminLessonDetailView({
     <div className="space-y-6">
       <AdminPageHeader
         title={lesson.title}
-        description={`Lesson ${lesson.globalOrder} of ${totalLessons} · Module ${lesson.moduleNumber} — ${lesson.moduleName}`}
+        description={`Lesson ${lesson.globalOrder} of ${totalLessons} · Module ${lesson.moduleNumber}: ${lesson.moduleName}`}
         icon={BookOpen}
         actions={
           <>
@@ -246,7 +246,7 @@ export function AdminLessonDetailView({
       )}
 
       {initialLoadFailed && (
-        <AdminLoadWarning message="Live completion stats could not be fetched — showing the lesson preview without them. Check that the database is reachable." />
+        <AdminLoadWarning message="Live completion stats could not be fetched, showing the lesson preview without them. Check that the database is reachable." />
       )}
 
       <AdminLessonPreview blocks={lesson.blocks} lessonId={lesson.id} />

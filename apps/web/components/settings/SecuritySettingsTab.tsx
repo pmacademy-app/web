@@ -85,7 +85,7 @@ function ChangeEmailCard() {
             <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading...
           </div>
         ) : (
-          <p className="text-sm text-foreground font-mono">{currentEmail || '—'}</p>
+          <p className="text-sm text-foreground font-mono">{currentEmail || '-'}</p>
         )}
       </div>
 

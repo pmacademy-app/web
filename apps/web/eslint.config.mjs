@@ -132,6 +132,7 @@ const RAW_BUTTON_ALLOWLIST = [
   "leaderboard/CohortsSection.tsx",
   "leaderboard/FriendAccountabilitySection.tsx",
   "leaderboard/LeaderboardHeader.tsx",
+  "leaderboard/LeaderboardPopoverModal.tsx",
   "leaderboard/LeaderboardScopeSwitcher.tsx",
   "leaderboard/LeaderboardTable.tsx",
   "leaderboard/ProfileComparisonModal.tsx",
@@ -147,6 +148,7 @@ const RAW_BUTTON_ALLOWLIST = [
   "portfolio/FeaturedCapstoneCard.tsx",
   "portfolio/PortfolioCapstones.tsx",
   "portfolio/ShareButton.tsx",
+  "progress/ProgressSectionDropdown.tsx",
   "quick-start/QuickStartModal.tsx",
   "quiz/QuizOption.tsx",
   "review/QualitySelector.tsx",
@@ -159,6 +161,7 @@ const RAW_BUTTON_ALLOWLIST = [
   "settings/ProfileSettingsTab.tsx",
   "settings/ReferralSettingsTab.tsx",
   "settings/SecuritySettingsTab.tsx",
+  "settings/SettingsTabs.tsx",
   "ui/accordion.tsx",
 ];
 

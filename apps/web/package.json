@@ -52,6 +52,8 @@
     "test:update-password": "vitest run lib/__tests__/update-password.test.ts",
     "test:rls": "vitest run lib/__tests__/rls.test.ts",
     "test:middleware-auth": "vitest run lib/__tests__/middleware-auth.test.ts",
+    "test:baseline": "vitest run lib/__tests__/baseline-aggregation.test.ts",
+    "baseline:report": "npx tsx scripts/baseline-report.ts",
     "benchmark": "npx tsx ../../scripts/benchmark-concurrency.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

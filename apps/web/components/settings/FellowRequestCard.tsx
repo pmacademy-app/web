@@ -168,7 +168,7 @@ export function FellowRequestCard() {
             <>
               <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-foreground flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary shrink-0" />
-                Your portfolio meets every requirement — you&apos;re eligible to request PM Fellow status.
+                Your portfolio meets every requirement, and you&apos;re eligible to request PM Fellow status.
               </div>
               <button
                 type="button"

@@ -30,8 +30,8 @@ export const ModuleCompletedEmail: React.FC<ModuleCompletedEmailProps> = ({
         What&apos;s next?
       </p>
       <ul style={{ fontSize: '14px', color: '#70685A', paddingLeft: '20px', lineHeight: 1.8 }}>
-        <li><strong>Capstone Project</strong> — Apply what you learned to build a portfolio project.</li>
-        <li><strong>Next Curriculum Module</strong> — Keep your momentum going into the next module.</li>
+        <li><strong>Capstone Project</strong>: Apply what you learned to build a portfolio project.</li>
+        <li><strong>Next Curriculum Module</strong>: Keep your momentum going into the next module.</li>
       </ul>
       <Button href={`${appUrl}/capstones?module=${moduleSlug}`}>Start Capstone Project</Button>
     </EmailWrapper>

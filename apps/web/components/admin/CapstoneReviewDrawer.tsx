@@ -175,7 +175,7 @@ export function CapstoneReviewDrawer({ capstoneId, capstone, isOpen, onClose }: 
         open={confirmReject}
         onOpenChange={setConfirmReject}
         title="Reject this capstone?"
-        description="The submission will be marked reviewed and kept private — it will not appear on the learner's public portfolio."
+        description="The submission will be marked reviewed and kept private; it will not appear on the learner's public portfolio."
         confirmLabel="Reject"
         destructive
         onConfirm={() => handleReview('reject')}

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SettingsTabs } from '@/components/settings/SettingsTabs'
-import { Settings, Shield, HelpCircle } from 'lucide-react'
+import { Shield, HelpCircle } from 'lucide-react'
 import { BRAND } from '@/lib/brand'
 
 export const metadata: Metadata = {
@@ -11,55 +11,42 @@ export const metadata: Metadata = {
 
 export default function SettingsPage() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Settings className="h-5 w-5 text-primary" />
-          <span className="text-xs font-bold uppercase tracking-wider text-primary">
-            Account & Preference Settings
-          </span>
+    <div className="container mx-auto px-4 py-5 max-w-4xl space-y-4">
+      {/* Compact Header with Short Action Buttons */}
+      <div className="border-b border-border/60 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+            Settings &amp; Preferences
+          </h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Customize your public portfolio, account security, and notification preferences.
+          </p>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold font-serif text-foreground">
-          Settings & Preferences
-        </h1>
-        <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
-          Customize how your public portfolio appears and control your in-app and email notification preferences.
-        </p>
+
+        {/* Short Action Buttons: Shield (Privacy) & ? (Help) */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/privacy"
+            title="Privacy Policy"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/70 bg-card hover:bg-secondary/60 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors shadow-2xs"
+          >
+            <Shield className="w-3.5 h-3.5 text-primary" />
+            <span>Privacy</span>
+          </Link>
+
+          <Link
+            href="/contact"
+            title="Need Help?"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/70 bg-card hover:bg-secondary/60 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors shadow-2xs"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-primary" />
+            <span>Help</span>
+          </Link>
+        </div>
       </div>
 
       {/* Tabbed Settings */}
       <SettingsTabs />
-
-      {/* Privacy & Support Notice */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 rounded-xl border border-border bg-card/40 text-xs text-muted-foreground flex items-start gap-3">
-          <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-          <p className="leading-relaxed">
-            <strong className="text-foreground font-semibold">Privacy Commitment:</strong> {BRAND.product} never sells or exposes private reflection notes. Only reflections and capstones explicitly marked as public will appear on your public portfolio page. Read our{' '}
-            <Link href="/privacy" className="text-primary underline font-medium">Privacy Policy</Link> and{' '}
-            <Link href="/terms" className="text-primary underline font-medium">Terms of Service</Link>.
-          </p>
-        </div>
-
-        <div className="p-4 rounded-xl border border-border bg-card/40 text-xs text-muted-foreground flex items-start gap-3 justify-between">
-          <div className="flex items-start gap-3">
-            <HelpCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <p className="text-foreground font-semibold">Need Help or Support?</p>
-              <p className="leading-relaxed">
-                Have questions about your progress, certificates, or platform features? Reach out to our team anytime.
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/contact"
-            className="text-xs font-bold text-primary hover:underline shrink-0 pt-0.5"
-          >
-            Contact Support →
-          </Link>
-        </div>
-      </div>
     </div>
   )
 }

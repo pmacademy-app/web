@@ -47,13 +47,13 @@ class BlockErrorBoundary extends React.Component<{
       if (this.props.block.type === 'mermaid') {
         return (
           <div className="border border-destructive/20 bg-destructive/5 p-4 rounded-xl my-6">
-            <p className="text-xs font-semibold text-destructive mb-2">This diagram couldn&apos;t be rendered — skip to the next section.</p>
+            <p className="text-xs font-semibold text-destructive mb-2">This diagram couldn&apos;t be rendered, skip to the next section.</p>
           </div>
         );
       }
       return (
         <div className="border border-destructive/20 bg-destructive/5 p-4 rounded-xl text-center text-xs text-destructive my-4">
-          This content section couldn&apos;t load — skip to the next one.
+          This content section couldn&apos;t load, skip to the next one.
         </div>
       );
     }

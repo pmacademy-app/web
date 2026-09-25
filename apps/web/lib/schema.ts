@@ -59,7 +59,7 @@ export function getCourseSchema() {
     '@context': 'https://schema.org',
     '@type': 'Course',
     '@id': `${siteUrl}/curriculum#course`,
-    name: `${BRAND.fullName} — Full Product Management Curriculum`,
+    name: `${BRAND.fullName}: Full Product Management Curriculum`,
     description: BRAND.metadata.description,
     url: `${siteUrl}/curriculum`,
     provider: {
@@ -113,7 +113,7 @@ export function getLessonSchema(
     '@id': `${lessonUrl}#learningresource`,
     name: `Lesson ${globalOrder}: ${lesson.title}`,
     headline: `Lesson ${globalOrder}: ${lesson.title}`,
-    description: `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} — Module: ${moduleName}.`,
+    description: `Read Lesson ${globalOrder} of ${BRAND.product}. ${lesson.title} (Module: ${moduleName}).`,
     learningResourceType: 'Lesson',
     educationalLevel: levelStr,
     timeRequired: `PT${lesson.estimatedReadingTime || 20}M`,
@@ -176,7 +176,7 @@ export function getAboutPageSchema() {
         '@type': 'AboutPage',
         '@id': `${siteUrl}/about#webpage`,
         url: `${siteUrl}/about`,
-        name: `About — ${BRAND.fullName}`,
+        name: `About: ${BRAND.fullName}`,
         description:
           "Learn why Prodily exists and how we're making structured product management education more accessible.",
         mainEntity: {

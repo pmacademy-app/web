@@ -248,7 +248,7 @@ export function AdminSidebar({ mobileOpen, onMobileClose, user, attention }: Adm
       {mobileOpen && (
         <div className="no-print fixed inset-0 z-50 md:hidden flex">
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/60 transition-opacity"
             onClick={onMobileClose}
             aria-hidden="true"
           />

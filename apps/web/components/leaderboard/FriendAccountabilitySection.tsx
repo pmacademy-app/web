@@ -3,15 +3,20 @@
 import React, { useState } from 'react'
 import { Shield, UserPlus, Trash2, Loader2, Check, AlertCircle } from 'lucide-react'
 import type { LeaderboardEntry } from '@/lib/leaderboard'
+import { cn } from '@/lib/utils'
 
 interface FriendAccountabilitySectionProps {
   initialFriends: LeaderboardEntry[]
   currentUserId?: string
+  className?: string
+  hideHeader?: boolean
 }
 
 export function FriendAccountabilitySection({
   initialFriends,
   currentUserId,
+  className,
+  hideHeader,
 }: FriendAccountabilitySectionProps) {
   const [friends, setFriends] = useState<LeaderboardEntry[]>(initialFriends)
   const [usernameInput, setUsernameInput] = useState('')
@@ -59,7 +64,7 @@ export function FriendAccountabilitySection({
     } catch {
       setFeedback({
         type: 'error',
-        message: 'Network error while adding friend. Please try again.',
+        message: 'Network error while adding friend.',
       })
     } finally {
       setLoading(false)
@@ -101,15 +106,17 @@ export function FriendAccountabilitySection({
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
-      <div className="flex items-center justify-between border-b border-border pb-3">
-        <div className="flex items-center gap-2 text-foreground font-bold font-serif text-base">
-          <Shield className="w-5 h-5 text-emerald-500" /> Friend Accountability
+    <div className={cn('space-y-4', !hideHeader && 'rounded-2xl border border-border bg-card p-6 shadow-xs', className)}>
+      {!hideHeader && (
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="flex items-center gap-2 text-foreground font-bold font-serif text-base">
+            <Shield className="w-5 h-5 text-emerald-500" /> Friend Accountability
+          </div>
+          <span className="text-xs text-muted-foreground font-mono">
+            {friends.length} Friends
+          </span>
         </div>
-        <span className="text-xs text-muted-foreground font-mono">
-          {friends.length} Friends
-        </span>
-      </div>
+      )}
 
       {/* Add Friend Form */}
       <form onSubmit={handleAddFriend} className="space-y-2">

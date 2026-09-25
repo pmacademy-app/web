@@ -46,7 +46,7 @@ export function PortfolioReadinessCard({
               <span>Portfolio Sharing Readiness</span>
             </h3>
             <span
-              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
                 isReadyToShare
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
                   : statusLabel === 'Needs Attention'

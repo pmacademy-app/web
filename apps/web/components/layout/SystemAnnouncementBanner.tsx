@@ -114,7 +114,7 @@ export function SystemAnnouncementBanner({
             key={announcement.id}
             role="alert"
             className={cn(
-              'relative w-full border-b py-2.5 px-4 sm:px-6 transition-all backdrop-blur-md shadow-sm',
+              'relative w-full border-b py-2.5 px-4 sm:px-6 transition-all shadow-xs',
               style.bg
             )}
           >

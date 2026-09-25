@@ -15,6 +15,25 @@ vi.mock('../supabase', () => ({
   createServiceRoleClient: vi.fn(),
 }))
 
+/**
+ * ## Separator convention: pipes and commas, not em dashes
+ *
+ * The portfolio title and description assertions below used to expect an em dash
+ * (`Elena Rostova — Product Management Fellow at Prodily | Portfolio`). Commit 4525e85
+ * changed both producers — `generateMetadata` in `app/(portfolio)/p/[username]/page.tsx`
+ * and `generateProfilePageJsonLd` in `lib/portfolio.ts` — to a pipe in titles and a comma
+ * in descriptions, under the stated intent "Remove emojis and AI em-dashes". That commit
+ * removed 64 em-dash lines across the product and added one back, so this is a deliberate
+ * house style for user-facing copy, not an accident.
+ *
+ * The tests were not updated with it, which is the only reason they failed. They are
+ * updated here to assert the convention that actually ships. The implementation was
+ * deliberately NOT reverted: doing so would have restored a character the codebase is
+ * removing on purpose, and would have left the other 63 call sites inconsistent.
+ *
+ * If the separator ever changes again, change it in the two producers and here together.
+ * The convention applies to rendered copy only; code comments are unaffected.
+ */
 describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
   const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl).replace(/\/$/, '')
 
@@ -103,7 +122,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
   }
 
   describe('1. Public Portfolio Metadata & Titles', () => {
-    it('generates Fellow-specific title following standard "[Name] — Product Management Fellow at Prodily | Portfolio"', async () => {
+    it('generates Fellow-specific title following standard "[Name] | Product Management Fellow at Prodily | Portfolio"', async () => {
       const mockSupabase = createMockSupabaseWithUser({
         name: 'Elena Rostova',
         username: 'erostova',
@@ -113,10 +132,10 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
 
       const meta = await generateMetadata({ params: Promise.resolve({ username: 'erostova' }) })
 
-      expect(meta.title).toBe('Elena Rostova — Product Management Fellow at Prodily | Portfolio')
+      expect(meta.title).toBe('Elena Rostova | Product Management Fellow at Prodily | Portfolio')
     })
 
-    it('generates Non-Fellow title following standard "[Name] — Product Portfolio"', async () => {
+    it('generates Non-Fellow title following standard "[Name] | Product Portfolio"', async () => {
       const mockSupabase = createMockSupabaseWithUser({
         name: 'Jordan Rivera',
         username: 'jrivera',
@@ -126,7 +145,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
 
       const meta = await generateMetadata({ params: Promise.resolve({ username: 'jrivera' }) })
 
-      expect(meta.title).toBe('Jordan Rivera — Product Portfolio')
+      expect(meta.title).toBe('Jordan Rivera | Product Portfolio')
       expect(meta.title).not.toContain('Fellow')
     })
 
@@ -142,7 +161,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
       const meta = await generateMetadata({ params: Promise.resolve({ username: 'erostova' }) })
       const desc = meta.description as string
 
-      expect(desc).toContain('Elena Rostova — Product Management Fellow at Prodily')
+      expect(desc).toContain('Elena Rostova, Product Management Fellow at Prodily')
       expect(desc).toContain('Fintech strategy & monetization leader.')
       expect(desc.toLowerCase()).not.toContain('verified')
       expect(desc.toLowerCase()).not.toContain('worksfor')
@@ -226,21 +245,21 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
       expect(meta.openGraph).toBeDefined()
       const og = meta.openGraph as unknown as Record<string, unknown>
       expect(og?.type).toBe('profile')
-      expect(og?.title).toBe('Elena Rostova — Product Management Fellow at Prodily | Portfolio')
+      expect(og?.title).toBe('Elena Rostova | Product Management Fellow at Prodily | Portfolio')
       expect(og?.url).toBe(`${SITE_URL}/p/erostova`)
       expect(og?.images).toEqual([
         {
           url: `${SITE_URL}/api/og/portfolio/erostova`,
           width: 1200,
           height: 630,
-          alt: 'Elena Rostova — Product Management Fellow at Prodily | Portfolio',
+          alt: 'Elena Rostova | Product Management Fellow at Prodily | Portfolio',
         },
       ])
 
       expect(meta.twitter).toBeDefined()
       const tw = meta.twitter as unknown as Record<string, unknown>
       expect(tw?.card).toBe('summary_large_image')
-      expect(tw?.title).toBe('Elena Rostova — Product Management Fellow at Prodily | Portfolio')
+      expect(tw?.title).toBe('Elena Rostova | Product Management Fellow at Prodily | Portfolio')
     })
   })
 
@@ -372,7 +391,7 @@ describe('Unit 3: Portfolio SEO & Discoverability Test Suite', () => {
       expect(schema['@type']).toBe('ProfilePage')
       expect(schema['@id']).toBe('https://prodily.adityagangwani.me/p/mvance#profilepage')
       expect(schema.url).toBe('https://prodily.adityagangwani.me/p/mvance')
-      expect(schema.name).toBe('Marcus Vance — Product Management Fellow at Prodily | Portfolio')
+      expect(schema.name).toBe('Marcus Vance | Product Management Fellow at Prodily | Portfolio')
 
       const mainEntity = schema.mainEntity as Record<string, unknown>
       expect(mainEntity['@type']).toBe('Person')

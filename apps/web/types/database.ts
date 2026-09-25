@@ -1793,6 +1793,8 @@ export type Database = {
       }
       users: {
         Row: {
+          age_confirmed_at: string | null
+          age_confirmed_minimum: number | null
           auth_provider: string
           avatar_url: string | null
           bio: string | null
@@ -1820,7 +1822,10 @@ export type Database = {
           portfolio_layout: Json | null
           portfolio_verification_override: string | null
           portfolio_view_count: number
+          privacy_version: string | null
           streak_freezes_available: number
+          terms_accepted_at: string | null
+          terms_version: string | null
           timezone: string
           total_active_seconds: number
           total_xp: number
@@ -1828,6 +1833,8 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          age_confirmed_at?: string | null
+          age_confirmed_minimum?: number | null
           auth_provider?: string
           avatar_url?: string | null
           bio?: string | null
@@ -1855,7 +1862,10 @@ export type Database = {
           portfolio_layout?: Json | null
           portfolio_verification_override?: string | null
           portfolio_view_count?: number
+          privacy_version?: string | null
           streak_freezes_available?: number
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           timezone?: string
           total_active_seconds?: number
           total_xp?: number
@@ -1863,6 +1873,8 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          age_confirmed_at?: string | null
+          age_confirmed_minimum?: number | null
           auth_provider?: string
           avatar_url?: string | null
           bio?: string | null
@@ -1890,7 +1902,10 @@ export type Database = {
           portfolio_layout?: Json | null
           portfolio_verification_override?: string | null
           portfolio_view_count?: number
+          privacy_version?: string | null
           streak_freezes_available?: number
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           timezone?: string
           total_active_seconds?: number
           total_xp?: number

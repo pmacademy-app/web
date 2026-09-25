@@ -110,6 +110,7 @@ const EXEMPT_COMPONENTS = [
   'leaderboard/CohortsSection.tsx',
   'leaderboard/FriendAccountabilitySection.tsx',
   'leaderboard/LeaderboardHeader.tsx',
+  'leaderboard/LeaderboardPopoverModal.tsx',
   'leaderboard/LeaderboardScopeSwitcher.tsx',
   'leaderboard/LeaderboardTable.tsx',
   'leaderboard/ProfileComparisonModal.tsx',
@@ -125,6 +126,7 @@ const EXEMPT_COMPONENTS = [
   'portfolio/FeaturedCapstoneCard.tsx',
   'portfolio/PortfolioCapstones.tsx',
   'portfolio/ShareButton.tsx',
+  'progress/ProgressSectionDropdown.tsx',
   'quick-start/QuickStartModal.tsx',
   'quiz/QuizOption.tsx',
   'review/QualitySelector.tsx',
@@ -137,6 +139,7 @@ const EXEMPT_COMPONENTS = [
   'settings/ProfileSettingsTab.tsx',
   'settings/ReferralSettingsTab.tsx',
   'settings/SecuritySettingsTab.tsx',
+  'settings/SettingsTabs.tsx',
   'ui/accordion.tsx',
 ]
 

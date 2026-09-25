@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { createAuthenticatedServerClient } from './supabase'
 import { globalNotificationDispatcher } from './notifications/dispatcher'
 import { initializeNotificationConnectors } from './notifications/events/connectors'
+import { consentFromAuthMetadata, type ConsentRecord } from './legal/consent'
 
 export type UserProfile = Database['public']['Tables']['users']['Row']
 
@@ -14,7 +15,7 @@ export type UserProfile = Database['public']['Tables']['users']['Row']
 export async function ensureUserProfile(
   supabase: SupabaseClient<Database>,
   user: User,
-  extra?: { name?: string; timezone?: string; provider?: string }
+  extra?: { name?: string; timezone?: string; provider?: string; consent?: ConsentRecord | null }
 ): Promise<UserProfile | null> {
   const { data: existing } = await supabase
     .from('users')
@@ -30,6 +31,14 @@ export async function ensureUserProfile(
   const provider = extra?.provider ?? user.app_metadata?.provider ?? 'email'
   const timezone = extra?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'UTC'
 
+  // Signup consent. Flow B (verification OFF) hands it in directly; Flow A creates
+  // this row at verification time instead, so the consent captured on the signup
+  // form travels in auth metadata — the same carrier the pending referral code
+  // uses — and is recovered here. `null` for any path that never presented the
+  // agreement (OAuth, legacy accounts): the columns stay NULL rather than
+  // recording a consent that did not happen.
+  const consent = extra?.consent ?? consentFromAuthMetadata(user.user_metadata)
+
   const { data: inserted, error } = await supabase
     .from('users')
     .insert({
@@ -38,6 +47,7 @@ export async function ensureUserProfile(
       name,
       auth_provider: provider,
       timezone,
+      ...(consent ?? {}),
       current_streak: 0,
       longest_streak: 0,
       streak_freezes_available: 0,

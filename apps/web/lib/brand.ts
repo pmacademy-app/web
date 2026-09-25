@@ -14,7 +14,11 @@ export const BRAND = {
     instagram: 'https://www.instagram.com/prodily_pm/',
     buyMeACoffee: 'https://buymeacoffee.com/prodily',
   },
-  legalEntity: 'Prodily',
+  // NOTE: there is deliberately no `legalEntity` here. Presenting the brand name as
+  // the registered operating entity was a misrepresentation flagged by the September
+  // 2026 legal audit. Operator identity, registration details and the grievance
+  // contact now live in `lib/legal/legal-config.ts`, where they are explicitly
+  // configured rather than inferred from branding.
   certificateIssuer: 'Prodily',
   adminName: 'Prodily PM Academy Admin',
   // Canonical site URL — always read from NEXT_PUBLIC_SITE_URL env var in runtime code.
@@ -35,12 +39,12 @@ export const BRAND = {
     background: TOKENS.colors.background,
   },
   metadata: {
-    homeTitle: 'Prodily PM Academy — Learn Product Management by Building',
+    homeTitle: 'Prodily PM Academy | Learn Product Management by Building',
     titleTemplate: '%s | Prodily PM Academy',
     description:
       'A structured, free path to learn product management, practice through applied capstones, and build a public portfolio that proves your product thinking.',
     shortDescription:
-      'Learn product management through 90 structured lessons, applied capstones, and interactive practice — then turn the work you create into a public portfolio you can show.',
+      'Learn product management through 90 structured lessons, applied capstones, and interactive practice, then turn the work you create into a public portfolio you can show.',
   },
   assets: {
     dir: '/brand',

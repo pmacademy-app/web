@@ -29,13 +29,13 @@ interface AdminCreateInAppNotificationModalProps {
   onCreated: (item: InAppBroadcastItem) => void
 }
 
-const CATEGORIES: Array<{ key: InAppCategory; label: string; icon: string }> = [
-  { key: 'announcement', label: 'Announcement', icon: '📢' },
-  { key: 'learning', label: 'Learning & Curriculum', icon: '📚' },
-  { key: 'achievements', label: 'Achievements & Badges', icon: '🏆' },
-  { key: 'product_updates', label: 'Product Update', icon: '✨' },
-  { key: 'security', label: 'Security & Account', icon: '🔒' },
-  { key: 'marketing', label: 'Marketing & Community', icon: '🚀' },
+const CATEGORIES: Array<{ key: InAppCategory; label: string }> = [
+  { key: 'announcement', label: 'Announcement' },
+  { key: 'learning', label: 'Learning & Curriculum' },
+  { key: 'achievements', label: 'Achievements & Badges' },
+  { key: 'product_updates', label: 'Product Update' },
+  { key: 'security', label: 'Security & Account' },
+  { key: 'marketing', label: 'Marketing & Community' },
 ]
 
 const PRIORITIES: Array<{ key: InAppPriorityLevel; label: string; desc: string; color: string }> = [
@@ -209,7 +209,7 @@ export function AdminCreateInAppNotificationModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-admin-surface border border-admin-border rounded-xl max-w-2xl w-full p-6 space-y-6 shadow-2xl my-8">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-admin-border pb-4">
@@ -242,7 +242,7 @@ export function AdminCreateInAppNotificationModal({
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. New Capstone Project Available 🚀"
+                placeholder="e.g. New Capstone Project Available"
                 className="w-full px-3 py-2 text-xs bg-admin-surface-raised border border-admin-border rounded-lg text-admin-fg placeholder:text-admin-fg-subtle focus:outline-none focus:border-admin-accent"
                 maxLength={150}
               />
@@ -257,7 +257,7 @@ export function AdminCreateInAppNotificationModal({
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.key} value={c.key}>
-                    {c.icon} {c.label}
+                    {c.label}
                   </option>
                 ))}
               </select>
@@ -628,7 +628,7 @@ export function AdminCreateInAppNotificationModal({
 
         {/* Broad Audience Safety Confirmation Dialog */}
         {showBroadConfirmation && (
-          <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="fixed inset-0 z-60 bg-black/70 flex items-center justify-center p-4 animate-in fade-in duration-150">
             <div className="bg-admin-surface border border-admin-danger/40 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-lg bg-admin-danger-soft text-admin-danger border border-admin-danger/30">

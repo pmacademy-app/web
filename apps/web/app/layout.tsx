@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Fraunces } from 'next/font/google'
-import Script from 'next/script'
-import { GoogleAnalytics } from '@next/third-parties/google'
 import { Analytics } from '@vercel/analytics/react'
+import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner'
+import { ConsentGatedAnalytics } from '@/components/legal/ConsentGatedAnalytics'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
@@ -107,6 +107,9 @@ export const viewport: Viewport = {
 
 // ─── Analytics ────────────────────────────────────────────────────────────────
 
+// Both are non-essential and therefore consent-gated: `ConsentGatedAnalytics`
+// injects neither script until the visitor accepts optional cookies. Vercel Web
+// Analytics below is cookieless and collects no identifiers, so it is not gated.
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID
 
@@ -143,26 +146,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </TooltipProvider>
         </ApiClientProvider>
 
-        {/* Google Analytics 4 */}
-        {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
+        {/* Google Analytics 4 + Google Tag Manager — loaded only after consent */}
+        <ConsentGatedAnalytics gaId={GA_ID} gtmId={GTM_ID} />
 
-        {/* Vercel Web Analytics */}
+        {/* Vercel Web Analytics (cookieless, no identifiers) */}
         <Analytics />
 
-        {/* Google Tag Manager (optional) */}
-        {GTM_ID && (
-          <Script
-            id="gtm-script"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${GTM_ID}');`,
-            }}
-          />
-        )}
+        <CookieConsentBanner />
       </body>
     </html>
   )
