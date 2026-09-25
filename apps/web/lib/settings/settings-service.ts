@@ -103,6 +103,98 @@ export async function resetProgress(
       
     if (rErr) console.warn('[settings-service] Reset reflections warning:', rErr)
   }
+
+  // Synchronize progress-derived badges so that reset learning state does not leave orphaned achievements
+  await synchronizeProgressBadges(supabase, userId, !moduleSlug || moduleSlug === 'all')
+}
+
+export const PROGRESS_DERIVED_BADGE_KEYS = [
+  'first_lesson',
+  'module_complete',
+  'curriculum_explorer',
+  'first_perfect_quiz',
+  'quiz_master',
+  'first_capstone',
+  'capstones_all',
+  'pm_academy_graduate',
+] as const
+
+/**
+ * Re-evaluates and resets progress-derived badges when learning progress is reset.
+ * Account-level achievements (portfolio_published, streaks, XP milestones) are intentionally preserved.
+ */
+export async function synchronizeProgressBadges(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  isFullReset: boolean
+): Promise<void> {
+  try {
+    if (isFullReset) {
+      const { data: dbBadges } = await supabase
+        .from('badges')
+        .select('id')
+        .in('key', PROGRESS_DERIVED_BADGE_KEYS as unknown as string[])
+
+      if (dbBadges && dbBadges.length > 0) {
+        const badgeIds = dbBadges.map((b) => b.id)
+        await supabase
+          .from('user_badges')
+          .delete()
+          .eq('user_id', userId)
+          .in('badge_id', badgeIds)
+      }
+      return
+    }
+
+    // Module-specific reset: evaluate remaining completed lessons & capstones
+    const { data: progressRows } = await supabase
+      .from('user_lesson_progress')
+      .select('lesson_id, status, quiz_score, quiz_attempts')
+      .eq('user_id', userId)
+
+    const completed = (progressRows || []).filter((p) => p.status === 'completed')
+    const lessonsCount = completed.length
+    const modulesCount = Math.floor(lessonsCount / 10)
+    const perfectFirstAttempt = completed.filter(
+      (p) => p.quiz_attempts === 1 && (p.quiz_score ?? 0) === 100
+    ).length
+    const perfectQuiz = completed.filter((p) => (p.quiz_score ?? 0) === 100).length
+
+    const { data: capstones } = await supabase
+      .from('capstone_submissions')
+      .select('id')
+      .eq('user_id', userId)
+      .in('status', ['submitted', 'reviewed'])
+    const capstonesCount = capstones?.length ?? 0
+
+    const revokedKeys: string[] = []
+    if (lessonsCount < 1) revokedKeys.push('first_lesson')
+    if (modulesCount < 1) revokedKeys.push('module_complete')
+    if (lessonsCount < 30) revokedKeys.push('curriculum_explorer')
+    if (lessonsCount < 90 || capstonesCount < 9) revokedKeys.push('pm_academy_graduate')
+    if (perfectFirstAttempt < 1) revokedKeys.push('first_perfect_quiz')
+    if (perfectQuiz < 10) revokedKeys.push('quiz_master')
+    if (capstonesCount < 1) revokedKeys.push('first_capstone')
+    if (capstonesCount < 9) revokedKeys.push('capstones_all')
+
+    if (revokedKeys.length > 0) {
+      const { data: dbBadges } = await supabase
+        .from('badges')
+        .select('id')
+        .in('key', revokedKeys)
+
+      if (dbBadges && dbBadges.length > 0) {
+        const badgeIds = dbBadges.map((b) => b.id)
+        await supabase
+          .from('user_badges')
+          .delete()
+          .eq('user_id', userId)
+          .in('badge_id', badgeIds)
+      }
+    }
+  } catch (err) {
+    console.warn('[settings-service] Warning synchronizing progress badges on reset:', err)
+  }
 }
 
 /**

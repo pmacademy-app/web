@@ -1,7 +1,11 @@
 import type { NotificationPriorityLevel, NotificationChannel, NotificationCategory } from '../types'
 import { PRIORITY_MATRIX } from '../constants'
 import { globalFeatureFlagService } from '../feature-flags/service'
-import { createDefaultNotificationPreferences, isChannelEnabledByPreferences } from '../preferences/defaults'
+import {
+  isChannelEnabledByPreferences,
+  getResolvedUserNotificationPreferences,
+} from '../preferences/defaults'
+import type { UserNotificationPreferences } from '../preferences/types'
 import { globalPriorityMatrix } from '../priority/matrix'
 import { globalProviderRegistry, sendEmailWithFailover } from '../providers'
 import type { ProviderSendResult } from '../providers/types'
@@ -50,6 +54,10 @@ export interface EnqueueNotificationParams {
   priorityLevel?: NotificationPriorityLevel
   /** Optional broadcast ID — tags the email_queue row for deduplication and stats. */
   broadcastId?: string
+  /**
+   * Pre-resolved notification preferences for batch enqueueing to eliminate N+1 queries.
+   */
+  preloadedPreferences?: UserNotificationPreferences
   /**
    * Logical identity of this message, unique across `email_queue`.
    *
@@ -101,7 +109,9 @@ export async function enqueueNotificationItem(
   // 3. User Preferences Check
   const allowBypass = globalPriorityMatrix.evaluatePreferenceBypass(priorityLevel)
   if (!allowBypass && !isCritical) {
-    const userPrefs = createDefaultNotificationPreferences(params.userId)
+    const userPrefs =
+      params.preloadedPreferences ||
+      (await getResolvedUserNotificationPreferences(supabase, params.userId))
     const isAllowed = isChannelEnabledByPreferences(userPrefs, params.category, params.channel)
     if (!isAllowed) {
       await recordSkippedEvent(supabase, params, `user_preference_disabled:${params.category}`)

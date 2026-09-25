@@ -33,14 +33,34 @@ export const GET = withRoute(
       const defaultPrefs = createDefaultNotificationPreferences(authUserId)
       return NextResponse.json({
         success: true,
-        preferences: defaultPrefs,
+        preferences: {
+          in_app_enabled: defaultPrefs.allInApp,
+          email_enabled: defaultPrefs.allEmail,
+          all_notifications: defaultPrefs.allNotifications,
+          all_email: defaultPrefs.allEmail,
+          all_in_app: defaultPrefs.allInApp,
+          learning_email: defaultPrefs.learning.email,
+          learning_in_app: defaultPrefs.learning.inApp,
+          achievements_email: defaultPrefs.achievements.email,
+          achievements_in_app: defaultPrefs.achievements.inApp,
+          security_email: defaultPrefs.security.email,
+          security_in_app: defaultPrefs.security.inApp,
+          marketing_email: defaultPrefs.marketing.email,
+          marketing_in_app: defaultPrefs.marketing.inApp,
+          preferred_reminder_hour: defaultPrefs.preferredReminderHour,
+        },
         timezone: (userRow)?.timezone || 'UTC',
       })
     }
 
+    const typedPref = prefRow as Record<string, unknown>
     return NextResponse.json({
       success: true,
-      preferences: prefRow,
+      preferences: {
+        ...prefRow,
+        in_app_enabled: typedPref.all_in_app ?? typedPref.in_app_enabled ?? true,
+        email_enabled: typedPref.all_email ?? typedPref.email_enabled ?? true,
+      },
       timezone: (userRow)?.timezone || 'UTC',
     })
   } catch (err) {
@@ -65,16 +85,29 @@ export const PATCH = withRoute(
     const body = await request.json()
     const supabase = createServiceRoleClient()
 
+    // Normalize field names between UI form contract and database schema
+    const {
+      in_app_enabled,
+      email_enabled,
+      ...rest
+    } = body
+
+    const updatePayload: Record<string, unknown> = {
+      user_id: authUserId,
+      ...rest,
+      updated_at: new Date().toISOString(),
+    }
+
+    if (in_app_enabled !== undefined) {
+      updatePayload.all_in_app = in_app_enabled
+    }
+    if (email_enabled !== undefined) {
+      updatePayload.all_email = email_enabled
+    }
+
     const { error } = await supabase
       .from('user_notification_preferences')
-      .upsert(
-        {
-          user_id: authUserId,
-          ...body,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      )
+      .upsert(updatePayload as never, { onConflict: 'user_id' })
 
     if (error) {
       console.error('[API:settings/notifications] Error updating preferences:', error)

@@ -98,3 +98,150 @@ function categoryToProperty(
       return 'learning'
   }
 }
+
+/**
+ * Maps a database row from `user_notification_preferences` to the application-level
+ * `UserNotificationPreferences` structure. Falls back to defaults for any unconfigured fields.
+ */
+export function mapDbRowToNotificationPreferences(
+  userId: string,
+  row?: Record<string, unknown> | null
+): UserNotificationPreferences {
+  const defaults = createDefaultNotificationPreferences(userId)
+  if (!row) {
+    return defaults
+  }
+
+  const allNotifications =
+    typeof row.all_notifications === 'boolean'
+      ? row.all_notifications
+      : typeof row.allNotifications === 'boolean'
+      ? row.allNotifications
+      : defaults.allNotifications
+
+  const allEmail =
+    typeof row.all_email === 'boolean'
+      ? row.all_email
+      : typeof row.email_enabled === 'boolean'
+      ? row.email_enabled
+      : typeof row.allEmail === 'boolean'
+      ? row.allEmail
+      : defaults.allEmail
+
+  const allInApp =
+    typeof row.all_in_app === 'boolean'
+      ? row.all_in_app
+      : typeof row.in_app_enabled === 'boolean'
+      ? row.in_app_enabled
+      : typeof row.allInApp === 'boolean'
+      ? row.allInApp
+      : defaults.allInApp
+
+  const resolveCategory = (
+    prefix: string,
+    defaultVal: { email: boolean; inApp: boolean }
+  ) => {
+    const emailVal =
+      typeof row[`${prefix}_email`] === 'boolean'
+        ? (row[`${prefix}_email`] as boolean)
+        : defaultVal.email
+    const inAppVal =
+      typeof row[`${prefix}_in_app`] === 'boolean'
+        ? (row[`${prefix}_in_app`] as boolean)
+        : defaultVal.inApp
+    return { email: emailVal, inApp: inAppVal }
+  }
+
+  return {
+    userId,
+    allNotifications,
+    allEmail,
+    allInApp,
+    security: { email: true, inApp: true }, // Security is always non-negotiable
+    learning: resolveCategory('learning', defaults.learning),
+    achievements: resolveCategory('achievements', defaults.achievements),
+    portfolio: resolveCategory('portfolio', defaults.portfolio),
+    certificates: resolveCategory('certificates', defaults.certificates),
+    productUpdates: resolveCategory('product_updates', defaults.productUpdates),
+    marketing: resolveCategory('marketing', defaults.marketing),
+    preferredReminderHour:
+      typeof row.preferred_reminder_hour === 'number'
+        ? (row.preferred_reminder_hour as number)
+        : defaults.preferredReminderHour,
+    preferredRecapDay: defaults.preferredRecapDay,
+    preferredRecapHour: defaults.preferredRecapHour,
+    timezone: typeof row.timezone === 'string' ? (row.timezone as string) : defaults.timezone,
+    unsubscribeToken:
+      typeof row.unsubscribe_token === 'string' ? (row.unsubscribe_token as string) : undefined,
+    updatedAt:
+      typeof row.updated_at === 'string' ? (row.updated_at as string) : defaults.updatedAt,
+  }
+}
+
+/**
+ * Resolves persisted notification preferences for a user from `user_notification_preferences`.
+ * If no record is found or an error occurs, cleanly falls back to default preferences.
+ */
+export async function getResolvedUserNotificationPreferences(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  userId: string
+): Promise<UserNotificationPreferences> {
+  const defaults = createDefaultNotificationPreferences(userId)
+  if (!userId || !supabase) return defaults
+
+  try {
+    const { data: row, error } = await supabase
+      .from('user_notification_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (error || !row) {
+      return defaults
+    }
+
+    return mapDbRowToNotificationPreferences(userId, row as Record<string, unknown>)
+  } catch {
+    return defaults
+  }
+}
+
+/**
+ * Resolves persisted notification preferences for multiple users in a single query.
+ * Prevents N+1 database queries during batch queue processing or broadcasts.
+ */
+export async function getBatchUserNotificationPreferences(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  userIds: string[]
+): Promise<Map<string, UserNotificationPreferences>> {
+  const resultMap = new Map<string, UserNotificationPreferences>()
+  if (!userIds || userIds.length === 0) return resultMap
+
+  const uniqueIds = Array.from(new Set(userIds.filter(Boolean)))
+  uniqueIds.forEach((id) => {
+    resultMap.set(id, createDefaultNotificationPreferences(id))
+  })
+
+  if (!supabase) return resultMap
+
+  try {
+    const { data: rows, error } = await supabase
+      .from('user_notification_preferences')
+      .select('*')
+      .in('user_id', uniqueIds)
+
+    if (!error && rows) {
+      for (const row of rows as Record<string, unknown>[]) {
+        const uid = String(row.user_id)
+        resultMap.set(uid, mapDbRowToNotificationPreferences(uid, row))
+      }
+    }
+  } catch {
+    // Graceful fallback to default preferences already in map
+  }
+
+  return resultMap
+}
+

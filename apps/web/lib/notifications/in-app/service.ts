@@ -3,7 +3,9 @@ import { globalFeatureFlagService } from '../feature-flags/service'
 import {
   createDefaultNotificationPreferences,
   isChannelEnabledByPreferences,
+  getResolvedUserNotificationPreferences,
 } from '../preferences/defaults'
+import type { UserNotificationPreferences } from '../preferences/types'
 import { PRIORITY_MATRIX } from '../constants'
 import type { EventEnvelope } from '../types'
 
@@ -26,6 +28,7 @@ export interface InAppNotificationWriteParams {
   body: string
   actionUrl?: string
   priority?: keyof typeof PRIORITY_MATRIX
+  preloadedPreferences?: UserNotificationPreferences
 }
 
 /**
@@ -47,20 +50,34 @@ export async function createInAppNotification(params: InAppNotificationWritePara
       return { success: false, reason: 'in_app_notifications_disabled' }
     }
 
-    const prefs = createDefaultNotificationPreferences(params.userId)
+    let supabaseClient: ReturnType<typeof createServiceRoleClient> | null = null
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        supabaseClient = createServiceRoleClient()
+      } catch {
+        // fallback in mocked or isolated test run
+      }
+    }
+
+    const prefs =
+      params.preloadedPreferences ||
+      (supabaseClient
+        ? await getResolvedUserNotificationPreferences(supabaseClient, params.userId)
+        : createDefaultNotificationPreferences(params.userId))
+
     const isAllowed = isChannelEnabledByPreferences(prefs, params.category as never, 'in_app')
     if (!isAllowed) {
       return { success: false, reason: `user_disabled_${params.category}_in_app` }
     }
 
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (!supabaseClient) {
       return { success: false, reason: 'supabase_env_missing' }
     }
 
     const priorityNumber = PRIORITY_MATRIX[params.priority || 'medium'].numericValue
     const idempotencyKey = params.idempotencyKey || params.eventId || null
 
-    const supabase = createServiceRoleClient()
+    const supabase = supabaseClient
 
     // 3. Idempotency verification: avoid creating duplicate in-app rows
     if (idempotencyKey) {

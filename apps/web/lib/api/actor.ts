@@ -111,7 +111,12 @@ async function resolve(request: Request, allow: ReadonlySet<ActorKind>): Promise
   }
 
   if (allow.has('admin')) {
-    const admin = await requireAdminUser(request)
+    // If the route strictly requires admin (neither learner nor anonymous is allowed),
+    // an unauthorized attempt is a genuine access denial on an admin endpoint and must be audited.
+    // If the route allows other roles (dual-role: learner + admin), testing for admin is merely
+    // role discovery; non-admins are permitted and must not produce false-positive access_denied audit logs.
+    const isStrictlyAdminRoute = !allow.has('learner') && !allow.has('anonymous')
+    const admin = await requireAdminUser(request, { silent: !isStrictlyAdminRoute })
     if (admin.authorized && admin.userId) {
       return { ok: true, actor: { kind: 'admin', userId: admin.userId, email: admin.email ?? '' } }
     }

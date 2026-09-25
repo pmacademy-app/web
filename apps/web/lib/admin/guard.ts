@@ -10,18 +10,35 @@ export interface AdminAuthResult {
   statusCode?: number
 }
 
-const adminGuardCache = new WeakMap<Request, Promise<AdminAuthResult>>()
+export interface RequireAdminOptions {
+  silent?: boolean
+}
+
+interface CachedAdminAuth {
+  result: AdminAuthResult
+  loggedAudit: boolean
+  userId?: string
+  userEmail?: string
+}
+
+const adminGuardCache = new WeakMap<Request, CachedAdminAuth>()
 
 /**
  * Internal resolver for server-side authorization guard verifying admin status.
  */
-async function resolveRequireAdminUser(request: Request): Promise<AdminAuthResult> {
+async function resolveRequireAdminUser(
+  request: Request,
+  options?: RequireAdminOptions
+): Promise<CachedAdminAuth> {
   const authUser = await getAuthenticatedUserFromRequest(request)
   if (!authUser) {
     return {
-      authorized: false,
-      error: 'Authentication required',
-      statusCode: 401,
+      result: {
+        authorized: false,
+        error: 'Authentication required',
+        statusCode: 401,
+      },
+      loggedAudit: false,
     }
   }
 
@@ -35,11 +52,18 @@ async function resolveRequireAdminUser(request: Request): Promise<AdminAuthResul
   const typedUserRow = userRow as unknown as { is_admin?: boolean; email: string } | null
 
   if (error || !typedUserRow) {
-    await logAdminAction(authUser.id, authUser.email || 'unknown', 'access_denied', 'system', undefined, { reason: 'User record missing' })
+    if (!options?.silent) {
+      await logAdminAction(authUser.id, authUser.email || 'unknown', 'access_denied', 'system', undefined, { reason: 'User record missing' })
+    }
     return {
-      authorized: false,
-      error: 'User account record not found',
-      statusCode: 403,
+      result: {
+        authorized: false,
+        error: 'User account record not found',
+        statusCode: 403,
+      },
+      loggedAudit: !options?.silent,
+      userId: authUser.id,
+      userEmail: authUser.email || 'unknown',
     }
   }
 
@@ -50,18 +74,30 @@ async function resolveRequireAdminUser(request: Request): Promise<AdminAuthResul
   const isAuthorizedAdmin = isEnvAdmin || isDbAdmin
 
   if (!isAuthorizedAdmin) {
-    await logAdminAction(authUser.id, typedUserRow.email, 'access_denied', 'system', undefined, { reason: 'Non-admin user' })
+    if (!options?.silent) {
+      await logAdminAction(authUser.id, typedUserRow.email, 'access_denied', 'system', undefined, { reason: 'Non-admin user' })
+    }
     return {
-      authorized: false,
-      error: 'Access denied: Admin privileges required',
-      statusCode: 403,
+      result: {
+        authorized: false,
+        error: 'Access denied: Admin privileges required',
+        statusCode: 403,
+      },
+      loggedAudit: !options?.silent,
+      userId: authUser.id,
+      userEmail: typedUserRow.email,
     }
   }
 
   return {
-    authorized: true,
+    result: {
+      authorized: true,
+      userId: authUser.id,
+      email: typedUserRow.email,
+    },
+    loggedAudit: false,
     userId: authUser.id,
-    email: typedUserRow.email,
+    userEmail: typedUserRow.email,
   }
 }
 
@@ -69,15 +105,30 @@ async function resolveRequireAdminUser(request: Request): Promise<AdminAuthResul
  * Server-side authorization guard verifying whether the requesting user is an admin.
  * Deduplicated per request instance using WeakMap.
  */
-export async function requireAdminUser(request: Request): Promise<AdminAuthResult> {
+export async function requireAdminUser(
+  request: Request,
+  options?: RequireAdminOptions
+): Promise<AdminAuthResult> {
   const cached = adminGuardCache.get(request)
   if (cached) {
-    return cached
+    // If this call explicitly wants auditing and the cached denial was silent, emit the audit log now
+    if (!options?.silent && !cached.result.authorized && !cached.loggedAudit && cached.userId) {
+      cached.loggedAudit = true
+      await logAdminAction(
+        cached.userId,
+        cached.userEmail || 'unknown',
+        'access_denied',
+        'system',
+        undefined,
+        { reason: 'Non-admin user' }
+      )
+    }
+    return cached.result
   }
 
-  const promise = resolveRequireAdminUser(request)
-  adminGuardCache.set(request, promise)
-  return promise
+  const cachedAuth = await resolveRequireAdminUser(request, options)
+  adminGuardCache.set(request, cachedAuth)
+  return cachedAuth.result
 }
 
 /**
