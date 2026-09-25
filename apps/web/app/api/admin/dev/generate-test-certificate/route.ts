@@ -47,8 +47,8 @@ export const POST = withRoute(
 
     const typedUser = user as unknown as { id: string; email: string; name?: string; username?: string }
 
-    // 2. Issue Test Certificate (reuses production certificate service)
-    const certRow = await issueCertificate(supabase, targetUserId, type, moduleSlug)
+    // 2. Issue Test Certificate (reuses production certificate service with admin dev bypass)
+    const certRow = await issueCertificate(supabase, targetUserId, type, moduleSlug, { bypassPrerequisites: true })
 
     // Override / mark certificate as DEV TEST certificate
     const testCertCode = `TEST-${certRow.certificate_code}`

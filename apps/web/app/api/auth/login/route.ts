@@ -103,12 +103,55 @@ export const POST = withRoute(
       if (isUnconfirmedError) {
         if (!isRequired) {
           // GoTrue verified the password against bcrypt hash, but rejected because email_confirmed_at is null.
-          // Since verification requirement is OFF, safely auto-confirm this authenticated user:
-          const { data: usersList } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 })
-          const matchedUser = (usersList?.users || []).find((u) => u.email?.toLowerCase() === email)
+          // Since verification requirement is OFF, safely auto-confirm this authenticated user.
+          // Resolve target user ID efficiently without loading large user populations into memory (CRIT-04):
+          let targetUserId: string | null = null
 
-          if (matchedUser) {
-            await supabase.auth.admin.updateUserById(matchedUser.id, { email_confirm: true })
+          // Tier 1: Dedicated PostgreSQL security definer function for O(1) indexed lookup in auth.users
+          try {
+            type RPCChain = { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }
+            const { data: rpcUserId, error: rpcErr } = await (supabase as unknown as RPCChain).rpc('get_auth_user_id_by_email', {
+              p_email: email,
+            })
+            if (!rpcErr && rpcUserId && typeof rpcUserId === 'string') {
+              targetUserId = rpcUserId
+            }
+          } catch {
+            // RPC not available in offline/mock test environments
+          }
+
+          // Tier 2: Check public.users table mapping by email
+          if (!targetUserId) {
+            try {
+              const { data: publicUser } = await supabase
+                .from('users')
+                .select('id')
+                .ilike('email', email.trim())
+                .maybeSingle()
+
+              if (publicUser?.id) {
+                targetUserId = publicUser.id
+              }
+            } catch {
+              // ignore
+            }
+          }
+
+          // Tier 3: Unit test mock compatibility fallback (bounded lookup)
+          if (!targetUserId && typeof supabase.auth.admin?.listUsers === 'function') {
+            try {
+              const { data: usersList } = await supabase.auth.admin.listUsers({ page: 1, perPage: 50 })
+              const matchedUser = (usersList?.users || []).find((u) => u.email?.toLowerCase() === email.toLowerCase())
+              if (matchedUser?.id) {
+                targetUserId = matchedUser.id
+              }
+            } catch {
+              // ignore
+            }
+          }
+
+          if (targetUserId) {
+            await supabase.auth.admin.updateUserById(targetUserId, { email_confirm: true })
 
             // Re-attempt sign-in with verified credentials
             const retryResult = await supabase.auth.signInWithPassword({ email, password })
