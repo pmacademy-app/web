@@ -33,7 +33,7 @@ export function CurriculumSection() {
     <section
       id="curriculum"
       aria-labelledby="curriculum-heading"
-      className={`bg-surface-muted ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      className={`bg-transparent ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
         {/* Header */}

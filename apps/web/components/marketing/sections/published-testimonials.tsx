@@ -53,7 +53,7 @@ export async function PublishedTestimonialsSection() {
     <section
       id="testimonials"
       aria-labelledby="testimonials-heading"
-      className={`${SECTION_Y} bg-surface-muted border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      className={`${SECTION_Y} bg-transparent border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
         <Reveal amount={0.25} className="max-w-[640px] mb-12">

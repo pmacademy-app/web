@@ -82,7 +82,7 @@ export function HowItWorksSection() {
     <section
       id="how-it-works"
       aria-labelledby="how-it-works-heading"
-      className={`${SECTION_Y} bg-background border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      className={`${SECTION_Y} bg-transparent border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
         <Reveal amount={0.25} className="max-w-[640px] mb-12">

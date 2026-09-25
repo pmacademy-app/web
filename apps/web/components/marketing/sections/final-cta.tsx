@@ -25,7 +25,7 @@ export function FinalCTASection({ showTrustStrip = false }: FinalCTASectionProps
     <section
       id="final-cta"
       aria-labelledby="cta-heading"
-      className="relative py-24 lg:py-32 overflow-hidden border-t border-border/80 bg-background scroll-mt-24 lg:scroll-mt-28 isolate"
+      className="relative py-24 lg:py-32 overflow-hidden border-t border-border/80 bg-transparent scroll-mt-24 lg:scroll-mt-28 isolate"
     >
       {/* Subtle ambient light for soft depth. Tinted from the primary token, drifts
           slowly, and holds still for reduced-motion users. */}
