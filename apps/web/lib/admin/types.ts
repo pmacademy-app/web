@@ -626,6 +626,8 @@ export interface AdminAuditLogResult {
   page: number
   pageSize: number
   totalPages: number
+  /** Next keyset cursor for stable cursor-based pagination across large audit logs. */
+  nextCursor?: string | null
   /** True when the query failed and the result is an empty fallback. */
   failed?: boolean
 }

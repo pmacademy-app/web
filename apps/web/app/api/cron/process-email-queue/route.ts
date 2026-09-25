@@ -55,7 +55,8 @@ export const POST = withRoute(
   async () => {
     const startTime = Date.now()
     try {
-      const result = await processEmailQueue(50)
+      // Drain up to 5 batches (up to 250 emails) per 5-minute cron invocation within a 45s safety window
+      const result = await processEmailQueue(50, { maxBatches: 5, maxExecutionMs: 45_000 })
       const durationMs = Date.now() - startTime
 
       await recordSchedulerHeartbeat('healthy', {

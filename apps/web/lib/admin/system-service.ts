@@ -447,15 +447,17 @@ export class SystemService {
     to?: string
     page?: number
     pageSize?: number
+    cursor?: string
   }): Promise<AdminAuditLogResult> {
     const supabase = createServiceRoleClient()
     const page = Math.max(1, Number(params.page) || 1)
-    const pageSize = Math.min(100, Math.max(5, Number(params.pageSize) || 25))
+    const pageSize = Math.min(100, Math.max(1, Number(params.pageSize) || 25))
     const admin = params.admin?.trim() || null
     const action = params.action?.trim() || null
     const target = params.target?.trim() || null
     const from = params.from || null
     const to = params.to || null
+    const cursor = params.cursor?.trim() || null
 
     try {
       let query = supabase
@@ -471,14 +473,42 @@ export class SystemService {
         const sanitized = target.replace(/'/g, "''").replace(/%/g, '\\%')
         query = query.or(`target_resource.ilike.%${sanitized}%,target_id.ilike.%${sanitized}%`)
       }
-      if (from) query = query.gte('created_at', `${from}T00:00:00.000Z`)
-      if (to) query = query.lte('created_at', `${to}T23:59:59.999Z`)
-      query = query.order('created_at', { ascending: false }).range((page - 1) * pageSize, page * pageSize - 1)
+      if (from) {
+        // Handle ISO string or bare YYYY-MM-DD date safely
+        const fromIso = from.includes('T') ? from : `${from}T00:00:00.000Z`
+        query = query.gte('created_at', fromIso)
+      }
+      if (to) {
+        const toIso = to.includes('T') ? to : `${to}T23:59:59.999Z`
+        query = query.lte('created_at', toIso)
+      }
+
+      // Stable deterministic ordering with unique ID tie-breaker
+      query = query.order('created_at', { ascending: false }).order('id', { ascending: false })
+
+      let isKeyset = false
+      if (cursor) {
+        try {
+          const decoded = Buffer.from(cursor, 'base64').toString('utf-8')
+          const [cursorTs, cursorId] = decoded.split('|')
+          if (cursorTs && cursorId) {
+            query = query.or(`created_at.lt.${cursorTs},and(created_at.eq.${cursorTs},id.lt.${cursorId})`)
+            query = query.limit(pageSize + 1)
+            isKeyset = true
+          }
+        } catch {
+          // If cursor decoding fails, fallback to page-based pagination
+        }
+      }
+
+      if (!isKeyset) {
+        query = query.range((page - 1) * pageSize, page * pageSize - 1)
+      }
 
       const { data, count, error } = await query
       if (error) throw new Error(error.message)
 
-      const entries: AdminAuditEntry[] = ((data || []) as unknown as Array<{
+      const rawRows = (data || []) as Array<{
         id: string
         admin_user_id: string | null
         admin_email: string
@@ -487,7 +517,25 @@ export class SystemService {
         target_id: string | null
         metadata: Record<string, unknown> | null
         created_at: string
-      }>).map((r) => ({
+      }>
+
+      let nextCursor: string | null = null
+      let rowsToReturn = rawRows
+
+      if (isKeyset) {
+        if (rawRows.length > pageSize) {
+          rowsToReturn = rawRows.slice(0, pageSize)
+          const lastItem = rowsToReturn[rowsToReturn.length - 1]
+          nextCursor = Buffer.from(`${lastItem.created_at}|${lastItem.id}`).toString('base64')
+        }
+      } else {
+        if (rawRows.length === pageSize && count && page * pageSize < count) {
+          const lastItem = rawRows[rawRows.length - 1]
+          nextCursor = Buffer.from(`${lastItem.created_at}|${lastItem.id}`).toString('base64')
+        }
+      }
+
+      const entries: AdminAuditEntry[] = rowsToReturn.map((r) => ({
         id: String(r.id),
         adminId: r.admin_user_id ? String(r.admin_user_id) : null,
         adminEmail: String(r.admin_email),
@@ -499,7 +547,14 @@ export class SystemService {
       }))
 
       const total = count || 0
-      return { entries, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) }
+      return {
+        entries,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.max(1, Math.ceil(total / pageSize)),
+        nextCursor,
+      }
     } catch (err) {
       console.warn('[SystemService] getAuditLog failed:', err)
       return { entries: [], total: 0, page, pageSize, totalPages: 1, failed: true }

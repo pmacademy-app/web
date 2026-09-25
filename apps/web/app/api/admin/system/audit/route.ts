@@ -27,6 +27,7 @@ export const GET = withRoute(
       to: searchParams.get('to') || undefined,
       page: Number(searchParams.get('page')) || 1,
       pageSize: Number(searchParams.get('pageSize')) || 25,
+      cursor: searchParams.get('cursor') || undefined,
     })
     return NextResponse.json({ success: true, ...result })
   } catch (err) {

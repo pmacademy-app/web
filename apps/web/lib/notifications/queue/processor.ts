@@ -400,12 +400,31 @@ async function mapConcurrent<T, R>(
 }
 
 /**
- * Processes a batch of pending emails from the persistent Supabase `email_queue`.
- * Claims rows atomically using PostgreSQL RPC claim_email_queue_items(batchSize).
+ * Configuration options for bounded multi-batch queue draining.
  */
-export async function processEmailQueue(
-  batchSize: number = 50
-): Promise<{ processed: number; delivered: number; failed: number; suppressed: number; skipped: number; reclaimed: number }> {
+export interface ProcessEmailQueueOptions {
+  /** Maximum number of sequential batches to drain in one invocation (default 1). */
+  maxBatches?: number
+  /** Safety timeout in milliseconds to prevent exceeding serverless deadlines (default 60,000ms). */
+  maxExecutionMs?: number
+}
+
+export type ProcessEmailQueueResult = {
+  processed: number
+  delivered: number
+  failed: number
+  suppressed: number
+  skipped: number
+  reclaimed: number
+}
+
+/**
+ * Processes a single batch of pending emails from the persistent Supabase `email_queue`.
+ */
+async function processSingleBatch(
+  batchSize: number = 50,
+  shouldReclaim: boolean = true
+): Promise<ProcessEmailQueueResult> {
   // Check Global Queue Processing Feature Flag (persisted, not per-process default)
   const processingEnabled = await globalFeatureFlagService.isEnabledAsync('QUEUE_PROCESSING_ENABLED')
   if (!processingEnabled) {
@@ -416,14 +435,16 @@ export async function processEmailQueue(
 
   // 0. B6: Reclaim stale 'processing' items whose execution lease expired (>15 min)
   let reclaimedCount = 0
-  try {
-    const reclaimResult = await reclaimStaleProcessingItems(supabase)
-    reclaimedCount = reclaimResult.reclaimedCount
-    if (reclaimedCount > 0) {
-      log.info('queue.stale_items_reclaimed', { reclaimedCount })
+  if (shouldReclaim) {
+    try {
+      const reclaimResult = await reclaimStaleProcessingItems(supabase)
+      reclaimedCount = reclaimResult.reclaimedCount
+      if (reclaimedCount > 0) {
+        log.info('queue.stale_items_reclaimed', { reclaimedCount })
+      }
+    } catch (reclaimErr) {
+      log.warnException('queue.stale_reclaim_check_failed', reclaimErr)
     }
-  } catch (reclaimErr) {
-    log.warnException('queue.stale_reclaim_check_failed', reclaimErr)
   }
 
   let claimedRows: Array<Record<string, unknown>> = []
@@ -708,6 +729,61 @@ export async function processEmailQueue(
     suppressed: suppressedCount,
     skipped: skippedCount,
     reclaimed: reclaimedCount,
+  }
+}
+
+/**
+ * Processes pending emails from the persistent Supabase `email_queue`.
+ * Claims rows atomically using PostgreSQL RPC claim_email_queue_items(batchSize).
+ * Supports bounded multi-batch draining via `options.maxBatches` and `options.maxExecutionMs`.
+ */
+export async function processEmailQueue(
+  batchSize: number = 50,
+  options?: ProcessEmailQueueOptions
+): Promise<ProcessEmailQueueResult> {
+  const maxBatches = Math.max(1, Math.min(20, options?.maxBatches || 1))
+  const maxExecutionMs = options?.maxExecutionMs || 60_000
+
+  // Single-batch execution fast path (default)
+  if (maxBatches === 1) {
+    return processSingleBatch(batchSize, true)
+  }
+
+  const startTime = Date.now()
+  let totalProcessed = 0
+  let totalDelivered = 0
+  let totalFailed = 0
+  let totalSuppressed = 0
+  let totalSkipped = 0
+  let totalReclaimed = 0
+
+  for (let batchIndex = 0; batchIndex < maxBatches; batchIndex++) {
+    if (Date.now() - startTime > maxExecutionMs) {
+      log.warn('queue.drain_deadline_exceeded', { batchIndex, maxBatches, elapsedMs: Date.now() - startTime })
+      break
+    }
+
+    const batchResult = await processSingleBatch(batchSize, batchIndex === 0)
+    totalProcessed += batchResult.processed
+    totalDelivered += batchResult.delivered
+    totalFailed += batchResult.failed
+    totalSuppressed += batchResult.suppressed
+    totalSkipped += batchResult.skipped
+    totalReclaimed += batchResult.reclaimed
+
+    // If fewer items were processed than the batch size, the queue has been drained
+    if (batchResult.processed < batchSize) {
+      break
+    }
+  }
+
+  return {
+    processed: totalProcessed,
+    delivered: totalDelivered,
+    failed: totalFailed,
+    suppressed: totalSuppressed,
+    skipped: totalSkipped,
+    reclaimed: totalReclaimed,
   }
 }
 
