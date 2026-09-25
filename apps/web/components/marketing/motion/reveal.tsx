@@ -106,8 +106,10 @@ export function Reveal({
       data-revealed={revealed ? 'true' : 'false'}
       style={{ transitionDelay: delay ? `${delay}ms` : undefined, ...style }}
       className={cn(
-        'transition-[opacity,transform] duration-500 ease-out will-change-[opacity,transform]',
-        revealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
+        // ease-out-quint decelerates hard at the end, so the element settles rather than
+        // stops. 16px of travel over 700ms reads as arrival, not as a slide.
+        'transition-[opacity,transform] duration-700 ease-out-quint',
+        revealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
         'motion-reduce:transition-none motion-reduce:translate-y-0',
         className
       )}

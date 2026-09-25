@@ -24,7 +24,7 @@ export function Footer() {
             <div className="flex items-center mb-4">
               <BrandLogo variant="full" size="sm" />
             </div>
-            <p className="text-body-sm text-locked leading-relaxed max-w-[240px]">
+            <p className="text-body-sm text-ink-muted leading-relaxed max-w-[260px]">
               Prodily PM Academy — a structured path to learn product management, build product work, and create proof of your skills.
             </p>
           </div>
@@ -40,9 +40,10 @@ export function Footer() {
                     <Link
                       href={link.href}
                       className="
-                        text-body-sm text-locked
-                        hover:text-foreground
-                        transition-colors duration-[120ms]
+                        inline-block text-body-sm text-ink-muted
+                        hover:text-foreground hover:translate-x-0.5
+                        transition-[color,transform] duration-200 ease-out-quint
+                        motion-reduce:transition-colors motion-reduce:hover:translate-x-0
                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-xs
                       "
                     >
@@ -63,7 +64,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p className="text-body-sm text-locked">
+          <p className="text-body-sm text-ink-muted">
             © {currentYear} {BRAND.fullName}. Built by{' '}
             <Link
               href="https://adityagangwani.me"
@@ -76,10 +77,10 @@ export function Footer() {
             to make serious product management education more accessible.
           </p>
           <div className="flex flex-col items-start gap-2 sm:items-end">
-            <p className="text-body-sm text-locked">
+            <p className="text-body-sm text-ink-muted">
               Free core curriculum. No paywalled lessons.
             </p>
-            <CookiePreferencesButton className="text-body-sm text-locked hover:text-foreground" />
+            <CookiePreferencesButton className="text-body-sm text-ink-muted hover:text-foreground" />
           </div>
         </div>
 
@@ -88,12 +89,12 @@ export function Footer() {
             brand name as a registered company. Until real operator details are
             supplied, the honest default below is what visitors see. */}
         <div className="pt-6 mt-6 border-t border-border space-y-1.5">
-          <p className="text-caption text-locked leading-relaxed max-w-[720px]">
+          <p className="text-caption text-ink-muted leading-relaxed max-w-[720px]">
             {operatorDescription(BRAND.fullName)}
             {LEGAL_OPERATOR.registrationId ? ` Registration: ${LEGAL_OPERATOR.registrationId}.` : ''}
             {LEGAL_OPERATOR.address ? ` ${operatorAddressLabel()}: ${LEGAL_OPERATOR.address}.` : ''}
           </p>
-          <p className="text-caption text-locked leading-relaxed">
+          <p className="text-caption text-ink-muted leading-relaxed">
             {GRIEVANCE_CONTACT.officerName
               ? `${GRIEVANCE_CONTACT.officerTitle ?? 'Grievance Officer'}: ${GRIEVANCE_CONTACT.officerName} — `
               : 'Grievances and privacy requests: '}

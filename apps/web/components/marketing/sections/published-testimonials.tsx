@@ -1,4 +1,12 @@
 import { Reveal } from '@/components/marketing/motion/reveal'
+import {
+  CARD,
+  CONTAINER,
+  EYEBROW,
+  EYEBROW_RULE,
+  SECTION_TITLE,
+  SECTION_Y,
+} from '@/components/marketing/styles'
 import { FeedbackAdminService } from '@/lib/admin/feedback-service'
 
 /**
@@ -45,16 +53,17 @@ export async function PublishedTestimonialsSection() {
     <section
       id="testimonials"
       aria-labelledby="testimonials-heading"
-      className="py-20 lg:py-24 bg-surface-muted border-t border-border/80 scroll-mt-24 lg:scroll-mt-28"
+      className={`${SECTION_Y} bg-surface-muted border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
-      <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
-        <Reveal amount={0.25} className="max-w-[640px] mb-10">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
+      <div className={CONTAINER}>
+        <Reveal amount={0.25} className="max-w-[640px] mb-12">
+          <div className={`${EYEBROW} mb-4`}>
+            <span aria-hidden="true" className={EYEBROW_RULE} />
             FROM LEARNERS
           </div>
           <h2
             id="testimonials-heading"
-            className="font-display text-h1 font-semibold text-foreground tracking-[-0.02em]"
+            className={SECTION_TITLE}
           >
             What people say after using it.
           </h2>
@@ -63,11 +72,12 @@ export async function PublishedTestimonialsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 items-stretch">
           {shown.map((testimonial, index) => (
             <Reveal key={testimonial.id} amount={0.15} delay={index * 60} className="h-full">
-              <figure className="h-full flex flex-col gap-5 rounded-sm bg-surface border border-border p-6">
-                <blockquote className="text-body-sm text-foreground/85 leading-relaxed flex-1">
+              <figure className={`h-full flex flex-col gap-5 p-6 ${CARD}`}>
+                <span aria-hidden="true" className="font-display text-h1 leading-none text-primary/30 select-none">&ldquo;</span>
+                <blockquote className="-mt-4 text-body-sm text-foreground/85 leading-relaxed flex-1">
                   {testimonial.content}
                 </blockquote>
-                <figcaption className="text-caption text-locked">
+                <figcaption className="pt-4 border-t border-border text-caption text-ink-muted">
                   <span className="font-semibold text-foreground">{testimonial.authorName}</span>
                   {testimonial.role ? <span> · {testimonial.role}</span> : null}
                 </figcaption>

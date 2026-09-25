@@ -37,7 +37,7 @@ export function TestimonialCard({ testimonial, className }: TestimonialCardProps
       {/* Attribution */}
       <figcaption className="mt-4 pt-4 border-t border-border">
         <p className="text-body-sm font-medium text-foreground">{testimonial.author}</p>
-        <p className="text-caption text-locked">{testimonial.role}</p>
+        <p className="text-caption text-ink-muted">{testimonial.role}</p>
       </figcaption>
     </figure>
   )

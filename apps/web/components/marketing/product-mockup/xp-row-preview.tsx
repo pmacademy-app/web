@@ -20,7 +20,7 @@ export function XPRowPreview() {
           <Zap size={11} className="text-accent" />
         </div>
         <span className="text-body-sm font-semibold text-foreground">1,240</span>
-        <span className="text-caption text-locked">XP</span>
+        <span className="text-caption text-ink-muted">XP</span>
       </div>
 
       {/* Divider */}
@@ -32,12 +32,12 @@ export function XPRowPreview() {
           <Flame size={11} className="text-warning" />
         </div>
         <span className="text-body-sm font-semibold text-foreground">7</span>
-        <span className="text-caption text-locked">day streak</span>
+        <span className="text-caption text-ink-muted">day streak</span>
       </div>
 
       {/* Level */}
       <div className="ml-auto">
-        <span className="text-caption text-locked">Level </span>
+        <span className="text-caption text-ink-muted">Level </span>
         <span className="text-caption font-semibold text-foreground">3</span>
       </div>
     </div>

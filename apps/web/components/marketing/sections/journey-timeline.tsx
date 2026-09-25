@@ -179,7 +179,7 @@ export function JourneyTimeline() {
               <p
                 className={cn(
                   'mt-1 text-caption leading-relaxed max-w-[130px] transition-colors duration-200',
-                  isActive ? 'text-foreground font-medium' : 'text-locked'
+                  isActive ? 'text-foreground font-medium' : 'text-ink-muted'
                 )}
               >
                 {stage.description}

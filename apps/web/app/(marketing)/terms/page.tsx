@@ -42,19 +42,19 @@ export default function TermsPage() {
         <h1 className="text-4xl md:text-5xl font-bold font-serif text-foreground">
           Terms of Service
         </h1>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-ink-muted">
           Last updated: {LEGAL_DOCS_REVISION_LABEL} • Version {TERMS_VERSION} • {BRAND.fullName}
         </p>
       </div>
 
       {/* Main Content */}
-      <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-sm text-muted-foreground leading-relaxed">
+      <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-sm text-ink-muted leading-relaxed">
         {/* Core Guarantee */}
         <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 text-foreground space-y-2">
           <div className="flex items-center gap-2 font-bold text-sm text-primary">
             <CheckCircle2 className="w-4 h-4" /> Free-Forever Core Curriculum Commitment
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-xs text-ink-muted leading-relaxed">
             {BRAND.fullName} provides the complete 90-lesson Product Management curriculum, interactive quizzes, spaced-repetition flashcards, skill radar analytics, capstones, and completion certificates <strong className="text-foreground font-semibold">100% free of charge</strong>. There are no mandatory subscriptions, hidden paywalls, paywalled lesson locks, or credit card requirements to complete the core curriculum.
           </p>
         </div>
@@ -184,14 +184,14 @@ export default function TermsPage() {
                 {GRIEVANCE_CONTACT.officerTitle ?? 'Grievance & Legal Contact'}
               </p>
               {GRIEVANCE_CONTACT.officerName ? (
-                <p className="text-xs text-muted-foreground">{GRIEVANCE_CONTACT.officerName}</p>
+                <p className="text-xs text-ink-muted">{GRIEVANCE_CONTACT.officerName}</p>
               ) : (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-ink-muted">
                   A named grievance officer has not yet been designated. Until one is, grievances are handled directly by the Platform operator at the address below.
                 </p>
               )}
               {LEGAL_OPERATOR.address && (
-                <p className="text-xs text-muted-foreground">{LEGAL_OPERATOR.address}</p>
+                <p className="text-xs text-ink-muted">{LEGAL_OPERATOR.address}</p>
               )}
             </div>
             <a
@@ -201,7 +201,7 @@ export default function TermsPage() {
               {GRIEVANCE_CONTACT.email ?? BRAND.supportEmail}
             </a>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <p className="text-[11px] text-ink-muted leading-relaxed">
             These Terms reflect a September 2026 internal legal and privacy audit and are pending review by qualified counsel before the Platform&apos;s final public launch. They are the operator&apos;s current, good-faith statement of how the Service works, not legal advice.
           </p>
         </section>
@@ -212,7 +212,7 @@ export default function TermsPage() {
         <Link href="/" className="font-bold text-primary hover:underline">
           ← Back to Homepage
         </Link>
-        <Link href="/privacy" className="font-bold text-muted-foreground hover:text-foreground">
+        <Link href="/privacy" className="font-bold text-ink-muted hover:text-foreground">
           View Privacy Policy →
         </Link>
       </div>

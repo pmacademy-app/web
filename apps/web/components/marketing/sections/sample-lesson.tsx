@@ -2,6 +2,16 @@ import Link from 'next/link'
 import { ArrowRight, Clock } from 'lucide-react'
 
 import { Reveal } from '@/components/marketing/motion/reveal'
+import {
+  CARD,
+  CARD_INTERACTIVE,
+  CONTAINER,
+  EYEBROW,
+  EYEBROW_RULE,
+  SECTION_LEAD,
+  SECTION_TITLE,
+  SECTION_Y,
+} from '@/components/marketing/styles'
 import { fetchCompiledLesson, fetchCurriculumData } from '@/lib/lesson-loader'
 
 /**
@@ -135,20 +145,21 @@ export async function SampleLessonSection() {
     <section
       id="sample"
       aria-labelledby="sample-heading"
-      className="bg-surface-muted py-20 lg:py-28 border-t border-border/80 scroll-mt-24 lg:scroll-mt-28"
+      className={`bg-surface-muted ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
-      <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
-        <Reveal amount={0.2} className="max-w-[640px] mb-10">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
+      <div className={CONTAINER}>
+        <Reveal amount={0.2} className="max-w-[640px] mb-12">
+          <div className={`${EYEBROW} mb-4`}>
+            <span aria-hidden="true" className={EYEBROW_RULE} />
             READ BEFORE YOU SIGN UP
           </div>
           <h2
             id="sample-heading"
-            className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4 tracking-[-0.02em]"
+            className={`${SECTION_TITLE} mb-4`}
           >
             Judge the teaching, not the landing page.
           </h2>
-          <p className="text-body-lg text-locked leading-relaxed">
+          <p className={SECTION_LEAD}>
             Three lessons are open to read in full, no account needed. This is how every
             lesson opens: with the question it exists to answer.
           </p>
@@ -159,17 +170,15 @@ export async function SampleLessonSection() {
           <Reveal amount={0.15} className="lg:col-span-7 h-full">
             <Link
               href={`/lessons/${lead.slug}`}
-              className="
-                group flex h-full flex-col justify-between gap-6 rounded-sm
-                bg-surface border border-border p-7 lg:p-9
-                hover:border-border-strong hover:shadow-sm
-                transition-all duration-[120ms]
+              className={`
+                group relative flex h-full flex-col justify-between gap-8 overflow-hidden
+                p-7 lg:p-9 ${CARD} ${CARD_INTERACTIVE}
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
-              "
+              `}
             >
               <div className="space-y-4">
-                <div className="flex items-center gap-3 text-caption font-mono text-locked">
-                  <span className="text-primary font-semibold">LESSON {lead.order}</span>
+                <div className="flex items-center gap-3 text-caption font-mono text-ink-muted">
+                  <span className="rounded-md bg-primary-soft px-2 py-0.5 text-primary font-semibold">LESSON {lead.order}</span>
                   <span aria-hidden="true">·</span>
                   <span className="inline-flex items-center gap-1.5">
                     <Clock size={12} aria-hidden="true" />
@@ -177,12 +186,12 @@ export async function SampleLessonSection() {
                   </span>
                 </div>
 
-                <h3 className="font-display text-h2 font-semibold text-foreground leading-snug group-hover:text-primary transition-colors duration-[120ms]">
+                <h3 className="font-display text-h3 sm:text-h2 font-semibold text-foreground leading-snug tracking-[-0.015em] text-balance group-hover:text-primary transition-colors duration-200">
                   {lead.title}
                 </h3>
 
                 {/* The lesson's own words, read from compiled content — not a paraphrase. */}
-                <blockquote className="text-body text-foreground/80 leading-relaxed border-l-2 border-primary/30 pl-4">
+                <blockquote className="text-body text-foreground/80 leading-relaxed border-l-2 border-primary/30 pl-4 transition-colors duration-300 group-hover:border-primary">
                   {lead.opening}
                 </blockquote>
               </div>
@@ -192,7 +201,7 @@ export async function SampleLessonSection() {
                 <ArrowRight
                   size={15}
                   aria-hidden="true"
-                  className="transition-transform duration-[120ms] group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+                  className="transition-transform duration-200 ease-out-quint group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
                 />
               </span>
             </Link>
@@ -204,31 +213,29 @@ export async function SampleLessonSection() {
               <Reveal key={sample.id} amount={0.15} delay={80 + index * 60} className="h-full">
                 <Link
                   href={`/lessons/${sample.slug}`}
-                  className="
-                    group flex h-full flex-col justify-between gap-4 rounded-sm
-                    bg-surface border border-border p-6
-                    hover:border-border-strong hover:shadow-sm
-                    transition-all duration-[120ms]
+                  className={`
+                    group flex h-full flex-col justify-between gap-5
+                    p-6 ${CARD} ${CARD_INTERACTIVE}
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus
-                  "
+                  `}
                 >
                   <div className="space-y-2.5">
-                    <div className="flex items-center gap-3 text-caption font-mono text-locked">
+                    <div className="flex items-center gap-3 text-caption font-mono text-ink-muted">
                       <span className="text-primary font-semibold">LESSON {sample.order}</span>
                       <span aria-hidden="true">·</span>
                       <span>{sample.minutes} min</span>
                     </div>
-                    <h3 className="font-display text-h4 font-semibold text-foreground leading-snug group-hover:text-primary transition-colors duration-[120ms]">
+                    <h3 className="font-display text-h4 font-semibold text-foreground leading-snug text-balance group-hover:text-primary transition-colors duration-200">
                       {sample.title}
                     </h3>
                   </div>
 
-                  <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-locked group-hover:text-primary transition-colors duration-[120ms]">
+                  <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-ink-muted group-hover:text-primary transition-colors duration-200">
                     Read it
                     <ArrowRight
                       size={13}
                       aria-hidden="true"
-                      className="transition-transform duration-[120ms] group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+                      className="transition-transform duration-200 ease-out-quint group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
                     />
                   </span>
                 </Link>

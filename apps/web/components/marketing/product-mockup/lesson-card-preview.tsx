@@ -25,8 +25,8 @@ export function LessonCardPreview() {
           Writing a PRD people can actually use
         </p>
         <div className="flex items-center gap-2 mt-0.5">
-          <Clock size={11} className="text-locked" />
-          <span className="text-caption text-locked">18 min</span>
+          <Clock size={11} className="text-ink-muted" />
+          <span className="text-caption text-ink-muted">18 min</span>
           <span className="text-caption text-success font-medium">• Quiz ready</span>
         </div>
       </div>

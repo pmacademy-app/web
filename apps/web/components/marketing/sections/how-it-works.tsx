@@ -1,6 +1,14 @@
 import { BookOpen, Layers, PenTool, RotateCw } from 'lucide-react'
 
 import { Reveal } from '@/components/marketing/motion/reveal'
+import {
+  CONTAINER,
+  EYEBROW,
+  EYEBROW_RULE,
+  SECTION_LEAD,
+  SECTION_TITLE,
+  SECTION_Y,
+} from '@/components/marketing/styles'
 
 /**
  * How the learning works — Phase 0.C.
@@ -74,33 +82,34 @@ export function HowItWorksSection() {
     <section
       id="how-it-works"
       aria-labelledby="how-it-works-heading"
-      className="py-20 lg:py-28 bg-background border-t border-border/80 scroll-mt-24 lg:scroll-mt-28"
+      className={`${SECTION_Y} bg-background border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
-      <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
+      <div className={CONTAINER}>
         <Reveal amount={0.25} className="max-w-[640px] mb-12">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
+          <div className={`${EYEBROW} mb-4`}>
+            <span aria-hidden="true" className={EYEBROW_RULE} />
             THE LEARNING LOOP
           </div>
           <h2
             id="how-it-works-heading"
-            className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4 tracking-[-0.02em]"
+            className={`${SECTION_TITLE} mb-4`}
           >
             Read, recall, apply, retain.
           </h2>
-          <p className="text-body-lg text-locked leading-relaxed">
+          <p className={SECTION_LEAD}>
             Reading alone does not build product judgment. Every lesson runs the same four
             steps, and the fourth one brings you back.
           </p>
         </Reveal>
 
-        <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-sm overflow-hidden border border-border">
+        <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-xl overflow-hidden border border-border">
           {LOOP.map((item, index) => {
             const Icon = item.icon
             return (
               // `Reveal` renders a div, so it sits *inside* the list item rather than
               // wrapping it: an <ol> may only contain <li>, and a div in between costs
               // the list its semantics for a screen reader.
-              <li key={item.step} className="h-full bg-surface">
+              <li key={item.step} className="group h-full bg-surface transition-colors duration-300 hover:bg-background">
                 <Reveal
                   amount={0.2}
                   delay={index * 70}
@@ -108,13 +117,13 @@ export function HowItWorksSection() {
                 >
                   <div className="flex items-center justify-between">
                     <span
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-sm bg-primary/8 text-primary"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary-soft text-primary ring-1 ring-primary/15 transition-transform duration-300 ease-spring-soft group-hover:-translate-y-0.5 group-hover:rotate-[-4deg] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-hover:rotate-0"
                       aria-hidden="true"
                     >
                       <Icon size={17} />
                     </span>
                     <span
-                      className="font-mono text-caption font-semibold text-locked/70"
+                      className="font-mono text-caption font-semibold text-border-strong transition-colors duration-300 group-hover:text-primary"
                       aria-hidden="true"
                     >
                       {String(item.step).padStart(2, '0')}
@@ -130,7 +139,7 @@ export function HowItWorksSection() {
                     </p>
                   </div>
 
-                  <p className="text-body-sm text-locked leading-relaxed mt-auto">
+                  <p className="text-body-sm text-ink-muted leading-relaxed mt-auto">
                     {item.description}
                   </p>
                 </Reveal>
@@ -142,7 +151,7 @@ export function HowItWorksSection() {
         {/* Supporting mechanics. A single quiet row rather than four more sections —
             these exist and help the story, but they are not the pitch. */}
         <Reveal amount={0.3} delay={120}>
-          <p className="mt-8 text-body-sm text-locked leading-relaxed max-w-[720px]">
+          <p className="mt-8 text-body-sm text-ink-muted leading-relaxed max-w-[720px] text-pretty">
             Along the way: daily streaks with freezes for the days life gets in the way,
             badges for real milestones, a skill radar across seven product competencies,
             a searchable glossary, and an optional leaderboard if that is what keeps you

@@ -25,7 +25,7 @@ export function ModuleCardPreview() {
       {/* Progress bar */}
       <div className="mb-3">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-caption text-locked">Progress</span>
+          <span className="text-caption text-ink-muted">Progress</span>
           <span className="text-caption font-medium text-foreground">42%</span>
         </div>
         <div className="h-1.5 bg-surface-muted rounded-full overflow-hidden">
@@ -40,13 +40,13 @@ export function ModuleCardPreview() {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
           <div className="w-1.5 h-1.5 rounded-full bg-skill-execution" />
-          <span className="text-caption text-locked">Execution</span>
+          <span className="text-caption text-ink-muted">Execution</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-1.5 h-1.5 rounded-full bg-skill-leadership" />
-          <span className="text-caption text-locked">Leadership</span>
+          <span className="text-caption text-ink-muted">Leadership</span>
         </div>
-        <span className="ml-auto text-caption text-locked">10 lessons</span>
+        <span className="ml-auto text-caption text-ink-muted">10 lessons</span>
       </div>
     </div>
   )

@@ -1,5 +1,13 @@
 import { FeatureCard } from '@/components/marketing/feature-card'
 import { Reveal } from '@/components/marketing/motion/reveal'
+import {
+  CONTAINER,
+  EYEBROW,
+  EYEBROW_RULE,
+  SECTION_LEAD,
+  SECTION_TITLE,
+  SECTION_Y,
+} from '@/components/marketing/styles'
 
 const COMPARISON_CARDS = [
   {
@@ -37,27 +45,28 @@ export function WhySection() {
     <section
       id="why"
       aria-labelledby="why-heading"
-      className="bg-background py-20 lg:py-28 border-t border-border/80 scroll-mt-24 lg:scroll-mt-28"
+      className={`bg-background ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
-      <div className="max-w-[1120px] mx-auto px-5 lg:px-8">
+      <div className={CONTAINER}>
         {/* Header */}
-        <Reveal amount={0.3} className="max-w-[760px] mx-auto text-center mb-14">
-          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-primary mb-3">
+        <Reveal amount={0.3} className="max-w-[800px] mx-auto text-center mb-16 flex flex-col items-center">
+          <div className={`${EYEBROW} mb-4`}>
+            <span aria-hidden="true" className={EYEBROW_RULE} />
             THE TRADE-OFF YOU SHOULDN&apos;T HAVE TO MAKE
           </div>
           <h2
             id="why-heading"
-            className="font-display text-h1 lg:text-display-lg font-semibold text-foreground mb-4"
+            className={`${SECTION_TITLE} mb-5`}
           >
             Self-study gives you information. Bootcamps give you structure. Prodily gives you a path to practice and proof.
           </h2>
-          <p className="text-body-lg text-locked leading-relaxed">
+          <p className={`${SECTION_LEAD} max-w-[680px]`}>
             Product management is easy to study badly. You can collect hundreds of videos, frameworks, and opinions without ever building a coherent mental model or producing work of your own. Paid programs solve some of the structure problem, but they can be expensive. Prodily combines a structured curriculum with applied practice and portfolio output, without putting the core learning path behind a paywall.
           </p>
         </Reveal>
 
         {/* Comparison cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 items-stretch pt-3">
           {COMPARISON_CARDS.map((card, i) => (
             <Reveal key={card.title} amount={0.2} delay={i * 80} className="h-full">
               <FeatureCard

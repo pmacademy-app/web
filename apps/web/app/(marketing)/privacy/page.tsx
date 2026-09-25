@@ -43,18 +43,18 @@ export default function PrivacyPage() {
         <h1 className="text-4xl md:text-5xl font-bold font-serif text-foreground">
           Privacy Policy
         </h1>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-ink-muted">
           Last updated: {LEGAL_DOCS_REVISION_LABEL} • Version {PRIVACY_VERSION} • {BRAND.fullName}
         </p>
       </div>
 
       {/* Main Content */}
-      <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-sm text-muted-foreground leading-relaxed">
+      <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-sm text-ink-muted leading-relaxed">
         <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 text-foreground space-y-2">
           <p className="font-semibold text-sm">
             Core Privacy Principle
           </p>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-xs text-ink-muted leading-relaxed">
             {BRAND.fullName} is designed around learner data ownership and privacy. We do not sell, rent, or trade your personal data. Your learning progress, spaced-repetition (SRS) records, quiz answers, and private reflection notes belong strictly to you.
           </p>
         </div>
@@ -224,14 +224,14 @@ export default function PrivacyPage() {
                 {GRIEVANCE_CONTACT.officerTitle ?? 'Grievance & Privacy Contact'}
               </p>
               {GRIEVANCE_CONTACT.officerName ? (
-                <p className="text-xs text-muted-foreground">{GRIEVANCE_CONTACT.officerName}</p>
+                <p className="text-xs text-ink-muted">{GRIEVANCE_CONTACT.officerName}</p>
               ) : (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-ink-muted">
                   A named grievance officer has not yet been designated. Until one is, requests are handled directly by the Platform operator at the address below.
                 </p>
               )}
               {LEGAL_OPERATOR.address && (
-                <p className="text-xs text-muted-foreground">{LEGAL_OPERATOR.address}</p>
+                <p className="text-xs text-ink-muted">{LEGAL_OPERATOR.address}</p>
               )}
             </div>
             <a
@@ -241,7 +241,7 @@ export default function PrivacyPage() {
               {GRIEVANCE_CONTACT.email ?? BRAND.supportEmail}
             </a>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <p className="text-[11px] text-ink-muted leading-relaxed">
             This Privacy Policy reflects a September 2026 internal legal and privacy audit and is pending review by qualified counsel before the Platform&apos;s final public launch. It is the operator&apos;s current, good-faith description of how the Service handles data, not legal advice.
           </p>
         </section>
@@ -252,7 +252,7 @@ export default function PrivacyPage() {
         <Link href="/" className="font-bold text-primary hover:underline">
           ← Back to Homepage
         </Link>
-        <Link href="/terms" className="font-bold text-muted-foreground hover:text-foreground">
+        <Link href="/terms" className="font-bold text-ink-muted hover:text-foreground">
           View Terms of Service →
         </Link>
       </div>

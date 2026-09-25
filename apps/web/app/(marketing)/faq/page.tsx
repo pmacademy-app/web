@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { BUTTON_PRIMARY, BUTTON_SECONDARY } from '@/components/marketing/styles'
 import { BRAND } from '@/lib/brand'
 import { FAQ_ITEMS } from '@/config/content'
 import { FAQExplorer } from '@/components/marketing/faq-explorer'
@@ -59,7 +60,7 @@ export default function FAQPage() {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(faqJsonLd) }}
       />
 
-      <main className="container mx-auto px-5 lg:px-8 pt-24 pb-20 lg:pt-32 lg:pb-28 max-w-4xl space-y-12">
+      <div className="container mx-auto px-5 lg:px-8 pt-24 pb-20 lg:pt-32 lg:pb-28 max-w-4xl space-y-12">
         
         {/* ── Page Header ──────────────────────────────────────────────── */}
         <header className="space-y-4">
@@ -71,7 +72,7 @@ export default function FAQPage() {
             Frequently Asked Questions
           </h1>
 
-          <p className="text-base sm:text-lg text-[#70685A] leading-relaxed max-w-2xl">
+          <p className="text-base sm:text-lg text-ink-muted leading-relaxed max-w-2xl">
             Everything you need to know about the curriculum, applied work, portfolio, and access.
           </p>
         </header>
@@ -80,12 +81,12 @@ export default function FAQPage() {
         <FAQExplorer />
 
         {/* ── Still Have Questions & Contact Box ───────────────────────── */}
-        <section className="rounded-2xl border border-[#DED8CB] bg-white p-8 sm:p-10 shadow-xs space-y-6">
+        <section className="rounded-2xl border border-border bg-surface p-8 sm:p-10 shadow-xs space-y-6">
           <div className="space-y-2">
             <h2 className="text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
               Still have a question?
             </h2>
-            <p className="text-sm sm:text-base text-[#70685A] leading-relaxed">
+            <p className="text-sm sm:text-base text-ink-muted leading-relaxed">
               Get in touch and we&apos;ll help you find the answer.
             </p>
           </div>
@@ -93,13 +94,7 @@ export default function FAQPage() {
           <div className="flex flex-wrap items-center gap-3.5 pt-1">
             <Link
               href="/contact"
-              className="
-                inline-flex items-center gap-2 px-5 py-3
-                bg-primary text-white font-semibold text-sm rounded-lg
-                shadow-[0_2px_12px_rgba(31,107,78,0.25)]
-                hover:bg-[#18553E] hover:shadow-[0_4px_20px_rgba(31,107,78,0.35)]
-                active:scale-[0.98] transition-all duration-150
-              "
+              className={BUTTON_PRIMARY}
             >
               <span>Get in Touch</span>
               <MessageCircle size={15} />
@@ -107,12 +102,7 @@ export default function FAQPage() {
 
             <Link
               href="/curriculum"
-              className="
-                inline-flex items-center gap-2 px-5 py-3
-                bg-white text-foreground font-semibold text-sm rounded-lg
-                border border-[#DED8CB] hover:border-[#BDB4A2] hover:bg-[#F2EFE7]
-                active:scale-[0.98] transition-all duration-150
-              "
+              className={BUTTON_SECONDARY}
             >
               <span>Explore Curriculum</span>
               <ArrowRight size={15} />
@@ -120,7 +110,7 @@ export default function FAQPage() {
           </div>
         </section>
 
-      </main>
+      </div>
     </div>
   )
 }

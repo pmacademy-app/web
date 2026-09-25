@@ -31,9 +31,10 @@ export function ModuleCard({ module, className }: ModuleCardProps) {
   return (
     <article
       className={cn(
-        'group relative bg-surface border border-border rounded-xl p-5',
-        'hover:-translate-y-0.5 hover:border-border-strong hover:shadow-sm',
-        'transition-all duration-[180ms]',
+        'group relative bg-surface border border-border rounded-xl p-5 lg:p-6',
+        'hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[0_12px_32px_-12px_rgba(23,26,23,0.16)]',
+        'transition-[transform,box-shadow,border-color] duration-300 ease-out-quint',
+        'motion-reduce:transition-colors motion-reduce:hover:translate-y-0',
         'focus-within:ring-2 focus-within:ring-focus',
         'flex flex-col h-full',
         className,
@@ -44,20 +45,20 @@ export function ModuleCard({ module, className }: ModuleCardProps) {
         <div className="flex items-center gap-2.5">
           <div
             className="
-              w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
-              bg-primary/10 border border-primary/20 text-primary group-hover:bg-primary group-hover:text-primary-foreground
-              transition-colors duration-[180ms]
+              w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0
+              bg-primary-soft border border-primary/20 text-primary group-hover:bg-primary group-hover:text-primary-foreground
+              transition-colors duration-300
             "
           >
             <CurriculumModuleIcon slugOrIcon={moduleSlug} className="w-4 h-4" />
           </div>
-          <span className="text-caption font-mono font-bold text-locked uppercase tracking-wider">
+          <span className="text-caption font-mono font-semibold text-ink-muted uppercase tracking-wider">
             Module {numberStr}
           </span>
         </div>
 
         {/* Time */}
-        <span className="text-caption text-locked font-mono font-medium flex-shrink-0">{module.estimatedTime}</span>
+        <span className="text-caption text-ink-muted font-mono font-medium flex-shrink-0">{module.estimatedTime}</span>
       </div>
 
       {/* Title with consistent height */}
@@ -92,17 +93,18 @@ export function ModuleCard({ module, className }: ModuleCardProps) {
 
       {/* Spacer to push footer cleanly to bottom */}
       <div className="mt-auto pt-2">
-        {/* Progress bar (decorative) */}
-        <div className="h-1 bg-surface-muted rounded-full mb-3.5 overflow-hidden">
-          <div className="h-full w-0 bg-primary rounded-full" />
+        {/* Decorative rule that draws in on hover. Transform only; static for
+            reduced-motion users. */}
+        <div aria-hidden="true" className="h-px bg-border mb-3.5 overflow-hidden">
+          <div className="h-full w-full origin-left scale-x-0 bg-primary transition-transform duration-500 ease-out-quint group-hover:scale-x-100 motion-reduce:transition-none" />
         </div>
 
         {/* Outcome & lesson count footer */}
         <div className="flex items-center justify-between gap-3 min-h-[2rem]">
-          <p className="text-caption text-locked leading-snug flex-1">
+          <p className="text-caption text-ink-muted leading-snug flex-1">
             Outcome: {module.outcome}
           </p>
-          <span className="text-caption text-locked font-mono flex-shrink-0 whitespace-nowrap">
+          <span className="text-caption text-ink-muted font-mono flex-shrink-0 whitespace-nowrap">
             {module.lessonCount} lessons
           </span>
         </div>
