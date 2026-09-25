@@ -72,7 +72,7 @@ jobs:
         # decides what counts as "patch or minor" here is a supply-chain hole: whoever
         # can move the tag can change this workflow's merge criteria without a PR.
         # Re-pin deliberately when bumping, and re-verify the SHA against the tag.
-        uses: dependabot/fetch-metadata@21025c705c08248db411dc16f3619e6b5f9ea21a # v2.5.0
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
