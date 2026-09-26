@@ -166,7 +166,8 @@ describe('Notification Platform Foundation Unit Test Suite', () => {
 
   it('isChannelEnabledByPreferences evaluates category channel permissions', () => {
     const prefs = createDefaultNotificationPreferences('user-100')
-    expect(isChannelEnabledByPreferences(prefs, 'learning', 'email')).toBe(false)
+    // Phase 1.2: learning email defaults to true (reconnect the return path).
+    expect(isChannelEnabledByPreferences(prefs, 'learning', 'email')).toBe(true)
     expect(isChannelEnabledByPreferences(prefs, 'security', 'email')).toBe(true)
     expect(isChannelEnabledByPreferences(prefs, 'marketing', 'email')).toBe(false)
 

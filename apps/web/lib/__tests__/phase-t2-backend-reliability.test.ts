@@ -99,21 +99,26 @@ describe('Phase T2 — Core Backend Reliability Regression Suite', () => {
       expect(prefs.allNotifications).toBe(true)
       expect(prefs.allEmail).toBe(true)
       expect(prefs.allInApp).toBe(true)
-      // Default: learning & achievements email are FALSE, inApp is TRUE
-      expect(prefs.learning.email).toBe(false)
+      // Phase 1.2: learning & achievements email now DEFAULT to TRUE (reconnect the
+      // return path). inApp remains true.
+      expect(prefs.learning.email).toBe(true)
       expect(prefs.learning.inApp).toBe(true)
-      expect(prefs.achievements.email).toBe(false)
+      expect(prefs.achievements.email).toBe(true)
       expect(prefs.achievements.inApp).toBe(true)
       // Security is always true
       expect(prefs.security.email).toBe(true)
       expect(prefs.security.inApp).toBe(true)
+      // Marketing remains opt-in only
+      expect(prefs.marketing.email).toBe(false)
 
-      expect(isChannelEnabledByPreferences(prefs, 'learning', 'email')).toBe(false)
+      expect(isChannelEnabledByPreferences(prefs, 'learning', 'email')).toBe(true)
       expect(isChannelEnabledByPreferences(prefs, 'learning', 'in_app')).toBe(true)
       expect(isChannelEnabledByPreferences(prefs, 'security', 'email')).toBe(true)
     })
 
-    it('State 2: Explicit preference row matching defaults is respected', () => {
+    it('State 2: Explicit stored opt-out (learning/achievements email false) is respected over the new default', () => {
+      // A learner who explicitly disabled learning/achievement email keeps that
+      // choice — the Phase 1.2 default only applies when the value is genuinely absent.
       const dbRow = {
         user_id: 'user-2',
         all_notifications: true,
@@ -194,8 +199,8 @@ describe('Phase T2 — Core Backend Reliability Regression Suite', () => {
       expect(map.size).toBe(3)
       expect(map.get('u1')?.learning.email).toBe(true)
       expect(map.get('u2')?.allEmail).toBe(false)
-      // u3 not in DB -> falls back to default
-      expect(map.get('u3')?.learning.email).toBe(false)
+      // u3 not in DB -> falls back to default (Phase 1.2: learning email defaults true)
+      expect(map.get('u3')?.learning.email).toBe(true)
     })
 
     it('enqueueNotificationItem respects explicit opt-in for learning email', async () => {

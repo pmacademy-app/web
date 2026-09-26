@@ -6,17 +6,20 @@ import type { NotificationCategory, NotificationChannel } from '../types'
  *
  * Communication hierarchy:
  *   PRIMARY  → In-App Notifications (all learning events)
- *   SECONDARY → Email (Auth/Security, Major Milestones, Weekly Recap, Admin broadcasts only)
- *
- * Email is disabled by default for:
- *   - lesson.completed, quiz.completed, review.completed (In-App only)
- *   - badge.earned, xp.level_up, streak.* (In-App only)
+ *   SECONDARY → Email (Auth/Security, Learning, Achievements, Major Milestones,
+ *               Weekly Recap, Admin broadcasts)
  *
  * Email is enabled by default for:
  *   - Security: welcome, verify, password reset, suspicious login (always on)
+ *   - Learning: daily reminder + weekly recap (the return path — Phase 1.2)
+ *   - Achievements: badge earned, level up, milestones (Phase 1.2)
  *   - Major milestones: module.completed, certificate.generated, portfolio.published
- *   - Weekly learning recap (max once/week, meaningful activity required)
  *   - Admin product announcements (manually triggered)
+ *
+ * Phase 1.2 note: `learning.email` and `achievements.email` now default to `true`.
+ * This changes ONLY the absence-of-preference fallback — a stored explicit `false`
+ * (opt-out) or `true` is always honoured by `mapDbRowToNotificationPreferences`, and
+ * the unsubscribe / suppression paths remain authoritative. Marketing stays opt-in.
  */
 export function createDefaultNotificationPreferences(userId: string): UserNotificationPreferences {
   return {
@@ -26,11 +29,11 @@ export function createDefaultNotificationPreferences(userId: string): UserNotifi
     allInApp: true,
     // Security: always email + in-app (non-negotiable)
     security: { email: true, inApp: true },
-    // Learning events: In-App only. Email disabled (lesson/quiz/review/streak/flashcard are in-app)
-    learning: { email: false, inApp: true },
-    // Achievements: In-App only. Badge earned, XP level up are in-app.
-    // Major module completion emails handled by certificates/portfolio channels.
-    achievements: { email: false, inApp: true },
+    // Learning events: email + in-app by default (Phase 1.2 — reconnect the return
+    // path so daily reminders / weekly recaps actually reach lapsed learners).
+    learning: { email: true, inApp: true },
+    // Achievements: email + in-app by default (Phase 1.2 — badge/level-up milestones).
+    achievements: { email: true, inApp: true },
     // Portfolio published: email + in-app (major milestone)
     portfolio: { email: true, inApp: true },
     // Certificate generated: email + in-app (major milestone)

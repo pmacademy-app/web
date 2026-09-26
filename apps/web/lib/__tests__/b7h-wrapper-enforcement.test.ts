@@ -180,15 +180,17 @@ describe('B7-H — the repository satisfies the rule it just adopted', () => {
   // 128 since B13-A added `user/quick-start/route.ts`: `QuickStartContext` used to
   // write the completion flag with a browser-held Supabase session, which B13-A
   // removed, so the write needed a server route. It uses `withRoute` like the rest.
-  it('accounts for all 128 routes', () => {
-    expect(files).toHaveLength(128)
-    expect(migrated).toHaveLength(125)
+  // 129 since Phase 1.5 added `cron/lifecycle/route.ts` (also on `withRoute`).
+  it('accounts for all 129 routes', () => {
+    expect(files).toHaveLength(129)
+    expect(migrated).toHaveLength(126)
   })
 
   it('keeps each wave at the size its own suite asserts', () => {
     const inGroup = (prefix: string) => migrated.filter((f) => f.startsWith(prefix)).length
 
-    expect(inGroup('cron/')).toBe(6)
+    // 7 cron routes since Phase 1.5 added the lifecycle reactivation cron.
+    expect(inGroup('cron/')).toBe(7)
     expect(inGroup('auth/')).toBe(8)
     expect(inGroup('settings/')).toBe(11)
     expect(inGroup('admin/')).toBe(61)

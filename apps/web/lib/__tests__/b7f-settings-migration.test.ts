@@ -240,7 +240,8 @@ describe('B7-F — migration scope', () => {
   it('keeps the cron and auth waves intact', () => {
     const migrated = routeFilesImporting('@/lib/api/with-route')
 
-    expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(6)
+    // 7 cron routes since Phase 1.5 added the lifecycle reactivation cron.
+    expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(7)
     expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(8)
   })
 })

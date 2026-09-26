@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       job_to_run:
-        description: 'Specific job to trigger (queue, broadcasts, retry, daily, weekly, cleanup, all)'
+        description: 'Specific job to trigger (queue, broadcasts, retry, daily, weekly, lifecycle, cleanup, all)'
         required: false
         default: 'all'
 
@@ -117,6 +117,27 @@ jobs:
           SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
           SITE_URL="${SITE_URL%/}"
           curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/weekly-recap" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+  lifecycle-sequences:
+    name: Queue Lifecycle Reactivation Sequences
+    # Runs hourly on the shared '30 * * * *' trigger. The endpoint gates each user on
+    # their LOCAL preferred hour and dedupes with a lifecycle-<seq>-<user>-<localDate>
+    # idempotency key, so hourly invocation sends at most one lifecycle email per user
+    # per day. A 30% deterministic holdout is applied per sequence for measurement.
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '30 * * * *' ||
+      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'lifecycle')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Lifecycle Endpoint
+        run: |
+          RAW_URL="${{ secrets.PRODUCTION_SITE_URL || secrets.APP_URL }}"
+          SITE_URL="${RAW_URL:-https://prodily.adityagangwani.me}"
+          SITE_URL="${SITE_URL%/}"
+          curl --fail-with-body -s -S -X POST "${SITE_URL}/api/cron/lifecycle" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 

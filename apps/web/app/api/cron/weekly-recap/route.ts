@@ -60,6 +60,7 @@ export const POST = withRoute(
     const supabase = createServiceRoleClient()
     let recapsQueued = 0
     let recapsSkippedTimezone = 0
+    let recapsSkippedNoActivity = 0
 
     const startTime = Date.now()
     const weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
@@ -150,6 +151,17 @@ export const POST = withRoute(
 
           const xpEarnedThisWeek = xpMap.get(user.id) || 0
           const lessonsCompletedCount = lessonMap.get(user.id) || 0
+
+          // Phase 1.4 — suppress zero-value recaps. A "0 lessons, 0 XP this week"
+          // summary is noise that trains learners to ignore the channel and inflates
+          // unsubscribe/complaint rates. Only mail a recap when there is meaningful
+          // activity to report. (Timezone gating above already ran, so this does not
+          // affect delivery timing for active learners.)
+          if (xpEarnedThisWeek <= 0 && lessonsCompletedCount <= 0) {
+            recapsSkippedNoActivity++
+            continue
+          }
+
           const idempotencyKey = `weekly-recap-${user.id}-${userLocalTime.localDate}`
 
           const result = await enqueueNotificationItem({
@@ -195,6 +207,8 @@ export const POST = withRoute(
       success: true,
       timestamp: new Date().toISOString(),
       recapsQueued,
+      recapsSkippedTimezone,
+      recapsSkippedNoActivity,
     })
   }
 )

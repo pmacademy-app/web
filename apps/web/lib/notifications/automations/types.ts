@@ -11,6 +11,10 @@ export type EmailAutomationKey =
   | 'learning.weekly_recap'
   | 'learning.daily_reminder'
   | 'inactive.resume_learning'
+  // Phase 1.5 lifecycle reactivation sequences
+  | 'lifecycle.d1_never_started'
+  | 'lifecycle.d3_started_not_finished'
+  | 'lifecycle.streak_broken'
 
 export interface EmailAutomationMeta {
   key: EmailAutomationKey

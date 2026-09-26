@@ -206,7 +206,8 @@ describe('B7-G1 — migration scope', () => {
    * and that G2 did not shrink G1 — asserted above and below.
    */
   it('leaves every earlier wave intact', () => {
-    expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(6)
+    // 7 cron routes since Phase 1.5 added the lifecycle reactivation cron.
+    expect(migrated.filter((f) => f.startsWith('cron/'))).toHaveLength(7)
     expect(migrated.filter((f) => f.startsWith('auth/'))).toHaveLength(8)
     expect(migrated.filter((f) => f.startsWith('settings/'))).toHaveLength(11)
   })
