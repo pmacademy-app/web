@@ -67,7 +67,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
   const queue = await AdminConsoleService.getEmailQueueOverview()
 
   // Fetch per-tab data in parallel; each service degrades to empty fallbacks.
-  const [overview, emailHistory, volumeSeries, automationsState, templates, notificationEvents, contactMessages, announcementsData, broadcastsData, inAppData] =
+  const [overview, emailHistory, volumeSeries, automationsState, lifecycleMetrics, templates, notificationEvents, contactMessages, announcementsData, broadcastsData, inAppData] =
     await Promise.all([
       tab === 'overview' ? CommunicationsService.getCommunicationsOverview() : Promise.resolve(null),
       tab === 'email' || tab === 'queue'
@@ -80,6 +80,7 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
         : Promise.resolve(null),
       tab === 'email' ? CommunicationsService.getEmailVolumeSeries(14) : Promise.resolve([]),
       tab === 'automations' ? EmailAutomationsService.getState() : Promise.resolve(null),
+      tab === 'automations' ? CommunicationsService.getLifecycleMetrics() : Promise.resolve(null),
       tab === 'templates' || tab === 'broadcasts' ? CommunicationsService.getTemplateList() : Promise.resolve([]),
       tab === 'in-app' ? CommunicationsService.getNotificationEvents(50) : Promise.resolve([]),
       tab === 'contact' ? CommunicationsService.getContactMessages(100) : Promise.resolve([]),
@@ -169,7 +170,9 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
       )}
 
       {/* Automations */}
-      {tab === 'automations' && automationsState && <AdminEmailAutomationsView initialState={automationsState} />}
+      {tab === 'automations' && automationsState && (
+        <AdminEmailAutomationsView initialState={automationsState} lifecycleMetrics={lifecycleMetrics} />
+      )}
 
       {/* Templates */}
       {tab === 'templates' && (
@@ -207,8 +210,8 @@ export default async function AdminCommunicationsPage({ searchParams }: PageProp
 
               <div className="p-4 rounded-lg bg-admin-bg/60 border border-admin-border flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-admin-fg">Scheduled Automations (`learning.weekly_recap`, `learning.daily_reminder`, `inactive.resume_learning`)</p>
-                  <p className="text-admin-fg-muted">Not events — dispatched by the scheduler on a cadence, not by learner activity.</p>
+                  <p className="font-bold text-admin-fg">Scheduled Automations (`learning.weekly_recap`, `learning.daily_reminder`, `lifecycle.d1_never_started`, `lifecycle.d3_started_not_finished`, `lifecycle.streak_broken`)</p>
+                  <p className="text-admin-fg-muted">Not events — dispatched by the scheduler on a cadence, not by learner activity. Lifecycle sequences run a 30% holdout (see the Automations tab).</p>
                 </div>
                 <AdminStatusBadge status="info" label="Scheduled" />
               </div>

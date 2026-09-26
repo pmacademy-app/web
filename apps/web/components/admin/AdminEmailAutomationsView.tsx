@@ -11,6 +11,8 @@ import {
   Calendar,
   Save,
   Loader2,
+  Repeat,
+  FlaskConical,
 } from 'lucide-react'
 import { useAdminToast } from './admin-toast'
 import { apiPost } from '@/lib/api/client'
@@ -19,9 +21,12 @@ import type {
   EmailAutomationMeta,
   EmailDigestSchedules,
 } from '@/lib/notifications/automations/types'
+import type { AdminLifecycleMetrics } from '@/lib/admin/communications-service'
 
 interface AdminEmailAutomationsViewProps {
   initialState: EmailAutomationsState
+  /** Read-only Phase 1 lifecycle metrics (treatment/holdout/delivery). Optional. */
+  lifecycleMetrics?: AdminLifecycleMetrics | null
 }
 
 const DAYS_OF_WEEK = [
@@ -34,7 +39,7 @@ const DAYS_OF_WEEK = [
   { value: 6, label: 'Saturday' },
 ]
 
-export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomationsViewProps) {
+export function AdminEmailAutomationsView({ initialState, lifecycleMetrics }: AdminEmailAutomationsViewProps) {
   const { toast } = useAdminToast()
   const [state, setState] = useState<EmailAutomationsState>(initialState)
   const [schedules, setSchedules] = useState<EmailDigestSchedules>(
@@ -168,6 +173,11 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
 
   const criticalAuth = state.automations.filter((a) => a.isCritical)
   const optionalTransactional = state.automations.filter((a) => !a.isCritical && a.category === 'Transactional' && !a.isDeferred)
+  // Phase 1.5 lifecycle reactivation sequences (Scheduled category, `lifecycle.*`).
+  // Surfaced separately so admins can enable/disable each one and see its holdout.
+  const lifecycleSequences = state.automations.filter((a) => a.key.startsWith('lifecycle.'))
+  const metricByKey = new Map((lifecycleMetrics?.sequences || []).map((m) => [m.key, m]))
+  const holdoutPercent = lifecycleMetrics?.holdoutPercent ?? 30
 
   return (
     <div className="space-y-8">
@@ -517,6 +527,101 @@ export function AdminEmailAutomationsView({ initialState }: AdminEmailAutomation
           ))}
         </div>
       </div>
+
+      {/* Section 4: Lifecycle Reactivation Sequences (Phase 1.5) */}
+      {lifecycleSequences.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Repeat className="w-4 h-4 text-admin-accent" />
+            <h3 className="text-sm font-bold text-admin-fg uppercase tracking-wider">Lifecycle Reactivation Sequences</h3>
+          </div>
+
+          {/* Read-only experiment design banner — holdout is code-controlled */}
+          <div className="p-4 rounded-xl bg-admin-info-soft/40 border border-admin-info/25 flex items-start gap-3">
+            <FlaskConical className="w-4 h-4 text-admin-info shrink-0 mt-0.5" />
+            <div className="space-y-1 text-xs text-admin-fg-muted">
+              <p className="font-bold text-admin-fg">
+                Each sequence runs a deterministic {holdoutPercent}% holdout
+                {' '}(≈{100 - holdoutPercent}% treatment / ≈{holdoutPercent}% holdout).
+              </p>
+              <p>
+                Assignment is a stable hash of the user ID and the sequence key, so a user never
+                moves between treatment and holdout across runs, and each sequence is bucketed
+                independently. Holdout users still receive all normal notifications — only the
+                sequence being tested is withheld. The holdout share is configured in code and is
+                shown here read-only.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {lifecycleSequences.map((item) => (
+              <AutomationCard
+                key={item.key}
+                item={item}
+                loadingKey={loadingKey}
+                onToggle={() => handleToggleAutomation(item.key, item.enabled)}
+              />
+            ))}
+          </div>
+
+          {/* Read-only operational metrics (accurate counts from existing data) */}
+          {lifecycleMetrics && (
+            <div className="rounded-xl border border-admin-border bg-admin-surface overflow-hidden">
+              <div className="px-4 py-3 border-b border-admin-border">
+                <h4 className="text-xs font-bold text-admin-fg uppercase tracking-wider">Sequence Metrics</h4>
+                <p className="text-[11px] text-admin-fg-muted mt-0.5">
+                  Treatment sends and recorded holdout assignments, derived from the email queue and
+                  notification events.
+                </p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-left text-admin-fg-subtle border-b border-admin-border">
+                      <th className="px-4 py-2 font-semibold">Sequence</th>
+                      <th className="px-4 py-2 font-semibold text-right">Treated</th>
+                      <th className="px-4 py-2 font-semibold text-right">Delivered</th>
+                      <th className="px-4 py-2 font-semibold text-right">Failed</th>
+                      <th className="px-4 py-2 font-semibold text-right">Holdout</th>
+                      <th className="px-4 py-2 font-semibold text-right">Observed split</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {lifecycleSequences.map((item) => {
+                      const m = metricByKey.get(item.key)
+                      const treated = m?.treated ?? 0
+                      const holdout = m?.holdout ?? 0
+                      const total = treated + holdout
+                      const treatedPct = total > 0 ? Math.round((treated / total) * 100) : null
+                      return (
+                        <tr key={item.key} className="border-b border-admin-border/60 last:border-0">
+                          <td className="px-4 py-2.5">
+                            <span className="font-semibold text-admin-fg">{item.name}</span>
+                            <span className="block text-[10px] font-mono text-admin-fg-subtle">{item.key}</span>
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-mono text-admin-fg">{treated}</td>
+                          <td className="px-4 py-2.5 text-right font-mono text-admin-success">{m?.delivered ?? 0}</td>
+                          <td className="px-4 py-2.5 text-right font-mono text-admin-danger">{m?.failed ?? 0}</td>
+                          <td className="px-4 py-2.5 text-right font-mono text-admin-fg">{holdout}</td>
+                          <td className="px-4 py-2.5 text-right font-mono text-admin-fg-muted">
+                            {treatedPct === null ? '—' : `${treatedPct}% / ${100 - treatedPct}%`}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-4 py-2.5 border-t border-admin-border text-[11px] text-admin-fg-subtle">
+                &ldquo;Observed split&rdquo; is treatment vs holdout among assigned users; it converges on
+                ≈{100 - holdoutPercent}% / ≈{holdoutPercent}% as volume grows. Empty until the lifecycle
+                cron has run.
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

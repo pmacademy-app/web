@@ -9,7 +9,8 @@
 
 import { createServiceRoleClient } from '@/lib/supabase'
 import { EMAIL_TEMPLATE_MAP, renderEmailTemplate } from '@/emails'
-import { AUTOMATION_METADATA } from '@/lib/notifications/automations/service'
+import { AUTOMATION_METADATA, EmailAutomationsService } from '@/lib/notifications/automations/service'
+import { DEFAULT_LIFECYCLE_HOLDOUT_PERCENT } from '@/lib/notifications/lifecycle/holdout'
 import { BRAND } from '@/lib/brand'
 import type { AdminAttentionItem } from './types'
 import {
@@ -90,7 +91,29 @@ export interface AdminNotificationEventItem {
   payload: Record<string, unknown>
 }
 
+/** Per-sequence operational counts for a Phase 1 lifecycle reactivation automation. */
+export interface AdminLifecycleSequenceMetric {
+  key: string
+  name: string
+  /** Treatment sends that entered the email queue (any status) for this sequence. */
+  treated: number
+  /** Delivered treatment sends. */
+  delivered: number
+  /** Failed + dead-lettered treatment sends. */
+  failed: number
+  /** Recorded holdout assignments (notification_events, reason `lifecycle_holdout:<key>`). */
+  holdout: number
+}
+
+export interface AdminLifecycleMetrics {
+  /** Configured holdout share (read-only; code-controlled, not editable from Admin). */
+  holdoutPercent: number
+  sequences: AdminLifecycleSequenceMetric[]
+}
+
 export interface AdminCommunicationsOverview {
+  /** Global non-critical email pause state (safety signal shown on the overview). */
+  globalPause: boolean
   kpis: {
     emailsSent: number
     pending: number
@@ -514,12 +537,77 @@ export class CommunicationsService {
   }
 
   /**
+   * Read-only operational metrics for the Phase 1 lifecycle reactivation sequences.
+   *
+   * Every number is derived directly from existing production data — no analytics
+   * are invented:
+   *   - treated / delivered / failed come from `email_queue` filtered by the
+   *     sequence's `template_key` (treatment sends that entered the queue).
+   *   - holdout comes from the `notification_events` rows the lifecycle cron writes
+   *     with `skipped_reason = 'lifecycle_holdout:<key>'`.
+   *
+   * The `holdoutPercent` is the code-controlled constant, surfaced read-only so an
+   * admin can see the experiment design without being able to alter it here.
+   */
+  public static async getLifecycleMetrics(): Promise<AdminLifecycleMetrics> {
+    const supabase = createServiceRoleClient()
+    const sequencesMeta = AUTOMATION_METADATA.filter((a) => a.key.startsWith('lifecycle.'))
+
+    const emptyResult: AdminLifecycleMetrics = {
+      holdoutPercent: DEFAULT_LIFECYCLE_HOLDOUT_PERCENT,
+      sequences: sequencesMeta.map((m) => ({
+        key: m.key,
+        name: m.name,
+        treated: 0,
+        delivered: 0,
+        failed: 0,
+        holdout: 0,
+      })),
+    }
+
+    try {
+      const sequences = await Promise.all(
+        sequencesMeta.map(async (meta) => {
+          const [treated, delivered, failed, holdout] = await Promise.all([
+            supabase.from('email_queue').select('id', { count: 'exact', head: true }).eq('template_key', meta.key),
+            supabase
+              .from('email_queue')
+              .select('id', { count: 'exact', head: true })
+              .eq('template_key', meta.key)
+              .eq('status', 'delivered'),
+            supabase
+              .from('email_queue')
+              .select('id', { count: 'exact', head: true })
+              .eq('template_key', meta.key)
+              .in('status', ['failed', 'dead_letter']),
+            supabase
+              .from('notification_events')
+              .select('id', { count: 'exact', head: true })
+              .eq('skipped_reason', `lifecycle_holdout:${meta.key}`),
+          ])
+          return {
+            key: meta.key,
+            name: meta.name,
+            treated: treated.count || 0,
+            delivered: delivered.count || 0,
+            failed: failed.count || 0,
+            holdout: holdout.count || 0,
+          }
+        })
+      )
+      return { holdoutPercent: DEFAULT_LIFECYCLE_HOLDOUT_PERCENT, sequences }
+    } catch {
+      return emptyResult
+    }
+  }
+
+  /**
    * Overview KPIs + attention rows + recent communication activity.
    */
   public static async getCommunicationsOverview(): Promise<AdminCommunicationsOverview> {
     const supabase = createServiceRoleClient()
     try {
-      const [totalEmails, pending, failed, contact, testimonials, recentEmails, recentContact, recentEvents] =
+      const [totalEmails, pending, failed, contact, testimonials, recentEmails, recentContact, recentEvents, globalPause] =
         await Promise.all([
           // Full ledger count — "Emails sent" covers every status (pending,
           // processing, retrying, delivered, failed, dead_letter, suppressed,
@@ -547,6 +635,8 @@ export class CommunicationsService {
             .select('id, event_type, skipped_reason, created_at')
             .order('created_at', { ascending: false })
             .limit(6),
+          // Global non-critical email pause — surfaced as a safety signal on the overview.
+          EmailAutomationsService.isGlobalPauseActive(),
         ])
 
       const emailsSent = totalEmails.count || 0
@@ -615,6 +705,7 @@ export class CommunicationsService {
       recentActivity.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
 
       return {
+        globalPause: Boolean(globalPause),
         kpis: {
           emailsSent,
           pending: pending.count || 0,
@@ -627,6 +718,7 @@ export class CommunicationsService {
       }
     } catch {
       return {
+        globalPause: false,
         kpis: { emailsSent: 0, pending: 0, failed: 0, newContactMessages: 0, pendingTestimonials: 0 },
         attention: [],
         recentActivity: [],

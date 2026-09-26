@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Mail, Clock, AlertTriangle, MessageSquare, Star, Activity, ArrowRight } from 'lucide-react'
+import { Mail, Clock, AlertTriangle, MessageSquare, Star, Activity, ArrowRight, PauseCircle, CheckCircle2 } from 'lucide-react'
 import { AdminKpiCard } from './AdminKpiCard'
 import { AdminSection } from './AdminSection'
 import { AdminAttentionCenter } from './AdminAttentionCenter'
@@ -20,10 +20,43 @@ const ACTIVITY_ICONS: Record<AdminCommunicationsOverview['recentActivity'][numbe
 }
 
 export function AdminCommunicationsOverview({ data }: AdminCommunicationsOverviewProps) {
-  const { kpis, attention, recentActivity } = data
+  const { kpis, attention, recentActivity, globalPause } = data
 
   return (
     <div className="space-y-6">
+      {/* Global email delivery status — the primary safety signal. Paused halts all
+          non-critical mail (reminders, recaps, lifecycle sequences); critical auth
+          emails always continue. Links to the master switch on the Automations tab. */}
+      <Link
+        href="/admin/communications?tab=automations"
+        className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 transition-colors ${
+          globalPause
+            ? 'bg-admin-warning-soft border-admin-warning/30 hover:bg-admin-warning-soft/80'
+            : 'bg-admin-surface border-admin-border hover:bg-admin-surface-raised'
+        }`}
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          {globalPause ? (
+            <PauseCircle className="w-4 h-4 text-admin-warning shrink-0" />
+          ) : (
+            <CheckCircle2 className="w-4 h-4 text-admin-success shrink-0" />
+          )}
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-admin-fg">
+              {globalPause ? 'Non-critical email delivery is PAUSED' : 'Email delivery is active'}
+            </p>
+            <p className="text-[11px] text-admin-fg-muted truncate">
+              {globalPause
+                ? 'Reminders, recaps and lifecycle sequences are held in queue. Critical auth emails still send.'
+                : 'Automated emails dispatch normally per individual toggles and daily quotas.'}
+            </p>
+          </div>
+        </div>
+        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-admin-accent shrink-0">
+          Manage <ArrowRight className="w-3 h-3" />
+        </span>
+      </Link>
+
       {/* KPI grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <AdminKpiCard
