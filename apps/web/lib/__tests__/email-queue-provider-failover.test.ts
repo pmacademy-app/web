@@ -318,6 +318,29 @@ describe('processEmailQueue — Brevo/Resend provider failover', () => {
       expect(calls).toEqual(['brevo'])
       expect(result.delivered).toBe(1)
     })
+
+    // Regression: Brevo's real out-of-credit response is HTTP 400 with body
+    // `{"code":"not_enough_credits"}` and NO `message`. The provider then reports
+    // `error: "HTTP 400 error from Brevo"` (no capacity keyword) but
+    // `providerCode: "not_enough_credits"`. The processor must classify the failure on
+    // `providerCode`; classifying on `error` read the 400 as a PERMANENT bad-request and
+    // dead-lettered mail that should be retried once credits refresh.
+    it('Brevo 400 not_enough_credits (no message) + Resend transient outage -> retried, NOT dead-lettered', async () => {
+      const { result, updates, calls } = await runOneItem({
+        brevo: { ok: false, status: 400, body: { code: 'not_enough_credits' } },
+        resend: { ok: false, status: 500, body: { message: 'Internal error' } },
+      })
+
+      // Capacity code must still trigger the failover to Resend.
+      expect(calls).toEqual(['brevo', 'resend'])
+      expect(result.delivered).toBe(0)
+      expect(result.failed).toBe(1)
+
+      // The item still has retries left (attempt 1 of 3), so a transient dual failure
+      // must land in 'retrying', never 'dead_letter'.
+      expect(updates.some((u) => u.status === 'retrying')).toBe(true)
+      expect(updates.some((u) => u.status === 'dead_letter')).toBe(false)
+    })
   })
 })
 

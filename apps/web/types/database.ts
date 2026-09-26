@@ -2119,6 +2119,24 @@ export type Database = {
         Args: { p_provider: string }
         Returns: boolean
       }
+      // Added by 20260925000002_phase_t2_backend_reliability.sql
+      record_lesson_quiz_completion: {
+        Args: {
+          p_user_id: string
+          p_lesson_id: string
+          p_score_percentage: number
+          p_correct_count: number
+          p_total_questions: number
+          p_attempts: Json
+          p_quiz_correct_xp_per_question?: number
+          p_quiz_perfect_bonus_xp?: number
+        }
+        Returns: Json
+      }
+      sync_user_xp: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

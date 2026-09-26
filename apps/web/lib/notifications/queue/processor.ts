@@ -691,10 +691,20 @@ async function processSingleBatch(
 
       // B6: Distinguish permanent provider rejections (400 bad request, 401, 403, 422)
       // from transient failures. Permanent rejections route directly to dead_letter.
+      //
+      // Classify on the provider's own `providerCode`, NOT its human-readable `error`.
+      // Brevo reports credit exhaustion as an ordinary HTTP 400 whose body is
+      // `{"code":"not_enough_credits"}` with no `message`, so `error` degrades to a
+      // bare "HTTP 400 error from Brevo" — no capacity keyword — while `providerCode`
+      // carries the signal. Reading `error` here classified that transient exhaustion
+      // as a permanent 400 and dead-lettered mail that should have been retried once
+      // credits refreshed. `providerCode` falls back to `error` when absent, so no
+      // signal is lost for providers/attempts that only populate `error`.
+      const classifyAttempt = (a: ProviderSendResult) =>
+        classifyProviderFailure(a.statusCode, a.providerCode ?? a.error)
       const isPermanent = Boolean(
-        sendResult.attempts?.some(
-          (a) => classifyProviderFailure(a.statusCode, a.error) === 'permanent'
-        ) || (sendResult.attempts?.length === 1 && classifyProviderFailure(sendResult.attempts[0].statusCode, sendResult.attempts[0].error) === 'permanent')
+        sendResult.attempts?.some((a) => classifyAttempt(a) === 'permanent') ||
+          (sendResult.attempts?.length === 1 && classifyAttempt(sendResult.attempts[0]) === 'permanent')
       )
 
       if (isPermanent) {

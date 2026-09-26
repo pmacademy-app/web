@@ -425,3 +425,33 @@ Falsifiers, stated up front:
 Prodily does not need more product. It has a 548,000-word library of genuinely excellent writing, a working spaced-repetition engine, nine real capstone deliverables, a portfolio, certificates, streaks with freezes, and an industrial-grade notification platform.
 
 **Almost none of it is connected to a user who just signed up.** The blueprint above connects what exists, in the order that the evidence supports — and says plainly which steps are still guesses.
+
+---
+
+## 12. Technical remediation status (added 2026-09-26)
+
+The recommendations above stand. This section marks only the items whose **engineering
+substrate** genuinely changed on the `tech-fixes` technical-remediation track (T1–T5) and
+the final review. Product decisions and unbuilt sequences are unchanged and still open.
+
+| Blueprint item | Status after T1–T5 | Note |
+|---|---|---|
+| **1.1 Read stored preferences in the queue processor** | **Done in code (T2.1)** | `processor.ts` now resolves `user_notification_preferences` (batched); `/settings` toggles are live for email. Measure remains as written. |
+| **1.2 Enable email by default for learning + achievements** | Open (product) | Defaults/policy unchanged by the technical track. |
+| **1.3 Invert the daily-reminder audience** | Open (product) | Pagination now covers the full audience (T3.1) and delivery is timezone-aware (T5.4), but the daily reminder is still streak-gated; inverting the audience is unbuilt. |
+| **1.4 Suppress the zero-activity weekly recap** | Open (product) | Recap now scales + is timezone-aware, but the zero-activity suppression rule is not implemented. |
+| **1.5 Three lifecycle sequences** | Open (product) | Not built. |
+| **2.3 Land the completion loop** | Partially done (T4) | The flashcard-deck→reflection advance callback is now wired; the completion-screen/next-lesson redesign is still product work. |
+| **2.5 Surface the theory-gate failure** | **Done in code (T4)** | "Mark Theory as Read" now renders an accessible inline error instead of silently swallowing the rejection. |
+
+**Foundational hardening delivered alongside (not in the blueprint, but enabling it):**
+security/data-integrity (T1), atomic lesson completion + ledger-authoritative XP + badge-
+reset correctness (T2), audit/SRS query scalability (T3), settings dirty-state + toast
+feedback + lesson-tab URL sync (T4), and the full operational layer — bounce/complaint
+webhooks, `/api/health`, provider failover, alerts, timezone-aware crons, unified retry
+(T5). The final review additionally fixed a queue dead-letter mis-classification and a
+scheduler bug that would have suppressed nearly all reminders/recaps.
+
+**Still required before any of this reaches users:** production migration application, env
+configuration, Vercel deploy, provider webhook registration, and post-deploy verification —
+none performed. See Implementation Plan §9.

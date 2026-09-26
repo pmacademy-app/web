@@ -133,7 +133,7 @@ export async function synchronizeProgressBadges(
       const { data: dbBadges } = await supabase
         .from('badges')
         .select('id')
-        .in('key', PROGRESS_DERIVED_BADGE_KEYS as unknown as string[])
+        .in('key', [...PROGRESS_DERIVED_BADGE_KEYS])
 
       if (dbBadges && dbBadges.length > 0) {
         const badgeIds = dbBadges.map((b) => b.id)

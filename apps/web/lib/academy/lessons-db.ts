@@ -3,7 +3,7 @@ import path from 'path'
 import { verifyTheoryReadEngagement, getRuntimeXpValues } from '../xp'
 import { updateUserStreak } from '../streaks-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '../supabase'
+import type { Database, Json } from '../supabase'
 import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
 import { completeLesson } from '../lessons-completion-service'
@@ -217,29 +217,31 @@ export async function recordQuizAttemptAction(
   let totalXpToAward = 0
   let isFirstAttempt = false
 
-  // Attempt atomic execution via PostgreSQL RPC record_lesson_quiz_completion
+  // Attempt atomic execution via PostgreSQL RPC record_lesson_quiz_completion.
+  // The RPC returns a jsonb envelope; narrow it explicitly rather than casting the
+  // client, so the typed data layer stays free of escape-hatch casts (B8-G).
   let rpcSuccess = false
   try {
-    type RpcResponse = { data: { success: boolean; total_xp_awarded?: number; is_first_attempt?: boolean } | null; error: unknown }
-    const rpcFn = supabase.rpc as unknown as (name: string, args: Record<string, unknown>) => Promise<RpcResponse>
-    const { data: rpcData, error: rpcError } = await rpcFn(
-      'record_lesson_quiz_completion',
-      {
-        p_user_id: userId,
-        p_lesson_id: lessonId,
-        p_score_percentage: scorePercentage,
-        p_correct_count: correctCount,
-        p_total_questions: totalQuestions,
-        p_attempts: validatedAttempts,
-        p_quiz_correct_xp_per_question: xpConfig.QUIZ_CORRECT,
-        p_quiz_perfect_bonus_xp: xpConfig.QUIZ_PERFECT_BONUS,
-      }
-    )
+    const { data: rpcData, error: rpcError } = await supabase.rpc('record_lesson_quiz_completion', {
+      p_user_id: userId,
+      p_lesson_id: lessonId,
+      p_score_percentage: scorePercentage,
+      p_correct_count: correctCount,
+      p_total_questions: totalQuestions,
+      p_attempts: validatedAttempts as Json,
+      p_quiz_correct_xp_per_question: xpConfig.QUIZ_CORRECT,
+      p_quiz_perfect_bonus_xp: xpConfig.QUIZ_PERFECT_BONUS,
+    })
 
-    if (!rpcError && rpcData && rpcData.success) {
+    const envelope =
+      rpcData && typeof rpcData === 'object' && !Array.isArray(rpcData)
+        ? (rpcData as Record<string, unknown>)
+        : null
+
+    if (!rpcError && envelope && envelope.success === true) {
       rpcSuccess = true
-      totalXpToAward = rpcData.total_xp_awarded ?? 0
-      isFirstAttempt = Boolean(rpcData.is_first_attempt)
+      totalXpToAward = typeof envelope.total_xp_awarded === 'number' ? envelope.total_xp_awarded : 0
+      isFirstAttempt = Boolean(envelope.is_first_attempt)
     }
   } catch {
     rpcSuccess = false
