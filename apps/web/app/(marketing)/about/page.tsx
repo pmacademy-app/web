@@ -45,9 +45,6 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(aboutSchema) }}
       />
       <div className="text-center space-y-4 max-w-2xl mx-auto">
-        <span className="text-xs font-bold uppercase tracking-wider text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-          OUR MISSION
-        </span>
         <h1 className="text-4xl md:text-5xl font-bold font-serif text-foreground">
           Make serious product management education accessible to everyone.
         </h1>

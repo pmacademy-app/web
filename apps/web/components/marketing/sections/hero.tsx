@@ -54,13 +54,8 @@ export function HeroSection() {
     <section
       id="hero"
       aria-labelledby="hero-heading"
-      className="relative pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-24 overflow-hidden bg-background"
+      className="relative pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-24 overflow-hidden bg-transparent"
     >
-      {/* Architectural grid, tinted from the primary token so it follows the theme. */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,color-mix(in_srgb,var(--color-primary)_5%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_srgb,var(--color-primary)_5%,transparent)_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,#000_55%,transparent_100%)]"
-      />
 
       {/* Ambient glow behind the workbench. Slow drift, transform only, off for
           reduced motion. Gives the product visual depth without a drop-shadow stack. */}
@@ -74,14 +69,6 @@ export function HeroSection() {
 
           {/* ── Left Column: Value Proposition & CTAs ────────────────────────── */}
           <div className="lg:col-span-6 flex flex-col gap-6">
-            {/* Eyebrow */}
-            <div className={`${ENTER} self-start inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-soft/70 px-3 py-1 text-[11px] font-mono font-semibold uppercase tracking-[0.14em] text-primary`}>
-              <span aria-hidden="true" className="relative flex h-1.5 w-1.5">
-                <span className="absolute inset-0 rounded-full bg-primary animate-status-ping motion-reduce:hidden" />
-                <span className="relative h-1.5 w-1.5 rounded-full bg-primary" />
-              </span>
-              FREE, STRUCTURED PM CURRICULUM
-            </div>
 
             {/* Main Headline */}
             <h1

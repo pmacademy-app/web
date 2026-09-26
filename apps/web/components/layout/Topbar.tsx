@@ -3,7 +3,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Menu, User, LogOut, ChevronRight, Sparkles, Pencil } from 'lucide-react'
+import { Menu, User, LogOut, ChevronRight, Sparkles, Pencil, Search } from 'lucide-react'
+import { BrandIcon } from '@/components/brand/BrandLogo'
+import { useSearch } from '@/components/search/SearchOverlayProvider'
 import { formatLogoutFailures, logout, LEARNER_LOGIN_PATH } from '@/lib/auth/logout'
 import { getLevelTitle } from '@/lib/xp'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
@@ -13,6 +15,8 @@ import { useQuickStart } from '@/components/quick-start/QuickStartContext'
 
 interface TopbarProps {
   onMenuOpen: () => void
+  onToggleSidebarCollapse?: () => void
+  isSidebarCollapsed?: boolean
   userProfile: {
     name: string | null
     email: string
@@ -21,9 +25,10 @@ interface TopbarProps {
   }
 }
 
-export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
+export default function Topbar({ onMenuOpen, onToggleSidebarCollapse, isSidebarCollapsed, userProfile }: TopbarProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const { openSearch } = useSearch()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const { openQuickStart } = useQuickStart()
@@ -82,20 +87,38 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
   const levelTitle = getLevelTitle(userProfile.level)
 
   return (
-    <header className="h-16 sticky top-0 bg-background border-b border-border z-20 px-4 md:px-6 flex items-center justify-between">
-      {/* Left: Mobile Toggle & Breadcrumbs */}
-      <div className="flex items-center gap-3">
+    <header className="h-16 sticky top-0 bg-background/90 backdrop-blur-md border-b border-border z-20 px-3 sm:px-4 md:px-6 flex items-center justify-between gap-2">
+      {/* Left: Mobile & Desktop Toggle & Breadcrumbs */}
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
         <button
           type="button"
-          onClick={onMenuOpen}
-          className="lg:hidden w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg border border-border text-foreground hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          aria-label="Open navigation menu"
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.innerWidth >= 1024 && onToggleSidebarCollapse) {
+              onToggleSidebarCollapse()
+            } else {
+              onMenuOpen()
+            }
+          }}
+          className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg border border-border text-foreground hover:bg-secondary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer transition-colors shrink-0"
+          aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Toggle navigation'}
+          title={isSidebarCollapsed ? 'Expand sidebar' : 'Toggle navigation'}
         >
           <Menu className="w-5 h-5" />
         </button>
 
+        {/* Mobile App Branding with Prodily Icon */}
+        <div className="flex sm:hidden items-center gap-2 min-w-0">
+          <Link href="/dashboard" className="flex items-center gap-1.5 focus:outline-none shrink-0" title="Prodily Dashboard">
+            <BrandIcon size="sm" />
+          </Link>
+          <span className="text-muted-foreground/40 text-xs">/</span>
+          <span className="font-serif font-bold text-foreground text-sm truncate max-w-[120px]">
+            {breadcrumbs[breadcrumbs.length - 1]?.label || 'Dashboard'}
+          </span>
+        </div>
+
         {/* Breadcrumbs Navigation */}
-        <nav aria-label="Breadcrumbs" className="hidden sm:flex items-center gap-1.5 text-xs font-medium">
+        <nav aria-label="Breadcrumbs" className="hidden sm:flex items-center gap-1.5 text-xs font-medium min-w-0">
           <Link
             href="/dashboard"
             className="text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded px-1"
@@ -106,19 +129,19 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
             const isLast = idx === breadcrumbs.length - 1
             return (
               <div key={`${crumb.label}-${idx}`} className="flex items-center gap-1.5">
-                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60" />
+                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
                 {isLast ? (
-                  <span className="text-foreground font-semibold px-1" aria-current="page">
+                  <span className="text-foreground font-semibold px-1 truncate" aria-current="page">
                     {crumb.label}
                   </span>
                 ) : !crumb.href ? (
-                  <span className="text-muted-foreground px-1">
+                  <span className="text-muted-foreground px-1 truncate">
                     {crumb.label}
                   </span>
                 ) : (
                   <Link
                     href={crumb.href}
-                    className="text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded px-1"
+                    className="text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded px-1 truncate"
                   >
                     {crumb.label}
                   </Link>
@@ -127,15 +150,21 @@ export default function Topbar({ onMenuOpen, userProfile }: TopbarProps) {
             )
           })}
         </nav>
-
-        {/* Mobile Page Title fallback */}
-        <div className="sm:hidden font-serif font-bold text-foreground text-sm">
-          {breadcrumbs[breadcrumbs.length - 1]?.label || 'PM Academy'}
-        </div>
       </div>
 
-      {/* Right: Feedback, Notifications & Profile Dropdown */}
-      <div className="flex items-center gap-2 sm:gap-2.5">
+      {/* Right: Quick Search, Feedback, Notifications & Profile Dropdown */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        {/* Mobile Quick Search Button */}
+        <button
+          type="button"
+          id="topbar-mobile-search-btn"
+          onClick={openSearch}
+          title="Search curriculum (⌘K)"
+          aria-label="Search curriculum"
+          className="lg:hidden p-2.5 rounded-lg border border-input bg-card hover:bg-secondary/40 text-muted-foreground hover:text-foreground transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center min-w-[40px] min-h-[40px]"
+        >
+          <Search className="w-4 h-4" />
+        </button>
         {/* Feedback Trigger — Pencil button */}
         <button
           type="button"

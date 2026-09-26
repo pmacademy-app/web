@@ -45,7 +45,7 @@ export function WhySection() {
     <section
       id="why"
       aria-labelledby="why-heading"
-      className={`bg-background ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      className={`bg-transparent ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
         {/* Header */}
