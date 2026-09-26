@@ -59,7 +59,10 @@ describe('Phase T5 — Operational Resilience & Observability Test Suite', () =>
   beforeEach(() => {
     vi.clearAllMocks()
     process.env = { ...originalEnv }
-    process.env.CRON_SECRET = 'valid_cron_secret_t5'
+    process.env.PRIMARY_EMAIL_PROVIDER = 'brevo'
+    delete process.env.RESEND_API_KEY
+    delete process.env.BREVO_API_KEY
+    process.env.CRON_SECRET = 'test-cron-secret'
     process.env.RESEND_WEBHOOK_SECRET = 'whsec_test_secret_svix'
     process.env.BREVO_WEBHOOK_SECRET = 'test_brevo_secret'
   })
@@ -799,7 +802,7 @@ describe('Phase T5 — Operational Resilience & Observability Test Suite', () =>
       // Test with force=true: both users are enqueued with their respective local date idempotency keys
       const reqForce = new Request('http://localhost:3000/api/cron/daily-reminder?force=true', {
         method: 'POST',
-        headers: { Authorization: 'Bearer valid_cron_secret_t5' },
+        headers: { Authorization: 'Bearer test-cron-secret' },
       })
       const resForce = await handleDailyReminder(reqForce)
       expect(resForce.status).toBe(200)
@@ -827,7 +830,7 @@ describe('Phase T5 — Operational Resilience & Observability Test Suite', () =>
 
       const req = new Request('http://localhost:3000/api/cron/retry-failed', {
         method: 'POST',
-        headers: { Authorization: 'Bearer valid_cron_secret_t5' },
+        headers: { Authorization: 'Bearer test-cron-secret' },
       })
 
       const res = await handleRetryFailed(req)
