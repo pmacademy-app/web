@@ -220,20 +220,36 @@ export default function QuizBlock({ block }: BlockProps) {
           </div>
         </div>
 
+        {/*
+          Phase 3 (3.3): on completion the lesson shell takes over with the "Lesson
+          Completed!" screen whose primary CTA is the next lesson. While the attempt is
+          being saved we show a progress indicator; flashcards are demoted to a secondary
+          fallback (they are also reachable from their own tab now, unlocked after theory).
+        */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-          {lessonCtx?.onAdvanceTab && (
-            <Button
-              onClick={() => lessonCtx.onAdvanceTab?.('flashcards')}
-              size="lg"
-              className="w-full sm:w-auto font-bold px-8 shadow-sm"
-            >
-              Continue to Flashcards →
-            </Button>
+          {submitting ? (
+            <div className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Saving your progress…
+            </div>
+          ) : (
+            <>
+              {lessonCtx?.onAdvanceTab && (
+                <Button
+                  onClick={() => lessonCtx.onAdvanceTab?.('flashcards')}
+                  variant="outline"
+                  size="lg"
+                  className="w-full sm:w-auto font-medium"
+                >
+                  Review Flashcards
+                </Button>
+              )}
+              <Button onClick={handleReset} variant="outline" size="lg" className="w-full sm:w-auto font-medium">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Retry Quiz
+              </Button>
+            </>
           )}
-          <Button onClick={handleReset} variant="outline" size="lg" className="w-full sm:w-auto font-medium">
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Retry Quiz
-          </Button>
         </div>
       </div>
     );

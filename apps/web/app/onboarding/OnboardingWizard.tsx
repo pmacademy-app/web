@@ -32,6 +32,11 @@ import {
   Layers,
 } from 'lucide-react'
 import { submitOnboarding, checkUsernameAvailability, recordOnboardingStep, OnboardingData } from './actions'
+import {
+  ONBOARDING_PRIMARY_DESTINATION,
+  ONBOARDING_SECONDARY_DESTINATION,
+  type OnboardingDestination,
+} from './onboarding-destinations'
 import { AvatarUpload } from '@/components/profile/AvatarUpload'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -403,7 +408,7 @@ export default function OnboardingWizard({ user, profile, onboardingSettings }: 
     }
   }
 
-  const handleComplete = async (targetDestination: '/academy' | '/dashboard' = '/academy') => {
+  const handleComplete = async (targetDestination: OnboardingDestination = ONBOARDING_PRIMARY_DESTINATION) => {
     setErrorMsg(null)
 
     startTransition(async () => {
@@ -949,18 +954,22 @@ export default function OnboardingWizard({ user, profile, onboardingSettings }: 
             </Button>
           ) : (
             <div className="flex-1 flex flex-col sm:flex-row items-center gap-2.5 w-full">
+              {/* Phase 3 (3.1): the dominant CTA lands on /dashboard, which renders the
+                  FirstSessionKickoffCard ("Start Your First Lesson") — the lowest-friction
+                  path to a meaningful first learning action. Browsing the full curriculum at
+                  /academy (nine collapsed modules) is the secondary, exploratory choice. */}
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => handleComplete('/dashboard')}
+                onClick={() => handleComplete(ONBOARDING_SECONDARY_DESTINATION)}
                 disabled={isPending}
                 className="w-full sm:flex-1 rounded-xl h-11 border-border font-medium text-foreground hover:bg-muted"
               >
-                Explore Prodily
+                Explore Curriculum
               </Button>
               <Button
                 type="button"
-                onClick={() => handleComplete('/academy')}
+                onClick={() => handleComplete(ONBOARDING_PRIMARY_DESTINATION)}
                 disabled={isPending}
                 className="w-full sm:flex-1 rounded-xl h-11 bg-primary text-white hover:text-white hover:bg-primary/90 font-semibold shadow-xs"
               >

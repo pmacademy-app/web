@@ -288,7 +288,21 @@ describe('Phase T4 — User Experience & State Resilience Suite', () => {
         expect(isTabUnlocked('quiz', prog)).toBe(true)
       })
 
-      it('locks flashcards and reflection until lesson status is completed', () => {
+      it('unlocks flashcards after theory is read but keeps reflection gated on completion (Phase 3, 3.6)', () => {
+        // Before theory is read, both retrieval-practice tabs stay locked.
+        const started: LessonProgressV2 = {
+          status: 'in_progress',
+          theory_read_at: null,
+          quiz_score: null,
+          quiz_attempts: 0,
+          xp_earned: 0,
+          completed_at: null,
+        }
+        expect(isTabUnlocked('flashcards', started)).toBe(false)
+        expect(isTabUnlocked('reflection', started)).toBe(false)
+
+        // After theory is read (before the quiz / completion), flashcards unlock so
+        // retrieval practice sits where it belongs; reflection remains post-completion.
         const inProgress: LessonProgressV2 = {
           status: 'in_progress',
           theory_read_at: '2026-09-25T12:00:00.000Z',
@@ -297,7 +311,7 @@ describe('Phase T4 — User Experience & State Resilience Suite', () => {
           xp_earned: 0,
           completed_at: null,
         }
-        expect(isTabUnlocked('flashcards', inProgress)).toBe(false)
+        expect(isTabUnlocked('flashcards', inProgress)).toBe(true)
         expect(isTabUnlocked('reflection', inProgress)).toBe(false)
 
         const completed: LessonProgressV2 = {
