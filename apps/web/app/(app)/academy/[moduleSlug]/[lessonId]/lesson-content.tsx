@@ -15,11 +15,13 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useLessonProgressV2 } from '@/hooks/use-lesson-progress-v2'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
 import { BlockTreeRenderer } from '@/renderer/block-tree-renderer'
 import { LessonContextProvider } from '@/contexts/lesson-context'
+import { dispatchClientNotificationEvent } from '@/lib/events/client-event-bus'
 import type { CompiledLesson, CompiledBlock } from '@/types'
 import {
   BookOpen,
@@ -32,6 +34,7 @@ import {
   Loader2,
   Award,
   Trophy,
+  AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBreadcrumbs } from '@/contexts/breadcrumb-context'
@@ -82,6 +85,14 @@ function getBlocksForTab(blocks: CompiledBlock[], tab: TabType): CompiledBlock[]
     return blocks.filter((b) => b.type === 'reflection')
   }
   return []
+}
+
+export function isTabUnlocked(tab: TabType, prog: LessonProgressV2 | null | undefined): boolean {
+  if (tab === 'theory') return true
+  if (!prog) return false
+  if (tab === 'quiz') return !!prog.theory_read_at
+  if (tab === 'flashcards' || tab === 'reflection') return prog.status === 'completed'
+  return false
 }
 
 // ─── Theory engagement tracker ───────────────────────────────────────────────
@@ -298,10 +309,12 @@ function TheoryReadButton({
   theoryReadAt,
   onComplete,
   isLoading,
+  error,
 }: {
   theoryReadAt: string | null
   onComplete: () => void
   isLoading: boolean
+  error?: string | null
 }) {
   if (theoryReadAt) {
     return (
@@ -318,7 +331,16 @@ function TheoryReadButton({
   }
 
   return (
-    <div className="mt-8 flex justify-center">
+    <div className="mt-8 flex flex-col items-center gap-3">
+      {error && (
+        <div
+          role="alert"
+          className="flex items-center gap-2 p-3 text-xs font-medium text-destructive bg-destructive/10 border border-destructive/20 rounded-xl max-w-md w-full text-left"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
       <Button onClick={onComplete} disabled={isLoading} size="lg" className="font-bold px-8">
         {isLoading ? (
           <>
@@ -353,15 +375,24 @@ export default function LessonPageContent({
     recordQuizAttempt,
   } = useLessonProgressV2(lesson.id, initialProgress)
 
-  const [activeTab, setActiveTab] = useState<TabType>('theory')
+  const searchParams = useSearchParams()
+  const initialTabParam = searchParams.get('tab') as TabType | null
+
+  // Initialize active tab from query param if unlocked, else default to 'theory'
+  const initialActiveTab: TabType = (
+    initialTabParam &&
+    ['theory', 'quiz', 'flashcards', 'reflection'].includes(initialTabParam) &&
+    isTabUnlocked(initialTabParam, initialProgress)
+  ) ? initialTabParam : 'theory'
+
+  const [activeTab, setActiveTab] = useState<TabType>(initialActiveTab)
   const [completedThisSession, setCompletedThisSession] = useState(false)
   const [theorySubmitting, setTheorySubmitting] = useState(false)
+  const [theoryError, setTheoryError] = useState<string | null>(null)
   const [showFirstSessionCelebration, setShowFirstSessionCelebration] = useState(false)
   const [celebrationXp, setCelebrationXp] = useState(50)
   const { activeSecondsRef, scrollPercentRef } = useTheoryEngagement(activeTab === 'theory')
   const hasTrackedStartRef = useRef(false)
-
-  const { setBreadcrumbs } = useBreadcrumbs()
 
   // Track lesson start once per lesson mount
   useEffect(() => {
@@ -370,6 +401,21 @@ export default function LessonPageContent({
       trackLessonStarted(lesson.id, lesson.module)
     }
   }, [lesson.id, lesson.module])
+
+  const handleTabChange = useCallback((tab: TabType) => {
+    setActiveTab(tab)
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      if (tab === 'theory') {
+        url.searchParams.delete('tab')
+      } else {
+        url.searchParams.set('tab', tab)
+      }
+      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash)
+    }
+  }, [])
+
+  const { setBreadcrumbs } = useBreadcrumbs()
 
   // Sync breadcrumbs with topbar — use globalOrder for correct display
   useEffect(() => {
@@ -380,6 +426,24 @@ export default function LessonPageContent({
     ])
     return () => setBreadcrumbs([])
   }, [lesson, globalOrder, moduleNumber, moduleName, setBreadcrumbs])
+
+
+  // Handle browser back/forward (popstate) between tabs
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search)
+      const tab = params.get('tab') as TabType | null
+      if (tab && ['theory', 'quiz', 'flashcards', 'reflection'].includes(tab)) {
+        if (isTabUnlocked(tab, progress)) {
+          setActiveTab(tab)
+          return
+        }
+      }
+      setActiveTab('theory')
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [progress])
 
   // Mark in-progress on first open
   useEffect(() => {
@@ -452,13 +516,21 @@ export default function LessonPageContent({
 
   const handleTheoryComplete = async () => {
     setTheorySubmitting(true)
+    setTheoryError(null)
     try {
       await recordTheoryRead(activeSecondsRef.current, scrollPercentRef.current)
       trackTheoryRead(lesson.id)
-      setActiveTab('quiz')
-    } catch {
-      // Engagement threshold not met — still allow navigation
-      setActiveTab('quiz')
+      handleTabChange('quiz')
+    } catch (err: unknown) {
+      const msg = (err instanceof Error && err.message)
+        ? err.message
+        : 'Engagement threshold not met. Please review the theory content thoroughly before proceeding to the quiz.'
+      setTheoryError(msg)
+      dispatchClientNotificationEvent({
+        title: 'Engagement Requirement',
+        body: msg,
+        variant: 'error',
+      })
     } finally {
       setTheorySubmitting(false)
     }
@@ -593,7 +665,7 @@ export default function LessonPageContent({
             </Link>
           )}
           <Link
-            href="/academy"
+            href={`/academy#${lesson.module}`}
             className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground hover:bg-accent/40 transition-all"
           >
             Back to Curriculum
@@ -618,7 +690,7 @@ export default function LessonPageContent({
       {/* Navigation & Tab Headers */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-4">
         <Link
-          href="/academy"
+          href={`/academy#${lesson.module}`}
           className="inline-flex items-center gap-2 px-3.5 py-2.5 -ml-3.5 min-h-[44px] rounded-lg text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
@@ -638,7 +710,7 @@ export default function LessonPageContent({
                 aria-selected={isActive}
                 aria-controls={`panel-${tab.id}`}
                 disabled={!tab.unlocked}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                   isActive
                     ? 'bg-primary text-primary-foreground shadow-sm'
@@ -687,7 +759,7 @@ export default function LessonPageContent({
             <LessonContextProvider
               lessonId={lesson.id}
               onQuizComplete={handleQuizComplete}
-              onAdvanceTab={(tab) => setActiveTab(tab)}
+              onAdvanceTab={(tab) => handleTabChange(tab)}
             >
               <BlockTreeRenderer
                 blocks={getBlocksForTab(lesson.blocks, 'theory')}
@@ -698,6 +770,7 @@ export default function LessonPageContent({
               theoryReadAt={progress.theory_read_at}
               onComplete={handleTheoryComplete}
               isLoading={theorySubmitting}
+              error={theoryError}
             />
           </div>
         )}
@@ -708,7 +781,7 @@ export default function LessonPageContent({
             <LessonContextProvider
               lessonId={lesson.id}
               onQuizComplete={handleQuizComplete}
-              onAdvanceTab={(tab) => setActiveTab(tab)}
+              onAdvanceTab={(tab) => handleTabChange(tab)}
             >
               <BlockTreeRenderer
                 blocks={getBlocksForTab(lesson.blocks, 'quiz')}
@@ -723,7 +796,8 @@ export default function LessonPageContent({
           <div id="panel-flashcards" role="tabpanel" aria-labelledby="tab-flashcards">
             <LessonContextProvider
               lessonId={lesson.id}
-              onAdvanceTab={(tab) => setActiveTab(tab)}
+              onAdvanceTab={(tab) => handleTabChange(tab)}
+              onFlashcardsComplete={() => handleTabChange('reflection')}
             >
               <BlockTreeRenderer
                 blocks={getBlocksForTab(lesson.blocks, 'flashcards')}
@@ -759,7 +833,7 @@ export default function LessonPageContent({
         )}
 
         <Link
-          href="/academy"
+          href={`/academy#${lesson.module}`}
           className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-primary/20 bg-primary/5 text-primary font-bold hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           View Curriculum

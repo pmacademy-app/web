@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
+import { useDirtyFormGuard } from '@/hooks/use-dirty-form-guard'
+import { showClientToast } from '@/lib/events/client-event-bus'
 import type {
   ChangeEmailGetResponse,
   ChangeEmailPostResponse,
@@ -20,6 +22,9 @@ function ChangeEmailCard() {
   const [emailSuccessMsg, setEmailSuccessMsg] = useState<string | null>(null)
   const [emailErrorMsg, setEmailErrorMsg] = useState<string | null>(null)
 
+  const isEmailDirty = emailPassword.length > 0 || newEmail.length > 0
+  useDirtyFormGuard(isEmailDirty)
+
   const { data: emailData, isLoading: loadingEmail, mutate: mutateEmail } =
     useApiQuery<ChangeEmailGetResponse>('/api/settings/security/change-email')
 
@@ -29,11 +34,15 @@ function ChangeEmailCard() {
     e.preventDefault()
 
     if (!emailPassword) {
-      setEmailErrorMsg('Current password is required.')
+      const msg = 'Current password is required.'
+      setEmailErrorMsg(msg)
+      showClientToast('Email Change Failed', msg, 'error')
       return
     }
     if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-      setEmailErrorMsg('Please enter a valid email address.')
+      const msg = 'Please enter a valid email address.'
+      setEmailErrorMsg(msg)
+      showClientToast('Email Change Failed', msg, 'error')
       return
     }
 
@@ -41,27 +50,40 @@ function ChangeEmailCard() {
     setEmailSuccessMsg(null)
     setEmailErrorMsg(null)
 
-    const result = await apiPost<ChangeEmailPostResponse>('/api/settings/security/change-email', {
-      currentPassword: emailPassword,
-      newEmail,
-    })
+    try {
+      const result = await apiPost<ChangeEmailPostResponse>('/api/settings/security/change-email', {
+        currentPassword: emailPassword,
+        newEmail,
+      })
 
-    setSubmittingEmail(false)
+      setSubmittingEmail(false)
 
-    if (!result.ok) {
-      setEmailErrorMsg(result.error.message)
-      return
+      if (!result.ok) {
+        const errorText = result.error.message
+        setEmailErrorMsg(errorText)
+        showClientToast('Email Change Failed', errorText, 'error')
+        return
+      }
+
+      if (!result.data.success) {
+        const errorText = result.data.error || 'Failed to start email change. Please try again.'
+        setEmailErrorMsg(errorText)
+        showClientToast('Email Change Failed', errorText, 'error')
+        return
+      }
+
+      const successText = result.data.message || `Confirmation link sent to ${newEmail}.`
+      setEmailSuccessMsg(successText)
+      showClientToast('Confirmation Sent', successText, 'success')
+      setEmailPassword('')
+      setNewEmail('')
+      void mutateEmail()
+    } catch (err) {
+      setSubmittingEmail(false)
+      const errorText = err instanceof Error ? err.message : 'Network error updating email.'
+      setEmailErrorMsg(errorText)
+      showClientToast('Email Change Failed', errorText, 'error')
     }
-
-    if (!result.data.success) {
-      setEmailErrorMsg(result.data.error || 'Failed to start email change. Please try again.')
-      return
-    }
-
-    setEmailSuccessMsg(result.data.message || `Confirmation link sent to ${newEmail}.`)
-    setEmailPassword('')
-    setNewEmail('')
-    void mutateEmail()
   }
 
   return (
@@ -172,57 +194,87 @@ export function SecuritySettingsTab() {
   const [saving, setSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const saveCountRef = React.useRef(0)
+
+  const isPasswordDirty = currentPassword.length > 0 || newPassword.length > 0 || confirmPassword.length > 0
+  useDirtyFormGuard(isPasswordDirty)
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!currentPassword) {
-      setErrorMessage('Current password is required.')
+      const msg = 'Current password is required.'
+      setErrorMessage(msg)
+      showClientToast('Password Update Failed', msg, 'error')
       return
     }
 
     if (newPassword.length < 6) {
-      setErrorMessage('New password must be at least 6 characters long.')
+      const msg = 'New password must be at least 6 characters long.'
+      setErrorMessage(msg)
+      showClientToast('Password Update Failed', msg, 'error')
       return
     }
 
     if (newPassword !== confirmPassword) {
-      setErrorMessage('New passwords do not match.')
+      const msg = 'New passwords do not match.'
+      setErrorMessage(msg)
+      showClientToast('Password Update Failed', msg, 'error')
       return
     }
 
     if (currentPassword === newPassword) {
-      setErrorMessage('New password must be different from your current password.')
+      const msg = 'New password must be different from your current password.'
+      setErrorMessage(msg)
+      showClientToast('Password Update Failed', msg, 'error')
       return
     }
 
+    if (saving) return
+    const currentSaveId = ++saveCountRef.current
     setSaving(true)
     setSuccessMessage(false)
     setErrorMessage(null)
 
-    const result = await apiPost<SecurityUpdateResponse>('/api/settings/security', {
-      currentPassword,
-      newPassword,
-      confirmPassword,
-    })
+    try {
+      const result = await apiPost<SecurityUpdateResponse>('/api/settings/security', {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      })
 
-    setSaving(false)
+      if (currentSaveId !== saveCountRef.current) return
 
-    if (!result.ok) {
-      setErrorMessage(result.error.message)
-      return
+      if (!result.ok) {
+        const errorText = result.error.message
+        setErrorMessage(errorText)
+        showClientToast('Password Update Failed', errorText, 'error')
+        return
+      }
+
+      if (!result.data.success) {
+        const errorText = result.data.error || 'Failed to update password. Please try again.'
+        setErrorMessage(errorText)
+        showClientToast('Password Update Failed', errorText, 'error')
+        return
+      }
+
+      setSuccessMessage(true)
+      showClientToast('Password Updated', 'Your account password has been updated.', 'success')
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+      setTimeout(() => setSuccessMessage(false), 4000)
+    } catch (err) {
+      if (currentSaveId !== saveCountRef.current) return
+      const errorText = err instanceof Error ? err.message : 'Network error updating password.'
+      setErrorMessage(errorText)
+      showClientToast('Password Update Failed', errorText, 'error')
+    } finally {
+      if (currentSaveId === saveCountRef.current) {
+        setSaving(false)
+      }
     }
-
-    if (!result.data.success) {
-      setErrorMessage(result.data.error || 'Failed to update password. Please try again.')
-      return
-    }
-
-    setSuccessMessage(true)
-    setCurrentPassword('')
-    setNewPassword('')
-    setConfirmPassword('')
-    setTimeout(() => setSuccessMessage(false), 4000)
   }
 
   return (
@@ -342,6 +394,11 @@ export function SecuritySettingsTab() {
             {errorMessage && (
               <span className="text-xs font-semibold text-destructive flex items-center gap-1.5 animate-in fade-in-0" role="alert">
                 <AlertCircle className="w-4 h-4 shrink-0" /> {errorMessage}
+              </span>
+            )}
+            {!successMessage && !errorMessage && isPasswordDirty && (
+              <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
+                Unsaved changes
               </span>
             )}
           </div>

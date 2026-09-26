@@ -23,6 +23,7 @@ import { resolveModuleCtaTarget } from '@/lib/curriculum-access'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
 import { CurriculumModuleIcon } from '@/components/curriculum/CurriculumModuleIcon'
+import { AcademyNavigationRetention } from '@/components/curriculum/AcademyNavigationRetention'
 
 export const metadata: Metadata = {
   title: 'Curriculum',
@@ -125,6 +126,7 @@ export default async function AcademyPage() {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(courseJsonLd) }}
       />
       <div className="container mx-auto px-4 py-8 lg:py-12 max-w-5xl space-y-8">
+        <AcademyNavigationRetention />
         {/* Page Header with Pie Chart in front of it */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-8">
           <div className="space-y-3 max-w-2xl flex-1">
@@ -260,6 +262,9 @@ export default async function AcademyPage() {
               <details
                 key={moduleSlug}
                 id={moduleSlug}
+                data-module-slug={moduleSlug}
+                data-recommended={isRecommended ? 'true' : undefined}
+                data-has-target={targetLesson ? 'true' : undefined}
                 className="group rounded-2xl border border-border bg-card hover:border-primary/40 transition-all shadow-xs open:shadow-sm open:border-border-strong scroll-mt-24 overflow-hidden"
               >
                 <summary className="flex flex-col sm:flex-row sm:items-center justify-between p-5 md:p-6 cursor-pointer list-none select-none gap-4 hover:bg-muted/30 transition-colors">

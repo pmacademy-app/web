@@ -1,12 +1,25 @@
 'use client'
 
 import React, { useState } from 'react'
-import { User, Globe, Save, Loader2, CheckCircle2, Sparkles } from 'lucide-react'
+import { User, Globe, Save, Loader2, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react'
 import { AvatarUpload } from '@/components/profile/AvatarUpload'
 import { useQuickStart } from '@/components/quick-start/QuickStartContext'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPost } from '@/lib/api/client'
+import { useDirtyFormGuard, areFormsEqual } from '@/hooks/use-dirty-form-guard'
+import { showClientToast } from '@/lib/events/client-event-bus'
 import type { ProfileGetResponse, ProfileUpdateResponse } from '@/lib/api/contracts/settings'
+
+function buildProfileData(profile?: ProfileGetResponse['profile']) {
+  return {
+    name: profile?.name || '',
+    avatarUrl: profile?.avatar_url || '',
+    bio: profile?.bio || '',
+    linkedinUrl: profile?.linkedin_url || '',
+    githubUrl: profile?.github_url || '',
+    websiteUrl: profile?.website_url || '',
+  }
+}
 
 function LinkedInIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   return (
@@ -32,48 +45,66 @@ function ProfileFormContent({
   onSaveSuccess: () => void
 }) {
   const { openQuickStart } = useQuickStart()
+  const [persistedData, setPersistedData] = useState(() => buildProfileData(profile))
+  const [formData, setFormData] = useState(() => buildProfileData(profile))
   const [saving, setSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const saveCountRef = React.useRef(0)
 
-  const [formData, setFormData] = useState({
-    name: profile?.name || '',
-    avatarUrl: profile?.avatar_url || '',
-    bio: profile?.bio || '',
-    linkedinUrl: profile?.linkedin_url || '',
-    githubUrl: profile?.github_url || '',
-    websiteUrl: profile?.website_url || '',
-  })
+  const isDirty = !areFormsEqual(formData, persistedData)
+  useDirtyFormGuard(isDirty)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (saving) return
+    const currentSaveId = ++saveCountRef.current
     setSaving(true)
     setSuccessMessage(false)
     setErrorMessage(null)
 
-    const result = await apiPost<ProfileUpdateResponse>('/api/settings/profile', {
+    const payload = {
       name: formData.name,
       bio: formData.bio,
       linkedin_url: formData.linkedinUrl,
       github_url: formData.githubUrl,
       website_url: formData.websiteUrl,
-    })
-
-    setSaving(false)
-
-    if (!result.ok) {
-      setErrorMessage(result.error.message)
-      return
     }
 
-    if (!result.data.success) {
-      setErrorMessage(result.data.error || 'Failed to update profile.')
-      return
-    }
+    try {
+      const result = await apiPost<ProfileUpdateResponse>('/api/settings/profile', payload)
 
-    setSuccessMessage(true)
-    onSaveSuccess()
-    setTimeout(() => setSuccessMessage(false), 3000)
+      if (currentSaveId !== saveCountRef.current) return
+
+      if (!result.ok) {
+        const errorText = result.error.message
+        setErrorMessage(errorText)
+        showClientToast('Profile Save Failed', errorText, 'error')
+        return
+      }
+
+      if (!result.data.success) {
+        const errorText = result.data.error || 'Failed to update profile.'
+        setErrorMessage(errorText)
+        showClientToast('Profile Save Failed', errorText, 'error')
+        return
+      }
+
+      setPersistedData(formData)
+      setSuccessMessage(true)
+      showClientToast('Profile Saved', 'Your public profile has been updated.', 'success')
+      onSaveSuccess()
+      setTimeout(() => setSuccessMessage(false), 3000)
+    } catch (err) {
+      if (currentSaveId !== saveCountRef.current) return
+      const errorText = err instanceof Error ? err.message : 'Network error updating profile.'
+      setErrorMessage(errorText)
+      showClientToast('Profile Save Failed', errorText, 'error')
+    } finally {
+      if (currentSaveId === saveCountRef.current) {
+        setSaving(false)
+      }
+    }
   }
 
   return (
@@ -203,24 +234,30 @@ function ProfileFormContent({
         </div>
 
         {/* Feedback Messages & Save Button */}
-        <div className="flex items-center justify-between pt-3 border-t border-border/60">
-          <div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-border/60">
+          <div className="flex-1">
             {successMessage && (
-              <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 animate-in fade-in-0">
-                <CheckCircle2 className="w-4 h-4" /> Profile updated successfully!
+              <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 animate-in fade-in-0" role="status">
+                <CheckCircle2 className="w-4 h-4 shrink-0" /> Profile updated successfully!
               </span>
             )}
             {errorMessage && (
-              <span className="text-xs font-semibold text-destructive animate-in fade-in-0">
-                {errorMessage}
+              <span className="text-xs font-semibold text-destructive flex items-center gap-1.5 animate-in fade-in-0" role="alert">
+                <AlertCircle className="w-4 h-4 shrink-0" /> {errorMessage}
+              </span>
+            )}
+            {!successMessage && !errorMessage && isDirty && (
+              <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
+                Unsaved changes
               </span>
             )}
           </div>
 
           <button
             type="submit"
-            disabled={saving}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-all shadow-2xs disabled:opacity-50 cursor-pointer"
+            disabled={saving || !isDirty}
+            aria-disabled={saving || !isDirty}
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             Save Profile

@@ -11,6 +11,8 @@ import { NotificationPreferencesTab } from '@/components/notifications/Notificat
 import { ReferralSettingsTab } from '@/components/settings/ReferralSettingsTab'
 import { DangerZoneTab } from '@/components/settings/DangerZoneTab'
 
+import { SettingsDirtyProvider, useSettingsDirtyContext } from '@/hooks/use-dirty-form-guard'
+
 export type SettingsTabKey = 'profile' | 'security' | 'portfolio' | 'notifications' | 'referrals' | 'danger-zone'
 
 interface TabItem {
@@ -28,15 +30,18 @@ const TABS: TabItem[] = [
   { key: 'danger-zone', label: 'Danger Zone', icon: AlertTriangle },
 ]
 
-export function SettingsTabs() {
+function SettingsTabsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { confirmNavigationIfDirty } = useSettingsDirtyContext()
   const tabParam = searchParams.get('tab') as SettingsTabKey | null
 
   const validTabs: SettingsTabKey[] = ['profile', 'security', 'portfolio', 'notifications', 'referrals', 'danger-zone']
   const activeTab: SettingsTabKey = tabParam && validTabs.includes(tabParam) ? tabParam : 'profile'
 
   const handleTabChange = (tab: SettingsTabKey) => {
+    if (tab === activeTab) return
+    if (!confirmNavigationIfDirty()) return
     router.push(`/settings?tab=${tab}`, { scroll: false })
   }
 
@@ -82,5 +87,13 @@ export function SettingsTabs() {
         {activeTab === 'danger-zone' && <DangerZoneTab />}
       </div>
     </div>
+  )
+}
+
+export function SettingsTabs() {
+  return (
+    <SettingsDirtyProvider>
+      <SettingsTabsContent />
+    </SettingsDirtyProvider>
   )
 }

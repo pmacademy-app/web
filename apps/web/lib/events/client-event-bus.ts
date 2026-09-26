@@ -7,6 +7,7 @@ export interface ClientNotificationEventDetail {
   category?: string
   xpEarned?: number
   badgeName?: string
+  variant?: 'success' | 'error' | 'info'
 }
 
 const EVENT_NAME = 'pma:notification-emitted'
@@ -15,6 +16,14 @@ export function dispatchClientNotificationEvent(detail: ClientNotificationEventD
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail }))
   }
+}
+
+export function showClientToast(
+  title: string,
+  body: string,
+  variant: 'success' | 'error' | 'info' = 'info'
+): void {
+  dispatchClientNotificationEvent({ title, body, variant })
 }
 
 export function subscribeClientNotificationEvent(
