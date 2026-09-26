@@ -245,6 +245,39 @@ export async function POST(request: Request) {
       try {
         const supabase = createServiceRoleClient()
 
+        // Derive deterministic provider event ID for idempotency
+        const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id')
+        const rawEventId = String(data.id || payload.id || '')
+        const providerEventId = svixId
+          ? `resend:${svixId}`
+          : rawEventId
+            ? `${providerLabel.toLowerCase()}:${rawEventId}`
+            : emailId
+              ? `${providerLabel.toLowerCase()}:${emailId}:${eventType}`
+              : null
+
+        // Idempotency: verify this exact provider event has not already been ingested
+        if (providerEventId) {
+          try {
+            const { data: existingEvent } = await supabase
+              .from('email_delivery_events')
+              .select('id')
+              .eq('provider_event_id', providerEventId)
+              .maybeSingle()
+
+            if (existingEvent && existingEvent.id) {
+              return NextResponse.json({
+                success: true,
+                processed: true,
+                duplicate: true,
+                outboundEventType: eventType,
+              })
+            }
+          } catch {
+            // Column or query failure falls through to normal insert
+          }
+        }
+
         // 1. Find target queue item by resend_id
         let queueId: string | null = null
         if (emailId) {
@@ -256,13 +289,14 @@ export async function POST(request: Request) {
           if (queueItem && queueItem.id) queueId = String(queueItem.id)
         }
 
-        // 2. Insert into email_delivery_events log
+        // 2. Insert into email_delivery_events log (with provider_event_id and sanitized metadata)
         await supabase.from('email_delivery_events').insert({
           email_queue_id: queueId,
           resend_id: emailId || null,
           event_type: eventType,
           metadata: (data as unknown as import('@/lib/supabase').Json),
           occurred_at: new Date().toISOString(),
+          provider_event_id: providerEventId || null,
         })
 
         // 3. Update queue item status if matched
@@ -297,15 +331,38 @@ export async function POST(request: Request) {
         // Suppression is also what keeps the retry routes from requeueing these rows —
         // they exclude suppressed recipients before requeueing.
         if (eventType === 'email.complained' || eventType === 'email.bounced') {
-          const recipientEmail = String(data.email || data.to || data.recipient || payload.email || '')
-          if (recipientEmail) {
+          const rawEmail = String(data.email || data.to || data.recipient || payload.email || '').trim().toLowerCase()
+          if (rawEmail && rawEmail.includes('@')) {
+            // A. Synchronize suppression record in email_suppressions
             await supabase
               .from('email_suppressions')
               .upsert({
-                email: recipientEmail,
+                email: rawEmail,
                 reason: eventType === 'email.complained' ? 'spam_complaint' : 'hard_bounce',
                 suppressed_at: new Date().toISOString(),
-              })
+              }, { onConflict: 'email' })
+
+            // B. Synchronize user preferences if user exists in public.users
+            try {
+              const { data: userRow } = await supabase
+                .from('users')
+                .select('id')
+                .eq('email', rawEmail)
+                .maybeSingle()
+
+              if (userRow && userRow.id) {
+                await supabase
+                  .from('user_notification_preferences')
+                  .update({
+                    all_email: false,
+                    marketing_email: false,
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq('user_id', userRow.id)
+              }
+            } catch (userSyncErr) {
+              log.warnException('email.webhook.user_pref_suppress_sync_failed', userSyncErr)
+            }
           }
         }
 

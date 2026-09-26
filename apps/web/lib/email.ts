@@ -55,6 +55,7 @@ export async function sendEmail({
   replyTo,
   preferProvider,
   isCritical,
+  checkSuppression,
 }: {
   to: string
   subject: string
@@ -79,6 +80,10 @@ export async function sendEmail({
    * the EMAIL_ENABLED kill switch if explicitly configured.
    */
   isCritical?: boolean
+  /**
+   * Optional flag to enforce suppression check directly on raw transport.
+   */
+  checkSuppression?: boolean
 }): Promise<SendEmailResult> {
   const fromEmail = customFromEmail || getFromEmail()
 
@@ -99,6 +104,31 @@ export async function sendEmail({
       }
     } catch (err) {
       console.error('[email] Error checking EMAIL_ENABLED kill switch:', err)
+    }
+
+    // 1b. Suppression check for direct non-critical sends (when enabled)
+    if (checkSuppression) {
+      try {
+        const { createServiceRoleClient } = await import('@/lib/supabase')
+        const supabase = createServiceRoleClient()
+        const { data: suppression } = await supabase
+          .from('email_suppressions')
+          .select('id')
+          .eq('email', to.trim().toLowerCase())
+          .maybeSingle()
+
+        if (suppression && (suppression as { id: string }).id) {
+          console.warn(`[email] Direct send blocked: recipient is suppressed (target: ${maskEmail(to)})`)
+          return {
+            success: false,
+            error: 'Recipient email address is suppressed',
+            statusCode: 400,
+            provider: 'simulated',
+          }
+        }
+      } catch (suppressErr) {
+        console.error('[email] Error checking email suppression:', suppressErr)
+      }
     }
   }
 

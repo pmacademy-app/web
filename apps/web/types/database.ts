@@ -466,6 +466,7 @@ export type Database = {
           id: string
           metadata: Json
           occurred_at: string
+          provider_event_id: string | null
           resend_id: string | null
         }
         Insert: {
@@ -474,6 +475,7 @@ export type Database = {
           id?: string
           metadata?: Json
           occurred_at?: string
+          provider_event_id?: string | null
           resend_id?: string | null
         }
         Update: {
@@ -482,6 +484,7 @@ export type Database = {
           id?: string
           metadata?: Json
           occurred_at?: string
+          provider_event_id?: string | null
           resend_id?: string | null
         }
         Relationships: [

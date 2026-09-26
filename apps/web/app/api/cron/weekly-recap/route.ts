@@ -57,27 +57,11 @@ export const POST = withRoute(
 
     const isForced = query.force === 'true'
 
-    if (!isForced) {
-      const now = new Date()
-      const currentDay = now.getUTCDay()
-      const currentHour = now.getUTCHours()
-
-      if (currentDay !== weeklySched.dayOfWeek || currentHour !== weeklySched.hourUtc) {
-        return NextResponse.json({
-          success: true,
-          message: 'Skipped: Current time does not match configured schedule window.',
-          configured: { dayOfWeek: weeklySched.dayOfWeek, hourUtc: weeklySched.hourUtc },
-          current: { dayOfWeek: currentDay, hourUtc: currentHour },
-          recapsQueued: 0,
-        })
-      }
-    }
-
     const supabase = createServiceRoleClient()
     let recapsQueued = 0
+    let recapsSkippedTimezone = 0
 
     const startTime = Date.now()
-    const todayDate = new Date().toISOString().slice(0, 10)
     const weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
     const weekNumber = Math.ceil(new Date().getDate() / 7)
 
@@ -91,16 +75,16 @@ export const POST = withRoute(
           break
         }
 
-        let query = supabase
+        let queryBuilder = supabase
           .from('users')
           .select('id, email, name, total_xp, current_streak')
           .not('email', 'is', null)
 
         if (lastSeenId) {
-          query = query.gt('id', lastSeenId)
+          queryBuilder = queryBuilder.gt('id', lastSeenId)
         }
 
-        const { data: rawUsers, error: queryErr } = await query
+        const { data: rawUsers, error: queryErr } = await queryBuilder
           .order('id', { ascending: true })
           .limit(BATCH_SIZE)
 
@@ -147,11 +131,26 @@ export const POST = withRoute(
           lessonMap.set(row.user_id, (lessonMap.get(row.user_id) || 0) + 1)
         }
 
+        const { getUserLocalTime } = await import('@/lib/notifications/timezone')
+
         for (const user of users) {
           if (!user.email) continue
+
+          const userPref = prefMap.get(user.id)
+          const userLocalTime = getUserLocalTime(userPref?.timezone)
+          const targetDay = userPref?.preferredRecapDay ?? weeklySched.dayOfWeek ?? 0
+          const targetHour = userPref?.preferredRecapHour ?? weeklySched.hourUtc ?? 18
+
+          // Timezone-aware delivery window evaluation:
+          // Dispatches only when user's local day of week and local hour match the recap window (bypassed with force=true)
+          if (!isForced && (userLocalTime.localDayOfWeek !== targetDay || userLocalTime.localHour !== targetHour)) {
+            recapsSkippedTimezone++
+            continue
+          }
+
           const xpEarnedThisWeek = xpMap.get(user.id) || 0
           const lessonsCompletedCount = lessonMap.get(user.id) || 0
-          const idempotencyKey = `weekly-recap-${user.id}-${todayDate}`
+          const idempotencyKey = `weekly-recap-${user.id}-${userLocalTime.localDate}`
 
           const result = await enqueueNotificationItem({
             userId: user.id,
@@ -171,7 +170,7 @@ export const POST = withRoute(
             eventType: 'system.weekly_recap',
             category: 'learning',
             priorityLevel: 'medium',
-            preloadedPreferences: prefMap.get(user.id),
+            preloadedPreferences: userPref,
           })
           if (result.success) recapsQueued++
         }

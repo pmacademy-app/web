@@ -25,6 +25,7 @@
 5. **Separate Test vs Production Sends**: Admin "Send Test Email" (direct verification to admin inbox) must remain completely separate from Admin "Send Production Email" (queued delivery to learner account).
 6. **No Fake External Telemetry**: External monitoring (Resend, Supabase, Vercel) must never be falsely presented as active telemetry when only environment-variable configuration checks exist.
 7. **Database-Backed Persistence**: State that requires survival across serverless restarts (rate limits, email queues, system errors, user progress) MUST use PostgreSQL database tables (`public.rate_limits`, `public.email_queue`, `public.system_errors`).
+8. **Primary Tab Deliverability Standard for Founder & Broadcast Emails**: All outbound founder reflections and broadcast campaigns must adhere to the verified Primary Tab formula: (a) `From` and `Reply-To` strictly aligned to the authenticated domain (`aditya@prodily.adityagangwani.me`), (b) `suppressListUnsubscribe: true` and `suppressMarketingTags: true`, (c) open & click tracking disabled at the domain level, (d) zero-pixel hidden preheader `<div>`s strictly prohibited, (e) zero CTA button blocks (use clean inline typography and natural links), and (f) dual synchronized plaintext/HTML alternatives. Never cross-wire `@gmail.com` into Reply-To when From is a custom domain.
 
 ---
 

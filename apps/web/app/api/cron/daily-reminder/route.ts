@@ -57,26 +57,11 @@ export const POST = withRoute(
 
     const isForced = query.force === 'true'
 
-    if (!isForced) {
-      const now = new Date()
-      const currentHour = now.getUTCHours()
-
-      if (currentHour !== dailySched.hourUtc) {
-        return NextResponse.json({
-          success: true,
-          message: 'Skipped: Current time does not match configured daily schedule window.',
-          configured: { hourUtc: dailySched.hourUtc },
-          current: { hourUtc: currentHour },
-          remindersQueued: 0,
-        })
-      }
-    }
-
     const supabase = createServiceRoleClient()
     let remindersQueued = 0
+    let remindersSkippedTimezone = 0
 
     const startTime = Date.now()
-    const todayDate = new Date().toISOString().slice(0, 10)
 
     try {
       let lastSeenId: string | null = null
@@ -88,17 +73,17 @@ export const POST = withRoute(
           break
         }
 
-        let query = supabase
+        let queryBuilder = supabase
           .from('users')
           .select('id, email, name, current_streak')
           .gt('current_streak', 0)
           .not('email', 'is', null)
 
         if (lastSeenId) {
-          query = query.gt('id', lastSeenId)
+          queryBuilder = queryBuilder.gt('id', lastSeenId)
         }
 
-        const { data: rawUsers, error: queryErr } = await query
+        const { data: rawUsers, error: queryErr } = await queryBuilder
           .order('id', { ascending: true })
           .limit(BATCH_SIZE)
 
@@ -120,9 +105,24 @@ export const POST = withRoute(
         // Batch resolve notification preferences for this entire page (anti-N+1)
         const prefMap = await getBatchUserNotificationPreferences(supabase, userIds)
 
+        const { getUserLocalTime } = await import('@/lib/notifications/timezone')
+
         for (const user of users) {
           if (!user.email) continue
-          const idempotencyKey = `daily-reminder-${user.id}-${todayDate}`
+
+          const userPref = prefMap.get(user.id)
+          const userLocalTime = getUserLocalTime(userPref?.timezone)
+          const targetHour = userPref?.preferredReminderHour ?? dailySched.hourUtc ?? 9
+
+          // Timezone-aware delivery window evaluation:
+          // In production, when running periodically, only dispatch if current time
+          // matches the user's local preferred reminder hour (bypassed with force=true).
+          if (!isForced && userLocalTime.localHour !== targetHour) {
+            remindersSkippedTimezone++
+            continue
+          }
+
+          const idempotencyKey = `daily-reminder-${user.id}-${userLocalTime.localDate}`
           const result = await enqueueNotificationItem({
             userId: user.id,
             toEmail: user.email,
@@ -139,7 +139,7 @@ export const POST = withRoute(
             eventType: 'learning.daily_reminder',
             category: 'learning',
             priorityLevel: 'medium',
-            preloadedPreferences: prefMap.get(user.id),
+            preloadedPreferences: userPref,
           })
           if (result.success) remindersQueued++
         }

@@ -2,15 +2,13 @@ name: Production Notification & Email Automation Scheduler
 
 on:
   schedule:
-    # 1. Process email queue & broadcasts every 5 minutes (24/7 continuous)
+    # 1. Process email queue & broadcasts every 5 minutes (24/7 continuous; handles retries automatically)
     - cron: '*/5 * * * *'
-    # 2. Retry failed emails every hour at :00 IST (30 * * * * UTC)
-    - cron: '30 * * * *'
-    # 3. Daily reminder at 09:00 AM IST (03:30 UTC: 30 3 * * *)
+    # 2. Daily reminder at 09:00 AM IST (03:30 UTC: 30 3 * * *)
     - cron: '30 3 * * *'
-    # 4. Weekly recap every Monday at 09:00 AM IST (03:30 UTC: 30 3 * * 1)
+    # 3. Weekly recap every Monday at 09:00 AM IST (03:30 UTC: 30 3 * * 1)
     - cron: '30 3 * * 1'
-    # 5. Queue / timeline / delivery log cleanup daily at 02:00 AM IST (20:30 UTC: 30 20 * * *)
+    # 4. Queue / timeline / delivery log cleanup daily at 02:00 AM IST (20:30 UTC: 30 20 * * *)
     - cron: '30 20 * * *'
   workflow_dispatch:
     inputs:
@@ -62,11 +60,12 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
+  # DEPRECATED (Phase T5): /api/cron/process-email-queue handles all retries continuously every 5 minutes.
+  # Retained solely for manual diagnostic invocation.
   retry-failed-emails:
-    name: Retry Failed Emails
+    name: Retry Failed Emails (Deprecated)
     if: |
-      github.event_name == 'schedule' && github.event.schedule == '30 * * * *' ||
-      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'retry')
+      github.event_name == 'workflow_dispatch' && inputs.job_to_run == 'retry'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

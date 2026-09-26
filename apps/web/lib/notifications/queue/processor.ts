@@ -106,7 +106,25 @@ export async function enqueueNotificationItem(
     }
   }
 
-  // 3. User Preferences Check
+  // 3. Suppression Check (Non-critical emails only)
+  if (!isCritical && params.channel === 'email' && params.toEmail) {
+    try {
+      const { data: suppression } = await supabase
+        .from('email_suppressions')
+        .select('id')
+        .eq('email', params.toEmail.trim().toLowerCase())
+        .maybeSingle()
+
+      if (suppression && (suppression as { id: string }).id) {
+        await recordSkippedEvent(supabase, params, 'email_suppressed')
+        return { success: false, reason: 'Recipient email address is suppressed' }
+      }
+    } catch {
+      // Non-fatal read check falls through
+    }
+  }
+
+  // 4. User Preferences Check
   const allowBypass = globalPriorityMatrix.evaluatePreferenceBypass(priorityLevel)
   if (!allowBypass && !isCritical) {
     const userPrefs =
@@ -722,6 +740,22 @@ async function processSingleBatch(
     else if (outcome === 'skipped') skippedCount++
   }
 
+  // Operational Alert: repeated provider failures in a single batch
+  if (failedCount >= 5) {
+    try {
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'error',
+        category: 'queue',
+        operation: 'email.repeated_provider_failures',
+        message: `High batch failure rate: ${failedCount} of ${claimedRows.length} email dispatches failed in single batch`,
+        details: { failedCount, batchSize: claimedRows.length },
+      })
+    } catch {
+      // Non-fatal logger fallback
+    }
+  }
+
   return {
     processed: claimedRows.length,
     delivered: deliveredCount,
@@ -775,6 +809,30 @@ export async function processEmailQueue(
     if (batchResult.processed < batchSize) {
       break
     }
+  }
+
+  // Operational Alert: Check for unexpected queue backlog growth
+  try {
+    const supabase = createServiceRoleClient()
+    const { count, error } = await supabase
+      .from('email_queue')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['pending', 'retrying'])
+      .lte('scheduled_at', new Date().toISOString())
+
+    if (!error && typeof count === 'number' && count > 200) {
+      log.warn('queue.backlog_growth_detected', { backlogCount: count })
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'warning',
+        category: 'queue',
+        operation: 'queue_backlog_growth',
+        message: `Email queue backlog has grown to ${count} unprocessed items`,
+        details: { backlogCount: count, totalProcessed },
+      })
+    }
+  } catch {
+    // Non-fatal telemetry check
   }
 
   return {
