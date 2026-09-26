@@ -28,8 +28,6 @@ import { resolveActor, type Actor, type ActorDenial, type ActorPolicy } from './
  * What it deliberately does not own: business logic, authorization decisions
  * beyond the actor kind, and response shaping for the success path. A handler
  * returns its own `Response` and the wrapper passes it through untouched.
- *
- * Nothing imports this yet. Route migration is B7-C onwards.
  */
 
 /**

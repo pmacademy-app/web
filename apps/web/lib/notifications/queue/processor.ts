@@ -1,7 +1,11 @@
 import type { NotificationPriorityLevel, NotificationChannel, NotificationCategory } from '../types'
 import { PRIORITY_MATRIX } from '../constants'
 import { globalFeatureFlagService } from '../feature-flags/service'
-import { createDefaultNotificationPreferences, isChannelEnabledByPreferences } from '../preferences/defaults'
+import {
+  isChannelEnabledByPreferences,
+  getResolvedUserNotificationPreferences,
+} from '../preferences/defaults'
+import type { UserNotificationPreferences } from '../preferences/types'
 import { globalPriorityMatrix } from '../priority/matrix'
 import { globalProviderRegistry, sendEmailWithFailover } from '../providers'
 import type { ProviderSendResult } from '../providers/types'
@@ -51,6 +55,10 @@ export interface EnqueueNotificationParams {
   /** Optional broadcast ID — tags the email_queue row for deduplication and stats. */
   broadcastId?: string
   /**
+   * Pre-resolved notification preferences for batch enqueueing to eliminate N+1 queries.
+   */
+  preloadedPreferences?: UserNotificationPreferences
+  /**
    * Logical identity of this message, unique across `email_queue`.
    *
    * When set, duplicate prevention is enforced by a unique index instead of by a
@@ -98,10 +106,30 @@ export async function enqueueNotificationItem(
     }
   }
 
-  // 3. User Preferences Check
+  // 3. Suppression Check (Non-critical emails only)
+  if (!isCritical && params.channel === 'email' && params.toEmail) {
+    try {
+      const { data: suppression } = await supabase
+        .from('email_suppressions')
+        .select('id')
+        .eq('email', params.toEmail.trim().toLowerCase())
+        .maybeSingle()
+
+      if (suppression && (suppression as { id: string }).id) {
+        await recordSkippedEvent(supabase, params, 'email_suppressed')
+        return { success: false, reason: 'Recipient email address is suppressed' }
+      }
+    } catch {
+      // Non-fatal read check falls through
+    }
+  }
+
+  // 4. User Preferences Check
   const allowBypass = globalPriorityMatrix.evaluatePreferenceBypass(priorityLevel)
   if (!allowBypass && !isCritical) {
-    const userPrefs = createDefaultNotificationPreferences(params.userId)
+    const userPrefs =
+      params.preloadedPreferences ||
+      (await getResolvedUserNotificationPreferences(supabase, params.userId))
     const isAllowed = isChannelEnabledByPreferences(userPrefs, params.category, params.channel)
     if (!isAllowed) {
       await recordSkippedEvent(supabase, params, `user_preference_disabled:${params.category}`)
@@ -390,12 +418,31 @@ async function mapConcurrent<T, R>(
 }
 
 /**
- * Processes a batch of pending emails from the persistent Supabase `email_queue`.
- * Claims rows atomically using PostgreSQL RPC claim_email_queue_items(batchSize).
+ * Configuration options for bounded multi-batch queue draining.
  */
-export async function processEmailQueue(
-  batchSize: number = 50
-): Promise<{ processed: number; delivered: number; failed: number; suppressed: number; skipped: number; reclaimed: number }> {
+export interface ProcessEmailQueueOptions {
+  /** Maximum number of sequential batches to drain in one invocation (default 1). */
+  maxBatches?: number
+  /** Safety timeout in milliseconds to prevent exceeding serverless deadlines (default 60,000ms). */
+  maxExecutionMs?: number
+}
+
+export type ProcessEmailQueueResult = {
+  processed: number
+  delivered: number
+  failed: number
+  suppressed: number
+  skipped: number
+  reclaimed: number
+}
+
+/**
+ * Processes a single batch of pending emails from the persistent Supabase `email_queue`.
+ */
+async function processSingleBatch(
+  batchSize: number = 50,
+  shouldReclaim: boolean = true
+): Promise<ProcessEmailQueueResult> {
   // Check Global Queue Processing Feature Flag (persisted, not per-process default)
   const processingEnabled = await globalFeatureFlagService.isEnabledAsync('QUEUE_PROCESSING_ENABLED')
   if (!processingEnabled) {
@@ -406,14 +453,16 @@ export async function processEmailQueue(
 
   // 0. B6: Reclaim stale 'processing' items whose execution lease expired (>15 min)
   let reclaimedCount = 0
-  try {
-    const reclaimResult = await reclaimStaleProcessingItems(supabase)
-    reclaimedCount = reclaimResult.reclaimedCount
-    if (reclaimedCount > 0) {
-      log.info('queue.stale_items_reclaimed', { reclaimedCount })
+  if (shouldReclaim) {
+    try {
+      const reclaimResult = await reclaimStaleProcessingItems(supabase)
+      reclaimedCount = reclaimResult.reclaimedCount
+      if (reclaimedCount > 0) {
+        log.info('queue.stale_items_reclaimed', { reclaimedCount })
+      }
+    } catch (reclaimErr) {
+      log.warnException('queue.stale_reclaim_check_failed', reclaimErr)
     }
-  } catch (reclaimErr) {
-    log.warnException('queue.stale_reclaim_check_failed', reclaimErr)
   }
 
   let claimedRows: Array<Record<string, unknown>> = []
@@ -642,10 +691,20 @@ export async function processEmailQueue(
 
       // B6: Distinguish permanent provider rejections (400 bad request, 401, 403, 422)
       // from transient failures. Permanent rejections route directly to dead_letter.
+      //
+      // Classify on the provider's own `providerCode`, NOT its human-readable `error`.
+      // Brevo reports credit exhaustion as an ordinary HTTP 400 whose body is
+      // `{"code":"not_enough_credits"}` with no `message`, so `error` degrades to a
+      // bare "HTTP 400 error from Brevo" — no capacity keyword — while `providerCode`
+      // carries the signal. Reading `error` here classified that transient exhaustion
+      // as a permanent 400 and dead-lettered mail that should have been retried once
+      // credits refreshed. `providerCode` falls back to `error` when absent, so no
+      // signal is lost for providers/attempts that only populate `error`.
+      const classifyAttempt = (a: ProviderSendResult) =>
+        classifyProviderFailure(a.statusCode, a.providerCode ?? a.error)
       const isPermanent = Boolean(
-        sendResult.attempts?.some(
-          (a) => classifyProviderFailure(a.statusCode, a.error) === 'permanent'
-        ) || (sendResult.attempts?.length === 1 && classifyProviderFailure(sendResult.attempts[0].statusCode, sendResult.attempts[0].error) === 'permanent')
+        sendResult.attempts?.some((a) => classifyAttempt(a) === 'permanent') ||
+          (sendResult.attempts?.length === 1 && classifyAttempt(sendResult.attempts[0]) === 'permanent')
       )
 
       if (isPermanent) {
@@ -691,6 +750,22 @@ export async function processEmailQueue(
     else if (outcome === 'skipped') skippedCount++
   }
 
+  // Operational Alert: repeated provider failures in a single batch
+  if (failedCount >= 5) {
+    try {
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'error',
+        category: 'queue',
+        operation: 'email.repeated_provider_failures',
+        message: `High batch failure rate: ${failedCount} of ${claimedRows.length} email dispatches failed in single batch`,
+        details: { failedCount, batchSize: claimedRows.length },
+      })
+    } catch {
+      // Non-fatal logger fallback
+    }
+  }
+
   return {
     processed: claimedRows.length,
     delivered: deliveredCount,
@@ -698,6 +773,85 @@ export async function processEmailQueue(
     suppressed: suppressedCount,
     skipped: skippedCount,
     reclaimed: reclaimedCount,
+  }
+}
+
+/**
+ * Processes pending emails from the persistent Supabase `email_queue`.
+ * Claims rows atomically using PostgreSQL RPC claim_email_queue_items(batchSize).
+ * Supports bounded multi-batch draining via `options.maxBatches` and `options.maxExecutionMs`.
+ */
+export async function processEmailQueue(
+  batchSize: number = 50,
+  options?: ProcessEmailQueueOptions
+): Promise<ProcessEmailQueueResult> {
+  const maxBatches = Math.max(1, Math.min(20, options?.maxBatches || 1))
+  const maxExecutionMs = options?.maxExecutionMs || 60_000
+
+  // Single-batch execution fast path (default)
+  if (maxBatches === 1) {
+    return processSingleBatch(batchSize, true)
+  }
+
+  const startTime = Date.now()
+  let totalProcessed = 0
+  let totalDelivered = 0
+  let totalFailed = 0
+  let totalSuppressed = 0
+  let totalSkipped = 0
+  let totalReclaimed = 0
+
+  for (let batchIndex = 0; batchIndex < maxBatches; batchIndex++) {
+    if (Date.now() - startTime > maxExecutionMs) {
+      log.warn('queue.drain_deadline_exceeded', { batchIndex, maxBatches, elapsedMs: Date.now() - startTime })
+      break
+    }
+
+    const batchResult = await processSingleBatch(batchSize, batchIndex === 0)
+    totalProcessed += batchResult.processed
+    totalDelivered += batchResult.delivered
+    totalFailed += batchResult.failed
+    totalSuppressed += batchResult.suppressed
+    totalSkipped += batchResult.skipped
+    totalReclaimed += batchResult.reclaimed
+
+    // If fewer items were processed than the batch size, the queue has been drained
+    if (batchResult.processed < batchSize) {
+      break
+    }
+  }
+
+  // Operational Alert: Check for unexpected queue backlog growth
+  try {
+    const supabase = createServiceRoleClient()
+    const { count, error } = await supabase
+      .from('email_queue')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['pending', 'retrying'])
+      .lte('scheduled_at', new Date().toISOString())
+
+    if (!error && typeof count === 'number' && count > 200) {
+      log.warn('queue.backlog_growth_detected', { backlogCount: count })
+      const { logSystemError } = await import('@/lib/monitoring/logger')
+      void logSystemError({
+        severity: 'warning',
+        category: 'queue',
+        operation: 'queue_backlog_growth',
+        message: `Email queue backlog has grown to ${count} unprocessed items`,
+        details: { backlogCount: count, totalProcessed },
+      })
+    }
+  } catch {
+    // Non-fatal telemetry check
+  }
+
+  return {
+    processed: totalProcessed,
+    delivered: totalDelivered,
+    failed: totalFailed,
+    suppressed: totalSuppressed,
+    skipped: totalSkipped,
+    reclaimed: totalReclaimed,
   }
 }
 

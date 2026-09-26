@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
 
 import { logAdminAction } from '@/lib/admin/guard'
+import { isAdminEmail } from '@/lib/admin/authorization'
 import { AdminConsoleService } from '@/lib/admin/service'
 import { requireAdmin } from '@/lib/api/actor'
 import { withRoute } from '@/lib/api/with-route'
@@ -46,14 +47,69 @@ export const DELETE = withRoute(
       const { id } = params
       const supabase = createServiceRoleClient()
 
+      // 1. Guard against self-deletion
+      if (id === admin.userId) {
+        return NextResponse.json(
+          { error: 'Admins cannot delete their own account through the admin panel.' },
+          { status: 400 }
+        )
+      }
+
+      // 2. Fetch target user to check existence and admin hierarchy
+      const { data: targetUser, error: targetErr } = await supabase
+        .from('users')
+        .select('id, email, is_admin')
+        .eq('id', id)
+        .maybeSingle()
+
+      if (targetErr || !targetUser) {
+        return NextResponse.json({ error: 'User not found.' }, { status: 404 })
+      }
+
+      const targetIsAdmin = Boolean(targetUser.is_admin) || isAdminEmail(targetUser.email)
+      const actorIsSuperAdmin = isAdminEmail(admin.email)
+
+      // 3. Admin hierarchy protection
+      if (targetIsAdmin) {
+        // Prevent deletion of environment-configured superadmins
+        if (isAdminEmail(targetUser.email)) {
+          return NextResponse.json(
+            { error: 'Primary system administrators cannot be deleted via the API.' },
+            { status: 403 }
+          )
+        }
+        // Only superadmins can delete promoted database administrators
+        if (!actorIsSuperAdmin) {
+          return NextResponse.json(
+            { error: 'Superadmin privileges required to delete an administrator account.' },
+            { status: 403 }
+          )
+        }
+      }
+
+      // 4. Cascade delete application data (user tables, badges, certificates delinking, queue)
       await deleteAccount(supabase, id)
-      await logAdminAction(admin.userId, admin.email, 'admin_user_deleted', 'user', id)
+
+      // 5. Permanently delete GoTrue auth user to prevent zombie accounts
+      const { error: authDeleteError } = await supabase.auth.admin.deleteUser(id)
+      if (authDeleteError) {
+        console.error(`[admin.users.id.delete] Auth user deletion failed for ${id}:`, authDeleteError)
+      }
+
+      await logAdminAction(admin.userId, admin.email, 'admin_user_deleted', 'user', id, {
+        targetEmail: targetUser.email,
+        authDeleted: !authDeleteError,
+      })
 
       revalidatePath('/admin/users')
       revalidatePath('/academy', 'layout')
       revalidatePath('/dashboard', 'layout')
 
-      return NextResponse.json({ success: true, deletedUserId: id })
+      return NextResponse.json({
+        success: true,
+        deletedUserId: id,
+        authDeleted: !authDeleteError,
+      })
     } catch (error: unknown) {
       const message = adminErrorMessage(error, 'Failed to delete user account.')
       return NextResponse.json({ error: message }, { status: 500 })

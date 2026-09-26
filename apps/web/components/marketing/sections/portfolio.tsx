@@ -27,7 +27,7 @@ export function PortfolioSection() {
     <section
       id="portfolio"
       aria-labelledby="portfolio-heading"
-      className={`${SECTION_Y} bg-surface border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      className={`${SECTION_Y} bg-transparent border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={`${CONTAINER} space-y-12`}>
 

@@ -2,15 +2,17 @@ name: Production Notification & Email Automation Scheduler
 
 on:
   schedule:
-    # 1. Process email queue & broadcasts every 5 minutes (24/7 continuous)
+    # 1. Process email queue & broadcasts every 5 minutes (24/7 continuous; handles retries automatically)
     - cron: '*/5 * * * *'
-    # 2. Retry failed emails every hour at :00 IST (30 * * * * UTC)
+    # 2. Timezone-aware reminders & recaps run HOURLY. Since Phase T5, the daily-reminder
+    #    and weekly-recap endpoints gate delivery on each user's LOCAL preferred hour
+    #    (and, for recaps, local day of week). A once-daily/once-weekly trigger could only
+    #    ever match the single timezone whose local window happened to coincide with the
+    #    trigger instant, so every other user — including all default-preference users
+    #    (UTC, reminder 09:00, recap Sunday 18:00) — was silently skipped. The per-user
+    #    gate plus the local-date idempotency key make hourly invocation exactly-once.
     - cron: '30 * * * *'
-    # 3. Daily reminder at 09:00 AM IST (03:30 UTC: 30 3 * * *)
-    - cron: '30 3 * * *'
-    # 4. Weekly recap every Monday at 09:00 AM IST (03:30 UTC: 30 3 * * 1)
-    - cron: '30 3 * * 1'
-    # 5. Queue / timeline / delivery log cleanup daily at 02:00 AM IST (20:30 UTC: 30 20 * * *)
+    # 3. Queue / timeline / delivery log cleanup daily at 02:00 AM IST (20:30 UTC: 30 20 * * *)
     - cron: '30 20 * * *'
   workflow_dispatch:
     inputs:
@@ -62,11 +64,12 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
 
+  # DEPRECATED (Phase T5): /api/cron/process-email-queue handles all retries continuously every 5 minutes.
+  # Retained solely for manual diagnostic invocation.
   retry-failed-emails:
-    name: Retry Failed Emails
+    name: Retry Failed Emails (Deprecated)
     if: |
-      github.event_name == 'schedule' && github.event.schedule == '30 * * * *' ||
-      github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'retry')
+      github.event_name == 'workflow_dispatch' && inputs.job_to_run == 'retry'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -82,7 +85,7 @@ jobs:
   daily-reminder:
     name: Queue Daily Reminders
     if: |
-      github.event_name == 'schedule' && github.event.schedule == '30 3 * * *' ||
+      github.event_name == 'schedule' && github.event.schedule == '30 * * * *' ||
       github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'daily')
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -98,8 +101,12 @@ jobs:
 
   weekly-recap:
     name: Queue Weekly Recaps
+    # Runs hourly on the same '30 * * * *' trigger as daily reminders. The endpoint gates
+    # each user on their LOCAL day-of-week AND local hour, so hourly invocation dispatches
+    # exactly one recap per user per week (in their local Sunday-18:00-by-default window),
+    # deduplicated by the weekly-recap-<user>-<localDate> idempotency key.
     if: |
-      github.event_name == 'schedule' && github.event.schedule == '30 3 * * 1' ||
+      github.event_name == 'schedule' && github.event.schedule == '30 * * * *' ||
       github.event_name == 'workflow_dispatch' && (inputs.job_to_run == 'all' || inputs.job_to_run == 'weekly')
     runs-on: ubuntu-latest
     timeout-minutes: 5

@@ -144,6 +144,16 @@ export async function POST(request: Request) {
       request.headers.get('webhook-signature')
     )
 
+    // A webhook this endpoint cannot cryptographically authenticate must be rejected in
+    // production. This route writes suppression records and disables users' email
+    // preferences, so accepting an unverifiable request is a forgery vector — and there
+    // is no startup env validation guaranteeing the secrets are set. We therefore fail
+    // CLOSED unless we are explicitly in local dev/test, where a provider secret is
+    // typically absent; an unset or unknown NODE_ENV (as on a misconfigured deploy)
+    // counts as production and is rejected, mirroring the cron actor's "no secret
+    // configured must never authenticate" rule.
+    const allowUnverified = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+
     // 1. Authenticate Inbound Webhook Request
     if (hasSvixHeaders) {
       // Path A: Resend / Svix Signature Verification
@@ -161,6 +171,18 @@ export async function POST(request: Request) {
           })
           return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
         }
+      } else if (!allowUnverified) {
+        // Signed webhook request arrived but RESEND_WEBHOOK_SECRET is not configured —
+        // we cannot verify it, so reject rather than process it unauthenticated.
+        log.warn('email.webhook.unauthenticated', { reason: 'resend_secret_unconfigured' })
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'error',
+          category: 'webhook',
+          operation: 'resend_webhook_auth',
+          message: 'Rejected webhook: Svix headers present but RESEND_WEBHOOK_SECRET is not configured',
+        })
+        return NextResponse.json({ error: 'Unauthorized: Webhook verification is not configured' }, { status: 401 })
       }
     } else {
       // Path B: Brevo Webhook Shared Secret Verification
@@ -181,6 +203,17 @@ export async function POST(request: Request) {
         // If Resend secret is configured but request lacks Svix headers and no Brevo secret is configured, reject
         log.warn('email.webhook.unauthenticated', { reason: 'missing_headers' })
         return NextResponse.json({ error: 'Unauthorized: Missing webhook authentication' }, { status: 401 })
+      } else if (!allowUnverified) {
+        // No webhook secret configured at all — cannot authenticate; reject in production.
+        log.warn('email.webhook.unauthenticated', { reason: 'no_secret_configured' })
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'error',
+          category: 'webhook',
+          operation: 'brevo_webhook_auth',
+          message: 'Rejected webhook: no BREVO_WEBHOOK_SECRET or RESEND_WEBHOOK_SECRET is configured',
+        })
+        return NextResponse.json({ error: 'Unauthorized: Webhook verification is not configured' }, { status: 401 })
       }
     }
 
@@ -245,6 +278,39 @@ export async function POST(request: Request) {
       try {
         const supabase = createServiceRoleClient()
 
+        // Derive deterministic provider event ID for idempotency
+        const svixId = request.headers.get('svix-id') || request.headers.get('webhook-id')
+        const rawEventId = String(data.id || payload.id || '')
+        const providerEventId = svixId
+          ? `resend:${svixId}`
+          : rawEventId
+            ? `${providerLabel.toLowerCase()}:${rawEventId}`
+            : emailId
+              ? `${providerLabel.toLowerCase()}:${emailId}:${eventType}`
+              : null
+
+        // Idempotency: verify this exact provider event has not already been ingested
+        if (providerEventId) {
+          try {
+            const { data: existingEvent } = await supabase
+              .from('email_delivery_events')
+              .select('id')
+              .eq('provider_event_id', providerEventId)
+              .maybeSingle()
+
+            if (existingEvent && existingEvent.id) {
+              return NextResponse.json({
+                success: true,
+                processed: true,
+                duplicate: true,
+                outboundEventType: eventType,
+              })
+            }
+          } catch {
+            // Column or query failure falls through to normal insert
+          }
+        }
+
         // 1. Find target queue item by resend_id
         let queueId: string | null = null
         if (emailId) {
@@ -256,13 +322,14 @@ export async function POST(request: Request) {
           if (queueItem && queueItem.id) queueId = String(queueItem.id)
         }
 
-        // 2. Insert into email_delivery_events log
+        // 2. Insert into email_delivery_events log (with provider_event_id and sanitized metadata)
         await supabase.from('email_delivery_events').insert({
           email_queue_id: queueId,
           resend_id: emailId || null,
           event_type: eventType,
           metadata: (data as unknown as import('@/lib/supabase').Json),
           occurred_at: new Date().toISOString(),
+          provider_event_id: providerEventId || null,
         })
 
         // 3. Update queue item status if matched
@@ -297,15 +364,38 @@ export async function POST(request: Request) {
         // Suppression is also what keeps the retry routes from requeueing these rows —
         // they exclude suppressed recipients before requeueing.
         if (eventType === 'email.complained' || eventType === 'email.bounced') {
-          const recipientEmail = String(data.email || data.to || data.recipient || payload.email || '')
-          if (recipientEmail) {
+          const rawEmail = String(data.email || data.to || data.recipient || payload.email || '').trim().toLowerCase()
+          if (rawEmail && rawEmail.includes('@')) {
+            // A. Synchronize suppression record in email_suppressions
             await supabase
               .from('email_suppressions')
               .upsert({
-                email: recipientEmail,
+                email: rawEmail,
                 reason: eventType === 'email.complained' ? 'spam_complaint' : 'hard_bounce',
                 suppressed_at: new Date().toISOString(),
-              })
+              }, { onConflict: 'email' })
+
+            // B. Synchronize user preferences if user exists in public.users
+            try {
+              const { data: userRow } = await supabase
+                .from('users')
+                .select('id')
+                .eq('email', rawEmail)
+                .maybeSingle()
+
+              if (userRow && userRow.id) {
+                await supabase
+                  .from('user_notification_preferences')
+                  .update({
+                    all_email: false,
+                    marketing_email: false,
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq('user_id', userRow.id)
+              }
+            } catch (userSyncErr) {
+              log.warnException('email.webhook.user_pref_suppress_sync_failed', userSyncErr)
+            }
           }
         }
 

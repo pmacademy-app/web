@@ -3,7 +3,7 @@ import path from 'path'
 import { verifyTheoryReadEngagement, getRuntimeXpValues } from '../xp'
 import { updateUserStreak } from '../streaks-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '../supabase'
+import type { Database, Json } from '../supabase'
 import { createServiceRoleClient } from '../supabase'
 import { awardXp, hasXpEvent } from '../xp-service'
 import { completeLesson } from '../lessons-completion-service'
@@ -212,64 +212,98 @@ export async function recordQuizAttemptAction(
   const correctCount = validatedAttempts.filter((a) => a.is_correct).length
   const scorePercentage = Math.round((correctCount / totalQuestions) * 100)
 
-  const insertRows = validatedAttempts.map((a) => ({
-    user_id: userId,
-    lesson_id: lessonId,
-    question_id: a.question_id,
-    selected_option: a.selected_option,
-    is_correct: a.is_correct,
-  }))
-
-  const { error: attemptsInsertError } = await supabase
-    .from('quiz_attempts')
-    .insert(insertRows)
-
-  if (attemptsInsertError) throw attemptsInsertError
-
-  const { data: progress, error: progressFetchError } = await supabase
-    .from('user_lesson_progress')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('lesson_id', lessonId)
-    .maybeSingle()
-
-  if (progressFetchError) throw progressFetchError
-
-  const isFirstAttempt = !progress || progress.quiz_attempts === 0
-
   const xpConfig = await getRuntimeXpValues(supabase)
 
-  const { data: existingQuizEvents } = await supabase
-    .from('xp_events')
-    .select('xp_amount')
-    .eq('user_id', userId)
-    .eq('source_type', 'quiz_correct')
-    .eq('source_id', lessonId)
+  let totalXpToAward = 0
+  let isFirstAttempt = false
 
-  const alreadyAwardedXp = existingQuizEvents?.reduce((sum, e) => sum + e.xp_amount, 0) ?? 0
-  const maxPossibleXp = correctCount * xpConfig.QUIZ_CORRECT
-  const incrementalXp = Math.max(0, maxPossibleXp - alreadyAwardedXp)
+  // Attempt atomic execution via PostgreSQL RPC record_lesson_quiz_completion.
+  // The RPC returns a jsonb envelope; narrow it explicitly rather than casting the
+  // client, so the typed data layer stays free of escape-hatch casts (B8-G).
+  let rpcSuccess = false
+  try {
+    const { data: rpcData, error: rpcError } = await supabase.rpc('record_lesson_quiz_completion', {
+      p_user_id: userId,
+      p_lesson_id: lessonId,
+      p_score_percentage: scorePercentage,
+      p_correct_count: correctCount,
+      p_total_questions: totalQuestions,
+      p_attempts: validatedAttempts as Json,
+      p_quiz_correct_xp_per_question: xpConfig.QUIZ_CORRECT,
+      p_quiz_perfect_bonus_xp: xpConfig.QUIZ_PERFECT_BONUS,
+    })
 
-  let perfectBonusXp = 0
-  if (isFirstAttempt && correctCount === totalQuestions) {
-    const hasBonus = await hasXpEvent(supabase, userId, 'quiz_bonus', lessonId)
-    if (!hasBonus) {
-      perfectBonusXp = xpConfig.QUIZ_PERFECT_BONUS
+    const envelope =
+      rpcData && typeof rpcData === 'object' && !Array.isArray(rpcData)
+        ? (rpcData as Record<string, unknown>)
+        : null
+
+    if (!rpcError && envelope && envelope.success === true) {
+      rpcSuccess = true
+      totalXpToAward = typeof envelope.total_xp_awarded === 'number' ? envelope.total_xp_awarded : 0
+      isFirstAttempt = Boolean(envelope.is_first_attempt)
     }
+  } catch {
+    rpcSuccess = false
   }
 
-  const totalXpToAward = incrementalXp + perfectBonusXp
+  // Fallback path when running in environments without the RPC (e.g. unit mocks)
+  if (!rpcSuccess) {
+    const insertRows = validatedAttempts.map((a) => ({
+      user_id: userId,
+      lesson_id: lessonId,
+      question_id: a.question_id,
+      selected_option: a.selected_option,
+      is_correct: a.is_correct,
+    }))
 
-  await completeLesson(
-    supabase,
-    userId,
-    lessonId,
-    scorePercentage,
-    totalXpToAward
-  )
+    const { error: attemptsInsertError } = await supabase
+      .from('quiz_attempts')
+      .insert(insertRows)
 
-  if (incrementalXp > 0) {
-    try {
+    if (attemptsInsertError) throw attemptsInsertError
+
+    const { data: progress, error: progressFetchError } = await supabase
+      .from('user_lesson_progress')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('lesson_id', lessonId)
+      .maybeSingle()
+
+    if (progressFetchError) throw progressFetchError
+
+    isFirstAttempt = !progress || progress.quiz_attempts === 0
+
+    const { data: existingQuizEvents } = await supabase
+      .from('xp_events')
+      .select('xp_amount')
+      .eq('user_id', userId)
+      .eq('source_type', 'quiz_correct')
+      .eq('source_id', lessonId)
+
+    const alreadyAwardedXp = existingQuizEvents?.reduce((sum, e) => sum + e.xp_amount, 0) ?? 0
+    const maxPossibleXp = correctCount * xpConfig.QUIZ_CORRECT
+    const incrementalXp = Math.max(0, maxPossibleXp - alreadyAwardedXp)
+
+    let perfectBonusXp = 0
+    if (isFirstAttempt && correctCount === totalQuestions) {
+      const hasBonus = await hasXpEvent(supabase, userId, 'quiz_bonus', lessonId)
+      if (!hasBonus) {
+        perfectBonusXp = xpConfig.QUIZ_PERFECT_BONUS
+      }
+    }
+
+    totalXpToAward = incrementalXp + perfectBonusXp
+
+    await completeLesson(
+      supabase,
+      userId,
+      lessonId,
+      scorePercentage,
+      totalXpToAward
+    )
+
+    if (incrementalXp > 0) {
       await awardXp(
         supabase,
         userId,
@@ -277,13 +311,9 @@ export async function recordQuizAttemptAction(
         incrementalXp,
         lessonId
       )
-    } catch (xpError) {
-      console.error(`[lessons-db] Error logging quiz_correct XP:`, xpError)
     }
-  }
 
-  if (perfectBonusXp > 0) {
-    try {
+    if (perfectBonusXp > 0) {
       await awardXp(
         supabase,
         userId,
@@ -291,8 +321,6 @@ export async function recordQuizAttemptAction(
         perfectBonusXp,
         lessonId
       )
-    } catch (bonusError) {
-      console.error(`[lessons-db] Error logging quiz_bonus XP:`, bonusError)
     }
   }
 

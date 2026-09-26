@@ -1,33 +1,17 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Bell, Clock, Save, CheckCircle2 } from 'lucide-react'
+import React, { useState, useRef } from 'react'
+import { Bell, Clock, Save, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 import { useApiQuery } from '@/lib/api/hooks'
 import { apiPatch } from '@/lib/api/client'
+import { useDirtyFormGuard, areFormsEqual } from '@/hooks/use-dirty-form-guard'
+import { showClientToast } from '@/lib/events/client-event-bus'
 import type { NotificationPreferencesResponse } from '@/lib/api/contracts/settings'
 
-function NotificationPreferencesForm({
-  initialPreferences,
-  onSaveSuccess,
-}: {
-  initialPreferences?: NotificationPreferencesResponse['preferences']
-  onSaveSuccess: () => void
-}) {
-  const [saving, setSaving] = useState<boolean>(false)
-  const [savedSuccess, setSavedSuccess] = useState<boolean>(false)
+type PreferencesState = ReturnType<typeof buildPreferencesState>
 
-  const p = initialPreferences
-  const [preferences, setPreferences] = useState<{
-    inAppEnabled: boolean
-    emailEnabled: boolean
-    reminderHour: number
-    categories: {
-      learning: { inApp: boolean; email: boolean }
-      achievements: { inApp: boolean; email: boolean }
-      security: { inApp: boolean; email: boolean }
-      marketing: { inApp: boolean; email: boolean }
-    }
-  }>({
+function buildPreferencesState(p?: NotificationPreferencesResponse['preferences']) {
+  return {
     inAppEnabled: p?.in_app_enabled ?? true,
     emailEnabled: p?.email_enabled ?? true,
     reminderHour: p?.preferred_reminder_hour ?? 20,
@@ -49,11 +33,33 @@ function NotificationPreferencesForm({
         email: p?.marketing_email ?? false,
       },
     },
-  })
+  }
+}
+
+function NotificationPreferencesForm({
+  initialPreferences,
+  onSaveSuccess,
+}: {
+  initialPreferences?: NotificationPreferencesResponse['preferences']
+  onSaveSuccess: () => void
+}) {
+  const [persistedPreferences, setPersistedPreferences] = useState<PreferencesState>(() => buildPreferencesState(initialPreferences))
+  const [preferences, setPreferences] = useState<PreferencesState>(() => buildPreferencesState(initialPreferences))
+  const [saving, setSaving] = useState<boolean>(false)
+  const [savedSuccess, setSavedSuccess] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const saveCountRef = useRef(0)
+
+  const isDirty = !areFormsEqual(preferences, persistedPreferences)
+  useDirtyFormGuard(isDirty)
 
   const handleSave = async () => {
+    if (saving) return
+    const currentSaveId = ++saveCountRef.current
     setSaving(true)
     setSavedSuccess(false)
+    setErrorMessage(null)
+
     try {
       const payload = {
         in_app_enabled: preferences.inAppEnabled,
@@ -71,15 +77,28 @@ function NotificationPreferencesForm({
 
       const res = await apiPatch<NotificationPreferencesResponse>('/api/settings/notifications', payload)
 
+      if (currentSaveId !== saveCountRef.current) return
+
       if (res.ok && res.data.success) {
+        setPersistedPreferences(preferences)
         setSavedSuccess(true)
+        showClientToast('Preferences Saved', 'Your notification preferences have been successfully updated.', 'success')
         onSaveSuccess()
         setTimeout(() => setSavedSuccess(false), 3000)
+      } else {
+        const errorText = !res.ok ? res.error.message : ((res.data as unknown as { error?: string })?.error || 'Failed to update preferences. Please try again.')
+        setErrorMessage(errorText)
+        showClientToast('Save Failed', errorText, 'error')
       }
     } catch (err) {
-      console.error('[NotificationPreferencesTab] Save error:', err)
+      if (currentSaveId !== saveCountRef.current) return
+      const errorText = err instanceof Error ? err.message : 'Network error updating preferences.'
+      setErrorMessage(errorText)
+      showClientToast('Save Failed', errorText, 'error')
     } finally {
-      setSaving(false)
+      if (currentSaveId === saveCountRef.current) {
+        setSaving(false)
+      }
     }
   }
 
@@ -102,7 +121,7 @@ function NotificationPreferencesForm({
               type="checkbox"
               checked={preferences.inAppEnabled}
               onChange={(e) =>
-                setPreferences((prev) => ({ ...prev, inAppEnabled: e.target.checked }))
+                setPreferences((prev: PreferencesState) => ({ ...prev, inAppEnabled: e.target.checked }))
               }
               className="w-4 h-4 rounded text-primary border-border focus:ring-primary"
             />
@@ -117,7 +136,7 @@ function NotificationPreferencesForm({
               type="checkbox"
               checked={preferences.emailEnabled}
               onChange={(e) =>
-                setPreferences((prev) => ({ ...prev, emailEnabled: e.target.checked }))
+                setPreferences((prev: PreferencesState) => ({ ...prev, emailEnabled: e.target.checked }))
               }
               className="w-4 h-4 rounded text-primary border-border focus:ring-primary"
             />
@@ -150,7 +169,7 @@ function NotificationPreferencesForm({
                     type="checkbox"
                     checked={preferences.categories[cat.key].inApp}
                     onChange={(e) =>
-                      setPreferences((prev) => ({
+                      setPreferences((prev: PreferencesState) => ({
                         ...prev,
                         categories: {
                           ...prev.categories,
@@ -168,7 +187,7 @@ function NotificationPreferencesForm({
                     type="checkbox"
                     checked={preferences.categories[cat.key].email}
                     onChange={(e) =>
-                      setPreferences((prev) => ({
+                      setPreferences((prev: PreferencesState) => ({
                         ...prev,
                         categories: {
                           ...prev.categories,
@@ -201,7 +220,7 @@ function NotificationPreferencesForm({
           <select
             value={preferences.reminderHour}
             onChange={(e) =>
-              setPreferences((prev) => ({ ...prev, reminderHour: parseInt(e.target.value, 10) }))
+              setPreferences((prev: PreferencesState) => ({ ...prev, reminderHour: parseInt(e.target.value, 10) }))
             }
             className="px-3 py-1.5 rounded-lg border border-input bg-card text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
@@ -215,23 +234,35 @@ function NotificationPreferencesForm({
       </div>
 
       {/* Save Trigger */}
-      <div className="flex items-center justify-between pt-2">
-        {savedSuccess ? (
-          <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-            <CheckCircle2 className="w-4 h-4" />
-            Preferences saved successfully!
-          </span>
-        ) : (
-          <span />
-        )}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
+        <div className="flex-1">
+          {savedSuccess ? (
+            <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 animate-in fade-in-0" role="status">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              Preferences saved successfully!
+            </span>
+          ) : errorMessage ? (
+            <span className="text-xs font-semibold text-destructive flex items-center gap-1.5 animate-in fade-in-0" role="alert">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              {errorMessage}
+            </span>
+          ) : isDirty ? (
+            <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">
+              Unsaved changes
+            </span>
+          ) : (
+            <span />
+          )}
+        </div>
 
         <button
           type="button"
           onClick={handleSave}
-          disabled={saving}
-          className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"
+          disabled={saving || !isDirty}
+          aria-disabled={saving || !isDirty}
+          className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
         >
-          <Save className="w-4 h-4" />
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saving ? 'Saving...' : 'Save Preferences'}
         </button>
       </div>

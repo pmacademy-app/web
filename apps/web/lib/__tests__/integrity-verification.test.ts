@@ -68,12 +68,18 @@ describe('Integrity Verification', () => {
       // Authentication via CRON_SECRET Bearer header
       expect(content).toContain('Authorization: Bearer ${{ secrets.CRON_SECRET }}')
 
-      // IST-converted schedules in UTC:
-      expect(content).toContain("- cron: '*/5 * * * *'")  // 5-min continuous
-      expect(content).toContain("- cron: '30 * * * *'")   // Hourly at :00 IST
-      expect(content).toContain("- cron: '30 3 * * *'")   // Daily 09:00 AM IST (03:30 UTC)
-      expect(content).toContain("- cron: '30 3 * * 1'")   // Monday 09:00 AM IST (03:30 UTC)
-      expect(content).toContain("- cron: '30 20 * * *'")  // Daily 02:00 AM IST (20:30 UTC)
+      // Schedules (UTC). Since Phase T5 the daily-reminder and weekly-recap endpoints
+      // gate each user on their LOCAL preferred hour (and local day for recaps), so both
+      // ride the HOURLY trigger rather than a fixed once-daily/once-weekly one — a coarse
+      // trigger could only ever match a single timezone and silently skipped everyone else
+      // (including all default-preference users). Per-user gating + the local-date
+      // idempotency key keep hourly invocation exactly-once.
+      expect(content).toContain("- cron: '*/5 * * * *'")  // 5-min continuous (queue + broadcasts)
+      expect(content).toContain("- cron: '30 * * * *'")   // Hourly (timezone-aware reminders + recaps)
+      expect(content).toContain("- cron: '30 20 * * *'")  // Daily cleanup 02:00 AM IST (20:30 UTC)
+      // The pre-T5 fixed daily/weekly triggers are intentionally gone; hourly + local gating replaces them.
+      expect(content).not.toContain("- cron: '30 3 * * *'")
+      expect(content).not.toContain("- cron: '30 3 * * 1'")
     })
 
     it('vercel.json is clean and does not contain duplicate Vercel Cron definitions', () => {

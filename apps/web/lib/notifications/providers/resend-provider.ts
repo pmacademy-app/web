@@ -44,19 +44,42 @@ export class ResendProvider implements NotificationProvider {
         (process.env.RESEND_FROM_EMAIL || process.env.BREVO_FROM_EMAIL)?.trim() ||
         this.defaultFrom
 
+      const headers: Record<string, string> = {}
+      if (payload.variables.suppressListUnsubscribe !== true) {
+        headers['List-Unsubscribe'] = `<${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/settings?tab=notifications>`
+      }
+      if (payload.variables.headers && typeof payload.variables.headers === 'object') {
+        Object.assign(headers, payload.variables.headers)
+      } else if (payload.variables.customHeaders && typeof payload.variables.customHeaders === 'object') {
+        Object.assign(headers, payload.variables.customHeaders)
+      }
+
+      let tags: Array<{ name: string; value: string }> | undefined
+      if (payload.variables.suppressMarketingTags !== true) {
+        if (Array.isArray(payload.variables.tags)) {
+          tags = payload.variables.tags as Array<{ name: string; value: string }>
+        } else {
+          tags = [
+            { name: 'template_key', value: payload.templateKey.replace(/[^a-zA-Z0-9_-]/g, '_') },
+            { name: 'template_version', value: String(payload.templateVersion).replace(/[^a-zA-Z0-9_-]/g, '_') },
+          ]
+        }
+      }
+
       const bodyPayload: Record<string, unknown> = {
         from: fromEmail,
         to: [recipientEmail],
         subject: (payload.variables.subject as string) || 'Prodily Notification',
         html: payload.variables.html as string,
         text: payload.variables.text as string,
-        headers: {
-          'List-Unsubscribe': `<${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/settings?tab=notifications>`,
-        },
-        tags: [
-          { name: 'template_key', value: payload.templateKey.replace(/[^a-zA-Z0-9_-]/g, '_') },
-          { name: 'template_version', value: String(payload.templateVersion).replace(/[^a-zA-Z0-9_-]/g, '_') },
-        ],
+      }
+
+      if (Object.keys(headers).length > 0) {
+        bodyPayload.headers = headers
+      }
+
+      if (tags && tags.length > 0) {
+        bodyPayload.tags = tags
       }
 
       if (payload.variables.replyTo) {

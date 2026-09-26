@@ -43,19 +43,42 @@ export class BrevoProvider implements NotificationProvider {
       const senderEmailMatch = fromEmail?.match(/<([^>]+)>/)
       const senderEmail = senderEmailMatch ? senderEmailMatch[1] : (fromEmail || BRAND.emailFromAddress)
 
+      const headers: Record<string, string> = {}
+      if (payload.variables.suppressListUnsubscribe !== true) {
+        headers['List-Unsubscribe'] = `<${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/settings?tab=notifications>`
+      }
+      if (payload.variables.headers && typeof payload.variables.headers === 'object') {
+        Object.assign(headers, payload.variables.headers)
+      } else if (payload.variables.customHeaders && typeof payload.variables.customHeaders === 'object') {
+        Object.assign(headers, payload.variables.customHeaders)
+      }
+
+      let tags: string[] | undefined
+      if (payload.variables.suppressMarketingTags !== true) {
+        if (Array.isArray(payload.variables.tags)) {
+          tags = (payload.variables.tags as unknown[]).map(String)
+        } else {
+          tags = [
+            payload.templateKey.replace(/[^a-zA-Z0-9_-]/g, '_'),
+            `v${String(payload.templateVersion).replace(/[^a-zA-Z0-9_-]/g, '_')}`,
+          ]
+        }
+      }
+
       const bodyPayload: Record<string, unknown> = {
         sender: { name: senderName, email: senderEmail },
         to: [{ email: recipientEmail, name: payload.recipient.name || recipientEmail.split('@')[0] }],
         subject: (payload.variables.subject as string) || 'Prodily Notification',
         htmlContent: (payload.variables.html as string) || '',
         textContent: (payload.variables.text as string) || '',
-        headers: {
-          'List-Unsubscribe': `<${process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || BRAND.siteUrl}/settings?tab=notifications>`,
-        },
-        tags: [
-          payload.templateKey.replace(/[^a-zA-Z0-9_-]/g, '_'),
-          `v${String(payload.templateVersion).replace(/[^a-zA-Z0-9_-]/g, '_')}`,
-        ],
+      }
+
+      if (Object.keys(headers).length > 0) {
+        bodyPayload.headers = headers
+      }
+
+      if (tags && tags.length > 0) {
+        bodyPayload.tags = tags
       }
 
       if (payload.variables.replyTo) {

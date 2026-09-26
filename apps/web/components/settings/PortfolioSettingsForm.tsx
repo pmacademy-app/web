@@ -71,6 +71,26 @@ const SECTION_DESCRIPTIONS: Record<string, { label: string; description: string 
   },
 }
 
+import { useDirtyFormGuard, areFormsEqual } from '@/hooks/use-dirty-form-guard'
+import { showClientToast } from '@/lib/events/client-event-bus'
+
+function buildPortfolioData(settings?: PortfolioSettingsData): PortfolioSettingsData {
+  return {
+    username: settings?.username || '',
+    name: settings?.name || '',
+    bio: settings?.bio || '',
+    avatarUrl: settings?.avatarUrl || '',
+    linkedinUrl: settings?.linkedinUrl || '',
+    githubUrl: settings?.githubUrl || '',
+    websiteUrl: settings?.websiteUrl || '',
+    isPortfolioPublic: settings?.isPortfolioPublic ?? true,
+    portfolioLayout: settings?.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT,
+    featuredCapstoneId: settings?.featuredCapstoneId || null,
+    portfolioViewCount: settings?.portfolioViewCount || 0,
+    verificationOverride: settings?.verificationOverride || null,
+  }
+}
+
 function PortfolioSettingsFormContent({
   initialSettings,
   initialSubmittedCapstones,
@@ -80,20 +100,16 @@ function PortfolioSettingsFormContent({
   initialSubmittedCapstones?: LearnerSubmittedCapstoneSummary[]
   onSaveSuccess: () => void
 }) {
-  const [formData, setFormData] = useState<PortfolioSettingsData>({
-    username: initialSettings?.username || '',
-    name: initialSettings?.name || '',
-    bio: initialSettings?.bio || '',
-    avatarUrl: initialSettings?.avatarUrl || '',
-    linkedinUrl: initialSettings?.linkedinUrl || '',
-    githubUrl: initialSettings?.githubUrl || '',
-    websiteUrl: initialSettings?.websiteUrl || '',
-    isPortfolioPublic: initialSettings?.isPortfolioPublic ?? true,
-    portfolioLayout: initialSettings?.portfolioLayout || DEFAULT_PORTFOLIO_LAYOUT,
-    featuredCapstoneId: initialSettings?.featuredCapstoneId || null,
-    portfolioViewCount: initialSettings?.portfolioViewCount || 0,
-    verificationOverride: initialSettings?.verificationOverride || null,
-  })
+  const [persistedSettings, setPersistedSettings] = useState<PortfolioSettingsData>(() =>
+    buildPortfolioData(initialSettings)
+  )
+  const [formData, setFormData] = useState<PortfolioSettingsData>(() =>
+    buildPortfolioData(initialSettings)
+  )
+  const saveCountRef = React.useRef(0)
+
+  const isDirty = !areFormsEqual(formData, persistedSettings)
+  useDirtyFormGuard(isDirty)
 
   const [submittedCapstones] = useState<LearnerSubmittedCapstoneSummary[]>(
     initialSubmittedCapstones || []
@@ -125,33 +141,47 @@ function PortfolioSettingsFormContent({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (saving) return
+    const currentSaveId = ++saveCountRef.current
     setSaving(true)
     setErrorMsg(null)
     setSuccessMsg(null)
 
-    const result = await apiPost<{ settings: PortfolioSettingsData }>('/api/settings/portfolio', formData)
-    setSaving(false)
+    try {
+      const result = await apiPost<{ settings: PortfolioSettingsData }>('/api/settings/portfolio', formData)
 
-    if (!result.ok) {
-      setErrorMsg(result.error.message)
-      return
-    }
+      if (currentSaveId !== saveCountRef.current) return
 
-    if (result.data?.settings) {
-      setFormData((prev) => ({
-        ...prev,
-        ...result.data.settings,
-      }))
-    }
-    setSuccessMsg('Portfolio settings and layout updated successfully!')
-    onSaveSuccess()
+      if (!result.ok) {
+        const errorText = result.error.message
+        setErrorMsg(errorText)
+        showClientToast('Portfolio Save Failed', errorText, 'error')
+        return
+      }
 
-    if (formData.featuredCapstoneId) {
-      const feat = submittedCapstones.find((c) => c.id === formData.featuredCapstoneId)
-      trackPortfolioFeaturedCapstoneSet(feat?.moduleSlug)
-    }
-    if (formData.portfolioLayout) {
-      trackPortfolioLayoutUpdated(formData.portfolioLayout)
+      const updated = result.data?.settings ? { ...formData, ...result.data.settings } : formData
+      setFormData(updated)
+      setPersistedSettings(updated)
+      setSuccessMsg('Portfolio settings and layout updated successfully!')
+      showClientToast('Portfolio Saved', 'Portfolio settings and layout updated successfully!', 'success')
+      onSaveSuccess()
+
+      if (formData.featuredCapstoneId) {
+        const feat = submittedCapstones.find((c) => c.id === formData.featuredCapstoneId)
+        trackPortfolioFeaturedCapstoneSet(feat?.moduleSlug)
+      }
+      if (formData.portfolioLayout) {
+        trackPortfolioLayoutUpdated(formData.portfolioLayout)
+      }
+    } catch (err) {
+      if (currentSaveId !== saveCountRef.current) return
+      const errorText = err instanceof Error ? err.message : 'Network error updating portfolio.'
+      setErrorMsg(errorText)
+      showClientToast('Portfolio Save Failed', errorText, 'error')
+    } finally {
+      if (currentSaveId === saveCountRef.current) {
+        setSaving(false)
+      }
     }
   }
 
@@ -556,21 +586,27 @@ function PortfolioSettingsFormContent({
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {successMsg && (
-            <span className="text-xs font-bold text-emerald-500 flex items-center gap-1 animate-in fade-in-0">
+            <span className="text-xs font-bold text-emerald-500 flex items-center gap-1 animate-in fade-in-0" role="status">
               <Check className="w-4 h-4 shrink-0" />
               <span>Saved successfully!</span>
             </span>
           )}
           {errorMsg && (
-            <span className="text-xs font-bold text-destructive flex items-center gap-1 animate-in fade-in-0">
+            <span className="text-xs font-bold text-destructive flex items-center gap-1 animate-in fade-in-0" role="alert">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </span>
           )}
+          {!successMsg && !errorMsg && isDirty && (
+            <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md text-center">
+              Unsaved changes
+            </span>
+          )}
           <button
             type="submit"
-            disabled={saving}
-            className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shrink-0"
+            disabled={saving || !isDirty}
+            aria-disabled={saving || !isDirty}
+            className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
           >
             {saving ? (
               <>

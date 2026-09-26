@@ -3,8 +3,16 @@ import { z } from 'zod'
 
 import { withRoute } from '@/lib/api/with-route'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
+import { getBatchUserNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { createServiceRoleClient } from '@/lib/supabase'
+
+/** Keyset pagination batch size for weekly recap processing */
+const BATCH_SIZE = 100
+/** Safety bound on total pages processed per cron invocation */
+const MAX_PAGES = 50
+/** Maximum execution duration per cron run to respect serverless function deadlines (50s) */
+const MAX_EXECUTION_MS = 50_000
 
 /**
  * `force=true` bypasses the schedule-window check. Every value is accepted, as
@@ -49,80 +57,100 @@ export const POST = withRoute(
 
     const isForced = query.force === 'true'
 
-    if (!isForced) {
-      const now = new Date()
-      const currentDay = now.getUTCDay()
-      const currentHour = now.getUTCHours()
-
-      if (currentDay !== weeklySched.dayOfWeek || currentHour !== weeklySched.hourUtc) {
-        return NextResponse.json({
-          success: true,
-          message: 'Skipped: Current time does not match configured schedule window.',
-          configured: { dayOfWeek: weeklySched.dayOfWeek, hourUtc: weeklySched.hourUtc },
-          current: { dayOfWeek: currentDay, hourUtc: currentHour },
-          recapsQueued: 0,
-        })
-      }
-    }
-
     const supabase = createServiceRoleClient()
     let recapsQueued = 0
+    let recapsSkippedTimezone = 0
+
+    const startTime = Date.now()
+    const weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    const weekNumber = Math.ceil(new Date().getDate() / 7)
 
     try {
-      // Fetch active users with email from users table
-      const { data: rawUsers, error: queryErr } = await supabase
-        .from('users')
-        .select('id, email, name, total_xp, current_streak')
-        .not('email', 'is', null)
-        .limit(100)
+      let lastSeenId: string | null = null
 
-      if (queryErr) {
-        const { logSystemError } = await import('@/lib/monitoring/logger')
-        void logSystemError({
-          severity: 'error',
-          category: 'cron',
-          operation: 'cron_weekly_recap_query',
-          message: `Database query failure in /api/cron/weekly-recap: ${queryErr.message}`,
-        })
-      }
+      for (let page = 0; page < MAX_PAGES; page++) {
+        // Enforce execution budget to guarantee return before serverless deadline
+        if (Date.now() - startTime > MAX_EXECUTION_MS) {
+          console.warn('[cron/weekly-recap] Reached execution deadline, stopping pagination')
+          break
+        }
 
-      const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; total_xp?: number; current_streak?: number }>
+        let queryBuilder = supabase
+          .from('users')
+          .select('id, email, name, total_xp, current_streak')
+          .not('email', 'is', null)
 
-      if (users.length > 0) {
+        if (lastSeenId) {
+          queryBuilder = queryBuilder.gt('id', lastSeenId)
+        }
+
+        const { data: rawUsers, error: queryErr } = await queryBuilder
+          .order('id', { ascending: true })
+          .limit(BATCH_SIZE)
+
+        if (queryErr) {
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'error',
+            category: 'cron',
+            operation: 'cron_weekly_recap_query',
+            message: `Database query failure in /api/cron/weekly-recap: ${queryErr.message}`,
+          })
+          break
+        }
+
+        const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; total_xp?: number; current_streak?: number }>
+        if (users.length === 0) break
+
         const userIds = users.map((u) => u.id)
-        const weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
-        // Fetch weekly XP events
-        const { data: xpRows } = await supabase
-          .from('xp_events')
-          .select('user_id, xp_amount')
-          .in('user_id', userIds)
-          .gte('created_at', weekStartDate)
-
-        // Fetch weekly completed lessons
-        const { data: lessonRows } = await supabase
-          .from('user_lesson_progress')
-          .select('user_id')
-          .in('user_id', userIds)
-          .eq('status', 'completed')
-          .gte('completed_at', weekStartDate)
+        // Batch fetch in parallel: weekly XP events, weekly completed lessons, and notification preferences
+        const [xpRes, lessonRes, prefMap] = await Promise.all([
+          supabase
+            .from('xp_events')
+            .select('user_id, xp_amount')
+            .in('user_id', userIds)
+            .gte('created_at', weekStartDate),
+          supabase
+            .from('user_lesson_progress')
+            .select('user_id')
+            .in('user_id', userIds)
+            .eq('status', 'completed')
+            .gte('completed_at', weekStartDate),
+          getBatchUserNotificationPreferences(supabase, userIds),
+        ])
 
         const xpMap = new Map<string, number>()
-        for (const row of xpRows || []) {
+        for (const row of (xpRes.data || []) as Array<{ user_id: string; xp_amount: number }>) {
           if (!row.user_id) continue
           xpMap.set(row.user_id, (xpMap.get(row.user_id) || 0) + (row.xp_amount || 0))
         }
 
         const lessonMap = new Map<string, number>()
-        for (const row of lessonRows || []) {
+        for (const row of (lessonRes.data || []) as Array<{ user_id: string }>) {
           lessonMap.set(row.user_id, (lessonMap.get(row.user_id) || 0) + 1)
         }
 
-        const weekNumber = Math.ceil(new Date().getDate() / 7)
+        const { getUserLocalTime } = await import('@/lib/notifications/timezone')
+
         for (const user of users) {
           if (!user.email) continue
+
+          const userPref = prefMap.get(user.id)
+          const userLocalTime = getUserLocalTime(userPref?.timezone)
+          const targetDay = userPref?.preferredRecapDay ?? weeklySched.dayOfWeek ?? 0
+          const targetHour = userPref?.preferredRecapHour ?? weeklySched.hourUtc ?? 18
+
+          // Timezone-aware delivery window evaluation:
+          // Dispatches only when user's local day of week and local hour match the recap window (bypassed with force=true)
+          if (!isForced && (userLocalTime.localDayOfWeek !== targetDay || userLocalTime.localHour !== targetHour)) {
+            recapsSkippedTimezone++
+            continue
+          }
+
           const xpEarnedThisWeek = xpMap.get(user.id) || 0
           const lessonsCompletedCount = lessonMap.get(user.id) || 0
+          const idempotencyKey = `weekly-recap-${user.id}-${userLocalTime.localDate}`
 
           const result = await enqueueNotificationItem({
             userId: user.id,
@@ -137,15 +165,21 @@ export const POST = withRoute(
               currentStreak: user.current_streak || 0,
               weekNumber,
             },
-            eventId: `weekly-recap-${user.id}-${new Date().toISOString().slice(0, 10)}`,
+            eventId: idempotencyKey,
+            idempotencyKey,
             eventType: 'system.weekly_recap',
             category: 'learning',
             priorityLevel: 'medium',
+            preloadedPreferences: userPref,
           })
           if (result.success) recapsQueued++
         }
-        await EmailAutomationsService.recordDigestRun('weeklyRecap')
+
+        lastSeenId = users[users.length - 1].id
+        if (users.length < BATCH_SIZE) break
       }
+
+      await EmailAutomationsService.recordDigestRun('weeklyRecap')
     } catch (err) {
       console.error('[cron/weekly-recap] Failed to process weekly recaps:', err)
       const { logSystemError } = await import('@/lib/monitoring/logger')

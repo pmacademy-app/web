@@ -6,8 +6,10 @@ import { processEmailQueue } from '@/lib/notifications/queue/processor'
 /**
  * POST|GET /api/cron/retry-failed
  *
- * Accepts the scheduler's `CRON_SECRET` bearer token or an authenticated admin
- * session. The unauthorized-attempt record is preserved through `onDenied`.
+ * @deprecated Deprecated in Phase T5. Email retry handling is natively unified in
+ * `/api/cron/process-email-queue`, which processes both 'pending' and 'retrying' items
+ * with exponential backoff and reclaims stale processing leases every 5 minutes.
+ * Retained for backwards compatibility with external schedulers.
  */
 export const POST = withRoute(
   {
@@ -27,17 +29,14 @@ export const POST = withRoute(
   },
   async () => {
     try {
-      // This route runs a normal queue pass — the same work /api/cron/process-email-queue
-      // already does every five minutes. It performs no dead-letter recovery and does not
-      // clear next_retry_at, so `processed` is the honest field name; the previous
-      // `retried` read as "failed items recovered", which it never was.
-      // See ISSUES_KNOWN.md D-06 and ISSUE-21.
+      // Deprecated: /api/cron/process-email-queue already drains both pending and retrying items.
       const result = await processEmailQueue(50)
       return NextResponse.json({
         success: true,
+        deprecated: true,
         timestamp: new Date().toISOString(),
         processed: result.processed,
-        note: 'Duplicates the 5-minute queue pass; performs no dead-letter recovery.',
+        note: 'Deprecated: retry processing is unified in /api/cron/process-email-queue (duplicates the 5-minute queue pass; performs no dead-letter recovery).',
       })
     } catch (err) {
       const { logSystemError } = await import('@/lib/monitoring/logger')

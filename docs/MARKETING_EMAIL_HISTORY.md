@@ -25,6 +25,7 @@ Between **August 11, 2026** and **September 18, 2026**, Prodily executed twelve 
 | **11** | `follow_prodily_sep_2026` | `apps/web/scripts/local-campaigns/follow_prodily_sep_2026/` | Brevo (280) & Resend (72) | Sep 18, 2026 | All registered eligible learners (Social Channels Follow Campaign) | 352 sent (280 Brevo, 72 Resend) | **Delivered (100% Success)** |
 | **12** | `email_1_junior_pms_sep_2026` | `apps/web/scripts/local-campaigns/email_1_junior_pms_sep_2026/` | Brevo (280) & Resend (7) | Sep 18, 2026 | Zero-progress learners (0 completed lessons, 0 total XP) | 287 sent (280 Brevo, 7 Resend) | **Delivered (100% Success)** |
 | **13** | `whats_actually_stopping_you_sep_2026` | `apps/web/scripts/local-campaigns/whats_actually_stopping_you_sep_2026/` | Resend (90) & Brevo (196) | Sep 19, 2026 | Zero-progress learners (0 completed lessons, 0 total XP) | 286 eligible (90 Resend, 196 Brevo) | **Configured / Scripted** |
+| **14** | `small_ask_prodily_sep_2026` | `apps/web/scripts/local-campaigns/small_ask_prodily_sep_2026/` | Resend (90) & Brevo (296) | Sep 25, 2026 | All registered eligible learners (Personal founder update on 500-user goal) | 386 sent (90 Resend, 296 Brevo) | **Delivered (100% Success)** |
 
 ---
 
@@ -47,10 +48,17 @@ Between **August 11, 2026** and **September 18, 2026**, Prodily executed twelve 
 - **RFC Compliance:** All outbound providers automatically attach RFC-compliant `List-Unsubscribe` headers pointing to `<https://prodily.adityagangwani.me/settings?tab=notifications>`.
 
 ### 3. Deliverability Standards & Anti-Promotions Formatting
-- **Text-Forward Presentation:** Starting in Campaign 10, re-engagement emails transitioned from heavy HTML card wrappers (drop shadows, borders, hero graphics) to clean, native typography on white canvas (`#ffffff`).
-- **Text-Link CTAs:** Prominent block buttons were replaced with clean text links (e.g. `Continue your journey →`).
-- **Clean Canonical Destination URLs:** Elimination of aggressive commercial tracking strings (`utm_medium=marketing`) in favor of direct canonical links (`https://prodily.adityagangwani.me/academy`) to prevent automated sorting into Gmail's Promotions tab.
-- **Link Hygiene:** Maintaining a low total link count (only primary journey link and discreet footer preference link) to optimize inbox placement.
+- **Standardized Primary Tab Placement Formula (September 25, 2026):**
+  Established and verified during Campaign 14 (`small_ask_prodily_sep_2026`), where the exact same setup was tested and proved to bypass Gmail's Promotions tab and land reliably in the **Primary / Normal Inbox**:
+  1. **From & Reply-To Exact Alignment:** Both set strictly to `Aditya Gangwani <aditya@prodily.adityagangwani.me>` and `aditya@prodily.adityagangwani.me`. Never point `Reply-To` to external `@gmail.com` webmail addresses.
+  2. **Suppression of List-Unsubscribe:** Set `suppressListUnsubscribe: true` for direct founder broadcasts and updates. Google's neural classifiers use the presence of `List-Unsubscribe` as an immediate machine-classification trigger to relegate emails to Promotions.
+  3. **Suppression of Marketing Tags:** Set `suppressMarketingTags: true` so no `template_key`, `template_version`, or `X-Mailin-Tag` headers are attached by Resend or Brevo.
+  4. **Open & Click Tracking Disabled:** Both `open_tracking` and `click_tracking` disabled on sending domains to eliminate redirect proxies and 1x1 tracking pixels that trigger spam and promotional heuristics.
+  5. **No Hidden Marketing Preheaders:** Zero-pixel hidden preview text divs (`display:none; font-size:1px...`) are strictly prohibited.
+  6. **No Button Blocks / Promotional CTAs:** Eliminate heavy `<button>` elements, colored button wrappers, or marketing action cards. All CTAs must use natural inline paragraph text or clean text links.
+  7. **Canonical Minimal Footprint:** Minimal unstyled preferences and unsubscribe links in the footer (`Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications`).
+  8. **Synchronized Multipart Alternative:** Both plain-text and HTML versions sent in exact match.
+- **Text-Forward Presentation:** Clean typography on white canvas (`#FFFFFF`) inside the canonical 560px Prodily card layout (`#FBFAF6` canvas, 1px `#DED8CB` border).
 
 ### 4. Safety & Idempotency Architecture
 - **Local Isolation:** Execution scripts reside under `apps/web/scripts/local-campaigns/` (isolated from public version control via `.gitignore`).
@@ -1254,6 +1262,91 @@ If you have a minute, just reply to this email and tell me. Even a couple of wor
 I'm asking because I'd rather understand what's getting in the way than keep sending you reminders that aren't useful.
 
 — Aditya Gangwani
+Founder, Prodily
+
+Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications
+```
+
+---
+
+```
+================================================================================
+CAMPAIGN 14: small_ask_prodily_sep_2026
+================================================================================
+```
+
+### Campaign Metadata
+- **Campaign Name:** Founder Update — “a small ask about Prodily”
+- **Campaign Identifier:** `small_ask_prodily_sep_2026`
+- **Source Folder:** `apps/web/scripts/local-campaigns/small_ask_prodily_sep_2026/`
+- **Script Path:** `apps/web/scripts/local-campaigns/small_ask_prodily_sep_2026/send-small-ask-prodily-campaign.ts`
+- **Log Path:** `apps/web/scripts/local-campaigns/small_ask_prodily_sep_2026/logs/campaign_sent_small_ask_prodily_sep_2026.json`
+- **Platform:** Resend (first 90 recipients) & Brevo (remaining 296 recipients)
+- **Campaign Purpose:** Personal founder update from Aditya Gangwani sharing an honest milestone reflection (set a goal for 500 users, currently at 396) and asking engaged Prodily learners to share the platform with 1–2 peers who might benefit.
+- **Campaign Type:** Founder Milestone & Reflection / Word-of-Mouth Ask Broadcast
+- **Audience Allocation (Dynamic Split):**
+  - Evaluated against live database `public.users` (396 registered users).
+  - Excluded 3 internal admins (`adityagangwaniexam@gmail.com`, `pmacademyapp@gmail.com`, `ryangomez9965@gmail.com`), 7 suppressions, 0 opt-outs.
+  - Total eligible recipients: **386 learners**.
+  - Deterministically ordered by `created_at ASC`, `id ASC`.
+  - **First 90 recipients → Resend** (`RESEND_MAX_ALLOCATION = 90`, Rank 1 to 90).
+  - **Remaining 296 recipients → Brevo** (Rank 91 to 386).
+  - Strict mutual exclusivity (zero duplicate overlap across providers).
+- **Date Sent:** September 25, 2026
+- **Sender Name:** Aditya Gangwani
+- **Sender Email:** `aditya@prodily.adityagangwani.me`
+- **Display From:** `Aditya Gangwani <aditya@prodily.adityagangwani.me>`
+- **Reply-To Address:** `aditya@prodily.adityagangwani.me` (Strictly aligned with From)
+- **Sign-off Persona:** `Aditya` \n `Founder, Prodily`
+- **Primary CTA:** None (personal reflection, word-of-mouth share ask)
+- **Unsubscribe URL:** `https://prodily.adityagangwani.me/settings?tab=notifications`
+- **Inbox Deliverability & Placement Results:**
+  - **Primary Tab Placement:** Verified landing in Gmail **Primary / Normal Inbox** (bypassed Promotions tab).
+  - **Deliverability Formula Applied:**
+    1. Aligned `Reply-To` to sender domain (`aditya@prodily.adityagangwani.me`).
+    2. Suppressed `List-Unsubscribe` header (`suppressListUnsubscribe: true`).
+    3. Suppressed marketing/template tags (`suppressMarketingTags: true`).
+    4. Domain-level open tracking and click tracking disabled.
+    5. Zero-pixel hidden marketing preheader divs eliminated.
+    6. Zero CTA button elements; natural paragraph typography.
+    7. Synchronized multipart alternative (`text/plain` + `text/html`).
+- **Status:** **Delivered to Production (386 recipients: 90 Resend, 296 Brevo — 100% Success)**
+
+---
+
+### Email 14.1 — a small ask about Prodily
+
+**Campaign:** `small_ask_prodily_sep_2026`  
+**Platform:** Resend (90) & Brevo (296)  
+**Sequence position:** 1 of 1  
+**Date:** September 25, 2026  
+**Audience:** All registered eligible learners (386 total)  
+**Sender:** Aditya Gangwani <aditya@prodily.adityagangwani.me>  
+**Reply-To:** aditya@prodily.adityagangwani.me  
+**Subject:** `a small ask about Prodily`  
+**Preview text:** `Quick honest update from me.`  
+**Primary CTA:** None  
+**Sign-off:** `Aditya` <br> `Founder, Prodily`  
+**Status:** Delivered (386 recipients logged: 90 Resend, 296 Brevo — 0 failures)  
+
+#### Exact Email Content (Plain Text)
+
+```text
+Hey,
+
+Quick honest update from me.
+
+I set a goal a few weeks back to get Prodily to 500 users by end of this month. We're at 396 right now, and I'm just going to say it, I probably won't hit 500. Getting a new product in front of the right people is way harder than I expected, even when you've built something you're proud of.
+
+Not complaining, just being upfront.
+
+You've been using Prodily for a bit now, so you probably get it better than most people ever will. The number was never really the point for me though. What I actually care about is having enough people using it that I can learn from them. Right now I genuinely don't know if the PM Fellow status is landing the way I hoped, whether people actually value putting it on their LinkedIn or if it's just a nice to have nobody really cares about. More real usage is the only way I find that out.
+
+So if Prodily's been useful to you, it would mean a lot if you shared it with one or two people who might actually benefit. Forward this email, mention it if it comes up, whatever's easiest. No pressure either way.
+
+Thanks for using it, and thanks for reading this.
+
+Aditya
 Founder, Prodily
 
 Manage Preferences · Unsubscribe: https://prodily.adityagangwani.me/settings?tab=notifications

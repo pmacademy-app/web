@@ -143,6 +143,23 @@ Meanwhile `weekly-recap` targets *all* users, so a fixed version would send inac
 
 **A user who signs up and stalls receives exactly two emails, ever: verify and welcome. Then nothing, forever.** That is the whole explanation for "stayed 2–3 days."
 
+> **Remediation status (2026-09-26, `tech-fixes`):** The *wire-level* defects behind this
+> root cause are now fixed in code (product metrics still to be measured post-deploy).
+> - **(a)** `enqueueNotificationItem` and `createInAppNotification` now resolve
+>   `user_notification_preferences` from the database (Phase **T2.1**), with a batched
+>   lookup to avoid N+1.
+> - **(b)** Preference resolution honours the persisted per-category channel flags rather
+>   than the opt-out defaults; critical auth mail still bypasses (Phase **T2.1**).
+> - **(c)** The reminder crons replaced `.limit(100)` with keyset pagination over the full
+>   audience (Phase **T3.1**) and gate delivery on each user's *local* preferred hour
+>   (Phase **T5.4**). During this final review a scheduler bug was found and fixed: the
+>   endpoints were only triggered once/day, so the new local-hour gate matched almost no
+>   one — they now run hourly. The audience-inversion concern (mailing only the engaged,
+>   demotivating "0/0/0" recaps) is **not** yet resolved: no lifecycle sequence for the
+>   never-opened / stalled / went-quiet segments has been built, and that remains product
+>   work (Blueprint §A, this plan's Phase 1). Streak-only targeting of the daily reminder
+>   is unchanged.
+
 ---
 
 ## 6. Root cause 5 — The learning loop never closes, and the reward comes after the work
@@ -247,3 +264,38 @@ Collapse `/badges` + `/progress/badges` and `/capstones` + `/progress/capstones`
 ## 11. The one thing not to do
 
 **Do not add features.** There is more product surface than 396 users can consume. Every root cause above is something already built that is disconnected, mis-sequenced, or mis-targeted by a few lines.
+
+---
+
+## 12. Technical remediation status (added 2026-09-26)
+
+The original findings above are preserved as written. This section records what the
+`tech-fixes` technical remediation track (T1–T5) and the final review changed, without
+rewriting the diagnosis.
+
+**Addressed in code (metrics pending deploy + Phase 0.B baseline):**
+- **Root cause 4 (a)/(b)** — the disconnected retention channel — is fixed at the wire
+  (T2.1). This was the audit's "highest-leverage fix." Whether it moves D7 return is a
+  hypothesis until measured server-side.
+- **Root cause 4 (c)** — the 100-row reminder ceiling — is fixed (T3.1) and reminders are
+  now timezone-aware (T5.4, with the hourly-scheduler fix from this review).
+
+**Partially addressed:**
+- **Root cause 4 (c) audience inversion** — the *plumbing* is fixed, but the missing
+  lifecycle sequences (never-opened, started-not-finished, went-quiet) and the risk of a
+  demotivating "0/0/0" weekly recap to inactive users are **product** work, not done.
+- **Root causes 1, 2, 3, 5** (activation friction, 40-minute unit of work, personalization
+  theatre, the un-closed loop) are **product-surface** problems and are **out of scope** for
+  the technical track; they remain open for Phases 3–7. Note that T4 did wire the
+  flashcard→reflection advance and surface theory-gate errors, a small piece of "landing
+  the loop" (RC5), but the sequencing/reward-timing redesign is untouched.
+
+**New engineering findings from the final review (do not change the product diagnosis):**
+- A queue capacity-exhaustion mis-classification would have **dead-lettered** transactional
+  mail during routine Brevo credit exhaustion — fixed.
+- The timezone-aware reminder/recap gate shipped with a once-daily/once-weekly scheduler, so
+  it would have **silently suppressed** almost all reminders — fixed to hourly.
+- Two committed tests had shipped red on `tech-fixes` — reconciled.
+
+**Not started:** production migration application, env/secret configuration, Vercel deploy,
+provider webhook registration, and post-deploy verification. See the Implementation Plan §9.

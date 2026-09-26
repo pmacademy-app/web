@@ -10,9 +10,14 @@ import type { Database } from '@/lib/supabase'
 import { BRAND } from '@/lib/brand'
 import { calculateLevel, type LevelInfo } from '@/lib/xp'
 import { generateCertificateCode } from '@/lib/certificates'
+import { getLessonIdsForModule } from '@/lib/curriculum-registry'
 import { PublicError } from '@/lib/errors/public-error'
 
 export type CertificateRow = Database['public']['Tables']['certificates']['Row']
+
+export interface IssueCertificateOptions {
+  bypassPrerequisites?: boolean
+}
 
 export interface VerifiedCertificatePayload {
   id: string
@@ -34,13 +39,17 @@ export interface VerifiedCertificatePayload {
 
 /**
  * Issues or retrieves an official certificate record for a user.
+ * Strictly verifies curriculum or modular completion prerequisites before issuance.
  */
 export async function issueCertificate(
   supabase: SupabaseClient<Database>,
   userId: string,
   type: string = 'full_curriculum',
-  moduleSlug: string | null = null
+  moduleSlug: string | null = null,
+  options?: IssueCertificateOptions
 ): Promise<CertificateRow> {
+  const normalizedType = type === 'module' ? 'module_completion' : type
+
   // 1. Fetch user state
   const { data: user, error: userError } = await supabase
     .from('users')
@@ -59,13 +68,52 @@ export async function issueCertificate(
     .eq('user_id', userId)
     .eq('status', 'completed')
 
-  const lessonsCompleted = progressRows?.length ?? 0
+  const completedLessonIds = new Set((progressRows || []).map((p) => p.lesson_id))
+  const lessonsCompleted = completedLessonIds.size
   const modulesCompleted = Math.min(9, Math.floor(lessonsCompleted / 10))
   const levelInfo = calculateLevel(user.total_xp || 0)
 
-  const certCode = generateCertificateCode(userId, type, moduleSlug)
+  // 3. Prerequisite validation (enforced unless explicit bypass provided)
+  if (!options?.bypassPrerequisites) {
+    if (normalizedType === 'full_curriculum') {
+      if (lessonsCompleted < 90) {
+        throw new PublicError(
+          `Full curriculum completion certificate requires completing all 90 lessons (currently ${lessonsCompleted}/90).`,
+          { status: 400, code: 'PREREQUISITES_NOT_MET' }
+        )
+      }
+    } else if (normalizedType === 'module_completion') {
+      if (!moduleSlug) {
+        throw new PublicError('Module slug is required for module certificate issuance.', {
+          status: 400,
+          code: 'INVALID_REQUEST',
+        })
+      }
+      const requiredLessonIds = getLessonIdsForModule(moduleSlug)
+      if (requiredLessonIds.length === 0) {
+        throw new PublicError(`Invalid or unrecognized module slug: "${moduleSlug}".`, {
+          status: 400,
+          code: 'INVALID_MODULE',
+        })
+      }
+      const completedInModule = requiredLessonIds.filter((id) => completedLessonIds.has(id)).length
+      if (completedInModule < requiredLessonIds.length) {
+        throw new PublicError(
+          `Module completion certificate requires completing all ${requiredLessonIds.length} lessons in this module (currently ${completedInModule}/${requiredLessonIds.length}).`,
+          { status: 400, code: 'PREREQUISITES_NOT_MET' }
+        )
+      }
+    } else {
+      throw new PublicError(`Invalid certificate type: "${type}". Must be "full_curriculum" or "module_completion".`, {
+        status: 400,
+        code: 'INVALID_REQUEST',
+      })
+    }
+  }
 
-  // 3. Check if certificate already exists
+  const certCode = generateCertificateCode(userId, normalizedType, moduleSlug)
+
+  // 4. Check if certificate already exists (idempotent lookup)
   const { data: existing } = await supabase
     .from('certificates')
     .select('*')
@@ -76,11 +124,11 @@ export async function issueCertificate(
     return existing
   }
 
-  // 4. Insert new certificate
+  // 5. Insert new certificate
   const newCert = {
     user_id: userId,
     certificate_code: certCode,
-    type,
+    type: normalizedType,
     module_slug: moduleSlug,
     learner_name: user.name || user.username || 'PM Academy Learner',
     level: levelInfo.level,

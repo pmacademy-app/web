@@ -276,11 +276,36 @@ export function HeroWorkbench() {
                     />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <div className="font-semibold text-sm text-foreground">Aditya Gangwani</div>
-                      <span className="text-[10px] font-semibold bg-primary-soft text-primary px-2 py-0.5 rounded-md border border-primary/20">
-                        Fellow
-                      </span>
+                      <div className="group relative inline-flex items-center">
+                        <span
+                          tabIndex={0}
+                          role="img"
+                          aria-label="PM Fellow"
+                          className="inline-flex items-center justify-center transition-transform duration-200 ease-out-quint group-hover:scale-110 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary rounded-full cursor-pointer"
+                        >
+                          <img
+                            src="/icon-512.png"
+                            alt="PM Fellow verified badge"
+                            width={16}
+                            height={16}
+                            className="w-4 h-4 object-contain shrink-0 drop-shadow-xs"
+                          />
+                        </span>
+
+                        {/* Hover Tooltip */}
+                        <span
+                          role="tooltip"
+                          className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 rounded bg-foreground text-background text-[11px] font-medium shadow-md whitespace-nowrap z-30 opacity-0 -translate-y-1 transition-all duration-200 ease-out-quint group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
+                        >
+                          PM Fellow
+                          <span
+                            className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-foreground"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </div>
                     </div>
                     <p className="text-xs text-ink-muted">Aspiring Product Manager · Level 6</p>
                   </div>

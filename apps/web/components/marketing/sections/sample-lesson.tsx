@@ -145,7 +145,7 @@ export async function SampleLessonSection() {
     <section
       id="sample"
       aria-labelledby="sample-heading"
-      className={`bg-surface-muted ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
+      className={`bg-transparent ${SECTION_Y} border-t border-border/80 scroll-mt-24 lg:scroll-mt-28`}
     >
       <div className={CONTAINER}>
         <Reveal amount={0.2} className="max-w-[640px] mb-12">

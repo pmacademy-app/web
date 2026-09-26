@@ -1211,3 +1211,49 @@ After all phases, using only capabilities that exist today:
 **And the team can see all of it** — signup to verification to onboarding to first lesson to return to capstone — in one server-side funnel that does not depend on cookie consent, with each change attributable to the phase that shipped it.
 
 No new product was built. The product that existed was connected.
+
+---
+
+# 9. Technical Remediation Track (T1–T5) — Status
+
+> Added 2026-09-26. The technical remediation track ran in parallel to the product
+> phases above, on branch `tech-fixes` (baseline `4748e2c` → HEAD). It is a separate
+> workstream from Phases 0–8: it hardens security, reliability, performance, UX-state
+> and operational resilience of machinery that already ships, rather than changing the
+> product surface. Two of its fixes directly discharge findings named in this plan —
+> **F1 (the dead inbox channel, `processor.ts` preference resolution)** and **F2 (the
+> inverted / capped reminder audience)** — so those findings are now addressed in code,
+> though their *product* metrics (activation, return rate) remain to be measured under
+> the Phase 0.B baseline once deployed.
+
+### Completed on `tech-fixes` (code + tests + migrations authored; validated locally)
+
+| Phase | Area | Outcome |
+|---|---|---|
+| **T1** | Security & data integrity | Certificate issuance now enforces curriculum/module prerequisites; client `INSERT` on `certificates` revoked (RLS); admin deletion cascades to `auth.users` with self-/primary-/hierarchy guards; login resolves users via an O(1) `SECURITY DEFINER` RPC instead of `listUsers(1000)`; password-reset retry errors are classified, not leaked. |
+| **T2** | Backend reliability | Notification preferences resolved from `user_notification_preferences` (fixes **F1**); XP triggers scoped + ledger-authoritative across INSERT/UPDATE/DELETE with trigger-depth guards; lesson completion wrapped in the atomic `record_lesson_quiz_completion` RPC; progress reset revokes only progress-derived badges and preserves account-level achievements; admin audit false positives removed via silent authorization probes. |
+| **T3** | Performance & query | Keyset pagination + batch preference resolution in reminder crons (fixes **F2**'s 100-row ceiling); deterministic `created_at, id` keyset pagination for admin audit; parallelised SRS reads with an O(1) lesson map and batch persistence; supporting indexes. |
+| **T4** | UX & state resilience | Dirty-form guard (`beforeunload` + in-app tab confirm), `saveCountRef` stale-response protection, semantic toast feedback; lesson-tab URL sync with `popstate`; surfaced theory-engagement errors; wired flashcard→reflection advance; academy accordion retention. |
+| **T5** | Operational resilience | Email bounce/complaint webhook ingestion with Svix/Brevo verification, idempotency, suppression + preference sync; `GET /api/health` DB probe (200/503); single failover implementation (`sendEmailWithFailover`); repeated-failure and backlog alerts; timezone-aware reminder/recap delivery windows; unified retry processing (deprecated redundant `retry-failed` cron). |
+
+### Final-review fixes (2026-09-26, this pass — beyond the five phase reports)
+
+1. **Queue capacity-exhaustion mis-classification (High).** `processor.ts` classified provider failures on the human-readable `error` string instead of `providerCode`. A Brevo `HTTP 400 {"code":"not_enough_credits"}` (no message) was read as a *permanent* bad-request and **dead-lettered** instead of retried. Fixed to classify on `providerCode` (falling back to `error`); regression test added.
+2. **Timezone-aware crons never fired for most users (High).** T5.4 added a per-user *local-hour* (and local-day) delivery gate, but the GitHub Actions scheduler still triggered `daily-reminder` once/day (03:30 UTC) and `weekly-recap` once/week (Mon 03:30 UTC). With every default-preference user on UTC/09:00/Sunday-18:00, the gate could never match and **no reminders or recaps were sent**. The scheduler now invokes both endpoints **hourly** (`30 * * * *`); the per-user gate plus the local-date idempotency key make delivery exactly-once. Two stale committed tests that had shipped **red** (`integrity-verification`, `b8g-typed-db-migration`) were reconciled/fixed.
+3. **Typed data-layer escape hatch reinstated (Medium).** T2 reintroduced `as unknown as` casts into `lessons-db.ts` and `settings-service.ts`, violating the B8-G invariant. The `record_lesson_quiz_completion` RPC was added to the generated DB types and the casts removed.
+
+### Remaining — production deployment / configuration (NOT complete)
+
+These are **manual, out-of-band** steps. None have been performed; production has not been touched.
+
+- Apply migrations `20260925000001` (T1 security), `20260925000002` (T2 reliability), `20260925000003` (T3 performance), `20260926000001` (T5 operational) to the Supabase production database, in filename order. Each migration file carries its own inline description and safety notes.
+- Set/verify env: `BREVO_API_KEY`, `BREVO_WEBHOOK_SECRET`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `CRON_SECRET`.
+- Deploy `tech-fixes` to Vercel; verify `GET /api/health` returns 200.
+- Register webhook endpoints in the Brevo and Resend dashboards → `/api/email/webhooks`.
+- Confirm the updated GitHub Actions scheduler is active on the default branch (hourly reminder/recap trigger).
+- Backfill per-user `timezone` where available; users without one default to UTC delivery windows (acknowledged operational risk).
+
+### Deferred / non-blocking
+
+- Per-user `preferred_recap_day` / `preferred_recap_hour` are not persisted (no columns); weekly recaps use the Sunday-18:00 local default for all users. Wiring these to the schema is a future enhancement, not a regression.
+- Historical certificates forged before the T1 RLS/prerequisite hardening remain in the database; audit/revocation is an optional data-cleanup task.

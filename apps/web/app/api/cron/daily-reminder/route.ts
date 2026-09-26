@@ -3,8 +3,16 @@ import { z } from 'zod'
 
 import { withRoute } from '@/lib/api/with-route'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
+import { getBatchUserNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
 import { createServiceRoleClient } from '@/lib/supabase'
+
+/** Keyset pagination batch size for daily reminder processing */
+const BATCH_SIZE = 100
+/** Safety bound on total pages processed per cron invocation to prevent runaway loops */
+const MAX_PAGES = 50
+/** Maximum execution duration per cron run to respect serverless function deadlines (50s) */
+const MAX_EXECUTION_MS = 50_000
 
 /**
  * `force=true` bypasses the schedule-window check. Every value is accepted, as
@@ -49,48 +57,72 @@ export const POST = withRoute(
 
     const isForced = query.force === 'true'
 
-    if (!isForced) {
-      const now = new Date()
-      const currentHour = now.getUTCHours()
-
-      if (currentHour !== dailySched.hourUtc) {
-        return NextResponse.json({
-          success: true,
-          message: 'Skipped: Current time does not match configured daily schedule window.',
-          configured: { hourUtc: dailySched.hourUtc },
-          current: { hourUtc: currentHour },
-          remindersQueued: 0,
-        })
-      }
-    }
-
     const supabase = createServiceRoleClient()
     let remindersQueued = 0
+    let remindersSkippedTimezone = 0
+
+    const startTime = Date.now()
 
     try {
-      const { data: rawUsers, error: queryErr } = await supabase
-        .from('users')
-        .select('id, email, name, current_streak')
-        .gt('current_streak', 0)
-        .not('email', 'is', null)
-        .limit(100)
+      let lastSeenId: string | null = null
 
-      if (queryErr) {
-        const { logSystemError } = await import('@/lib/monitoring/logger')
-        void logSystemError({
-          severity: 'error',
-          category: 'cron',
-          operation: 'cron_daily_reminder_query',
-          message: `Database query failure in /api/cron/daily-reminder: ${queryErr.message}`,
-        })
-      }
+      for (let page = 0; page < MAX_PAGES; page++) {
+        // Enforce execution budget to guarantee return before serverless deadline
+        if (Date.now() - startTime > MAX_EXECUTION_MS) {
+          console.warn('[cron/daily-reminder] Reached execution deadline, stopping pagination')
+          break
+        }
 
-      const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; current_streak?: number }>
+        let queryBuilder = supabase
+          .from('users')
+          .select('id, email, name, current_streak')
+          .gt('current_streak', 0)
+          .not('email', 'is', null)
 
-      if (users.length > 0) {
-        const todayDate = new Date().toISOString().slice(0, 10)
+        if (lastSeenId) {
+          queryBuilder = queryBuilder.gt('id', lastSeenId)
+        }
+
+        const { data: rawUsers, error: queryErr } = await queryBuilder
+          .order('id', { ascending: true })
+          .limit(BATCH_SIZE)
+
+        if (queryErr) {
+          const { logSystemError } = await import('@/lib/monitoring/logger')
+          void logSystemError({
+            severity: 'error',
+            category: 'cron',
+            operation: 'cron_daily_reminder_query',
+            message: `Database query failure in /api/cron/daily-reminder: ${queryErr.message}`,
+          })
+          break
+        }
+
+        const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; current_streak?: number }>
+        if (users.length === 0) break
+
+        const userIds = users.map((u) => u.id)
+        // Batch resolve notification preferences for this entire page (anti-N+1)
+        const prefMap = await getBatchUserNotificationPreferences(supabase, userIds)
+
+        const { getUserLocalTime } = await import('@/lib/notifications/timezone')
+
         for (const user of users) {
           if (!user.email) continue
+
+          const userPref = prefMap.get(user.id)
+          const userLocalTime = getUserLocalTime(userPref?.timezone)
+          const targetHour = userPref?.preferredReminderHour ?? dailySched.hourUtc ?? 9
+
+          // Timezone-aware delivery window evaluation:
+          // In production, when running periodically, only dispatch if current time
+          // matches the user's local preferred reminder hour (bypassed with force=true).
+          if (!isForced && userLocalTime.localHour !== targetHour) {
+            remindersSkippedTimezone++
+            continue
+          }
+
+          const idempotencyKey = `daily-reminder-${user.id}-${userLocalTime.localDate}`
           const result = await enqueueNotificationItem({
             userId: user.id,
             toEmail: user.email,
@@ -102,15 +134,21 @@ export const POST = withRoute(
               currentStreak: user.current_streak || 1,
               dueCount: 5,
             },
-            eventId: `daily-reminder-${user.id}-${todayDate}`,
+            eventId: idempotencyKey,
+            idempotencyKey,
             eventType: 'learning.daily_reminder',
             category: 'learning',
             priorityLevel: 'medium',
+            preloadedPreferences: userPref,
           })
           if (result.success) remindersQueued++
         }
-        await EmailAutomationsService.recordDigestRun('dailyReminder')
+
+        lastSeenId = users[users.length - 1].id
+        if (users.length < BATCH_SIZE) break
       }
+
+      await EmailAutomationsService.recordDigestRun('dailyReminder')
     } catch (err) {
       console.error('[cron/daily-reminder] Failed to queue daily reminders:', err)
       const { logSystemError } = await import('@/lib/monitoring/logger')

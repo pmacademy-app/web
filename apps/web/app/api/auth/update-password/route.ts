@@ -289,10 +289,11 @@ export const POST = withRoute(
         if (!isExpected) {
           void logSystemError({ severity: 'warning', category: 'auth', operation: 'update_password_failure', message: retryError.message })
         }
-        const response = NextResponse.json(
-          { success: false, error: retryError.message || 'Failed to update password. Your reset link may have expired.' },
-          { status: isExpected ? 401 : 400 }
-        )
+        const response = apiClassifiedAuthError({
+          cause: retryError,
+          context: 'reset_password',
+          status: isExpected ? 401 : 400,
+        })
         if (isExpected) {
           clearRecoveryCookies(response)
         }
