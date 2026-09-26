@@ -31,7 +31,7 @@ import {
   GraduationCap,
   Layers,
 } from 'lucide-react'
-import { submitOnboarding, checkUsernameAvailability, OnboardingData } from './actions'
+import { submitOnboarding, checkUsernameAvailability, recordOnboardingStep, OnboardingData } from './actions'
 import { AvatarUpload } from '@/components/profile/AvatarUpload'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -300,6 +300,13 @@ export default function OnboardingWizard({ user, profile, onboardingSettings }: 
 
     return () => clearTimeout(timer)
   }, [formData.username, user.id])
+
+  // Phase 2 — record the furthest onboarding step reached for per-step funnel drop-off.
+  // Fire-and-forget and best-effort: the server action is monotonic and swallows errors,
+  // so this can never block or regress the wizard. Fires once per distinct step value.
+  useEffect(() => {
+    void recordOnboardingStep(step)
+  }, [step])
 
   const updateForm = <K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) => {
     setFormData((prev) => {
