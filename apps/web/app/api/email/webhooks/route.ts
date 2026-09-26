@@ -144,6 +144,16 @@ export async function POST(request: Request) {
       request.headers.get('webhook-signature')
     )
 
+    // A webhook this endpoint cannot cryptographically authenticate must be rejected in
+    // production. This route writes suppression records and disables users' email
+    // preferences, so accepting an unverifiable request is a forgery vector — and there
+    // is no startup env validation guaranteeing the secrets are set. We therefore fail
+    // CLOSED unless we are explicitly in local dev/test, where a provider secret is
+    // typically absent; an unset or unknown NODE_ENV (as on a misconfigured deploy)
+    // counts as production and is rejected, mirroring the cron actor's "no secret
+    // configured must never authenticate" rule.
+    const allowUnverified = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+
     // 1. Authenticate Inbound Webhook Request
     if (hasSvixHeaders) {
       // Path A: Resend / Svix Signature Verification
@@ -161,6 +171,18 @@ export async function POST(request: Request) {
           })
           return NextResponse.json({ error: 'Unauthorized: Invalid webhook signature' }, { status: 401 })
         }
+      } else if (!allowUnverified) {
+        // Signed webhook request arrived but RESEND_WEBHOOK_SECRET is not configured —
+        // we cannot verify it, so reject rather than process it unauthenticated.
+        log.warn('email.webhook.unauthenticated', { reason: 'resend_secret_unconfigured' })
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'error',
+          category: 'webhook',
+          operation: 'resend_webhook_auth',
+          message: 'Rejected webhook: Svix headers present but RESEND_WEBHOOK_SECRET is not configured',
+        })
+        return NextResponse.json({ error: 'Unauthorized: Webhook verification is not configured' }, { status: 401 })
       }
     } else {
       // Path B: Brevo Webhook Shared Secret Verification
@@ -181,6 +203,17 @@ export async function POST(request: Request) {
         // If Resend secret is configured but request lacks Svix headers and no Brevo secret is configured, reject
         log.warn('email.webhook.unauthenticated', { reason: 'missing_headers' })
         return NextResponse.json({ error: 'Unauthorized: Missing webhook authentication' }, { status: 401 })
+      } else if (!allowUnverified) {
+        // No webhook secret configured at all — cannot authenticate; reject in production.
+        log.warn('email.webhook.unauthenticated', { reason: 'no_secret_configured' })
+        const { logSystemError } = await import('@/lib/monitoring/logger')
+        void logSystemError({
+          severity: 'error',
+          category: 'webhook',
+          operation: 'brevo_webhook_auth',
+          message: 'Rejected webhook: no BREVO_WEBHOOK_SECRET or RESEND_WEBHOOK_SECRET is configured',
+        })
+        return NextResponse.json({ error: 'Unauthorized: Webhook verification is not configured' }, { status: 401 })
       }
     }
 

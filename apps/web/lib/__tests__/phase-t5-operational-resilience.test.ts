@@ -122,6 +122,52 @@ describe('Phase T5 — Operational Resilience & Observability Test Suite', () =>
       expect(res.status).toBe(401)
     })
 
+    // Regression: production must fail CLOSED when a webhook cannot be verified. Without
+    // env validation, a deploy could start with RESEND_WEBHOOK_SECRET unset; a request
+    // carrying svix headers would then be processed unverified — a forgery vector into
+    // the suppression/preference tables.
+    it('rejects a signed (svix) request with HTTP 401 in production when RESEND_WEBHOOK_SECRET is missing', async () => {
+      const prevNodeEnv = process.env.NODE_ENV
+      delete process.env.RESEND_WEBHOOK_SECRET
+      delete process.env.BREVO_WEBHOOK_SECRET
+      ;(process.env as Record<string, string | undefined>).NODE_ENV = 'production'
+      try {
+        const payload = JSON.stringify({ type: 'email.bounced', data: { email: 'victim@example.com', bounce: { type: 'Permanent' } } })
+        const req = new Request('http://localhost:3000/api/email/webhooks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'svix-id': 'msg_forged',
+            'svix-timestamp': `${Math.floor(Date.now() / 1000)}`,
+            'svix-signature': 'v1,anything',
+          },
+          body: payload,
+        })
+        const res = await handleWebhook(req)
+        expect(res.status).toBe(401)
+      } finally {
+        ;(process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv
+      }
+    })
+
+    it('rejects an unsigned request with HTTP 401 in production when no webhook secret is configured', async () => {
+      const prevNodeEnv = process.env.NODE_ENV
+      delete process.env.RESEND_WEBHOOK_SECRET
+      delete process.env.BREVO_WEBHOOK_SECRET
+      ;(process.env as Record<string, string | undefined>).NODE_ENV = 'production'
+      try {
+        const req = new Request('http://localhost:3000/api/email/webhooks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event: 'hard_bounce', email: 'victim@example.com' }),
+        })
+        const res = await handleWebhook(req)
+        expect(res.status).toBe(401)
+      } finally {
+        ;(process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv
+      }
+    })
+
     it('handles malformed JSON payload safely with HTTP 400 without crashing', async () => {
       const malformedPayload = '{"type": "email.bounced", data: { unclosed'
       const headers = generateSvixHeaders(malformedPayload)
