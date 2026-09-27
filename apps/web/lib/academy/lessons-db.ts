@@ -1,6 +1,9 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
 import { verifyTheoryReadEngagement, getRuntimeXpValues } from '../xp'
+import { getCoreReadingMinutes } from './lesson-structure'
+import { getRecutVariant } from './experiment'
+import type { CompiledLesson } from '@/types'
 import { updateUserStreak } from '../streaks-db'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Json } from '../supabase'
@@ -140,13 +143,27 @@ export async function recordTheoryReadAction(
   activeSeconds: number,
   scrollPercentage: number
 ) {
+  // Phase 4 (§4.1, Step 5): the engagement gate must reflect what the learner is actually
+  // asked to read before the quiz — the Core — not the full historical lesson including the
+  // Deep-dive. `recordTheoryReadAction` previously fed the FULL-lesson `estimatedReadingTime`
+  // into the ≥45s floor, so for a treatment learner the gate would silently demand they dwell
+  // long enough to have read material that is no longer on the Core path. We recompute against
+  // Core reading time for the treatment variant; control keeps the authored full-lesson figure
+  // so its gate is unchanged. The variant is derived deterministically from the userId, the
+  // same way the lesson RSC derives it — no extra parameter is threaded through the route.
   let estMinutesReading = 2
   try {
     if (/^les_[a-z0-9]+$/.test(lessonId)) {
       const filePath = path.join(DIST_LESSONS_DIR, `${lessonId}.json`)
       const raw = await readFile(filePath, 'utf-8')
-      const lesson = JSON.parse(raw)
-      estMinutesReading = lesson?.estimatedReadingTime ?? 2
+      const lesson = JSON.parse(raw) as CompiledLesson
+      const fullEst = lesson?.estimatedReadingTime ?? 2
+      if (getRecutVariant(userId) === 'treatment') {
+        const coreMinutes = getCoreReadingMinutes(lesson)
+        estMinutesReading = coreMinutes > 0 ? coreMinutes : fullEst
+      } else {
+        estMinutesReading = fullEst
+      }
     }
   } catch (e) {
     console.warn(`[lessons-db] Lesson file not found for ${lessonId}. Defaulting to 2 mins.`, e)

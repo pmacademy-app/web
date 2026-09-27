@@ -63,6 +63,16 @@ type EventMap = {
   // ─── Lesson Feedback Loop Events (Phase 6) ───────────────────────────────
   lesson_feedback_submitted:       { lesson_id: string; rating: number; tags_count: number; has_comment: boolean }
 
+  // ─── Re-cut Unit of Work Events (Plan Phase 4) ────────────────────────────
+  // GA4 is consent-gated (correction C2), so the authoritative Phase 4 funnel is the
+  // server-side one; these mirror the key moments for consenting-visitor colour. The
+  // server-measurable stages (opened / theory read / completed / deep-dive marker) remain
+  // the source of truth for the experiment readout.
+  recut_experiment_exposed:  { lesson_id: string; variant: 'control' | 'treatment' }
+  core_viewed:               { lesson_id: string; variant?: 'control' | 'treatment' }
+  quiz_started:              { lesson_id: string; question_count: number }
+  deep_dive_opened:          { lesson_id: string }
+
   // ─── Sharing & Referral Events (Phase 7) ──────────────────────────────────
   referral_link_copied:            { channel?: string }
   referral_shared:                 { platform: 'linkedin' | 'twitter' | 'whatsapp' | 'generic' }
@@ -247,6 +257,28 @@ export function trackLessonFeedbackSubmitted(
     tags_count: tagsCount,
     has_comment: hasComment,
   })
+}
+
+// ─── Re-cut Unit of Work Trackers (Plan Phase 4) ─────────────────────────────
+
+/** Fired once per lesson mount with the learner's A/B variant for the recut experiment. */
+export function trackRecutExperimentExposed(lessonId: string, variant: 'control' | 'treatment') {
+  trackEvent('recut_experiment_exposed', { lesson_id: lessonId, variant })
+}
+
+/** Fired when the Core (theory) surface is first viewed. */
+export function trackCoreViewed(lessonId: string, variant?: 'control' | 'treatment') {
+  trackEvent('core_viewed', { lesson_id: lessonId, variant })
+}
+
+/** Fired when the learner opens the practice quiz, with the number of questions presented. */
+export function trackQuizStarted(lessonId: string, questionCount: number) {
+  trackEvent('quiz_started', { lesson_id: lessonId, question_count: questionCount })
+}
+
+/** Fired the first time the learner expands the optional Deep-dive section. */
+export function trackDeepDiveOpened(lessonId: string) {
+  trackEvent('deep_dive_opened', { lesson_id: lessonId })
 }
 
 // ─── Sharing & Referral Trackers (Phase 7) ──────────────────────────────────

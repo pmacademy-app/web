@@ -251,6 +251,32 @@ export function ActivationFunnelView({ data }: ActivationFunnelViewProps) {
           </div>
         )}
       </AdminSection>
+
+      {/* Deep-dive engagement — Phase 4 (§4.4) guardrail: is the optional depth abandoned? */}
+      <AdminSection title="Deep-dive engagement" icon={GraduationCap} meta="Among lesson-openers">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <div className="space-y-1">
+            <span className="block text-[11px] uppercase tracking-wider text-admin-fg-muted">Opened Deep-dive</span>
+            <span className="font-mono text-lg font-bold text-admin-fg">
+              {num(data.deepDive.learnersWhoOpenedDeepDive)}
+            </span>
+          </div>
+          <div className="space-y-1">
+            <span className="block text-[11px] uppercase tracking-wider text-admin-fg-muted">% of openers</span>
+            <span className="font-mono text-lg font-bold text-admin-fg">{data.deepDive.pctOfOpeners}%</span>
+          </div>
+          <div className="space-y-1">
+            <span className="block text-[11px] uppercase tracking-wider text-admin-fg-muted">Lessons w/ Deep-dive</span>
+            <span className="font-mono text-lg font-bold text-admin-fg">
+              {num(data.deepDive.lessonsWithDeepDiveOpened)}
+            </span>
+          </div>
+        </div>
+        <p className="mt-3 text-[11px] text-admin-fg-muted">
+          A near-zero rate warns the depth that differentiates Prodily is being abandoned even if activation improves.
+          Consent-independent (server marker), so complete versus GA4.
+        </p>
+      </AdminSection>
     </div>
   )
 }

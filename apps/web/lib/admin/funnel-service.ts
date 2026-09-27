@@ -16,6 +16,7 @@ import {
   assembleActivationFunnelStages,
   computeOnboardingStepFunnel,
   computeCompletedLessonDistribution,
+  computeDeepDiveEngagement,
   computeReviewPctOfOpeners,
   type ActivationFunnelView,
   type OnboardingStepUserRow,
@@ -94,10 +95,12 @@ async function aggregateActivationFunnel(
           )
           .range(from, to)
       ),
-      fetchAllRows<BaselineProgressRow>((from, to) =>
+      fetchAllRows<BaselineProgressRow & { deep_dive_opened_at: string | null }>((from, to) =>
         supabase
           .from('user_lesson_progress')
-          .select('user_id, lesson_id, status, theory_read_at, completed_at, quiz_attempts')
+          .select(
+            'user_id, lesson_id, status, theory_read_at, completed_at, quiz_attempts, deep_dive_opened_at'
+          )
           .range(from, to)
       ),
       fetchAllRows<BaselineXpEventRow>((from, to) =>
@@ -117,6 +120,7 @@ async function aggregateActivationFunnel(
     const onboardingSteps = computeOnboardingStepFunnel(users)
     const knownUserIds = new Set(users.map((u) => u.id))
     const continued = computeCompletedLessonDistribution(progress, knownUserIds)
+    const deepDive = computeDeepDiveEngagement(progress, knownUserIds)
 
     return {
       generatedAt,
@@ -132,6 +136,7 @@ async function aggregateActivationFunnel(
       reviewPctOfOpeners: computeReviewPctOfOpeners(funnel, review),
       capstone,
       continued,
+      deepDive,
     }
   } catch (err) {
     console.error('[FunnelService] Failed to aggregate activation funnel:', err)
@@ -174,6 +179,12 @@ async function aggregateActivationFunnel(
         awaitingReview: 0,
       },
       continued: { activatedLearners: 0, buckets: [] },
+      deepDive: {
+        learnersWhoOpenedLesson: 0,
+        learnersWhoOpenedDeepDive: 0,
+        pctOfOpeners: 0,
+        lessonsWithDeepDiveOpened: 0,
+      },
       failed: true,
     }
   }

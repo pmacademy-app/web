@@ -20,6 +20,8 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { getServerUser } from '@/lib/auth'
 import { isLessonUnlocked } from '@/lib/lessons-completion-service'
 import { getCanonicalPrerequisiteRange } from '@/lib/curriculum-access'
+import { getRecutVariant } from '@/lib/academy/experiment'
+import { withSampledQuiz } from '@/lib/academy/lesson-structure'
 import { BRAND } from '@/lib/brand'
 import { safeJsonLd } from '@/lib/seo/safe-json-ld'
 import LessonPageContent from './lesson-content'
@@ -302,7 +304,19 @@ export default async function AcademyLessonPage({ params }: PageProps) {
     )
   }
 
-  // 6. Render lesson content via the v2 client shell
+  // 6. Phase 4 — resolve the A/B variant (deterministic per user; control when the
+  //    experiment flag is off) and, for treatment, replace the 15-question quiz with a
+  //    stable 5-question sample seeded by "<userId>:<lessonId>". The sampling is done on a
+  //    shallow clone (withSampledQuiz) so the shared/cached compiled lesson is never mutated;
+  //    the full 15-question pool stays on disk and the quiz route still validates every
+  //    submitted answer against it. Sample lessons (no user) stay control / full pool.
+  const recutVariant = getRecutVariant(user?.id ?? null)
+  const renderedLesson =
+    recutVariant === 'treatment'
+      ? withSampledQuiz(lesson, `${user?.id ?? 'anon'}:${lessonId}`)
+      : lesson
+
+  // 7. Render lesson content via the v2 client shell
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? BRAND.siteUrl
   const lessonUrl = `${siteUrl}/academy/${lesson.module}/${lessonId}`
 
@@ -344,7 +358,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         />
       )}
       <LessonPageContent
-        lesson={lesson}
+        lesson={renderedLesson}
         prevLessonUrl={prevLessonUrl}
         nextLessonUrl={nextLessonUrl}
         nextLessonTitle={nextMeta?.title ?? null}
@@ -352,6 +366,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         moduleNumber={moduleNum}
         moduleName={moduleName}
         initialProgress={initialProgress}
+        recutVariant={recutVariant}
       />
     </>
   )
