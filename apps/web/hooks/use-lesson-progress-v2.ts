@@ -129,6 +129,18 @@ export function useLessonProgressV2(lessonId: string, initialProgress?: LessonPr
     [lessonId, mutate]
   )
 
+  // Phase 4 (§4.4): record the first Deep-dive open server-side so depth consumption is
+  // countable in the consent-independent funnel. Idempotent on the server (only sets the
+  // marker when currently null); fire-and-forget on the client — a failed marker must never
+  // block reading the Deep-dive.
+  const recordDeepDiveOpened = useCallback(async () => {
+    try {
+      await apiPatch(endpoint, { deep_dive_opened: true })
+    } catch (err) {
+      console.error('[use-lesson-progress-v2] recordDeepDiveOpened error:', err)
+    }
+  }, [endpoint])
+
   return {
     progress,
     loading,
@@ -137,5 +149,6 @@ export function useLessonProgressV2(lessonId: string, initialProgress?: LessonPr
     markInProgress,
     recordTheoryRead,
     recordQuizAttempt,
+    recordDeepDiveOpened,
   }
 }
