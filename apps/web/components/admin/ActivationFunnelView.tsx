@@ -117,9 +117,11 @@ export function ActivationFunnelView({ data }: ActivationFunnelViewProps) {
         )}
       </AdminSection>
 
-      {/* Onboarding step drop-off — the one new Phase 2 instrumentation. */}
+      {/* Onboarding reach → completion. Since Phase 4A (ADR-007) onboarding is a single
+          screen, so this is one "reached onboarding" stage plus the completion signal, not a
+          multi-step drop-off. */}
       <AdminSection
-        title="Onboarding step drop-off"
+        title="Onboarding completion"
         icon={ListOrdered}
         meta={`${num(data.onboardingSteps.instrumentedCohort)} instrumented`}
       >
@@ -127,7 +129,7 @@ export function ActivationFunnelView({ data }: ActivationFunnelViewProps) {
           <AdminEmptyState
             icon={ListOrdered}
             title="No instrumented onboarding sessions yet"
-            description="Per-step drop-off appears once learners move through the wizard after this phase ships. Accounts created before instrumentation are excluded, not counted as drop-offs."
+            description="Onboarding reach and completion appear once learners reach the onboarding screen after instrumentation shipped. Accounts created before instrumentation are excluded, not counted as drop-offs."
             className="py-8"
           />
         ) : (

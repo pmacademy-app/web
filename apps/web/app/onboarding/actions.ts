@@ -8,18 +8,22 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export interface OnboardingData {
-  name: string
-  username: string
-  avatar_url?: string | null
-  bio?: string
-  career_role?: string // Experience level / Role
-  goal?: string // Primary goal
-  topics?: string[] // Multiple selected interests
-  learning_preference?: string // Preferred learning style
-  linkedin_url?: string
-  twitter_url?: string
-  github_url?: string
-  website_url?: string
+  // Phase 4 (Collapse the Entrance): the critical onboarding path is now goal + experience.
+  // Identity/portfolio fields below are DEFERRED — optional at onboarding and collected later
+  // in Settings → Portfolio, which validates them identically (lib/portfolio.ts:validateUsername).
+  // They remain in the payload for backward compatibility with any client that still sends them.
+  goal: string // Primary goal — REQUIRED (drives completion + the recommended starting module)
+  career_role: string // Experience level / Role — REQUIRED
+  name?: string // Deferred: display name
+  username?: string // Deferred: public portfolio handle
+  avatar_url?: string | null // Deferred
+  bio?: string // Deferred
+  topics?: string[] // Deferred: multiple selected interests
+  learning_preference?: string // Deferred: preferred learning style
+  linkedin_url?: string // Deferred
+  twitter_url?: string // Deferred
+  github_url?: string // Deferred
+  website_url?: string // Deferred
 }
 
 export async function checkUsernameAvailability(rawUsername: string, currentUserId?: string): Promise<{ available: boolean; error?: string }> {
@@ -150,19 +154,31 @@ export async function submitOnboarding(data: OnboardingData) {
       return { error: 'Unauthorized: Invalid session' }
     }
 
-    // Server-side validation
-    const username = (data.username || '').trim().toLowerCase()
-    if (!username) {
-      return { error: 'Username is required.' }
+    // Server-side validation — Phase 4 (Collapse the Entrance).
+    //
+    // The critical onboarding path is goal + experience only. These two are what make the
+    // learner's path meaningful and, via `profile.goal`, what `app/(app)/layout.tsx` and
+    // `proxy.ts` read as the onboarding-completion signal. They are the sole required inputs.
+    const goal = (data.goal || '').trim()
+    if (!goal) {
+      return { error: 'Please choose your primary learning goal.' }
     }
-    if (username.length < 3 || username.length > 24 || !/^[a-z0-9_]+$/.test(username)) {
+
+    const careerRole = (data.career_role || '').trim()
+    if (!careerRole) {
+      return { error: 'Please choose your experience level.' }
+    }
+
+    // Deferred identity fields. Optional at onboarding — but if a value IS supplied (e.g. by an
+    // older client, or a resuming user's prefilled draft) it must still be well-formed, matching
+    // the client and the later Settings → Portfolio validation. An absent value is written as NULL
+    // and collected later; a malformed one is rejected rather than silently persisted.
+    const username = (data.username || '').trim().toLowerCase()
+    if (username && (username.length < 3 || username.length > 24 || !/^[a-z0-9_]+$/.test(username))) {
       return { error: 'Username must be 3–24 characters and only contain letters, numbers, and underscores.' }
     }
 
     const name = (data.name || '').trim()
-    if (!name) {
-      return { error: 'Display name is required.' }
-    }
 
     const dbSupabase = createServiceRoleClient()
 
@@ -174,27 +190,36 @@ export async function submitOnboarding(data: OnboardingData) {
       prefStr,
     ].filter(Boolean).join(' | ') || null
 
-    // Normalize website / portfolio / social URL
+    // Normalize website / portfolio / social URL (only relevant when a value is supplied).
     const websiteUrl = data.website_url?.trim() || (data.twitter_url ? `https://x.com/${data.twitter_url.replace(/^@/, '').replace(/^https?:\/\/(www\.)?(twitter|x)\.com\//, '')}` : null)
 
-    // 1. Update public.users table with chosen fields
+    // 1. Update public.users with the required fields, plus any deferred field the caller supplied.
+    //
+    // The required path always writes goal, experience and the completion flag. Deferred identity
+    // fields are added to the update ONLY when a non-empty value is present, so:
+    //   - a new one-screen learner leaves username/name/avatar/bio/socials untouched (they stay
+    //     NULL and are collected later in Settings → Portfolio), and
+    //   - a resuming learner (or an older client sending the full form) never has existing profile
+    //     data overwritten with nulls.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: dbError } = await (dbSupabase.from('users') as any).update({ 
-      name,
-      username,
-      avatar_url: data.avatar_url?.trim() || null,
-      bio: data.bio?.trim() || null,
-      career_role: data.career_role?.trim() || null,
-      goal: data.goal?.trim() || null,
-      learning_purpose: compositeLearningPurpose,
-      // Structured columns for precise broadcast filtering
-      onboarding_topics: Array.isArray(data.topics) && data.topics.length > 0 ? data.topics : [],
-      onboarding_preference: data.learning_preference?.trim() || null,
-      linkedin_url: data.linkedin_url?.trim() || null,
-      github_url: data.github_url?.trim() || null,
-      website_url: websiteUrl,
-      onboarding_completed: true 
-    }).eq('id', userId)
+    const updatePayload: Record<string, any> = {
+      career_role: careerRole,
+      goal,
+      onboarding_completed: true,
+    }
+    if (name) updatePayload.name = name
+    if (username) updatePayload.username = username
+    if (data.avatar_url?.trim()) updatePayload.avatar_url = data.avatar_url.trim()
+    if (data.bio?.trim()) updatePayload.bio = data.bio.trim()
+    if (compositeLearningPurpose) updatePayload.learning_purpose = compositeLearningPurpose
+    if (Array.isArray(data.topics) && data.topics.length > 0) updatePayload.onboarding_topics = data.topics
+    if (data.learning_preference?.trim()) updatePayload.onboarding_preference = data.learning_preference.trim()
+    if (data.linkedin_url?.trim()) updatePayload.linkedin_url = data.linkedin_url.trim()
+    if (data.github_url?.trim()) updatePayload.github_url = data.github_url.trim()
+    if (websiteUrl) updatePayload.website_url = websiteUrl
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: dbError } = await (dbSupabase.from('users') as any).update(updatePayload).eq('id', userId)
 
     if (dbError) {
       console.error('[onboarding/actions] Database update error:', dbError.message)
@@ -204,16 +229,18 @@ export async function submitOnboarding(data: OnboardingData) {
       return { error: 'Failed to save profile information. Please try again.' }
     }
 
-    // 2. Update auth metadata so middleware and JWT reflect onboarding_complete and preferences
+    // 2. Update auth metadata so middleware and the JWT reflect onboarding_complete and the
+    //    chosen path. Only the required fields are always written; deferred identity fields are
+    //    included only when supplied, mirroring the DB update above.
     const { error: metaError } = await dbSupabase.auth.admin.updateUserById(userId, {
       user_metadata: {
-        full_name: name,
-        username,
-        avatar_url: data.avatar_url || undefined,
-        career_role: data.career_role || undefined,
-        goal: data.goal || undefined,
-        topics: data.topics || undefined,
-        learning_preference: data.learning_preference || undefined,
+        ...(name ? { full_name: name } : {}),
+        ...(username ? { username } : {}),
+        ...(data.avatar_url ? { avatar_url: data.avatar_url } : {}),
+        career_role: careerRole,
+        goal,
+        ...(Array.isArray(data.topics) && data.topics.length > 0 ? { topics: data.topics } : {}),
+        ...(data.learning_preference ? { learning_preference: data.learning_preference } : {}),
         onboarding_complete: true,
       },
     })

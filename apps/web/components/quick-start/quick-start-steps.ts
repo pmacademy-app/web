@@ -23,6 +23,21 @@ export interface QuickStartStep {
   featureBadge?: string
 }
 
+/**
+ * Phase 4 (Collapse the Entrance), 4.2 — the Quick Start tour no longer auto-fires.
+ *
+ * The 8-step tour used to launch automatically on the first authenticated page, immediately after
+ * onboarding, selling leaderboards, badges, capstones and the portfolio to a learner with zero
+ * investment and before they had reached a single lesson. Per the Phase 4 decision it is removed
+ * from the entrance: auto-launch is disabled while the tour and every step below are preserved and
+ * remain available on demand via the Topbar "Quick Start" control.
+ *
+ * This is a flag, not a deletion: setting it back to `true` restores the auto-launch behaviour, and
+ * a future phase can instead defer it to fire after Lesson 1 once Phase 2 funnel data on
+ * `trackQuickStartSkipped` is available to justify the choice.
+ */
+export const QUICK_START_AUTO_LAUNCH_ENABLED = false
+
 export const QUICK_START_STEPS: QuickStartStep[] = [
   {
     id: 'welcome',
