@@ -419,6 +419,61 @@ function TheoryReadButton({
   )
 }
 
+// ─── Core reading progress (Phase 4 revised, Step 7) ─────────────────────────
+//
+// A quiet reading-progress affordance for the Core surface. The revised direction keeps a
+// fuller (honest 10–15 min) Core, so the UX job is to lower PERCEIVED effort: a thin sticky
+// bar plus a "Core · ~N min" label gives the learner "you are here / this is finite" context
+// without gamification. Purely presentational; it reads window scroll and never gates anything.
+// Honours reduced-motion (the width transition is the only motion and is disabled below).
+
+function CoreReadingProgress({ estimatedMinutes }: { estimatedMinutes: number }) {
+  const [percent, setPercent] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const doc = document.documentElement
+      const max = doc.scrollHeight - window.innerHeight
+      setPercent(max <= 0 ? 100 : Math.min(100, Math.max(0, Math.round((window.scrollY / max) * 100))))
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <div className="sticky top-0 z-10 -mx-6 md:-mx-8 -mt-6 md:-mt-8 mb-6 px-6 md:px-8 pt-4 pb-3 bg-card/95 backdrop-blur-sm border-b border-border">
+      <div className="flex items-center justify-between text-xs mb-2">
+        <span className="inline-flex items-center gap-2 font-bold uppercase tracking-wider text-primary">
+          <BookOpen className="h-3.5 w-3.5" />
+          Core
+          {estimatedMinutes > 0 && (
+            <span className="font-medium normal-case tracking-normal text-muted-foreground">
+              · ~{estimatedMinutes} min · the complete concept
+            </span>
+          )}
+        </span>
+        <span className="font-semibold text-muted-foreground tabular-nums" aria-hidden="true">
+          {percent}%
+        </span>
+      </div>
+      <div
+        className="h-1 w-full rounded-full bg-muted overflow-hidden"
+        role="progressbar"
+        aria-label="Core reading progress"
+        aria-valuenow={percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className="h-full rounded-full bg-primary transition-[width] duration-300 motion-reduce:transition-none"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function LessonPageContent({
@@ -872,6 +927,11 @@ export default function LessonPageContent({
         {/* Theory Panel */}
         {activeTab === 'theory' && (
           <div id="panel-theory" role="tabpanel" aria-labelledby="tab-theory">
+            {/* Phase 4 (revised, Step 7): quiet Core progress affordance — lowers perceived
+                effort for a fuller Core without gamification. Treatment only. */}
+            {isTreatment && (
+              <CoreReadingProgress estimatedMinutes={coreReadingMinutes} />
+            )}
             <LessonContextProvider
               lessonId={lesson.id}
               onQuizComplete={handleQuizComplete}

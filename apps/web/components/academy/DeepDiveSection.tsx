@@ -58,6 +58,13 @@ export function DeepDiveSection({
 
   return (
     <section className="mt-10 border-t border-border pt-8" aria-labelledby="deep-dive-heading">
+      {/* Reassure the learner the concept is already complete — Deep-dive enriches, it does
+          not repair Core. Keeps the Core → Quiz → Next path guilt-free while making the
+          optional depth feel first-class, not hidden (Step 9). */}
+      <p className="mb-3 text-xs text-muted-foreground">
+        You&apos;ve covered the complete concept. The quiz and next lesson are ready whenever you
+        are — or keep going for optional depth below.
+      </p>
       <Button
         variant="outline"
         onClick={handleToggle}
@@ -71,10 +78,10 @@ export function DeepDiveSection({
           </span>
           <span className="space-y-0.5">
             <span className="block text-sm font-bold text-foreground">
-              Deep Dive — optional extended material
+              Deep Dive — optional depth
             </span>
             <span className="block text-xs text-muted-foreground">
-              Case studies, company examples, frameworks and references
+              Extended examples, company cases, interview &amp; real-world perspectives, references
               {estimatedMinutes > 0 ? ` · ~${estimatedMinutes} min` : ''}
             </span>
           </span>
