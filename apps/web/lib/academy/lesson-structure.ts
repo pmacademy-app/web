@@ -6,67 +6,101 @@
  * (`lessons-db.ts`, `page.tsx`), and the Phase 4 test suites — so there is exactly one
  * definition of "what is Core", "how a quiz is sampled" and "how long Core takes to read".
  *
- * IMPLEMENTATION_PLAN.md §"Phase 4 — Re-cut the unit of work" (item 4.1) specifies the
- * classification by BLOCK TYPE, so it is deterministic and maintainable across the whole
- * 90-lesson corpus rather than hand-tuned per lesson:
+ * ── Product direction (revised) ──
+ * Core is defined by LEARNING IMPORTANCE, not block type: it must be conceptually COMPLETE —
+ * a learner should finish Core and understand the lesson's central concept without being
+ * forced to open Deep-dive. Deep-dive enriches; it never repairs an incomplete Core. The
+ * earlier "~7-minute" target is dropped — an honest 10–15 minute Core is fine; perceived
+ * effort is lowered through UI/UX (reading progress, per-section cards, progressive
+ * disclosure of the optional depth), not by evicting learning content.
  *
- *   Core       : learningObjectives · theory · mentalModel · keyTakeaways
- *   Deep dive  : caseStudy · companyExample · realWorldPerspective · interviewPerspective
- *                framework · cheatSheet · glossary · resources · connections
- *                commonMistakes · mermaid
+ *   Core       : heading · paragraph · learningObjectives · theory · mentalModel ·
+ *                framework · commonMistakes · keyTakeaways · summary  (+ concept diagrams)
+ *   Deep dive  : caseStudy · companyExample · realWorldPerspective · interviewPerspective ·
+ *                cheatSheet · glossary · resources · connections
+ *   Content-aware: mermaid — inherits the group of the content it accompanies (see below)
+ *   Tabs       : quiz · flashcardDeck · reflection
  *
- * Three structural block types are not named by the plan because they are framing, not
- * content sections: `heading`, `paragraph` (the lesson intro/narrative around the theory)
- * and `summary` (a short recap). They are assigned to Core so the Core view reads as a
- * complete short lesson (intro → objectives → theory → model → takeaways → recap) rather
- * than opening mid-sentence. `quiz`, `flashcardDeck` and `reflection` are their own tabs
- * and belong to neither group. Every one of the 21 compiled block types is therefore
- * classified exactly once — there are no orphaned blocks (asserted by the corpus test).
+ * This corrects the first implementation, which pushed `framework`, `commonMistakes` and ALL
+ * `mermaid` diagrams into Deep-dive purely by type — separating essential explanation and
+ * concept-defining diagrams from the Core. Two mechanisms make the classification content-
+ * aware and maintainable without a hand-authored 90-lesson list:
+ *   • an explicit per-block `depth` override (`'core' | 'deepDive'`) that wins over any type
+ *     default — so any individual block can be pinned either way when it is an exception;
+ *   • content-aware diagram placement — a standalone `mermaid` inherits the group of the
+ *     nearest preceding content block, so a diagram illustrating the theory/model/framework
+ *     stays in Core while one attached to an optional case study rides along to Deep-dive.
  *
- * ── Discrepancy with the source documents (NON-NEGOTIABLE RULE 15) ──
- * The plan/blueprint target a "~7 min" Core. In the actual compiled corpus the single
- * `theory` block averages ~3,765 words (~19 min at 200 wpm) and Core-by-type totals
- * ~4,600 words (~23 min). A literal 7-minute Core is therefore NOT achievable by block
- * grouping — it would require subdividing the monolithic `theory` block, i.e. rewriting
- * curriculum, which Phase 4 explicitly forbids ("the markdown, the compiler and the
- * content pipeline are untouched"). Per Rule 15 we follow the documents' STRUCTURE
- * faithfully and report HONEST computed estimates; the 7-minute figure is an unresolved
- * content-authoring decision, not something to fake or hack. The `~40%` reduction the
- * split does deliver (Core drops the ~3,200 words of examples/case studies/frameworks) is
- * real and measured.
+ * Every one of the 21 compiled block types is still classified exactly once — no orphans
+ * (asserted by the corpus test). Reading estimates are honest and computed from real prose.
  */
 
 import type { CompiledBlock, CompiledLesson, CompiledQuizQuestion } from '@/types'
 
 // ─── Classification ───────────────────────────────────────────────────────────
+//
+// Phase 4 (revised direction): Core is defined by LEARNING IMPORTANCE, not merely by block
+// type. Core must contain the complete conceptual foundation a learner needs to understand
+// the lesson — essential theory, the mental model(s), the framework(s) that structure the
+// concept, the diagrams that EXPLAIN the concept, the pitfalls that clarify it, and the
+// takeaways. Deep-dive holds genuinely optional depth: extended/reinforcing examples,
+// additional company cases, optional perspectives, reference and further reading.
+//
+// The classification is still deterministic and corpus-wide (no hand-authored 90-lesson
+// list), but with two things the first implementation lacked:
+//
+//   1. An EXPLICIT PER-BLOCK OVERRIDE (`block.depth`). Any individual block can be pinned to
+//      Core or Deep-dive regardless of its generic type — the maintainable escape hatch the
+//      product requires ("an important block must be able to stay Core even if its type would
+//      normally be Deep-dive", and vice-versa). Populated in source/compiler metadata when a
+//      specific block is an exception; empty for the corpus today, which the improved
+//      type-defaults already handle.
+//   2. CONTENT-AWARE placement for diagrams. A standalone `mermaid` block is NOT forced to
+//      Deep-dive by its type. It inherits the group of the content it accompanies (the nearest
+//      preceding Core/Deep-dive block): a diagram that visualises the theory/model/framework
+//      stays in Core; a diagram attached to an optional case study rides along to Deep-dive.
+//      (Diagrams authored INLINE inside mentalModel/framework were always Core and still are.)
+//
+// The ~7-minute target is deliberately gone: Core keeps everything conceptually necessary and
+// the honest estimate reflects that (Step 6). Perceived effort is lowered through UI/UX, not by
+// evicting learning content.
 
 export type BlockGroup = 'core' | 'deepDive' | 'quiz' | 'flashcards' | 'reflection'
+export type BlockDepth = 'core' | 'deepDive'
 
-/** Content blocks that make up the primary ~first-session Core experience. */
+/**
+ * Content blocks that establish the concept — the conceptual foundation. Includes the
+ * framework(s) and common-pitfalls that the first implementation wrongly pushed to Deep-dive.
+ */
 export const CORE_BLOCK_TYPES: ReadonlySet<string> = new Set([
   'heading',
   'paragraph',
   'learningObjectives',
   'theory',
   'mentalModel',
+  'framework',
+  'commonMistakes',
   'keyTakeaways',
   'summary',
 ])
 
-/** Optional extended material — visible and labelled, never removed. */
+/** Genuinely optional depth — reinforces or extends understanding, never establishes it. */
 export const DEEP_DIVE_BLOCK_TYPES: ReadonlySet<string> = new Set([
   'caseStudy',
   'companyExample',
   'realWorldPerspective',
   'interviewPerspective',
-  'framework',
   'cheatSheet',
   'glossary',
   'resources',
   'connections',
-  'commonMistakes',
-  'mermaid',
 ])
+
+/**
+ * Types whose placement depends on the content they accompany rather than their type alone.
+ * A standalone diagram belongs wherever the concept it illustrates lives.
+ */
+export const CONTENT_AWARE_BLOCK_TYPES: ReadonlySet<string> = new Set(['mermaid'])
 
 /** Blocks that render in their own tab, not in the theory reading surface. */
 export const TAB_BLOCK_TYPES: ReadonlySet<string> = new Set([
@@ -76,29 +110,59 @@ export const TAB_BLOCK_TYPES: ReadonlySet<string> = new Set([
 ])
 
 /**
- * Classifies a single block. `other` is only ever returned for a block type that is not
- * yet known here; the corpus test asserts this never happens for shipped content, so a new
- * block type added to the compiler surfaces as a test failure rather than silently landing
- * in (or out of) Core.
+ * Single-block classification by explicit override then type default. Content-aware types
+ * (mermaid) default to Core here — a diagram is treated as concept-supporting unless context
+ * (see `classifyBlocks`) or an explicit `depth` says otherwise, which is the safe direction
+ * given the product rule that essential diagrams must stay in Core. `other` is only returned
+ * for an unknown type; the corpus test asserts that never happens for shipped content.
  */
-export function classifyBlock(block: Pick<CompiledBlock, 'type'>): BlockGroup | 'other' {
+export function classifyBlock(block: Pick<CompiledBlock, 'type' | 'depth'>): BlockGroup | 'other' {
   const t = block.type
   if (t === 'quiz') return 'quiz'
   if (t === 'flashcardDeck') return 'flashcards'
   if (t === 'reflection') return 'reflection'
+  // Explicit per-block override wins over every type default.
+  if (block.depth === 'core') return 'core'
+  if (block.depth === 'deepDive') return 'deepDive'
   if (CORE_BLOCK_TYPES.has(t)) return 'core'
   if (DEEP_DIVE_BLOCK_TYPES.has(t)) return 'deepDive'
+  if (CONTENT_AWARE_BLOCK_TYPES.has(t)) return 'core'
   return 'other'
 }
 
-/** The Core content blocks, in authored order. */
-export function getCoreBlocks(blocks: CompiledBlock[]): CompiledBlock[] {
-  return blocks.filter((b) => CORE_BLOCK_TYPES.has(b.type))
+/**
+ * Context-aware classification of a whole block list. Identical to `classifyBlock` for every
+ * type except the content-aware ones (mermaid), which inherit the group of the nearest
+ * preceding Core/Deep-dive content block (defaulting to Core when none precedes them). An
+ * explicit `block.depth` override still wins. Returned in authored order, one group per block.
+ */
+export function classifyBlocks(blocks: CompiledBlock[]): (BlockGroup | 'other')[] {
+  const groups = blocks.map((b) => classifyBlock(b))
+  let lastContentGroup: BlockGroup = 'core'
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i]
+    const g = groups[i]
+    const isContentAware = CONTENT_AWARE_BLOCK_TYPES.has(b.type) && b.depth == null
+    if (isContentAware) {
+      // Inherit the context established by the last real content block.
+      groups[i] = lastContentGroup
+    } else if (g === 'core' || g === 'deepDive') {
+      lastContentGroup = g
+    }
+  }
+  return groups
 }
 
-/** The Deep-dive content blocks, in authored order. Never hidden — rendered on demand. */
+/** The Core content blocks, in authored order (context-aware). */
+export function getCoreBlocks(blocks: CompiledBlock[]): CompiledBlock[] {
+  const groups = classifyBlocks(blocks)
+  return blocks.filter((_, i) => groups[i] === 'core')
+}
+
+/** The Deep-dive content blocks, in authored order (context-aware). Never hidden. */
 export function getDeepDiveBlocks(blocks: CompiledBlock[]): CompiledBlock[] {
-  return blocks.filter((b) => DEEP_DIVE_BLOCK_TYPES.has(b.type))
+  const groups = classifyBlocks(blocks)
+  return blocks.filter((_, i) => groups[i] === 'deepDive')
 }
 
 // ─── Reading-time estimation ────────────────────────────────────────────────────

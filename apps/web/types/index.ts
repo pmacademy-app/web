@@ -217,6 +217,13 @@ export interface CompiledLessonRef {
 export interface CompiledBlock {
   blockId: string
   type: string
+  /**
+   * Phase 4 (revised): explicit Core/Deep-dive override for this block, independent of its
+   * generic type. Optional — when absent the type default (and content-aware rules for
+   * diagrams) in `lib/academy/lesson-structure.ts` applies. Lets an important block stay in
+   * Core even if its type would normally be Deep-dive, and vice-versa.
+   */
+  depth?: 'core' | 'deepDive'
   // Shared optional fields across all block types
   text?: string
   level?: number
