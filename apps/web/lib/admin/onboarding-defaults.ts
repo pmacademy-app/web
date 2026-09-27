@@ -1,8 +1,9 @@
 /**
  * Onboarding default options (client-safe).
  *
- * Pure data: the option lists and step definitions the onboarding wizard renders
- * before an administrator has customised them. No logic, no imports beyond the
+ * Pure data: the goal and experience option lists the single-screen onboarding wizard
+ * renders before an administrator has customised them, plus the reference topic and
+ * learning-preference taxonomy for existing learners. No logic, no imports beyond the
  * shared types.
  *
  * They live here rather than in `settings-service.ts` for the same reason the
@@ -19,11 +20,10 @@
  * browser build fails. That is not hypothetical: it is exactly what happened in
  * B9-C when `node:async_hooks` landed behind `portfolio-db`.
  *
- * `settings-service.ts` re-exports all five names, so server call sites are
- * unchanged.
+ * `settings-service.ts` re-exports these names, so server call sites are unchanged.
  */
 
-import type { OnboardingFieldOption, OnboardingStepConfig } from './types'
+import type { OnboardingFieldOption } from './types'
 
 export const DEFAULT_GOAL_OPTIONS: OnboardingFieldOption[] = [
   {
@@ -168,29 +168,8 @@ export const DEFAULT_PREFERENCE_OPTIONS: OnboardingFieldOption[] = [
   },
 ]
 
-export const DEFAULT_ONBOARDING_STEPS: OnboardingStepConfig[] = [
-  {
-    id: 'step_profile',
-    title: 'Build Your Profile',
-    description: 'Personalize your learner identity and shareable public portfolio.',
-    requiredFields: ['username', 'name'],
-  },
-  {
-    id: 'step_background',
-    title: 'Tell Us About You',
-    description: 'Help us calibrate your starting point and customized recommendations.',
-    requiredFields: ['experience_level', 'goal'],
-  },
-  {
-    id: 'step_interests',
-    title: 'Choose What You Want to Learn',
-    description: 'Select your focus areas and preferred learning format.',
-    requiredFields: ['topics', 'learning_preference'],
-  },
-  {
-    id: 'step_path',
-    title: 'Your Prodily Path',
-    description: 'Your personalized learning plan is ready to launch.',
-    requiredFields: [],
-  },
-]
+// Phase 4C note: `DEFAULT_ONBOARDING_STEPS` was removed with the 4-step wizard model.
+// `DEFAULT_TOPIC_OPTIONS` and `DEFAULT_PREFERENCE_OPTIONS` are retained as the reference
+// taxonomy for the `onboarding_topics` / `onboarding_preference` attributes existing
+// learners still carry (e.g. `lib/personalization/path-resolver.ts` maps topic IDs to
+// labels); they are no longer part of the live single-screen onboarding path.

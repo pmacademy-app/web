@@ -4,23 +4,15 @@ import {
   DEFAULT_EXPERIENCE_OPTIONS,
   DEFAULT_TOPIC_OPTIONS,
   DEFAULT_PREFERENCE_OPTIONS,
-  DEFAULT_ONBOARDING_STEPS,
 } from '@/lib/admin/settings-service'
 import { CURRICULUM_MODULE_META } from '@/lib/admin/curriculum-meta'
 
 describe('Onboarding Architecture & Recommendation Engine', () => {
   describe('Default Configuration Invariants', () => {
-    it('provides exactly 4 default steps covering all onboarding phases', () => {
-      expect(DEFAULT_ONBOARDING_STEPS).toHaveLength(4)
-      expect(DEFAULT_ONBOARDING_STEPS.map((s) => s.id)).toEqual([
-        'step_profile',
-        'step_background',
-        'step_interests',
-        'step_path',
-      ])
-    })
-
-    it('defines the exact 4 Step 2 Experience Level options with stable IDs', () => {
+    // Phase 4C: onboarding collapsed to a single screen collecting goal + experience.
+    // The former 4-step model (DEFAULT_ONBOARDING_STEPS) was removed; the two live option
+    // groups below plus the reference topic/preference taxonomy remain.
+    it('defines the exact 4 Experience Level options with stable IDs', () => {
       expect(DEFAULT_EXPERIENCE_OPTIONS).toHaveLength(4)
       expect(DEFAULT_EXPERIENCE_OPTIONS.map((e) => ({ id: e.id, label: e.label }))).toEqual([
         { id: 'beginner', label: 'Beginner' },
@@ -30,7 +22,7 @@ describe('Onboarding Architecture & Recommendation Engine', () => {
       ])
     })
 
-    it('defines the exact 5 Step 2 Primary Goal options with stable IDs', () => {
+    it('defines the exact 5 Primary Goal options with stable IDs', () => {
       expect(DEFAULT_GOAL_OPTIONS).toHaveLength(5)
       expect(DEFAULT_GOAL_OPTIONS.map((g) => ({ id: g.id, label: g.label }))).toEqual([
         { id: 'become_pm', label: 'Become a Product Manager' },
@@ -41,7 +33,7 @@ describe('Onboarding Architecture & Recommendation Engine', () => {
       ])
     })
 
-    it('defines the exact 10 Step 3 Interest options supporting multi-select with stable IDs', () => {
+    it('defines the exact 10 reference Interest topics with stable IDs', () => {
       expect(DEFAULT_TOPIC_OPTIONS).toHaveLength(10)
       expect(DEFAULT_TOPIC_OPTIONS.map((t) => ({ id: t.id, label: t.label }))).toEqual([
         { id: 'discovery', label: 'Product Discovery' },
@@ -57,7 +49,7 @@ describe('Onboarding Architecture & Recommendation Engine', () => {
       ])
     })
 
-    it('defines the exact 5 Step 3 Learning Preference options with stable IDs', () => {
+    it('defines the exact 5 reference Learning Preference options with stable IDs', () => {
       expect(DEFAULT_PREFERENCE_OPTIONS).toHaveLength(5)
       expect(DEFAULT_PREFERENCE_OPTIONS.map((p) => ({ id: p.id, label: p.label }))).toEqual([
         { id: 'structured', label: 'Structured learning' },

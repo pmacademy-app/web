@@ -130,15 +130,15 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(typeof emailFlag?.enabled).toBe('boolean')
   })
 
-  it('SettingsService.getOnboardingSettings returns 4 default steps and exact option sets', async () => {
+  // Phase 4C: the live onboarding is a single screen collecting goal + experience only,
+  // so the settings model exposes exactly those two option groups (no steps, topics, or
+  // learning-preference config).
+  it('SettingsService.getOnboardingSettings returns the single-screen goal + experience option sets', async () => {
     const onboarding = await SettingsService.getOnboardingSettings()
     expect(typeof onboarding.enabled).toBe('boolean')
-    expect(Array.isArray(onboarding.steps)).toBe(true)
-    expect(onboarding.steps.length).toBe(4)
-    expect(onboarding.steps[0].id).toBe('step_profile')
-    expect(onboarding.steps[1].id).toBe('step_background')
-    expect(onboarding.steps[2].id).toBe('step_interests')
-    expect(onboarding.steps[3].id).toBe('step_path')
+
+    // The 4-step model was removed — no configurable steps exist.
+    expect((onboarding as { steps?: unknown }).steps).toBeUndefined()
 
     // 4 Experience Level options
     expect(onboarding.fieldOptions?.experience_level?.length).toBe(4)
@@ -159,30 +159,9 @@ describe('Admin Settings Unit Test Suite', () => {
       'Explore Product Management',
     ])
 
-    // 10 Interest options
-    expect(onboarding.fieldOptions?.topics?.length).toBe(10)
-    expect(onboarding.fieldOptions?.topics?.map((t) => t.label)).toEqual([
-      'Product Discovery',
-      'User Research',
-      'Product Strategy',
-      'Product Roadmapping',
-      'Prioritization',
-      'Metrics & Analytics',
-      'PRDs & Documentation',
-      'Agile & Execution',
-      'Stakeholder Management',
-      'Product Launch',
-    ])
-
-    // 5 Learning Preference options
-    expect(onboarding.fieldOptions?.learning_preference?.length).toBe(5)
-    expect(onboarding.fieldOptions?.learning_preference?.map((p) => p.label)).toEqual([
-      'Structured learning',
-      'Hands-on practice',
-      'Case studies',
-      'Quick lessons',
-      'A mix of everything',
-    ])
+    // The deferred groups are not part of the live single-screen config.
+    expect(onboarding.fieldOptions?.topics).toBeUndefined()
+    expect(onboarding.fieldOptions?.learning_preference).toBeUndefined()
   })
 
   it('SettingsService.getAllSettings returns all 6 workspace domains in parallel', async () => {
@@ -237,48 +216,15 @@ describe('Admin Settings Unit Test Suite', () => {
     expect(updated.weeklyRecapDay).toBe(5)
   })
 
-  it('SettingsService.updateOnboardingSettings saves customized steps and required fields', async () => {
-    const customSteps = [
-      {
-        id: 'step_profile',
-        title: 'Custom Profile & Portfolio',
-        description: 'Personalize your learner identity and shareable public portfolio.',
-        requiredFields: ['username', 'name'],
-      },
-      {
-        id: 'step_background',
-        title: 'Custom Background & Career Track',
-        description: 'Help us calibrate your starting point and customized recommendations.',
-        requiredFields: ['experience_level', 'goal'],
-      },
-      {
-        id: 'step_interests',
-        title: 'Custom Skill Focus & Learning Style',
-        description: 'Select your focus areas and preferred learning format.',
-        requiredFields: ['topics', 'learning_preference'],
-      },
-      {
-        id: 'step_path',
-        title: 'Your Calibrated Curriculum',
-        description: 'Your personalized learning plan is ready to launch.',
-        requiredFields: [],
-      },
-    ]
-
-    const updated = await SettingsService.updateOnboardingSettings({
-      enabled: false,
-      steps: customSteps,
-    })
-
+  it('SettingsService.updateOnboardingSettings toggles the onboarding screen on/off', async () => {
+    const updated = await SettingsService.updateOnboardingSettings({ enabled: false })
     expect(updated.enabled).toBe(false)
-    expect(updated.steps.length).toBe(4)
-    expect(updated.steps[0].title).toBe('Custom Profile & Portfolio')
-    expect(updated.steps[0].requiredFields).toEqual(['username', 'name'])
-    expect(updated.steps[1].requiredFields).toEqual(['experience_level', 'goal'])
-    expect(updated.steps[2].requiredFields).toEqual(['topics', 'learning_preference'])
+
+    const reloaded = await SettingsService.getOnboardingSettings()
+    expect(reloaded.enabled).toBe(false)
   })
 
-  it('SettingsService supports configuring custom field options across all 4 onboarding categories', async () => {
+  it('SettingsService supports configuring the goal and experience option groups', async () => {
     const customGoalOptions = [
       {
         id: 'executive_track',
@@ -299,43 +245,18 @@ describe('Admin Settings Unit Test Suite', () => {
       },
     ]
 
-    const customTopics = [
-      {
-        id: 'ai_product',
-        label: 'AI Product Management',
-        badge: 'AI',
-        enabled: true,
-      },
-    ]
-
-    const customPreferences = [
-      {
-        id: 'cohort',
-        label: 'Cohort-based sprint',
-        description: 'Weekly peer assignments and live reviews.',
-        badge: 'Live',
-        enabled: true,
-      },
-    ]
-
     const updated = await SettingsService.updateOnboardingSettings({
       fieldOptions: {
         goal: customGoalOptions,
         experience_level: customExpOptions,
-        topics: customTopics,
-        learning_preference: customPreferences,
       },
     })
 
     expect(updated.fieldOptions?.goal?.length).toBe(1)
     expect(updated.fieldOptions?.experience_level?.length).toBe(1)
-    expect(updated.fieldOptions?.topics?.length).toBe(1)
-    expect(updated.fieldOptions?.learning_preference?.length).toBe(1)
 
     const reloaded = await SettingsService.getOnboardingSettings()
     expect(reloaded.fieldOptions?.goal?.[0].label).toBe('Director / VP of Product Transition')
     expect(reloaded.fieldOptions?.experience_level?.[0].label).toBe('University Student')
-    expect(reloaded.fieldOptions?.topics?.[0].label).toBe('AI Product Management')
-    expect(reloaded.fieldOptions?.learning_preference?.[0].label).toBe('Cohort-based sprint')
   })
 })
