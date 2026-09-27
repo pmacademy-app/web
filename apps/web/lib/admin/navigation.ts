@@ -9,6 +9,7 @@ import {
   Trophy,
   Activity,
   Gauge,
+  Filter,
   Settings,
   type LucideIcon,
 } from 'lucide-react'
@@ -65,6 +66,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: 'Insights',
     items: [
       { name: 'Analytics', href: '/admin/analytics', icon: Gauge, built: true },
+      { name: 'Activation Funnel', href: '/admin/analytics/funnel', icon: Filter, built: true },
     ],
   },
   {
@@ -87,10 +89,30 @@ export const ADMIN_NAV_BUILT = ADMIN_NAV.map((group) => ({
   items: group.items.filter((item) => item.built),
 })).filter((group) => group.items.length > 0)
 
-/** Lookup helper: is `pathname` the active route for a nav item? */
+/** All nav hrefs, longest first — used to resolve the most specific active match. */
+const ALL_NAV_HREFS = ADMIN_NAV.flatMap((group) => group.items.map((item) => item.href)).sort(
+  (a, b) => b.length - a.length
+)
+
+/**
+ * Lookup helper: is `pathname` the active route for a nav item?
+ *
+ * Exact matches always win. For prefix matches, the most specific nav href wins, so a
+ * nested route like `/admin/analytics/funnel` highlights only "Activation Funnel" and not
+ * its parent "Analytics" — while `/admin/users/[id]` still keeps "Users" highlighted
+ * because no deeper nav item claims that path.
+ */
 export function isAdminNavItemActive(item: AdminNavItem, pathname: string) {
   if (item.href === '/admin') return pathname === '/admin'
-  return pathname === item.href || pathname.startsWith(`${item.href}/`)
+  if (pathname === item.href) return true
+  if (!pathname.startsWith(`${item.href}/`)) return false
+  // A longer nav href that also prefixes this path is the more specific owner.
+  const moreSpecific = ALL_NAV_HREFS.find(
+    (href) =>
+      href.length > item.href.length &&
+      (pathname === href || pathname.startsWith(`${href}/`))
+  )
+  return !moreSpecific
 }
 
 /** Current top-level section label for breadcrumbs ("Operations / Users"). */

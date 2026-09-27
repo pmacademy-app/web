@@ -79,6 +79,23 @@ export const EMAIL_TEMPLATE_MAP: Record<string, { component: React.ComponentType
     component: WelcomeEmail,
     subjectLine: `Resume your learning path on ${BRAND.shortName}`,
   },
+
+  // Phase 1.5 — Lifecycle reactivation sequences. These reuse the existing
+  // WelcomeEmail component (a "get started / come back" nudge) rather than
+  // introducing new visual templates; the distinct keys exist so each sequence is
+  // independently toggleable, idempotent, and measurable in `email_queue`.
+  'lifecycle.d1_never_started': {
+    component: WelcomeEmail,
+    subjectLine: `Ready to start your first lesson on ${BRAND.shortName}?`,
+  },
+  'lifecycle.d3_started_not_finished': {
+    component: WelcomeEmail,
+    subjectLine: `Pick up where you left off on ${BRAND.shortName}`,
+  },
+  'lifecycle.streak_broken': {
+    component: WelcomeEmail,
+    subjectLine: `Your learning streak is waiting on ${BRAND.shortName}`,
+  },
 }
 
 export function stripHtmlToPlainText(html: string): string {

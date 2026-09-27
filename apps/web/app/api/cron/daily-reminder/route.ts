@@ -5,6 +5,7 @@ import { withRoute } from '@/lib/api/with-route'
 import { EmailAutomationsService } from '@/lib/notifications/automations/service'
 import { getBatchUserNotificationPreferences } from '@/lib/notifications/preferences/defaults'
 import { enqueueNotificationItem } from '@/lib/notifications/queue/processor'
+import { getDueCardsCount } from '@/lib/flashcards-service'
 import { createServiceRoleClient } from '@/lib/supabase'
 
 /** Keyset pagination batch size for daily reminder processing */
@@ -60,6 +61,8 @@ export const POST = withRoute(
     const supabase = createServiceRoleClient()
     let remindersQueued = 0
     let remindersSkippedTimezone = 0
+    let remindersSkippedActiveToday = 0
+    let remindersSkippedNoDueCards = 0
 
     const startTime = Date.now()
 
@@ -73,10 +76,14 @@ export const POST = withRoute(
           break
         }
 
+        // Phase 1.3 — audience inversion. The previous `.gt('current_streak', 0)`
+        // filter mailed only the already-engaged and went silent the moment a streak
+        // broke, so lapsed learners (exactly the people a reminder should reach) were
+        // never contacted. We now page the full base and decide per user below using
+        // real activity/due-card data, preserving the T3 keyset pagination.
         let queryBuilder = supabase
           .from('users')
-          .select('id, email, name, current_streak')
-          .gt('current_streak', 0)
+          .select('id, email, name, current_streak, last_streak_date, timezone')
           .not('email', 'is', null)
 
         if (lastSeenId) {
@@ -98,7 +105,14 @@ export const POST = withRoute(
           break
         }
 
-        const users = (rawUsers || []) as Array<{ id: string; email: string; name?: string; current_streak?: number }>
+        const users = (rawUsers || []) as Array<{
+          id: string
+          email: string
+          name?: string
+          current_streak?: number
+          last_streak_date?: string | null
+          timezone?: string | null
+        }>
         if (users.length === 0) break
 
         const userIds = users.map((u) => u.id)
@@ -111,14 +125,47 @@ export const POST = withRoute(
           if (!user.email) continue
 
           const userPref = prefMap.get(user.id)
-          const userLocalTime = getUserLocalTime(userPref?.timezone)
+          // Prefer the timezone stored on the preferences row; fall back to the
+          // user's own profile timezone so no-preference-row learners are still
+          // scheduled in their real local window rather than defaulting to UTC.
+          const timezone = userPref?.timezone || user.timezone || 'UTC'
+          const userLocalTime = getUserLocalTime(timezone)
           const targetHour = userPref?.preferredReminderHour ?? dailySched.hourUtc ?? 9
 
-          // Timezone-aware delivery window evaluation:
+          // Timezone-aware delivery window evaluation (preserved from T5):
           // In production, when running periodically, only dispatch if current time
           // matches the user's local preferred reminder hour (bypassed with force=true).
           if (!isForced && userLocalTime.localHour !== targetHour) {
             remindersSkippedTimezone++
+            continue
+          }
+
+          // Phase 1.3 — a learner who already registered activity *today* (their
+          // `last_streak_date`, stored in local-date terms by the streak engine,
+          // equals today) has no need of a "come review" nudge. Skipping them keeps
+          // the reminder targeted at the lapsed/quiet audience.
+          if (user.last_streak_date && user.last_streak_date === userLocalTime.localDate) {
+            remindersSkippedActiveToday++
+            continue
+          }
+
+          // Phase 1.6 — use the REAL due-card count from the SRS engine, never a
+          // hardcoded placeholder. Users with zero due cards (including everyone who
+          // has never started a lesson, and so has no unlocked cards) are suppressed
+          // here — sending "you have cards waiting" to someone with none is the same
+          // defect as a zero-activity recap. The never-started audience is owned by
+          // the D+1 lifecycle sequence instead (see /api/cron/lifecycle), so no user
+          // is contacted twice for the same gap.
+          let dueCount = 0
+          try {
+            dueCount = await getDueCardsCount(supabase, user.id)
+          } catch (dueErr) {
+            console.warn('[cron/daily-reminder] due-card count failed; suppressing send', user.id, dueErr)
+            remindersSkippedNoDueCards++
+            continue
+          }
+          if (dueCount <= 0) {
+            remindersSkippedNoDueCards++
             continue
           }
 
@@ -131,8 +178,8 @@ export const POST = withRoute(
             templateKey: 'learning.daily_reminder',
             templateVariables: {
               userName: user.name || user.email.split('@')[0],
-              currentStreak: user.current_streak || 1,
-              dueCount: 5,
+              currentStreak: user.current_streak || 0,
+              dueCount,
             },
             eventId: idempotencyKey,
             idempotencyKey,
@@ -164,6 +211,9 @@ export const POST = withRoute(
       success: true,
       timestamp: new Date().toISOString(),
       remindersQueued,
+      remindersSkippedTimezone,
+      remindersSkippedActiveToday,
+      remindersSkippedNoDueCards,
     })
   }
 )

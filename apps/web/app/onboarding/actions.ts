@@ -62,6 +62,55 @@ export async function checkUsernameAvailability(rawUsername: string, currentUser
   }
 }
 
+/**
+ * Phase 2 — record the furthest onboarding-wizard step a learner reached.
+ *
+ * IMPLEMENTATION_PLAN.md §"Phase 2" item 3: the wizard is a client component whose
+ * intermediate steps leave no server trace, so per-step drop-off cannot be measured.
+ * This writes a lightweight, monotonic marker (`users.onboarding_step_reached`) that the
+ * admin activation funnel reads.
+ *
+ * Deliberately best-effort: it never blocks the wizard and swallows its own errors. A
+ * failed marker write costs one data point, never the learner's onboarding. The write is
+ * monotonic — it only ever advances the recorded step — so out-of-order calls (e.g. a
+ * learner clicking Back then Forward) cannot regress the furthest step reached.
+ */
+export async function recordOnboardingStep(step: number): Promise<void> {
+  try {
+    if (!Number.isInteger(step) || step < 1 || step > 4) return
+
+    const cookieStore = await cookies()
+    const accessToken = cookieStore.get('sb-access-token')?.value
+    if (!accessToken) return
+
+    const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: { persistSession: false },
+    })
+    const {
+      data: { user },
+      error: authError,
+    } = await authSupabase.auth.getUser(accessToken)
+    if (authError || !user?.id) return
+
+    const dbSupabase = createServiceRoleClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing } = await (dbSupabase.from('users') as any)
+      .select('onboarding_step_reached')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    const current: number | null = existing?.onboarding_step_reached ?? null
+    if (current !== null && current >= step) return // monotonic: never regress
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (dbSupabase.from('users') as any)
+      .update({ onboarding_step_reached: step })
+      .eq('id', user.id)
+  } catch (err) {
+    console.error('[onboarding/actions] recordOnboardingStep failed (non-blocking):', err)
+  }
+}
+
 export async function submitOnboarding(data: OnboardingData) {
   try {
     const cookieStore = await cookies()

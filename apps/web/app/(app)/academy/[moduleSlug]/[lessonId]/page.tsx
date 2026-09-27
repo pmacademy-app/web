@@ -347,6 +347,7 @@ export default async function AcademyLessonPage({ params }: PageProps) {
         lesson={lesson}
         prevLessonUrl={prevLessonUrl}
         nextLessonUrl={nextLessonUrl}
+        nextLessonTitle={nextMeta?.title ?? null}
         globalOrder={globalOrder}
         moduleNumber={moduleNum}
         moduleName={moduleName}

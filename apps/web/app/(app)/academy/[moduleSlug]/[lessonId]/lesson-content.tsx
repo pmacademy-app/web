@@ -58,6 +58,7 @@ interface LessonPageContentProps {
   lesson: CompiledLesson
   prevLessonUrl: string | null
   nextLessonUrl: string | null
+  nextLessonTitle?: string | null   // title of the next lesson, for the completion CTA
   globalOrder: number       // 1-indexed global curriculum position (1..90)
   moduleNumber: number      // 1-indexed module number (1..9)
   moduleName: string        // formatted module display name
@@ -90,9 +91,43 @@ function getBlocksForTab(blocks: CompiledBlock[], tab: TabType): CompiledBlock[]
 export function isTabUnlocked(tab: TabType, prog: LessonProgressV2 | null | undefined): boolean {
   if (tab === 'theory') return true
   if (!prog) return false
-  if (tab === 'quiz') return !!prog.theory_read_at
-  if (tab === 'flashcards' || tab === 'reflection') return prog.status === 'completed'
+  // Phase 3 (3.6): retrieval practice belongs *before* the quiz, not after "done".
+  // Flashcards unlock as soon as theory is read — consistent with the /review hub,
+  // which already surfaces cards for in-progress lessons. Reflection remains a
+  // post-completion activity and stays gated on lesson completion.
+  if (tab === 'quiz' || tab === 'flashcards') return !!prog.theory_read_at
+  if (tab === 'reflection') return prog.status === 'completed'
   return false
+}
+
+// ─── Phase 3 first-session helpers (exported for unit testing) ───────────────
+
+/**
+ * Phase 3 (3.2): whether a quiz submission response means the lesson is now complete.
+ * When true, the lesson shell renders the completion screen directly on quiz
+ * completion, so the learner is never stranded on the quiz tab after skipping the
+ * optional reflection.
+ */
+export function lessonCompletedFromQuiz(
+  res: { isCompleted?: boolean; success?: boolean } | null | undefined
+): boolean {
+  return !!res && (res.isCompleted === true || res.success === true)
+}
+
+/**
+ * Phase 3 (3.6): where finishing the flashcard deck should send the learner. Once
+ * flashcards can be reached before the quiz, advancing to a still-locked reflection
+ * tab would be wrong — send them to the quiz until the lesson is complete.
+ */
+export function flashcardsAdvanceTarget(isReflectionUnlocked: boolean): TabType {
+  return isReflectionUnlocked ? 'reflection' : 'quiz'
+}
+
+/**
+ * Phase 3 (3.3): the completion screen's primary CTA names the next lesson when known.
+ */
+export function nextLessonCtaLabel(nextLessonTitle: string | null | undefined): string {
+  return nextLessonTitle ? `Next Lesson: ${nextLessonTitle} →` : 'Continue to Next Lesson →'
 }
 
 // ─── Theory engagement tracker ───────────────────────────────────────────────
@@ -361,6 +396,7 @@ export default function LessonPageContent({
   lesson,
   prevLessonUrl,
   nextLessonUrl,
+  nextLessonTitle,
   globalOrder,
   moduleNumber,
   moduleName,
@@ -387,6 +423,8 @@ export default function LessonPageContent({
 
   const [activeTab, setActiveTab] = useState<TabType>(initialActiveTab)
   const [completedThisSession, setCompletedThisSession] = useState(false)
+  // Quiz score for the session, surfaced on the completion screen (Phase 3, 3.2/3.3).
+  const [sessionQuizScore, setSessionQuizScore] = useState<number | null>(null)
   const [theorySubmitting, setTheorySubmitting] = useState(false)
   const [theoryError, setTheoryError] = useState<string | null>(null)
   const [showFirstSessionCelebration, setShowFirstSessionCelebration] = useState(false)
@@ -457,8 +495,16 @@ export default function LessonPageContent({
       const res = await recordQuizAttempt(attempts)
       if (res) {
         trackQuizCompleted(lesson.id, res.score)
-        if (res.isCompleted || res.success) {
+        if (lessonCompletedFromQuiz(res)) {
           trackLessonCompleted(lesson.id, lesson.title, res.xpEarned)
+
+          // Phase 3 (3.2): the completion screen was previously reachable only via the
+          // optional reflection, so finishing the quiz and skipping reflection left the
+          // learner stranded on the quiz tab. Render it on quiz completion instead.
+          setSessionQuizScore(
+            typeof res.scorePercentage === 'number' ? res.scorePercentage : res.score ?? null
+          )
+          setCompletedThisSession(true)
 
           // Check if this was the learner's very first completed lesson
           if (res.isFirstLesson) {
@@ -511,7 +557,9 @@ export default function LessonPageContent({
 
   // Tab lock state
   const isQuizUnlocked = !!progress.theory_read_at
-  const isFlashcardsUnlocked = progress.status === 'completed'
+  // Phase 3 (3.6): flashcards unlock after theory is read (retrieval practice before the
+  // quiz), consistent with isTabUnlocked and the /review hub. Reflection stays post-completion.
+  const isFlashcardsUnlocked = !!progress.theory_read_at
   const isReflectionUnlocked = progress.status === 'completed'
 
   const handleTheoryComplete = async () => {
@@ -641,6 +689,11 @@ export default function LessonPageContent({
           <p className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
             You have mastered <strong>{lesson.title}</strong>. Your skill radar has been updated.
           </p>
+          {sessionQuizScore !== null && (
+            <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              You scored {sessionQuizScore}% on the practice quiz.
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-3">
@@ -649,7 +702,8 @@ export default function LessonPageContent({
               href={nextLessonUrl}
               className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow hover:bg-primary/95 transition-all"
             >
-              Continue to Next Lesson →
+              {/* Phase 3 (3.3): name the next lesson so the milestone points somewhere concrete. */}
+              {nextLessonCtaLabel(nextLessonTitle)}
             </Link>
           ) : (
             <div className="p-4 rounded-xl bg-amber-500/10 text-amber-700 border border-amber-500/20 text-sm font-bold">
@@ -797,7 +851,12 @@ export default function LessonPageContent({
             <LessonContextProvider
               lessonId={lesson.id}
               onAdvanceTab={(tab) => handleTabChange(tab)}
-              onFlashcardsComplete={() => handleTabChange('reflection')}
+              onFlashcardsComplete={() =>
+                // Flashcards can now be reached before the quiz (3.6). Only advance to
+                // reflection once it is actually unlocked (lesson completed); otherwise
+                // send the learner on to the quiz, the natural next step.
+                handleTabChange(flashcardsAdvanceTarget(isReflectionUnlocked))
+              }
             >
               <BlockTreeRenderer
                 blocks={getBlocksForTab(lesson.blocks, 'flashcards')}

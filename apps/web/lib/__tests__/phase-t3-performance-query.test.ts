@@ -6,6 +6,7 @@ import {
   recordBatchFlashcardReviews,
   getDueCardsCount,
 } from '../flashcards-service'
+import * as flashcardsService from '../flashcards-service'
 import { SystemService } from '../admin/system-service'
 import { processEmailQueue } from '../notifications/queue/processor'
 import { calculateSM2, SRSRating } from '../srs'
@@ -194,6 +195,13 @@ describe('Phase T3 — Performance & Query Architecture Suite', () => {
     it('processes records beyond the old 100 limit using keyset pagination with cursor and batch preferences', async () => {
       const { createServiceRoleClient } = await import('../supabase')
 
+      // Phase 1.6 — the daily reminder now passes the real due-card count and
+      // suppresses zero-due sends. Stub the SRS helper so this pagination test
+      // exercises eligible learners; restore it afterwards so T3.3 (which tests the
+      // real getDueCardsCount) is unaffected.
+      const dueCardsSpy = vi.spyOn(flashcardsService, 'getDueCardsCount').mockResolvedValue(4)
+      try {
+
       // Simulate 150 eligible users in the database
       const allEligibleUsers = Array.from({ length: 150 }, (_, i) => ({
         id: `user-${String(i).padStart(4, '0')}`,
@@ -283,6 +291,9 @@ describe('Phase T3 — Performance & Query Architecture Suite', () => {
       // Deterministic idempotency keys were generated for every user
       expect(enqueuedKeys.length).toBe(150)
       expect(enqueuedKeys[0]).toMatch(/^daily-reminder-user-0000-\d{4}-\d{2}-\d{2}$/)
+      } finally {
+        dueCardsSpy.mockRestore()
+      }
     })
   })
 

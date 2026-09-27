@@ -1821,6 +1821,7 @@ export type Database = {
           name: string | null
           onboarding_completed: boolean
           onboarding_preference: string | null
+          onboarding_step_reached: number | null
           onboarding_topics: string[]
           portfolio_layout: Json | null
           portfolio_verification_override: string | null
@@ -1861,6 +1862,7 @@ export type Database = {
           name?: string | null
           onboarding_completed?: boolean
           onboarding_preference?: string | null
+          onboarding_step_reached?: number | null
           onboarding_topics?: string[]
           portfolio_layout?: Json | null
           portfolio_verification_override?: string | null
@@ -1901,6 +1903,7 @@ export type Database = {
           name?: string | null
           onboarding_completed?: boolean
           onboarding_preference?: string | null
+          onboarding_step_reached?: number | null
           onboarding_topics?: string[]
           portfolio_layout?: Json | null
           portfolio_verification_override?: string | null

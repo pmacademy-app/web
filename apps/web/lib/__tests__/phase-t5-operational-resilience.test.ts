@@ -32,6 +32,13 @@ vi.mock('@/emails', () => ({
   })),
 }))
 
+// Phase 1.6 — the daily reminder now passes the REAL due-card count and suppresses
+// zero-due sends. Stub the SRS helper so the timezone/idempotency test below exercises
+// eligible learners (with due cards) rather than the suppression path.
+vi.mock('@/lib/flashcards-service', () => ({
+  getDueCardsCount: vi.fn(async () => 3),
+}))
+
 import { POST as handleWebhook } from '../../app/api/email/webhooks/route'
 import { GET as handleHealthCheck } from '../../app/api/health/route'
 import { POST as handleRetryFailed } from '../../app/api/cron/retry-failed/route'
@@ -748,18 +755,19 @@ describe('Phase T5 — Operational Resilience & Observability Test Suite', () =>
       const mockSupabase = {
         from: vi.fn((table: string) => {
           if (table === 'users') {
+            // Phase 1.3 — audience query no longer filters on current_streak; the
+            // chain is now select().not('email',...).order().limit(). last_streak_date
+            // is left unset so both learners read as "not active today" (eligible).
             return {
               select: () => ({
-                gt: () => ({
-                  not: () => ({
-                    order: () => ({
-                      limit: async () => ({
-                        data: [
-                          { id: 'user-tokyo', email: 'tokyo@example.com', name: 'Kenji', current_streak: 5 },
-                          { id: 'user-ny', email: 'ny@example.com', name: 'Sarah', current_streak: 3 },
-                        ],
-                        error: null,
-                      }),
+                not: () => ({
+                  order: () => ({
+                    limit: async () => ({
+                      data: [
+                        { id: 'user-tokyo', email: 'tokyo@example.com', name: 'Kenji', current_streak: 5, last_streak_date: null, timezone: 'Asia/Tokyo' },
+                        { id: 'user-ny', email: 'ny@example.com', name: 'Sarah', current_streak: 3, last_streak_date: null, timezone: 'America/New_York' },
+                      ],
+                      error: null,
                     }),
                   }),
                 }),

@@ -44,6 +44,11 @@ export const AUTOMATION_METADATA: Array<Omit<EmailAutomationMeta, 'enabled'>> = 
 
   // Deferred Post-Launch
   { key: 'inactive.resume_learning', name: 'Resume Learning', description: 'Re-engagement prompt for inactive learners (Deferred for launch).', category: 'Scheduled', isCritical: false, isDeferred: true },
+
+  // Phase 1.5 — Lifecycle Reactivation Sequences (30% deterministic holdout)
+  { key: 'lifecycle.d1_never_started', name: 'D+1 Never Started', description: 'Nudges learners who signed up ~1 day ago but have not started any lesson.', category: 'Scheduled', isCritical: false },
+  { key: 'lifecycle.d3_started_not_finished', name: 'D+3 Started, Not Finished', description: 'Brings back learners who started ~3 days ago but have not completed the first milestone.', category: 'Scheduled', isCritical: false },
+  { key: 'lifecycle.streak_broken', name: 'Streak Broken Comeback', description: 'Reactivates previously-active learners whose streak broke and who have since gone quiet.', category: 'Scheduled', isCritical: false },
 ]
 
 export const DEFAULT_AUTOMATION_TOGGLES: Record<EmailAutomationKey, boolean> = {
@@ -59,6 +64,9 @@ export const DEFAULT_AUTOMATION_TOGGLES: Record<EmailAutomationKey, boolean> = {
   'learning.weekly_recap': true,
   'learning.daily_reminder': true,
   'inactive.resume_learning': false,
+  'lifecycle.d1_never_started': true,
+  'lifecycle.d3_started_not_finished': true,
+  'lifecycle.streak_broken': true,
 }
 
 export class EmailAutomationsService {
