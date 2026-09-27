@@ -17,10 +17,12 @@ import { describe, it, expect } from 'vitest'
 import {
   CORE_BLOCK_TYPES,
   DEEP_DIVE_BLOCK_TYPES,
+  CONTENT_AWARE_BLOCK_TYPES,
   TAB_BLOCK_TYPES,
   QUIZ_POOL_EXPECTED_SIZE,
   QUIZ_SAMPLE_SIZE,
   classifyBlock,
+  classifyBlocks,
   getCoreBlocks,
   getDeepDiveBlocks,
   estimateReadingMinutes,
@@ -110,22 +112,59 @@ function makeLesson(overrides: Partial<CompiledLesson> = {}): CompiledLesson {
 
 // ─── 4.1 — Classification ───────────────────────────────────────────────────
 
-describe('4.1 — Core / Deep-dive classification', () => {
-  it('places the plan-specified content blocks in Core', () => {
-    for (const t of ['learningObjectives', 'theory', 'mentalModel', 'keyTakeaways']) {
+describe('4.1 — Core / Deep-dive classification (importance-based)', () => {
+  it('places the conceptual-foundation blocks in Core — including framework & common mistakes', () => {
+    for (const t of [
+      'learningObjectives', 'theory', 'mentalModel', 'framework', 'commonMistakes',
+      'keyTakeaways', 'summary',
+    ]) {
       expect(classifyBlock({ type: t })).toBe('core')
       expect(CORE_BLOCK_TYPES.has(t)).toBe(true)
     }
   })
 
-  it('places the plan-specified extended blocks in Deep-dive', () => {
+  it('places genuinely-optional depth in Deep-dive (framework/commonMistakes/mermaid are NOT here)', () => {
     for (const t of [
       'caseStudy', 'companyExample', 'realWorldPerspective', 'interviewPerspective',
-      'framework', 'cheatSheet', 'glossary', 'resources', 'connections', 'commonMistakes', 'mermaid',
+      'cheatSheet', 'glossary', 'resources', 'connections',
     ]) {
       expect(classifyBlock({ type: t })).toBe('deepDive')
       expect(DEEP_DIVE_BLOCK_TYPES.has(t)).toBe(true)
     }
+    // Regression against the first implementation: these must no longer be Deep-dive-by-type.
+    for (const t of ['framework', 'commonMistakes', 'mermaid']) {
+      expect(DEEP_DIVE_BLOCK_TYPES.has(t)).toBe(false)
+    }
+  })
+
+  it('treats mermaid as content-aware, defaulting to Core (essential diagrams stay in Core)', () => {
+    expect(CONTENT_AWARE_BLOCK_TYPES.has('mermaid')).toBe(true)
+    // A lone mermaid with no context defaults to Core.
+    expect(classifyBlock({ type: 'mermaid' })).toBe('core')
+  })
+
+  it('an explicit depth override wins over the generic type default (both directions)', () => {
+    // A case study pinned to Core.
+    expect(classifyBlock({ type: 'caseStudy', depth: 'core' })).toBe('core')
+    // A theory block pinned to Deep-dive.
+    expect(classifyBlock({ type: 'theory', depth: 'deepDive' })).toBe('deepDive')
+  })
+
+  it('mermaid inherits the group of the content it accompanies', () => {
+    const blocks = [
+      block('framework', { name: 'F', children: [block('paragraph', { text: 'x' })] }),
+      block('mermaid', { source: 'graph TD; A-->B' }), // accompanies the framework → Core
+      block('caseStudy', { title: 'C', children: [block('paragraph', { text: 'y' })] }),
+      block('mermaid', { source: 'graph TD; C-->D' }), // accompanies the case study → Deep-dive
+    ]
+    const groups = classifyBlocks(blocks)
+    expect(groups).toEqual(['core', 'core', 'deepDive', 'deepDive'])
+    // And an override still wins even for a mermaid.
+    const pinned = classifyBlocks([
+      block('caseStudy', { title: 'C' }),
+      block('mermaid', { source: 'x', depth: 'core' }),
+    ])
+    expect(pinned).toEqual(['deepDive', 'core'])
   })
 
   it('keeps quiz / flashcards / reflection as their own tabs, in neither content group', () => {
@@ -146,15 +185,17 @@ describe('4.1 — Core / Deep-dive classification', () => {
     }
   })
 
-  it('splits a lesson into a non-empty Core and a non-empty Deep-dive', () => {
+  it('splits a lesson into a conceptually-complete Core and a non-empty optional Deep-dive', () => {
     const lesson = makeLesson()
-    const core = getCoreBlocks(lesson.blocks)
-    const deep = getDeepDiveBlocks(lesson.blocks)
+    const core = getCoreBlocks(lesson.blocks).map((b) => b.type)
+    const deep = getDeepDiveBlocks(lesson.blocks).map((b) => b.type)
     expect(core.length).toBeGreaterThan(0)
     expect(deep.length).toBeGreaterThan(0)
-    // Core must not be the whole lesson: the heavy example material is deferred.
-    expect(core.map((b) => b.type)).not.toContain('caseStudy')
-    expect(deep.map((b) => b.type)).toContain('caseStudy')
+    // Core is conceptually complete: theory, model, framework, pitfalls, takeaways.
+    expect(core).toEqual(expect.arrayContaining(['theory', 'mentalModel', 'framework', 'commonMistakes', 'keyTakeaways']))
+    // Optional depth is deferred, not deleted.
+    expect(deep).toEqual(expect.arrayContaining(['caseStudy', 'companyExample', 'interviewPerspective']))
+    expect(core).not.toContain('caseStudy')
   })
 })
 
@@ -163,13 +204,18 @@ describe('4.1 — Core / Deep-dive classification', () => {
 describe('Rendering — getBlocksForTab respects the variant', () => {
   const lesson = makeLesson()
 
-  it('treatment theory tab renders ONLY Core (never the whole lesson)', () => {
+  it('treatment theory tab renders the complete Core, deferring only optional depth', () => {
     const rendered = getBlocksForTab(lesson.blocks, 'theory', 'treatment')
     const types = rendered.map((b) => b.type)
+    // Conceptual foundation present, including framework & the concept diagram.
     expect(types).toContain('theory')
+    expect(types).toContain('framework')
+    expect(types).toContain('commonMistakes')
+    expect(types).toContain('mermaid')
     expect(types).toContain('keyTakeaways')
+    // Optional depth deferred to the Deep-dive section.
     expect(types).not.toContain('caseStudy')
-    expect(types).not.toContain('mermaid')
+    expect(types).not.toContain('companyExample')
     expect(types).not.toContain('quiz')
     expect(rendered.length).toBe(getCoreBlocks(lesson.blocks).length)
   })
