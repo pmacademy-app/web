@@ -54,7 +54,20 @@ import {
   type LifecycleUserSnapshot,
 } from '../notifications/lifecycle/segments'
 
-const CRON_HEADERS = { Authorization: 'Bearer test-cron-secret' }
+const TEST_CRON_SECRET = 'test-cron-secret'
+const CRON_HEADERS = { Authorization: `Bearer ${TEST_CRON_SECRET}` }
+
+// Pin CRON_SECRET so this suite is hermetic. The cron routes exercised below
+// (daily-reminder, weekly-recap, lifecycle) authenticate the caller against
+// process.env.CRON_SECRET, and every request here presents TEST_CRON_SECRET. The
+// shared vitest setup only falls back to this value when CRON_SECRET is unset — but CI
+// injects a real CRON_SECRET as a job-level secret, so without pinning it here the
+// ambient value would win and every cron request would 401 (yielding an error body with
+// no `remindersQueued`). Establishing it per-test matches the other cron suites
+// (b7a/b7b/b7c) and keeps the production auth check itself untouched.
+beforeEach(() => {
+  process.env.CRON_SECRET = TEST_CRON_SECRET
+})
 
 /** Keyset-aware `users` query builder mock: supports select().not().[gt(id)].order().limit(). */
 function usersBuilder(usersArr: Array<Record<string, unknown>>) {
