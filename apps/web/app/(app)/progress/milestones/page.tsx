@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser, type UserProfile } from '@/lib/auth'
+import { getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { resolvePersonalizedPath, resolveNextRecommendedMilestone } from '@/lib/personalization/path-resolver'
 import { RecommendedActionCard } from '@/components/progress/RecommendedActionCard'
@@ -27,7 +27,7 @@ export default async function MilestoneProgressPage() {
 
   const [
     { data: progressRows },
-    { data: personalizationRow },
+    personalizationRow,
     curriculum,
   ] = await Promise.all([
     (supabase
@@ -36,11 +36,8 @@ export default async function MilestoneProgressPage() {
       .eq('user_id', user.id) as unknown as Promise<{
       data: Array<{ lesson_id: string; status: 'not_started' | 'in_progress' | 'completed' }> | null
     }>,
-    (supabase
-      .from('users') as unknown as DBChain)
-      .select('goal, career_role, onboarding_topics, onboarding_preference, learning_purpose')
-      .eq('id', user.id)
-      .maybeSingle() as unknown as Promise<{ data: Pick<UserProfile, 'goal' | 'career_role' | 'onboarding_topics' | 'onboarding_preference' | 'learning_purpose'> | null }>,
+    // Reuses the layout's memoized users SELECT instead of re-querying the row.
+    getCurrentUserProfile(),
     fetchCurriculumData().catch(() => null),
   ])
 

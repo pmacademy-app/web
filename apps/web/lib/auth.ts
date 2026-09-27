@@ -1,7 +1,7 @@
 import { SupabaseClient, User } from '@supabase/supabase-js'
 import type { Database } from '@/lib/supabase'
 import { cookies } from 'next/headers'
-import { createAuthenticatedServerClient } from './supabase'
+import { createAuthenticatedServerClient, createServiceRoleClient } from './supabase'
 import { globalNotificationDispatcher } from './notifications/dispatcher'
 import { initializeNotificationConnectors } from './notifications/events/connectors'
 import { consentFromAuthMetadata, type ConsentRecord } from './legal/consent'
@@ -166,6 +166,37 @@ async function resolveServerUser(): Promise<User | null> {
  * Memoized per server-request lifecycle using React cache().
  */
 export const getServerUser = cache(resolveServerUser)
+
+/**
+ * Loads the authenticated user's `public.users` profile row.
+ *
+ * Memoized per server-request lifecycle via React cache(), so the shared
+ * `(app)` layout and the page rendered beneath it collapse into a SINGLE
+ * `users` SELECT instead of each issuing their own duplicate round-trip.
+ *
+ * Reads through the RLS-scoped authenticated client when an access token is
+ * present (matching the layout's existing defense-in-depth), falling back to
+ * the service-role client otherwise. Returns null when unauthenticated or the
+ * row does not yet exist — callers own the ensureUserProfile() bootstrap path.
+ */
+export const getCurrentUserProfile = cache(async (): Promise<UserProfile | null> => {
+  const authUser = await getServerUser()
+  if (!authUser) return null
+
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('sb-access-token')?.value
+  const supabase = accessToken
+    ? createAuthenticatedServerClient(accessToken)
+    : createServiceRoleClient()
+
+  const { data } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', authUser.id)
+    .maybeSingle()
+
+  return (data as UserProfile | null) ?? null
+})
 
 const requestAuthCache = new WeakMap<Request, Promise<User | null>>()
 

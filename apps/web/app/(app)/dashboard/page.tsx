@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
+import { ensureUserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { fetchCurriculumData } from '@/lib/lesson-loader'
 import { getUserStreakStatus } from '@/lib/streaks-db'
 import { getReviewQueueData } from '@/lib/flashcards-service'
@@ -31,9 +31,11 @@ export default async function DashboardPage() {
 
   const supabase = createServiceRoleClient()
 
-  // Parallel data fetching with lean column projection
+  // Parallel data fetching with lean column projection.
+  // The users profile comes from the request-memoized resolver so it reuses the
+  // SELECT already issued by the (app) layout instead of duplicating it.
   const [
-    { data: dbProfile, error: dbError },
+    dbProfile,
     { data: progressRows },
     curriculum,
     streakStatus,
@@ -41,11 +43,7 @@ export default async function DashboardPage() {
     { data: capstoneRows },
     { data: recentXpEvents },
   ] = await Promise.all([
-    (supabase
-      .from('users') as unknown as DBChain)
-      .select('*')
-      .eq('id', authUser.id)
-      .maybeSingle() as unknown as Promise<{ data: UserProfile | null; error: { message: string } | null }>,
+    getCurrentUserProfile(),
     (supabase
       .from('user_lesson_progress') as unknown as DBChain)
       .select('lesson_id, status')
@@ -71,11 +69,7 @@ export default async function DashboardPage() {
     }>,
   ])
 
-  let profile = dbProfile as UserProfile | null
-
-  if (dbError) {
-    console.error('[dashboard] Error loading database profile:', dbError.message)
-  }
+  let profile = dbProfile
 
   if (!profile) {
     profile = await ensureUserProfile(supabase, authUser)

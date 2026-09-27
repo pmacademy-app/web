@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createAuthenticatedServerClient, createServiceRoleClient } from '@/lib/supabase'
-import { ensureUserProfile, UserProfile, getServerUser } from '@/lib/auth'
+import { createServiceRoleClient } from '@/lib/supabase'
+import { ensureUserProfile, UserProfile, getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { SettingsService } from '@/lib/admin/settings-service'
 import AppShell from '@/components/layout/AppShell'
 import { BreadcrumbProvider } from '@/contexts/breadcrumb-context'
@@ -26,24 +25,15 @@ export default async function AuthenticatedLayout({
     redirect('/login')
   }
 
-  const cookieStore = await cookies()
-  const accessToken = cookieStore.get('sb-access-token')?.value
-  const supabase = accessToken ? createAuthenticatedServerClient(accessToken) : createServiceRoleClient()
-
   // Enforce email verification requirement when enabled
   const isVerificationRequired = await SettingsService.isEmailVerificationRequired()
   if (isVerificationRequired && !authUser.email_confirmed_at) {
     redirect('/login?error=email_not_confirmed')
   }
 
-  // Fetch the public.users record
-  const { data: dbProfile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', authUser.id)
-    .maybeSingle()
-
-  let profile = dbProfile as UserProfile | null
+  // Fetch the public.users record via the request-memoized resolver so the page
+  // rendered beneath this layout reuses the same SELECT instead of duplicating it.
+  let profile = await getCurrentUserProfile()
 
   // Initialize profile if not found
   if (!profile) {

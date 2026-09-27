@@ -42,6 +42,12 @@ export function useLessonProgressV2(lessonId: string, initialProgress?: LessonPr
     {
       fallbackData: initialProgress ?? undefined,
       revalidateOnFocus: true,
+      // The lesson server component already fetched this exact progress row for
+      // the same request and passed it as initialProgress, so the default SWR
+      // on-mount revalidation is a redundant GET (an extra serverless invocation
+      // + DB read on every lesson open). Skip it when we have server data; focus
+      // revalidation and post-action mutate() keep the client in sync afterward.
+      revalidateOnMount: initialProgress ? false : undefined,
     }
   )
 

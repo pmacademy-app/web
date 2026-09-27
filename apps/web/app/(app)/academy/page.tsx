@@ -16,7 +16,7 @@ import {
   Check,
 } from 'lucide-react'
 import { createServiceRoleClient } from '@/lib/supabase'
-import { getServerUser } from '@/lib/auth'
+import { getServerUser, getCurrentUserProfile } from '@/lib/auth'
 import { BRAND } from '@/lib/brand'
 import { resolvePersonalizedPath } from '@/lib/personalization/path-resolver'
 import { resolveModuleCtaTarget } from '@/lib/curriculum-access'
@@ -57,23 +57,20 @@ export default async function AcademyPage() {
   let personalizedPath = resolvePersonalizedPath(null)
   if (user) {
     const supabase = createServiceRoleClient()
-    const [{ data: rows }, { data: dbUser }] = await Promise.all([
+    // dbUser reuses the layout's memoized users SELECT rather than re-querying it.
+    const [{ data: rows }, dbUser] = await Promise.all([
       supabase
         .from('user_lesson_progress')
         .select('lesson_id')
         .eq('user_id', user.id)
         .eq('status', 'completed'),
-      supabase
-        .from('users')
-        .select('goal, career_role, onboarding_topics, onboarding_preference, learning_purpose')
-        .eq('id', user.id)
-        .maybeSingle(),
+      getCurrentUserProfile(),
     ])
     if (rows) {
       completedSet = new Set((rows as { lesson_id: string }[]).map((r) => r.lesson_id))
     }
     if (dbUser) {
-      personalizedPath = resolvePersonalizedPath(dbUser as Parameters<typeof resolvePersonalizedPath>[0])
+      personalizedPath = resolvePersonalizedPath(dbUser)
     }
   }
 
