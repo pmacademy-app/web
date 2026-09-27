@@ -183,6 +183,65 @@ export function computeCompletedLessonDistribution(
   }
 }
 
+// ─── Deep-dive engagement (Plan Phase 4, §4.4) ───────────────────────────────
+
+/**
+ * Progress row shape for deep-dive counting. Declared locally (rather than reusing
+ * `BaselineProgressRow`) so the funnel can read the Phase 4 `deep_dive_opened_at` marker
+ * without widening the shared baseline type, which is unit-tested against its own fixtures.
+ */
+export interface DeepDiveProgressRow {
+  user_id: string | null
+  status: string
+  deep_dive_opened_at: string | null
+}
+
+export interface DeepDiveEngagement {
+  /** Learners who have opened ≥1 lesson (a progress row exists). */
+  learnersWhoOpenedLesson: number
+  /** Learners who opened the Deep-dive on ≥1 lesson. */
+  learnersWhoOpenedDeepDive: number
+  /** Share of lesson-openers who opened a Deep-dive — the §4.4 guardrail. */
+  pctOfOpeners: number
+  /** Total lessons on which a Deep-dive was opened (marker set). */
+  lessonsWithDeepDiveOpened: number
+}
+
+/**
+ * How many learners engage with the optional Deep-dive material.
+ *
+ * IMPLEMENTATION_PLAN.md §4.4 requires depth consumption to be "observable rather than
+ * assumed", and §"Phase 4 → Guardrails" warns that a near-zero Deep-dive open rate means
+ * "the depth that is Prodily's differentiator is being abandoned" — a strategic loss even
+ * if activation improves. This computes the guardrail from the persisted first-open marker
+ * (`deep_dive_opened_at`), consent-independent per correction C2. Rows for users no longer
+ * present are ignored so a deleted account cannot inflate the count.
+ */
+export function computeDeepDiveEngagement(
+  progress: DeepDiveProgressRow[],
+  knownUserIds: Set<string>
+): DeepDiveEngagement {
+  const openers = new Set<string>()
+  const deepDivers = new Set<string>()
+  let lessonsWithDeepDive = 0
+
+  for (const row of progress) {
+    if (!row.user_id || !knownUserIds.has(row.user_id)) continue
+    openers.add(row.user_id)
+    if (row.deep_dive_opened_at) {
+      deepDivers.add(row.user_id)
+      lessonsWithDeepDive++
+    }
+  }
+
+  return {
+    learnersWhoOpenedLesson: openers.size,
+    learnersWhoOpenedDeepDive: deepDivers.size,
+    pctOfOpeners: pct(deepDivers.size, openers.size),
+    lessonsWithDeepDiveOpened: lessonsWithDeepDive,
+  }
+}
+
 // ─── The assembled activation funnel view ────────────────────────────────────
 
 export interface VerificationStage {
@@ -216,6 +275,8 @@ export interface ActivationFunnelView {
   reviewPctOfOpeners: number
   capstone: BaselineCapstoneReality
   continued: CompletedLessonDistribution
+  /** Phase 4 (§4.4): optional Deep-dive engagement among lesson-openers. */
+  deepDive: DeepDiveEngagement
   failed?: boolean
 }
 
